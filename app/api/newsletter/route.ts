@@ -24,7 +24,7 @@ function getSql() {
   const databaseUrl = getDatabaseUrl()
   
   sqlClient = postgres(databaseUrl, {
-    ssl: shouldUseSsl(databaseUrl) ? 'require' : false,
+    ssl: 'prefer',
     max: 1,
     prepare: false,
     idle_timeout: 10,
