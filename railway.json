@@ -1,0 +1,23 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "services": {
+    "zooming-youth": {
+      "build": {
+        "builder": "DOCKERFILE",
+        "dockerfilePath": "Dockerfile.backend"
+      },
+      "deploy": {
+        "startCommand": "uvicorn src.api.main:app --host 0.0.0.0 --port 8000"
+      }
+    },
+    "frontend": {
+      "build": {
+        "builder": "DOCKERFILE",
+        "dockerfilePath": "Dockerfile.frontend"
+      },
+      "deploy": {
+        "startCommand": "node server.js"
+      }
+    }
+  }
+}
