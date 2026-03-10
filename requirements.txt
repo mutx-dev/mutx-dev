@@ -39,6 +39,8 @@ numpy==1.26.3
 pyyaml==6.0.1
 python-dotenv==1.0.1
 hvac==2.1.0
+prometheus-client==0.19.0
+
 
 # Utilities
 python-dateutil==2.8.2
