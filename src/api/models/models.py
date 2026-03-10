@@ -1,0 +1,240 @@
+import uuid
+from datetime import datetime
+from typing import Optional
+from sqlalchemy import Boolean, DateTime, Enum as SQLEnum, Float, ForeignKey, Integer, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects.postgresql import UUID, ARRAY as PG_ARRAY
+import enum
+
+from src.api.database import Base
+
+
+def ARRAY(type_):
+    """
+    Polymorphic ARRAY type that works with both PostgreSQL and SQLite (as JSON string).
+    """
+    from sqlalchemy.types import TypeDecorator, TEXT
+    import json
+
+    class ArrayType(TypeDecorator):
+        impl = TEXT
+        cache_ok = True
+
+        def load_dialect_impl(self, dialect):
+            if dialect.name == "postgresql":
+                return dialect.type_descriptor(PG_ARRAY(type_))
+            else:
+                return dialect.type_descriptor(TEXT())
+
+        def process_bind_param(self, value, dialect):
+            if value is None:
+                return None
+            if dialect.name == "postgresql":
+                return value
+            return json.dumps(value)
+
+        def process_result_value(self, value, dialect):
+            if value is None:
+                return None
+            if dialect.name == "postgresql":
+                return value
+            return json.loads(value)
+
+    return ArrayType()
+
+
+class Plan(str, enum.Enum):
+    FREE = "free"
+    STARTER = "starter"
+    PRO = "pro"
+    ENTERPRISE = "enterprise"
+
+
+class AgentType(str, enum.Enum):
+    OPENAI = "openai"
+    ANTHROPIC = "anthropic"
+    LANGCHAIN = "langchain"
+    CUSTOM = "custom"
+
+
+class AlertType(str, enum.Enum):
+    CPU_HIGH = "cpu_high"
+    MEMORY_HIGH = "memory_high"
+    AGENT_DOWN = "agent_down"
+    DEPLOYMENT_FAILED = "deployment_failed"
+    QUOTA_EXCEEDED = "quota_exceeded"
+
+
+class AgentStatus(str, enum.Enum):
+    CREATING = "creating"
+    RUNNING = "running"
+    STOPPED = "stopped"
+    FAILED = "failed"
+    DELETING = "deleting"
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=True)
+    plan: Mapped[Plan] = mapped_column(SQLEnum(Plan), default=Plan.FREE)
+    api_key: Mapped[str] = mapped_column(String(64), unique=True, nullable=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Email verification fields
+    is_email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    email_verification_token: Mapped[str] = mapped_column(String(255), nullable=True, index=True)
+    email_verified_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    # Password reset fields
+    password_reset_token: Mapped[str] = mapped_column(String(255), nullable=True, index=True)
+    password_reset_expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+
+    agents: Mapped[list["Agent"]] = relationship("Agent", back_populates="user", cascade="all, delete-orphan")
+    api_keys: Mapped[list["APIKey"]] = relationship("APIKey", back_populates="user", cascade="all, delete-orphan")
+    webhooks: Mapped[list["Webhook"]] = relationship("Webhook", back_populates="user", cascade="all, delete-orphan")
+
+
+class Agent(Base):
+    __tablename__ = "agents"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    type: Mapped[AgentType] = mapped_column(SQLEnum(AgentType), default=AgentType.OPENAI)
+    config: Mapped[str] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(50), default="creating")
+    api_key: Mapped[str] = mapped_column(String(128), nullable=True, index=True)  # Agent API key for self-auth
+    last_heartbeat: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user: Mapped["User"] = relationship("User", back_populates="agents")
+    deployments: Mapped[list["Deployment"]] = relationship("Deployment", back_populates="agent", cascade="all, delete-orphan")
+    metrics: Mapped[list["Metrics"]] = relationship("Metrics", back_populates="agent", cascade="all, delete-orphan")
+    alerts: Mapped[list["Alert"]] = relationship("Alert", back_populates="agent", cascade="all, delete-orphan")
+    logs: Mapped[list["AgentLog"]] = relationship("AgentLog", back_populates="agent", cascade="all, delete-orphan")
+    agent_metrics: Mapped[list["AgentMetric"]] = relationship("AgentMetric", back_populates="agent", cascade="all, delete-orphan")
+
+
+class Deployment(Base):
+    __tablename__ = "deployments"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    agent_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(50), default="pending")
+    region: Mapped[str] = mapped_column(String(50), nullable=True)
+    version: Mapped[str] = mapped_column(String(50), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    replicas: Mapped[int] = mapped_column(Integer, default=1)
+    node_id: Mapped[str] = mapped_column(String(255), nullable=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    ended_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    error_message: Mapped[str] = mapped_column(Text, nullable=True)
+
+    agent: Mapped["Agent"] = relationship("Agent", back_populates="deployments")
+
+
+class APIKey(Base):
+    __tablename__ = "api_keys"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    key_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    last_used: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    user: Mapped["User"] = relationship("User", back_populates="api_keys")
+
+
+class Webhook(Base):
+    __tablename__ = "webhooks"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    url: Mapped[str] = mapped_column(String(512), nullable=False)
+    events: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
+    secret: Mapped[str] = mapped_column(String(255), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    user: Mapped["User"] = relationship("User", back_populates="webhooks")
+
+
+class Metrics(Base):
+    __tablename__ = "metrics"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    agent_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True)
+    cpu: Mapped[float] = mapped_column(Float, nullable=True)
+    memory: Mapped[float] = mapped_column(Float, nullable=True)
+    requests: Mapped[int] = mapped_column(Integer, default=0)
+    latency: Mapped[float] = mapped_column(Float, nullable=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+    agent: Mapped["Agent"] = relationship("Agent", back_populates="metrics")
+
+
+class Alert(Base):
+    __tablename__ = "alerts"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    agent_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True)
+    type: Mapped[AlertType] = mapped_column(SQLEnum(AlertType), nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    resolved: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    resolved_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+
+    agent: Mapped["Agent"] = relationship("Agent", back_populates="alerts")
+
+
+class AgentLog(Base):
+    __tablename__ = "agent_logs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    agent_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True)
+    level: Mapped[str] = mapped_column(String(20), default="info")
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    extra_data: Mapped[str] = mapped_column(Text, nullable=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+    agent: Mapped["Agent"] = relationship("Agent", back_populates="logs")
+
+
+class AgentMetric(Base):
+    __tablename__ = "agent_metrics"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    agent_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True)
+    cpu_usage: Mapped[float] = mapped_column(Float, nullable=True)
+    memory_usage: Mapped[float] = mapped_column(Float, nullable=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+    agent: Mapped["Agent"] = relationship("Agent", back_populates="agent_metrics")
+
+
+class WebhookDeliveryLog(Base):
+    """Log of webhook delivery attempts"""
+    __tablename__ = "webhook_delivery_logs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    webhook_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("webhooks.id"), nullable=False, index=True)
+    event: Mapped[str] = mapped_column(String(100), nullable=False)
+    payload: Mapped[str] = mapped_column(Text, nullable=False)
+    status_code: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    response_body: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    success: Mapped[bool] = mapped_column(Boolean, default=False)
+    error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    attempts: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    delivered_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    webhook: Mapped["Webhook"] = relationship("Webhook")

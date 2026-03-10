@@ -1,0 +1,42 @@
+name: Feature request
+description: Propose a change grounded in a real user or maintainer need.
+title: "feat: "
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - web
+        - api
+        - cli
+        - sdk
+        - docs
+        - infra
+        - testing
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Explain the user, operator, or maintainer pain.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the smallest useful version of the idea.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Mention any simpler or different approaches you considered.
+  - type: textarea
+    id: scope
+    attributes:
+      label: Likely scope
+      description: Files, surfaces, or docs that may need to change.

@@ -1,0 +1,5 @@
+skip_list:
+  - yaml[line-length]
+exclude_paths:
+  - .venv/
+  - node_modules/

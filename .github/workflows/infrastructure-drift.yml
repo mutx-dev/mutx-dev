@@ -1,0 +1,102 @@
+name: Infrastructure Drift Detection
+
+on:
+  schedule:
+    - cron: "30 5 * * *" # daily 05:30 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  terraform-drift:
+    name: Terraform drift (${{ matrix.environment }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [staging, production]
+
+    env:
+      TF_IN_AUTOMATION: "true"
+      TF_VAR_do_token: ${{ secrets.DO_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.TF_STATE_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.TF_STATE_SECRET_ACCESS_KEY }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        run: |
+          missing=0
+          for var in TF_VAR_do_token AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
+            if [ -z "${!var}" ]; then
+              echo "::error::Missing secret/env: $var"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform init (remote backend)
+        run: |
+          terraform -chdir=infrastructure/terraform init \
+            -reconfigure \
+            -backend-config=environments/${{ matrix.environment }}/backend.hcl
+
+      - name: Terraform plan (drift check)
+        id: plan
+        shell: bash
+        run: |
+          set +e
+          terraform -chdir=infrastructure/terraform plan \
+            -detailed-exitcode \
+            -var-file=environments/${{ matrix.environment }}/terraform.tfvars \
+            -out=tfplan-${{ matrix.environment }}.bin
+          exit_code=$?
+          set -e
+
+          if [ "$exit_code" -eq 1 ]; then
+            echo "Terraform plan failed"
+            exit 1
+          fi
+
+          if [ "$exit_code" -eq 2 ]; then
+            echo "drift=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Drift detected in ${{ matrix.environment }}"
+          else
+            echo "drift=false" >> "$GITHUB_OUTPUT"
+            echo "No drift detected in ${{ matrix.environment }}"
+          fi
+
+      - name: Render human-readable plan
+        if: always()
+        run: |
+          if [ -f infrastructure/terraform/tfplan-${{ matrix.environment }}.bin ]; then
+            terraform -chdir=infrastructure/terraform show -no-color \
+              tfplan-${{ matrix.environment }}.bin > tfplan-${{ matrix.environment }}.txt
+          else
+            echo "No plan output was generated" > tfplan-${{ matrix.environment }}.txt
+          fi
+
+      - name: Upload plan artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-${{ matrix.environment }}
+          path: |
+            infrastructure/terraform/tfplan-${{ matrix.environment }}.bin
+            infrastructure/terraform/tfplan-${{ matrix.environment }}.txt
+
+      - name: Fail on drift
+        if: steps.plan.outputs.drift == 'true'
+        run: |
+          echo "Terraform drift detected in ${{ matrix.environment }}"
+          exit 1

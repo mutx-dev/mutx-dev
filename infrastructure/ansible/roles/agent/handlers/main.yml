@@ -1,0 +1,14 @@
+---
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: Restart agent
+  systemd:
+    name: "{{ systemd_unit_name }}"
+    state: restarted
+
+- name: Stop agent
+  systemd:
+    name: "{{ systemd_unit_name }}"
+    state: stopped

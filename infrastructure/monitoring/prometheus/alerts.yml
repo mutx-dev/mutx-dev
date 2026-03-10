@@ -1,0 +1,65 @@
+groups:
+  - name: mutx-core
+    rules:
+      - alert: MutxApiDown
+        expr: up{job="mutx-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MUTX API target is down"
+          description: "Prometheus cannot scrape mutx-api for more than 2 minutes."
+
+      - alert: HighApiP95Latency
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job="mutx-api"}[5m])) by (le)) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API p95 latency"
+          description: "MUTX API p95 latency is above 1s for 10 minutes."
+
+      - alert: RedisExporterDown
+        expr: up{job="redis-exporter"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis exporter is down"
+          description: "No Redis metrics for 5 minutes."
+
+      - alert: PostgresExporterDown
+        expr: up{job="postgres-exporter"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Postgres exporter is down"
+          description: "No Postgres metrics for 5 minutes."
+
+      - alert: NodeExporterDown
+        expr: up{job="node-exporter"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Node exporter is down"
+          description: "Host-level metrics are unavailable for 5 minutes."
+
+      - alert: HostHighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host memory usage is above 90%"
+          description: "Node memory pressure has stayed above 90% for 10 minutes."
+
+      - alert: HostDiskAlmostFull
+        expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay",mountpoint="/"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay",mountpoint="/"}) < 0.15
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Root filesystem is running low"
+          description: "Available space on / is below 15% for at least 15 minutes."

@@ -1,0 +1,228 @@
+---
+- name: Provision Agent Infrastructure
+  hosts: agents,monitoring
+  become: true
+  vars:
+    postgres_version: "15"
+    postgres_password: "{{ lookup('env', 'POSTGRES_PASSWORD') }}"
+    redis_password: "{{ lookup('env', 'REDIS_PASSWORD') }}"
+    tailscale_auth_key: "{{ lookup('env', 'TAILSCALE_AUTH_KEY') }}"
+    admin_cidr: "{{ lookup('env', 'ADMIN_CIDR') | default('0.0.0.0/0', true) }}"
+    private_cidr: "{{ lookup('env', 'PRIVATE_CIDR') | default('10.0.0.0/8', true) }}"
+    ufw_rules:
+      - rule: allow
+        port: "22"
+        src: "{{ admin_cidr }}"
+        comment: "SSH"
+      - rule: allow
+        port: "5432"
+        src: "{{ private_cidr }}"
+        comment: "PostgreSQL"
+      - rule: allow
+        port: "6379"
+        src: "{{ private_cidr }}"
+        comment: "Redis"
+      - rule: allow
+        port: "8080"
+        src: "{{ private_cidr }}"
+        comment: "Agent API"
+
+  tasks:
+    - name: Update apt cache
+      ansible.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install essential packages
+      ansible.apt:
+        name:
+          - curl
+          - wget
+          - gnupg2
+          - ca-certificates
+          - software-properties-common
+          - ufw
+          - fail2ban
+          - auditd
+          - python3-pip
+        state: present
+
+    - name: Include Docker role
+      ansible.builtin.include_role:
+        name: docker
+
+    - name: Validate required secrets are provided
+      ansible.builtin.assert:
+        that:
+          - postgres_password | length > 0
+          - redis_password | length > 0
+        fail_msg: "POSTGRES_PASSWORD and REDIS_PASSWORD must be set in the environment before provisioning"
+
+    - name: Configure PostgreSQL
+      block:
+        - name: Add PostgreSQL APT repository
+          ansible.builtin.apt_repository:
+            repo: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
+            state: present
+
+        - name: Install PostgreSQL
+          ansible.apt:
+            name: "postgresql-{{ postgres_version }}"
+            state: present
+
+        - name: Start PostgreSQL service
+          ansible.service:
+            name: postgresql
+            state: started
+            enabled: yes
+
+        - name: Create application database
+          become_user: postgres
+          postgresql_db:
+            name: agent_db
+            encoding: UTF-8
+
+        - name: Create application user
+          become_user: postgres
+          postgresql_user:
+            name: agent_user
+            password: "{{ postgres_password }}"
+            db: agent_db
+            priv: ALL
+
+        - name: Configure PostgreSQL listen addresses
+          lineinfile:
+            path: /etc/postgresql/{{ postgres_version }}/main/postgresql.conf
+            regexp: "^listen_addresses"
+            line: "listen_addresses = '*'"
+          notify: Restart PostgreSQL
+      when: "'agents' in group_names"
+
+    - name: Configure Redis
+      block:
+        - name: Install Redis
+          ansible.apt:
+            name: redis-server
+            state: present
+
+        - name: Configure Redis bind address
+          lineinfile:
+            path: /etc/redis/redis.conf
+            regexp: "^bind"
+            line: "bind 0.0.0.0"
+          notify: Restart Redis
+
+        - name: Configure Redis password
+          lineinfile:
+            path: /etc/redis/redis.conf
+            regexp: "^# requirepass"
+            line: "requirepass {{ redis_password }}"
+          notify: Restart Redis
+
+        - name: Start Redis service
+          ansible.service:
+            name: redis-server
+            state: started
+            enabled: yes
+      when: "'agents' in group_names"
+
+    - name: Install and configure Tailscale
+      block:
+        - name: Add Tailscale GPG key
+          ansible.builtin.apt_key:
+            url: https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }}/{{ ansible_distribution_version }}/no.gpg.key
+            state: present
+
+        - name: Add Tailscale repository
+          ansible.builtin.apt_repository:
+            repo: "deb https://pkgs.tailscale.com/stable/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main"
+            state: present
+
+        - name: Install Tailscale
+          ansible.apt:
+            name: tailscale
+            state: present
+
+        - name: Start Tailscale
+          command: tailscale up --auth-key {{ tailscale_auth_key }} --operator root
+          register: tailscale_up
+          failed_when: false
+
+        - name: Enable Tailscale service
+          systemd:
+            name: tailscaled
+            enabled: yes
+            state: started
+      when: tailscale_auth_key is defined and tailscale_auth_key != ""
+
+    - name: Configure UFW firewall
+      ufw:
+        state: enabled
+        policy: deny
+
+    - name: Add UFW rules
+      ufw:
+        rule: "{{ item.rule }}"
+        port: "{{ item.port }}"
+        from_ip: "{{ item.src | default(omit) }}"
+        comment: "{{ item.comment }}"
+      loop: "{{ ufw_rules }}"
+
+    - name: SSH hardening - Disable password authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^PasswordAuthentication"
+        line: "PasswordAuthentication no"
+      notify: Restart SSH
+
+    - name: SSH hardening - Disable root login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^PermitRootLogin"
+        line: "PermitRootLogin no"
+      notify: Restart SSH
+
+    - name: SSH hardening - Use only SSHv2
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^Protocol"
+        line: "Protocol 2"
+      notify: Restart SSH
+
+    - name: SSH hardening - Disable X11Forwarding
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^X11Forwarding"
+        line: "X11Forwarding no"
+      notify: Restart SSH
+
+    - name: Configure fail2ban
+      template:
+        src: fail2ban.j2
+        dest: /etc/fail2ban/jail.local
+      vars:
+        fail2ban_bantime: 3600
+        fail2ban_findtime: 600
+        fail2ban_maxretry: 3
+      notify: Restart fail2ban
+
+  handlers:
+    - name: Restart PostgreSQL
+      ansible.service:
+        name: postgresql
+        state: restarted
+
+    - name: Restart Redis
+      ansible.service:
+        name: redis-server
+        state: restarted
+
+    - name: Restart SSH
+      ansible.service:
+        name: sshd
+        state: restarted
+
+    - name: Restart fail2ban
+      ansible.service:
+        name: fail2ban
+        state: restarted

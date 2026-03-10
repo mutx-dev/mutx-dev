@@ -1,0 +1,29 @@
+[Unit]
+Description=mutx.dev Agent Service
+After=network-online.target docker.service
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory={{ agent_volume_path }}
+ExecStartPre=/usr/bin/docker rm -f {{ agent_name }} || true
+ExecStart=/usr/bin/docker run \
+    --name {{ agent_name }} \
+    --network agent_network \
+    --env-file /etc/{{ agent_name }}/env \
+    -v {{ agent_volume_path }}:/data \
+    -p {{ agent_port }}:8080 \
+    --memory={{ agent_memory_limit }} \
+    --cpu-period={{ agent_cpu_period }} \
+    --cpu-quota={{ agent_cpu_quota }} \
+    --restart={{ agent_container_restart_policy }} \
+    {{ agent_image }}
+ExecStop=/usr/bin/docker stop {{ agent_name }}
+
+User={{ agent_system_user }}
+Group={{ agent_system_user }}
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: {{ n8n_docker_image }}:{{ n8n_version }}
+    container_name: {{ n8n_docker_container_name }}
+    restart: always
+    ports:
+      - "{{ n8n_host }}:{{ n8n_port }}:5678"
+    environment:
+      - N8N_HOST={{ n8n_host }}
+      - N8N_PORT={{ n8n_port }}
+      - N8N_PROTOCOL=http
+      - N8N_BASE_URL=/
+      - N8N_ENCRYPTION_KEY={{ n8n_encryption_key }}
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=n8n_postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE={{ n8n_db_name }}
+      - DB_POSTGRESDB_USER={{ n8n_db_user }}
+      - DB_POSTGRESDB_PASSWORD={{ n8n_db_password }}
+      - EXECUTION_MODE={{ n8n_execution_mode }}
+      - GENERIC_TIMEZONE={{ n8n_timezone }}
+      {% if n8n_basic_auth_active | bool %}
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER={{ n8n_basic_auth_user }}
+      - N8N_BASIC_AUTH_PASSWORD={{ n8n_basic_auth_password }}
+      {% endif %}
+      {% if n8n_webhook_url %}
+      - WEBHOOK_URL={{ n8n_webhook_url }}
+      {% endif %}
+      {% if n8n_log_LEVEL %}
+      - N8N_LOG_LEVEL={{ n8n_log_LEVEL }}
+      {% endif %}
+    volumes:
+      - {{ n8n_data_path }}:/home/node/.n8n
+    networks:
+      - n8n_network
+    {% if n8n_ssl_enabled | bool %}
+    volumes:
+      - {{ n8n_ssl_path }}:/ssl
+    {% endif %}
+
+networks:
+  n8n_network:
+    external: true

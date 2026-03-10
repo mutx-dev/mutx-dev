@@ -1,0 +1,46 @@
+import { NextRequest, NextResponse } from 'next/server'
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
+async function getAuthToken(request: NextRequest): Promise<string | null> {
+  const token = request.cookies.get('access_token')?.value
+  if (token) return token
+  
+  const authHeader = request.headers.get('authorization')
+  if (authHeader?.startsWith('Bearer ')) {
+    return authHeader.substring(7)
+  }
+  
+  return null
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const token = await getAuthToken(request)
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { id } = await params
+
+    const response = await fetch(`${API_BASE_URL}/api-keys/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Failed to revoke API key' }))
+      return NextResponse.json(error, { status: response.status })
+    }
+
+    return new NextResponse(null, { status: 204 })
+  } catch (error) {
+    console.error('API key delete error:', error)
+    return NextResponse.json({ error: 'Failed to connect to API' }, { status: 500 })
+  }
+}
