@@ -82,7 +82,9 @@ export async function POST(request: Request) {
         to: normalizedEmail,
         replyTo: 'mario@mutx.dev',
         subject: "You're on the list! 🚀",
-        template: 'waitlist',
+        template: {
+          id: 'waitlist',
+        },
       })
 
       if (result.error) {
