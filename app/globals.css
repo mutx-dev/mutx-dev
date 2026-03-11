@@ -3,35 +3,13 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 3 3 7;
-    --foreground: 244 247 251;
-  }
-
-  * {
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
   body {
-    min-height: 100vh;
-    background-color: rgb(var(--background));
-    color: rgb(var(--foreground));
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    @apply bg-[#030307] text-slate-200 antialiased;
   }
+}
 
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  button, input, textarea, select {
-    font: inherit;
+@layer components {
+  .glass {
+    @apply border border-white/10 bg-black/40 backdrop-blur-xl;
   }
 }

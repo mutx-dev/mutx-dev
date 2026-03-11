@@ -8,24 +8,31 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: 'rgb(var(--background) / <alpha-value>)',
-        foreground: 'rgb(var(--foreground) / <alpha-value>)',
-        muted: 'rgb(var(--muted) / <alpha-value>)',
-        'muted-foreground': 'rgb(var(--muted-foreground) / <alpha-value>)',
-        border: 'rgb(var(--border) / <alpha-value>)',
-        input: 'rgb(var(--input) / <alpha-value>)',
-        ring: 'rgb(var(--ring) / <alpha-value>)',
-        surface: 'rgb(var(--surface) / <alpha-value>)',
-        'surface-elevated': 'rgb(var(--surface-elevated) / <alpha-value>)',
-        'surface-panel': 'rgb(var(--surface-panel) / <alpha-value>)',
-        'surface-overlay': 'rgb(var(--surface-overlay) / <alpha-value>)',
-        'surface-app': 'rgb(var(--surface-app) / <alpha-value>)',
-        'text-soft': 'rgb(var(--text-soft) / <alpha-value>)',
-        'text-faint': 'rgb(var(--text-faint) / <alpha-value>)',
-        primary: {
-          DEFAULT: 'rgb(var(--primary) / <alpha-value>)',
-          foreground: 'rgb(var(--primary-foreground) / <alpha-value>)',
+        background: '#030307',
+        surface: '#0a0a0f',
+        cyan: {
+          400: '#22d3ee',
+          500: '#06b6d4',
         },
+        amber: {
+          400: '#fbbf24',
+        },
+        emerald: {
+          400: '#34d399',
+        },
+        blue: {
+          600: '#2563eb',
+        },
+        slate: {
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#94a3b8',
+          500: '#64748b',
+          600: '#475569',
+        },
+      },
+      backgroundImage: {
+        'cinematic-noir': 'radial-gradient(ellipse at top, rgba(34, 211, 238, 0.15), transparent 50%), radial-gradient(ellipse at bottom_right, rgba(245, 158, 11, 0.1), transparent 40%), linear-gradient(180deg, #030307 0%, #0a0e17 100%)',
       },
       boxShadow: {
         panel: '0 20px 60px rgba(2, 6, 23, 0.34)',
