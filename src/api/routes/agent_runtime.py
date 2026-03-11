@@ -233,7 +233,7 @@ async def poll_commands(
     # Query pending commands
     # Command model currently missing in src/api/models
     return CommandsListResponse(commands=[])
-    
+
     query = select(Command).where(
         Command.agent_id == uuid.UUID(agent_id),
         Command.status == "pending",
@@ -271,7 +271,7 @@ async def acknowledge_command(
     """Acknowledge command execution."""
     # Command model currently missing
     return {"status": "ok", "message": "Command support pending"}
-    
+
     result = await db.execute(select(Command).where(Command.id == uuid.UUID(request.command_id)))
     command = result.scalar_one_or_none()
 
