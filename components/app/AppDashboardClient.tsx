@@ -19,50 +19,14 @@ import {
 } from 'lucide-react'
 
 import { Card } from '@/components/ui/Card'
+import { type components } from '@/app/types/api'
 
-type User = {
-  id: string
-  email: string
-  name: string
-  plan: string
-  is_email_verified: boolean
-}
-
-type Agent = {
-  id: string
-  name: string
-  status: string
-  description?: string | null
-  created_at: string
-}
-
-type Deployment = {
-  id: string
-  agent_id: string
-  status: string
-  replicas: number
-  started_at?: string | null
-}
-
-type ApiKey = {
-  id: string
-  name: string
-  created_at: string
-  expires_at?: string | null
-  is_active: boolean
-}
-
-type Health = {
-  status: string
-  database?: string
-  error?: string | null
-}
-
-type CreateKeyResponse = {
-  id: string
-  name: string
-  key: string
-}
+type User = components['schemas']['UserResponse']
+type Agent = components['schemas']['AgentResponse']
+type Deployment = components['schemas']['DeploymentResponse']
+type ApiKey = components['schemas']['APIKeyResponse']
+type Health = components['schemas']['HealthResponse']
+type CreateKeyResponse = components['schemas']['APIKeyCreateResponse']
 
 async function readJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
   const response = await fetch(input, { ...init, cache: 'no-store' })
