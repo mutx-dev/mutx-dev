@@ -77,7 +77,7 @@ mutx status
 
 | Command | Current issue |
 |--------|---------------|
-| `mutx deploy create` | still points at an older `/api/v1/...` route shape |
+| `mutx deploy create` | uses the live deploy route, but the backend currently ignores `--replicas` and starts with 1 replica |
 
 For those flows, prefer the live route behavior in code over older docs. `mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`.
 

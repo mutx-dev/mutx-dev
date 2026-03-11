@@ -52,7 +52,12 @@ def list_deployments(limit: int, skip: int, agent_id: Optional[str], status: Opt
 
 @deploy_group.command(name="create")
 @click.option("--agent-id", "-a", required=True, help="Agent ID to deploy")
-@click.option("--replicas", "-r", default=1, help="Number of replicas")
+@click.option(
+    "--replicas",
+    "-r",
+    default=1,
+    help="Requested replica count. Current backend deploy route always starts with 1 replica.",
+)
 def create_deployment(agent_id: str, replicas: int):
     """Create a new deployment"""
     config = CLIConfig()
@@ -71,6 +76,11 @@ def create_deployment(agent_id: str, replicas: int):
         result = response.json()
         click.echo(f"Created deployment: {result.get('deployment_id')}")
         click.echo(f"Status: {result.get('status')}")
+        if replicas != 1:
+            click.echo(
+                "Note: the current backend deploy route ignores --replicas and starts with 1 replica.",
+                err=True,
+            )
     elif response.status_code == 404:
         click.echo("Error: Agent not found", err=True)
     else:
