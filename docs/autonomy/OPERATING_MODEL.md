@@ -12,6 +12,7 @@ Ship a high volume of small, reviewed, testable changes every day without giving
 - keep changes small and file ownership clear
 - require review by a different agent than the author
 - stage before production for anything that changes contracts, auth, runtime, or infrastructure
+- enforce patch and changed-file guardrails so one autonomous pass stays small
 
 ## Lanes
 

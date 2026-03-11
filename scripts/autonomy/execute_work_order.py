@@ -8,12 +8,44 @@ import subprocess
 from pathlib import Path
 
 
+DEFAULT_MAX_CHANGED_FILES = 6
+
+
 def run(command: list[str], *, cwd: str | None = None, check: bool = True) -> subprocess.CompletedProcess[str]:
     return subprocess.run(command, cwd=cwd, check=check, text=True, capture_output=True)
 
 
 def git_output(args: list[str]) -> str:
     return run(["git", *args]).stdout.strip()
+
+
+def count_changed_files() -> int:
+    status = git_output(["status", "--short"])
+    return len([line for line in status.splitlines() if line.strip()])
+
+
+def write_guardrail_failure(reason: str, details: dict) -> None:
+    failure_path = Path(".autonomy/guardrail-failure.json")
+    failure_path.parent.mkdir(parents=True, exist_ok=True)
+    failure_path.write_text(json.dumps({"reason": reason, "details": details}, indent=2) + "\n")
+
+
+def enforce_repo_guardrails() -> None:
+    max_changed_files = int(
+        os.environ.get("AUTONOMY_MAX_CHANGED_FILES", str(DEFAULT_MAX_CHANGED_FILES))
+    )
+    changed_files = count_changed_files()
+    if changed_files > max_changed_files:
+        write_guardrail_failure(
+            "too_many_worktree_files",
+            {
+                "changed_files": changed_files,
+                "max_changed_files": max_changed_files,
+            },
+        )
+        raise RuntimeError(
+            f"Autonomous worktree touches {changed_files} files, exceeding AUTONOMY_MAX_CHANGED_FILES={max_changed_files}"
+        )
 
 
 def ensure_branch(branch: str, base_branch: str) -> None:
@@ -155,6 +187,7 @@ def main() -> int:
     exit_code = run_agent_command(work_order, brief_path)
     if exit_code != 0:
         return exit_code
+    enforce_repo_guardrails()
     maybe_open_pr(work_order, args.base_branch)
     return 0
 
