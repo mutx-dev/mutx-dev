@@ -17,7 +17,7 @@ class MutxClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.mutx.dev/v1",
+        base_url: str = "https://api.mutx.dev",
         timeout: float = 30.0,
     ):
         self.api_key = api_key
@@ -75,7 +75,7 @@ class MutxAsyncClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.mutx.dev/v1",
+        base_url: str = "https://api.mutx.dev",
         timeout: float = 30.0,
     ):
         self.api_key = api_key

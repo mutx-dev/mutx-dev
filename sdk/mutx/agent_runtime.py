@@ -83,7 +83,7 @@ class MutxAgentClient:
 
     def __init__(
         self,
-        mutx_url: str = "https://api.mutx.dev/v1",
+        mutx_url: str = "https://api.mutx.dev",
         api_key: Optional[str] = None,
         agent_id: Optional[str] = None,
         timeout: float = 30.0,
@@ -526,7 +526,7 @@ class MutxAgentSyncClient:
 
     def __init__(
         self,
-        mutx_url: str = "https://api.mutx.dev/v1",
+        mutx_url: str = "https://api.mutx.dev",
         api_key: Optional[str] = None,
         agent_id: Optional[str] = None,
         timeout: float = 30.0,
@@ -656,7 +656,7 @@ class MutxAgentSyncClient:
 
 # Convenience function for quick setup
 async def create_agent_client(
-    mutx_url: str = "https://api.mutx.dev/v1",
+    mutx_url: str = "https://api.mutx.dev",
     agent_name: str = "default-agent",
     agent_description: str = "",
     api_key: Optional[str] = None,
@@ -667,7 +667,7 @@ async def create_agent_client(
 
     Usage:
         client = await create_agent_client(
-            mutx_url="https://api.mutx.dev/v1",
+            mutx_url="https://api.mutx.dev",
             agent_name="my-agent",
         )
         client.start_heartbeat()
