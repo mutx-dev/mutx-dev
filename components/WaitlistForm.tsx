@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react'
 
 export function WaitlistForm() {
@@ -56,12 +57,12 @@ export function WaitlistForm() {
             onChange={(event) => setEmail(event.target.value)}
             placeholder="you@company.com"
             required
-            className="min-w-0 flex-1 rounded-full border border-white/10 bg-white/5 px-6 py-4 text-base text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+            className="min-w-0 flex-1 rounded-full border border-white/10 bg-white/5 px-5 py-3.5 text-base text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
           />
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-cyan-400 px-8 py-4 text-base font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-cyan-400 px-8 py-3.5 text-base font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? 'Joining...' : 'Get Early Access'}
             <ArrowRight className="h-5 w-5" />

@@ -31,6 +31,12 @@ const features = [
 export default function LandingPage() {
   return (
     <div className="relative min-h-screen bg-[#030307] text-slate-200">
+      {/* Background Cinematic Backdrop */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -left-[10%] -top-[10%] h-[40%] w-[40%] rounded-full bg-cyan-500/10 blur-[120px]" />
+        <div className="absolute right-[-10%] top-[20%] h-[30%] w-[30%] rounded-full bg-blue-600/10 blur-[120px]" />
+      </div>
+
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 backdrop-blur-md border-b border-white/5 bg-black/20">
         <div className="flex items-center gap-2">
@@ -38,6 +44,10 @@ export default function LandingPage() {
             <Image src="/logo-new.png" alt="mutx.dev" fill className="object-cover" />
           </div>
           <span className="text-xl font-bold tracking-tight text-white">mutx<span className="text-cyan-400">.dev</span></span>
+        </div>
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
+          <a href="#features" className="hover:text-white transition">Features</a>
+          <a href="#waitlist" className="hover:text-white transition">Waitlist</a>
         </div>
         <div className="flex items-center gap-4">
           <a href="https://github.com/fortunexbt/mutx-dev" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition">
@@ -48,11 +58,6 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative px-6 pb-20 pt-32 sm:px-10 overflow-hidden">
-        <div className="pointer-events-none fixed inset-0">
-          <div className="absolute -left-[10%] -top-[10%] h-[40%] w-[40%] rounded-full bg-cyan-500/10 blur-[120px]" />
-          <div className="absolute right-[-10%] top-[20%] h-[30%] w-[30%] rounded-full bg-blue-600/10 blur-[120px]" />
-        </div>
-        
         <div className="mx-auto flex max-w-7xl flex-col items-center text-center">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -87,6 +92,7 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="mt-12 w-full max-w-xl"
+            id="waitlist"
           >
             <WaitlistForm />
           </motion.div>
