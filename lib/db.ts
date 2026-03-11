@@ -1,9 +1,11 @@
 import postgres from 'postgres'
 
-// Railway's internal network (postgres.railway.internal) rejects SSL upgrade attempts.
-// We must explicitly disable SSL for the connection to succeed over the private network.
+// Railway provides the complete DATABASE_URL in the environment
+// We need to disable SSL rejection to allow the connection over the proxy.
 const sql = process.env.DATABASE_URL
-  ? postgres(process.env.DATABASE_URL, { ssl: false })
+  ? postgres(process.env.DATABASE_URL, {
+      ssl: { rejectUnauthorized: false },
+    })
   : null
 
 export default sql

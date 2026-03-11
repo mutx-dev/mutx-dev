@@ -3,6 +3,7 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 RUN npm install
+RUN npm install sharp
 
 FROM base AS development
 COPY . .
