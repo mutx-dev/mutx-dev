@@ -22,7 +22,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.models import Agent, AgentLog, AgentMetric, AgentStatus
+from src.api.models import Agent, AgentLog, AgentMetric, AgentStatus, Command
 
 logger = logging.getLogger(__name__)
 
