@@ -19,14 +19,15 @@ export const metadata: Metadata = {
     description: 'A production-minded stack for auth, agents, deployments, webhooks, API keys, and infrastructure automation.',
     url: 'https://mutx.dev',
     siteName: 'MUTX',
-    images: [{ url: '/og-image.svg', width: 1200, height: 630, alt: 'MUTX' }],
+    images: [{ url: 'https://mutx.dev/logo-new.png', width: 1200, height: 630, alt: 'MUTX | Open Source Control Plane for AI Agents' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
+    site: '@mutx_dev',
     title: 'MUTX | Open Source Control Plane for AI Agents',
     description: 'Deploy, operate, and observe AI agents with a real stack: web, API, CLI, SDK, infra, and a live waitlist.',
-    images: ['/og-image.svg'],
+    images: ['https://mutx.dev/logo-new.png'],
   },
   icons: {
     icon: '/favicon.ico',
