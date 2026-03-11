@@ -101,8 +101,8 @@ export default function LandingPage() {
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="relative h-8 w-8 overflow-hidden rounded-md">
-              <Image src="/logo-new.png" alt="MUTX" fill className="object-cover" />
+            <div className="relative h-8 w-8">
+              <Image src="/logo.png" alt="MUTX" fill className="object-contain" />
             </div>
             <span className="text-sm font-semibold tracking-wider">MUTX</span>
           </div>
@@ -287,7 +287,7 @@ deployment = client.deployments.create({'\n'}
 
       <footer className="border-t border-white/10 py-8 px-6 text-sm text-white/40 text-center flex flex-col items-center gap-4">
         <div className="flex items-center gap-2">
-          <Image src="/logo-new.png" alt="mutx.dev" width={20} height={20} className="rounded" />
+          <Image src="/logo.png" alt="mutx.dev" width={20} height={20} className="object-contain" />
           <span>MUTX Open Source Control Plane</span>
         </div>
         <div className="flex gap-6">

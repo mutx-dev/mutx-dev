@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description: 'A production-minded stack for auth, agents, deployments, webhooks, API keys, and infrastructure automation.',
     url: 'https://mutx.dev',
     siteName: 'MUTX',
-    images: [{ url: 'https://mutx.dev/logo-new.png', width: 1200, height: 630, alt: 'MUTX | Open Source Control Plane for AI Agents' }],
+    images: [{ url: 'https://mutx.dev/logo.png', width: 300, height: 300, alt: 'MUTX | Open Source Control Plane for AI Agents' }],
     type: 'website',
   },
   twitter: {
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     site: '@mutx_dev',
     title: 'MUTX | Open Source Control Plane for AI Agents',
     description: 'Deploy, operate, and observe AI agents with a real stack: web, API, CLI, SDK, infra, and a live waitlist.',
-    images: ['https://mutx.dev/logo-new.png'],
+    images: ['https://mutx.dev/logo.png'],
   },
   icons: {
     icon: '/favicon.ico',

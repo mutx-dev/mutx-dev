@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/logo-new.png" alt="MUTX logo" width="160" />
+  <img src="public/logo.png" alt="MUTX logo" width="160" />
 </p>
 
 <h1 align="center">MUTX: The Industrial Control Plane for AI Agents</h1>
