@@ -81,9 +81,12 @@ services:
       target: development
     container_name: mutx-frontend
     environment:
+      DATABASE_URL: postgresql://mutx:mutx_password@postgres:5432/mutx
+      DATABASE_SSL_MODE: disable
       NEXT_PUBLIC_API_URL: http://localhost:8000
       NEXT_PUBLIC_SITE_URL: http://localhost:3000
       NODE_ENV: development
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
     ports:
       - "3000:3000"
     volumes:
