@@ -53,7 +53,7 @@ Requirements:
 2. Orchestrator scans open issues labeled `autonomy:ready`.
 3. Work is assigned to a single owning agent based on area labels.
 4. Authoring agent creates a branch and PR.
-5. Reviewer agent checks scope, ownership, validation, and drift.
+5. Reviewer agent checks scope, ownership, validation, and drift. If reviewer login mapping is configured, PR assignment follows the work order.
 6. CI gates run.
 7. Safe PRs auto-merge; risky PRs stop for human approval.
 
