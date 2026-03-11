@@ -9,6 +9,7 @@ from mutx.agent_runtime import (
     create_agent_client,
 )
 from mutx.agents import Agents
+from mutx.api_keys import APIKeys
 from mutx.deployments import Deployments
 from mutx.webhooks import Webhooks
 
@@ -34,6 +35,7 @@ class MutxClient:
         )
 
         self.agents = Agents(self._client)
+        self.api_keys = APIKeys(self._client)
         self.deployments = Deployments(self._client)
         self.webhooks = Webhooks(self._client)
 
@@ -53,6 +55,14 @@ class MutxClient:
     @agents.setter
     def agents(self, value: Agents):
         self._agents = value
+
+    @property
+    def api_keys(self) -> APIKeys:
+        return self._api_keys
+
+    @api_keys.setter
+    def api_keys(self, value: APIKeys):
+        self._api_keys = value
 
     @property
     def deployments(self) -> Deployments:
@@ -92,6 +102,7 @@ class MutxAsyncClient:
         )
 
         self.agents = Agents(self._client)
+        self.api_keys = APIKeys(self._client)
         self.deployments = Deployments(self._client)
         self.webhooks = Webhooks(self._client)
 
@@ -111,6 +122,14 @@ class MutxAsyncClient:
     @agents.setter
     def agents(self, value: Agents):
         self._agents = value
+
+    @property
+    def api_keys(self) -> APIKeys:
+        return self._api_keys
+
+    @api_keys.setter
+    def api_keys(self, value: APIKeys):
+        self._api_keys = value
 
     @property
     def deployments(self) -> Deployments:
@@ -137,5 +156,6 @@ __all__ = [
     "AgentInfo",
     "Command",
     "AgentMetrics",
+    "APIKeys",
     "create_agent_client",
 ]
