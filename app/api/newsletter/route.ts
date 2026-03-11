@@ -20,7 +20,11 @@ export async function POST(request: Request) {
       throw new Error('Database not configured')
     }
     const body = await request.json()
-    const { email, source } = body
+    const { email, source, mathAnswer, honeypot } = body
+
+    if (honeypot || mathAnswer !== '4') {
+      return NextResponse.json({ success: false, error: 'Invalid input' }, { status: 400 })
+    }
 
     if (!email) {
       return NextResponse.json({ success: false, error: 'Email is required' }, { status: 400 })

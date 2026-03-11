@@ -19,6 +19,8 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
   const [success, setSuccess] = useState(false)
   const [successMessage, setSuccessMessage] = useState("You're on the list. Check your inbox.")
   const [error, setError] = useState('')
+  const [mathAnswer, setMathAnswer] = useState('')
+  const [honeypot, setHoneypot] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -58,7 +60,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
       const response = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source }),
+        body: JSON.stringify({ email, source, mathAnswer, honeypot }),
       })
 
       const payload = await response.json()
@@ -122,6 +124,15 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
           </motion.div>
         ) : (
           <form onSubmit={handleSubmit} className="flex w-full flex-col gap-3 sm:flex-row">
+            <input
+              type="text"
+              name="honeypot"
+              className="hidden"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+            />
             <label className="sr-only" htmlFor={`waitlist-email-${source}`}>Email address</label>
             <input
               id={`waitlist-email-${source}`}
@@ -131,6 +142,14 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
               placeholder="you@company.com"
               required
               className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/30 transition-colors"
+            />
+            <input
+              type="text"
+              value={mathAnswer}
+              onChange={(e) => setMathAnswer(e.target.value)}
+              placeholder="What is 2 + 2?"
+              required
+              className="w-full sm:w-32 rounded-lg border border-white/10 bg-black px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/30 transition-colors"
             />
             <button
               type="submit"
