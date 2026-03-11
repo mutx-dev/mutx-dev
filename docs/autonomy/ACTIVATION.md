@@ -37,6 +37,8 @@ This repo is now set up with the team definitions and a GitHub-native control-to
 - `AUTONOMY_BASE_BRANCH`: optional, defaults to `main`
 - `AUTONOMY_BRIEF_DIR`: optional, defaults to `.autonomy/briefs`
 - `AUTONOMY_MODEL`: optional, defaults to `gpt-4.1-mini`
+- `AUTONOMY_MAX_PATCH_BYTES`: optional, defaults to `50000`
+- `AUTONOMY_MAX_CHANGED_FILES`: optional, defaults to `6`
 
 ## Required Secret
 
@@ -59,6 +61,8 @@ If `AUTONOMY_AGENT_CMD_TEMPLATE` is unset but `GITHUB_MODELS_TOKEN` or `OPENAI_A
 ```text
 python scripts/autonomy/hosted_llm_executor.py --agent {agent} --brief {brief} --work-order {work_order}
 ```
+
+If a generated patch exceeds the configured size or file-count guardrails, the executor stops and writes `.autonomy/guardrail-failure.json` for debugging.
 
 ## Dispatch Logic
 

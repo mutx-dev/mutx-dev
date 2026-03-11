@@ -9,6 +9,7 @@ import textwrap
 import urllib.error
 import urllib.request
 from pathlib import Path
+from typing import Any
 
 
 AREA_CONTEXT = {
@@ -73,6 +74,9 @@ ALLOWED_COMMAND_PREFIXES = (
     'git diff',
 )
 
+DEFAULT_MAX_PATCH_BYTES = 50000
+DEFAULT_MAX_CHANGED_FILES = 6
+
 
 def run(command: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
     return subprocess.run(command, text=True, capture_output=True, check=check)
@@ -94,7 +98,8 @@ def extract_issue_paths(text: str, repo_files: set[str]) -> list[str]:
 
 
 def collect_files(work_order: dict[str, object]) -> list[str]:
-    labels = [label for label in work_order.get('labels', []) if isinstance(label, str)]
+    raw_labels = work_order.get('labels', [])
+    labels = [label for label in raw_labels if isinstance(label, str)] if isinstance(raw_labels, list) else []
     repo_files = set(git_ls_files())
     files: list[str] = []
     for label in labels:
@@ -219,7 +224,10 @@ def parse_json_response(raw: str) -> dict[str, object]:
     if text.startswith('```'):
         text = re.sub(r'^```(?:json)?\n', '', text)
         text = re.sub(r'\n```$', '', text)
-    return json.loads(text)
+    payload = json.loads(text)
+    if not isinstance(payload, dict):
+        raise ValueError('Hosted model response must be a JSON object')
+    return payload
 
 
 def extract_patch(raw_patch: str) -> str:
@@ -228,6 +236,55 @@ def extract_patch(raw_patch: str) -> str:
         text = re.sub(r'^```diff\n', '', text)
         text = re.sub(r'\n```$', '', text)
     return text.strip()
+
+
+def count_changed_files_from_patch(patch_text: str) -> int:
+    return sum(1 for line in patch_text.splitlines() if line.startswith('diff --git '))
+
+
+def write_guardrail_failure(reason: str, details: dict[str, object]) -> None:
+    failure_path = Path('.autonomy/guardrail-failure.json')
+    failure_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {'reason': reason, 'details': details}
+    failure_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n')
+
+
+def enforce_patch_guardrails(patch_text: str) -> None:
+    if not patch_text:
+        return
+
+    max_patch_bytes = int(os.environ.get('AUTONOMY_MAX_PATCH_BYTES', str(DEFAULT_MAX_PATCH_BYTES)))
+    max_changed_files = int(
+        os.environ.get('AUTONOMY_MAX_CHANGED_FILES', str(DEFAULT_MAX_CHANGED_FILES))
+    )
+    patch_size = len(patch_text.encode('utf-8'))
+    changed_files = count_changed_files_from_patch(patch_text)
+
+    if patch_size > max_patch_bytes:
+        write_guardrail_failure(
+            'patch_too_large',
+            {
+                'patch_size_bytes': patch_size,
+                'max_patch_bytes': max_patch_bytes,
+                'changed_files': changed_files,
+            },
+        )
+        raise RuntimeError(
+            f'Generated patch is {patch_size} bytes, exceeding AUTONOMY_MAX_PATCH_BYTES={max_patch_bytes}'
+        )
+
+    if changed_files > max_changed_files:
+        write_guardrail_failure(
+            'too_many_files',
+            {
+                'changed_files': changed_files,
+                'max_changed_files': max_changed_files,
+                'patch_size_bytes': patch_size,
+            },
+        )
+        raise RuntimeError(
+            f'Generated patch touches {changed_files} files, exceeding AUTONOMY_MAX_CHANGED_FILES={max_changed_files}'
+        )
 
 
 def apply_patch_text(patch_text: str) -> None:
@@ -277,9 +334,11 @@ def main() -> int:
     payload = parse_json_response(response_text)
 
     patch_text = extract_patch(str(payload.get('patch', '')))
+    enforce_patch_guardrails(patch_text)
     apply_patch_text(patch_text)
 
-    validation_commands = validate_commands(list(payload.get('validation_commands', [])))
+    raw_validation_commands: Any = payload.get('validation_commands', [])
+    validation_commands = validate_commands(raw_validation_commands if isinstance(raw_validation_commands, list) else [])
     if validation_commands:
         run_validation(validation_commands)
 
