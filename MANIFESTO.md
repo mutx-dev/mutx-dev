@@ -1,32 +1,137 @@
-# The mutx.dev Manifesto
+# MUTX Manifesto
 
-## The Crisis of Agentic Infrastructure
+## We Do Not Think The Hard Part Is The Model
 
-Agentic AI is easy to prototype but notoriously hard to operate at scale. We are currently witnessing a "first contact with reality" crisis: over 40% of agentic projects are expected to be cancelled by 2027 due to spiralling costs, unclear value, and inadequate risk controls.
+The hardest part of agentic software is not generating tokens.
+It is turning token generation into something a team can trust, operate, budget, debug, and ship.
 
-The problem is not that agents cannot "reason"; the problem is that they are not **governed, observable, or affordable** under real adversarial and reliability conditions.
+That is the problem MUTX exists to solve.
+
+We believe the next wave of software will be built around agents that can reason, call tools, write state, react to events, and operate continuously. But we also believe most of the market is still focused on the easiest layer to demo and the least important layer to own: prompts, wrappers, and orchestrated screenshots.
+
+The real bottleneck is everything that happens after the demo works once.
+
+## The Real Failure Mode
+
+Agent projects usually do not die because the model is too weak.
+They die because the surrounding system is too weak.
+
+They die when:
+
+- identity is unclear
+- ownership is not enforced
+- deployments are implicit instead of modeled
+- secrets and API keys are bolted on late
+- webhooks have no real governance layer
+- logs and metrics exist, but nobody can trust them
+- the website, API, CLI, SDK, and infra all drift apart
+- local success cannot survive production reality
+
+This is not a prompt engineering problem.
+It is a systems problem.
 
 ## Our Thesis
 
-Infrastructure, not just models, is the primary bottleneck for Agentic AI adoption.
+Infrastructure is the constraint.
+Control planes are the wedge.
+Operational trust is the product.
 
-To move from "cool demo" to "production infrastructure," we must treat agentic workflows with the same rigour as traditional software:
+If agents are going to do real work, they need to be treated like production systems, not novelty interfaces.
+That means:
 
-*   **Isolation as Default:** Agents must operate in dedicated, logically and network-isolated environments (VPC + firewall).
-*   **Policy as Code:** Permissions and resource access must be enforced at the platform boundary, not left to the agent's prompt.
-*   **Operational Trust:** We provide the missing layer of operational primitives: retries, idempotency, budgeting, rate limiting, and audit logs.
-*   **Protocol Openness:** We embrace open standards like the Model Context Protocol (MCP) to ensure interoperability and avoid lock-in.
+- explicit control planes
+- durable state
+- reproducible deployments
+- real authentication and ownership
+- observable execution
+- cost visibility
+- open interfaces
+- honest contracts between code, docs, and product surfaces
 
-## Our Mission
+## What MUTX Is
 
-To sell the "missing layer" of agent operations.
+MUTX is an open-source control plane for AI agents.
 
-We are building the production infrastructure to **deploy, run, observe, and govern** AI agents in real-world conditions. We do not train models; we operationalise them.
+It is not just an API.
+It is not just a dashboard.
+It is not just a CLI.
+It is not just an SDK.
 
-## The mutx.dev Promise
+It is the layer that ties all of those together so agent systems become operable.
 
-1.  **Deployable Agents:** Reach a stable runtime within minutes.
-2.  **Deterministic Control:** Enforce per-tenant budgets and rate limits.
-3.  **Auditability:** Every run is reconstructible—who ran what, with which permissions, and what it touched.
+In practical terms, that means MUTX is being built to handle the surfaces around agents that teams actually need:
 
-**Deploy agents like you deploy services—isolated, observable, governed.**
+- auth and user identity
+- agent records and lifecycle actions
+- deployment records and lifecycle actions
+- API key management
+- webhook ingestion and outbound automation hooks
+- health, readiness, logs, and metrics surfaces
+- website and app experiences that reflect the real platform
+- infrastructure automation that does not live outside the product story
+
+## What MUTX Is Not
+
+We are not building a closed model lab.
+We are not building a token resale business.
+We are not pretending a demo runtime is a platform.
+We are not interested in fake enterprise theater.
+
+We care more about a system that is honest, operable, and extensible than a product that looks finished while hiding brittle assumptions underneath.
+
+## Our Principles
+
+### 1. Current-State Honesty
+The repo should say what exists, what works, what is rough, and what is still aspirational.
+
+### 2. Control Over Magic
+A boring, explicit control plane is more valuable than clever hidden behavior.
+
+### 3. Open Interfaces
+The website, API, CLI, SDK, docs, and infrastructure should reinforce each other instead of drifting into parallel realities.
+
+### 4. Cost Transparency
+The platform should make model and infrastructure cost easier to reason about, not harder.
+
+### 5. Operational Trust
+If an operator cannot answer who owns a resource, what changed, what failed, and what to do next, the platform is unfinished.
+
+### 6. Small Surfaces, Strong Guarantees
+We would rather have a smaller system with real semantics than a larger one full of implied behavior.
+
+## Why Open Source
+
+Agent infrastructure should be inspectable.
+The control layer around deployment, auth, API keys, and operational workflows should not be magic.
+
+Open source forces clarity.
+It sharpens interfaces.
+It reveals drift.
+It invites the right contributors.
+And it creates the conditions for a real platform, not just a proprietary wrapper around the same problems.
+
+## Where We Are Going
+
+The destination is not "an AI app."
+The destination is an operating layer for agent systems.
+
+Near term, that means tightening contracts, hardening auth and ownership, improving the app surface, and making the CLI, SDK, and API tell the same story.
+Long term, that means turning agent execution, deployment, observability, and governance into a coherent product surface teams can actually build on.
+
+## The Invitation
+
+If you care about:
+
+- agent systems that survive contact with reality
+- infrastructure that is more than marketing copy
+- honest product architecture
+- open-source platforms with real operational depth
+
+then MUTX is for you.
+
+Build with us.
+Break the edges.
+Tighten the contracts.
+Help turn the control plane into the product.
+
+**Deploy agents like you deploy services. Operate them like systems.**

@@ -27,6 +27,7 @@ htmlcov/
 .tox/
 
 # Infrastructure
+infrastructure/terraform/*.backup
 .terraform/
 *.tfstate
 *.tfstate.backup
@@ -46,3 +47,8 @@ docs/archive/
 *.swp
 *.swo
 *~
+# Frontend test artifacts
+playwright-report/
+test-results/
+
+

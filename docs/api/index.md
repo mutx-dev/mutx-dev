@@ -1,53 +1,70 @@
 # API Overview
 
-The mutx.dev control plane is a FastAPI application living in `src/api/`. Routes are mounted directly without version prefixes.
+The MUTX control plane is a FastAPI application living in `src/api/`.
+Routes are mounted directly at top-level prefixes. There is no global `/v1` backend prefix.
 
 ## Base URLs
 
-- **Local:** `http://localhost:8000`
-- **Production:** `https://api.mutx.dev` (or via Railway)
+- Local API: `http://localhost:8000`
+- Website route proxies: `http://localhost:3000/api/*`
+- Hosted frontend: `https://mutx.dev`
+- Hosted app surface: `https://app.mutx.dev`
 
 ## Route Groups
 
 | Group | Routes |
-| :--- | :--- |
-| **Root** | `GET /`, `GET /health`, `GET /ready` |
-| **Auth** | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me` |
-| **Agents** | `POST /agents`, `GET /agents`, `GET /agents/{agent_id}`, `DELETE /agents/{agent_id}`, `POST /agents/{agent_id}/deploy`, `POST /agents/{agent_id}/stop`, `GET /agents/{agent_id}/logs`, `GET /agents/{agent_id}/metrics` |
-| **Deployments** | `GET /deployments`, `GET /deployments/{deployment_id}`, `POST /deployments/{deployment_id}/scale`, `DELETE /deployments/{deployment_id}` |
-| **Waitlist** | `POST /api/newsletter` |
-| **Webhooks** | `POST /webhooks/agent-status`, `POST /webhooks/deployment`, `POST /webhooks/metrics` |
+| --- | --- |
+| Root | `GET /`, `GET /health`, `GET /ready` |
+| Auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me` |
+| Agents | `POST /agents`, `GET /agents`, `GET /agents/{agent_id}`, `DELETE /agents/{agent_id}`, `POST /agents/{agent_id}/deploy`, `POST /agents/{agent_id}/stop`, `GET /agents/{agent_id}/logs`, `GET /agents/{agent_id}/metrics` |
+| Deployments | `GET /deployments`, `POST /deployments`, `GET /deployments/{deployment_id}`, `POST /deployments/{deployment_id}/scale`, `POST /deployments/{deployment_id}/restart`, `DELETE /deployments/{deployment_id}` |
+| API Keys | `GET /api-keys`, `POST /api-keys`, `DELETE /api-keys/{key_id}`, `POST /api-keys/{key_id}/rotate` |
+| Webhooks | `POST /webhooks/agent-status`, `POST /webhooks/deployment`, `POST /webhooks/metrics` |
+| Newsletter | `GET /newsletter`, `POST /newsletter` |
+
+## Website Proxies
+
+The Next.js app also exposes same-origin route handlers under `app/api/` for browser-facing workflows. Examples include:
+
+- `/api/auth/login`
+- `/api/auth/me`
+- `/api/dashboard/agents`
+- `/api/dashboard/deployments`
+- `/api/api-keys`
+- `/api/newsletter`
+
+Use the FastAPI routes for direct control-plane integrations and the Next.js route handlers for browser or app-surface flows.
 
 ## Quickstart
 
 ```bash
 BASE_URL=http://localhost:8000
 
-# Registration
 curl -X POST "$BASE_URL/auth/register" \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
 
-# Login
 curl -X POST "$BASE_URL/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","password":"StrongPass1!"}'
 ```
 
-Authenticated requests require the access token:
+Authenticated requests require a bearer token:
+
 ```bash
 curl "$BASE_URL/auth/me" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-## Health Endpoints
+## Health And Readiness
 
-- `/health`: Application status and database liveness.
-- `/ready`: Returns `200` when application is fully initialized and DB is reachable; `503` otherwise.
+- `/health` reports application status and database liveness
+- `/ready` returns `200` when the application is initialized and the data layer is reachable, otherwise `503`
 
-## Error Format
+## Error Shape
 
-FastAPI validation errors:
+FastAPI validation errors typically look like this:
+
 ```json
 {
   "detail": [
@@ -61,13 +78,16 @@ FastAPI validation errors:
 ```
 
 ## Pagination
-List endpoints support `skip` and `limit` query parameters (e.g., `GET /agents?skip=0&limit=50`).
 
----
+List endpoints generally support `skip` and `limit` query parameters, for example:
+
+```bash
+curl "$BASE_URL/agents?skip=0&limit=50"
+```
 
 ## Detailed Docs
 
 - [Authentication](./authentication.md)
 - [Agents](./agents.md)
 - [Deployments](./deployments.md)
-- [Webhook ingestion](./webhooks.md)
+- [Webhook Ingestion](./webhooks.md)

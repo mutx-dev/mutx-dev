@@ -11,6 +11,8 @@ import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from fastapi import FastAPI
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -24,6 +26,11 @@ TEST_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
 
 # Configure pytest-asyncio
 pytest_plugins = ("pytest_asyncio",)
+
+
+@compiles(PGUUID, "sqlite")
+def compile_uuid_sqlite(_type, _compiler, **_kw):
+    return "CHAR(36)"
 
 
 def create_test_app() -> FastAPI:

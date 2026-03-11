@@ -9,10 +9,21 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/fortunexbt/mutx-dev"><strong>Explore the Repo</strong></a> ·
+  <a href="./MANIFESTO.md"><strong>Our Manifesto</strong></a> ·
+  <a href="./WHITEPAPER.md"><strong>Technical Whitepaper</strong></a> ·
   <a href="https://mutx.dev"><strong>Live Preview</strong></a> ·
-  <a href="./docs/README.md"><strong>Read Docs</strong></a>
+  <a href="./docs/README.md"><strong>Read Docs</strong></a> ·
+  <a href="https://github.com/fortunexbt/mutx-dev"><strong>GitHub</strong></a>
 </p>
+
+---
+
+## Start Here
+
+- Read [the manifesto](./MANIFESTO.md) for the product thesis and design philosophy.
+- Read [the technical whitepaper](./WHITEPAPER.md) for the system model, architecture, and roadmap framing.
+- Read [the docs hub](./docs/README.md) for setup, workflows, and contributor-facing documentation.
+- Visit [`mutx.dev`](https://mutx.dev) for the landing site and [`app.mutx.dev`](https://app.mutx.dev) for the operator surface preview.
 
 ---
 
