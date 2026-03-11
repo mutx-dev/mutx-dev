@@ -90,39 +90,33 @@ const surfaces = [
 const usps = [
   {
     icon: Shield,
-    title: 'Not another agent wrapper',
-    description:
-      'MUTX is the control layer around agents: auth, ownership, deployments, API keys, webhooks, persistence, and ops ergonomics.',
+    title: 'Operational Maturity',
+    description: 'Auth, ownership, API keys, and webhooks as first-class primitives.',
   },
   {
     icon: Database,
-    title: 'Backed by working code',
-    description:
-      'The repo already ships real routes, real schema bootstrapping, real waitlist persistence, and real deployment scaffolding.',
+    title: 'Infrastructure-First',
+    description: 'Built-in support for Docker, Railway, Terraform, and Ansible.',
   },
   {
     icon: GitBranch,
-    title: 'Contributor-ready from day one',
-    description:
-      'The roadmap is explicit about what is shipped, what is rough, and which lanes need help across web, API, CLI, SDK, infra, and docs.',
+    title: 'Open Source',
+    description: 'A contributor-first roadmap from local testing to production scale.',
   },
 ]
 
 const shippedNow = [
-  'JWT auth flows with register, login, refresh, forgot-password, verify-email, and `/auth/me`.',
-  'Agent create/list/detail/delete plus deploy, stop, logs, and metrics routes.',
-  'Deployment list/detail/create/scale/restart/delete plus deployment-scoped logs and metrics.',
-  'API key creation, rotation, and revoke flows.',
-  'Webhook registration plus agent-status, deployment, and metrics ingestion.',
-  'Website waitlist persistence with Postgres and Resend-backed confirmation emails.',
+  'Auth: JWT, ownership, API keys, email verification',
+  'Agents: CRUD, deployments, logs, metrics',
+  'Webhooks: Ingestion and status reporting',
+  'Infra: Docker, Terraform, Ansible, monitoring',
 ]
 
 const nextUp = [
-  'Tighter CLI, SDK, and API contract alignment.',
-  'A real authenticated dashboard instead of a mostly teaser app surface.',
-  'Typed agent config instead of string blobs.',
-  'Monitoring and self-healing wired into actual runtime behavior.',
-  'Better local-first tests and route coverage.',
+  'Dashboard: Production-ready authenticated UI',
+  'Hardening: Ownership checks, schema alignment',
+  'SDK: Tightening API contract parity',
+  'Observability: Lifecycle history and self-healing',
 ]
 
 const roadmapColumns = [
@@ -279,7 +273,7 @@ export default function LandingPage() {
               transition={{ duration: 0.7, delay: 0.08 }}
               className="mt-6 max-w-5xl text-5xl font-semibold leading-[0.95] tracking-[-0.04em] text-white sm:text-7xl lg:text-[5.7rem]"
             >
-              Deploy agents like services. <span className="gradient-text">Operate them like systems.</span>
+              Control plane for <br /><span className="gradient-text">AI agents.</span>
             </motion.h1>
 
             <motion.p
@@ -288,7 +282,7 @@ export default function LandingPage() {
               transition={{ duration: 0.7, delay: 0.16 }}
               className="mt-8 max-w-3xl text-lg leading-8 text-slate-300 sm:text-xl"
             >
-              MUTX is an open-source control plane for AI agents: web surface, FastAPI backend, Python CLI, Python SDK, deployment foundations, and a real waitlist pipeline wired to Postgres + Resend.
+              MUTX provides the operational layer agents need for production: authentication, lifecycle orchestration, and deployment primitives.
             </motion.p>
 
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -431,9 +425,9 @@ export default function LandingPage() {
       <Section id="what-it-is">
         <div className="grid gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-end">
           <SectionHeading
-            eyebrow="What MUTX actually is"
-            title="A control plane for AI agents, not a vibes-only wrapper."
-            description="The strongest thing about this project is the shape of the stack: website, API, CLI, SDK, infra, monitoring, docs, and a roadmap that tells the truth about what exists and what still needs to be built."
+            eyebrow="What it is"
+            title="A control plane for autonomous agents."
+            description="The stack designed to take agents from local prototypes to production systems."
           />
 
           <div className="grid gap-4 sm:grid-cols-3">
