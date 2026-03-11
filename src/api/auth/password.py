@@ -3,7 +3,8 @@ from typing import Optional
 
 from passlib.context import CryptContext
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Fallback to pbkdf2_sha256 if bcrypt is acting up with newer python/library versions
+pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
 
 MIN_PASSWORD_LENGTH = 8
 

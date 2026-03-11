@@ -13,6 +13,7 @@ from src.api.models.models import (
     AgentType,
     AgentStatus,
     AlertType,
+    Command,
 )
 
 __all__ = [
@@ -30,4 +31,5 @@ __all__ = [
     "AgentType",
     "AgentStatus",
     "AlertType",
+    "Command",
 ]

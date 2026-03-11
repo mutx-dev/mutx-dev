@@ -240,9 +240,28 @@ class AgentLog(Base):
     level: Mapped[str] = mapped_column(String(20), default="info")
     message: Mapped[str] = mapped_column(Text, nullable=False)
     extra_data: Mapped[str] = mapped_column(Text, nullable=True)
+    meta_data: Mapped[Optional[dict]] = mapped_column(Text, nullable=True) # Renamed to meta_data
     timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
 
     agent: Mapped["Agent"] = relationship("Agent", back_populates="logs")
+
+
+class Command(Base):
+    __tablename__ = "commands"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    agent_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True
+    )
+    action: Mapped[str] = mapped_column(String(100), nullable=False)
+    parameters: Mapped[Optional[dict]] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(50), default="pending")
+    result: Mapped[Optional[dict]] = mapped_column(Text, nullable=True)
+    error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    agent: Mapped["Agent"] = relationship("Agent")
 
 
 class AgentMetric(Base):
