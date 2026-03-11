@@ -27,7 +27,7 @@ Repo guidance for agentic coding agents working in `/Users/fortune/MUTX/mutx-dev
 - `npm run build` works because it uses `next build --no-lint`.
 - `tests/conftest.py` is stale against `src/api/models/models.py`; pytest collects tests, but runtime execution currently fails because fixtures still pass `username` and `hashed_password` to `User`.
 - `tests/website.spec.ts` hits `https://mutx.dev` directly; treat Playwright as production smoke testing unless you rewrite it.
-- `scripts/test.sh` is stale: it calls `npm run test`, but no `test` script exists in `package.json`.
+- `scripts/test.sh` runs the current trusted validation baseline instead of `npm test`, which does not exist in `package.json`.
 
 ## Setup And Environment
 - CI uses Node 20 for frontend checks.
