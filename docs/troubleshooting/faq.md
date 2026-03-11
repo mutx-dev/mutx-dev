@@ -18,8 +18,9 @@ Not yet. Core auth and listing flows work well, but some commands still reflect 
 
 The two biggest gaps right now are:
 
-- `mutx agents create` does not send the required `user_id`
 - `mutx deploy create` still points at an older `/api/v1/...` route
+
+`mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`.
 
 ## Is the SDK fully aligned with the API?
 

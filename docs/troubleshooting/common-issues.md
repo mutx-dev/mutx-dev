@@ -21,17 +21,17 @@ docker-compose exec postgres pg_isready -U mutx
 
 ## CLI login works, but agent creation fails
 
-Current cause: `mutx agents create` does not supply the `user_id` that `POST /agents` currently requires.
+Current cause: older docs and examples may still suggest a client-supplied `user_id`, but the backend now derives ownership from auth.
 
-Use the API directly for creation:
+Use the CLI or the authenticated API shape instead:
 
 ```bash
 curl -X POST http://localhost:8000/agents \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "name":"Support Bot",
-    "config":"{\"model\":\"gpt-4\"}",
-    "user_id":"YOUR_USER_ID"
+    "config":"{\"model\":\"gpt-4\"}"
   }'
 ```
 
@@ -82,7 +82,6 @@ That is expected with the current images.
 Prefer host-side verification:
 
 ```bash
-npm run lint
 npm run build
 python3 -m pytest --collect-only -q
 ```
