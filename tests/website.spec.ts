@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('mutx.dev QA', () => {
   test('homepage loads and renders waitlist signup', async ({ page }) => {
-    // Go to homepage
-    await page.goto('https://mutx.dev');
+    // Go to homepage (using baseURL from config)
+    await page.goto('/');
     
     // Wait for page to be interactive
     await page.waitForLoadState('domcontentloaded');
@@ -31,7 +31,7 @@ test.describe('mutx.dev QA', () => {
       }
     });
     
-    await page.goto('https://mutx.dev');
+    await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(2000);
     
