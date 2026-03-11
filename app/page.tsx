@@ -101,7 +101,7 @@ export default function LandingPage() {
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="relative h-8 w-8 overflow-hidden rounded-md bg-white/10">
+            <div className="relative h-8 w-8 overflow-hidden rounded-md">
               <Image src="/logo-new.png" alt="MUTX" fill className="object-cover" />
             </div>
             <span className="text-sm font-semibold tracking-wider">MUTX</span>
@@ -173,20 +173,20 @@ export default function LandingPage() {
                 <pre className="text-sm leading-relaxed">
 <span className="text-blue-400">from</span> mutx <span className="text-blue-400">import</span> Client{'\n\n'}
 <span className="text-white/40"># Initialize the MUTX client</span>{'\n'}
-client = Client(api_key=<span className="text-green-400">"mutx_sk_..."</span>){'\n\n'}
+client = Client(api_key=<span className="text-green-400">&quot;mutx_sk_...&quot;</span>){'\n\n'}
 <span className="text-white/40"># Create a new autonomous agent</span>{'\n'}
 agent = client.agents.create({'\n'}
-  name=<span className="text-green-400">"data-analyzer"</span>,{'\n'}
-  model=<span className="text-green-400">"gpt-4o"</span>,{'\n'}
-  capabilities=[<span className="text-green-400">"sql"</span>, <span className="text-green-400">"pandas"</span>]{'\n'}
+  name=<span className="text-green-400">&quot;data-analyzer&quot;</span>,{'\n'}
+  model=<span className="text-green-400">&quot;gpt-4o&quot;</span>,{'\n'}
+  capabilities=[<span className="text-green-400">&quot;sql&quot;</span>, <span className="text-green-400">&quot;pandas&quot;</span>]{'\n'}
 ){'\n\n'}
 <span className="text-white/40"># Deploy to the control plane</span>{'\n'}
 deployment = client.deployments.create({'\n'}
   agent_id=agent.id,{'\n'}
-  environment=<span className="text-green-400">"production"</span>,{'\n'}
+  environment=<span className="text-green-400">&quot;production&quot;</span>,{'\n'}
   replicas=<span className="text-yellow-300">3</span>{'\n'}
 ){'\n\n'}
-<span className="text-blue-400">print</span>(<span className="text-green-400">f"Agent deployed: </span>{'{'}deployment.url{'}'}<span className="text-green-400">"</span>)
+<span className="text-blue-400">print</span>(<span className="text-green-400">f&quot;Agent deployed: </span>{'{'}deployment.url{'}'}<span className="text-green-400">&quot;</span>)
                 </pre>
               </TerminalWindow>
             </div>
