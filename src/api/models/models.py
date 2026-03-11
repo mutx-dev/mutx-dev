@@ -240,7 +240,7 @@ class AgentLog(Base):
     level: Mapped[str] = mapped_column(String(20), default="info")
     message: Mapped[str] = mapped_column(Text, nullable=False)
     extra_data: Mapped[str] = mapped_column(Text, nullable=True)
-    meta_data: Mapped[Optional[dict]] = mapped_column(Text, nullable=True) # Renamed to meta_data
+    meta_data: Mapped[Optional[dict]] = mapped_column(Text, nullable=True)  # Renamed to meta_data
     timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
 
     agent: Mapped["Agent"] = relationship("Agent", back_populates="logs")
