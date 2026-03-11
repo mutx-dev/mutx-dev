@@ -140,6 +140,13 @@ uvicorn src.api.main:app --reload --port 8000
 npm run dev
 ```
 
+Regenerate the API contract explicitly when backend routes change:
+
+```bash
+python3 scripts/generate_openapi.py
+npm run generate-types
+```
+
 ---
 
 *MUTX: Building the backbone of the agentic economy.*

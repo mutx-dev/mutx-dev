@@ -2,12 +2,9 @@ import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime
 import logging
-import json
-from pathlib import Path
 
 from fastapi import FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.openapi.utils import get_openapi
 
 from src.api.config import get_settings
 from src.api.database import dispose_engine, init_db
@@ -78,12 +75,6 @@ async def lifespan(app: FastAPI):
         monitor_task = asyncio.create_task(start_background_monitor())
     else:
         monitor_task = asyncio.create_task(_start_monitor_when_database_ready(app))
-
-    # Generate OpenAPI spec on startup
-    Path("docs/api").mkdir(parents=True, exist_ok=True)
-    with open("docs/api/openapi.json", "w") as f:
-        json.dump(get_openapi(title=app.title, version=app.version, routes=app.routes), f, indent=2)
-        logger.info("OpenAPI spec generated at docs/api/openapi.json")
 
     try:
         yield

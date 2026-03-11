@@ -10,7 +10,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.api.database import get_db
-from src.api.models import Agent, Deployment, AgentLog, AgentMetric, AgentStatus, User, AgentType
+from src.api.models import (
+    Agent,
+    Deployment,
+    AgentLog,
+    AgentMetric,
+    AgentStatus,
+    User,
+    AgentType,
+    DeploymentEvent as DeploymentEventModel,
+)
 from src.api.models.schemas import (
     AgentCreate,
     AgentResponse,
@@ -70,6 +79,18 @@ def _serialize_deployment(deployment: Deployment):
         "started_at": deployment.started_at,
         "ended_at": deployment.ended_at,
         "error_message": deployment.error_message,
+        "events": [
+            {
+                "id": event.id,
+                "deployment_id": event.deployment_id,
+                "event_type": event.event_type,
+                "status": event.status,
+                "node_id": event.node_id,
+                "error_message": event.error_message,
+                "created_at": event.created_at,
+            }
+            for event in getattr(deployment, "events", [])
+        ],
     }
 
 
@@ -146,7 +167,9 @@ async def get_agent(
     current_user: User = Depends(get_current_user),
 ):
     result = await db.execute(
-        select(Agent).options(selectinload(Agent.deployments)).where(Agent.id == agent_id)
+        select(Agent)
+        .options(selectinload(Agent.deployments).selectinload(Deployment.events))
+        .where(Agent.id == agent_id)
     )
     agent = result.scalar_one_or_none()
     if not agent:
@@ -198,6 +221,16 @@ async def deploy_agent(
         started_at=datetime.utcnow(),
     )
     db.add(deployment)
+    await db.flush()  # Get deployment.id
+
+    # Record deploy event
+    deploy_event = DeploymentEventModel(
+        deployment_id=deployment.id,
+        event_type="deploy",
+        status="deploying",
+    )
+    db.add(deploy_event)
+
     agent.status = AgentStatus.RUNNING.value
     await db.commit()
     await db.refresh(deployment)
@@ -228,6 +261,14 @@ async def stop_agent(
     for deployment in deployments:
         deployment.status = "stopped"
         deployment.ended_at = datetime.utcnow()
+
+        # Record stop event
+        stop_event = DeploymentEventModel(
+            deployment_id=deployment.id,
+            event_type="stop",
+            status="stopped",
+        )
+        db.add(stop_event)
 
     agent.status = AgentStatus.STOPPED.value
     await db.commit()
