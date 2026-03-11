@@ -80,8 +80,8 @@ async def lifespan(app: FastAPI):
         monitor_task = asyncio.create_task(_start_monitor_when_database_ready(app))
 
     # Generate OpenAPI spec on startup
-    Path('docs/api').mkdir(parents=True, exist_ok=True)
-    with open('docs/api/openapi.json', 'w') as f:
+    Path("docs/api").mkdir(parents=True, exist_ok=True)
+    with open("docs/api/openapi.json", "w") as f:
         json.dump(get_openapi(title=app.title, version=app.version, routes=app.routes), f, indent=2)
         logger.info("OpenAPI spec generated at docs/api/openapi.json")
 
@@ -154,7 +154,9 @@ async def health_check(request: Request):
 async def readiness_check(request: Request, response: Response):
     database_ready = request.app.state.database_ready
     database_error = request.app.state.database_error
-    database_status = "ready" if database_ready else "unavailable" if database_error else "initializing"
+    database_status = (
+        "ready" if database_ready else "unavailable" if database_error else "initializing"
+    )
 
     if not database_ready:
         response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
@@ -174,6 +176,7 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "src.api.main:app",
         host=settings.api_host,

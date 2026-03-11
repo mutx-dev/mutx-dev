@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class AgentInfo:
     """Information about the registered agent."""
+
     agent_id: str
     name: str
     api_key: str
@@ -35,6 +36,7 @@ class AgentInfo:
 @dataclass
 class Command:
     """A command received from MUTX."""
+
     command_id: str
     action: str
     parameters: dict
@@ -44,6 +46,7 @@ class Command:
 @dataclass
 class AgentMetrics:
     """Metrics to report to MUTX."""
+
     cpu_usage: float = 0.0
     memory_usage: float = 0.0  # MB
     uptime_seconds: float = 0.0
@@ -313,12 +316,14 @@ class MutxAgentClient:
 
             commands = []
             for cmd in data.get("commands", []):
-                commands.append(Command(
-                    command_id=cmd["command_id"],
-                    action=cmd["action"],
-                    parameters=cmd.get("parameters", {}),
-                    received_at=datetime.fromisoformat(cmd["received_at"]),
-                ))
+                commands.append(
+                    Command(
+                        command_id=cmd["command_id"],
+                        action=cmd["action"],
+                        parameters=cmd.get("parameters", {}),
+                        received_at=datetime.fromisoformat(cmd["received_at"]),
+                    )
+                )
 
             return commands
         except httpx.HTTPError as e:
@@ -465,7 +470,9 @@ class MutxAgentClient:
         """
         callback = callback or self._command_callback
         if not callback:
-            raise ValueError("No command callback set. Use set_command_callback() or pass callback parameter.")
+            raise ValueError(
+                "No command callback set. Use set_command_callback() or pass callback parameter."
+            )
 
         last_poll = datetime.utcnow()
 

@@ -83,7 +83,9 @@ class User(Base):
     plan: Mapped[Plan] = mapped_column(SQLEnum(Plan), default=Plan.FREE)
     api_key: Mapped[str] = mapped_column(String(64), unique=True, nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     # Email verification fields
     is_email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -93,39 +95,63 @@ class User(Base):
     password_reset_token: Mapped[str] = mapped_column(String(255), nullable=True, index=True)
     password_reset_expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
-    agents: Mapped[list["Agent"]] = relationship("Agent", back_populates="user", cascade="all, delete-orphan")
-    api_keys: Mapped[list["APIKey"]] = relationship("APIKey", back_populates="user", cascade="all, delete-orphan")
-    webhooks: Mapped[list["Webhook"]] = relationship("Webhook", back_populates="user", cascade="all, delete-orphan")
+    agents: Mapped[list["Agent"]] = relationship(
+        "Agent", back_populates="user", cascade="all, delete-orphan"
+    )
+    api_keys: Mapped[list["APIKey"]] = relationship(
+        "APIKey", back_populates="user", cascade="all, delete-orphan"
+    )
+    webhooks: Mapped[list["Webhook"]] = relationship(
+        "Webhook", back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class Agent(Base):
     __tablename__ = "agents"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     type: Mapped[AgentType] = mapped_column(SQLEnum(AgentType), default=AgentType.OPENAI)
     config: Mapped[str] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(String(50), default="creating")
-    api_key: Mapped[str] = mapped_column(String(128), nullable=True, index=True)  # Agent API key for self-auth
+    api_key: Mapped[str] = mapped_column(
+        String(128), nullable=True, index=True
+    )  # Agent API key for self-auth
     last_heartbeat: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user: Mapped["User"] = relationship("User", back_populates="agents")
-    deployments: Mapped[list["Deployment"]] = relationship("Deployment", back_populates="agent", cascade="all, delete-orphan")
-    metrics: Mapped[list["Metrics"]] = relationship("Metrics", back_populates="agent", cascade="all, delete-orphan")
-    alerts: Mapped[list["Alert"]] = relationship("Alert", back_populates="agent", cascade="all, delete-orphan")
-    logs: Mapped[list["AgentLog"]] = relationship("AgentLog", back_populates="agent", cascade="all, delete-orphan")
-    agent_metrics: Mapped[list["AgentMetric"]] = relationship("AgentMetric", back_populates="agent", cascade="all, delete-orphan")
+    deployments: Mapped[list["Deployment"]] = relationship(
+        "Deployment", back_populates="agent", cascade="all, delete-orphan"
+    )
+    metrics: Mapped[list["Metrics"]] = relationship(
+        "Metrics", back_populates="agent", cascade="all, delete-orphan"
+    )
+    alerts: Mapped[list["Alert"]] = relationship(
+        "Alert", back_populates="agent", cascade="all, delete-orphan"
+    )
+    logs: Mapped[list["AgentLog"]] = relationship(
+        "AgentLog", back_populates="agent", cascade="all, delete-orphan"
+    )
+    agent_metrics: Mapped[list["AgentMetric"]] = relationship(
+        "AgentMetric", back_populates="agent", cascade="all, delete-orphan"
+    )
 
 
 class Deployment(Base):
     __tablename__ = "deployments"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    agent_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True)
+    agent_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True
+    )
     status: Mapped[str] = mapped_column(String(50), default="pending")
     region: Mapped[str] = mapped_column(String(50), nullable=True)
     version: Mapped[str] = mapped_column(String(50), nullable=True)
@@ -143,7 +169,9 @@ class APIKey(Base):
     __tablename__ = "api_keys"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
     key_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     last_used: Mapped[datetime] = mapped_column(DateTime, nullable=True)
@@ -158,7 +186,9 @@ class Webhook(Base):
     __tablename__ = "webhooks"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
     url: Mapped[str] = mapped_column(String(512), nullable=False)
     events: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
     secret: Mapped[str] = mapped_column(String(255), nullable=True)
@@ -172,7 +202,9 @@ class Metrics(Base):
     __tablename__ = "metrics"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    agent_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True)
+    agent_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True
+    )
     cpu: Mapped[float] = mapped_column(Float, nullable=True)
     memory: Mapped[float] = mapped_column(Float, nullable=True)
     requests: Mapped[int] = mapped_column(Integer, default=0)
@@ -186,7 +218,9 @@ class Alert(Base):
     __tablename__ = "alerts"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    agent_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True)
+    agent_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True
+    )
     type: Mapped[AlertType] = mapped_column(SQLEnum(AlertType), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
     resolved: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -200,7 +234,9 @@ class AgentLog(Base):
     __tablename__ = "agent_logs"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    agent_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True)
+    agent_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True
+    )
     level: Mapped[str] = mapped_column(String(20), default="info")
     message: Mapped[str] = mapped_column(Text, nullable=False)
     extra_data: Mapped[str] = mapped_column(Text, nullable=True)
@@ -213,7 +249,9 @@ class AgentMetric(Base):
     __tablename__ = "agent_metrics"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    agent_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True)
+    agent_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True
+    )
     cpu_usage: Mapped[float] = mapped_column(Float, nullable=True)
     memory_usage: Mapped[float] = mapped_column(Float, nullable=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
@@ -223,10 +261,13 @@ class AgentMetric(Base):
 
 class WebhookDeliveryLog(Base):
     """Log of webhook delivery attempts"""
+
     __tablename__ = "webhook_delivery_logs"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    webhook_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("webhooks.id"), nullable=False, index=True)
+    webhook_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("webhooks.id"), nullable=False, index=True
+    )
     event: Mapped[str] = mapped_column(String(100), nullable=False)
     payload: Mapped[str] = mapped_column(Text, nullable=False)
     status_code: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)

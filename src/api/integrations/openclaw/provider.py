@@ -7,21 +7,23 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
+
 class OpenClawProvider:
     """
     Integration provider for OpenClaw (github.com/openclaw/openclaw).
     Bridges OpenClaw's local-first runtime with mutx.dev cloud infrastructure.
     """
-    
+
     def __init__(self, agent: Agent):
         self.agent = agent
         self.config = self._parse_config(agent.config)
 
     def _parse_config(self, config_str: str | None) -> Dict[str, Any]:
         import json
+
         try:
             return json.loads(config_str) if config_str else {}
-        except:
+        except json.JSONDecodeError:
             return {}
 
     async def deploy(self, session: AsyncSession):
@@ -30,16 +32,16 @@ class OpenClawProvider:
         In a real scenario, this would provision a container with OpenClaw pre-installed.
         """
         logger.info(f"Deploying OpenClaw agent: {self.agent.name}")
-        
+
         # 1. Initialize OpenClaw workspace
         await self._log(session, "Initializing OpenClaw runtime environment...")
-        
+
         # 2. Install requested skills from ClawHub
         skills = self.config.get("skills", [])
         if skills:
             await self._log(session, f"Installing skills from ClawHub: {', '.join(skills)}")
             # Simulation: wait for skill installation
-        
+
         # 3. Configure Gateways (WhatsApp, Discord, etc.)
         gateways = self.config.get("gateways", [])
         if gateways:
@@ -52,10 +54,11 @@ class OpenClawProvider:
             agent_id=self.agent.id,
             level=level,
             message=f"[OpenClaw] {message}",
-            timestamp=datetime.utcnow()
+            timestamp=datetime.utcnow(),
         )
         session.add(log)
         await session.commit()
+
 
 async def handle_openclaw_lifecycle(session: AsyncSession, agent: Agent):
     """

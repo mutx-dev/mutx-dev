@@ -31,6 +31,7 @@ router = APIRouter(prefix="/agents", tags=["agent-runtime"])
 
 # --- Pydantic Models ---
 
+
 class AgentRegisterRequest(BaseModel):
     name: str
     description: Optional[str] = ""
@@ -102,6 +103,7 @@ class AgentStatusResponse(BaseModel):
 
 # --- Helper Functions ---
 
+
 async def verify_agent_api_key(
     agent_id: str,
     api_key: str,
@@ -122,6 +124,7 @@ async def verify_agent_api_key(
 
 # --- Routes ---
 
+
 @router.post("/register", response_model=AgentRegisterResponse)
 async def register_agent(
     request: AgentRegisterRequest,
@@ -129,12 +132,12 @@ async def register_agent(
 ):
     """
     Register a new agent with MUTX.
-    
+
     Returns agent_id and api_key that the agent should use for subsequent requests.
     """
     # Generate unique API key for this agent
     agent_api_key = f"mutx_agent_{uuid.uuid4().hex}_{uuid.uuid4().hex[:8]}"
-    
+
     agent = Agent(
         name=request.name,
         description=request.description or "",
@@ -142,13 +145,13 @@ async def register_agent(
         config=str(request.metadata) if request.metadata else None,
         api_key=agent_api_key,
     )
-    
+
     db.add(agent)
     await db.commit()
     await db.refresh(agent)
-    
+
     logger.info(f"Registered new agent: {agent.id} ({agent.name})")
-    
+
     return AgentRegisterResponse(
         agent_id=str(agent.id),
         api_key=agent_api_key,
@@ -165,21 +168,19 @@ async def heartbeat(
     """Update agent heartbeat status."""
     # Get API key from Authorization header
     # For now, accept agent_id in body for simplicity
-    
-    result = await db.execute(
-        select(Agent).where(Agent.id == uuid.UUID(request.agent_id))
-    )
+
+    result = await db.execute(select(Agent).where(Agent.id == uuid.UUID(request.agent_id)))
     agent = result.scalar_one_or_none()
-    
+
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
-    
+
     # Update agent status and last heartbeat
     agent.status = request.status
     agent.last_heartbeat = datetime.utcnow()
-    
+
     await db.commit()
-    
+
     return {
         "status": "ok",
         "agent_id": request.agent_id,
@@ -193,14 +194,12 @@ async def report_metrics(
     db: AsyncSession = Depends(get_db),
 ):
     """Report agent metrics to MUTX."""
-    result = await db.execute(
-        select(Agent).where(Agent.id == uuid.UUID(request.agent_id))
-    )
+    result = await db.execute(select(Agent).where(Agent.id == uuid.UUID(request.agent_id)))
     agent = result.scalar_one_or_none()
-    
+
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
-    
+
     # Store metric
     metric = AgentMetric(
         agent_id=agent.id,
@@ -209,9 +208,9 @@ async def report_metrics(
         timestamp=datetime.utcnow(),
     )
     db.add(metric)
-    
+
     await db.commit()
-    
+
     return {
         "status": "ok",
         "agent_id": request.agent_id,
@@ -225,31 +224,29 @@ async def poll_commands(
     db: AsyncSession = Depends(get_db),
 ):
     """Poll for pending commands for this agent."""
-    result = await db.execute(
-        select(Agent).where(Agent.id == uuid.UUID(agent_id))
-    )
+    result = await db.execute(select(Agent).where(Agent.id == uuid.UUID(agent_id)))
     agent = result.scalar_one_or_none()
-    
+
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
-    
+
     # Query pending commands
     query = select(Command).where(
         Command.agent_id == uuid.UUID(agent_id),
         Command.status == "pending",
     )
-    
+
     if since:
         try:
             since_dt = datetime.fromisoformat(since)
             query = query.where(Command.created_at > since_dt)
         except ValueError:
             pass
-    
+
     query = query.order_by(Command.created_at.asc()).limit(50)
     result = await db.execute(query)
     commands = result.scalars().all()
-    
+
     return CommandsListResponse(
         commands=[
             CommandResponse(
@@ -269,22 +266,20 @@ async def acknowledge_command(
     db: AsyncSession = Depends(get_db),
 ):
     """Acknowledge command execution."""
-    result = await db.execute(
-        select(Command).where(Command.id == uuid.UUID(request.command_id))
-    )
+    result = await db.execute(select(Command).where(Command.id == uuid.UUID(request.command_id)))
     command = result.scalar_one_or_none()
-    
+
     if not command:
         raise HTTPException(status_code=404, detail="Command not found")
-    
+
     # Update command status
     command.status = "completed" if request.success else "failed"
     command.result = request.result
     command.error_message = request.error
     command.completed_at = datetime.utcnow()
-    
+
     await db.commit()
-    
+
     return {
         "status": "ok",
         "command_id": request.command_id,
@@ -297,14 +292,12 @@ async def submit_log(
     db: AsyncSession = Depends(get_db),
 ):
     """Submit a log entry from the agent."""
-    result = await db.execute(
-        select(Agent).where(Agent.id == uuid.UUID(request.agent_id))
-    )
+    result = await db.execute(select(Agent).where(Agent.id == uuid.UUID(request.agent_id)))
     agent = result.scalar_one_or_none()
-    
+
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
-    
+
     log_entry = AgentLog(
         agent_id=agent.id,
         level=request.level,
@@ -313,9 +306,9 @@ async def submit_log(
         timestamp=datetime.utcnow(),
     )
     db.add(log_entry)
-    
+
     await db.commit()
-    
+
     return {
         "status": "ok",
         "agent_id": request.agent_id,
@@ -328,18 +321,16 @@ async def get_agent_status(
     db: AsyncSession = Depends(get_db),
 ):
     """Get agent status."""
-    result = await db.execute(
-        select(Agent).where(Agent.id == uuid.UUID(agent_id))
-    )
+    result = await db.execute(select(Agent).where(Agent.id == uuid.UUID(agent_id)))
     agent = result.scalar_one_or_none()
-    
+
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
-    
+
     uptime = 0.0
     if agent.created_at:
         uptime = (datetime.utcnow() - agent.created_at).total_seconds()
-    
+
     return AgentStatusResponse(
         agent_id=str(agent.id),
         status=agent.status,

@@ -8,7 +8,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=False, extra="ignore")
 
-    database_url: str = Field(default="postgresql://user:password@localhost:5432/mutx", validation_alias=AliasChoices("DATABASE_URL", "DB_URL"))
+    database_url: str = Field(
+        default="postgresql://user:password@localhost:5432/mutx",
+        validation_alias=AliasChoices("DATABASE_URL", "DB_URL"),
+    )
     database_ssl_mode: str | None = Field(
         default=None,
         validation_alias=AliasChoices("DATABASE_SSL_MODE", "DB_SSL_MODE"),

@@ -193,7 +193,7 @@ class MessageResponse(BaseModel):
 async def forgot_password(request: ForgotPasswordRequest, session: AsyncSession = Depends(get_db)):
     """Request a password reset email."""
     user_service = UserService(session)
-    
+
     user = await user_service.get_user_by_email(request.email)
     if user:
         # Only send email if user exists (don't reveal if email exists)
@@ -201,16 +201,18 @@ async def forgot_password(request: ForgotPasswordRequest, session: AsyncSession 
         token = await user_service.create_password_reset_token(user.id)
         # Send email
         send_password_reset_email(user.email, user.name, token)
-    
+
     # Always return success to prevent email enumeration
-    return MessageResponse(message="If an account exists with this email, a password reset link has been sent")
+    return MessageResponse(
+        message="If an account exists with this email, a password reset link has been sent"
+    )
 
 
 @router.post("/reset-password", response_model=MessageResponse)
 async def reset_password(request: ResetPasswordRequest, session: AsyncSession = Depends(get_db)):
     """Reset password using token."""
     user_service = UserService(session)
-    
+
     # Validate password strength
     is_valid, error_message = validate_password_strength(request.new_password)
     if not is_valid:
@@ -218,7 +220,7 @@ async def reset_password(request: ResetPasswordRequest, session: AsyncSession = 
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=error_message,
         )
-    
+
     # Reset password
     user = await user_service.reset_password(request.token, request.new_password)
     if not user:
@@ -226,7 +228,7 @@ async def reset_password(request: ResetPasswordRequest, session: AsyncSession = 
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired reset token",
         )
-    
+
     return MessageResponse(message="Password has been reset successfully")
 
 
@@ -234,36 +236,40 @@ async def reset_password(request: ResetPasswordRequest, session: AsyncSession = 
 async def verify_email(request: VerifyEmailRequest, session: AsyncSession = Depends(get_db)):
     """Verify email with token."""
     user_service = UserService(session)
-    
+
     user = await user_service.verify_email(request.token)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired verification token",
         )
-    
+
     return MessageResponse(message="Email has been verified successfully")
 
 
 @router.post("/resend-verification", response_model=MessageResponse)
-async def resend_verification(request: ResendVerificationRequest, session: AsyncSession = Depends(get_db)):
+async def resend_verification(
+    request: ResendVerificationRequest, session: AsyncSession = Depends(get_db)
+):
     """Resend verification email."""
     user_service = UserService(session)
-    
+
     user = await user_service.get_user_by_email(request.email)
     if not user:
         # Don't reveal if email exists
-        return MessageResponse(message="If an account exists and is not verified, a verification email has been sent")
-    
+        return MessageResponse(
+            message="If an account exists and is not verified, a verification email has been sent"
+        )
+
     if user.is_email_verified:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email is already verified",
         )
-    
+
     # Create new verification token
     token = await user_service.create_email_verification_token(user.id)
     # Send email
     send_verification_email(user.email, user.name, token)
-    
+
     return MessageResponse(message="Verification email has been sent")

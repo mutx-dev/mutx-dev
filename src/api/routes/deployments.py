@@ -32,13 +32,13 @@ async def _get_deployment_with_ownership(
     deployment = result.scalar_one_or_none()
     if not deployment:
         raise HTTPException(status_code=404, detail="Deployment not found")
-    
+
     # Verify ownership through the agent
     agent_result = await db.execute(select(Agent).where(Agent.id == deployment.agent_id))
     agent = agent_result.scalar_one_or_none()
     if not agent or agent.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to access this deployment")
-    
+
     return deployment
 
 
@@ -78,7 +78,9 @@ async def list_deployments(
         agent_result = await db.execute(select(Agent).where(Agent.id == agent_id))
         agent = agent_result.scalar_one_or_none()
         if not agent or agent.user_id != current_user.id:
-            raise HTTPException(status_code=403, detail="Not authorized to view deployments for this agent")
+            raise HTTPException(
+                status_code=403, detail="Not authorized to view deployments for this agent"
+            )
         query = query.where(Deployment.agent_id == agent_id)
     if status:
         query = query.where(Deployment.status == status)
@@ -105,10 +107,10 @@ async def scale_deployment(
     current_user: User = Depends(get_current_user),
 ):
     deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
-    
+
     if deployment.status not in ["running", "ready"]:
         raise HTTPException(status_code=400, detail="Can only scale running deployments")
-    
+
     deployment.replicas = scale_data.replicas
     await db.commit()
     await db.refresh(deployment)
@@ -123,15 +125,15 @@ async def kill_deployment(
     current_user: User = Depends(get_current_user),
 ):
     deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
-    
+
     deployment.status = "killed"
     deployment.ended_at = datetime.utcnow()
-    
+
     result = await db.execute(select(Agent).where(Agent.id == deployment.agent_id))
     agent = result.scalar_one_or_none()
     if agent:
         agent.status = AgentStatus.STOPPED.value
-    
+
     await db.commit()
     logger.info(f"Killed deployment: {deployment_id}")
 
@@ -150,11 +152,11 @@ async def create_deployment(
         raise HTTPException(status_code=404, detail="Agent not found")
     if agent.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to deploy this agent")
-    
+
     # Check if agent is in a deployable state
     if agent.status == AgentStatus.DELETING.value:
         raise HTTPException(status_code=400, detail="Cannot deploy an agent that is being deleted")
-    
+
     # Create the deployment
     deployment = Deployment(
         agent_id=deployment_data.agent_id,
@@ -163,10 +165,10 @@ async def create_deployment(
         started_at=datetime.utcnow(),
     )
     db.add(deployment)
-    
+
     # Update agent status
     agent.status = AgentStatus.RUNNING.value
-    
+
     await db.commit()
     await db.refresh(deployment)
     logger.info(f"Created deployment {deployment.id} for agent {deployment_data.agent_id}")
@@ -181,26 +183,26 @@ async def restart_deployment(
 ):
     """Restart an existing deployment."""
     deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
-    
+
     # Can only restart deployments that are stopped, failed, or killed
     if deployment.status not in ["stopped", "failed", "killed"]:
         raise HTTPException(
-            status_code=400, 
-            detail=f"Cannot restart deployment with status '{deployment.status}'. Only stopped, failed, or killed deployments can be restarted."
+            status_code=400,
+            detail=f"Cannot restart deployment with status '{deployment.status}'. Only stopped, failed, or killed deployments can be restarted.",
         )
-    
+
     # Reset deployment status
     deployment.status = "pending"
     deployment.started_at = datetime.utcnow()
     deployment.ended_at = None
     deployment.error_message = None
-    
+
     # Update agent status
     agent_result = await db.execute(select(Agent).where(Agent.id == deployment.agent_id))
     agent = agent_result.scalar_one_or_none()
     if agent:
         agent.status = AgentStatus.RUNNING.value
-    
+
     await db.commit()
     await db.refresh(deployment)
     logger.info(f"Restarted deployment: {deployment_id}")
@@ -218,18 +220,15 @@ async def get_deployment_logs(
 ):
     """Get logs for a specific deployment."""
     deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
-    
+
     # Query logs for the deployment's agent
     query = (
-        select(AgentLog)
-        .where(AgentLog.agent_id == deployment.agent_id)
-        .offset(skip)
-        .limit(limit)
+        select(AgentLog).where(AgentLog.agent_id == deployment.agent_id).offset(skip).limit(limit)
     )
     if level:
         query = query.where(AgentLog.level == level)
     query = query.order_by(AgentLog.timestamp.desc())
-    
+
     result = await db.execute(query)
     logs = result.scalars().all()
     return logs
@@ -245,7 +244,7 @@ async def get_deployment_metrics(
 ):
     """Get metrics for a specific deployment."""
     deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
-    
+
     # Query metrics for the deployment's agent
     query = (
         select(AgentMetric)
@@ -254,7 +253,7 @@ async def get_deployment_metrics(
         .limit(limit)
         .order_by(AgentMetric.timestamp.desc())
     )
-    
+
     result = await db.execute(query)
     metrics = result.scalars().all()
     return metrics

@@ -45,7 +45,9 @@ def list_deployments(limit: int, skip: int, agent_id: Optional[str], status: Opt
         return
 
     for dep in deployments:
-        click.echo(f"{dep['id']} | {dep['agent_id']} | {dep['status']} | replicas: {dep.get('replicas', 1)}")
+        click.echo(
+            f"{dep['id']} | {dep['agent_id']} | {dep['status']} | replicas: {dep.get('replicas', 1)}"
+        )
 
 
 @deploy_group.command(name="create")

@@ -99,22 +99,22 @@ async def get_user_from_api_key(
         return None
 
     user_service = UserService(session)
-    
+
     # Try to find the user by checking all their API keys
     # This requires iterating through user API keys - for efficiency,
     # we could add a lookup by prefix or store a reference
     # For now, we'll iterate through users and check their keys
     from sqlalchemy import select
     from src.api.models.models import User
-    
+
     result = await session.execute(select(User).where(User.is_active))
     users = result.scalars().all()
-    
+
     for user in users:
         api_key_obj = await user_service.verify_api_key(x_api_key, user.id)
         if api_key_obj:
             return user
-    
+
     return None
 
 
@@ -135,21 +135,21 @@ async def get_current_user_or_api_key(
                 user = await user_service.get_user_by_id(user_id)
                 if user and user.is_active:
                     return user
-    
+
     # Try API key
     if x_api_key:
         user_service = UserService(session)
         from sqlalchemy import select
         from src.api.models.models import User
-        
+
         result = await session.execute(select(User).where(User.is_active))
         users = result.scalars().all()
-        
+
         for user in users:
             api_key_obj = await user_service.verify_api_key(x_api_key, user.id)
             if api_key_obj:
                 return user
-    
+
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid or expired token",
@@ -167,4 +167,5 @@ def require_auth(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
         return await func(*args, **kwargs)
+
     return wrapper

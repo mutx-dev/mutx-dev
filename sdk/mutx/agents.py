@@ -35,9 +35,7 @@ class Deployment:
         self.replicas = data["replicas"]
         self.node_id = data.get("node_id")
         self.started_at = datetime.fromisoformat(data["started_at"])
-        self.ended_at = (
-            datetime.fromisoformat(data["ended_at"]) if data.get("ended_at") else None
-        )
+        self.ended_at = datetime.fromisoformat(data["ended_at"]) if data.get("ended_at") else None
         self.error_message = data.get("error_message")
         self._data = data
 

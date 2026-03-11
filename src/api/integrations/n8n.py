@@ -96,10 +96,7 @@ class N8nClient:
                 data = response.json()
                 self._client.headers["Authorization"] = f"Bearer {data.get('token')}"
 
-    @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=2, max=10)
-    )
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
     def _request(
         self,
         method: str,
@@ -203,10 +200,10 @@ class N8nClient:
     ) -> WebhookResponse:
         webhook = self._request("GET", f"/rest/webhook/{workflow_id}")
         webhook_url = webhook.get("webhookUrl")
-        
+
         response_data = None
         execution_id = None
-        
+
         if data:
             trigger_response = self._client.post(
                 webhook_url,
@@ -214,7 +211,7 @@ class N8nClient:
                 timeout=timeout,
             )
             trigger_response.raise_for_status()
-            
+
             if wait_for_response:
                 execution = self._request(
                     "GET",
@@ -222,7 +219,7 @@ class N8nClient:
                 )
                 response_data = execution.get("data")
                 execution_id = execution.get("executionId")
-        
+
         return WebhookResponse(
             workflow_id=workflow_id,
             webhook_url=webhook_url,
@@ -265,7 +262,7 @@ class N8nClient:
             params["workflowId"] = workflow_id
         if status:
             params["status"] = status
-        
+
         data = self._request("GET", "/rest/executions", params=params)
         return [Execution(**e) for e in data.get("data", [])]
 

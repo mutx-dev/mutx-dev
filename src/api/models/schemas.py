@@ -40,6 +40,7 @@ class DeploymentScale(BaseModel):
 
 class DeploymentLogsResponse(BaseModel):
     """Response model for deployment logs"""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
@@ -52,6 +53,7 @@ class DeploymentLogsResponse(BaseModel):
 
 class DeploymentMetricsResponse(BaseModel):
     """Response model for deployment metrics"""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
@@ -146,6 +148,7 @@ class APIKeyResponse(BaseModel):
 
 class APIKeyCreateResponse(BaseModel):
     """Response containing the newly created API key - only shown once!"""
+
     id: uuid.UUID
     name: str
     key: str  # The plain API key - only returned on creation
@@ -156,7 +159,10 @@ class APIKeyCreateResponse(BaseModel):
 # Webhook Schemas
 class WebhookCreate(BaseModel):
     url: str = Field(..., max_length=512, description="The URL to receive webhook events")
-    events: list[str] = Field(default_factory=lambda: ["*"], description="List of events to subscribe to (e.g., 'agent.status', 'deployment.*', '*' for all)")
+    events: list[str] = Field(
+        default_factory=lambda: ["*"],
+        description="List of events to subscribe to (e.g., 'agent.status', 'deployment.*', '*' for all)",
+    )
     secret: Optional[str] = Field(None, description="Optional secret for signature verification")
 
 
@@ -180,6 +186,7 @@ class WebhookResponse(BaseModel):
 
 class WebhookDelivery(BaseModel):
     """Schema for webhook delivery attempts"""
+
     webhook_id: uuid.UUID
     event: str
     payload: dict

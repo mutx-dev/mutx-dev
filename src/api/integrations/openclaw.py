@@ -50,10 +50,7 @@ class OpenClawClient:
     def _build_url(self, endpoint: str) -> str:
         return f"{self.config.base_url}{endpoint}"
 
-    @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=2, max=10)
-    )
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
     def _request(
         self,
         method: str,

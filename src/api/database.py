@@ -4,7 +4,12 @@ from typing import Any
 
 from sqlalchemy import text
 from sqlalchemy.engine import make_url
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.pool import NullPool
 
@@ -91,7 +96,9 @@ def build_sync_database_url(database_url: str) -> str:
 
     if ssl_setting:
         normalized_ssl_setting = _normalize_ssl_setting(ssl_setting)
-        query["sslmode"] = normalized_ssl_setting if isinstance(normalized_ssl_setting, str) else "disable"
+        query["sslmode"] = (
+            normalized_ssl_setting if isinstance(normalized_ssl_setting, str) else "disable"
+        )
 
     if base_drivername == "postgres":
         return url.set(drivername="postgresql", query=query).render_as_string(hide_password=False)
@@ -165,9 +172,7 @@ async def _run_schema_setup() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         if conn.dialect.name == "postgresql":
-            await conn.execute(
-                text("ALTER TABLE agents ADD COLUMN IF NOT EXISTS description TEXT")
-            )
+            await conn.execute(text("ALTER TABLE agents ADD COLUMN IF NOT EXISTS description TEXT"))
 
 
 async def init_db() -> None:
@@ -177,9 +182,7 @@ async def init_db() -> None:
         if not _should_retry_without_ssl(exc):
             raise
 
-        logger.warning(
-            "Database rejected SSL upgrade; retrying with SSL disabled for asyncpg"
-        )
+        logger.warning("Database rejected SSL upgrade; retrying with SSL disabled for asyncpg")
         await _reconfigure_engine(override_ssl_mode="disable")
         await _run_schema_setup()
 

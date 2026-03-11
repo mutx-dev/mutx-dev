@@ -139,15 +139,17 @@ class MetricsCollector:
             self._metrics_history[agent_id] = deque(maxlen=self.max_history)
 
         metrics = self._agent_metrics[agent_id]
-        self._metrics_history[agent_id].append({
-            "timestamp": datetime.utcnow(),
-            "request_count": metrics.request_count,
-            "error_count": metrics.error_count,
-            "success_count": metrics.success_count,
-            "avg_latency_ms": metrics.avg_latency_ms,
-            "cpu_usage": metrics.cpu_usage,
-            "memory_usage": metrics.memory_usage,
-        })
+        self._metrics_history[agent_id].append(
+            {
+                "timestamp": datetime.utcnow(),
+                "request_count": metrics.request_count,
+                "error_count": metrics.error_count,
+                "success_count": metrics.success_count,
+                "avg_latency_ms": metrics.avg_latency_ms,
+                "cpu_usage": metrics.cpu_usage,
+                "memory_usage": metrics.memory_usage,
+            }
+        )
 
     async def get_agent_metrics(self, agent_id: str) -> Optional[AgentMetrics]:
         async with self._lock:
@@ -574,9 +576,13 @@ class MonitoringService:
             "memory_usage": round(metrics.memory_usage, 2),
             "restart_count": metrics.restart_count,
             "consecutive_failures": metrics.consecutive_failures,
-            "last_request_at": metrics.last_request_at.isoformat() if metrics.last_request_at else None,
+            "last_request_at": (
+                metrics.last_request_at.isoformat() if metrics.last_request_at else None
+            ),
             "last_error_at": metrics.last_error_at.isoformat() if metrics.last_error_at else None,
-            "last_health_check": metrics.last_health_check.isoformat() if metrics.last_health_check else None,
+            "last_health_check": (
+                metrics.last_health_check.isoformat() if metrics.last_health_check else None
+            ),
             "uptime": uptime,
         }
 

@@ -24,7 +24,9 @@ logger = logging.getLogger(__name__)
 
 async def get_webhook_auth(
     authorization: Optional[str] = Header(None, description="Bearer token for JWT auth"),
-    x_api_key: Optional[str] = Header(None, alias="X-API-Key", description="API key for webhook authentication"),
+    x_api_key: Optional[str] = Header(
+        None, alias="X-API-Key", description="API key for webhook authentication"
+    ),
     session: AsyncSession = Depends(get_db),
 ) -> User:
     """Authenticate webhook requests via JWT or API key."""
@@ -50,11 +52,11 @@ async def agent_status_update(
         raise HTTPException(status_code=404, detail="Agent not found")
     if agent.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to update this agent")
-    
+
     old_status = agent.status
     agent.status = status_data.status.value
     agent.updated_at = datetime.utcnow()
-    
+
     log = AgentLog(
         agent_id=agent.id,
         level="info",
@@ -62,7 +64,7 @@ async def agent_status_update(
         extra_data=f"node_id: {status_data.node_id}",
     )
     db.add(log)
-    
+
     if status_data.error_message:
         agent.status = AgentStatus.FAILED.value
         error_log = AgentLog(
@@ -72,7 +74,7 @@ async def agent_status_update(
             extra_data=f"node_id: {status_data.node_id}",
         )
         db.add(error_log)
-    
+
     await db.commit()
     logger.info(f"Agent {agent.id} status updated to {status_data.status.value}")
     return {"status": "updated"}
@@ -89,19 +91,19 @@ async def deployment_event(
     deployment = result.scalar_one_or_none()
     if not deployment:
         raise HTTPException(status_code=404, detail="Deployment not found")
-    
+
     # Get the agent to verify ownership
     agent_result = await db.execute(select(Agent).where(Agent.id == deployment.agent_id))
     agent = agent_result.scalar_one_or_none()
     if not agent or agent.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to update this deployment")
-    
+
     if event_data.status:
         deployment.status = event_data.status
-    
+
     if event_data.node_id:
         deployment.node_id = event_data.node_id
-    
+
     if event_data.error_message:
         deployment.error_message = event_data.error_message
         deployment.status = "failed"
@@ -112,17 +114,17 @@ async def deployment_event(
             extra_data=f"deployment_id: {deployment.id}, event: {event_data.event}",
         )
         db.add(error_log)
-    
+
     if event_data.event == "stopped" or event_data.status == "stopped":
         deployment.ended_at = datetime.utcnow()
         if agent:
             agent.status = AgentStatus.STOPPED.value
-    
+
     if event_data.event == "healthy" or event_data.status == "running":
         deployment.status = "running"
         if deployment.started_at is None:
             deployment.started_at = datetime.utcnow()
-    
+
     await db.commit()
     logger.info(f"Deployment {deployment.id} event: {event_data.event}")
     return {"status": "processed"}
@@ -140,8 +142,10 @@ async def receive_metrics(
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
     if agent.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to submit metrics for this agent")
-    
+        raise HTTPException(
+            status_code=403, detail="Not authorized to submit metrics for this agent"
+        )
+
     metric = AgentMetric(
         agent_id=metrics_data.agent_id,
         cpu_usage=metrics_data.cpu_usage,
@@ -157,6 +161,7 @@ async def receive_metrics(
 # Webhook Registration Endpoints
 # ============================================
 
+
 @router.post("/", response_model=WebhookResponse, status_code=201)
 async def create_webhook(
     webhook_data: WebhookCreate,
@@ -166,11 +171,8 @@ async def create_webhook(
     """Register a new webhook endpoint."""
     # Validate URL format
     if not webhook_data.url.startswith(("http://", "https://")):
-        raise HTTPException(
-            status_code=400,
-            detail="URL must start with http:// or https://"
-        )
-    
+        raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
+
     # Validate events
     valid_event_prefixes = ["agent.", "deployment.", "metrics.", "alert."]
     for event in webhook_data.events:
@@ -178,9 +180,9 @@ async def create_webhook(
             if not event.endswith(".*"):
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Invalid event: {event}. Must be 'agent.*', 'deployment.*', 'metrics.*', 'alert.*', or '*'"
+                    detail=f"Invalid event: {event}. Must be 'agent.*', 'deployment.*', 'metrics.*', 'alert.*', or '*'",
                 )
-    
+
     webhook = Webhook(
         user_id=current_user.id,
         url=webhook_data.url,
@@ -191,7 +193,7 @@ async def create_webhook(
     db.add(webhook)
     await db.commit()
     await db.refresh(webhook)
-    
+
     logger.info(f"Webhook created: {webhook.id} for user {current_user.id}")
     return webhook
 
@@ -202,9 +204,7 @@ async def list_webhooks(
     current_user: User = Depends(get_webhook_auth),
 ):
     """List all webhooks registered by the authenticated user."""
-    result = await db.execute(
-        select(Webhook).where(Webhook.user_id == current_user.id)
-    )
+    result = await db.execute(select(Webhook).where(Webhook.user_id == current_user.id))
     webhooks = result.scalars().all()
     return webhooks
 
@@ -217,16 +217,13 @@ async def get_webhook(
 ):
     """Get a specific webhook by ID."""
     result = await db.execute(
-        select(Webhook).where(
-            Webhook.id == webhook_id,
-            Webhook.user_id == current_user.id
-        )
+        select(Webhook).where(Webhook.id == webhook_id, Webhook.user_id == current_user.id)
     )
     webhook = result.scalar_one_or_none()
-    
+
     if not webhook:
         raise HTTPException(status_code=404, detail="Webhook not found")
-    
+
     return webhook
 
 
@@ -239,42 +236,35 @@ async def update_webhook(
 ):
     """Update an existing webhook."""
     result = await db.execute(
-        select(Webhook).where(
-            Webhook.id == webhook_id,
-            Webhook.user_id == current_user.id
-        )
+        select(Webhook).where(Webhook.id == webhook_id, Webhook.user_id == current_user.id)
     )
     webhook = result.scalar_one_or_none()
-    
+
     if not webhook:
         raise HTTPException(status_code=404, detail="Webhook not found")
-    
+
     # Update fields if provided
     if webhook_data.url is not None:
         if not webhook_data.url.startswith(("http://", "https://")):
-            raise HTTPException(
-                status_code=400,
-                detail="URL must start with http:// or https://"
-            )
+            raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
         webhook.url = webhook_data.url
-    
+
     if webhook_data.events is not None:
         valid_event_prefixes = ["agent.", "deployment.", "metrics.", "alert."]
         for event in webhook_data.events:
-            if event != "*" and not any(event.startswith(prefix) for prefix in valid_event_prefixes):
+            if event != "*" and not any(
+                event.startswith(prefix) for prefix in valid_event_prefixes
+            ):
                 if not event.endswith(".*"):
-                    raise HTTPException(
-                        status_code=400,
-                        detail=f"Invalid event: {event}"
-                    )
+                    raise HTTPException(status_code=400, detail=f"Invalid event: {event}")
         webhook.events = webhook_data.events
-    
+
     if webhook_data.is_active is not None:
         webhook.is_active = webhook_data.is_active
-    
+
     await db.commit()
     await db.refresh(webhook)
-    
+
     logger.info(f"Webhook updated: {webhook.id}")
     return webhook
 
@@ -287,19 +277,16 @@ async def delete_webhook(
 ):
     """Delete a webhook."""
     result = await db.execute(
-        select(Webhook).where(
-            Webhook.id == webhook_id,
-            Webhook.user_id == current_user.id
-        )
+        select(Webhook).where(Webhook.id == webhook_id, Webhook.user_id == current_user.id)
     )
     webhook = result.scalar_one_or_none()
-    
+
     if not webhook:
         raise HTTPException(status_code=404, detail="Webhook not found")
-    
+
     await db.delete(webhook)
     await db.commit()
-    
+
     logger.info(f"Webhook deleted: {webhook_id}")
     return None
 
@@ -312,34 +299,29 @@ async def test_webhook(
 ):
     """Send a test event to a webhook to verify it's working."""
     result = await db.execute(
-        select(Webhook).where(
-            Webhook.id == webhook_id,
-            Webhook.user_id == current_user.id
-        )
+        select(Webhook).where(Webhook.id == webhook_id, Webhook.user_id == current_user.id)
     )
     webhook = result.scalar_one_or_none()
-    
+
     if not webhook:
         raise HTTPException(status_code=404, detail="Webhook not found")
-    
+
     # Import the delivery function
     from src.api.services.webhook_service import deliver_webhook_with_retry
     import aiohttp
-    
+
     test_payload = {
         "message": "This is a test webhook from MUTX",
         "event": "test",
     }
-    
+
     async with aiohttp.ClientSession() as session:
-        success = await deliver_webhook_with_retry(
-            session, db, webhook, "test", test_payload
-        )
-    
+        success = await deliver_webhook_with_retry(session, db, webhook, "test", test_payload)
+
     if success:
         return {"status": "test_delivered", "message": "Test event delivered successfully"}
     else:
         raise HTTPException(
             status_code=502,
-            detail="Test event delivery failed. Check webhook URL and ensure it's reachable."
+            detail="Test event delivery failed. Check webhook URL and ensure it's reachable.",
         )

@@ -50,12 +50,12 @@ async def create_api_key(
     # Generate the plain API key (only shown once)
     plain_key = generate_api_key()
     key_hash = hash_key(plain_key)
-    
+
     # Calculate expiration if provided
     expires_at = None
     if key_data.expires_in_days:
         expires_at = datetime.utcnow() + timedelta(days=key_data.expires_in_days)
-    
+
     # Create the API key record
     api_key = APIKey(
         id=uuid.uuid4(),
@@ -65,11 +65,11 @@ async def create_api_key(
         expires_at=expires_at,
         is_active=True,
     )
-    
+
     db.add(api_key)
     await db.commit()
     await db.refresh(api_key)
-    
+
     return APIKeyCreateResponse(
         id=api_key.id,
         name=api_key.name,
@@ -87,22 +87,19 @@ async def revoke_api_key(
 ):
     """Revoke (delete) an API key"""
     result = await db.execute(
-        select(APIKey).where(
-            APIKey.id == key_id,
-            APIKey.user_id == current_user.id
-        )
+        select(APIKey).where(APIKey.id == key_id, APIKey.user_id == current_user.id)
     )
     api_key = result.scalar_one_or_none()
-    
+
     if not api_key:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="API key not found",
         )
-    
+
     await db.delete(api_key)
     await db.commit()
-    
+
     return None
 
 
@@ -115,26 +112,23 @@ async def rotate_api_key(
     """Rotate an API key (revoke old and create new)"""
     # Find the existing key
     result = await db.execute(
-        select(APIKey).where(
-            APIKey.id == key_id,
-            APIKey.user_id == current_user.id
-        )
+        select(APIKey).where(APIKey.id == key_id, APIKey.user_id == current_user.id)
     )
     old_key = result.scalar_one_or_none()
-    
+
     if not old_key:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="API key not found",
         )
-    
+
     # Generate new key
     plain_key = generate_api_key()
     key_hash = hash_key(plain_key)
-    
+
     # Delete old key
     await db.delete(old_key)
-    
+
     # Create new key with same expiration
     new_key = APIKey(
         id=uuid.uuid4(),
@@ -144,11 +138,11 @@ async def rotate_api_key(
         expires_at=old_key.expires_at,
         is_active=True,
     )
-    
+
     db.add(new_key)
     await db.commit()
     await db.refresh(new_key)
-    
+
     return APIKeyCreateResponse(
         id=new_key.id,
         name=new_key.name,

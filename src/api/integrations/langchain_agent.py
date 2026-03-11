@@ -11,7 +11,11 @@ from langchain_anthropic import ChatAnthropic
 from langchain_community.chat_models import ChatOllama
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, BaseMessage
 from langchain_core.tools import BaseTool
-from langchain.agents import AgentExecutor, create_openai_functions_agent, create_structured_chat_agent
+from langchain.agents import (
+    AgentExecutor,
+    create_openai_functions_agent,
+    create_structured_chat_agent,
+)
 from langchain.memory import ConversationBufferMemory, ChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
@@ -73,10 +77,7 @@ class BaseLLM(ABC):
 class OpenAILLM(BaseLLM):
     def __init__(self, model: str, temperature: float = 0.7, max_tokens: int = 2048, **kwargs):
         self.client = ChatOpenAI(
-            model=model,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            **kwargs
+            model=model, temperature=temperature, max_tokens=max_tokens, **kwargs
         )
 
     def invoke(self, messages: List[BaseMessage]) -> AIMessage:
@@ -89,10 +90,7 @@ class OpenAILLM(BaseLLM):
 class AnthropicLLM(BaseLLM):
     def __init__(self, model: str, temperature: float = 0.7, max_tokens: int = 2048, **kwargs):
         self.client = ChatAnthropic(
-            model=model,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            **kwargs
+            model=model, temperature=temperature, max_tokens=max_tokens, **kwargs
         )
 
     def invoke(self, messages: List[BaseMessage]) -> AIMessage:
@@ -104,11 +102,7 @@ class AnthropicLLM(BaseLLM):
 
 class OllamaLLM(BaseLLM):
     def __init__(self, model: str, temperature: float = 0.7, **kwargs):
-        self.client = ChatOllama(
-            model=model,
-            temperature=temperature,
-            **kwargs
-        )
+        self.client = ChatOllama(model=model, temperature=temperature, **kwargs)
 
     def invoke(self, messages: List[BaseMessage]) -> AIMessage:
         return self.client.invoke(messages)
@@ -125,21 +119,17 @@ class LLMWrapper:
                 model=config.model,
                 temperature=config.temperature,
                 max_tokens=config.max_tokens,
-                **kwargs
+                **kwargs,
             )
         elif config.provider == LLMProvider.ANTHROPIC:
             return AnthropicLLM(
                 model=config.model,
                 temperature=config.temperature,
                 max_tokens=config.max_tokens,
-                **kwargs
+                **kwargs,
             )
         elif config.provider == LLMProvider.OLLAMA:
-            return OllamaLLM(
-                model=config.model,
-                temperature=config.temperature,
-                **kwargs
-            )
+            return OllamaLLM(model=config.model, temperature=config.temperature, **kwargs)
         else:
             raise ValueError(f"Unknown LLM provider: {config.provider}")
 
@@ -253,25 +243,25 @@ class LangChainAgent:
                     name="search_documents",
                     description="Search through documents using semantic similarity. Use this to find relevant information from uploaded documents.",
                     function=lambda kwargs, vector_store_name=vector_store_name: BuiltInTools.search_documents(
-                        vector_store_name,
-                        kwargs.get("query", ""),
-                        kwargs.get("k", 4)
+                        vector_store_name, kwargs.get("query", ""), kwargs.get("k", 4)
                     ),
                 )
             )
 
-        tool_definitions.extend([
-            ToolDefinition(
-                name="get_time",
-                description="Get the current timestamp",
-                function=lambda _: BuiltInTools.get_timestamp(),
-            ),
-            ToolDefinition(
-                name="calculator",
-                description="Perform mathematical calculations",
-                function=lambda kwargs: BuiltInTools.calculate(kwargs.get("expression", "0")),
-            ),
-        ])
+        tool_definitions.extend(
+            [
+                ToolDefinition(
+                    name="get_time",
+                    description="Get the current timestamp",
+                    function=lambda _: BuiltInTools.get_timestamp(),
+                ),
+                ToolDefinition(
+                    name="calculator",
+                    description="Perform mathematical calculations",
+                    function=lambda kwargs: BuiltInTools.calculate(kwargs.get("expression", "0")),
+                ),
+            ]
+        )
 
         return ToolFactory.create_tools(tool_definitions)
 
@@ -281,12 +271,14 @@ class LangChainAgent:
             "If you need to search for information, use the search_documents tool."
         )
 
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", system_message),
-            MessagesPlaceholder(variable_name="chat_history", optional=True),
-            ("human", "{input}"),
-            MessagesPlaceholder(variable_name="agent_scratchpad"),
-        ])
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", system_message),
+                MessagesPlaceholder(variable_name="chat_history", optional=True),
+                ("human", "{input}"),
+                MessagesPlaceholder(variable_name="agent_scratchpad"),
+            ]
+        )
         return prompt
 
     def initialize(self):
@@ -323,6 +315,7 @@ class LangChainAgent:
     def _get_llm_adapter(self):
         if isinstance(self.llm, OpenAILLM):
             from langchain_openai import ChatOpenAI
+
             return ChatOpenAI(
                 model=self.config.model,
                 temperature=self.config.temperature,
@@ -330,6 +323,7 @@ class LangChainAgent:
             )
         elif isinstance(self.llm, AnthropicLLM):
             from langchain_anthropic import ChatAnthropic
+
             return ChatAnthropic(
                 model=self.config.model,
                 temperature=self.config.temperature,
@@ -337,6 +331,7 @@ class LangChainAgent:
             )
         else:
             from langchain_community.chat_models import ChatOllama
+
             return ChatOllama(
                 model=self.config.model,
                 temperature=self.config.temperature,
@@ -352,7 +347,9 @@ class LangChainAgent:
                 output = result.get("output", "")
             else:
                 messages = [
-                    SystemMessage(content=self.config.system_prompt or "You are a helpful assistant."),
+                    SystemMessage(
+                        content=self.config.system_prompt or "You are a helpful assistant."
+                    ),
                     HumanMessage(content=input_text),
                 ]
                 response = self.llm.invoke(messages)
@@ -360,11 +357,13 @@ class LangChainAgent:
 
             self.memory_manager.add_ai_message(output)
             self.state.last_run = datetime.utcnow()
-            self.state.conversation_history.append({
-                "timestamp": self.state.last_run.isoformat(),
-                "input": input_text,
-                "output": output,
-            })
+            self.state.conversation_history.append(
+                {
+                    "timestamp": self.state.last_run.isoformat(),
+                    "input": input_text,
+                    "output": output,
+                }
+            )
             self.state.status = "ready"
 
             return {
@@ -392,7 +391,9 @@ class LangChainAgent:
                 output = result.get("output", "")
             else:
                 messages = [
-                    SystemMessage(content=self.config.system_prompt or "You are a helpful assistant."),
+                    SystemMessage(
+                        content=self.config.system_prompt or "You are a helpful assistant."
+                    ),
                     HumanMessage(content=input_text),
                 ]
                 response = await self.llm.ainvoke(messages)
@@ -400,11 +401,13 @@ class LangChainAgent:
 
             self.memory_manager.add_ai_message(output)
             self.state.last_run = datetime.utcnow()
-            self.state.conversation_history.append({
-                "timestamp": self.state.last_run.isoformat(),
-                "input": input_text,
-                "output": output,
-            })
+            self.state.conversation_history.append(
+                {
+                    "timestamp": self.state.last_run.isoformat(),
+                    "input": input_text,
+                    "output": output,
+                }
+            )
             self.state.status = "ready"
 
             return {
@@ -437,7 +440,9 @@ class LangChainAgent:
                                 yield msg.content
             else:
                 messages = [
-                    SystemMessage(content=self.config.system_prompt or "You are a helpful assistant."),
+                    SystemMessage(
+                        content=self.config.system_prompt or "You are a helpful assistant."
+                    ),
                     HumanMessage(content=input_text),
                 ]
                 response = self.llm.invoke(messages)

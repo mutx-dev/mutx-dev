@@ -74,6 +74,7 @@ class VectorStoreManager:
             )
         elif self.config.embedding_provider == EmbeddingProvider.OLLAMA:
             from langchain_community.embeddings import OllamaEmbeddings
+
             return OllamaEmbeddings(model=self.config.embedding_model)
         else:
             raise ValueError(f"Unknown embedding provider: {self.config.embedding_provider}")
@@ -119,7 +120,9 @@ class VectorStoreManager:
                 session.add(doc)
             session.commit()
 
-        logger.info(f"Added {len(splits)} document chunks to collection {self.config.collection_name}")
+        logger.info(
+            f"Added {len(splits)} document chunks to collection {self.config.collection_name}"
+        )
         return [f"doc_{i}" for i in range(len(splits))]
 
     def similarity_search(
@@ -131,9 +134,8 @@ class VectorStoreManager:
         with self._get_sync_session_maker() as session:
             query_embedding = self._embeddings.embed_query(query)
 
-            stmt = (
-                session.query(DocumentModel)
-                .filter(DocumentModel.collection_name == self.config.collection_name)
+            stmt = session.query(DocumentModel).filter(
+                DocumentModel.collection_name == self.config.collection_name
             )
 
             if filter_metadata:
@@ -144,6 +146,7 @@ class VectorStoreManager:
 
             def cosine_similarity(a: List[float], b: List[float]) -> float:
                 import numpy as np
+
                 a = np.array(a)
                 b = np.array(b)
                 return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
@@ -160,8 +163,7 @@ class VectorStoreManager:
             top_k = scored_results[:k]
 
             documents = [
-                Document(page_content=doc.content, metadata=doc.extra_data)
-                for score, doc in top_k
+                Document(page_content=doc.content, metadata=doc.extra_data) for score, doc in top_k
             ]
 
         logger.info(f"Similarity search returned {len(documents)} documents")
@@ -187,6 +189,7 @@ class VectorStoreManager:
                 )
                 if doc_model and doc_model.embedding:
                     import numpy as np
+
                     score = float(
                         np.dot(
                             np.array(query_embedding),
@@ -214,9 +217,11 @@ class VectorStoreManager:
 
     def get_collection_stats(self) -> Dict[str, Any]:
         with self._get_sync_session_maker() as session:
-            count = session.query(DocumentModel).filter(
-                DocumentModel.collection_name == self.config.collection_name
-            ).count()
+            count = (
+                session.query(DocumentModel)
+                .filter(DocumentModel.collection_name == self.config.collection_name)
+                .count()
+            )
         return {
             "collection_name": self.config.collection_name,
             "document_count": count,

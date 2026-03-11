@@ -47,7 +47,7 @@ class UserService:
         password_hash = None
         if password:
             password_hash = hash_password(password)
-        
+
         user = User(
             id=uuid.uuid4(),
             email=email,
@@ -62,21 +62,15 @@ class UserService:
         return user
 
     async def get_user_by_email(self, email: str) -> Optional[User]:
-        result = await self.session.execute(
-            select(User).where(User.email == email)
-        )
+        result = await self.session.execute(select(User).where(User.email == email))
         return result.scalar_one_or_none()
 
     async def get_user_by_id(self, user_id: uuid.UUID) -> Optional[User]:
-        result = await self.session.execute(
-            select(User).where(User.id == user_id)
-        )
+        result = await self.session.execute(select(User).where(User.id == user_id))
         return result.scalar_one_or_none()
 
     async def get_user_by_api_key(self, api_key: str) -> Optional[User]:
-        result = await self.session.execute(
-            select(User).where(User.api_key == api_key)
-        )
+        result = await self.session.execute(select(User).where(User.api_key == api_key))
         return result.scalar_one_or_none()
 
     async def authenticate_user(self, email: str, password: str) -> Optional[User]:
@@ -89,9 +83,7 @@ class UserService:
 
     async def update_user_plan(self, user_id: uuid.UUID, plan: Plan) -> User:
         await self.session.execute(
-            update(User)
-            .where(User.id == user_id)
-            .values(plan=plan, updated_at=datetime.utcnow())
+            update(User).where(User.id == user_id).values(plan=plan, updated_at=datetime.utcnow())
         )
         await self.session.commit()
         user = await self.get_user_by_id(user_id)
@@ -115,7 +107,7 @@ class UserService:
     ) -> tuple[APIKey, str]:
         plain_key = generate_api_key()
         key_hash = hash_api_key(plain_key)
-        
+
         expires_at = None
         if expires_in_days:
             expires_at = datetime.utcnow() + timedelta(days=expires_in_days)
@@ -134,20 +126,16 @@ class UserService:
 
     async def get_user_api_keys(self, user_id: uuid.UUID) -> list[APIKey]:
         result = await self.session.execute(
-            select(APIKey)
-            .where(APIKey.user_id == user_id)
-            .where(APIKey.is_active)
+            select(APIKey).where(APIKey.user_id == user_id).where(APIKey.is_active)
         )
         return list(result.scalars().all())
 
     async def verify_api_key(self, plain_key: str, user_id: uuid.UUID) -> Optional[APIKey]:
         result = await self.session.execute(
-            select(APIKey)
-            .where(APIKey.user_id == user_id)
-            .where(APIKey.is_active)
+            select(APIKey).where(APIKey.user_id == user_id).where(APIKey.is_active)
         )
         api_keys = result.scalars().all()
-        
+
         for api_key in api_keys:
             if verify_api_key(plain_key, api_key.key_hash):
                 if api_key.expires_at and api_key.expires_at < datetime.utcnow():
@@ -158,9 +146,7 @@ class UserService:
 
     async def update_api_key_last_used(self, api_key_id: uuid.UUID) -> None:
         await self.session.execute(
-            update(APIKey)
-            .where(APIKey.id == api_key_id)
-            .values(last_used=datetime.utcnow())
+            update(APIKey).where(APIKey.id == api_key_id).values(last_used=datetime.utcnow())
         )
         await self.session.commit()
 
@@ -178,14 +164,14 @@ class UserService:
         user = await self.get_user_by_id(user_id)
         if not user:
             return False
-        
+
         plan_limits = {
             Plan.FREE: {"agents": 3, "deployments": 5, "api_keys": 2},
             Plan.STARTER: {"agents": 10, "deployments": 20, "api_keys": 10},
             Plan.PRO: {"agents": 50, "deployments": 100, "api_keys": 50},
             Plan.ENTERPRISE: {"agents": -1, "deployments": -1, "api_keys": -1},
         }
-        
+
         limit = plan_limits.get(user.plan, {}).get(resource, 0)
         if limit == -1:
             return True
@@ -205,9 +191,7 @@ class UserService:
         """Create and store an email verification token."""
         token = generate_token()
         await self.session.execute(
-            update(User)
-            .where(User.id == user_id)
-            .values(email_verification_token=token)
+            update(User).where(User.id == user_id).values(email_verification_token=token)
         )
         await self.session.commit()
         return token
@@ -220,7 +204,7 @@ class UserService:
         user = result.scalar_one_or_none()
         if not user:
             return None
-        
+
         # Update user as verified
         await self.session.execute(
             update(User)
@@ -232,7 +216,7 @@ class UserService:
             )
         )
         await self.session.commit()
-        
+
         # Refresh user
         await self.session.refresh(user)
         return user
@@ -262,18 +246,16 @@ class UserService:
 
     async def reset_password(self, token: str, new_password: str) -> Optional[User]:
         """Reset password with token. Returns user if successful."""
-        result = await self.session.execute(
-            select(User).where(User.password_reset_token == token)
-        )
+        result = await self.session.execute(select(User).where(User.password_reset_token == token))
         user = result.scalar_one_or_none()
-        
+
         if not user:
             return None
-        
+
         # Check if token is expired
         if user.password_reset_expires_at and user.password_reset_expires_at < datetime.utcnow():
             return None
-        
+
         # Update password and clear reset token
         password_hash = hash_password(new_password)
         await self.session.execute(
@@ -286,16 +268,14 @@ class UserService:
             )
         )
         await self.session.commit()
-        
+
         # Refresh user
         await self.session.refresh(user)
         return user
 
     async def get_user_by_password_reset_token(self, token: str) -> Optional[User]:
         """Get user by password reset token (without resetting)."""
-        result = await self.session.execute(
-            select(User).where(User.password_reset_token == token)
-        )
+        result = await self.session.execute(select(User).where(User.password_reset_token == token))
         return result.scalar_one_or_none()
 
     async def clear_password_reset_token(self, user_id: uuid.UUID) -> None:

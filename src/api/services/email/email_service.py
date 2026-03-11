@@ -19,32 +19,34 @@ def generate_token() -> str:
     return secrets.token_urlsafe(32)
 
 
-def send_email(to_email: str, subject: str, html_body: str, text_body: Optional[str] = None) -> bool:
+def send_email(
+    to_email: str, subject: str, html_body: str, text_body: Optional[str] = None
+) -> bool:
     """Send an email using SMTP.
-    
+
     Returns True if email was sent successfully, False otherwise.
     """
     if not settings.smtp_user or not settings.smtp_password:
         logger.warning(f"SMTP not configured. Would send email to {to_email}: {subject}")
         return True  # Return True in dev mode so flow continues
-    
+
     try:
-        msg = MIMEMultipart('alternative')
-        msg['From'] = f"{settings.smtp_from_name} <{settings.smtp_from_email}>"
-        msg['To'] = to_email
-        msg['Subject'] = subject
-        
+        msg = MIMEMultipart("alternative")
+        msg["From"] = f"{settings.smtp_from_name} <{settings.smtp_from_email}>"
+        msg["To"] = to_email
+        msg["Subject"] = subject
+
         # Attach plain text and HTML versions
         if text_body:
-            msg.attach(MIMEText(text_body, 'plain'))
-        msg.attach(MIMEText(html_body, 'html'))
-        
+            msg.attach(MIMEText(text_body, "plain"))
+        msg.attach(MIMEText(html_body, "html"))
+
         # Connect to SMTP server and send
         with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
             server.starttls()
             server.login(settings.smtp_user, settings.smtp_password)
             server.send_message(msg)
-        
+
         logger.info(f"Email sent successfully to {to_email}")
         return True
     except Exception as e:
@@ -55,7 +57,7 @@ def send_email(to_email: str, subject: str, html_body: str, text_body: Optional[
 def send_verification_email(to_email: str, name: str, token: str) -> bool:
     """Send email verification email."""
     verify_url = f"{settings.frontend_url}/verify-email?token={token}"
-    
+
     subject = "Verify your MUTX account"
     html_body = f"""
     <!DOCTYPE html>
@@ -91,14 +93,14 @@ def send_verification_email(to_email: str, name: str, token: str) -> bool:
     
     If you didn't create an account with MUTX, you can safely ignore this email.
     """
-    
+
     return send_email(to_email, subject, html_body, text_body)
 
 
 def send_password_reset_email(to_email: str, name: str, token: str) -> bool:
     """Send password reset email."""
     reset_url = f"{settings.frontend_url}/reset-password?token={token}"
-    
+
     subject = "Reset your MUTX password"
     html_body = f"""
     <!DOCTYPE html>
@@ -137,5 +139,5 @@ def send_password_reset_email(to_email: str, name: str, token: str) -> bool:
     
     If you didn't request a password reset, you can safely ignore this email.
     """
-    
+
     return send_email(to_email, subject, html_body, text_body)

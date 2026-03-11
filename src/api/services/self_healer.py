@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import time
 import uuid
 from typing import Optional, Dict, Any, List, Callable
 from dataclasses import dataclass, field
@@ -183,9 +184,7 @@ class RecoveryExecutor:
 
             record.status = RecoveryStatus.SUCCESS
             record.completed_at = datetime.utcnow()
-            record.recovery_time_seconds = (
-                record.completed_at - record.started_at
-            ).total_seconds()
+            record.recovery_time_seconds = (record.completed_at - record.started_at).total_seconds()
 
             logger.info(
                 f"Recovery successful for agent {agent_id}: {action.value} "
@@ -196,13 +195,9 @@ class RecoveryExecutor:
             record.status = RecoveryStatus.FAILED
             record.completed_at = datetime.utcnow()
             record.error_message = str(e)
-            record.recovery_time_seconds = (
-                record.completed_at - record.started_at
-            ).total_seconds()
+            record.recovery_time_seconds = (record.completed_at - record.started_at).total_seconds()
 
-            logger.error(
-                f"Recovery failed for agent {agent_id}: {str(e)}"
-            )
+            logger.error(f"Recovery failed for agent {agent_id}: {str(e)}")
 
             if self.config.rollback_on_failure and action != RecoveryAction.ROLLBACK:
                 logger.info(f"Attempting automatic rollback for agent {agent_id}")
@@ -431,10 +426,12 @@ class RecoveryTimeTracker:
             if agent_id not in self._recovery_times:
                 self._recovery_times[agent_id] = deque(maxlen=100)
 
-            self._recovery_times[agent_id].append({
-                "timestamp": datetime.utcnow(),
-                "recovery_time_seconds": recovery_time_seconds,
-            })
+            self._recovery_times[agent_id].append(
+                {
+                    "timestamp": datetime.utcnow(),
+                    "recovery_time_seconds": recovery_time_seconds,
+                }
+            )
 
     async def get_average_recovery_time(self, agent_id: str) -> Optional[float]:
         async with self._lock:
@@ -554,7 +551,9 @@ class SelfHealingService:
                 return None
 
             if agent_id in self._last_recovery_time:
-                time_since_last = (datetime.utcnow() - self._last_recovery_time[agent_id]).total_seconds()
+                time_since_last = (
+                    datetime.utcnow() - self._last_recovery_time[agent_id]
+                ).total_seconds()
                 if time_since_last < self.config.min_recovery_interval_seconds:
                     logger.debug(
                         f"Skipping recovery for {agent_id}: "
@@ -625,7 +624,9 @@ class SelfHealingService:
 
         metadata = {
             "trigger": "consecutive_failures",
-            "consecutive_failures": self.health_check_scheduler.get_agent_health(agent_id).consecutive_failures,
+            "consecutive_failures": self.health_check_scheduler.get_agent_health(
+                agent_id
+            ).consecutive_failures,
         }
 
         return await self.recovery_executor.execute_recovery(agent_id, action, metadata)
@@ -674,7 +675,9 @@ class SelfHealingService:
             "consecutive_failures": health.consecutive_failures,
             "last_check": health.last_check.isoformat(),
             "last_failure_reason": health.last_failure_reason,
-            "last_recovery_at": health.last_recovery_at.isoformat() if health.last_recovery_at else None,
+            "last_recovery_at": (
+                health.last_recovery_at.isoformat() if health.last_recovery_at else None
+            ),
             "current_version": self.version_manager.get_current_version(agent_id),
             "stable_version": self.version_manager.get_stable_version(agent_id),
             "recovery": recovery_stats,

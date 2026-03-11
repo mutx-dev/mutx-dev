@@ -1,5 +1,3 @@
-from typing import Optional
-
 import httpx
 
 from mutx.agent_runtime import (

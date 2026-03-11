@@ -139,9 +139,8 @@ class AgentRuntime:
     def _initialize_vector_store(self):
         try:
             vector_config = VectorStoreConfig(
-                database_url=self.config.database_url or os.getenv(
-                    "DATABASE_URL", "postgresql://user:password@localhost:5432/mutx"
-                ),
+                database_url=self.config.database_url
+                or os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/mutx"),
                 embedding_provider=EmbeddingProvider.OPENAI,
                 embedding_model="text-embedding-ada-002",
                 collection_name="default",

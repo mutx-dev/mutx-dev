@@ -50,8 +50,7 @@ def _serialize_agent(agent: Agent, include_deployments: bool = False):
 
     if include_deployments:
         payload["deployments"] = [
-            _serialize_deployment(deployment)
-            for deployment in agent.deployments
+            _serialize_deployment(deployment) for deployment in agent.deployments
         ]
 
     return payload
@@ -106,9 +105,7 @@ async def get_agent(
     current_user: User = Depends(get_current_user),
 ):
     result = await db.execute(
-        select(Agent)
-        .options(selectinload(Agent.deployments))
-        .where(Agent.id == agent_id)
+        select(Agent).options(selectinload(Agent.deployments)).where(Agent.id == agent_id)
     )
     agent = result.scalar_one_or_none()
     if not agent:
@@ -132,7 +129,7 @@ async def delete_agent(
     # Ownership check
     if agent.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to delete this agent")
-    
+
     agent.status = AgentStatus.DELETING.value
     await db.delete(agent)
     await db.commit()
@@ -152,7 +149,7 @@ async def deploy_agent(
     # Ownership check
     if agent.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to deploy this agent")
-    
+
     deployment = Deployment(
         agent_id=agent_id,
         status="deploying",
@@ -180,18 +177,17 @@ async def stop_agent(
     # Ownership check
     if agent.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to stop this agent")
-    
+
     result = await db.execute(
         select(Deployment).where(
-            Deployment.agent_id == agent_id,
-            Deployment.status.in_(["running", "deploying"])
+            Deployment.agent_id == agent_id, Deployment.status.in_(["running", "deploying"])
         )
     )
     deployments = result.scalars().all()
     for deployment in deployments:
         deployment.status = "stopped"
         deployment.ended_at = datetime.utcnow()
-    
+
     agent.status = AgentStatus.STOPPED.value
     await db.commit()
     logger.info(f"Stopped agent: {agent_id}")
@@ -214,7 +210,7 @@ async def get_agent_logs(
         raise HTTPException(status_code=404, detail="Agent not found")
     if agent.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to access this agent's logs")
-    
+
     query = select(AgentLog).where(AgentLog.agent_id == agent_id).offset(skip).limit(limit)
     if level:
         query = query.where(AgentLog.level == level)
@@ -239,7 +235,7 @@ async def get_agent_metrics(
         raise HTTPException(status_code=404, detail="Agent not found")
     if agent.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to access this agent's metrics")
-    
+
     query = (
         select(AgentMetric)
         .where(AgentMetric.agent_id == agent_id)

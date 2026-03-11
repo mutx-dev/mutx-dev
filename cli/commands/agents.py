@@ -52,6 +52,7 @@ def create_agent(name: str, description: str, config: str):
         return
 
     import json
+
     try:
         # Validate JSON but send as string to match API schema
         config_json = json.loads(config)
