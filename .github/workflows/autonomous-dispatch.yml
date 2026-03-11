@@ -1,0 +1,120 @@
+name: Autonomous Dispatch Runner
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Skip issue claiming and executor handoff'
+        required: false
+        default: 'true'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: autonomous-dispatch
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    name: Claim and Dispatch Work Order
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Configure git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Capture autonomy-ready issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              labels: 'autonomy:ready',
+              per_page: 100,
+            });
+            const fs = require('fs');
+            fs.writeFileSync('autonomy-queue.json', JSON.stringify(issues, null, 2));
+
+      - name: Build work order
+        run: python scripts/autonomy/build_work_order.py --queue autonomy-queue.json --output autonomy-work-order.json
+
+      - name: Show work order
+        run: cat autonomy-work-order.json
+
+      - name: Claim issue for autonomous execution
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+
+          work_order = json.load(open('autonomy-work-order.json'))
+          if work_order.get('status') == 'idle':
+              raise SystemExit(0)
+
+          issue = str(work_order['issue'])
+          agent = work_order['agent']
+          reviewer = work_order['reviewer']
+          lane = work_order['lane']
+          branch = work_order['branch']
+
+          subprocess.run([
+              'gh', 'issue', 'edit', issue,
+              '--add-label', 'autonomy:claimed',
+          ], check=True)
+
+          subprocess.run([
+              'gh', 'issue', 'comment', issue,
+              '--body', (
+                  f'Autonomous dispatch claimed this task.\\n\\n'
+                  f'- authoring agent: `{agent}`\\n'
+                  f'- reviewer agent: `{reviewer}`\\n'
+                  f'- lane: `{lane}`\\n'
+                  f'- branch: `{branch}`\\n'
+              ),
+          ], check=True)
+          PY
+
+      - name: Hand off to local executor
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        env:
+          AUTONOMY_EXECUTOR_SETUP_CMD: ${{ vars.AUTONOMY_EXECUTOR_SETUP_CMD }}
+          AUTONOMY_AGENT_CMD_TEMPLATE: ${{ vars.AUTONOMY_AGENT_CMD_TEMPLATE }}
+          AUTONOMY_OPEN_PR: ${{ vars.AUTONOMY_OPEN_PR }}
+          AUTONOMY_MODEL: ${{ vars.AUTONOMY_MODEL }}
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_MODELS_TOKEN: ${{ secrets.GITHUB_MODELS_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -n "$AUTONOMY_EXECUTOR_SETUP_CMD" ]; then
+            bash -lc "$AUTONOMY_EXECUTOR_SETUP_CMD"
+          fi
+          python scripts/autonomy/execute_work_order.py autonomy-work-order.json

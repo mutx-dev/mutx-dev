@@ -1,0 +1,75 @@
+version: 1
+default_branch: main
+orchestrator: mission-control-orchestrator
+safe_automerge_labels:
+  - autonomy:safe
+  - size:xs
+  - size:s
+blocked_automerge_labels:
+  - area:auth
+  - area:infra
+  - area:runtime
+  - risk:high
+agents:
+  - id: mission-control-orchestrator
+    path: agents/mission-control-orchestrator/AGENT.md
+    owns:
+      - planning
+      - dispatch
+      - backlog
+      - coordination
+  - id: control-plane-steward
+    path: agents/control-plane-steward/AGENT.md
+    owns:
+      - src/api/main.py
+      - src/api/routes/**
+      - src/api/services/**
+      - src/api/models/**
+  - id: operator-surface-builder
+    path: agents/operator-surface-builder/AGENT.md
+    owns:
+      - app/**
+      - components/**
+      - lib/**
+  - id: auth-identity-guardian
+    path: agents/auth-identity-guardian/AGENT.md
+    owns:
+      - src/api/routes/auth.py
+      - src/api/middleware/auth.py
+      - src/api/auth/**
+      - app/api/auth/**
+  - id: cli-sdk-contract-keeper
+    path: agents/cli-sdk-contract-keeper/AGENT.md
+    owns:
+      - cli/**
+      - sdk/mutx/**
+      - pyproject.toml
+      - sdk/pyproject.toml
+  - id: runtime-protocol-engineer
+    path: agents/runtime-protocol-engineer/AGENT.md
+    owns:
+      - src/api/routes/agent_runtime.py
+      - sdk/mutx/agent_runtime.py
+  - id: qa-reliability-engineer
+    path: agents/qa-reliability-engineer/AGENT.md
+    owns:
+      - tests/**
+      - .github/workflows/ci.yml
+      - .github/pull_request_template.md
+  - id: infra-delivery-operator
+    path: agents/infra-delivery-operator/AGENT.md
+    owns:
+      - infrastructure/**
+      - scripts/**
+  - id: observability-sre
+    path: agents/observability-sre/AGENT.md
+    owns:
+      - src/api/metrics.py
+      - src/api/services/monitor.py
+      - infrastructure/monitoring/**
+  - id: docs-drift-curator
+    path: agents/docs-drift-curator/AGENT.md
+    owns:
+      - README.md
+      - docs/**
+      - AGENTS.md

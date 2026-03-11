@@ -51,4 +51,6 @@ docs/archive/
 playwright-report/
 test-results/
 
+# Autonomy artifacts
+.autonomy/
 

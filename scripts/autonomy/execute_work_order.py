@@ -1,0 +1,163 @@
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shlex
+import subprocess
+from pathlib import Path
+
+
+def run(command: list[str], *, cwd: str | None = None, check: bool = True) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(command, cwd=cwd, check=check, text=True, capture_output=True)
+
+
+def git_output(args: list[str]) -> str:
+    return run(["git", *args]).stdout.strip()
+
+
+def ensure_branch(branch: str, base_branch: str) -> None:
+    run(["git", "fetch", "origin", base_branch], check=False)
+    run(["git", "checkout", base_branch])
+    run(["git", "pull", "--ff-only", "origin", base_branch], check=False)
+    existing = run(["git", "branch", "--list", branch], check=False).stdout.strip()
+    if existing:
+        run(["git", "checkout", branch])
+        return
+    run(["git", "checkout", "-b", branch])
+
+
+def write_brief(work_order: dict, output_dir: Path) -> Path:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    brief_path = output_dir / f"issue-{work_order['issue']}.md"
+    lines = [
+        f"# Work Order #{work_order['issue']}",
+        "",
+        f"- title: {work_order['title']}",
+        f"- agent: {work_order['agent']}",
+        f"- reviewer: {work_order['reviewer']}",
+        f"- lane: {work_order['lane']}",
+        f"- branch: {work_order['branch']}",
+        f"- url: {work_order.get('url', '')}",
+        f"- labels: {', '.join(work_order.get('labels', []))}",
+        "",
+        "## Acceptance / Context",
+        "",
+        work_order.get("acceptance", "").strip() or "No issue body provided.",
+        "",
+        "## Constraints",
+        "",
+        "- Make the smallest correct change.",
+        "- Stay inside the owned file area unless the task clearly requires a linked dependency update.",
+        "- Open a PR instead of pushing to main.",
+    ]
+    brief_path.write_text("\n".join(lines) + "\n")
+    return brief_path
+
+
+def maybe_comment_issue(work_order: dict, brief_path: Path) -> None:
+    if not os.environ.get("GH_TOKEN"):
+        return
+    body = (
+        f"Executor prepared branch `{work_order['branch']}` for `{work_order['agent']}`.\n\n"
+        f"- reviewer: `{work_order['reviewer']}`\n"
+        f"- lane: `{work_order['lane']}`\n"
+        f"- brief artifact: `{brief_path}`\n"
+    )
+    run(["gh", "issue", "comment", str(work_order["issue"]), "--body", body], check=False)
+
+
+def run_agent_command(work_order: dict, brief_path: Path) -> int:
+    template = os.environ.get("AUTONOMY_AGENT_CMD_TEMPLATE", "").strip()
+    if not template:
+        if os.environ.get("GITHUB_MODELS_TOKEN") or os.environ.get("OPENAI_API_KEY"):
+            template = (
+                "python scripts/autonomy/hosted_llm_executor.py --agent {agent} "
+                "--brief {brief} --work-order {work_order}"
+            )
+        else:
+            print("AUTONOMY_AGENT_CMD_TEMPLATE is not set; branch and brief are prepared.")
+            return 0
+
+    command = template.format(
+        issue=work_order["issue"],
+        agent=work_order["agent"],
+        reviewer=work_order["reviewer"],
+        lane=work_order["lane"],
+        branch=work_order["branch"],
+        title=work_order["title"],
+        brief=str(brief_path),
+        work_order=os.environ.get("AUTONOMY_WORK_ORDER_PATH", "autonomy-work-order.json"),
+    )
+    print(f"Running agent command: {command}")
+    result = subprocess.run(shlex.split(command), text=True)
+    return result.returncode
+
+
+def maybe_open_pr(work_order: dict, base_branch: str) -> None:
+    if os.environ.get("AUTONOMY_OPEN_PR", "false").lower() != "true":
+        return
+    status = git_output(["status", "--short"])
+    if not status:
+        print("No changes detected; skipping PR creation.")
+        return
+    run(["git", "add", "."])
+    commit_message = f"autonomy: issue #{work_order['issue']} via {work_order['agent']}"
+    run(["git", "commit", "-m", commit_message], check=False)
+    run(["git", "push", "-u", "origin", work_order["branch"]], check=False)
+    if not os.environ.get("GH_TOKEN"):
+        return
+    pr_body = (
+        "## What changed?\n\n"
+        f"- autonomous implementation for #{work_order['issue']}\n\n"
+        "## Why?\n\n"
+        f"- advance the `{work_order['agent']}` queue\n\n"
+        "## Validation\n\n"
+        "- executor-supplied validation pending\n"
+    )
+    run(
+        [
+            "gh",
+            "pr",
+            "create",
+            "--draft",
+            "--base",
+            base_branch,
+            "--head",
+            work_order["branch"],
+            "--title",
+            f"autonomy: {work_order['title']}",
+            "--body",
+            pr_body,
+        ],
+        check=False,
+    )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Prepare and execute a MUTX autonomous work order")
+    parser.add_argument("work_order", help="Path to work order JSON")
+    parser.add_argument("--base-branch", default=os.environ.get("AUTONOMY_BASE_BRANCH", "main"))
+    parser.add_argument("--brief-dir", default=os.environ.get("AUTONOMY_BRIEF_DIR", ".autonomy/briefs"))
+    args = parser.parse_args()
+
+    work_order_path = Path(args.work_order)
+    os.environ["AUTONOMY_WORK_ORDER_PATH"] = str(work_order_path)
+    work_order = json.loads(work_order_path.read_text())
+
+    if work_order.get("status") == "idle":
+        print("No available work order.")
+        return 0
+
+    ensure_branch(work_order["branch"], args.base_branch)
+    brief_path = write_brief(work_order, Path(args.brief_dir))
+    maybe_comment_issue(work_order, brief_path)
+    exit_code = run_agent_command(work_order, brief_path)
+    if exit_code != 0:
+        return exit_code
+    maybe_open_pr(work_order, args.base_branch)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
