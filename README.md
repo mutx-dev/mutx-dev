@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://github.com/fortunexbt/mutx-dev"><strong>Explore the Repo</strong></a> ·
   <a href="https://mutx.dev"><strong>Live Preview</strong></a> ·
-  <a href="https://docs.mutx.dev"><strong>Read Docs</strong></a>
+  <a href="./docs/README.md"><strong>Read Docs</strong></a>
 </p>
 
 ---
