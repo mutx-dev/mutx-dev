@@ -5,9 +5,9 @@ The agents routes manage agent records, deployments, logs, and metrics.
 ## Current Implementation Notes
 
 - Routes are mounted at `/agents`, not `/v1/agents`.
-- `POST /agents` currently requires an explicit `user_id` in the request body.
+- `POST /agents` derives ownership from the authenticated user instead of accepting `user_id` in the request body.
 - `config` is currently modeled as a string field, so JSON config should be sent as a string payload.
-- Auth dependencies are not currently attached to these route handlers, even though the broader product direction assumes authenticated control-plane access.
+- Auth dependencies are attached to these route handlers, so agent operations require authenticated control-plane access.
 
 ## Routes
 
@@ -24,18 +24,18 @@ The agents routes manage agent records, deployments, logs, and metrics.
 
 ## Create an Agent
 
-Use `/auth/me` first if you need a `user_id`.
+Authenticate first, then create the agent without sending a `user_id`.
 
 ```bash
 BASE_URL=http://localhost:8000
 
 curl -X POST "$BASE_URL/agents" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Support Bot",
     "description": "Handles inbound support tasks",
-    "config": "{\"model\":\"gpt-4\"}",
-    "user_id": "YOUR_USER_ID"
+    "config": "{\"model\":\"gpt-4\"}"
   }'
 ```
 

@@ -70,7 +70,6 @@ class Agents:
         name: str,
         description: Optional[str] = None,
         config: Optional[str] = None,
-        user_id: Optional[str] = None,
     ) -> Agent:
         response = self._client.post(
             "/agents",
@@ -78,7 +77,6 @@ class Agents:
                 "name": name,
                 "description": description,
                 "config": config,
-                "user_id": user_id,
             },
         )
         response.raise_for_status()
