@@ -20,10 +20,30 @@ export async function POST(request: Request) {
       throw new Error('Database not configured')
     }
     const body = await request.json()
-    const { email, source, mathAnswer, honeypot } = body
+    const { email, source, captchaToken, honeypot } = body
 
-    if (honeypot || mathAnswer !== '4') {
+    // 1. Honeypot check
+    if (honeypot) {
       return NextResponse.json({ success: false, error: 'Invalid input' }, { status: 400 })
+    }
+
+    // 2. CAPTCHA verification
+    if (!process.env.TURNSTILE_SECRET_KEY) {
+      throw new Error('CAPTCHA secret key not configured')
+    }
+    
+    const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        secret: process.env.TURNSTILE_SECRET_KEY,
+        response: captchaToken,
+      }),
+    })
+    
+    const turnstileData = await turnstileResponse.json()
+    if (!turnstileData.success) {
+      return NextResponse.json({ success: false, error: 'Invalid CAPTCHA' }, { status: 400 })
     }
 
     if (!email) {
