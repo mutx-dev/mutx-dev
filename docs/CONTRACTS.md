@@ -21,7 +21,7 @@ Used by the landing page for capturing early access intent.
 ## 2. Agent Management (`/agents`)
 
 - **Endpoints**:
-  - `POST /agents`: Create new agent. Requires `name`, `description`, `config` (as a JSON string), `user_id`.
+  - `POST /agents`: Create new agent. Requires `name`, `description`, and `config` (as a JSON string). Ownership comes from the authenticated user.
   - `GET /agents`: List agents for current user.
   - `GET /agents/{agent_id}`: Detail view.
 - **Critical Caveat**: The `config` field MUST be passed as a serialized **JSON string**, not a raw JSON object. Agents: do not attempt to send a raw object; stringify it first.

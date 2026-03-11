@@ -79,7 +79,7 @@ curl -X POST http://localhost:8000/auth/login \
 
 ## 7. Create and deploy an agent record
 
-Get your user id:
+Log in first so you have an access token:
 
 ```bash
 curl http://localhost:8000/auth/me \
@@ -90,12 +90,12 @@ Create the agent:
 
 ```bash
 curl -X POST http://localhost:8000/agents \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "name":"My First Agent",
     "description":"Local test agent",
-    "config":"{\"model\":\"gpt-4\"}",
-    "user_id":"YOUR_USER_ID"
+    "config":"{\"model\":\"gpt-4\"}"
   }'
 ```
 
@@ -124,7 +124,7 @@ mutx login --email you@example.com
 mutx whoami
 ```
 
-Note: some CLI commands still reflect older API assumptions. See `docs/cli.md` for the current support matrix.
+Note: `mutx deploy create` still reflects older API assumptions. See `docs/cli.md` for the current support matrix.
 
 ## Optional: frontend verification
 
