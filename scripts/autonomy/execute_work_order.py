@@ -19,6 +19,20 @@ def git_output(args: list[str]) -> str:
     return run(["git", *args]).stdout.strip()
 
 
+def resolve_reviewer_login(reviewer_agent: str) -> str | None:
+    raw_map = os.environ.get("AUTONOMY_REVIEWER_MAP", "").strip()
+    if not raw_map:
+        return None
+    try:
+        reviewer_map = json.loads(raw_map)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(reviewer_map, dict):
+        return None
+    login = reviewer_map.get(reviewer_agent)
+    return login if isinstance(login, str) and login.strip() else None
+
+
 def count_changed_files() -> int:
     status = git_output(["status", "--short"])
     return len([line for line in status.splitlines() if line.strip()])
@@ -164,6 +178,30 @@ def maybe_open_pr(work_order: dict, base_branch: str) -> None:
         ],
         check=False,
     )
+    reviewer_login = resolve_reviewer_login(work_order["reviewer"])
+    if reviewer_login and os.environ.get("GH_TOKEN"):
+        run(
+            [
+                "gh",
+                "pr",
+                "edit",
+                work_order["branch"],
+                "--add-assignee",
+                reviewer_login,
+            ],
+            check=False,
+        )
+        run(
+            [
+                "gh",
+                "pr",
+                "comment",
+                work_order["branch"],
+                "--body",
+                f"Reviewer routing: `{work_order['reviewer']}` -> @{reviewer_login}",
+            ],
+            check=False,
+        )
 
 
 def main() -> int:
