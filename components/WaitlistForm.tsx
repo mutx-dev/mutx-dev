@@ -1,8 +1,7 @@
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react'
-// Assuming Cloudflare Turnstile or similar
-import Turnstile from 'react-turnstile'
+import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
 
 import { cn } from '@/lib/utils'
 
@@ -21,6 +20,8 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
   const [error, setError] = useState('')
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [honeypot, setHoneypot] = useState('')
+  const turnstileRef = useRef<BoundTurnstileObject | null>(null)
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? ''
 
   useEffect(() => {
     let cancelled = false
@@ -50,11 +51,21 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
     }
   }, [])
 
+  const resetTurnstile = () => {
+    setCaptchaToken(null)
+    turnstileRef.current?.reset()
+  }
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+    if (!turnstileSiteKey) {
+      setError('Waitlist verification is unavailable right now. Please try again later.')
+      return
+    }
+
     if (!captchaToken) {
-      setError('Please complete the CAPTCHA')
+      setError('Please complete the verification challenge.')
       return
     }
 
@@ -94,6 +105,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to join waitlist')
     } finally {
+      resetTurnstile()
       setLoading(false)
     }
   }
@@ -128,7 +140,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
             </div>
           </motion.div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex w-full flex-col gap-3">
+          <form onSubmit={handleSubmit} className="flex w-full flex-col gap-3" data-testid={`waitlist-form-${source}`}>
             <input
               type="text"
               name="honeypot"
@@ -148,15 +160,50 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
               required
               className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/30 transition-colors"
             />
-            
-            <Turnstile
-              sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''}
-              onVerify={(token) => setCaptchaToken(token)}
-            />
+
+            {turnstileSiteKey ? (
+              <Turnstile
+                action="waitlist"
+                appearance="always"
+                className="min-h-[65px]"
+                fixedSize
+                onError={(_, boundTurnstile) => {
+                  turnstileRef.current = boundTurnstile ?? null
+                  setCaptchaToken(null)
+                  setError('Verification failed. Please refresh the challenge and try again.')
+                }}
+                onExpire={(_, boundTurnstile) => {
+                  turnstileRef.current = boundTurnstile
+                  setCaptchaToken(null)
+                  setError('Verification expired. Please complete the challenge again.')
+                }}
+                onLoad={(_, boundTurnstile) => {
+                  turnstileRef.current = boundTurnstile
+                }}
+                onTimeout={(boundTurnstile) => {
+                  turnstileRef.current = boundTurnstile
+                  setCaptchaToken(null)
+                  setError('Verification timed out. Please complete the challenge again.')
+                }}
+                onVerify={(token, boundTurnstile) => {
+                  turnstileRef.current = boundTurnstile
+                  setCaptchaToken(token)
+                  setError('')
+                }}
+                refreshExpired="auto"
+                sitekey={turnstileSiteKey}
+                size="flexible"
+                theme="auto"
+              />
+            ) : (
+              <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                Waitlist verification is unavailable right now. Please try again later.
+              </div>
+            )}
 
             <button
               type="submit"
-              disabled={loading || !captchaToken}
+              disabled={loading || !captchaToken || !turnstileSiteKey}
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? 'Joining...' : 'Join Waitlist'}

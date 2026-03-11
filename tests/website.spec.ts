@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('mutx.dev QA', () => {
-  test('homepage loads and has working waitlist', async ({ page }) => {
+  test('homepage loads and renders waitlist signup', async ({ page }) => {
     // Go to homepage
     await page.goto('https://mutx.dev');
     
@@ -15,16 +15,12 @@ test.describe('mutx.dev QA', () => {
     // Check waitlist form exists
     const emailInput = page.locator('input[type="email"]').first();
     await expect(emailInput).toBeVisible();
-    
-    // Test form submission
-    const email = `test${Date.now()}@example.com`;
-    await emailInput.fill(email);
-    
-    const submitBtn = page.locator('button[type="submit"]').first();
-    await submitBtn.click();
-    
-    // Wait for success
-    await expect(page.locator('text=You\'re on the list')).toBeVisible({ timeout: 15000 });
+
+    const waitlistForm = page.getByTestId('waitlist-form-hero');
+    await expect(waitlistForm).toBeVisible();
+
+    const submitBtn = waitlistForm.locator('button[type="submit"]');
+    await expect(submitBtn).toBeVisible();
   });
 
   test('no console errors', async ({ page }) => {

@@ -39,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        <link rel="preconnect" href="https://challenges.cloudflare.com" />
         <meta name="theme-color" content="#050816" />
       </head>
       <body className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} min-h-screen font-[family:var(--font-display)] antialiased`}>
