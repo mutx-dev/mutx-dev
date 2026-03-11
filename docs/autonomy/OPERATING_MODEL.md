@@ -56,6 +56,7 @@ Requirements:
 5. Reviewer agent checks scope, ownership, validation, and drift. If reviewer login mapping is configured, PR assignment follows the work order.
 6. CI gates run.
 7. Safe PRs auto-merge; risky PRs stop for human approval.
+8. Stale claimed issues with no open PR are automatically released back into the queue after the configured timeout.
 
 ## Required Labels
 

@@ -40,6 +40,7 @@ This repo is now set up with the team definitions and a GitHub-native control-to
 - `AUTONOMY_MAX_PATCH_BYTES`: optional, defaults to `50000`
 - `AUTONOMY_MAX_CHANGED_FILES`: optional, defaults to `6`
 - `AUTONOMY_REVIEWER_MAP`: optional JSON object mapping reviewer-agent ids to GitHub logins
+- `AUTONOMY_STALE_CLAIM_MINUTES`: optional, defaults to `120`
 
 ## Required Secret
 
@@ -66,6 +67,8 @@ python scripts/autonomy/hosted_llm_executor.py --agent {agent} --brief {brief} -
 If a generated patch exceeds the configured size or file-count guardrails, the executor stops and writes `.autonomy/guardrail-failure.json` for debugging.
 
 If `AUTONOMY_REVIEWER_MAP` is set, the executor also assigns the mapped GitHub login to the PR and leaves a reviewer-routing comment.
+
+If an issue stays labeled `autonomy:claimed` past `AUTONOMY_STALE_CLAIM_MINUTES` and no open PR exists for the claimed branch, the dispatch workflow automatically releases the claim and comments on the issue.
 
 ## Dispatch Logic
 

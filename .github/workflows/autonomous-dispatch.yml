@@ -23,6 +23,8 @@ jobs:
   dispatch:
     name: Claim and Dispatch Work Order
     runs-on: ubuntu-latest
+    env:
+      AUTONOMY_STALE_CLAIM_MINUTES: ${{ vars.AUTONOMY_STALE_CLAIM_MINUTES || '120' }}
 
     steps:
       - name: Check out repository
@@ -44,6 +46,82 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Release stale claimed issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const staleMinutes = parseInt(process.env.AUTONOMY_STALE_CLAIM_MINUTES || '120', 10);
+            const cutoff = Date.now() - staleMinutes * 60 * 1000;
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              labels: 'autonomy:claimed',
+              per_page: 100,
+            });
+
+            for (const issue of issues) {
+              const updatedAt = new Date(issue.updated_at).getTime();
+              if (Number.isNaN(updatedAt) || updatedAt >= cutoff) {
+                continue;
+              }
+
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner,
+                repo,
+                issue_number: issue.number,
+                per_page: 100,
+              });
+
+              const claimComment = [...comments].reverse().find(comment =>
+                comment.body.includes('Autonomous dispatch claimed this task.') &&
+                comment.body.includes('- branch: `')
+              );
+
+              let branchName = null;
+              if (claimComment) {
+                const match = claimComment.body.match(/- branch: `([^`]+)`/);
+                branchName = match ? match[1] : null;
+              }
+
+              let hasOpenPr = false;
+              if (branchName) {
+                const prs = await github.paginate(github.rest.pulls.list, {
+                  owner,
+                  repo,
+                  state: 'open',
+                  head: `${owner}:${branchName}`,
+                  per_page: 100,
+                });
+                hasOpenPr = prs.length > 0;
+              }
+
+              if (hasOpenPr) {
+                continue;
+              }
+
+              await github.rest.issues.removeLabel({
+                owner,
+                repo,
+                issue_number: issue.number,
+                name: 'autonomy:claimed',
+              }).catch(() => null);
+
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issue.number,
+                body: [
+                  'Autonomous dispatch released this stale claim.',
+                  '',
+                  `- no open PR was found for the claimed branch${branchName ? ` \\`${branchName}\\`` : ''}`,
+                  `- stale threshold: ${staleMinutes} minutes`,
+                  '- the issue is eligible for re-dispatch',
+                ].join('\n'),
+              });
+            }
 
       - name: Capture autonomy-ready issues
         uses: actions/github-script@v7
