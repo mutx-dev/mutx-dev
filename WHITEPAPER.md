@@ -102,22 +102,22 @@ At a high level, MUTX has four major layers:
 
 ```mermaid
 flowchart LR
-    Website[Next.js Website]
-    AppHost[App Surface]
-    CLI[Python CLI]
-    SDK[Python SDK]
-    API[FastAPI Control Plane]
-    DB[(Postgres)]
-    Redis[(Redis)]
-    Infra[Docker / Railway / Terraform / Ansible]
+    Website["Next.js Website"];
+    AppHost["App Surface"];
+    CLI["Python CLI"];
+    SDK["Python SDK"];
+    API["FastAPI Control Plane"];
+    DB[("Postgres")];
+    Redis[("Redis")];
+    Infra["Docker / Railway / Terraform / Ansible"];
 
-    Website --> API
-    AppHost --> API
-    CLI --> API
-    SDK --> API
-    API --> DB
-    API --> Redis
-    Infra --> API
+    Website --> API;
+    AppHost --> API;
+    CLI --> API;
+    SDK --> API;
+    API --> DB;
+    API --> Redis;
+    Infra --> API;
 ```
 
 ### 5.1 Current implementation surface
@@ -151,14 +151,22 @@ The live route families in the codebase are:
 
 ```mermaid
 flowchart TD
-    Root[FastAPI App]
-    Root --> Auth[/auth]
-    Root --> Agents[/agents]
-    Root --> Deployments[/deployments]
-    Root --> Keys[/api-keys]
-    Root --> Hooks[/webhooks]
-    Root --> Newsletter[/newsletter]
-    Root --> Health[/health and /ready]
+    Root["FastAPI App"];
+    Auth["/auth"];
+    Agents["/agents"];
+    Deployments["/deployments"];
+    Keys["/api-keys"];
+    Hooks["/webhooks"];
+    Newsletter["/newsletter"];
+    Health["/health and /ready"];
+
+    Root --> Auth;
+    Root --> Agents;
+    Root --> Deployments;
+    Root --> Keys;
+    Root --> Hooks;
+    Root --> Newsletter;
+    Root --> Health;
 ```
 
 ### 6.2 Resource model
@@ -204,7 +212,7 @@ erDiagram
         uuid id
         uuid user_id
         string url
-        string[] events
+        string events
     }
 ```
 
@@ -345,14 +353,14 @@ The Next.js app layer proxies backend flows such as:
 
 ```mermaid
 flowchart LR
-    Browser[Browser]
-    NextRoutes[Next.js Route Handlers]
-    FastAPI[FastAPI API]
-    Data[(Postgres)]
+    Browser["Browser"];
+    NextRoutes["Next.js Route Handlers"];
+    FastAPI["FastAPI API"];
+    Data[("Postgres")];
 
-    Browser --> NextRoutes
-    NextRoutes --> FastAPI
-    FastAPI --> Data
+    Browser --> NextRoutes;
+    NextRoutes --> FastAPI;
+    FastAPI --> Data;
 ```
 
 This pattern matters because it allows the website and app host to feel integrated with the platform instead of behaving like two unrelated systems.
