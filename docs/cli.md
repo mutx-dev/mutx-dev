@@ -77,10 +77,9 @@ mutx status
 
 | Command | Current issue |
 |--------|---------------|
-| `mutx agents create` | does not supply the `user_id` that `POST /agents` currently requires |
 | `mutx deploy create` | still points at an older `/api/v1/...` route shape |
 
-For those flows, use the API directly for now.
+For those flows, prefer the live route behavior in code over older docs. `mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`.
 
 ## Example Session
 
