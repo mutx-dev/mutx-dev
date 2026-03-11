@@ -2,25 +2,62 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 import logging
-from typing import Optional
+from typing import Optional, Any
 import uuid
+import json
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.api.database import get_db
-from src.api.models import Agent, Deployment, AgentLog, AgentMetric, AgentStatus, User
+from src.api.models import Agent, Deployment, AgentLog, AgentMetric, AgentStatus, User, AgentType
 from src.api.models.schemas import (
     AgentCreate,
     AgentResponse,
     AgentDetailResponse,
     AgentLogResponse,
     AgentMetricResponse,
+    OpenAIAgentConfig,
+    AnthropicAgentConfig,
+    LangChainAgentConfig,
+    CustomAgentConfig,
 )
 from src.api.middleware.auth import get_current_user
 
 router = APIRouter(prefix="/agents", tags=["agents"])
 logger = logging.getLogger(__name__)
+
+
+def _validate_agent_config(agent_type: AgentType, config: Any) -> str:
+    """Validate and normalize agent configuration based on its type."""
+    if config is None:
+        return "{}"
+
+    # If it's already a string, try to parse it first to ensure it's valid JSON
+    if isinstance(config, str):
+        try:
+            config_dict = json.loads(config)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid JSON in agent configuration")
+    else:
+        config_dict = config
+
+    try:
+        if agent_type == AgentType.OPENAI:
+            validated = OpenAIAgentConfig(**config_dict)
+        elif agent_type == AgentType.ANTHROPIC:
+            validated = AnthropicAgentConfig(**config_dict)
+        elif agent_type == AgentType.LANGCHAIN:
+            validated = LangChainAgentConfig(**config_dict)
+        elif agent_type == AgentType.CUSTOM:
+            validated = CustomAgentConfig(**config_dict)
+        else:
+            # Fallback for future types not yet fully schema-guarded
+            return json.dumps(config_dict)
+
+        return validated.model_dump_json()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Configuration validation failed: {str(e)}")
 
 
 def _serialize_deployment(deployment: Deployment):
@@ -62,11 +99,15 @@ async def create_agent(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    # Validate and normalize config based on agent type
+    config_json = _validate_agent_config(agent_data.type, agent_data.config)
+
     # Use current_user.id for ownership, not from request body
     agent = Agent(
         name=agent_data.name,
         description=agent_data.description,
-        config=agent_data.config,
+        type=agent_data.type,
+        config=config_json,
         user_id=current_user.id,
         status=AgentStatus.CREATING.value,
     )
