@@ -7,7 +7,16 @@ import uuid
 import logging
 
 from src.api.database import get_db
-from src.api.models import Agent, Deployment, AgentLog, AgentMetric, AgentStatus, User, Webhook
+from src.api.models import (
+    Agent,
+    Deployment,
+    AgentLog,
+    AgentMetric,
+    AgentStatus,
+    User,
+    Webhook,
+    DeploymentEvent as DeploymentEventModel,
+)
 from src.api.models.schemas import (
     AgentStatusUpdate,
     DeploymentEvent,
@@ -103,6 +112,16 @@ async def deployment_event(
 
     if event_data.node_id:
         deployment.node_id = event_data.node_id
+
+    # Record the event in the lifecycle history
+    new_event = DeploymentEventModel(
+        deployment_id=deployment.id,
+        event_type=event_data.event,
+        status=event_data.status or deployment.status,
+        node_id=event_data.node_id,
+        error_message=event_data.error_message,
+    )
+    db.add(new_event)
 
     if event_data.error_message:
         deployment.error_message = event_data.error_message

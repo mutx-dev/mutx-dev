@@ -53,6 +53,20 @@ class DeploymentCreate(BaseModel):
     replicas: int = 1
 
 
+class DeploymentEventResponse(BaseModel):
+    """Response model for deployment events"""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    deployment_id: uuid.UUID
+    event_type: str
+    status: str
+    node_id: Optional[str]
+    error_message: Optional[str]
+    created_at: datetime
+
+
 class DeploymentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -64,6 +78,7 @@ class DeploymentResponse(BaseModel):
     started_at: Optional[datetime] = None
     ended_at: Optional[datetime]
     error_message: Optional[str]
+    events: list[DeploymentEventResponse] = Field(default_factory=list)
 
 
 class DeploymentScale(BaseModel):

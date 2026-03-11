@@ -1,6 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 import logging
 from typing import Optional
 import uuid
@@ -8,7 +9,15 @@ import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.models import Deployment, Agent, AgentStatus, User, AgentLog, AgentMetric
+from src.api.models import (
+    Deployment,
+    Agent,
+    AgentStatus,
+    User,
+    AgentLog,
+    AgentMetric,
+    DeploymentEvent as DeploymentEventModel,
+)
 from src.api.models.schemas import (
     DeploymentResponse,
     DeploymentScale,
@@ -28,7 +37,11 @@ async def _get_deployment_with_ownership(
     current_user: User,
 ) -> Deployment:
     """Get deployment and verify ownership through the agent."""
-    result = await db.execute(select(Deployment).where(Deployment.id == deployment_id))
+    result = await db.execute(
+        select(Deployment)
+        .options(selectinload(Deployment.events))
+        .where(Deployment.id == deployment_id)
+    )
     deployment = result.scalar_one_or_none()
     if not deployment:
         raise HTTPException(status_code=404, detail="Deployment not found")
@@ -52,6 +65,18 @@ def _serialize_deployment(deployment: Deployment):
         "started_at": deployment.started_at,
         "ended_at": deployment.ended_at,
         "error_message": deployment.error_message,
+        "events": [
+            {
+                "id": event.id,
+                "deployment_id": event.deployment_id,
+                "event_type": event.event_type,
+                "status": event.status,
+                "node_id": event.node_id,
+                "error_message": event.error_message,
+                "created_at": event.created_at,
+            }
+            for event in getattr(deployment, "events", [])
+        ],
     }
 
 
@@ -67,6 +92,7 @@ async def list_deployments(
     # Filter deployments by agents owned by the current user
     query = (
         select(Deployment)
+        .options(selectinload(Deployment.events))
         .join(Agent, Deployment.agent_id == Agent.id)
         .where(Agent.user_id == current_user.id)
         .order_by(Deployment.created_at.desc())
@@ -112,6 +138,16 @@ async def scale_deployment(
         raise HTTPException(status_code=400, detail="Can only scale running deployments")
 
     deployment.replicas = scale_data.replicas
+
+    # Record scale event
+    scale_event = DeploymentEventModel(
+        deployment_id=deployment.id,
+        event_type="scale",
+        status=deployment.status,
+        error_message=None,
+    )
+    db.add(scale_event)
+
     await db.commit()
     await db.refresh(deployment)
     logger.info(f"Scaled deployment {deployment_id} to {scale_data.replicas} replicas")
@@ -128,6 +164,14 @@ async def kill_deployment(
 
     deployment.status = "killed"
     deployment.ended_at = datetime.utcnow()
+
+    # Record kill event
+    kill_event = DeploymentEventModel(
+        deployment_id=deployment.id,
+        event_type="kill",
+        status="killed",
+    )
+    db.add(kill_event)
 
     result = await db.execute(select(Agent).where(Agent.id == deployment.agent_id))
     agent = result.scalar_one_or_none()
@@ -165,6 +209,15 @@ async def create_deployment(
         started_at=datetime.utcnow(),
     )
     db.add(deployment)
+    await db.flush()  # Get deployment.id
+
+    # Record create event
+    create_event = DeploymentEventModel(
+        deployment_id=deployment.id,
+        event_type="create",
+        status="pending",
+    )
+    db.add(create_event)
 
     # Update agent status
     agent.status = AgentStatus.RUNNING.value
@@ -196,6 +249,14 @@ async def restart_deployment(
     deployment.started_at = datetime.utcnow()
     deployment.ended_at = None
     deployment.error_message = None
+
+    # Record restart event
+    restart_event = DeploymentEventModel(
+        deployment_id=deployment.id,
+        event_type="restart",
+        status="pending",
+    )
+    db.add(restart_event)
 
     # Update agent status
     agent_result = await db.execute(select(Agent).where(Agent.id == deployment.agent_id))

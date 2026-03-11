@@ -163,6 +163,25 @@ class Deployment(Base):
     error_message: Mapped[str] = mapped_column(Text, nullable=True)
 
     agent: Mapped["Agent"] = relationship("Agent", back_populates="deployments")
+    events: Mapped[list["DeploymentEvent"]] = relationship(
+        "DeploymentEvent", back_populates="deployment", cascade="all, delete-orphan"
+    )
+
+
+class DeploymentEvent(Base):
+    __tablename__ = "deployment_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    deployment_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("deployments.id"), nullable=False, index=True
+    )
+    event_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    status: Mapped[str] = mapped_column(String(50), nullable=False)
+    node_id: Mapped[str] = mapped_column(String(255), nullable=True)
+    error_message: Mapped[str] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    deployment: Mapped["Deployment"] = relationship("Deployment", back_populates="events")
 
 
 class APIKey(Base):
