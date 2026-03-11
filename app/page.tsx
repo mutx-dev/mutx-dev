@@ -177,7 +177,7 @@ client = Client(api_key=<span className="text-green-400">&quot;mutx_sk_...&quot;
 <span className="text-white/40"># Create a new autonomous agent</span>{'\n'}
 agent = client.agents.create({'\n'}
   name=<span className="text-green-400">&quot;data-analyzer&quot;</span>,{'\n'}
-  model=<span className="text-green-400">&quot;gpt-4o&quot;</span>,{'\n'}
+  model=<span className="text-green-400">&quot;gpt-5.4&quot;</span>,{'\n'}
   capabilities=[<span className="text-green-400">&quot;sql&quot;</span>, <span className="text-green-400">&quot;pandas&quot;</span>]{'\n'}
 ){'\n\n'}
 <span className="text-white/40"># Deploy to the control plane</span>{'\n'}

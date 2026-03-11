@@ -1,8 +1,8 @@
-'use client'
-
 import { type FormEvent, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react'
+// Assuming Cloudflare Turnstile or similar
+import Turnstile from 'react-turnstile'
 
 import { cn } from '@/lib/utils'
 
@@ -19,7 +19,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
   const [success, setSuccess] = useState(false)
   const [successMessage, setSuccessMessage] = useState("You're on the list. Check your inbox.")
   const [error, setError] = useState('')
-  const [mathAnswer, setMathAnswer] = useState('')
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [honeypot, setHoneypot] = useState('')
 
   useEffect(() => {
@@ -53,6 +53,11 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+    if (!captchaToken) {
+      setError('Please complete the CAPTCHA')
+      return
+    }
+
     setLoading(true)
     setError('')
 
@@ -60,7 +65,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
       const response = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source, mathAnswer, honeypot }),
+        body: JSON.stringify({ email, source, captchaToken, honeypot }),
       })
 
       const payload = await response.json()
@@ -123,7 +128,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
             </div>
           </motion.div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex w-full flex-col gap-3 sm:flex-row">
+          <form onSubmit={handleSubmit} className="flex w-full flex-col gap-3">
             <input
               type="text"
               name="honeypot"
@@ -143,17 +148,15 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
               required
               className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/30 transition-colors"
             />
-            <input
-              type="text"
-              value={mathAnswer}
-              onChange={(e) => setMathAnswer(e.target.value)}
-              placeholder="What is 2 + 2?"
-              required
-              className="w-full sm:w-32 rounded-lg border border-white/10 bg-black px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/30 transition-colors"
+            
+            <Turnstile
+              sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''}
+              onVerify={(token) => setCaptchaToken(token)}
             />
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !captchaToken}
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? 'Joining...' : 'Join Waitlist'}
