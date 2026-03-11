@@ -149,7 +149,8 @@ async def scale_deployment(
     db.add(scale_event)
 
     await db.commit()
-    await db.refresh(deployment)
+    # Re-fetch to ensure events are loaded and attributes are fresh
+    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
     logger.info(f"Scaled deployment {deployment_id} to {scale_data.replicas} replicas")
     return _serialize_deployment(deployment)
 
@@ -223,7 +224,8 @@ async def create_deployment(
     agent.status = AgentStatus.RUNNING.value
 
     await db.commit()
-    await db.refresh(deployment)
+    # Re-fetch to ensure events are loaded and attributes are fresh
+    deployment = await _get_deployment_with_ownership(deployment.id, db, current_user)
     logger.info(f"Created deployment {deployment.id} for agent {deployment_data.agent_id}")
     return _serialize_deployment(deployment)
 
@@ -265,7 +267,8 @@ async def restart_deployment(
         agent.status = AgentStatus.RUNNING.value
 
     await db.commit()
-    await db.refresh(deployment)
+    # Re-fetch to ensure events are loaded and attributes are fresh
+    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
     logger.info(f"Restarted deployment: {deployment_id}")
     return _serialize_deployment(deployment)
 
