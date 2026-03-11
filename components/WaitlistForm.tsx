@@ -1,3 +1,5 @@
+'use client'
+
 import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react'
@@ -12,6 +14,7 @@ export type WaitlistFormProps = {
 }
 
 export function WaitlistForm({ source = 'homepage', compact = false, className }: WaitlistFormProps) {
+  const initialTurnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? ''
   const [email, setEmail] = useState('')
   const [count, setCount] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
@@ -20,8 +23,9 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
   const [error, setError] = useState('')
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [honeypot, setHoneypot] = useState('')
+  const [turnstileSiteKey, setTurnstileSiteKey] = useState(initialTurnstileSiteKey)
+  const [loadingTurnstileSiteKey, setLoadingTurnstileSiteKey] = useState(!initialTurnstileSiteKey)
   const turnstileRef = useRef<BoundTurnstileObject | null>(null)
-  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? ''
 
   useEffect(() => {
     let cancelled = false
@@ -51,6 +55,40 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
     }
   }, [])
 
+  useEffect(() => {
+    if (initialTurnstileSiteKey) {
+      return
+    }
+
+    let cancelled = false
+
+    async function loadTurnstileSiteKey() {
+      try {
+        const response = await fetch('/api/turnstile/site-key', { cache: 'no-store' })
+        const payload = await response.json()
+        const nextSiteKey = typeof payload.siteKey === 'string' ? payload.siteKey.trim() : ''
+
+        if (!cancelled) {
+          setTurnstileSiteKey(nextSiteKey)
+        }
+      } catch {
+        if (!cancelled) {
+          setTurnstileSiteKey('')
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingTurnstileSiteKey(false)
+        }
+      }
+    }
+
+    void loadTurnstileSiteKey()
+
+    return () => {
+      cancelled = true
+    }
+  }, [initialTurnstileSiteKey])
+
   const resetTurnstile = () => {
     setCaptchaToken(null)
     turnstileRef.current?.reset()
@@ -60,7 +98,11 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
     event.preventDefault()
 
     if (!turnstileSiteKey) {
-      setError('Waitlist verification is unavailable right now. Please try again later.')
+      setError(
+        loadingTurnstileSiteKey
+          ? 'Verification is still loading. Please try again in a moment.'
+          : 'Waitlist verification is unavailable right now. Please try again later.'
+      )
       return
     }
 
@@ -197,7 +239,9 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
               />
             ) : (
               <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-                Waitlist verification is unavailable right now. Please try again later.
+                {loadingTurnstileSiteKey
+                  ? 'Loading verification challenge...'
+                  : 'Waitlist verification is unavailable right now. Please try again later.'}
               </div>
             )}
 
