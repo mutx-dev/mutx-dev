@@ -2,6 +2,7 @@ import click
 
 from cli.config import CLIConfig, get_client
 from cli.commands.agents import agents_group
+from cli.commands.api_keys import api_keys_group
 from cli.commands.deploy import deploy_group
 
 
@@ -95,6 +96,7 @@ def status():
 
 
 cli.add_command(agents_group)
+cli.add_command(api_keys_group)
 cli.add_command(deploy_group)
 
 
