@@ -79,6 +79,12 @@ async function verifyTurnstileToken(request: Request, token: string) {
   return true
 }
 
+/**
+ * NEXTJS WAITLIST API (SOURCE OF TRUTH)
+ * This is the primary endpoint for web-based waitlist submissions.
+ * It handles captcha verification, honeypot checks, and direct DB insertion.
+ * Backend python API may eventually proxy here or share the same DB.
+ */
 export async function POST(request: Request) {
   try {
     if (!sql) {

@@ -25,6 +25,10 @@ async def create_waitlist_signup(
     payload: WaitlistSignupCreate,
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    BACKEND WAITLIST API (DEPRECATED/SECONDARY)
+    Prefer app/api/newsletter/route.ts for web submissions to ensure Turnstile validation.
+    """
     normalized_email = payload.email.lower().strip()
     normalized_source = (payload.source or "coming-soon").strip()[:120]
 
