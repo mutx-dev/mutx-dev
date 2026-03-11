@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #000000;
+    --surface: #0a0a0a;
+    --surface-strong: #111111;
+    --foreground: #ffffff;
+    --muted: #888888;
+    --line: rgba(255, 255, 255, 0.1);
+    --primary: #ffffff;
+    --accent: #333333;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--background);
+    color: var(--foreground);
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  a {
+    color: inherit;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply border border-white/10 bg-black/40 backdrop-blur-xl;
+  }
+
+  .panel {
+    @apply border border-white/10 bg-[#0a0a0a];
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-white/80;
+  }
+
+  .terminal-shell {
+    @apply overflow-hidden rounded-xl border border-white/10 bg-black;
+  }
+
+  .terminal-line {
+    @apply flex items-start gap-3 whitespace-pre-wrap break-words font-mono text-sm;
+  }
+
+  .terminal-prompt {
+    @apply text-white/40;
+  }
+
+  .terminal-caret {
+    animation: blink 1s steps(1, end) infinite;
+  }
+
+  .stat-pill {
+    @apply rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/80;
+  }
+}
+
+@keyframes blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}

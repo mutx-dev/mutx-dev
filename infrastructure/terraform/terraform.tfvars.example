@@ -1,0 +1,28 @@
+do_token = "your-digitalocean-api-token"
+
+region        = "nyc1"
+droplet_size  = "m3.xlarge.x86"
+droplet_image = "ubuntu-22-04-x86"
+
+data_volume_size = 100
+agent_port        = 8080
+agent_version     = "v1.0.0"
+telemetry_enabled = false
+
+# Restrict SSH to your office/home/VPN CIDR in production.
+admin_cidr       = "203.0.113.10/32"
+admin_ssh_key_id = "your-ssh-key-id"
+ssh_public_key   = "ssh-rsa AAAA..."
+
+customers = [
+  {
+    id       = "customer-001"
+    vpc_cidr = "10.0.1.0/24"
+    ssh_key  = "ssh-rsa AAAA..."
+  },
+  {
+    id       = "customer-002"
+    vpc_cidr = "10.0.2.0/24"
+    ssh_key  = "ssh-rsa AAAA..."
+  }
+]

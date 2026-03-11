@@ -1,0 +1,177 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - img "MUTX" [ref=e7]
+          - generic [ref=e8]: MUTX
+        - generic [ref=e9]:
+          - link "Overview" [ref=e10] [cursor=pointer]:
+            - /url: "#overview"
+          - link "Platform" [ref=e11] [cursor=pointer]:
+            - /url: "#platform"
+          - link "Roadmap" [ref=e12] [cursor=pointer]:
+            - /url: "#roadmap"
+          - link "Contribute" [ref=e13] [cursor=pointer]:
+            - /url: "#contribute"
+        - generic [ref=e14]:
+          - link [ref=e15] [cursor=pointer]:
+            - /url: https://github.com/fortunexbt/mutx-dev
+            - img [ref=e16]
+          - link [ref=e19] [cursor=pointer]:
+            - /url: https://x.com/mutxdev
+            - img [ref=e20]
+    - main [ref=e22]:
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - generic [ref=e27]: Open Source Control Plane
+          - heading "Deploy and operate AI agents at scale." [level=1] [ref=e28]:
+            - text: Deploy and operate
+            - text: AI agents at scale.
+          - paragraph [ref=e29]: MUTX is an open-source framework and control plane for building, deploying, and monitoring autonomous agents. Stop writing custom infrastructure and focus on agent logic.
+          - generic [ref=e30]:
+            - link "View Documentation" [ref=e31] [cursor=pointer]:
+              - /url: https://github.com/fortunexbt/mutx-dev
+              - text: View Documentation
+              - img [ref=e32]
+            - link "Open Dashboard" [ref=e34] [cursor=pointer]:
+              - /url: https://app.mutx.dev
+          - generic [ref=e37]:
+            - generic [ref=e38]:
+              - generic [ref=e39]: Waitlist Live
+              - generic [ref=e40]: 24 registered
+            - generic [ref=e41]:
+              - paragraph [ref=e42]: Request early access
+              - paragraph [ref=e43]: Get updates, technical documentation, and early access.
+            - generic [ref=e44]:
+              - generic [ref=e45]: Email address
+              - textbox "Email address" [ref=e46]:
+                - /placeholder: you@company.com
+                - text: test1773236044108@example.com
+              - textbox "What is 2 + 2?" [active] [ref=e47]
+              - button "Join Waitlist" [ref=e48] [cursor=pointer]:
+                - text: Join Waitlist
+                - img [ref=e49]
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - paragraph [ref=e60]: deploy_agent.py
+            - generic [ref=e61]: Python SDK
+          - generic [ref=e64]: "from mutx import Client # Initialize the MUTX client client = Client(api_key=\"mutx_sk_...\") # Create a new autonomous agent agent = client.agents.create( name=\"data-analyzer\", model=\"gpt-4o\", capabilities=[\"sql\", \"pandas\"] ) # Deploy to the control plane deployment = client.deployments.create( agent_id=agent.id, environment=\"production\", replicas=3 ) print(f\"Agent deployed: {deployment.url}\")"
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - heading "Production-ready primitives." [level=2] [ref=e69]
+          - paragraph [ref=e70]: Everything you need to take an agent from a local script to a resilient, monitored service.
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - img [ref=e73]
+            - heading "Operational Security" [level=3] [ref=e75]
+            - paragraph [ref=e76]: Built-in authentication, API key management, and fine-grained permissions.
+          - generic [ref=e77]:
+            - img [ref=e78]
+            - heading "Infrastructure First" [level=3] [ref=e82]
+            - paragraph [ref=e83]: Seamless integration with Docker, Terraform, and Ansible for reliable deployments.
+          - generic [ref=e84]:
+            - img [ref=e85]
+            - heading "Open Source" [level=3] [ref=e89]
+            - paragraph [ref=e90]: A transparent, community-driven roadmap from local development to production.
+      - generic [ref=e92]:
+        - generic [ref=e93]:
+          - heading "Unified Operator Surface." [level=2] [ref=e94]
+          - paragraph [ref=e95]: Manage your agents through a clean web dashboard, interact via standard REST APIs, or automate with our SDKs.
+        - generic [ref=e96]:
+          - generic [ref=e97]:
+            - img [ref=e98]
+            - heading "Unified Operator Surface" [level=3] [ref=e102]
+            - paragraph [ref=e103]: A comprehensive Next.js frontend for monitoring, deployment management, and API key generation.
+          - generic [ref=e104]:
+            - img [ref=e105]
+            - heading "FastAPI Control Plane" [level=3] [ref=e108]
+            - paragraph [ref=e109]: High-performance backend exposing standard REST APIs for agent CRUD, health checks, and webhooks.
+          - generic [ref=e110]:
+            - img [ref=e111]
+            - heading "Developer CLI & SDK" [level=3] [ref=e113]
+            - paragraph [ref=e114]: Python client libraries and CLI tools for managing the agent lifecycle directly from your terminal.
+      - generic [ref=e117]:
+        - generic [ref=e118]:
+          - heading "Development Roadmap." [level=2] [ref=e119]
+          - paragraph [ref=e120]: Our vision for building the most robust agent infrastructure. We build in public and welcome community contributions.
+        - generic [ref=e121]:
+          - generic [ref=e122]:
+            - 'heading "Phase 1: Foundation" [level=3] [ref=e123]'
+            - list [ref=e124]:
+              - listitem [ref=e125]:
+                - img [ref=e126]
+                - generic [ref=e129]: Authentication and authorization
+              - listitem [ref=e130]:
+                - img [ref=e131]
+                - generic [ref=e134]: Agent CRUD and deployment APIs
+              - listitem [ref=e135]:
+                - img [ref=e136]
+                - generic [ref=e139]: Python SDK and CLI parity
+              - listitem [ref=e140]:
+                - img [ref=e141]
+                - generic [ref=e144]: Basic dashboard UI
+          - generic [ref=e145]:
+            - 'heading "Phase 2: Observability" [level=3] [ref=e146]'
+            - list [ref=e147]:
+              - listitem [ref=e148]:
+                - img [ref=e149]
+                - generic [ref=e152]: Typed agent configurations
+              - listitem [ref=e153]:
+                - img [ref=e154]
+                - generic [ref=e157]: Deployment event history
+              - listitem [ref=e158]:
+                - img [ref=e159]
+                - generic [ref=e162]: Webhook registration system
+              - listitem [ref=e163]:
+                - img [ref=e164]
+                - generic [ref=e167]: Runtime metrics and monitoring
+          - generic [ref=e168]:
+            - 'heading "Phase 3: Scale" [level=3] [ref=e169]'
+            - list [ref=e170]:
+              - listitem [ref=e171]:
+                - img [ref=e172]
+                - generic [ref=e175]: Execution tracing and replay
+              - listitem [ref=e176]:
+                - img [ref=e177]
+                - generic [ref=e180]: Versioning and deployment rollbacks
+              - listitem [ref=e181]:
+                - img [ref=e182]
+                - generic [ref=e185]: Quota management
+              - listitem [ref=e186]:
+                - img [ref=e187]
+                - generic [ref=e190]: Vector database integrations
+      - generic [ref=e192]:
+        - heading "Build with MUTX." [level=2] [ref=e193]
+        - paragraph [ref=e194]: Join the waitlist to receive updates on our progress, get access to early technical documentation, and start building with the MUTX framework.
+        - generic [ref=e198]:
+          - generic [ref=e199]:
+            - generic [ref=e200]: Waitlist Live
+            - generic [ref=e201]: 24 registered
+          - generic [ref=e202]:
+            - paragraph [ref=e203]: Request early access
+            - paragraph [ref=e204]: Get updates, technical documentation, and early access.
+          - generic [ref=e205]:
+            - generic [ref=e206]: Email address
+            - textbox "Email address" [ref=e207]:
+              - /placeholder: you@company.com
+            - textbox "What is 2 + 2?" [ref=e208]
+            - button "Join Waitlist" [ref=e209] [cursor=pointer]:
+              - text: Join Waitlist
+              - img [ref=e210]
+    - contentinfo [ref=e212]:
+      - generic [ref=e213]:
+        - img "mutx.dev" [ref=e214]
+        - generic [ref=e215]: MUTX Open Source Control Plane
+      - generic [ref=e216]:
+        - link "GitHub" [ref=e217] [cursor=pointer]:
+          - /url: https://github.com/fortunexbt/mutx-dev
+        - link "Twitter" [ref=e218] [cursor=pointer]:
+          - /url: https://x.com/mutxdev
+        - link "Contact" [ref=e219] [cursor=pointer]:
+          - /url: mailto:hello@mutx.dev
+  - alert [ref=e220]
+```

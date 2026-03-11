@@ -1,0 +1,18 @@
+#!/bin/bash
+
+BACKUP_DIR="{{ n8n_backup_path }}"
+N8N_DATA="{{ n8n_data_path }}"
+DATE=$(date +%Y%m%d_%H%M%S)
+
+mkdir -p "$BACKUP_DIR"
+
+echo "Starting n8n backup at $(date)"
+
+tar -czf "$BACKUP_DIR/n8n_backup_$DATE.tar.gz" -C "$N8N_DATA" .
+
+echo "Backup completed: n8n_backup_$DATE.tar.gz"
+
+find "$BACKUP_DIR" -name "n8n_backup_*.tar.gz" -mtime +7 -delete
+
+echo "Old backups cleaned up"
+echo "Backup finished at $(date)"

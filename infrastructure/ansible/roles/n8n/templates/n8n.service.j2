@@ -1,0 +1,17 @@
+[Unit]
+Description=n8n Workflow Automation
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User={{ n8n_user }}
+Group={{ n8n_group }}
+WorkingDirectory={{ n8n_data_path }}
+Environment=NODE_ENV=production
+EnvironmentFile={{ n8n_config_path }}/n8n.env
+ExecStart=/usr/bin/docker start n8n
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,6 @@
+---
+agent_system_user: agent
+agent_container_restart_policy: always
+agent_memory_limit: 512m
+agent_cpu_period: 100000
+agent_cpu_quota: 50000

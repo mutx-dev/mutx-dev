@@ -1,0 +1,36 @@
+# Node
+node_modules/
+*.log
+.next/
+.env
+.env.local
+.DS_Store
+dist/
+build/
+tsconfig.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+ENV/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Infrastructure
+.terraform/
+*.tfstate
+*.tfstate.backup
+.ansible/
+.ssh/
+
+# Archives and Docs
+archive/
+docs/archive/

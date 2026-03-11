@@ -1,0 +1,112 @@
+from datetime import datetime
+from typing import Any, Optional
+from uuid import UUID
+
+import httpx
+
+
+class Webhook:
+    def __init__(self, data: dict[str, Any]):
+        self.id = UUID(data["id"])
+        self.url = data["url"]
+        self.events = data.get("events", [])
+        self.secret = data.get("secret")
+        self.active = data.get("active", True)
+        self.created_at = datetime.fromisoformat(data["created_at"])
+        self._data = data
+
+    def __repr__(self) -> str:
+        return f"Webhook(id={self.id}, url={self.url}, active={self.active})"
+
+
+class WebhookEvent:
+    def __init__(self, data: dict[str, Any]):
+        self.id = UUID(data["id"])
+        self.webhook_id = UUID(data["webhook_id"])
+        self.event_type = data["event_type"]
+        self.payload = data.get("payload", {})
+        self.delivered = data.get("delivered", False)
+        self.created_at = datetime.fromisoformat(data["created_at"])
+        self._data = data
+
+
+class Webhooks:
+    def __init__(self, client: httpx.Client | httpx.AsyncClient):
+        self._client = client
+
+    def create(
+        self,
+        url: str,
+        events: list[str],
+        secret: Optional[str] = None,
+        active: bool = True,
+    ) -> Webhook:
+        response = self._client.post(
+            "/webhooks",
+            json={
+                "url": url,
+                "events": events,
+                "secret": secret,
+                "active": active,
+            },
+        )
+        response.raise_for_status()
+        return Webhook(response.json())
+
+    def list(
+        self,
+        skip: int = 0,
+        limit: int = 50,
+    ) -> list[Webhook]:
+        response = self._client.get(
+            "/webhooks",
+            params={"skip": skip, "limit": limit},
+        )
+        response.raise_for_status()
+        return [Webhook(data) for data in response.json()]
+
+    def get(self, webhook_id: UUID | str) -> Webhook:
+        response = self._client.get(f"/webhooks/{webhook_id}")
+        response.raise_for_status()
+        return Webhook(response.json())
+
+    def delete(self, webhook_id: UUID | str) -> None:
+        response = self._client.delete(f"/webhooks/{webhook_id}")
+        response.raise_for_status()
+
+    def get_events(
+        self,
+        webhook_id: UUID | str,
+        skip: int = 0,
+        limit: int = 50,
+    ) -> list[WebhookEvent]:
+        response = self._client.get(
+            f"/webhooks/{webhook_id}/events",
+            params={"skip": skip, "limit": limit},
+        )
+        response.raise_for_status()
+        return [WebhookEvent(data) for data in response.json()]
+
+    def update(
+        self,
+        webhook_id: UUID | str,
+        url: Optional[str] = None,
+        events: Optional[list[str]] = None,
+        active: Optional[bool] = None,
+    ) -> Webhook:
+        payload = {}
+        if url is not None:
+            payload["url"] = url
+        if events is not None:
+            payload["events"] = events
+        if active is not None:
+            payload["active"] = active
+
+        response = self._client.patch(f"/webhooks/{webhook_id}", json=payload)
+        response.raise_for_status()
+        return Webhook(response.json())
+
+    def test(self, webhook_id: UUID | str) -> dict[str, Any]:
+        response = self._client.post(f"/webhooks/{webhook_id}/test")
+        response.raise_for_status()
+        return response.json()

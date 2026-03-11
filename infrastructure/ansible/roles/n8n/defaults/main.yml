@@ -1,0 +1,48 @@
+---
+n8n_host: "localhost"
+n8n_port: 5678
+n8n_data_path: "/opt/n8n/data"
+n8n_config_path: "/opt/n8n/config"
+n8n_ssl_path: "/opt/n8n/ssl"
+n8n_backup_path: "/opt/n8n/backups"
+
+n8n_user: "ubuntu"
+n8n_group: "ubuntu"
+
+n8n_version: "latest"
+
+n8n_db_name: "n8n"
+n8n_db_user: "n8n"
+n8n_db_password: "n8n_password_change_me"
+
+n8n_domain: "n8n.example.com"
+n8n_ssl_enabled: false
+n8n_ssl_email: "admin@example.com"
+n8n_ssl_renewal_days: 30
+
+n8n_use_docker: true
+
+n8n_execution_mode: "regular"
+n8n_queue_health_check_active: "true"
+
+n8n_timezone: "UTC"
+n8n_encryption_key: ""
+
+n8n_basic_auth_active: false
+n8n_basic_auth_user: "admin"
+n8n_basic_auth_password: "n8n_password_change_me"
+
+n8n_webhook_url: ""
+n8n_webhook_test_url: ""
+
+n8n_backup_days: 1
+
+n8n_docker_image: "n8nio/n8n"
+n8n_docker_container_name: "n8n"
+
+n8n_n8n_custom_extension_bundle: ""
+n8n_n8n_custom_extensions: ""
+
+n8n_log_LEVEL: "info"
+
+n8n_generic_variables: {}
