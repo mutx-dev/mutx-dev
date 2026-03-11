@@ -429,6 +429,20 @@ export function AppDashboardClient() {
                       <p>Agent: <span className="text-slate-300">{deployment.agent_id.split('-')[0]}</span></p>
                       <p>Replicas: <span className="text-white font-medium">{deployment.replicas}</span></p>
                     </div>
+
+                    {deployment.events?.length ? (
+                      <div className="mt-3 border-t border-white/5 pt-3">
+                        <div className="flex items-center justify-between text-[10px]">
+                          <span className="text-slate-500 uppercase tracking-wider">Latest Event</span>
+                          <span className="text-slate-400 font-[family:var(--font-mono)]">
+                            {formatDate(deployment.events[deployment.events.length - 1].created_at)}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-[11px] text-emerald-400/80 truncate">
+                          {deployment.events[deployment.events.length - 1].event_type} → {deployment.events[deployment.events.length - 1].status}
+                        </p>
+                      </div>
+                    ) : null}
                   </div>
                 ))
               ) : (

@@ -11,7 +11,6 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
-
 # revision identifiers, used by Alembic.
 revision: str = "8f2d6e4b9c1a"
 down_revision: Union[str, None] = "e8f636a73690"
@@ -35,7 +34,12 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(op.f("ix_deployment_events_deployment_id"), "deployment_events", ["deployment_id"], unique=False)
+    op.create_index(
+        op.f("ix_deployment_events_deployment_id"),
+        "deployment_events",
+        ["deployment_id"],
+        unique=False,
+    )
 
 
 def downgrade() -> None:
