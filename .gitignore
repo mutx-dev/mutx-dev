@@ -23,6 +23,8 @@ ENV/
 .coverage
 htmlcov/
 *.egg-info/
+.mypy_cache/
+.tox/
 
 # Infrastructure
 .terraform/
@@ -30,7 +32,17 @@ htmlcov/
 *.tfstate.backup
 .ansible/
 .ssh/
+*.tfvars
+*.tfvars.json
+.terraform.lock.hcl
 
 # Archives and Docs
 archive/
 docs/archive/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

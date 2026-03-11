@@ -1,0 +1,22 @@
+name: Docs improvement
+description: Report stale docs, missing examples, or unclear setup guidance.
+title: "docs: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is unclear or incorrect?
+    validations:
+      required: true
+  - type: textarea
+    id: location
+    attributes:
+      label: Relevant file or section
+      description: Link the file path, heading, or command.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested fix
+      description: What would make this easier to understand or more accurate?
