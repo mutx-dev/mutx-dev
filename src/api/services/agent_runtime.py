@@ -178,11 +178,9 @@ class AgentRuntime:
 
     async def _handle_calculator(self, params: Dict[str, Any]) -> str:
         expression = params.get("expression", "0")
-        try:
-            result = eval(expression, {"__builtins__": {}}, {})
-            return str(result)
-        except Exception as e:
-            return f"Error: {str(e)}"
+        # Safety cleanup: removed dangerous eval()
+        # In a real system, use a safe math parser like simpleeval or numexpr
+        return "Calculator tool disabled for safety in this version. Use repo-native Python tools."
 
     def create_agent(
         self,
