@@ -4,28 +4,14 @@ import { motion } from 'framer-motion'
 import { ArrowRight, Zap, Cpu, Shield, Globe, Github, Twitter, Mail } from 'lucide-react'
 import Image from 'next/image'
 import { WaitlistForm } from '@/components/WaitlistForm'
+import { Card } from '@/components/ui/Card'
+import { Section } from '@/components/ui/Section'
 
 const features = [
-  {
-    icon: Cpu,
-    title: 'Compute-Optimized',
-    description: 'Infrastructure shaped for long-running AI agent workloads and heavy token throughput.',
-  },
-  {
-    icon: Shield,
-    title: 'State Persistence',
-    description: 'Keep runtime context durable across restarts so your agents survive real production conditions.',
-  },
-  {
-    icon: Globe,
-    title: 'Webhook Ready',
-    description: 'Capture events, status updates, and runtime signals without duct-taped side systems.',
-  },
-  {
-    icon: Zap,
-    title: 'Built For Speed',
-    description: 'Move from local prototype to production runtime with a simpler operator story.',
-  },
+  { icon: Cpu, title: 'Compute-Optimized', description: 'Infrastructure shaped for long-running AI agent workloads and heavy token throughput.' },
+  { icon: Shield, title: 'State Persistence', description: 'Keep runtime context durable across restarts so your agents survive real production conditions.' },
+  { icon: Globe, title: 'Webhook Ready', description: 'Capture events, status updates, and runtime signals without duct-taped side systems.' },
+  { icon: Zap, title: 'Built For Speed', description: 'Move from local prototype to production runtime with a simpler operator story.' },
 ]
 
 export default function LandingPage() {
@@ -47,7 +33,6 @@ export default function LandingPage() {
         </div>
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
           <a href="#features" className="hover:text-white transition">Features</a>
-          <a href="#waitlist" className="hover:text-white transition">Waitlist</a>
         </div>
         <div className="flex items-center gap-4">
           <a href="https://github.com/fortunexbt/mutx-dev" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white transition">
@@ -92,7 +77,6 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="mt-12 w-full max-w-xl"
-            id="waitlist"
           >
             <WaitlistForm />
           </motion.div>
@@ -100,26 +84,24 @@ export default function LandingPage() {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="px-6 py-24 sm:px-10">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-16 text-center">
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Built for production reliability.</h2>
-            <p className="mt-4 text-slate-400">Everything you need to move agents from local scripts to production scale.</p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {features.map(({ icon: Icon, title, description }) => (
-              <div key={title} className="rounded-2xl border border-white/5 bg-white/[0.02] p-8 transition-all hover:border-cyan-500/30 hover:bg-white/[0.04]">
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-semibold text-white">{title}</h3>
-                <p className="mt-3 leading-relaxed text-slate-400">{description}</p>
-              </div>
-            ))}
-          </div>
+      <Section id="features">
+        <div className="mb-16 text-center">
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">Built for production reliability.</h2>
+          <p className="mt-4 text-slate-400">Everything you need to move agents from local scripts to production scale.</p>
         </div>
-      </section>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {features.map(({ icon: Icon, title, description }) => (
+            <Card key={title}>
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400">
+                <Icon className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-semibold text-white">{title}</h3>
+              <p className="mt-3 leading-relaxed text-slate-400">{description}</p>
+            </Card>
+          ))}
+        </div>
+      </Section>
 
       {/* Footer */}
       <footer className="border-t border-white/5 bg-black/40 px-6 py-12 sm:px-10">
@@ -129,7 +111,6 @@ export default function LandingPage() {
             <span className="text-lg font-bold text-white">mutx.dev</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-slate-500">
-            <a href="https://twitter.com/mutxdev" target="_blank" rel="noreferrer" className="transition hover:text-cyan-400">Twitter</a>
             <a href="https://github.com/fortunexbt/mutx-dev" target="_blank" rel="noreferrer" className="transition hover:text-cyan-400">GitHub</a>
             <a href="mailto:mario@mutx.dev" className="flex items-center gap-2 transition hover:text-cyan-400">
               <Mail className="h-4 w-4" />
