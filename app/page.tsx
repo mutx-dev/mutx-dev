@@ -2,12 +2,10 @@
 
 import {
   ArrowRight,
-  Code2,
   Database,
   Github,
   GitBranch,
   Layers3,
-  Mail,
   Server,
   Shield,
   Terminal,
@@ -24,7 +22,7 @@ const TWITTER_URL = 'https://x.com/mutxdev'
 
 const navItems = [
   { label: 'Overview', href: '#overview' },
-  { label: 'Platform', href: '#platform' },
+  { label: 'What Exists', href: '#platform' },
   { label: 'Roadmap', href: '#roadmap' },
   { label: 'Contribute', href: '#contribute' },
 ]
@@ -32,65 +30,65 @@ const navItems = [
 const features = [
   {
     icon: Shield,
-    title: 'Operational Security',
-    description: 'Built-in authentication, API key management, and fine-grained permissions.',
+    title: 'Auth And Access Foundations',
+    description: 'Real login, tokens, current-user flows, and hashed API key lifecycle management already exist in the control plane.',
   },
   {
     icon: Database,
-    title: 'Infrastructure First',
-    description: 'Seamless integration with Docker, Terraform, and Ansible for reliable deployments.',
+    title: 'Durable Control-Plane Records',
+    description: 'Users, agents, deployments, logs, metrics, health, and readiness are modeled as product surfaces, not ad hoc scripts.',
   },
   {
     icon: GitBranch,
-    title: 'Open Source',
-    description: 'A transparent, community-driven roadmap from local development to production.',
+    title: 'Open Interfaces',
+    description: 'Website, API, CLI, SDK, and infrastructure code live in one repo so the product contract stays inspectable and fixable.',
   },
 ]
 
 const capabilities = [
   {
     icon: Layers3,
-    title: 'Unified Operator Surface',
-    description: 'A comprehensive Next.js frontend for monitoring, deployment management, and API key generation.',
+    title: 'Website And App Host',
+    description: 'The web layer is part of the product: a public landing site, same-origin route proxies, a live waitlist flow, and an app surface preview.',
   },
   {
     icon: Server,
     title: 'FastAPI Control Plane',
-    description: 'High-performance backend exposing standard REST APIs for agent CRUD, health checks, and webhooks.',
+    description: 'Live route groups cover auth, agents, deployments, API keys, webhook ingestion, newsletter, health, and readiness.',
   },
   {
     icon: Terminal,
-    title: 'Developer CLI & SDK',
-    description: 'Python client libraries and CLI tools for managing the agent lifecycle directly from your terminal.',
+    title: 'CLI, SDK, And Infra Foundations',
+    description: 'Python client surfaces, Docker, Railway, Terraform, Ansible, and monitoring assets make the control plane usable beyond the browser.',
   },
 ]
 
 const roadmap = [
   {
-    title: 'Phase 1: Foundation',
+    title: 'Now',
     items: [
-      'Authentication and authorization',
-      'Agent CRUD and deployment APIs',
-      'Python SDK and CLI parity',
-      'Basic dashboard UI',
+      'Tighten auth and ownership on agents and deployments',
+      'Align CLI and SDK behavior with live API contracts',
+      'Turn the app surface into a real authenticated dashboard',
+      'Make contact and API key workflows more complete',
     ],
   },
   {
-    title: 'Phase 2: Observability',
+    title: 'Next',
     items: [
       'Typed agent configurations',
-      'Deployment event history',
-      'Webhook registration system',
-      'Runtime metrics and monitoring',
+      'Deployment events and lifecycle history',
+      'Webhook registration as a real product surface',
+      'Better observability views for logs, metrics, and state changes',
     ],
   },
   {
-    title: 'Phase 3: Scale',
+    title: 'Later',
     items: [
-      'Execution tracing and replay',
-      'Versioning and deployment rollbacks',
+      'Execution and traces APIs for agent runs',
+      'Versioning, rollback, and deployment history UX',
       'Quota management',
-      'Vector database integrations',
+      'Expanded runtime support and vector or RAG features',
     ],
   },
 ]
@@ -132,15 +130,15 @@ export default function LandingPage() {
           <div className="mx-auto max-w-7xl grid gap-16 lg:grid-cols-2 lg:items-center">
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/80 mb-8">
-                <span>Open Source Control Plane</span>
+                <span>Open-Source Agent Control Plane</span>
               </div>
               
               <h1 className="text-4xl font-medium tracking-tight sm:text-6xl mb-6">
-                Deploy and operate <br /> AI agents at scale.
+                The control plane for <br /> operating AI agents.
               </h1>
               
               <p className="text-lg text-white/60 mb-10 leading-relaxed max-w-xl">
-                MUTX is an open-source framework and control plane for building, deploying, and monitoring autonomous agents. Stop writing custom infrastructure and focus on agent logic.
+                MUTX is an open-source control plane for teams that need more than an agent demo. Today it gives you real auth, agent and deployment records, API keys, webhook ingestion, health checks, and coordinated web, API, CLI, and SDK surfaces.
               </p>
 
               <div className="flex flex-wrap items-center gap-4 mb-12">
@@ -150,17 +148,15 @@ export default function LandingPage() {
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90"
                 >
-                  View Documentation
+                  View on GitHub
                   <ArrowRight className="h-4 w-4" />
                 </a>
-                <a
-                  href="https://app.mutx.dev"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10"
+                <span
+                  aria-disabled="true"
+                  className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/35"
                 >
-                  Open Dashboard
-                </a>
+                  Open Dashboard - Coming Soon
+                </span>
               </div>
 
               <div className="max-w-md">
@@ -169,24 +165,15 @@ export default function LandingPage() {
             </div>
 
             <div className="relative">
-              <TerminalWindow title="deploy_agent.py" path="scripts" label="Python SDK">
+              <TerminalWindow title="control-plane.sh" path="examples" label="live routes">
                 <pre className="text-sm leading-relaxed">
-<span className="text-blue-400">from</span> mutx <span className="text-blue-400">import</span> Client{'\n\n'}
-<span className="text-white/40"># Initialize the MUTX client</span>{'\n'}
-client = Client(api_key=<span className="text-green-400">&quot;mutx_sk_...&quot;</span>){'\n\n'}
-<span className="text-white/40"># Create a new autonomous agent</span>{'\n'}
-agent = client.agents.create({'\n'}
-  name=<span className="text-green-400">&quot;data-analyzer&quot;</span>,{'\n'}
-  model=<span className="text-green-400">&quot;gpt-5.4&quot;</span>,{'\n'}
-  capabilities=[<span className="text-green-400">&quot;sql&quot;</span>, <span className="text-green-400">&quot;pandas&quot;</span>]{'\n'}
-){'\n\n'}
-<span className="text-white/40"># Deploy to the control plane</span>{'\n'}
-deployment = client.deployments.create({'\n'}
-  agent_id=agent.id,{'\n'}
-  environment=<span className="text-green-400">&quot;production&quot;</span>,{'\n'}
-  replicas=<span className="text-yellow-300">3</span>{'\n'}
-){'\n\n'}
-<span className="text-blue-400">print</span>(<span className="text-green-400">f&quot;Agent deployed: </span>{'{'}deployment.url{'}'}<span className="text-green-400">&quot;</span>)
+BASE_URL=<span className="text-green-400">&quot;http://localhost:8000&quot;</span>{'\n\n'}
+<span className="text-white/40"># Authenticate against the control plane</span>{'\n'}
+curl -X POST <span className="text-green-400">&quot;$BASE_URL/auth/login&quot;</span>{'\n'}
+<span className="text-white/40"># Inspect durable resources</span>{'\n'}
+curl <span className="text-green-400">&quot;$BASE_URL/agents?limit=10&amp;skip=0&quot;</span>{'\n'}
+curl <span className="text-green-400">&quot;$BASE_URL/deployments&quot;</span>{'\n'}
+curl <span className="text-green-400">&quot;$BASE_URL/health&quot;</span>
                 </pre>
               </TerminalWindow>
             </div>
@@ -199,9 +186,9 @@ deployment = client.deployments.create({'\n'}
         <section id="overview" className="px-6 py-24 bg-[#050505]">
           <div className="mx-auto max-w-7xl">
             <div className="max-w-3xl mb-16">
-              <h2 className="text-3xl font-medium tracking-tight sm:text-4xl mb-6">Production-ready primitives.</h2>
+              <h2 className="text-3xl font-medium tracking-tight sm:text-4xl mb-6">Control-plane foundations.</h2>
               <p className="text-lg text-white/60">
-                Everything you need to take an agent from a local script to a resilient, monitored service.
+                MUTX is strongest today where agent projects usually fall apart first: identity, resource modeling, and operator-facing interfaces.
               </p>
             </div>
 
@@ -221,9 +208,9 @@ deployment = client.deployments.create({'\n'}
         <section id="platform" className="px-6 py-24">
           <div className="mx-auto max-w-7xl">
             <div className="max-w-3xl mb-16">
-              <h2 className="text-3xl font-medium tracking-tight sm:text-4xl mb-6">Unified Operator Surface.</h2>
+              <h2 className="text-3xl font-medium tracking-tight sm:text-4xl mb-6">What exists today.</h2>
               <p className="text-lg text-white/60">
-                Manage your agents through a clean web dashboard, interact via standard REST APIs, or automate with our SDKs.
+                What exists today is a real control-plane shell with honest boundaries. The dashboard is still maturing, but the core platform surfaces are already in place.
               </p>
             </div>
 
@@ -247,7 +234,7 @@ deployment = client.deployments.create({'\n'}
             <div className="max-w-3xl mb-16">
               <h2 className="text-3xl font-medium tracking-tight sm:text-4xl mb-6">Development Roadmap.</h2>
               <p className="text-lg text-white/60">
-                Our vision for building the most robust agent infrastructure. We build in public and welcome community contributions.
+                We publish the roadmap the same way we build the product: current-state first, target-state second, with the biggest gaps called out clearly.
               </p>
             </div>
 
@@ -274,7 +261,7 @@ deployment = client.deployments.create({'\n'}
           <div className="mx-auto max-w-3xl">
             <h2 className="text-3xl font-medium tracking-tight sm:text-5xl mb-6">Build with MUTX.</h2>
             <p className="text-lg text-white/60 mb-10 leading-relaxed">
-              Join the waitlist to receive updates on our progress, get access to early technical documentation, and start building with the MUTX framework.
+              Join the waitlist for product updates, technical docs, and early access as we harden the control plane for real operator workflows.
             </p>
             <div className="flex justify-center">
               <div className="w-full max-w-md text-left">
@@ -288,7 +275,7 @@ deployment = client.deployments.create({'\n'}
       <footer className="border-t border-white/10 py-8 px-6 text-sm text-white/40 text-center flex flex-col items-center gap-4">
         <div className="flex items-center gap-2">
           <Image src="/logo.png" alt="mutx.dev" width={20} height={20} className="object-contain" />
-          <span>MUTX Open Source Control Plane</span>
+          <span>MUTX Open-Source Agent Control Plane</span>
         </div>
         <div className="flex gap-6">
           <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub</a>

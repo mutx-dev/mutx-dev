@@ -12,11 +12,11 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://mutx.dev'),
   title: 'MUTX | Open Source Control Plane for AI Agents',
-  description: 'Deploy, operate, and observe AI agents with a FastAPI control plane, Next.js operator surface, Python CLI, SDK, and infrastructure automation.',
+  description: 'Open-source control plane foundations for AI agents: auth, agent and deployment records, API keys, webhook ingestion, health checks, and coordinated web, API, CLI, and SDK surfaces.',
   keywords: ['AI agents', 'agent infrastructure', 'fastapi', 'next.js', 'python sdk', 'terraform', 'railway', 'waitlist'],
   openGraph: {
     title: 'MUTX | Open Source Control Plane for AI Agents',
-    description: 'A production-minded stack for auth, agents, deployments, webhooks, API keys, and infrastructure automation.',
+    description: 'An open-source control plane for AI agents with real auth, durable resources, API keys, health surfaces, and infrastructure foundations.',
     url: 'https://mutx.dev',
     siteName: 'MUTX',
     images: [{ url: 'https://mutx.dev/logo.png', width: 300, height: 300, alt: 'MUTX | Open Source Control Plane for AI Agents' }],
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     site: '@mutx_dev',
     title: 'MUTX | Open Source Control Plane for AI Agents',
-    description: 'Deploy, operate, and observe AI agents with a real stack: web, API, CLI, SDK, infra, and a live waitlist.',
+    description: 'Open-source control plane foundations for teams operating AI agents beyond the demo.',
     images: ['https://mutx.dev/logo.png'],
   },
   icons: {
