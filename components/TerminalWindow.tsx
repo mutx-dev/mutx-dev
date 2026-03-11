@@ -16,33 +16,30 @@ type TerminalWindowProps = {
 export function TerminalWindow({ title, path, label, children, className }: TerminalWindowProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 18 }}
+      initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className={cn('terminal-shell relative overflow-hidden rounded-[28px] border border-white/10 bg-[#08111f]/90 shadow-[0_30px_100px_rgba(2,6,23,0.55)]', className)}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      className={cn('relative overflow-hidden rounded-lg border border-white/10 bg-[#0a0a0a] shadow-2xl', className)}
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
-      <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-5 py-3">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-            <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
-            <span className="h-3 w-3 rounded-full bg-[#28c840]" />
+      <div className="flex items-center justify-between border-b border-white/10 bg-white/5 px-4 py-2">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
           </div>
           <div>
-            <p className="text-sm font-medium text-white">{title}</p>
-            {path ? <p className="text-[11px] uppercase tracking-[0.28em] text-slate-500">{path}</p> : null}
+            <p className="text-xs font-medium text-white/80">{title}</p>
           </div>
         </div>
         {label ? (
-          <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-[11px] uppercase tracking-[0.25em] text-cyan-200">
+          <span className="rounded bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white/60">
             {label}
           </span>
         ) : null}
       </div>
-      <div className="relative p-5 font-[family:var(--font-mono)] text-[13px] leading-6 text-slate-200 sm:p-6 sm:text-sm">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(103,232,249,0.12),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent_35%)]" />
+      <div className="relative p-4 font-mono text-[13px] leading-6 text-slate-300 sm:p-5 sm:text-sm">
         <div className="relative">{children}</div>
       </div>
     </motion.div>

@@ -92,20 +92,19 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
   }
 
   return (
-    <div className={cn('panel relative overflow-hidden rounded-[28px] border border-white/10 p-5 sm:p-6', compact && 'p-4 sm:p-5', className)}>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(103,232,249,0.14),transparent_38%),radial-gradient(circle_at_bottom_right,rgba(245,158,11,0.1),transparent_34%)]" />
+    <div className={cn('relative overflow-hidden rounded-xl border border-white/10 bg-[#111111] p-5 sm:p-6 shadow-xl', compact && 'p-4 sm:p-5', className)}>
       <div className="relative">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="eyebrow !py-1.5">Waitlist is live</span>
-          <span className="stat-pill">
-            {count === null ? 'Postgres-backed signup' : `${count.toLocaleString()} builders in`}
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <span className="eyebrow">Waitlist Live</span>
+          <span className="text-sm text-white/60">
+            {count === null ? 'Join the waitlist' : `${count.toLocaleString()} registered`}
           </span>
         </div>
 
-        <div className="mt-4 space-y-2">
-          <p className="text-lg font-semibold text-white sm:text-xl">Get launch drops, contributor invites, and early access.</p>
-          <p className="max-w-2xl text-sm leading-6 text-slate-300">
-            Signups are stored in Postgres and confirmation emails are sent through Resend.
+        <div className="space-y-1 mb-6">
+          <p className="text-lg font-medium text-white sm:text-xl">Request early access</p>
+          <p className="text-sm text-white/60">
+            Get updates, technical documentation, and early access.
           </p>
         </div>
 
@@ -113,16 +112,16 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-5 flex items-start gap-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-5 py-4 text-emerald-100"
+            className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white"
           >
-            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-white" />
             <div>
-              <p className="font-medium">{successMessage}</p>
-              <p className="mt-1 text-sm text-emerald-100/80">We will send launch updates, docs, and contributor calls to that inbox.</p>
+              <p className="font-medium text-sm">{successMessage}</p>
+              <p className="mt-1 text-xs text-white/60">We'll be in touch soon.</p>
             </div>
           </motion.div>
         ) : (
-          <form onSubmit={handleSubmit} className="mt-5 flex w-full flex-col gap-3 lg:flex-row">
+          <form onSubmit={handleSubmit} className="flex w-full flex-col gap-3 sm:flex-row">
             <label className="sr-only" htmlFor={`waitlist-email-${source}`}>Email address</label>
             <input
               id={`waitlist-email-${source}`}
@@ -131,15 +130,15 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@company.com"
               required
-              className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4 text-base text-white placeholder:text-slate-500 focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300/20"
+              className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/30 transition-colors"
             />
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-300 via-cyan-200 to-amber-200 px-7 py-4 text-base font-semibold text-slate-950 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading ? 'Joining...' : 'Join the waitlist'}
-              <ArrowRight className="h-5 w-5" />
+              {loading ? 'Joining...' : 'Join Waitlist'}
+              <ArrowRight className="h-4 w-4" />
             </button>
           </form>
         )}
@@ -148,7 +147,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-3 flex items-center gap-2 text-sm text-rose-300"
+            className="mt-3 flex items-center gap-2 text-sm text-red-400"
           >
             <AlertCircle className="h-4 w-4" />
             {error}
