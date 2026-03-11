@@ -168,16 +168,14 @@ async def test_user(db_session: AsyncSession):
     from src.api.models.models import User
     
     user = User(
-        id=uuid.UUID("00000000-0000-0000-0000-000000000001"),
+        id=uuid.UUID("11111111-1111-4111-a111-111111111111"),
         email="test@example.com",
-        username="testuser",
-        hashed_password="hashedpassword",
+        password_hash="hashedpassword",
         is_active=True,
         name="Test User",
     )
     db_session.add(user)
     await db_session.commit()
-    await db_session.refresh(user)
     return user
 
 
@@ -187,16 +185,14 @@ async def other_user(db_session: AsyncSession):
     from src.api.models.models import User
     
     user = User(
-        id=uuid.UUID("00000000-0000-0000-0000-000000000002"),
+        id=uuid.UUID("22222222-2222-4222-a222-222222222222"),
         email="other@example.com",
-        username="otheruser",
-        hashed_password="hashedpassword",
+        password_hash="hashedpassword",
         is_active=True,
         name="Other User",
     )
     db_session.add(user)
     await db_session.commit()
-    await db_session.refresh(user)
     return user
 
 
@@ -206,7 +202,7 @@ async def test_agent(db_session: AsyncSession, test_user):
     from src.api.models.models import Agent, AgentStatus
     
     agent = Agent(
-        id=uuid.UUID("00000000-0000-0000-0000-000000000010"),
+        id=uuid.UUID("33333333-3333-4333-a333-333333333333"),
         name="test-agent",
         description="A test agent",
         config='{"model": "gpt-4"}',
@@ -215,7 +211,6 @@ async def test_agent(db_session: AsyncSession, test_user):
     )
     db_session.add(agent)
     await db_session.commit()
-    await db_session.refresh(agent)
     return agent
 
 
@@ -225,12 +220,11 @@ async def test_deployment(db_session: AsyncSession, test_agent):
     from src.api.models.models import Deployment
     
     deployment = Deployment(
-        id=uuid.UUID("00000000-0000-0000-0000-000000000020"),
+        id=uuid.UUID("44444444-4444-4444-a444-444444444444"),
         agent_id=test_agent.id,
         status="running",
         replicas=1,
     )
     db_session.add(deployment)
     await db_session.commit()
-    await db_session.refresh(deployment)
     return deployment

@@ -11,7 +11,6 @@ from src.api.auth.password import hash_password, verify_password
 from src.api.models.models import User, APIKey, Plan
 from src.api.services.email.email_service import (
     generate_token,
-    VERIFICATION_TOKEN_EXPIRE_HOURS,
     PASSWORD_RESET_TOKEN_EXPIRE_HOURS,
 )
 
@@ -137,7 +136,7 @@ class UserService:
         result = await self.session.execute(
             select(APIKey)
             .where(APIKey.user_id == user_id)
-            .where(APIKey.is_active == True)
+            .where(APIKey.is_active)
         )
         return list(result.scalars().all())
 
@@ -145,7 +144,7 @@ class UserService:
         result = await self.session.execute(
             select(APIKey)
             .where(APIKey.user_id == user_id)
-            .where(APIKey.is_active == True)
+            .where(APIKey.is_active)
         )
         api_keys = result.scalars().all()
         

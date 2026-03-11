@@ -1,17 +1,17 @@
 import os
 import logging
 from typing import Optional, List, Dict, Any
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
-from sqlalchemy import Column, String, Text, Float, Integer, create_engine
+from sqlalchemy import Column, String, Text, create_engine
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from src.api.database import build_sync_database_url
 

@@ -13,7 +13,6 @@ import logging
 import platform
 import threading
 import time
-import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Callable, Optional
@@ -56,29 +55,29 @@ class AgentMetrics:
 class MutxAgentClient:
     """
     Client for agents to connect to MUTX platform.
-    
+
     Usage:
         client = MutxAgentClient(
             mutx_url="https://api.mutx.dev",
             api_key="your-agent-api-key"  # Or use agent_id for registration
         )
-        
+
         # Register the agent
         await client.register(name="my-agent", description="My AI agent")
-        
+
         # Start heartbeat loop
         client.start_heartbeat(interval=30)
-        
+
         # Report metrics
         await client.report_metrics(AgentMetrics(cpu_usage=25.0, memory_usage=512.0))
-        
+
         # Poll for commands
         commands = await client.poll_commands()
-        
+
         # Cleanup
         client.stop()
     """
-    
+
     def __init__(
         self,
         mutx_url: str = "https://api.mutx.dev/v1",
@@ -90,7 +89,7 @@ class MutxAgentClient:
         self.api_key = api_key
         self.agent_id = agent_id
         self.timeout = timeout
-        
+
         self._client: Optional[httpx.AsyncClient] = None
         self._heartbeat_thread: Optional[threading.Thread] = None
         self._heartbeat_running = False
@@ -99,10 +98,10 @@ class MutxAgentClient:
         self._start_time = time.time()
         self._requests_processed = 0
         self._errors_count = 0
-        
+
         # Callback for handling commands
         self._command_callback: Optional[Callable[[Command], Any]] = None
-    
+
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None:
             headers = {
@@ -110,20 +109,20 @@ class MutxAgentClient:
             }
             if self.api_key:
                 headers["Authorization"] = f"Bearer {self.api_key}"
-            
+
             self._client = httpx.AsyncClient(
                 base_url=self.mutx_url,
                 timeout=self.timeout,
                 headers=headers,
             )
         return self._client
-    
+
     async def close(self):
         """Close the HTTP client."""
         if self._client:
             await self._client.aclose()
             self._client = None
-    
+
     async def register(
         self,
         name: str,
@@ -132,38 +131,38 @@ class MutxAgentClient:
     ) -> AgentInfo:
         """
         Register this agent with MUTX.
-        
+
         Args:
             name: Agent name
             description: Agent description
             metadata: Additional metadata
-            
+
         Returns:
             AgentInfo with agent_id and api_key
         """
         client = await self._get_client()
-        
+
         payload = {
             "name": name,
             "description": description or "",
             "metadata": metadata or {},
             "capabilities": ["heartbeat", "metrics", "commands"],
         }
-        
+
         try:
             response = await client.post("/agents/register", json=payload)
             response.raise_for_status()
             data = response.json()
-            
+
             self.agent_id = data["agent_id"]
             self.api_key = data["api_key"]
             self._registered = True
-            
+
             # Update headers with new API key
             client.headers["Authorization"] = f"Bearer {self.api_key}"
-            
+
             logger.info(f"Registered agent: {self.agent_id}")
-            
+
             return AgentInfo(
                 agent_id=self.agent_id,
                 name=name,
@@ -178,7 +177,7 @@ class MutxAgentClient:
                     "Invalid API key. Provide an agent_api_key or use register() first."
                 )
             raise
-    
+
     async def connect(
         self,
         agent_id: str,
@@ -186,20 +185,20 @@ class MutxAgentClient:
     ) -> bool:
         """
         Connect using existing agent credentials.
-        
+
         Args:
             agent_id: The agent ID
             api_key: The agent API key
-            
+
         Returns:
             True if connection successful
         """
         self.agent_id = agent_id
         self.api_key = api_key
-        
+
         client = await self._get_client()
         client.headers["Authorization"] = f"Bearer {self.api_key}"
-        
+
         # Verify connection with a simple request
         try:
             response = await client.get(f"/agents/{agent_id}/status")
@@ -210,7 +209,7 @@ class MutxAgentClient:
         except httpx.HTTPError as e:
             logger.error(f"Failed to connect: {e}")
             return False
-    
+
     async def heartbeat(
         self,
         status: str = "running",
@@ -218,19 +217,19 @@ class MutxAgentClient:
     ) -> dict:
         """
         Send a heartbeat to MUTX.
-        
+
         Args:
             status: Agent status (running, idle, error, stopped)
             message: Optional status message
-            
+
         Returns:
             Response from MUTX
         """
         if not self.agent_id:
             raise ValueError("Agent not registered. Call register() or connect() first.")
-        
+
         client = await self._get_client()
-        
+
         payload = {
             "agent_id": self.agent_id,
             "status": status,
@@ -239,7 +238,7 @@ class MutxAgentClient:
             "platform": platform.system(),
             "hostname": platform.node(),
         }
-        
+
         try:
             response = await client.post("/agents/heartbeat", json=payload)
             response.raise_for_status()
@@ -247,25 +246,25 @@ class MutxAgentClient:
         except httpx.HTTPError as e:
             logger.error(f"Heartbeat failed: {e}")
             raise
-    
+
     async def report_metrics(
         self,
         metrics: AgentMetrics,
     ) -> dict:
         """
         Report metrics to MUTX.
-        
+
         Args:
             metrics: AgentMetrics object with current metrics
-            
+
         Returns:
             Response from MUTX
         """
         if not self.agent_id:
             raise ValueError("Agent not registered. Call register() or connect() first.")
-        
+
         client = await self._get_client()
-        
+
         payload = {
             "agent_id": self.agent_id,
             "cpu_usage": metrics.cpu_usage,
@@ -276,7 +275,7 @@ class MutxAgentClient:
             "custom": metrics.custom,
             "timestamp": datetime.utcnow().isoformat(),
         }
-        
+
         try:
             response = await client.post("/agents/metrics", json=payload)
             response.raise_for_status()
@@ -284,34 +283,34 @@ class MutxAgentClient:
         except httpx.HTTPError as e:
             logger.error(f"Metrics report failed: {e}")
             raise
-    
+
     async def poll_commands(
         self,
         since: Optional[datetime] = None,
     ) -> list[Command]:
         """
         Poll for pending commands from MUTX.
-        
+
         Args:
             since: Only return commands received after this time
-            
+
         Returns:
             List of Command objects
         """
         if not self.agent_id:
             raise ValueError("Agent not registered. Call register() or connect() first.")
-        
+
         client = await self._get_client()
-        
+
         params = {"agent_id": self.agent_id}
         if since:
             params["since"] = since.isoformat()
-        
+
         try:
             response = await client.get("/agents/commands", params=params)
             response.raise_for_status()
             data = response.json()
-            
+
             commands = []
             for cmd in data.get("commands", []):
                 commands.append(Command(
@@ -320,12 +319,12 @@ class MutxAgentClient:
                     parameters=cmd.get("parameters", {}),
                     received_at=datetime.fromisoformat(cmd["received_at"]),
                 ))
-            
+
             return commands
         except httpx.HTTPError as e:
             logger.error(f"Command poll failed: {e}")
             return []
-    
+
     async def acknowledge_command(
         self,
         command_id: str,
@@ -335,21 +334,21 @@ class MutxAgentClient:
     ) -> dict:
         """
         Acknowledge a command execution.
-        
+
         Args:
             command_id: The command ID
             success: Whether execution was successful
             result: Result data
             error: Error message if failed
-            
+
         Returns:
             Response from MUTX
         """
         if not self.agent_id:
             raise ValueError("Agent not registered.")
-        
+
         client = await self._get_client()
-        
+
         payload = {
             "command_id": command_id,
             "agent_id": self.agent_id,
@@ -358,7 +357,7 @@ class MutxAgentClient:
             "error": error,
             "completed_at": datetime.utcnow().isoformat(),
         }
-        
+
         try:
             response = await client.post("/agents/commands/acknowledge", json=payload)
             response.raise_for_status()
@@ -366,7 +365,7 @@ class MutxAgentClient:
         except httpx.HTTPError as e:
             logger.error(f"Command acknowledgment failed: {e}")
             raise
-    
+
     async def log(
         self,
         level: str,
@@ -375,20 +374,20 @@ class MutxAgentClient:
     ) -> dict:
         """
         Send a log entry to MUTX.
-        
+
         Args:
             level: Log level (debug, info, warning, error)
             message: Log message
             metadata: Additional metadata
-            
+
         Returns:
             Response from MUTX
         """
         if not self.agent_id:
             raise ValueError("Agent not registered.")
-        
+
         client = await self._get_client()
-        
+
         payload = {
             "agent_id": self.agent_id,
             "level": level,
@@ -396,7 +395,7 @@ class MutxAgentClient:
             "metadata": metadata or {},
             "timestamp": datetime.utcnow().isoformat(),
         }
-        
+
         try:
             response = await client.post("/agents/logs", json=payload)
             response.raise_for_status()
@@ -404,7 +403,7 @@ class MutxAgentClient:
         except httpx.HTTPError as e:
             logger.error(f"Log failed: {e}")
             raise
-    
+
     def start_heartbeat(
         self,
         interval: int = 30,
@@ -412,14 +411,14 @@ class MutxAgentClient:
     ):
         """
         Start automatic heartbeat loop in background thread.
-        
+
         Args:
             interval: Heartbeat interval in seconds
             status: Status to send with heartbeat
         """
         self._heartbeat_interval = interval
         self._heartbeat_running = True
-        
+
         def heartbeat_loop():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
@@ -430,11 +429,11 @@ class MutxAgentClient:
                     logger.error(f"Auto-heartbeat error: {e}")
                 time.sleep(self._heartbeat_interval)
             loop.close()
-        
+
         self._heartbeat_thread = threading.Thread(target=heartbeat_loop, daemon=True)
         self._heartbeat_thread.start()
         logger.info(f"Started heartbeat loop (interval={interval}s)")
-    
+
     def stop_heartbeat(self):
         """Stop the automatic heartbeat loop."""
         self._heartbeat_running = False
@@ -442,16 +441,16 @@ class MutxAgentClient:
             self._heartbeat_thread.join(timeout=5)
             self._heartbeat_thread = None
         logger.info("Stopped heartbeat loop")
-    
+
     def set_command_callback(self, callback: Callable[[Command], Any]):
         """
         Set callback for handling commands.
-        
+
         Args:
             callback: Async function that receives Command and returns result
         """
         self._command_callback = callback
-    
+
     async def run_command_loop(
         self,
         poll_interval: int = 5,
@@ -459,7 +458,7 @@ class MutxAgentClient:
     ):
         """
         Run the command polling loop.
-        
+
         Args:
             poll_interval: How often to poll for commands (seconds)
             callback: Function to handle commands
@@ -467,13 +466,13 @@ class MutxAgentClient:
         callback = callback or self._command_callback
         if not callback:
             raise ValueError("No command callback set. Use set_command_callback() or pass callback parameter.")
-        
+
         last_poll = datetime.utcnow()
-        
+
         while True:
             try:
                 commands = await self.poll_commands(since=last_poll)
-                
+
                 for command in commands:
                     try:
                         result = await callback(command)
@@ -489,26 +488,26 @@ class MutxAgentClient:
                             success=False,
                             error=str(e),
                         )
-                
+
                 if commands:
                     last_poll = datetime.utcnow()
-                    
+
             except Exception as e:
                 logger.error(f"Command loop error: {e}")
-            
+
             await asyncio.sleep(poll_interval)
-    
+
     @property
     def is_registered(self) -> bool:
         return self._registered
-    
+
     @property
     def uptime(self) -> float:
         return time.time() - self._start_time
-    
+
     def increment_requests(self):
         self._requests_processed += 1
-    
+
     def increment_errors(self):
         self._errors_count += 1
 
@@ -517,7 +516,7 @@ class MutxAgentSyncClient:
     """
     Synchronous version of MutxAgentClient for simpler use cases.
     """
-    
+
     def __init__(
         self,
         mutx_url: str = "https://api.mutx.dev/v1",
@@ -533,20 +532,20 @@ class MutxAgentSyncClient:
         self._start_time = time.time()
         self._requests_processed = 0
         self._errors_count = 0
-    
+
     def _get_client(self) -> httpx.Client:
         headers = {
             "Content-Type": "application/json",
         }
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
-        
+
         return httpx.Client(
             base_url=self.mutx_url,
             timeout=self.timeout,
             headers=headers,
         )
-    
+
     def register(
         self,
         name: str,
@@ -563,11 +562,11 @@ class MutxAgentSyncClient:
             response = client.post("/agents/register", json=payload)
             response.raise_for_status()
             data = response.json()
-            
+
             self.agent_id = data["agent_id"]
             self.api_key = data["api_key"]
             self._registered = True
-            
+
             return AgentInfo(
                 agent_id=self.agent_id,
                 name=name,
@@ -575,7 +574,7 @@ class MutxAgentSyncClient:
                 status=data.get("status", "registered"),
                 registered_at=datetime.utcnow(),
             )
-    
+
     def heartbeat(
         self,
         status: str = "running",
@@ -584,7 +583,7 @@ class MutxAgentSyncClient:
         """Synchronous heartbeat."""
         if not self.agent_id:
             raise ValueError("Agent not registered.")
-        
+
         with self._get_client() as client:
             payload = {
                 "agent_id": self.agent_id,
@@ -595,7 +594,7 @@ class MutxAgentSyncClient:
             response = client.post("/agents/heartbeat", json=payload)
             response.raise_for_status()
             return response.json()
-    
+
     def report_metrics(
         self,
         cpu_usage: float = 0.0,
@@ -605,7 +604,7 @@ class MutxAgentSyncClient:
         """Synchronous metrics reporting."""
         if not self.agent_id:
             raise ValueError("Agent not registered.")
-        
+
         with self._get_client() as client:
             payload = {
                 "agent_id": self.agent_id,
@@ -620,7 +619,7 @@ class MutxAgentSyncClient:
             response = client.post("/agents/metrics", json=payload)
             response.raise_for_status()
             return response.json()
-    
+
     def log(
         self,
         level: str,
@@ -630,7 +629,7 @@ class MutxAgentSyncClient:
         """Synchronous logging."""
         if not self.agent_id:
             raise ValueError("Agent not registered.")
-        
+
         with self._get_client() as client:
             payload = {
                 "agent_id": self.agent_id,
@@ -642,7 +641,7 @@ class MutxAgentSyncClient:
             response = client.post("/agents/logs", json=payload)
             response.raise_for_status()
             return response.json()
-    
+
     @property
     def is_registered(self) -> bool:
         return self._registered
@@ -658,7 +657,7 @@ async def create_agent_client(
 ) -> MutxAgentClient:
     """
     Create and register an agent client.
-    
+
     Usage:
         client = await create_agent_client(
             mutx_url="https://api.mutx.dev/v1",
@@ -667,12 +666,12 @@ async def create_agent_client(
         client.start_heartbeat()
     """
     client = MutxAgentClient(mutx_url=mutx_url, api_key=api_key, agent_id=agent_id)
-    
+
     if api_key and agent_id:
         await client.connect(agent_id, api_key)
     else:
         await client.register(name=agent_name, description=agent_description)
-    
+
     return client
 
 

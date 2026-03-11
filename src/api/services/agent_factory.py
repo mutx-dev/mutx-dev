@@ -3,7 +3,7 @@ from typing import Optional, Any
 import logging
 from dataclasses import dataclass
 
-from ..integrations.openclaw import OpenClawClient, OpenClawConfig, AgentConfig, AgentStatus
+from ..integrations.openclaw import OpenClawClient, OpenClawConfig, AgentConfig
 
 logger = logging.getLogger(__name__)
 

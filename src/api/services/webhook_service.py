@@ -17,12 +17,9 @@ from datetime import datetime
 from typing import Optional
 
 import aiohttp
-from sqlalchemy import Column, DateTime, Boolean, String, Text, Integer, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.database import Base
-from src.api.models import User, Webhook, WebhookDeliveryLog
+from src.api.models import Webhook, WebhookDeliveryLog
 
 logger = logging.getLogger(__name__)
 
@@ -183,7 +180,7 @@ async def trigger_webhook_event(
     """
     # Get all active webhooks that subscribe to this event
     result = await db.execute(
-        select(Webhook).where(Webhook.is_active == True)
+        select(Webhook).where(Webhook.is_active)
     )
     webhooks = result.scalars().all()
     

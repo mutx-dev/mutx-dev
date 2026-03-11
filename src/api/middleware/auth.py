@@ -1,6 +1,5 @@
 from functools import wraps
 from typing import Optional
-from uuid import UUID
 
 from fastapi import Depends, Header, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -108,7 +107,7 @@ async def get_user_from_api_key(
     from sqlalchemy import select
     from src.api.models.models import User
     
-    result = await session.execute(select(User).where(User.is_active == True))
+    result = await session.execute(select(User).where(User.is_active))
     users = result.scalars().all()
     
     for user in users:
@@ -143,7 +142,7 @@ async def get_current_user_or_api_key(
         from sqlalchemy import select
         from src.api.models.models import User
         
-        result = await session.execute(select(User).where(User.is_active == True))
+        result = await session.execute(select(User).where(User.is_active))
         users = result.scalars().all()
         
         for user in users:

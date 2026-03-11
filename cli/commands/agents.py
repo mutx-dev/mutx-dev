@@ -105,7 +105,7 @@ def delete_agent(agent_id: str, force: bool):
     if response.status_code == 204:
         click.echo(f"Deleted agent: {agent_id}")
     elif response.status_code == 404:
-        click.echo(f"Error: Agent not found", err=True)
+        click.echo("Error: Agent not found", err=True)
     else:
         click.echo(f"Error: {response.text}", err=True)
 
@@ -132,7 +132,7 @@ def deploy_agent(agent_id: str):
         click.echo(f"Deployment ID: {result.get('deployment_id')}")
         click.echo(f"Status: {result.get('status')}")
     elif response.status_code == 404:
-        click.echo(f"Error: Agent not found", err=True)
+        click.echo("Error: Agent not found", err=True)
     else:
         click.echo(f"Error: {response.text}", err=True)
 
@@ -171,7 +171,7 @@ def get_logs(agent_id: str, limit: int, level: Optional[str]):
             message = log.get("message", "")
             click.echo(f"{timestamp} | {level_str} | {message}")
     elif response.status_code == 404:
-        click.echo(f"Error: Agent not found", err=True)
+        click.echo("Error: Agent not found", err=True)
     else:
         click.echo(f"Error: {response.text}", err=True)
 
@@ -200,6 +200,6 @@ def get_status(agent_id: str):
         click.echo(f"Status: {agent['status']}")
         click.echo(f"Created at: {agent.get('created_at', 'N/A')}")
     elif response.status_code == 404:
-        click.echo(f"Error: Agent not found", err=True)
+        click.echo("Error: Agent not found", err=True)
     else:
         click.echo(f"Error: {response.text}", err=True)

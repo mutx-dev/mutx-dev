@@ -6,6 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.pool import NullPool
 
 from src.api.config import get_settings
 
@@ -60,12 +61,17 @@ def _build_engine_config(database_url: str, override_ssl_mode: str | None = None
         raise ValueError("DATABASE_URL must use a PostgreSQL or SQLite scheme")
 
     query = dict(url.query)
-    connect_args: dict[str, Any] = {"timeout": settings.database_connect_timeout_seconds}
+    connect_args: dict[str, Any] = {
+        "timeout": settings.database_connect_timeout_seconds,
+        "statement_cache_size": 0,
+    }
 
     url_ssl_setting = query.pop("sslmode", None) or query.pop("ssl", None)
     ssl_setting = override_ssl_mode or settings.database_ssl_mode or url_ssl_setting
     if ssl_setting:
         connect_args["ssl"] = _normalize_ssl_setting(ssl_setting)
+
+    query.setdefault("prepared_statement_cache_size", "0")
 
     asyncpg_url = url.set(drivername="postgresql+asyncpg", query=query)
     return EngineConfig(
@@ -97,11 +103,18 @@ def build_sync_database_url(database_url: str) -> str:
 
 
 def _create_engine(engine_config: EngineConfig) -> AsyncEngine:
+    engine_kwargs: dict[str, Any] = {
+        "echo": False,
+        "pool_pre_ping": True,
+        "connect_args": engine_config.connect_args,
+    }
+
+    if engine_config.url.startswith("postgresql+"):
+        engine_kwargs["poolclass"] = NullPool
+
     return create_async_engine(
         engine_config.url,
-        echo=False,
-        pool_pre_ping=True,
-        connect_args=engine_config.connect_args,
+        **engine_kwargs,
     )
 
 

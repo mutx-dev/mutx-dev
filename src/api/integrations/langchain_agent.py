@@ -1,8 +1,6 @@
-import os
-import json
 import logging
 import uuid
-from typing import Optional, List, Dict, Any, Callable, Union
+from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
 from enum import Enum
 from abc import ABC, abstractmethod
@@ -14,11 +12,10 @@ from langchain_community.chat_models import ChatOllama
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, BaseMessage
 from langchain_core.tools import BaseTool
 from langchain.agents import AgentExecutor, create_openai_functions_agent, create_structured_chat_agent
-from langchain.agents.agent_types import AgentType
 from langchain.memory import ConversationBufferMemory, ChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-from .vector_store import VectorStoreManager, VectorStoreConfig, VectorStoreRegistry
+from .vector_store import VectorStoreRegistry
 
 logger = logging.getLogger(__name__)
 

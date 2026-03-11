@@ -17,7 +17,6 @@ from ..integrations.langchain_agent import (
     ToolDefinition,
 )
 from ..integrations.vector_store import (
-    VectorStoreManager,
     VectorStoreConfig,
     VectorStoreRegistry,
     EmbeddingProvider,

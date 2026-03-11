@@ -1,6 +1,5 @@
 import logging
-import uuid
-from typing import Dict, Any, List
+from typing import Dict, Any
 from datetime import datetime
 
 from src.api.models import Agent, AgentStatus, AgentLog

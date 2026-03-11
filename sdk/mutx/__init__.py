@@ -2,17 +2,17 @@ from typing import Optional
 
 import httpx
 
+from mutx.agent_runtime import (
+    AgentInfo,
+    AgentMetrics,
+    Command,
+    MutxAgentClient,
+    MutxAgentSyncClient,
+    create_agent_client,
+)
 from mutx.agents import Agents
 from mutx.deployments import Deployments
 from mutx.webhooks import Webhooks
-from mutx.agent_runtime import (
-    MutxAgentClient,
-    MutxAgentSyncClient,
-    AgentInfo,
-    Command,
-    AgentMetrics,
-    create_agent_client,
-)
 
 
 class MutxClient:

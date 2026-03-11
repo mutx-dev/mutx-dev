@@ -3,7 +3,7 @@ import logging
 import uuid
 import hashlib
 import hmac
-from typing import Optional, Dict, Any, List, Callable, Set
+from typing import Optional, Dict, Any, List, Callable
 from dataclasses import dataclass, field
 from enum import Enum
 from datetime import datetime

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
+from pydantic import EmailStr
 from datetime import datetime
 from typing import Optional
 import uuid
@@ -187,3 +188,18 @@ class WebhookDelivery(BaseModel):
     error_message: Optional[str]
     attempts: int
     created_at: datetime
+
+
+class WaitlistSignupCreate(BaseModel):
+    email: EmailStr
+    source: Optional[str] = None
+
+
+class WaitlistSignupResponse(BaseModel):
+    success: bool = True
+    message: str
+    duplicate: bool = False
+
+
+class WaitlistCountResponse(BaseModel):
+    count: int

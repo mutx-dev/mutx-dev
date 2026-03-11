@@ -70,7 +70,7 @@ def create_deployment(agent_id: str, replicas: int):
         click.echo(f"Created deployment: {result.get('deployment_id')}")
         click.echo(f"Status: {result.get('status')}")
     elif response.status_code == 404:
-        click.echo(f"Error: Agent not found", err=True)
+        click.echo("Error: Agent not found", err=True)
     else:
         click.echo(f"Error: {response.text}", err=True)
 
@@ -101,7 +101,7 @@ def scale_deployment(deployment_id: str, replicas: int):
     elif response.status_code == 400:
         click.echo(f"Error: {response.json().get('detail', 'Cannot scale deployment')}", err=True)
     elif response.status_code == 404:
-        click.echo(f"Error: Deployment not found", err=True)
+        click.echo("Error: Deployment not found", err=True)
     else:
         click.echo(f"Error: {response.text}", err=True)
 
@@ -130,6 +130,6 @@ def delete_deployment(deployment_id: str, force: bool):
     if response.status_code == 204:
         click.echo(f"Deleted deployment: {deployment_id}")
     elif response.status_code == 404:
-        click.echo(f"Error: Deployment not found", err=True)
+        click.echo("Error: Deployment not found", err=True)
     else:
         click.echo(f"Error: {response.text}", err=True)

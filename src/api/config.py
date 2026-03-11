@@ -18,7 +18,12 @@ class Settings(BaseSettings):
         default=8000,
         validation_alias=AliasChoices("API_PORT", "PORT"),
     )
-    cors_origins: list[str] = ["http://localhost:3000", "https://mutx.dev"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",
+        "http://app.localhost:3000",
+        "https://mutx.dev",
+        "https://app.mutx.dev",
+    ]
     log_level: str = "INFO"
     jwt_secret: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
     access_token_expire_minutes: int = 30

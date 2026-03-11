@@ -1,12 +1,11 @@
 import asyncio
 import logging
 import psutil
-import time
 import uuid
 from typing import Optional, Dict, Any, List, Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from datetime import datetime, timedelta
+from datetime import datetime
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 
@@ -199,7 +198,6 @@ class HealthChecker:
         if not check_fn:
             return AgentHealthStatus.UNKNOWN
 
-        last_result = None
         for attempt in range(self.max_retries):
             try:
                 if asyncio.iscoroutinefunction(check_fn):
@@ -210,7 +208,6 @@ class HealthChecker:
                 if result:
                     self._last_check_results[agent_id] = True
                     return AgentHealthStatus.HEALTHY
-                last_result = result
 
             except asyncio.TimeoutError:
                 logger.warning(f"Health check timeout for agent {agent_id}, attempt {attempt + 1}")

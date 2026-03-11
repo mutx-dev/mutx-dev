@@ -59,7 +59,7 @@ class TestListDeployments:
         other_agent = Agent(
             name="other-agent",
             description="Other agent",
-            config={},
+            config="{}",
             user_id=test_agent.user_id,
             status=AgentStatus.CREATING.value,
         )

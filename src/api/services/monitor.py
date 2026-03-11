@@ -3,17 +3,26 @@ import logging
 import random
 import uuid
 from datetime import datetime, timedelta
-from typing import List
 
-from sqlalchemy import select, update, func
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.database import async_session_maker
+from src.api import database as database_module
 from src.api.models import Agent, AgentLog, AgentMetric, AgentStatus, Deployment
 
 logger = logging.getLogger(__name__)
 
 # --- Synthetic Data Generators ---
+
+COT_STEPS = [
+    "plan next tool call",
+    "summarize retrieved evidence",
+    "compare candidate actions",
+    "verify output safety",
+]
+
+MODELS = ["gpt-4o-mini", "claude-3-5-sonnet", "llama3.1"]
+TOOLS = ["web_search", "vector_lookup", "http_request", "code_exec"]
 
 LOG_TEMPLATES = [
     ("info", "Received request: {request_id}"),
@@ -161,7 +170,7 @@ async def start_background_monitor():
     logger.info("Starting background agent monitor...")
     while True:
         try:
-            async with async_session_maker() as session:
+            async with database_module.async_session_maker() as session:
                 await _simulate_agent_lifecycle(session)
         except Exception as e:
             logger.error(f"Error in background monitor: {e}")

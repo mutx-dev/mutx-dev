@@ -7,7 +7,6 @@ from alembic import context
 
 from src.api.config import get_settings
 from src.api.database import Base, build_sync_database_url
-from src.api.models import models
 
 config = context.config
 

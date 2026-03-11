@@ -120,7 +120,6 @@ async def login(request: LoginRequest, session: AsyncSession = Depends(get_db)):
 
     # Check if email is verified (optional - can be enabled by setting REQUIRE_EMAIL_VERIFICATION)
     # For now, we'll allow login but warn if not verified
-    email_verified = user.is_email_verified
 
     access_token, access_token_expires_at = create_access_token(user.id)
     refresh_token, _ = create_refresh_token(user.id)

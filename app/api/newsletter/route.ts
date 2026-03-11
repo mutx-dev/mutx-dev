@@ -3,13 +3,17 @@ import { join } from 'path'
 
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
-import postgres, { type Sql } from 'postgres'
+
+import { getApiBaseUrl } from '@/app/api/_lib/controlPlane'
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 const waitlistTemplateId = process.env.RESEND_WAITLIST_TEMPLATE_ID || 'waitlist'
 const waitlistFrom = process.env.WAITLIST_FROM || 'MUTX <hi@mutx.dev>'
 const waitlistReplyTo = process.env.WAITLIST_REPLY_TO || 'mario@mutx.dev'
 const fallbackWaitlistFile = join(process.cwd(), '.mutx', 'waitlist.json')
+const API_BASE_URL = getApiBaseUrl()
+
+export const dynamic = 'force-dynamic'
 
 type WaitlistRecord = {
   email: string
@@ -17,76 +21,48 @@ type WaitlistRecord = {
   created_at: string
 }
 
-function getDatabaseUrl() {
-  const value = process.env.DATABASE_URL || process.env.POSTGRES_URL
-  if (!value) throw new Error('DATABASE_URL is not configured')
-  return value
-}
-
 function getSiteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL || 'https://mutx.dev'
 }
 
 function allowFileFallback() {
-  const value = process.env.DATABASE_URL || process.env.POSTGRES_URL
-
-  if (!value) {
-    return true
-  }
-
-  try {
-    const parsed = new URL(value)
-    return ['host', 'localhost', '127.0.0.1', '::1'].includes(parsed.hostname)
-  } catch {
-    return true
-  }
+  return process.env.NODE_ENV !== 'production'
 }
 
-function getSslMode(databaseUrl: string): false | 'require' {
-  const envSslMode = process.env.DATABASE_SSL_MODE?.toLowerCase()
-  if (envSslMode === 'disable') return false
-  if (envSslMode === 'require') return 'require'
-
-  const parsed = new URL(databaseUrl)
-  const urlSslMode = parsed.searchParams.get('sslmode')?.toLowerCase()
-
-  if (urlSslMode === 'disable') return false
-  if (urlSslMode === 'require') return 'require'
-
-  const shouldRequireSsl =
-    !['localhost', '127.0.0.1', '::1'].includes(parsed.hostname) &&
-    !parsed.hostname.endsWith('.railway.internal')
-
-  return shouldRequireSsl ? 'require' : false
-}
-
-let sqlClient: Sql | null = null
-
-function getSql() {
-  if (sqlClient) return sqlClient
-  const databaseUrl = getDatabaseUrl()
-
-  sqlClient = postgres(databaseUrl, {
-    ssl: getSslMode(databaseUrl),
-    max: 1,
-    prepare: false,
-    idle_timeout: 10,
-    connect_timeout: 10,
+async function persistViaBackend(email: string, source: string) {
+  const response = await fetch(`${API_BASE_URL}/newsletter`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, source }),
+    cache: 'no-store',
+    signal: AbortSignal.timeout(4000),
   })
 
-  return sqlClient
+  const payload = await response.json().catch(() => ({ message: 'Failed to join waitlist' }))
+
+  if (!response.ok) {
+    throw new Error(payload.detail || payload.error || 'Failed to join waitlist')
+  }
+
+  return {
+    message: payload.message || "You're on the list!",
+    duplicate: Boolean(payload.duplicate),
+  }
 }
 
-async function ensureTable() {
-  const sql = getSql()
-  await sql`
-    CREATE TABLE IF NOT EXISTS waitlist (
-      id SERIAL PRIMARY KEY,
-      email TEXT NOT NULL UNIQUE,
-      source TEXT DEFAULT 'coming-soon',
-      created_at TIMESTAMPTZ DEFAULT NOW()
-    )
-  `
+async function getCountViaBackend() {
+  const response = await fetch(`${API_BASE_URL}/newsletter`, {
+    cache: 'no-store',
+    signal: AbortSignal.timeout(4000),
+  })
+
+  const payload = await response.json().catch(() => ({ count: 0 }))
+
+  if (!response.ok) {
+    throw new Error(payload.detail || payload.error || 'Failed to fetch waitlist count')
+  }
+
+  return Number(payload.count || 0)
 }
 
 async function readFallbackWaitlist() {
@@ -167,6 +143,20 @@ async function sendConfirmationEmail(email: string) {
   return { sent: true, fallback: true, id: fallbackResult.data?.id }
 }
 
+async function sendConfirmationEmailWithTimeout(email: string) {
+  try {
+    return await Promise.race([
+      sendConfirmationEmail(email),
+      new Promise<{ sent: false; fallback: true }>((resolve) => {
+        setTimeout(() => resolve({ sent: false, fallback: true }), 4000)
+      }),
+    ])
+  } catch (error) {
+    console.error('Waitlist email send failed:', error)
+    return { sent: false, fallback: true }
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -184,24 +174,13 @@ export async function POST(request: Request) {
     const normalizedEmail = email.toLowerCase().trim()
     const normalizedSource = String(source || 'coming-soon').trim().slice(0, 120)
 
+    let waitlistResult: { message: string; duplicate: boolean }
+
     try {
-      await ensureTable()
-      const sql = getSql()
-
-      const existing = await sql`SELECT id FROM waitlist WHERE email = ${normalizedEmail}`
-      if (existing.length > 0) {
-        return NextResponse.json({ success: true, message: "You're already on the list!", emailSent: false })
-      }
-
-      await sql`
-        INSERT INTO waitlist (email, source)
-        VALUES (${normalizedEmail}, ${normalizedSource || 'coming-soon'})
-      `
-
-      console.log('New waitlist signup (DB):', normalizedEmail)
-    } catch (databaseError) {
+      waitlistResult = await persistViaBackend(normalizedEmail, normalizedSource)
+    } catch (backendError) {
       if (!allowFileFallback()) {
-        throw databaseError
+        throw backendError
       }
 
       const entries = await readFallbackWaitlist()
@@ -218,17 +197,22 @@ export async function POST(request: Request) {
       })
 
       await writeFallbackWaitlist(entries)
-      console.warn('Waitlist database unavailable; used file fallback for local/dev flow.')
+      console.warn('Waitlist backend unavailable; used file fallback for local/dev flow.')
+      waitlistResult = { message: "You're on the list!", duplicate: false }
     }
 
-    const emailResult = await sendConfirmationEmail(normalizedEmail)
+    if (waitlistResult.duplicate) {
+      return NextResponse.json({ success: true, message: waitlistResult.message, emailSent: false })
+    }
+
+    const emailResult = await sendConfirmationEmailWithTimeout(normalizedEmail)
     if (emailResult.sent) {
       console.log('Confirmation email sent:', emailResult.id)
     }
 
     return NextResponse.json({
       success: true,
-      message: "You're on the list!",
+      message: waitlistResult.message,
       emailSent: emailResult.sent,
     })
   } catch (error) {
@@ -240,13 +224,11 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     try {
-      await ensureTable()
-      const sql = getSql()
-      const result = await sql`SELECT COUNT(*) as count FROM waitlist`
-      return NextResponse.json({ count: Number(result[0]?.count || 0) })
-    } catch (databaseError) {
+      const count = await getCountViaBackend()
+      return NextResponse.json({ count })
+    } catch (backendError) {
       if (!allowFileFallback()) {
-        throw databaseError
+        throw backendError
       }
 
       const entries = await readFallbackWaitlist()

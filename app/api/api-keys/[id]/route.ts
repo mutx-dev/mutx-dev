@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+import { getApiBaseUrl, getAuthToken } from '@/app/api/_lib/controlPlane'
 
-async function getAuthToken(request: NextRequest): Promise<string | null> {
-  const token = request.cookies.get('access_token')?.value
-  if (token) return token
-  
-  const authHeader = request.headers.get('authorization')
-  if (authHeader?.startsWith('Bearer ')) {
-    return authHeader.substring(7)
-  }
-  
-  return null
-}
+const API_BASE_URL = getApiBaseUrl()
+
+export const dynamic = 'force-dynamic'
 
 export async function DELETE(
   request: NextRequest,

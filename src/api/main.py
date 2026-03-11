@@ -12,7 +12,7 @@ from fastapi.openapi.utils import get_openapi
 from src.api.config import get_settings
 from src.api.database import dispose_engine, init_db
 from src.api.models.schemas import HealthResponse
-from src.api.routes import agents, deployments, webhooks, auth, clawhub, api_keys
+from src.api.routes import agents, deployments, webhooks, auth, clawhub, api_keys, newsletter
 from src.api.metrics import router as metrics_router, track_request
 from src.api.services.monitor import start_background_monitor
 
@@ -51,6 +51,14 @@ async def _initialize_database_with_retries(app: FastAPI) -> None:
             await asyncio.sleep(retry_delay)
 
 
+async def _start_monitor_when_database_ready(app: FastAPI) -> None:
+    while not getattr(app.state, "database_ready", False):
+        await asyncio.sleep(1)
+
+    logger.info("Database ready; starting background monitor")
+    await start_background_monitor()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting up API...")
@@ -66,8 +74,10 @@ async def lifespan(app: FastAPI):
         logger.info("Database initialization running in background")
         database_init_task = asyncio.create_task(_initialize_database_with_retries(app))
 
-    # Start the background simulation/monitoring service
-    monitor_task = asyncio.create_task(start_background_monitor())
+    if settings.database_required_on_startup:
+        monitor_task = asyncio.create_task(start_background_monitor())
+    else:
+        monitor_task = asyncio.create_task(_start_monitor_when_database_ready(app))
 
     # Generate OpenAPI spec on startup
     Path('docs/api').mkdir(parents=True, exist_ok=True)
@@ -124,6 +134,7 @@ app.include_router(webhooks.router)
 app.include_router(auth.router)
 app.include_router(clawhub.router)
 app.include_router(api_keys.router)
+app.include_router(newsletter.router)
 
 
 @app.get("/health", response_model=HealthResponse)
