@@ -3,16 +3,48 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic import EmailStr
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 import uuid
 
-from src.api.models.models import AgentStatus
+from src.api.models.models import AgentStatus, AgentType
+
+
+class AgentConfigBase(BaseModel):
+    """Base schema for specialized agent configurations"""
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class OpenAIAgentConfig(AgentConfigBase):
+    model: str = Field(default="gpt-4o")
+    temperature: float = Field(default=0.7, ge=0.0, le=2.0)
+    system_prompt: Optional[str] = None
+    max_tokens: Optional[int] = Field(default=None, gt=0)
+
+
+class AnthropicAgentConfig(AgentConfigBase):
+    model: str = Field(default="claude-3-5-sonnet-20240620")
+    temperature: float = Field(default=0.7, ge=0.0, le=1.0)
+    system_prompt: Optional[str] = None
+    max_tokens: int = Field(default=4096, gt=0)
+
+
+class LangChainAgentConfig(AgentConfigBase):
+    chain_id: str
+    parameters: dict[str, Any] = Field(default_factory=dict)
+
+
+class CustomAgentConfig(AgentConfigBase):
+    image: str
+    command: list[str] = Field(default_factory=list)
+    env: dict[str, str] = Field(default_factory=dict)
 
 
 class AgentCreate(BaseModel):
-    name: str
-    description: Optional[str] = None
-    config: Optional[str] = None
+    name: str = Field(..., min_length=1, max_length=255)
+    description: Optional[str] = Field(None, max_length=1000)
+    type: AgentType = Field(default=AgentType.OPENAI)
+    config: Optional[dict[str, Any] | str] = None
     # user_id is set from current_user in the route, not from request body
 
 

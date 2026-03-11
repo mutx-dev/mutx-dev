@@ -21,7 +21,8 @@ class TestCreateAgent:
             json={
                 "name": "new-agent",
                 "description": "A new test agent",
-                "config": json.dumps({"model": "gpt-4", "temperature": 0.7}),
+                "type": "openai",
+                "config": {"model": "gpt-4o", "temperature": 0.7},
             },
         )
         assert response.status_code == 201
@@ -29,7 +30,26 @@ class TestCreateAgent:
         assert data["name"] == "new-agent"
         assert data["description"] == "A new test agent"
         assert data["status"] == "creating"
+        
+        # Verify validated config
+        config = json.loads(data["config"])
+        assert config["model"] == "gpt-4o"
+        assert config["temperature"] == 0.7
         assert "id" in data
+
+    @pytest.mark.asyncio
+    async def test_create_agent_invalid_config(self, client: AsyncClient):
+        """Test creating an agent with invalid config schema."""
+        response = await client.post(
+            "/agents",
+            json={
+                "name": "invalid-config-agent",
+                "type": "openai",
+                "config": {"model": "gpt-4o", "temperature": 5.0},  # Invalid temperature > 2.0
+            },
+        )
+        assert response.status_code == 400
+        assert "Configuration validation failed" in response.json()["detail"]
     
     @pytest.mark.asyncio
     async def test_create_agent_with_minimal_data(self, client: AsyncClient):
