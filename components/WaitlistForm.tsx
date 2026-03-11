@@ -117,7 +117,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
             <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-white" />
             <div>
               <p className="font-medium text-sm">{successMessage}</p>
-              <p className="mt-1 text-xs text-white/60">We'll be in touch soon.</p>
+              <p className="mt-1 text-xs text-white/60">We&apos;ll be in touch soon.</p>
             </div>
           </motion.div>
         ) : (

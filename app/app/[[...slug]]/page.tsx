@@ -63,9 +63,9 @@ export default function AppPreviewPage() {
                   <h1 className="mt-5 max-w-4xl text-3xl font-bold tracking-tight text-white sm:text-5xl leading-[1.1]">
                     Real authenticated operations.
                   </h1>
-                  <p className="mt-5 max-w-2xl text-lg leading-relaxed text-slate-400">
-                    This isn't a mock UI. Authenticate directly against the FastAPI control plane to inspect live agent status, deployment configurations, and API keys.
-                  </p>
+                    <p className="mt-5 max-w-2xl text-lg leading-relaxed text-slate-400">
+                      This isn&apos;t a mock UI. Authenticate directly against the FastAPI control plane to inspect live agent status, deployment configurations, and API keys.
+                    </p>
                 </div>
 
                 <TerminalWindow title="proxy-routes.ts" path="app/api/dashboard" label="network" className="shadow-2xl">
