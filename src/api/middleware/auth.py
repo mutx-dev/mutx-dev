@@ -160,7 +160,7 @@ async def get_current_user_or_api_key(
 async def get_current_agent(
     authorization: Optional[str] = Header(None),
     session: AsyncSession = Depends(get_db),
-) -> "Agent":
+):
     """Authenticate an agent using its API key in the Authorization header."""
     from sqlalchemy import select
     from src.api.models.models import Agent

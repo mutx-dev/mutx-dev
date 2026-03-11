@@ -177,7 +177,7 @@ class AgentRuntime:
         return datetime.utcnow().isoformat()
 
     async def _handle_calculator(self, params: Dict[str, Any]) -> str:
-        expression = params.get("expression", "0")
+        _expression = params.get("expression", "0")
         # Safety cleanup: removed dangerous eval()
         # In a real system, use a safe math parser like simpleeval or numexpr
         return "Calculator tool disabled for safety in this version. Use repo-native Python tools."
