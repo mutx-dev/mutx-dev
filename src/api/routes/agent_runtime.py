@@ -38,7 +38,11 @@ router = APIRouter(prefix="/agents", tags=["agent-runtime"])
 class AgentRegisterRequest(BaseModel):
     name: str
     description: Optional[str] = ""
+<<<<<<< HEAD
     metadata: dict[str, Any] = {}
+=======
+    metadata: dict = {}
+>>>>>>> 5da86b3 (fix(api): clean runtime deletion and remove dead auth helper)
     capabilities: list[str] = []
 
 
@@ -65,7 +69,7 @@ class MetricsRequest(BaseModel):
     uptime_seconds: Optional[float] = 0.0
     requests_processed: Optional[int] = 0
     errors_count: Optional[int] = 0
-    custom: Optional[dict] = {}
+    custom: dict = {}
     timestamp: str
 
 
@@ -73,7 +77,11 @@ class LogRequest(BaseModel):
     agent_id: str
     level: str = "info"
     message: str
+<<<<<<< HEAD
     metadata: dict[str, Any] = {}
+=======
+    metadata: dict = {}
+>>>>>>> 5da86b3 (fix(api): clean runtime deletion and remove dead auth helper)
     timestamp: str
 
 
@@ -102,27 +110,6 @@ class AgentStatusResponse(BaseModel):
     status: str
     last_heartbeat: Optional[str]
     uptime_seconds: float
-
-
-# --- Helper Functions ---
-
-
-async def verify_agent_api_key(
-    agent_id: str,
-    api_key: str,
-    db: AsyncSession,
-) -> Agent:
-    """Verify agent exists and API key is valid."""
-    result = await db.execute(
-        select(Agent).where(
-            Agent.id == uuid.UUID(agent_id),
-            Agent.api_key == api_key,
-        )
-    )
-    agent = result.scalar_one_or_none()
-    if not agent:
-        raise HTTPException(status_code=401, detail="Invalid agent credentials")
-    return agent
 
 
 # --- Routes ---
