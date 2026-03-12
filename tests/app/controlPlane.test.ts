@@ -1,4 +1,3 @@
-import { describe, expect, it } from '@jest/globals'
 import type { NextRequest } from 'next/server'
 
 import { getCookieDomain, shouldUseSecureCookies } from '../../app/api/_lib/controlPlane'
