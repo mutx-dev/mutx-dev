@@ -61,7 +61,8 @@ test.describe('mutx.dev QA', () => {
 
     const waitlistForm = page.getByTestId('waitlist-form-hero');
     await expect(waitlistForm).toBeVisible();
-    await expect(waitlistForm.getByText(/loading verification challenge|waitlist verification is unavailable right now/i)).toBeVisible();
+    await expect(waitlistForm.getByText(/loading verification challenge/i)).toBeHidden();
+    await expect(waitlistForm.getByText(/waitlist verification is unavailable right now/i)).toBeVisible();
 
     const submitBtn = waitlistForm.locator('button[type="submit"]');
     await expect(submitBtn).toBeDisabled();
