@@ -97,6 +97,8 @@ task = agent.run_task(
 print(f"Autonomous agent operating: {task.id}")
 ```
 
+Note: `MutxAsyncClient` is currently deprecated until the async resource surface is fully implemented. Prefer `MutxClient` or direct `httpx.AsyncClient` integrations for now.
+
 ---
 
 ## 🗺️ Roadmap & Maturity
