@@ -51,6 +51,12 @@ ansible-lint:
 ansible-inventory:
 	./scripts/generate-inventory.sh
 
+ansible-provision: ansible-inventory
+	cd $(ANSIBLE_DIR) && ansible-playbook -i inventory.generated.ini playbooks/provision.yml
+
+ansible-deploy-agent: ansible-inventory
+	cd $(ANSIBLE_DIR) && ansible-playbook -i inventory.generated.ini playbooks/deploy-agent.yml
+
 monitor-up:
 	docker compose --env-file $(MONITORING_ENV_FILE) -f $(MONITORING_COMPOSE_FILE) up -d
 

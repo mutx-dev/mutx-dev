@@ -37,9 +37,9 @@ terraform apply -var-file=environments/production/terraform.tfvars
 ## Ansible Provisioning
 
 ```bash
-cd infrastructure/ansible
-ansible-playbook -i inventory.ini playbooks/provision.yml
-ansible-playbook -i inventory.ini playbooks/deploy-agent.yml
+cd infrastructure
+make ansible-provision
+make ansible-deploy-agent
 ```
 
 Install Ansible collections and lint before applying:
