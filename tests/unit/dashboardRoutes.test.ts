@@ -66,6 +66,37 @@ describe('dashboard route proxies', () => {
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
   })
 
+  it('preserves successful list responses for dashboard deployments proxy', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ([
+        {
+          id: 'dep_123',
+          agent_id: 'agent_123',
+          status: 'running',
+        },
+      ]),
+    })
+    const { GET } = await import('../../app/api/dashboard/deployments/route')
+
+    const response = await GET(mockRequest())
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments?limit=20', {
+      headers: { Authorization: 'Bearer token' },
+      cache: 'no-store',
+    })
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual([
+      {
+        id: 'dep_123',
+        agent_id: 'agent_123',
+        status: 'running',
+      },
+    ])
+  })
+
   it('returns 401 from dashboard deployments proxy when no auth token exists', async () => {
     getAuthToken.mockResolvedValue(null)
     const { GET } = await import('../../app/api/dashboard/deployments/route')
