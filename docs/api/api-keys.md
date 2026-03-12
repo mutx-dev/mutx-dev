@@ -31,7 +31,11 @@ curl https://api.mutx.dev/api-keys \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
+<<<<<<< HEAD
 The dashboard uses the same list route through its Next.js proxy before rendering the API key panel.
+=======
+The dashboard reads the same route through its Next.js proxy before rendering the API key panel.
+>>>>>>> origin/main
 
 ### Create Key
 
