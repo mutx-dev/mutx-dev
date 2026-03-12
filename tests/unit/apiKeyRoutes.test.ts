@@ -75,4 +75,36 @@ describe('API key route proxies', () => {
     })
     expect(response.status).toBe(204)
   })
+
+  it('preserves successful rotate responses for the dashboard proxy', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        id: 'key_456',
+        name: 'rotated-key',
+        key: 'mutx_live_rotated',
+      }),
+    })
+
+    const { POST } = await import('../../app/api/api-keys/[id]/rotate/route')
+
+    const response = await POST(mockRequest(), {
+      params: Promise.resolve({ id: 'key_123' }),
+    })
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys/key_123/rotate', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer token',
+      },
+    })
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({
+      id: 'key_456',
+      name: 'rotated-key',
+      key: 'mutx_live_rotated',
+    })
+  })
 })
