@@ -130,9 +130,10 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
       setSuccessMessage(
         alreadyJoined
           ? payload.message || "You're already on the list!"
-          : emailSent
-            ? payload.message || "You're on the list. Check your inbox."
-            : "You're on the list. Email delivery is not configured in this environment yet."
+          : payload.message
+            || (emailSent
+              ? "You're on the list. Check your inbox."
+              : "You're on the list.")
       )
 
       if (!alreadyJoined) {
