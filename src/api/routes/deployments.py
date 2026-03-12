@@ -31,6 +31,23 @@ router = APIRouter(prefix="/deployments", tags=["deployments"])
 logger = logging.getLogger(__name__)
 
 
+async def _get_owned_agent(
+    agent_id: uuid.UUID,
+    db: AsyncSession,
+    current_user: User,
+    *,
+    not_found_detail: str,
+    forbidden_detail: str,
+) -> Agent:
+    result = await db.execute(select(Agent).where(Agent.id == agent_id))
+    agent = result.scalar_one_or_none()
+    if not agent:
+        raise HTTPException(status_code=404, detail=not_found_detail)
+    if agent.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail=forbidden_detail)
+    return agent
+
+
 async def _get_deployment_with_ownership(
     deployment_id: uuid.UUID,
     db: AsyncSession,
@@ -46,11 +63,13 @@ async def _get_deployment_with_ownership(
     if not deployment:
         raise HTTPException(status_code=404, detail="Deployment not found")
 
-    # Verify ownership through the agent
-    agent_result = await db.execute(select(Agent).where(Agent.id == deployment.agent_id))
-    agent = agent_result.scalar_one_or_none()
-    if not agent or agent.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to access this deployment")
+    await _get_owned_agent(
+        deployment.agent_id,
+        db,
+        current_user,
+        not_found_detail="Deployment not found",
+        forbidden_detail="Not authorized to access this deployment",
+    )
 
     return deployment
 
@@ -100,13 +119,13 @@ async def list_deployments(
         .limit(limit)
     )
     if agent_id:
-        # Verify the user owns this agent
-        agent_result = await db.execute(select(Agent).where(Agent.id == agent_id))
-        agent = agent_result.scalar_one_or_none()
-        if not agent or agent.user_id != current_user.id:
-            raise HTTPException(
-                status_code=403, detail="Not authorized to view deployments for this agent"
-            )
+        await _get_owned_agent(
+            agent_id,
+            db,
+            current_user,
+            not_found_detail="Agent not found",
+            forbidden_detail="Not authorized to view deployments for this agent",
+        )
         query = query.where(Deployment.agent_id == agent_id)
     if status:
         query = query.where(Deployment.status == status)
@@ -190,13 +209,13 @@ async def create_deployment(
     current_user: User = Depends(get_current_user),
 ):
     """Create a new deployment for an agent."""
-    # Verify the agent exists and belongs to the user
-    agent_result = await db.execute(select(Agent).where(Agent.id == deployment_data.agent_id))
-    agent = agent_result.scalar_one_or_none()
-    if not agent:
-        raise HTTPException(status_code=404, detail="Agent not found")
-    if agent.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to deploy this agent")
+    agent = await _get_owned_agent(
+        deployment_data.agent_id,
+        db,
+        current_user,
+        not_found_detail="Agent not found",
+        forbidden_detail="Not authorized to deploy this agent",
+    )
 
     # Check if agent is in a deployable state
     if agent.status == AgentStatus.DELETING.value:

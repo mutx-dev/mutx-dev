@@ -5,7 +5,6 @@ import asyncio
 from collections.abc import AsyncGenerator
 import os
 import uuid
-from datetime import datetime
 
 import pytest
 import pytest_asyncio
@@ -35,7 +34,7 @@ def compile_uuid_sqlite(_type, _compiler, **_kw):
 
 def create_test_app() -> FastAPI:
     """Create a test FastAPI application."""
-    from src.api.routes import agents, deployments, api_keys, auth, webhooks, clawhub, agent_runtime, newsletter
+    from src.api.routes import agents, deployments, api_keys, auth, webhooks, clawhub, agent_runtime, newsletter, ingest, leads
     
     app = FastAPI(title="MUTX Test API")
     
@@ -48,6 +47,8 @@ def create_test_app() -> FastAPI:
     app.include_router(clawhub.router)
     app.include_router(agent_runtime.router)
     app.include_router(newsletter.router)
+    app.include_router(leads.router)
+    app.include_router(ingest.router)
     
     # Health check endpoint
     @app.get("/health")
@@ -103,7 +104,9 @@ async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
 async def client(db_session: AsyncSession, test_user):
     """Create test client with database and auth overrides."""
     from src.api.database import get_db
-    from src.api.middleware.auth import get_current_user
+    from src.api.middleware.auth import get_current_user, get_current_user_or_api_key
+    from src.api.routes.webhooks import get_webhook_auth
+    from src.api.routes.ingest import get_ingest_auth
     
     # Create test app
     test_app = create_test_app()
@@ -115,9 +118,22 @@ async def client(db_session: AsyncSession, test_user):
     async def override_get_current_user():
         return test_user
     
+    # Override get_current_user_or_api_key to return test user
+    async def override_get_current_user_or_api_key():
+        return test_user
+
+    async def override_get_webhook_auth():
+        return test_user
+
+    async def override_get_ingest_auth():
+        return test_user
+    
     # Override dependencies
     test_app.dependency_overrides[get_db] = override_get_db
     test_app.dependency_overrides[get_current_user] = override_get_current_user
+    test_app.dependency_overrides[get_current_user_or_api_key] = override_get_current_user_or_api_key
+    test_app.dependency_overrides[get_webhook_auth] = override_get_webhook_auth
+    test_app.dependency_overrides[get_ingest_auth] = override_get_ingest_auth
     
     async with AsyncClient(
         transport=ASGITransport(app=test_app),
@@ -153,7 +169,9 @@ async def client_no_auth(db_session: AsyncSession):
 async def other_user_client(db_session: AsyncSession, other_user):
     """Create test client authenticated as other_user."""
     from src.api.database import get_db
-    from src.api.middleware.auth import get_current_user
+    from src.api.middleware.auth import get_current_user, get_current_user_or_api_key
+    from src.api.routes.webhooks import get_webhook_auth
+    from src.api.routes.ingest import get_ingest_auth
     
     test_app = create_test_app()
     
@@ -163,8 +181,20 @@ async def other_user_client(db_session: AsyncSession, other_user):
     async def override_get_current_user():
         return other_user
     
+    async def override_get_current_user_or_api_key():
+        return other_user
+
+    async def override_get_webhook_auth():
+        return other_user
+
+    async def override_get_ingest_auth():
+        return other_user
+    
     test_app.dependency_overrides[get_db] = override_get_db
     test_app.dependency_overrides[get_current_user] = override_get_current_user
+    test_app.dependency_overrides[get_current_user_or_api_key] = override_get_current_user_or_api_key
+    test_app.dependency_overrides[get_webhook_auth] = override_get_webhook_auth
+    test_app.dependency_overrides[get_ingest_auth] = override_get_ingest_auth
     
     async with AsyncClient(
         transport=ASGITransport(app=test_app),

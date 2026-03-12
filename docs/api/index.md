@@ -21,6 +21,7 @@ Routes are mounted directly at top-level prefixes. There is no global `/v1` back
 | API Keys | `GET /api-keys`, `POST /api-keys`, `DELETE /api-keys/{key_id}`, `POST /api-keys/{key_id}/rotate` |
 | Webhooks | `POST /webhooks/agent-status`, `POST /webhooks/deployment`, `POST /webhooks/metrics` |
 | Newsletter | `GET /newsletter`, `POST /newsletter` |
+| Leads | `POST /leads`, `GET /leads`, `GET /leads/{lead_id}` |
 
 ## Website Proxies
 
@@ -88,6 +89,8 @@ curl "$BASE_URL/agents?skip=0&limit=50"
 ## Detailed Docs
 
 - [Authentication](./authentication.md)
+- [API Keys](./api-keys.md)
 - [Agents](./agents.md)
 - [Deployments](./deployments.md)
 - [Webhook Ingestion](./webhooks.md)
+- [Leads](./leads.md)

@@ -13,6 +13,7 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 import { TerminalWindow } from '@/components/TerminalWindow'
 import { WaitlistForm } from '@/components/WaitlistForm'
@@ -151,12 +152,13 @@ export default function LandingPage() {
                   View on GitHub
                   <ArrowRight className="h-4 w-4" />
                 </a>
-                <span
-                  aria-disabled="true"
-                  className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white/35"
+                <Link
+                  href="/app"
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
                 >
-                  Open Dashboard - Coming Soon
-                </span>
+                  Open Dashboard
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
 
               <div className="max-w-md">
