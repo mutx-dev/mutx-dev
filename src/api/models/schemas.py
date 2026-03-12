@@ -129,6 +129,7 @@ class AgentResponse(BaseModel):
     id: uuid.UUID
     name: str
     description: Optional[str]
+    type: AgentType
     status: str
     config: Optional[dict[str, Any]]
     created_at: datetime

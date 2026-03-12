@@ -868,6 +868,121 @@
         }
       }
     },
+    "/deployments/{deployment_id}/events": {
+      "get": {
+        "tags": [
+          "deployments"
+        ],
+        "summary": "Get Deployment Events",
+        "description": "Get paginated lifecycle events for a specific deployment.",
+        "operationId": "get_deployment_events_deployments__deployment_id__events_get",
+        "parameters": [
+          {
+            "name": "deployment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Deployment Id"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "event_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Event Type"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeploymentEventHistoryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/deployments/{deployment_id}/scale": {
       "post": {
         "tags": [
@@ -1187,237 +1302,6 @@
         }
       }
     },
-    "/webhooks/agent-status": {
-      "post": {
-        "tags": [
-          "webhooks"
-        ],
-        "summary": "Agent Status Update",
-        "operationId": "agent_status_update_webhooks_agent_status_post",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Bearer token for JWT auth",
-              "title": "Authorization"
-            },
-            "description": "Bearer token for JWT auth"
-          },
-          {
-            "name": "X-API-Key",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "API key for webhook authentication",
-              "title": "X-Api-Key"
-            },
-            "description": "API key for webhook authentication"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AgentStatusUpdate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/webhooks/deployment": {
-      "post": {
-        "tags": [
-          "webhooks"
-        ],
-        "summary": "Deployment Event",
-        "operationId": "deployment_event_webhooks_deployment_post",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Bearer token for JWT auth",
-              "title": "Authorization"
-            },
-            "description": "Bearer token for JWT auth"
-          },
-          {
-            "name": "X-API-Key",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "API key for webhook authentication",
-              "title": "X-Api-Key"
-            },
-            "description": "API key for webhook authentication"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeploymentEvent"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/webhooks/metrics": {
-      "post": {
-        "tags": [
-          "webhooks"
-        ],
-        "summary": "Receive Metrics",
-        "operationId": "receive_metrics_webhooks_metrics_post",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Bearer token for JWT auth",
-              "title": "Authorization"
-            },
-            "description": "Bearer token for JWT auth"
-          },
-          {
-            "name": "X-API-Key",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "API key for webhook authentication",
-              "title": "X-Api-Key"
-            },
-            "description": "API key for webhook authentication"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MetricsReportRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/webhooks/": {
       "post": {
         "tags": [
@@ -1458,10 +1342,10 @@
                   "type": "null"
                 }
               ],
-              "description": "API key for webhook authentication",
+              "description": "API key for webhook management",
               "title": "X-Api-Key"
             },
-            "description": "API key for webhook authentication"
+            "description": "API key for webhook management"
           }
         ],
         "requestBody": {
@@ -1536,10 +1420,10 @@
                   "type": "null"
                 }
               ],
-              "description": "API key for webhook authentication",
+              "description": "API key for webhook management",
               "title": "X-Api-Key"
             },
-            "description": "API key for webhook authentication"
+            "description": "API key for webhook management"
           }
         ],
         "responses": {
@@ -1620,10 +1504,10 @@
                   "type": "null"
                 }
               ],
-              "description": "API key for webhook authentication",
+              "description": "API key for webhook management",
               "title": "X-Api-Key"
             },
-            "description": "API key for webhook authentication"
+            "description": "API key for webhook management"
           }
         ],
         "responses": {
@@ -1698,10 +1582,10 @@
                   "type": "null"
                 }
               ],
-              "description": "API key for webhook authentication",
+              "description": "API key for webhook management",
               "title": "X-Api-Key"
             },
-            "description": "API key for webhook authentication"
+            "description": "API key for webhook management"
           }
         ],
         "requestBody": {
@@ -1786,10 +1670,10 @@
                   "type": "null"
                 }
               ],
-              "description": "API key for webhook authentication",
+              "description": "API key for webhook management",
               "title": "X-Api-Key"
             },
-            "description": "API key for webhook authentication"
+            "description": "API key for webhook management"
           }
         ],
         "responses": {
@@ -1859,10 +1743,10 @@
                   "type": "null"
                 }
               ],
-              "description": "API key for webhook authentication",
+              "description": "API key for webhook management",
               "title": "X-Api-Key"
             },
-            "description": "API key for webhook authentication"
+            "description": "API key for webhook management"
           }
         ],
         "responses": {
@@ -2630,7 +2514,7 @@
           "newsletter"
         ],
         "summary": "Create Waitlist Signup",
-        "description": "BACKEND WAITLIST API (DEPRECATED)\nSubmit waitlist signups. \nNOTE: For web-based submissions, prefer the Next.js API route \n(app/api/newsletter/route.ts) which includes Cloudflare Turnstile verification.",
+        "description": "BACKEND WAITLIST API (DEPRECATED)\nSubmit waitlist signups.\nNOTE: For web-based submissions, prefer the Next.js API route\n(app/api/newsletter/route.ts) which includes Cloudflare Turnstile verification.",
         "operationId": "create_waitlist_signup_newsletter_post",
         "requestBody": {
           "content": {
@@ -2649,6 +2533,183 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WaitlistSignupResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/leads": {
+      "post": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "Capture Lead",
+        "description": "Capture a new contact lead.\nPublic endpoint for landing pages and onboarding.",
+        "operationId": "capture_lead_leads_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "List Leads",
+        "description": "List captured leads.\nRestricted to authenticated users (internal/admin use).",
+        "operationId": "list_leads_leads_get",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LeadResponse"
+                  },
+                  "title": "Response List Leads Leads Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/leads/{lead_id}": {
+      "get": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "Get Lead",
+        "description": "Get a specific lead by ID.",
+        "operationId": "get_lead_leads__lead_id__get",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
                 }
               }
             }
@@ -3076,6 +3137,240 @@
         }
       }
     },
+    "/ingest/agent-status": {
+      "post": {
+        "tags": [
+          "ingest"
+        ],
+        "summary": "Agent Status Update",
+        "description": "Update an agent status and append logs (Ingestion).",
+        "operationId": "agent_status_update_ingest_agent_status_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer token for JWT auth",
+              "title": "Authorization"
+            },
+            "description": "Bearer token for JWT auth"
+          },
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "API key for ingestion authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for ingestion authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentStatusUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ingest/deployment": {
+      "post": {
+        "tags": [
+          "ingest"
+        ],
+        "summary": "Deployment Event",
+        "description": "Update deployment state and related agent state (Ingestion).",
+        "operationId": "deployment_event_ingest_deployment_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer token for JWT auth",
+              "title": "Authorization"
+            },
+            "description": "Bearer token for JWT auth"
+          },
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "API key for ingestion authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for ingestion authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeploymentEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ingest/metrics": {
+      "post": {
+        "tags": [
+          "ingest"
+        ],
+        "summary": "Receive Metrics",
+        "description": "Record agent metrics (Ingestion).",
+        "operationId": "receive_metrics_ingest_metrics_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer token for JWT auth",
+              "title": "Authorization"
+            },
+            "description": "Bearer token for JWT auth"
+          },
+          {
+            "name": "X-API-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "API key for ingestion authentication",
+              "title": "X-Api-Key"
+            },
+            "description": "API key for ingestion authentication"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetricsReportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health Check",
@@ -3289,9 +3584,6 @@
                 "type": "object"
               },
               {
-                "type": "string"
-              },
-              {
                 "type": "null"
               }
             ],
@@ -3326,6 +3618,9 @@
             ],
             "title": "Description"
           },
+          "type": {
+            "$ref": "#/components/schemas/AgentType"
+          },
           "status": {
             "type": "string",
             "title": "Status"
@@ -3333,7 +3628,7 @@
           "config": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "object"
               },
               {
                 "type": "null"
@@ -3369,6 +3664,7 @@
           "id",
           "name",
           "description",
+          "type",
           "status",
           "config",
           "created_at",
@@ -3577,6 +3873,9 @@
             ],
             "title": "Description"
           },
+          "type": {
+            "$ref": "#/components/schemas/AgentType"
+          },
           "status": {
             "type": "string",
             "title": "Status"
@@ -3584,7 +3883,7 @@
           "config": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "object"
               },
               {
                 "type": "null"
@@ -3613,6 +3912,7 @@
           "id",
           "name",
           "description",
+          "type",
           "status",
           "config",
           "created_at",
@@ -3881,6 +4181,70 @@
           "event"
         ],
         "title": "DeploymentEvent"
+      },
+      "DeploymentEventHistoryResponse": {
+        "properties": {
+          "deployment_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Deployment Id"
+          },
+          "deployment_status": {
+            "type": "string",
+            "title": "Deployment Status"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DeploymentEventResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "event_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Type"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "deployment_id",
+          "deployment_status",
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "DeploymentEventHistoryResponse",
+        "description": "Paginated deployment lifecycle event history."
       },
       "DeploymentEventResponse": {
         "properties": {
@@ -4284,6 +4648,141 @@
           "skill_id"
         ],
         "title": "InstallSkillRequest"
+      },
+      "LeadCreate": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "LeadCreate"
+      },
+      "LeadResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "name",
+          "company",
+          "message",
+          "source",
+          "created_at"
+        ],
+        "title": "LeadResponse"
       },
       "LogRequest": {
         "properties": {

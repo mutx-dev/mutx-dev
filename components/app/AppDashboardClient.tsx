@@ -382,7 +382,14 @@ export function AppDashboardClient() {
                   agents.map((agent) => (
                     <tr key={agent.id} className="transition-colors hover:bg-white/[0.02]">
                       <td className="px-6 py-4">
-                        <p className="font-medium text-slate-200">{agent.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-slate-200">{agent.name}</p>
+                          {agent.type ? (
+                            <span className="inline-flex items-center rounded bg-white/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-slate-300">
+                              {agent.type}
+                            </span>
+                          ) : null}
+                        </div>
                         <p className="text-xs text-slate-500 font-[family:var(--font-mono)] mt-1">{agent.id.split('-')[0]}</p>
                       </td>
                       <td className="px-6 py-4 capitalize">
