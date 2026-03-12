@@ -43,8 +43,15 @@ def list_agents(limit: int, skip: int):
 @agents_group.command(name="create")
 @click.option("--name", "-n", required=True, help="Agent name")
 @click.option("--description", "-d", default="", help="Agent description")
+@click.option(
+    "--type",
+    "-t",
+    "agent_type",
+    default="openai",
+    help="Agent type (openai, anthropic, langchain, custom)",
+)
 @click.option("--config", "-c", default="{}", help="Agent config as JSON object string")
-def create_agent(name: str, description: str, config: str):
+def create_agent(name: str, description: str, agent_type: str, config: str):
     """Create a new agent"""
     cli_config = CLIConfig()
     if not cli_config.is_authenticated():
@@ -66,6 +73,7 @@ def create_agent(name: str, description: str, config: str):
         json={
             "name": name,
             "description": description,
+            "type": agent_type,
             "config": config_json,
         },
     )

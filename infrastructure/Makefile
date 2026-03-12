@@ -67,4 +67,6 @@ monitor-validate:
 	docker run --rm -v $(PWD)/monitoring/prometheus:/etc/prometheus prom/prometheus:v2.54.1 \
 		promtool check config /etc/prometheus/prometheus.yml && \
 	docker run --rm -v $(PWD)/monitoring/prometheus:/etc/prometheus prom/prometheus:v2.54.1 \
-		promtool check rules /etc/prometheus/alerts.yml
+		promtool check rules /etc/prometheus/alerts.yml && \
+	docker run --rm -v $(PWD)/monitoring/prometheus:/etc/alertmanager prom/alertmanager:v0.27.0 \
+		amtool check-config /etc/alertmanager/alertmanager.yml

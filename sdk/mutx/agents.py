@@ -83,6 +83,7 @@ class Agents:
         self,
         name: str,
         description: Optional[str] = None,
+        type: str = "openai",
         config: Optional[dict[str, Any] | str] = None,
     ) -> Agent:
         response = self._client.post(
@@ -90,6 +91,7 @@ class Agents:
             json={
                 "name": name,
                 "description": description,
+                "type": type,
                 "config": config,
             },
         )
