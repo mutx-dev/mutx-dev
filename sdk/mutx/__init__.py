@@ -177,5 +177,7 @@ __all__ = [
     "AgentMetrics",
     "APIKeys",
     "ClawHub",
+    "Deployments",
+    "Webhooks",
     "create_agent_client",
 ]
