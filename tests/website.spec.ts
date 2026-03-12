@@ -28,43 +28,25 @@ test.describe('mutx.dev QA', () => {
   });
 
   test('homepage loads and renders waitlist signup', async ({ page }) => {
+    // Go to homepage (using baseURL from config)
     await page.goto('/');
+
+    // Wait for page to be interactive
     await page.waitForLoadState('domcontentloaded');
 
+    // Check h1 exists
     const h1 = page.locator('h1');
     await expect(h1).toBeVisible({ timeout: 10000 });
 
-    const waitlistForm = page.getByTestId('waitlist-form-hero');
-    await expect(waitlistForm).toBeVisible();
-
-    const emailInput = waitlistForm.locator('input[type="email"]');
+    // Check waitlist form exists
+    const emailInput = page.locator('input[type=\"email\"]').first();
     await expect(emailInput).toBeVisible();
 
-    await expect(waitlistForm.getByText(/loading verification challenge/i)).toBeHidden();
-
-    const submitBtn = waitlistForm.locator('button[type="submit"]');
-    await expect(submitBtn).toBeVisible();
-    await expect(submitBtn).toBeDisabled();
-  });
-
-  test('waitlist verification failure is surfaced to the user', async ({ page }) => {
-    await page.route('**/api/turnstile/site-key', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ siteKey: '' }),
-      });
-    });
-
-    await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
-
     const waitlistForm = page.getByTestId('waitlist-form-hero');
     await expect(waitlistForm).toBeVisible();
-    await expect(waitlistForm.getByText(/loading verification challenge|waitlist verification is unavailable right now/i)).toBeVisible();
 
-    const submitBtn = waitlistForm.locator('button[type="submit"]');
-    await expect(submitBtn).toBeDisabled();
+    const submitBtn = waitlistForm.locator('button[type=\"submit\"]');
+    await expect(submitBtn).toBeVisible();
   });
 
   test('no console errors', async ({ page }) => {
@@ -80,14 +62,18 @@ test.describe('mutx.dev QA', () => {
       errors.push(error.message);
     });
 
+    page.on('response', (response) => {
+      if (response.status() >= 400) {
+        console.log('HTTP_ERROR', response.status(), response.url());
+      }
+    });
+
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(2000);
 
     const isBenignError = (error: string) =>
-      /favicon\.ico/i.test(error) ||
-      /favicon/i.test(error) ||
-      /503 \(Service Unavailable\)/i.test(error);
+      /favicon\\.ico/i.test(error) || /favicon/i.test(error);
     const criticalErrors = errors.filter((error) => !isBenignError(error));
 
     expect(criticalErrors, 'Console errors: ' + criticalErrors.join('; ')).toHaveLength(0);

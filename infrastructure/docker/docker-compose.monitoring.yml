@@ -35,7 +35,7 @@ services:
     ports:
       - "127.0.0.1:${ALERTMANAGER_PORT:-9093}:9093"
     volumes:
-      - ../monitoring/prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./infrastructure/monitoring/prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
       - alertmanager_data:/alertmanager
     restart: unless-stopped
     networks:
@@ -53,8 +53,8 @@ services:
     ports:
       - "127.0.0.1:${GRAFANA_PORT:-3001}:3000"
     volumes:
-      - ../monitoring/grafana/dashboards:/etc/grafana/dashboards:ro
-      - ../monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infrastructure/monitoring/grafana/dashboards:/etc/grafana/dashboards:ro
+      - ./infrastructure/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
       - grafana_data:/var/lib/grafana
     depends_on:
       prometheus:
