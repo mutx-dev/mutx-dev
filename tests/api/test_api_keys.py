@@ -265,3 +265,22 @@ class TestRotateAPIKey:
         response = await client.post(f"/api-keys/{key.id}/rotate")
         assert response.status_code == 409
         assert "already revoked" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_rotate_other_user_api_key_not_found(
+        self, client: AsyncClient, db_session: AsyncSession, other_user
+    ):
+        """Test rotating another user's API key does not leak its existence."""
+        key = APIKey(
+            id=uuid.uuid4(),
+            user_id=other_user.id,
+            key_hash="other_hash",
+            name="other-users-key",
+            is_active=True,
+        )
+        db_session.add(key)
+        await db_session.commit()
+
+        response = await client.post(f"/api-keys/{key.id}/rotate")
+        assert response.status_code == 404
+        assert response.json()["detail"] == "API key not found"
