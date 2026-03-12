@@ -13,12 +13,14 @@ class Webhook:
         self.url = data["url"]
         self.events = data.get("events", [])
         self.secret = data.get("secret")
-        self.active = data.get("active", True)
+        # Contract parity: backend uses `is_active`; keep `.active` as compatibility alias.
+        self.is_active = data.get("is_active", data.get("active", True))
+        self.active = self.is_active
         self.created_at = datetime.fromisoformat(data["created_at"])
         self._data = data
 
     def __repr__(self) -> str:
-        return f"Webhook(id={self.id}, url={self.url}, active={self.active})"
+        return f"Webhook(id={self.id}, url={self.url}, is_active={self.is_active})"
 
 
 class WebhookEvent:
@@ -41,15 +43,15 @@ class Webhooks:
         url: str,
         events: list[str],
         secret: Optional[str] = None,
-        active: bool = True,
+        is_active: bool = True,
     ) -> Webhook:
         response = self._client.post(
-            "/webhooks",
+            "/webhooks/",
             json={
                 "url": url,
                 "events": events,
                 "secret": secret,
-                "active": active,
+                "is_active": is_active,
             },
         )
         response.raise_for_status()
@@ -61,7 +63,7 @@ class Webhooks:
         limit: int = 50,
     ) -> list[Webhook]:
         response = self._client.get(
-            "/webhooks",
+            "/webhooks/",
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
@@ -94,6 +96,7 @@ class Webhooks:
         webhook_id: UUID | str,
         url: Optional[str] = None,
         events: Optional[list[str]] = None,
+        is_active: Optional[bool] = None,
         active: Optional[bool] = None,
     ) -> Webhook:
         payload = {}
@@ -101,8 +104,11 @@ class Webhooks:
             payload["url"] = url
         if events is not None:
             payload["events"] = events
-        if active is not None:
-            payload["active"] = active
+        # Preserve backward compatibility for callers using `active=`.
+        if is_active is None and active is not None:
+            is_active = active
+        if is_active is not None:
+            payload["is_active"] = is_active
 
         response = self._client.patch(f"/webhooks/{webhook_id}", json=payload)
         response.raise_for_status()
