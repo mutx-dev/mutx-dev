@@ -15,6 +15,7 @@ Deployment records are exposed through `/deployments`, but creation currently ha
 |------|---------|
 | `GET /deployments` | List deployments |
 | `GET /deployments/{deployment_id}` | Get one deployment |
+| `GET /deployments/{deployment_id}/events` | Get paginated lifecycle history for one deployment |
 | `POST /deployments/{deployment_id}/scale` | Change replica count |
 | `DELETE /deployments/{deployment_id}` | Mark deployment as killed |
 
@@ -63,6 +64,46 @@ Example response:
   "error_message": null
 }
 ```
+
+## Deployment Event History
+
+```bash
+curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/events"
+curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/events?event_type=scale"
+curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/events?status=failed&limit=20"
+```
+
+Supported query parameters:
+
+- `skip`
+- `limit`
+- `event_type`
+- `status`
+
+Example response:
+
+```json
+{
+  "items": [
+    {
+      "id": "uuid",
+      "deployment_id": "uuid",
+      "event_type": "deploy.failed",
+      "status": "failed",
+      "node_id": "node-123",
+      "error_message": "image pull failed",
+      "created_at": "2026-03-12T09:15:00Z"
+    }
+  ],
+  "total": 1,
+  "skip": 0,
+  "limit": 20,
+  "event_type": null,
+  "status": "failed"
+}
+```
+
+This route returns newest-first lifecycle history and makes it possible to page through deployment state transitions over time.
 
 ## Scale a Deployment
 

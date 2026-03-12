@@ -67,6 +67,17 @@ class DeploymentEventResponse(BaseModel):
     created_at: datetime
 
 
+class DeploymentEventHistoryResponse(BaseModel):
+    """Paginated deployment lifecycle event history."""
+
+    items: list[DeploymentEventResponse] = Field(default_factory=list)
+    total: int
+    skip: int
+    limit: int
+    event_type: Optional[str] = None
+    status: Optional[str] = None
+
+
 class DeploymentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
