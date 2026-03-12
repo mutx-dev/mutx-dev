@@ -447,9 +447,11 @@ export function AppDashboardClient() {
               </p>
             </div>
             {label === "Health" ? (
-              <p className="mt-2 text-xs text-slate-500 font-[family:var(--font-mono)]">
-                database: {health?.database || "unknown"}
-              </p>
+              <div className="mt-2 space-y-1 text-xs text-slate-500 font-[family:var(--font-mono)]">
+                <p>database: {health?.database || "unknown"}</p>
+                <p>updated: {formatDate(health?.timestamp)}</p>
+                {health?.error ? <p className="text-rose-300">error: {health.error}</p> : null}
+              </div>
             ) : null}
           </Card>
         ))}
