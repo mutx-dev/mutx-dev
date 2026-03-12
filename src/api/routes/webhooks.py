@@ -7,6 +7,7 @@ from typing import Optional
 
 from src.api.database import get_db
 from src.api.models import User, Webhook
+from src.api.services.webhook_handler import WebhookEventType as WebhookEvent
 from src.api.models.schemas import (
     WebhookCreate,
     WebhookUpdate,
@@ -47,13 +48,19 @@ async def create_webhook(
         raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
 
     # Validate events
-    valid_event_prefixes = ["agent.", "deployment.", "metrics.", "alert."]
+    allowed_events = [e.value for e in WebhookEvent]
     for event in webhook_data.events:
-        if event != "*" and not any(event.startswith(prefix) for prefix in valid_event_prefixes):
-            if not event.endswith(".*"):
+        if event == "*":
+            continue
+
+        if event not in allowed_events:
+            # Check for prefix.* wildcards
+            if not any(
+                event.startswith(p.split(".")[0] + ".*") for p in allowed_events if "." in p
+            ):
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Invalid event: {event}. Must be 'agent.*', 'deployment.*', 'metrics.*', 'alert.*', or '*'",
+                    detail=f"Invalid event: {event}. Supported events: {allowed_events} and '*'",
                 )
 
     webhook = Webhook(
@@ -123,13 +130,20 @@ async def update_webhook(
         webhook.url = webhook_data.url
 
     if webhook_data.events is not None:
-        valid_event_prefixes = ["agent.", "deployment.", "metrics.", "alert."]
+        allowed_events = [e.value for e in WebhookEvent]
         for event in webhook_data.events:
-            if event != "*" and not any(
-                event.startswith(prefix) for prefix in valid_event_prefixes
-            ):
-                if not event.endswith(".*"):
-                    raise HTTPException(status_code=400, detail=f"Invalid event: {event}")
+            if event == "*":
+                continue
+
+            if event not in allowed_events:
+                # Check for prefix.* wildcards
+                if not any(
+                    event.startswith(p.split(".")[0] + ".*") for p in allowed_events if "." in p
+                ):
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Invalid event: {event}. Supported events: {allowed_events} and '*'",
+                    )
         webhook.events = webhook_data.events
 
     if webhook_data.is_active is not None:
