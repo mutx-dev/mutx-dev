@@ -62,37 +62,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to connect to API' }, { status: 500 })
   }
 }
-
-export async function DELETE(request: NextRequest) {
-  try {
-    const token = await getAuthToken(request)
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Extract key ID from URL path: /api/api-keys/{keyId}
-    const pathParts = request.nextUrl.pathname.split('/')
-    const keyId = pathParts[pathParts.length - 1]
-
-    if (!keyId || keyId === 'api-keys') {
-      return NextResponse.json({ error: 'Missing key ID' }, { status: 400 })
-    }
-
-    const response = await fetch(`${API_BASE_URL}/api-keys/${keyId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: 'Failed to revoke API key' }))
-      return NextResponse.json(error, { status: response.status })
-    }
-
-    return new NextResponse(null, { status: 204 })
-  } catch (error) {
-    console.error('API key delete error:', error)
-    return NextResponse.json({ error: 'Failed to connect to API' }, { status: 500 })
-  }
-}

@@ -169,6 +169,33 @@ export function AppDashboardClient() {
       setApiKeys([])
       setHealth(null)
       setCreatedKey(null)
+      setMode('login')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleRevokeKey(id: string) {
+    if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) {
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch(`/api/api-keys/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({ detail: 'Failed to revoke API key' }))
+        throw new Error(payload.detail || payload.error || 'Revocation failed')
+      }
+
+      await loadDashboard()
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : 'Revocation failed')
     } finally {
       setLoading(false)
     }
@@ -493,14 +520,27 @@ export function AppDashboardClient() {
               </motion.div>
             ) : null}
 
-            <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-2 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
               {apiKeys.length ? (
                 apiKeys.map((apiKey) => (
                   <div key={apiKey.id} className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-sm">
-                    <p className="font-medium text-slate-300">{apiKey.name}</p>
-                    <span className="text-[10px] uppercase tracking-widest text-slate-500 font-[family:var(--font-mono)]">
-                      {apiKey.is_active ? 'Active' : 'Revoked'}
-                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-slate-300 truncate">{apiKey.name}</p>
+                      <p className="text-[10px] uppercase tracking-widest text-slate-500 font-[family:var(--font-mono)] mt-0.5">
+                        {apiKey.is_active ? 'Active' : 'Revoked'} · {formatDate(apiKey.created_at)}
+                      </p>
+                    </div>
+                    {apiKey.is_active ? (
+                      <button
+                        type="button"
+                        onClick={() => handleRevokeKey(apiKey.id)}
+                        disabled={loading}
+                        className="ml-3 shrink-0 rounded p-1 text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-400 disabled:opacity-30"
+                        title="Revoke key"
+                      >
+                        <XCircle className="h-4 w-4" />
+                      </button>
+                    ) : null}
                   </div>
                 ))
               ) : (
