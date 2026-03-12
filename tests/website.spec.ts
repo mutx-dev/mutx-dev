@@ -1,6 +1,32 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('mutx.dev QA', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('https://challenges.cloudflare.com/**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/javascript',
+        body: 'window.turnstile={render:(el,opts)=>{setTimeout(()=>opts?.callback?.("ci-test-token"),0);return "widget-id";},reset:()=>{},remove:()=>{}};',
+      });
+    });
+
+    await page.route('**/_next/image**', async (route) => {
+      const url = new URL(route.request().url());
+      const originalUrl = url.searchParams.get('url');
+
+      if (!originalUrl || originalUrl.includes('/logo.png')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'image/png',
+          body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wn8nWsAAAAASUVORK5CYII=', 'base64'),
+        });
+        return;
+      }
+
+      await route.fallback();
+    });
+  });
+
   test('homepage loads and renders waitlist signup', async ({ page }) => {
     // Go to homepage (using baseURL from config)
     await page.goto('/');
@@ -34,6 +60,12 @@ test.describe('mutx.dev QA', () => {
 
     page.on('pageerror', (error) => {
       errors.push(error.message);
+    });
+
+    page.on('response', (response) => {
+      if (response.status() >= 400) {
+        console.log('HTTP_ERROR', response.status(), response.url());
+      }
     });
 
     await page.goto('/');
