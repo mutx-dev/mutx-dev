@@ -50,4 +50,8 @@ echo "Running frontend build check..."
 npm run build
 
 echo ""
+echo "Running frontend smoke tests..."
+npx playwright test --project=chromium
+
+echo ""
 echo "Validation complete!"
