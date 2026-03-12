@@ -47,6 +47,28 @@ test.describe('mutx.dev QA', () => {
     await expect(submitBtn).toBeVisible();
   });
 
+  test('waitlist verification failure is surfaced to the user', async ({ page }) => {
+    await page.route('**/api/turnstile/site-key', async (route) => {
+      await route.fulfill({
+        status: 503,
+        contentType: 'application/json',
+        body: JSON.stringify({ siteKey: '' }),
+      });
+    });
+
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+
+    const waitlistForm = page.getByTestId('waitlist-form-hero');
+    await expect(waitlistForm).toBeVisible();
+    await expect(
+      waitlistForm.getByText(/waitlist verification is unavailable right now/i)
+    ).toBeVisible();
+
+    const submitBtn = waitlistForm.locator('button[type="submit"]');
+    await expect(submitBtn).toBeDisabled();
+  });
+
   test('no console errors', async ({ page }) => {
     const errors: string[] = [];
     const ignoredErrorPatterns = [
