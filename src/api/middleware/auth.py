@@ -74,18 +74,6 @@ async def get_current_user_optional(
     return user
 
 
-async def get_api_key_user(
-    x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
-    session: AsyncSession = Depends(get_db),
-) -> Optional[User]:
-    """Authenticate using any active user-owned API key."""
-    if not x_api_key:
-        return None
-
-    user_service = UserService(session)
-    return await user_service.get_user_for_api_key(x_api_key)
-
-
 async def get_user_from_api_key(
     x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
     session: AsyncSession = Depends(get_db),
@@ -96,6 +84,9 @@ async def get_user_from_api_key(
 
     user_service = UserService(session)
     return await user_service.get_user_for_api_key(x_api_key)
+
+
+get_api_key_user = get_user_from_api_key
 
 
 async def get_current_user_or_api_key(
