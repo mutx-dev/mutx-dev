@@ -71,7 +71,7 @@ make monitor-up
 
 The monitoring compose file binds UI and exporter ports to localhost by default.
 Stop it with `cd infrastructure && make monitor-down`.
-Prometheus now loads alerting rules from `infrastructure/monitoring/prometheus/alerts.yml` and scrapes the API via `host.docker.internal:8000` (works for local Docker Desktop + Linux host-gateway mapping).
+Prometheus now loads alerting rules from `infrastructure/monitoring/prometheus/alerts.yml` and scrapes the API via `host.docker.internal:8000` (works for local Docker Desktop + Linux host-gateway mapping). Grafana provisioning and dashboard mounts are resolved relative to `infrastructure/docker/docker-compose.monitoring.yml`, so the stack reads from `../monitoring/grafana/...` when launched from `infrastructure/`.
 
 ## CI Drift Detection
 
