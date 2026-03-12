@@ -1,17 +1,13 @@
 import pytest
 from httpx import AsyncClient
-import uuid
+
 
 @pytest.mark.asyncio
 async def test_webhook_lifecycle(client: AsyncClient, test_user):
     # 1. Create Webhook
     response = await client.post(
         "/webhooks/",
-        json={
-            "url": "https://example.com/webhook",
-            "events": ["agent.*"],
-            "secret": "test-secret"
-        }
+        json={"url": "https://example.com/webhook", "events": ["agent.*"], "secret": "test-secret"},
     )
     assert response.status_code == 201
     webhook = response.json()
@@ -32,8 +28,7 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
 
     # 4. Update Webhook
     response = await client.patch(
-        f"/webhooks/{webhook_id}",
-        json={"url": "https://example.com/updated", "is_active": False}
+        f"/webhooks/{webhook_id}", json={"url": "https://example.com/updated", "is_active": False}
     )
     assert response.status_code == 200
     data = response.json()
@@ -48,6 +43,40 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
     response = await client.get(f"/webhooks/{webhook_id}")
     assert response.status_code == 404
 
+
+@pytest.mark.asyncio
+async def test_webhook_event_contract_validation(client: AsyncClient):
+    # Exact event names from internal contract are accepted.
+    response = await client.post(
+        "/webhooks/",
+        json={
+            "url": "https://example.com/exact",
+            "events": ["agent.status", "deployment.event", "metrics.report"],
+        },
+    )
+    assert response.status_code == 201
+    webhook = response.json()
+    assert set(webhook["events"]) == {"agent.status", "deployment.event", "metrics.report"}
+
+    # Wildcard prefixes are still accepted.
+    response = await client.post(
+        "/webhooks/",
+        json={
+            "url": "https://example.com/wild",
+            "events": ["agent.*", "*"],
+        },
+    )
+    assert response.status_code == 201
+
+    # Unknown event names are rejected.
+    response = await client.post(
+        "/webhooks/",
+        json={"url": "https://example.com/bad", "events": ["agent.status_changed"]},
+    )
+    assert response.status_code == 400
+    assert "Invalid event" in response.text
+
+
 @pytest.mark.asyncio
 async def test_webhook_unauthorized(client: AsyncClient):
     # Logout or use unauthenticated client
@@ -55,19 +84,22 @@ async def test_webhook_unauthorized(client: AsyncClient):
     # But usually there's a way to test unauth.
     pass
 
+
 @pytest.mark.asyncio
 async def test_webhook_test_trigger(client: AsyncClient, test_user, monkeypatch):
     # Mock deliver_webhook_with_retry
     import src.api.services.webhook_service
+
     async def mock_deliver(*args, **kwargs):
         return True
-    
-    monkeypatch.setattr(src.api.services.webhook_service, "deliver_webhook_with_retry", mock_deliver)
-    
+
+    monkeypatch.setattr(
+        src.api.services.webhook_service, "deliver_webhook_with_retry", mock_deliver
+    )
+
     # Create
     response = await client.post(
-        "/webhooks/",
-        json={"url": "https://example.com/webhook", "events": ["*"]}
+        "/webhooks/", json={"url": "https://example.com/webhook", "events": ["*"]}
     )
     webhook_id = response.json()["id"]
 

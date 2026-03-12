@@ -201,6 +201,14 @@ class APIKey(Base):
     user: Mapped["User"] = relationship("User", back_populates="api_keys")
 
 
+class WebhookEvent(str, enum.Enum):
+    AGENT_STATUS = "agent.status"
+    DEPLOYMENT_EVENT = "deployment.event"
+    METRICS_REPORT = "metrics.report"
+    ALERT_TRIGGERED = "alert.triggered"
+    ALL = "*"
+
+
 class Webhook(Base):
     __tablename__ = "webhooks"
 

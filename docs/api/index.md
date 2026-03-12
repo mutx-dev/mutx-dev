@@ -19,7 +19,7 @@ Routes are mounted directly at top-level prefixes. There is no global `/v1` back
 | Agents | `POST /agents`, `GET /agents`, `GET /agents/{agent_id}`, `DELETE /agents/{agent_id}`, `POST /agents/{agent_id}/deploy`, `POST /agents/{agent_id}/stop`, `GET /agents/{agent_id}/logs`, `GET /agents/{agent_id}/metrics` |
 | Deployments | `GET /deployments`, `POST /deployments`, `GET /deployments/{deployment_id}`, `POST /deployments/{deployment_id}/scale`, `POST /deployments/{deployment_id}/restart`, `DELETE /deployments/{deployment_id}` |
 | API Keys | `GET /api-keys`, `POST /api-keys`, `DELETE /api-keys/{key_id}`, `POST /api-keys/{key_id}/rotate` |
-| Webhooks | `POST /webhooks/agent-status`, `POST /webhooks/deployment`, `POST /webhooks/metrics` |
+| Webhooks | `POST /ingest/agent-status`, `POST /ingest/deployment`, `POST /ingest/metrics`, `GET /webhooks/`, `GET /webhooks/{id}`, `PATCH /webhooks/{id}`, `DELETE /webhooks/{id}`, `POST /webhooks/{id}/test` |
 | Newsletter | `GET /newsletter`, `POST /newsletter` |
 | Leads | `POST /leads`, `GET /leads`, `GET /leads/{lead_id}` |
 

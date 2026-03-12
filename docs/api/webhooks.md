@@ -41,10 +41,8 @@ Register your own endpoints to receive real-time notifications from MUTX.
 
 ### Supported Events
 
-- `agent.*`: All agent-related events
-- `deployment.*`: All deployment-related events
-- `metrics.*`: Periodic metrics reports
-- `alert.*`: System alerts and thresholds
+- Exact event names: `agent.status`, `deployment.event`, `metrics.report`, `alert.triggered`
+- Wildcard prefixes: `agent.*`, `deployment.*`, `metrics.*`, `alert.*`
 - `*`: All events
 
 ### Registration
@@ -55,7 +53,7 @@ curl -X POST "https://api.mutx.dev/webhooks/" \
   -H "Content-Type: application/json" \
   -d '{
     "url": "https://your-app.com/webhooks/mutx",
-    "events": ["agent.status_changed", "deployment.failed"],
+    "events": ["agent.status", "deployment.*"],
     "secret": "optional-hmac-secret"
   }'
 ```
@@ -72,5 +70,5 @@ curl -X POST "https://api.mutx.dev/webhooks/" \
 
 ## Delivery and Security
 
-- **Retries**: MUTX will retry failed deliveries up to 5 times with exponential backoff.
-- **Signatures**: If a `secret` is provided during registration, MUTX will include an `X-MUTX-Signature` header (HMAC-SHA256) for payload verification.
+- **Retries**: MUTX will retry failed deliveries up to 3 times with exponential backoff.
+- **Signatures**: If a `secret` is provided during registration, MUTX will include an `X-Webhook-Signature` header (HMAC-SHA256) for payload verification.

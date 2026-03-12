@@ -1,18 +1,37 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-import uuid
 import logging
+import uuid
 from typing import Optional
 
+from fastapi import APIRouter, Depends, HTTPException, Header
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.api.database import get_db
-from src.api.models import User, Webhook
+from src.api.models import User, Webhook, WebhookEvent
 from src.api.models.schemas import (
     WebhookCreate,
     WebhookUpdate,
     WebhookResponse,
 )
 from src.api.middleware.auth import get_current_user_or_api_key
+
+ALLOWED_WEBHOOK_PREFIXES = {"agent", "deployment", "metrics", "alert"}
+
+
+def _is_supported_event(event: str, allowed_events: list[str]) -> bool:
+    """Validate webhook subscription event patterns and exact event names."""
+    if event in allowed_events:
+        return True
+
+    if event == "*":
+        return True
+
+    if event.endswith(".*"):
+        prefix = event[:-2]
+        return prefix in ALLOWED_WEBHOOK_PREFIXES
+
+    return False
+
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 logger = logging.getLogger(__name__)
@@ -47,14 +66,17 @@ async def create_webhook(
         raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
 
     # Validate events
-    valid_event_prefixes = ["agent.", "deployment.", "metrics.", "alert."]
+    allowed_events = [e.value for e in WebhookEvent]
     for event in webhook_data.events:
-        if event != "*" and not any(event.startswith(prefix) for prefix in valid_event_prefixes):
-            if not event.endswith(".*"):
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Invalid event: {event}. Must be 'agent.*', 'deployment.*', 'metrics.*', 'alert.*', or '*'",
-                )
+        if not _is_supported_event(event, allowed_events):
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Invalid event: "
+                    f"{event}. Supported events are exact names {allowed_events} "
+                    "or wildcard prefixes like agent.*, deployment.*, metrics.*, alert.*, or *"
+                ),
+            )
 
     webhook = Webhook(
         user_id=current_user.id,
@@ -123,13 +145,17 @@ async def update_webhook(
         webhook.url = webhook_data.url
 
     if webhook_data.events is not None:
-        valid_event_prefixes = ["agent.", "deployment.", "metrics.", "alert."]
+        allowed_events = [e.value for e in WebhookEvent]
         for event in webhook_data.events:
-            if event != "*" and not any(
-                event.startswith(prefix) for prefix in valid_event_prefixes
-            ):
-                if not event.endswith(".*"):
-                    raise HTTPException(status_code=400, detail=f"Invalid event: {event}")
+            if not _is_supported_event(event, allowed_events):
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        "Invalid event: "
+                        f"{event}. Supported events are exact names {allowed_events} "
+                        "or wildcard prefixes like agent.*, deployment.*, metrics.*, alert.*, or *"
+                    ),
+                )
         webhook.events = webhook_data.events
 
     if webhook_data.is_active is not None:

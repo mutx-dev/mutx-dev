@@ -323,15 +323,19 @@ async def submit_log(
 
 @router.get("/{agent_id}/status", response_model=AgentStatusResponse)
 async def get_agent_status(
-    agent_id: str,
+    agent_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Get agent status."""
-    result = await db.execute(select(Agent).where(Agent.id == uuid.UUID(agent_id)))
+    result = await db.execute(select(Agent).where(Agent.id == agent_id))
     agent = result.scalar_one_or_none()
 
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
+
+    if agent.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to access this agent")
 
     uptime = 0.0
     if agent.created_at:

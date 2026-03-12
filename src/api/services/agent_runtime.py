@@ -366,11 +366,21 @@ class RuntimeManager:
         return cls._default_runtime
 
     @classmethod
-    def delete_runtime(cls, runtime_id: str) -> bool:
-        if runtime_id in cls._runtimes:
-            del cls._runtimes[runtime_id]
-            return True
-        return False
+    async def delete_runtime(cls, runtime_id: str) -> bool:
+        runtime = cls._runtimes.get(runtime_id)
+        if not runtime:
+            return False
+
+        # Ensure runtime is fully stopped before removing it from registry.
+        if runtime.state.status not in (RuntimeStatus.STOPPED, RuntimeStatus.STOPPING):
+            await runtime.stop()
+
+        del cls._runtimes[runtime_id]
+        if cls._default_runtime and cls._default_runtime.runtime_id == runtime_id:
+            cls._default_runtime = None
+
+        logger.info(f"Runtime {runtime_id} deleted")
+        return True
 
     @classmethod
     def list_runtimes(cls) -> List[RuntimeState]:

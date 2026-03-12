@@ -4,6 +4,7 @@ from src.api.models.models import (
     Deployment,
     APIKey,
     Webhook,
+    WebhookEvent,
     Metrics,
     Alert,
     AgentLog,
@@ -32,6 +33,7 @@ __all__ = [
     "Plan",
     "AgentType",
     "AgentStatus",
+    "WebhookEvent",
     "AlertType",
     "Command",
 ]
