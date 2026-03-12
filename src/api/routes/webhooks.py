@@ -6,12 +6,13 @@ import logging
 from typing import Optional
 
 from src.api.database import get_db
-from src.api.models import User, Webhook
+from src.api.models import User, Webhook, WebhookDeliveryLog
 from src.api.services.webhook_handler import WebhookEventType as WebhookEvent
 from src.api.models.schemas import (
     WebhookCreate,
     WebhookUpdate,
     WebhookResponse,
+    WebhookDelivery,
 )
 from src.api.middleware.auth import get_current_user_or_api_key
 
@@ -206,3 +207,30 @@ async def test_webhook(
             status_code=502,
             detail="Test event delivery failed. Check webhook URL and ensure it's reachable.",
         )
+
+
+@router.get("/{webhook_id}/deliveries", response_model=list[WebhookDelivery])
+async def list_webhook_deliveries(
+    webhook_id: uuid.UUID,
+    event: Optional[str] = None,
+    success: Optional[bool] = None,
+    limit: int = 50,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_webhook_auth),
+):
+    """List delivery attempts for a webhook owned by the authenticated user."""
+    webhook = await _get_owned_webhook(webhook_id, db, current_user)
+
+    query = (
+        select(WebhookDeliveryLog)
+        .where(WebhookDeliveryLog.webhook_id == webhook.id)
+        .order_by(WebhookDeliveryLog.created_at.desc())
+        .limit(limit)
+    )
+    if event is not None:
+        query = query.where(WebhookDeliveryLog.event == event)
+    if success is not None:
+        query = query.where(WebhookDeliveryLog.success == success)
+
+    result = await db.execute(query)
+    return result.scalars().all()

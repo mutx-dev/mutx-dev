@@ -1,5 +1,8 @@
 import pytest
 from httpx import AsyncClient
+import uuid
+
+from src.api.models.models import WebhookDeliveryLog
 
 @pytest.mark.asyncio
 async def test_webhook_lifecycle(client: AsyncClient, test_user):
@@ -103,3 +106,67 @@ async def test_webhook_test_trigger(client: AsyncClient, test_user, monkeypatch)
     response = await client.post(f"/webhooks/{webhook_id}/test")
     assert response.status_code == 200
     assert response.json()["status"] == "test_delivered"
+
+
+@pytest.mark.asyncio
+async def test_webhook_delivery_history_filters(client: AsyncClient, db_session, test_user):
+    create_response = await client.post(
+        "/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["*"]},
+    )
+    assert create_response.status_code == 201
+    webhook_id = uuid.UUID(create_response.json()["id"])
+
+    db_session.add_all(
+        [
+            WebhookDeliveryLog(
+                webhook_id=webhook_id,
+                event="deployment.event",
+                payload='{"status":"running"}',
+                success=True,
+                attempts=1,
+            ),
+            WebhookDeliveryLog(
+                webhook_id=webhook_id,
+                event="agent.status",
+                payload='{"new_status":"failed"}',
+                success=False,
+                error_message="boom",
+                attempts=2,
+            ),
+        ]
+    )
+    await db_session.commit()
+
+    response = await client.get(f"/webhooks/{webhook_id}/deliveries?event=agent.status&success=false")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["event"] == "agent.status"
+    assert data[0]["success"] is False
+
+
+@pytest.mark.asyncio
+async def test_webhook_delivery_history_other_user_forbidden(
+    client: AsyncClient, other_user_client: AsyncClient, db_session, test_user
+):
+    create_response = await client.post(
+        "/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["*"]},
+    )
+    assert create_response.status_code == 201
+    webhook_id = uuid.UUID(create_response.json()["id"])
+
+    db_session.add(
+        WebhookDeliveryLog(
+            webhook_id=webhook_id,
+            event="agent.status",
+            payload='{"new_status":"running"}',
+            success=True,
+            attempts=1,
+        )
+    )
+    await db_session.commit()
+
+    response = await other_user_client.get(f"/webhooks/{webhook_id}/deliveries")
+    assert response.status_code == 403
