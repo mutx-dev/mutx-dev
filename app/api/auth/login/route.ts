@@ -9,6 +9,8 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    const secureCookies =
+      request.nextUrl.protocol === 'https:' || request.headers.get('x-forwarded-proto') === 'https'
 
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
@@ -27,14 +29,14 @@ export async function POST(request: NextRequest) {
     nextResponse.cookies.set('access_token', payload.access_token, {
       httpOnly: false,
       sameSite: 'lax',
-      secure: true,
+      secure: secureCookies,
       path: '/',
       maxAge: payload.expires_in || 1800,
     })
     nextResponse.cookies.set('refresh_token', payload.refresh_token, {
       httpOnly: false,
       sameSite: 'lax',
-      secure: true,
+      secure: secureCookies,
       path: '/',
       maxAge: 60 * 60 * 24 * 7,
     })
