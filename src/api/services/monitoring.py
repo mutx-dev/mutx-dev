@@ -19,6 +19,37 @@ STALE_THRESHOLD_SECONDS = 120  # Agent is failed after 120s
 HEAL_THRESHOLD_SECONDS = 30  # Heal failed agents after 30s
 
 
+async def _get_latest_deployment(session: AsyncSession, agent_id: uuid.UUID) -> Deployment | None:
+    result = await session.execute(
+        select(Deployment)
+        .where(Deployment.agent_id == agent_id)
+        .order_by(Deployment.created_at.desc())
+        .limit(1)
+    )
+    return result.scalar_one_or_none()
+
+
+def _record_deployment_event(
+    session: AsyncSession,
+    deployment: Deployment,
+    *,
+    event_type: str,
+    status: str,
+    error_message: str | None = None,
+) -> None:
+    from src.api.models import DeploymentEvent
+
+    session.add(
+        DeploymentEvent(
+            deployment_id=deployment.id,
+            event_type=event_type,
+            status=status,
+            node_id=deployment.node_id,
+            error_message=error_message,
+        )
+    )
+
+
 async def monitor_agent_health(session: AsyncSession):
     """
     Main monitoring and self-healing lifecycle:
@@ -50,6 +81,13 @@ async def monitor_agent_health(session: AsyncSession):
                     node_id=f"node-{uuid.uuid4().hex[:6]}",
                 )
                 session.add(deployment)
+                await session.flush()
+                _record_deployment_event(
+                    session,
+                    deployment,
+                    event_type="monitor_started",
+                    status="running",
+                )
 
             logger.info(f"Monitor: Agent {agent.name} ({agent.id}) promoted to RUNNING")
 
@@ -80,6 +118,19 @@ async def monitor_agent_health(session: AsyncSession):
             )
             session.add(log)
 
+            deployment = await _get_latest_deployment(session, agent.id)
+            if deployment is not None:
+                deployment.status = "failed"
+                deployment.ended_at = now
+                deployment.error_message = log.message
+                _record_deployment_event(
+                    session,
+                    deployment,
+                    event_type="monitor_failed",
+                    status="failed",
+                    error_message=log.message,
+                )
+
     # 3. Auto-Heal Failed Agents
     result = await session.execute(select(Agent).where(Agent.status == "failed"))
     failed_agents = result.scalars().all()
@@ -96,7 +147,7 @@ async def monitor_agent_health(session: AsyncSession):
                 .where(
                     Alert.agent_id == agent.id,
                     Alert.type == AlertType.AGENT_DOWN,
-                    not Alert.resolved,
+                    Alert.resolved.is_(False),
                 )
                 .values(resolved=True, resolved_at=now)
             )
@@ -109,5 +160,18 @@ async def monitor_agent_health(session: AsyncSession):
                 timestamp=now,
             )
             session.add(heal_log)
+
+            deployment = await _get_latest_deployment(session, agent.id)
+            if deployment is not None:
+                deployment.status = "running"
+                deployment.started_at = now
+                deployment.ended_at = None
+                deployment.error_message = None
+                _record_deployment_event(
+                    session,
+                    deployment,
+                    event_type="monitor_restarted",
+                    status="running",
+                )
 
     await session.commit()
