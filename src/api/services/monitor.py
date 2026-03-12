@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api import database as database_module
 from src.api.models import Agent, AgentLog
 from src.api.services.monitoring import monitor_agent_health
+from src.api.services.self_healer import get_self_healing_service
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +72,9 @@ async def _generate_synthetic_logs(session: AsyncSession, agent_id: uuid.UUID):
 async def start_background_monitor():
     """Main loop for the background service."""
     logger.info("Starting background agent monitor...")
+    self_healing = get_self_healing_service()
+    await self_healing.start()
+
     while True:
         try:
             async with database_module.async_session_maker() as session:
