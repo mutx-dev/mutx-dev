@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { Resend } from 'resend'
 import sql from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
@@ -9,6 +10,50 @@ type TurnstileVerificationResult = {
   success: boolean
   action?: string
   ['error-codes']?: string[]
+}
+
+const resendApiKey = process.env.RESEND_API_KEY?.trim()
+const resendFromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'MUTX <hello@mutx.dev>'
+const resend = resendApiKey ? new Resend(resendApiKey) : null
+
+function isEmailDeliveryConfigured() {
+  return Boolean(resend)
+}
+
+async function sendWaitlistConfirmationEmail(to: string) {
+  if (!resend) {
+    throw new Error('RESEND_API_KEY is not configured')
+  }
+
+  const subject = "You're on the MUTX waitlist"
+  const html = `
+    <div style="font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111;">
+      <p style="margin: 0 0 16px;">You're on the list.</p>
+      <p style="margin: 0 0 16px;">We'll send product updates, technical docs, and early-access notes as MUTX hardens into a real operator control plane.</p>
+      <p style="margin: 0; color: #666; font-size: 14px;">— MUTX</p>
+    </div>
+  `
+  const text = [
+    "You're on the MUTX waitlist.",
+    '',
+    "We'll send product updates, technical docs, and early-access notes as MUTX hardens into a real operator control plane.",
+    '',
+    '— MUTX',
+  ].join('\n')
+
+  const result = await resend.emails.send({
+    from: resendFromEmail,
+    to: [to],
+    subject,
+    html,
+    text,
+  })
+
+  if (result.error) {
+    throw new Error(result.error.message || 'Resend email send failed')
+  }
+
+  return result
 }
 
 async function ensureTableExists() {
@@ -132,10 +177,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: "You're already on the list!", emailSent: false })
     }
 
+    let emailSent = false
+    let message = "You're on the list!"
+
+    if (isEmailDeliveryConfigured()) {
+      try {
+        await sendWaitlistConfirmationEmail(normalizedEmail)
+        emailSent = true
+        message = "You're on the list. Check your inbox."
+      } catch (emailError) {
+        console.error('Waitlist confirmation email failed:', emailError)
+      }
+    } else {
+      console.warn('Waitlist email delivery skipped: RESEND_API_KEY is not configured')
+    }
+
     return NextResponse.json({
       success: true,
-      message: "You're on the list!",
-      emailSent: false,
+      message,
+      emailSent,
     })
   } catch (error) {
     console.error('Waitlist error:', error)
