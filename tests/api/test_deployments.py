@@ -213,6 +213,8 @@ class TestDeploymentEvents:
         response = await client.get(f"/deployments/{test_deployment.id}/events")
         assert response.status_code == 200
         data = response.json()
+        assert data["deployment_id"] == str(test_deployment.id)
+        assert data["deployment_status"] == test_deployment.status
         assert data["total"] == 1
         assert data["skip"] == 0
         assert data["limit"] == 100
@@ -242,6 +244,8 @@ class TestDeploymentEvents:
         response = await client.get(f"/deployments/{test_deployment.id}/events?event_type=restart")
         assert response.status_code == 200
         data = response.json()
+        assert data["deployment_id"] == str(test_deployment.id)
+        assert data["deployment_status"] == test_deployment.status
         assert data["total"] == 1
         assert data["event_type"] == "restart"
         assert data["status"] is None
@@ -278,12 +282,33 @@ class TestDeploymentEvents:
         )
         assert response.status_code == 200
         data = response.json()
+        assert data["deployment_id"] == str(test_deployment.id)
+        assert data["deployment_status"] == test_deployment.status
         assert data["total"] == 1
         assert data["limit"] == 1
         assert data["status"] == "failed"
         assert len(data["items"]) == 1
         assert data["items"][0]["event_type"] == "deploy.failed"
         assert data["items"][0]["status"] == "failed"
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_events_empty_history_returns_metadata(
+        self, client: AsyncClient, test_deployment
+    ):
+        response = await client.get(f"/deployments/{test_deployment.id}/events")
+        assert response.status_code == 200
+
+        data = response.json()
+        assert data == {
+            "deployment_id": str(test_deployment.id),
+            "deployment_status": test_deployment.status,
+            "items": [],
+            "total": 0,
+            "skip": 0,
+            "limit": 100,
+            "event_type": None,
+            "status": None,
+        }
 
     @pytest.mark.asyncio
     async def test_get_deployment_events_other_user_forbidden(

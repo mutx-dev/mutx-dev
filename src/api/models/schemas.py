@@ -70,6 +70,8 @@ class DeploymentEventResponse(BaseModel):
 class DeploymentEventHistoryResponse(BaseModel):
     """Paginated deployment lifecycle event history."""
 
+    deployment_id: uuid.UUID
+    deployment_status: str
     items: list[DeploymentEventResponse] = Field(default_factory=list)
     total: int
     skip: int

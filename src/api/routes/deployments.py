@@ -180,6 +180,8 @@ async def get_deployment_events(
     result = await db.execute(query)
     items = result.scalars().all()
     return {
+        "deployment_id": deployment.id,
+        "deployment_status": deployment.status,
         "items": items,
         "total": total,
         "skip": skip,

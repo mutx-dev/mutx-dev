@@ -84,6 +84,8 @@ Example response:
 
 ```json
 {
+  "deployment_id": "uuid",
+  "deployment_status": "failed",
   "items": [
     {
       "id": "uuid",
@@ -103,7 +105,7 @@ Example response:
 }
 ```
 
-This route returns newest-first lifecycle history and makes it possible to page through deployment state transitions over time.
+This route returns newest-first lifecycle history and makes it possible to page through deployment state transitions over time. The top-level `deployment_id` and `deployment_status` fields let operators render history context without making a second deployment-detail request.
 
 ## Scale a Deployment
 
