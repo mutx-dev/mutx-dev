@@ -11,6 +11,7 @@ These endpoints are used by agents to connect to MUTX:
 - /agents/{agent_id}/status - Get agent status
 """
 
+import json
 import logging
 import uuid
 from datetime import datetime
@@ -145,7 +146,7 @@ async def register_agent(
         name=request.name,
         description=request.description or "",
         status=AgentStatus.RUNNING.value,
-        config=str(request.metadata) if request.metadata else None,
+        config=json.dumps(request.metadata) if request.metadata is not None else None,
         api_key=agent_api_key,
         user_id=current_user.id,
     )
