@@ -20,8 +20,10 @@ from sqlalchemy.pool import StaticPool
 os.environ.setdefault("DATABASE_REQUIRED_ON_STARTUP", "false")
 os.environ.setdefault("JWT_SECRET", "test-secret-key")
 
-# Use SQLite in-memory for tests (for local dev)
-TEST_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+# Use an isolated SQLite database for tests by default.
+# Do not inherit DATABASE_URL from the shell, or tests can accidentally hit a
+# real/dev database and fail in misleading ways.
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "sqlite+aiosqlite:///:memory:")
 
 # Configure pytest-asyncio
 pytest_plugins = ("pytest_asyncio",)
@@ -69,7 +71,11 @@ def event_loop():
 @pytest_asyncio.fixture(scope="function")
 async def test_engine():
     """Create test database engine."""
-    # Import Base from database to use the real models
+    # Import models before Base.metadata.create_all() so SQLAlchemy has the
+    # declarative tables registered. Without this, create_all() can silently
+    # create an empty schema and tests fail later with misleading "no such table"
+    # errors.
+    from src.api.models import models as _models  # noqa: F401
     from src.api.database import Base
     
     engine = create_async_engine(
