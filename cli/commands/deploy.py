@@ -130,6 +130,65 @@ def scale_deployment(deployment_id: str, replicas: int):
         click.echo(f"Error: {response.text}", err=True)
 
 
+@deploy_group.command(name="events")
+@click.argument("deployment_id")
+@click.option("--limit", "-l", default=100, help="Number of events to fetch")
+@click.option("--skip", "-s", default=0, help="Number of events to skip")
+@click.option("--event-type", default=None, help="Filter by event type")
+@click.option("--status", default=None, help="Filter by event status")
+def deployment_events(
+    deployment_id: str,
+    limit: int,
+    skip: int,
+    event_type: Optional[str],
+    status: Optional[str],
+):
+    """Get deployment event history"""
+    config = CLIConfig()
+    if not config.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        return
+
+    params = {"limit": limit, "skip": skip}
+    if event_type:
+        params["event_type"] = event_type
+    if status:
+        params["status"] = status
+
+    client = get_client(config)
+    response = client.get(f"/deployments/{deployment_id}/events", params=params)
+
+    if response.status_code == 401:
+        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+        return
+
+    if response.status_code == 200:
+        payload = response.json()
+        items = payload.get("items", [])
+        if not items:
+            click.echo("No deployment events found.")
+            return
+
+        click.echo(
+            f"Deployment: {payload.get('deployment_id')} | status: {payload.get('deployment_status')}"
+        )
+        for item in items:
+            click.echo(
+                " | ".join(
+                    [
+                        item.get("created_at", ""),
+                        item.get("event_type", "unknown"),
+                        item.get("status", "unknown"),
+                        f"node: {item.get('node_id') or 'n/a'}",
+                    ]
+                )
+            )
+    elif response.status_code == 404:
+        click.echo("Error: Deployment not found", err=True)
+    else:
+        click.echo(f"Error: {response.text}", err=True)
+
+
 @deploy_group.command(name="delete")
 @click.argument("deployment_id")
 @click.option("--force", "-f", is_flag=True, help="Force deletion without confirmation")
