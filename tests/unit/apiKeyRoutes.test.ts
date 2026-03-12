@@ -141,6 +141,30 @@ describe('API key route proxies', () => {
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
   })
 
+  it('preserves upstream forbidden responses for create proxy', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 403,
+      json: async () => ({ detail: 'Forbidden' }),
+    })
+
+    const { POST } = await import('../../app/api/api-keys/route')
+
+    const response = await POST(mockJsonRequest({ name: 'blocked-key' }))
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: 'blocked-key' }),
+    })
+    expect(response.status).toBe(403)
+    await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
+  })
+
   it('preserves successful revoke responses for the dashboard proxy', async () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock).mockResolvedValue({
