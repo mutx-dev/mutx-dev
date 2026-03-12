@@ -106,4 +106,5 @@ These infrastructure checks are authoritative for infra changes, but they are no
 
 - Replace static inventory usage with Terraform-generated inventory by default in Ansible playbook wrappers.
 - Wire alert delivery (Alertmanager/notification channel) for critical rules.
+- Default local Alertmanager routing now drops alerts unless they are explicitly labeled `notify="webhook"`, preventing noisy failed webhook retries in dev setups without a receiver.
 - Add automated backup/restore verification for PostgreSQL and Redis volumes.
