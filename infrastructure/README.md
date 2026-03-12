@@ -100,8 +100,11 @@ make tf-plan-production-detailed
 make monitor-validate
 ```
 
+These infrastructure checks are authoritative for infra changes, but they are not the same thing as the app CI lane in `.github/workflows/ci.yml`. Keep infra-specific validation explicit so application PRs do not fail on hidden cross-surface assumptions.
+
 ## Next Hardening Items
 
 - Replace static inventory usage with Terraform-generated inventory by default in Ansible playbook wrappers.
 - Wire alert delivery (Alertmanager/notification channel) for critical rules.
+- Default local Alertmanager routing now drops alerts unless they are explicitly labeled `notify="webhook"`, preventing noisy failed webhook retries in dev setups without a receiver.
 - Add automated backup/restore verification for PostgreSQL and Redis volumes.

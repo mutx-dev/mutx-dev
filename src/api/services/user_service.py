@@ -144,6 +144,22 @@ class UserService:
                 return api_key
         return None
 
+    async def get_user_for_api_key(self, plain_key: str) -> Optional[User]:
+        """Resolve an active user for either legacy user API keys or managed APIKey records."""
+        user = await self.get_user_by_api_key(plain_key)
+        if user and user.is_active:
+            return user
+
+        result = await self.session.execute(select(User).where(User.is_active))
+        users = result.scalars().all()
+
+        for active_user in users:
+            api_key = await self.verify_api_key(plain_key, active_user.id)
+            if api_key:
+                return active_user
+
+        return None
+
     async def update_api_key_last_used(self, api_key_id: uuid.UUID) -> None:
         await self.session.execute(
             update(APIKey).where(APIKey.id == api_key_id).values(last_used=datetime.utcnow())
