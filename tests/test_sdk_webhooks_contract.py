@@ -69,3 +69,21 @@ def test_webhooks_update_maps_legacy_active_to_is_active_field() -> None:
     webhooks.update(webhook_id=uuid.uuid4(), active=False)
 
     assert captured["json"] == {"is_active": False}
+
+
+def test_webhooks_get_events_uses_expected_route_and_query_params() -> None:
+    captured: dict[str, Any] = {}
+    webhook_id = uuid.uuid4()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        captured["query"] = dict(request.url.params)
+        return httpx.Response(200, json=[])
+
+    client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
+    webhooks = Webhooks(client)
+
+    webhooks.get_events(webhook_id=webhook_id, skip=5, limit=10)
+
+    assert captured["path"] == f"/webhooks/{webhook_id}/events"
+    assert captured["query"] == {"skip": "5", "limit": "10"}

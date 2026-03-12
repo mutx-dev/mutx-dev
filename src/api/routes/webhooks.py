@@ -1,17 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, Header, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import func, select
 import uuid
 import logging
 from typing import Optional
 
 from src.api.database import get_db
-from src.api.models import User, Webhook
+from src.api.models import User, Webhook, WebhookDeliveryLog
 from src.api.services.webhook_handler import WebhookEventType as WebhookEvent
 from src.api.models.schemas import (
     WebhookCreate,
     WebhookUpdate,
     WebhookResponse,
+    WebhookDeliveryHistoryResponse,
 )
 from src.api.middleware.auth import get_current_user_or_api_key
 
@@ -105,6 +106,56 @@ async def get_webhook(
         raise HTTPException(status_code=404, detail="Webhook not found")
 
     return webhook
+
+
+@router.get("/{webhook_id}/events", response_model=WebhookDeliveryHistoryResponse)
+async def get_webhook_events(
+    webhook_id: uuid.UUID,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
+    event: Optional[str] = Query(None),
+    success: Optional[bool] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_webhook_auth),
+):
+    """Get paginated delivery history for a webhook owned by the authenticated user."""
+    result = await db.execute(
+        select(Webhook).where(Webhook.id == webhook_id, Webhook.user_id == current_user.id)
+    )
+    webhook = result.scalar_one_or_none()
+
+    if not webhook:
+        raise HTTPException(status_code=404, detail="Webhook not found")
+
+    filters = [WebhookDeliveryLog.webhook_id == webhook.id]
+    if event:
+        filters.append(WebhookDeliveryLog.event == event)
+    if success is not None:
+        filters.append(WebhookDeliveryLog.success == success)
+
+    total_result = await db.execute(
+        select(func.count()).select_from(WebhookDeliveryLog).where(*filters)
+    )
+    total = total_result.scalar_one()
+
+    deliveries_result = await db.execute(
+        select(WebhookDeliveryLog)
+        .where(*filters)
+        .order_by(WebhookDeliveryLog.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    deliveries = deliveries_result.scalars().all()
+
+    return {
+        "webhook_id": webhook.id,
+        "items": deliveries,
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "event": event,
+        "success": success,
+    }
 
 
 @router.patch("/{webhook_id}", response_model=WebhookResponse)
