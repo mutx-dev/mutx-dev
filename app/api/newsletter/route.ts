@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { Resend } from 'resend'
 import sql from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
@@ -9,6 +10,36 @@ type TurnstileVerificationResult = {
   success: boolean
   action?: string
   ['error-codes']?: string[]
+}
+
+const resendApiKey = process.env.RESEND_API_KEY?.trim()
+const resendFromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'MUTX <waitlist@mutx.dev>'
+const resendWaitlistTemplateId = process.env.RESEND_WAITLIST_TEMPLATE_ID?.trim() || 'waitlist'
+const resend = resendApiKey ? new Resend(resendApiKey) : null
+
+function isEmailDeliveryConfigured() {
+  return Boolean(resend && resendFromEmail && resendWaitlistTemplateId)
+}
+
+async function sendWaitlistConfirmationEmail(to: string) {
+  if (!resend) {
+    throw new Error('RESEND_API_KEY is not configured')
+  }
+
+  const result = await resend.emails.send({
+    from: resendFromEmail,
+    to: [to],
+    template: {
+      id: resendWaitlistTemplateId,
+      variables: {},
+    },
+  })
+
+  if (result.error) {
+    throw new Error(result.error.message || 'Resend email send failed')
+  }
+
+  return result
 }
 
 async function ensureTableExists() {
@@ -132,10 +163,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: "You're already on the list!", emailSent: false })
     }
 
+    let emailSent = false
+    let message = "You're on the list!"
+
+    if (isEmailDeliveryConfigured()) {
+      try {
+        await sendWaitlistConfirmationEmail(normalizedEmail)
+        emailSent = true
+        message = "You're on the list. Check your inbox."
+      } catch (emailError) {
+        console.error('Waitlist confirmation email failed:', emailError)
+      }
+    } else {
+      console.warn('Waitlist email delivery skipped: Resend waitlist email is not fully configured')
+    }
+
     return NextResponse.json({
       success: true,
-      message: "You're on the list!",
-      emailSent: false,
+      message,
+      emailSent,
     })
   } catch (error) {
     console.error('Waitlist error:', error)

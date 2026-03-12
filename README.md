@@ -8,14 +8,6 @@
   <strong>Deploy, run, observe, and govern AI agents like you deploy services.</strong>
 </p>
 
-<p align="center">
-  <a href="./MANIFESTO.md"><strong>Our Manifesto</strong></a> ·
-  <a href="./WHITEPAPER.md"><strong>Technical Whitepaper</strong></a> ·
-  <a href="https://mutx.dev"><strong>Live Preview</strong></a> ·
-  <a href="./docs/README.md"><strong>Read Docs</strong></a> ·
-  <a href="https://github.com/fortunexbt/mutx-dev"><strong>GitHub</strong></a>
-</p>
-
 ---
 
 ## Start Here
@@ -105,6 +97,8 @@ task = agent.run_task(
 print(f"Autonomous agent operating: {task.id}")
 ```
 
+Note: `MutxAsyncClient` is currently deprecated until the async resource surface is fully implemented. Prefer `MutxClient` or direct `httpx.AsyncClient` integrations for now.
+
 ---
 
 ## 🗺️ Roadmap & Maturity
@@ -135,7 +129,7 @@ npm install
 pip install -r requirements.txt
 
 # 2. Start infra & services
-docker-compose -f infrastructure/docker/docker-compose.yml up -d postgres redis
+docker compose -f infrastructure/docker/docker-compose.yml up -d postgres redis
 uvicorn src.api.main:app --reload --port 8000
 npm run dev
 ```

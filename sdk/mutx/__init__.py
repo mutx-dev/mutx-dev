@@ -1,3 +1,5 @@
+import warnings
+
 import httpx
 
 from mutx.agent_runtime import (
@@ -98,6 +100,12 @@ class MutxAsyncClient:
         base_url: str = "https://api.mutx.dev",
         timeout: float = 30.0,
     ):
+        warnings.warn(
+            "MutxAsyncClient is deprecated until async resource methods are fully implemented; "
+            "prefer MutxClient or raw httpx.AsyncClient integrations for now.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.api_key = api_key
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout

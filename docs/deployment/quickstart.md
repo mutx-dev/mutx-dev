@@ -31,7 +31,7 @@ DATABASE_URL=postgresql://mutx:mutx_password@localhost:5432/mutx
 ## 2. Start local services
 
 ```bash
-docker-compose up -d postgres redis
+docker compose -f infrastructure/docker/docker-compose.yml up -d postgres redis
 ```
 
 ## 3. Start the API

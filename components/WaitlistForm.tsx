@@ -23,8 +23,8 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
   const [error, setError] = useState('')
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [honeypot, setHoneypot] = useState('')
-  const [turnstileSiteKey, setTurnstileSiteKey] = useState(initialTurnstileSiteKey)
-  const [loadingTurnstileSiteKey, setLoadingTurnstileSiteKey] = useState(!initialTurnstileSiteKey)
+  const [turnstileSiteKey, setTurnstileSiteKey] = useState('')
+  const [loadingTurnstileSiteKey, setLoadingTurnstileSiteKey] = useState(true)
   const turnstileRef = useRef<BoundTurnstileObject | null>(null)
 
   useEffect(() => {
@@ -56,10 +56,6 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
   }, [])
 
   useEffect(() => {
-    if (initialTurnstileSiteKey) {
-      return
-    }
-
     let cancelled = false
 
     async function loadTurnstileSiteKey() {
@@ -73,7 +69,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
         }
       } catch {
         if (!cancelled) {
-          setTurnstileSiteKey('')
+          setTurnstileSiteKey(initialTurnstileSiteKey)
         }
       } finally {
         if (!cancelled) {
@@ -134,9 +130,10 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
       setSuccessMessage(
         alreadyJoined
           ? payload.message || "You're already on the list!"
-          : emailSent
-            ? payload.message || "You're on the list. Check your inbox."
-            : "You're on the list. Email delivery is not configured in this environment yet."
+          : payload.message
+            || (emailSent
+              ? "You're on the list. Check your inbox."
+              : "You're on the list.")
       )
 
       if (!alreadyJoined) {

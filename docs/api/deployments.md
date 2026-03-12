@@ -1,12 +1,12 @@
 # Deployments API
 
-Deployment records are exposed through `/deployments`, but creation currently happens through the agent deploy route.
+Deployment records are exposed through `/deployments`, and creation is currently available both through `/deployments` and the agent deploy route.
 
 ## Current Implementation Notes
 
-- There is no `POST /deployments` route in the current FastAPI app.
-- Create deployments with `POST /agents/{agent_id}/deploy`.
-- There are no deployment restart, logs, or metrics routes today.
+- `POST /deployments` creates a deployment when given an owned `agent_id`.
+- `POST /agents/{agent_id}/deploy` is still available as the agent-centric create path.
+- Deployment restart, logs, and metrics routes exist in the current FastAPI app.
 - `POST /deployments/{deployment_id}/scale` only succeeds when the deployment status is `running` or `ready`.
 
 ## Routes
@@ -14,8 +14,12 @@ Deployment records are exposed through `/deployments`, but creation currently ha
 | Route | Purpose |
 |------|---------|
 | `GET /deployments` | List deployments |
+| `POST /deployments` | Create a deployment for an owned agent |
 | `GET /deployments/{deployment_id}` | Get one deployment |
 | `GET /deployments/{deployment_id}/events` | Get paginated lifecycle history for one deployment |
+| `GET /deployments/{deployment_id}/logs` | Get deployment logs |
+| `GET /deployments/{deployment_id}/metrics` | Get deployment metrics |
+| `POST /deployments/{deployment_id}/restart` | Restart a stopped or failed deployment |
 | `POST /deployments/{deployment_id}/scale` | Change replica count |
 | `DELETE /deployments/{deployment_id}` | Mark deployment as killed |
 
@@ -28,6 +32,14 @@ curl -X POST "$BASE_URL/agents/YOUR_AGENT_ID/deploy"
 ```
 
 That returns a deployment id you can use with the routes below.
+
+Direct deployment creation is also available:
+
+```bash
+curl -X POST "$BASE_URL/deployments" \
+  -H "Content-Type: application/json" \
+  -d '{"agent_id": "YOUR_AGENT_ID", "replicas": 1}'
+```
 
 ## List Deployments
 
@@ -116,6 +128,26 @@ curl -X POST "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/scale" \
 ```
 
 If the deployment is not `running` or `ready`, the API returns `400` with `Can only scale running deployments`.
+
+## Restart a Deployment
+
+```bash
+curl -X POST "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/restart"
+```
+
+Current implementation note: restart only succeeds from `stopped` or `failed` deployment states.
+
+## Deployment Logs
+
+```bash
+curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/logs?limit=50"
+```
+
+## Deployment Metrics
+
+```bash
+curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/metrics?limit=50"
+```
 
 ## Delete a Deployment
 

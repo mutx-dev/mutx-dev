@@ -9,7 +9,7 @@ This matrix tracks the current repo state and where contributors can help next.
 | Web | Strong marketing surface and a clean app-facing teaser | app surface is still mostly static | authenticated dashboard basics, app data fetching, contact capture |
 | API | Real auth, agent, deployment, webhook, health, and readiness routes | auth and ownership are not consistently enforced outside `/auth/*` | route auth, ownership checks, typed schemas, route tests |
 | CLI | usable for auth, status, listing, and some deploy flows | create and some deploy commands still reflect older contracts | align command payloads and route paths, improve auth ergonomics |
-| SDK | useful foundation and packaging | defaults and supported methods do not fully match the server | shrink to supported methods or add missing API routes |
+| SDK | useful foundation and packaging | defaults and supported methods do not fully match the server; `MutxAsyncClient` is currently deprecated until the async resource surface is real | shrink to supported methods or add missing API routes |
 | Infra | Terraform, Ansible, Docker, and deployment docs exist | validation and confidence loops are thin | CI validation, syntax checks, infra docs cleanup |
 | Tests and CI | lint/build commands and a basic GitHub Actions workflow exist | backend tests are improving, but CI truth still depends on keeping Playwright/test assumptions aligned with supported hosted behavior | route tests, local-first Playwright, stronger CI coverage, validation ownership docs |
 | Docs | current-state docs are much more honest than before | still need ongoing drift control | examples, contribution docs, roadmap-linked issue shaping |
@@ -47,6 +47,7 @@ This matrix tracks the current repo state and where contributors can help next.
 
 - remove unsupported assumptions
 - align default base URLs and method coverage
+- keep `MutxAsyncClient` deprecation and docs honest until async method coverage is real
 - add a supported-method matrix with tests
 
 ### `area:testing`

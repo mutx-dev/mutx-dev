@@ -70,6 +70,7 @@ mutx status
 | `mutx agents deploy` | reliable | uses `POST /agents/{id}/deploy` |
 | `mutx agents delete` | reliable | uses `DELETE /agents/{id}` |
 | `mutx deploy list` | reliable | uses `GET /deployments` |
+| `mutx deploy events` | reliable | uses `GET /deployments/{id}/events` |
 | `mutx deploy scale` | reliable | uses `POST /deployments/{id}/scale` |
 | `mutx deploy delete` | reliable | uses `DELETE /deployments/{id}` |
 

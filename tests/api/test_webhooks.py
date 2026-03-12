@@ -4,16 +4,13 @@ import uuid
 
 from src.api.models.models import WebhookDeliveryLog
 
+
 @pytest.mark.asyncio
 async def test_webhook_lifecycle(client: AsyncClient, test_user):
     # 1. Create Webhook
     response = await client.post(
         "/webhooks/",
-        json={
-            "url": "https://example.com/webhook",
-            "events": ["agent.*"],
-            "secret": "test-secret"
-        }
+        json={"url": "https://example.com/webhook", "events": ["agent.*"], "secret": "test-secret"},
     )
     assert response.status_code == 201
     webhook = response.json()
@@ -34,8 +31,7 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
 
     # 4. Update Webhook
     response = await client.patch(
-        f"/webhooks/{webhook_id}",
-        json={"url": "https://example.com/updated", "is_active": False}
+        f"/webhooks/{webhook_id}", json={"url": "https://example.com/updated", "is_active": False}
     )
     assert response.status_code == 200
     data = response.json()
@@ -49,6 +45,7 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
     # 6. Verify Deletion
     response = await client.get(f"/webhooks/{webhook_id}")
     assert response.status_code == 404
+
 
 @pytest.mark.asyncio
 async def test_webhook_unauthorized(client_no_auth: AsyncClient):
@@ -86,19 +83,22 @@ async def test_webhook_other_user_forbidden(
     test_response = await other_user_client.post(f"/webhooks/{webhook_id}/test")
     assert test_response.status_code == 403
 
+
 @pytest.mark.asyncio
 async def test_webhook_test_trigger(client: AsyncClient, test_user, monkeypatch):
     # Mock deliver_webhook_with_retry
     import src.api.services.webhook_service
+
     async def mock_deliver(*args, **kwargs):
         return True
-    
-    monkeypatch.setattr(src.api.services.webhook_service, "deliver_webhook_with_retry", mock_deliver)
-    
+
+    monkeypatch.setattr(
+        src.api.services.webhook_service, "deliver_webhook_with_retry", mock_deliver
+    )
+
     # Create
     response = await client.post(
-        "/webhooks/",
-        json={"url": "https://example.com/webhook", "events": ["*"]}
+        "/webhooks/", json={"url": "https://example.com/webhook", "events": ["*"]}
     )
     webhook_id = response.json()["id"]
 
@@ -138,12 +138,49 @@ async def test_webhook_delivery_history_filters(client: AsyncClient, db_session,
     )
     await db_session.commit()
 
-    response = await client.get(f"/webhooks/{webhook_id}/deliveries?event=agent.status&success=false")
+    response = await client.get(
+        f"/webhooks/{webhook_id}/deliveries?event=agent.status&success=false"
+    )
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 1
     assert data[0]["event"] == "agent.status"
     assert data[0]["success"] is False
+
+
+@pytest.mark.asyncio
+async def test_webhook_delivery_history_supports_legacy_user_api_key_auth(
+    client: AsyncClient, client_no_auth: AsyncClient, db_session, test_user
+):
+    create_response = await client.post(
+        "/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["*"]},
+    )
+    assert create_response.status_code == 201
+    webhook_id = uuid.UUID(create_response.json()["id"])
+
+    test_user.api_key = "legacy-webhook-key"
+    db_session.add(test_user)
+    db_session.add(
+        WebhookDeliveryLog(
+            webhook_id=webhook_id,
+            event="agent.heartbeat",
+            payload='{"status":"running"}',
+            success=True,
+            attempts=1,
+        )
+    )
+    await db_session.commit()
+
+    response = await client_no_auth.get(
+        f"/webhooks/{webhook_id}/deliveries",
+        headers={"X-API-Key": "legacy-webhook-key"},
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["event"] == "agent.heartbeat"
 
 
 @pytest.mark.asyncio
