@@ -18,6 +18,7 @@ from src.api.routes import (
     api_keys,
     newsletter,
     agent_runtime,
+    ingest,
 )
 from src.api.metrics import router as metrics_router, track_request
 from src.api.services.monitor import start_background_monitor
@@ -136,6 +137,7 @@ app.include_router(clawhub.router)
 app.include_router(api_keys.router)
 app.include_router(newsletter.router)
 app.include_router(agent_runtime.router)
+app.include_router(ingest.router)
 
 
 @app.get("/health", response_model=HealthResponse)

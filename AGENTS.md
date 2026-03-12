@@ -1,5 +1,5 @@
 # AGENTS.md
-Repo guidance for agentic coding agents working in `/Users/fortune/MUTX/mutx-dev`.
+Repo guidance for agentic coding agents working in `/Users/fortune/MUTX`.
 
 ## Rule Files
 - No `.cursorrules` file exists.
@@ -155,6 +155,20 @@ make -C infrastructure monitor-validate
 - Good backend validation: `ruff check src/api/routes/agents.py`, `./.venv/bin/python -m pytest tests/api/test_agents.py::TestCreateAgent::test_create_agent_success -q`, and `python -m compileall src/api`.
 - Good frontend validation: `npm run build` and `npx playwright test tests/website.spec.ts -g "homepage loads and has working waitlist"`.
 - If you change infra code, use the matching `make -C infrastructure ...` target instead of ad hoc commands when possible.
+
+## OpenCode / Autonomous Execution
+- OpenCode is authorized to operate in high-agency mode on this repo.
+- Prefer speed, momentum, and continuous shipping over conservative permission friction when the work is recoverable through git history, branches, PRs, or reverts.
+- PR-first always. Never merge directly to `main` unless Fortune explicitly asks.
+- Every PR should get a comment tagging `@codex please review`.
+- Empty queue is a failure state: never allow both open issues and open PRs to hit zero at the same time.
+- Zero open PRs while open issues exist is also a failure state: convert the top issue into a live PR or draft PR immediately.
+- If the queue gets thin, open the next roadmap-backed issues immediately.
+- If `ROADMAP.md` is stale, update it like a senior engineer / CTO.
+- Fix CI or fix the code, but do not normalize living in red.
+- Keep changes small, reviewable, and truthful.
+- When blocked by external path/tool friction, prefer continuing inside the canonical repo path or report the exact blocker fast.
+- Default autonomous loop: inspect → execute → validate → PR → tag `@codex` → report → repeat.
 
 ## Defaults
 - Trust source over docs.
