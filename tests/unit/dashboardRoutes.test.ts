@@ -95,4 +95,18 @@ describe('dashboard route proxies', () => {
       detail: 'database unavailable',
     })
   })
+
+  it('returns a fallback health payload when the health proxy throws', async () => {
+    ;(global.fetch as jest.Mock).mockRejectedValue(new Error('socket hang up'))
+
+    const { GET } = await import('../../app/api/dashboard/health/route')
+
+    const response = await GET()
+
+    expect(response.status).toBe(500)
+    await expect(response.json()).resolves.toEqual({
+      status: 'unknown',
+      error: 'Failed to connect to API',
+    })
+  })
 })
