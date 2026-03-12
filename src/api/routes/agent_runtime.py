@@ -12,6 +12,7 @@ These endpoints are used by agents to connect to MUTX:
 """
 
 import logging
+import json
 import uuid
 from datetime import datetime
 from typing import Any, Optional
@@ -145,7 +146,7 @@ async def register_agent(
         name=request.name,
         description=request.description or "",
         status=AgentStatus.RUNNING.value,
-        config=(__import__("json").dumps(request.metadata) if request.metadata else None),
+        config=json.dumps(request.metadata) if request.metadata else None,
         api_key=agent_api_key,
         user_id=current_user.id,
     )
