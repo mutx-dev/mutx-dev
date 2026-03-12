@@ -11,6 +11,12 @@ function mockRequest() {
   return {} as NextRequest
 }
 
+function mockJsonRequest(body: unknown) {
+  return {
+    json: async () => body,
+  } as NextRequest
+}
+
 describe('API key route proxies', () => {
   beforeEach(() => {
     getAuthToken.mockReset()
@@ -105,6 +111,38 @@ describe('API key route proxies', () => {
       id: 'key_456',
       name: 'rotated-key',
       key: 'mutx_live_rotated',
+    })
+  })
+
+  it('preserves successful create responses for the dashboard proxy', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 201,
+      json: async () => ({
+        id: 'key_789',
+        name: 'build-key',
+        key: 'mutx_live_created',
+      }),
+    })
+
+    const { POST } = await import('../../app/api/api-keys/route')
+
+    const response = await POST(mockJsonRequest({ name: 'build-key' }))
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: 'build-key' }),
+    })
+    expect(response.status).toBe(201)
+    await expect(response.json()).resolves.toEqual({
+      id: 'key_789',
+      name: 'build-key',
+      key: 'mutx_live_created',
     })
   })
 })
