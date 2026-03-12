@@ -61,7 +61,7 @@ class ClawHub:
             json={"agent_id": str(agent_id), "skill_id": skill_id},
         )
         response.raise_for_status()
-        return await response.json()
+        return response.json()
 
     def uninstall_skill(self, agent_id: UUID | str, skill_id: str) -> dict[str, Any]:
         """Removes a skill from an agent's configuration."""
@@ -83,4 +83,4 @@ class ClawHub:
             json={"agent_id": str(agent_id), "skill_id": skill_id},
         )
         response.raise_for_status()
-        return await response.json()
+        return response.json()
