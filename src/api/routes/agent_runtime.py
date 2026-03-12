@@ -359,21 +359,27 @@ async def submit_log(
 async def get_agent_status(
     agent_id: str,
     db: AsyncSession = Depends(get_db),
+    agent: Agent = Depends(get_current_agent),
 ):
-    """Get agent status."""
-    result = await db.execute(select(Agent).where(Agent.id == uuid.UUID(agent_id)))
-    agent = result.scalar_one_or_none()
+    """Get status for the authenticated agent."""
+    if str(agent.id) != agent_id:
+        raise HTTPException(status_code=403, detail="Agent ID mismatch")
 
-    if not agent:
+    result = await db.execute(select(Agent).where(Agent.id == agent.id))
+    current_agent = result.scalar_one_or_none()
+
+    if not current_agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
     uptime = 0.0
-    if agent.created_at:
-        uptime = (datetime.utcnow() - agent.created_at).total_seconds()
+    if current_agent.created_at:
+        uptime = (datetime.utcnow() - current_agent.created_at).total_seconds()
 
     return AgentStatusResponse(
-        agent_id=str(agent.id),
-        status=agent.status,
-        last_heartbeat=agent.last_heartbeat.isoformat() if agent.last_heartbeat else None,
+        agent_id=str(current_agent.id),
+        status=current_agent.status,
+        last_heartbeat=(
+            current_agent.last_heartbeat.isoformat() if current_agent.last_heartbeat else None
+        ),
         uptime_seconds=uptime,
     )

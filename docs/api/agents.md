@@ -2,6 +2,8 @@
 
 The agents routes manage agent records, deployments, logs, and metrics.
 
+Runtime-facing agent endpoints such as heartbeat, command polling, log submission, and `GET /agents/{agent_id}/status` use the agent API key as a bearer token. Control-plane users should use the standard `GET /agents/{agent_id}` route instead.
+
 ## Current Implementation Notes
 
 - Routes are mounted at `/agents`, not `/v1/agents`.
@@ -16,6 +18,7 @@ The agents routes manage agent records, deployments, logs, and metrics.
 | `POST /agents` | Create an agent record |
 | `GET /agents` | List agents |
 | `GET /agents/{agent_id}` | Get one agent with deployments |
+| `GET /agents/{agent_id}/status` | Get runtime status for the authenticated agent |
 | `DELETE /agents/{agent_id}` | Delete an agent |
 | `POST /agents/{agent_id}/deploy` | Create a deployment record and mark the agent running |
 | `POST /agents/{agent_id}/stop` | Stop active deployments for an agent |
@@ -73,6 +76,17 @@ curl "$BASE_URL/agents/YOUR_AGENT_ID"
 ```
 
 The detail response includes a `deployments` array.
+
+## Get Runtime Status
+
+This runtime endpoint is only for the authenticated agent itself.
+
+```bash
+curl "$BASE_URL/agents/YOUR_AGENT_ID/status" \
+  -H "Authorization: Bearer YOUR_AGENT_API_KEY"
+```
+
+If the bearer token belongs to a different agent, the API returns `403 Agent ID mismatch`.
 
 ## Deploy an Agent
 
