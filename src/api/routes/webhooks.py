@@ -6,7 +6,8 @@ import logging
 from typing import Optional
 
 from src.api.database import get_db
-from src.api.models import User, Webhook, WebhookEvent
+from src.api.models import User, Webhook
+from src.api.services.webhook_handler import WebhookEventType as WebhookEvent
 from src.api.models.schemas import (
     WebhookCreate,
     WebhookUpdate,
