@@ -50,6 +50,9 @@ async def create_webhook(
     # Validate events
     allowed_events = [e.value for e in WebhookEvent]
     for event in webhook_data.events:
+        if event == "*":
+            continue
+
         if event not in allowed_events:
             # Check for prefix.* wildcards
             if not any(
@@ -57,7 +60,7 @@ async def create_webhook(
             ):
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Invalid event: {event}. Supported events: {allowed_events}",
+                    detail=f"Invalid event: {event}. Supported events: {allowed_events} and '*'",
                 )
 
     webhook = Webhook(
@@ -129,6 +132,9 @@ async def update_webhook(
     if webhook_data.events is not None:
         allowed_events = [e.value for e in WebhookEvent]
         for event in webhook_data.events:
+            if event == "*":
+                continue
+
             if event not in allowed_events:
                 # Check for prefix.* wildcards
                 if not any(
@@ -136,7 +142,7 @@ async def update_webhook(
                 ):
                     raise HTTPException(
                         status_code=400,
-                        detail=f"Invalid event: {event}. Supported events: {allowed_events}",
+                        detail=f"Invalid event: {event}. Supported events: {allowed_events} and '*'",
                     )
         webhook.events = webhook_data.events
 
