@@ -13,13 +13,13 @@ test.describe('mutx.dev QA', () => {
     await expect(h1).toBeVisible({ timeout: 10000 });
 
     // Check waitlist form exists
-    const emailInput = page.locator('input[type="email"]').first();
+    const emailInput = page.locator('input[type=\"email\"]').first();
     await expect(emailInput).toBeVisible();
 
     const waitlistForm = page.getByTestId('waitlist-form-hero');
     await expect(waitlistForm).toBeVisible();
 
-    const submitBtn = waitlistForm.locator('button[type="submit"]');
+    const submitBtn = waitlistForm.locator('button[type=\"submit\"]');
     await expect(submitBtn).toBeVisible();
   });
 
@@ -40,7 +40,9 @@ test.describe('mutx.dev QA', () => {
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(2000);
 
-    const criticalErrors = errors.filter((e) => !e.includes('favicon') && !e.includes('404'));
+    const isBenignError = (error: string) =>
+      /favicon\\.ico/i.test(error) || /favicon/i.test(error);
+    const criticalErrors = errors.filter((error) => !isBenignError(error));
 
     expect(criticalErrors, 'Console errors: ' + criticalErrors.join('; ')).toHaveLength(0);
   });
