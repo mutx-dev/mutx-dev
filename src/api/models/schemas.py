@@ -44,7 +44,7 @@ class AgentCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=1000)
     type: AgentType = Field(default=AgentType.OPENAI)
-    config: Optional[dict[str, Any] | str] = None
+    config: Optional[dict[str, Any]] = None
     # user_id is set from current_user in the route, not from request body
 
 
@@ -117,7 +117,7 @@ class AgentResponse(BaseModel):
     name: str
     description: Optional[str]
     status: str
-    config: Optional[str]
+    config: Optional[dict[str, Any]]
     created_at: datetime
     updated_at: datetime
     user_id: uuid.UUID

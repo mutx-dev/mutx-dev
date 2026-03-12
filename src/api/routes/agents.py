@@ -95,12 +95,21 @@ def _serialize_deployment(deployment: Deployment):
 
 
 def _serialize_agent(agent: Agent, include_deployments: bool = False):
+    config_dict = None
+    if agent.config:
+        try:
+            config_dict = (
+                json.loads(agent.config) if isinstance(agent.config, str) else agent.config
+            )
+        except json.JSONDecodeError:
+            config_dict = {"raw_config": agent.config}
+
     payload = {
         "id": agent.id,
         "name": agent.name,
         "description": agent.description,
         "status": agent.status,
-        "config": agent.config,
+        "config": config_dict,
         "created_at": agent.created_at,
         "updated_at": agent.updated_at,
         "user_id": agent.user_id,
