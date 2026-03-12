@@ -5,7 +5,6 @@ import asyncio
 from collections.abc import AsyncGenerator
 import os
 import uuid
-from datetime import datetime
 
 import pytest
 import pytest_asyncio
@@ -35,7 +34,7 @@ def compile_uuid_sqlite(_type, _compiler, **_kw):
 
 def create_test_app() -> FastAPI:
     """Create a test FastAPI application."""
-    from src.api.routes import agents, deployments, api_keys, auth, webhooks, clawhub, agent_runtime, newsletter, ingest
+    from src.api.routes import agents, deployments, api_keys, auth, webhooks, clawhub, agent_runtime, newsletter, ingest, leads
     
     app = FastAPI(title="MUTX Test API")
     
@@ -48,6 +47,7 @@ def create_test_app() -> FastAPI:
     app.include_router(clawhub.router)
     app.include_router(agent_runtime.router)
     app.include_router(newsletter.router)
+    app.include_router(leads.router)
     app.include_router(ingest.router)
     
     # Health check endpoint
