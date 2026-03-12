@@ -38,11 +38,16 @@ echo "Generating frontend API types..."
 npm run generate-types
 
 echo ""
-echo "Running frontend build check..."
-npm run build
+echo "Checking generated frontend API types are committed..."
+git diff --exit-code -- app/types/api.ts
 
 echo ""
-echo "Skipping frontend lint: current ESLint setup is known broken in this repo."
+echo "Running frontend lint..."
+npm run lint
+
+echo ""
+echo "Running frontend build check..."
+npm run build
 
 echo ""
 echo "Validation complete!"
