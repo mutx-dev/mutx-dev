@@ -1,53 +1,68 @@
 """
 Tests for /api-keys endpoints.
 """
-import pytest
-import pytest_asyncio
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
+
 import uuid
 
+import pytest
+from httpx import AsyncClient
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.api.models.models import APIKey
+from src.api.routes.api_keys import MAX_ACTIVE_API_KEYS_PER_USER, hash_key
 
 
 class TestListAPIKeys:
     """Tests for GET /api-keys endpoint."""
-    
+
     @pytest.mark.asyncio
     async def test_list_api_keys_empty(self, client: AsyncClient):
         """Test listing API keys when none exist."""
         response = await client.get("/api-keys")
         assert response.status_code == 200
         assert response.json() == []
-    
+
     @pytest.mark.asyncio
     async def test_list_api_keys_with_data(
         self, client: AsyncClient, db_session: AsyncSession, test_user
     ):
-        """Test listing API keys returns user's keys."""
-        # Create an API key
-        key = APIKey(
+        """Test listing API keys returns only the current user's keys in reverse chronological order."""
+        older_key = APIKey(
             id=uuid.uuid4(),
             user_id=test_user.id,
-            key_hash="hashed_key",
-            name="test-key",
+            key_hash="older_hash",
+            name="older-key",
             is_active=True,
         )
-        db_session.add(key)
+        db_session.add(older_key)
         await db_session.commit()
-        
+
+        newer_key = APIKey(
+            id=uuid.uuid4(),
+            user_id=test_user.id,
+            key_hash="newer_hash",
+            name="newer-key",
+            is_active=False,
+        )
+        db_session.add(newer_key)
+        await db_session.commit()
+
         response = await client.get("/api-keys")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 1
-        assert data[0]["name"] == "test-key"
+        assert [item["name"] for item in data] == ["newer-key", "older-key"]
+        assert data[0]["is_active"] is False
+        assert data[1]["is_active"] is True
 
 
 class TestCreateAPIKey:
     """Tests for POST /api-keys endpoint."""
-    
+
     @pytest.mark.asyncio
-    async def test_create_api_key_success(self, client: AsyncClient):
+    async def test_create_api_key_success(
+        self, client: AsyncClient, db_session: AsyncSession, test_user
+    ):
         """Test creating an API key successfully."""
         response = await client.post(
             "/api-keys",
@@ -61,7 +76,14 @@ class TestCreateAPIKey:
         assert data["name"] == "new-key"
         assert "key" in data
         assert data["key"].startswith("mutx_live_")
-    
+
+        result = await db_session.execute(select(APIKey).where(APIKey.user_id == test_user.id))
+        stored_key = result.scalar_one()
+        assert stored_key.name == "new-key"
+        assert stored_key.key_hash == hash_key(data["key"])
+        assert stored_key.is_active is True
+        assert stored_key.expires_at is not None
+
     @pytest.mark.asyncio
     async def test_create_api_key_minimal(self, client: AsyncClient):
         """Test creating an API key with minimal data."""
@@ -72,15 +94,57 @@ class TestCreateAPIKey:
         assert response.status_code == 201
         assert response.json()["name"] == "minimal-key"
 
+    @pytest.mark.asyncio
+    async def test_create_api_key_enforces_active_limit(
+        self, client: AsyncClient, db_session: AsyncSession, test_user
+    ):
+        """Test that creating an API key fails once the active key limit is reached."""
+        for index in range(MAX_ACTIVE_API_KEYS_PER_USER):
+            db_session.add(
+                APIKey(
+                    id=uuid.uuid4(),
+                    user_id=test_user.id,
+                    key_hash=f"hash-{index}",
+                    name=f"key-{index}",
+                    is_active=True,
+                )
+            )
+        await db_session.commit()
+
+        response = await client.post("/api-keys", json={"name": "overflow-key"})
+        assert response.status_code == 409
+        assert "Active API key limit reached" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_create_api_key_ignores_revoked_keys_for_limit(
+        self, client: AsyncClient, db_session: AsyncSession, test_user
+    ):
+        """Test that revoked keys do not count against the active key limit."""
+        for index in range(MAX_ACTIVE_API_KEYS_PER_USER):
+            db_session.add(
+                APIKey(
+                    id=uuid.uuid4(),
+                    user_id=test_user.id,
+                    key_hash=f"hash-{index}",
+                    name=f"key-{index}",
+                    is_active=index != 0,
+                )
+            )
+        await db_session.commit()
+
+        response = await client.post("/api-keys", json={"name": "replacement-key"})
+        assert response.status_code == 201
+        assert response.json()["name"] == "replacement-key"
+
 
 class TestRevokeAPIKey:
     """Tests for DELETE /api-keys/{key_id} endpoint."""
-    
+
     @pytest.mark.asyncio
     async def test_revoke_api_key_success(
         self, client: AsyncClient, db_session: AsyncSession, test_user
     ):
-        """Test revoking an API key."""
+        """Test revoking an API key marks it inactive instead of deleting it."""
         key = APIKey(
             id=uuid.uuid4(),
             user_id=test_user.id,
@@ -90,20 +154,42 @@ class TestRevokeAPIKey:
         )
         db_session.add(key)
         await db_session.commit()
-        
+
         response = await client.delete(f"/api-keys/{key.id}")
         assert response.status_code == 204
-        
-        # Verify it's gone
+
         result = await db_session.get(APIKey, key.id)
-        assert result is None
-    
+        assert result is not None
+        assert result.is_active is False
+
+    @pytest.mark.asyncio
+    async def test_revoke_api_key_is_idempotent(
+        self, client: AsyncClient, db_session: AsyncSession, test_user
+    ):
+        """Test revoking an already revoked API key stays a no-op."""
+        key = APIKey(
+            id=uuid.uuid4(),
+            user_id=test_user.id,
+            key_hash="hashed_key",
+            name="already-revoked",
+            is_active=False,
+        )
+        db_session.add(key)
+        await db_session.commit()
+
+        response = await client.delete(f"/api-keys/{key.id}")
+        assert response.status_code == 204
+
+        result = await db_session.get(APIKey, key.id)
+        assert result is not None
+        assert result.is_active is False
+
     @pytest.mark.asyncio
     async def test_revoke_api_key_not_found(self, client: AsyncClient):
         """Test revoking non-existent API key returns 404."""
         response = await client.delete(f"/api-keys/{uuid.uuid4()}")
         assert response.status_code == 404
-    
+
     @pytest.mark.asyncio
     async def test_revoke_other_user_forbidden(
         self, client: AsyncClient, db_session: AsyncSession, other_user
@@ -118,19 +204,19 @@ class TestRevokeAPIKey:
         )
         db_session.add(key)
         await db_session.commit()
-        
+
         response = await client.delete(f"/api-keys/{key.id}")
-        assert response.status_code == 404  # Not found for this user
+        assert response.status_code == 404
 
 
 class TestRotateAPIKey:
     """Tests for POST /api-keys/{key_id}/rotate endpoint."""
-    
+
     @pytest.mark.asyncio
     async def test_rotate_api_key_success(
         self, client: AsyncClient, db_session: AsyncSession, test_user
     ):
-        """Test rotating an API key."""
+        """Test rotating an API key revokes the old record and creates a new one."""
         key = APIKey(
             id=uuid.uuid4(),
             user_id=test_user.id,
@@ -140,14 +226,42 @@ class TestRotateAPIKey:
         )
         db_session.add(key)
         await db_session.commit()
-        
+
         response = await client.post(f"/api-keys/{key.id}/rotate")
         assert response.status_code == 200
         data = response.json()
         assert data["name"] == "to-rotate"
         assert "key" in data
         assert data["key"].startswith("mutx_live_")
-        
-        # Verify old key is gone
-        result = await db_session.get(APIKey, key.id)
-        assert result is None
+        assert data["id"] != str(key.id)
+
+        old_record = await db_session.get(APIKey, key.id)
+        assert old_record is not None
+        assert old_record.is_active is False
+
+        result = await db_session.execute(select(APIKey).where(APIKey.user_id == test_user.id))
+        keys = result.scalars().all()
+        assert len(keys) == 2
+        active_keys = [item for item in keys if item.is_active]
+        assert len(active_keys) == 1
+        assert active_keys[0].name == "to-rotate"
+        assert active_keys[0].key_hash == hash_key(data["key"])
+
+    @pytest.mark.asyncio
+    async def test_rotate_revoked_api_key_conflicts(
+        self, client: AsyncClient, db_session: AsyncSession, test_user
+    ):
+        """Test rotating a revoked API key returns a conflict."""
+        key = APIKey(
+            id=uuid.uuid4(),
+            user_id=test_user.id,
+            key_hash="old_hash",
+            name="revoked-key",
+            is_active=False,
+        )
+        db_session.add(key)
+        await db_session.commit()
+
+        response = await client.post(f"/api-keys/{key.id}/rotate")
+        assert response.status_code == 409
+        assert "already revoked" in response.json()["detail"]
