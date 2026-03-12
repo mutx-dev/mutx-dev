@@ -31,11 +31,7 @@ curl https://api.mutx.dev/api-keys \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-<<<<<<< HEAD
-The dashboard uses the same list route through its Next.js proxy before rendering the API key panel.
-=======
-The dashboard reads the same route through its Next.js proxy before rendering the API key panel.
->>>>>>> origin/main
+The dashboard uses the same list route through its Next.js proxy before rendering the API key panel. If the dashboard session is missing, the proxy returns `401 Unauthorized` without calling the backend.
 
 ### Create Key
 
@@ -60,7 +56,7 @@ curl -X POST https://api.mutx.dev/api-keys \
   -d '{"name":"Production Deployer","expires_in_days":30}'
 ```
 
-The dashboard uses the same create route and reveals the new plain-text key once after a successful response.
+The dashboard uses the same create route and reveals the new plain-text key once after a successful response. If the backend rejects creation, the proxy preserves the upstream error payload.
 
 ### Rotate Key
 
@@ -93,6 +89,15 @@ curl -X DELETE https://api.mutx.dev/api-keys/YOUR_KEY_ID \
 ```
 
 The dashboard uses the same revoke route and refreshes the key list after deletion. If the dashboard session is missing, the proxy returns `401 Unauthorized` without calling the backend.
+
+## Dashboard Proxy Summary
+
+The website proxy routes under `app/api/api-keys/**` intentionally preserve the live backend contract:
+
+- missing dashboard auth returns `401`
+- successful create and rotate responses return the one-time plain-text key payload
+- successful revoke responses preserve `204 No Content`
+- upstream `403` or validation errors are passed through instead of being rewritten
 
 ## Security Best Practices
 
