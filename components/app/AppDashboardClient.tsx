@@ -245,6 +245,27 @@ export function AppDashboardClient() {
     }
   }
 
+  async function handleRotateKey(keyId: string) {
+    setLoading(true);
+    setError("");
+
+    try {
+      const payload = await readJson<CreateKeyResponse>(`/api/api-keys/${keyId}/rotate`, {
+        method: "POST",
+      });
+      setCreatedKey(payload);
+      await loadDashboard();
+    } catch (nextError) {
+      setError(
+        nextError instanceof Error
+          ? nextError.message
+          : "Failed to rotate API key",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
   if (!user) {
     return (
       <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
@@ -660,14 +681,24 @@ export function AppDashboardClient() {
                       </span>
                     </div>
                     {apiKey.is_active ? (
-                      <button
-                        type="button"
-                        onClick={() => handleRevokeKey(apiKey.id)}
-                        disabled={loading}
-                        className="rounded border border-rose-500/30 px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-rose-300 transition hover:border-rose-400 hover:text-rose-200 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        Revoke
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleRotateKey(apiKey.id)}
+                          disabled={loading}
+                          className="rounded border border-cyan-500/30 px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Rotate
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRevokeKey(apiKey.id)}
+                          disabled={loading}
+                          className="rounded border border-rose-500/30 px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-rose-300 transition hover:border-rose-400 hover:text-rose-200 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Revoke
+                        </button>
+                      </div>
                     ) : null}
                   </div>
                 ))
