@@ -38,6 +38,10 @@ echo "Generating frontend API types..."
 npm run generate-types
 
 echo ""
+echo "Running app-level frontend unit tests..."
+npm run test:app
+
+echo ""
 echo "Checking generated frontend API types are committed..."
 git diff --exit-code -- app/types/api.ts
 
