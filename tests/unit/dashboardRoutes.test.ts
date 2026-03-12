@@ -47,6 +47,37 @@ describe('dashboard route proxies', () => {
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
   })
 
+  it('preserves successful list responses for dashboard agents proxy', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ([
+        {
+          id: 'agent_123',
+          name: 'runtime-agent',
+          status: 'running',
+        },
+      ]),
+    })
+    const { GET } = await import('../../app/api/dashboard/agents/route')
+
+    const response = await GET(mockRequest())
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/agents?limit=20', {
+      headers: { Authorization: 'Bearer token' },
+      cache: 'no-store',
+    })
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual([
+      {
+        id: 'agent_123',
+        name: 'runtime-agent',
+        status: 'running',
+      },
+    ])
+  })
+
   it('preserves upstream forbidden responses for dashboard deployments proxy', async () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock).mockResolvedValue({
