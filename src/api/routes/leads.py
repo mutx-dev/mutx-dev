@@ -5,9 +5,19 @@ from typing import List
 import uuid
 
 from src.api.database import get_db
-from src.api.models.models import Lead, User
+from src.api.models.models import Lead, Plan, User
 from src.api.models.schemas import LeadCreate, LeadResponse
 from src.api.middleware.auth import get_current_user
+
+
+def _assert_internal_user(current_user: User) -> None:
+    """Restrict sensitive lead read access to internal/non-free users."""
+    if current_user.plan == Plan.FREE:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Leads access is restricted to internal users",
+        )
+
 
 router = APIRouter(prefix="/leads", tags=["leads"])
 
@@ -45,7 +55,7 @@ async def list_leads(
     List captured leads.
     Restricted to authenticated users (internal/admin use).
     """
-    # In a real app, we might check if user is admin
+    _assert_internal_user(current_user)
     result = await db.execute(
         select(Lead).order_by(Lead.created_at.desc()).offset(skip).limit(limit)
     )
@@ -60,6 +70,7 @@ async def get_lead(
     current_user: User = Depends(get_current_user),
 ):
     """Get a specific lead by ID."""
+    _assert_internal_user(current_user)
     result = await db.execute(select(Lead).where(Lead.id == lead_id))
     lead = result.scalar_one_or_none()
     if not lead:
