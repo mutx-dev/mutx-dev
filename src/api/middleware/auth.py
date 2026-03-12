@@ -184,9 +184,7 @@ async def get_current_agent(
 
     # In a real app, we'd hash the token or use a faster lookup
     # For now, we match the logic used in the existing verify_agent_api_key
-    result = await session.execute(
-        select(Agent).where(Agent.api_key == token)
-    )
+    result = await session.execute(select(Agent).where(Agent.api_key == token))
     agent = result.scalar_one_or_none()
 
     if not agent:

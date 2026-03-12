@@ -27,8 +27,8 @@ async def create_waitlist_signup(
 ):
     """
     BACKEND WAITLIST API (DEPRECATED)
-    Submit waitlist signups. 
-    NOTE: For web-based submissions, prefer the Next.js API route 
+    Submit waitlist signups.
+    NOTE: For web-based submissions, prefer the Next.js API route
     (app/api/newsletter/route.ts) which includes Cloudflare Turnstile verification.
     """
     normalized_email = payload.email.lower().strip()
