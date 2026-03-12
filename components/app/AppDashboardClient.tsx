@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Activity,
+  AlertTriangle,
   Bot,
+  CheckCircle2,
   Copy,
   KeyRound,
   Loader2,
@@ -12,6 +14,7 @@ import {
   RefreshCcw,
   Rocket,
   ShieldCheck,
+  Sparkles,
   UserCircle2,
   XCircle,
 } from "lucide-react";
@@ -47,6 +50,29 @@ function formatDate(value?: string | null) {
   return new Date(value).toLocaleString();
 }
 
+function formatRelativeDate(value?: string | null) {
+  if (!value) return "Not recorded";
+
+  const then = new Date(value).getTime();
+  if (Number.isNaN(then)) return "Invalid timestamp";
+
+  const diffMs = then - Date.now();
+  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+  const minutes = Math.round(diffMs / 60000);
+
+  if (Math.abs(minutes) < 60) {
+    return rtf.format(minutes, "minute");
+  }
+
+  const hours = Math.round(minutes / 60);
+  if (Math.abs(hours) < 48) {
+    return rtf.format(hours, "hour");
+  }
+
+  const days = Math.round(hours / 24);
+  return rtf.format(days, "day");
+}
+
 function StatusDot({ status }: { status: string }) {
   const color =
     status === "running" || status === "healthy"
@@ -56,6 +82,18 @@ function StatusDot({ status }: { status: string }) {
         : "bg-amber-300";
 
   return <span className={`inline-block h-2.5 w-2.5 rounded-full ${color}`} />;
+}
+
+function statusTone(status: string) {
+  if (status === "running" || status === "healthy") {
+    return "bg-emerald-400/10 text-emerald-300 border-emerald-400/20";
+  }
+
+  if (status === "failed" || status === "error" || status === "unhealthy") {
+    return "bg-rose-400/10 text-rose-300 border-rose-400/20";
+  }
+
+  return "bg-amber-400/10 text-amber-300 border-amber-400/20";
 }
 
 export function AppDashboardClient() {
@@ -75,14 +113,74 @@ export function AppDashboardClient() {
   const [apiKeyName, setApiKeyName] = useState("App dashboard key");
   const [createdKey, setCreatedKey] = useState<CreateKeyResponse | null>(null);
 
+  const runningAgents = agents.filter((agent) => agent.status === "running").length;
+  const healthyDeployments = deployments.filter(
+    (deployment) => deployment.status === "running" || deployment.status === "healthy",
+  ).length;
+  const failedDeployments = deployments.filter(
+    (deployment) => deployment.status === "failed" || deployment.status === "error",
+  ).length;
+  const activeKeys = apiKeys.filter((apiKey) => apiKey.is_active).length;
+  const latestDeploymentEvent = deployments
+    .flatMap((deployment) => deployment.events ?? [])
+    .sort(
+      (left, right) =>
+        new Date(right.created_at ?? 0).getTime() - new Date(left.created_at ?? 0).getTime(),
+    )[0];
+
   const summary = useMemo(
     () => [
-      { label: "Agents", value: String(agents.length), icon: Bot },
-      { label: "Deployments", value: String(deployments.length), icon: Rocket },
-      { label: "API Keys", value: String(apiKeys.length), icon: KeyRound },
-      { label: "Health", value: health?.status || "unknown", icon: Activity },
+      {
+        label: "Agents",
+        value: String(agents.length),
+        detail:
+          agents.length > 0
+            ? `${runningAgents} running · ${agents.length - runningAgents} non-running`
+            : "No agents provisioned yet",
+        icon: Bot,
+      },
+      {
+        label: "Deployments",
+        value: String(deployments.length),
+        detail:
+          deployments.length > 0
+            ? `${healthyDeployments} healthy · ${failedDeployments} failing`
+            : "No deployments recorded yet",
+        icon: Rocket,
+      },
+      {
+        label: "API Keys",
+        value: String(apiKeys.length),
+        detail:
+          apiKeys.length > 0
+            ? `${activeKeys} active · ${apiKeys.length - activeKeys} revoked`
+            : "No operator keys created yet",
+        icon: KeyRound,
+      },
+      {
+        label: "Health",
+        value: health?.status || "unknown",
+        detail:
+          health?.timestamp
+            ? `Checked ${formatRelativeDate(health.timestamp)}`
+            : health?.error
+              ? "Control plane health fetch failed"
+              : "No freshness timestamp exposed",
+        icon: Activity,
+      },
     ],
-    [agents.length, deployments.length, apiKeys.length, health?.status],
+    [
+      activeKeys,
+      agents.length,
+      apiKeys.length,
+      deployments.length,
+      failedDeployments,
+      health?.error,
+      health?.timestamp,
+      health?.status,
+      healthyDeployments,
+      runningAgents,
+    ],
   );
 
   async function loadDashboard() {
@@ -255,9 +353,12 @@ export function AppDashboardClient() {
     setError("");
 
     try {
-      const payload = await readJson<CreateKeyResponse>(`/api/api-keys/${keyId}/rotate`, {
-        method: "POST",
-      });
+      const payload = await readJson<CreateKeyResponse>(
+        `/api/api-keys/${keyId}/rotate`,
+        {
+          method: "POST",
+        },
+      );
       setCreatedKey(payload);
       await loadDashboard();
     } catch (nextError) {
@@ -275,14 +376,28 @@ export function AppDashboardClient() {
     return (
       <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
         <Card className="border border-white/5 bg-white/[0.01]">
-          <div className="flex items-center gap-3 text-cyan-400 mb-6">
+          <div className="mb-6 flex items-center gap-3 text-cyan-400">
             <UserCircle2 className="h-6 w-6" />
             <h2 className="text-xl font-semibold text-white">
               Operator Console
             </h2>
           </div>
 
-          <div className="mt-5 inline-flex rounded-full border border-white/5 bg-white/[0.02] p-1 text-sm mb-6">
+          <div className="mb-4 rounded-2xl border border-cyan-400/15 bg-cyan-400/5 p-4 text-sm text-slate-300">
+            <div className="flex items-start gap-3">
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
+              <div>
+                <p className="font-medium text-white">Honest app state</p>
+                <p className="mt-1 leading-relaxed text-slate-400">
+                  This app only unlocks live dashboard data after a real session is
+                  established through the control-plane auth proxy. Until then,
+                  this signed-out view is the product boundary on purpose.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5 mb-6 inline-flex rounded-full border border-white/5 bg-white/[0.02] p-1 text-sm">
             {(["login", "register"] as const).map((value) => (
               <button
                 key={value}
@@ -347,19 +462,31 @@ export function AppDashboardClient() {
         </Card>
 
         <Card className="border border-white/5 bg-white/[0.01]">
-          <div className="flex items-center gap-3 text-cyan-400 mb-6">
+          <div className="mb-6 flex items-center gap-3 text-cyan-400">
             <Activity className="h-6 w-6" />
             <h2 className="text-xl font-semibold text-white">System Status</h2>
           </div>
           <div className="space-y-3">
             {[
-              { label: "Control Plane", route: "/auth/*", status: "Online" },
-              { label: "Agent Mesh", route: "/agents", status: "Online" },
-              { label: "Key Vault", route: "/api-keys", status: "Online" },
+              {
+                label: "Control Plane",
+                route: "/auth/*",
+                status: "Real auth boundary",
+              },
+              {
+                label: "Agent Mesh",
+                route: "/agents",
+                status: "Live after login",
+              },
+              {
+                label: "Key Vault",
+                route: "/api-keys",
+                status: "Live after login",
+              },
               {
                 label: "Runtime Sync",
                 route: "/deployments",
-                status: "Online",
+                status: "Live after login",
               },
             ].map((item) => (
               <div
@@ -368,16 +495,22 @@ export function AppDashboardClient() {
               >
                 <div>
                   <p className="font-medium text-white">{item.label}</p>
-                  <p className="text-xs text-slate-500 mt-1 font-[family:var(--font-mono)]">
+                  <p className="mt-1 text-xs text-slate-500 font-[family:var(--font-mono)]">
                     {item.route}
                   </p>
                 </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-slate-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-300" />
                   {item.status}
                 </span>
               </div>
             ))}
+          </div>
+
+          <div className="mt-4 rounded-xl border border-amber-400/15 bg-amber-400/5 p-4 text-xs leading-relaxed text-slate-400">
+            {bootstrapping
+              ? "Checking whether an operator session already exists..."
+              : "No session detected yet. This app does not fake fleet data for signed-out visitors."}
           </div>
         </Card>
       </div>
@@ -403,8 +536,11 @@ export function AppDashboardClient() {
           <button
             type="button"
             onClick={handleRefresh}
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm transition hover:border-cyan-300/30 hover:text-white"
+            disabled={refreshing || loading}
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm transition hover:border-cyan-300/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
+            <RefreshCcw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+            {refreshing ? "Refreshing" : "Refresh"}
           </button>
           <button
             type="button"
@@ -425,12 +561,16 @@ export function AppDashboardClient() {
       ) : null}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+<<<<<<< HEAD
         {summary.map(({ label, value, icon: Icon }) => (
+=======
+        {summary.map(({ label, value, detail, icon: Icon }) => (
+>>>>>>> 2823e3d (feat(web): make app dashboard honest and operator-useful)
           <Card
             key={label}
-            className="p-5 border border-white/5 bg-white/[0.01]"
+            className="border border-white/5 bg-white/[0.01] p-5"
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] text-cyan-400">
                 <Icon className="h-5 w-5" />
               </div>
@@ -445,165 +585,218 @@ export function AppDashboardClient() {
                 {value}
               </p>
             </div>
+            <p className="mt-2 text-xs text-slate-500">{detail}</p>
             {label === "Health" ? (
+<<<<<<< HEAD
               <p className="mt-2 text-xs text-slate-500 font-[family:var(--font-mono)]">
                 database: {health?.database || "unknown"}
               </p>
+=======
+              <>
+                <p className="mt-2 text-xs text-slate-500 font-[family:var(--font-mono)]">
+                  database: {health?.database || "unknown"}
+                </p>
+                {health?.error ? (
+                  <p className="mt-2 text-xs text-rose-300">error: {health.error}</p>
+                ) : null}
+              </>
+>>>>>>> 2823e3d (feat(web): make app dashboard honest and operator-useful)
             ) : null}
           </Card>
         ))}
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
-        <Card className="border border-white/5 bg-white/[0.01] p-0 overflow-hidden">
-          <div className="p-6 border-b border-white/5 flex items-center justify-between">
-            <div className="flex items-center gap-3 text-cyan-400">
-              <Bot className="h-5 w-5" />
-              <h3 className="text-lg font-semibold text-white tracking-tight">
-                Agent Fleet
-              </h3>
+        <div className="space-y-6">
+          <Card className="border border-white/5 bg-white/[0.01] p-0 overflow-hidden">
+            <div className="flex items-center justify-between border-b border-white/5 p-6">
+              <div className="flex items-center gap-3 text-cyan-400">
+                <Bot className="h-5 w-5" />
+                <div>
+                  <h3 className="text-lg font-semibold tracking-tight text-white">
+                    Agent Fleet
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Truthful view of agents returned by the authenticated control plane.
+                  </p>
+                </div>
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-white/[0.03] px-2 py-1 text-xs font-medium text-slate-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                Live sync
+              </span>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-md bg-white/[0.03] px-2 py-1 text-xs font-medium text-slate-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>{" "}
-              Live sync
-            </span>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-white/[0.02] text-slate-400 text-xs uppercase tracking-widest">
-                <tr>
-                  <th className="px-6 py-4 font-medium">Identifier</th>
-                  <th className="px-6 py-4 font-medium">Status</th>
-                  <th className="px-6 py-4 font-medium text-right">
-                    Provisioned
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {refreshing ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-white/[0.02] text-xs uppercase tracking-widest text-slate-400">
                   <tr>
-                    <td
-                      colSpan={3}
-                      className="px-6 py-12 text-center text-slate-500"
-                    >
-                      Refreshing live agent data…
-                    </td>
+                    <th className="px-6 py-4 font-medium">Identifier</th>
+                    <th className="px-6 py-4 font-medium">Status</th>
+                    <th className="px-6 py-4 font-medium">Created</th>
                   </tr>
-                ) : agents.length ? (
-                  agents.map((agent) => (
-                    <tr
-                      key={agent.id}
-                      className="transition-colors hover:bg-white/[0.02]"
-                    >
-                      <td className="px-6 py-4">
-                        <p className="font-medium text-slate-200">
-                          {agent.name}
-                        </p>
-                        <p className="text-xs text-slate-500 font-[family:var(--font-mono)] mt-1">
-                          {agent.id.split("-")[0]}
-                        </p>
-                      </td>
-                      <td className="px-6 py-4 capitalize">
-                        <span
-                          className={`inline-flex items-center gap-2 rounded-full border border-white/5 px-2.5 py-0.5 text-xs font-medium ${agent.status === "running" ? "bg-emerald-400/10 text-emerald-400" : "bg-white/5 text-slate-300"}`}
-                        >
-                          <StatusDot status={agent.status} />
-                          {agent.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-slate-400 text-right font-[family:var(--font-mono)] text-xs">
-                        {formatDate(agent.created_at)}
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {refreshing ? (
+                    <tr>
+                      <td
+                        colSpan={3}
+                        className="px-6 py-12 text-center text-slate-500"
+                      >
+                        Refreshing live agent data…
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={3}
-                      className="px-6 py-12 text-center text-slate-500"
-                    >
-                      No agents found for this account yet.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+                  ) : agents.length ? (
+                    agents.map((agent) => (
+                      <tr
+                        key={agent.id}
+                        className="transition-colors hover:bg-white/[0.02]"
+                      >
+                        <td className="px-6 py-4 align-top">
+                          <p className="font-medium text-slate-200">
+                            {agent.name}
+                          </p>
+                          <p className="mt-1 text-xs font-[family:var(--font-mono)] text-slate-500">
+                            {agent.id}
+                          </p>
+                        </td>
+                        <td className="px-6 py-4 align-top capitalize">
+                          <span
+                            className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-0.5 text-xs font-medium ${statusTone(agent.status)}`}
+                          >
+                            <StatusDot status={agent.status} />
+                            {agent.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 align-top text-xs text-slate-400">
+                          <p className="font-[family:var(--font-mono)]">
+                            {formatDate(agent.created_at)}
+                          </p>
+                          <p className="mt-1 text-slate-500">
+                            {formatRelativeDate(agent.created_at)}
+                          </p>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={3}
+                        className="px-6 py-12 text-center text-slate-500"
+                      >
+                        No agents found for this account yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
 
-        <div className="space-y-6">
-          <Card className="border border-white/5 bg-white/[0.01]">
-            <div className="flex items-center justify-between mb-6">
+          <Card className="border border-white/5 bg-white/[0.01] p-0 overflow-hidden">
+            <div className="flex items-center justify-between border-b border-white/5 p-6">
               <div className="flex items-center gap-3 text-emerald-400">
                 <Rocket className="h-5 w-5" />
-                <h3 className="text-lg font-semibold text-white tracking-tight">
-                  Active Deployments
-                </h3>
+                <div>
+                  <h3 className="text-lg font-semibold tracking-tight text-white">
+                    Deployment Timeline
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Current deployment state plus the freshest lifecycle event we can surface.
+                  </p>
+                </div>
               </div>
+              {latestDeploymentEvent ? (
+                <span className="rounded-full border border-emerald-400/15 bg-emerald-400/5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-300">
+                  latest event {formatRelativeDate(latestDeploymentEvent.created_at)}
+                </span>
+              ) : null}
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 p-6">
               {refreshing ? (
                 <div className="rounded-xl border border-white/5 border-dashed p-6 text-center text-sm text-slate-500">
                   Refreshing deployment state…
                 </div>
               ) : deployments.length ? (
-                deployments.map((deployment) => (
-                  <div
-                    key={deployment.id}
-                    className="rounded-xl border border-white/5 bg-white/[0.02] p-4 transition hover:border-emerald-400/20"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="font-[family:var(--font-mono)] text-xs text-slate-300">
-                        {deployment.id.split("-")[0]}
-                      </p>
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-400">
-                        {deployment.status}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-slate-500">
-                      <p>
-                        Agent:{" "}
-                        <span className="text-slate-300">
-                          {deployment.agent_id.split("-")[0]}
-                        </span>
-                      </p>
-                      <p>
-                        Replicas:{" "}
-                        <span className="text-white font-medium">
-                          {deployment.replicas}
-                        </span>
-                      </p>
-                    </div>
+                deployments.map((deployment) => {
+                  const latestEvent = deployment.events?.[deployment.events.length - 1];
 
-                    {deployment.events?.length ? (
-                      <div className="mt-3 border-t border-white/5 pt-3">
-                        <div className="flex items-center justify-between text-[10px]">
-                          <span className="text-slate-500 uppercase tracking-wider">
-                            Latest Event
-                          </span>
-                          <span className="text-slate-400 font-[family:var(--font-mono)]">
-                            {formatDate(
-                              deployment.events[deployment.events.length - 1]
-                                .created_at,
-                            )}
-                          </span>
+                  return (
+                    <div
+                      key={deployment.id}
+                      className="rounded-xl border border-white/5 bg-white/[0.02] p-4 transition hover:border-emerald-400/20"
+                    >
+                      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <p className="font-medium text-white">{deployment.id}</p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            Agent {deployment.agent_id}
+                          </p>
                         </div>
-                        <p className="mt-1 text-[11px] text-emerald-400/80 truncate">
-                          {
-                            deployment.events[deployment.events.length - 1]
-                              .event_type
-                          }{" "}
-                          →{" "}
-                          {
-                            deployment.events[deployment.events.length - 1]
-                              .status
-                          }
-                        </p>
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${statusTone(deployment.status)}`}
+                        >
+                          <StatusDot status={deployment.status} />
+                          {deployment.status}
+                        </span>
                       </div>
-                    ) : null}
-                  </div>
-                ))
+
+                      <div className="grid gap-3 text-xs text-slate-400 sm:grid-cols-3">
+                        <div className="rounded-lg border border-white/5 bg-black/20 p-3">
+                          <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                            Replicas
+                          </p>
+                          <p className="mt-2 text-lg font-semibold text-white">
+                            {deployment.replicas}
+                          </p>
+                        </div>
+                        <div className="rounded-lg border border-white/5 bg-black/20 p-3">
+                          <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                            Started
+                          </p>
+                          <p className="mt-2 font-[family:var(--font-mono)] text-[11px] text-slate-300">
+                            {formatDate(deployment.started_at)}
+                          </p>
+                        </div>
+                        <div className="rounded-lg border border-white/5 bg-black/20 p-3">
+                          <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                            Ended
+                          </p>
+                          <p className="mt-2 font-[family:var(--font-mono)] text-[11px] text-slate-300">
+                            {formatDate(deployment.ended_at)}
+                          </p>
+                        </div>
+                      </div>
+
+                      {latestEvent ? (
+                        <div className="mt-3 rounded-lg border border-emerald-400/10 bg-emerald-400/[0.04] p-3 text-xs">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <p className="font-medium text-emerald-300">
+                              Latest event: {latestEvent.event_type}
+                            </p>
+                            <span className="text-slate-400">
+                              {formatDate(latestEvent.created_at)} · {formatRelativeDate(latestEvent.created_at)}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-slate-300">
+                            Status: {latestEvent.status}
+                          </p>
+                          
+                        </div>
+                      ) : (
+                        <div className="mt-3 rounded-lg border border-white/5 border-dashed p-3 text-xs text-slate-500">
+                          No deployment event history is exposed for this record yet.
+                        </div>
+                      )}
+
+                      {deployment.error_message ? (
+                        <div className="mt-3 rounded-lg border border-rose-500/20 bg-rose-500/5 px-3 py-2 text-[11px] text-rose-200">
+                          Error: {deployment.error_message}
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })
               ) : (
                 <div className="rounded-xl border border-white/5 border-dashed p-6 text-center text-sm text-slate-500">
                   No deployments found for this account yet.
@@ -611,15 +804,20 @@ export function AppDashboardClient() {
               )}
             </div>
           </Card>
+        </div>
 
+        <div className="space-y-6">
           <Card className="border border-white/5 bg-white/[0.01]">
-            <div className="flex items-center justify-between mb-6">
+            <div className="mb-6 flex items-center justify-between">
               <div className="flex items-center gap-3 text-amber-400">
                 <KeyRound className="h-5 w-5" />
-                <h3 className="text-lg font-semibold text-white tracking-tight">
+                <h3 className="text-lg font-semibold tracking-tight text-white">
                   API Keys
                 </h3>
               </div>
+              <span className="rounded-full border border-white/5 bg-white/[0.03] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Operator-owned
+              </span>
             </div>
 
             <form onSubmit={handleCreateKey} className="mb-6 flex gap-2">
@@ -648,11 +846,11 @@ export function AppDashboardClient() {
                 animate={{ opacity: 1, height: "auto" }}
                 className="mb-6 overflow-hidden rounded-lg border border-amber-400/30 bg-amber-400/10 p-4"
               >
-                <p className="text-xs font-medium text-amber-200 mb-2">
+                <p className="mb-2 text-xs font-medium text-amber-200">
                   New key generated
                 </p>
                 <div className="flex items-center gap-2 rounded bg-black/40 px-3 py-2">
-                  <code className="text-xs text-white truncate flex-1">
+                  <code className="flex-1 truncate text-xs text-white">
                     {createdKey.key}
                   </code>
                   <button
@@ -666,7 +864,7 @@ export function AppDashboardClient() {
               </motion.div>
             ) : null}
 
-            <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-2 max-h-[340px] overflow-y-auto pr-2 custom-scrollbar">
               {apiKeys.length ? (
                 apiKeys.map((apiKey) => (
                   <div
@@ -676,15 +874,19 @@ export function AppDashboardClient() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="truncate font-medium text-slate-300">{apiKey.name}</p>
+                          <p className="truncate font-medium text-slate-300">
+                            {apiKey.name}
+                          </p>
                           <span
                             className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest ${apiKey.is_active ? "bg-emerald-400/10 text-emerald-300" : "bg-white/5 text-slate-400"}`}
                           >
-                            <span className={`h-1.5 w-1.5 rounded-full ${apiKey.is_active ? "bg-emerald-300" : "bg-slate-500"}`} />
+                            <span
+                              className={`h-1.5 w-1.5 rounded-full ${apiKey.is_active ? "bg-emerald-300" : "bg-slate-500"}`}
+                            />
                             {apiKey.is_active ? "Active" : "Revoked"}
                           </span>
                         </div>
-                        <div className="mt-2 space-y-1 text-[11px] text-slate-500 font-[family:var(--font-mono)]">
+                        <div className="mt-2 space-y-1 font-[family:var(--font-mono)] text-[11px] text-slate-500">
                           <p>Created: {formatDate(apiKey.created_at)}</p>
                           <p>Last used: {formatDate(apiKey.last_used)}</p>
                           <p>Expires: {formatDate(apiKey.expires_at)}</p>
@@ -714,10 +916,58 @@ export function AppDashboardClient() {
                   </div>
                 ))
               ) : (
-                <p className="text-center text-xs text-slate-500 py-4">
+                <p className="py-4 text-center text-xs text-slate-500">
                   No keys provisioned.
                 </p>
               )}
+            </div>
+          </Card>
+
+          <Card className="border border-white/5 bg-white/[0.01]">
+            <div className="mb-4 flex items-center gap-3 text-cyan-300">
+              {health?.status === "healthy" ? (
+                <CheckCircle2 className="h-5 w-5" />
+              ) : (
+                <AlertTriangle className="h-5 w-5" />
+              )}
+              <h3 className="text-lg font-semibold tracking-tight text-white">
+                Operator Readout
+              </h3>
+            </div>
+
+            <div className="space-y-3 text-sm text-slate-300">
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                  Current health posture
+                </p>
+                <p className="mt-2 text-white">
+                  {health?.status === "healthy"
+                    ? "Control plane looks reachable from the dashboard proxy."
+                    : "Control plane state is degraded, unknown, or not yet verified from this session."}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                  Fleet signal
+                </p>
+                <p className="mt-2 text-white">
+                  {agents.length || deployments.length
+                    ? `${runningAgents}/${agents.length} agents are running, and ${healthyDeployments}/${deployments.length} deployments look healthy.`
+                    : "This account has no live fleet records yet, which is shown honestly instead of filling the screen with placeholders."}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                  Key management
+                </p>
+                <p className="mt-2 text-white">
+                  {activeKeys > 0
+                    ? `${activeKeys} active API key${activeKeys === 1 ? "" : "s"} can authenticate operator workflows right now.`
+                    : "No active API keys are present yet; generate one here when you need non-browser access."}
+                </p>
+              </div>
             </div>
           </Card>
         </div>
