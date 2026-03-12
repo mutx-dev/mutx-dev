@@ -11,7 +11,7 @@ function NetworkNodes() {
 
   // Generate deterministic-looking random positions for nodes
   const nodes = useMemo(() => {
-    const pts = []
+    const pts: THREE.Vector3[] = []
     for (let i = 0; i < 20; i++) {
       pts.push(
         new THREE.Vector3(
@@ -34,7 +34,7 @@ function NetworkNodes() {
 
   // Determine connections (just simple distance-based or index-based)
   const lines = useMemo(() => {
-    const l = []
+    const l: [THREE.Vector3, THREE.Vector3][] = []
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         if (nodes[i].distanceTo(nodes[j]) < 6) {
@@ -61,7 +61,7 @@ function NetworkNodes() {
       {lines.map((line, i) => (
         <Line
           key={`line-${i}`}
-          points={line as any}
+          points={line}
           color="#22d3ee"
           opacity={0.15}
           transparent
@@ -70,9 +70,9 @@ function NetworkNodes() {
       ))}
       
       {/* Moving packets to simulate data/webhooks */}
-      <DataPacket path={lines[0] as any} color="#fcd34d" speed={0.5} />
-      <DataPacket path={lines[5] as any} color="#67e8f9" speed={0.3} delay={1} />
-      <DataPacket path={lines[10] as any} color="#67e8f9" speed={0.6} delay={2} />
+      <DataPacket path={lines[0] || [new THREE.Vector3(), new THREE.Vector3()]} color="#fcd34d" speed={0.5} />
+      <DataPacket path={lines[5] || [new THREE.Vector3(), new THREE.Vector3()]} color="#67e8f9" speed={0.3} delay={1} />
+      <DataPacket path={lines[10] || [new THREE.Vector3(), new THREE.Vector3()]} color="#67e8f9" speed={0.6} delay={2} />
     </group>
   )
 }
