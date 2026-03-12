@@ -10,8 +10,11 @@ from typing import Any, cast
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.models import Agent, AgentLog, Deployment, Alert, AlertType
-from src.api.services.webhook_service import trigger_agent_status_event, trigger_deployment_event
+from src.api.models import Alert, AlertType, Agent, AgentLog, Deployment
+from src.api.services.webhook_service import (
+    trigger_agent_status_event,
+    trigger_deployment_event,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +24,9 @@ STALE_THRESHOLD_SECONDS = 120  # Agent is failed after 120s
 HEAL_THRESHOLD_SECONDS = 30  # Heal failed agents after 30s
 
 
-async def _get_latest_deployment(session: AsyncSession, agent_id: uuid.UUID) -> Deployment | None:
+async def _get_latest_deployment(
+    session: AsyncSession, agent_id: uuid.UUID
+) -> Deployment | None:
     result = await session.execute(
         select(Deployment)
         .where(Deployment.agent_id == agent_id)
@@ -52,7 +57,7 @@ def _record_deployment_event(
     )
 
 
-async def monitor_agent_health(session: AsyncSession):
+async def monitor_agent_health(session: AsyncSession) -> None:
     """
     Main monitoring and self-healing lifecycle:
     1. Promote 'creating' -> 'running' after a delay
