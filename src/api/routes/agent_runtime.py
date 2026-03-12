@@ -12,9 +12,10 @@ These endpoints are used by agents to connect to MUTX:
 """
 
 import logging
+import json
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
@@ -37,8 +38,8 @@ router = APIRouter(prefix="/agents", tags=["agent-runtime"])
 class AgentRegisterRequest(BaseModel):
     name: str
     description: Optional[str] = ""
-    metadata: Optional[dict] = {}
-    capabilities: Optional[list[str]] = []
+    metadata: dict[str, Any] = {}
+    capabilities: list[str] = []
 
 
 class AgentRegisterResponse(BaseModel):
@@ -72,7 +73,7 @@ class LogRequest(BaseModel):
     agent_id: str
     level: str = "info"
     message: str
-    metadata: Optional[dict] = {}
+    metadata: dict[str, Any] = {}
     timestamp: str
 
 
@@ -145,7 +146,7 @@ async def register_agent(
         name=request.name,
         description=request.description or "",
         status=AgentStatus.RUNNING.value,
-        config=str(request.metadata) if request.metadata else None,
+        config=json.dumps(request.metadata) if request.metadata else None,
         api_key=agent_api_key,
         user_id=current_user.id,
     )

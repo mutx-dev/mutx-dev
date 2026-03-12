@@ -58,3 +58,30 @@ async def test_agent_status_rejects_requests_for_other_agents(
 
     assert response.status_code == 403
     assert response.json()['detail'] == 'Agent ID mismatch'
+
+
+@pytest.mark.asyncio
+async def test_runtime_registered_agent_round_trips_metadata_as_json(client):
+    metadata = {
+        'provider': 'openclaw',
+        'model': 'gpt-4.1-mini',
+        'flags': {'webhooks': True},
+    }
+
+    register_response = await client.post(
+        '/agents/register',
+        json={
+            'name': 'runtime-json-agent',
+            'description': 'runtime-created agent',
+            'metadata': metadata,
+            'capabilities': ['heartbeat'],
+        },
+    )
+
+    assert register_response.status_code == 200
+    agent_id = register_response.json()['agent_id']
+
+    detail_response = await client.get(f'/agents/{agent_id}')
+
+    assert detail_response.status_code == 200
+    assert detail_response.json()['config'] == metadata
