@@ -109,7 +109,9 @@ def test_webhooks_get_deliveries_uses_live_backend_route_and_filters() -> None:
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     webhooks = Webhooks(client)
 
-    deliveries = webhooks.get_deliveries(webhook_id, limit=10, skip=5, event="agent.status", success=False)
+    deliveries = webhooks.get_deliveries(
+        webhook_id, limit=10, skip=5, event="agent.status", success=False
+    )
 
     assert captured["path"] == f"/webhooks/{webhook_id}/deliveries"
     assert captured["query"] == {

@@ -214,6 +214,7 @@ async def list_webhook_deliveries(
     webhook_id: uuid.UUID,
     event: Optional[str] = None,
     success: Optional[bool] = None,
+    skip: int = 0,
     limit: int = 50,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_webhook_auth),
@@ -225,6 +226,7 @@ async def list_webhook_deliveries(
         select(WebhookDeliveryLog)
         .where(WebhookDeliveryLog.webhook_id == webhook.id)
         .order_by(WebhookDeliveryLog.created_at.desc())
+        .offset(skip)
         .limit(limit)
     )
     if event is not None:
