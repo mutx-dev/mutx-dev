@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime
 from typing import Any, Callable, Generator, Optional
 from uuid import UUID
@@ -13,11 +14,22 @@ class Agent:
         self.name = data["name"]
         self.description = data.get("description")
         self.status = data["status"]
-        self.config = data.get("config")
+        self.config_json = data.get("config")
+        self.config = self._parse_config(self.config_json)
         self.created_at = datetime.fromisoformat(data["created_at"])
         self.updated_at = datetime.fromisoformat(data["updated_at"])
         self.user_id = data.get("user_id")
         self._data = data
+
+    @staticmethod
+    def _parse_config(raw_config: Any) -> Any:
+        if not isinstance(raw_config, str):
+            return raw_config
+
+        try:
+            return json.loads(raw_config)
+        except json.JSONDecodeError:
+            return raw_config
 
     def __repr__(self) -> str:
         return f"Agent(id={self.id}, name={self.name}, status={self.status})"
@@ -71,7 +83,7 @@ class Agents:
         self,
         name: str,
         description: Optional[str] = None,
-        config: Optional[str] = None,
+        config: Optional[dict[str, Any] | str] = None,
     ) -> Agent:
         response = self._client.post(
             "/agents",

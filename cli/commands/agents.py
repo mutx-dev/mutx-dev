@@ -43,7 +43,7 @@ def list_agents(limit: int, skip: int):
 @agents_group.command(name="create")
 @click.option("--name", "-n", required=True, help="Agent name")
 @click.option("--description", "-d", default="", help="Agent description")
-@click.option("--config", "-c", default="{}", help="Agent config as JSON string")
+@click.option("--config", "-c", default="{}", help="Agent config as JSON object string")
 def create_agent(name: str, description: str, config: str):
     """Create a new agent"""
     cli_config = CLIConfig()
@@ -54,9 +54,8 @@ def create_agent(name: str, description: str, config: str):
     import json
 
     try:
-        # Validate JSON but send as string to match API schema
+        # Validate JSON locally; backend accepts dict or string and normalizes it.
         config_json = json.loads(config)
-        config_str = json.dumps(config_json)
     except json.JSONDecodeError:
         click.echo("Error: Invalid JSON in config", err=True)
         return
@@ -67,7 +66,7 @@ def create_agent(name: str, description: str, config: str):
         json={
             "name": name,
             "description": description,
-            "config": config_str,
+            "config": config_json,
         },
     )
 
