@@ -257,3 +257,24 @@ class WaitlistSignupResponse(BaseModel):
 
 class WaitlistCountResponse(BaseModel):
     count: int
+
+
+# Lead Schemas
+class LeadCreate(BaseModel):
+    email: EmailStr
+    name: Optional[str] = Field(None, max_length=255)
+    company: Optional[str] = Field(None, max_length=255)
+    message: Optional[str] = Field(None, max_length=5000)
+    source: Optional[str] = Field(None, max_length=120)
+
+
+class LeadResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    email: str
+    name: Optional[str]
+    company: Optional[str]
+    message: Optional[str]
+    source: Optional[str]
+    created_at: datetime
