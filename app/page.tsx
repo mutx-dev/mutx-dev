@@ -2,6 +2,7 @@
 
 import {
   ArrowRight,
+  BookOpen,
   Database,
   Github,
   GitBranch,
@@ -152,13 +153,16 @@ export default function LandingPage() {
                   View on GitHub
                   <ArrowRight className="h-4 w-4" />
                 </a>
-                <Link
-                  href="/app"
+                <a
+                  href="https://docs.mutx.dev"
+                  target="_blank"
+                  rel="noreferrer"
                   className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
                 >
-                  Open Dashboard
+                  <BookOpen className="h-4 w-4" />
+                  Open Docs
                   <ArrowRight className="h-4 w-4" />
-                </Link>
+                </a>
               </div>
 
               <div className="max-w-md">
