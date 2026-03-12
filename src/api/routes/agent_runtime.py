@@ -177,6 +177,9 @@ async def heartbeat(
     # Update agent status and last heartbeat
     agent.status = request.status
     agent.last_heartbeat = datetime.utcnow()
+    
+    # Ensure agent ownership is verified - agent is already authenticated via get_current_agent
+    # which performs the lookup by api_key. Here we just ensure we save the state.
 
     await db.commit()
 
