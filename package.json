@@ -7,7 +7,8 @@
     "build": "next build --no-lint",
     "start": "next start",
     "lint": "next lint",
-    "generate-types": "openapi-typescript docs/api/openapi.json -o app/types/api.ts"
+    "generate-types": "openapi-typescript docs/api/openapi.json -o app/types/api.ts",
+    "test:app": "jest --runInBand tests/app/controlPlane.test.ts"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.0",
@@ -50,6 +51,9 @@
     "playwright": "^1.58.2",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.5",
+    "@types/jest": "^30.0.0"
   }
 }

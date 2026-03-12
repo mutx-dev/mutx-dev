@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getApiBaseUrl } from '@/app/api/_lib/controlPlane'
+import { getApiBaseUrl, getCookieDomain, shouldUseSecureCookies } from '@/app/api/_lib/controlPlane'
 
 const API_BASE_URL = getApiBaseUrl()
 
@@ -9,8 +9,8 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const secureCookies =
-      request.nextUrl.protocol === 'https:' || request.headers.get('x-forwarded-proto') === 'https'
+    const secureCookies = shouldUseSecureCookies(request)
+    const cookieDomain = getCookieDomain(request)
 
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
       httpOnly: false,
       sameSite: 'lax',
       secure: secureCookies,
+      domain: cookieDomain,
       path: '/',
       maxAge: payload.expires_in || 1800,
     })
@@ -37,6 +38,7 @@ export async function POST(request: NextRequest) {
       httpOnly: false,
       sameSite: 'lax',
       secure: secureCookies,
+      domain: cookieDomain,
       path: '/',
       maxAge: 60 * 60 * 24 * 7,
     })
