@@ -349,7 +349,6 @@ async def get_agent_status(
 
     result = await db.execute(select(Agent).where(Agent.id == agent.id))
     current_agent = result.scalar_one_or_none()
-
     if not current_agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
