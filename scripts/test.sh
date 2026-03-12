@@ -30,8 +30,8 @@ echo "Running Python compile check..."
 "$PYTHON_BIN" -m compileall src/api cli sdk/mutx
 
 echo ""
-echo "Running pytest collection..."
-"$PYTHON_BIN" -m pytest --collect-only -q
+echo "Running Python API test suite..."
+"$PYTHON_BIN" -m pytest tests/api --maxfail=1 -q
 
 echo ""
 echo "Generating frontend API types..."

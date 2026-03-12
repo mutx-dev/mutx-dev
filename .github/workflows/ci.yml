@@ -9,8 +9,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  frontend:
-    name: Frontend checks
+  validate:
+    name: Validation
     runs-on: ubuntu-latest
 
     steps:
@@ -23,42 +23,18 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run build
-        run: npm run build
-
-      - name: Generate API types
-        run: npm run generate-types
-
-  python:
-    name: Python checks
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install Python tooling
+      - name: Install dependencies
         run: |
+          npm ci
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -e ".[dev]"
 
-      - name: Ruff
-        run: ruff check src/api cli sdk
-
-      - name: Black
-        run: black --check src/api cli sdk
-
-      - name: Syntax smoke check
-        run: python -m compileall src/api cli sdk/mutx
-
-      - name: Pytest collection
-        run: python -m pytest --collect-only -q
+      - name: Run validation suite
+        run: |
+          bash scripts/test.sh
