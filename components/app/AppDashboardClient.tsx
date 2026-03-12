@@ -269,7 +269,6 @@ export function AppDashboardClient() {
     } finally {
       setLoading(false);
     }
->>>>>>> theirs
   }
 
   if (!user) {
