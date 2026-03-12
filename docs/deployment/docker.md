@@ -13,7 +13,7 @@ docker-compose up
 Run only data services in the background:
 
 ```bash
-docker-compose up -d postgres redis
+docker compose -f infrastructure/docker/docker-compose.yml up -d postgres redis
 ```
 
 The local compose file currently starts:
