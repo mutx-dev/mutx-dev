@@ -5,26 +5,41 @@ from datetime import datetime, timedelta
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.models.models import APIKey, User
-from src.api.models.schemas import APIKeyCreate, APIKeyResponse, APIKeyCreateResponse
 from src.api.middleware.auth import get_current_user
+from src.api.models.models import APIKey, User
+from src.api.models.schemas import APIKeyCreate, APIKeyCreateResponse, APIKeyResponse
 
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])
 
 
+MAX_ACTIVE_API_KEYS_PER_USER = 10
+
+
 def generate_api_key() -> str:
-    """Generate a new API key with 'mutx_live_' prefix"""
+    """Generate a new API key with 'mutx_live_' prefix."""
     random_part = secrets.token_urlsafe(32)
     return f"mutx_live_{random_part}"
 
 
 def hash_key(key: str) -> str:
-    """Hash an API key for storage"""
+    """Hash an API key for storage."""
     return hashlib.sha256(key.encode()).hexdigest()
+
+
+async def get_owned_api_key(
+    db: AsyncSession, user_id: uuid.UUID, key_id: uuid.UUID
+) -> APIKey | None:
+    result = await db.execute(select(APIKey).where(APIKey.id == key_id, APIKey.user_id == user_id))
+    return result.scalar_one_or_none()
+
+
+async def count_active_api_keys(db: AsyncSession, user_id: uuid.UUID) -> int:
+    result = await db.execute(select(APIKey).where(APIKey.user_id == user_id, APIKey.is_active))
+    return len(result.scalars().all())
 
 
 @router.get("", response_model=List[APIKeyResponse])
@@ -32,12 +47,11 @@ async def list_api_keys(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """List all API keys for the current user"""
+    """List all API keys for the current user, including revoked keys for auditability."""
     result = await db.execute(
         select(APIKey).where(APIKey.user_id == current_user.id).order_by(APIKey.created_at.desc())
     )
-    keys = result.scalars().all()
-    return keys
+    return result.scalars().all()
 
 
 @router.post("", response_model=APIKeyCreateResponse, status_code=status.HTTP_201_CREATED)
@@ -46,17 +60,21 @@ async def create_api_key(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Create a new API key"""
-    # Generate the plain API key (only shown once)
+    """Create a new API key."""
+    active_key_count = await count_active_api_keys(db, current_user.id)
+    if active_key_count >= MAX_ACTIVE_API_KEYS_PER_USER:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Active API key limit reached ({MAX_ACTIVE_API_KEYS_PER_USER})",
+        )
+
     plain_key = generate_api_key()
     key_hash = hash_key(plain_key)
 
-    # Calculate expiration if provided
     expires_at = None
     if key_data.expires_in_days:
         expires_at = datetime.utcnow() + timedelta(days=key_data.expires_in_days)
 
-    # Create the API key record
     api_key = APIKey(
         id=uuid.uuid4(),
         user_id=current_user.id,
@@ -73,7 +91,7 @@ async def create_api_key(
     return APIKeyCreateResponse(
         id=api_key.id,
         name=api_key.name,
-        key=plain_key,  # Only returned on creation!
+        key=plain_key,
         created_at=api_key.created_at,
         expires_at=api_key.expires_at,
     )
@@ -85,19 +103,16 @@ async def revoke_api_key(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Revoke (delete) an API key"""
-    result = await db.execute(
-        select(APIKey).where(APIKey.id == key_id, APIKey.user_id == current_user.id)
-    )
-    api_key = result.scalar_one_or_none()
+    """Revoke an API key without deleting its record."""
+    api_key = await get_owned_api_key(db, current_user.id, key_id)
 
     if not api_key:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="API key not found",
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="API key not found")
 
-    await db.delete(api_key)
+    if not api_key.is_active:
+        return None
+
+    api_key.is_active = False
     await db.commit()
 
     return None
@@ -109,27 +124,23 @@ async def rotate_api_key(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Rotate an API key (revoke old and create new)"""
-    # Find the existing key
-    result = await db.execute(
-        select(APIKey).where(APIKey.id == key_id, APIKey.user_id == current_user.id)
-    )
-    old_key = result.scalar_one_or_none()
+    """Rotate an active API key by revoking the old one and issuing a new one."""
+    old_key = await get_owned_api_key(db, current_user.id, key_id)
 
     if not old_key:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="API key not found")
+
+    if not old_key.is_active:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="API key not found",
+            status_code=status.HTTP_409_CONFLICT,
+            detail="API key is already revoked and cannot be rotated",
         )
 
-    # Generate new key
     plain_key = generate_api_key()
     key_hash = hash_key(plain_key)
 
-    # Delete old key
-    await db.delete(old_key)
+    old_key.is_active = False
 
-    # Create new key with same expiration
     new_key = APIKey(
         id=uuid.uuid4(),
         user_id=current_user.id,
