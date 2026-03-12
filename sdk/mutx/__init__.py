@@ -10,6 +10,7 @@ from mutx.agent_runtime import (
 )
 from mutx.agents import Agents
 from mutx.api_keys import APIKeys
+from mutx.clawhub import ClawHub
 from mutx.deployments import Deployments
 from mutx.webhooks import Webhooks
 
@@ -36,6 +37,7 @@ class MutxClient:
 
         self.agents = Agents(self._client)
         self.api_keys = APIKeys(self._client)
+        self.clawhub = ClawHub(self._client)
         self.deployments = Deployments(self._client)
         self.webhooks = Webhooks(self._client)
 
@@ -63,6 +65,14 @@ class MutxClient:
     @api_keys.setter
     def api_keys(self, value: APIKeys):
         self._api_keys = value
+
+    @property
+    def clawhub(self) -> ClawHub:
+        return self._clawhub
+
+    @clawhub.setter
+    def clawhub(self, value: ClawHub):
+        self._clawhub = value
 
     @property
     def deployments(self) -> Deployments:
@@ -103,6 +113,7 @@ class MutxAsyncClient:
 
         self.agents = Agents(self._client)
         self.api_keys = APIKeys(self._client)
+        self.clawhub = ClawHub(self._client)
         self.deployments = Deployments(self._client)
         self.webhooks = Webhooks(self._client)
 
@@ -132,6 +143,14 @@ class MutxAsyncClient:
         self._api_keys = value
 
     @property
+    def clawhub(self) -> ClawHub:
+        return self._clawhub
+
+    @clawhub.setter
+    def clawhub(self, value: ClawHub):
+        self._clawhub = value
+
+    @property
     def deployments(self) -> Deployments:
         return self._deployments
 
@@ -157,5 +176,6 @@ __all__ = [
     "Command",
     "AgentMetrics",
     "APIKeys",
+    "ClawHub",
     "create_agent_client",
 ]
