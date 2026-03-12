@@ -31,7 +31,11 @@ curl https://api.mutx.dev/api-keys \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
+<<<<<<< HEAD
+The dashboard uses the same list route through its Next.js proxy before rendering the API key panel.
+=======
 The dashboard reads the same route through its Next.js proxy before rendering the API key panel.
+>>>>>>> origin/main
 
 ### Create Key
 
@@ -72,7 +76,7 @@ curl -X POST https://api.mutx.dev/api-keys/YOUR_KEY_ID/rotate \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-The dashboard uses the same rotate route through its Next.js proxy and immediately reveals the newly issued plain-text key once.
+The dashboard uses the same rotate route through its Next.js proxy and immediately reveals the newly issued plain-text key once. If the backend rejects the rotation, the proxy preserves the upstream error response.
 
 ### Revoke Key
 
@@ -88,7 +92,7 @@ curl -X DELETE https://api.mutx.dev/api-keys/YOUR_KEY_ID \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-The dashboard uses the same revoke route and refreshes the key list after deletion.
+The dashboard uses the same revoke route and refreshes the key list after deletion. If the dashboard session is missing, the proxy returns `401 Unauthorized` without calling the backend.
 
 ## Security Best Practices
 
