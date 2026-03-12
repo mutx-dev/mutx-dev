@@ -672,34 +672,46 @@ export function AppDashboardClient() {
                 apiKeys.map((apiKey) => (
                   <div
                     key={apiKey.id}
-                    className="flex items-center justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-sm"
+                    className="rounded-lg border border-white/5 bg-white/[0.02] px-3 py-3 text-sm"
                   >
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium text-slate-300">{apiKey.name}</p>
-                      <span className="text-[10px] uppercase tracking-widest text-slate-500 font-[family:var(--font-mono)]">
-                        {apiKey.is_active ? "Active" : "Revoked"}
-                      </span>
-                    </div>
-                    {apiKey.is_active ? (
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleRotateKey(apiKey.id)}
-                          disabled={loading}
-                          className="rounded border border-cyan-500/30 px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          Rotate
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleRevokeKey(apiKey.id)}
-                          disabled={loading}
-                          className="rounded border border-rose-500/30 px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-rose-300 transition hover:border-rose-400 hover:text-rose-200 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          Revoke
-                        </button>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="truncate font-medium text-slate-300">{apiKey.name}</p>
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest ${apiKey.is_active ? "bg-emerald-400/10 text-emerald-300" : "bg-white/5 text-slate-400"}`}
+                          >
+                            <span className={`h-1.5 w-1.5 rounded-full ${apiKey.is_active ? "bg-emerald-300" : "bg-slate-500"}`} />
+                            {apiKey.is_active ? "Active" : "Revoked"}
+                          </span>
+                        </div>
+                        <div className="mt-2 space-y-1 text-[11px] text-slate-500 font-[family:var(--font-mono)]">
+                          <p>Created: {formatDate(apiKey.created_at)}</p>
+                          <p>Last used: {formatDate(apiKey.last_used)}</p>
+                          <p>Expires: {formatDate(apiKey.expires_at)}</p>
+                        </div>
                       </div>
-                    ) : null}
+                      {apiKey.is_active ? (
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleRotateKey(apiKey.id)}
+                            disabled={loading}
+                            className="rounded border border-cyan-500/30 px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-cyan-300 transition hover:border-cyan-400 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            Rotate
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRevokeKey(apiKey.id)}
+                            disabled={loading}
+                            className="rounded border border-rose-500/30 px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-rose-300 transition hover:border-rose-400 hover:text-rose-200 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            Revoke
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
                 ))
               ) : (
