@@ -53,4 +53,26 @@ describe('API key route proxies', () => {
     expect(response.status).toBe(403)
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
   })
+
+  it('preserves successful revoke responses for the dashboard proxy', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 204,
+    })
+
+    const { DELETE } = await import('../../app/api/api-keys/[id]/route')
+
+    const response = await DELETE(mockRequest(), {
+      params: Promise.resolve({ id: 'key_123' }),
+    })
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys/key_123', {
+      method: 'DELETE',
+      headers: {
+        Authorization: 'Bearer token',
+      },
+    })
+    expect(response.status).toBe(204)
+  })
 })
