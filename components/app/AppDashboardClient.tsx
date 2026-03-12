@@ -5,9 +5,7 @@ import { motion } from 'framer-motion'
 import {
   Activity,
   Bot,
-  CheckCircle2,
   Copy,
-  Database,
   KeyRound,
   Loader2,
   LogOut,
@@ -69,7 +67,6 @@ export function AppDashboardClient() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([])
   const [health, setHealth] = useState<Health | null>(null)
   const [apiKeyName, setApiKeyName] = useState('App dashboard key')
-  const [apiKeyDays, setApiKeyDays] = useState('30')
   const [createdKey, setCreatedKey] = useState<CreateKeyResponse | null>(null)
 
   const summary = useMemo(
@@ -185,7 +182,6 @@ export function AppDashboardClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: apiKeyName,
-          expires_in_days: Number(apiKeyDays) || undefined,
         }),
       })
 
@@ -200,7 +196,12 @@ export function AppDashboardClient() {
 
   async function copyKey() {
     if (!createdKey?.key) return
-    await navigator.clipboard.writeText(createdKey.key)
+
+    try {
+      await navigator.clipboard.writeText(createdKey.key)
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : 'Failed to copy API key')
+    }
   }
 
   if (!user) {
@@ -316,7 +317,7 @@ export function AppDashboardClient() {
             className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm transition hover:border-cyan-300/30 hover:text-white"
           >
             {refreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
-            Refresh
+            {refreshing ? 'Refreshing…' : 'Refresh'}
           </button>
           <button
             type="button"
