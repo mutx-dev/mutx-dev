@@ -1,6 +1,4 @@
 import click
-from typing import Optional
-from uuid import UUID
 
 from cli.config import CLIConfig, get_client
 
@@ -67,7 +65,6 @@ def install_skill(agent_id: str, skill_id: str):
         return
 
     if response.status_code == 200:
-        result = response.json()
         click.echo(f"Successfully initiated installation of '{skill_id}' for agent {agent_id}")
     elif response.status_code == 404:
         click.echo(f"Error: Agent {agent_id} not found", err=True)
