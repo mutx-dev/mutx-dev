@@ -24,6 +24,15 @@ Returns a list of all active API keys associated with your account.
 - **Endpoint**: `GET /api-keys`
 - **Auth**: JWT required
 
+Example:
+
+```bash
+curl https://api.mutx.dev/api-keys \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+The dashboard reads the same route through its Next.js proxy before rendering the API key panel.
+
 ### Create Key
 
 Generates a new API key. The plain-text key is **only shown once** in the response.
@@ -37,6 +46,17 @@ Generates a new API key. The plain-text key is **only shown once** in the respon
       "expires_in_days": 30
     }
     ```
+
+Example:
+
+```bash
+curl -X POST https://api.mutx.dev/api-keys \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Production Deployer","expires_in_days":30}'
+```
+
+The dashboard uses the same create route and reveals the new plain-text key once after a successful response.
 
 ### Rotate Key
 
