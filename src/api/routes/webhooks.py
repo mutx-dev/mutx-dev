@@ -51,7 +51,9 @@ async def create_webhook(
     for event in webhook_data.events:
         if event not in allowed_events:
             # Check for prefix.* wildcards
-            if not any(event.startswith(p.split(".")[0] + ".*") for p in allowed_events if "." in p):
+            if not any(
+                event.startswith(p.split(".")[0] + ".*") for p in allowed_events if "." in p
+            ):
                 raise HTTPException(
                     status_code=400,
                     detail=f"Invalid event: {event}. Supported events: {allowed_events}",
@@ -128,7 +130,9 @@ async def update_webhook(
         for event in webhook_data.events:
             if event not in allowed_events:
                 # Check for prefix.* wildcards
-                if not any(event.startswith(p.split(".")[0] + ".*") for p in allowed_events if "." in p):
+                if not any(
+                    event.startswith(p.split(".")[0] + ".*") for p in allowed_events if "." in p
+                ):
                     raise HTTPException(
                         status_code=400,
                         detail=f"Invalid event: {event}. Supported events: {allowed_events}",
