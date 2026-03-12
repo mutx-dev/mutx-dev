@@ -65,4 +65,15 @@ describe('dashboard route proxies', () => {
     expect(response.status).toBe(403)
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
   })
+
+  it('returns 401 from dashboard deployments proxy when no auth token exists', async () => {
+    getAuthToken.mockResolvedValue(null)
+    const { GET } = await import('../../app/api/dashboard/deployments/route')
+
+    const response = await GET(mockRequest())
+
+    expect(response.status).toBe(401)
+    await expect(response.json()).resolves.toEqual({ detail: 'Unauthorized' })
+    expect(global.fetch).not.toHaveBeenCalled()
+  })
 })
