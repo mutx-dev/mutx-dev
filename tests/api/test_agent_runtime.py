@@ -85,3 +85,43 @@ async def test_runtime_registered_agent_round_trips_metadata_as_json(client):
 
     assert detail_response.status_code == 200
     assert detail_response.json()['config'] == metadata
+
+
+@pytest.mark.asyncio
+async def test_runtime_registered_agent_api_key_authenticates_status_and_heartbeat(client):
+    register_response = await client.post(
+        '/agents/register',
+        json={
+            'name': 'runtime-auth-agent',
+            'description': 'runtime-created agent',
+            'metadata': {'provider': 'openclaw'},
+            'capabilities': ['heartbeat'],
+        },
+    )
+
+    assert register_response.status_code == 200
+    payload = register_response.json()
+    agent_id = payload['agent_id']
+    api_key = payload['api_key']
+
+    status_response = await client.get(
+        f'/agents/{agent_id}/status',
+        headers={'Authorization': f'Bearer {api_key}'},
+    )
+
+    assert status_response.status_code == 200
+    assert status_response.json()['agent_id'] == agent_id
+
+    heartbeat_response = await client.post(
+        '/agents/heartbeat',
+        headers={'Authorization': f'Bearer {api_key}'},
+        json={
+            'agent_id': agent_id,
+            'status': 'running',
+            'message': 'demo heartbeat',
+            'timestamp': datetime.utcnow().isoformat(),
+        },
+    )
+
+    assert heartbeat_response.status_code == 200
+    assert heartbeat_response.json()['agent_id'] == agent_id
