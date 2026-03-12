@@ -19,6 +19,25 @@ router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 logger = logging.getLogger(__name__)
 
 
+async def _get_owned_webhook(
+    webhook_id: uuid.UUID,
+    db: AsyncSession,
+    current_user: User,
+    *,
+    not_found_detail: str = "Webhook not found",
+    forbidden_detail: str = "Not authorized to access this webhook",
+) -> Webhook:
+    result = await db.execute(select(Webhook).where(Webhook.id == webhook_id))
+    webhook = result.scalar_one_or_none()
+
+    if not webhook:
+        raise HTTPException(status_code=404, detail=not_found_detail)
+    if webhook.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail=forbidden_detail)
+
+    return webhook
+
+
 async def get_webhook_auth(
     authorization: Optional[str] = Header(None, description="Bearer token for JWT auth"),
     x_api_key: Optional[str] = Header(
@@ -96,14 +115,7 @@ async def get_webhook(
     current_user: User = Depends(get_webhook_auth),
 ):
     """Get a specific webhook by ID."""
-    result = await db.execute(
-        select(Webhook).where(Webhook.id == webhook_id, Webhook.user_id == current_user.id)
-    )
-    webhook = result.scalar_one_or_none()
-
-    if not webhook:
-        raise HTTPException(status_code=404, detail="Webhook not found")
-
+    webhook = await _get_owned_webhook(webhook_id, db, current_user)
     return webhook
 
 
@@ -115,13 +127,7 @@ async def update_webhook(
     current_user: User = Depends(get_webhook_auth),
 ):
     """Update an existing webhook."""
-    result = await db.execute(
-        select(Webhook).where(Webhook.id == webhook_id, Webhook.user_id == current_user.id)
-    )
-    webhook = result.scalar_one_or_none()
-
-    if not webhook:
-        raise HTTPException(status_code=404, detail="Webhook not found")
+    webhook = await _get_owned_webhook(webhook_id, db, current_user)
 
     # Update fields if provided
     if webhook_data.url is not None:
@@ -163,13 +169,7 @@ async def delete_webhook(
     current_user: User = Depends(get_webhook_auth),
 ):
     """Delete a webhook."""
-    result = await db.execute(
-        select(Webhook).where(Webhook.id == webhook_id, Webhook.user_id == current_user.id)
-    )
-    webhook = result.scalar_one_or_none()
-
-    if not webhook:
-        raise HTTPException(status_code=404, detail="Webhook not found")
+    webhook = await _get_owned_webhook(webhook_id, db, current_user)
 
     await db.delete(webhook)
     await db.commit()
@@ -185,13 +185,7 @@ async def test_webhook(
     current_user: User = Depends(get_webhook_auth),
 ):
     """Send a test event to a webhook to verify it's working."""
-    result = await db.execute(
-        select(Webhook).where(Webhook.id == webhook_id, Webhook.user_id == current_user.id)
-    )
-    webhook = result.scalar_one_or_none()
-
-    if not webhook:
-        raise HTTPException(status_code=404, detail="Webhook not found")
+    webhook = await _get_owned_webhook(webhook_id, db, current_user)
 
     # Import the delivery function
     from src.api.services.webhook_service import deliver_webhook_with_retry

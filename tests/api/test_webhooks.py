@@ -1,6 +1,5 @@
 import pytest
 from httpx import AsyncClient
-import uuid
 
 @pytest.mark.asyncio
 async def test_webhook_lifecycle(client: AsyncClient, test_user):
@@ -49,11 +48,40 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
     assert response.status_code == 404
 
 @pytest.mark.asyncio
-async def test_webhook_unauthorized(client: AsyncClient):
-    # Logout or use unauthenticated client
-    # Note: client is likely pre-authenticated in these tests based on test_agents.py
-    # But usually there's a way to test unauth.
-    pass
+async def test_webhook_unauthorized(client_no_auth: AsyncClient):
+    response = await client_no_auth.get("/webhooks/")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_webhook_other_user_forbidden(
+    client: AsyncClient, other_user_client: AsyncClient, test_user
+):
+    response = await client.post(
+        "/webhooks/",
+        json={
+            "url": "https://example.com/webhook",
+            "events": ["agent.*"],
+            "secret": "test-secret",
+        },
+    )
+    assert response.status_code == 201
+    webhook_id = response.json()["id"]
+
+    get_response = await other_user_client.get(f"/webhooks/{webhook_id}")
+    assert get_response.status_code == 403
+
+    patch_response = await other_user_client.patch(
+        f"/webhooks/{webhook_id}",
+        json={"url": "https://example.com/hijacked"},
+    )
+    assert patch_response.status_code == 403
+
+    delete_response = await other_user_client.delete(f"/webhooks/{webhook_id}")
+    assert delete_response.status_code == 403
+
+    test_response = await other_user_client.post(f"/webhooks/{webhook_id}/test")
+    assert test_response.status_code == 403
 
 @pytest.mark.asyncio
 async def test_webhook_test_trigger(client: AsyncClient, test_user, monkeypatch):
