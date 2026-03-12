@@ -14,10 +14,11 @@ type TurnstileVerificationResult = {
 
 const resendApiKey = process.env.RESEND_API_KEY?.trim()
 const resendFromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'MUTX <waitlist@mutx.dev>'
+const resendWaitlistTemplateId = process.env.RESEND_WAITLIST_TEMPLATE_ID?.trim() || 'waitlist'
 const resend = resendApiKey ? new Resend(resendApiKey) : null
 
 function isEmailDeliveryConfigured() {
-  return Boolean(resend)
+  return Boolean(resend && resendFromEmail && resendWaitlistTemplateId)
 }
 
 async function sendWaitlistConfirmationEmail(to: string) {
@@ -25,28 +26,13 @@ async function sendWaitlistConfirmationEmail(to: string) {
     throw new Error('RESEND_API_KEY is not configured')
   }
 
-  const subject = "You're on the MUTX waitlist"
-  const html = `
-    <div style="font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #111;">
-      <p style="margin: 0 0 16px;">You're on the list.</p>
-      <p style="margin: 0 0 16px;">We'll send product updates, technical docs, and early-access notes as MUTX hardens into a real operator control plane.</p>
-      <p style="margin: 0; color: #666; font-size: 14px;">— MUTX</p>
-    </div>
-  `
-  const text = [
-    "You're on the MUTX waitlist.",
-    '',
-    "We'll send product updates, technical docs, and early-access notes as MUTX hardens into a real operator control plane.",
-    '',
-    '— MUTX',
-  ].join('\n')
-
   const result = await resend.emails.send({
     from: resendFromEmail,
     to: [to],
-    subject,
-    html,
-    text,
+    template: {
+      id: resendWaitlistTemplateId,
+      variables: {},
+    },
   })
 
   if (result.error) {
@@ -189,7 +175,7 @@ export async function POST(request: Request) {
         console.error('Waitlist confirmation email failed:', emailError)
       }
     } else {
-      console.warn('Waitlist email delivery skipped: RESEND_API_KEY is not configured for waitlist sender')
+      console.warn('Waitlist email delivery skipped: Resend waitlist email is not fully configured')
     }
 
     return NextResponse.json({
