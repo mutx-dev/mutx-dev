@@ -80,12 +80,27 @@ export function AppDashboardClient() {
 
   const summary = useMemo(
     () => [
-      { label: "Agents", value: String(agents.length), icon: Bot },
-      { label: "Deployments", value: String(deployments.length), icon: Rocket },
-      { label: "API Keys", value: String(apiKeys.length), icon: KeyRound },
+      {
+        label: "Agents",
+        value: String(agents.length),
+        icon: Bot,
+        detail: `${agents.filter((agent) => agent.status === 'running').length} running`,
+      },
+      {
+        label: "Deployments",
+        value: String(deployments.length),
+        icon: Rocket,
+        detail: `${deployments.filter((deployment) => deployment.status === 'running' || deployment.status === 'ready').length} active`,
+      },
+      {
+        label: "API Keys",
+        value: String(apiKeys.length),
+        icon: KeyRound,
+        detail: `${apiKeys.filter((apiKey) => apiKey.is_active).length} active`,
+      },
       { label: "Health", value: health?.status || "unknown", icon: Activity },
     ],
-    [agents.length, deployments.length, apiKeys.length, health?.status],
+    [agents, deployments, apiKeys, health?.status],
   );
 
   async function loadDashboard() {
@@ -426,7 +441,7 @@ export function AppDashboardClient() {
       ) : null}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {summary.map(({ label, value, icon: Icon }) => (
+        {summary.map(({ label, value, icon: Icon, detail }) => (
           <Card
             key={label}
             className="p-5 border border-white/5 bg-white/[0.01]"
@@ -452,6 +467,10 @@ export function AppDashboardClient() {
                 <p>updated: {formatDate(health?.timestamp)}</p>
                 {health?.error ? <p className="text-rose-300">error: {health.error}</p> : null}
               </div>
+            ) : detail ? (
+              <p className="mt-2 text-xs text-slate-500 font-[family:var(--font-mono)]">
+                {detail}
+              </p>
             ) : null}
           </Card>
         ))}
