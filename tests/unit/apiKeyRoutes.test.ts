@@ -79,44 +79,6 @@ describe('API key route proxies', () => {
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
-  it('returns 401 from rotate proxy when no auth token exists', async () => {
-    getAuthToken.mockResolvedValue(null)
-    const { POST } = await import('../../app/api/api-keys/[id]/rotate/route')
-
-    const response = await POST(mockRequest(), {
-      params: Promise.resolve({ id: 'key_123' }),
-    })
-
-    expect(response.status).toBe(401)
-    await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' })
-    expect(global.fetch).not.toHaveBeenCalled()
-  })
-
-  it('returns 401 from rotate proxy when no auth token exists', async () => {
-    getAuthToken.mockResolvedValue(null)
-    const { POST } = await import('../../app/api/api-keys/[id]/rotate/route')
-
-    const response = await POST(mockRequest(), {
-      params: Promise.resolve({ id: 'key_123' }),
-    })
-
-    expect(response.status).toBe(401)
-    await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' })
-    expect(global.fetch).not.toHaveBeenCalled()
-  })
-
-  it('returns 401 from rotate proxy when no auth token exists', async () => {
-    getAuthToken.mockResolvedValue(null)
-    const { POST } = await import('../../app/api/api-keys/[id]/rotate/route')
-
-    const response = await POST(mockRequest(), {
-      params: Promise.resolve({ id: 'key_123' }),
-    })
-
-    expect(response.status).toBe(401)
-    await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' })
-    expect(global.fetch).not.toHaveBeenCalled()
-  })
 
   it('returns 401 from rotate proxy when no auth token exists', async () => {
     getAuthToken.mockResolvedValue(null)
@@ -150,6 +112,54 @@ describe('API key route proxies', () => {
       headers: {
         Authorization: 'Bearer token',
       },
+    })
+    expect(response.status).toBe(403)
+    await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
+  })
+
+  it('preserves upstream forbidden responses for revoke proxy', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 403,
+      json: async () => ({ detail: 'Forbidden' }),
+    })
+
+    const { DELETE } = await import('../../app/api/api-keys/[id]/route')
+
+    const response = await DELETE(mockRequest(), {
+      params: Promise.resolve({ id: 'key_123' }),
+    })
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys/key_123', {
+      method: 'DELETE',
+      headers: {
+        Authorization: 'Bearer token',
+      },
+    })
+    expect(response.status).toBe(403)
+    await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
+  })
+
+  it('preserves upstream forbidden responses for create proxy', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 403,
+      json: async () => ({ detail: 'Forbidden' }),
+    })
+
+    const { POST } = await import('../../app/api/api-keys/route')
+
+    const response = await POST(mockJsonRequest({ name: 'blocked-key' }))
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: 'blocked-key' }),
     })
     expect(response.status).toBe(403)
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
