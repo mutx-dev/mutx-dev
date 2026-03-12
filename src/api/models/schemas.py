@@ -247,14 +247,18 @@ class WebhookResponse(BaseModel):
 class WebhookDelivery(BaseModel):
     """Schema for webhook delivery attempts"""
 
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
     webhook_id: uuid.UUID
     event: str
-    payload: dict
+    payload: str
     status_code: Optional[int]
     success: bool
     error_message: Optional[str]
     attempts: int
     created_at: datetime
+    delivered_at: Optional[datetime]
 
 
 class WaitlistSignupCreate(BaseModel):
