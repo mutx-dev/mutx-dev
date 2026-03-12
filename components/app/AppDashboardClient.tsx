@@ -174,6 +174,28 @@ export function AppDashboardClient() {
     }
   }
 
+  async function handleRevokeKey(id: string) {
+    setLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch(`/api/api-keys/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({ detail: 'Revoke failed' }))
+        throw new Error(payload.detail || payload.error || 'Revoke failed')
+      }
+
+      await loadDashboard()
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : 'Failed to revoke API key')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   async function handleCreateKey(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setLoading(true)
@@ -496,11 +518,24 @@ export function AppDashboardClient() {
             <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
               {apiKeys.length ? (
                 apiKeys.map((apiKey) => (
-                  <div key={apiKey.id} className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-sm">
-                    <p className="font-medium text-slate-300">{apiKey.name}</p>
-                    <span className="text-[10px] uppercase tracking-widest text-slate-500 font-[family:var(--font-mono)]">
-                      {apiKey.is_active ? 'Active' : 'Revoked'}
-                    </span>
+                  <div key={apiKey.id} className="group flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-sm transition hover:bg-white/[0.04]">
+                    <div>
+                      <p className="font-medium text-slate-300">{apiKey.name}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] uppercase tracking-widest text-slate-500 font-[family:var(--font-mono)]">
+                        {apiKey.is_active ? 'Active' : 'Revoked'}
+                      </span>
+                      {apiKey.is_active && (
+                        <button
+                          type="button"
+                          onClick={() => handleRevokeKey(apiKey.id)}
+                          className="opacity-0 group-hover:opacity-100 text-rose-400 hover:text-rose-300 transition-opacity"
+                        >
+                          <XCircle className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))
               ) : (

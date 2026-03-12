@@ -82,7 +82,12 @@ async def agent_status_update(
         db.add(error_log)
 
     await db.commit()
-    logger.info(f"Agent {agent.id} status updated to {status_data.status.value}")
+    from src.api.services.webhook_service import trigger_agent_status_event
+    await trigger_agent_status_event(
+        db, agent.id, old_status, agent.status, agent.name
+    )
+
+    logger.info(f"Agent {agent.id} status updated to {agent.status}")
     return {"status": "updated"}
 
 
@@ -143,6 +148,11 @@ async def deployment_event(
             deployment.started_at = datetime.utcnow()
 
     await db.commit()
+    from src.api.services.webhook_service import trigger_deployment_event
+    await trigger_deployment_event(
+        db, deployment.id, agent.id, event_data.event, deployment.status
+    )
+
     logger.info(f"Deployment {deployment.id} event: {event_data.event}")
     return {"status": "processed"}
 
@@ -173,5 +183,17 @@ async def receive_metrics(
     agent.last_heartbeat = datetime.utcnow()
     db.add(metric)
     await db.commit()
+    from src.api.services.webhook_service import trigger_webhook_event
+    await trigger_webhook_event(
+        db,
+        "metrics.updated",
+        {
+            "agent_id": str(metrics_data.agent_id),
+            "cpu_usage": metrics_data.cpu_usage,
+            "memory_usage": metrics_data.memory_usage,
+            "timestamp": datetime.utcnow().isoformat(),
+        },
+    )
+
     logger.debug(f"Received metrics for agent {metrics_data.agent_id}")
     return {"status": "recorded"}

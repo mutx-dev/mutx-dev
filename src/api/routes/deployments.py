@@ -168,6 +168,11 @@ async def scale_deployment(
     db.add(scale_event)
 
     await db.commit()
+    from src.api.services.webhook_service import trigger_deployment_event
+    await trigger_deployment_event(
+        db, deployment.id, deployment.agent_id, "scale", deployment.status
+    )
+
     # Re-fetch to ensure events are loaded and attributes are fresh
     deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
     logger.info(f"Scaled deployment {deployment_id} to {scale_data.replicas} replicas")
@@ -199,6 +204,11 @@ async def kill_deployment(
         agent.status = AgentStatus.STOPPED.value
 
     await db.commit()
+    from src.api.services.webhook_service import trigger_deployment_event
+    await trigger_deployment_event(
+        db, deployment.id, deployment.agent_id, "kill", deployment.status
+    )
+
     logger.info(f"Killed deployment: {deployment_id}")
 
 
@@ -243,6 +253,11 @@ async def create_deployment(
     agent.status = AgentStatus.RUNNING.value
 
     await db.commit()
+    from src.api.services.webhook_service import trigger_deployment_event
+    await trigger_deployment_event(
+        db, deployment.id, deployment_data.agent_id, "create", deployment.status
+    )
+
     # Re-fetch to ensure events are loaded and attributes are fresh
     deployment = await _get_deployment_with_ownership(deployment.id, db, current_user)
     logger.info(f"Created deployment {deployment.id} for agent {deployment_data.agent_id}")
@@ -286,6 +301,11 @@ async def restart_deployment(
         agent.status = AgentStatus.RUNNING.value
 
     await db.commit()
+    from src.api.services.webhook_service import trigger_deployment_event
+    await trigger_deployment_event(
+        db, deployment.id, deployment.agent_id, "restart", deployment.status
+    )
+
     # Re-fetch to ensure events are loaded and attributes are fresh
     deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
     logger.info(f"Restarted deployment: {deployment_id}")

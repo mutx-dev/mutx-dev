@@ -70,6 +70,19 @@ async def monitor_agent_health(session: AsyncSession):
                 message=f"Agent {agent.name} failed to report heartbeat for {STALE_THRESHOLD_SECONDS}s",
             )
             session.add(alert)
+            await session.commit()
+
+            from src.api.services.webhook_service import trigger_webhook_event
+            await trigger_webhook_event(
+                session,
+                "alert.triggered",
+                {
+                    "agent_id": str(agent.id),
+                    "alert_id": str(alert.id),
+                    "type": AlertType.AGENT_DOWN.value,
+                    "message": alert.message,
+                },
+            )
 
             # Log failure
             log = AgentLog(
@@ -99,6 +112,19 @@ async def monitor_agent_health(session: AsyncSession):
                     not Alert.resolved,
                 )
                 .values(resolved=True, resolved_at=now)
+            )
+            await session.commit()
+
+            from src.api.services.webhook_service import trigger_webhook_event
+            await trigger_webhook_event(
+                session,
+                "alert.resolved",
+                {
+                    "agent_id": str(agent.id),
+                    "type": AlertType.AGENT_DOWN.value,
+                    "message": "Agent recovered and is back to RUNNING",
+                    "resolved_at": now.isoformat(),
+                },
             )
 
             # Log recovery
