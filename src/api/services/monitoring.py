@@ -9,9 +9,8 @@ from datetime import datetime, timedelta
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.models import Agent, AgentLog, Deployment, Alert, AlertType, User
+from src.api.models import Agent, AgentLog, Deployment, Alert, AlertType
 from src.api.services.webhook_service import trigger_webhook_event
-import aiohttp
 
 logger = logging.getLogger(__name__)
 
