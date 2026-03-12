@@ -72,14 +72,33 @@ If a CLI command fails unexpectedly, compare it against the route implementation
 ## Frontend Checks
 
 ```bash
-npm run lint -- --file app/layout.tsx
+npm run test:app
 npm run build
 ```
+
+Use `npm run test:app` for the current app-level Jest coverage under `tests/unit/`. Do not rely on ad hoc `next lint --file ...` commands here; the repo's trusted baseline is `scripts/test.sh` plus targeted unit or Playwright runs.
 
 ## Playwright Note
 
 ```bash
 npx playwright test --list
+npx playwright test tests/website.spec.ts -g "waitlist verification failure is surfaced to the user"
 ```
 
-Current Playwright specs target `https://mutx.dev`, not localhost.
+Current Playwright smoke coverage runs locally via the checked-in config. Use `npx playwright test --list` first to confirm discovery and then run the smallest matching spec or grep target.
+
+## Trusted Validation Baseline
+
+```bash
+bash scripts/test.sh
+```
+
+That script is the current repo-native validation baseline and now includes:
+
+- Python lint and format checks
+- Python compile checks
+- full API pytest suite
+- OpenAPI type generation
+- app-level frontend unit tests
+- production build verification
+- targeted Playwright smoke coverage
