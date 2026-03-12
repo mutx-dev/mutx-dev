@@ -1,107 +1,76 @@
-# Webhook Ingestion API
+# Webhooks and Ingestion API
 
-The current `/webhooks` routes are ingestion endpoints for runtime and deployment callbacks.
+MUTX provides two distinct sets of webhook-related interfaces:
+1. **Ingestion API**: Endpoints for agents and deployments to report status, events, and metrics.
+2. **Webhook Registration API**: A system for users to register endpoints that receive notifications from MUTX when certain events occur.
 
-They are not a user-facing webhook registration system yet.
+## Ingestion API
 
-## Routes
+These endpoints are used by the MUTX runtime or deployed agents to report state changes back to the control plane.
+
+### Routes
 
 | Route | Purpose |
 |------|---------|
-| `POST /webhooks/agent-status` | Update an agent status and append logs |
-| `POST /webhooks/deployment` | Update deployment state and related agent state |
-| `POST /webhooks/metrics` | Record agent metrics |
+| `POST /ingest/agent-status` | Update an agent status and append logs |
+| `POST /ingest/deployment` | Update deployment state and related agent state |
+| `POST /ingest/metrics` | Record agent metrics |
 
-## Current Implementation Notes
+### Authentication
 
-- These handlers are designed for internal callbacks or deployed agent infrastructure.
-- There are no `GET /webhooks`, `POST /webhooks`, `PUT /webhooks/{id}`, or `DELETE /webhooks/{id}` routes in the current server.
-- The current route handlers do not attach auth dependencies.
+Ingest endpoints require authentication via:
+- **JWT Bearer Token**: Provide in the `Authorization: Bearer <token>` header.
+- **API Key**: Provide in the `X-API-Key` header.
 
-## Agent Status Update
+### Agent Status Update
 
 ```bash
-BASE_URL=http://localhost:8000
-
-curl -X POST "$BASE_URL/webhooks/agent-status" \
+curl -X POST "https://api.mutx.dev/ingest/agent-status" \
+  -H "X-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "agent_id": "YOUR_AGENT_ID",
     "status": "running",
-    "node_id": "node-123",
-    "error_message": null
+    "node_id": "node-123"
   }'
 ```
 
-Payload fields:
+## Webhook Registration API (User Facing)
 
-| Field | Type | Required |
-|------|------|----------|
-| `agent_id` | UUID | yes |
-| `status` | enum | yes |
-| `node_id` | string | no |
-| `error_message` | string | no |
+Register your own endpoints to receive real-time notifications from MUTX.
 
-## Deployment Event
+### Supported Events
+
+- `agent.*`: All agent-related events
+- `deployment.*`: All deployment-related events
+- `metrics.*`: Periodic metrics reports
+- `alert.*`: System alerts and thresholds
+- `*`: All events
+
+### Registration
 
 ```bash
-curl -X POST "$BASE_URL/webhooks/deployment" \
+curl -X POST "https://api.mutx.dev/webhooks/" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "deployment_id": "YOUR_DEPLOYMENT_ID",
-    "event": "healthy",
-    "status": "running",
-    "node_id": "node-123",
-    "error_message": null
+    "url": "https://your-app.com/webhooks/mutx",
+    "events": ["agent.status_changed", "deployment.failed"],
+    "secret": "optional-hmac-secret"
   }'
 ```
 
-Payload fields:
+### Management Endpoints
 
-| Field | Type | Required |
-|------|------|----------|
-| `deployment_id` | UUID | yes |
-| `event` | string | yes |
-| `status` | string | no |
-| `node_id` | string | no |
-| `error_message` | string | no |
+| Method | Route | Purpose |
+|--------|-------|---------|
+| `GET` | `/webhooks/` | List all registered webhooks |
+| `GET` | `/webhooks/{id}` | Get a specific webhook |
+| `PATCH` | `/webhooks/{id}` | Update a webhook (URL, events, active status) |
+| `DELETE` | `/webhooks/{id}` | Remove a webhook |
+| `POST` | `/webhooks/{id}/test` | Send a test event to verify delivery |
 
-## Metrics Report
+## Delivery and Security
 
-```bash
-curl -X POST "$BASE_URL/webhooks/metrics" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "agent_id": "YOUR_AGENT_ID",
-    "cpu_usage": 42.5,
-    "memory_usage": 68.1
-  }'
-```
-
-Payload fields:
-
-| Field | Type | Required |
-|------|------|----------|
-| `agent_id` | UUID | yes |
-| `cpu_usage` | float | yes |
-| `memory_usage` | float | yes |
-
-## Response Shape
-
-All three routes currently return a small confirmation body such as:
-
-```json
-{"status": "updated"}
-```
-
-or:
-
-```json
-{"status": "processed"}
-```
-
-or:
-
-```json
-{"status": "recorded"}
-```
+- **Retries**: MUTX will retry failed deliveries up to 5 times with exponential backoff.
+- **Signatures**: If a `secret` is provided during registration, MUTX will include an `X-MUTX-Signature` header (HMAC-SHA256) for payload verification.
