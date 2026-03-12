@@ -149,6 +149,41 @@ async def test_webhook_delivery_history_filters(client: AsyncClient, db_session,
 
 
 @pytest.mark.asyncio
+async def test_webhook_delivery_history_supports_legacy_user_api_key_auth(
+    client: AsyncClient, client_no_auth: AsyncClient, db_session, test_user
+):
+    create_response = await client.post(
+        "/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["*"]},
+    )
+    assert create_response.status_code == 201
+    webhook_id = uuid.UUID(create_response.json()["id"])
+
+    test_user.api_key = "legacy-webhook-key"
+    db_session.add(test_user)
+    db_session.add(
+        WebhookDeliveryLog(
+            webhook_id=webhook_id,
+            event="agent.heartbeat",
+            payload='{"status":"running"}',
+            success=True,
+            attempts=1,
+        )
+    )
+    await db_session.commit()
+
+    response = await client_no_auth.get(
+        f"/webhooks/{webhook_id}/deliveries",
+        headers={"X-API-Key": "legacy-webhook-key"},
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["event"] == "agent.heartbeat"
+
+
+@pytest.mark.asyncio
 async def test_webhook_delivery_history_other_user_forbidden(
     client: AsyncClient, other_user_client: AsyncClient, db_session, test_user
 ):
