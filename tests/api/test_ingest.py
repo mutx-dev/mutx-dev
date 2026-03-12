@@ -142,3 +142,25 @@ async def test_agent_runtime_heartbeat_emits_status_webhook_on_status_change(
     assert delivered[1][1]["new_status"] == "running"
 
     client.app.dependency_overrides.pop(get_current_agent, None)
+
+
+@pytest.mark.asyncio
+async def test_runtime_manager_delete_runtime_clears_default_runtime_reference():
+    from src.api.services.agent_runtime import RuntimeConfig, RuntimeManager
+
+    RuntimeManager._runtimes = {}
+    RuntimeManager._default_runtime = None
+
+    runtime = RuntimeManager.get_or_create_default(RuntimeConfig(default_timeout=123))
+
+    assert RuntimeManager.delete_runtime(runtime.runtime_id) is True
+    assert RuntimeManager.get_runtime(runtime.runtime_id) is None
+    assert RuntimeManager._default_runtime is None
+
+    replacement = RuntimeManager.get_or_create_default(RuntimeConfig(default_timeout=456))
+
+    assert replacement.runtime_id != runtime.runtime_id
+    assert replacement.config.default_timeout == 456
+
+    RuntimeManager._runtimes = {}
+    RuntimeManager._default_runtime = None
