@@ -41,7 +41,8 @@ async def monitor_agent_health(session: AsyncSession):
             dep_check = await session.execute(
                 select(Deployment).where(Deployment.agent_id == agent.id)
             )
-            if not dep_check.scalar_one_or_none():
+            deployment = dep_check.scalar_one_or_none()
+            if not deployment:
                 deployment = Deployment(
                     agent_id=agent.id,
                     status="running",
@@ -50,8 +51,17 @@ async def monitor_agent_health(session: AsyncSession):
                     node_id=f"node-{uuid.uuid4().hex[:6]}",
                 )
                 session.add(deployment)
+                await session.flush()
 
             logger.info(f"Monitor: Agent {agent.name} ({agent.id}) promoted to RUNNING")
+
+            from src.api.services.webhook_service import trigger_agent_status_event, trigger_deployment_event
+            await trigger_agent_status_event(
+                session, agent.id, "creating", "running", agent.name
+            )
+            await trigger_deployment_event(
+                session, deployment.id, agent.id, "healthy", "running"
+            )
 
     # 2. Detect Heartbeat Failures
     result = await session.execute(select(Agent).where(Agent.status == "running"))
