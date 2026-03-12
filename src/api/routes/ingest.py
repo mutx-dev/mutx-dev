@@ -27,6 +27,10 @@ from src.api.services.webhook_service import (
     trigger_webhook_event,
 )
 
+
+ACTIVE_DEPLOYMENT_STATUSES = {"running", "ready", "active", "healthy"}
+TERMINAL_DEPLOYMENT_STATUSES = {"stopped", "failed", "killed"}
+
 router = APIRouter(prefix="/ingest", tags=["ingest"])
 logger = logging.getLogger(__name__)
 
@@ -114,17 +118,21 @@ async def deployment_event(
     if not agent or agent.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to update this deployment")
 
-    if event_data.status:
-        deployment.status = event_data.status
+    effective_status = event_data.status or deployment.status
+
+    if event_data.error_message:
+        effective_status = "failed"
 
     if event_data.node_id:
         deployment.node_id = event_data.node_id
 
-    # Record the event in the lifecycle history
+    deployment.status = effective_status
+
+    # Record the event in the lifecycle history using the resolved status.
     new_event = DeploymentEventModel(
         deployment_id=deployment.id,
         event_type=event_data.event,
-        status=event_data.status or deployment.status,
+        status=effective_status,
         node_id=event_data.node_id,
         error_message=event_data.error_message,
     )
@@ -132,7 +140,6 @@ async def deployment_event(
 
     if event_data.error_message:
         deployment.error_message = event_data.error_message
-        deployment.status = "failed"
         error_log = AgentLog(
             agent_id=deployment.agent_id,
             level="error",
@@ -140,16 +147,21 @@ async def deployment_event(
             extra_data=f"deployment_id: {deployment.id}, event: {event_data.event}",
         )
         db.add(error_log)
+    elif effective_status in ACTIVE_DEPLOYMENT_STATUSES:
+        deployment.error_message = None
 
-    if event_data.event == "stopped" or event_data.status == "stopped":
+    if effective_status in TERMINAL_DEPLOYMENT_STATUSES:
         deployment.ended_at = datetime.utcnow()
         if agent:
-            agent.status = AgentStatus.STOPPED.value
+            agent.status = AgentStatus.STOPPED.value if effective_status == "stopped" else AgentStatus.FAILED.value
 
-    if event_data.event == "healthy" or event_data.status == "running":
+    if effective_status in ACTIVE_DEPLOYMENT_STATUSES:
         deployment.status = "running"
         if deployment.started_at is None:
             deployment.started_at = datetime.utcnow()
+        deployment.ended_at = None
+        if agent:
+            agent.status = AgentStatus.RUNNING.value
 
     await db.commit()
 
