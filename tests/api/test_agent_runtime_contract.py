@@ -98,3 +98,39 @@ async def test_connected_agent_runtime_sdk_uses_status_auth_contract(client: Asy
     assert heartbeat_response["agent_id"] == payload["agent_id"]
 
     await sdk_client.close()
+
+
+@pytest.mark.asyncio
+async def test_agent_status_auth_rejects_other_agent_api_key(client: AsyncClient):
+    first = await client.post(
+        "/agents/register",
+        json={
+            "name": "owner-a",
+            "description": "ownership check a",
+            "metadata": {"demo": True},
+            "capabilities": ["heartbeat"],
+        },
+    )
+    second = await client.post(
+        "/agents/register",
+        json={
+            "name": "owner-b",
+            "description": "ownership check b",
+            "metadata": {"demo": True},
+            "capabilities": ["heartbeat"],
+        },
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+
+    first_payload = first.json()
+    second_payload = second.json()
+
+    wrong_auth_response = await client.get(
+        f"/agents/{second_payload['agent_id']}/status",
+        headers={"Authorization": f"Bearer {first_payload['api_key']}"},
+    )
+
+    assert wrong_auth_response.status_code == 403
+    assert wrong_auth_response.json()["detail"] == "Agent ID mismatch"
