@@ -36,6 +36,17 @@ describe('API key route proxies', () => {
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
+  it('returns 401 from list proxy when no auth token exists', async () => {
+    getAuthToken.mockResolvedValue(null)
+    const { GET } = await import('../../app/api/api-keys/route')
+
+    const response = await GET(mockRequest())
+
+    expect(response.status).toBe(401)
+    await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' })
+    expect(global.fetch).not.toHaveBeenCalled()
+  })
+
   it('preserves upstream forbidden responses for rotate proxy', async () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock).mockResolvedValue({
