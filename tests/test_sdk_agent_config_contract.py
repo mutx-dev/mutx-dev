@@ -11,7 +11,7 @@ import httpx
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "sdk"))
 
 from mutx import Deployments, Webhooks
-from mutx.agents import Agent, Agents
+from mutx.agents import Agent, AgentDetail, Agents
 
 
 def _agent_payload(config: Any = None, **overrides: Any) -> dict[str, Any]:
@@ -80,3 +80,58 @@ def test_agents_create_accepts_json_string_config_and_preserves_it() -> None:
 def test_top_level_sdk_exports_include_deployments_and_webhooks() -> None:
     assert Deployments is not None
     assert Webhooks is not None
+
+
+def test_agent_detail_parses_nested_deployments_and_events() -> None:
+    deployment_id = uuid.uuid4()
+    detail = AgentDetail(
+        _agent_payload(
+            deployments=[
+                {
+                    "id": str(deployment_id),
+                    "agent_id": str(uuid.uuid4()),
+                    "status": "running",
+                    "replicas": 2,
+                    "node_id": "node-1",
+                    "started_at": "2026-03-12T10:00:00",
+                    "ended_at": None,
+                    "error_message": None,
+                    "events": [
+                        {
+                            "id": str(uuid.uuid4()),
+                            "deployment_id": str(deployment_id),
+                            "event_type": "deploy",
+                            "status": "running",
+                            "node_id": "node-1",
+                            "error_message": None,
+                            "created_at": "2026-03-12T10:00:01",
+                        }
+                    ],
+                }
+            ]
+        )
+    )
+
+    assert len(detail.deployments) == 1
+    assert detail.deployments[0].status == "running"
+    assert detail.deployments[0].replicas == 2
+    assert len(detail.deployments[0].events) == 1
+    assert detail.deployments[0].events[0].event_type == "deploy"
+
+
+def test_agent_logs_maps_backend_extra_data_field_to_sdk_aliases() -> None:
+    agent_id = uuid.uuid4()
+    log_payload = [{
+        "id": str(uuid.uuid4()),
+        "agent_id": str(agent_id),
+        "level": "INFO",
+        "message": "ready",
+        "extra_data": '{"deployment_id":"abc"}',
+        "timestamp": "2026-03-12T10:15:00",
+    }]
+
+    client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(lambda request: httpx.Response(200, json=log_payload)))
+    logs = Agents(client).logs(agent_id)
+
+    assert logs[0].extra_data == '{"deployment_id":"abc"}'
+    assert logs[0].metadata == '{"deployment_id":"abc"}'

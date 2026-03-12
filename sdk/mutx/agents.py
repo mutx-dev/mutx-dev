@@ -35,10 +35,16 @@ class Agent:
         return f"Agent(id={self.id}, name={self.name}, status={self.status})"
 
 
-class AgentDetail(Agent):
+class DeploymentEvent:
     def __init__(self, data: dict[str, Any]):
-        super().__init__(data)
-        self.deployments = [Deployment(d) for d in data.get("deployments", [])]
+        self.id = UUID(data["id"])
+        self.deployment_id = UUID(data["deployment_id"])
+        self.event_type = data["event_type"]
+        self.status = data["status"]
+        self.node_id = data.get("node_id")
+        self.error_message = data.get("error_message")
+        self.created_at = datetime.fromisoformat(data["created_at"])
+        self._data = data
 
 
 class Deployment:
@@ -48,10 +54,17 @@ class Deployment:
         self.status = data["status"]
         self.replicas = data["replicas"]
         self.node_id = data.get("node_id")
-        self.started_at = datetime.fromisoformat(data["started_at"])
+        self.started_at = datetime.fromisoformat(data["started_at"]) if data.get("started_at") else None
         self.ended_at = datetime.fromisoformat(data["ended_at"]) if data.get("ended_at") else None
         self.error_message = data.get("error_message")
+        self.events = [DeploymentEvent(item) for item in data.get("events", [])]
         self._data = data
+
+
+class AgentDetail(Agent):
+    def __init__(self, data: dict[str, Any]):
+        super().__init__(data)
+        self.deployments = [Deployment(d) for d in data.get("deployments", [])]
 
 
 class AgentLog:
@@ -61,7 +74,8 @@ class AgentLog:
         self.level = data["level"]
         self.message = data["message"]
         self.timestamp = datetime.fromisoformat(data["timestamp"])
-        self.metadata = data.get("metadata")
+        self.extra_data = data.get("extra_data")
+        self.metadata = data.get("metadata", self.extra_data)
         self._data = data
 
 
