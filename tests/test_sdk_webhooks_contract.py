@@ -27,37 +27,11 @@ def _webhook_payload(**overrides: Any) -> dict[str, Any]:
     return payload
 
 
-def _delivery_payload(**overrides: Any) -> dict[str, Any]:
-    payload = {
-        "id": str(uuid.uuid4()),
-        "webhook_id": str(uuid.uuid4()),
-        "event": "agent.status",
-        "payload": '{"new_status":"running"}',
-        "success": True,
-        "status_code": 200,
-        "response_body": "ok",
-        "error_message": None,
-        "attempts": 1,
-        "delivered_at": "2026-03-12T08:17:00",
-        "created_at": "2026-03-12T08:16:30",
-    }
-    payload.update(overrides)
-    return payload
-
-
 def test_webhook_parses_is_active_and_keeps_active_alias() -> None:
     webhook = Webhook(_webhook_payload(is_active=False))
 
     assert webhook.is_active is False
     assert webhook.active is False
-
-
-def test_webhook_delivery_parses_optional_contract_fields() -> None:
-    delivery = WebhookDelivery(_delivery_payload(status_code=None, delivered_at=None))
-
-    assert delivery.event == "agent.status"
-    assert delivery.status_code is None
-    assert delivery.delivered_at is None
 
 
 def test_webhooks_create_uses_trailing_slash_route_and_is_active_contract_field() -> None:
@@ -97,13 +71,38 @@ def test_webhooks_update_maps_legacy_active_to_is_active_field() -> None:
     assert captured["json"] == {"is_active": False}
 
 
+def _delivery_payload(**overrides: Any) -> dict[str, Any]:
+    payload = {
+        "id": str(uuid.uuid4()),
+        "webhook_id": str(uuid.uuid4()),
+        "event": "agent.status",
+        "payload": '{"status":"running"}',
+        "status_code": 202,
+        "success": True,
+        "error_message": None,
+        "attempts": 1,
+        "created_at": "2026-03-12T08:18:00",
+        "delivered_at": "2026-03-12T08:18:01",
+    }
+    payload.update(overrides)
+    return payload
+
+
+def test_webhook_delivery_parses_optional_contract_fields() -> None:
+    delivery = WebhookDelivery(_delivery_payload(status_code=None, error_message="boom", delivered_at=None))
+
+    assert delivery.status_code is None
+    assert delivery.error_message == "boom"
+    assert delivery.delivered_at is None
+
+
 def test_webhooks_get_deliveries_uses_live_backend_route_and_filters() -> None:
     captured: dict[str, Any] = {}
     webhook_id = uuid.uuid4()
 
     def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
-        captured["query"] = dict(request.url.params)
+        captured["params"] = dict(request.url.params)
         return httpx.Response(200, json=[_delivery_payload(webhook_id=str(webhook_id))])
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
@@ -114,11 +113,11 @@ def test_webhooks_get_deliveries_uses_live_backend_route_and_filters() -> None:
     )
 
     assert captured["path"] == f"/webhooks/{webhook_id}/deliveries"
-    assert captured["query"] == {
+    assert captured["params"] == {
         "skip": "5",
         "limit": "10",
         "event": "agent.status",
         "success": "false",
     }
     assert len(deliveries) == 1
-    assert deliveries[0].success is True
+    assert deliveries[0].webhook_id == webhook_id

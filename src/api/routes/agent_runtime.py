@@ -38,11 +38,8 @@ router = APIRouter(prefix="/agents", tags=["agent-runtime"])
 class AgentRegisterRequest(BaseModel):
     name: str
     description: Optional[str] = ""
-<<<<<<< HEAD
     metadata: dict[str, Any] = {}
-=======
-    metadata: dict = {}
->>>>>>> 5da86b3 (fix(api): clean runtime deletion and remove dead auth helper)
+    metadata: dict[str, Any] = {}
     capabilities: list[str] = []
 
 
@@ -77,11 +74,8 @@ class LogRequest(BaseModel):
     agent_id: str
     level: str = "info"
     message: str
-<<<<<<< HEAD
     metadata: dict[str, Any] = {}
-=======
-    metadata: dict = {}
->>>>>>> 5da86b3 (fix(api): clean runtime deletion and remove dead auth helper)
+    metadata: dict[str, Any] = {}
     timestamp: str
 
 
