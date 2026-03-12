@@ -184,6 +184,32 @@ def get_logs(agent_id: str, limit: int, level: Optional[str]):
         click.echo(f"Error: {response.text}", err=True)
 
 
+@agents_group.command(name="stop")
+@click.argument("agent_id")
+def stop_agent(agent_id: str):
+    """Stop a running agent"""
+    config_obj = CLIConfig()
+    if not config_obj.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        return
+
+    client = get_client(config_obj)
+    response = client.post(f"/agents/{agent_id}/stop")
+
+    if response.status_code == 401:
+        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+        return
+
+    if response.status_code == 200:
+        result = response.json()
+        click.echo(f"Stopped agent: {agent_id}")
+        click.echo(f"Status: {result.get('status')}")
+    elif response.status_code == 404:
+        click.echo("Error: Agent not found", err=True)
+    else:
+        click.echo(f"Error: {response.text}", err=True)
+
+
 @agents_group.command(name="status")
 @click.argument("agent_id")
 def get_status(agent_id: str):

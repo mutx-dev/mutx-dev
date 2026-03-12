@@ -66,9 +66,46 @@ curl -X POST "https://api.mutx.dev/webhooks/" \
 |--------|-------|---------|
 | `GET` | `/webhooks/` | List all registered webhooks |
 | `GET` | `/webhooks/{id}` | Get a specific webhook |
+| `GET` | `/webhooks/{id}/deliveries` | List delivery attempts for one webhook |
 | `PATCH` | `/webhooks/{id}` | Update a webhook (URL, events, active status) |
 | `DELETE` | `/webhooks/{id}` | Remove a webhook |
 | `POST` | `/webhooks/{id}/test` | Send a test event to verify delivery |
+
+### Delivery History
+
+Delivery attempts are persisted and can be queried directly:
+
+```bash
+curl "https://api.mutx.dev/webhooks/YOUR_WEBHOOK_ID/deliveries?limit=20" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+curl "https://api.mutx.dev/webhooks/YOUR_WEBHOOK_ID/deliveries?event=agent.status&success=false" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+Supported query parameters:
+
+- `skip`
+- `limit`
+- `event`
+- `success`
+
+Example response item:
+
+```json
+{
+  "id": "uuid",
+  "webhook_id": "uuid",
+  "event": "agent.status",
+  "payload": "{\"new_status\":\"failed\"}",
+  "status_code": 502,
+  "success": false,
+  "error_message": "upstream timeout",
+  "attempts": 2,
+  "created_at": "2026-03-12T09:15:00Z",
+  "delivered_at": null
+}
+```
 
 ## Delivery and Security
 

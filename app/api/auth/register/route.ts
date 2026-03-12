@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getApiBaseUrl } from '@/app/api/_lib/controlPlane'
+import { getApiBaseUrl, getCookieDomain, shouldUseSecureCookies } from '@/app/api/_lib/controlPlane'
 
 const API_BASE_URL = getApiBaseUrl()
 
@@ -9,6 +9,8 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    const secureCookies = shouldUseSecureCookies(request)
+    const cookieDomain = getCookieDomain(request)
 
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
@@ -27,14 +29,16 @@ export async function POST(request: NextRequest) {
     nextResponse.cookies.set('access_token', payload.access_token, {
       httpOnly: false,
       sameSite: 'lax',
-      secure: true,
+      secure: secureCookies,
+      domain: cookieDomain,
       path: '/',
       maxAge: payload.expires_in || 1800,
     })
     nextResponse.cookies.set('refresh_token', payload.refresh_token, {
       httpOnly: false,
       sameSite: 'lax',
-      secure: true,
+      secure: secureCookies,
+      domain: cookieDomain,
       path: '/',
       maxAge: 60 * 60 * 24 * 7,
     })

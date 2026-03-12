@@ -74,48 +74,19 @@ async def get_current_user_optional(
     return user
 
 
-async def get_api_key_user(
-    x_api_key: Optional[str] = Header(None),
-    session: AsyncSession = Depends(get_db),
-) -> Optional[User]:
-    """Authenticate using the user's main API key (from User table)."""
-    if not x_api_key:
-        return None
-
-    user_service = UserService(session)
-    user = await user_service.get_user_by_api_key(x_api_key)
-    if not user or not user.is_active:
-        return None
-
-    return user
-
-
 async def get_user_from_api_key(
     x_api_key: Optional[str] = Header(None, alias="X-API-Key"),
     session: AsyncSession = Depends(get_db),
 ) -> Optional[User]:
-    """Authenticate using a user-created API key (from APIKey table)."""
+    """Authenticate using any active user-owned API key."""
     if not x_api_key:
         return None
 
     user_service = UserService(session)
+    return await user_service.get_user_for_api_key(x_api_key)
 
-    # Try to find the user by checking all their API keys
-    # This requires iterating through user API keys - for efficiency,
-    # we could add a lookup by prefix or store a reference
-    # For now, we'll iterate through users and check their keys
-    from sqlalchemy import select
-    from src.api.models.models import User
 
-    result = await session.execute(select(User).where(User.is_active))
-    users = result.scalars().all()
-
-    for user in users:
-        api_key_obj = await user_service.verify_api_key(x_api_key, user.id)
-        if api_key_obj:
-            return user
-
-    return None
+get_api_key_user = get_user_from_api_key
 
 
 async def get_current_user_or_api_key(
@@ -139,16 +110,9 @@ async def get_current_user_or_api_key(
     # Try API key
     if x_api_key:
         user_service = UserService(session)
-        from sqlalchemy import select
-        from src.api.models.models import User
-
-        result = await session.execute(select(User).where(User.is_active))
-        users = result.scalars().all()
-
-        for user in users:
-            api_key_obj = await user_service.verify_api_key(x_api_key, user.id)
-            if api_key_obj:
-                return user
+        user = await user_service.get_user_for_api_key(x_api_key)
+        if user:
+            return user
 
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

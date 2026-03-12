@@ -8,14 +8,6 @@
   <strong>Deploy, run, observe, and govern AI agents like you deploy services.</strong>
 </p>
 
-<p align="center">
-  <a href="./MANIFESTO.md"><strong>Our Manifesto</strong></a> ·
-  <a href="./WHITEPAPER.md"><strong>Technical Whitepaper</strong></a> ·
-  <a href="https://mutx.dev"><strong>Live Preview</strong></a> ·
-  <a href="./docs/README.md"><strong>Read Docs</strong></a> ·
-  <a href="https://github.com/fortunexbt/mutx-dev"><strong>GitHub</strong></a>
-</p>
-
 ---
 
 ## Start Here

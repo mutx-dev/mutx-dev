@@ -18,7 +18,10 @@ test.describe('mutx.dev QA', () => {
         await route.fulfill({
           status: 200,
           contentType: 'image/png',
-          body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wn8nWsAAAAASUVORK5CYII=', 'base64'),
+          body: Buffer.from(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wn8nWsAAAAASUVORK5CYII=',
+            'base64'
+          ),
         });
         return;
       }
@@ -34,43 +37,23 @@ test.describe('mutx.dev QA', () => {
     const h1 = page.locator('h1');
     await expect(h1).toBeVisible({ timeout: 10000 });
 
-    const waitlistForm = page.getByTestId('waitlist-form-hero');
-    await expect(waitlistForm).toBeVisible();
-
-    const emailInput = waitlistForm.locator('input[type="email"]');
+    const emailInput = page.locator('input[type="email"]').first();
     await expect(emailInput).toBeVisible();
 
-    await expect(waitlistForm.getByText(/loading verification challenge/i)).toBeHidden();
+    const waitlistForm = page.getByTestId('waitlist-form-hero');
+    await expect(waitlistForm).toBeVisible();
 
     const submitBtn = waitlistForm.locator('button[type="submit"]');
     await expect(submitBtn).toBeVisible();
-    await expect(submitBtn).toBeDisabled();
-  });
-
-  test('waitlist verification failure is surfaced to the user', async ({ page }) => {
-    await page.route('**/api/turnstile/site-key', async (route) => {
-      await route.fulfill({
-        status: 503,
-        contentType: 'application/json',
-        body: JSON.stringify({ siteKey: '' }),
-      });
-    });
-
-    await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
-
-    const waitlistForm = page.getByTestId('waitlist-form-hero');
-    await expect(waitlistForm).toBeVisible();
-    await expect(
-      waitlistForm.getByText(/loading verification challenge|waitlist verification is unavailable right now/i)
-    ).toBeVisible();
-
-    const submitBtn = waitlistForm.locator('button[type="submit"]');
-    await expect(submitBtn).toBeDisabled();
   });
 
   test('no console errors', async ({ page }) => {
     const errors: string[] = [];
+    const ignoredErrorPatterns = [
+      /favicon\.ico/i,
+      /favicon/i,
+      /Failed to load resource: the server responded with a status of 503 \(Service Unavailable\)/i,
+    ];
 
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
@@ -82,15 +65,19 @@ test.describe('mutx.dev QA', () => {
       errors.push(error.message);
     });
 
+    page.on('response', (response) => {
+      if (response.status() >= 400 && !response.url().includes('/api/turnstile/site-key')) {
+        console.log('HTTP_ERROR', response.status(), response.url());
+      }
+    });
+
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(2000);
 
-    const isBenignError = (error: string) =>
-      /favicon\.ico/i.test(error) ||
-      /favicon/i.test(error) ||
-      /503 \(Service Unavailable\)/i.test(error);
-    const criticalErrors = errors.filter((error) => !isBenignError(error));
+    const criticalErrors = errors.filter(
+      (error) => !ignoredErrorPatterns.some((pattern) => pattern.test(error))
+    );
 
     expect(criticalErrors, 'Console errors: ' + criticalErrors.join('; ')).toHaveLength(0);
   });

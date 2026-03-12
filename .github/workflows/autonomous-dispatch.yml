@@ -116,7 +116,7 @@ jobs:
                 body: [
                   'Autonomous dispatch released this stale claim.',
                   '',
-                  `- no open PR was found for the claimed branch${branchName ? ` \\`${branchName}\\`` : ''}`,
+                  '- no open PR was found for the claimed branch' + (branchName ? ` - \`${branchName}\`` : ''),
                   `- stale threshold: ${staleMinutes} minutes`,
                   '- the issue is eligible for re-dispatch',
                 ].join('\n'),

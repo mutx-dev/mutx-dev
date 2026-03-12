@@ -1,6 +1,6 @@
 # API Keys
 
-API keys allow you to authenticate with the mutx.dev API without using session cookies or manual JWT tokens. They are ideal for automation, CI/CD, and agent-to-agent communication.
+API keys allow you to authenticate with the MUTX API without using session cookies or manual JWT tokens. They are ideal for automation, CI/CD, and agent-to-agent communication.
 
 ## Key Types
 
@@ -12,7 +12,7 @@ API keys allow you to authenticate with the mutx.dev API without using session c
 To use an API key, include it in the `X-API-Key` header of your requests:
 
 ```bash
-curl -H "X-API-Key: mutx_live_your_key_here" https://api.mutx.dev/v1/agents
+curl -H "X-API-Key: mutx_live_your_key_here" https://api.mutx.dev/agents
 ```
 
 ## Lifecycle Management
@@ -45,12 +45,30 @@ Revokes the specified key and generates a new one with the same name and expirat
 - **Endpoint**: `POST /api-keys/{key_id}/rotate`
 - **Auth**: JWT required
 
+Example:
+
+```bash
+curl -X POST https://api.mutx.dev/api-keys/YOUR_KEY_ID/rotate \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+The dashboard uses the same rotate route through its Next.js proxy and immediately reveals the newly issued plain-text key once.
+
 ### Revoke Key
 
 Permanently deactivates and deletes the specified API key.
 
 - **Endpoint**: `DELETE /api-keys/{key_id}`
 - **Auth**: JWT required
+
+Example:
+
+```bash
+curl -X DELETE https://api.mutx.dev/api-keys/YOUR_KEY_ID \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+The dashboard uses the same revoke route and refreshes the key list after deletion.
 
 ## Security Best Practices
 

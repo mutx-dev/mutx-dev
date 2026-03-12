@@ -17,9 +17,10 @@ Routes are mounted directly at top-level prefixes. There is no global `/v1` back
 | Root | `GET /`, `GET /health`, `GET /ready` |
 | Auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me` |
 | Agents | `POST /agents`, `GET /agents`, `GET /agents/{agent_id}`, `DELETE /agents/{agent_id}`, `POST /agents/{agent_id}/deploy`, `POST /agents/{agent_id}/stop`, `GET /agents/{agent_id}/logs`, `GET /agents/{agent_id}/metrics` |
-| Deployments | `GET /deployments`, `POST /deployments`, `GET /deployments/{deployment_id}`, `POST /deployments/{deployment_id}/scale`, `POST /deployments/{deployment_id}/restart`, `DELETE /deployments/{deployment_id}` |
+| Agent Runtime | `POST /agents/register`, `POST /agents/heartbeat`, `POST /agents/metrics`, `GET /agents/commands`, `POST /agents/commands/acknowledge`, `POST /agents/logs`, `GET /agents/{agent_id}/status` |
+| Deployments | `GET /deployments`, `GET /deployments/{deployment_id}`, `GET /deployments/{deployment_id}/events`, `POST /deployments/{deployment_id}/scale`, `POST /deployments/{deployment_id}/restart`, `DELETE /deployments/{deployment_id}` |
 | API Keys | `GET /api-keys`, `POST /api-keys`, `DELETE /api-keys/{key_id}`, `POST /api-keys/{key_id}/rotate` |
-| Webhooks | `POST /webhooks/agent-status`, `POST /webhooks/deployment`, `POST /webhooks/metrics` |
+| Webhooks | `GET /webhooks/`, `GET /webhooks/{id}`, `GET /webhooks/{id}/deliveries`, `PATCH /webhooks/{id}`, `DELETE /webhooks/{id}`, `POST /webhooks/{id}/test`, `POST /webhooks/agent-status`, `POST /webhooks/deployment`, `POST /webhooks/metrics` |
 | Newsletter | `GET /newsletter`, `POST /newsletter` |
 | Leads | `POST /leads`, `GET /leads`, `GET /leads/{lead_id}` |
 
@@ -32,6 +33,8 @@ The Next.js app also exposes same-origin route handlers under `app/api/` for bro
 - `/api/dashboard/agents`
 - `/api/dashboard/deployments`
 - `/api/api-keys`
+- `/api/api-keys/[id]`
+- `/api/api-keys/[id]/rotate`
 - `/api/newsletter`
 
 Use the FastAPI routes for direct control-plane integrations and the Next.js route handlers for browser or app-surface flows.
@@ -56,6 +59,8 @@ Authenticated requests require a bearer token:
 curl "$BASE_URL/auth/me" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
+
+Agent runtime routes use the agent API key as the bearer token rather than a user access token.
 
 ## Health And Readiness
 
