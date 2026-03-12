@@ -9,7 +9,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.config import get_settings
 from src.api.database import dispose_engine, init_db
 from src.api.models.schemas import HealthResponse
-from src.api.routes import agents, deployments, webhooks, auth, clawhub, api_keys, newsletter, agent_runtime
+from src.api.routes import (
+    agents,
+    deployments,
+    webhooks,
+    auth,
+    clawhub,
+    api_keys,
+    newsletter,
+    agent_runtime,
+    ingest,
+)
 from src.api.metrics import router as metrics_router, track_request
 from src.api.services.monitor import start_background_monitor
 
@@ -127,6 +137,7 @@ app.include_router(clawhub.router)
 app.include_router(api_keys.router)
 app.include_router(newsletter.router)
 app.include_router(agent_runtime.router)
+app.include_router(ingest.router)
 
 
 @app.get("/health", response_model=HealthResponse)

@@ -22,7 +22,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.models import Agent, AgentLog, AgentMetric, AgentStatus, Command
+from src.api.middleware.auth import get_current_agent, get_current_user
+from src.api.models import Agent, AgentLog, AgentMetric, AgentStatus, Command, User
 
 logger = logging.getLogger(__name__)
 
@@ -129,6 +130,7 @@ async def verify_agent_api_key(
 async def register_agent(
     request: AgentRegisterRequest,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Register a new agent with MUTX.
@@ -144,13 +146,14 @@ async def register_agent(
         status=AgentStatus.RUNNING.value,
         config=str(request.metadata) if request.metadata else None,
         api_key=agent_api_key,
+        user_id=current_user.id,
     )
 
     db.add(agent)
     await db.commit()
     await db.refresh(agent)
 
-    logger.info(f"Registered new agent: {agent.id} ({agent.name})")
+    logger.info(f"Registered new agent: {agent.id} ({agent.name}) for user: {current_user.id}")
 
     return AgentRegisterResponse(
         agent_id=str(agent.id),
@@ -164,16 +167,12 @@ async def register_agent(
 async def heartbeat(
     request: HeartbeatRequest,
     db: AsyncSession = Depends(get_db),
+    agent: Agent = Depends(get_current_agent),
 ):
     """Update agent heartbeat status."""
-    # Get API key from Authorization header
-    # For now, accept agent_id in body for simplicity
-
-    result = await db.execute(select(Agent).where(Agent.id == uuid.UUID(request.agent_id)))
-    agent = result.scalar_one_or_none()
-
-    if not agent:
-        raise HTTPException(status_code=404, detail="Agent not found")
+    # Verify the agent_id in body matches the authenticated agent
+    if str(agent.id) != request.agent_id:
+        raise HTTPException(status_code=403, detail="Agent ID mismatch")
 
     # Update agent status and last heartbeat
     agent.status = request.status
@@ -192,13 +191,12 @@ async def heartbeat(
 async def report_metrics(
     request: MetricsRequest,
     db: AsyncSession = Depends(get_db),
+    agent: Agent = Depends(get_current_agent),
 ):
     """Report agent metrics to MUTX."""
-    result = await db.execute(select(Agent).where(Agent.id == uuid.UUID(request.agent_id)))
-    agent = result.scalar_one_or_none()
-
-    if not agent:
-        raise HTTPException(status_code=404, detail="Agent not found")
+    # Verify the agent_id in body matches the authenticated agent
+    if str(agent.id) != request.agent_id:
+        raise HTTPException(status_code=403, detail="Agent ID mismatch")
 
     # Store metric
     metric = AgentMetric(
@@ -222,20 +220,16 @@ async def poll_commands(
     agent_id: str = Query(...),
     since: Optional[str] = Query(None),
     db: AsyncSession = Depends(get_db),
+    agent: Agent = Depends(get_current_agent),
 ):
     """Poll for pending commands for this agent."""
-    result = await db.execute(select(Agent).where(Agent.id == uuid.UUID(agent_id)))
-    agent = result.scalar_one_or_none()
-
-    if not agent:
-        raise HTTPException(status_code=404, detail="Agent not found")
+    # Verify the agent_id in query matches the authenticated agent
+    if str(agent.id) != agent_id:
+        raise HTTPException(status_code=403, detail="Agent ID mismatch")
 
     # Query pending commands
-    # Command model currently missing in src/api/models
-    return CommandsListResponse(commands=[])
-
     query = select(Command).where(
-        Command.agent_id == uuid.UUID(agent_id),
+        Command.agent_id == agent.id,
         Command.status == "pending",
     )
 
@@ -267,12 +261,19 @@ async def poll_commands(
 async def acknowledge_command(
     request: CommandAcknowledgeRequest,
     db: AsyncSession = Depends(get_db),
+    agent: Agent = Depends(get_current_agent),
 ):
     """Acknowledge command execution."""
-    # Command model currently missing
-    return {"status": "ok", "message": "Command support pending"}
+    # Verify the agent_id in body matches the authenticated agent
+    if str(agent.id) != request.agent_id:
+        raise HTTPException(status_code=403, detail="Agent ID mismatch")
 
-    result = await db.execute(select(Command).where(Command.id == uuid.UUID(request.command_id)))
+    result = await db.execute(
+        select(Command).where(
+            Command.id == uuid.UUID(request.command_id),
+            Command.agent_id == agent.id,
+        )
+    )
     command = result.scalar_one_or_none()
 
     if not command:
@@ -296,13 +297,12 @@ async def acknowledge_command(
 async def submit_log(
     request: LogRequest,
     db: AsyncSession = Depends(get_db),
+    agent: Agent = Depends(get_current_agent),
 ):
     """Submit a log entry from the agent."""
-    result = await db.execute(select(Agent).where(Agent.id == uuid.UUID(request.agent_id)))
-    agent = result.scalar_one_or_none()
-
-    if not agent:
-        raise HTTPException(status_code=404, detail="Agent not found")
+    # Verify the agent_id in body matches the authenticated agent
+    if str(agent.id) != request.agent_id:
+        raise HTTPException(status_code=403, detail="Agent ID mismatch")
 
     log_entry = AgentLog(
         agent_id=agent.id,
