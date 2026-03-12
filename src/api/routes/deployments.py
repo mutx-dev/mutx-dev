@@ -1,6 +1,6 @@
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 import logging
 from typing import Optional
@@ -22,7 +22,7 @@ from src.api.models.schemas import (
     DeploymentResponse,
     DeploymentScale,
     DeploymentCreate,
-    DeploymentEventResponse,
+    DeploymentEventHistoryResponse,
     DeploymentLogsResponse,
     DeploymentMetricsResponse,
 )
@@ -145,30 +145,50 @@ async def get_deployment(
     return _serialize_deployment(deployment)
 
 
-@router.get("/{deployment_id}/events", response_model=list[DeploymentEventResponse])
+@router.get("/{deployment_id}/events", response_model=DeploymentEventHistoryResponse)
 async def get_deployment_events(
     deployment_id: uuid.UUID,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     event_type: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Get lifecycle events for a specific deployment."""
+    """Get paginated lifecycle events for a specific deployment."""
     deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+
+    filters = [DeploymentEventModel.deployment_id == deployment.id]
+    if event_type:
+        filters.append(DeploymentEventModel.event_type == event_type)
+    if status:
+        filters.append(DeploymentEventModel.status == status)
+
+    total_result = await db.execute(
+        select(func.count()).select_from(DeploymentEventModel).where(*filters)
+    )
+    total = total_result.scalar_one()
 
     query = (
         select(DeploymentEventModel)
-        .where(DeploymentEventModel.deployment_id == deployment.id)
+        .where(*filters)
         .order_by(DeploymentEventModel.created_at.desc())
         .offset(skip)
         .limit(limit)
     )
-    if event_type:
-        query = query.where(DeploymentEventModel.event_type == event_type)
 
     result = await db.execute(query)
-    return result.scalars().all()
+    items = result.scalars().all()
+    return {
+        "deployment_id": deployment.id,
+        "deployment_status": deployment.status,
+        "items": items,
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "event_type": event_type,
+        "status": status,
+    }
 
 
 @router.post("/{deployment_id}/scale", response_model=DeploymentResponse)

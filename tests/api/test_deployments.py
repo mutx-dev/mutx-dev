@@ -213,8 +213,13 @@ class TestDeploymentEvents:
         response = await client.get(f"/deployments/{test_deployment.id}/events")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 1
-        assert data[0]["event_type"] == "scale"
+        assert data["deployment_id"] == str(test_deployment.id)
+        assert data["deployment_status"] == test_deployment.status
+        assert data["total"] == 1
+        assert data["skip"] == 0
+        assert data["limit"] == 100
+        assert len(data["items"]) == 1
+        assert data["items"][0]["event_type"] == "scale"
 
     @pytest.mark.asyncio
     async def test_get_deployment_events_filter_by_type(
@@ -239,8 +244,71 @@ class TestDeploymentEvents:
         response = await client.get(f"/deployments/{test_deployment.id}/events?event_type=restart")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 1
-        assert data[0]["event_type"] == "restart"
+        assert data["deployment_id"] == str(test_deployment.id)
+        assert data["deployment_status"] == test_deployment.status
+        assert data["total"] == 1
+        assert data["event_type"] == "restart"
+        assert data["status"] is None
+        assert len(data["items"]) == 1
+        assert data["items"][0]["event_type"] == "restart"
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_events_filter_by_status_and_paginate(
+        self, client: AsyncClient, test_deployment, db_session: AsyncSession
+    ):
+        db_session.add_all(
+            [
+                DeploymentEvent(
+                    deployment_id=test_deployment.id,
+                    event_type="deploy.requested",
+                    status="pending",
+                ),
+                DeploymentEvent(
+                    deployment_id=test_deployment.id,
+                    event_type="deploy.active",
+                    status="active",
+                ),
+                DeploymentEvent(
+                    deployment_id=test_deployment.id,
+                    event_type="deploy.failed",
+                    status="failed",
+                ),
+            ]
+        )
+        await db_session.commit()
+
+        response = await client.get(
+            f"/deployments/{test_deployment.id}/events?status=failed&limit=1"
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["deployment_id"] == str(test_deployment.id)
+        assert data["deployment_status"] == test_deployment.status
+        assert data["total"] == 1
+        assert data["limit"] == 1
+        assert data["status"] == "failed"
+        assert len(data["items"]) == 1
+        assert data["items"][0]["event_type"] == "deploy.failed"
+        assert data["items"][0]["status"] == "failed"
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_events_empty_history_returns_metadata(
+        self, client: AsyncClient, test_deployment
+    ):
+        response = await client.get(f"/deployments/{test_deployment.id}/events")
+        assert response.status_code == 200
+
+        data = response.json()
+        assert data == {
+            "deployment_id": str(test_deployment.id),
+            "deployment_status": test_deployment.status,
+            "items": [],
+            "total": 0,
+            "skip": 0,
+            "limit": 100,
+            "event_type": None,
+            "status": None,
+        }
 
     @pytest.mark.asyncio
     async def test_get_deployment_events_other_user_forbidden(
