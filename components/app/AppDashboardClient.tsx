@@ -348,31 +348,45 @@ export function AppDashboardClient() {
           </div>
           <div className="space-y-3">
             {[
-              { label: "Control Plane", route: "/auth/*", status: "Online" },
-              { label: "Agent Mesh", route: "/agents", status: "Online" },
-              { label: "Key Vault", route: "/api-keys", status: "Online" },
+              { label: "Control Plane", route: "/auth/*", status: "Available" },
+              { label: "Agent Mesh", route: "/api/dashboard/agents", status: "Login required" },
+              { label: "Key Vault", route: "/api/api-keys", status: "Login required" },
               {
                 label: "Runtime Sync",
-                route: "/deployments",
-                status: "Online",
+                route: "/api/dashboard/deployments",
+                status: "Login required",
               },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-4 text-sm"
-              >
-                <div>
-                  <p className="font-medium text-white">{item.label}</p>
-                  <p className="text-xs text-slate-500 mt-1 font-[family:var(--font-mono)]">
-                    {item.route}
-                  </p>
+            ].map((item) => {
+              const requiresAuth = item.status === "Login required";
+
+              return (
+                <div
+                  key={item.label}
+                  className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-4 text-sm"
+                >
+                  <div>
+                    <p className="font-medium text-white">{item.label}</p>
+                    <p className="text-xs text-slate-500 mt-1 font-[family:var(--font-mono)]">
+                      {item.route}
+                    </p>
+                  </div>
+                  <span
+                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${
+                      requiresAuth
+                        ? "bg-amber-500/10 text-amber-300"
+                        : "bg-emerald-500/10 text-emerald-400"
+                    }`}
+                  >
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        requiresAuth ? "bg-amber-300" : "bg-emerald-400"
+                      }`}
+                    />
+                    {item.status}
+                  </span>
                 </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                  {item.status}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
       </div>
