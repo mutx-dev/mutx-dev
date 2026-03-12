@@ -21,6 +21,11 @@ from src.api.models.schemas import (
     MetricsReportRequest,
 )
 from src.api.middleware.auth import get_current_user_or_api_key
+from src.api.services.webhook_service import (
+    trigger_agent_status_event,
+    trigger_deployment_event,
+    trigger_webhook_event,
+)
 
 router = APIRouter(prefix="/ingest", tags=["ingest"])
 logger = logging.getLogger(__name__)
@@ -82,12 +87,11 @@ async def agent_status_update(
         db.add(error_log)
 
     await db.commit()
-    from src.api.services.webhook_service import trigger_agent_status_event
-    await trigger_agent_status_event(
-        db, agent.id, old_status, agent.status, agent.name
-    )
 
-    logger.info(f"Agent {agent.id} status updated to {agent.status}")
+    # Trigger webhook
+    await trigger_agent_status_event(db, agent.id, old_status, agent.status, agent.name)
+
+    logger.info(f"Agent {agent.id} status updated to {status_data.status.value}")
     return {"status": "updated"}
 
 
@@ -148,10 +152,9 @@ async def deployment_event(
             deployment.started_at = datetime.utcnow()
 
     await db.commit()
-    from src.api.services.webhook_service import trigger_deployment_event
-    await trigger_deployment_event(
-        db, deployment.id, agent.id, event_data.event, deployment.status
-    )
+
+    # Trigger webhook
+    await trigger_deployment_event(db, deployment.id, agent.id, event_data.event, deployment.status)
 
     logger.info(f"Deployment {deployment.id} event: {event_data.event}")
     return {"status": "processed"}
@@ -183,10 +186,11 @@ async def receive_metrics(
     agent.last_heartbeat = datetime.utcnow()
     db.add(metric)
     await db.commit()
-    from src.api.services.webhook_service import trigger_webhook_event
+
+    # Trigger metrics webhook
     await trigger_webhook_event(
         db,
-        "metrics.updated",
+        "metrics.report",
         {
             "agent_id": str(metrics_data.agent_id),
             "cpu_usage": metrics_data.cpu_usage,
