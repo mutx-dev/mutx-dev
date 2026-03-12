@@ -2,6 +2,8 @@ SHELL := /bin/bash
 
 TF_DIR := terraform
 ANSIBLE_DIR := ansible
+MONITORING_ENV_FILE := ../.env.monitoring
+MONITORING_COMPOSE_FILE := docker/docker-compose.monitoring.yml
 
 .PHONY: check-tools tf-fmt tf-init tf-init-staging tf-init-production tf-validate tf-plan tf-plan-staging tf-plan-production tf-plan-staging-detailed tf-plan-production-detailed ansible-deps ansible-lint ansible-inventory monitor-up monitor-down monitor-validate
 
@@ -50,10 +52,10 @@ ansible-inventory:
 	./scripts/generate-inventory.sh
 
 monitor-up:
-	cd .. && ./start-monitoring.sh
+	docker compose --env-file $(MONITORING_ENV_FILE) -f $(MONITORING_COMPOSE_FILE) up -d
 
 monitor-down:
-	cd .. && docker compose --env-file .env.monitoring -f docker-compose.monitoring.yml down
+	docker compose --env-file $(MONITORING_ENV_FILE) -f $(MONITORING_COMPOSE_FILE) down
 
 monitor-validate:
 	docker run --rm -v $(PWD)/monitoring/prometheus:/etc/prometheus prom/prometheus:v2.54.1 \
