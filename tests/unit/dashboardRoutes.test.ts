@@ -138,4 +138,36 @@ describe('dashboard route proxies', () => {
     await expect(response.json()).resolves.toEqual({ detail: 'Unauthorized' })
     expect(global.fetch).not.toHaveBeenCalled()
   })
+
+  it('preserves upstream health payloads and statuses', async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      status: 503,
+      json: async () => ({ status: 'degraded', detail: 'database unavailable' }),
+    })
+    const { GET } = await import('../../app/api/dashboard/health/route')
+
+    const response = await GET()
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/health', {
+      cache: 'no-store',
+    })
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toEqual({
+      status: 'degraded',
+      detail: 'database unavailable',
+    })
+  })
+
+  it('returns a fallback health payload when the health proxy throws', async () => {
+    ;(global.fetch as jest.Mock).mockRejectedValue(new Error('socket hang up'))
+    const { GET } = await import('../../app/api/dashboard/health/route')
+
+    const response = await GET()
+
+    expect(response.status).toBe(500)
+    await expect(response.json()).resolves.toEqual({
+      status: 'unknown',
+      error: 'Failed to connect to API',
+    })
+  })
 })
