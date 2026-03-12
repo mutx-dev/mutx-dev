@@ -22,7 +22,6 @@ from src.api.models.schemas import (
     DeploymentResponse,
     DeploymentScale,
     DeploymentCreate,
-    DeploymentEventResponse,
     DeploymentEventHistoryResponse,
     DeploymentLogsResponse,
     DeploymentMetricsResponse,
@@ -166,9 +165,7 @@ async def get_deployment_events(
         filters.append(DeploymentEventModel.status == status)
 
     total_result = await db.execute(
-        select(func.count())
-        .select_from(DeploymentEventModel)
-        .where(*filters)
+        select(func.count()).select_from(DeploymentEventModel).where(*filters)
     )
     total = total_result.scalar_one()
 
