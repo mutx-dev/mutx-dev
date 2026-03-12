@@ -56,9 +56,16 @@ def list_deployments(limit: int, skip: int, agent_id: Optional[str], status: Opt
     "--replicas",
     "-r",
     default=1,
-    help="Requested replica count. Current backend deploy route always starts with 1 replica.",
+    help="Requested replica count. Supported via /deployments create route.",
 )
-def create_deployment(agent_id: str, replicas: int):
+@click.option(
+    "--route",
+    type=click.Choice(["deployments", "agent"], case_sensitive=False),
+    default="deployments",
+    show_default=True,
+    help="Backend route to use: canonical /deployments or legacy/live /agents/{agent_id}/deploy.",
+)
+def create_deployment(agent_id: str, replicas: int, route: str):
     """Create a new deployment"""
     config = CLIConfig()
     if not config.is_authenticated():
@@ -66,19 +73,24 @@ def create_deployment(agent_id: str, replicas: int):
         return
 
     client = get_client(config)
-    response = client.post(f"/agents/{agent_id}/deploy")
+
+    if route == "deployments":
+        response = client.post("/deployments", json={"agent_id": agent_id, "replicas": replicas})
+    else:
+        response = client.post(f"/agents/{agent_id}/deploy")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
         return
 
-    if response.status_code == 200:
+    if response.status_code in (200, 201):
         result = response.json()
-        click.echo(f"Created deployment: {result.get('deployment_id')}")
+        deployment_id = result.get("deployment_id") or result.get("id")
+        click.echo(f"Created deployment: {deployment_id}")
         click.echo(f"Status: {result.get('status')}")
-        if replicas != 1:
+        if route == "agent" and replicas != 1:
             click.echo(
-                "Note: the current backend deploy route ignores --replicas and starts with 1 replica.",
+                "Note: /agents/{agent_id}/deploy currently ignores --replicas and starts with 1 replica.",
                 err=True,
             )
     elif response.status_code == 404:

@@ -28,12 +28,23 @@ class Deployments:
         self._client = client
 
     def create(self, agent_id: UUID | str, replicas: int = 1) -> Deployment:
+        """Create a deployment via /deployments (canonical backend route)."""
         response = self._client.post(
             "/deployments",
             json={"agent_id": str(agent_id), "replicas": replicas},
         )
         response.raise_for_status()
         return Deployment(response.json())
+
+    def create_for_agent(self, agent_id: UUID | str) -> dict[str, Any]:
+        """Create deployment via legacy/live route /agents/{agent_id}/deploy.
+
+        This endpoint currently returns a lightweight payload:
+        {"deployment_id": ..., "status": ...}
+        """
+        response = self._client.post(f"/agents/{agent_id}/deploy")
+        response.raise_for_status()
+        return response.json()
 
     def list(
         self,
