@@ -45,6 +45,15 @@ jobs:
         with:
           terraform_wrapper: false
 
+      - name: Validate monitoring configs
+        run: |
+          docker run --rm -v "$PWD/infrastructure/monitoring/prometheus:/etc/prometheus" \
+            prom/prometheus:v2.54.1 promtool check config /etc/prometheus/prometheus.yml
+          docker run --rm -v "$PWD/infrastructure/monitoring/prometheus:/etc/prometheus" \
+            prom/prometheus:v2.54.1 promtool check rules /etc/prometheus/alerts.yml
+          docker run --rm -v "$PWD/infrastructure/monitoring/prometheus:/etc/prometheus" \
+            prom/alertmanager:v0.27.0 amtool check-config /etc/prometheus/alertmanager.yml
+
       - name: Terraform init (remote backend)
         run: |
           terraform -chdir=infrastructure/terraform init \

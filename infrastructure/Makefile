@@ -5,7 +5,7 @@ ANSIBLE_DIR := ansible
 MONITORING_ENV_FILE := ../.env.monitoring
 MONITORING_COMPOSE_FILE := docker/docker-compose.monitoring.yml
 
-.PHONY: check-tools tf-fmt tf-init tf-init-staging tf-init-production tf-validate tf-plan tf-plan-staging tf-plan-production tf-plan-staging-detailed tf-plan-production-detailed ansible-deps ansible-lint ansible-inventory monitor-up monitor-down monitor-validate
+.PHONY: check-tools tf-fmt tf-init tf-init-staging tf-init-production tf-validate tf-plan tf-plan-staging tf-plan-production tf-plan-staging-detailed tf-plan-production-detailed ansible-deps ansible-lint ansible-inventory monitor-up monitor-down monitor-validate monitor-validate-config monitor-validate-rules alertmanager-validate
 
 check-tools:
 	@command -v terraform >/dev/null 2>&1 || { echo "terraform not found"; exit 1; }
@@ -63,8 +63,16 @@ monitor-up:
 monitor-down:
 	docker compose --env-file $(MONITORING_ENV_FILE) -f $(MONITORING_COMPOSE_FILE) down
 
-monitor-validate:
-	docker run --rm -v $(PWD)/monitoring/prometheus:/etc/prometheus prom/prometheus:v2.54.1 \
-		promtool check config /etc/prometheus/prometheus.yml && \
-	docker run --rm -v $(PWD)/monitoring/prometheus:/etc/prometheus prom/prometheus:v2.54.1 \
+monitor-validate: monitor-validate-config monitor-validate-rules
+
+monitor-validate-config:
+	docker run --rm -v $(CURDIR)/monitoring/prometheus:/etc/prometheus prom/prometheus:v2.54.1 \
+		promtool check config /etc/prometheus/prometheus.yml
+
+monitor-validate-rules:
+	docker run --rm -v $(CURDIR)/monitoring/prometheus:/etc/prometheus prom/prometheus:v2.54.1 \
 		promtool check rules /etc/prometheus/alerts.yml
+
+alertmanager-validate:
+	docker run --rm -v $(CURDIR)/monitoring/prometheus:/etc/prometheus prom/alertmanager:v0.27.0 \
+		amtool check-config /etc/prometheus/alertmanager.yml

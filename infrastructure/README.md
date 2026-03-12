@@ -98,10 +98,14 @@ make tf-plan-production-detailed
 
 # Validate Prometheus config + alert rules
 make monitor-validate
+
+# Validate Alertmanager config independently
+make alertmanager-validate
 ```
 
 ## Next Hardening Items
 
 - Replace static inventory usage with Terraform-generated inventory by default in Ansible playbook wrappers.
 - Wire alert delivery (Alertmanager/notification channel) for critical rules.
+- Add Alertmanager validation to CI so broken notification config fails fast before deploy.
 - Add automated backup/restore verification for PostgreSQL and Redis volumes.
