@@ -22,6 +22,7 @@ from src.api.models.schemas import (
     DeploymentResponse,
     DeploymentScale,
     DeploymentCreate,
+    DeploymentEventResponse,
     DeploymentLogsResponse,
     DeploymentMetricsResponse,
 )
@@ -142,6 +143,32 @@ async def get_deployment(
 ):
     deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
     return _serialize_deployment(deployment)
+
+
+@router.get("/{deployment_id}/events", response_model=list[DeploymentEventResponse])
+async def get_deployment_events(
+    deployment_id: uuid.UUID,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=500),
+    event_type: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get lifecycle events for a specific deployment."""
+    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+
+    query = (
+        select(DeploymentEventModel)
+        .where(DeploymentEventModel.deployment_id == deployment.id)
+        .order_by(DeploymentEventModel.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    if event_type:
+        query = query.where(DeploymentEventModel.event_type == event_type)
+
+    result = await db.execute(query)
+    return result.scalars().all()
 
 
 @router.post("/{deployment_id}/scale", response_model=DeploymentResponse)

@@ -5,7 +5,7 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.models.models import Agent, Deployment, AgentStatus
+from src.api.models.models import Agent, Deployment, AgentStatus, DeploymentEvent
 
 
 class TestListDeployments:
@@ -191,6 +191,62 @@ class TestScaleDeployment:
             f"/deployments/{test_deployment.id}/scale",
             json={"replicas": 5},
         )
+        assert response.status_code == 403
+
+
+class TestDeploymentEvents:
+    """Tests for GET /deployments/{deployment_id}/events endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_events_success(
+        self, client: AsyncClient, test_deployment, db_session: AsyncSession
+    ):
+        event = DeploymentEvent(
+            deployment_id=test_deployment.id,
+            event_type="scale",
+            status=test_deployment.status,
+            node_id="node-123",
+        )
+        db_session.add(event)
+        await db_session.commit()
+
+        response = await client.get(f"/deployments/{test_deployment.id}/events")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["event_type"] == "scale"
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_events_filter_by_type(
+        self, client: AsyncClient, test_deployment, db_session: AsyncSession
+    ):
+        db_session.add_all(
+            [
+                DeploymentEvent(
+                    deployment_id=test_deployment.id,
+                    event_type="scale",
+                    status=test_deployment.status,
+                ),
+                DeploymentEvent(
+                    deployment_id=test_deployment.id,
+                    event_type="restart",
+                    status="pending",
+                ),
+            ]
+        )
+        await db_session.commit()
+
+        response = await client.get(f"/deployments/{test_deployment.id}/events?event_type=restart")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["event_type"] == "restart"
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_events_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_deployment
+    ):
+        response = await other_user_client.get(f"/deployments/{test_deployment.id}/events")
         assert response.status_code == 403
 
 
