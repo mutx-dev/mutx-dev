@@ -139,6 +139,7 @@ async def client(db_session: AsyncSession, test_user):
         transport=ASGITransport(app=test_app),
         base_url="http://test"
     ) as client:
+        client.app = test_app
         yield client
     
     test_app.dependency_overrides.clear()
@@ -160,6 +161,7 @@ async def client_no_auth(db_session: AsyncSession):
         transport=ASGITransport(app=test_app),
         base_url="http://test"
     ) as client:
+        client.app = test_app
         yield client
     
     test_app.dependency_overrides.clear()
@@ -200,6 +202,7 @@ async def other_user_client(db_session: AsyncSession, other_user):
         transport=ASGITransport(app=test_app),
         base_url="http://test"
     ) as client:
+        client.app = test_app
         yield client
     
     test_app.dependency_overrides.clear()

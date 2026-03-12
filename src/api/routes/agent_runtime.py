@@ -24,6 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_agent, get_current_user
 from src.api.models import Agent, AgentLog, AgentMetric, AgentStatus, Command, User
+from src.api.services.webhook_service import trigger_webhook_event
 
 logger = logging.getLogger(__name__)
 
@@ -175,10 +176,43 @@ async def heartbeat(
         raise HTTPException(status_code=403, detail="Agent ID mismatch")
 
     # Update agent status and last heartbeat
+    previous_status = agent.status
+    now = datetime.utcnow()
     agent.status = request.status
-    agent.last_heartbeat = datetime.utcnow()
+    agent.last_heartbeat = now
 
     await db.commit()
+
+    await trigger_webhook_event(
+        db,
+        "agent.heartbeat",
+        {
+            "agent_id": str(agent.id),
+            "agent_name": agent.name,
+            "status": agent.status,
+            "previous_status": previous_status,
+            "message": request.message,
+            "platform": request.platform,
+            "hostname": request.hostname,
+            "timestamp": now.isoformat(),
+        },
+    )
+
+    if previous_status != agent.status:
+        await trigger_webhook_event(
+            db,
+            "agent.status",
+            {
+                "agent_id": str(agent.id),
+                "agent_name": agent.name,
+                "old_status": previous_status,
+                "new_status": agent.status,
+                "message": request.message,
+                "platform": request.platform,
+                "hostname": request.hostname,
+                "timestamp": now.isoformat(),
+            },
+        )
 
     return {
         "status": "ok",
