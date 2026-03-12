@@ -11,7 +11,7 @@ This matrix tracks the current repo state and where contributors can help next.
 | CLI | usable for auth, status, listing, and some deploy flows | create and some deploy commands still reflect older contracts | align command payloads and route paths, improve auth ergonomics |
 | SDK | useful foundation and packaging | defaults and supported methods do not fully match the server | shrink to supported methods or add missing API routes |
 | Infra | Terraform, Ansible, Docker, and deployment docs exist | validation and confidence loops are thin | CI validation, syntax checks, infra docs cleanup |
-| Tests and CI | lint/build commands and a basic GitHub Actions workflow exist | backend tests are sparse and Playwright still targets production | route tests, local-first Playwright, stronger CI coverage |
+| Tests and CI | lint/build commands and a basic GitHub Actions workflow exist | backend tests are improving, but CI truth still depends on keeping Playwright/test assumptions aligned with supported hosted behavior | route tests, local-first Playwright, stronger CI coverage, validation ownership docs |
 | Docs | current-state docs are much more honest than before | still need ongoing drift control | examples, contribution docs, roadmap-linked issue shaping |
 
 ## Highest-Leverage Next Tasks

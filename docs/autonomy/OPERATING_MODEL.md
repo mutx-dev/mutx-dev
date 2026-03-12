@@ -74,6 +74,17 @@ Requirements:
 - enable auto-merge only after labels and checks pass
 - block force-pushes to protected branches
 
+## Validation Truth Contract
+
+Keep CI aligned with what the repo actually supports today.
+
+- `scripts/test.sh` is the authoritative repo-wide validation entrypoint for CI.
+- Python API truth comes from `pytest tests/api`, lint/format checks, and compile checks.
+- Frontend truth comes from generated API types, lint, build, and the checked-in Playwright smoke suite.
+- Playwright is currently a production-smoke lane, not a generic localhost integration lane. If the suite assumes hosted behavior (for example Turnstile bootstrapping), CI should provide the matching test shim instead of failing on expected external-service gaps.
+- Infra validation should live in dedicated workflows/targets (`make tf-validate`, `make monitor-validate`, drift workflows) rather than silently piggybacking on unrelated app PRs.
+- When a validation lane starts failing for config drift rather than product breakage, either fix the fixture/assumption immediately or remove that lane from required CI until it is truthful again.
+
 ## What Not To Automate Yet
 
 - direct production infra changes
