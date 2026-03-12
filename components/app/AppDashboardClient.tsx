@@ -103,6 +103,21 @@ export function AppDashboardClient() {
     [agents, deployments, apiKeys, health?.status],
   );
 
+  const authStatus = useMemo(() => {
+    if (bootstrapping) {
+      return {
+        label: "Checking session",
+        detail: "Verifying the dashboard cookie before showing app data.",
+      };
+    }
+
+    return {
+      label: "Authentication required",
+      detail:
+        "Localhost demo mode stays on the login surface until /api/auth/me resolves with a valid session.",
+    };
+  }, [bootstrapping]);
+
   async function loadDashboard() {
     const [nextUser, nextHealth, nextAgents, nextDeployments, nextKeys] =
       await Promise.all([
@@ -284,6 +299,19 @@ export function AppDashboardClient() {
   if (!user) {
     return (
       <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+        <div className="xl:col-span-2 rounded-2xl border border-cyan-400/15 bg-cyan-400/5 px-5 py-4 text-sm text-cyan-100">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-300">
+                {authStatus.label}
+              </p>
+              <p className="mt-1 text-sm text-cyan-50/90">{authStatus.detail}</p>
+            </div>
+            <p className="text-xs font-[family:var(--font-mono)] text-cyan-200/80">
+              /app → /api/auth/me gate
+            </p>
+          </div>
+        </div>
         <Card className="border border-white/5 bg-white/[0.01]">
           <div className="flex items-center gap-3 text-cyan-400 mb-6">
             <UserCircle2 className="h-6 w-6" />
