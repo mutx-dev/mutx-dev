@@ -65,4 +65,24 @@ describe('dashboard route proxies', () => {
     expect(response.status).toBe(403)
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
   })
+
+  it('preserves upstream health payloads and statuses', async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      status: 503,
+      json: async () => ({ status: 'degraded', detail: 'database unavailable' }),
+    })
+
+    const { GET } = await import('../../app/api/dashboard/health/route')
+
+    const response = await GET()
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/health', {
+      cache: 'no-store',
+    })
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toEqual({
+      status: 'degraded',
+      detail: 'database unavailable',
+    })
+  })
 })
