@@ -59,10 +59,19 @@ python3 -m compileall src/api cli sdk/mutx
 ### Playwright
 
 ```bash
+npx playwright test tests/website.spec.ts
+```
+
+```bash
 npx playwright test --list
 ```
 
-Important: current Playwright specs target `https://mutx.dev`, not localhost.
+By default, tests use `BASE_URL=http://localhost:3000` from `playwright.config.ts`.
+Set an explicit target when needed:
+
+```bash
+BASE_URL=https://mutx.dev npx playwright test tests/website.spec.ts
+```
 
 ## Source Of Truth
 

@@ -158,12 +158,17 @@ make -C infrastructure monitor-validate
 
 ## CIPHER / OpenCode Operating Model
 - CIPHER is the orchestrator: priorities, continuity, roadmap, queue health, and truth checks.
-- OpenCode is the executor: code changes, validation, branch management, PR creation, and issue follow-through.
+- OpenCode is the builder: code changes, validation, branch management, PR creation, and issue follow-through.
+- `@codex` review is the reviewer gate on every PR.
+- Crons / automation are the ops layer: queue checks, drift detection, and recurring dispatch.
 - Canonical repo path: `/Users/fortune/MUTX`
 - Preferred OpenCode session: `ses_32248211cffeU1XmfngaGDmd9a`
+- Task lifecycle: Inbox → Assigned → In Progress → Review → Done | Failed.
+- Orchestrator owns state transitions and routing; builder owns artifact production; reviewer owns quality pushback.
 
 ## OpenCode / Autonomous Execution
 - OpenCode is authorized to operate in high-agency mode on this repo.
+- Prefer Build over Plan for autonomous execution; Plan is intentionally more restricted.
 - Prefer speed, momentum, and continuous shipping over conservative permission friction when the work is recoverable through git history, branches, PRs, or reverts.
 - PR-first always. Never merge directly to `main` unless Fortune explicitly asks.
 - Every PR should get a comment tagging `@codex please review`.
@@ -175,6 +180,7 @@ make -C infrastructure monitor-validate
 - If `ROADMAP.md` is stale, update it like a senior engineer / CTO.
 - Update `ROADMAP.md` after meaningful merge waves, priority changes, newly obvious bottlenecks, or when a roadmap item is effectively complete.
 - Fix CI or fix the code, but do not normalize living in red.
+- If Codex/OpenCode hits upstream `server_error` or provider instability, retry once, then fall back and continue rather than stalling the lane.
 - Keep changes small, reviewable, and truthful.
 - Do not claim success without matching repo-native validation.
 - Prefer the canonical repo path first; if external worktrees are used, keep them purposeful and short-lived.
@@ -189,6 +195,13 @@ Always report back with:
 - Issue
 - Blockers
 - Next
+
+Every handoff should also make clear:
+- what was done
+- exact files/paths touched
+- how to verify
+- known issues or risks
+- the next expected owner/action
 
 ## Defaults
 - Trust source over docs.

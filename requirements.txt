@@ -10,6 +10,7 @@ asyncpg==0.29.0
 psycopg[binary]>=3.2.13
 greenlet==3.0.3
 alembic==1.13.1
+aiosqlite==0.20.0
 
 # Infrastructure
 python-digitalocean==1.17.0

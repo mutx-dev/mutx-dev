@@ -2,7 +2,7 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.models.models import Lead
+from src.api.models.models import Lead, Plan
 
 
 @pytest.mark.asyncio
@@ -44,12 +44,26 @@ async def test_capture_lead_minimal(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_list_leads_authenticated(client: AsyncClient, test_user):
-    """Test listing leads requires authentication."""
-    # This should succeed because 'client' is authenticated (via conftest fixtures usually)
+async def test_list_leads_authenticated(client: AsyncClient, test_user, db_session: AsyncSession):
+    """Test listing leads requires an internal user tier."""
+    test_user.plan = Plan.PRO
+    db_session.add(test_user)
+    await db_session.commit()
+
     response = await client.get("/leads")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
+
+
+@pytest.mark.asyncio
+async def test_list_leads_forbidden_for_free_plan(client: AsyncClient, test_user, db_session: AsyncSession):
+    """Test free-tier users cannot access lead management list."""
+    test_user.plan = Plan.FREE
+    db_session.add(test_user)
+    await db_session.commit()
+
+    response = await client.get("/leads")
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -60,8 +74,12 @@ async def test_list_leads_unauthorized(client_no_auth: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_get_lead_authenticated(client: AsyncClient, db_session: AsyncSession):
-    """Test fetching a single lead when authenticated."""
+async def test_get_lead_authenticated(client: AsyncClient, test_user, db_session: AsyncSession):
+    """Test fetching a single lead when authenticated as internal user."""
+    test_user.plan = Plan.PRO
+    db_session.add(test_user)
+    await db_session.commit()
+
     lead = Lead(
         email="reader@example.com",
         name="Reader",
@@ -81,6 +99,22 @@ async def test_get_lead_authenticated(client: AsyncClient, db_session: AsyncSess
 
 
 @pytest.mark.asyncio
+async def test_get_lead_forbidden_for_free_plan(client: AsyncClient, test_user, db_session: AsyncSession):
+    """Test free-tier users cannot access a lead by id."""
+    test_user.plan = Plan.FREE
+    db_session.add(test_user)
+    await db_session.commit()
+
+    lead = Lead(email="private@example.com", source="homepage")
+    db_session.add(lead)
+    await db_session.commit()
+    await db_session.refresh(lead)
+
+    response = await client.get(f"/leads/{lead.id}")
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_get_lead_unauthorized(client_no_auth: AsyncClient, db_session: AsyncSession):
     """Test fetching a single lead without auth fails."""
     lead = Lead(email="private@example.com", source="homepage")
@@ -93,7 +127,11 @@ async def test_get_lead_unauthorized(client_no_auth: AsyncClient, db_session: As
 
 
 @pytest.mark.asyncio
-async def test_get_lead_not_found(client: AsyncClient):
-    """Test fetching an unknown lead returns 404."""
+async def test_get_lead_not_found(client: AsyncClient, test_user, db_session: AsyncSession):
+    """Test fetching an unknown lead returns 404 for internal users."""
+    test_user.plan = Plan.PRO
+    db_session.add(test_user)
+    await db_session.commit()
+
     response = await client.get("/leads/00000000-0000-0000-0000-999999999999")
     assert response.status_code == 404

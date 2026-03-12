@@ -30,13 +30,29 @@ test.describe('mutx.dev QA', () => {
         errors.push(msg.text());
       }
     });
-    
+    page.on('pageerror', error => {
+      errors.push(error.message);
+    });
+
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(2000);
-    
-    // Filter out non-critical errors
-    const criticalErrors = errors.filter(e => !e.includes('favicon') && !e.includes('404'));
-    console.log('Errors found:', criticalErrors);
+
+    const criticalErrors = errors.filter((e) => {
+      const lower = e.toLowerCase();
+      const isNonActionable =
+        lower.includes('favicon') ||
+        lower.includes('404') ||
+        lower.includes('font-size:0;color:transparent') ||
+        lower.includes("script-src' was not explicitly set") ||
+        (lower.includes('failed to load resource') && lower.includes('401'));
+
+      return !isNonActionable;
+    });
+
+    expect(
+      criticalErrors,
+      `Console errors: ${criticalErrors.join('\n')}`,
+    ).toHaveLength(0);
   });
 });
