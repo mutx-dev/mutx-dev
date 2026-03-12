@@ -80,6 +80,14 @@ class TestListDeployments:
         data = response.json()
         assert len(data) == 1
         assert data[0]["agent_id"] == str(test_agent.id)
+
+    @pytest.mark.asyncio
+    async def test_list_deployments_other_user_agent_forbidden(
+        self, other_user_client: AsyncClient, test_agent
+    ):
+        """Test filtering by another user's agent is forbidden."""
+        response = await other_user_client.get(f"/deployments?agent_id={test_agent.id}")
+        assert response.status_code == 403
     
     @pytest.mark.asyncio
     async def test_list_deployments_by_status(
@@ -252,4 +260,19 @@ class TestCreateDeployment:
             "/deployments",
             json={"agent_id": str(test_agent.id), "replicas": 1},
         )
+        assert response.status_code == 403
+
+
+class TestRestartDeployment:
+    """Tests for POST /deployments/{deployment_id}/restart endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_restart_deployment_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_deployment, db_session: AsyncSession
+    ):
+        """Test other users cannot restart deployments they do not own."""
+        test_deployment.status = "stopped"
+        await db_session.commit()
+
+        response = await other_user_client.post(f"/deployments/{test_deployment.id}/restart")
         assert response.status_code == 403
