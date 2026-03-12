@@ -157,6 +157,46 @@ async def get_current_user_or_api_key(
     )
 
 
+async def get_current_agent(
+    authorization: Optional[str] = Header(None),
+    session: AsyncSession = Depends(get_db),
+):
+    """Authenticate an agent using its API key in the Authorization header."""
+    from sqlalchemy import select
+    from src.api.models.models import Agent
+
+    if not authorization:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing authorization header",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    parts = authorization.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authorization header format",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token = parts[1]
+
+    # In a real app, we'd hash the token or use a faster lookup
+    # For now, we match the logic used in the existing verify_agent_api_key
+    result = await session.execute(select(Agent).where(Agent.api_key == token))
+    agent = result.scalar_one_or_none()
+
+    if not agent:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid agent credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return agent
+
+
 async def get_authenticated_user(
     user: User = Depends(get_current_user),
 ) -> User:

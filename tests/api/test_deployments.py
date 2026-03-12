@@ -2,7 +2,6 @@
 Tests for /deployments endpoints.
 """
 import pytest
-import pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -126,6 +125,14 @@ class TestGetDeployment:
         )
         assert response.status_code == 404
 
+    @pytest.mark.asyncio
+    async def test_get_deployment_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_deployment
+    ):
+        """Test other users cannot read deployments they do not own."""
+        response = await other_user_client.get(f"/deployments/{test_deployment.id}")
+        assert response.status_code == 403
+
 
 class TestScaleDeployment:
     """Tests for POST /deployments/{deployment_id}/scale endpoint."""
@@ -167,6 +174,17 @@ class TestScaleDeployment:
         )
         assert response.status_code == 400
 
+    @pytest.mark.asyncio
+    async def test_scale_deployment_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_deployment
+    ):
+        """Test other users cannot scale deployments they do not own."""
+        response = await other_user_client.post(
+            f"/deployments/{test_deployment.id}/scale",
+            json={"replicas": 5},
+        )
+        assert response.status_code == 403
+
 
 class TestKillDeployment:
     """Tests for DELETE /deployments/{deployment_id} endpoint."""
@@ -191,6 +209,14 @@ class TestKillDeployment:
             "/deployments/00000000-0000-0000-0000-999999999999"
         )
         assert response.status_code == 404
+
+    @pytest.mark.asyncio
+    async def test_kill_deployment_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_deployment
+    ):
+        """Test other users cannot kill deployments they do not own."""
+        response = await other_user_client.delete(f"/deployments/{test_deployment.id}")
+        assert response.status_code == 403
     
     @pytest.mark.asyncio
     async def test_kill_deployment_stops_agent(
@@ -212,3 +238,18 @@ class TestKillDeployment:
         # Verify agent status changed
         await db_session.refresh(test_agent)
         assert test_agent.status == AgentStatus.STOPPED.value
+
+
+class TestCreateDeployment:
+    """Tests for POST /deployments endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_agent
+    ):
+        """Test other users cannot deploy agents they do not own."""
+        response = await other_user_client.post(
+            "/deployments",
+            json={"agent_id": str(test_agent.id), "replicas": 1},
+        )
+        assert response.status_code == 403

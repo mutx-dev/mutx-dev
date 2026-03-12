@@ -88,6 +88,7 @@ curl "$BASE_URL/agents?skip=0&limit=50"
 ## Detailed Docs
 
 - [Authentication](./authentication.md)
+- [API Keys](./api-keys.md)
 - [Agents](./agents.md)
 - [Deployments](./deployments.md)
 - [Webhook Ingestion](./webhooks.md)

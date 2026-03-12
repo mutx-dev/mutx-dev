@@ -656,6 +656,172 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/newsletter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Waitlist Count */
+        get: operations["get_waitlist_count_newsletter_get"];
+        put?: never;
+        /**
+         * Create Waitlist Signup
+         * @description BACKEND WAITLIST API (DEPRECATED)
+         *     Submit waitlist signups.
+         *     NOTE: For web-based submissions, prefer the Next.js API route
+         *     (app/api/newsletter/route.ts) which includes Cloudflare Turnstile verification.
+         */
+        post: operations["create_waitlist_signup_newsletter_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/agents/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register Agent
+         * @description Register a new agent with MUTX.
+         *
+         *     Returns agent_id and api_key that the agent should use for subsequent requests.
+         */
+        post: operations["register_agent_agents_register_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/agents/heartbeat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Heartbeat
+         * @description Update agent heartbeat status.
+         */
+        post: operations["heartbeat_agents_heartbeat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/agents/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report Metrics
+         * @description Report agent metrics to MUTX.
+         */
+        post: operations["report_metrics_agents_metrics_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/agents/commands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Poll Commands
+         * @description Poll for pending commands for this agent.
+         */
+        get: operations["poll_commands_agents_commands_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/agents/commands/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acknowledge Command
+         * @description Acknowledge command execution.
+         */
+        post: operations["acknowledge_command_agents_commands_acknowledge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/agents/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit Log
+         * @description Submit a log entry from the agent.
+         */
+        post: operations["submit_log_agents_logs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/agents/{agent_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Agent Status
+         * @description Get agent status.
+         */
+        get: operations["get_agent_status_agents__agent_id__status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -767,8 +933,10 @@ export interface components {
             name: string;
             /** Description */
             description?: string | null;
+            /** @default openai */
+            type: components["schemas"]["AgentType"];
             /** Config */
-            config?: string | null;
+            config?: Record<string, never> | string | null;
         };
         /** AgentDetailResponse */
         AgentDetailResponse: {
@@ -849,6 +1017,37 @@ export interface components {
              */
             timestamp: string;
         };
+        /** AgentRegisterRequest */
+        AgentRegisterRequest: {
+            /** Name */
+            name: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string | null;
+            /**
+             * Metadata
+             * @default {}
+             */
+            metadata: Record<string, never> | null;
+            /**
+             * Capabilities
+             * @default []
+             */
+            capabilities: string[] | null;
+        };
+        /** AgentRegisterResponse */
+        AgentRegisterResponse: {
+            /** Agent Id */
+            agent_id: string;
+            /** Api Key */
+            api_key: string;
+            /** Status */
+            status: string;
+            /** Message */
+            message: string;
+        };
         /** AgentResponse */
         AgentResponse: {
             /**
@@ -885,6 +1084,17 @@ export interface components {
          * @enum {string}
          */
         AgentStatus: "creating" | "running" | "stopped" | "failed" | "deleting";
+        /** AgentStatusResponse */
+        AgentStatusResponse: {
+            /** Agent Id */
+            agent_id: string;
+            /** Status */
+            status: string;
+            /** Last Heartbeat */
+            last_heartbeat: string | null;
+            /** Uptime Seconds */
+            uptime_seconds: number;
+        };
         /** AgentStatusUpdate */
         AgentStatusUpdate: {
             /**
@@ -897,6 +1107,42 @@ export interface components {
             node_id?: string | null;
             /** Error Message */
             error_message?: string | null;
+        };
+        /**
+         * AgentType
+         * @enum {string}
+         */
+        AgentType: "openai" | "anthropic" | "langchain" | "custom";
+        /** CommandAcknowledgeRequest */
+        CommandAcknowledgeRequest: {
+            /** Command Id */
+            command_id: string;
+            /** Agent Id */
+            agent_id: string;
+            /** Success */
+            success: boolean;
+            /** Result */
+            result?: Record<string, never> | null;
+            /** Error */
+            error?: string | null;
+            /** Completed At */
+            completed_at: string;
+        };
+        /** CommandResponse */
+        CommandResponse: {
+            /** Command Id */
+            command_id: string;
+            /** Action */
+            action: string;
+            /** Parameters */
+            parameters: Record<string, never>;
+            /** Received At */
+            received_at: string;
+        };
+        /** CommandsListResponse */
+        CommandsListResponse: {
+            /** Commands */
+            commands: components["schemas"]["CommandResponse"][];
         };
         /** DeploymentCreate */
         DeploymentCreate: {
@@ -926,6 +1172,35 @@ export interface components {
             node_id?: string | null;
             /** Error Message */
             error_message?: string | null;
+        };
+        /**
+         * DeploymentEventResponse
+         * @description Response model for deployment events
+         */
+        DeploymentEventResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Deployment Id
+             * Format: uuid
+             */
+            deployment_id: string;
+            /** Event Type */
+            event_type: string;
+            /** Status */
+            status: string;
+            /** Node Id */
+            node_id: string | null;
+            /** Error Message */
+            error_message: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /**
          * DeploymentLogsResponse
@@ -1003,6 +1278,8 @@ export interface components {
             ended_at: string | null;
             /** Error Message */
             error_message: string | null;
+            /** Events */
+            events?: components["schemas"]["DeploymentEventResponse"][];
         };
         /** DeploymentScale */
         DeploymentScale: {
@@ -1036,6 +1313,24 @@ export interface components {
             /** Error */
             error?: string | null;
         };
+        /** HeartbeatRequest */
+        HeartbeatRequest: {
+            /** Agent Id */
+            agent_id: string;
+            /**
+             * Status
+             * @default running
+             */
+            status: string;
+            /** Message */
+            message?: string | null;
+            /** Timestamp */
+            timestamp: string;
+            /** Platform */
+            platform?: string | null;
+            /** Hostname */
+            hostname?: string | null;
+        };
         /** InstallSkillRequest */
         InstallSkillRequest: {
             /**
@@ -1045,6 +1340,25 @@ export interface components {
             agent_id: string;
             /** Skill Id */
             skill_id: string;
+        };
+        /** LogRequest */
+        LogRequest: {
+            /** Agent Id */
+            agent_id: string;
+            /**
+             * Level
+             * @default info
+             */
+            level: string;
+            /** Message */
+            message: string;
+            /**
+             * Metadata
+             * @default {}
+             */
+            metadata: Record<string, never> | null;
+            /** Timestamp */
+            timestamp: string;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -1072,6 +1386,43 @@ export interface components {
             cpu_usage: number;
             /** Memory Usage */
             memory_usage: number;
+        };
+        /** MetricsRequest */
+        MetricsRequest: {
+            /** Agent Id */
+            agent_id: string;
+            /**
+             * Cpu Usage
+             * @default 0
+             */
+            cpu_usage: number | null;
+            /**
+             * Memory Usage
+             * @default 0
+             */
+            memory_usage: number | null;
+            /**
+             * Uptime Seconds
+             * @default 0
+             */
+            uptime_seconds: number | null;
+            /**
+             * Requests Processed
+             * @default 0
+             */
+            requests_processed: number | null;
+            /**
+             * Errors Count
+             * @default 0
+             */
+            errors_count: number | null;
+            /**
+             * Custom
+             * @default {}
+             */
+            custom: Record<string, never> | null;
+            /** Timestamp */
+            timestamp: string;
         };
         /** RefreshRequest */
         RefreshRequest: {
@@ -1172,15 +1523,41 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
-            /** Input */
-            input?: unknown;
-            /** Context */
-            ctx?: Record<string, never>;
         };
         /** VerifyEmailRequest */
         VerifyEmailRequest: {
             /** Token */
             token: string;
+        };
+        /** WaitlistCountResponse */
+        WaitlistCountResponse: {
+            /** Count */
+            count: number;
+        };
+        /** WaitlistSignupCreate */
+        WaitlistSignupCreate: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Source */
+            source?: string | null;
+        };
+        /** WaitlistSignupResponse */
+        WaitlistSignupResponse: {
+            /**
+             * Success
+             * @default true
+             */
+            success: boolean;
+            /** Message */
+            message: string;
+            /**
+             * Duplicate
+             * @default false
+             */
+            duplicate: boolean;
         };
         /** WebhookCreate */
         WebhookCreate: {
@@ -1417,9 +1794,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": Record<string, never>;
                 };
             };
             /** @description Validation Error */
@@ -1452,9 +1827,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": Record<string, never>;
                 };
             };
             /** @description Validation Error */
@@ -2647,6 +3020,299 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["APIKeyCreateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_waitlist_count_newsletter_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaitlistCountResponse"];
+                };
+            };
+        };
+    };
+    create_waitlist_signup_newsletter_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WaitlistSignupCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaitlistSignupResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    register_agent_agents_register_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgentRegisterRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentRegisterResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    heartbeat_agents_heartbeat_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HeartbeatRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    report_metrics_agents_metrics_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetricsRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    poll_commands_agents_commands_get: {
+        parameters: {
+            query: {
+                agent_id: string;
+                since?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommandsListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    acknowledge_command_agents_commands_acknowledge_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CommandAcknowledgeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_log_agents_logs_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LogRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_agent_status_agents__agent_id__status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentStatusResponse"];
                 };
             };
             /** @description Validation Error */

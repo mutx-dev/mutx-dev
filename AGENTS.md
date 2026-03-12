@@ -1,5 +1,5 @@
 # AGENTS.md
-Repo guidance for agentic coding agents working in `/Users/fortune/MUTX/mutx-dev`.
+Repo guidance for agentic coding agents working in `/Users/fortune/MUTX`.
 
 ## Rule Files
 - No `.cursorrules` file exists.
@@ -155,6 +155,40 @@ make -C infrastructure monitor-validate
 - Good backend validation: `ruff check src/api/routes/agents.py`, `./.venv/bin/python -m pytest tests/api/test_agents.py::TestCreateAgent::test_create_agent_success -q`, and `python -m compileall src/api`.
 - Good frontend validation: `npm run build` and `npx playwright test tests/website.spec.ts -g "homepage loads and has working waitlist"`.
 - If you change infra code, use the matching `make -C infrastructure ...` target instead of ad hoc commands when possible.
+
+## CIPHER / OpenCode Operating Model
+- CIPHER is the orchestrator: priorities, continuity, roadmap, queue health, and truth checks.
+- OpenCode is the executor: code changes, validation, branch management, PR creation, and issue follow-through.
+- Canonical repo path: `/Users/fortune/MUTX`
+- Preferred OpenCode session: `ses_32248211cffeU1XmfngaGDmd9a`
+
+## OpenCode / Autonomous Execution
+- OpenCode is authorized to operate in high-agency mode on this repo.
+- Prefer speed, momentum, and continuous shipping over conservative permission friction when the work is recoverable through git history, branches, PRs, or reverts.
+- PR-first always. Never merge directly to `main` unless Fortune explicitly asks.
+- Every PR should get a comment tagging `@codex please review`.
+- Empty queue is a failure state: never allow both open issues and open PRs to hit zero at the same time.
+- Zero open PRs while open issues exist is also a failure state: convert the top issue into a live PR or draft PR immediately.
+- Backlog creation is incomplete until at least one issue is actively becoming a PR.
+- If the queue gets thin, open the next roadmap-backed issues immediately.
+- If a merge wave lands, create the next roadmap-backed issues before the queue goes flat.
+- If `ROADMAP.md` is stale, update it like a senior engineer / CTO.
+- Update `ROADMAP.md` after meaningful merge waves, priority changes, newly obvious bottlenecks, or when a roadmap item is effectively complete.
+- Fix CI or fix the code, but do not normalize living in red.
+- Keep changes small, reviewable, and truthful.
+- Do not claim success without matching repo-native validation.
+- Prefer the canonical repo path first; if external worktrees are used, keep them purposeful and short-lived.
+- Default autonomous loop: inspect → execute → validate → PR → tag `@codex` → report → repeat.
+
+## Reporting Contract
+Always report back with:
+- Task
+- Changed files
+- Validation
+- PR
+- Issue
+- Blockers
+- Next
 
 ## Defaults
 - Trust source over docs.
