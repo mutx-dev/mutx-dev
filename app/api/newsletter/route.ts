@@ -13,7 +13,7 @@ type TurnstileVerificationResult = {
 }
 
 const resendApiKey = process.env.RESEND_API_KEY?.trim()
-const resendFromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'MUTX <hello@mutx.dev>'
+const resendFromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'MUTX <waitlist@mutx.dev>'
 const resend = resendApiKey ? new Resend(resendApiKey) : null
 
 function isEmailDeliveryConfigured() {
@@ -189,7 +189,7 @@ export async function POST(request: Request) {
         console.error('Waitlist confirmation email failed:', emailError)
       }
     } else {
-      console.warn('Waitlist email delivery skipped: RESEND_API_KEY is not configured')
+      console.warn('Waitlist email delivery skipped: RESEND_API_KEY is not configured for waitlist sender')
     }
 
     return NextResponse.json({
