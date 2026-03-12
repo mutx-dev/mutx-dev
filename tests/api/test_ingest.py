@@ -2,7 +2,6 @@ from datetime import datetime
 
 import pytest
 from httpx import AsyncClient
-from src.api.models.models import AgentStatus
 
 @pytest.mark.asyncio
 async def test_ingest_agent_status(client: AsyncClient, test_user, test_agent):
@@ -64,9 +63,9 @@ async def test_ingest_unauthorized_agent(client: AsyncClient, test_user):
 async def test_agent_runtime_heartbeat_triggers_heartbeat_webhook_without_status_change(
     client: AsyncClient, db_session, test_agent, monkeypatch
 ):
-    from src.api.models.models import AgentStatus
     from src.api.routes.agent_runtime import get_current_agent
     import src.api.routes.agent_runtime as agent_runtime_routes
+    from src.api.models.models import AgentStatus
 
     test_agent.status = AgentStatus.RUNNING.value
     await db_session.commit()
@@ -96,7 +95,11 @@ async def test_agent_runtime_heartbeat_triggers_heartbeat_webhook_without_status
     assert [event for event, _ in delivered] == ["agent.heartbeat"]
     assert delivered[0][1]["agent_id"] == str(test_agent.id)
     assert delivered[0][1]["status"] == "running"
+    assert delivered[0][1]["previous_status"] == "running"
     assert delivered[0][1]["message"] == "still alive"
+    assert delivered[0][1]["platform"] == "linux"
+    assert delivered[0][1]["hostname"] == "agent-01"
+    assert delivered[0][1]["timestamp"]
 
     client.app.dependency_overrides.pop(get_current_agent, None)
 
@@ -105,10 +108,9 @@ async def test_agent_runtime_heartbeat_triggers_heartbeat_webhook_without_status
 async def test_agent_runtime_heartbeat_emits_status_webhook_on_status_change(
     client: AsyncClient, db_session, test_agent, monkeypatch
 ):
-    from src.api.models.models import AgentStatus
-    from src.api.models.models import AgentStatus
     from src.api.routes.agent_runtime import get_current_agent
     import src.api.routes.agent_runtime as agent_runtime_routes
+    from src.api.models.models import AgentStatus
 
     test_agent.status = AgentStatus.RUNNING.value
     await db_session.commit()
