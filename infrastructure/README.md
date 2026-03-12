@@ -65,10 +65,12 @@ Required environment variables before running playbooks:
 ```bash
 cp .env.monitoring.example .env.monitoring
 # set strong credentials/passwords
-./start-monitoring.sh
+cd infrastructure
+make monitor-up
 ```
 
 The monitoring compose file binds UI and exporter ports to localhost by default.
+Stop it with `cd infrastructure && make monitor-down`.
 Prometheus now loads alerting rules from `infrastructure/monitoring/prometheus/alerts.yml` and scrapes the API via `host.docker.internal:8000` (works for local Docker Desktop + Linux host-gateway mapping).
 
 ## CI Drift Detection
