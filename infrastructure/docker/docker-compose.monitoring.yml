@@ -26,6 +26,21 @@ services:
       timeout: 10s
       retries: 5
 
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: mutx-alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    ports:
+      - "127.0.0.1:${ALERTMANAGER_PORT:-9093}:9093"
+    volumes:
+      - ./infrastructure/monitoring/prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    restart: unless-stopped
+    networks:
+      - monitoring
+
   grafana:
     image: grafana/grafana:11.2.2
     container_name: mutx-grafana
@@ -122,6 +137,7 @@ services:
 volumes:
   prometheus_data:
   grafana_data:
+  alertmanager_data:
   redis_data:
   postgres_data:
 
