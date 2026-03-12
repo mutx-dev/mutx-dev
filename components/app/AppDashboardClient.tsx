@@ -225,6 +225,26 @@ export function AppDashboardClient() {
     await navigator.clipboard.writeText(createdKey.key);
   }
 
+  async function handleRevokeKey(keyId: string) {
+    setLoading(true);
+    setError("");
+
+    try {
+      await readJson(`/api/api-keys/${keyId}`, {
+        method: "DELETE",
+      });
+      await loadDashboard();
+    } catch (nextError) {
+      setError(
+        nextError instanceof Error
+          ? nextError.message
+          : "Failed to revoke API key",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
   if (!user) {
     return (
       <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
@@ -631,12 +651,24 @@ export function AppDashboardClient() {
                 apiKeys.map((apiKey) => (
                   <div
                     key={apiKey.id}
-                    className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-sm"
+                    className="flex items-center justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-sm"
                   >
-                    <p className="font-medium text-slate-300">{apiKey.name}</p>
-                    <span className="text-[10px] uppercase tracking-widest text-slate-500 font-[family:var(--font-mono)]">
-                      {apiKey.is_active ? "Active" : "Revoked"}
-                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-slate-300">{apiKey.name}</p>
+                      <span className="text-[10px] uppercase tracking-widest text-slate-500 font-[family:var(--font-mono)]">
+                        {apiKey.is_active ? "Active" : "Revoked"}
+                      </span>
+                    </div>
+                    {apiKey.is_active ? (
+                      <button
+                        type="button"
+                        onClick={() => handleRevokeKey(apiKey.id)}
+                        disabled={loading}
+                        className="rounded border border-rose-500/30 px-2 py-1 text-[10px] font-medium uppercase tracking-widest text-rose-300 transition hover:border-rose-400 hover:text-rose-200 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        Revoke
+                      </button>
+                    ) : null}
                   </div>
                 ))
               ) : (
