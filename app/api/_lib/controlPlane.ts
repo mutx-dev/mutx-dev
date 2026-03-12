@@ -16,6 +16,20 @@ export function getApiBaseUrl() {
   )
 }
 
+export function shouldUseSecureCookies(request: NextRequest) {
+  return request.nextUrl.protocol === 'https:' || request.headers.get('x-forwarded-proto') === 'https'
+}
+
+export function getCookieDomain(request: NextRequest) {
+  const hostname = request.nextUrl.hostname.toLowerCase()
+
+  if (hostname === 'app.mutx.dev' || hostname === 'mutx.dev') {
+    return '.mutx.dev'
+  }
+
+  return undefined
+}
+
 export async function getAuthToken(request: NextRequest): Promise<string | null> {
   const token = request.cookies.get('access_token')?.value
   if (token) return token
