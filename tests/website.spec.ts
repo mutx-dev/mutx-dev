@@ -42,13 +42,14 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('link', { name: /inspect repo/i })).toBeVisible();
   });
 
-  test('landing page does not expose deprecated waitlist hero', async ({ page }) => {
+  test('landing page exposes live demo path and hero waitlist capture', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByTestId('waitlist-form-hero')).toHaveCount(0);
-    await expect(page.locator('input[type="email"]')).toHaveCount(0);
-    await expect(page.getByText(/waitlist verification is unavailable right now/i)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /view demo path/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /open operator app/i })).toBeVisible();
+    await expect(page.getByTestId('waitlist-form-hero')).toBeVisible();
+    await expect(page.locator('input[type="email"]')).toHaveCount(1);
   });
 
   test('no console errors', async ({ page }) => {

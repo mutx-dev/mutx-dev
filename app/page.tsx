@@ -147,13 +147,6 @@ export default function LandingPage() {
               <WaitlistForm source="hero" compact />
             </div>
 
-              ))}
-            </div>
-
-            <div className="mt-8 max-w-xl">
-              <WaitlistForm source="hero" compact />
-            </div>
-
             <div className="mt-8 rounded-[28px] border border-cyan-400/15 bg-cyan-400/[0.06] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.24)]">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
