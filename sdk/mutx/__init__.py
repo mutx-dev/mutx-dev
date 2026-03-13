@@ -101,8 +101,8 @@ class MutxAsyncClient:
         timeout: float = 30.0,
     ):
         warnings.warn(
-            "MutxAsyncClient is deprecated until async resource methods are fully implemented; "
-            "prefer MutxClient or raw httpx.AsyncClient integrations for now.",
+            "MutxAsyncClient is deprecated for sync-style direct usage; use async-prefixed"
+            " resource methods like acreate, alist, aget, etc. when using async transports.",
             DeprecationWarning,
             stacklevel=2,
         )

@@ -27,9 +27,36 @@ class Deployments:
     def __init__(self, client: httpx.Client | httpx.AsyncClient):
         self._client = client
 
+    @staticmethod
+    def _required_sync_client() -> None:
+        raise RuntimeError("This resource requires a sync httpx.Client. For async clients, use the `a*` methods")
+
+    @staticmethod
+    def _required_async_client() -> None:
+        raise RuntimeError("This async resource helper requires an async httpx.AsyncClient and an `a*` method call")
+
+    def _require_sync_client(self) -> None:
+        if isinstance(self._client, httpx.AsyncClient):
+            self._required_sync_client()
+
+    def _require_async_client(self) -> None:
+        if not isinstance(self._client, httpx.AsyncClient):
+            self._required_async_client()
+
     def create(self, agent_id: UUID | str, replicas: int = 1) -> Deployment:
         """Create a deployment via /deployments (canonical backend route)."""
+        self._require_sync_client()
         response = self._client.post(
+            "/deployments",
+            json={"agent_id": str(agent_id), "replicas": replicas},
+        )
+        response.raise_for_status()
+        return Deployment(response.json())
+
+    async def acreate(self, agent_id: UUID | str, replicas: int = 1) -> Deployment:
+        """Create a deployment via /deployments (canonical backend route)."""
+        self._require_async_client()
+        response = await self._client.post(
             "/deployments",
             json={"agent_id": str(agent_id), "replicas": replicas},
         )
@@ -42,7 +69,15 @@ class Deployments:
         This endpoint currently returns a lightweight payload:
         {"deployment_id": ..., "status": ...}
         """
+        self._require_sync_client()
         response = self._client.post(f"/agents/{agent_id}/deploy")
+        response.raise_for_status()
+        return response.json()
+
+    async def acreate_for_agent(self, agent_id: UUID | str) -> dict[str, Any]:
+        """Create deployment via legacy/live route /agents/{agent_id}/deploy."""
+        self._require_async_client()
+        response = await self._client.post(f"/agents/{agent_id}/deploy")
         response.raise_for_status()
         return response.json()
 
@@ -59,16 +94,43 @@ class Deployments:
         if status:
             params["status"] = status
 
+        self._require_sync_client()
         response = self._client.get("/deployments", params=params)
         response.raise_for_status()
         return [Deployment(data) for data in response.json()]
 
+    async def alist(
+        self,
+        skip: int = 0,
+        limit: int = 50,
+        agent_id: Optional[UUID | str] = None,
+        status: Optional[str] = None,
+    ) -> list[Deployment]:
+        params: dict[str, Any] = {"skip": skip, "limit": limit}
+        if agent_id:
+            params["agent_id"] = str(agent_id)
+        if status:
+            params["status"] = status
+
+        self._require_async_client()
+        response = await self._client.get("/deployments", params=params)
+        response.raise_for_status()
+        return [Deployment(data) for data in response.json()]
+
     def get(self, deployment_id: UUID | str) -> Deployment:
+        self._require_sync_client()
         response = self._client.get(f"/deployments/{deployment_id}")
         response.raise_for_status()
         return Deployment(response.json())
 
+    async def aget(self, deployment_id: UUID | str) -> Deployment:
+        self._require_async_client()
+        response = await self._client.get(f"/deployments/{deployment_id}")
+        response.raise_for_status()
+        return Deployment(response.json())
+
     def scale(self, deployment_id: UUID | str, replicas: int) -> Deployment:
+        self._require_sync_client()
         response = self._client.post(
             f"/deployments/{deployment_id}/scale",
             json={"replicas": replicas},
@@ -76,13 +138,35 @@ class Deployments:
         response.raise_for_status()
         return Deployment(response.json())
 
+    async def ascale(self, deployment_id: UUID | str, replicas: int) -> Deployment:
+        self._require_async_client()
+        response = await self._client.post(
+            f"/deployments/{deployment_id}/scale",
+            json={"replicas": replicas},
+        )
+        response.raise_for_status()
+        return Deployment(response.json())
+
     def restart(self, deployment_id: UUID | str) -> Deployment:
+        self._require_sync_client()
         response = self._client.post(f"/deployments/{deployment_id}/restart")
         response.raise_for_status()
         return Deployment(response.json())
 
+    async def arestart(self, deployment_id: UUID | str) -> Deployment:
+        self._require_async_client()
+        response = await self._client.post(f"/deployments/{deployment_id}/restart")
+        response.raise_for_status()
+        return Deployment(response.json())
+
     def delete(self, deployment_id: UUID | str) -> None:
+        self._require_sync_client()
         response = self._client.delete(f"/deployments/{deployment_id}")
+        response.raise_for_status()
+
+    async def adelete(self, deployment_id: UUID | str) -> None:
+        self._require_async_client()
+        response = await self._client.delete(f"/deployments/{deployment_id}")
         response.raise_for_status()
 
     def logs(
@@ -91,7 +175,22 @@ class Deployments:
         skip: int = 0,
         limit: int = 100,
     ) -> list[dict[str, Any]]:
+        self._require_sync_client()
         response = self._client.get(
+            f"/deployments/{deployment_id}/logs",
+            params={"skip": skip, "limit": limit},
+        )
+        response.raise_for_status()
+        return response.json()
+
+    async def alogs(
+        self,
+        deployment_id: UUID | str,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
+        self._require_async_client()
+        response = await self._client.get(
             f"/deployments/{deployment_id}/logs",
             params={"skip": skip, "limit": limit},
         )
@@ -104,7 +203,22 @@ class Deployments:
         skip: int = 0,
         limit: int = 100,
     ) -> list[dict[str, Any]]:
+        self._require_sync_client()
         response = self._client.get(
+            f"/deployments/{deployment_id}/metrics",
+            params={"skip": skip, "limit": limit},
+        )
+        response.raise_for_status()
+        return response.json()
+
+    async def ametrics(
+        self,
+        deployment_id: UUID | str,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
+        self._require_async_client()
+        response = await self._client.get(
             f"/deployments/{deployment_id}/metrics",
             params={"skip": skip, "limit": limit},
         )
