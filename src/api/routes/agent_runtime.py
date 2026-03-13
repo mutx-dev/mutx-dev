@@ -181,7 +181,9 @@ async def heartbeat(
             },
         )
     except Exception:
-        logger.exception("Failed to emit agent.heartbeat webhook", extra={"agent_id": str(agent.id)})
+        logger.exception(
+            "Failed to emit agent.heartbeat webhook", extra={"agent_id": str(agent.id)}
+        )
 
     if previous_status != agent.status:
         try:
@@ -200,7 +202,9 @@ async def heartbeat(
                 },
             )
         except Exception:
-            logger.exception("Failed to emit agent.status webhook", extra={"agent_id": str(agent.id)})
+            logger.exception(
+                "Failed to emit agent.status webhook", extra={"agent_id": str(agent.id)}
+            )
 
     return {
         "status": "ok",
