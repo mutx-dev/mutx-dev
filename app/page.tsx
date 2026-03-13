@@ -84,6 +84,21 @@ const proof = [
   'Current-state language is preferred over aspirational marketing.',
 ]
 
+const walkthroughSteps = [
+  {
+    title: 'Authenticate with operator context',
+    description: 'Start with the same ownership-aware login boundary used by the dashboard and CLI before touching fleet state.',
+  },
+  {
+    title: 'Inspect agents and deployments',
+    description: 'Move straight into the live agent list, deployment records, and deployment event history to verify what is actually running.',
+  },
+  {
+    title: 'Check health and API key posture',
+    description: 'Confirm readiness, health, API key limits, and revocation flow from the same control-plane surface before handing anything off.',
+  },
+]
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white/20">
@@ -217,6 +232,32 @@ export default function LandingPage() {
                   <route.icon className="mb-4 h-5 w-5 text-white/85" />
                   <h3 className="mb-2 text-base font-medium text-white">{route.title}</h3>
                   <p className="text-sm leading-6 text-white/60">{route.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-white/10 bg-black px-5 py-16 sm:px-6 md:py-20">
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-12">
+            <div className="max-w-xl">
+              <div className="eyebrow mb-4">Demo walkthrough</div>
+              <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">Show the operator flow in the same order a buyer will verify it.</h2>
+              <p className="mt-4 text-base leading-7 text-white/62 sm:text-lg">
+                The live dashboard already tells a coherent story. The landing page should set up that path clearly so visitors know where auth, agents, deployments, health, and API key truth appear once they enter the product.
+              </p>
+            </div>
+
+            <div className="grid gap-4">
+              {walkthroughSteps.map((step, index) => (
+                <div key={step.title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                  <div className="mb-3 flex items-center gap-3">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-400/10 text-sm font-semibold text-cyan-100">
+                      0{index + 1}
+                    </span>
+                    <h3 className="text-base font-medium text-white">{step.title}</h3>
+                  </div>
+                  <p className="text-sm leading-6 text-white/60">{step.description}</p>
                 </div>
               ))}
             </div>
