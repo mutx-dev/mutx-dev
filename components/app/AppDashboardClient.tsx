@@ -110,6 +110,7 @@ export function AppDashboardClient() {
   const [refreshing, setRefreshing] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [error, setError] = useState("");
+  const [copiedKey, setCopiedKey] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [deployments, setDeployments] = useState<Deployment[]>([]);
@@ -295,6 +296,7 @@ export function AppDashboardClient() {
   async function handleLogout() {
     setLoading(true);
     setError("");
+    setCopiedKey(false);
 
     try {
       await fetch("/api/auth/logout", { method: "POST" });
@@ -341,6 +343,8 @@ export function AppDashboardClient() {
 
     try {
       await navigator.clipboard.writeText(createdKey.key);
+      setCopiedKey(true);
+      window.setTimeout(() => setCopiedKey(false), 2500);
     } catch (nextError) {
       setError(
         nextError instanceof Error
@@ -902,6 +906,9 @@ export function AppDashboardClient() {
                     <Copy className="h-4 w-4" />
                   </button>
                 </div>
+                <p className="mt-2 text-[11px] text-amber-100/90">
+                  {copiedKey ? "Copied to clipboard. Store it before you refresh or leave this page." : "Copy now. This secret will not be shown again after you leave this state."}
+                </p>
               </motion.div>
             ) : null}
 
@@ -940,7 +947,11 @@ export function AppDashboardClient() {
 
             <div className="space-y-2 max-h-[340px] overflow-y-auto pr-2 custom-scrollbar">
               {apiKeys.length ? (
-                apiKeys.map((apiKey) => (
+                apiKeys.map((apiKey) => {
+                  const lastUsedRelative = apiKey.last_used ? formatRelativeDate(apiKey.last_used) : "Never used";
+                  const expiresRelative = apiKey.expires_at ? formatRelativeDate(apiKey.expires_at) : "No expiry";
+
+                  return (
                   <div
                     key={apiKey.id}
                     className="rounded-lg border border-white/5 bg-white/[0.02] px-3 py-3 text-sm"
@@ -962,8 +973,22 @@ export function AppDashboardClient() {
                         </div>
                         <div className="mt-2 space-y-1 font-[family:var(--font-mono)] text-[11px] text-slate-500">
                           <p>Created: {formatDate(apiKey.created_at)}</p>
-                          <p>Last used: {formatDate(apiKey.last_used)}</p>
-                          <p>Expires: {formatDate(apiKey.expires_at)}</p>
+                          <p>Last used: {formatDate(apiKey.last_used)} · {lastUsedRelative}</p>
+                          <p>Expires: {formatDate(apiKey.expires_at)} · {expiresRelative}</p>
+                        </div>
+                        <div className="mt-3 flex flex-wrap gap-2 text-[10px] font-medium uppercase tracking-widest text-slate-400">
+                          <span className="rounded-full border border-white/10 bg-black/20 px-2 py-1">
+                            {apiKey.is_active ? "Usable right now" : "Audit-only record"}
+                          </span>
+                          {apiKey.last_used ? (
+                            <span className="rounded-full border border-white/10 bg-black/20 px-2 py-1">
+                              Seen {lastUsedRelative}
+                            </span>
+                          ) : (
+                            <span className="rounded-full border border-white/10 bg-black/20 px-2 py-1">
+                              Never presented to the API
+                            </span>
+                          )}
                         </div>
                       </div>
                       {apiKey.is_active ? (
@@ -988,7 +1013,8 @@ export function AppDashboardClient() {
                       ) : null}
                     </div>
                   </div>
-                ))
+                  );
+                })
               ) : (
                 <p className="py-4 text-center text-xs text-slate-500">
                   No keys provisioned yet. Generate one here to unlock non-browser operator access.
@@ -1043,6 +1069,17 @@ export function AppDashboardClient() {
                       : `${activeKeys} active API key${activeKeys === 1 ? "" : "s"} can authenticate operator workflows right now, with ${apiKeyCapacityRemaining} slot${apiKeyCapacityRemaining === 1 ? "" : "s"} still available.`
                     : `No active API keys are present yet; all ${apiKeyLimit} slots are available when you need non-browser access.`}
                 </p>
+              </div>
+
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                  Demo walkthrough
+                </p>
+                <ol className="mt-2 space-y-2 text-white">
+                  <li>1. Sign in or register to establish a real operator session.</li>
+                  <li>2. Refresh to prove agent, deployment, health, and API key surfaces are live.</li>
+                  <li>3. Generate a key, copy the one-time secret, then rotate or revoke it to show lifecycle truth.</li>
+                </ol>
               </div>
             </div>
           </Card>
