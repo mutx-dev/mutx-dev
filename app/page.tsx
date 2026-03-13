@@ -96,9 +96,8 @@ export default function LandingPage() {
             </ul>
           </div>
 
-          <div className="relative space-y-4">
+          <div className="relative">
             <AnimatedTerminal />
-            <WaitlistForm source="hero" compact />
           </div>
         </section>
       </main>
