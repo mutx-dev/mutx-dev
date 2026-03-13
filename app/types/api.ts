@@ -167,6 +167,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/deployments/{deployment_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Deployment Events
+         * @description Get paginated lifecycle events for a specific deployment.
+         */
+        get: operations["get_deployment_events_deployments__deployment_id__events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/deployments/{deployment_id}/scale": {
         parameters: {
             query?: never;
@@ -244,57 +264,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/webhooks/agent-status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Agent Status Update */
-        post: operations["agent_status_update_webhooks_agent_status_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/webhooks/deployment": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Deployment Event */
-        post: operations["deployment_event_webhooks_deployment_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/webhooks/metrics": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Receive Metrics */
-        post: operations["receive_metrics_webhooks_metrics_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/webhooks/": {
         parameters: {
             query?: never;
@@ -361,6 +330,26 @@ export interface paths {
          * @description Send a test event to a webhook to verify it's working.
          */
         post: operations["test_webhook_webhooks__webhook_id__test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/webhooks/{webhook_id}/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Webhook Deliveries
+         * @description List delivery attempts for a webhook owned by the authenticated user.
+         */
+        get: operations["list_webhook_deliveries_webhooks__webhook_id__deliveries_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -601,13 +590,13 @@ export interface paths {
         };
         /**
          * List Api Keys
-         * @description List all API keys for the current user
+         * @description List all API keys for the current user, including revoked keys for auditability.
          */
         get: operations["list_api_keys_api_keys_get"];
         put?: never;
         /**
          * Create Api Key
-         * @description Create a new API key
+         * @description Create a new API key.
          */
         post: operations["create_api_key_api_keys_post"];
         delete?: never;
@@ -628,7 +617,7 @@ export interface paths {
         post?: never;
         /**
          * Revoke Api Key
-         * @description Revoke (delete) an API key
+         * @description Revoke an API key without deleting its record.
          */
         delete: operations["revoke_api_key_api_keys__key_id__delete"];
         options?: never;
@@ -647,7 +636,7 @@ export interface paths {
         put?: never;
         /**
          * Rotate Api Key
-         * @description Rotate an API key (revoke old and create new)
+         * @description Rotate an active API key by revoking the old one and issuing a new one.
          */
         post: operations["rotate_api_key_api_keys__key_id__rotate_post"];
         delete?: never;
@@ -674,6 +663,52 @@ export interface paths {
          *     (app/api/newsletter/route.ts) which includes Cloudflare Turnstile verification.
          */
         post: operations["create_waitlist_signup_newsletter_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Leads
+         * @description List captured leads.
+         *     Restricted to authenticated users (internal/admin use).
+         */
+        get: operations["list_leads_leads_get"];
+        put?: never;
+        /**
+         * Capture Lead
+         * @description Capture a new contact lead.
+         *     Public endpoint for landing pages and onboarding.
+         */
+        post: operations["capture_lead_leads_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leads/{lead_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Lead
+         * @description Get a specific lead by ID.
+         */
+        get: operations["get_lead_leads__lead_id__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -811,11 +846,71 @@ export interface paths {
         };
         /**
          * Get Agent Status
-         * @description Get agent status.
+         * @description Get status for the authenticated agent.
          */
         get: operations["get_agent_status_agents__agent_id__status_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ingest/agent-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Agent Status Update
+         * @description Update an agent status and append logs (Ingestion).
+         */
+        post: operations["agent_status_update_ingest_agent_status_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ingest/deployment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deployment Event
+         * @description Update deployment state and related agent state (Ingestion).
+         */
+        post: operations["deployment_event_ingest_deployment_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ingest/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Receive Metrics
+         * @description Record agent metrics (Ingestion).
+         */
+        post: operations["receive_metrics_ingest_metrics_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -936,7 +1031,7 @@ export interface components {
             /** @default openai */
             type: components["schemas"]["AgentType"];
             /** Config */
-            config?: Record<string, never> | string | null;
+            config?: Record<string, never> | null;
         };
         /** AgentDetailResponse */
         AgentDetailResponse: {
@@ -952,7 +1047,7 @@ export interface components {
             /** Status */
             status: string;
             /** Config */
-            config: string | null;
+            config: Record<string, never> | null;
             /**
              * Created At
              * Format: date-time
@@ -1030,12 +1125,12 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: Record<string, never> | null;
+            metadata: Record<string, never>;
             /**
              * Capabilities
              * @default []
              */
-            capabilities: string[] | null;
+            capabilities: string[];
         };
         /** AgentRegisterResponse */
         AgentRegisterResponse: {
@@ -1062,7 +1157,7 @@ export interface components {
             /** Status */
             status: string;
             /** Config */
-            config: string | null;
+            config: Record<string, never> | null;
             /**
              * Created At
              * Format: date-time
@@ -1172,6 +1267,31 @@ export interface components {
             node_id?: string | null;
             /** Error Message */
             error_message?: string | null;
+        };
+        /**
+         * DeploymentEventHistoryResponse
+         * @description Paginated deployment lifecycle event history.
+         */
+        DeploymentEventHistoryResponse: {
+            /**
+             * Deployment Id
+             * Format: uuid
+             */
+            deployment_id: string;
+            /** Deployment Status */
+            deployment_status: string;
+            /** Items */
+            items?: components["schemas"]["DeploymentEventResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Event Type */
+            event_type?: string | null;
+            /** Status */
+            status?: string | null;
         };
         /**
          * DeploymentEventResponse
@@ -1341,6 +1461,45 @@ export interface components {
             /** Skill Id */
             skill_id: string;
         };
+        /** LeadCreate */
+        LeadCreate: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Name */
+            name?: string | null;
+            /** Company */
+            company?: string | null;
+            /** Message */
+            message?: string | null;
+            /** Source */
+            source?: string | null;
+        };
+        /** LeadResponse */
+        LeadResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            /** Name */
+            name: string | null;
+            /** Company */
+            company: string | null;
+            /** Message */
+            message: string | null;
+            /** Source */
+            source: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** LogRequest */
         LogRequest: {
             /** Agent Id */
@@ -1356,7 +1515,7 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: Record<string, never> | null;
+            metadata: Record<string, never>;
             /** Timestamp */
             timestamp: string;
         };
@@ -1576,6 +1735,41 @@ export interface components {
              * @description Optional secret for signature verification
              */
             secret?: string | null;
+        };
+        /**
+         * WebhookDelivery
+         * @description Schema for webhook delivery attempts
+         */
+        WebhookDelivery: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Webhook Id
+             * Format: uuid
+             */
+            webhook_id: string;
+            /** Event */
+            event: string;
+            /** Payload */
+            payload: string;
+            /** Status Code */
+            status_code: number | null;
+            /** Success */
+            success: boolean;
+            /** Error Message */
+            error_message: string | null;
+            /** Attempts */
+            attempts: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Delivered At */
+            delivered_at: string | null;
         };
         /** WebhookResponse */
         WebhookResponse: {
@@ -2049,6 +2243,44 @@ export interface operations {
             };
         };
     };
+    get_deployment_events_deployments__deployment_id__events_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                event_type?: string | null;
+                status?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                deployment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentEventHistoryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     scale_deployment_deployments__deployment_id__scale_post: {
         parameters: {
             query?: never;
@@ -2192,127 +2424,13 @@ export interface operations {
             };
         };
     };
-    agent_status_update_webhooks_agent_status_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Bearer token for JWT auth */
-                authorization?: string | null;
-                /** @description API key for webhook authentication */
-                "X-API-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AgentStatusUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    deployment_event_webhooks_deployment_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Bearer token for JWT auth */
-                authorization?: string | null;
-                /** @description API key for webhook authentication */
-                "X-API-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DeploymentEvent"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    receive_metrics_webhooks_metrics_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Bearer token for JWT auth */
-                authorization?: string | null;
-                /** @description API key for webhook authentication */
-                "X-API-Key"?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MetricsReportRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     list_webhooks_webhooks__get: {
         parameters: {
             query?: never;
             header?: {
                 /** @description Bearer token for JWT auth */
                 authorization?: string | null;
-                /** @description API key for webhook authentication */
+                /** @description API key for webhook management */
                 "X-API-Key"?: string | null;
             };
             path?: never;
@@ -2346,7 +2464,7 @@ export interface operations {
             header?: {
                 /** @description Bearer token for JWT auth */
                 authorization?: string | null;
-                /** @description API key for webhook authentication */
+                /** @description API key for webhook management */
                 "X-API-Key"?: string | null;
             };
             path?: never;
@@ -2384,7 +2502,7 @@ export interface operations {
             header?: {
                 /** @description Bearer token for JWT auth */
                 authorization?: string | null;
-                /** @description API key for webhook authentication */
+                /** @description API key for webhook management */
                 "X-API-Key"?: string | null;
             };
             path: {
@@ -2420,7 +2538,7 @@ export interface operations {
             header?: {
                 /** @description Bearer token for JWT auth */
                 authorization?: string | null;
-                /** @description API key for webhook authentication */
+                /** @description API key for webhook management */
                 "X-API-Key"?: string | null;
             };
             path: {
@@ -2454,7 +2572,7 @@ export interface operations {
             header?: {
                 /** @description Bearer token for JWT auth */
                 authorization?: string | null;
-                /** @description API key for webhook authentication */
+                /** @description API key for webhook management */
                 "X-API-Key"?: string | null;
             };
             path: {
@@ -2494,7 +2612,7 @@ export interface operations {
             header?: {
                 /** @description Bearer token for JWT auth */
                 authorization?: string | null;
-                /** @description API key for webhook authentication */
+                /** @description API key for webhook management */
                 "X-API-Key"?: string | null;
             };
             path: {
@@ -2511,6 +2629,47 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_webhook_deliveries_webhooks__webhook_id__deliveries_get: {
+        parameters: {
+            query?: {
+                event?: string | null;
+                success?: boolean | null;
+                skip?: number;
+                limit?: number;
+            };
+            header?: {
+                /** @description Bearer token for JWT auth */
+                authorization?: string | null;
+                /** @description API key for webhook management */
+                "X-API-Key"?: string | null;
+            };
+            path: {
+                webhook_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebhookDelivery"][];
                 };
             };
             /** @description Validation Error */
@@ -3086,6 +3245,106 @@ export interface operations {
             };
         };
     };
+    list_leads_leads_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    capture_lead_leads_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_lead_leads__lead_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     register_agent_agents_register_post: {
         parameters: {
             query?: never;
@@ -3298,7 +3557,9 @@ export interface operations {
     get_agent_status_agents__agent_id__status_get: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 agent_id: string;
             };
@@ -3313,6 +3574,120 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AgentStatusResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    agent_status_update_ingest_agent_status_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Bearer token for JWT auth */
+                authorization?: string | null;
+                /** @description API key for ingestion authentication */
+                "X-API-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgentStatusUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deployment_event_ingest_deployment_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Bearer token for JWT auth */
+                authorization?: string | null;
+                /** @description API key for ingestion authentication */
+                "X-API-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeploymentEvent"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    receive_metrics_ingest_metrics_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Bearer token for JWT auth */
+                authorization?: string | null;
+                /** @description API key for ingestion authentication */
+                "X-API-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetricsReportRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
