@@ -1,13 +1,14 @@
 # Deployments API
 
-Deployment records are exposed through `/deployments`, and creation is currently available both through `/deployments` and the agent deploy route.
+Deployment records are exposed through `/deployments`, and creation is available through both `/deployments` and the agent deploy route.
 
 ## Current Implementation Notes
 
+- Every deployment route requires authenticated control-plane access.
 - `POST /deployments` creates a deployment when given an owned `agent_id`.
 - `POST /agents/{agent_id}/deploy` is still available as the agent-centric create path.
-- Deployment restart, logs, and metrics routes exist in the current FastAPI app.
 - `POST /deployments/{deployment_id}/scale` only succeeds when the deployment status is `running` or `ready`.
+- `POST /deployments/{deployment_id}/restart` currently allows `stopped`, `failed`, and `killed` deployments.
 
 ## Routes
 
@@ -19,7 +20,7 @@ Deployment records are exposed through `/deployments`, and creation is currently
 | `GET /deployments/{deployment_id}/events` | Get paginated lifecycle history for one deployment |
 | `GET /deployments/{deployment_id}/logs` | Get deployment logs |
 | `GET /deployments/{deployment_id}/metrics` | Get deployment metrics |
-| `POST /deployments/{deployment_id}/restart` | Restart a stopped or failed deployment |
+| `POST /deployments/{deployment_id}/restart` | Restart a stopped, failed, or killed deployment |
 | `POST /deployments/{deployment_id}/scale` | Change replica count |
 | `DELETE /deployments/{deployment_id}` | Mark deployment as killed |
 
@@ -28,7 +29,8 @@ Deployment records are exposed through `/deployments`, and creation is currently
 ```bash
 BASE_URL=http://localhost:8000
 
-curl -X POST "$BASE_URL/agents/YOUR_AGENT_ID/deploy"
+curl -X POST "$BASE_URL/agents/YOUR_AGENT_ID/deploy" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 That returns a deployment id you can use with the routes below.
@@ -37,6 +39,7 @@ Direct deployment creation is also available:
 
 ```bash
 curl -X POST "$BASE_URL/deployments" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"agent_id": "YOUR_AGENT_ID", "replicas": 1}'
 ```
@@ -44,9 +47,14 @@ curl -X POST "$BASE_URL/deployments" \
 ## List Deployments
 
 ```bash
-curl "$BASE_URL/deployments"
-curl "$BASE_URL/deployments?status=running&limit=10"
-curl "$BASE_URL/deployments?agent_id=YOUR_AGENT_ID"
+curl "$BASE_URL/deployments" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl "$BASE_URL/deployments?status=running&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl "$BASE_URL/deployments?agent_id=YOUR_AGENT_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 Supported query parameters:
@@ -59,7 +67,8 @@ Supported query parameters:
 ## Get a Deployment
 
 ```bash
-curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID"
+curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 Example response:
@@ -80,9 +89,14 @@ Example response:
 ## Deployment Event History
 
 ```bash
-curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/events"
-curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/events?event_type=scale"
-curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/events?status=failed&limit=20"
+curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/events" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/events?event_type=scale" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/events?status=failed&limit=20" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 Supported query parameters:
@@ -117,12 +131,13 @@ Example response:
 }
 ```
 
-This route returns newest-first lifecycle history and makes it possible to page through deployment state transitions over time. The top-level `deployment_id` and `deployment_status` fields let operators render history context without making a second deployment-detail request.
+This route returns newest-first lifecycle history and lets operators page through deployment state transitions over time.
 
 ## Scale a Deployment
 
 ```bash
 curl -X POST "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/scale" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"replicas": 3}'
 ```
@@ -132,27 +147,29 @@ If the deployment is not `running` or `ready`, the API returns `400` with `Can o
 ## Restart a Deployment
 
 ```bash
-curl -X POST "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/restart"
+curl -X POST "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/restart" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
-
-Current implementation note: restart only succeeds from `stopped` or `failed` deployment states.
 
 ## Deployment Logs
 
 ```bash
-curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/logs?limit=50"
+curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/logs?limit=50" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ## Deployment Metrics
 
 ```bash
-curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/metrics?limit=50"
+curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/metrics?limit=50" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ## Delete a Deployment
 
 ```bash
-curl -X DELETE "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID"
+curl -X DELETE "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 Current implementation note: delete marks the deployment as `killed`, sets `ended_at`, and updates the parent agent to `stopped` when found.
@@ -161,6 +178,7 @@ Current implementation note: delete marks the deployment as `killed`, sets `ende
 
 Deployments may show statuses such as:
 
+- `pending`
 - `deploying`
 - `running`
 - `ready`
