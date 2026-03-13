@@ -1,3 +1,8 @@
+---
+description: Short answers to the most common repo and product questions.
+icon: question
+---
+
 # FAQ
 
 ## What is in this repo today?

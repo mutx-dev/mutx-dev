@@ -1,146 +1,187 @@
 <p align="center">
-  <img src="public/logo.png" alt="MUTX logo" width="160" />
+  <img src="https://github.com/fortunexbt/mutx-dev/blob/main/public/logo.png" />
 </p>
-
-<h1 align="center">MUTX: The Industrial Control Plane for AI Agents</h1>
 
 <p align="center">
-  <strong>Deploy, run, observe, and govern AI agents like you deploy services.</strong>
+  <strong>The control plane for deploying, operating, and governing AI agents.</strong>
+</p>
+
+<p align="center">
+  Deploy agents like you deploy services.
+</p>
+
+<p align="center">
+  <a href="https://docs.mutx.dev"><img src="https://img.shields.io/badge/docs-open-black?style=for-the-badge"></a>
+  <a href="https://github.com/fortunexbt/mutx-dev"><img src="https://img.shields.io/github/stars/fortunexbt/mutx-dev?style=for-the-badge"></a>
+  <a href="https://github.com/fortunexbt/mutx-dev/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-black?style=for-the-badge"></a>
 </p>
 
 ---
 
-## Start Here
+# What is MUTX
 
-- Read [the manifesto](./MANIFESTO.md) for the product thesis and design philosophy.
-- Read [the technical whitepaper](./WHITEPAPER.md) for the system model, architecture, and roadmap framing.
-- Read [the docs hub](./docs/README.md) for setup, workflows, and contributor-facing documentation.
-- Visit [`mutx.dev`](https://mutx.dev) for the landing site and [`app.mutx.dev`](https://app.mutx.dev) for the operator surface preview.
+MUTX is an **industrial control plane for AI agents**.
 
----
+It lets you deploy, operate, observe, and govern autonomous agents as production systems.
 
-## 🚀 The Thesis
-Agentic AI is easy to prototype but notoriously hard to operate at scale. We are building the **industrial-grade operating system** for enterprise AI agents—providing the operational rigor required to take agentic projects from demo to production.
+Think:
 
-> **"If this looks like your kind of infrastructure, there is real work waiting. MUTX is the control plane people will actually build on."**
-
----
-
-## 🏛️ The Infrastructure Gap
-
-| Capability | The SaaS Wrapper Trap | MUTX Industrial Infrastructure |
-| :--- | :--- | :--- |
-| **Architecture** | Multi-tenant, shared cluster | **Single-tenant, bare-metal VPC** |
-| **Persistence** | Ephemeral, timeout-capped | **24/7 autonomous runtime** |
-| **Observability** | Console logs | **Unified metrics/tracing/alerts** |
-| **Economics** | Predatory token-markup | **BYOK / Zero Margin** |
-
----
-
-## 🏗️ Architecture At A Glance
-
-```mermaid
-graph LR
-    subgraph "Control Plane"
-        API[FastAPI Control Plane]
-        DB[(Postgres + Redis)]
-        API --> DB
-    end
-    subgraph "Developer Experience"
-        CLI[Python CLI]
-        SDK[Python SDK]
-    end
-    subgraph "Operator Surface"
-        Web[Next.js Dashboard]
-    end
-    subgraph "Infrastructure"
-        Infra[Docker + Terraform + Ansible]
-    end
-
-    CLI --> API
-    SDK --> API
-    Web --> API
-    API --> Infra
+```
+Vercel → for web apps
+Kubernetes → for containers
+MUTX → for AI agents
 ```
 
----
+Capabilities include:
 
-## 🛠️ Developer-First Ergonomics
-
-### The Operator Terminal
-```bash
-# Provision a hardened VPC for your agent swarm
-$ mutx deploy --config ./agents/production.json --region us-east-1
-
-# Monitor observability across global clusters
-$ mutx status --agent-id 8829-44-202
-```
-
-### The SDK Interface
-```python
-from mutx import MutxClient
-
-# Connect to your dedicated control plane
-client = MutxClient(api_key="mutx_live_xxx")
-
-# Spin up a specialized, persistent operator
-agent = client.agents.create(
-    name="Financial-Reconciliation-Bot",
-    config='{"model": "gpt-4o-mini", "temp": 0.1}',
-)
-
-# Trigger a mission-critical task asynchronously
-task = agent.run_task(
-    instruction="Reconcile daily ledger against Stripe and Bank APIs",
-    priority="high"
-)
-print(f"Autonomous agent operating: {task.id}")
-```
-
-Note: `MutxAsyncClient` is currently deprecated until the async resource surface is fully implemented. Prefer `MutxClient` or direct `httpx.AsyncClient` integrations for now.
+• agent lifecycle management  
+• orchestration and scheduling  
+• observability and debugging  
+• policy and governance  
+• CLI + API + SDK access  
 
 ---
 
-## 🗺️ Roadmap & Maturity
+# Documentation
 
-| Phase | Focus | Status |
-| :--- | :--- | :--- |
-| **NOW** | Auth/Ownership, CLI/SDK Alignment, Dashboard UX | 🔥 In Progress |
-| **NEXT** | Typed Agent Config, Lifecycle History, Webhook Surface | 🏗️ Planning |
-| **LATER** | Traces API, Vector/RAG, Quota Enforcement | 🔭 Backlog |
+The full documentation lives at:
+
+→ **https://docs.mutx.dev**
+
+<p align="center">
+  <a href="https://docs.mutx.dev">
+    <img src="https://docs.mutx.dev/~gitbook/image?url=https%3A%2F%2F2092776695-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FlrUGCvqeS10g6J0hLJNu%252Fuploads%252F0JprPBsUyScuvYUAtdUu%252Fmutx_docs_og_editorial.png%3Falt%3Dmedia%26token%3Dc56634e1-e5d6-4afa-9dbd-d94c8cf71ef7&width=1248&dpr=2&quality=100&sign=cade74dc&sv=2"/>
+  </a>
+</p>
+
+Start here:
+
+- **Quickstart**  
+  https://docs.mutx.dev/docs/deployment/quickstart
+
+- **Architecture overview**  
+  https://docs.mutx.dev/docs/architecture/overview
+
+- **API reference**  
+  https://docs.mutx.dev/docs/contracts/api
+
+- **CLI guide**  
+  https://docs.mutx.dev/docs/cli
 
 ---
 
-## 🤝 Contributor Lanes
-MUTX is at the stage where strong contributors can leave a visible mark on the product.
+# Quickstart
 
-- **`area:web`**: Build a real, authenticated dashboard.
-- **`area:api`**: Harden ownership and schema coverage.
-- **`area:cli/sdk`**: Perfect the operator ergonomics.
-- **`area:infra`**: Hardening deployment loops and monitoring.
-
----
-
-## 🏁 Quickstart
+Clone the repository:
 
 ```bash
-# 1. Install dependencies
-npm install
-pip install -r requirements.txt
-
-# 2. Start infra & services
-docker compose -f infrastructure/docker/docker-compose.yml up -d postgres redis
-uvicorn src.api.main:app --reload --port 8000
-npm run dev
+git clone https://github.com/fortunexbt/mutx-dev
+cd mutx-dev
 ```
 
-Regenerate the API contract explicitly when backend routes change:
+Run the platform locally:
 
 ```bash
-python3 scripts/generate_openapi.py
-npm run generate-types
+make up
+```
+
+Create your first agent:
+
+```bash
+mutx agent create
+```
+
+More details in the docs:
+
+https://docs.mutx.dev/docs/deployment/quickstart
+
+---
+
+# Project structure
+
+```
+mutx/
+ ├── control-plane        # FastAPI control plane
+ ├── cli                  # MUTX operator CLI
+ ├── sdk                  # Python SDK
+ ├── agents               # agent templates and roles
+ ├── infrastructure       # deployment and infra
+ └── docs                 # GitBook source
 ```
 
 ---
 
-*MUTX: Building the backbone of the agentic economy.*
+# Architecture
+
+MUTX consists of four main layers:
+
+**Control Plane**  
+FastAPI services coordinating agent lifecycle.
+
+**Execution Layer**  
+Agent runtimes and worker nodes.
+
+**Interface Layer**  
+CLI, SDK, and API access.
+
+**Observability Layer**  
+Logs, metrics, and debugging tools.
+
+Full architecture:
+
+https://docs.mutx.dev/docs/architecture/overview
+
+---
+
+# Roadmap
+
+Near-term priorities:
+
+- production agent lifecycle
+- scheduling and orchestration
+- policy and governance
+- observability tooling
+- SDK expansion
+
+See:
+
+https://docs.mutx.dev/roadmap
+
+---
+
+# Contributing
+
+Contributions are welcome.
+
+Start here:
+
+- Contributing guide  
+  https://docs.mutx.dev/contributing
+
+- Code of conduct  
+  https://github.com/fortunexbt/mutx-dev/blob/main/CODE_OF_CONDUCT.md
+
+---
+
+# Security
+
+Security policy:
+
+https://github.com/fortunexbt/mutx-dev/blob/main/SECURITY.md
+
+---
+
+# License
+
+MIT License.
+
+See:
+
+https://github.com/fortunexbt/mutx-dev/blob/main/LICENSE
+
+---
+
+<p align="center">
+  <strong>MUTX</strong><br>
+  Autonomous infrastructure for the agentic era.
+</p>

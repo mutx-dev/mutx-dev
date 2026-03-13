@@ -1,14 +1,25 @@
+---
+description: Fastest local path from clone to first running MUTX workflow.
+icon: bolt
+---
+
 # Quickstart
 
 This guide follows the current repo layout and route contracts.
 
-## Prerequisites
+{% stepper %}
+{% step %}
+### Check prerequisites
 
-- Node.js 18+
-- Python 3.10+
-- Docker and Docker Compose
+You need:
 
-## 1. Install dependencies
+* Node.js 18+
+* Python 3.10+
+* Docker and Docker Compose
+{% endstep %}
+
+{% step %}
+### Install dependencies
 
 ```bash
 git clone https://github.com/fortunexbt/mutx.dev.git
@@ -27,8 +38,10 @@ Set a local database URL in `.env`:
 ```bash
 DATABASE_URL=postgresql://mutx:mutx_password@localhost:5432/mutx
 ```
+{% endstep %}
 
-## 2. Start the local demo stack
+{% step %}
+### Start the local demo stack
 
 Use the repo's canonical bootstrap script when you want the fastest morning-demo path:
 
@@ -40,15 +53,12 @@ If you prefer to run services manually, start the local dependencies first:
 
 ```bash
 docker compose -f infrastructure/docker/docker-compose.yml up -d postgres redis
-```
-
-## 3. Start the API
-
-```bash
 uvicorn src.api.main:app --reload --port 8000
 ```
+{% endstep %}
 
-## 4. Start the web app
+{% step %}
+### Start the web app
 
 In another terminal:
 
@@ -58,18 +68,22 @@ npm run dev
 
 Visit:
 
-- `http://localhost:3000` for the marketing site
-- `http://localhost:3000/app` for the app-facing surface
+* `http://localhost:3000` for the marketing site
+* `http://localhost:3000/app` for the app-facing surface
+{% endstep %}
 
-## 5. Verify health
+{% step %}
+### Verify health
 
 ```bash
 curl http://localhost:8000/
 curl http://localhost:8000/health
 curl http://localhost:8000/ready
 ```
+{% endstep %}
 
-## 6. Create a local user
+{% step %}
+### Create a local user
 
 ```bash
 curl -X POST http://localhost:8000/auth/register \
@@ -77,17 +91,19 @@ curl -X POST http://localhost:8000/auth/register \
   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
 ```
 
-Log in and save the access token if you want to use `/auth/me`:
+Log in and save the access token:
 
 ```bash
 curl -X POST http://localhost:8000/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","password":"StrongPass1!"}'
 ```
+{% endstep %}
 
-## 7. Create and deploy an agent record
+{% step %}
+### Create and deploy an agent record
 
-Log in first so you have an access token:
+Confirm your auth first:
 
 ```bash
 curl http://localhost:8000/auth/me \
@@ -119,16 +135,18 @@ curl -X POST http://localhost:8000/deployments \
   -d '{"agent_id":"YOUR_AGENT_ID","replicas":1}'
 ```
 
-Inspect the deployment:
+Inspect the result:
 
 ```bash
 curl http://localhost:8000/deployments
 curl http://localhost:8000/agents/YOUR_AGENT_ID
 ```
+{% endstep %}
+{% endstepper %}
 
-## Optional: CLI setup
+## Optional extras
 
-The CLI installs from the repo root:
+### CLI setup
 
 ```bash
 source .venv/bin/activate
@@ -140,7 +158,7 @@ mutx whoami
 
 `mutx deploy create` now targets the current `POST /deployments` route. See `docs/cli.md` for the current support matrix.
 
-## Optional: frontend verification
+### Frontend verification
 
 ```bash
 npm run lint

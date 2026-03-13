@@ -1,10 +1,15 @@
+---
+description: Security posture, zero-trust model, BYOK direction, and audit controls.
+icon: shield-halved
+---
+
 # Security
 
 > Note: parts of this document describe the intended security posture, not only the currently wired implementation. For example, current Terraform and Ansible still expose some ports and do not yet match every target-state claim below.
 
 This document describes the security architecture of mutx.dev, including zero-trust principles, BYOK model, EvalView guardrails, and network isolation.
 
----
+***
 
 ## Security Philosophy
 
@@ -16,7 +21,7 @@ mutx.dev operates on a **zero-trust** security model with the following principl
 4. **Explicit verification** — Validate at every step
 5. **Automate security** — Machine-speed detection and response
 
----
+***
 
 ## Zero-Trust Model
 
@@ -79,15 +84,15 @@ From `infrastructure/ansible/playbooks/provision.yml:116`:
 
 ### ZTNA Features
 
-| Feature | Implementation | Benefit |
-|---------|---------------|---------|
-| **WireGuard Encryption** | All traffic encrypted | Data in transit protection |
-| **mTLS** | Service-to-service auth | Identity verification |
-| **Port minimization goal** | Tailscale-first access model | Reduced attack surface |
-| **Short-lived Certs** | Automatic rotation | Credential theft prevention |
-| **Network Isolation** | Per-tenant VPCs | Lateral movement prevention |
+| Feature                    | Implementation               | Benefit                     |
+| -------------------------- | ---------------------------- | --------------------------- |
+| **WireGuard Encryption**   | All traffic encrypted        | Data in transit protection  |
+| **mTLS**                   | Service-to-service auth      | Identity verification       |
+| **Port minimization goal** | Tailscale-first access model | Reduced attack surface      |
+| **Short-lived Certs**      | Automatic rotation           | Credential theft prevention |
+| **Network Isolation**      | Per-tenant VPCs              | Lateral movement prevention |
 
----
+***
 
 ## Bring Your Own Key (BYOK)
 
@@ -143,25 +148,25 @@ mutx.dev implements a true BYOK model where customers retain control of their AI
 
 ### BYOK Benefits
 
-| Benefit | Description |
-|---------|-------------|
-| **Zero Markup** | Pay only provider rates, no markup |
-| **Key Control** | Keys stored in tenant's Vault |
-| **Audit Trail** | All API calls logged |
-| **Provider Diversity** | Use any LLM provider |
-| **Compliance** | Keys never touch mutx infrastructure |
+| Benefit                | Description                          |
+| ---------------------- | ------------------------------------ |
+| **Zero Markup**        | Pay only provider rates, no markup   |
+| **Key Control**        | Keys stored in tenant's Vault        |
+| **Audit Trail**        | All API calls logged                 |
+| **Provider Diversity** | Use any LLM provider                 |
+| **Compliance**         | Keys never touch mutx infrastructure |
 
 ### Vault Configuration
 
 Keys are stored in HashiCorp Vault with:
 
-- **Encryption**: AES-256 at rest
-- **Access Control**: Tenant-specific policies
-- **Audit Logging**: All secret access recorded
-- **Token TTL**: Short-lived tokens (15 min)
-- **No Root Access**: Mutx cannot access tenant keys
+* **Encryption**: AES-256 at rest
+* **Access Control**: Tenant-specific policies
+* **Audit Logging**: All secret access recorded
+* **Token TTL**: Short-lived tokens (15 min)
+* **No Root Access**: Mutx cannot access tenant keys
 
----
+***
 
 ## EvalView Guardrails
 
@@ -219,31 +224,31 @@ EvalView is mutx.dev's hypervisor-level security layer that acts as a local LLM 
 
 #### 1. Input Validation
 
-| Check | Method | Action |
-|-------|--------|--------|
+| Check                | Method                 | Action                    |
+| -------------------- | ---------------------- | ------------------------- |
 | **Prompt Injection** | Pattern matching + LLM | Reject malicious payloads |
-| **PII Detection** | NER + Regex | Mask sensitive data |
-| **Toxic Content** | Classifier | Block harmful requests |
-| **Length Limits** | Token count | Truncate or reject |
-| **Encoding** | Sanitization | Strip dangerous chars |
+| **PII Detection**    | NER + Regex            | Mask sensitive data       |
+| **Toxic Content**    | Classifier             | Block harmful requests    |
+| **Length Limits**    | Token count            | Truncate or reject        |
+| **Encoding**         | Sanitization           | Strip dangerous chars     |
 
 #### 2. Output Filtering
 
-| Check | Method | Action |
-|-------|--------|--------|
-| **PII Redaction** | Regex patterns | Replace with [REDACTED] |
-| **Safe Content** | Classifier | Filter harmful outputs |
-| **Injection Prevention** | Output encoding | Escape special chars |
-| **Token Limits** | Token count | Truncate responses |
+| Check                    | Method          | Action                   |
+| ------------------------ | --------------- | ------------------------ |
+| **PII Redaction**        | Regex patterns  | Replace with \[REDACTED] |
+| **Safe Content**         | Classifier      | Filter harmful outputs   |
+| **Injection Prevention** | Output encoding | Escape special chars     |
+| **Token Limits**         | Token count     | Truncate responses       |
 
 #### 3. Anomaly Detection
 
-| Check | Behavior | Action |
-|-------|----------|--------|
-| **Request Velocity** | > 100 req/min per agent | Rate limit |
-| **Output Length** | > 10x normal | Flag for review |
-| **Error Rate** | > 50% errors | Pause agent |
-| **Behavioral Drift** | Intent mismatch | Alert + log |
+| Check                | Behavior                | Action          |
+| -------------------- | ----------------------- | --------------- |
+| **Request Velocity** | > 100 req/min per agent | Rate limit      |
+| **Output Length**    | > 10x normal            | Flag for review |
+| **Error Rate**       | > 50% errors            | Pause agent     |
+| **Behavioral Drift** | Intent mismatch         | Alert + log     |
 
 ### Guardrail Response
 
@@ -285,7 +290,7 @@ If any check fails:
 }
 ```
 
----
+***
 
 ## Network Isolation
 
@@ -383,7 +388,7 @@ fail2ban is configured to protect against brute force:
     fail2ban_maxretry: 3         # After 3 attempts
 ```
 
----
+***
 
 ## Authentication & Authorization
 
@@ -416,19 +421,19 @@ fail2ban is configured to protect against brute force:
 
 ### Token Management
 
-| Token Type | Lifetime | Storage |
-|------------|---------|---------|
-| **Access Token** | 15 min | JWT (stateless) |
-| **Refresh Token** | 7 days | HttpOnly cookie |
-| **API Key** | User-defined | Vault (encrypted) |
+| Token Type        | Lifetime     | Storage           |
+| ----------------- | ------------ | ----------------- |
+| **Access Token**  | 15 min       | JWT (stateless)   |
+| **Refresh Token** | 7 days       | HttpOnly cookie   |
+| **API Key**       | User-defined | Vault (encrypted) |
 
 ### Authorization Model
 
-- **Role-Based Access Control (RBAC)**
-- **API Key scopes**: `read`, `write`, `admin`
-- **Resource-level permissions**: Tenant → Agent → Tool
+* **Role-Based Access Control (RBAC)**
+* **API Key scopes**: `read`, `write`, `admin`
+* **Resource-level permissions**: Tenant → Agent → Tool
 
----
+***
 
 ## Compliance & Audit
 
@@ -436,38 +441,38 @@ fail2ban is configured to protect against brute force:
 
 All security-relevant events are logged:
 
-| Event | Logged To | Retention |
-|-------|-----------|-----------|
-| Login attempts | Auditd + Vault | 1 year |
-| API key access | Vault audit | 1 year |
-| Agent creation | PostgreSQL | 90 days |
-| Agent execution | PostgreSQL | 90 days |
-| Configuration changes | Terraform state | 7 years |
-| Network access | Tailscale logs | 30 days |
+| Event                 | Logged To       | Retention |
+| --------------------- | --------------- | --------- |
+| Login attempts        | Auditd + Vault  | 1 year    |
+| API key access        | Vault audit     | 1 year    |
+| Agent creation        | PostgreSQL      | 90 days   |
+| Agent execution       | PostgreSQL      | 90 days   |
+| Configuration changes | Terraform state | 7 years   |
+| Network access        | Tailscale logs  | 30 days   |
 
 ### Security Monitoring
 
-- **Real-time alerts**: Critical events trigger PagerDuty
-- **SIEM integration**: Exportable logs (JSON)
-- **Compliance reports**: SOC2-ready evidence
+* **Real-time alerts**: Critical events trigger PagerDuty
+* **SIEM integration**: Exportable logs (JSON)
+* **Compliance reports**: SOC2-ready evidence
 
----
+***
 
 ## Summary
 
-| Layer | Technology | Protection |
-|-------|------------|------------|
-| **Network** | VPC, Tailscale ZTNA | Isolation, encryption |
-| **Firewall** | UFW, security groups | Port filtering |
-| **Auth** | JWT, OAuth2 | Identity verification |
-| **Secrets** | HashiCorp Vault | Key protection |
-| **Runtime** | EvalView Guardrails | I/O validation |
-| **Monitor** | fail2ban, auditd | Intrusion detection |
+| Layer        | Technology           | Protection            |
+| ------------ | -------------------- | --------------------- |
+| **Network**  | VPC, Tailscale ZTNA  | Isolation, encryption |
+| **Firewall** | UFW, security groups | Port filtering        |
+| **Auth**     | JWT, OAuth2          | Identity verification |
+| **Secrets**  | HashiCorp Vault      | Key protection        |
+| **Runtime**  | EvalView Guardrails  | I/O validation        |
+| **Monitor**  | fail2ban, auditd     | Intrusion detection   |
 
----
+***
 
 ## Related Documentation
 
-- [Overview](./overview.md)
-- [Infrastructure](./infrastructure.md)
-- [Agent Runtime](./agent-runtime.md)
+* [Architecture Overview](overview.md)
+* [Infrastructure](infrastructure.md)
+* [Agent Runtime](agent-runtime.md)
