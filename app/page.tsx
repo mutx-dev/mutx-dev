@@ -25,8 +25,9 @@ const TWITTER_URL = 'https://x.com/mutxdev'
 const navItems = [
   { label: 'Overview', href: '#overview' },
   { label: 'What Exists', href: '#platform' },
-  { label: 'Roadmap', href: '#roadmap' },
-  { label: 'Contribute', href: '#contribute' },
+  { label: 'Docs', href: 'https://docs.mutx.dev', external: true },
+  { label: 'GitHub', href: GITHUB_URL, external: true },
+  { label: 'Contact', href: '#contact' },
 ]
 
 const features = [
@@ -109,7 +110,13 @@ export default function LandingPage() {
 
           <div className="hidden items-center gap-8 text-sm text-white/60 md:flex">
             {navItems.map((item) => (
-              <a key={item.label} href={item.href} className="transition-colors hover:text-white">
+              <a
+                key={item.label}
+                href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noreferrer' : undefined}
+                className="transition-colors hover:text-white"
+              >
                 {item.label}
               </a>
             ))}
@@ -132,7 +139,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-7xl grid gap-16 lg:grid-cols-2 lg:items-center">
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/80 mb-8">
-                <span>Open-Source Agent Control Plane</span>
+                <span>Open-source docs-first control plane</span>
               </div>
               
               <h1 className="text-4xl font-medium tracking-tight sm:text-6xl mb-6">
@@ -140,7 +147,7 @@ export default function LandingPage() {
               </h1>
               
               <p className="text-lg text-white/60 mb-10 leading-relaxed max-w-xl">
-                MUTX is an open-source control plane for teams that need more than an agent demo. Today it gives you real auth, agent and deployment records, API keys, webhook ingestion, health checks, and coordinated web, API, CLI, and SDK surfaces.
+                MUTX is an open-source control plane for teams operating AI agents. Start with the docs and GitHub repo to inspect the current surface area, then join the waitlist or contact us for early access to the hosted operator experience.
               </p>
 
               <div className="flex flex-wrap items-center gap-4 mb-12">
@@ -150,7 +157,7 @@ export default function LandingPage() {
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90"
                 >
-                  View on GitHub
+                  Inspect the code
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
@@ -160,12 +167,15 @@ export default function LandingPage() {
                   className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
                 >
                   <GitBranch className="h-4 w-4 opacity-80" />
-                  Open Docs
+                  Read the docs
                   <ArrowRight className="h-4 w-4" />
                 </a>
               </div>
 
               <div className="max-w-md">
+                <p className="mb-4 text-sm leading-relaxed text-white/50">
+                  Public entry points are docs, GitHub, and the waitlist. The dashboard preview is intentionally not the primary path for first-time visitors.
+                </p>
                 <WaitlistForm source="hero" compact />
               </div>
             </div>
@@ -216,7 +226,7 @@ curl <span className="text-green-400">&quot;$BASE_URL/health&quot;</span>
             <div className="max-w-3xl mb-16">
               <h2 className="text-3xl font-medium tracking-tight sm:text-4xl mb-6">What exists today.</h2>
               <p className="text-lg text-white/60">
-                What exists today is a real control-plane shell with honest boundaries. The dashboard is still maturing, but the core platform surfaces are already in place.
+                What exists today is a real control-plane shell with honest boundaries. Public visitors should start in docs and GitHub; the dashboard remains a preview while the operator surface matures.
               </p>
             </div>
 
@@ -267,7 +277,7 @@ curl <span className="text-green-400">&quot;$BASE_URL/health&quot;</span>
           <div className="mx-auto max-w-3xl">
             <h2 className="text-3xl font-medium tracking-tight sm:text-5xl mb-6">Build with MUTX.</h2>
             <p className="text-lg text-white/60 mb-10 leading-relaxed">
-              Join the waitlist for product updates, technical docs, and early access as we harden the control plane for real operator workflows.
+              Join the waitlist for launch updates, docs changes, and early hosted access. If you are evaluating MUTX today, start with the docs and repository, then contact us for fit questions.
             </p>
             <div className="flex justify-center">
               <div className="w-full max-w-md text-left">
@@ -278,7 +288,7 @@ curl <span className="text-green-400">&quot;$BASE_URL/health&quot;</span>
         </section>
       </main>
 
-      <footer className="border-t border-white/10 py-8 px-6 text-sm text-white/40 text-center flex flex-col items-center gap-4">
+      <footer id="contact" className="border-t border-white/10 py-8 px-6 text-sm text-white/40 text-center flex flex-col items-center gap-4">
         <div className="flex items-center gap-2">
           <Image src="/logo.png" alt="mutx.dev" width={20} height={20} className="object-contain" />
           <span>MUTX Open-Source Agent Control Plane</span>
