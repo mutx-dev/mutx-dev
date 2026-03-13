@@ -76,10 +76,10 @@ Start with the path that matches your goal.
 
 ## Priority 5: Contribute and maintain
 
-* [Contributing](contributing.md)
+* [Contributing](contributing/)
 * [Contributor Covenant Code of Conduct](code_of_conduct.md)
 * [AGENTS.md](agents-1.md) — maintainer-facing repo guidance.
-* [pull\_request\_template](.github/pull_request_template.md) — PR expectations and checklist.
+* [pull\_request\_template](contributing/github-workflows/pull_request_template.md) — PR expectations and checklist.
 
 {% hint style="info" %}
 When docs and code disagree, trust the code and update the closest doc.

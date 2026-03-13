@@ -7,7 +7,7 @@ icon: life-ring
 
 Use the smallest channel that fits the problem.
 
-<table data-view="cards"><thead><tr><th>Title</th><th data-card-target data-type="content-ref">Target</th></tr></thead><tbody><tr><td>Bug reports</td><td><a href="docs/troubleshooting/">troubleshooting</a></td></tr><tr><td>Docs fixes</td><td><a href="contributing.md">contributing.md</a></td></tr><tr><td>Security reports</td><td><a href="security.md">security.md</a></td></tr></tbody></table>
+<table data-view="cards"><thead><tr><th>Title</th><th data-card-target data-type="content-ref">Target</th></tr></thead><tbody><tr><td>Bug reports</td><td><a href="docs/troubleshooting/">troubleshooting</a></td></tr><tr><td>Docs fixes</td><td><a href="contributing/">contributing</a></td></tr><tr><td>Security reports</td><td><a href="security.md">security.md</a></td></tr></tbody></table>
 
 ## Bugs
 
