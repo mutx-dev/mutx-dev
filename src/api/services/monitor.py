@@ -74,24 +74,33 @@ async def start_background_monitor():
     logger.info("Starting background agent monitor...")
     self_healing = get_self_healing_service()
     await self_healing.start()
+    try:
+        while True:
+            try:
+                async with database_module.async_session_maker() as session:
+                    # 1. Run actual monitoring and self-healing logic
+                    await monitor_agent_health(session)
 
-    while True:
+                    # 2. Add synthetic activity for "lively" UI feel (demo only)
+                    result = await session.execute(select(Agent).where(Agent.status == "running"))
+                    running_agents = result.scalars().all()
+                    for agent in running_agents:
+                        if random.random() < 0.3:
+                            await _generate_synthetic_logs(session, agent.id)
+
+                    await session.commit()
+            except asyncio.CancelledError:
+                raise
+            except Exception as e:
+                logger.error(f"Error in background monitor: {e}")
+                await asyncio.sleep(5)
+
+            await asyncio.sleep(5)  # Run every 5 seconds
+    except asyncio.CancelledError:
+        logger.info("Background agent monitor cancellation requested")
+        raise
+    finally:
         try:
-            async with database_module.async_session_maker() as session:
-                # 1. Run actual monitoring and self-healing logic
-                await monitor_agent_health(session)
-
-                # 2. Add synthetic activity for "lively" UI feel (demo only)
-                result = await session.execute(select(Agent).where(Agent.status == "running"))
-                running_agents = result.scalars().all()
-                for agent in running_agents:
-                    if random.random() < 0.3:
-                        await _generate_synthetic_logs(session, agent.id)
-
-                await session.commit()
-
-        except Exception as e:
-            logger.error(f"Error in background monitor: {e}")
-            await asyncio.sleep(5)
-
-        await asyncio.sleep(5)  # Run every 5 seconds
+            await self_healing.stop()
+        except Exception:
+            logger.exception("Failed to stop self-healing service cleanly")
