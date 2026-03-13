@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { ArrowRight, Github, ShieldCheck, Activity, KeyRound, Webhook } from 'lucide-react'
+import { ArrowRight, Github, ShieldCheck, Activity, KeyRound, Webhook, PlayCircle, LayoutDashboard, ServerCog, TerminalSquare } from 'lucide-react'
 
 import { AnimatedTerminal } from '@/components/AnimatedTerminal'
 import { WaitlistForm } from '@/components/WaitlistForm'
@@ -15,7 +15,6 @@ const links = [
   { label: 'github', href: GITHUB_URL },
   { label: 'contact', href: '/contact' },
 ]
-
 
 const featureCards = [
   {
@@ -37,6 +36,31 @@ const featureCards = [
     icon: Webhook,
     title: 'event and webhook control',
     body: 'Coordinate inbound events, deployments, and downstream automation from one control plane instead of glue code theater.',
+  },
+]
+
+const operatorSignals = [
+  { label: 'auth', value: 'ownership-scoped sessions' },
+  { label: 'deployments', value: 'truthful runtime inventory' },
+  { label: 'health', value: 'ready / degraded / recovering' },
+  { label: 'events', value: 'webhook and automation flow' },
+]
+
+const walkthrough = [
+  {
+    icon: LayoutDashboard,
+    title: 'dashboard truth',
+    body: 'See the same deployment and agent state your operators will actually act on during a live demo.',
+  },
+  {
+    icon: ServerCog,
+    title: 'recovery loop',
+    body: 'Surface degradation, queue recovery, and re-check health from a single control plane pass.',
+  },
+  {
+    icon: TerminalSquare,
+    title: 'cli parity',
+    body: 'Keep the command path aligned with the operator UI so demos and production workflows stay coherent.',
   },
 ]
 
@@ -76,18 +100,18 @@ export default function LandingPage() {
       </nav>
 
       <main className="relative px-5 pb-20 pt-28 sm:px-6 md:pt-32 lg:pt-36">
-        <section className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:items-center">
+        <section className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center">
           <div className="max-w-2xl">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/65">
               open-source agent control plane
             </div>
 
             <h1 className="max-w-4xl text-4xl font-medium tracking-tight text-white sm:text-5xl lg:text-[4.5rem] lg:leading-[0.92]">
-              run ai agents like production systems.
+              run ai agents with a control surface operators can trust.
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-7 text-white/62 sm:text-lg sm:leading-8">
-              MUTX is the control plane for teams running agent workloads with real auth, deployment flow, health truth, webhook routing, and operator-grade interfaces.
+              MUTX gives teams a production-facing path for agent auth, deployment flow, health truth, webhook routing, and demo-ready operator interfaces without pretending the hard parts are solved by vibes.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -98,6 +122,19 @@ export default function LandingPage() {
               <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/[0.08]">
                 inspect repo
               </a>
+              <a href="#walkthrough" className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-3 text-sm font-medium text-cyan-100 transition hover:border-cyan-300/40 hover:bg-cyan-400/15">
+                <PlayCircle className="h-4 w-4" />
+                view demo path
+              </a>
+            </div>
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              {operatorSignals.map((item) => (
+                <div key={item.label} className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/38">{item.label}</p>
+                  <p className="mt-2 text-sm text-white/78">{item.value}</p>
+                </div>
+              ))}
             </div>
 
             <div className="mt-8 max-w-xl">
@@ -119,6 +156,32 @@ export default function LandingPage() {
 
           <div className="relative">
             <AnimatedTerminal />
+          </div>
+        </section>
+
+        <section id="walkthrough" className="mx-auto mt-20 max-w-6xl rounded-[32px] border border-white/10 bg-white/[0.03] p-6 shadow-[0_30px_120px_rgba(0,0,0,0.32)] sm:p-8 lg:p-10">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-200/75">demo walkthrough</p>
+              <h2 className="mt-3 text-3xl font-medium tracking-tight text-white sm:text-4xl">
+                A clean operator story from login to recovery.
+              </h2>
+              <p className="mt-4 max-w-lg text-sm leading-7 text-white/58 sm:text-base">
+                The landing surface now points directly at the product story: authenticate, inspect runtime truth, react to degradation, and move between UI and CLI without losing operator context.
+              </p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              {walkthrough.map(({ icon: Icon, title, body }) => (
+                <div key={title} className="rounded-3xl border border-white/10 bg-black/30 p-5">
+                  <div className="inline-flex rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-cyan-200">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-4 text-lg font-medium text-white">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-white/55">{body}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </main>
