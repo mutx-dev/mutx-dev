@@ -118,6 +118,7 @@ export function AppDashboardClient() {
   const [health, setHealth] = useState<Health | null>(null);
   const [apiKeyName, setApiKeyName] = useState("App dashboard key");
   const [createdKey, setCreatedKey] = useState<CreateKeyResponse | null>(null);
+  const [lastKeyAction, setLastKeyAction] = useState<"created" | "rotated">("created");
 
   const runningAgents = agents.filter((agent) => agent.status === "running").length;
   const healthyDeployments = deployments.filter(
@@ -325,6 +326,7 @@ export function AppDashboardClient() {
         }),
       });
 
+      setLastKeyAction("created");
       setCreatedKey(payload);
       await loadDashboard();
     } catch (nextError) {
@@ -385,6 +387,7 @@ export function AppDashboardClient() {
           method: "POST",
         },
       );
+      setLastKeyAction("rotated");
       setCreatedKey(payload);
       await loadDashboard();
     } catch (nextError) {
@@ -887,17 +890,22 @@ export function AppDashboardClient() {
                       New key generated
                     </p>
                     <p className="mt-1 text-[11px] leading-relaxed text-amber-50/80">
-                      This secret is only shown once. Copy it now, then store it outside the dashboard before refreshing or rotating again.
+                      {lastKeyAction === "rotated"
+                        ? "Rotation succeeded. The previous key is now revoked, and this replacement secret is only shown once. Copy it now, then store it outside the dashboard before leaving this state."
+                        : "This secret is only shown once. Copy it now, then store it outside the dashboard before refreshing or rotating again."}
                     </p>
                   </div>
                   <span className="rounded-full bg-amber-950/50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-200">
-                    one-time reveal
+                    {lastKeyAction === "rotated" ? "rotation complete" : "one-time reveal"}
                   </span>
                 </div>
                 <div className="mt-3 flex items-center gap-2 rounded bg-black/40 px-3 py-2">
                   <code className="flex-1 truncate text-xs text-white">
                     {createdKey.key}
                   </code>
+                  <span className="hidden text-[10px] font-medium uppercase tracking-widest text-amber-200 sm:inline">
+                    {lastKeyAction === "rotated" ? "replacement key" : "new key"}
+                  </span>
                   <button
                     type="button"
                     onClick={copyKey}
@@ -907,12 +915,18 @@ export function AppDashboardClient() {
                   </button>
                 </div>
                 <p className="mt-2 text-[11px] text-amber-100/90">
-                  {copiedKey ? "Copied to clipboard. Store it before you refresh or leave this page." : "Copy now. This secret will not be shown again after you leave this state."}
+                  {copiedKey
+                    ? lastKeyAction === "rotated"
+                      ? "Replacement key copied. The revoked predecessor remains visible below for audit proof."
+                      : "Copied to clipboard. Store it before you refresh or leave this page."
+                    : lastKeyAction === "rotated"
+                      ? "Copy the replacement key now. The previous key is already revoked and this secret will not be shown again."
+                      : "Copy now. This secret will not be shown again after you leave this state."}
                 </p>
               </motion.div>
             ) : null}
 
-            <div className="mb-4 grid gap-3 sm:grid-cols-2">
+            <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-slate-300">
                 <p className="text-[10px] uppercase tracking-widest text-slate-500">
                   Newest active key
@@ -942,6 +956,18 @@ export function AppDashboardClient() {
                 ) : (
                   <p className="mt-2 text-slate-500">No revoked keys yet.</p>
                 )}
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-slate-300">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                  Demo cue
+                </p>
+                <p className="mt-2 text-white">
+                  {apiKeyLimitReached
+                    ? "Show the create button locking at the active limit, then rotate or revoke a key to reopen capacity live."
+                    : activeKeys > 0
+                      ? "Use the copy → rotate flow to prove one-time secret reveal and audit-safe revocation in a single path."
+                      : "Generate the first operator key here to unlock a full non-browser auth lifecycle demo."}
+                </p>
               </div>
             </div>
 
