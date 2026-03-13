@@ -73,7 +73,6 @@ def test_deploy_events_hits_contract_route_and_renders_items(monkeypatch) -> Non
     assert "scale | running | node: node-1" in result.output
 
 
-
 def test_deploy_list_passes_agent_and_status_filters(monkeypatch) -> None:
     captured: dict[str, Any] = {}
 
@@ -112,7 +111,6 @@ def test_deploy_list_passes_agent_and_status_filters(monkeypatch) -> None:
         },
     }
     assert "dep-123 | agent-123 | running | replicas: 2" in result.output
-
 
 
 def test_deploy_create_hits_canonical_route_with_replicas(monkeypatch) -> None:
