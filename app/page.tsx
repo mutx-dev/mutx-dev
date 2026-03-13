@@ -10,7 +10,6 @@ import {
   Server,
   Shield,
   Terminal,
-  Twitter,
   CheckCircle2,
 } from 'lucide-react'
 import Image from 'next/image'
@@ -123,11 +122,13 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="text-white/60 hover:text-white transition-colors">
+            <a href={GITHUB_URL} target="_blank" rel="noreferrer" aria-label="GitHub" className="text-white/60 hover:text-white transition-colors">
               <Github className="h-5 w-5" />
             </a>
-            <a href={TWITTER_URL} target="_blank" rel="noreferrer" className="text-white/60 hover:text-white transition-colors">
-              <Twitter className="h-5 w-5" />
+            <a href={TWITTER_URL} target="_blank" rel="noreferrer" aria-label="X" className="text-white/60 hover:text-white transition-colors">
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-current">
+                <path d="M18.244 2H21.5l-7.11 8.13L22.75 22h-6.54l-5.12-6.69L5.24 22H2l7.6-8.69L1.25 2h6.71l4.63 6.1L18.244 2Zm-1.147 18h1.803L6.98 3.894H5.045L17.097 20Z" />
+              </svg>
             </a>
           </div>
         </div>
@@ -295,7 +296,7 @@ curl <span className="text-green-400">&quot;$BASE_URL/health&quot;</span>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-6">
           <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub</a>
-          <a href={TWITTER_URL} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Twitter</a>
+                    <a href="https://docs.mutx.dev" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Docs</a>
           <a href="https://docs.mutx.dev" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Docs</a>
           <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
           <a href="mailto:hello@mutx.dev" className="hover:text-white transition-colors">Contact</a>
