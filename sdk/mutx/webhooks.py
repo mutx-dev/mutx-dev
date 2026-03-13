@@ -42,30 +42,6 @@ class WebhookDelivery:
         return f"WebhookDelivery(id={self.id}, event={self.event}, success={self.success})"
 
 
-class WebhookDelivery:
-    def __init__(self, data: dict[str, Any]):
-        self.id = UUID(data["id"])
-        self.webhook_id = UUID(data["webhook_id"])
-        self.event = data["event"]
-        self.payload = data.get("payload")
-        self.success = data.get("success", False)
-        self.status_code = data.get("status_code")
-        self.response_body = data.get("response_body")
-        self.error_message = data.get("error_message")
-        self.attempts = data.get("attempts")
-        self.delivered_at = (
-            datetime.fromisoformat(data["delivered_at"]) if data.get("delivered_at") else None
-        )
-        self.created_at = datetime.fromisoformat(data["created_at"])
-        self._data = data
-
-    def __repr__(self) -> str:
-        return (
-            f"WebhookDelivery(id={self.id}, event={self.event}, success={self.success}, "
-            f"status_code={self.status_code})"
-        )
-
-
 class Webhooks:
     def __init__(self, client: httpx.Client | httpx.AsyncClient):
         self._client = client
@@ -109,27 +85,6 @@ class Webhooks:
     def delete(self, webhook_id: UUID | str) -> None:
         response = self._client.delete(f"/webhooks/{webhook_id}")
         response.raise_for_status()
-
-    def get_deliveries(
-        self,
-        webhook_id: UUID | str,
-        skip: int = 0,
-        limit: int = 50,
-        event: Optional[str] = None,
-        success: Optional[bool] = None,
-    ) -> list[WebhookDelivery]:
-        params: dict[str, Any] = {"skip": skip, "limit": limit}
-        if event is not None:
-            params["event"] = event
-        if success is not None:
-            params["success"] = success
-
-        response = self._client.get(
-            f"/webhooks/{webhook_id}/deliveries",
-            params=params,
-        )
-        response.raise_for_status()
-        return [WebhookDelivery(data) for data in response.json()]
 
     def get_deliveries(
         self,
