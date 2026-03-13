@@ -73,6 +73,45 @@ def test_deploy_events_hits_contract_route_and_renders_items(monkeypatch) -> Non
     assert "scale | running | node: node-1" in result.output
 
 
+def test_deploy_list_passes_agent_and_status_filters(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["params"] = params
+        return DummyResponse(
+            200,
+            [
+                {
+                    "id": "dep-123",
+                    "agent_id": "agent-123",
+                    "status": "running",
+                    "replicas": 2,
+                }
+            ],
+        )
+
+    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.deploy.get_client", lambda config: SimpleNamespace(get=fake_get))
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        ["deploy", "list", "--limit", "5", "--skip", "2", "--agent-id", "agent-123", "--status", "running"],
+    )
+
+    assert result.exit_code == 0
+    assert captured == {
+        "path": "/deployments",
+        "params": {
+            "limit": 5,
+            "skip": 2,
+            "agent_id": "agent-123",
+            "status": "running",
+        },
+    }
+    assert "dep-123 | agent-123 | running | replicas: 2" in result.output
+
 def test_deploy_create_hits_canonical_route_with_replicas(monkeypatch) -> None:
     captured: dict[str, Any] = {}
 
