@@ -101,6 +101,24 @@ function maskApiKeyId(value: string) {
   return `${value.slice(0, 6)}…${value.slice(-4)}`;
 }
 
+const walkthroughSteps = [
+  {
+    title: "Authenticate with operator context",
+    description:
+      "Start with the same ownership-aware boundary used by the dashboard and CLI before you touch fleet state.",
+  },
+  {
+    title: "Inspect agents and deployments",
+    description:
+      "Verify agent records, deployment status, and the freshest deployment events before claiming anything is live.",
+  },
+  {
+    title: "Confirm health and API key posture",
+    description:
+      "Check readiness, health, and API key capacity from the same surface so the operator handoff stays honest.",
+  },
+] as const;
+
 export function AppDashboardClient() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
