@@ -96,6 +96,11 @@ function statusTone(status: string) {
   return "bg-amber-400/10 text-amber-300 border-amber-400/20";
 }
 
+function maskApiKeyId(value: string) {
+  if (value.length <= 10) return value;
+  return `${value.slice(0, 6)}…${value.slice(-4)}`;
+}
+
 export function AppDashboardClient() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
@@ -131,6 +136,8 @@ export function AppDashboardClient() {
       (left, right) =>
         new Date(right.created_at ?? 0).getTime() - new Date(left.created_at ?? 0).getTime(),
     )[0];
+  const newestActiveKey = apiKeys.find((apiKey) => apiKey.is_active) ?? null;
+  const newestRevokedKey = [...apiKeys].reverse().find((apiKey) => !apiKey.is_active) ?? null;
   const authBoundaryDetail = useMemo(() => {
     if (user?.email) return `Signed in as ${user.email}`;
     if (error) return error;
@@ -870,10 +877,20 @@ export function AppDashboardClient() {
                 animate={{ opacity: 1, height: "auto" }}
                 className="mb-6 overflow-hidden rounded-lg border border-amber-400/30 bg-amber-400/10 p-4"
               >
-                <p className="mb-2 text-xs font-medium text-amber-200">
-                  New key generated
-                </p>
-                <div className="flex items-center gap-2 rounded bg-black/40 px-3 py-2">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-medium text-amber-200">
+                      New key generated
+                    </p>
+                    <p className="mt-1 text-[11px] leading-relaxed text-amber-50/80">
+                      This secret is only shown once. Copy it now, then store it outside the dashboard before refreshing or rotating again.
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-amber-950/50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-200">
+                    one-time reveal
+                  </span>
+                </div>
+                <div className="mt-3 flex items-center gap-2 rounded bg-black/40 px-3 py-2">
                   <code className="flex-1 truncate text-xs text-white">
                     {createdKey.key}
                   </code>
@@ -887,6 +904,39 @@ export function AppDashboardClient() {
                 </div>
               </motion.div>
             ) : null}
+
+            <div className="mb-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-slate-300">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                  Newest active key
+                </p>
+                {newestActiveKey ? (
+                  <>
+                    <p className="mt-2 font-medium text-white">{newestActiveKey.name}</p>
+                    <p className="mt-1 font-[family:var(--font-mono)] text-[11px] text-slate-500">
+                      {maskApiKeyId(newestActiveKey.id)} · last used {formatRelativeDate(newestActiveKey.last_used)}
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-2 text-slate-500">No active key issued yet.</p>
+                )}
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-slate-300">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                  Audit trail
+                </p>
+                {newestRevokedKey ? (
+                  <>
+                    <p className="mt-2 font-medium text-white">Most recent revoked key kept for history</p>
+                    <p className="mt-1 font-[family:var(--font-mono)] text-[11px] text-slate-500">
+                      {maskApiKeyId(newestRevokedKey.id)} · revoked key still visible in the ledger
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-2 text-slate-500">No revoked keys yet.</p>
+                )}
+              </div>
+            </div>
 
             <div className="space-y-2 max-h-[340px] overflow-y-auto pr-2 custom-scrollbar">
               {apiKeys.length ? (
