@@ -173,6 +173,34 @@ def deployment_events(
         click.echo(f"Error: {response.text}", err=True)
 
 
+@deploy_group.command(name="restart")
+@click.argument("deployment_id")
+def restart_deployment(deployment_id: str):
+    """Restart a deployment"""
+    config = CLIConfig()
+    if not config.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        return
+
+    client = get_client(config)
+    response = client.post(f"/deployments/{deployment_id}/restart")
+
+    if response.status_code == 401:
+        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+        return
+
+    if response.status_code == 200:
+        deployment = response.json()
+        click.echo(f"Restarted deployment: {deployment.get('id', deployment_id)}")
+        click.echo(f"Status: {deployment.get('status')}")
+    elif response.status_code == 400:
+        click.echo(f"Error: {response.json().get('detail', 'Cannot restart deployment')}", err=True)
+    elif response.status_code == 404:
+        click.echo("Error: Deployment not found", err=True)
+    else:
+        click.echo(f"Error: {response.text}", err=True)
+
+
 @deploy_group.command(name="delete")
 @click.argument("deployment_id")
 @click.option("--force", "-f", is_flag=True, help="Force deletion without confirmation")

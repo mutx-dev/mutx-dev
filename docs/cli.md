@@ -78,8 +78,9 @@ mutx status
 | `mutx deploy list`   | reliable | uses `GET /deployments`                                                  |
 | `mutx deploy create` | reliable | uses `POST /deployments`                                                 |
 | `mutx deploy events` | reliable | uses `GET /deployments/{id}/events`                                      |
-| `mutx deploy scale`  | reliable | uses `POST /deployments/{id}/scale`                                      |
-| `mutx deploy delete` | reliable | uses `DELETE /deployments/{id}`                                          |
+| `mutx deploy scale`   | reliable | uses `POST /deployments/{id}/scale`                                      |
+| `mutx deploy restart` | reliable | uses `POST /deployments/{id}/restart`                                    |
+| `mutx deploy delete`  | reliable | uses `DELETE /deployments/{id}`                                          |
 
 `mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`.
 
@@ -103,6 +104,9 @@ mutx deploy list --limit 10
 
 # Create a deployment for an owned agent
 mutx deploy create --agent-id YOUR_AGENT_ID --replicas 1
+
+# Restart a failed deployment
+mutx deploy restart YOUR_DEPLOYMENT_ID
 ```
 
 ## When in Doubt
