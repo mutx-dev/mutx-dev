@@ -165,6 +165,32 @@ describe('API key route proxies', () => {
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
   })
 
+  it('preserves active key limit conflicts for create proxy', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: async () => ({ detail: 'Active API key limit reached (10)' }),
+    })
+
+    const { POST } = await import('../../app/api/api-keys/route')
+
+    const response = await POST(mockJsonRequest({ name: 'overflow-key' }))
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: 'overflow-key' }),
+    })
+    expect(response.status).toBe(409)
+    await expect(response.json()).resolves.toEqual({
+      detail: 'Active API key limit reached (10)',
+    })
+  })
+
   it('preserves successful revoke responses for the dashboard proxy', async () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock).mockResolvedValue({
