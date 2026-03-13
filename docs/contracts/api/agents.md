@@ -2,14 +2,14 @@
 
 The agents routes manage agent records, deployments, logs, and metrics.
 
-Runtime-facing agent endpoints such as heartbeat, command polling, log submission, and `GET /agents/{agent_id}/status` use the agent API key as a bearer token. Control-plane users should use the standard `GET /agents/{agent_id}` route instead.
+Runtime-facing endpoints such as heartbeat, command polling, log submission, and `GET /agents/{agent_id}/status` use agent identity auth. Control-plane users should use the standard user-authenticated agent routes.
 
 ## Current Implementation Notes
 
 - Routes are mounted at `/agents`, not `/v1/agents`.
 - `POST /agents` derives ownership from the authenticated user instead of accepting `user_id` in the request body.
 - `config` is currently modeled as a string field, so JSON config should be sent as a string payload.
-- Auth dependencies are attached to these route handlers, so agent operations require authenticated control-plane access.
+- Control-plane routes enforce user ownership; runtime status enforces agent identity match.
 
 ## Routes
 
@@ -60,7 +60,8 @@ Example response:
 ## List Agents
 
 ```bash
-curl "$BASE_URL/agents?limit=10&skip=0"
+curl "$BASE_URL/agents?limit=10&skip=0" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 Optional filters:
@@ -72,7 +73,8 @@ Optional filters:
 ## Get an Agent
 
 ```bash
-curl "$BASE_URL/agents/YOUR_AGENT_ID"
+curl "$BASE_URL/agents/YOUR_AGENT_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 The detail response includes a `deployments` array.
@@ -91,7 +93,8 @@ If the bearer token belongs to a different agent, the API returns `403 Agent ID 
 ## Deploy an Agent
 
 ```bash
-curl -X POST "$BASE_URL/agents/YOUR_AGENT_ID/deploy"
+curl -X POST "$BASE_URL/agents/YOUR_AGENT_ID/deploy" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 Example response:
@@ -106,26 +109,32 @@ Example response:
 ## Stop an Agent
 
 ```bash
-curl -X POST "$BASE_URL/agents/YOUR_AGENT_ID/stop"
+curl -X POST "$BASE_URL/agents/YOUR_AGENT_ID/stop" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ## Agent Logs
 
 ```bash
-curl "$BASE_URL/agents/YOUR_AGENT_ID/logs?limit=50&skip=0"
-curl "$BASE_URL/agents/YOUR_AGENT_ID/logs?limit=50&level=error"
+curl "$BASE_URL/agents/YOUR_AGENT_ID/logs?limit=50&skip=0" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl "$BASE_URL/agents/YOUR_AGENT_ID/logs?limit=50&level=error" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ## Agent Metrics
 
 ```bash
-curl "$BASE_URL/agents/YOUR_AGENT_ID/metrics?limit=50&skip=0"
+curl "$BASE_URL/agents/YOUR_AGENT_ID/metrics?limit=50&skip=0" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ## Delete an Agent
 
 ```bash
-curl -X DELETE "$BASE_URL/agents/YOUR_AGENT_ID"
+curl -X DELETE "$BASE_URL/agents/YOUR_AGENT_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 Successful deletion returns `204 No Content`.
