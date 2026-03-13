@@ -10,7 +10,6 @@ import {
   Server,
   Shield,
   Terminal,
-  Twitter,
   CheckCircle2,
 } from 'lucide-react'
 import Image from 'next/image'
@@ -295,8 +294,7 @@ curl <span className="text-green-400">&quot;$BASE_URL/health&quot;</span>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-6">
           <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub</a>
-          <a href={TWITTER_URL} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Twitter</a>
-          <a href="https://docs.mutx.dev" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Docs</a>
+                    <a href="https://docs.mutx.dev" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Docs</a>
           <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
           <a href="mailto:hello@mutx.dev" className="hover:text-white transition-colors">Contact</a>
         </div>
