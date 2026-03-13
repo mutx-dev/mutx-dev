@@ -37,12 +37,14 @@ curl -X POST http://localhost:8000/agents \
 
 ## `mutx deploy create` returns route errors
 
-Current cause: that command still targets an older `/api/v1/...` path.
+This should no longer happen on current mainline: `mutx deploy create` now targets `POST /deployments`.
 
-Use the API or `mutx agents deploy` instead:
+If you still see route errors, reinstall the CLI from the current repo checkout and retry:
 
 ```bash
-curl -X POST http://localhost:8000/agents/YOUR_AGENT_ID/deploy
+source .venv/bin/activate
+pip install -e .
+mutx deploy create --agent-id YOUR_AGENT_ID --replicas 1
 ```
 
 ## Playwright fails against localhost

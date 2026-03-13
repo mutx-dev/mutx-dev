@@ -99,10 +99,16 @@ curl -X POST http://localhost:8000/agents \
   }'
 ```
 
-Deploy it:
+Deploy it (either route works; the CLI uses the canonical `/deployments` create flow):
 
 ```bash
 curl -X POST http://localhost:8000/agents/YOUR_AGENT_ID/deploy
+
+# or
+curl -X POST http://localhost:8000/deployments \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"agent_id":"YOUR_AGENT_ID","replicas":1}'
 ```
 
 Inspect the deployment:
@@ -124,7 +130,7 @@ mutx login --email you@example.com
 mutx whoami
 ```
 
-Note: `mutx deploy create` still reflects older API assumptions. See `docs/cli.md` for the current support matrix.
+`mutx deploy create` now targets the current `POST /deployments` route. See `docs/cli.md` for the current support matrix.
 
 ## Optional: frontend verification
 

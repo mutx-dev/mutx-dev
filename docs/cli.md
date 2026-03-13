@@ -70,6 +70,7 @@ mutx status
 | `mutx agents deploy` | reliable | uses `POST /agents/{id}/deploy` |
 | `mutx agents delete` | reliable | uses `DELETE /agents/{id}` |
 | `mutx deploy list` | reliable | uses `GET /deployments` |
+| `mutx deploy create` | reliable | uses `POST /deployments` |
 | `mutx deploy events` | reliable | uses `GET /deployments/{id}/events` |
 | `mutx deploy scale` | reliable | uses `POST /deployments/{id}/scale` |
 | `mutx deploy delete` | reliable | uses `DELETE /deployments/{id}` |
@@ -93,6 +94,9 @@ mutx agents list --limit 10
 
 # List current deployments
 mutx deploy list --limit 10
+
+# Create a deployment for an owned agent
+mutx deploy create --agent-id YOUR_AGENT_ID --replicas 1
 ```
 
 ## When in Doubt
