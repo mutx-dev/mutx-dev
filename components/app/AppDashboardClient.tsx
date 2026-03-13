@@ -215,7 +215,7 @@ export function AppDashboardClient() {
   const authBoundaryDetail = useMemo(() => {
     if (user?.email) return `Signed in as ${user.email}`;
     if (error) return error;
-    if (bootstrapping) return "Session detection in progress";
+    if (bootstrapping) return "Checking for an existing operator session";
     return "No operator session established yet";
   }, [bootstrapping, error, user?.email]);
 
@@ -668,6 +668,7 @@ export function AppDashboardClient() {
               : "Checking for an existing operator session. No session detected yet. On localhost or demo paths, verify the API base URL and cookie flow before expecting fleet data here."}
           </div>
         </Card>
+
         <Card className="border border-white/5 bg-white/[0.01]">
           <div className="mb-4 flex items-center gap-3 text-cyan-300">
             <ShieldCheck className="h-6 w-6" />
@@ -698,7 +699,6 @@ export function AppDashboardClient() {
             ))}
           </ol>
         </Card>
-
       </div>
     );
   }

@@ -92,3 +92,19 @@ These are not a second backend. They proxy to the FastAPI control plane and shap
 python3 scripts/generate_openapi.py
 npm run generate-types
 ```
+
+## Demo Validation
+
+Verify the frontend demo path works locally:
+
+```bash
+npm run demo:validate
+```
+
+This starts the Next.js dev server, validates critical routes, and reports pass/fail:
+
+- `/` - Marketing homepage
+- `/app` - Operator dashboard shell
+- `/contact`, `/privacy-policy` - Static pages
+
+The script exits with code 0 on success, 1 on failure. Use it in CI or pre-demo checks.
