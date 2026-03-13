@@ -4,7 +4,7 @@ icon: compass
 coverY: 0
 coverHeight: 202
 layout:
-  width: default
+  width: wide
   cover:
     visible: true
     size: hero
@@ -22,9 +22,12 @@ layout:
     visible: true
   tags:
     visible: true
+tags:
+  - tag: pls-contribute
+    primary: true
 ---
 
-# Welcome
+# README
 
 MUTX is the control plane for deploying, operating, and governing AI agents.
 
