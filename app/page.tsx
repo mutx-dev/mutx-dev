@@ -26,7 +26,7 @@ const navItems = [
   { label: 'What Exists', href: '#platform' },
   { label: 'Docs', href: 'https://docs.mutx.dev', external: true },
   { label: 'GitHub', href: GITHUB_URL, external: true },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Contact', href: '/contact' },
 ]
 
 const features = [
@@ -298,7 +298,7 @@ curl <span className="text-green-400">&quot;$BASE_URL/health&quot;</span>
           <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub</a>
           <a href="https://docs.mutx.dev" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Docs</a>
           <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
-          <a href="mailto:hello.dev" className="hover:text-white transition-colors">Contact</a>
+          <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
         </div>
       </footer>
     </div>
