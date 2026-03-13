@@ -1,3 +1,4 @@
+from datetime import datetime
 """
 Tests for /deployments endpoints.
 """
@@ -433,6 +434,45 @@ class TestCreateDeployment:
 
 class TestRestartDeployment:
     """Tests for POST /deployments/{deployment_id}/restart endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_restart_deployment_success(
+        self, client: AsyncClient, test_deployment, test_agent, db_session: AsyncSession
+    ):
+        """Restarting a stopped deployment should reset lifecycle fields and append an event."""
+        test_deployment.status = "failed"
+        test_deployment.ended_at = datetime.utcnow()
+        test_deployment.error_message = "boot failed"
+        test_agent.status = AgentStatus.STOPPED.value
+        await db_session.commit()
+
+        response = await client.post(f"/deployments/{test_deployment.id}/restart")
+        assert response.status_code == 200
+
+        data = response.json()
+        assert data["id"] == str(test_deployment.id)
+        assert data["status"] == "pending"
+        assert data["ended_at"] is None
+        assert data["error_message"] is None
+
+        events_response = await client.get(f"/deployments/{test_deployment.id}/events?event_type=restart")
+        assert events_response.status_code == 200
+        events_data = events_response.json()
+        assert events_data["total"] == 1
+        assert events_data["items"][0]["event_type"] == "restart"
+        assert events_data["items"][0]["status"] == "pending"
+
+        await db_session.refresh(test_agent)
+        assert test_agent.status == AgentStatus.RUNNING.value
+
+    @pytest.mark.asyncio
+    async def test_restart_deployment_rejects_running_deployments(
+        self, client: AsyncClient, test_deployment
+    ):
+        """Running deployments cannot be restarted via the restart contract."""
+        response = await client.post(f"/deployments/{test_deployment.id}/restart")
+        assert response.status_code == 400
+        assert "Cannot restart deployment with status 'running'" in response.json()["detail"]
 
     @pytest.mark.asyncio
     async def test_restart_deployment_other_user_forbidden(
