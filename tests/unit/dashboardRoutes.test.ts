@@ -160,6 +160,7 @@ describe('dashboard route proxies', () => {
     await expect(response.json()).resolves.toEqual({ detail: 'Session expired' })
   })
 
+<<<<<<< HEAD
   it('returns 401 from auth me proxy when no auth token exists', async () => {
     getAuthToken.mockResolvedValue(null)
     const { GET } = await import('../../app/api/auth/me/route')
@@ -171,6 +172,8 @@ describe('dashboard route proxies', () => {
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
+=======
+>>>>>>> f76a0f8 (test(web): cover auth me dashboard proxy passthrough)
   it('preserves successful auth me payloads', async () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock).mockResolvedValue({
