@@ -6,8 +6,7 @@ from enum import Enum
 
 from sqlalchemy import Column, String, Text, create_engine
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_core.documents import Document
@@ -26,7 +25,7 @@ class DocumentModel(Base):
     id = Column(String, primary_key=True)
     collection_name = Column(String, nullable=False, index=True)
     content = Column(Text, nullable=False)
-    extra_data = Column("metadata", JSONB, default={})
+    extra_data = Column("metadata", JSONB, default=dict)
     embedding = Column(JSONB, nullable=True)
 
 
