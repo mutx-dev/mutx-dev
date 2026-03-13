@@ -215,7 +215,7 @@ export function AppDashboardClient() {
   const authBoundaryDetail = useMemo(() => {
     if (user?.email) return `Signed in as ${user.email}`;
     if (error) return error;
-    if (bootstrapping) return "Checking for an existing operator session";
+    if (bootstrapping) return "Session detection in progress";
     return "No operator session established yet";
   }, [bootstrapping, error, user?.email]);
 
@@ -664,10 +664,41 @@ export function AppDashboardClient() {
 
           <div className="mt-4 rounded-xl border border-amber-400/15 bg-amber-400/5 p-4 text-xs leading-relaxed text-slate-400">
             {bootstrapping
-              ? "Checking whether an operator session already exists..."
-              : "No session detected yet. On localhost or demo paths, verify the API base URL and cookie flow before expecting fleet data here."}
+              ? "Checking for an existing operator session..."
+              : "Checking for an existing operator session. No session detected yet. On localhost or demo paths, verify the API base URL and cookie flow before expecting fleet data here."}
           </div>
         </Card>
+        <Card className="border border-white/5 bg-white/[0.01]">
+          <div className="mb-4 flex items-center gap-3 text-cyan-300">
+            <ShieldCheck className="h-6 w-6" />
+            <h2 className="text-xl font-semibold text-white">Operator readiness</h2>
+          </div>
+          <span
+            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold uppercase tracking-[0.24em] ${operatorReadiness.tone}`}
+          >
+            {operatorReadiness.label}
+          </span>
+          <p className="mt-3 text-sm leading-6 text-slate-300">{operatorReadiness.detail}</p>
+        </Card>
+
+        <Card className="border border-white/5 bg-white/[0.01]">
+          <div className="mb-4 flex items-center gap-3 text-cyan-300">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-200/75">Demo walkthrough</p>
+          </div>
+
+          <ol className="mt-2 space-y-3 text-white">
+            {walkthroughSteps.map((step, index) => (
+              <li key={step.title} className="rounded-lg border border-white/5 bg-black/20 px-3 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
+                  Step {index + 1}
+                </p>
+                <p className="mt-2 text-sm font-medium text-white">{step.title}</p>
+                <p className="mt-1 text-sm leading-6 text-slate-400">{step.description}</p>
+              </li>
+            ))}
+          </ol>
+        </Card>
+
       </div>
     );
   }
