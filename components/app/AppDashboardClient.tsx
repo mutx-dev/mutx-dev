@@ -127,6 +127,12 @@ export function AppDashboardClient() {
       (left, right) =>
         new Date(right.created_at ?? 0).getTime() - new Date(left.created_at ?? 0).getTime(),
     )[0];
+  const authBoundaryDetail = useMemo(() => {
+    if (user?.email) return `Signed in as ${user.email}`;
+    if (error) return error;
+    if (bootstrapping) return "Checking for an existing operator session";
+    return "No operator session established yet";
+  }, [bootstrapping, error, user?.email]);
 
   const summary = useMemo(
     () => [
@@ -162,9 +168,9 @@ export function AppDashboardClient() {
         value: health?.status || "unknown",
         detail:
           health?.timestamp
-            ? `Checked ${formatRelativeDate(health.timestamp)}`
+            ? `${health.error ? `${health.error} · ` : ""}Checked ${formatRelativeDate(health.timestamp)}`
             : health?.error
-              ? "Control plane health fetch failed"
+              ? health.error
               : "No freshness timestamp exposed",
         icon: Activity,
       },
@@ -390,10 +396,8 @@ export function AppDashboardClient() {
                 <p className="font-medium text-white">Honest app state</p>
                 <p className="mt-1 leading-relaxed text-slate-400">
                   This app only unlocks live dashboard data after a real session is
-                  established through the control-plane auth proxy. On localhost,
-                  that usually means the web app can reach the API at the configured
-                  base URL and set the auth cookie successfully. Until then, this
-                  signed-out view is the product boundary on purpose.
+                  established through the control-plane auth proxy. Until then,
+                  this signed-out view is the product boundary on purpose.
                 </p>
               </div>
             </div>
@@ -471,24 +475,29 @@ export function AppDashboardClient() {
           <div className="space-y-3">
             {[
               {
-                label: "Control Plane",
-                route: "/auth/*",
-                status: "Real auth boundary",
+                label: "Auth Boundary",
+                route: "/api/auth/*",
+                status: authBoundaryDetail,
               },
               {
-                label: "Agent Mesh",
-                route: "/agents",
-                status: "Live after login",
+                label: "Agents",
+                route: "/api/dashboard/agents",
+                status: "Owned agents after login",
               },
               {
-                label: "Key Vault",
-                route: "/api-keys",
-                status: "Live after login",
+                label: "Deployments",
+                route: "/api/dashboard/deployments",
+                status: "Owned deployments after login",
               },
               {
-                label: "Runtime Sync",
-                route: "/deployments",
-                status: "Live after login",
+                label: "API Keys",
+                route: "/api/api-keys",
+                status: "Operator credentials after login",
+              },
+              {
+                label: "Health",
+                route: "/api/dashboard/health",
+                status: "Control plane status",
               },
             ].map((item) => (
               <div
@@ -935,7 +944,7 @@ export function AppDashboardClient() {
                 <p className="mt-2 text-white">
                   {health?.status === "healthy"
                     ? "Control plane looks reachable from the dashboard proxy."
-                    : "Control plane state is degraded, unknown, or not yet verified from this session. If this is localhost, confirm the configured API base URL is reachable before debugging the UI."}
+                    : "Control plane state is degraded, unknown, or not yet verified from this session."}
                 </p>
               </div>
 

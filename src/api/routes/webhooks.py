@@ -88,7 +88,7 @@ async def create_webhook(
         url=webhook_data.url,
         events=webhook_data.events,
         secret=webhook_data.secret,
-        is_active=True,
+        is_active=webhook_data.is_active,
     )
     db.add(webhook)
     await db.commit()
