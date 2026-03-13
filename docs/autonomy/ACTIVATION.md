@@ -1,15 +1,20 @@
+---
+description: Turn on the autonomous shipping loop with the smallest safe setup.
+icon: power-off
+---
+
 # Activation Guide
 
 This repo is now set up with the team definitions and a GitHub-native control-tower scaffold. You do not need to run anything locally.
 
 ## What Is Already In Repo
 
-- agent definitions under `agents/`
-- ownership map in `agents/registry.yml`
-- control-tower workflow in `.github/workflows/autonomous-shipping.yml`
-- GitHub-hosted dispatcher in `.github/workflows/autonomous-dispatch.yml`
-- scoped intake template in `.github/ISSUE_TEMPLATE/agent-task.yml`
-- updated CI and PR template for truthful validation
+* agent definitions under `agents/`
+* ownership map in `agents/registry.yml`
+* control-tower workflow in `.github/workflows/autonomous-shipping.yml`
+* GitHub-hosted dispatcher in `.github/workflows/autonomous-dispatch.yml`
+* scoped intake template in `.github/ISSUE_TEMPLATE/agent-task.yml`
+* updated CI and PR template for truthful validation
 
 ## Smallest Real Deployment
 
@@ -24,35 +29,35 @@ This repo is now set up with the team definitions and a GitHub-native control-to
 
 ## Hosted Runner Shape
 
-- GitHub-hosted `ubuntu-latest`
-- ephemeral checkout each run
-- GitHub CLI authenticated with `GITHUB_TOKEN`
-- Python 3.11 and Node 20 available in workflow
+* GitHub-hosted `ubuntu-latest`
+* ephemeral checkout each run
+* GitHub CLI authenticated with `GITHUB_TOKEN`
+* Python 3.11 and Node 20 available in workflow
 
 ## Executor Variables
 
-- `AUTONOMY_EXECUTOR_SETUP_CMD`: optional install/bootstrap shell command for the hosted runner
-- `AUTONOMY_AGENT_CMD_TEMPLATE`: command template invoked after branch prep
-- `AUTONOMY_OPEN_PR`: `true` or `false`
-- `AUTONOMY_BASE_BRANCH`: optional, defaults to `main`
-- `AUTONOMY_BRIEF_DIR`: optional, defaults to `.autonomy/briefs`
-- `AUTONOMY_MODEL`: optional, defaults to `gpt-4.1-mini`
-- `AUTONOMY_MAX_PATCH_BYTES`: optional, defaults to `50000`
-- `AUTONOMY_MAX_CHANGED_FILES`: optional, defaults to `6`
-- `AUTONOMY_REVIEWER_MAP`: optional JSON object mapping reviewer-agent ids to GitHub logins
-- `AUTONOMY_STALE_CLAIM_MINUTES`: optional, defaults to `120`
+* `AUTONOMY_EXECUTOR_SETUP_CMD`: optional install/bootstrap shell command for the hosted runner
+* `AUTONOMY_AGENT_CMD_TEMPLATE`: command template invoked after branch prep
+* `AUTONOMY_OPEN_PR`: `true` or `false`
+* `AUTONOMY_BASE_BRANCH`: optional, defaults to `main`
+* `AUTONOMY_BRIEF_DIR`: optional, defaults to `.autonomy/briefs`
+* `AUTONOMY_MODEL`: optional, defaults to `gpt-4.1-mini`
+* `AUTONOMY_MAX_PATCH_BYTES`: optional, defaults to `50000`
+* `AUTONOMY_MAX_CHANGED_FILES`: optional, defaults to `6`
+* `AUTONOMY_REVIEWER_MAP`: optional JSON object mapping reviewer-agent ids to GitHub logins
+* `AUTONOMY_STALE_CLAIM_MINUTES`: optional, defaults to `120`
 
 ## Required Secret
 
-- `GITHUB_MODELS_TOKEN`: preferred for the default hosted executor in `scripts/autonomy/hosted_llm_executor.py`
+* `GITHUB_MODELS_TOKEN`: preferred for the default hosted executor in `scripts/autonomy/hosted_llm_executor.py`
 
 ## Optional Secret
 
-- `OPENAI_API_KEY`: alternate provider for the same hosted executor if you do not use GitHub Models
+* `OPENAI_API_KEY`: alternate provider for the same hosted executor if you do not use GitHub Models
 
 Example:
 
-```text
+```
 AUTONOMY_EXECUTOR_SETUP_CMD=pip install openai
 AUTONOMY_AGENT_CMD_TEMPLATE=python scripts/autonomy/github_hosted_agent.py --agent {agent} --brief {brief} --work-order {work_order}
 AUTONOMY_OPEN_PR=true
@@ -60,7 +65,7 @@ AUTONOMY_OPEN_PR=true
 
 If `AUTONOMY_AGENT_CMD_TEMPLATE` is unset but `GITHUB_MODELS_TOKEN` or `OPENAI_API_KEY` is present, the workflow falls back to:
 
-```text
+```
 python scripts/autonomy/hosted_llm_executor.py --agent {agent} --brief {brief} --work-order {work_order}
 ```
 
@@ -72,9 +77,7 @@ If an issue stays labeled `autonomy:claimed` past `AUTONOMY_STALE_CLAIM_MINUTES`
 
 ## Dispatch Logic
 
-Use `scripts/autonomy/select_agent.py` to map labels to a specialist and release lane.
-Use `scripts/autonomy/build_work_order.py` to pick the highest-priority unclaimed issue and create an executor-ready work order.
-Use `scripts/autonomy/execute_work_order.py` to create the branch, write the brief, optionally comment on the issue, invoke the hosted coding command, and optionally open a draft PR.
+Use `scripts/autonomy/select_agent.py` to map labels to a specialist and release lane. Use `scripts/autonomy/build_work_order.py` to pick the highest-priority unclaimed issue and create an executor-ready work order. Use `scripts/autonomy/execute_work_order.py` to create the branch, write the brief, optionally comment on the issue, invoke the hosted coding command, and optionally open a draft PR.
 
 Example:
 
@@ -92,17 +95,17 @@ python scripts/autonomy/execute_work_order.py autonomy-work-order.json
 
 ## Recommended First Automation
 
-- let the orchestrator open or update a queue summary every 15 minutes
-- let only 2 to 4 agents author code at first
-- require reviewer assignment before merge
-- auto-merge only `safe-auto-merge` lane changes
+* let the orchestrator open or update a queue summary every 15 minutes
+* let only 2 to 4 agents author code at first
+* require reviewer assignment before merge
+* auto-merge only `safe-auto-merge` lane changes
 
 ## Do Not Enable Yet
 
-- unattended infra applies
-- unattended auth-breaking changes
-- unattended production migrations
-- unattended runtime protocol rewrites
+* unattended infra applies
+* unattended auth-breaking changes
+* unattended production migrations
+* unattended runtime protocol rewrites
 
 ## Expansion Path
 
