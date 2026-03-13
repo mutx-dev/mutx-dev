@@ -91,6 +91,21 @@ Create your first agent:
 mutx agent create
 ```
 
+### Demo Validation
+
+Verify the demo path works locally:
+
+```bash
+npm run demo:validate
+```
+
+This validates:
+- Homepage loads (`/`)
+- App shell loads (`/app`)
+- Static pages load (`/contact`, `/privacy-policy`)
+
+Success output confirms the demo path is ready for presentation.
+
 More details in the docs:
 
 https://docs.mutx.dev/docs/deployment/quickstart
