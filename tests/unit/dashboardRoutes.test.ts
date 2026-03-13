@@ -160,6 +160,17 @@ describe('dashboard route proxies', () => {
     await expect(response.json()).resolves.toEqual({ detail: 'Session expired' })
   })
 
+  it('returns 401 from auth me proxy when no auth token exists', async () => {
+    getAuthToken.mockResolvedValue(null)
+    const { GET } = await import('../../app/api/auth/me/route')
+
+    const response = await GET(mockRequest())
+
+    expect(response.status).toBe(401)
+    await expect(response.json()).resolves.toEqual({ detail: 'Unauthorized' })
+    expect(global.fetch).not.toHaveBeenCalled()
+  })
+
   it('preserves successful auth me payloads', async () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock).mockResolvedValue({
@@ -204,6 +215,49 @@ describe('dashboard route proxies', () => {
       status: 'degraded',
       detail: 'database unavailable',
     })
+  })
+
+  it('preserves upstream unauthorized responses for api keys proxy', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 401,
+      json: async () => ({ detail: 'Session expired' }),
+    })
+    const { GET } = await import('../../app/api/api-keys/route')
+
+    const response = await GET(mockRequest())
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+      headers: { Authorization: 'Bearer token' },
+    })
+    expect(response.status).toBe(401)
+    await expect(response.json()).resolves.toEqual({ detail: 'Session expired' })
+  })
+
+  it('preserves upstream conflict responses for api key creation', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: async () => ({ detail: 'Active API key limit reached' }),
+    })
+    const { POST } = await import('../../app/api/api-keys/route')
+
+    const response = await POST({
+      json: async () => ({ name: 'Demo key' }),
+    } as NextRequest)
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: 'Demo key' }),
+    })
+    expect(response.status).toBe(409)
+    await expect(response.json()).resolves.toEqual({ detail: 'Active API key limit reached' })
   })
 
   it('returns a fallback health payload when the health proxy throws', async () => {
