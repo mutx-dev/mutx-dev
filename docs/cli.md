@@ -62,7 +62,7 @@ mutx status
 |--------|--------|-------|
 | `mutx status` | reliable | shows API URL and auth state |
 | `mutx login` | reliable | uses `/auth/login` |
-| `mutx logout` | reliable | clears local config |
+| `mutx logout` | reliable | clears local tokens and tells you how to confirm the resulting CLI state |
 | `mutx whoami` | reliable | uses `/auth/me` |
 | `mutx agents list` | reliable | uses `GET /agents` |
 | `mutx agents status` | reliable | uses `GET /agents/{id}` |
