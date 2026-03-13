@@ -1,6 +1,6 @@
 # Table of contents
 
-* [README](README.md)
+* [Welcome](README.md)
 * [Manifesto](manifesto.md)
 * [Whitepaper](whitepaper.md)
 * [Roadmap](roadmap.md)
