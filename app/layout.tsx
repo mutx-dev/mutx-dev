@@ -10,11 +10,15 @@ const ibmPlexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
+  alternates: {
+    canonical: 'https://mutx.dev',
+  },
   metadataBase: new URL('https://mutx.dev'),
   title: 'MUTX | Open Source Control Plane for AI Agents',
   description: 'Open-source control plane foundations for AI agents: auth, agent and deployment records, API keys, webhook ingestion, health checks, and coordinated web, API, CLI, and SDK surfaces.',
   keywords: ['AI agents', 'agent infrastructure', 'fastapi', 'next.js', 'python sdk', 'terraform', 'railway', 'waitlist'],
   openGraph: {
+    locale: 'en_US',
     title: 'MUTX | Open Source Control Plane for AI Agents',
     description: 'An open-source control plane for AI agents with real auth, durable resources, API keys, health surfaces, and infrastructure foundations.',
     url: 'https://mutx.dev',
@@ -23,6 +27,7 @@ export const metadata: Metadata = {
     type: 'website',
   },
   twitter: {
+    creator: '@mutxdev',
     card: 'summary_large_image',
     site: '@mutx_dev',
     title: 'MUTX | Open Source Control Plane for AI Agents',

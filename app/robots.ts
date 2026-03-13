@@ -5,10 +5,11 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
-        disallow: ['/app'],
+        allow: ['/', '/privacy-policy'],
+        disallow: ['/app', '/api/'],
       },
     ],
     sitemap: 'https://mutx.dev/sitemap.xml',
+    host: 'https://mutx.dev',
   }
 }
