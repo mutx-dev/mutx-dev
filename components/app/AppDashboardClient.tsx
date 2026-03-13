@@ -1164,14 +1164,11 @@ export function AppDashboardClient() {
                   Demo cue
                 </p>
                 <p className="mt-2 text-white">
-                  {apiKeyLimit === null
-                    ? "Generate, copy, and rotate keys without tripping a quota wall to show enterprise-grade operator throughput."
-                    : apiKeyLimitReached
-                      ? "Show the create button locking at the active limit, then rotate or revoke a key to reopen capacity live."
-                      : activeKeys > 0
-                        ? "Use the copy → rotate flow to prove one-time secret reveal and audit-safe revocation in a single path."
-                        : "Generate the first operator key here to unlock a full non-browser auth lifecycle demo."}
-                </p>
+                  {apiKeyLimitReached
+                    ? "Show the create button locking at the active limit, then rotate or revoke a key to reopen capacity live."
+                    : activeKeys > 0
+                      ? "Use the copy → rotate flow to prove one-time secret reveal and audit-safe revocation in a single path."
+                      : "Generate the first operator key here to unlock a full non-browser auth lifecycle demo."}                </p>
               </div>
             </div>
 
