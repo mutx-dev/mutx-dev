@@ -54,11 +54,14 @@ def logout():
     """Logout from mutx.dev"""
     config = CLIConfig()
     if not config.is_authenticated():
-        click.echo("Not logged in.")
+        click.echo("No local access token is stored.")
+        click.echo("Run 'mutx status' to inspect current CLI state.")
         return
 
     config.clear_auth()
     click.echo("Logged out successfully.")
+    click.echo("Local access and refresh tokens cleared.")
+    click.echo("Run 'mutx status' to confirm local auth state.")
 
 
 @cli.command(name="whoami")
