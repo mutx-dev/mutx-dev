@@ -1,86 +1,187 @@
----
-description: Fastest way to get oriented, get running, and go deeper in MUTX.
-icon: compass
-cover:
-  light: .gitbook/assets/mutx_docs_og_editorial.png
-  dark: .gitbook/assets/mutx_docs_og_editorial.png
-coverY: 0
-coverHeight: 287
-layout:
-  width: wide
-  cover:
-    visible: true
-    size: hero
-  title:
-    visible: true
-  description:
-    visible: true
-  tableOfContents:
-    visible: true
-  outline:
-    visible: true
-  pagination:
-    visible: true
-  metadata:
-    visible: true
-  tags:
-    visible: true
-tags:
-  - tag: pls-contribute
-    primary: true
+<p align="center">
+  <img src="https://github.com/fortunexbt/mutx-dev/blob/main/public/logo.png" />
+</p>
+
+<p align="center">
+  <strong>The control plane for deploying, operating, and governing AI agents.</strong>
+</p>
+
+<p align="center">
+  Deploy agents like you deploy services.
+</p>
+
+<p align="center">
+  <a href="https://docs.mutx.dev"><img src="https://img.shields.io/badge/docs-open-black?style=for-the-badge"></a>
+  <a href="https://github.com/fortunexbt/mutx-dev"><img src="https://img.shields.io/github/stars/fortunexbt/mutx-dev?style=for-the-badge"></a>
+  <a href="https://github.com/fortunexbt/mutx-dev/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-black?style=for-the-badge"></a>
+</p>
+
 ---
 
-# Welcome
+# What is MUTX
 
-MUTX is the control plane for deploying, operating, and governing AI agents.
+MUTX is an **industrial control plane for AI agents**.
 
-Start with the path that matches your goal.
+It lets you deploy, operate, observe, and govern autonomous agents as production systems.
 
-<table data-view="cards"><thead><tr><th>Title</th><th data-card-target data-type="content-ref">Target</th><th data-hidden data-card-cover data-type="image">Cover image</th></tr></thead><tbody><tr><td>Get running</td><td><a href="docs/deployment/quickstart.md">quickstart.md</a></td><td><a href="https://images.unsplash.com/photo-1634910409614-71a507e13588?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHw3fHxydW5uaW5nJTIwcm9ib3R8ZW58MHx8fHwxNzczNDA5Nzk4fDA&#x26;ixlib=rb-4.1.0&#x26;q=85">https://images.unsplash.com/photo-1634910409614-71a507e13588?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHw3fHxydW5uaW5nJTIwcm9ib3R8ZW58MHx8fHwxNzczNDA5Nzk4fDA&#x26;ixlib=rb-4.1.0&#x26;q=85</a></td></tr><tr><td>Browse the docs</td><td><a href="docs/">docs</a></td><td><a href="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHwyfHxyZWFkaW5nJTIwYm90fGVufDB8fHx8MTc3MzQwOTg3OXww&#x26;ixlib=rb-4.1.0&#x26;q=85">https://images.unsplash.com/photo-1620712943543-bcc4688e7485?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHwyfHxyZWFkaW5nJTIwYm90fGVufDB8fHx8MTc3MzQwOTg3OXww&#x26;ixlib=rb-4.1.0&#x26;q=85</a></td></tr><tr><td>Integrate with the API</td><td><a href="docs/contracts/api/index.md">index.md</a></td><td><a href="https://images.unsplash.com/photo-1760931969401-9bd6ee902798?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHw3fHxyb2JvdCUyMHdpcmVzfGVufDB8fHx8MTc3MzQwOTg5Mnww&#x26;ixlib=rb-4.1.0&#x26;q=85">https://images.unsplash.com/photo-1760931969401-9bd6ee902798?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHw3fHxyb2JvdCUyMHdpcmVzfGVufDB8fHx8MTc3MzQwOTg5Mnww&#x26;ixlib=rb-4.1.0&#x26;q=85</a></td></tr><tr><td>Understand the platform</td><td><a href="docs/architecture/overview.md">overview.md</a></td><td><a href="https://images.unsplash.com/photo-1634869258987-f13de2902431?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHwzfHxyb2JvdCUyMHRodW1icyUyMHVwfGVufDB8fHx8MTc3MzQwOTk1Mnww&#x26;ixlib=rb-4.1.0&#x26;q=85">https://images.unsplash.com/photo-1634869258987-f13de2902431?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHwzfHxyb2JvdCUyMHRodW1icyUyMHVwfGVufDB8fHx8MTc3MzQwOTk1Mnww&#x26;ixlib=rb-4.1.0&#x26;q=85</a></td></tr></tbody></table>
+Think:
 
-## Fast paths
+```
+Vercel → for web apps
+Kubernetes → for containers
+MUTX → for AI agents
+```
 
-* **Ship locally:** [Quickstart](docs/deployment/quickstart.md) → [CLI Guide](docs/cli.md) → [Debugging](docs/troubleshooting/debugging.md)
-* **Learn the product:** [Manifesto](manifesto.md) → [Whitepaper](whitepaper.md) → [Project Status](docs/project-status.md)
-* **Go deep on operations:** [Deployment](docs/deployment/) → [MUTX Infrastructure](infrastructure.md) → [Roadmap](roadmap.md)
+Capabilities include:
 
-## Priority 1: Get running
+• agent lifecycle management  
+• orchestration and scheduling  
+• observability and debugging  
+• policy and governance  
+• CLI + API + SDK access  
 
-* [Quickstart](docs/deployment/quickstart.md) — local setup and first agent.
-* [Documentation Hub](docs/) — code-accurate docs index.
-* [API Overview](docs/contracts/api/index.md) — routes, auth model, and base URLs.
-* [Architecture Overview](docs/architecture/overview.md) — core platform layout.
+---
 
-## Priority 2: Understand the product
+# Documentation
 
-* [Project Status](docs/project-status.md) — current state and known gaps.
-* [Roadmap](roadmap.md) — near-term priorities.
-* [MUTX Manifesto](manifesto.md) — product thesis.
-* [MUTX Technical Whitepaper](whitepaper.md) — deeper technical framing.
+The full documentation lives at:
 
-## Priority 3: Build and operate
+→ **https://docs.mutx.dev**
 
-* [Deployment](docs/deployment/) — install and ship paths.
-* [CLI Guide](docs/cli.md) — operator workflows from the terminal.
-* [Python SDK](sdk.md) — programmatic access.
-* [Autonomous Agent Team](agents/) — agent roles and ownership model.
-* [MUTX Infrastructure](infrastructure.md) — infra and ops context.
+<p align="center">
+  <a href="https://docs.mutx.dev">
+    <img src="https://docs.mutx.dev/~gitbook/image?url=https%3A%2F%2F2092776695-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FlrUGCvqeS10g6J0hLJNu%252Fuploads%252F0JprPBsUyScuvYUAtdUu%252Fmutx_docs_og_editorial.png%3Falt%3Dmedia%26token%3Dc56634e1-e5d6-4afa-9dbd-d94c8cf71ef7&width=1248&dpr=2&quality=100&sign=cade74dc&sv=2"/>
+  </a>
+</p>
 
-## Priority 4: Troubleshoot and support
+Start here:
 
-* [Troubleshooting](docs/troubleshooting/)
-* [Common Issues](docs/troubleshooting/common-issues.md)
-* [Debugging](docs/troubleshooting/debugging.md)
-* [Support](support.md)
-* [Security Policy](security.md)
+- **Quickstart**  
+  https://docs.mutx.dev/docs/deployment/quickstart
 
-## Priority 5: Contribute and maintain
+- **Architecture overview**  
+  https://docs.mutx.dev/docs/architecture/overview
 
-* [Contributing](contributing/)
-* [Contributor Covenant Code of Conduct](code_of_conduct.md)
-* [AGENTS.md](agents-1.md) — maintainer-facing repo guidance.
-* [pull\_request\_template](contributing/github-workflows/pull_request_template.md) — PR expectations and checklist.
+- **API reference**  
+  https://docs.mutx.dev/docs/contracts/api
 
-{% hint style="info" %}
-When docs and code disagree, trust the code and update the closest doc.
-{% endhint %}
+- **CLI guide**  
+  https://docs.mutx.dev/docs/cli
+
+---
+
+# Quickstart
+
+Clone the repository:
+
+```bash
+git clone https://github.com/fortunexbt/mutx-dev
+cd mutx-dev
+```
+
+Run the platform locally:
+
+```bash
+make up
+```
+
+Create your first agent:
+
+```bash
+mutx agent create
+```
+
+More details in the docs:
+
+https://docs.mutx.dev/docs/deployment/quickstart
+
+---
+
+# Project structure
+
+```
+mutx/
+ ├── control-plane        # FastAPI control plane
+ ├── cli                  # MUTX operator CLI
+ ├── sdk                  # Python SDK
+ ├── agents               # agent templates and roles
+ ├── infrastructure       # deployment and infra
+ └── docs                 # GitBook source
+```
+
+---
+
+# Architecture
+
+MUTX consists of four main layers:
+
+**Control Plane**  
+FastAPI services coordinating agent lifecycle.
+
+**Execution Layer**  
+Agent runtimes and worker nodes.
+
+**Interface Layer**  
+CLI, SDK, and API access.
+
+**Observability Layer**  
+Logs, metrics, and debugging tools.
+
+Full architecture:
+
+https://docs.mutx.dev/docs/architecture/overview
+
+---
+
+# Roadmap
+
+Near-term priorities:
+
+- production agent lifecycle
+- scheduling and orchestration
+- policy and governance
+- observability tooling
+- SDK expansion
+
+See:
+
+https://docs.mutx.dev/roadmap
+
+---
+
+# Contributing
+
+Contributions are welcome.
+
+Start here:
+
+- Contributing guide  
+  https://docs.mutx.dev/contributing
+
+- Code of conduct  
+  https://github.com/fortunexbt/mutx-dev/blob/main/CODE_OF_CONDUCT.md
+
+---
+
+# Security
+
+Security policy:
+
+https://github.com/fortunexbt/mutx-dev/blob/main/SECURITY.md
+
+---
+
+# License
+
+MIT License.
+
+See:
+
+https://github.com/fortunexbt/mutx-dev/blob/main/LICENSE
+
+---
+
+<p align="center">
+  <strong>MUTX</strong><br>
+  Autonomous infrastructure for the agentic era.
+</p>
