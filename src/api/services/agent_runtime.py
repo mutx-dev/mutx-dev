@@ -368,7 +368,7 @@ class RuntimeManager:
     @classmethod
     def delete_runtime(cls, runtime_id: str) -> bool:
         runtime = cls._runtimes.get(runtime_id)
-        if not runtime:
+        if runtime is None:
             return False
 
         if cls._default_runtime is runtime:
