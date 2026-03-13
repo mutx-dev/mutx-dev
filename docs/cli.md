@@ -12,7 +12,8 @@ The CLI is a Click application defined in `cli/` and installed from the repo roo
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e .
+pip install -r requirements.txt
+pip install -e ".[dev]"
 ```
 
 ## Configuration
