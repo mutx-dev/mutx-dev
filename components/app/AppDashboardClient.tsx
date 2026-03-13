@@ -101,29 +101,6 @@ function maskApiKeyId(value: string) {
   return `${value.slice(0, 6)}…${value.slice(-4)}`;
 }
 
-const walkthroughSteps = [
-  {
-    title: "Authenticate with operator context",
-    description:
-      "Start with the same ownership-aware boundary used by the dashboard and CLI before you touch fleet state.",
-  },
-  {
-    title: "Inspect agents and deployments",
-    description:
-      "Verify agent records, deployment status, and the freshest deployment events before claiming anything is live.",
-  },
-  {
-    title: "Prove non-browser API access",
-    description:
-      "Generate or rotate an operator key, copy the one-time secret, and show the quota and audit trail updating live.",
-  },
-  {
-    title: "Close the loop on recovery",
-    description:
-      "Refresh health after a deployment change so operators can confirm the system recovered from the same control surface.",
-  },
-] as const;
-
 export function AppDashboardClient() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
@@ -152,9 +129,10 @@ export function AppDashboardClient() {
   ).length;
   const activeKeys = apiKeys.filter((apiKey) => apiKey.is_active).length;
   const revokedKeys = apiKeys.length - activeKeys;
-  const apiKeyLimit = 10;
-  const apiKeyCapacityRemaining = Math.max(apiKeyLimit - activeKeys, 0);
-  const apiKeyLimitReached = activeKeys >= apiKeyLimit;
+  const userPlan = user?.plan ?? "free";
+  const apiKeyLimit = userPlan === "enterprise" ? null : userPlan === "pro" ? 50 : userPlan === "starter" ? 10 : 2;
+  const apiKeyCapacityRemaining = apiKeyLimit === null ? null : Math.max(apiKeyLimit - activeKeys, 0);
+  const apiKeyLimitReached = apiKeyLimit === null ? false : activeKeys >= apiKeyLimit;
   const latestDeploymentEvent = deployments
     .flatMap((deployment) => deployment.events ?? [])
     .sort(
@@ -163,59 +141,10 @@ export function AppDashboardClient() {
     )[0];
   const newestActiveKey = apiKeys.find((apiKey) => apiKey.is_active) ?? null;
   const newestRevokedKey = [...apiKeys].reverse().find((apiKey) => !apiKey.is_active) ?? null;
-  const operatorReadiness = useMemo(() => {
-    if (!user) {
-      return {
-        label: "auth required",
-        tone: "bg-amber-400/10 text-amber-300 border-amber-400/20",
-        detail: "Open an operator session to unlock live fleet, health, and key state.",
-      };
-    }
-
-    if (health?.status !== "healthy") {
-      return {
-        label: "recovery path",
-        tone: "bg-rose-400/10 text-rose-300 border-rose-400/20",
-        detail: health?.error
-          ? `Health check reports ${health.error}.`
-          : "Control plane health still needs recovery confirmation.",
-      };
-    }
-
-    if (!agents.length || !deployments.length) {
-      return {
-        label: "seed demo data",
-        tone: "bg-amber-400/10 text-amber-300 border-amber-400/20",
-        detail: "Auth is live, but the operator story gets stronger once agents and deployments exist.",
-      };
-    }
-
-    if (activeKeys === 0) {
-      return {
-        label: "issue first key",
-        tone: "bg-cyan-400/10 text-cyan-200 border-cyan-400/20",
-        detail: "Fleet truth is visible. Generate an API key to complete the non-browser control path.",
-      };
-    }
-
-    if (apiKeyLimitReached) {
-      return {
-        label: "quota edge proven",
-        tone: "bg-amber-400/10 text-amber-300 border-amber-400/20",
-        detail: "Key quota is saturated. Rotate or revoke one key live to show recovery from the limit edge.",
-      };
-    }
-
-    return {
-      label: "demo ready",
-      tone: "bg-emerald-400/10 text-emerald-300 border-emerald-400/20",
-      detail: "Auth, fleet, health, and API key lifecycle are all visible from one operator surface.",
-    };
-  }, [activeKeys, agents.length, apiKeyLimitReached, deployments.length, health?.error, health?.status, user]);
   const authBoundaryDetail = useMemo(() => {
     if (user?.email) return `Signed in as ${user.email}`;
     if (error) return error;
-    if (bootstrapping) return "Session detection in progress";
+    if (bootstrapping) return "Checking for an existing operator session";
     return "No operator session established yet";
   }, [bootstrapping, error, user?.email]);
 
@@ -314,7 +243,6 @@ export function AppDashboardClient() {
       activeKeys,
       agents.length,
       apiKeyCapacityRemaining,
-      apiKeyLimit,
       apiKeyLimitReached,
       apiKeys.length,
       deployments.length,
@@ -325,7 +253,7 @@ export function AppDashboardClient() {
       health?.status,
       healthyDeployments,
       runningAgents,
-      user.plan,
+      userPlan,
     ],
   );
 
@@ -665,41 +593,10 @@ export function AppDashboardClient() {
 
           <div className="mt-4 rounded-xl border border-amber-400/15 bg-amber-400/5 p-4 text-xs leading-relaxed text-slate-400">
             {bootstrapping
-              ? "Checking for an existing operator session..."
-              : "Checking for an existing operator session. No session detected yet. On localhost or demo paths, verify the API base URL and cookie flow before expecting fleet data here."}
+              ? "Checking whether an operator session already exists..."
+              : "No session detected yet. On localhost or demo paths, verify the API base URL and cookie flow before expecting fleet data here."}
           </div>
         </Card>
-        <Card className="border border-white/5 bg-white/[0.01]">
-          <div className="mb-4 flex items-center gap-3 text-cyan-300">
-            <ShieldCheck className="h-6 w-6" />
-            <h2 className="text-xl font-semibold text-white">Operator readiness</h2>
-          </div>
-          <span
-            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold uppercase tracking-[0.24em] ${operatorReadiness.tone}`}
-          >
-            {operatorReadiness.label}
-          </span>
-          <p className="mt-3 text-sm leading-6 text-slate-300">{operatorReadiness.detail}</p>
-        </Card>
-
-        <Card className="border border-white/5 bg-white/[0.01]">
-          <div className="mb-4 flex items-center gap-3 text-cyan-300">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-200/75">Demo walkthrough</p>
-          </div>
-
-          <ol className="mt-2 space-y-3 text-white">
-            {walkthroughSteps.map((step, index) => (
-              <li key={step.title} className="rounded-lg border border-white/5 bg-black/20 px-3 py-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
-                  Step {index + 1}
-                </p>
-                <p className="mt-2 text-sm font-medium text-white">{step.title}</p>
-                <p className="mt-1 text-sm leading-6 text-slate-400">{step.description}</p>
-              </li>
-            ))}
-          </ol>
-        </Card>
-
       </div>
     );
   }
@@ -746,40 +643,6 @@ export function AppDashboardClient() {
           {error}
         </div>
       ) : null}
-
-      <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-cyan-400/[0.12] via-black/40 to-emerald-400/[0.08] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.24)]">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-200/75">
-              operator demo readiness
-            </p>
-            <h3 className="mt-2 text-2xl font-semibold tracking-tight text-white">
-              Keep the story honest from auth to recovery.
-            </h3>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-              Show the product in the order an operator actually uses it: establish the session, verify fleet truth, prove non-browser key control, then refresh health after a change.
-            </p>
-          </div>
-          <div className={`inline-flex items-center rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.24em] ${operatorReadiness.tone}`}>
-            {operatorReadiness.label}
-          </div>
-        </div>
-
-        <div className="mt-4 grid gap-3 xl:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400">current focus</p>
-            <p className="mt-2 text-sm text-white">{operatorReadiness.detail}</p>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400">latest deployment event</p>
-            <p className="mt-2 text-sm text-white">
-              {latestDeploymentEvent
-                ? `${latestDeploymentEvent.event_type} · ${formatRelativeDate(latestDeploymentEvent.created_at)}`
-                : "No deployment event exposed yet"}
-            </p>
-          </div>
-        </div>
-      </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {summary.map(({ label, value, detail, icon: Icon }) => (
@@ -1165,11 +1028,13 @@ export function AppDashboardClient() {
                   Demo cue
                 </p>
                 <p className="mt-2 text-white">
-                  {apiKeyLimitReached
-                    ? "Show the create button locking at the active limit, then rotate or revoke a key to reopen capacity live."
-                    : activeKeys > 0
-                      ? "Use the copy → rotate flow to prove one-time secret reveal and audit-safe revocation in a single path."
-                      : "Generate the first operator key here to unlock a full non-browser auth lifecycle demo."}
+                  {apiKeyLimit === null
+                    ? "Generate, copy, and rotate keys without tripping a quota wall to show enterprise-grade operator throughput."
+                    : apiKeyLimitReached
+                      ? "Show the create button locking at the active limit, then rotate or revoke a key to reopen capacity live."
+                      : activeKeys > 0
+                        ? "Use the copy → rotate flow to prove one-time secret reveal and audit-safe revocation in a single path."
+                        : "Generate the first operator key here to unlock a full non-browser auth lifecycle demo."}
                 </p>
               </div>
             </div>
@@ -1315,16 +1180,10 @@ export function AppDashboardClient() {
                 <p className="text-[10px] uppercase tracking-widest text-slate-500">
                   Demo walkthrough
                 </p>
-                <ol className="mt-2 space-y-3 text-white">
-                  {walkthroughSteps.map((step, index) => (
-                    <li key={step.title} className="rounded-lg border border-white/5 bg-black/20 px-3 py-3">
-                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
-                        Step {index + 1}
-                      </p>
-                      <p className="mt-2 text-sm font-medium text-white">{step.title}</p>
-                      <p className="mt-1 text-sm leading-6 text-slate-400">{step.description}</p>
-                    </li>
-                  ))}
+                <ol className="mt-2 space-y-2 text-white">
+                  <li>1. Sign in or register to establish a real operator session.</li>
+                  <li>2. Refresh to prove agent, deployment, health, and API key surfaces are live.</li>
+                  <li>3. Generate a key, copy the one-time secret, then rotate or revoke it to show lifecycle truth.</li>
                 </ol>
               </div>
             </div>
