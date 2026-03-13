@@ -216,10 +216,10 @@ async def test_webhook(
 @router.get("/{webhook_id}/deliveries", response_model=list[WebhookDelivery])
 async def list_webhook_deliveries(
     webhook_id: uuid.UUID,
-    event: Optional[str] = None,
-    success: Optional[bool] = None,
-    skip: int = 0,
-    limit: int = 50,
+    event: Optional[str] = Query(None),
+    success: Optional[bool] = Query(None),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_webhook_auth),
 ):
