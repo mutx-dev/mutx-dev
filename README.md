@@ -1,8 +1,11 @@
 ---
 description: Fastest way to get oriented, get running, and go deeper in MUTX.
 icon: compass
+cover:
+  light: .gitbook/assets/mutx_docs_og_editorial.png
+  dark: .gitbook/assets/mutx_docs_og_editorial.png
 coverY: 0
-coverHeight: 202
+coverHeight: 287
 layout:
   width: wide
   cover:
@@ -27,7 +30,7 @@ tags:
     primary: true
 ---
 
-# README
+# Welcome
 
 MUTX is the control plane for deploying, operating, and governing AI agents.
 
