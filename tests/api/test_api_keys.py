@@ -2,6 +2,7 @@
 Tests for /api-keys endpoints.
 """
 
+import hashlib
 import uuid
 
 import pytest
@@ -10,7 +11,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.models.models import APIKey
-from src.api.routes.api_keys import MAX_ACTIVE_API_KEYS_PER_USER, hash_key
+from src.api.routes.api_keys import MAX_ACTIVE_API_KEYS_PER_USER
+from src.api.services.user_service import verify_api_key
 
 
 class TestListAPIKeys:
@@ -80,7 +82,7 @@ class TestCreateAPIKey:
         result = await db_session.execute(select(APIKey).where(APIKey.user_id == test_user.id))
         stored_key = result.scalar_one()
         assert stored_key.name == "new-key"
-        assert stored_key.key_hash == hash_key(data["key"])
+        assert verify_api_key(data["key"], stored_key.key_hash)
         assert stored_key.is_active is True
         assert stored_key.expires_at is not None
 
@@ -245,7 +247,7 @@ class TestRotateAPIKey:
         active_keys = [item for item in keys if item.is_active]
         assert len(active_keys) == 1
         assert active_keys[0].name == "to-rotate"
-        assert active_keys[0].key_hash == hash_key(data["key"])
+        assert verify_api_key(data["key"], active_keys[0].key_hash)
 
     @pytest.mark.asyncio
     async def test_rotate_revoked_api_key_conflicts(
@@ -284,3 +286,12 @@ class TestRotateAPIKey:
         response = await client.post(f"/api-keys/{key.id}/rotate")
         assert response.status_code == 404
         assert response.json()["detail"] == "API key not found"
+
+
+class TestVerifyAPIKeyCompatibility:
+    """Compatibility tests for legacy API key hashes."""
+
+    def test_verify_api_key_accepts_legacy_sha256_hash(self):
+        plain_key = "mutx_live_legacy_example"
+        legacy_hash = hashlib.sha256(plain_key.encode()).hexdigest()
+        assert verify_api_key(plain_key, legacy_hash)

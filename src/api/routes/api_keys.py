@@ -1,4 +1,3 @@
-import hashlib
 import secrets
 import uuid
 from datetime import datetime, timedelta
@@ -12,6 +11,7 @@ from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models.models import APIKey, User
 from src.api.models.schemas import APIKeyCreate, APIKeyCreateResponse, APIKeyResponse
+from src.api.services.user_service import hash_api_key
 
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])
 
@@ -23,11 +23,6 @@ def generate_api_key() -> str:
     """Generate a new API key with 'mutx_live_' prefix."""
     random_part = secrets.token_urlsafe(32)
     return f"mutx_live_{random_part}"
-
-
-def hash_key(key: str) -> str:
-    """Hash an API key for storage."""
-    return hashlib.sha256(key.encode()).hexdigest()
 
 
 async def get_owned_api_key(
@@ -69,7 +64,7 @@ async def create_api_key(
         )
 
     plain_key = generate_api_key()
-    key_hash = hash_key(plain_key)
+    key_hash = hash_api_key(plain_key)
 
     expires_at = None
     if key_data.expires_in_days:
@@ -137,7 +132,7 @@ async def rotate_api_key(
         )
 
     plain_key = generate_api_key()
-    key_hash = hash_key(plain_key)
+    key_hash = hash_api_key(plain_key)
 
     old_key.is_active = False
 
