@@ -561,11 +561,7 @@ export function AppDashboardClient() {
       ) : null}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-<<<<<<< HEAD
-        {summary.map(({ label, value, icon: Icon }) => (
-=======
         {summary.map(({ label, value, detail, icon: Icon }) => (
->>>>>>> 2823e3d (feat(web): make app dashboard honest and operator-useful)
           <Card
             key={label}
             className="border border-white/5 bg-white/[0.01] p-5"
@@ -587,11 +583,6 @@ export function AppDashboardClient() {
             </div>
             <p className="mt-2 text-xs text-slate-500">{detail}</p>
             {label === "Health" ? (
-<<<<<<< HEAD
-              <p className="mt-2 text-xs text-slate-500 font-[family:var(--font-mono)]">
-                database: {health?.database || "unknown"}
-              </p>
-=======
               <>
                 <p className="mt-2 text-xs text-slate-500 font-[family:var(--font-mono)]">
                   database: {health?.database || "unknown"}
@@ -600,7 +591,6 @@ export function AppDashboardClient() {
                   <p className="mt-2 text-xs text-rose-300">error: {health.error}</p>
                 ) : null}
               </>
->>>>>>> 2823e3d (feat(web): make app dashboard honest and operator-useful)
             ) : null}
           </Card>
         ))}
