@@ -224,6 +224,7 @@ class WebhookCreate(BaseModel):
         description="List of events to subscribe to (e.g., 'agent.status', 'deployment.*', '*' for all)",
     )
     secret: Optional[str] = Field(None, description="Optional secret for signature verification")
+    is_active: bool = Field(True, description="Whether the webhook should be active immediately")
 
 
 class WebhookUpdate(BaseModel):
