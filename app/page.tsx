@@ -52,6 +52,12 @@ const proofPoints = [
   { label: 'lead capture', value: 'waitlist + institutional contact endpoints live' },
 ]
 
+const liveStats = [
+  { label: 'operator story', value: 'login → fleet → key → recovery' },
+  { label: 'surface parity', value: 'landing, app, and cli stay aligned' },
+  { label: 'demo mode', value: 'built for real operator walkthroughs' },
+]
+
 const walkthrough = [
   {
     icon: LayoutDashboard,
@@ -143,6 +149,15 @@ export default function LandingPage() {
               ))}
             </div>
 
+            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+              {liveStats.map((item) => (
+                <div key={item.label} className="rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.05] px-4 py-3 shadow-[0_20px_60px_rgba(0,0,0,0.2)]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-200/60">{item.label}</p>
+                  <p className="mt-2 text-sm text-white/82">{item.value}</p>
+                </div>
+              ))}
+            </div>
+
             <div className="mt-8 max-w-xl">
               <WaitlistForm source="hero" compact />
             </div>
@@ -197,6 +212,18 @@ export default function LandingPage() {
               <p className="mt-4 max-w-lg text-sm leading-7 text-white/58 sm:text-base">
                 The landing surface now points directly at the product story: authenticate, inspect runtime truth, react to degradation, and move between UI and CLI without losing operator context.
               </p>
+
+              <div className="mt-6 rounded-3xl border border-white/10 bg-black/30 p-5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/45">demo checkpoints</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  {proofPoints.map((item) => (
+                    <div key={item.label} className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/40">{item.label}</p>
+                      <p className="mt-2 text-sm text-white/78">{item.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
