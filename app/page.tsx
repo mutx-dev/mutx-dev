@@ -46,6 +46,12 @@ const operatorSignals = [
   { label: 'events', value: 'webhook and automation flow' },
 ]
 
+const proofPoints = [
+  { label: 'operator dashboard', value: 'live auth + fleet + key lifecycle' },
+  { label: 'public proof', value: 'docs, repo, and roadmap shipped in the open' },
+  { label: 'lead capture', value: 'waitlist + institutional contact endpoints live' },
+]
+
 const walkthrough = [
   {
     icon: LayoutDashboard,
@@ -139,6 +145,28 @@ export default function LandingPage() {
 
             <div className="mt-8 max-w-xl">
               <WaitlistForm source="hero" compact />
+            </div>
+
+            <div className="mt-8 rounded-[28px] border border-cyan-400/15 bg-cyan-400/[0.06] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.24)]">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-200/75">live demo path</p>
+                  <h2 className="mt-2 text-xl font-medium text-white sm:text-2xl">Open the exact surfaces the story depends on.</h2>
+                </div>
+                <a href="/app" className="inline-flex items-center gap-2 rounded-xl border border-cyan-300/25 bg-black/30 px-4 py-2.5 text-sm font-medium text-cyan-100 transition hover:border-cyan-200/40 hover:bg-black/45">
+                  open operator app
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+              </div>
+
+              <div className="mt-5 grid gap-3 md:grid-cols-3">
+                {proofPoints.map((item) => (
+                  <div key={item.label} className="rounded-2xl border border-white/10 bg-black/30 px-4 py-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/40">{item.label}</p>
+                    <p className="mt-2 text-sm text-white/78">{item.value}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
