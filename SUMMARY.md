@@ -1,8 +1,8 @@
 # Table of contents
 
 * [Welcome](README.md)
-* [MUTX Manifesto](manifesto.md)
-* [MUTX Technical Whitepaper](whitepaper.md)
+* [Manifesto](manifesto.md)
+* [Whitepaper](whitepaper.md)
 * [Roadmap](roadmap.md)
 * [Documentation Hub](docs/README.md)
   * [API Source of Truth](docs/contracts/README.md)
