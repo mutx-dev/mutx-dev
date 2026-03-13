@@ -129,9 +129,9 @@ export function AppDashboardClient() {
   ).length;
   const activeKeys = apiKeys.filter((apiKey) => apiKey.is_active).length;
   const revokedKeys = apiKeys.length - activeKeys;
-  const apiKeyLimit = 2;
-  const apiKeyCapacityRemaining = Math.max(apiKeyLimit - activeKeys, 0);
-  const apiKeyLimitReached = activeKeys >= apiKeyLimit;
+  const apiKeyLimit = user.plan === "enterprise" ? null : user.plan === "pro" ? 50 : user.plan === "starter" ? 10 : 2;
+  const apiKeyCapacityRemaining = apiKeyLimit === null ? null : Math.max(apiKeyLimit - activeKeys, 0);
+  const apiKeyLimitReached = apiKeyLimit === null ? false : activeKeys >= apiKeyLimit;
   const latestDeploymentEvent = deployments
     .flatMap((deployment) => deployment.events ?? [])
     .sort(
@@ -146,6 +146,50 @@ export function AppDashboardClient() {
     if (bootstrapping) return "Checking for an existing operator session";
     return "No operator session established yet";
   }, [bootstrapping, error, user?.email]);
+
+  const deploymentHealthDetail = useMemo(() => {
+    if (!deployments.length) {
+      return "No deployment heartbeat yet";
+    }
+
+    if (failedDeployments > 0) {
+      return `${failedDeployments} deployment${failedDeployments === 1 ? "" : "s"} need attention`;
+    }
+
+    if (healthyDeployments === deployments.length) {
+      return "All deployments look healthy";
+    }
+
+    return `${healthyDeployments}/${deployments.length} deployments healthy`;
+  }, [deployments.length, failedDeployments, healthyDeployments]);
+
+  const agentHealthDetail = useMemo(() => {
+    if (!agents.length) {
+      return "No agent runtime reported yet";
+    }
+
+    if (runningAgents === agents.length) {
+      return "Every agent is running";
+    }
+
+    if (runningAgents === 0) {
+      return "No agents are currently running";
+    }
+
+    return `${runningAgents}/${agents.length} agents running`;
+  }, [agents.length, runningAgents]);
+
+  const apiKeyPlanDetail = useMemo(() => {
+    if (apiKeyLimit === null) {
+      return `${activeKeys} active key${activeKeys === 1 ? "" : "s"} on an unlimited enterprise quota`;
+    }
+
+    if (apiKeyLimitReached) {
+      return `Plan limit reached at ${activeKeys}/${apiKeyLimit} active keys`;
+    }
+
+    return `${apiKeyCapacityRemaining} slot${apiKeyCapacityRemaining === 1 ? "" : "s"} remain before the plan limit`;
+  }, [activeKeys, apiKeyCapacityRemaining, apiKeyLimit, apiKeyLimitReached]);
 
   const summary = useMemo(
     () => [
@@ -174,8 +218,12 @@ export function AppDashboardClient() {
           apiKeys.length > 0
             ? apiKeyLimitReached
               ? `Active limit reached (${activeKeys}/${apiKeyLimit}) · ${revokedKeys} revoked`
-              : `${activeKeys}/${apiKeyLimit} active · ${apiKeyCapacityRemaining} slot${apiKeyCapacityRemaining === 1 ? "" : "s"} left`
-            : `0/${apiKeyLimit} active · ${apiKeyLimit} slots available`,
+              : apiKeyLimit === null
+                ? `${activeKeys} active · unlimited plan capacity`
+                : `${activeKeys}/${apiKeyLimit} active · ${apiKeyCapacityRemaining} slot${apiKeyCapacityRemaining === 1 ? "" : "s"} left`
+            : apiKeyLimit === null
+              ? "0 active · unlimited plan capacity"
+              : `0/${apiKeyLimit} active · ${apiKeyLimit} slots available`,
         icon: KeyRound,
       },
       {
@@ -204,6 +252,7 @@ export function AppDashboardClient() {
       health?.status,
       healthyDeployments,
       runningAgents,
+      user.plan,
     ],
   );
 
@@ -737,6 +786,20 @@ export function AppDashboardClient() {
             </div>
 
             <div className="space-y-3 p-6">
+              <div className="grid gap-3 lg:grid-cols-3">
+                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 text-xs text-slate-300">
+                  <p className="text-[10px] uppercase tracking-widest text-slate-500">Runtime signal</p>
+                  <p className="mt-2 text-white">{agentHealthDetail}</p>
+                </div>
+                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 text-xs text-slate-300">
+                  <p className="text-[10px] uppercase tracking-widest text-slate-500">Deployment posture</p>
+                  <p className="mt-2 text-white">{deploymentHealthDetail}</p>
+                </div>
+                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 text-xs text-slate-300">
+                  <p className="text-[10px] uppercase tracking-widest text-slate-500">Replica footprint</p>
+                  <p className="mt-2 text-white">{deployments.reduce((sum, deployment) => sum + deployment.replicas, 0)} total replicas across the visible fleet</p>
+                </div>
+              </div>
               {refreshing ? (
                 <div className="rounded-xl border border-white/5 border-dashed p-6 text-center text-sm text-slate-500">
                   Refreshing deployment state…
@@ -848,13 +911,15 @@ export function AppDashboardClient() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="font-medium text-white">Active key limit</p>
                 <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${apiKeyLimitReached ? "bg-rose-400/15 text-rose-200" : "bg-emerald-400/15 text-emerald-200"}`}>
-                  {activeKeys}/{apiKeyLimit} active
+                  {apiKeyLimit === null ? `${activeKeys} active · unlimited` : `${activeKeys}/${apiKeyLimit} active`}
                 </span>
               </div>
               <p className="mt-2 leading-relaxed text-amber-50/80">
-                {apiKeyLimitReached
-                  ? "Create is blocked until you revoke or rotate an existing active key. Revoked keys stay visible for audit history."
-                  : `${apiKeyCapacityRemaining} active slot${apiKeyCapacityRemaining === 1 ? "" : "s"} remain before the control plane blocks new key creation.`}
+                {apiKeyLimit === null
+                  ? "Enterprise plans can issue more active keys without hitting a quota wall. Revoked keys still remain visible for audit history."
+                  : apiKeyLimitReached
+                    ? "Create is blocked until you revoke or rotate an existing active key. Revoked keys stay visible for audit history."
+                    : `${apiKeyCapacityRemaining} active slot${apiKeyCapacityRemaining === 1 ? "" : "s"} remain before the control plane blocks new key creation.`}
               </p>
             </div>
 
@@ -962,11 +1027,13 @@ export function AppDashboardClient() {
                   Demo cue
                 </p>
                 <p className="mt-2 text-white">
-                  {apiKeyLimitReached
-                    ? "Show the create button locking at the active limit, then rotate or revoke a key to reopen capacity live."
-                    : activeKeys > 0
-                      ? "Use the copy → rotate flow to prove one-time secret reveal and audit-safe revocation in a single path."
-                      : "Generate the first operator key here to unlock a full non-browser auth lifecycle demo."}
+                  {apiKeyLimit === null
+                    ? "Generate, copy, and rotate keys without tripping a quota wall to show enterprise-grade operator throughput."
+                    : apiKeyLimitReached
+                      ? "Show the create button locking at the active limit, then rotate or revoke a key to reopen capacity live."
+                      : activeKeys > 0
+                        ? "Use the copy → rotate flow to prove one-time secret reveal and audit-safe revocation in a single path."
+                        : "Generate the first operator key here to unlock a full non-browser auth lifecycle demo."}
                 </p>
               </div>
             </div>
@@ -1090,11 +1157,22 @@ export function AppDashboardClient() {
                 </p>
                 <p className="mt-2 text-white">
                   {activeKeys > 0
-                    ? apiKeyLimitReached
-                      ? `${activeKeys} active API keys are already consuming the current ${apiKeyLimit}-key limit. Rotate or revoke one before creating another.`
-                      : `${activeKeys} active API key${activeKeys === 1 ? "" : "s"} can authenticate operator workflows right now, with ${apiKeyCapacityRemaining} slot${apiKeyCapacityRemaining === 1 ? "" : "s"} still available.`
-                    : `No active API keys are present yet; all ${apiKeyLimit} slots are available when you need non-browser access.`}
+                    ? apiKeyLimit === null
+                      ? `${activeKeys} active API key${activeKeys === 1 ? "" : "s"} can authenticate operator workflows right now, and this plan does not enforce a hard key cap.`
+                      : apiKeyLimitReached
+                        ? `${activeKeys} active API keys are already consuming the current ${apiKeyLimit}-key limit. Rotate or revoke one before creating another.`
+                        : `${activeKeys} active API key${activeKeys === 1 ? "" : "s"} can authenticate operator workflows right now, with ${apiKeyCapacityRemaining} slot${apiKeyCapacityRemaining === 1 ? "" : "s"} still available.`
+                    : apiKeyLimit === null
+                      ? "No active API keys are present yet; enterprise capacity is open when you need non-browser access."
+                      : `No active API keys are present yet; all ${apiKeyLimit} slots are available when you need non-browser access.`}
                 </p>
+              </div>
+
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                  Plan quota truth
+                </p>
+                <p className="mt-2 text-white">{apiKeyPlanDetail}</p>
               </div>
 
               <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
