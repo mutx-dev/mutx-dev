@@ -28,7 +28,15 @@ Set a local database URL in `.env`:
 DATABASE_URL=postgresql://mutx:mutx_password@localhost:5432/mutx
 ```
 
-## 2. Start local services
+## 2. Start the local demo stack
+
+Use the repo's canonical bootstrap script when you want the fastest morning-demo path:
+
+```bash
+./scripts/dev.sh
+```
+
+If you prefer to run services manually, start the local dependencies first:
 
 ```bash
 docker compose -f infrastructure/docker/docker-compose.yml up -d postgres redis
@@ -139,10 +147,18 @@ npm run lint
 npm run build
 ```
 
-## Optional: Playwright smoke tests
+## Optional: validation commands
+
+Quick discovery for the hosted smoke suite:
 
 ```bash
 npx playwright test --list
 ```
 
-Important: current Playwright specs target `https://mutx.dev`, not localhost.
+Full repo validation:
+
+```bash
+./scripts/test.sh
+```
+
+Important: the checked-in Playwright smoke suite is part of the repo validation path and currently exercises the hosted surface, not a localhost browser flow.
