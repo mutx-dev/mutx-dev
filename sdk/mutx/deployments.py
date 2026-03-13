@@ -7,6 +7,31 @@ from uuid import UUID
 import httpx
 
 
+class DeploymentEvent:
+    def __init__(self, data: dict[str, Any]):
+        self.id = UUID(data["id"])
+        self.deployment_id = UUID(data["deployment_id"])
+        self.event_type = data["event_type"]
+        self.status = data["status"]
+        self.node_id = data.get("node_id")
+        self.error_message = data.get("error_message")
+        self.created_at = datetime.fromisoformat(data["created_at"])
+        self._data = data
+
+
+class DeploymentEventHistory:
+    def __init__(self, data: dict[str, Any]):
+        self.deployment_id = UUID(data["deployment_id"])
+        self.deployment_status = data["deployment_status"]
+        self.items = [DeploymentEvent(item) for item in data.get("items", [])]
+        self.total = data["total"]
+        self.skip = data["skip"]
+        self.limit = data["limit"]
+        self.event_type = data.get("event_type")
+        self.status = data.get("status")
+        self._data = data
+
+
 class Deployment:
     def __init__(self, data: dict[str, Any]):
         self.id = UUID(data["id"])
@@ -14,9 +39,12 @@ class Deployment:
         self.status = data["status"]
         self.replicas = data["replicas"]
         self.node_id = data.get("node_id")
-        self.started_at = datetime.fromisoformat(data["started_at"])
+        self.started_at = (
+            datetime.fromisoformat(data["started_at"]) if data.get("started_at") else None
+        )
         self.ended_at = datetime.fromisoformat(data["ended_at"]) if data.get("ended_at") else None
         self.error_message = data.get("error_message")
+        self.events = [DeploymentEvent(item) for item in data.get("events", [])]
         self._data = data
 
     def __repr__(self) -> str:
@@ -133,6 +161,50 @@ class Deployments:
         response.raise_for_status()
         return Deployment(response.json())
 
+    def events(
+        self,
+        deployment_id: UUID | str,
+        skip: int = 0,
+        limit: int = 100,
+        event_type: Optional[str] = None,
+        status: Optional[str] = None,
+    ) -> DeploymentEventHistory:
+        params: dict[str, Any] = {"skip": skip, "limit": limit}
+        if event_type:
+            params["event_type"] = event_type
+        if status:
+            params["status"] = status
+
+        self._require_sync_client()
+        response = self._client.get(
+            f"/deployments/{deployment_id}/events",
+            params=params,
+        )
+        response.raise_for_status()
+        return DeploymentEventHistory(response.json())
+
+    async def aevents(
+        self,
+        deployment_id: UUID | str,
+        skip: int = 0,
+        limit: int = 100,
+        event_type: Optional[str] = None,
+        status: Optional[str] = None,
+    ) -> DeploymentEventHistory:
+        params: dict[str, Any] = {"skip": skip, "limit": limit}
+        if event_type:
+            params["event_type"] = event_type
+        if status:
+            params["status"] = status
+
+        self._require_async_client()
+        response = await self._client.get(
+            f"/deployments/{deployment_id}/events",
+            params=params,
+        )
+        response.raise_for_status()
+        return DeploymentEventHistory(response.json())
+
     def scale(self, deployment_id: UUID | str, replicas: int) -> Deployment:
         self._require_sync_client()
         response = self._client.post(
@@ -178,11 +250,16 @@ class Deployments:
         deployment_id: UUID | str,
         skip: int = 0,
         limit: int = 100,
+        level: Optional[str] = None,
     ) -> list[dict[str, Any]]:
+        params: dict[str, Any] = {"skip": skip, "limit": limit}
+        if level:
+            params["level"] = level
+
         self._require_sync_client()
         response = self._client.get(
             f"/deployments/{deployment_id}/logs",
-            params={"skip": skip, "limit": limit},
+            params=params,
         )
         response.raise_for_status()
         return response.json()
@@ -192,11 +269,16 @@ class Deployments:
         deployment_id: UUID | str,
         skip: int = 0,
         limit: int = 100,
+        level: Optional[str] = None,
     ) -> list[dict[str, Any]]:
+        params: dict[str, Any] = {"skip": skip, "limit": limit}
+        if level:
+            params["level"] = level
+
         self._require_async_client()
         response = await self._client.get(
             f"/deployments/{deployment_id}/logs",
-            params={"skip": skip, "limit": limit},
+            params=params,
         )
         response.raise_for_status()
         return response.json()

@@ -6,7 +6,14 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.models.models import Agent, Deployment, AgentStatus, DeploymentEvent
+from src.api.models.models import (
+    Agent,
+    AgentLog,
+    AgentMetric,
+    AgentStatus,
+    Deployment,
+    DeploymentEvent,
+)
 
 
 class TestListDeployments:
@@ -316,6 +323,90 @@ class TestDeploymentEvents:
         self, other_user_client: AsyncClient, test_deployment
     ):
         response = await other_user_client.get(f"/deployments/{test_deployment.id}/events")
+        assert response.status_code == 403
+
+
+class TestDeploymentLogs:
+    """Tests for GET /deployments/{deployment_id}/logs endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_logs_supports_level_filter(
+        self, client: AsyncClient, test_deployment, db_session: AsyncSession
+    ):
+        db_session.add_all(
+            [
+                AgentLog(
+                    agent_id=test_deployment.agent_id,
+                    level="INFO",
+                    message="startup complete",
+                    extra_data='{"node":"node-1"}',
+                ),
+                AgentLog(
+                    agent_id=test_deployment.agent_id,
+                    level="ERROR",
+                    message="probe failed",
+                    extra_data='{"node":"node-1"}',
+                ),
+            ]
+        )
+        await db_session.commit()
+
+        response = await client.get(f"/deployments/{test_deployment.id}/logs?level=ERROR&limit=10")
+        assert response.status_code == 200
+
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["agent_id"] == str(test_deployment.agent_id)
+        assert data[0]["level"] == "ERROR"
+        assert data[0]["message"] == "probe failed"
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_logs_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_deployment
+    ):
+        response = await other_user_client.get(f"/deployments/{test_deployment.id}/logs")
+        assert response.status_code == 403
+
+
+class TestDeploymentMetrics:
+    """Tests for GET /deployments/{deployment_id}/metrics endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_metrics_returns_agent_metrics_descending(
+        self, client: AsyncClient, test_deployment, db_session: AsyncSession
+    ):
+        db_session.add_all(
+            [
+                AgentMetric(
+                    agent_id=test_deployment.agent_id,
+                    cpu_usage=0.22,
+                    memory_usage=0.40,
+                    timestamp=datetime.fromisoformat("2026-03-12T09:00:00"),
+                ),
+                AgentMetric(
+                    agent_id=test_deployment.agent_id,
+                    cpu_usage=0.85,
+                    memory_usage=0.92,
+                    timestamp=datetime.fromisoformat("2026-03-12T09:10:00"),
+                ),
+            ]
+        )
+        await db_session.commit()
+
+        response = await client.get(f"/deployments/{test_deployment.id}/metrics?limit=10")
+        assert response.status_code == 200
+
+        data = response.json()
+        assert len(data) == 2
+        assert data[0]["agent_id"] == str(test_deployment.agent_id)
+        assert data[0]["cpu_usage"] == 0.85
+        assert data[1]["cpu_usage"] == 0.22
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_metrics_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_deployment
+    ):
+        response = await other_user_client.get(f"/deployments/{test_deployment.id}/metrics")
         assert response.status_code == 403
 
 
