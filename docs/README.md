@@ -11,7 +11,7 @@ Use this section when you need the code-accurate view of setup, runtime surfaces
 * [Overview](../)
 * [Quickstart](deployment/quickstart.md)
 * [Project Status](project-status.md)
-* [Roadmap](../ROADMAP.md)
+* [Roadmap](../roadmap.md)
 
 ## By area
 
@@ -26,8 +26,8 @@ Use this section when you need the code-accurate view of setup, runtime surfaces
 * [API](contracts/api/)
 * [Architecture](architecture/)
 * [Autonomy](autonomy/)
-* [MUTX Infrastructure](../infrastructure/)
-* [Python SDK](../sdk/)
+* [MUTX Infrastructure](../infrastructure.md)
+* [Python SDK](../sdk.md)
 
 ### Troubleshooting
 

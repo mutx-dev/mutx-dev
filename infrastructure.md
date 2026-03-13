@@ -1,0 +1,110 @@
+# MUTX Infrastructure
+
+Production-readiness baseline for Terraform, Ansible, Docker Compose, and monitoring.
+
+## Layout
+
+- `terraform/` – DigitalOcean VPC + droplet + firewall provisioning
+- `ansible/` – host hardening and container deployment playbooks
+- `monitoring/` – Prometheus + Grafana config
+
+## Terraform (DigitalOcean)
+
+```bash
+cd infrastructure
+make tf-fmt
+make tf-validate
+make ansible-inventory
+
+# Staging
+make tf-plan-staging
+
+# Production
+make tf-plan-production
+
+# Apply from terraform/ after reviewing plan
+cd terraform
+terraform apply -var-file=environments/production/terraform.tfvars
+```
+
+### Notes
+
+- Backend is environment-scoped via `terraform/environments/<env>/backend.hcl`.
+- Keep `admin_cidr` scoped to VPN/home-office CIDR. Avoid `0.0.0.0/0` in production.
+- Customer IDs must be unique.
+- Customer VPC CIDRs are validated at plan time.
+
+## Ansible Provisioning
+
+```bash
+cd infrastructure
+make ansible-provision
+make ansible-deploy-agent
+```
+
+Install Ansible collections and lint before applying:
+
+```bash
+cd infrastructure
+make ansible-deps
+make ansible-lint
+```
+
+Required environment variables before running playbooks:
+
+- `POSTGRES_PASSWORD`
+- `REDIS_PASSWORD`
+- `AGENT_API_KEY`
+- `AGENT_SECRET_KEY`
+- `ADMIN_CIDR` (recommended, defaults to `0.0.0.0/0`)
+- `PRIVATE_CIDR` (optional, defaults to `10.0.0.0/8`)
+- `TAILSCALE_AUTH_KEY` (optional)
+
+## Monitoring Stack
+
+```bash
+cp .env.monitoring.example .env.monitoring
+# set strong credentials/passwords
+cd infrastructure
+make monitor-up
+```
+
+The monitoring compose file binds UI and exporter ports to localhost by default.
+Stop it with `cd infrastructure && make monitor-down`.
+Prometheus now loads alerting rules from `infrastructure/monitoring/prometheus/alerts.yml` and scrapes the API via `host.docker.internal:8000` (works for local Docker Desktop + Linux host-gateway mapping). Grafana provisioning and dashboard mounts are resolved relative to `infrastructure/docker/docker-compose.monitoring.yml`, so the stack reads from `../monitoring/grafana/...` when launched from `infrastructure/`.
+
+## CI Drift Detection
+
+A scheduled GitHub Actions workflow now checks Terraform drift daily for both `staging` and `production` using `terraform plan -detailed-exitcode`:
+
+- Workflow: `.github/workflows/infrastructure-drift.yml`
+- Trigger: daily cron + manual dispatch
+- Behavior: uploads plan artifacts and fails when drift is detected
+
+Required GitHub secrets:
+
+- `DO_TOKEN`
+- `TF_STATE_ACCESS_KEY_ID`
+- `TF_STATE_SECRET_ACCESS_KEY`
+
+## Extra Validation Targets
+
+From `infrastructure/`:
+
+```bash
+# Drift-style exit codes (0=no changes, 2=changes)
+make tf-plan-staging-detailed
+make tf-plan-production-detailed
+
+# Validate Prometheus config + alert rules
+make monitor-validate
+```
+
+These infrastructure checks are authoritative for infra changes, but they are not the same thing as the app CI lane in `.github/workflows/ci.yml`. Keep infra-specific validation explicit so application PRs do not fail on hidden cross-surface assumptions.
+
+## Next Hardening Items
+
+- Replace static inventory usage with Terraform-generated inventory by default in Ansible playbook wrappers.
+- Wire alert delivery (Alertmanager/notification channel) for critical rules.
+- Default local Alertmanager routing now drops alerts unless they are explicitly labeled `notify="webhook"`, preventing noisy failed webhook retries in dev setups without a receiver.
+- Add automated backup/restore verification for PostgreSQL and Redis volumes.
