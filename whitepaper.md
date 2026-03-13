@@ -1,9 +1,4 @@
----
-description: Technical framing for MUTX, from current system shape to target direction.
-icon: file-lines
----
-
-# Whitepaper
+# MUTX Technical Whitepaper
 
 ## Abstract
 
@@ -15,7 +10,7 @@ This paper explains what MUTX is today, what problem it is solving, how the curr
 
 This document deliberately separates **current implementation** from **target architecture**.
 
-***
+---
 
 ## 1. Executive Summary
 
@@ -23,19 +18,19 @@ MUTX is being built as the operational layer around agent systems.
 
 Today, the repository already includes:
 
-* a Next.js website and app surface
-* a FastAPI control plane
-* a Python CLI
-* a Python SDK
-* route groups for auth, agents, deployments, API keys, webhooks, health, and readiness
-* infrastructure code spanning Docker, Railway, Terraform, Ansible, and monitoring foundations
-* a live waitlist path wired through the product surface
+- a Next.js website and app surface
+- a FastAPI control plane
+- a Python CLI
+- a Python SDK
+- route groups for auth, agents, deployments, API keys, webhooks, health, and readiness
+- infrastructure code spanning Docker, Railway, Terraform, Ansible, and monitoring foundations
+- a live waitlist path wired through the product surface
 
 The current system already models the outer shell of an agent platform well: users, agents, deployments, keys, webhooks, health, and operator-facing entry points. The core thesis is that this shell is the product wedge.
 
 The long-term goal is not to be another wrapper around model calls. The long-term goal is to become the control plane teams use to deploy, run, observe, and govern agent systems.
 
-***
+---
 
 ## 2. The Problem: Agent Systems Break Outside The Demo
 
@@ -43,64 +38,58 @@ Agent software often succeeds in isolated development environments and then fail
 
 The recurring failure modes are not exotic:
 
-| Failure mode         | What breaks                                               | Why it matters                                            |
-| -------------------- | --------------------------------------------------------- | --------------------------------------------------------- |
-| Identity drift       | unclear ownership of agents and deployments               | operators cannot safely manage shared environments        |
-| Deployment ambiguity | "run this agent" has no durable system record             | lifecycle, restart, rollback, and metrics become informal |
-| Secret sprawl        | API keys and tokens live in ad hoc env vars and notebooks | security posture degrades immediately                     |
-| Weak observability   | logs exist, but not as part of an operator workflow       | debugging becomes expensive and reactive                  |
-| Surface drift        | website, API, CLI, SDK, and docs disagree                 | trust in the platform erodes                              |
-| Runtime mismatch     | local assumptions do not survive hosted infrastructure    | teams lose confidence before they reach production        |
+| Failure mode | What breaks | Why it matters |
+| --- | --- | --- |
+| Identity drift | unclear ownership of agents and deployments | operators cannot safely manage shared environments |
+| Deployment ambiguity | "run this agent" has no durable system record | lifecycle, restart, rollback, and metrics become informal |
+| Secret sprawl | API keys and tokens live in ad hoc env vars and notebooks | security posture degrades immediately |
+| Weak observability | logs exist, but not as part of an operator workflow | debugging becomes expensive and reactive |
+| Surface drift | website, API, CLI, SDK, and docs disagree | trust in the platform erodes |
+| Runtime mismatch | local assumptions do not survive hosted infrastructure | teams lose confidence before they reach production |
 
 The result is predictable: many teams have an agent demo, but very few have an agent system.
 
 MUTX exists to close that gap.
 
-***
+---
 
 ## 3. Design Goals
 
 MUTX is built around a few explicit goals.
 
 ### 3.1 Control plane first
-
 The first job is to model the system around the agent, not just the agent itself.
 
 ### 3.2 Honest contracts
-
 The API, CLI, SDK, docs, and web surfaces should describe the same product.
 
 ### 3.3 Stateful records
-
 Agents, deployments, keys, and hooks should exist as durable resources with lifecycle semantics.
 
 ### 3.4 Operator usability
-
 The product should support the people running the system, not only the people coding against it.
 
 ### 3.5 Open interfaces
-
 The platform should stay interoperable, inspectable, and contributor-friendly.
 
 ### 3.6 Incremental hardening
-
 The system should improve by tightening contracts and guarantees, not by adding disconnected surface area.
 
-***
+---
 
 ## 4. Non-Goals
 
 MUTX is not currently trying to be:
 
-* a model provider
-* a closed-source agent framework
-* a prompt IDE
-* a token resale business
-* a fake-finished enterprise platform
+- a model provider
+- a closed-source agent framework
+- a prompt IDE
+- a token resale business
+- a fake-finished enterprise platform
 
 It is much more useful to treat MUTX as an open, evolving control-plane product than to describe it as a completed runtime stack.
 
-***
+---
 
 ## 5. System Overview
 
@@ -133,15 +122,15 @@ flowchart LR
 
 ### 5.1 Current implementation surface
 
-| Surface           | Current role                                                      |
-| ----------------- | ----------------------------------------------------------------- |
-| `app/`            | landing site, app host, route proxies, waitlist, metadata         |
-| `src/api/`        | auth, agents, deployments, API keys, webhooks, newsletter, health |
-| `cli/`            | terminal access for status, auth, and resource workflows          |
-| `sdk/mutx/`       | Python client wrappers around control-plane APIs                  |
-| `infrastructure/` | Terraform, Ansible, monitoring, and deployment references         |
+| Surface | Current role |
+| --- | --- |
+| `app/` | landing site, app host, route proxies, waitlist, metadata |
+| `src/api/` | auth, agents, deployments, API keys, webhooks, newsletter, health |
+| `cli/` | terminal access for status, auth, and resource workflows |
+| `sdk/mutx/` | Python client wrappers around control-plane APIs |
+| `infrastructure/` | Terraform, Ansible, monitoring, and deployment references |
 
-***
+---
 
 ## 6. Control Plane Architecture
 
@@ -151,14 +140,14 @@ The control plane is implemented as a FastAPI application with route groups moun
 
 The live route families in the codebase are:
 
-* `/auth`
-* `/agents`
-* `/deployments`
-* `/api-keys`
-* `/webhooks`
-* `/newsletter`
-* `/health`
-* `/ready`
+- `/auth`
+- `/agents`
+- `/deployments`
+- `/api-keys`
+- `/webhooks`
+- `/newsletter`
+- `/health`
+- `/ready`
 
 ```mermaid
 flowchart TD
@@ -229,21 +218,21 @@ erDiagram
 
 This matters because it gives MUTX a durable substrate for operator workflows. Instead of saying "an agent is running somewhere," the system can say:
 
-* which user owns it
-* which deployments exist for it
-* which metrics and logs attach to it
-* which API keys and hooks exist around it
+- which user owns it
+- which deployments exist for it
+- which metrics and logs attach to it
+- which API keys and hooks exist around it
 
-***
+---
 
 ## 7. Auth, Ownership, And Governance
 
 MUTX already exposes a meaningful auth surface:
 
-* registration and login
-* access and refresh tokens
-* logout and current-user inspection
-* email verification and password reset flows
+- registration and login
+- access and refresh tokens
+- logout and current-user inspection
+- email verification and password reset flows
 
 ### 7.1 Auth flow
 
@@ -267,10 +256,10 @@ sequenceDiagram
 
 API keys are first-class resources. The platform:
 
-* generates prefixed keys (`mutx_live_...`)
-* stores only hashed values server-side
-* supports create, list, revoke, and rotate workflows
-* exposes the one-time plaintext value only at creation time
+- generates prefixed keys (`mutx_live_...`)
+- stores only hashed values server-side
+- supports create, list, revoke, and rotate workflows
+- exposes the one-time plaintext value only at creation time
 
 This is the kind of control-plane behavior agent platforms usually delay until too late.
 
@@ -280,34 +269,35 @@ The repo is honest about a key gap: ownership hardening is still an active area 
 
 That honesty is a strength. It makes the next layer of work legible.
 
-***
+---
 
 ## 8. Agent And Deployment Lifecycle
 
 MUTX treats agents and deployments as related but separate records.
 
-An **agent** is the logical unit of behavior. A **deployment** is an operational instance or rollout of that agent.
+An **agent** is the logical unit of behavior.
+A **deployment** is an operational instance or rollout of that agent.
 
 ### 8.1 Agent lifecycle today
 
 The codebase currently models agent status values such as:
 
-* `creating`
-* `running`
-* `stopped`
-* `failed`
-* `deleting`
+- `creating`
+- `running`
+- `stopped`
+- `failed`
+- `deleting`
 
 Deployments are stored with operational fields such as:
 
-* `status`
-* `replicas`
-* `region`
-* `version`
-* `node_id`
-* `started_at`
-* `ended_at`
-* `error_message`
+- `status`
+- `replicas`
+- `region`
+- `version`
+- `node_id`
+- `started_at`
+- `ended_at`
+- `error_message`
 
 ### 8.2 Lifecycle flow
 
@@ -338,7 +328,7 @@ sequenceDiagram
 
 Today, this lifecycle is strongest as a control-plane record model. The deeper execution substrate behind those records is still being hardened. That means the semantics already exist, while the runtime behavior is still evolving toward the target platform architecture.
 
-***
+---
 
 ## 9. Website, App Host, And Same-Origin Operator UX
 
@@ -346,20 +336,20 @@ MUTX is unusual in that the web layer is part of the product thesis rather than 
 
 ### 9.1 Current web roles
 
-* `mutx.dev` acts as the primary public landing surface
-* `app.mutx.dev` is separated as the operator-facing app host
-* Next.js route handlers proxy selected control-plane workflows for same-origin UX
-* the site includes a functional waitlist path that bridges product surface, backend persistence, and email delivery
+- `mutx.dev` acts as the primary public landing surface
+- `app.mutx.dev` is separated as the operator-facing app host
+- Next.js route handlers proxy selected control-plane workflows for same-origin UX
+- the site includes a functional waitlist path that bridges product surface, backend persistence, and email delivery
 
 ### 9.2 Operator proxy pattern
 
 The Next.js app layer proxies backend flows such as:
 
-* auth login / me / logout / register
-* dashboard health
-* dashboard agents and deployments
-* API key lifecycle
-* waitlist / newsletter actions
+- auth login / me / logout / register
+- dashboard health
+- dashboard agents and deployments
+- API key lifecycle
+- waitlist / newsletter actions
 
 ```mermaid
 flowchart LR
@@ -375,24 +365,25 @@ flowchart LR
 
 This pattern matters because it allows the website and app host to feel integrated with the platform instead of behaving like two unrelated systems.
 
-***
+---
 
 ## 10. Observability And Event Surfaces
 
-Agent platforms need more than request logs. They need surfaces operators can use.
+Agent platforms need more than request logs.
+They need surfaces operators can use.
 
 MUTX already includes several observability-related paths:
 
-* `/health`
-* `/ready`
-* deployment logs and metrics routes
-* agent logs and metrics routes
-* webhook ingestion endpoints
-* monitoring configs in the infrastructure directory
+- `/health`
+- `/ready`
+- deployment logs and metrics routes
+- agent logs and metrics routes
+- webhook ingestion endpoints
+- monitoring configs in the infrastructure directory
 
 The repository also contains monitoring and self-healing service foundations. Some of these are more mature as code structure than as fully hardened operational behavior, but they point in the right architectural direction: treat observability as part of the product, not as an afterthought.
 
-***
+---
 
 ## 11. Infrastructure Story
 
@@ -402,10 +393,10 @@ MUTX includes both **current hosted deployment machinery** and **target infrastr
 
 The current project is structured around:
 
-* Railway for hosted application services
-* Docker and Docker Compose for local orchestration
-* Terraform and Ansible as infrastructure foundations
-* Prometheus and Grafana config for monitoring setup
+- Railway for hosted application services
+- Docker and Docker Compose for local orchestration
+- Terraform and Ansible as infrastructure foundations
+- Prometheus and Grafana config for monitoring setup
 
 ### 11.2 Target architecture direction
 
@@ -415,15 +406,15 @@ That target matters, but it is important not to confuse it with fully shipped be
 
 ### 11.3 Current vs target
 
-| Layer            | Current implementation              | Target direction                              |
-| ---------------- | ----------------------------------- | --------------------------------------------- |
-| Hosting          | Railway + Docker-based app services | more isolated compute per deployment boundary |
-| Persistence      | Postgres + Redis model              | richer state, history, and runtime alignment  |
-| Deployments      | database-backed lifecycle records   | real execution-backed rollout semantics       |
-| Operator UX      | landing site + app host + proxies   | full authenticated mission-control surface    |
-| Infra automation | Terraform / Ansible foundations     | reproducible tenant environment provisioning  |
+| Layer | Current implementation | Target direction |
+| --- | --- | --- |
+| Hosting | Railway + Docker-based app services | more isolated compute per deployment boundary |
+| Persistence | Postgres + Redis model | richer state, history, and runtime alignment |
+| Deployments | database-backed lifecycle records | real execution-backed rollout semantics |
+| Operator UX | landing site + app host + proxies | full authenticated mission-control surface |
+| Infra automation | Terraform / Ansible foundations | reproducible tenant environment provisioning |
 
-***
+---
 
 ## 12. Economics And Product Strategy
 
@@ -431,14 +422,14 @@ MUTX should make agent systems easier to reason about financially, not harder.
 
 The product direction favors:
 
-* clearer separation between infrastructure cost and model cost
-* a BYOK-friendly posture rather than opaque token resale
-* operator-visible lifecycle records over hidden background magic
-* open-source leverage instead of closed product mythology
+- clearer separation between infrastructure cost and model cost
+- a BYOK-friendly posture rather than opaque token resale
+- operator-visible lifecycle records over hidden background magic
+- open-source leverage instead of closed product mythology
 
 This is strategically important. The companies that win agent infrastructure will not win because they hid one more LLM call behind nicer branding. They will win because they built the layer teams trust to run real systems.
 
-***
+---
 
 ## 13. Why The Repo Structure Matters
 
@@ -446,19 +437,20 @@ One of the strongest things about MUTX is the shape of the repository itself.
 
 It already captures the important truth about agent products:
 
-* the website matters
-* the app host matters
-* the API matters
-* the CLI matters
-* the SDK matters
-* the infrastructure code matters
-* the docs matter
+- the website matters
+- the app host matters
+- the API matters
+- the CLI matters
+- the SDK matters
+- the infrastructure code matters
+- the docs matter
 
-A serious agent platform is not one repo folder with a wrapper class. It is a system with several coordinated operator surfaces.
+A serious agent platform is not one repo folder with a wrapper class.
+It is a system with several coordinated operator surfaces.
 
 MUTX already reflects that reality.
 
-***
+---
 
 ## 14. Current Status And Roadmap
 
@@ -466,27 +458,30 @@ The repo is strongest where many early projects are weakest: product boundaries,
 
 The next high-leverage work is well defined:
 
-* tighten auth and ownership enforcement
-* align CLI and SDK behavior to the live contract
-* make the app host a fully data-backed dashboard
-* improve route coverage and CI confidence
-* replace weak implicit behavior with stronger typed schemas and lifecycle semantics
+- tighten auth and ownership enforcement
+- align CLI and SDK behavior to the live contract
+- make the app host a fully data-backed dashboard
+- improve route coverage and CI confidence
+- replace weak implicit behavior with stronger typed schemas and lifecycle semantics
 
 This is not a vague roadmap. It is a direct continuation of the architecture already present.
 
-***
+---
 
 ## 15. Why MUTX Can Matter
 
-Most agent companies are still arguing about prompts and frameworks. MUTX is more interesting because it is arguing about systems.
+Most agent companies are still arguing about prompts and frameworks.
+MUTX is more interesting because it is arguing about systems.
 
 If agent software becomes real infrastructure, then the valuable layer is the one that makes it deployable, operable, observable, and governable.
 
 That is the layer MUTX is building.
 
-Not a chatbot shell. Not a prompt wrapper. A control plane.
+Not a chatbot shell.
+Not a prompt wrapper.
+A control plane.
 
-***
+---
 
 ## 16. Conclusion
 
@@ -494,16 +489,16 @@ MUTX should be understood as an open-source control-plane platform for agent sys
 
 Its core contribution is not a claim that every piece of the runtime story is finished today. Its core contribution is that it already models the right surfaces:
 
-* users
-* agents
-* deployments
-* API keys
-* webhooks
-* health
-* readiness
-* website and app experiences
-* CLI and SDK interfaces
-* infrastructure automation foundations
+- users
+- agents
+- deployments
+- API keys
+- webhooks
+- health
+- readiness
+- website and app experiences
+- CLI and SDK interfaces
+- infrastructure automation foundations
 
 That combination is what turns agent software from an experiment into a platform.
 
