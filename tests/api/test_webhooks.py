@@ -48,6 +48,30 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
 
 
 @pytest.mark.asyncio
+async def test_webhook_list_honors_skip_and_limit(client: AsyncClient):
+    for idx in range(3):
+        response = await client.post(
+            "/webhooks/",
+            json={
+                "url": f"https://example.com/webhook-{idx}",
+                "events": ["agent.*"]
+            }
+        )
+        assert response.status_code == 201
+
+    full_response = await client.get("/webhooks/")
+    assert full_response.status_code == 200
+    assert len(full_response.json()) == 3
+
+    limited_response = await client.get("/webhooks/?limit=1")
+    assert limited_response.status_code == 200
+    assert len(limited_response.json()) == 1
+
+    skipped_response = await client.get("/webhooks/?skip=1&limit=10")
+    assert skipped_response.status_code == 200
+    assert len(skipped_response.json()) == 2
+
+@pytest.mark.asyncio
 async def test_webhook_unauthorized(client_no_auth: AsyncClient):
     response = await client_no_auth.get("/webhooks/")
     assert response.status_code == 401

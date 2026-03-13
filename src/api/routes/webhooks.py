@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, Header, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import uuid
@@ -100,11 +100,15 @@ async def create_webhook(
 
 @router.get("/", response_model=list[WebhookResponse])
 async def list_webhooks(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_webhook_auth),
 ):
     """List all webhooks registered by the authenticated user."""
-    result = await db.execute(select(Webhook).where(Webhook.user_id == current_user.id))
+    result = await db.execute(
+        select(Webhook).where(Webhook.user_id == current_user.id).offset(skip).limit(limit)
+    )
     webhooks = result.scalars().all()
     return webhooks
 
