@@ -2,6 +2,7 @@ import pytest
 from httpx import AsyncClient
 import uuid
 
+from src.api.auth.jwt import create_access_token
 from src.api.models.models import WebhookDeliveryLog
 
 
@@ -199,6 +200,50 @@ async def test_webhook_delivery_history_supports_legacy_user_api_key_auth(
     response = await client_no_auth.get(
         f"/webhooks/{webhook_id}/deliveries",
         headers={"X-API-Key": "legacy-webhook-key"},
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["event"] == "agent.heartbeat"
+
+
+@pytest.mark.asyncio
+async def test_webhook_delivery_history_supports_managed_api_key_auth(
+    client_no_auth: AsyncClient, db_session, test_user
+):
+    access_token, _ = create_access_token(test_user.id)
+
+    create_response = await client_no_auth.post(
+        "/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["*"]},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    assert create_response.status_code == 201
+    webhook_id = uuid.UUID(create_response.json()["id"])
+
+    key_response = await client_no_auth.post(
+        "/api-keys",
+        json={"name": "managed-webhook-key"},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    assert key_response.status_code == 201
+    managed_api_key = key_response.json()["key"]
+
+    db_session.add(
+        WebhookDeliveryLog(
+            webhook_id=webhook_id,
+            event="agent.heartbeat",
+            payload='{"status":"running"}',
+            success=True,
+            attempts=1,
+        )
+    )
+    await db_session.commit()
+
+    response = await client_no_auth.get(
+        f"/webhooks/{webhook_id}/deliveries",
+        headers={"X-API-Key": managed_api_key},
     )
 
     assert response.status_code == 200

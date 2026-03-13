@@ -1,8 +1,10 @@
+import hashlib
 import secrets
 import uuid
 from datetime import datetime, timedelta
 from typing import Optional
 
+from passlib.exc import UnknownHashError
 from passlib.context import CryptContext
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,11 +28,17 @@ def generate_user_api_key() -> str:
 
 
 def hash_api_key(key: str) -> str:
-    return api_key_context.hash(key)
+    return hashlib.sha256(key.encode()).hexdigest()
 
 
 def verify_api_key(plain_key: str, hashed_key: str) -> bool:
-    return api_key_context.verify(plain_key, hashed_key)
+    if secrets.compare_digest(hash_api_key(plain_key), hashed_key):
+        return True
+
+    try:
+        return api_key_context.verify(plain_key, hashed_key)
+    except (UnknownHashError, ValueError):
+        return False
 
 
 class UserService:
