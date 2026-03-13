@@ -390,8 +390,10 @@ export function AppDashboardClient() {
                 <p className="font-medium text-white">Honest app state</p>
                 <p className="mt-1 leading-relaxed text-slate-400">
                   This app only unlocks live dashboard data after a real session is
-                  established through the control-plane auth proxy. Until then,
-                  this signed-out view is the product boundary on purpose.
+                  established through the control-plane auth proxy. On localhost,
+                  that usually means the web app can reach the API at the configured
+                  base URL and set the auth cookie successfully. Until then, this
+                  signed-out view is the product boundary on purpose.
                 </p>
               </div>
             </div>
@@ -510,7 +512,7 @@ export function AppDashboardClient() {
           <div className="mt-4 rounded-xl border border-amber-400/15 bg-amber-400/5 p-4 text-xs leading-relaxed text-slate-400">
             {bootstrapping
               ? "Checking whether an operator session already exists..."
-              : "No session detected yet. This app does not fake fleet data for signed-out visitors."}
+              : "No session detected yet. On localhost or demo paths, verify the API base URL and cookie flow before expecting fleet data here."}
           </div>
         </Card>
       </div>
@@ -933,7 +935,7 @@ export function AppDashboardClient() {
                 <p className="mt-2 text-white">
                   {health?.status === "healthy"
                     ? "Control plane looks reachable from the dashboard proxy."
-                    : "Control plane state is degraded, unknown, or not yet verified from this session."}
+                    : "Control plane state is degraded, unknown, or not yet verified from this session. If this is localhost, confirm the configured API base URL is reachable before debugging the UI."}
                 </p>
               </div>
 
