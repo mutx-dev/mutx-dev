@@ -96,6 +96,11 @@ function statusTone(status: string) {
   return "bg-amber-400/10 text-amber-300 border-amber-400/20";
 }
 
+function maskApiKeyId(value: string) {
+  if (value.length <= 10) return value;
+  return `${value.slice(0, 6)}…${value.slice(-4)}`;
+}
+
 export function AppDashboardClient() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
@@ -105,6 +110,7 @@ export function AppDashboardClient() {
   const [refreshing, setRefreshing] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [error, setError] = useState("");
+  const [copiedKey, setCopiedKey] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [deployments, setDeployments] = useState<Deployment[]>([]);
@@ -121,12 +127,18 @@ export function AppDashboardClient() {
     (deployment) => deployment.status === "failed" || deployment.status === "error",
   ).length;
   const activeKeys = apiKeys.filter((apiKey) => apiKey.is_active).length;
+  const revokedKeys = apiKeys.length - activeKeys;
+  const apiKeyLimit = 2;
+  const apiKeyCapacityRemaining = Math.max(apiKeyLimit - activeKeys, 0);
+  const apiKeyLimitReached = activeKeys >= apiKeyLimit;
   const latestDeploymentEvent = deployments
     .flatMap((deployment) => deployment.events ?? [])
     .sort(
       (left, right) =>
         new Date(right.created_at ?? 0).getTime() - new Date(left.created_at ?? 0).getTime(),
     )[0];
+  const newestActiveKey = apiKeys.find((apiKey) => apiKey.is_active) ?? null;
+  const newestRevokedKey = [...apiKeys].reverse().find((apiKey) => !apiKey.is_active) ?? null;
   const authBoundaryDetail = useMemo(() => {
     if (user?.email) return `Signed in as ${user.email}`;
     if (error) return error;
@@ -159,8 +171,10 @@ export function AppDashboardClient() {
         value: String(apiKeys.length),
         detail:
           apiKeys.length > 0
-            ? `${activeKeys} active · ${apiKeys.length - activeKeys} revoked`
-            : "No operator keys created yet",
+            ? apiKeyLimitReached
+              ? `Active limit reached (${activeKeys}/${apiKeyLimit}) · ${revokedKeys} revoked`
+              : `${activeKeys}/${apiKeyLimit} active · ${apiKeyCapacityRemaining} slot${apiKeyCapacityRemaining === 1 ? "" : "s"} left`
+            : `0/${apiKeyLimit} active · ${apiKeyLimit} slots available`,
         icon: KeyRound,
       },
       {
@@ -178,10 +192,13 @@ export function AppDashboardClient() {
     [
       activeKeys,
       agents.length,
+      apiKeyCapacityRemaining,
+      apiKeyLimitReached,
       apiKeys.length,
       deployments.length,
       failedDeployments,
       health?.error,
+      revokedKeys,
       health?.timestamp,
       health?.status,
       healthyDeployments,
@@ -279,6 +296,7 @@ export function AppDashboardClient() {
   async function handleLogout() {
     setLoading(true);
     setError("");
+    setCopiedKey(false);
 
     try {
       await fetch("/api/auth/logout", { method: "POST" });
@@ -325,6 +343,8 @@ export function AppDashboardClient() {
 
     try {
       await navigator.clipboard.writeText(createdKey.key);
+      setCopiedKey(true);
+      window.setTimeout(() => setCopiedKey(false), 2500);
     } catch (nextError) {
       setError(
         nextError instanceof Error
@@ -821,6 +841,20 @@ export function AppDashboardClient() {
               </span>
             </div>
 
+            <div className="mb-4 rounded-xl border border-amber-400/15 bg-amber-400/5 p-3 text-xs text-amber-100">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="font-medium text-white">Active key limit</p>
+                <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${apiKeyLimitReached ? "bg-rose-400/15 text-rose-200" : "bg-emerald-400/15 text-emerald-200"}`}>
+                  {activeKeys}/{apiKeyLimit} active
+                </span>
+              </div>
+              <p className="mt-2 leading-relaxed text-amber-50/80">
+                {apiKeyLimitReached
+                  ? "Create is blocked until you revoke or rotate an existing active key. Revoked keys stay visible for audit history."
+                  : `${apiKeyCapacityRemaining} active slot${apiKeyCapacityRemaining === 1 ? "" : "s"} remain before the control plane blocks new key creation.`}
+              </p>
+            </div>
+
             <form onSubmit={handleCreateKey} className="mb-6 flex gap-2">
               <input
                 value={apiKeyName}
@@ -830,13 +864,13 @@ export function AppDashboardClient() {
               />
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || apiKeyLimitReached}
                 className="inline-flex shrink-0 items-center justify-center rounded-lg bg-amber-400 px-3 py-2 text-sm font-semibold text-amber-950 transition hover:bg-amber-300 disabled:opacity-50"
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  "Generate"
+                  apiKeyLimitReached ? "Limit reached" : "Generate"
                 )}
               </button>
             </form>
@@ -847,10 +881,20 @@ export function AppDashboardClient() {
                 animate={{ opacity: 1, height: "auto" }}
                 className="mb-6 overflow-hidden rounded-lg border border-amber-400/30 bg-amber-400/10 p-4"
               >
-                <p className="mb-2 text-xs font-medium text-amber-200">
-                  New key generated
-                </p>
-                <div className="flex items-center gap-2 rounded bg-black/40 px-3 py-2">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-medium text-amber-200">
+                      New key generated
+                    </p>
+                    <p className="mt-1 text-[11px] leading-relaxed text-amber-50/80">
+                      This secret is only shown once. Copy it now, then store it outside the dashboard before refreshing or rotating again.
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-amber-950/50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-amber-200">
+                    one-time reveal
+                  </span>
+                </div>
+                <div className="mt-3 flex items-center gap-2 rounded bg-black/40 px-3 py-2">
                   <code className="flex-1 truncate text-xs text-white">
                     {createdKey.key}
                   </code>
@@ -862,12 +906,52 @@ export function AppDashboardClient() {
                     <Copy className="h-4 w-4" />
                   </button>
                 </div>
+                <p className="mt-2 text-[11px] text-amber-100/90">
+                  {copiedKey ? "Copied to clipboard. Store it before you refresh or leave this page." : "Copy now. This secret will not be shown again after you leave this state."}
+                </p>
               </motion.div>
             ) : null}
 
+            <div className="mb-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-slate-300">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                  Newest active key
+                </p>
+                {newestActiveKey ? (
+                  <>
+                    <p className="mt-2 font-medium text-white">{newestActiveKey.name}</p>
+                    <p className="mt-1 font-[family:var(--font-mono)] text-[11px] text-slate-500">
+                      {maskApiKeyId(newestActiveKey.id)} · last used {formatRelativeDate(newestActiveKey.last_used)}
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-2 text-slate-500">No active key issued yet.</p>
+                )}
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-slate-300">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                  Audit trail
+                </p>
+                {newestRevokedKey ? (
+                  <>
+                    <p className="mt-2 font-medium text-white">Most recent revoked key kept for history</p>
+                    <p className="mt-1 font-[family:var(--font-mono)] text-[11px] text-slate-500">
+                      {maskApiKeyId(newestRevokedKey.id)} · revoked key still visible in the ledger
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-2 text-slate-500">No revoked keys yet.</p>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-2 max-h-[340px] overflow-y-auto pr-2 custom-scrollbar">
               {apiKeys.length ? (
-                apiKeys.map((apiKey) => (
+                apiKeys.map((apiKey) => {
+                  const lastUsedRelative = apiKey.last_used ? formatRelativeDate(apiKey.last_used) : "Never used";
+                  const expiresRelative = apiKey.expires_at ? formatRelativeDate(apiKey.expires_at) : "No expiry";
+
+                  return (
                   <div
                     key={apiKey.id}
                     className="rounded-lg border border-white/5 bg-white/[0.02] px-3 py-3 text-sm"
@@ -889,8 +973,22 @@ export function AppDashboardClient() {
                         </div>
                         <div className="mt-2 space-y-1 font-[family:var(--font-mono)] text-[11px] text-slate-500">
                           <p>Created: {formatDate(apiKey.created_at)}</p>
-                          <p>Last used: {formatDate(apiKey.last_used)}</p>
-                          <p>Expires: {formatDate(apiKey.expires_at)}</p>
+                          <p>Last used: {formatDate(apiKey.last_used)} · {lastUsedRelative}</p>
+                          <p>Expires: {formatDate(apiKey.expires_at)} · {expiresRelative}</p>
+                        </div>
+                        <div className="mt-3 flex flex-wrap gap-2 text-[10px] font-medium uppercase tracking-widest text-slate-400">
+                          <span className="rounded-full border border-white/10 bg-black/20 px-2 py-1">
+                            {apiKey.is_active ? "Usable right now" : "Audit-only record"}
+                          </span>
+                          {apiKey.last_used ? (
+                            <span className="rounded-full border border-white/10 bg-black/20 px-2 py-1">
+                              Seen {lastUsedRelative}
+                            </span>
+                          ) : (
+                            <span className="rounded-full border border-white/10 bg-black/20 px-2 py-1">
+                              Never presented to the API
+                            </span>
+                          )}
                         </div>
                       </div>
                       {apiKey.is_active ? (
@@ -915,10 +1013,11 @@ export function AppDashboardClient() {
                       ) : null}
                     </div>
                   </div>
-                ))
+                  );
+                })
               ) : (
                 <p className="py-4 text-center text-xs text-slate-500">
-                  No keys provisioned.
+                  No keys provisioned yet. Generate one here to unlock non-browser operator access.
                 </p>
               )}
             </div>
@@ -965,9 +1064,22 @@ export function AppDashboardClient() {
                 </p>
                 <p className="mt-2 text-white">
                   {activeKeys > 0
-                    ? `${activeKeys} active API key${activeKeys === 1 ? "" : "s"} can authenticate operator workflows right now.`
-                    : "No active API keys are present yet; generate one here when you need non-browser access."}
+                    ? apiKeyLimitReached
+                      ? `${activeKeys} active API keys are already consuming the current ${apiKeyLimit}-key limit. Rotate or revoke one before creating another.`
+                      : `${activeKeys} active API key${activeKeys === 1 ? "" : "s"} can authenticate operator workflows right now, with ${apiKeyCapacityRemaining} slot${apiKeyCapacityRemaining === 1 ? "" : "s"} still available.`
+                    : `No active API keys are present yet; all ${apiKeyLimit} slots are available when you need non-browser access.`}
                 </p>
+              </div>
+
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+                <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                  Demo walkthrough
+                </p>
+                <ol className="mt-2 space-y-2 text-white">
+                  <li>1. Sign in or register to establish a real operator session.</li>
+                  <li>2. Refresh to prove agent, deployment, health, and API key surfaces are live.</li>
+                  <li>3. Generate a key, copy the one-time secret, then rotate or revoke it to show lifecycle truth.</li>
+                </ol>
               </div>
             </div>
           </Card>
