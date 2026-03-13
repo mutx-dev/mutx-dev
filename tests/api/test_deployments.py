@@ -387,6 +387,50 @@ class TestCreateDeployment:
         assert response.status_code == 403
 
 
+
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_records_create_event_and_sets_agent_running(
+        self, client: AsyncClient, test_agent, db_session: AsyncSession
+    ):
+        """Test canonical deployment creation persists lifecycle event metadata."""
+        test_agent.status = AgentStatus.STOPPED.value
+        await db_session.commit()
+
+        response = await client.post(
+            "/deployments",
+            json={"agent_id": str(test_agent.id), "replicas": 3},
+        )
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["agent_id"] == str(test_agent.id)
+        assert data["status"] == "pending"
+        assert data["replicas"] == 3
+        assert len(data["events"]) == 1
+        assert data["events"][0]["event_type"] == "create"
+        assert data["events"][0]["status"] == "pending"
+
+        await db_session.refresh(test_agent)
+        assert test_agent.status == AgentStatus.RUNNING.value
+
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_rejects_agents_being_deleted(
+        self, client: AsyncClient, test_agent, db_session: AsyncSession
+    ):
+        """Test canonical deployment creation rejects deleting agents."""
+        test_agent.status = AgentStatus.DELETING.value
+        await db_session.commit()
+
+        response = await client.post(
+            "/deployments",
+            json={"agent_id": str(test_agent.id), "replicas": 1},
+        )
+
+        assert response.status_code == 400
+        assert response.json() == {"detail": "Cannot deploy an agent that is being deleted"}
+
 class TestRestartDeployment:
     """Tests for POST /deployments/{deployment_id}/restart endpoint."""
 
