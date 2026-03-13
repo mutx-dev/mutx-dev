@@ -145,6 +145,45 @@ async def test_agent_runtime_heartbeat_emits_status_webhook_on_status_change(
 
 
 @pytest.mark.asyncio
+async def test_agent_runtime_heartbeat_returns_ok_when_webhook_dispatch_fails(
+    client: AsyncClient, db_session, test_agent, monkeypatch
+):
+    from src.api.routes.agent_runtime import get_current_agent
+    import src.api.routes.agent_runtime as agent_runtime_routes
+    from src.api.models.models import AgentStatus
+
+    test_agent.status = AgentStatus.CREATING.value
+    await db_session.commit()
+
+    emitted_events: list[str] = []
+
+    async def mock_trigger_webhook_event(db, event, payload):
+        emitted_events.append(event)
+        raise RuntimeError("webhook dispatch unavailable")
+
+    monkeypatch.setattr(agent_runtime_routes, "trigger_webhook_event", mock_trigger_webhook_event)
+    client.app.dependency_overrides[get_current_agent] = lambda: test_agent
+
+    response = await client.post(
+        "/agents/heartbeat",
+        json={
+            "agent_id": str(test_agent.id),
+            "status": "running",
+            "timestamp": datetime.utcnow().isoformat(),
+        },
+    )
+
+    assert response.status_code == 200
+    assert emitted_events == ["agent.heartbeat", "agent.status"]
+
+    await db_session.refresh(test_agent)
+    assert test_agent.status == AgentStatus.RUNNING.value
+    assert test_agent.last_heartbeat is not None
+
+    client.app.dependency_overrides.pop(get_current_agent, None)
+
+
+@pytest.mark.asyncio
 async def test_runtime_manager_delete_runtime_clears_default_runtime_reference():
     from src.api.services.agent_runtime import RuntimeConfig, RuntimeManager
 

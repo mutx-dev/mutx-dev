@@ -165,36 +165,42 @@ async def heartbeat(
 
     await db.commit()
 
-    await trigger_webhook_event(
-        db,
-        "agent.heartbeat",
-        {
-            "agent_id": str(agent.id),
-            "agent_name": agent.name,
-            "status": agent.status,
-            "previous_status": previous_status,
-            "message": request.message,
-            "platform": request.platform,
-            "hostname": request.hostname,
-            "timestamp": now.isoformat(),
-        },
-    )
-
-    if previous_status != agent.status:
+    try:
         await trigger_webhook_event(
             db,
-            "agent.status",
+            "agent.heartbeat",
             {
                 "agent_id": str(agent.id),
                 "agent_name": agent.name,
-                "old_status": previous_status,
-                "new_status": agent.status,
+                "status": agent.status,
+                "previous_status": previous_status,
                 "message": request.message,
                 "platform": request.platform,
                 "hostname": request.hostname,
                 "timestamp": now.isoformat(),
             },
         )
+    except Exception:
+        logger.exception("Failed to emit agent.heartbeat webhook", extra={"agent_id": str(agent.id)})
+
+    if previous_status != agent.status:
+        try:
+            await trigger_webhook_event(
+                db,
+                "agent.status",
+                {
+                    "agent_id": str(agent.id),
+                    "agent_name": agent.name,
+                    "old_status": previous_status,
+                    "new_status": agent.status,
+                    "message": request.message,
+                    "platform": request.platform,
+                    "hostname": request.hostname,
+                    "timestamp": now.isoformat(),
+                },
+            )
+        except Exception:
+            logger.exception("Failed to emit agent.status webhook", extra={"agent_id": str(agent.id)})
 
     return {
         "status": "ok",
