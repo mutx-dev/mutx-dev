@@ -74,13 +74,7 @@ mutx status
 | `mutx deploy scale` | reliable | uses `POST /deployments/{id}/scale` |
 | `mutx deploy delete` | reliable | uses `DELETE /deployments/{id}` |
 
-## Commands That Still Need Alignment
-
-| Command | Current issue |
-|--------|---------------|
-| `mutx deploy create` | uses the live deploy route, but the backend currently ignores `--replicas` and starts with 1 replica |
-
-For those flows, prefer the live route behavior in code over older docs. `mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`.
+`mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`.
 
 ## Example Session
 

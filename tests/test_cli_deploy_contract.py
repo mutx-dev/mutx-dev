@@ -71,3 +71,29 @@ def test_deploy_events_hits_contract_route_and_renders_items(monkeypatch) -> Non
     }
     assert "Deployment: dep-123 | status: running" in result.output
     assert "scale | running | node: node-1" in result.output
+
+
+def test_deploy_create_hits_canonical_route_with_replicas(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_post(path: str, json: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["json"] = json
+        return DummyResponse(201, {"id": "dep-456", "status": "pending"})
+
+    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.deploy.get_client", lambda config: SimpleNamespace(post=fake_post))
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        ["deploy", "create", "--agent-id", "agent-123", "--replicas", "3"],
+    )
+
+    assert result.exit_code == 0
+    assert captured == {
+        "path": "/deployments",
+        "json": {"agent_id": "agent-123", "replicas": 3},
+    }
+    assert "Created deployment: dep-456" in result.output
+    assert "Status: pending" in result.output
