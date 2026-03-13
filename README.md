@@ -79,32 +79,19 @@ git clone https://github.com/fortunexbt/mutx-dev
 cd mutx-dev
 ```
 
-Run the platform locally:
-
-```bash
-make up
-```
-
-Create your first agent:
-
-```bash
-mutx agent create
-```
-
 ### Demo Validation
 
-Verify the demo path works locally:
+Verify the demo path works locally in one command:
 
 ```bash
 npm run demo:validate
 ```
 
 This validates:
-- Homepage loads (`/`)
-- App shell loads (`/app`)
-- Static pages load (`/contact`, `/privacy-policy`)
-
-Success output confirms the demo path is ready for presentation.
+- API health (`/health`) and readiness (`/ready`),
+- Homepage loads (`/`),
+- App shell loads (`/app`),
+- Static pages load (`/contact`, `/privacy-policy`).
 
 More details in the docs:
 

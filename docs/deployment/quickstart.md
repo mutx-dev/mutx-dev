@@ -41,6 +41,18 @@ DATABASE_URL=postgresql://mutx:mutx_password@localhost:5432/mutx
 {% endstep %}
 
 {% step %}
+### One-command morning demo validation
+
+Use this for the canonical morning-run path (start everything + validate):
+
+```bash
+npm run demo:validate
+```
+
+This validates API health and the demo-facing routes in one go.
+{% endstep %}
+
+{% step %}
 ### Start the local demo stack
 
 Use the repo's canonical bootstrap script when you want the fastest morning-demo path:
