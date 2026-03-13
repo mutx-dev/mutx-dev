@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { ArrowRight, Github } from 'lucide-react'
 
 import { AnimatedTerminal } from '@/components/AnimatedTerminal'
+import { WaitlistForm } from '@/components/WaitlistForm'
 
 const GITHUB_URL = 'https://github.com/fortunexbt/mutx-dev'
 const DOCS_URL = 'https://docs.mutx.dev'
@@ -81,6 +82,10 @@ export default function LandingPage() {
               </a>
             </div>
 
+            <div className="mt-8 max-w-xl">
+              <WaitlistForm source="hero" compact />
+            </div>
+
             <ul className="mt-8 space-y-3 text-sm leading-6 text-white/58 sm:text-[15px]">
               {bullets.map((item) => (
                 <li key={item} className="flex items-start gap-3">
@@ -91,8 +96,9 @@ export default function LandingPage() {
             </ul>
           </div>
 
-          <div className="relative">
+          <div className="relative space-y-4">
             <AnimatedTerminal />
+            <WaitlistForm source="hero" compact />
           </div>
         </section>
       </main>
