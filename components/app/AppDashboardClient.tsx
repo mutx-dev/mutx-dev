@@ -243,6 +243,7 @@ export function AppDashboardClient() {
       activeKeys,
       agents.length,
       apiKeyCapacityRemaining,
+      apiKeyLimit,
       apiKeyLimitReached,
       apiKeys.length,
       deployments.length,
@@ -253,7 +254,6 @@ export function AppDashboardClient() {
       health?.status,
       healthyDeployments,
       runningAgents,
-      userPlan,
     ],
   );
 
@@ -1180,10 +1180,16 @@ export function AppDashboardClient() {
                 <p className="text-[10px] uppercase tracking-widest text-slate-500">
                   Demo walkthrough
                 </p>
-                <ol className="mt-2 space-y-2 text-white">
-                  <li>1. Sign in or register to establish a real operator session.</li>
-                  <li>2. Refresh to prove agent, deployment, health, and API key surfaces are live.</li>
-                  <li>3. Generate a key, copy the one-time secret, then rotate or revoke it to show lifecycle truth.</li>
+                <ol className="mt-2 space-y-3 text-white">
+                  {walkthroughSteps.map((step, index) => (
+                    <li key={step.title} className="rounded-lg border border-white/5 bg-black/20 px-3 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
+                        Step {index + 1}
+                      </p>
+                      <p className="mt-2 text-sm font-medium text-white">{step.title}</p>
+                      <p className="mt-1 text-sm leading-6 text-slate-400">{step.description}</p>
+                    </li>
+                  ))}
                 </ol>
               </div>
             </div>
