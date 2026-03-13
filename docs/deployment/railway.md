@@ -1,3 +1,8 @@
+---
+description: Managed hosting path for deploying MUTX on Railway.
+icon: train
+---
+
 # Railway Deployment
 
 Deploy to Railway for managed hosting.
@@ -95,6 +100,7 @@ The API service uses a Dockerfile-based deployment and a liveness health check:
 ### 1. Create Database
 
 In Railway dashboard:
+
 1. Go to your project
 2. Click "New" → "Database" → "PostgreSQL"
 3. Note the connection string
@@ -152,6 +158,7 @@ curl https://your-app.railway.app/health
 ### 1. Add Domain
 
 In Railway dashboard:
+
 1. Go to project → Settings → Domains
 2. Add custom domain (e.g., mutx.dev)
 3. Note the CNAME record
@@ -278,6 +285,7 @@ railway up
 ### Rollback
 
 In Railway dashboard:
+
 1. Go to Deployments
 2. Find previous deployment
 3. Click "Redeploy"
@@ -285,8 +293,9 @@ In Railway dashboard:
 ### Scale
 
 In Railway dashboard:
-- Go to Settings → Scaling
-- Adjust replicas (max 20 on Pro plan)
+
+* Go to Settings → Scaling
+* Adjust replicas (max 20 on Pro plan)
 
 ## Quick Reference
 

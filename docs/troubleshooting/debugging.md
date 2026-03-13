@@ -1,3 +1,8 @@
+---
+description: Practical commands for inspecting services, auth, data, and validation flow.
+icon: bug
+---
+
 # Debugging
 
 This guide reflects the current stack and route surface.
@@ -65,9 +70,9 @@ mutx deploy list --limit 5
 
 If a CLI command fails unexpectedly, compare it against the route implementations in:
 
-- `cli/commands/agents.py`
-- `cli/commands/deploy.py`
-- `src/api/routes/`
+* `cli/commands/agents.py`
+* `cli/commands/deploy.py`
+* `src/api/routes/`
 
 ## Frontend Checks
 
@@ -95,10 +100,10 @@ bash scripts/test.sh
 
 That script is the current repo-native validation baseline and now includes:
 
-- Python lint and format checks
-- Python compile checks
-- full API pytest suite
-- OpenAPI type generation
-- app-level frontend unit tests
-- production build verification
-- targeted Playwright smoke coverage
+* Python lint and format checks
+* Python compile checks
+* full API pytest suite
+* OpenAPI type generation
+* app-level frontend unit tests
+* production build verification
+* targeted Playwright smoke coverage

@@ -1,33 +1,38 @@
+---
+description: Register, log in, refresh tokens, inspect identity, and log out.
+icon: lock
+---
+
 # Authentication API
 
 The auth flow is the most complete part of the current API surface.
 
 ## Endpoints
 
-| Route | Purpose |
-|------|---------|
-| `POST /auth/register` | Create a user and return tokens |
-| `POST /auth/login` | Exchange email and password for tokens |
-| `POST /auth/refresh` | Exchange a refresh token for a new access token and refresh token |
-| `POST /auth/logout` | Return a success message |
-| `GET /auth/me` | Return the current user profile |
+| Route                 | Purpose                                                           |
+| --------------------- | ----------------------------------------------------------------- |
+| `POST /auth/register` | Create a user and return tokens                                   |
+| `POST /auth/login`    | Exchange email and password for tokens                            |
+| `POST /auth/refresh`  | Exchange a refresh token for a new access token and refresh token |
+| `POST /auth/logout`   | Return a success message                                          |
+| `GET /auth/me`        | Return the current user profile                                   |
 
 ## Password Rules
 
 `POST /auth/register` currently requires passwords that contain:
 
-- at least 8 characters
-- one uppercase letter
-- one lowercase letter
-- one number
-- one special character
+* at least 8 characters
+* one uppercase letter
+* one lowercase letter
+* one number
+* one special character
 
 ## Token Lifetimes
 
 From `src/api/auth/jwt.py` and `src/api/config.py`:
 
-- access token: 30 minutes
-- refresh token: 7 days
+* access token: 30 minutes
+* refresh token: 7 days
 
 ## Register
 
@@ -105,11 +110,11 @@ Current implementation note: `logout` returns a success message but does not rev
 
 ## Common Status Codes
 
-| Status | Meaning |
-|------|---------|
-| `201` | Registration succeeded |
-| `200` | Login, refresh, logout, or profile lookup succeeded |
-| `400` | Email already registered or password failed validation |
-| `401` | Invalid credentials or invalid refresh token |
-| `403` | Account is deactivated |
-| `422` | Request validation failed |
+| Status | Meaning                                                |
+| ------ | ------------------------------------------------------ |
+| `201`  | Registration succeeded                                 |
+| `200`  | Login, refresh, logout, or profile lookup succeeded    |
+| `400`  | Email already registered or password failed validation |
+| `401`  | Invalid credentials or invalid refresh token           |
+| `403`  | Account is deactivated                                 |
+| `422`  | Request validation failed                              |

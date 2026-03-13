@@ -1,3 +1,8 @@
+---
+description: Short answers to the most common repo and product questions.
+icon: question
+---
+
 # FAQ
 
 ## What is in this repo today?
@@ -18,7 +23,7 @@ Not yet. Core auth and listing flows work well, but some commands still reflect 
 
 The two biggest gaps right now are:
 
-- `mutx deploy create` still points at an older `/api/v1/...` route
+* `mutx deploy create` still points at an older `/api/v1/...` route
 
 `mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`.
 

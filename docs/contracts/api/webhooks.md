@@ -1,3 +1,8 @@
+---
+description: Runtime ingestion endpoints and user-facing webhook registration flows.
+icon: webhook
+---
+
 # Webhooks and Ingestion API
 
 MUTX has two webhook-related surfaces:
@@ -11,18 +16,18 @@ These endpoints are used by the MUTX runtime or deployed agents to report state 
 
 ### Routes
 
-| Route | Purpose |
-|------|---------|
-| `POST /ingest/agent-status` | Update an agent status and append logs |
-| `POST /ingest/deployment` | Update deployment state and related agent state |
-| `POST /ingest/metrics` | Record agent metrics |
+| Route                       | Purpose                                         |
+| --------------------------- | ----------------------------------------------- |
+| `POST /ingest/agent-status` | Update an agent status and append logs          |
+| `POST /ingest/deployment`   | Update deployment state and related agent state |
+| `POST /ingest/metrics`      | Record agent metrics                            |
 
 ### Authentication
 
 Ingest endpoints accept either:
 
-- `Authorization: Bearer <token>`
-- `X-API-Key: <key>`
+* `Authorization: Bearer <token>`
+* `X-API-Key: <key>`
 
 ### Agent Status Update
 
@@ -45,24 +50,24 @@ Register your own endpoint(s) to receive notifications from MUTX.
 
 Exact event values from `src/api/services/webhook_handler.py` include:
 
-- `agent.status_update`
-- `agent.heartbeat`
-- `agent.error`
-- `agent.started`
-- `agent.stopped`
-- `agent.crashed`
-- `deployment.created`
-- `deployment.updated`
-- `deployment.failed`
-- `deployment.rolled_back`
-- `metrics.report`
+* `agent.status_update`
+* `agent.heartbeat`
+* `agent.error`
+* `agent.started`
+* `agent.stopped`
+* `agent.crashed`
+* `deployment.created`
+* `deployment.updated`
+* `deployment.failed`
+* `deployment.rolled_back`
+* `metrics.report`
 
 Wildcard subscriptions currently accepted by route validation:
 
-- `agent.*`
-- `deployment.*`
-- `metrics.*`
-- `*`
+* `agent.*`
+* `deployment.*`
+* `metrics.*`
+* `*`
 
 ### Registration
 
@@ -79,14 +84,14 @@ curl -X POST "https://api.mutx.dev/webhooks/" \
 
 ### Management Endpoints
 
-| Method | Route | Purpose |
-|--------|-------|---------|
-| `GET` | `/webhooks/` | List all registered webhooks |
-| `GET` | `/webhooks/{webhook_id}` | Get a specific webhook |
-| `GET` | `/webhooks/{webhook_id}/deliveries` | List delivery attempts for one webhook |
-| `PATCH` | `/webhooks/{webhook_id}` | Update a webhook (URL, events, active status) |
-| `DELETE` | `/webhooks/{webhook_id}` | Remove a webhook |
-| `POST` | `/webhooks/{webhook_id}/test` | Send a test event to verify delivery |
+| Method   | Route                               | Purpose                                       |
+| -------- | ----------------------------------- | --------------------------------------------- |
+| `GET`    | `/webhooks/`                        | List all registered webhooks                  |
+| `GET`    | `/webhooks/{webhook_id}`            | Get a specific webhook                        |
+| `GET`    | `/webhooks/{webhook_id}/deliveries` | List delivery attempts for one webhook        |
+| `PATCH`  | `/webhooks/{webhook_id}`            | Update a webhook (URL, events, active status) |
+| `DELETE` | `/webhooks/{webhook_id}`            | Remove a webhook                              |
+| `POST`   | `/webhooks/{webhook_id}/test`       | Send a test event to verify delivery          |
 
 ### Delivery History
 
@@ -102,10 +107,10 @@ curl "https://api.mutx.dev/webhooks/YOUR_WEBHOOK_ID/deliveries?event=agent.statu
 
 Supported query parameters:
 
-- `skip`
-- `limit`
-- `event`
-- `success`
+* `skip`
+* `limit`
+* `event`
+* `success`
 
 Example response item:
 
@@ -126,6 +131,6 @@ Example response item:
 
 ## Delivery and Security
 
-- Retries: MUTX retries failed deliveries up to 3 attempts (`MAX_RETRIES = 3`).
-- Timeout: each delivery attempt uses a 30 second timeout.
-- Signatures: if a `secret` is configured, delivery requests include `X-Webhook-Signature: sha256=...`.
+* Retries: MUTX retries failed deliveries up to 3 attempts (`MAX_RETRIES = 3`).
+* Timeout: each delivery attempt uses a 30 second timeout.
+* Signatures: if a `secret` is configured, delivery requests include `X-Webhook-Signature: sha256=...`.

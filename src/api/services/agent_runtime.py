@@ -367,10 +367,15 @@ class RuntimeManager:
 
     @classmethod
     def delete_runtime(cls, runtime_id: str) -> bool:
-        if runtime_id in cls._runtimes:
-            del cls._runtimes[runtime_id]
-            return True
-        return False
+        runtime = cls._runtimes.get(runtime_id)
+        if not runtime:
+            return False
+
+        if cls._default_runtime is runtime:
+            cls._default_runtime = None
+
+        del cls._runtimes[runtime_id]
+        return True
 
     @classmethod
     def list_runtimes(cls) -> List[RuntimeState]:

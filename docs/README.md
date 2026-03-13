@@ -1,8 +1,15 @@
+---
+description: Best entry point for setup, platform references, and operator docs.
+icon: book
+---
+
 # MUTX Docs
 
 This is the code-accurate documentation hub for MUTX.
 
 Use this directory to understand what exists now, how to get started, and how the three public surfaces relate:
+
+<table data-view="cards"><thead><tr><th>Title</th><th data-card-target data-type="content-ref">Target</th></tr></thead><tbody><tr><td>Setup and local flow</td><td><a href="deployment/quickstart.md">quickstart.md</a></td></tr><tr><td>API and integration reference</td><td><a href="contracts/api/">api</a></td></tr><tr><td>Platform architecture</td><td><a href="architecture/">architecture</a></td></tr><tr><td>Troubleshooting and support</td><td><a href="troubleshooting/">troubleshooting</a></td></tr></tbody></table>
 
 - `mutx.dev` = public marketing site and product narrative
 - `docs.mutx.dev` = canonical documentation and API truth surface

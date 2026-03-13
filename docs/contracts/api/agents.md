@@ -1,3 +1,8 @@
+---
+description: Agent records, runtime state, deploy actions, logs, and metrics.
+icon: robot
+---
+
 # Agents API
 
 The agents routes manage agent records, deployments, logs, and metrics.
@@ -6,24 +11,24 @@ Runtime-facing endpoints such as heartbeat, command polling, log submission, and
 
 ## Current Implementation Notes
 
-- Routes are mounted at `/agents`, not `/v1/agents`.
-- `POST /agents` derives ownership from the authenticated user instead of accepting `user_id` in the request body.
-- `config` is currently modeled as a string field, so JSON config should be sent as a string payload.
-- Control-plane routes enforce user ownership; runtime status enforces agent identity match.
+* Routes are mounted at `/agents`, not `/v1/agents`.
+* `POST /agents` derives ownership from the authenticated user instead of accepting `user_id` in the request body.
+* `config` is currently modeled as a string field, so JSON config should be sent as a string payload.
+* Control-plane routes enforce user ownership; runtime status enforces agent identity match.
 
 ## Routes
 
-| Route | Purpose |
-|------|---------|
-| `POST /agents` | Create an agent record |
-| `GET /agents` | List agents |
-| `GET /agents/{agent_id}` | Get one agent with deployments |
-| `GET /agents/{agent_id}/status` | Get runtime status for the authenticated agent |
-| `DELETE /agents/{agent_id}` | Delete an agent |
+| Route                            | Purpose                                               |
+| -------------------------------- | ----------------------------------------------------- |
+| `POST /agents`                   | Create an agent record                                |
+| `GET /agents`                    | List agents                                           |
+| `GET /agents/{agent_id}`         | Get one agent with deployments                        |
+| `GET /agents/{agent_id}/status`  | Get runtime status for the authenticated agent        |
+| `DELETE /agents/{agent_id}`      | Delete an agent                                       |
 | `POST /agents/{agent_id}/deploy` | Create a deployment record and mark the agent running |
-| `POST /agents/{agent_id}/stop` | Stop active deployments for an agent |
-| `GET /agents/{agent_id}/logs` | List agent logs |
-| `GET /agents/{agent_id}/metrics` | List agent metrics |
+| `POST /agents/{agent_id}/stop`   | Stop active deployments for an agent                  |
+| `GET /agents/{agent_id}/logs`    | List agent logs                                       |
+| `GET /agents/{agent_id}/metrics` | List agent metrics                                    |
 
 ## Create an Agent
 
@@ -66,9 +71,9 @@ curl "$BASE_URL/agents?limit=10&skip=0" \
 
 Optional filters:
 
-- `skip`
-- `limit`
-- `user_id`
+* `skip`
+* `limit`
+* `user_id`
 
 ## Get an Agent
 
@@ -143,8 +148,8 @@ Successful deletion returns `204 No Content`.
 
 Current agent status enum values from `src/api/models/models.py`:
 
-- `creating`
-- `running`
-- `stopped`
-- `failed`
-- `deleting`
+* `creating`
+* `running`
+* `stopped`
+* `failed`
+* `deleting`

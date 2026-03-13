@@ -1,17 +1,21 @@
+---
+description: Runtime behavior, monitoring, recovery flows, and execution model.
+icon: microchip
+---
+
 # Agent Runtime
 
 This document describes how agents run in mutx.dev, including their lifecycle, monitoring, and self-healing capabilities.
 
 ## What is active today
 
-- `POST /agents/heartbeat` is the live runtime path for connected agents. It updates `agents.status` and `last_heartbeat` in the control plane.
-- Each runtime heartbeat now emits an `agent.heartbeat` outgoing webhook event for subscribers.
-- When a heartbeat changes the persisted agent status, MUTX also emits an `agent.status` outgoing webhook event.
-- The background monitor in `src/api/services/monitoring.py` still owns stale-agent detection, failure marking, alert resolution, and automatic recovery.
-- More advanced self-healing components remain partially aspirational until they are connected to real schedulers/executors.
+* `POST /agents/heartbeat` is the live runtime path for connected agents. It updates `agents.status` and `last_heartbeat` in the control plane.
+* Each runtime heartbeat now emits an `agent.heartbeat` outgoing webhook event for subscribers.
+* When a heartbeat changes the persisted agent status, MUTX also emits an `agent.status` outgoing webhook event.
+* The background monitor in `src/api/services/monitoring.py` still owns stale-agent detection, failure marking, alert resolution, and automatic recovery.
+* More advanced self-healing components remain partially aspirational until they are connected to real schedulers/executors.
 
-
----
+***
 
 ## Overview
 
@@ -45,7 +49,7 @@ The Agent Runtime (`src/api/services/agent_runtime.py:98`) is the core execution
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
----
+***
 
 ## Agent Lifecycle
 
@@ -110,13 +114,13 @@ def create_agent(
 
 ### Execution Modes
 
-| Mode | Method | Use Case |
-|------|--------|----------|
-| **Async** | `execute_agent()` | Non-blocking, high throughput |
-| **Sync** | `execute_agent_sync()` | Simple scripts, CLI tools |
-| **Streaming** | `execute_agent_stream()` | Real-time output, chat UIs |
+| Mode          | Method                   | Use Case                      |
+| ------------- | ------------------------ | ----------------------------- |
+| **Async**     | `execute_agent()`        | Non-blocking, high throughput |
+| **Sync**      | `execute_agent_sync()`   | Simple scripts, CLI tools     |
+| **Streaming** | `execute_agent_stream()` | Real-time output, chat UIs    |
 
----
+***
 
 ## Agent Types
 
@@ -134,10 +138,11 @@ class LangChainAgent:
 ```
 
 **Features:**
-- Multiple LLM providers (OpenAI, Anthropic, Ollama)
-- Tool-augmented execution
-- Conversation memory
-- Streaming support
+
+* Multiple LLM providers (OpenAI, Anthropic, Ollama)
+* Tool-augmented execution
+* Conversation memory
+* Streaming support
 
 ### 2. OpenClaw Agent
 
@@ -147,7 +152,7 @@ Multi-agent orchestration framework for complex workflows.
 
 Workflow automation with visual builder integration.
 
----
+***
 
 ## Tool Execution
 
@@ -178,11 +183,11 @@ Workflow automation with visual builder integration.
 
 ### Built-in Tools
 
-| Tool | Description | Example |
-|------|-------------|---------|
-| `search_documents` | Semantic search via vector store | `query="deployment guide"` |
-| `get_time` | Current timestamp | `get_time()` |
-| `calculator` | Safe math evaluation | `calculator(expression="2+2")` |
+| Tool               | Description                      | Example                        |
+| ------------------ | -------------------------------- | ------------------------------ |
+| `search_documents` | Semantic search via vector store | `query="deployment guide"`     |
+| `get_time`         | Current timestamp                | `get_time()`                   |
+| `calculator`       | Safe math evaluation             | `calculator(expression="2+2")` |
 
 ### Custom Tool Registration
 
@@ -198,7 +203,7 @@ runtime.tool_handler.register_handler(
 )
 ```
 
----
+***
 
 ## Monitoring
 
@@ -235,36 +240,36 @@ From `src/api/services/monitoring.py:363`, the `MonitoringService` provides comp
 
 ### Health Status Levels
 
-| Status | Condition | Action |
-|--------|-----------|--------|
-| **HEALTHY** | All checks pass | Normal operation |
-| **DEGRADED** | Performance below threshold | Log warning |
-| **UNHEALTHY** | Health check failed | Trigger recovery |
-| **UNKNOWN** | No health data | Skip monitoring |
+| Status        | Condition                   | Action           |
+| ------------- | --------------------------- | ---------------- |
+| **HEALTHY**   | All checks pass             | Normal operation |
+| **DEGRADED**  | Performance below threshold | Log warning      |
+| **UNHEALTHY** | Health check failed         | Trigger recovery |
+| **UNKNOWN**   | No health data              | Skip monitoring  |
 
 ### Alert Severity
 
-| Level | Threshold | Example |
-|-------|-----------|---------|
-| **INFO** | - | Agent registered |
-| **WARNING** | Error rate > 10% | High latency detected |
-| **ERROR** | Error rate > 25% | Agent unhealthy |
-| **CRITICAL** | Error rate > 50% | System failure |
+| Level        | Threshold        | Example               |
+| ------------ | ---------------- | --------------------- |
+| **INFO**     | -                | Agent registered      |
+| **WARNING**  | Error rate > 10% | High latency detected |
+| **ERROR**    | Error rate > 25% | Agent unhealthy       |
+| **CRITICAL** | Error rate > 50% | System failure        |
 
 ### Metrics Collected
 
-| Metric | Type | Description |
-|--------|------|-------------|
-| `request_count` | Counter | Total requests processed |
-| `error_count` | Counter | Failed requests |
-| `avg_latency_ms` | Gauge | Average response time |
-| `p95_latency_ms` | Gauge | 95th percentile latency |
-| `p99_latency_ms` | Gauge | 99th percentile latency |
-| `cpu_usage` | Gauge | System CPU percentage |
-| `memory_usage` | Gauge | System memory percentage |
-| `uptime_percentage` | Gauge | Agent uptime ratio |
+| Metric              | Type    | Description              |
+| ------------------- | ------- | ------------------------ |
+| `request_count`     | Counter | Total requests processed |
+| `error_count`       | Counter | Failed requests          |
+| `avg_latency_ms`    | Gauge   | Average response time    |
+| `p95_latency_ms`    | Gauge   | 95th percentile latency  |
+| `p99_latency_ms`    | Gauge   | 99th percentile latency  |
+| `cpu_usage`         | Gauge   | System CPU percentage    |
+| `memory_usage`      | Gauge   | System memory percentage |
+| `uptime_percentage` | Gauge   | Agent uptime ratio       |
 
----
+***
 
 ## Self-Healing
 
@@ -305,13 +310,13 @@ From `src/api/services/self_healer.py:491`, the `SelfHealingService` provides au
 
 ### Recovery Actions
 
-| Action | Trigger | Description |
-|--------|---------|-------------|
-| **RESTART** | 3 consecutive failures | Restart agent process |
-| **ROLLBACK** | After failed restart | Revert to stable version |
-| **RECREATE** | Persistent failure | Destroy and recreate agent |
-| **SCALE_UP** | High load | Add more agent instances |
-| **SCALE_DOWN** | Low load | Reduce resource usage |
+| Action          | Trigger                | Description                |
+| --------------- | ---------------------- | -------------------------- |
+| **RESTART**     | 3 consecutive failures | Restart agent process      |
+| **ROLLBACK**    | After failed restart   | Revert to stable version   |
+| **RECREATE**    | Persistent failure     | Destroy and recreate agent |
+| **SCALE\_UP**   | High load              | Add more agent instances   |
+| **SCALE\_DOWN** | Low load               | Reduce resource usage      |
 
 ### Health Check Configuration
 
@@ -371,7 +376,7 @@ The service tracks recovery metrics:
 
 **Target**: Recovery time < 5 seconds
 
----
+***
 
 ## Configuration
 
@@ -436,8 +441,8 @@ stats = runtime.get_stats()
 await runtime.stop()
 ```
 
----
+***
 
 ## Next Steps
 
-- [Security](./security.md)
+* [Security](security.md)

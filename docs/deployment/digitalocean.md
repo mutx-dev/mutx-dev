@@ -1,13 +1,18 @@
+---
+description: Provision and deploy with Terraform and Ansible on DigitalOcean.
+icon: droplet
+---
+
 # DigitalOcean Deployment
 
 Production deployment using Terraform and Ansible.
 
 ## Prerequisites
 
-- DigitalOcean account
-- `doctl` CLI installed
-- Terraform >= 1.0
-- Ansible >= 2.10
+* DigitalOcean account
+* `doctl` CLI installed
+* Terraform >= 1.0
+* Ansible >= 2.10
 
 ```bash
 # Install doctl
@@ -135,10 +140,11 @@ ansible-playbook -i inventory.ini playbooks/provision.yml
 ```
 
 This playbook:
-- Installs Docker
-- Configures firewall
-- Sets up monitoring
-- Creates necessary directories
+
+* Installs Docker
+* Configures firewall
+* Sets up monitoring
+* Creates necessary directories
 
 ### 3. Deploy Agent
 
