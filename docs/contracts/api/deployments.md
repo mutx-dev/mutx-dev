@@ -1,28 +1,33 @@
+---
+description: Deployment lifecycle records, events, logs, metrics, and scaling.
+icon: rocket
+---
+
 # Deployments API
 
 Deployment records are exposed through `/deployments`, and creation is available through both `/deployments` and the agent deploy route.
 
 ## Current Implementation Notes
 
-- Every deployment route requires authenticated control-plane access.
-- `POST /deployments` creates a deployment when given an owned `agent_id`.
-- `POST /agents/{agent_id}/deploy` is still available as the agent-centric create path.
-- `POST /deployments/{deployment_id}/scale` only succeeds when the deployment status is `running` or `ready`.
-- `POST /deployments/{deployment_id}/restart` currently allows `stopped`, `failed`, and `killed` deployments.
+* Every deployment route requires authenticated control-plane access.
+* `POST /deployments` creates a deployment when given an owned `agent_id`.
+* `POST /agents/{agent_id}/deploy` is still available as the agent-centric create path.
+* `POST /deployments/{deployment_id}/scale` only succeeds when the deployment status is `running` or `ready`.
+* `POST /deployments/{deployment_id}/restart` currently allows `stopped`, `failed`, and `killed` deployments.
 
 ## Routes
 
-| Route | Purpose |
-|------|---------|
-| `GET /deployments` | List deployments |
-| `POST /deployments` | Create a deployment for an owned agent |
-| `GET /deployments/{deployment_id}` | Get one deployment |
-| `GET /deployments/{deployment_id}/events` | Get paginated lifecycle history for one deployment |
-| `GET /deployments/{deployment_id}/logs` | Get deployment logs |
-| `GET /deployments/{deployment_id}/metrics` | Get deployment metrics |
-| `POST /deployments/{deployment_id}/restart` | Restart a stopped, failed, or killed deployment |
-| `POST /deployments/{deployment_id}/scale` | Change replica count |
-| `DELETE /deployments/{deployment_id}` | Mark deployment as killed |
+| Route                                       | Purpose                                            |
+| ------------------------------------------- | -------------------------------------------------- |
+| `GET /deployments`                          | List deployments                                   |
+| `POST /deployments`                         | Create a deployment for an owned agent             |
+| `GET /deployments/{deployment_id}`          | Get one deployment                                 |
+| `GET /deployments/{deployment_id}/events`   | Get paginated lifecycle history for one deployment |
+| `GET /deployments/{deployment_id}/logs`     | Get deployment logs                                |
+| `GET /deployments/{deployment_id}/metrics`  | Get deployment metrics                             |
+| `POST /deployments/{deployment_id}/restart` | Restart a stopped, failed, or killed deployment    |
+| `POST /deployments/{deployment_id}/scale`   | Change replica count                               |
+| `DELETE /deployments/{deployment_id}`       | Mark deployment as killed                          |
 
 ## Create a Deployment
 
@@ -59,10 +64,10 @@ curl "$BASE_URL/deployments?agent_id=YOUR_AGENT_ID" \
 
 Supported query parameters:
 
-- `skip`
-- `limit`
-- `agent_id`
-- `status`
+* `skip`
+* `limit`
+* `agent_id`
+* `status`
 
 ## Get a Deployment
 
@@ -101,10 +106,10 @@ curl "$BASE_URL/deployments/YOUR_DEPLOYMENT_ID/events?status=failed&limit=20" \
 
 Supported query parameters:
 
-- `skip`
-- `limit`
-- `event_type`
-- `status`
+* `skip`
+* `limit`
+* `event_type`
+* `status`
 
 Example response:
 
@@ -178,10 +183,10 @@ Current implementation note: delete marks the deployment as `killed`, sets `ende
 
 Deployments may show statuses such as:
 
-- `pending`
-- `deploying`
-- `running`
-- `ready`
-- `stopped`
-- `failed`
-- `killed`
+* `pending`
+* `deploying`
+* `running`
+* `ready`
+* `stopped`
+* `failed`
+* `killed`

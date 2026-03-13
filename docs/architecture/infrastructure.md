@@ -1,8 +1,13 @@
+---
+description: VPC design, network topology, provisioning flow, and service boundaries.
+icon: server
+---
+
 # Infrastructure
 
 This document describes the infrastructure design for mutx.dev, including VPC architecture, bare-metal provisioning, network topology, and security zones.
 
----
+***
 
 ## VPC Design
 
@@ -44,15 +49,15 @@ mutx.dev uses a **multi-tenant VPC architecture** where each customer receives a
 
 Each tenant VPC is provisioned on DigitalOcean with the following configuration:
 
-| Parameter | Value |
-|-----------|-------|
-| **Region** | Customer-selected (NYC, SFO, AMS, etc.) |
-| **VPC CIDR** | /24 (256 addresses) |
-| **Subnets** | 1x /24 (agent tier) |
-| **Internet Gateway** | Egress only (no inbound) |
-| **DHCP** | Managed (10.0.x.0/24 range) |
+| Parameter            | Value                                   |
+| -------------------- | --------------------------------------- |
+| **Region**           | Customer-selected (NYC, SFO, AMS, etc.) |
+| **VPC CIDR**         | /24 (256 addresses)                     |
+| **Subnets**          | 1x /24 (agent tier)                     |
+| **Internet Gateway** | Egress only (no inbound)                |
+| **DHCP**             | Managed (10.0.x.0/24 range)             |
 
----
+***
 
 ## Bare-Metal Provisioning
 
@@ -79,31 +84,29 @@ The provisioning pipeline follows a two-stage approach:
 The Terraform provisioning (`infrastructure/ansible/playbooks/provision.yml`) creates:
 
 1. **Droplet** (Compute)
-   - Size: Customer-selected (starting 4GB RAM)
-   - Image: Ubuntu 22.04 LTS
-   - VPC: Tenant VPC
-
+   * Size: Customer-selected (starting 4GB RAM)
+   * Image: Ubuntu 22.04 LTS
+   * VPC: Tenant VPC
 2. **Networking**
-   - Private networking enabled
-   - Floating IP (optional, for management)
-
+   * Private networking enabled
+   * Floating IP (optional, for management)
 3. **Storage**
-   - Volume for data (optional)
-   - Snapshots enabled
+   * Volume for data (optional)
+   * Snapshots enabled
 
 ### Ansible Configuration
 
 After Terraform provisions the compute, Ansible configures:
 
-| Role | Purpose |
-|------|---------|
-| **docker** | Install Docker, configure daemon |
-| **postgresql** | PostgreSQL 15 with pgvector |
-| **redis** | Redis with password auth |
-| **tailscale** | Zero-trust VPN mesh |
-| **ufw** | Firewall rules |
-| **fail2ban** | Intrusion prevention |
-| **agent** | Deploy agent containers |
+| Role           | Purpose                          |
+| -------------- | -------------------------------- |
+| **docker**     | Install Docker, configure daemon |
+| **postgresql** | PostgreSQL 15 with pgvector      |
+| **redis**      | Redis with password auth         |
+| **tailscale**  | Zero-trust VPN mesh              |
+| **ufw**        | Firewall rules                   |
+| **fail2ban**   | Intrusion prevention             |
+| **agent**      | Deploy agent containers          |
 
 ### Inventory Structure
 
@@ -122,7 +125,7 @@ ansible_python_interpreter=/usr/bin/python3
 ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 ```
 
----
+***
 
 ## Network Topology
 
@@ -203,16 +206,16 @@ ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
 ### IP Address Allocation
 
-| Range | Purpose | Hosts |
-|-------|---------|-------|
-| 10.0.1.0/27 | Reserved | - |
-| 10.0.1.32/27 | Agent pool | 30 agents |
-| 10.0.1.64/27 | EvalView | 1 guardrail VM |
+| Range         | Purpose       | Hosts                        |
+| ------------- | ------------- | ---------------------------- |
+| 10.0.1.0/27   | Reserved      | -                            |
+| 10.0.1.32/27  | Agent pool    | 30 agents                    |
+| 10.0.1.64/27  | EvalView      | 1 guardrail VM               |
 | 10.0.1.128/27 | Data services | PostgreSQL, Redis, Vector DB |
-| 10.0.1.192/26 | Reserved | Future use |
-| 10.0.2.0/24 | Management | Monitoring, Tailscale node |
+| 10.0.1.192/26 | Reserved      | Future use                   |
+| 10.0.2.0/24   | Management    | Monitoring, Tailscale node   |
 
----
+***
 
 ## Security Zones
 
@@ -286,15 +289,15 @@ ufw_rules:
 
 ### Network Segmentation
 
-| Component | Zone | Access | Notes |
-|-----------|------|--------|-------|
-| **EvalView Guard** | DMZ | Agents → Guard → Out | Input/output validation |
-| **Agent Containers** | App | Guard → Agent | Tool execution |
-| **PostgreSQL** | Data | Agent → DB | Via Unix socket |
-| **Redis** | Data | Agent → Redis | Password protected |
-| **Tailscale** | Mgmt | All | WireGuard mesh |
+| Component            | Zone | Access               | Notes                   |
+| -------------------- | ---- | -------------------- | ----------------------- |
+| **EvalView Guard**   | DMZ  | Agents → Guard → Out | Input/output validation |
+| **Agent Containers** | App  | Guard → Agent        | Tool execution          |
+| **PostgreSQL**       | Data | Agent → DB           | Via Unix socket         |
+| **Redis**            | Data | Agent → Redis        | Password protected      |
+| **Tailscale**        | Mgmt | All                  | WireGuard mesh          |
 
----
+***
 
 ## Service Communication
 
@@ -308,16 +311,16 @@ All inter-service communication within a tenant VPC uses:
 
 ### External Communication
 
-| Direction | Method | Security |
-|-----------|--------|----------|
-| **Agent → LLM Provider** | HTTPS | API key in Vault |
-| **Agent → Vector DB** | Unix socket | Local only |
-| **Tenant → Agent** | Tailscale | WireGuard + Auth |
-| **Control → Tenant** | Tailscale | mTLS via Tailscale |
+| Direction                | Method      | Security           |
+| ------------------------ | ----------- | ------------------ |
+| **Agent → LLM Provider** | HTTPS       | API key in Vault   |
+| **Agent → Vector DB**    | Unix socket | Local only         |
+| **Tenant → Agent**       | Tailscale   | WireGuard + Auth   |
+| **Control → Tenant**     | Tailscale   | mTLS via Tailscale |
 
----
+***
 
 ## Next Steps
 
-- [Agent Runtime](./agent-runtime.md)
-- [Security](./security.md)
+* [Agent Runtime](agent-runtime.md)
+* [Security](security.md)

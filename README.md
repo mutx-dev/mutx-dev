@@ -1,13 +1,42 @@
 ---
-description: Priority-ranked entry point for MUTX.
-icon: floppy-disk
+description: Fastest way to get oriented, get running, and go deeper in MUTX.
+icon: compass
+coverY: 0
+coverHeight: 202
+layout:
+  width: default
+  cover:
+    visible: true
+    size: hero
+  title:
+    visible: true
+  description:
+    visible: true
+  tableOfContents:
+    visible: true
+  outline:
+    visible: true
+  pagination:
+    visible: true
+  metadata:
+    visible: true
+  tags:
+    visible: true
 ---
 
 # Welcome
 
 MUTX is the control plane for deploying, operating, and governing AI agents.
 
-Use this page as the single entry point. Read top to bottom by priority.
+Start with the path that matches your goal.
+
+<table data-view="cards"><thead><tr><th>Title</th><th data-card-target data-type="content-ref">Target</th><th data-hidden data-card-cover data-type="image">Cover image</th></tr></thead><tbody><tr><td>Get running</td><td><a href="docs/deployment/quickstart.md">quickstart.md</a></td><td><a href="https://images.unsplash.com/photo-1634910409614-71a507e13588?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHw3fHxydW5uaW5nJTIwcm9ib3R8ZW58MHx8fHwxNzczNDA5Nzk4fDA&#x26;ixlib=rb-4.1.0&#x26;q=85">https://images.unsplash.com/photo-1634910409614-71a507e13588?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHw3fHxydW5uaW5nJTIwcm9ib3R8ZW58MHx8fHwxNzczNDA5Nzk4fDA&#x26;ixlib=rb-4.1.0&#x26;q=85</a></td></tr><tr><td>Browse the docs</td><td><a href="docs/">docs</a></td><td><a href="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHwyfHxyZWFkaW5nJTIwYm90fGVufDB8fHx8MTc3MzQwOTg3OXww&#x26;ixlib=rb-4.1.0&#x26;q=85">https://images.unsplash.com/photo-1620712943543-bcc4688e7485?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHwyfHxyZWFkaW5nJTIwYm90fGVufDB8fHx8MTc3MzQwOTg3OXww&#x26;ixlib=rb-4.1.0&#x26;q=85</a></td></tr><tr><td>Integrate with the API</td><td><a href="docs/contracts/api/index.md">index.md</a></td><td><a href="https://images.unsplash.com/photo-1760931969401-9bd6ee902798?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHw3fHxyb2JvdCUyMHdpcmVzfGVufDB8fHx8MTc3MzQwOTg5Mnww&#x26;ixlib=rb-4.1.0&#x26;q=85">https://images.unsplash.com/photo-1760931969401-9bd6ee902798?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHw3fHxyb2JvdCUyMHdpcmVzfGVufDB8fHx8MTc3MzQwOTg5Mnww&#x26;ixlib=rb-4.1.0&#x26;q=85</a></td></tr><tr><td>Understand the platform</td><td><a href="docs/architecture/overview.md">overview.md</a></td><td><a href="https://images.unsplash.com/photo-1634869258987-f13de2902431?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHwzfHxyb2JvdCUyMHRodW1icyUyMHVwfGVufDB8fHx8MTc3MzQwOTk1Mnww&#x26;ixlib=rb-4.1.0&#x26;q=85">https://images.unsplash.com/photo-1634869258987-f13de2902431?crop=entropy&#x26;cs=srgb&#x26;fm=jpg&#x26;ixid=M3wxOTcwMjR8MHwxfHNlYXJjaHwzfHxyb2JvdCUyMHRodW1icyUyMHVwfGVufDB8fHx8MTc3MzQwOTk1Mnww&#x26;ixlib=rb-4.1.0&#x26;q=85</a></td></tr></tbody></table>
+
+## Fast paths
+
+* **Ship locally:** [Quickstart](docs/deployment/quickstart.md) → [CLI Guide](docs/cli.md) → [Debugging](docs/troubleshooting/debugging.md)
+* **Learn the product:** [Manifesto](manifesto.md) → [Whitepaper](whitepaper.md) → [Project Status](docs/project-status.md)
+* **Go deep on operations:** [Deployment](docs/deployment/) → [MUTX Infrastructure](infrastructure.md) → [Roadmap](roadmap.md)
 
 ## Priority 1: Get running
 

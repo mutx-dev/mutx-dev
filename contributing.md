@@ -1,12 +1,17 @@
+---
+description: How to choose work, stay truthful, and submit clean MUTX contributions.
+icon: handshake
+---
+
 # Contributing
 
 Thanks for helping improve `mutx.dev`.
 
 ## Before You Start
 
-- Read `README.md`, `docs/README.md`, `ROADMAP.md`, and `docs/project-status.md`.
-- Trust the code over older docs when they disagree.
-- Keep changes scoped. This repo spans web, API, CLI, SDK, Docker, Terraform, and Ansible.
+* Read `README.md`, `docs/README.md`, `ROADMAP.md`, and `docs/project-status.md`.
+* Trust the code over older docs when they disagree.
+* Keep changes scoped. This repo spans web, API, CLI, SDK, Docker, Terraform, and Ansible.
 
 ## Local Setup
 
@@ -16,26 +21,26 @@ Use the canonical quickstart in `docs/deployment/quickstart.md`.
 
 The best starting points live in:
 
-- `ROADMAP.md`
-- `docs/project-status.md`
-- open issues created from those docs
+* `ROADMAP.md`
+* `docs/project-status.md`
+* open issues created from those docs
 
 Good contribution shapes:
 
-- API contract fixes
-- CLI and SDK alignment
-- dashboard/product surface improvements
-- docs drift cleanup
-- backend tests and CI improvements
+* API contract fixes
+* CLI and SDK alignment
+* dashboard/product surface improvements
+* docs drift cleanup
+* backend tests and CI improvements
 
 ## Pull Requests
 
-- Prefer small PRs by area.
-- Link an issue when there is one.
-- Explain what changed and why.
-- Include the validation commands you ran.
-- Update the closest docs when behavior changes.
-- Do not bundle unrelated cleanup with the main change.
+* Prefer small PRs by area.
+* Link an issue when there is one.
+* Explain what changed and why.
+* Include the validation commands you ran.
+* Update the closest docs when behavior changes.
+* Do not bundle unrelated cleanup with the main change.
 
 ## Validation
 
@@ -68,11 +73,11 @@ Important: current Playwright specs target `https://mutx.dev`, not localhost.
 
 When behavior is unclear, inspect:
 
-- `src/api/routes/`
-- `cli/commands/`
-- `sdk/mutx/`
-- `docker-compose.yml`
-- `docker-compose.production.yml`
+* `src/api/routes/`
+* `cli/commands/`
+* `sdk/mutx/`
+* `docker-compose.yml`
+* `docker-compose.production.yml`
 
 ## Questions And Support
 

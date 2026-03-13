@@ -1,5 +1,7 @@
 ---
+description: Repo operating notes and ground truth for coding agents working on MUTX.
 hidden: true
+icon: file-code
 ---
 
 # AGENTS.md

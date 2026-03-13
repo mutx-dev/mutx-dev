@@ -1,33 +1,42 @@
-## What changed?
+---
+description: Default checklist for clear, reviewable, validation-backed pull requests.
+icon: clipboard-check
+---
 
--
+# Pull Request Template
 
-## Why?
+Use this template to keep PRs small, explicit, and easy to review.
 
--
+### What changed?
 
-## Validation
+*
 
-- [ ] `npm run build`
-- [ ] `ruff check src/api cli sdk`
-- [ ] `black --check src/api cli sdk`
-- [ ] `python -m compileall src/api cli sdk/mutx`
-- [ ] targeted manual or automated verification
+### Why?
 
-## Agent Ownership
+*
 
-- authoring agent:
-- reviewer agent:
-- primary area:
-- risk: low / medium / high
-- lane: safe auto-merge / staging-first / human-gated
+### Validation
 
-## Docs
+* [ ] `npm run build`
+* [ ] `ruff check src/api cli sdk`
+* [ ] `black --check src/api cli sdk`
+* [ ] `python -m compileall src/api cli sdk/mutx`
+* [ ] targeted manual or automated verification
 
-- [ ] no docs update needed
-- [ ] updated the closest docs
+### Agent Ownership
 
-## Notes
+* authoring agent:
+* reviewer agent:
+* primary area:
+* risk: low / medium / high
+* lane: safe auto-merge / staging-first / human-gated
 
-- breaking changes:
-- follow-up work:
+### Docs
+
+* [ ] no docs update needed
+* [ ] updated the closest docs
+
+### Notes
+
+* breaking changes:
+* follow-up work:

@@ -1,3 +1,8 @@
+---
+description: Known setup, auth, deploy, and testing issues that match the repo today.
+icon: circle-info
+---
+
 # Common Issues
 
 This guide focuses on issues that match the current repo state.
@@ -61,10 +66,10 @@ The current FastAPI app does not mount a `/v1` prefix.
 
 Use:
 
-- `http://localhost:8000/auth/...`
-- `http://localhost:8000/agents/...`
-- `http://localhost:8000/deployments/...`
-- `http://localhost:8000/webhooks/...`
+* `http://localhost:8000/auth/...`
+* `http://localhost:8000/agents/...`
+* `http://localhost:8000/deployments/...`
+* `http://localhost:8000/webhooks/...`
 
 ## Waitlist works locally, but email does not send
 
@@ -76,8 +81,8 @@ If `RESEND_API_KEY` is unset, signups can still be stored in Postgres.
 
 That is expected with the current images.
 
-- `Dockerfile.api` installs `requirements.txt`, not dev extras
-- `package.json` has no `test` script
+* `Dockerfile.api` installs `requirements.txt`, not dev extras
+* `package.json` has no `test` script
 
 Prefer host-side verification:
 

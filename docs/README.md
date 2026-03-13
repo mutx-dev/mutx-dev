@@ -1,10 +1,13 @@
 ---
-description: Code-accurate setup and reference docs for MUTX.
+description: Best entry point for setup, platform references, and operator docs.
+icon: book
 ---
 
 # Documentation Hub
 
-Use this section when you need the code-accurate view of setup, runtime surfaces, and current gaps.
+Use this section when you want the code-accurate view of setup, runtime surfaces, and current gaps.
+
+<table data-view="cards"><thead><tr><th>Title</th><th data-card-target data-type="content-ref">Target</th></tr></thead><tbody><tr><td>Setup and local flow</td><td><a href="deployment/quickstart.md">quickstart.md</a></td></tr><tr><td>API and integration reference</td><td><a href="contracts/api/">api</a></td></tr><tr><td>Platform architecture</td><td><a href="architecture/">architecture</a></td></tr><tr><td>Troubleshooting and support</td><td><a href="troubleshooting/">troubleshooting</a></td></tr></tbody></table>
 
 ## Start here
 
@@ -17,7 +20,6 @@ Use this section when you need the code-accurate view of setup, runtime surfaces
 
 ### Setup and workflow
 
-* [Getting Started](/broken/spaces/lrUGCvqeS10g6J0hLJNu/pages/xRTz2VriUB1xSMzolOyC)
 * [CLI Guide](cli.md)
 * [Deployment](deployment/)
 
