@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { ArrowRight, Github } from 'lucide-react'
+import { ArrowRight, Github, ShieldCheck, Activity, KeyRound, Webhook } from 'lucide-react'
 
 import { AnimatedTerminal } from '@/components/AnimatedTerminal'
 import { WaitlistForm } from '@/components/WaitlistForm'
@@ -16,10 +16,28 @@ const links = [
   { label: 'contact', href: '/contact' },
 ]
 
-const bullets = [
-  'auth, deployments, keys, health, and webhooks in one control plane',
-  'open-source repo, docs, and operator workflows aligned to one product surface',
-  'built for teams that want real agent operations instead of demo theater',
+
+const featureCards = [
+  {
+    icon: ShieldCheck,
+    title: 'real auth boundaries',
+    body: 'Operator sessions, ownership-aware access, and non-browser authentication flows without fake screenshots.',
+  },
+  {
+    icon: Activity,
+    title: 'health that matches reality',
+    body: 'Expose deployment readiness, degraded paths, and recovery state from the same operator surface teams actually use.',
+  },
+  {
+    icon: KeyRound,
+    title: 'api key lifecycle',
+    body: 'Generate, rotate, and revoke keys with quota awareness so demos map cleanly to production workflows.',
+  },
+  {
+    icon: Webhook,
+    title: 'event and webhook control',
+    body: 'Coordinate inbound events, deployments, and downstream automation from one control plane instead of glue code theater.',
+  },
 ]
 
 export default function LandingPage() {
@@ -86,14 +104,17 @@ export default function LandingPage() {
               <WaitlistForm source="hero" compact />
             </div>
 
-            <ul className="mt-8 space-y-3 text-sm leading-6 text-white/58 sm:text-[15px]">
-              {bullets.map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-cyan-300" />
-                  <span>{item}</span>
-                </li>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              {featureCards.map(({ icon: Icon, title, body }) => (
+                <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.24)]">
+                  <div className="mb-3 inline-flex rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-2 text-cyan-200">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <p className="text-sm font-medium uppercase tracking-[0.2em] text-white/70">{title}</p>
+                  <p className="mt-2 text-sm leading-6 text-white/55">{body}</p>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
 
           <div className="relative">
