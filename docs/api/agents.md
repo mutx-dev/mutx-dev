@@ -20,7 +20,7 @@ Runtime-facing agent endpoints such as heartbeat, command polling, log submissio
 | `GET /agents/{agent_id}` | Get one agent with deployments |
 | `GET /agents/{agent_id}/status` | Get runtime status for the authenticated agent |
 | `DELETE /agents/{agent_id}` | Delete an agent |
-| `POST /agents/{agent_id}/deploy` | Create a deployment record and mark the agent running |
+| `POST /agents/{agent_id}/deploy` | Create a deployment record and mark the agent running (legacy agent-centric path) |
 | `POST /agents/{agent_id}/stop` | Stop active deployments for an agent |
 | `GET /agents/{agent_id}/logs` | List agent logs |
 | `GET /agents/{agent_id}/metrics` | List agent metrics |
@@ -90,18 +90,45 @@ If the bearer token belongs to a different agent, the API returns `403 Agent ID 
 
 ## Deploy an Agent
 
+Use the canonical deployments surface for new control-plane integrations:
+
 ```bash
-curl -X POST "$BASE_URL/agents/YOUR_AGENT_ID/deploy"
+curl -X POST "$BASE_URL/deployments"   -H "Content-Type: application/json"   -d '{"agent_id": "YOUR_AGENT_ID", "replicas": 1}'
 ```
 
 Example response:
 
 ```json
 {
-  "deployment_id": "uuid",
-  "status": "deploying"
+  "id": "uuid",
+  "agent_id": "uuid",
+  "status": "pending",
+  "replicas": 1,
+  "node_id": null,
+  "started_at": "2026-03-08T10:00:00Z",
+  "ended_at": null,
+  "error_message": null,
+  "events": [
+    {
+      "id": "uuid",
+      "deployment_id": "uuid",
+      "event_type": "create",
+      "status": "pending",
+      "node_id": null,
+      "error_message": null,
+      "created_at": "2026-03-08T10:00:00Z"
+    }
+  ]
 }
 ```
+
+The legacy agent-centric route remains available for live/demo parity:
+
+```bash
+curl -X POST "$BASE_URL/agents/YOUR_AGENT_ID/deploy"
+```
+
+That route returns a lightweight payload with `deployment_id` and `status`.
 
 ## Stop an Agent
 

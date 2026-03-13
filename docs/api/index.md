@@ -18,7 +18,7 @@ Routes are mounted directly at top-level prefixes. There is no global `/v1` back
 | Auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me` |
 | Agents | `POST /agents`, `GET /agents`, `GET /agents/{agent_id}`, `DELETE /agents/{agent_id}`, `POST /agents/{agent_id}/deploy`, `POST /agents/{agent_id}/stop`, `GET /agents/{agent_id}/logs`, `GET /agents/{agent_id}/metrics` |
 | Agent Runtime | `POST /agents/register`, `POST /agents/heartbeat`, `POST /agents/metrics`, `GET /agents/commands`, `POST /agents/commands/acknowledge`, `POST /agents/logs`, `GET /agents/{agent_id}/status` |
-| Deployments | `GET /deployments`, `GET /deployments/{deployment_id}`, `GET /deployments/{deployment_id}/events`, `POST /deployments/{deployment_id}/scale`, `POST /deployments/{deployment_id}/restart`, `DELETE /deployments/{deployment_id}` |
+| Deployments | `GET /deployments`, `POST /deployments`, `GET /deployments/{deployment_id}`, `GET /deployments/{deployment_id}/events`, `POST /deployments/{deployment_id}/scale`, `POST /deployments/{deployment_id}/restart`, `DELETE /deployments/{deployment_id}` |
 | API Keys | `GET /api-keys`, `POST /api-keys`, `DELETE /api-keys/{key_id}`, `POST /api-keys/{key_id}/rotate` |
 | Webhooks | `GET /webhooks/`, `GET /webhooks/{id}`, `GET /webhooks/{id}/deliveries`, `PATCH /webhooks/{id}`, `DELETE /webhooks/{id}`, `POST /webhooks/{id}/test`, `POST /webhooks/agent-status`, `POST /webhooks/deployment`, `POST /webhooks/metrics` |
 | Newsletter | `GET /newsletter`, `POST /newsletter` |
