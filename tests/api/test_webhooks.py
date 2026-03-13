@@ -1,6 +1,7 @@
 import pytest
 from httpx import AsyncClient
 import uuid
+from datetime import datetime, timedelta
 
 from src.api.auth.jwt import create_access_token
 from src.api.models.models import WebhookDeliveryLog
@@ -171,6 +172,75 @@ async def test_webhook_delivery_history_filters(client: AsyncClient, db_session,
     assert len(data) == 1
     assert data[0]["event"] == "agent.status"
     assert data[0]["success"] is False
+
+
+@pytest.mark.asyncio
+async def test_webhook_delivery_history_honors_skip_limit_and_desc_order(
+    client: AsyncClient, db_session
+):
+    create_response = await client.post(
+        "/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["*"]},
+    )
+    assert create_response.status_code == 201
+    webhook_id = uuid.UUID(create_response.json()["id"])
+
+    now = datetime.now()
+    db_session.add_all(
+        [
+            WebhookDeliveryLog(
+                webhook_id=webhook_id,
+                event="agent.status",
+                payload='{"seq":1}',
+                success=True,
+                attempts=1,
+                created_at=now - timedelta(minutes=3),
+            ),
+            WebhookDeliveryLog(
+                webhook_id=webhook_id,
+                event="agent.status",
+                payload='{"seq":2}',
+                success=False,
+                attempts=1,
+                created_at=now - timedelta(minutes=2),
+            ),
+            WebhookDeliveryLog(
+                webhook_id=webhook_id,
+                event="agent.status",
+                payload='{"seq":3}',
+                success=True,
+                attempts=1,
+                created_at=now - timedelta(minutes=1),
+            ),
+        ]
+    )
+    await db_session.commit()
+
+    response = await client.get(f"/webhooks/{webhook_id}/deliveries?skip=1&limit=1")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["payload"] == '{"seq":2}'
+    assert data[0]["success"] is False
+
+
+@pytest.mark.asyncio
+async def test_webhook_delivery_history_rejects_invalid_pagination_bounds(client: AsyncClient):
+    create_response = await client.post(
+        "/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["*"]},
+    )
+    assert create_response.status_code == 201
+    webhook_id = create_response.json()["id"]
+
+    negative_skip = await client.get(f"/webhooks/{webhook_id}/deliveries?skip=-1")
+    assert negative_skip.status_code == 422
+
+    zero_limit = await client.get(f"/webhooks/{webhook_id}/deliveries?limit=0")
+    assert zero_limit.status_code == 422
+
+    oversized_limit = await client.get(f"/webhooks/{webhook_id}/deliveries?limit=501")
+    assert oversized_limit.status_code == 422
 
 
 @pytest.mark.asyncio
