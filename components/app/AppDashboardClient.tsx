@@ -129,7 +129,8 @@ export function AppDashboardClient() {
   ).length;
   const activeKeys = apiKeys.filter((apiKey) => apiKey.is_active).length;
   const revokedKeys = apiKeys.length - activeKeys;
-  const apiKeyLimit = user.plan === "enterprise" ? null : user.plan === "pro" ? 50 : user.plan === "starter" ? 10 : 2;
+  const userPlan = user?.plan ?? "free";
+  const apiKeyLimit = userPlan === "enterprise" ? null : userPlan === "pro" ? 50 : userPlan === "starter" ? 10 : 2;
   const apiKeyCapacityRemaining = apiKeyLimit === null ? null : Math.max(apiKeyLimit - activeKeys, 0);
   const apiKeyLimitReached = apiKeyLimit === null ? false : activeKeys >= apiKeyLimit;
   const latestDeploymentEvent = deployments
@@ -252,7 +253,7 @@ export function AppDashboardClient() {
       health?.status,
       healthyDeployments,
       runningAgents,
-      user.plan,
+      userPlan,
     ],
   );
 
