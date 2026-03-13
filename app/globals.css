@@ -27,7 +27,7 @@
     background-color: var(--background);
     color: var(--foreground);
     text-rendering: optimizeLegibility;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -59,8 +59,16 @@
     @apply overflow-hidden rounded-xl border border-white/10 bg-black;
   }
 
+  .terminal-grid {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: center center;
+  }
+
   .terminal-line {
-    @apply flex items-start gap-3 whitespace-pre-wrap break-words font-mono text-sm;
+    @apply flex items-start gap-3 whitespace-pre-wrap break-words font-mono text-sm leading-6;
   }
 
   .terminal-prompt {
@@ -77,10 +85,12 @@
 }
 
 @keyframes blink {
-  0%, 49% {
+  0%,
+  49% {
     opacity: 1;
   }
-  50%, 100% {
+  50%,
+  100% {
     opacity: 0;
   }
 }

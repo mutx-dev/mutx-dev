@@ -3,111 +3,100 @@
 import {
   ArrowRight,
   BookOpen,
+  Boxes,
   Database,
   Github,
   GitBranch,
+  HeartPulse,
+  KeyRound,
   Layers3,
   Server,
   Shield,
-  Terminal,
-  CheckCircle2,
+  Webhook,
 } from 'lucide-react'
 import Image from 'next/image'
-import Link from 'next/link'
 
-import { TerminalWindow } from '@/components/TerminalWindow'
+import { AnimatedTerminal } from '@/components/AnimatedTerminal'
 import { WaitlistForm } from '@/components/WaitlistForm'
 
 const GITHUB_URL = 'https://github.com/fortunexbt/mutx-dev'
+const DOCS_URL = 'https://docs.mutx.dev'
 const TWITTER_URL = 'https://x.com/mutxdev'
 
 const navItems = [
-  { label: 'Overview', href: '#overview' },
-  { label: 'What Exists', href: '#platform' },
-  { label: 'Docs', href: 'https://docs.mutx.dev', external: true },
+  { label: 'Surface', href: '#surface' },
+  { label: 'Routes', href: '#routes' },
+  { label: 'Docs', href: DOCS_URL, external: true },
   { label: 'GitHub', href: GITHUB_URL, external: true },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Contact', href: '/contact' },
 ]
 
-const features = [
+const pillars = [
   {
     icon: Shield,
-    title: 'Auth And Access Foundations',
-    description: 'Real login, tokens, current-user flows, and hashed API key lifecycle management already exist in the control plane.',
+    title: 'Auth and ownership',
+    description: 'Current user flows, token auth, ownership-aware agent routes, and API key lifecycle management are already part of the live contract.',
+  },
+  {
+    icon: Boxes,
+    title: 'Agents and deployments',
+    description: 'Agent records, deployment surfaces, deployment events, and operator-visible status are modeled as product routes instead of one-off scripts.',
+  },
+  {
+    icon: HeartPulse,
+    title: 'Health and runtime truth',
+    description: 'Health, readiness, logs, metrics, and heartbeat-oriented runtime status give operators a real place to inspect system state.',
+  },
+  {
+    icon: Webhook,
+    title: 'Webhook ingestion',
+    description: 'Inbound webhook handling and outbound event direction are part of the control-plane shape, not an afterthought bolted onto demos.',
+  },
+]
+
+const routes = [
+  {
+    icon: Server,
+    title: 'FastAPI control plane',
+    description: 'Live route groups cover auth, agents, deployments, API keys, webhook ingestion, newsletter capture, health, and readiness.',
+  },
+  {
+    icon: KeyRound,
+    title: 'CLI and SDK workflows',
+    description: 'The repo ships a Python CLI and SDK so the same control-plane surface can be driven from terminals, scripts, and product UI.',
+  },
+  {
+    icon: Layers3,
+    title: 'Web and app surfaces',
+    description: 'The site, app-facing routes, same-origin proxies, and public docs all live together so product truth is inspectable in one place.',
   },
   {
     icon: Database,
-    title: 'Durable Control-Plane Records',
-    description: 'Users, agents, deployments, logs, metrics, health, and readiness are modeled as product surfaces, not ad hoc scripts.',
-  },
-  {
-    icon: GitBranch,
-    title: 'Open Interfaces',
-    description: 'Website, API, CLI, SDK, and infrastructure code live in one repo so the product contract stays inspectable and fixable.',
+    title: 'Infra in repo',
+    description: 'Docker, Railway, Terraform, and Ansible live alongside the product code so deployment and operator workflow do not disappear behind slides.',
   },
 ]
 
-const capabilities = [
-  {
-    icon: Layers3,
-    title: 'Website And App Host',
-    description: 'The web layer is part of the product: a public landing site, same-origin route proxies, a live waitlist flow, and an app surface preview.',
-  },
-  {
-    icon: Server,
-    title: 'FastAPI Control Plane',
-    description: 'Live route groups cover auth, agents, deployments, API keys, webhook ingestion, newsletter, health, and readiness.',
-  },
-  {
-    icon: Terminal,
-    title: 'CLI, SDK, And Infra Foundations',
-    description: 'Python client surfaces, Docker, Railway, Terraform, Ansible, and monitoring assets make the control plane usable beyond the browser.',
-  },
-]
-
-const roadmap = [
-  {
-    title: 'Now',
-    items: [
-      'Tighten auth and ownership on agents and deployments',
-      'Align CLI and SDK behavior with live API contracts',
-      'Turn the app surface into a real authenticated dashboard',
-      'Make contact and API key workflows more complete',
-    ],
-  },
-  {
-    title: 'Next',
-    items: [
-      'Typed agent configurations',
-      'Deployment events and lifecycle history',
-      'Webhook registration as a real product surface',
-      'Better observability views for logs, metrics, and state changes',
-    ],
-  },
-  {
-    title: 'Later',
-    items: [
-      'Execution and traces APIs for agent runs',
-      'Versioning, rollback, and deployment history UX',
-      'Quota management',
-      'Expanded runtime support and vector or RAG features',
-    ],
-  },
+const proof = [
+  'Docs and route references are public.',
+  'GitHub exposes the current product contract.',
+  'Web, API, CLI, SDK, and infra move in one repo.',
+  'Current-state language is preferred over aspirational marketing.',
 ]
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white/20">
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/75 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-6">
           <div className="flex items-center gap-3">
             <div className="relative h-8 w-8">
               <Image src="/logo.png" alt="MUTX" fill className="object-contain" />
             </div>
-            <span className="text-sm font-semibold tracking-wider">MUTX</span>
+            <span className="text-sm font-semibold tracking-[0.22em] text-white/90">MUTX</span>
           </div>
 
-          <div className="hidden items-center gap-8 text-sm text-white/60 md:flex">
+          <div className="hidden items-center gap-7 text-sm text-white/60 md:flex">
             {navItems.map((item) => (
               <a
                 key={item.label}
@@ -122,10 +111,10 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <a href={GITHUB_URL} target="_blank" rel="noreferrer" aria-label="GitHub" className="text-white/60 hover:text-white transition-colors">
+            <a href={GITHUB_URL} target="_blank" rel="noreferrer" aria-label="GitHub" className="text-white/60 transition-colors hover:text-white">
               <Github className="h-5 w-5" />
             </a>
-            <a href={TWITTER_URL} target="_blank" rel="noreferrer" aria-label="X" className="text-white/60 hover:text-white transition-colors">
+            <a href={TWITTER_URL} target="_blank" rel="noreferrer" aria-label="X" className="text-white/60 transition-colors hover:text-white">
               <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-current">
                 <path d="M18.244 2H21.5l-7.11 8.13L22.75 22h-6.54l-5.12-6.69L5.24 22H2l7.6-8.69L1.25 2h6.71l4.63 6.1L18.244 2Zm-1.147 18h1.803L6.98 3.894H5.045L17.097 20Z" />
               </svg>
@@ -135,172 +124,133 @@ export default function LandingPage() {
       </nav>
 
       <main>
-        {/* Hero Section */}
-        <section className="px-6 pt-32 pb-24 md:pt-48 md:pb-32">
-          <div className="mx-auto max-w-7xl grid gap-16 lg:grid-cols-2 lg:items-center">
+        <section className="px-5 pb-16 pt-24 sm:px-6 md:pb-20 md:pt-28 lg:pb-24 lg:pt-32">
+          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:items-center lg:gap-12">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/80 mb-8">
-                <span>Open-source docs-first control plane</span>
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-100/90 sm:text-xs">
+                <BookOpen className="h-3.5 w-3.5" />
+                Current-state docs, routes, and operator surface
               </div>
-              
-              <h1 className="text-4xl font-medium tracking-tight sm:text-6xl mb-6">
-                The control plane for <br /> operating AI agents.
+
+              <h1 className="max-w-4xl text-4xl font-medium tracking-tight text-white sm:text-5xl lg:text-[4.2rem] lg:leading-[0.94]">
+                Operate AI agents with real control.
               </h1>
-              
-              <p className="text-lg text-white/60 mb-10 leading-relaxed max-w-xl">
-                MUTX is an open-source control plane for teams operating AI agents. Start with the docs and GitHub repo to inspect the current surface area, then join the waitlist or contact us for early access to the hosted operator experience.
+
+              <p className="mt-5 max-w-2xl text-base leading-7 text-white/68 sm:text-lg sm:leading-8">
+                MUTX gives teams a control plane for agent auth, deployments, API keys, webhook ingestion, health, readiness, and operator workflows across web, API, CLI, and SDK surfaces.
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 mb-12">
+              <div className="mt-7 flex flex-wrap items-center gap-3">
                 <a
-                  href={GITHUB_URL}
+                  href={DOCS_URL}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90"
                 >
-                  Inspect the code
-                  <ArrowRight className="h-4 w-4" />
-                </a>
-                <a
-                  href="https://docs.mutx.dev"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/10"
-                >
-                  <GitBranch className="h-4 w-4 opacity-80" />
                   Read the docs
                   <ArrowRight className="h-4 w-4" />
                 </a>
+                <a
+                  href={GITHUB_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/10"
+                >
+                  Inspect the repo
+                  <GitBranch className="h-4 w-4 opacity-80" />
+                </a>
               </div>
 
-              <div className="max-w-md">
-                <p className="mb-4 text-sm leading-relaxed text-white/50">
-                  Public entry points are docs, GitHub, and the waitlist. The dashboard preview is intentionally not the primary path for first-time visitors.
-                </p>
-                <WaitlistForm source="hero" compact />
+              <div className="mt-7 grid gap-3 sm:grid-cols-2">
+                {proof.map((item) => (
+                  <div key={item} className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm leading-6 text-white/70">
+                    <span className="mt-1 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5">
+                      <ArrowRight className="h-3 w-3 text-cyan-200" />
+                    </span>
+                    <span>{item}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
             <div className="relative">
-              <TerminalWindow title="control-plane.sh" path="examples" label="live routes">
-                <pre className="text-sm leading-relaxed">
-BASE_URL=<span className="text-green-400">&quot;http://localhost:8000&quot;</span>{'\n\n'}
-<span className="text-white/40"># Authenticate against the control plane</span>{'\n'}
-curl -X POST <span className="text-green-400">&quot;$BASE_URL/auth/login&quot;</span>{'\n'}
-<span className="text-white/40"># Inspect durable resources</span>{'\n'}
-curl <span className="text-green-400">&quot;$BASE_URL/agents?limit=10&amp;skip=0&quot;</span>{'\n'}
-curl <span className="text-green-400">&quot;$BASE_URL/deployments&quot;</span>{'\n'}
-curl <span className="text-green-400">&quot;$BASE_URL/health&quot;</span>
-                </pre>
-              </TerminalWindow>
+              <AnimatedTerminal />
             </div>
           </div>
         </section>
 
-        <div className="border-t border-white/10" />
-
-        {/* Overview Section */}
-        <section id="overview" className="px-6 py-24 bg-[#050505]">
+        <section id="surface" className="border-t border-white/10 bg-[#050505] px-5 py-16 sm:px-6 md:py-20">
           <div className="mx-auto max-w-7xl">
-            <div className="max-w-3xl mb-16">
-              <h2 className="text-3xl font-medium tracking-tight sm:text-4xl mb-6">Control-plane foundations.</h2>
-              <p className="text-lg text-white/60">
-                MUTX is strongest today where agent projects usually fall apart first: identity, resource modeling, and operator-facing interfaces.
+            <div className="mb-10 flex max-w-3xl flex-col gap-4">
+              <div className="eyebrow w-fit">Control-plane surface</div>
+              <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">The parts operators actually need.</h2>
+              <p className="text-base leading-7 text-white/62 sm:text-lg">
+                The strongest current surface is not a promise deck. It is the set of routes, workflows, and operator primitives already visible in the repo and docs.
               </p>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-3">
-              {features.map((feature) => (
-                <div key={feature.title} className="rounded-xl border border-white/10 bg-[#0a0a0a] p-8 transition-colors hover:bg-[#111111]">
-                  <feature.icon className="h-6 w-6 text-white mb-6" />
-                  <h3 className="text-lg font-medium text-white mb-3">{feature.title}</h3>
-                  <p className="text-white/60 text-sm leading-relaxed">{feature.description}</p>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {pillars.map((pillar) => (
+                <div key={pillar.title} className="rounded-2xl border border-white/10 bg-[#0b0b0b] p-5 transition-colors hover:bg-[#111111]">
+                  <pillar.icon className="mb-4 h-5 w-5 text-cyan-100" />
+                  <h3 className="mb-2 text-base font-medium text-white">{pillar.title}</h3>
+                  <p className="text-sm leading-6 text-white/60">{pillar.description}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Platform Section */}
-        <section id="platform" className="px-6 py-24">
-          <div className="mx-auto max-w-7xl">
-            <div className="max-w-3xl mb-16">
-              <h2 className="text-3xl font-medium tracking-tight sm:text-4xl mb-6">What exists today.</h2>
-              <p className="text-lg text-white/60">
-                What exists today is a real control-plane shell with honest boundaries. Public visitors should start in docs and GitHub; the dashboard remains a preview while the operator surface matures.
+        <section id="routes" className="px-5 py-16 sm:px-6 md:py-20">
+          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14">
+            <div className="max-w-xl">
+              <div className="eyebrow mb-4">Live route shape</div>
+              <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">Web, API, CLI, SDK, and infra stay in one frame.</h2>
+              <p className="mt-4 text-base leading-7 text-white/62 sm:text-lg">
+                MUTX is most credible when the public site matches the implementation. That means auth, agents, deployments, API keys, webhooks, health, and readiness are described the same way they are shipped.
               </p>
             </div>
 
-            <div className="grid gap-8 lg:grid-cols-3">
-              {capabilities.map((cap) => (
-                <div key={cap.title} className="flex flex-col border-l border-white/10 pl-6">
-                  <cap.icon className="h-5 w-5 text-white/80 mb-4" />
-                  <h3 className="text-base font-medium text-white mb-2">{cap.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{cap.description}</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {routes.map((route) => (
+                <div key={route.title} className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                  <route.icon className="mb-4 h-5 w-5 text-white/85" />
+                  <h3 className="mb-2 text-base font-medium text-white">{route.title}</h3>
+                  <p className="text-sm leading-6 text-white/60">{route.description}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <div className="border-t border-white/10" />
-
-        {/* Roadmap Section */}
-        <section id="roadmap" className="px-6 py-24 bg-[#050505]">
-          <div className="mx-auto max-w-7xl">
-            <div className="max-w-3xl mb-16">
-              <h2 className="text-3xl font-medium tracking-tight sm:text-4xl mb-6">Development Roadmap.</h2>
-              <p className="text-lg text-white/60">
-                We publish the roadmap the same way we build the product: current-state first, target-state second, with the biggest gaps called out clearly.
+        <section className="border-y border-white/10 bg-[#050505] px-5 py-16 sm:px-6 md:py-20">
+          <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:items-start lg:gap-12">
+            <div className="max-w-xl">
+              <div className="eyebrow mb-4">Operator entry points</div>
+              <h2 className="text-3xl font-medium tracking-tight sm:text-4xl">Start with docs and source. Use the form when you need the hosted path.</h2>
+              <p className="mt-4 text-base leading-7 text-white/62 sm:text-lg">
+                The fastest way to understand MUTX is still the docs, route references, and repo. If you want launch updates, hosted access, or a direct fit conversation, use the contact and waitlist path.
               </p>
-            </div>
 
-            <div className="grid gap-8 md:grid-cols-3">
-              {roadmap.map((phase) => (
-                <div key={phase.title} className="rounded-xl border border-white/10 bg-black p-8">
-                  <h3 className="text-lg font-medium text-white mb-6">{phase.title}</h3>
-                  <ul className="space-y-4">
-                    {phase.items.map((item) => (
-                      <li key={item} className="flex gap-3 text-sm text-white/60">
-                        <CheckCircle2 className="h-4 w-4 text-white/40 shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Contribute Section */}
-        <section id="contribute" className="px-6 py-32 border-t border-white/10 text-center">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-medium tracking-tight sm:text-5xl mb-6">Build with MUTX.</h2>
-            <p className="text-lg text-white/60 mb-10 leading-relaxed">
-              Join the waitlist for launch updates, docs changes, and early hosted access. If you are evaluating MUTX today, start with the docs and repository, then contact us for fit questions.
-            </p>
-            <div className="flex justify-center">
-              <div className="w-full max-w-md text-left">
-                <WaitlistForm source="footer" />
+              <div className="mt-6 flex flex-wrap gap-3 text-sm text-white/70">
+                <a href={DOCS_URL} target="_blank" rel="noreferrer" className="stat-pill transition hover:border-white/20 hover:bg-white/10">
+                  Docs
+                </a>
+                <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="stat-pill transition hover:border-white/20 hover:bg-white/10">
+                  GitHub
+                </a>
+                <a href="/contact" className="stat-pill transition hover:border-white/20 hover:bg-white/10">
+                  Contact
+                </a>
               </div>
+            </div>
+
+            <div className="max-w-lg lg:justify-self-end">
+              <WaitlistForm source="hero" compact />
             </div>
           </div>
         </section>
       </main>
-
-      <footer id="contact" className="border-t border-white/10 py-8 px-6 text-sm text-white/40 text-center flex flex-col items-center gap-4">
-        <div className="flex items-center gap-2">
-          <Image src="/logo.png" alt="mutx.dev" width={20} height={20} className="object-contain" />
-          <span>MUTX Open-Source Agent Control Plane</span>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-6">
-          <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub</a>
-          <a href="https://docs.mutx.dev" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">Docs</a>
-          <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
-          <a href="mailto:hello.dev" className="hover:text-white transition-colors">Contact</a>
-        </div>
-      </footer>
     </div>
   )
 }
