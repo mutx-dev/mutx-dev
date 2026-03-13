@@ -16,6 +16,8 @@ const links = [
   { label: 'contact', href: '/contact' },
 ]
 
+const DEMO_COMMAND = 'npm run demo:validate'
+
 const featureCards = [
   {
     icon: ShieldCheck,
@@ -163,6 +165,15 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-8 rounded-[28px] border border-cyan-400/15 bg-cyan-400/[0.06] p-5 shadow-[0_20px_80px_rgba(0,0,0,0.24)]">
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/20 bg-black/30 p-3">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-cyan-200/75">morning demo</p>
+                  <p className="mt-1 text-sm text-white/80">Run this once in the morning before walkthroughs:</p>
+                  <code className="mt-2 inline-flex rounded-lg border border-white/10 bg-black/35 px-3 py-2 font-mono text-xs text-cyan-100">
+                    {DEMO_COMMAND}
+                  </code>
+                </div>
+              </div>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-200/75">live demo path</p>
