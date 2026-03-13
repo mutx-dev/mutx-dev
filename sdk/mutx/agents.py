@@ -54,7 +54,9 @@ class Deployment:
         self.status = data["status"]
         self.replicas = data["replicas"]
         self.node_id = data.get("node_id")
-        self.started_at = datetime.fromisoformat(data["started_at"]) if data.get("started_at") else None
+        self.started_at = (
+            datetime.fromisoformat(data["started_at"]) if data.get("started_at") else None
+        )
         self.ended_at = datetime.fromisoformat(data["ended_at"]) if data.get("ended_at") else None
         self.error_message = data.get("error_message")
         self.events = [DeploymentEvent(item) for item in data.get("events", [])]
@@ -95,11 +97,15 @@ class Agents:
 
     @staticmethod
     def _required_sync_client() -> None:
-        raise RuntimeError("This resource requires a sync httpx.Client. For async clients, use the `a*` methods")
+        raise RuntimeError(
+            "This resource requires a sync httpx.Client. For async clients, use the `a*` methods"
+        )
 
     @staticmethod
     def _required_async_client() -> None:
-        raise RuntimeError("This async resource helper requires an async httpx.AsyncClient and an `a*` method call")
+        raise RuntimeError(
+            "This async resource helper requires an async httpx.AsyncClient and an `a*` method call"
+        )
 
     def _require_sync_client(self) -> None:
         if isinstance(self._client, httpx.AsyncClient):

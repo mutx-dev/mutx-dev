@@ -47,11 +47,15 @@ class APIKeys:
 
     @staticmethod
     def _required_sync_client() -> None:
-        raise RuntimeError("This resource requires a sync httpx.Client. For async clients, use the `a*` methods")
+        raise RuntimeError(
+            "This resource requires a sync httpx.Client. For async clients, use the `a*` methods"
+        )
 
     @staticmethod
     def _required_async_client() -> None:
-        raise RuntimeError("This async resource helper requires an async httpx.AsyncClient and an `a*` method call")
+        raise RuntimeError(
+            "This async resource helper requires an async httpx.AsyncClient and an `a*` method call"
+        )
 
     def _require_sync_client(self) -> None:
         if isinstance(self._client, httpx.AsyncClient):

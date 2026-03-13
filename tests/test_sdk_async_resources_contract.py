@@ -83,7 +83,9 @@ async def test_agents_async_methods_are_awaited_with_async_client() -> None:
         captured["json"] = json.loads(request.content.decode())
         return httpx.Response(201, json=_agent_payload(name="async-agent"))
 
-    async with httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+    async with httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
         agents = Agents(client)
         agent = await agents.acreate(name="async-agent", config={"model": "gpt-4o"})
 
@@ -96,9 +98,11 @@ async def test_agents_async_methods_are_awaited_with_async_client() -> None:
 @pytest.mark.asyncio
 async def test_agents_sync_methods_reject_async_transport() -> None:
     async def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json=[]) 
+        return httpx.Response(200, json=[])
 
-    async with httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+    async with httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
         agents = Agents(client)
         with pytest.raises(RuntimeError, match="sync httpx.Client"):
             agents.list()
@@ -113,7 +117,9 @@ async def test_deployments_async_methods_are_awaited_with_async_client() -> None
         captured["json"] = request.url.query.params if request.url.query else {}
         return httpx.Response(201, json=_deployment_payload())
 
-    async with httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+    async with httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
         deployments = Deployments(client)
         deployment = await deployments.acreate(str(uuid.uuid4()), replicas=2)
 
@@ -130,7 +136,9 @@ async def test_api_keys_async_methods_are_awaited_with_async_client() -> None:
         captured["json"] = json.loads(request.content.decode())
         return httpx.Response(201, json=_api_key_payload(key="mutx_test_key"))
 
-    async with httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+    async with httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
         api_keys = APIKeys(client)
         key = await api_keys.acreate("test-key")
 
@@ -148,7 +156,9 @@ async def test_webhooks_async_methods_are_awaited_with_async_client() -> None:
         captured["json"] = json.loads(request.content.decode()) if request.content else {}
         return httpx.Response(201, json=_webhook_payload())
 
-    async with httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+    async with httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
         webhooks = Webhooks(client)
         webhook = await webhooks.acreate(url="https://example.com/hook", events=["agent.started"])
 
