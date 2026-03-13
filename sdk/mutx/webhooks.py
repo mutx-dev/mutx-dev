@@ -23,39 +23,23 @@ class Webhook:
         return f"Webhook(id={self.id}, url={self.url}, is_active={self.is_active})"
 
 
-class WebhookEvent:
-    def __init__(self, data: dict[str, Any]):
-        self.id = UUID(data["id"])
-        self.webhook_id = UUID(data["webhook_id"])
-        self.event_type = data["event_type"]
-        self.payload = data.get("payload", {})
-        self.delivered = data.get("delivered", False)
-        self.created_at = datetime.fromisoformat(data["created_at"])
-        self._data = data
-
-
 class WebhookDelivery:
     def __init__(self, data: dict[str, Any]):
         self.id = UUID(data["id"])
         self.webhook_id = UUID(data["webhook_id"])
         self.event = data["event"]
-        self.payload = data.get("payload")
-        self.success = data.get("success", False)
+        self.payload = data["payload"]
         self.status_code = data.get("status_code")
-        self.response_body = data.get("response_body")
+        self.success = data["success"]
         self.error_message = data.get("error_message")
-        self.attempts = data.get("attempts")
-        self.delivered_at = (
-            datetime.fromisoformat(data["delivered_at"]) if data.get("delivered_at") else None
-        )
+        self.attempts = data["attempts"]
         self.created_at = datetime.fromisoformat(data["created_at"])
+        delivered_at = data.get("delivered_at")
+        self.delivered_at = datetime.fromisoformat(delivered_at) if delivered_at else None
         self._data = data
 
     def __repr__(self) -> str:
-        return (
-            f"WebhookDelivery(id={self.id}, event={self.event}, success={self.success}, "
-            f"status_code={self.status_code})"
-        )
+        return f"WebhookDelivery(id={self.id}, event={self.event}, success={self.success})"
 
 
 class Webhooks:
@@ -101,19 +85,6 @@ class Webhooks:
     def delete(self, webhook_id: UUID | str) -> None:
         response = self._client.delete(f"/webhooks/{webhook_id}")
         response.raise_for_status()
-
-    def get_events(
-        self,
-        webhook_id: UUID | str,
-        skip: int = 0,
-        limit: int = 50,
-    ) -> list[WebhookEvent]:
-        response = self._client.get(
-            f"/webhooks/{webhook_id}/events",
-            params={"skip": skip, "limit": limit},
-        )
-        response.raise_for_status()
-        return [WebhookEvent(data) for data in response.json()]
 
     def get_deliveries(
         self,
