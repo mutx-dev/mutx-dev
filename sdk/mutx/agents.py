@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
-from typing import Any, Callable, Generator, Optional
+from typing import Any, AsyncGenerator, Callable, Generator, Optional
 from uuid import UUID
 
 import httpx
@@ -36,7 +36,7 @@ class Agent:
 
 
 class DeploymentEvent:
-    def __init__(self, data: dict[str, Any]):
+    def __init__(self, data: dict[str, Any]) -> None:
         self.id = UUID(data["id"])
         self.deployment_id = UUID(data["deployment_id"])
         self.event_type = data["event_type"]
@@ -95,6 +95,26 @@ class Agents:
     def __init__(self, client: httpx.Client | httpx.AsyncClient):
         self._client = client
 
+    @staticmethod
+    def _required_sync_client() -> None:
+        raise RuntimeError(
+            "This resource requires a sync httpx.Client. For async clients, use the `a*` methods"
+        )
+
+    @staticmethod
+    def _required_async_client() -> None:
+        raise RuntimeError(
+            "This async resource helper requires an async httpx.AsyncClient and an `a*` method call"
+        )
+
+    def _require_sync_client(self) -> None:
+        if isinstance(self._client, httpx.AsyncClient):
+            self._required_sync_client()
+
+    def _require_async_client(self) -> None:
+        if not isinstance(self._client, httpx.AsyncClient):
+            self._required_async_client()
+
     def create(
         self,
         name: str,
@@ -102,7 +122,28 @@ class Agents:
         type: str = "openai",
         config: Optional[dict[str, Any] | str] = None,
     ) -> Agent:
+        self._require_sync_client()
         response = self._client.post(
+            "/agents",
+            json={
+                "name": name,
+                "description": description,
+                "type": type,
+                "config": config,
+            },
+        )
+        response.raise_for_status()
+        return Agent(response.json())
+
+    async def acreate(
+        self,
+        name: str,
+        description: Optional[str] = None,
+        type: str = "openai",
+        config: Optional[dict[str, Any] | str] = None,
+    ) -> Agent:
+        self._require_async_client()
+        response = await self._client.post(
             "/agents",
             json={
                 "name": name,
@@ -120,6 +161,7 @@ class Agents:
         limit: int = 50,
         user_id: Optional[str] = None,
     ) -> list[Agent]:
+        self._require_sync_client()
         response = self._client.get(
             "/agents",
             params={"skip": skip, "limit": limit, "user_id": user_id},
@@ -127,22 +169,63 @@ class Agents:
         response.raise_for_status()
         return [Agent(data) for data in response.json()]
 
+    async def alist(
+        self,
+        skip: int = 0,
+        limit: int = 50,
+        user_id: Optional[str] = None,
+    ) -> list[Agent]:
+        self._require_async_client()
+        response = await self._client.get(
+            "/agents",
+            params={"skip": skip, "limit": limit, "user_id": user_id},
+        )
+        response.raise_for_status()
+        return [Agent(data) for data in response.json()]
+
     def get(self, agent_id: UUID | str) -> AgentDetail:
+        self._require_sync_client()
         response = self._client.get(f"/agents/{agent_id}")
         response.raise_for_status()
         return AgentDetail(response.json())
 
+    async def aget(self, agent_id: UUID | str) -> AgentDetail:
+        self._require_async_client()
+        response = await self._client.get(f"/agents/{agent_id}")
+        response.raise_for_status()
+        return AgentDetail(response.json())
+
     def delete(self, agent_id: UUID | str) -> None:
+        self._require_sync_client()
         response = self._client.delete(f"/agents/{agent_id}")
         response.raise_for_status()
 
+    async def adelete(self, agent_id: UUID | str) -> None:
+        self._require_async_client()
+        response = await self._client.delete(f"/agents/{agent_id}")
+        response.raise_for_status()
+
     def deploy(self, agent_id: UUID | str) -> dict[str, Any]:
+        self._require_sync_client()
         response = self._client.post(f"/agents/{agent_id}/deploy")
         response.raise_for_status()
         return response.json()
 
+    async def adeploy(self, agent_id: UUID | str) -> dict[str, Any]:
+        self._require_async_client()
+        response = await self._client.post(f"/agents/{agent_id}/deploy")
+        response.raise_for_status()
+        return response.json()
+
     def stop(self, agent_id: UUID | str) -> dict[str, Any]:
+        self._require_sync_client()
         response = self._client.post(f"/agents/{agent_id}/stop")
+        response.raise_for_status()
+        return response.json()
+
+    async def astop(self, agent_id: UUID | str) -> dict[str, Any]:
+        self._require_async_client()
+        response = await self._client.post(f"/agents/{agent_id}/stop")
         response.raise_for_status()
         return response.json()
 
@@ -153,7 +236,23 @@ class Agents:
         limit: int = 100,
         level: Optional[str] = None,
     ) -> list[AgentLog]:
+        self._require_sync_client()
         response = self._client.get(
+            f"/agents/{agent_id}/logs",
+            params={"skip": skip, "limit": limit, "level": level},
+        )
+        response.raise_for_status()
+        return [AgentLog(data) for data in response.json()]
+
+    async def alogs(
+        self,
+        agent_id: UUID | str,
+        skip: int = 0,
+        limit: int = 100,
+        level: Optional[str] = None,
+    ) -> list[AgentLog]:
+        self._require_async_client()
+        response = await self._client.get(
             f"/agents/{agent_id}/logs",
             params={"skip": skip, "limit": limit, "level": level},
         )
@@ -166,7 +265,22 @@ class Agents:
         skip: int = 0,
         limit: int = 100,
     ) -> list[AgentMetric]:
+        self._require_sync_client()
         response = self._client.get(
+            f"/agents/{agent_id}/metrics",
+            params={"skip": skip, "limit": limit},
+        )
+        response.raise_for_status()
+        return [AgentMetric(data) for data in response.json()]
+
+    async def ametrics(
+        self,
+        agent_id: UUID | str,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> list[AgentMetric]:
+        self._require_async_client()
+        response = await self._client.get(
             f"/agents/{agent_id}/metrics",
             params={"skip": skip, "limit": limit},
         )
@@ -179,7 +293,20 @@ class Agents:
         callback: Callable[[AgentLog], None],
         level: Optional[str] = None,
     ) -> Generator[AgentLog, None, None]:
+        self._require_sync_client()
         logs = self.logs(agent_id=agent_id, limit=500, level=level)
+        for log in logs:
+            callback(log)
+            yield log
+
+    async def astream_logs(
+        self,
+        agent_id: UUID | str,
+        callback: Callable[[AgentLog], None],
+        level: Optional[str] = None,
+    ) -> AsyncGenerator[AgentLog, None]:
+        self._require_async_client()
+        logs = await self.alogs(agent_id=agent_id, limit=500, level=level)
         for log in logs:
             callback(log)
             yield log
