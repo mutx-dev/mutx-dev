@@ -113,9 +113,14 @@ const walkthroughSteps = [
       "Verify agent records, deployment status, and the freshest deployment events before claiming anything is live.",
   },
   {
-    title: "Confirm health and API key posture",
+    title: "Prove non-browser API access",
     description:
-      "Check readiness, health, and API key capacity from the same surface so the operator handoff stays honest.",
+      "Generate or rotate an operator key, copy the one-time secret, and show the quota and audit trail updating live.",
+  },
+  {
+    title: "Close the loop on recovery",
+    description:
+      "Refresh health after a deployment change so operators can confirm the system recovered from the same control surface.",
   },
 ] as const;
 
@@ -147,10 +152,9 @@ export function AppDashboardClient() {
   ).length;
   const activeKeys = apiKeys.filter((apiKey) => apiKey.is_active).length;
   const revokedKeys = apiKeys.length - activeKeys;
-  const userPlan = user?.plan ?? "free";
-  const apiKeyLimit = userPlan === "enterprise" ? null : userPlan === "pro" ? 50 : userPlan === "starter" ? 10 : 2;
-  const apiKeyCapacityRemaining = apiKeyLimit === null ? null : Math.max(apiKeyLimit - activeKeys, 0);
-  const apiKeyLimitReached = apiKeyLimit === null ? false : activeKeys >= apiKeyLimit;
+  const apiKeyLimit = 10;
+  const apiKeyCapacityRemaining = Math.max(apiKeyLimit - activeKeys, 0);
+  const apiKeyLimitReached = activeKeys >= apiKeyLimit;
   const latestDeploymentEvent = deployments
     .flatMap((deployment) => deployment.events ?? [])
     .sort(
@@ -159,6 +163,55 @@ export function AppDashboardClient() {
     )[0];
   const newestActiveKey = apiKeys.find((apiKey) => apiKey.is_active) ?? null;
   const newestRevokedKey = [...apiKeys].reverse().find((apiKey) => !apiKey.is_active) ?? null;
+  const operatorReadiness = useMemo(() => {
+    if (!user) {
+      return {
+        label: "auth required",
+        tone: "bg-amber-400/10 text-amber-300 border-amber-400/20",
+        detail: "Open an operator session to unlock live fleet, health, and key state.",
+      };
+    }
+
+    if (health?.status !== "healthy") {
+      return {
+        label: "recovery path",
+        tone: "bg-rose-400/10 text-rose-300 border-rose-400/20",
+        detail: health?.error
+          ? `Health check reports ${health.error}.`
+          : "Control plane health still needs recovery confirmation.",
+      };
+    }
+
+    if (!agents.length || !deployments.length) {
+      return {
+        label: "seed demo data",
+        tone: "bg-amber-400/10 text-amber-300 border-amber-400/20",
+        detail: "Auth is live, but the operator story gets stronger once agents and deployments exist.",
+      };
+    }
+
+    if (activeKeys === 0) {
+      return {
+        label: "issue first key",
+        tone: "bg-cyan-400/10 text-cyan-200 border-cyan-400/20",
+        detail: "Fleet truth is visible. Generate an API key to complete the non-browser control path.",
+      };
+    }
+
+    if (apiKeyLimitReached) {
+      return {
+        label: "quota edge proven",
+        tone: "bg-amber-400/10 text-amber-300 border-amber-400/20",
+        detail: "Key quota is saturated. Rotate or revoke one key live to show recovery from the limit edge.",
+      };
+    }
+
+    return {
+      label: "demo ready",
+      tone: "bg-emerald-400/10 text-emerald-300 border-emerald-400/20",
+      detail: "Auth, fleet, health, and API key lifecycle are all visible from one operator surface.",
+    };
+  }, [activeKeys, agents.length, apiKeyLimitReached, deployments.length, health?.error, health?.status, user]);
   const authBoundaryDetail = useMemo(() => {
     if (user?.email) return `Signed in as ${user.email}`;
     if (error) return error;
@@ -661,6 +714,40 @@ export function AppDashboardClient() {
           {error}
         </div>
       ) : null}
+
+      <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-cyan-400/[0.12] via-black/40 to-emerald-400/[0.08] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.24)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-200/75">
+              operator demo readiness
+            </p>
+            <h3 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+              Keep the story honest from auth to recovery.
+            </h3>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
+              Show the product in the order an operator actually uses it: establish the session, verify fleet truth, prove non-browser key control, then refresh health after a change.
+            </p>
+          </div>
+          <div className={`inline-flex items-center rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.24em] ${operatorReadiness.tone}`}>
+            {operatorReadiness.label}
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-3 xl:grid-cols-[1.2fr_0.8fr]">
+          <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400">current focus</p>
+            <p className="mt-2 text-sm text-white">{operatorReadiness.detail}</p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-black/25 p-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-400">latest deployment event</p>
+            <p className="mt-2 text-sm text-white">
+              {latestDeploymentEvent
+                ? `${latestDeploymentEvent.event_type} · ${formatRelativeDate(latestDeploymentEvent.created_at)}`
+                : "No deployment event exposed yet"}
+            </p>
+          </div>
+        </div>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {summary.map(({ label, value, detail, icon: Icon }) => (

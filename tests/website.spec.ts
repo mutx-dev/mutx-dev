@@ -42,13 +42,29 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('link', { name: /inspect repo/i })).toBeVisible();
   });
 
-  test('landing page does not expose deprecated waitlist hero', async ({ page }) => {
+  test('landing page exposes live demo path and hero waitlist capture', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByTestId('waitlist-form-hero')).toHaveCount(0);
-    await expect(page.locator('input[type="email"]')).toHaveCount(0);
-    await expect(page.getByText(/waitlist verification is unavailable right now/i)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /view demo path/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /open operator app/i })).toBeVisible();
+    await expect(page.getByText(/demo walkthrough/i)).toBeVisible();
+    await expect(page.getByText(/demo checkpoints/i)).toBeVisible();
+    await expect(page.getByTestId('waitlist-form-hero')).toBeVisible();
+    await expect(page.locator('input[type="email"]')).toHaveCount(1);
+  });
+
+  test('operator app exposes dashboard walkthrough and readiness surfaces', async ({ page }) => {
+    await page.goto('/app');
+    await page.waitForLoadState('domcontentloaded');
+
+    await expect(page.getByRole('heading', { name: /real authenticated operations/i })).toBeVisible();
+    await expect(page.getByText(/mission control/i)).toBeVisible();
+    await expect(page.getByText(/demo walkthrough/i)).toBeVisible();
+    await expect(page.getByText(/step 1/i)).toBeVisible();
+    await expect(page.getByText(/step 4/i)).toBeVisible();
+    await expect(page.getByText(/auth required/i)).toBeVisible();
+    await expect(page.getByText(/checking for an existing operator session/i)).toBeVisible();
   });
 
   test('no console errors', async ({ page }) => {
