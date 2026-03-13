@@ -152,10 +152,9 @@ export function AppDashboardClient() {
   ).length;
   const activeKeys = apiKeys.filter((apiKey) => apiKey.is_active).length;
   const revokedKeys = apiKeys.length - activeKeys;
-  const userPlan = user?.plan ?? "free";
-  const apiKeyLimit = userPlan === "enterprise" ? null : userPlan === "pro" ? 50 : userPlan === "starter" ? 10 : 2;
-  const apiKeyCapacityRemaining = apiKeyLimit === null ? null : Math.max(apiKeyLimit - activeKeys, 0);
-  const apiKeyLimitReached = apiKeyLimit === null ? false : activeKeys >= apiKeyLimit;
+  const apiKeyLimit = 10;
+  const apiKeyCapacityRemaining = Math.max(apiKeyLimit - activeKeys, 0);
+  const apiKeyLimitReached = activeKeys >= apiKeyLimit;
   const latestDeploymentEvent = deployments
     .flatMap((deployment) => deployment.events ?? [])
     .sort(
