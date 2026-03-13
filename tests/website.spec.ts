@@ -30,43 +30,25 @@ test.describe('mutx.dev QA', () => {
     });
   });
 
-  test('homepage loads and renders waitlist signup', async ({ page }) => {
+  test('homepage loads and renders landing operator surface', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
     const h1 = page.locator('h1');
     await expect(h1).toBeVisible({ timeout: 10000 });
 
-    const emailInput = page.locator('input[type="email"]').first();
-    await expect(emailInput).toBeVisible();
-
-    const waitlistForm = page.getByTestId('waitlist-form-hero');
-    await expect(waitlistForm).toBeVisible();
-
-    const submitBtn = waitlistForm.locator('button[type="submit"]');
-    await expect(submitBtn).toBeVisible();
+    await expect(page.getByText(/open-source agent control plane/i)).toBeVisible();
+    await expect(page.getByRole('link', { name: /read docs/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /inspect repo/i })).toBeVisible();
   });
 
-  test('waitlist verification failure is surfaced to the user', async ({ page }) => {
-    await page.route('**/api/turnstile/site-key', async (route) => {
-      await route.fulfill({
-        status: 503,
-        contentType: 'application/json',
-        body: JSON.stringify({ siteKey: '' }),
-      });
-    });
-
+  test('landing page does not expose deprecated waitlist hero', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    const waitlistForm = page.getByTestId('waitlist-form-hero');
-    await expect(waitlistForm).toBeVisible();
-    await expect(
-      waitlistForm.getByText(/waitlist verification is unavailable right now/i)
-    ).toBeVisible();
-
-    const submitBtn = waitlistForm.locator('button[type="submit"]');
-    await expect(submitBtn).toBeDisabled();
+    await expect(page.getByTestId('waitlist-form-hero')).toHaveCount(0);
+    await expect(page.locator('input[type="email"]')).toHaveCount(0);
+    await expect(page.getByText(/waitlist verification is unavailable right now/i)).toHaveCount(0);
   });
 
   test('no console errors', async ({ page }) => {

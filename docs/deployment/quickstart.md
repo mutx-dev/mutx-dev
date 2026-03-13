@@ -41,7 +41,15 @@ DATABASE_URL=postgresql://mutx:mutx_password@localhost:5432/mutx
 {% endstep %}
 
 {% step %}
-### Start local services
+### Start the local demo stack
+
+Use the repo's canonical bootstrap script when you want the fastest morning-demo path:
+
+```bash
+./scripts/dev.sh
+```
+
+If you prefer to run services manually, start the local dependencies first:
 
 ```bash
 docker compose -f infrastructure/docker/docker-compose.yml up -d postgres redis
@@ -115,10 +123,16 @@ curl -X POST http://localhost:8000/agents \
   }'
 ```
 
-Deploy it:
+Deploy it (either route works; the CLI uses the canonical `/deployments` create flow):
 
 ```bash
 curl -X POST http://localhost:8000/agents/YOUR_AGENT_ID/deploy
+
+# or
+curl -X POST http://localhost:8000/deployments \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"agent_id":"YOUR_AGENT_ID","replicas":1}'
 ```
 
 Inspect the result:
@@ -142,9 +156,7 @@ mutx login --email you@example.com
 mutx whoami
 ```
 
-{% hint style="warning" %}
-`mutx deploy create` still reflects older API assumptions. Prefer `mutx agents deploy` or the direct API route.
-{% endhint %}
+`mutx deploy create` now targets the current `POST /deployments` route. See `docs/cli.md` for the current support matrix.
 
 ### Frontend verification
 
@@ -153,12 +165,18 @@ npm run lint
 npm run build
 ```
 
-### Playwright smoke tests
+## Optional: validation commands
+
+Quick discovery for the hosted smoke suite:
 
 ```bash
 npx playwright test --list
 ```
 
-{% hint style="info" %}
-Current Playwright specs target `https://mutx.dev`, not localhost.
-{% endhint %}
+Full repo validation:
+
+```bash
+./scripts/test.sh
+```
+
+Important: the checked-in Playwright smoke suite is part of the repo validation path and currently exercises the hosted surface, not a localhost browser flow.

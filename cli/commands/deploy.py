@@ -58,14 +58,7 @@ def list_deployments(limit: int, skip: int, agent_id: Optional[str], status: Opt
     default=1,
     help="Requested replica count. Supported via /deployments create route.",
 )
-@click.option(
-    "--route",
-    type=click.Choice(["deployments", "agent"], case_sensitive=False),
-    default="deployments",
-    show_default=True,
-    help="Backend route to use: canonical /deployments or legacy/live /agents/{agent_id}/deploy.",
-)
-def create_deployment(agent_id: str, replicas: int, route: str):
+def create_deployment(agent_id: str, replicas: int):
     """Create a new deployment"""
     config = CLIConfig()
     if not config.is_authenticated():
@@ -73,11 +66,7 @@ def create_deployment(agent_id: str, replicas: int, route: str):
         return
 
     client = get_client(config)
-
-    if route == "deployments":
-        response = client.post("/deployments", json={"agent_id": agent_id, "replicas": replicas})
-    else:
-        response = client.post(f"/agents/{agent_id}/deploy")
+    response = client.post("/deployments", json={"agent_id": agent_id, "replicas": replicas})
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -88,11 +77,6 @@ def create_deployment(agent_id: str, replicas: int, route: str):
         deployment_id = result.get("deployment_id") or result.get("id")
         click.echo(f"Created deployment: {deployment_id}")
         click.echo(f"Status: {result.get('status')}")
-        if route == "agent" and replicas != 1:
-            click.echo(
-                "Note: /agents/{agent_id}/deploy currently ignores --replicas and starts with 1 replica.",
-                err=True,
-            )
     elif response.status_code == 404:
         click.echo("Error: Agent not found", err=True)
     else:
@@ -183,6 +167,34 @@ def deployment_events(
                     ]
                 )
             )
+    elif response.status_code == 404:
+        click.echo("Error: Deployment not found", err=True)
+    else:
+        click.echo(f"Error: {response.text}", err=True)
+
+
+@deploy_group.command(name="restart")
+@click.argument("deployment_id")
+def restart_deployment(deployment_id: str):
+    """Restart a deployment"""
+    config = CLIConfig()
+    if not config.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        return
+
+    client = get_client(config)
+    response = client.post(f"/deployments/{deployment_id}/restart")
+
+    if response.status_code == 401:
+        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+        return
+
+    if response.status_code == 200:
+        deployment = response.json()
+        click.echo(f"Restarted deployment: {deployment.get('id', deployment_id)}")
+        click.echo(f"Status: {deployment.get('status')}")
+    elif response.status_code == 400:
+        click.echo(f"Error: {response.json().get('detail', 'Cannot restart deployment')}", err=True)
     elif response.status_code == 404:
         click.echo("Error: Deployment not found", err=True)
     else:

@@ -42,19 +42,21 @@ curl -X POST http://localhost:8000/agents \
 
 ## `mutx deploy create` returns route errors
 
-Current cause: that command still targets an older `/api/v1/...` path.
+This should no longer happen on current mainline: `mutx deploy create` now targets `POST /deployments`.
 
-Use the API or `mutx agents deploy` instead:
+If you still see route errors, reinstall the CLI from the current repo checkout and retry:
 
 ```bash
-curl -X POST http://localhost:8000/agents/YOUR_AGENT_ID/deploy
+source .venv/bin/activate
+pip install -e .
+mutx deploy create --agent-id YOUR_AGENT_ID --replicas 1
 ```
 
 ## Playwright fails against localhost
 
-Current cause: `playwright.config.ts` points to `https://mutx.dev`.
+Current cause: the checked-in Playwright smoke suite is aligned to the hosted MUTX surface, not the local dev server.
 
-Use it as a production smoke suite unless you first rewrite the config and tests for local URLs.
+Use `./scripts/dev.sh` for the canonical local demo path. Use the Playwright suite as part of `./scripts/test.sh` when you want repo validation against the hosted smoke target.
 
 ```bash
 npx playwright test --list
@@ -87,6 +89,5 @@ That is expected with the current images.
 Prefer host-side verification:
 
 ```bash
-npm run build
-python3 -m pytest --collect-only -q
+./scripts/test.sh
 ```

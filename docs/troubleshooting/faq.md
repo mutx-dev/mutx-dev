@@ -19,13 +19,12 @@ No. The current FastAPI app mounts plain routes such as `/auth`, `/agents`, `/de
 
 ## Can I use the CLI for everything?
 
-Not yet. Core auth and listing flows work well, but some commands still reflect older API assumptions.
+Not yet. Core auth and deployment flows work well, but some commands still lag the current API surface.
 
-The two biggest gaps right now are:
+Current examples:
 
-* `mutx deploy create` still points at an older `/api/v1/...` route
-
-`mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`.
+- `mutx deploy create` now targets the canonical `POST /deployments` route
+- `mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`
 
 ## Is the SDK fully aligned with the API?
 
@@ -37,7 +36,7 @@ Not currently. The contact route validates input and logs the payload, but it do
 
 ## Do the Playwright tests run against localhost?
 
-No. The current Playwright config targets `https://mutx.dev`.
+No. The current Playwright config targets the hosted MUTX surface. Use `./scripts/dev.sh` for the canonical local demo path and `./scripts/test.sh` for the repo's validation path.
 
 ## Are the architecture docs purely current-state?
 

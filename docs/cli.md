@@ -12,7 +12,8 @@ The CLI is a Click application defined in `cli/` and installed from the repo roo
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e .
+pip install -r requirements.txt
+pip install -e ".[dev]"
 ```
 
 ## Configuration
@@ -75,17 +76,13 @@ mutx status
 | `mutx agents deploy` | reliable | uses `POST /agents/{id}/deploy`                                          |
 | `mutx agents delete` | reliable | uses `DELETE /agents/{id}`                                               |
 | `mutx deploy list`   | reliable | uses `GET /deployments`                                                  |
+| `mutx deploy create` | reliable | uses `POST /deployments`                                                 |
 | `mutx deploy events` | reliable | uses `GET /deployments/{id}/events`                                      |
-| `mutx deploy scale`  | reliable | uses `POST /deployments/{id}/scale`                                      |
-| `mutx deploy delete` | reliable | uses `DELETE /deployments/{id}`                                          |
+| `mutx deploy scale`   | reliable | uses `POST /deployments/{id}/scale`                                      |
+| `mutx deploy restart` | reliable | uses `POST /deployments/{id}/restart`                                    |
+| `mutx deploy delete`  | reliable | uses `DELETE /deployments/{id}`                                          |
 
-## Commands That Still Need Alignment
-
-| Command              | Current issue                                                                                        |
-| -------------------- | ---------------------------------------------------------------------------------------------------- |
-| `mutx deploy create` | uses the live deploy route, but the backend currently ignores `--replicas` and starts with 1 replica |
-
-For those flows, prefer the live route behavior in code over older docs. `mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`.
+`mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`.
 
 ## Example Session
 
@@ -104,6 +101,12 @@ mutx agents list --limit 10
 
 # List current deployments
 mutx deploy list --limit 10
+
+# Create a deployment for an owned agent
+mutx deploy create --agent-id YOUR_AGENT_ID --replicas 1
+
+# Restart a failed deployment
+mutx deploy restart YOUR_DEPLOYMENT_ID
 ```
 
 ## When in Doubt
