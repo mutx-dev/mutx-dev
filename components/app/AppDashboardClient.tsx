@@ -121,6 +121,10 @@ export function AppDashboardClient() {
     (deployment) => deployment.status === "failed" || deployment.status === "error",
   ).length;
   const activeKeys = apiKeys.filter((apiKey) => apiKey.is_active).length;
+  const revokedKeys = apiKeys.length - activeKeys;
+  const apiKeyLimit = 2;
+  const apiKeyCapacityRemaining = Math.max(apiKeyLimit - activeKeys, 0);
+  const apiKeyLimitReached = activeKeys >= apiKeyLimit;
   const latestDeploymentEvent = deployments
     .flatMap((deployment) => deployment.events ?? [])
     .sort(
@@ -159,8 +163,10 @@ export function AppDashboardClient() {
         value: String(apiKeys.length),
         detail:
           apiKeys.length > 0
-            ? `${activeKeys} active · ${apiKeys.length - activeKeys} revoked`
-            : "No operator keys created yet",
+            ? apiKeyLimitReached
+              ? `Active limit reached (${activeKeys}/${apiKeyLimit}) · ${revokedKeys} revoked`
+              : `${activeKeys}/${apiKeyLimit} active · ${apiKeyCapacityRemaining} slot${apiKeyCapacityRemaining === 1 ? "" : "s"} left`
+            : `0/${apiKeyLimit} active · ${apiKeyLimit} slots available`,
         icon: KeyRound,
       },
       {
@@ -178,10 +184,13 @@ export function AppDashboardClient() {
     [
       activeKeys,
       agents.length,
+      apiKeyCapacityRemaining,
+      apiKeyLimitReached,
       apiKeys.length,
       deployments.length,
       failedDeployments,
       health?.error,
+      revokedKeys,
       health?.timestamp,
       health?.status,
       healthyDeployments,
@@ -821,6 +830,20 @@ export function AppDashboardClient() {
               </span>
             </div>
 
+            <div className="mb-4 rounded-xl border border-amber-400/15 bg-amber-400/5 p-3 text-xs text-amber-100">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="font-medium text-white">Active key limit</p>
+                <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${apiKeyLimitReached ? "bg-rose-400/15 text-rose-200" : "bg-emerald-400/15 text-emerald-200"}`}>
+                  {activeKeys}/{apiKeyLimit} active
+                </span>
+              </div>
+              <p className="mt-2 leading-relaxed text-amber-50/80">
+                {apiKeyLimitReached
+                  ? "Create is blocked until you revoke or rotate an existing active key. Revoked keys stay visible for audit history."
+                  : `${apiKeyCapacityRemaining} active slot${apiKeyCapacityRemaining === 1 ? "" : "s"} remain before the control plane blocks new key creation.`}
+              </p>
+            </div>
+
             <form onSubmit={handleCreateKey} className="mb-6 flex gap-2">
               <input
                 value={apiKeyName}
@@ -830,13 +853,13 @@ export function AppDashboardClient() {
               />
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || apiKeyLimitReached}
                 className="inline-flex shrink-0 items-center justify-center rounded-lg bg-amber-400 px-3 py-2 text-sm font-semibold text-amber-950 transition hover:bg-amber-300 disabled:opacity-50"
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  "Generate"
+                  apiKeyLimitReached ? "Limit reached" : "Generate"
                 )}
               </button>
             </form>
@@ -918,7 +941,7 @@ export function AppDashboardClient() {
                 ))
               ) : (
                 <p className="py-4 text-center text-xs text-slate-500">
-                  No keys provisioned.
+                  No keys provisioned yet. Generate one here to unlock non-browser operator access.
                 </p>
               )}
             </div>
@@ -965,8 +988,10 @@ export function AppDashboardClient() {
                 </p>
                 <p className="mt-2 text-white">
                   {activeKeys > 0
-                    ? `${activeKeys} active API key${activeKeys === 1 ? "" : "s"} can authenticate operator workflows right now.`
-                    : "No active API keys are present yet; generate one here when you need non-browser access."}
+                    ? apiKeyLimitReached
+                      ? `${activeKeys} active API keys are already consuming the current ${apiKeyLimit}-key limit. Rotate or revoke one before creating another.`
+                      : `${activeKeys} active API key${activeKeys === 1 ? "" : "s"} can authenticate operator workflows right now, with ${apiKeyCapacityRemaining} slot${apiKeyCapacityRemaining === 1 ? "" : "s"} still available.`
+                    : `No active API keys are present yet; all ${apiKeyLimit} slots are available when you need non-browser access.`}
                 </p>
               </div>
             </div>

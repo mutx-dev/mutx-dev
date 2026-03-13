@@ -139,6 +139,54 @@ describe('dashboard route proxies', () => {
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
+
+
+  it('preserves upstream unauthorized responses for auth me proxy', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 401,
+      json: async () => ({ detail: 'Session expired' }),
+    })
+    const { GET } = await import('../../app/api/auth/me/route')
+
+    const response = await GET(mockRequest())
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/auth/me', {
+      headers: { Authorization: 'Bearer token' },
+      cache: 'no-store',
+    })
+    expect(response.status).toBe(401)
+    await expect(response.json()).resolves.toEqual({ detail: 'Session expired' })
+  })
+
+  it('preserves successful auth me payloads', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        id: 'user_123',
+        email: 'operator@mutx.dev',
+        name: 'Operator',
+      }),
+    })
+    const { GET } = await import('../../app/api/auth/me/route')
+
+    const response = await GET(mockRequest())
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/auth/me', {
+      headers: { Authorization: 'Bearer token' },
+      cache: 'no-store',
+    })
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({
+      id: 'user_123',
+      email: 'operator@mutx.dev',
+      name: 'Operator',
+    })
+  })
+
   it('preserves upstream health payloads and statuses', async () => {
     ;(global.fetch as jest.Mock).mockResolvedValue({
       status: 503,
