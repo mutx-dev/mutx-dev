@@ -134,3 +134,97 @@ async def test_agent_status_auth_rejects_other_agent_api_key(client: AsyncClient
 
     assert wrong_auth_response.status_code == 403
     assert wrong_auth_response.json()["detail"] == "Agent ID mismatch"
+
+
+@pytest.mark.asyncio
+async def test_heartbeat_event_payload_shape_and_timing_contract(client: AsyncClient, monkeypatch):
+    emitted_events = []
+
+    async def fake_trigger_webhook_event(*args, **kwargs):
+        # Preserve call shape: (db, event, payload)
+        emitted_events.append((args[1], args[2]))
+        return 1
+
+    monkeypatch.setattr(
+        "src.api.routes.agent_runtime.trigger_webhook_event", fake_trigger_webhook_event
+    )
+
+    register_response = await client.post(
+        "/agents/register",
+        json={
+            "name": "runtime-heartbeat-shape",
+            "description": "heartbeat contract coverage",
+            "metadata": {"contract": True},
+            "capabilities": ["heartbeat"],
+        },
+    )
+    assert register_response.status_code == 200
+    payload = register_response.json()
+    agent_id = payload["agent_id"]
+    api_key = payload["api_key"]
+
+    # 1) first heartbeat keeps status unchanged => only heartbeat event
+    heartbeat_response = await client.post(
+        "/agents/heartbeat",
+        headers={"Authorization": f"Bearer {api_key}"},
+        json={
+            "agent_id": agent_id,
+            "status": "running",
+            "message": "still running",
+            "timestamp": "2026-03-14T14:00:00Z",
+            "platform": "test-platform",
+            "hostname": "test-host",
+        },
+    )
+    assert heartbeat_response.status_code == 200
+
+    body = heartbeat_response.json()
+    assert body["status"] == "ok"
+    assert body["agent_id"] == agent_id
+    assert "timestamp" in body
+
+    assert len(emitted_events) == 1
+    event_name, event_payload = emitted_events.pop(0)
+    assert event_name == "agent.heartbeat"
+    assert event_payload == {
+        "agent_id": agent_id,
+        "agent_name": "runtime-heartbeat-shape",
+        "status": "running",
+        "previous_status": "running",
+        "message": "still running",
+        "platform": "test-platform",
+        "hostname": "test-host",
+        "timestamp": body["timestamp"],
+    }
+
+    # 2) status change emits heartbeat + status event with identical timestamp
+    emitted_events.clear()
+
+    status_change_response = await client.post(
+        "/agents/heartbeat",
+        headers={"Authorization": f"Bearer {api_key}"},
+        json={
+            "agent_id": agent_id,
+            "status": "failed",
+            "message": "stopped by policy",
+            "timestamp": "2026-03-14T14:01:00Z",
+            "platform": "test-platform",
+            "hostname": "test-host",
+        },
+    )
+    assert status_change_response.status_code == 200
+
+    status_body = status_change_response.json()
+
+    assert len(emitted_events) == 2
+    heartbeat_event_name, heartbeat_event_payload = emitted_events[0]
+    status_event_name, status_event_payload = emitted_events[1]
+
+    assert heartbeat_event_name == "agent.heartbeat"
+    assert status_event_name == "agent.status"
+    assert heartbeat_event_payload["agent_id"] == agent_id
+    assert status_event_payload["agent_id"] == agent_id
+    assert heartbeat_event_payload["timestamp"] == status_body["timestamp"]
+    assert status_event_payload["timestamp"] == status_body["timestamp"]
+    assert status_event_payload["old_status"] == "running"
+    assert status_event_payload["new_status"] == "failed"

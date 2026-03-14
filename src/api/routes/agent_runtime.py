@@ -160,6 +160,7 @@ async def heartbeat(
     # Update agent status and last heartbeat
     previous_status = agent.status
     now = datetime.utcnow()
+    heartbeat_timestamp = now.isoformat()
     new_status = request.status.value
     agent.status = new_status
     agent.last_heartbeat = now
@@ -178,7 +179,7 @@ async def heartbeat(
                 "message": request.message,
                 "platform": request.platform,
                 "hostname": request.hostname,
-                "timestamp": now.isoformat(),
+                "timestamp": heartbeat_timestamp,
             },
         )
     except Exception:
@@ -199,7 +200,7 @@ async def heartbeat(
                     "message": request.message,
                     "platform": request.platform,
                     "hostname": request.hostname,
-                    "timestamp": now.isoformat(),
+                    "timestamp": heartbeat_timestamp,
                 },
             )
         except Exception:
@@ -210,7 +211,7 @@ async def heartbeat(
     return {
         "status": "ok",
         "agent_id": request.agent_id,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": heartbeat_timestamp,
     }
 
 
