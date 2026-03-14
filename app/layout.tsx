@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   twitter: {
     creator: '@mutxdev',
     card: 'summary_large_image',
-    site: '@mutx_dev',
+    site: '@mutxdev',
     title: 'MUTX | Open Source Control Plane for AI Agents',
     description: 'Open-source control plane foundations for teams operating AI agents beyond the demo.',
     images: ['https://mutx.dev/logo.png'],
