@@ -1,6 +1,6 @@
 import asyncio
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
 import pytest
@@ -161,7 +161,7 @@ async def test_agent_heartbeat_check_returns_false_for_unknown_agent(monkeypatch
 
 @pytest.mark.asyncio
 async def test_agent_heartbeat_check_uses_stale_threshold_and_created_at_fallback(monkeypatch):
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
 
     with_fresh_heartbeat = SimpleNamespace(
         last_heartbeat=now - timedelta(seconds=STALE_THRESHOLD_SECONDS - 1),
