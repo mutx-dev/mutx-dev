@@ -49,10 +49,10 @@ describe("api key dashboard selectors", () => {
   it("selects the newest revoked key regardless to existing list order", () => {
     const keys: ApiKey[] = [
       baseKey({
-        id: "oldest-revoked",
-        name: "Old Revoked",
-        created_at: "2026-03-14T10:00:00.000Z",
-        is_active: false,
+        id: "active-now",
+        name: "Current",
+        created_at: "2026-03-14T13:00:00.000Z",
+        is_active: true,
       }),
       baseKey({
         id: "newest-revoked",
@@ -61,10 +61,10 @@ describe("api key dashboard selectors", () => {
         is_active: false,
       }),
       baseKey({
-        id: "active-now",
-        name: "Current",
-        created_at: "2026-03-14T11:00:00.000Z",
-        is_active: true,
+        id: "oldest-revoked",
+        name: "Old Revoked",
+        created_at: "2026-03-14T10:00:00.000Z",
+        is_active: false,
       }),
     ];
 
