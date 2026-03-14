@@ -228,3 +228,61 @@ async def test_heartbeat_event_payload_shape_and_timing_contract(client: AsyncCl
     assert status_event_payload["timestamp"] == status_body["timestamp"]
     assert status_event_payload["old_status"] == "running"
     assert status_event_payload["new_status"] == "failed"
+
+
+@pytest.mark.asyncio
+async def test_heartbeat_webhook_failure_does_not_fail_heartbeat_response(client: AsyncClient, monkeypatch):
+    call_log = {
+        "agent.heartbeat": 0,
+        "agent.status": 0,
+    }
+
+    async def flaky_trigger_webhook_event(*args, **kwargs):
+        # Preserve call shape: (db, event, payload)
+        event_name = args[1]
+        call_log[event_name] = call_log.get(event_name, 0) + 1
+
+        if event_name == "agent.heartbeat":
+            raise RuntimeError("webhook transport unavailable")
+
+        return 1
+
+    monkeypatch.setattr(
+        "src.api.routes.agent_runtime.trigger_webhook_event", flaky_trigger_webhook_event
+    )
+
+    register_response = await client.post(
+        "/agents/register",
+        json={
+            "name": "runtime-heartbeat-failure",
+            "description": "heartbeat failure coverage",
+            "metadata": {"contract": "failure"},
+            "capabilities": ["heartbeat"],
+        },
+    )
+    assert register_response.status_code == 200
+    payload = register_response.json()
+    agent_id = payload["agent_id"]
+    api_key = payload["api_key"]
+
+    response = await client.post(
+        "/agents/heartbeat",
+        headers={"Authorization": f"Bearer {api_key}"},
+        json={
+            "agent_id": agent_id,
+            "status": "running",
+            "message": "heartbeat still accepted despite webhook failure",
+            "platform": "test-platform",
+            "hostname": "test-host",
+            "timestamp": "2026-03-14T14:02:00Z",
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "ok"
+    assert body["agent_id"] == agent_id
+    assert "timestamp" in body
+
+    assert call_log["agent.heartbeat"] == 1
+    assert call_log["agent.status"] == 0
