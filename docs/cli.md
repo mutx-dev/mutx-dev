@@ -82,6 +82,9 @@ mutx status
 | `mutx deploy restart` | reliable | uses `POST /deployments/{id}/restart`                                    |
 | `mutx deploy delete`  | reliable | uses `DELETE /deployments/{id}`                                          |
 
+Intentional omission: there is currently no dedicated `mutx deploy get` command for `GET /deployments/{id}`.
+Use `mutx deploy list` plus deployment-specific `events`, `logs`, and `metrics` commands for targeted inspection.
+
 `mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`.
 
 ## Example Session

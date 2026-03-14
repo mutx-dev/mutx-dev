@@ -10,8 +10,8 @@ Deployment records are exposed through `/deployments`, and creation is available
 ## Current Implementation Notes
 
 * Every deployment route requires authenticated control-plane access.
-* `POST /deployments` creates a deployment when given an owned `agent_id`.
-* `POST /agents/{agent_id}/deploy` is still available as the agent-centric create path.
+* `POST /deployments` is the canonical create path, starts the deployment in `pending`, and records a `create` lifecycle event.
+* `POST /agents/{agent_id}/deploy` is the legacy agent-centric create path and returns a lightweight payload with `deployment_id` and `status` (`deploying`).
 * `POST /deployments/{deployment_id}/scale` only succeeds when the deployment status is `running` or `ready`.
 * `POST /deployments/{deployment_id}/restart` currently allows `stopped`, `failed`, and `killed` deployments.
 
@@ -34,20 +34,22 @@ Deployment records are exposed through `/deployments`, and creation is available
 ```bash
 BASE_URL=http://localhost:8000
 
-curl -X POST "$BASE_URL/agents/YOUR_AGENT_ID/deploy" \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
-
-That returns a deployment id you can use with the routes below.
-
-Direct deployment creation is also available:
-
-```bash
 curl -X POST "$BASE_URL/deployments" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"agent_id": "YOUR_AGENT_ID", "replicas": 1}'
 ```
+
+Canonical `POST /deployments` returns the full deployment record (including status and lifecycle events).
+
+Legacy agent-scoped create remains available:
+
+```bash
+curl -X POST "$BASE_URL/agents/YOUR_AGENT_ID/deploy" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+That route returns a lightweight payload with `deployment_id` and `status`.
 
 ## List Deployments
 
