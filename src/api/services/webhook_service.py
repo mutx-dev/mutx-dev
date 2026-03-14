@@ -173,6 +173,7 @@ async def trigger_webhook_event(
     db: AsyncSession,
     event: str,
     payload: dict,
+    user_id: Optional[uuid.UUID] = None,
 ) -> int:
     """
     Trigger a webhook event to all active webhooks subscribed to the event.
@@ -180,8 +181,13 @@ async def trigger_webhook_event(
     Returns:
         Number of successful deliveries
     """
-    # Get all active webhooks that subscribe to this event
-    result = await db.execute(select(Webhook).where(Webhook.is_active))
+    # Get active webhooks that subscribe to this event.
+    # If a user_id is provided, only deliver within that tenant.
+    query = select(Webhook).where(Webhook.is_active)
+    if user_id is not None:
+        query = query.where(Webhook.user_id == user_id)
+
+    result = await db.execute(query)
     webhooks = result.scalars().all()
 
     # Filter webhooks by event subscription
