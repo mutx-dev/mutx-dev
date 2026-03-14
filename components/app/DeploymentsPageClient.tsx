@@ -16,6 +16,7 @@ import {
 import { DeploymentSortSelect } from "./DeploymentSortSelect";
 
 import { Card } from "@/components/ui/Card";
+import { DeploymentHistory } from "./DeploymentHistory";
 import { type components } from "@/app/types/api";
 
 type Deployment = components["schemas"]["DeploymentResponse"];
@@ -184,6 +185,7 @@ function DeploymentCard({ deployment }: { deployment: Deployment }) {
           <Activity className="h-3.5 w-3.5" />
           Logs
         </button>
+        <DeploymentHistory deploymentId={deployment.id} />
       </div>
     </Card>
   );
