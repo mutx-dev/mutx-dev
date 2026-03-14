@@ -21,7 +21,7 @@ import {
 
 import { Card } from "@/components/ui/Card";
 import { type components } from "@/app/types/api";
-import { getLatestActiveApiKey, getLatestRevokedApiKey } from "@/components/app/apiKeyHelpers";
+import { getApiKeyLimit, getLatestActiveApiKey, getLatestRevokedApiKey } from "@/components/app/apiKeyHelpers";
 
 type User = components["schemas"]["UserResponse"];
 type Agent = components["schemas"]["AgentResponse"];
@@ -177,9 +177,9 @@ export function AppDashboardClient() {
   ).length;
   const activeKeys = apiKeys.filter((apiKey) => apiKey.is_active).length;
   const revokedKeys = apiKeys.length - activeKeys;
-  const apiKeyLimit = 10;
-  const apiKeyCapacityRemaining = Math.max(apiKeyLimit - activeKeys, 0);
-  const apiKeyLimitReached = activeKeys >= apiKeyLimit;
+  const apiKeyLimit = getApiKeyLimit(user?.plan);
+  const apiKeyCapacityRemaining = apiKeyLimit === null ? null : Math.max(apiKeyLimit - activeKeys, 0);
+  const apiKeyLimitReached = apiKeyLimit !== null && activeKeys >= apiKeyLimit;
   const latestDeploymentEvent = deployments
     .flatMap((deployment) => deployment.events ?? [])
     .sort(

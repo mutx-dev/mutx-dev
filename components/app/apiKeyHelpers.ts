@@ -14,6 +14,20 @@ function sortByCreatedAtDesc(apiKeys: ApiKey[]) {
   );
 }
 
+const API_KEY_LIMIT_BY_PLAN: Record<string, number | null> = {
+  free: 2,
+  starter: 10,
+  pro: 50,
+  enterprise: null,
+};
+
+export function getApiKeyLimit(plan?: string | null): number | null {
+  const normalizedPlan = (plan ?? "").trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(API_KEY_LIMIT_BY_PLAN, normalizedPlan)
+    ? API_KEY_LIMIT_BY_PLAN[normalizedPlan]
+    : 10;
+}
+
 export function getLatestActiveApiKey(apiKeys: ApiKey[]) {
   return sortByCreatedAtDesc(apiKeys).find((apiKey) => apiKey.is_active) ?? null;
 }
