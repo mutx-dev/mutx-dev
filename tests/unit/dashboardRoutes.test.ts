@@ -230,6 +230,7 @@ describe('dashboard route proxies', () => {
 
     expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
       headers: { Authorization: 'Bearer token' },
+      cache: 'no-store',
     })
     expect(response.status).toBe(401)
     await expect(response.json()).resolves.toEqual({ detail: 'Session expired' })
@@ -255,6 +256,7 @@ describe('dashboard route proxies', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ name: 'Demo key' }),
+      cache: 'no-store',
     })
     expect(response.status).toBe(409)
     await expect(response.json()).resolves.toEqual({ detail: 'Active API key limit reached' })
