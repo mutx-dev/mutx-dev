@@ -10,6 +10,8 @@ const GITHUB_URL = 'https://github.com/fortunexbt/mutx-dev'
 const DOCS_URL = 'https://docs.mutx.dev'
 const X_URL = 'https://x.com/mutxdev'
 
+const DEMO_COMMAND = 'npm run demo:validate'
+
 const links = [
   { label: 'docs', href: DOCS_URL },
   { label: 'github', href: GITHUB_URL },
@@ -85,6 +87,12 @@ export default function LandingPage() {
                   {item.label}
                 </a>
               ))}
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-200/75">morning demo</p>
+              <p className="mt-1 text-white/80">Run once in the morning for a guaranteed local demo path:</p>
+              <code className="mt-2 inline-flex w-full max-w-full flex-wrap rounded-lg border border-white/10 bg-black/35 p-3 font-mono text-xs leading-5 break-all text-cyan-100">{DEMO_COMMAND}</code>
             </div>
           </div>
 
