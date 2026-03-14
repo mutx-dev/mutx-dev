@@ -118,6 +118,34 @@ describe("api key dashboard selectors", () => {
     expect(activeKey?.id).toBe("good-active");
   });
 
+  it("ignores malformed timestamps when selecting newest revoked key", () => {
+    const keys: ApiKey[] = [
+      baseKey({
+        id: "active-stable",
+        name: "Active Stable",
+        created_at: "2026-03-14T13:00:00.000Z",
+        is_active: true,
+      }),
+      baseKey({
+        id: "bad-revoked",
+        name: "Bad Revoked",
+        created_at: "not-a-date",
+        is_active: false,
+      }),
+      baseKey({
+        id: "good-revoked",
+        name: "Good Revoked",
+        created_at: "2026-03-14T12:00:00.000Z",
+        is_active: false,
+      }),
+    ];
+
+    const revokedKey = getLatestRevokedApiKey(keys);
+
+    expect(revokedKey).not.toBeNull();
+    expect(revokedKey?.id).toBe("good-revoked");
+  });
+
   it("maps plan quotas to API key limits", () => {
     expect(getApiKeyLimit("free")).toBe(2);
     expect(getApiKeyLimit("starter")).toBe(10);
