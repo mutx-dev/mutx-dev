@@ -5,10 +5,24 @@ cd "$(dirname "$0")/.."
 
 MUTX_SKIP_PLAYWRIGHT="${MUTX_SKIP_PLAYWRIGHT:-0}"
 
-if [ -x ".venv/bin/python" ]; then
-  PYTHON_BIN=".venv/bin/python"
-else
-  PYTHON_BIN="python3"
+PYTHON_BIN=""
+for candidate in ".venv/bin/python" "python3.11" "python3.10" "python3"; do
+  if [ "$candidate" = ".venv/bin/python" ]; then
+    [ -x "$candidate" ] || continue
+  elif ! command -v "$candidate" >/dev/null 2>&1; then
+    continue
+  fi
+
+  if "$candidate" -c "import fastapi, pytest" >/dev/null 2>&1; then
+    PYTHON_BIN="$candidate"
+    break
+  fi
+done
+
+if [ -z "$PYTHON_BIN" ]; then
+  echo "No Python interpreter with fastapi + pytest found."
+  echo "Install deps with: pip install -r requirements.txt && pip install -e \".[dev]\""
+  exit 1
 fi
 
 if [ -x ".venv/bin/ruff" ]; then
@@ -22,6 +36,8 @@ if [ -x ".venv/bin/black" ]; then
 else
   BLACK_BIN="black"
 fi
+
+echo "Using Python interpreter: $PYTHON_BIN"
 
 echo "Running Python lint and format checks..."
 "$RUFF_BIN" check src/api cli sdk

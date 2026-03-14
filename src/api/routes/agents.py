@@ -152,18 +152,12 @@ async def create_agent(
 async def list_agents(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
-    user_id: Optional[uuid.UUID] = Query(None),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     query = select(Agent).order_by(Agent.created_at.desc()).offset(skip).limit(limit)
-    # Filter by current user by default, unless explicitly requesting another user's agents
-    if user_id:
-        if user_id != current_user.id:
-            raise HTTPException(status_code=403, detail="Cannot view other users' agents")
-        query = query.where(Agent.user_id == user_id)
-    else:
-        query = query.where(Agent.user_id == current_user.id)
+    # Ownership is always derived from authenticated session, never query params.
+    query = query.where(Agent.user_id == current_user.id)
     result = await db.execute(query)
     agents = result.scalars().all()
     return [_serialize_agent(agent) for agent in agents]
