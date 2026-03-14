@@ -6,9 +6,8 @@ import { KeyRound, Plus, RefreshCw, Trash2, AlertCircle, Loader2 } from 'lucide-
 interface ApiKey {
   id: string;
   name: string;
-  prefix: string;
   created_at: string;
-  last_used_at: string | null;
+  last_used: string | null;
   expires_at: string | null;
 }
 
@@ -31,7 +30,7 @@ export function ApiKeysPageClient() {
         throw new Error(data.detail || 'Failed to fetch API keys');
       }
       const data = await res.json();
-      setKeys(data.keys || []);
+      setKeys(Array.isArray(data) ? data : (data.keys || []));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load API keys');
     } finally {
@@ -179,10 +178,9 @@ export function ApiKeysPageClient() {
               <div key={key.id} className="px-6 py-4 flex items-center justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-white">{key.name}</p>
-                  <p className="text-sm text-slate-500 font-mono mt-1">{key.prefix}••••••••••••••</p>
-                  <div className="flex gap-4 mt-2 text-xs text-slate-500">
+                                    <div className="flex gap-4 mt-2 text-xs text-slate-500">
                     <span>Created: {formatDate(key.created_at)}</span>
-                    <span>Last used: {formatDate(key.last_used_at)}</span>
+                    <span>Last used: {formatDate(key.last_used)}</span>
                   </div>
                 </div>
                 <div className="flex gap-2">
