@@ -17,7 +17,8 @@ export function getApiBaseUrl() {
 }
 
 export function shouldUseSecureCookies(request: NextRequest) {
-  return request.nextUrl.protocol === 'https:' || request.headers.get('x-forwarded-proto') === 'https'
+  void request
+  return true
 }
 
 export function getCookieDomain(request: NextRequest) {

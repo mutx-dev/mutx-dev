@@ -24,9 +24,9 @@ describe('dashboard auth cookie policy helpers', () => {
     expect(getCookieDomain(mockRequest('http://localhost:3000/api/auth/login'))).toBeUndefined()
   })
 
-  it('marks cookies secure for direct https and forwarded https requests', () => {
+  it('always marks auth cookies as secure', () => {
     expect(shouldUseSecureCookies(mockRequest('https://app.mutx.dev/api/auth/login'))).toBe(true)
     expect(shouldUseSecureCookies(mockRequest('http://app.mutx.dev/api/auth/login', 'https'))).toBe(true)
-    expect(shouldUseSecureCookies(mockRequest('http://localhost:3000/api/auth/login'))).toBe(false)
+    expect(shouldUseSecureCookies(mockRequest('http://localhost:3000/api/auth/login'))).toBe(true)
   })
 })
