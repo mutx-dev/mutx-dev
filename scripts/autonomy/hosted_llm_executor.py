@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import re
+import shlex
 import subprocess
 import textwrap
 import urllib.error
@@ -62,20 +63,24 @@ AREA_CONTEXT = {
     ],
 }
 
-ALLOWED_COMMAND_PREFIXES = (
-    'python ',
-    'python3 ',
-    'npm ',
-    'npx ',
-    'ruff ',
-    'black ',
-    './.venv/bin/python ',
-    'git status',
-    'git diff',
-)
+ALLOWED_EXECUTABLES = {
+    'python',
+    'python3',
+    'npm',
+    'npx',
+    'ruff',
+    'black',
+    './.venv/bin/python',
+}
+
+ALLOWED_GIT_COMMANDS = {
+    ('git', 'status'),
+    ('git', 'diff'),
+}
 
 DEFAULT_MAX_PATCH_BYTES = 50000
 DEFAULT_MAX_CHANGED_FILES = 6
+SHELL_METACHAR_PATTERN = re.compile(r'[;&|`<>$\n\r]')
 
 
 def run(command: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -296,17 +301,30 @@ def apply_patch_text(patch_text: str) -> None:
     run(['git', 'apply', str(patch_path)])
 
 
-def validate_commands(commands: list[str]) -> list[str]:
-    allowed = []
+def validate_commands(commands: list[str]) -> list[list[str]]:
+    allowed: list[list[str]] = []
     for command in commands[:3]:
-        if any(command.startswith(prefix) for prefix in ALLOWED_COMMAND_PREFIXES):
-            allowed.append(command)
+        if SHELL_METACHAR_PATTERN.search(command):
+            continue
+        try:
+            argv = shlex.split(command)
+        except ValueError:
+            continue
+        if not argv:
+            continue
+
+        if argv[0] in ALLOWED_EXECUTABLES:
+            allowed.append(argv)
+            continue
+
+        if tuple(argv[:2]) in ALLOWED_GIT_COMMANDS and len(argv) == 2:
+            allowed.append(argv)
     return allowed
 
 
-def run_validation(commands: list[str]) -> None:
+def run_validation(commands: list[list[str]]) -> None:
     for command in commands:
-        subprocess.run(['bash', '-lc', command], check=True)
+        subprocess.run(command, check=True)
 
 
 def main() -> int:
