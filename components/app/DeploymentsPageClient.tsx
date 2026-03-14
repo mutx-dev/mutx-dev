@@ -13,6 +13,7 @@ import {
   Search,
   Server,
 } from "lucide-react";
+import { DeploymentSortSelect } from "./DeploymentSortSelect";
 
 import { Card } from "@/components/ui/Card";
 import { type components } from "@/app/types/api";
@@ -204,6 +205,7 @@ export function DeploymentsPageClient() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"date"|"status"|"agent">("date");
 
   const runningDeployments = deployments.filter(
     (d) => d.status === "running",
@@ -216,12 +218,22 @@ export function DeploymentsPageClient() {
       }, 0)
     : null;
 
-  const filteredDeployments = deployments.filter(
-    (deployment) =>
-      deployment.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      deployment.agent_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      deployment.status.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredDeployments = deployments
+    .filter(
+      (deployment) =>
+        deployment.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        deployment.agent_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        deployment.status.toLowerCase().includes(searchQuery.toLowerCase()),
+    )
+    .sort((a, b) => {
+      if (sortBy === "date") {
+        const aDate = a.started_at ? new Date(a.started_at).getTime() : 0;
+        const bDate = b.started_at ? new Date(b.started_at).getTime() : 0;
+        return bDate - aDate;
+      }
+      if (sortBy === "status") return a.status.localeCompare(b.status);
+      return a.agent_id.localeCompare(b.agent_id);
+    });
 
   async function loadDeployments() {
     try {
@@ -372,6 +384,9 @@ export function DeploymentsPageClient() {
           placeholder="Search deployments by ID, agent ID, or status..."
           className="w-full rounded-xl border border-white/10 bg-black/40 py-3 pl-12 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-emerald-400 focus:outline-none"
         />
+      </div>
+      <div className="flex items-center gap-3">
+        <DeploymentSortSelect value={sortBy} onChange={setSortBy} />
       </div>
 
       {filteredDeployments.length === 0 ? (
