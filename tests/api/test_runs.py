@@ -1,82 +1,176 @@
-"""Tests for the runs API endpoints."""
-import uuid
 from datetime import datetime
-from unittest.mock import AsyncMock, patch
+import uuid
 
 import pytest
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.main import app
-from src.api.models import Agent, AgentRun, User
+from src.api.models.models import Agent, AgentStatus
 
 
-@pytest.fixture
-def mock_user():
-    user = User(
-        id=uuid.uuid4(),
-        email="test@example.com",
-        hashed_password="hashed",
-        created_at=datetime.utcnow(),
+@pytest.mark.asyncio
+async def test_create_run_persists_trace_data_and_returns_details(client, test_agent):
+    response = await client.post(
+        "/api/runs",
+        json={
+            "agent_id": str(test_agent.id),
+            "status": "completed",
+            "input_text": "Summarize deployment logs",
+            "output_text": "Deployment healthy with 0 failed checks.",
+            "metadata": {"model": "gpt-4.1-mini", "latency_ms": 231},
+            "traces": [
+                {
+                    "event_type": "prompt",
+                    "message": "Prompt prepared",
+                    "payload": {"tokens": 129},
+                },
+                {
+                    "event_type": "tool_call",
+                    "message": "Queried deployment metrics",
+                    "payload": {"tool": "get_metrics"},
+                },
+            ],
+        },
     )
-    return user
+
+    assert response.status_code == 201
+    payload = response.json()
+
+    assert payload["agent_id"] == str(test_agent.id)
+    assert payload["status"] == "completed"
+    assert payload["metadata"] == {"model": "gpt-4.1-mini", "latency_ms": 231}
+    assert payload["trace_count"] == 2
+    assert len(payload["traces"]) == 2
+    assert payload["traces"][0]["event_type"] == "prompt"
+    assert payload["traces"][1]["event_type"] == "tool_call"
+
+    runs_response = await client.get(f"/api/runs?agent_id={test_agent.id}")
+    assert runs_response.status_code == 200
+    history = runs_response.json()
+    assert history["total"] == 1
+    assert len(history["items"]) == 1
+    assert history["items"][0]["trace_count"] == 2
 
 
-@pytest.fixture
-def mock_agent(mock_user):
-    agent = Agent(
-        id=uuid.uuid4(),
-        user_id=mock_user.id,
-        name="Test Agent",
-        agent_type="test",
-        config={},
-        status="running",
-        created_at=datetime.utcnow(),
+@pytest.mark.asyncio
+async def test_get_run_and_trace_query_support_filters_and_pagination(client, test_agent):
+    create_response = await client.post(
+        "/api/runs",
+        json={
+            "agent_id": str(test_agent.id),
+            "status": "completed",
+            "input_text": "Analyze incident timeline",
+            "output_text": "Two anomalies found",
+            "traces": [
+                {
+                    "event_type": "step",
+                    "message": "Parse request",
+                    "payload": {"index": 0},
+                },
+                {
+                    "event_type": "tool_call",
+                    "message": "Query metrics store",
+                    "payload": {"index": 1},
+                },
+                {
+                    "event_type": "tool_call",
+                    "message": "Query logs store",
+                    "payload": {"index": 2},
+                },
+            ],
+        },
     )
-    return agent
+    assert create_response.status_code == 201
+    run_id = create_response.json()["id"]
+
+    run_response = await client.get(f"/api/runs/{run_id}")
+    assert run_response.status_code == 200
+    assert run_response.json()["trace_count"] == 3
+    assert len(run_response.json()["traces"]) == 3
+
+    traces_response = await client.get(
+        f"/api/runs/{run_id}/traces?event_type=tool_call&skip=0&limit=1"
+    )
+    assert traces_response.status_code == 200
+
+    traces_payload = traces_response.json()
+    assert traces_payload["run_id"] == run_id
+    assert traces_payload["event_type"] == "tool_call"
+    assert traces_payload["total"] == 2
+    assert len(traces_payload["items"]) == 1
+    assert traces_payload["items"][0]["event_type"] == "tool_call"
+    assert traces_payload["items"][0]["sequence"] == 1
 
 
-class TestRunsAPI:
-    """Test suite for runs API."""
+@pytest.mark.asyncio
+async def test_runs_are_scoped_by_authenticated_user(client, other_user_client, test_agent):
+    create_response = await client.post(
+        "/api/runs",
+        json={
+            "agent_id": str(test_agent.id),
+            "status": "completed",
+            "input_text": "scope check",
+            "traces": [],
+        },
+    )
+    assert create_response.status_code == 201
+    run_id = create_response.json()["id"]
 
-    @pytest.mark.asyncio
-    async def test_create_run_validation(self):
-        """Test that run creation requires valid input."""
-        # Test with invalid agent_id format
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
-            response = await client.post(
-                "/api/runs",
-                json={"agent_id": "not-a-uuid"},
-            )
-            assert response.status_code == 422
+    forbidden_response = await other_user_client.get(f"/api/runs/{run_id}")
+    assert forbidden_response.status_code == 403
+    assert forbidden_response.json()["detail"] == "Not authorized to access this run"
 
-    @pytest.mark.asyncio
-    async def test_list_runs_requires_auth(self):
-        """Test that listing runs requires authentication."""
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
-            response = await client.get("/api/runs")
-            assert response.status_code in [401, 403]
 
-    @pytest.mark.asyncio
-    async def test_get_run_not_found(self):
-        """Test that getting a non-existent run returns 404."""
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
-            fake_id = uuid.uuid4()
-            response = await client.get(f"/api/runs/{fake_id}")
-            assert response.status_code in [401, 403, 404]
+@pytest.mark.asyncio
+async def test_create_run_rejects_agent_not_owned_by_requesting_user(client, db_session, other_user):
+    other_agent = Agent(
+        id=uuid.UUID("66666666-6666-4666-a666-666666666666"),
+        name="other-agent",
+        description="another owner's agent",
+        config='{"model": "gpt-4o"}',
+        user_id=other_user.id,
+        status=AgentStatus.RUNNING,
+    )
+    db_session.add(other_agent)
+    await db_session.commit()
 
-    @pytest.mark.asyncio
-    async def test_run_trace_pagination(self):
-        """Test that trace listing supports pagination."""
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as client:
-            fake_id = uuid.uuid4()
-            response = await client.get(f"/api/runs/{fake_id}/traces?skip=0&limit=10")
-            assert response.status_code in [401, 403, 404]
+    response = await client.post(
+        "/api/runs",
+        json={
+            "agent_id": str(other_agent.id),
+            "status": "completed",
+            "input_text": "should fail",
+            "metadata": {},
+            "traces": [],
+        },
+    )
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Not authorized to access this agent"
+
+
+@pytest.mark.asyncio
+async def test_create_run_accepts_explicit_timestamps(client, test_agent):
+    started_at = datetime(2026, 3, 14, 10, 0, 0).isoformat()
+    completed_at = datetime(2026, 3, 14, 10, 0, 1).isoformat()
+
+    response = await client.post(
+        "/api/runs",
+        json={
+            "agent_id": str(test_agent.id),
+            "status": "completed",
+            "started_at": started_at,
+            "completed_at": completed_at,
+            "traces": [
+                {
+                    "event_type": "done",
+                    "payload": {"ok": True},
+                    "timestamp": completed_at,
+                }
+            ],
+        },
+    )
+
+    assert response.status_code == 201
+    payload = response.json()
+    assert payload["started_at"].startswith("2026-03-14T10:00:00")
+    assert payload["completed_at"].startswith("2026-03-14T10:00:01")
+    assert payload["traces"][0]["timestamp"].startswith("2026-03-14T10:00:01")
