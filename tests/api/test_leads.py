@@ -9,7 +9,7 @@ from src.api.models.models import Lead
 async def test_capture_lead_success(client: AsyncClient, db_session: AsyncSession):
     """Test capturing a lead successfully."""
     response = await client.post(
-        "/leads",
+        "/api/leads",
         json={
             "email": "lead@example.com",
             "name": "Lead Name",
@@ -32,7 +32,7 @@ async def test_capture_lead_success(client: AsyncClient, db_session: AsyncSessio
 async def test_capture_lead_minimal(client: AsyncClient):
     """Test capturing a lead with minimal data."""
     response = await client.post(
-        "/leads",
+        "/api/leads",
         json={
             "email": "minimal@example.com",
         },
@@ -61,7 +61,7 @@ async def test_list_leads_non_internal_forbidden(other_user_client: AsyncClient)
 @pytest.mark.asyncio
 async def test_list_leads_unauthorized(client_no_auth: AsyncClient):
     """Test listing leads without auth fails."""
-    response = await client_no_auth.get("/leads")
+    response = await client_no_auth.get("/api/leads")
     assert response.status_code == 401
 
 
@@ -84,7 +84,7 @@ async def test_list_leads_internal_unverified_forbidden(client_no_auth: AsyncCli
         )
 
     client_no_auth.app.dependency_overrides[get_current_user] = override_get_current_user
-    response = await client_no_auth.get("/leads")
+    response = await client_no_auth.get("/api/leads")
     assert response.status_code == 403
 
 
@@ -102,7 +102,7 @@ async def test_get_lead_internal_user(client: AsyncClient, db_session: AsyncSess
     await db_session.commit()
     await db_session.refresh(lead)
 
-    response = await client.get(f"/leads/{lead.id}")
+    response = await client.get(f"/api/leads/{lead.id}")
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == str(lead.id)
@@ -117,7 +117,7 @@ async def test_get_lead_non_internal_forbidden(other_user_client: AsyncClient, d
     await db_session.commit()
     await db_session.refresh(lead)
 
-    response = await other_user_client.get(f"/leads/{lead.id}")
+    response = await other_user_client.get(f"/api/leads/{lead.id}")
     assert response.status_code == 403
 
 
@@ -129,7 +129,7 @@ async def test_get_lead_unauthorized(client_no_auth: AsyncClient, db_session: As
     await db_session.commit()
     await db_session.refresh(lead)
 
-    response = await client_no_auth.get(f"/leads/{lead.id}")
+    response = await client_no_auth.get(f"/api/leads/{lead.id}")
     assert response.status_code == 401
 
 

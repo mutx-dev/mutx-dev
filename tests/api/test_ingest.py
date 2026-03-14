@@ -18,7 +18,7 @@ class TestIngestEndpoints:
     async def test_agent_status_requires_auth(self, client_no_auth: AsyncClient):
         """Test /ingest/agent-status requires authentication."""
         response = await client_no_auth.post(
-            "/ingest/agent-status",
+            "/api/ingest/agent-status",
             json={
                 "agent_id": str(uuid.uuid4()),
                 "status": "running",
@@ -43,7 +43,7 @@ class TestIngestEndpoints:
         await db_session.commit()
 
         response = await client.post(
-            "/ingest/agent-status",
+            "/api/ingest/agent-status",
             json={
                 "agent_id": str(agent_id),
                 "status": "running",
@@ -60,7 +60,7 @@ class TestIngestEndpoints:
     ):
         """Test agent status update returns 404 for unknown agent."""
         response = await client.post(
-            "/ingest/agent-status",
+            "/api/ingest/agent-status",
             json={
                 "agent_id": str(uuid.uuid4()),
                 "status": "running",
@@ -94,7 +94,7 @@ class TestIngestEndpoints:
         await db_session.commit()
 
         response = await client.post(
-            "/ingest/agent-status",
+            "/api/ingest/agent-status",
             json={
                 "agent_id": str(agent_id),
                 "status": "running",
@@ -111,7 +111,7 @@ class TestIngestMetricsEndpoint:
     async def test_metrics_requires_auth(self, client_no_auth: AsyncClient):
         """Test /ingest/metrics requires authentication."""
         response = await client_no_auth.post(
-            "/ingest/metrics",
+            "/api/ingest/metrics",
             json={
                 "agent_id": str(uuid.uuid4()),
                 "cpu_usage": 50.0,
@@ -124,7 +124,7 @@ class TestIngestMetricsEndpoint:
     async def test_metrics_not_found(self, client: AsyncClient, test_user: User):
         """Test metrics returns 404 for unknown agent."""
         response = await client.post(
-            "/ingest/metrics",
+            "/api/ingest/metrics",
             json={
                 "agent_id": str(uuid.uuid4()),
                 "cpu_usage": 50.0,
