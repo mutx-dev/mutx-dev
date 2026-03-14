@@ -52,7 +52,7 @@ class AgentRegisterResponse(BaseModel):
 
 class HeartbeatRequest(BaseModel):
     agent_id: str
-    status: str = "running"
+    status: AgentStatus = AgentStatus.RUNNING
     message: Optional[str] = None
     timestamp: str
     platform: Optional[str] = None
@@ -160,7 +160,8 @@ async def heartbeat(
     # Update agent status and last heartbeat
     previous_status = agent.status
     now = datetime.utcnow()
-    agent.status = request.status
+    new_status = request.status.value
+    agent.status = new_status
     agent.last_heartbeat = now
 
     await db.commit()
@@ -172,7 +173,7 @@ async def heartbeat(
             {
                 "agent_id": str(agent.id),
                 "agent_name": agent.name,
-                "status": agent.status,
+                "status": new_status,
                 "previous_status": previous_status,
                 "message": request.message,
                 "platform": request.platform,
@@ -185,7 +186,7 @@ async def heartbeat(
             "Failed to emit agent.heartbeat webhook", extra={"agent_id": str(agent.id)}
         )
 
-    if previous_status != agent.status:
+    if previous_status != new_status:
         try:
             await trigger_webhook_event(
                 db,
@@ -194,7 +195,7 @@ async def heartbeat(
                     "agent_id": str(agent.id),
                     "agent_name": agent.name,
                     "old_status": previous_status,
-                    "new_status": agent.status,
+                    "new_status": new_status,
                     "message": request.message,
                     "platform": request.platform,
                     "hostname": request.hostname,
