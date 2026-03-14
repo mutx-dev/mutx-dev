@@ -195,11 +195,6 @@ export function AnimatedTerminal() {
           </div>
         </div>
 
-        {isCompact ? (
-          <p className="mt-3 text-xs leading-5 text-white/45 sm:text-sm">
-            Tuned for smaller screens: larger text, auto-scroll, and cleaner spacing.
-          </p>
-        ) : null}
       </div>
     </TerminalWindow>
   )
