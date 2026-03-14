@@ -34,6 +34,28 @@ def resolve_reviewer_login(reviewer_agent: str) -> str | None:
     return login if isinstance(login, str) and login.strip() else None
 
 
+def resolve_open_pr_ref(branch: str) -> str:
+    # If branch is already a PR ref, keep it. Otherwise try to map to an open PR by head branch.
+    result = run(["gh", "pr", "list", "--state", "open", "--json", "number,headRefName", "--limit", "100"], check=False)
+    if result.returncode != 0:
+        return branch
+
+    try:
+        pull_requests = json.loads(result.stdout or "[]")
+    except json.JSONDecodeError:
+        return branch
+
+    for pull_request in pull_requests:
+        if pull_request.get("headRefName") == branch:
+            pr_number = pull_request.get("number")
+            if isinstance(pr_number, int):
+                return str(pr_number)
+            if isinstance(pr_number, str) and pr_number:
+                return pr_number
+
+    return branch
+
+
 def count_changed_files() -> int:
     status = git_output(["status", "--short"])
     return len([line for line in status.splitlines() if line.strip()])
@@ -115,8 +137,9 @@ def maybe_comment_issue(work_order: dict, brief_path: Path) -> None:
 
 
 def pr_has_codex_review_comment(pr_ref: str) -> bool:
+    resolved_pr = resolve_open_pr_ref(pr_ref)
     result = run(
-        ["gh", "pr", "view", pr_ref, "--json", "comments", "--jq", ".comments[].body"],
+        ["gh", "pr", "view", resolved_pr, "--json", "comments", "--jq", ".comments[].body"],
         check=False,
     )
     if result.returncode != 0:
@@ -127,10 +150,11 @@ def pr_has_codex_review_comment(pr_ref: str) -> bool:
 def maybe_comment_codex_review(pr_ref: str) -> None:
     if not os.environ.get("GH_TOKEN"):
         return
-    if pr_has_codex_review_comment(pr_ref):
+    resolved_pr = resolve_open_pr_ref(pr_ref)
+    if pr_has_codex_review_comment(resolved_pr):
         print("Codex review handoff already present.")
         return
-    result = run(["gh", "pr", "comment", pr_ref, "--body", CODEX_REVIEW_COMMENT], check=False)
+    result = run(["gh", "pr", "comment", resolved_pr, "--body", CODEX_REVIEW_COMMENT], check=False)
     if result.returncode != 0:
         print("Failed to post Codex review handoff comment.")
 
@@ -169,21 +193,17 @@ def maybe_open_pr(work_order: dict, base_branch: str) -> None:
     if not status:
         print("No changes detected; skipping PR creation.")
         return
+
     run(["git", "add", "."])
     commit_message = f"autonomy: issue #{work_order['issue']} via {work_order['agent']}"
     run(["git", "commit", "-m", commit_message], check=False)
     run(["git", "push", "-u", "origin", work_order["branch"]], check=False)
+
     if not os.environ.get("GH_TOKEN"):
         return
-    pr_body = (
-        "## What changed?\n\n"
-        f"- autonomous implementation for #{work_order['issue']}\n\n"
-        "## Why?\n\n"
-        f"- advance the `{work_order['agent']}` queue\n\n"
-        "## Validation\n\n"
-        "- executor-supplied validation pending\n"
-    )
-    run(
+
+    pr_ref = work_order["branch"]
+    create_result = run(
         [
             "gh",
             "pr",
@@ -196,11 +216,21 @@ def maybe_open_pr(work_order: dict, base_branch: str) -> None:
             "--title",
             f"autonomy: {work_order['title']}",
             "--body",
-            pr_body,
+            "## What changed?\n\n"
+            f"- autonomous implementation for #{work_order['issue']}\n\n"
+            "## Why?\n\n"
+            f"- advance the `{work_order['agent']}` queue\n\n"
+            "## Validation\n\n"
+            "- executor-supplied validation pending\n",
         ],
         check=False,
     )
-    maybe_comment_codex_review(work_order["branch"])
+
+    if create_result.returncode != 0:
+        print("Could not create PR (possibly already exists). Ensuring handoff is posted on the active PR.")
+
+    maybe_comment_codex_review(pr_ref)
+
     reviewer_login = resolve_reviewer_login(work_order["reviewer"])
     if reviewer_login and os.environ.get("GH_TOKEN"):
         run(
@@ -208,7 +238,7 @@ def maybe_open_pr(work_order: dict, base_branch: str) -> None:
                 "gh",
                 "pr",
                 "edit",
-                work_order["branch"],
+                pr_ref,
                 "--add-assignee",
                 reviewer_login,
             ],
@@ -219,7 +249,7 @@ def maybe_open_pr(work_order: dict, base_branch: str) -> None:
                 "gh",
                 "pr",
                 "comment",
-                work_order["branch"],
+                pr_ref,
                 "--body",
                 f"Reviewer routing: `{work_order['reviewer']}` -> @{reviewer_login}",
             ],
