@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.config import get_settings
 from src.api.database import dispose_engine, init_db
 from src.api.models.schemas import HealthResponse
+from src.api.middleware.security import add_security_middleware
 from src.api.routes import (
     agents,
     deployments,
@@ -119,9 +120,11 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+add_security_middleware(app, settings.cors_origins)
 
 # Add metrics middleware
 app.middleware("http")(track_request)
