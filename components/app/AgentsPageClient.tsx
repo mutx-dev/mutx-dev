@@ -347,6 +347,10 @@ export function AgentsPageClient() {
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-400/10 text-emerald-400">
               <Activity className="h-5 w-5" />
             </div>
+            <div>
+              <p className="text-2xl font-semibold text-white">{runningAgents}</p>
+              <p className="text-xs text-slate-500">Running</p>
+            </div>
           </div>
         </Card>
         
