@@ -14,9 +14,9 @@ function mockRequest(url: string, forwardedProto?: string) {
 }
 
 describe('dashboard auth cookie policy helpers', () => {
-  it('shares auth cookies across mutx.dev subdomains', () => {
-    expect(getCookieDomain(mockRequest('https://app.mutx.dev/api/auth/login'))).toBe('.mutx.dev')
-    expect(getCookieDomain(mockRequest('https://mutx.dev/api/auth/login'))).toBe('.mutx.dev')
+  it('does not force a shared domain for production hosts', () => {
+    expect(getCookieDomain(mockRequest('https://app.mutx.dev/api/auth/login'))).toBeUndefined()
+    expect(getCookieDomain(mockRequest('https://mutx.dev/api/auth/login'))).toBeUndefined()
   })
 
   it('does not force a domain on localhost-style environments', () => {
