@@ -8,6 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
 from src.api.models import Agent, AgentLog
+from src.api.middleware.auth import get_current_user
+from src.api.models.models import User
 
 router = APIRouter(prefix="/clawhub", tags=["clawhub"])
 
@@ -89,13 +91,19 @@ async def list_available_skills():
 
 
 @router.post("/install")
-async def install_skill(request: InstallSkillRequest, db: AsyncSession = Depends(get_db)):
+async def install_skill(
+    request: InstallSkillRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Installs a skill to an agent's configuration."""
     result = await db.execute(select(Agent).where(Agent.id == request.agent_id))
     agent = result.scalar_one_or_none()
 
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
+    if agent.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to modify this agent")
 
     # Simple JSON-based config management for the demo
     import json
@@ -125,13 +133,19 @@ async def install_skill(request: InstallSkillRequest, db: AsyncSession = Depends
 
 
 @router.post("/uninstall")
-async def uninstall_skill(request: InstallSkillRequest, db: AsyncSession = Depends(get_db)):
+async def uninstall_skill(
+    request: InstallSkillRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     """Removes a skill from an agent's configuration."""
     result = await db.execute(select(Agent).where(Agent.id == request.agent_id))
     agent = result.scalar_one_or_none()
 
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
+    if agent.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to modify this agent")
 
     import json
 
