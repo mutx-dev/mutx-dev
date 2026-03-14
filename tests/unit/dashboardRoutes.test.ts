@@ -207,9 +207,12 @@ describe('dashboard route proxies', () => {
 
     const response = await GET()
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/health', {
-      cache: 'no-store',
-    })
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://localhost:8000/health',
+      expect.objectContaining({
+        cache: 'no-store',
+      })
+    )
     expect(response.status).toBe(503)
     await expect(response.json()).resolves.toEqual({
       status: 'degraded',
