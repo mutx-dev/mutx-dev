@@ -21,6 +21,7 @@ import {
 
 import { Card } from "@/components/ui/Card";
 import { type components } from "@/app/types/api";
+import { getLatestActiveApiKey, getLatestRevokedApiKey } from "@/components/app/apiKeyHelpers";
 
 type User = components["schemas"]["UserResponse"];
 type Agent = components["schemas"]["AgentResponse"];
@@ -185,8 +186,8 @@ export function AppDashboardClient() {
       (left, right) =>
         new Date(right.created_at ?? 0).getTime() - new Date(left.created_at ?? 0).getTime(),
     )[0];
-  const newestActiveKey = apiKeys.find((apiKey) => apiKey.is_active) ?? null;
-  const newestRevokedKey = [...apiKeys].reverse().find((apiKey) => !apiKey.is_active) ?? null;
+  const newestActiveKey = getLatestActiveApiKey(apiKeys);
+  const newestRevokedKey = getLatestRevokedApiKey(apiKeys);
   const operatorReadiness = useMemo(() => {
     if (!user) {
       return {
