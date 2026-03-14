@@ -63,6 +63,14 @@ class Settings(BaseSettings):
             "DB_CONNECT_TIMEOUT_SECONDS",
         ),
     )
+    internal_user_email_domains: list[str] = Field(
+        default=["mutx.dev"],
+        validation_alias=AliasChoices(
+            "INTERNAL_USER_EMAIL_DOMAINS",
+            "ADMIN_EMAIL_DOMAINS",
+        ),
+        description="Email domains allowed to access internal-only endpoints.",
+    )
 
 
 @lru_cache()

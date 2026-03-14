@@ -44,12 +44,18 @@ async def test_capture_lead_minimal(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_list_leads_authenticated(client: AsyncClient, test_user):
-    """Test listing leads requires authentication."""
-    # This should succeed because 'client' is authenticated (via conftest fixtures usually)
+async def test_list_leads_internal_user(client: AsyncClient, test_user):
+    """Test listing leads for an internal user."""
     response = await client.get("/leads")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
+
+
+@pytest.mark.asyncio
+async def test_list_leads_non_internal_forbidden(other_user_client: AsyncClient):
+    """Test listing leads is forbidden for non-internal users."""
+    response = await other_user_client.get("/leads")
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
@@ -60,8 +66,8 @@ async def test_list_leads_unauthorized(client_no_auth: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_get_lead_authenticated(client: AsyncClient, db_session: AsyncSession):
-    """Test fetching a single lead when authenticated."""
+async def test_get_lead_internal_user(client: AsyncClient, db_session: AsyncSession):
+    """Test fetching a single lead when internal/authenticated."""
     lead = Lead(
         email="reader@example.com",
         name="Reader",
@@ -78,6 +84,18 @@ async def test_get_lead_authenticated(client: AsyncClient, db_session: AsyncSess
     data = response.json()
     assert data["id"] == str(lead.id)
     assert data["email"] == "reader@example.com"
+
+
+@pytest.mark.asyncio
+async def test_get_lead_non_internal_forbidden(other_user_client: AsyncClient, db_session: AsyncSession):
+    """Test fetching a lead is forbidden for non-internal users."""
+    lead = Lead(email="private@example.com", source="homepage")
+    db_session.add(lead)
+    await db_session.commit()
+    await db_session.refresh(lead)
+
+    response = await other_user_client.get(f"/leads/{lead.id}")
+    assert response.status_code == 403
 
 
 @pytest.mark.asyncio
