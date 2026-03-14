@@ -56,6 +56,14 @@ function formatTimestamp(timestamp?: string | null) {
   }
 }
 
+function formatMetadata(metadata: string): string {
+  try {
+    return JSON.stringify(JSON.parse(metadata), null, 2);
+  } catch {
+    return metadata;
+  }
+}
+
 async function fetchLogs<T>(url: string): Promise<T[]> {
   const response = await fetch(url, { cache: "no-store" });
   if (!response.ok) {
@@ -284,7 +292,7 @@ export function LogsViewer({
                           Metadata
                         </p>
                         <pre className="text-xs text-slate-400 overflow-x-auto">
-                          {JSON.stringify(JSON.parse(log.extra_data), null, 2)}
+                          {formatMetadata(log.extra_data)}
                         </pre>
                       </div>
                     )}
