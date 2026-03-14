@@ -16,9 +16,7 @@ logger = logging.getLogger(__name__)
 def _agent_heartbeat_check(agent_id: str):
     async def _check() -> bool:
         async with database_module.async_session_maker() as session:
-            result = await session.execute(
-                select(Agent).where(Agent.id == uuid.UUID(agent_id))
-            )
+            result = await session.execute(select(Agent).where(Agent.id == uuid.UUID(agent_id)))
             agent = result.scalar_one_or_none()
 
             if not agent:
