@@ -101,7 +101,7 @@ async def test_agent_runtime_heartbeat_triggers_heartbeat_webhook_without_status
 
     delivered: list[tuple[str, dict]] = []
 
-    async def mock_trigger_webhook_event(db, event, payload):
+    async def mock_trigger_webhook_event(db, event, payload, user_id=None):
         delivered.append((event, payload))
         return 1
 
@@ -149,7 +149,7 @@ async def test_agent_runtime_heartbeat_emits_status_webhook_on_status_change(
 
     delivered: list[tuple[str, dict]] = []
 
-    async def mock_trigger_webhook_event(db, event, payload):
+    async def mock_trigger_webhook_event(db, event, payload, user_id=None):
         delivered.append((event, payload))
         return 1
 
@@ -186,7 +186,7 @@ async def test_agent_runtime_heartbeat_returns_ok_when_webhook_dispatch_fails(
 
     emitted_events: list[str] = []
 
-    async def mock_trigger_webhook_event(db, event, payload):
+    async def mock_trigger_webhook_event(db, event, payload, user_id=None):
         emitted_events.append(event)
         raise RuntimeError("webhook dispatch unavailable")
 
