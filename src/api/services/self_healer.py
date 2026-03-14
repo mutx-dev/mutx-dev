@@ -5,7 +5,7 @@ import uuid
 from typing import Optional, Dict, Any, List, Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 from collections import deque
 
 logger = logging.getLogger(__name__)
@@ -152,7 +152,7 @@ class RecoveryExecutor:
             agent_id=agent_id,
             action=action,
             status=RecoveryStatus.PENDING,
-            started_at=datetime.utcnow(),
+            started_at=datetime.now(timezone.utc).replace(tzinfo=None),
             metadata=metadata or {},
         )
 
@@ -183,7 +183,7 @@ class RecoveryExecutor:
                     record.new_version = new_version
 
             record.status = RecoveryStatus.SUCCESS
-            record.completed_at = datetime.utcnow()
+            record.completed_at = datetime.now(timezone.utc).replace(tzinfo=None)
             record.recovery_time_seconds = (record.completed_at - record.started_at).total_seconds()
 
             logger.info(
@@ -193,7 +193,7 @@ class RecoveryExecutor:
 
         except Exception as e:
             record.status = RecoveryStatus.FAILED
-            record.completed_at = datetime.utcnow()
+            record.completed_at = datetime.now(timezone.utc).replace(tzinfo=None)
             record.error_message = str(e)
             record.recovery_time_seconds = (record.completed_at - record.started_at).total_seconds()
 
@@ -223,7 +223,7 @@ class RecoveryExecutor:
                 agent_id=agent_id,
                 action=RecoveryAction.ROLLBACK,
                 status=RecoveryStatus.FAILED,
-                started_at=datetime.utcnow(),
+                started_at=datetime.now(timezone.utc).replace(tzinfo=None),
                 error_message="No stable version available for rollback",
             )
 
@@ -234,7 +234,7 @@ class RecoveryExecutor:
                 agent_id=agent_id,
                 action=RecoveryAction.ROLLBACK,
                 status=RecoveryStatus.FAILED,
-                started_at=datetime.utcnow(),
+                started_at=datetime.now(timezone.utc).replace(tzinfo=None),
                 error_message="No rollback handler registered",
             )
 
@@ -249,8 +249,8 @@ class RecoveryExecutor:
                 agent_id=agent_id,
                 action=RecoveryAction.ROLLBACK,
                 status=RecoveryStatus.SUCCESS,
-                started_at=datetime.utcnow(),
-                completed_at=datetime.utcnow(),
+                started_at=datetime.now(timezone.utc).replace(tzinfo=None),
+                completed_at=datetime.now(timezone.utc).replace(tzinfo=None),
                 previous_version=original_record.previous_version,
                 new_version=target_version,
             )
@@ -260,8 +260,8 @@ class RecoveryExecutor:
                 agent_id=agent_id,
                 action=RecoveryAction.ROLLBACK,
                 status=RecoveryStatus.FAILED,
-                started_at=datetime.utcnow(),
-                completed_at=datetime.utcnow(),
+                started_at=datetime.now(timezone.utc).replace(tzinfo=None),
+                completed_at=datetime.now(timezone.utc).replace(tzinfo=None),
                 error_message=str(e),
             )
 
@@ -287,7 +287,7 @@ class HealthCheckScheduler:
         self._agent_health[agent_id] = AgentHealth(
             agent_id=agent_id,
             is_healthy=True,
-            last_check=datetime.utcnow(),
+            last_check=datetime.now(timezone.utc).replace(tzinfo=None),
         )
         logger.info(f"Registered health checker for agent {agent_id}")
 
@@ -340,7 +340,7 @@ class HealthCheckScheduler:
             return HealthCheckResult(
                 agent_id=agent_id,
                 is_healthy=False,
-                checked_at=datetime.utcnow(),
+                checked_at=datetime.now(timezone.utc).replace(tzinfo=None),
                 error_message="No health checker registered",
             )
 
@@ -358,7 +358,7 @@ class HealthCheckScheduler:
                 return HealthCheckResult(
                     agent_id=agent_id,
                     is_healthy=bool(is_healthy),
-                    checked_at=datetime.utcnow(),
+                    checked_at=datetime.now(timezone.utc).replace(tzinfo=None),
                     response_time_ms=response_time,
                 )
 
@@ -375,7 +375,7 @@ class HealthCheckScheduler:
         return HealthCheckResult(
             agent_id=agent_id,
             is_healthy=False,
-            checked_at=datetime.utcnow(),
+            checked_at=datetime.now(timezone.utc).replace(tzinfo=None),
             response_time_ms=response_time,
             error_message=f"Failed after {self.max_retries} attempts",
         )
@@ -428,7 +428,7 @@ class RecoveryTimeTracker:
 
             self._recovery_times[agent_id].append(
                 {
-                    "timestamp": datetime.utcnow(),
+                    "timestamp": datetime.now(timezone.utc).replace(tzinfo=None),
                     "recovery_time_seconds": recovery_time_seconds,
                 }
             )
@@ -552,7 +552,8 @@ class SelfHealingService:
 
             if agent_id in self._last_recovery_time:
                 time_since_last = (
-                    datetime.utcnow() - self._last_recovery_time[agent_id]
+                    datetime.now(timezone.utc).replace(tzinfo=None)
+                    - self._last_recovery_time[agent_id]
                 ).total_seconds()
                 if time_since_last < self.config.min_recovery_interval_seconds:
                     logger.debug(
@@ -587,7 +588,9 @@ class SelfHealingService:
             async with self._lock:
                 self._recovery_history.append(recovery_record)
                 if recovery_record.status in [RecoveryStatus.SUCCESS, RecoveryStatus.PARTIAL]:
-                    self._last_recovery_time[agent_id] = datetime.utcnow()
+                    self._last_recovery_time[agent_id] = datetime.now(timezone.utc).replace(
+                        tzinfo=None
+                    )
 
             if recovery_record.status == RecoveryStatus.SUCCESS:
                 self.version_manager.mark_stable_version(
