@@ -12,7 +12,7 @@ This repo ships both a local development compose file and a production-oriented 
 Start everything:
 
 ```bash
-docker-compose up
+docker compose -f infrastructure/docker/docker-compose.yml up --build
 ```
 
 Run only data services in the background:
@@ -31,13 +31,13 @@ The local compose file currently starts:
 ## Useful Commands
 
 ```bash
-docker-compose ps
-docker-compose logs -f api
-docker-compose logs -f frontend
-docker-compose restart api
-docker-compose build api
-docker-compose down
-docker-compose down -v
+docker compose -f infrastructure/docker/docker-compose.yml ps
+docker compose -f infrastructure/docker/docker-compose.yml logs -f api
+docker compose -f infrastructure/docker/docker-compose.yml logs -f frontend
+docker compose -f infrastructure/docker/docker-compose.yml restart api
+docker compose -f infrastructure/docker/docker-compose.yml build api
+docker compose -f infrastructure/docker/docker-compose.yml down
+docker compose -f infrastructure/docker/docker-compose.yml down -v
 ```
 
 ## Validate the Local Stack
@@ -55,20 +55,20 @@ open http://localhost:3000
 The production file in this repo is:
 
 ```
-docker-compose.production.yml
+infrastructure/docker/docker-compose.production.yml
 ```
 
 Bring it up with:
 
 ```bash
-docker-compose -f docker-compose.production.yml up -d --build
+docker compose -f infrastructure/docker/docker-compose.production.yml up -d --build
 ```
 
 Inspect it with:
 
 ```bash
-docker-compose -f docker-compose.production.yml ps
-docker-compose -f docker-compose.production.yml logs -f api
+docker compose -f infrastructure/docker/docker-compose.production.yml ps
+docker compose -f infrastructure/docker/docker-compose.production.yml logs -f api
 ```
 
 ## Environment Variables

@@ -10,10 +10,10 @@ This guide reflects the current stack and route surface.
 ## Container and Service Logs
 
 ```bash
-docker-compose logs -f api
-docker-compose logs -f frontend
-docker-compose logs -f postgres
-docker-compose logs -f redis
+docker compose -f infrastructure/docker/docker-compose.yml logs -f api
+docker compose -f infrastructure/docker/docker-compose.yml logs -f frontend
+docker compose -f infrastructure/docker/docker-compose.yml logs -f postgres
+docker compose -f infrastructure/docker/docker-compose.yml logs -f redis
 ```
 
 ## API Health Checks
@@ -53,8 +53,8 @@ curl -X POST http://localhost:8000/auth/login \
 ## Database Checks
 
 ```bash
-docker-compose exec postgres pg_isready -U mutx
-docker-compose exec postgres psql -U mutx -d mutx -c "SELECT now();"
+docker compose -f infrastructure/docker/docker-compose.yml exec postgres pg_isready -U mutx
+docker compose -f infrastructure/docker/docker-compose.yml exec postgres psql -U mutx -d mutx -c "SELECT now();"
 ```
 
 If the API is degraded, compare the running DB host to your `.env` `DATABASE_URL`.

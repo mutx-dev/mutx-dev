@@ -8,23 +8,24 @@ This quickstart is for the current repo as it exists now: Next.js frontend plus 
 - FastAPI control plane on port `8000`
 - Postgres and Redis via Docker Compose
 
-## 1. Install dependencies
+## 1. Canonical local bootstrap (repo root)
+
+```bash
+./scripts/dev.sh
+```
+
+This is the supported local bootstrap entrypoint. It uses `infrastructure/docker/docker-compose.yml` explicitly, creates `.env` from `.env.example` when needed, and starts PostgreSQL, Redis, API, and frontend containers.
+
+## 2. Manual split-process workflow (optional)
+
+If you prefer host processes for API and web:
 
 ```bash
 npm install
 pip install -r requirements.txt
-```
-
-## 2. Start backing services
-
-```bash
 docker compose -f infrastructure/docker/docker-compose.yml up -d postgres redis
-```
-
-## 3. Start the API
-
-```bash
 uvicorn src.api.main:app --reload --port 8000
+npm run dev
 ```
 
 Backend truth checks:
@@ -34,19 +35,13 @@ curl http://localhost:8000/health
 curl http://localhost:8000/ready
 ```
 
-## 4. Start the web surface
-
-```bash
-npm run dev
-```
-
 Then use:
 
 - `http://localhost:3000` for the marketing site shape
 - `http://localhost:3000/app` for the app shell preview
 - `http://localhost:3000/api/*` for the Next.js same-origin proxy layer
 
-## 5. Register or log in
+## 3. Register or log in
 
 Use either the browser flows or direct API calls.
 
@@ -58,7 +53,7 @@ curl -X POST "$BASE_URL/auth/register"   -H "Content-Type: application/json"   -
 curl -X POST "$BASE_URL/auth/login"   -H "Content-Type: application/json"   -d '{"email":"you@example.com","password":"StrongPass1!"}'
 ```
 
-## 6. Inspect real resources
+## 4. Inspect real resources
 
 ```bash
 curl "$BASE_URL/agents?limit=10&skip=0"   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"

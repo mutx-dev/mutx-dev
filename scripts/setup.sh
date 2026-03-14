@@ -1,30 +1,49 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 echo "Setting up mutx.dev..."
 
-ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+COMPOSE_FILE="$ROOT_DIR/infrastructure/docker/docker-compose.yml"
 cd "$ROOT_DIR"
 
-COMPOSE_FILE="$ROOT_DIR/infrastructure/docker/docker-compose.yml"
+if ! command -v docker >/dev/null 2>&1; then
+    echo "Docker is required for local setup."
+    echo "Install Docker Desktop or Docker Engine and retry."
+    exit 1
+fi
 
-if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+if ! docker info >/dev/null 2>&1; then
+    echo "Docker daemon is not running."
+    echo "Start Docker Desktop (or the Docker service) and retry."
+    exit 1
+fi
+
+if docker compose version >/dev/null 2>&1; then
     COMPOSE_CMD=(docker compose)
 elif command -v docker-compose >/dev/null 2>&1; then
     COMPOSE_CMD=(docker-compose)
 else
-    echo "Docker Compose is required (docker compose or docker-compose)."
+    echo "Docker Compose is required (docker compose plugin or docker-compose)."
     exit 1
 fi
 
 if [ ! -f "$COMPOSE_FILE" ]; then
     echo "Compose file not found at $COMPOSE_FILE"
+    echo "Expected local stack file: infrastructure/docker/docker-compose.yml"
     exit 1
 fi
 
-if [ ! -f .env ]; then
-    echo "Creating .env from example..."
-    cp .env.example .env
+if [ ! -f "$ROOT_DIR/.env" ]; then
+    if [ -f "$ROOT_DIR/.env.example" ]; then
+        echo "Creating .env from .env.example..."
+        cp "$ROOT_DIR/.env.example" "$ROOT_DIR/.env"
+    else
+        echo "Missing $ROOT_DIR/.env.example"
+        echo "Create $ROOT_DIR/.env with required local values and retry."
+        exit 1
+    fi
 fi
 
 echo "Installing Python dependencies..."
@@ -47,4 +66,4 @@ echo "Running migrations..."
 PYTHONPATH=./src/api alembic upgrade head
 
 echo "Setup complete!"
-echo "Run ./scripts/dev.sh to start development services"
+echo "Canonical local bootstrap command: ./scripts/dev.sh"

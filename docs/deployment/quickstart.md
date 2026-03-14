@@ -22,8 +22,8 @@ You need:
 ### Install dependencies
 
 ```bash
-git clone https://github.com/fortunexbt/mutx.dev.git
-cd mutx.dev
+git clone https://github.com/fortunexbt/mutx-dev.git
+cd mutx-dev
 
 npm install
 python3 -m venv .venv
@@ -41,9 +41,9 @@ DATABASE_URL=postgresql://mutx:mutx_password@localhost:5432/mutx
 {% endstep %}
 
 {% step %}
-### One-command morning demo validation
+### Optional one-command demo validation
 
-Use this for the canonical morning-run path (start everything + validate):
+Use this when you want a smoke check that boots the stack and validates routes in one run:
 
 ```bash
 npm run demo:validate
@@ -55,7 +55,7 @@ This validates API health and the demo-facing routes in one go.
 {% step %}
 ### Start the local demo stack
 
-Use the repo's canonical bootstrap script when you want the fastest morning-demo path:
+Use the canonical local bootstrap entrypoint from repo root:
 
 ```bash
 ./scripts/dev.sh
@@ -72,7 +72,7 @@ uvicorn src.api.main:app --reload --port 8000
 {% step %}
 ### Start the web app
 
-In another terminal:
+In another terminal for manual mode (skip this if you launched `./scripts/dev.sh`, because frontend is already running in Compose):
 
 ```bash
 npm run dev
