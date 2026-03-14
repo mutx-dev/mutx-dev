@@ -7,9 +7,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.models import Agent, AgentLog
 from src.api.middleware.auth import get_current_user
-from src.api.models.models import User
+from src.api.models import Agent, AgentLog, User
 
 router = APIRouter(prefix="/clawhub", tags=["clawhub"])
 
