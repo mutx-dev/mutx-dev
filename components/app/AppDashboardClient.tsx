@@ -101,6 +101,30 @@ function maskApiKeyId(value: string) {
   return `${value.slice(0, 6)}…${value.slice(-4)}`;
 }
 
+function getExpiryBadge(expiresAt?: string | null) {
+  if (!expiresAt) return null;
+
+  const expiresMs = new Date(expiresAt).getTime();
+  if (Number.isNaN(expiresMs)) return null;
+
+  const diffHours = (expiresMs - Date.now()) / (1000 * 60 * 60);
+  if (diffHours <= 0) {
+    return {
+      label: 'Expired',
+      tone: 'border-rose-500/30 bg-rose-500/10 text-rose-200',
+    };
+  }
+
+  if (diffHours <= 24 * 7) {
+    return {
+      label: 'Expiring soon',
+      tone: 'border-amber-400/30 bg-amber-400/10 text-amber-100',
+    };
+  }
+
+  return null;
+}
+
 const walkthroughSteps = [
   {
     title: "Authenticate with operator context",
@@ -1180,6 +1204,7 @@ export function AppDashboardClient() {
                 apiKeys.map((apiKey) => {
                   const lastUsedRelative = apiKey.last_used ? formatRelativeDate(apiKey.last_used) : "Never used";
                   const expiresRelative = apiKey.expires_at ? formatRelativeDate(apiKey.expires_at) : "No expiry";
+                  const expiryBadge = getExpiryBadge(apiKey.expires_at);
 
                   return (
                   <div
@@ -1188,7 +1213,7 @@ export function AppDashboardClient() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <p className="truncate font-medium text-slate-300">
                             {apiKey.name}
                           </p>
@@ -1200,6 +1225,11 @@ export function AppDashboardClient() {
                             />
                             {apiKey.is_active ? "Active" : "Revoked"}
                           </span>
+                          {expiryBadge ? (
+                            <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest ${expiryBadge.tone}`}>
+                              {expiryBadge.label}
+                            </span>
+                          ) : null}
                         </div>
                         <p className="mt-2 font-[family:var(--font-mono)] text-[11px] text-slate-500">
                           {maskApiKeyId(apiKey.id)}
