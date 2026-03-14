@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { Check, Copy, Github } from 'lucide-react'
 
@@ -23,7 +23,7 @@ const links = [
 export default function LandingPage() {
   const [demoCommandCopied, setDemoCommandCopied] = useState(false)
 
-  const copyDemoCommand = async () => {
+  const copyDemoCommand = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(DEMO_COMMAND)
     } catch {
@@ -41,7 +41,21 @@ export default function LandingPage() {
     window.setTimeout(() => {
       setDemoCommandCopied(false)
     }, 1200)
-  }
+  }, [])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+        const target = e.target as HTMLElement
+        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+          e.preventDefault()
+          copyDemoCommand()
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [copyDemoCommand])
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white/20">
@@ -126,7 +140,7 @@ export default function LandingPage() {
                   className="inline-flex shrink-0 items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-2 text-xs font-medium text-white transition hover:bg-white/[0.18]"
                 >
                   {demoCommandCopied ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}
-                  {demoCommandCopied ? 'Copied' : 'Copy'}
+                  {demoCommandCopied ? 'Copied' : 'Ctrl+C'}
                 </button>
               </div>
             </div>
