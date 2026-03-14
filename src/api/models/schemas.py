@@ -86,6 +86,7 @@ class DeploymentResponse(BaseModel):
     id: uuid.UUID
     agent_id: uuid.UUID
     status: str
+    version: Optional[str] = None
     replicas: int
     node_id: Optional[str]
     started_at: Optional[datetime] = None
@@ -121,6 +122,34 @@ class DeploymentMetricsResponse(BaseModel):
     cpu_usage: Optional[float]
     memory_usage: Optional[float]
     timestamp: datetime
+
+
+class DeploymentVersionResponse(BaseModel):
+    """Response model for deployment version"""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    deployment_id: uuid.UUID
+    version: int
+    config_snapshot: str
+    status: str
+    created_at: datetime
+    rolled_back_at: Optional[datetime] = None
+
+
+class DeploymentVersionHistoryResponse(BaseModel):
+    """Response model for deployment version history"""
+
+    deployment_id: uuid.UUID
+    items: list[DeploymentVersionResponse]
+    total: int
+
+
+class DeploymentRollbackRequest(BaseModel):
+    """Request model for rolling back a deployment"""
+
+    version: int
 
 
 class AgentResponse(BaseModel):

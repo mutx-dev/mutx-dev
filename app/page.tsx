@@ -22,6 +22,11 @@ const links = [
 
 export default function LandingPage() {
   const [demoCommandCopied, setDemoCommandCopied] = useState(false)
+  const [isMac, setIsMac] = useState(false)
+
+  useEffect(() => {
+    setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.platform))
+  }, [])
 
   const copyDemoCommand = useCallback(async () => {
     try {
@@ -140,7 +145,7 @@ export default function LandingPage() {
                   className="inline-flex shrink-0 items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-2 text-xs font-medium text-white transition hover:bg-white/[0.18]"
                 >
                   {demoCommandCopied ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}
-                  {demoCommandCopied ? 'Copied' : 'Ctrl+C'}
+                  {demoCommandCopied ? 'Copied' : (isMac ? '⌘C' : 'Ctrl+C')}
                 </button>
               </div>
             </div>
