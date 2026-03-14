@@ -220,6 +220,26 @@ describe('dashboard route proxies', () => {
     })
   })
 
+  it('returns a degraded status on health timeout', async () => {
+    const timeoutError = new DOMException('The operation was aborted.', 'AbortError')
+    ;(global.fetch as jest.Mock).mockRejectedValue(timeoutError)
+    const { GET } = await import('../../app/api/dashboard/health/route')
+
+    const response = await GET()
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://localhost:8000/health',
+      expect.objectContaining({
+        cache: 'no-store',
+      })
+    )
+    expect(response.status).toBe(504)
+    await expect(response.json()).resolves.toEqual({
+      status: 'degraded',
+      error: 'Health check timed out',
+    })
+  })
+
   it('preserves upstream unauthorized responses for api keys proxy', async () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock).mockResolvedValue({
