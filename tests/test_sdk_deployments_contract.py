@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 import uuid
 from pathlib import Path
@@ -51,6 +52,106 @@ def _event_history_payload(deployment_id: uuid.UUID, **overrides: Any) -> dict[s
     }
     payload.update(overrides)
     return payload
+
+
+def _metrics_payload() -> list[dict[str, Any]]:
+    return [
+        {
+            "id": str(uuid.uuid4()),
+            "agent_id": str(uuid.uuid4()),
+            "cpu_usage": 0.61,
+            "memory_usage": 0.44,
+            "timestamp": "2026-03-12T10:15:00",
+        }
+    ]
+
+
+def test_deployments_create_hits_canonical_route_and_maps_payload() -> None:
+    agent_id = uuid.uuid4()
+    captured: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        captured["body"] = request.content.decode()
+        return httpx.Response(
+            201,
+            json=_deployment_payload(agent_id=str(agent_id), status="pending", replicas=3),
+        )
+
+    with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+        deployment = Deployments(client).create(agent_id, replicas=3)
+
+    assert captured["path"] == "/deployments"
+    assert json.loads(captured["body"]) == {"agent_id": str(agent_id), "replicas": 3}
+    assert deployment.agent_id == agent_id
+    assert deployment.status == "pending"
+    assert deployment.replicas == 3
+
+
+@pytest.mark.asyncio
+async def test_deployments_acreate_hits_canonical_route_and_maps_payload() -> None:
+    agent_id = uuid.uuid4()
+    captured: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        captured["body"] = request.content.decode()
+        return httpx.Response(
+            201,
+            json=_deployment_payload(agent_id=str(agent_id), status="pending", replicas=2),
+        )
+
+    async with httpx.AsyncClient(
+        base_url="https://api.test",
+        transport=httpx.MockTransport(handler),
+    ) as client:
+        deployment = await Deployments(client).acreate(agent_id, replicas=2)
+
+    assert captured["path"] == "/deployments"
+    assert json.loads(captured["body"]) == {"agent_id": str(agent_id), "replicas": 2}
+    assert deployment.agent_id == agent_id
+    assert deployment.status == "pending"
+    assert deployment.replicas == 2
+
+
+def test_deployments_restart_hits_contract_route_and_maps_payload() -> None:
+    deployment_id = uuid.uuid4()
+    captured: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        captured["body"] = request.content.decode()
+        return httpx.Response(200, json=_deployment_payload(id=str(deployment_id), status="pending"))
+
+    with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+        deployment = Deployments(client).restart(deployment_id)
+
+    assert captured["path"] == f"/deployments/{deployment_id}/restart"
+    assert captured["body"] == ""
+    assert deployment.id == deployment_id
+    assert deployment.status == "pending"
+
+
+@pytest.mark.asyncio
+async def test_deployments_arestart_hits_contract_route_and_maps_payload() -> None:
+    deployment_id = uuid.uuid4()
+    captured: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        captured["body"] = request.content.decode()
+        return httpx.Response(200, json=_deployment_payload(id=str(deployment_id), status="pending"))
+
+    async with httpx.AsyncClient(
+        base_url="https://api.test",
+        transport=httpx.MockTransport(handler),
+    ) as client:
+        deployment = await Deployments(client).arestart(deployment_id)
+
+    assert captured["path"] == f"/deployments/{deployment_id}/restart"
+    assert captured["body"] == ""
+    assert deployment.id == deployment_id
+    assert deployment.status == "pending"
 
 
 def test_deployments_events_hits_contract_route_and_maps_payload() -> None:
@@ -139,6 +240,34 @@ def test_deployment_parser_accepts_nullable_started_at_and_nested_events() -> No
     assert deployment.events[0].event_type == "create"
 
 
+def test_deployment_parser_accepts_z_suffix_timestamps() -> None:
+    deployment_id = uuid.uuid4()
+    payload = _deployment_payload(
+        id=str(deployment_id),
+        started_at="2026-03-12T09:00:00Z",
+        ended_at="2026-03-12T09:30:00Z",
+        events=[
+            {
+                "id": str(uuid.uuid4()),
+                "deployment_id": str(deployment_id),
+                "event_type": "restart",
+                "status": "pending",
+                "node_id": None,
+                "error_message": None,
+                "created_at": "2026-03-12T09:45:00Z",
+            }
+        ],
+    )
+
+    deployment = Deployment(payload)
+
+    assert deployment.started_at is not None
+    assert deployment.started_at.tzinfo is not None
+    assert deployment.ended_at is not None
+    assert deployment.ended_at.tzinfo is not None
+    assert deployment.events[0].created_at.tzinfo is not None
+
+
 def test_deployments_logs_support_level_filter_param() -> None:
     deployment_id = uuid.uuid4()
     captured: dict[str, Any] = {}
@@ -175,3 +304,42 @@ async def test_deployments_alogs_support_level_filter_param() -> None:
     assert payload == []
     assert captured["path"] == f"/deployments/{deployment_id}/logs"
     assert captured["query"] == {"skip": "4", "limit": "75", "level": "INFO"}
+
+
+def test_deployments_metrics_hits_contract_route_and_query_params() -> None:
+    deployment_id = uuid.uuid4()
+    captured: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        captured["query"] = dict(request.url.params)
+        return httpx.Response(200, json=_metrics_payload())
+
+    with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+        payload = Deployments(client).metrics(deployment_id, skip=5, limit=15)
+
+    assert captured["path"] == f"/deployments/{deployment_id}/metrics"
+    assert captured["query"] == {"skip": "5", "limit": "15"}
+    assert payload[0]["cpu_usage"] == 0.61
+    assert payload[0]["memory_usage"] == 0.44
+
+
+@pytest.mark.asyncio
+async def test_deployments_ametrics_hits_contract_route_and_query_params() -> None:
+    deployment_id = uuid.uuid4()
+    captured: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        captured["query"] = dict(request.url.params)
+        return httpx.Response(200, json=_metrics_payload())
+
+    async with httpx.AsyncClient(
+        base_url="https://api.test",
+        transport=httpx.MockTransport(handler),
+    ) as client:
+        payload = await Deployments(client).ametrics(deployment_id, skip=6, limit=12)
+
+    assert captured["path"] == f"/deployments/{deployment_id}/metrics"
+    assert captured["query"] == {"skip": "6", "limit": "12"}
+    assert payload[0]["cpu_usage"] == 0.61

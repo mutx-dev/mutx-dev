@@ -7,6 +7,15 @@ from uuid import UUID
 import httpx
 
 
+def _parse_datetime(value: str | None) -> datetime | None:
+    if value is None:
+        return None
+    # FastAPI serializers may emit UTC timestamps with a trailing "Z".
+    if value.endswith("Z"):
+        value = f"{value[:-1]}+00:00"
+    return datetime.fromisoformat(value)
+
+
 class DeploymentEvent:
     def __init__(self, data: dict[str, Any]):
         self.id = UUID(data["id"])
@@ -15,7 +24,7 @@ class DeploymentEvent:
         self.status = data["status"]
         self.node_id = data.get("node_id")
         self.error_message = data.get("error_message")
-        self.created_at = datetime.fromisoformat(data["created_at"])
+        self.created_at = _parse_datetime(data["created_at"])
         self._data = data
 
 
@@ -39,10 +48,8 @@ class Deployment:
         self.status = data["status"]
         self.replicas = data["replicas"]
         self.node_id = data.get("node_id")
-        self.started_at = (
-            datetime.fromisoformat(data["started_at"]) if data.get("started_at") else None
-        )
-        self.ended_at = datetime.fromisoformat(data["ended_at"]) if data.get("ended_at") else None
+        self.started_at = _parse_datetime(data.get("started_at"))
+        self.ended_at = _parse_datetime(data.get("ended_at"))
         self.error_message = data.get("error_message")
         self.events = [DeploymentEvent(item) for item in data.get("events", [])]
         self._data = data
