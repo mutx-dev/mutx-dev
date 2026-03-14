@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class WebhookEventType(str, Enum):
+    AGENT_STATUS = "agent.status"
+    # Legacy alias retained for backwards compatibility.
     AGENT_STATUS_UPDATE = "agent.status_update"
     AGENT_HEARTBEAT = "agent.heartbeat"
     AGENT_ERROR = "agent.error"
@@ -282,11 +284,14 @@ class WebhookHandler:
         self.monitoring_service = monitoring_service
         self.self_healing_service = self_healing_service
 
+        agent_status_processor = AgentStatusUpdateProcessor(
+            monitoring_service,
+            self_healing_service,
+        )
+
         self._processors: Dict[WebhookEventType, EventProcessor] = {
-            WebhookEventType.AGENT_STATUS_UPDATE: AgentStatusUpdateProcessor(
-                monitoring_service,
-                self_healing_service,
-            ),
+            WebhookEventType.AGENT_STATUS: agent_status_processor,
+            WebhookEventType.AGENT_STATUS_UPDATE: agent_status_processor,
             WebhookEventType.AGENT_HEARTBEAT: HeartbeatProcessor(monitoring_service),
             WebhookEventType.METRICS_REPORT: MetricsReportProcessor(monitoring_service),
             WebhookEventType.DEPLOYMENT_CREATED: DeploymentEventProcessor(
@@ -334,7 +339,7 @@ class WebhookHandler:
                 return ProcessedWebhook(
                     webhook_id=webhook_id,
                     payload=WebhookPayload(
-                        event_type=WebhookEventType.AGENT_STATUS_UPDATE,
+                        event_type=WebhookEventType.AGENT_STATUS,
                         source=WebhookSource.UNKNOWN,
                         timestamp=received_at,
                     ),
@@ -347,7 +352,7 @@ class WebhookHandler:
                 return ProcessedWebhook(
                     webhook_id=webhook_id,
                     payload=WebhookPayload(
-                        event_type=WebhookEventType.AGENT_STATUS_UPDATE,
+                        event_type=WebhookEventType.AGENT_STATUS,
                         source=WebhookSource.UNKNOWN,
                         timestamp=received_at,
                     ),
@@ -392,7 +397,7 @@ class WebhookHandler:
             return ProcessedWebhook(
                 webhook_id=webhook_id,
                 payload=WebhookPayload(
-                    event_type=WebhookEventType.AGENT_STATUS_UPDATE,
+                    event_type=WebhookEventType.AGENT_STATUS,
                     source=WebhookSource.UNKNOWN,
                     timestamp=received_at,
                 ),
@@ -437,7 +442,7 @@ def create_status_update_payload(
     metadata: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     return {
-        "event_type": WebhookEventType.AGENT_STATUS_UPDATE.value,
+        "event_type": WebhookEventType.AGENT_STATUS.value,
         "source": WebhookSource.AGENT.value,
         "timestamp": datetime.utcnow().isoformat(),
         "agent_id": agent_id,

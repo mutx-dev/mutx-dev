@@ -48,9 +48,9 @@ Register your own endpoint(s) to receive notifications from MUTX.
 
 ### Supported Events
 
-Exact event values from `src/api/services/webhook_handler.py` include:
+Canonical outgoing event values include:
 
-* `agent.status_update`
+* `agent.status`
 * `agent.heartbeat`
 * `agent.error`
 * `agent.started`
@@ -61,6 +61,10 @@ Exact event values from `src/api/services/webhook_handler.py` include:
 * `deployment.failed`
 * `deployment.rolled_back`
 * `metrics.report`
+
+Legacy compatibility:
+
+* `agent.status_update` is still accepted at registration time, but runtime status-change webhooks are emitted as `agent.status`.
 
 Wildcard subscriptions currently accepted by route validation:
 

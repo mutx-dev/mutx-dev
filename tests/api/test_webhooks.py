@@ -50,6 +50,23 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "event_name",
+    ["agent.heartbeat", "agent.status", "agent.status_update"],
+)
+async def test_webhook_create_accepts_runtime_status_event_names(
+    client: AsyncClient, event_name: str
+):
+    response = await client.post(
+        "/webhooks/",
+        json={"url": "https://example.com/webhook", "events": [event_name]},
+    )
+
+    assert response.status_code == 201
+    assert response.json()["events"] == [event_name]
+
+
+@pytest.mark.asyncio
 async def test_webhook_list_honors_skip_and_limit(client: AsyncClient):
     for idx in range(3):
         response = await client.post(
