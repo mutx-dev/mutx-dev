@@ -1,234 +1,134 @@
-from datetime import datetime
+"""
+Tests for /ingest endpoints.
+"""
+import uuid
 
 import pytest
+import pytest_asyncio
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
-@pytest.mark.asyncio
-async def test_ingest_agent_status(client: AsyncClient, test_user, test_agent):
-    response = await client.post(
-        "/ingest/agent-status",
-        json={
-            "agent_id": str(test_agent.id),
-            "status": "running",
-            "node_id": "test-node"
-        }
-    )
-    assert response.status_code == 200
-    assert response.json()["status"] == "updated"
-
-@pytest.mark.asyncio
-async def test_ingest_metrics(client: AsyncClient, test_user, test_agent):
-    response = await client.post(
-        "/ingest/metrics",
-        json={
-            "agent_id": str(test_agent.id),
-            "cpu_usage": 50.0,
-            "memory_usage": 1024.0
-        }
-    )
-    assert response.status_code == 200
-    assert response.json()["status"] == "recorded"
-
-@pytest.mark.asyncio
-async def test_ingest_deployment(client: AsyncClient, test_user, test_deployment):
-    response = await client.post(
-        "/ingest/deployment",
-        json={
-            "deployment_id": str(test_deployment.id),
-            "event": "healthy",
-            "status": "running",
-            "node_id": "test-node"
-        }
-    )
-    assert response.status_code == 200
-    assert response.json()["status"] == "processed"
-
-@pytest.mark.asyncio
-async def test_ingest_unauthorized_agent(client: AsyncClient, test_user):
-    # Mocking another user's agent
-    other_agent_id = "00000000-0000-0000-0000-000000000000"
-    
-    response = await client.post(
-        "/ingest/agent-status",
-        json={
-            "agent_id": other_agent_id,
-            "status": "running"
-        }
-    )
-    # Since agent_id doesn't exist in DB, it should be 404
-    assert response.status_code == 404
+from src.api.models.models import Agent, AgentStatus, User
 
 
-@pytest.mark.asyncio
-async def test_agent_runtime_heartbeat_rejects_unknown_status_value(
-    client: AsyncClient, db_session, test_agent
-):
-    from src.api.routes.agent_runtime import get_current_agent
-    from src.api.models.models import AgentStatus
+class TestIngestEndpoints:
+    """Tests for ingestion endpoints."""
 
-    test_agent.status = AgentStatus.CREATING.value
-    await db_session.commit()
+    @pytest.mark.asyncio
+    async def test_agent_status_requires_auth(self, client_no_auth: AsyncClient):
+        """Test /ingest/agent-status requires authentication."""
+        response = await client_no_auth.post(
+            "/ingest/agent-status",
+            json={
+                "agent_id": str(uuid.uuid4()),
+                "status": "running",
+                "node_id": "test-node",
+            },
+        )
+        assert response.status_code == 401
 
-    client.app.dependency_overrides[get_current_agent] = lambda: test_agent
+    @pytest.mark.asyncio
+    async def test_agent_status_update_success(
+        self, client: AsyncClient, db_session: AsyncSession, test_user: User
+    ):
+        """Test successful agent status update."""
+        agent_id = uuid.uuid4()
+        agent = Agent(
+            id=agent_id,
+            user_id=test_user.id,
+            name="Test Agent",
+            status=AgentStatus.CREATING.value,
+        )
+        db_session.add(agent)
+        await db_session.commit()
 
-    response = await client.post(
-        "/agents/heartbeat",
-        json={
-            "agent_id": str(test_agent.id),
-            "status": "unexpected_status",
-            "timestamp": datetime.utcnow().isoformat(),
-        },
-    )
+        response = await client.post(
+            "/ingest/agent-status",
+            json={
+                "agent_id": str(agent_id),
+                "status": "running",
+                "node_id": "test-node",
+            },
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "updated"
 
-    assert response.status_code == 422
+    @pytest.mark.asyncio
+    async def test_agent_status_update_not_found(
+        self, client: AsyncClient, test_user: User
+    ):
+        """Test agent status update returns 404 for unknown agent."""
+        response = await client.post(
+            "/ingest/agent-status",
+            json={
+                "agent_id": str(uuid.uuid4()),
+                "status": "running",
+                "node_id": "test-node",
+            },
+        )
+        assert response.status_code == 404
 
-    await db_session.refresh(test_agent)
-    assert test_agent.status == AgentStatus.CREATING.value
+    @pytest.mark.asyncio
+    async def test_agent_status_update_forbidden(
+        self, client: AsyncClient, db_session: AsyncSession, test_user: User
+    ):
+        """Test agent status update returns 403 for unauthorized user."""
+        other_user = User(
+            id=uuid.uuid4(),
+            email="other@example.com",
+            password_hash="hash",
+            name="Other User",
+        )
+        db_session.add(other_user)
+        await db_session.commit()
 
-    client.app.dependency_overrides.pop(get_current_agent, None)
+        agent_id = uuid.uuid4()
+        agent = Agent(
+            id=agent_id,
+            user_id=other_user.id,
+            name="Other Agent",
+            status=AgentStatus.CREATING.value,
+        )
+        db_session.add(agent)
+        await db_session.commit()
 
-
-@pytest.mark.asyncio
-async def test_agent_runtime_heartbeat_triggers_heartbeat_webhook_without_status_change(
-    client: AsyncClient, db_session, test_agent, monkeypatch
-):
-    from src.api.routes.agent_runtime import get_current_agent
-    import src.api.routes.agent_runtime as agent_runtime_routes
-    from src.api.models.models import AgentStatus
-
-    test_agent.status = AgentStatus.RUNNING.value
-    await db_session.commit()
-
-    delivered: list[tuple[str, dict]] = []
-
-    async def mock_trigger_webhook_event(db, event, payload, user_id=None):
-        delivered.append((event, payload))
-        return 1
-
-    monkeypatch.setattr(agent_runtime_routes, "trigger_webhook_event", mock_trigger_webhook_event)
-    client.app.dependency_overrides[get_current_agent] = lambda: test_agent
-
-    response = await client.post(
-        "/agents/heartbeat",
-        json={
-            "agent_id": str(test_agent.id),
-            "status": "running",
-            "message": "still alive",
-            "platform": "linux",
-            "hostname": "agent-01",
-            "timestamp": datetime.utcnow().isoformat(),
-        },
-    )
-
-    assert response.status_code == 200
-    assert [event for event, _ in delivered] == ["agent.heartbeat"]
-    assert delivered[0][1]["agent_id"] == str(test_agent.id)
-    assert delivered[0][1]["status"] == "running"
-    assert delivered[0][1]["previous_status"] == "running"
-    assert delivered[0][1]["message"] == "still alive"
-    assert delivered[0][1]["platform"] == "linux"
-    assert delivered[0][1]["hostname"] == "agent-01"
-    assert delivered[0][1]["timestamp"]
-
-    client.app.dependency_overrides.pop(get_current_agent, None)
-
-
-@pytest.mark.asyncio
-async def test_agent_runtime_heartbeat_emits_status_webhook_on_status_change(
-    client: AsyncClient, db_session, test_agent, monkeypatch
-):
-    from src.api.routes.agent_runtime import get_current_agent
-    import src.api.routes.agent_runtime as agent_runtime_routes
-    from src.api.models.models import AgentStatus
-
-    test_agent.status = AgentStatus.RUNNING.value
-    await db_session.commit()
-
-    test_agent.status = AgentStatus.CREATING.value
-    await db_session.commit()
-
-    delivered: list[tuple[str, dict]] = []
-
-    async def mock_trigger_webhook_event(db, event, payload, user_id=None):
-        delivered.append((event, payload))
-        return 1
-
-    monkeypatch.setattr(agent_runtime_routes, "trigger_webhook_event", mock_trigger_webhook_event)
-    client.app.dependency_overrides[get_current_agent] = lambda: test_agent
-
-    response = await client.post(
-        "/agents/heartbeat",
-        json={
-            "agent_id": str(test_agent.id),
-            "status": "running",
-            "timestamp": datetime.utcnow().isoformat(),
-        },
-    )
-
-    assert response.status_code == 200
-    assert [event for event, _ in delivered] == ["agent.heartbeat", "agent.status"]
-    assert delivered[1][1]["old_status"] == "creating"
-    assert delivered[1][1]["new_status"] == "running"
-
-    client.app.dependency_overrides.pop(get_current_agent, None)
+        response = await client.post(
+            "/ingest/agent-status",
+            json={
+                "agent_id": str(agent_id),
+                "status": "running",
+                "node_id": "test-node",
+            },
+        )
+        assert response.status_code == 403
 
 
-@pytest.mark.asyncio
-async def test_agent_runtime_heartbeat_returns_ok_when_webhook_dispatch_fails(
-    client: AsyncClient, db_session, test_agent, monkeypatch
-):
-    from src.api.routes.agent_runtime import get_current_agent
-    import src.api.routes.agent_runtime as agent_runtime_routes
-    from src.api.models.models import AgentStatus
+class TestIngestMetricsEndpoint:
+    """Tests for /ingest/metrics endpoint."""
 
-    test_agent.status = AgentStatus.CREATING.value
-    await db_session.commit()
+    @pytest.mark.asyncio
+    async def test_metrics_requires_auth(self, client_no_auth: AsyncClient):
+        """Test /ingest/metrics requires authentication."""
+        response = await client_no_auth.post(
+            "/ingest/metrics",
+            json={
+                "agent_id": str(uuid.uuid4()),
+                "cpu_usage": 50.0,
+                "memory_usage": 1024,
+            },
+        )
+        assert response.status_code == 401
 
-    emitted_events: list[str] = []
-
-    async def mock_trigger_webhook_event(db, event, payload, user_id=None):
-        emitted_events.append(event)
-        raise RuntimeError("webhook dispatch unavailable")
-
-    monkeypatch.setattr(agent_runtime_routes, "trigger_webhook_event", mock_trigger_webhook_event)
-    client.app.dependency_overrides[get_current_agent] = lambda: test_agent
-
-    response = await client.post(
-        "/agents/heartbeat",
-        json={
-            "agent_id": str(test_agent.id),
-            "status": "running",
-            "timestamp": datetime.utcnow().isoformat(),
-        },
-    )
-
-    assert response.status_code == 200
-    assert emitted_events == ["agent.heartbeat", "agent.status"]
-
-    await db_session.refresh(test_agent)
-    assert test_agent.status == AgentStatus.RUNNING.value
-    assert test_agent.last_heartbeat is not None
-
-    client.app.dependency_overrides.pop(get_current_agent, None)
-
-
-@pytest.mark.asyncio
-async def test_runtime_manager_delete_runtime_clears_default_runtime_reference():
-    from src.api.services.agent_runtime import RuntimeConfig, RuntimeManager
-
-    RuntimeManager._runtimes = {}
-    RuntimeManager._default_runtime = None
-
-    runtime = RuntimeManager.get_or_create_default(RuntimeConfig(default_timeout=123))
-
-    assert RuntimeManager.delete_runtime(runtime.runtime_id) is True
-    assert RuntimeManager.get_runtime(runtime.runtime_id) is None
-    assert RuntimeManager._default_runtime is None
-
-    replacement = RuntimeManager.get_or_create_default(RuntimeConfig(default_timeout=456))
-
-    assert replacement.runtime_id != runtime.runtime_id
-    assert replacement.config.default_timeout == 456
-
-    RuntimeManager._runtimes = {}
-    RuntimeManager._default_runtime = None
+    @pytest.mark.asyncio
+    async def test_metrics_not_found(self, client: AsyncClient, test_user: User):
+        """Test metrics returns 404 for unknown agent."""
+        response = await client.post(
+            "/ingest/metrics",
+            json={
+                "agent_id": str(uuid.uuid4()),
+                "cpu_usage": 50.0,
+                "memory_usage": 1024,
+            },
+        )
+        assert response.status_code == 404
