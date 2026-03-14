@@ -160,3 +160,78 @@ def test_deploy_restart_hits_contract_route_and_renders_status(monkeypatch) -> N
     }
     assert "Restarted deployment: dep-789" in result.output
     assert "Status: pending" in result.output
+
+
+def test_deploy_logs_hits_contract_route_and_supports_level_filter(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["params"] = params
+        return DummyResponse(
+            200,
+            [
+                {
+                    "timestamp": "2026-03-12T15:05:00",
+                    "level": "ERROR",
+                    "message": "probe failed",
+                }
+            ],
+        )
+
+    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.deploy.get_client", lambda config: SimpleNamespace(get=fake_get))
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        ["deploy", "logs", "dep-123", "--limit", "20", "--skip", "3", "--level", "ERROR"],
+    )
+
+    assert result.exit_code == 0
+    assert captured == {
+        "path": "/deployments/dep-123/logs",
+        "params": {
+            "limit": 20,
+            "skip": 3,
+            "level": "ERROR",
+        },
+    }
+    assert "2026-03-12T15:05:00 | ERROR | probe failed" in result.output
+
+
+def test_deploy_metrics_hits_contract_route_and_renders_points(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["params"] = params
+        return DummyResponse(
+            200,
+            [
+                {
+                    "timestamp": "2026-03-12T15:10:00",
+                    "cpu_usage": 0.5,
+                    "memory_usage": 0.75,
+                }
+            ],
+        )
+
+    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.deploy.get_client", lambda config: SimpleNamespace(get=fake_get))
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        ["deploy", "metrics", "dep-123", "--limit", "10", "--skip", "1"],
+    )
+
+    assert result.exit_code == 0
+    assert captured == {
+        "path": "/deployments/dep-123/metrics",
+        "params": {
+            "limit": 10,
+            "skip": 1,
+        },
+    }
+    assert "2026-03-12T15:10:00 | cpu: 0.5 | memory: 0.75" in result.output
