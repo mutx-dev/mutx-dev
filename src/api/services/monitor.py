@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select
 
@@ -26,7 +26,7 @@ def _agent_heartbeat_check(agent_id: str):
             if not last_heartbeat:
                 return False
 
-            return (datetime.utcnow() - last_heartbeat) <= timedelta(
+            return (datetime.now(timezone.utc).replace(tzinfo=None) - last_heartbeat) <= timedelta(
                 seconds=STALE_THRESHOLD_SECONDS,
             )
 
@@ -43,13 +43,13 @@ async def _recover_agent_to_running(agent_id: str, metadata):
 
         previous_status = agent.status
         agent.status = AgentStatus.RUNNING.value
-        agent.last_heartbeat = datetime.utcnow()
+        agent.last_heartbeat = datetime.now(timezone.utc).replace(tzinfo=None)
         session.add(
             AgentLog(
                 agent_id=agent.id,
                 level="warning",
                 message="Self-healing recovery handler restored agent status to RUNNING",
-                timestamp=datetime.utcnow(),
+                timestamp=datetime.now(timezone.utc).replace(tzinfo=None),
             )
         )
         await session.commit()
