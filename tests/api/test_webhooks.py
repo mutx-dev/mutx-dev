@@ -310,7 +310,7 @@ async def test_webhook_delivery_history_supports_managed_api_key_auth(
     webhook_id = uuid.UUID(create_response.json()["id"])
 
     key_response = await client_no_auth.post(
-        "/api-keys",
+        "/api/api-keys",
         json={"name": "managed-webhook-key"},
         headers={"Authorization": f"Bearer {access_token}"},
     )

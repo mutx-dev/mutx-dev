@@ -142,7 +142,7 @@ async def test_api_keys_async_methods_are_awaited_with_async_client() -> None:
         api_keys = APIKeys(client)
         key = await api_keys.acreate("test-key")
 
-    assert captured["path"] == "/api-keys"
+    assert captured["path"] == "/api/api-keys"
     assert key.name == "ci-key"
     assert key.key == "mutx_test_key"
 

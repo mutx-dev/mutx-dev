@@ -73,7 +73,7 @@ def test_agents_create_hits_canonical_route_and_renders_agent(monkeypatch) -> No
 
     assert result.exit_code == 0
     assert captured == {
-        "path": "/agents",
+        "path": "/api/agents",
         "json": {
             "name": "test-agent",
             "description": "A test agent",
@@ -114,7 +114,7 @@ def test_agents_create_with_minimal_args(monkeypatch) -> None:
     result = runner.invoke(cli, ["agents", "create", "-n", "minimal-agent"])
 
     assert result.exit_code == 0
-    assert captured["path"] == "/agents"
+    assert captured["path"] == "/api/agents"
     assert captured["json"]["name"] == "minimal-agent"
     assert captured["json"]["description"] == ""
     assert captured["json"]["type"] == "openai"
@@ -157,7 +157,7 @@ def test_agents_deploy_hits_contract_route_and_renders_deployment(monkeypatch) -
 
     assert result.exit_code == 0
     assert captured == {
-        "path": f"/agents/{agent_id}/deploy",
+        "path": f"/api/agents/{agent_id}/deploy",
         "json": None,
     }
     assert f"Deploying agent: {agent_id}" in result.output

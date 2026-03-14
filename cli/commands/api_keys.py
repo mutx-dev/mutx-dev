@@ -19,7 +19,7 @@ def list_api_keys():
         return
 
     client = get_client(config)
-    response = client.get("/api-keys")
+    response = client.get("/api/api-keys")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -55,7 +55,7 @@ def create_api_key(name: str, expires_in_days: Optional[int]):
         payload["expires_in_days"] = expires_in_days
 
     client = get_client(config)
-    response = client.post("/api-keys", json=payload)
+    response = client.post("/api/api-keys", json=payload)
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -87,7 +87,7 @@ def revoke_api_key(key_id: str, force: bool):
             return
 
     client = get_client(config)
-    response = client.delete(f"/api-keys/{key_id}")
+    response = client.delete(f"/api/api-keys/{key_id}")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -118,7 +118,7 @@ def rotate_api_key(key_id: str, force: bool):
             return
 
     client = get_client(config)
-    response = client.post(f"/api-keys/{key_id}/rotate")
+    response = client.post(f"/api/api-keys/{key_id}/rotate")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
