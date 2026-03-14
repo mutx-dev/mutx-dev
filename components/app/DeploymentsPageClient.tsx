@@ -7,11 +7,14 @@ import {
   Clock,
   Loader2,
   Play,
+  Plus,
   Power,
   RefreshCcw,
   RotateCcw,
   Search,
   Server,
+  Trash2,
+  X,
 } from "lucide-react";
 import { DeploymentSortSelect } from "./DeploymentSortSelect";
 
@@ -20,7 +23,7 @@ import { DeploymentHistory } from "./DeploymentHistory";
 import { type components } from "@/app/types/api";
 
 type Deployment = components["schemas"]["DeploymentResponse"];
-type DeploymentEvent = components["schemas"]["DeploymentEventResponse"];
+type Agent = components["schemas"]["AgentResponse"];
 
 async function readJson<T>(
   input: RequestInfo | URL,
@@ -38,9 +41,20 @@ async function readJson<T>(
   return payload as T;
 }
 
-function formatDate(value?: string | null) {
-  if (!value) return "N/A";
-  return new Date(value).toLocaleString();
+async function writeJson<T>(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<T> {
+  const response = await fetch(input, { ...init, cache: "no-store" });
+  const payload = await response
+    .json()
+    .catch(() => ({ detail: "Request failed" }));
+
+  if (!response.ok) {
+    throw new Error(payload.detail || payload.error || "Request failed");
+  }
+
+  return payload as T;
 }
 
 function formatRelativeDate(value?: string | null) {
@@ -113,7 +127,18 @@ function DeploymentCardSkeleton() {
   );
 }
 
-function DeploymentCard({ deployment }: { deployment: Deployment }) {
+interface DeploymentCardProps {
+  deployment: Deployment;
+  onRestart: (id: string) => void;
+  onStop: (id: string) => void;
+  onStart: (id: string) => void;
+  onDelete: (id: string) => void;
+  isProcessing: (id: string) => boolean;
+}
+
+function DeploymentCard({ deployment, onRestart, onStop, onStart, onDelete, isProcessing }: DeploymentCardProps) {
+  const processing = isProcessing(deployment.id);
+
   return (
     <Card className="border border-white/5 bg-white/[0.02] p-5 transition hover:border-emerald-400/20">
       <div className="flex items-start justify-between gap-4">
@@ -165,15 +190,17 @@ function DeploymentCard({ deployment }: { deployment: Deployment }) {
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
         <button
-          className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10"
-          onClick={() => console.log("restart", deployment.id)}
+          className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
+          onClick={() => onRestart(deployment.id)}
+          disabled={processing}
         >
-          <RotateCcw className="h-3.5 w-3.5" />
+          <RotateCcw className={`h-3.5 w-3.5 ${processing ? 'animate-spin' : ''}`} />
           Restart
         </button>
         <button
-          className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10"
-          onClick={() => console.log("start/stop", deployment.id)}
+          className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
+          onClick={() => deployment.status === "running" ? onStop(deployment.id) : onStart(deployment.id)}
+          disabled={processing}
         >
           <Power className="h-3.5 w-3.5" />
           {deployment.status === "running" ? "Stop" : "Start"}
@@ -186,6 +213,14 @@ function DeploymentCard({ deployment }: { deployment: Deployment }) {
           Logs
         </button>
         <DeploymentHistory deploymentId={deployment.id} />
+        <button
+          className="inline-flex items-center gap-2 rounded-lg border border-rose-400/20 bg-rose-400/10 px-3 py-1.5 text-xs font-medium text-rose-300 transition hover:bg-rose-400/20 disabled:opacity-50"
+          onClick={() => onDelete(deployment.id)}
+          disabled={processing}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          Delete
+        </button>
       </div>
     </Card>
   );
@@ -201,13 +236,145 @@ function LoadingState() {
   );
 }
 
+interface CreateDeploymentDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  agents: Agent[];
+  onSubmit: (agentId: string, replicas: number) => Promise<void>;
+}
+
+function CreateDeploymentDialog({ open, onOpenChange, agents, onSubmit }: CreateDeploymentDialogProps) {
+  const [agentId, setAgentId] = useState("");
+  const [replicas, setReplicas] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const availableAgents = agents.filter(a => a.status !== "deployed");
+
+  useEffect(() => {
+    if (open && availableAgents.length > 0 && !agentId) {
+      setAgentId(availableAgents[0].id);
+    }
+  }, [open, availableAgents, agentId]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!agentId) return;
+    
+    setSubmitting(true);
+    setError("");
+    
+    try {
+      await onSubmit(agentId, replicas);
+      onOpenChange(false);
+      setAgentId("");
+      setReplicas(1);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create deployment");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => onOpenChange(false)} />
+      <div className="relative z-10 w-full max-w-md rounded-2xl border border-white/10 bg-[#0a0a0f] p-6 shadow-2xl">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-white">Create Deployment</h2>
+          <button
+            onClick={() => onOpenChange(false)}
+            className="rounded-lg p-1 text-slate-400 hover:text-white hover:bg-white/10"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="rounded-lg border border-rose-400/20 bg-rose-400/10 p-3 text-sm text-rose-300">
+              {error}
+            </div>
+          )}
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Select Agent
+            </label>
+            <select
+              value={agentId}
+              onChange={(e) => setAgentId(e.target.value)}
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-emerald-400 focus:outline-none"
+              required
+            >
+              {availableAgents.length === 0 ? (
+                <option value="">No available agents</option>
+              ) : (
+                availableAgents.map((agent) => (
+                  <option key={agent.id} value={agent.id}>
+                    {agent.name} ({agent.status})
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              Replicas
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="10"
+              value={replicas}
+              onChange={(e) => setReplicas(Math.max(1, parseInt(e.target.value) || 1))}
+              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-emerald-400 focus:outline-none"
+              required
+            />
+          </div>
+          
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:bg-white/10"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting || !agentId || availableAgents.length === 0}
+              className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 disabled:opacity-50"
+            >
+              {submitting ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Creating...
+                </span>
+              ) : (
+                "Create Deployment"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export function DeploymentsPageClient() {
   const [deployments, setDeployments] = useState<Deployment[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"date"|"status"|"agent">("date");
+  const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const runningDeployments = deployments.filter(
     (d) => d.status === "running",
@@ -239,8 +406,18 @@ export function DeploymentsPageClient() {
 
   async function loadDeployments() {
     try {
-      const data = await readJson<Deployment[]>("/api/dashboard/deployments");
-      setDeployments(data);
+      const data = await readJson<{ deployments?: Deployment[] } | Deployment[]>("/api/dashboard/deployments");
+      
+      let deploymentsData: Deployment[];
+      if (Array.isArray(data)) {
+        deploymentsData = data;
+      } else if (data.deployments) {
+        deploymentsData = data.deployments;
+      } else {
+        deploymentsData = [];
+      }
+      
+      setDeployments(deploymentsData);
       setError("");
     } catch (err) {
       setError(
@@ -249,12 +426,134 @@ export function DeploymentsPageClient() {
     }
   }
 
+  async function loadAgents() {
+    try {
+      const data = await readJson<{ agents?: Agent[] } | Agent[]>("/api/dashboard/agents");
+      
+      let agentsData: Agent[];
+      if (Array.isArray(data)) {
+        agentsData = data;
+      } else if (data.agents) {
+        agentsData = data.agents;
+      } else {
+        agentsData = [];
+      }
+      
+      setAgents(agentsData);
+    } catch (err) {
+      console.error("Failed to load agents:", err);
+    }
+  }
+
+  async function handleCreateDeployment(agentId: string, replicas: number) {
+    setProcessingIds(prev => new Set(prev).add("create"));
+    try {
+      await writeJson<Deployment>("/api/dashboard/deployments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ agent_id: agentId, replicas }),
+      });
+      await loadDeployments();
+    } finally {
+      setProcessingIds(prev => {
+        const next = new Set(prev);
+        next.delete("create");
+        return next;
+      });
+    }
+  }
+
+  async function handleRestart(deploymentId: string) {
+    setProcessingIds(prev => new Set(prev).add(deploymentId));
+    try {
+      await writeJson<Deployment>(`/api/dashboard/deployments/${deploymentId}`, {
+        method: "POST",
+      });
+      await loadDeployments();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to restart deployment");
+    } finally {
+      setProcessingIds(prev => {
+        const next = new Set(prev);
+        next.delete(deploymentId);
+        return next;
+      });
+    }
+  }
+
+  async function handleStop(deploymentId: string) {
+    setProcessingIds(prev => new Set(prev).add(deploymentId));
+    try {
+      await writeJson<Deployment>(`/api/dashboard/deployments/${deploymentId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "scale", replicas: 0 }),
+      });
+      await loadDeployments();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to stop deployment");
+    } finally {
+      setProcessingIds(prev => {
+        const next = new Set(prev);
+        next.delete(deploymentId);
+        return next;
+      });
+    }
+  }
+
+  async function handleStart(deploymentId: string) {
+    setProcessingIds(prev => new Set(prev).add(deploymentId));
+    try {
+      const deployment = deployments.find(d => d.id === deploymentId);
+      await writeJson<Deployment>(`/api/dashboard/deployments/${deploymentId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "scale", replicas: deployment?.replicas || 1 }),
+      });
+      await loadDeployments();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to start deployment");
+    } finally {
+      setProcessingIds(prev => {
+        const next = new Set(prev);
+        next.delete(deploymentId);
+        return next;
+      });
+    }
+  }
+
+  async function handleDelete(deploymentId: string) {
+    if (!confirm("Are you sure you want to delete this deployment? This action cannot be undone.")) {
+      return;
+    }
+    
+    setProcessingIds(prev => new Set(prev).add(deploymentId));
+    try {
+      await writeJson(`/api/dashboard/deployments/${deploymentId}`, {
+        method: "DELETE",
+      });
+      await loadDeployments();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete deployment");
+    } finally {
+      setProcessingIds(prev => {
+        const next = new Set(prev);
+        next.delete(deploymentId);
+        return next;
+      });
+    }
+  }
+
+  function isProcessing(id: string) {
+    return processingIds.has(id);
+  }
+
   useEffect(() => {
     let cancelled = false;
 
     async function bootstrap() {
       try {
-        await loadDeployments();
+        await Promise.all([loadDeployments(), loadAgents()]);
       } catch {
         // Error already handled in loadDeployments
       } finally {
@@ -281,7 +580,7 @@ export function DeploymentsPageClient() {
 
   async function handleRefresh() {
     setRefreshing(true);
-    await loadDeployments();
+    await Promise.all([loadDeployments(), loadAgents()]);
     setRefreshing(false);
   }
 
@@ -301,6 +600,13 @@ export function DeploymentsPageClient() {
 
   return (
     <div className="space-y-6">
+      <CreateDeploymentDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        agents={agents}
+        onSubmit={handleCreateDeployment}
+      />
+      
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
@@ -315,23 +621,50 @@ export function DeploymentsPageClient() {
             </div>
           </div>
         </div>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
-        >
-          {refreshing ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <RefreshCcw className="h-4 w-4" />
-          )}
-          {refreshing ? "Refreshing..." : "Refresh"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setCreateDialogOpen(true)}
+            className="inline-flex items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-400 transition hover:bg-emerald-400/20"
+          >
+            <Plus className="h-4 w-4" />
+            New Deployment
+          </button>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
+          >
+            {refreshing ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCcw className="h-4 w-4" />
+            )}
+            {refreshing ? "Refreshing..." : "Refresh"}
+          </button>
+        </div>
       </div>
 
       {error && (
-        <div className="rounded-xl border border-rose-400/20 bg-rose-400/10 p-4 text-sm text-rose-300">
-          {error}
+        <div className="rounded-xl border border-rose-400/20 bg-rose-400/10 p-4 text-sm text-rose-300 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span>{error}</span>
+            <button
+              onClick={async () => {
+                setError("");
+                await Promise.all([loadDeployments(), loadAgents()]);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-rose-400/30 bg-rose-400/20 px-3 py-1 text-xs font-medium text-rose-200 transition hover:bg-rose-400/30"
+            >
+              <RefreshCcw className="h-3.5 w-3.5" />
+              Retry
+            </button>
+          </div>
+          <button
+            onClick={() => setError("")}
+            className="text-rose-300 hover:text-white"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
 
@@ -400,11 +733,28 @@ export function DeploymentsPageClient() {
               ? "Try adjusting your search query"
               : "Deployments will appear here when agents are deployed"}
           </p>
+          {!searchQuery && (
+            <button
+              onClick={() => setCreateDialogOpen(true)}
+              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600"
+            >
+              <Plus className="h-4 w-4" />
+              Create Deployment
+            </button>
+          )}
         </div>
       ) : (
         <div className="space-y-4">
           {filteredDeployments.map((deployment) => (
-            <DeploymentCard key={deployment.id} deployment={deployment} />
+            <DeploymentCard
+              key={deployment.id}
+              deployment={deployment}
+              onRestart={handleRestart}
+              onStop={handleStop}
+              onStart={handleStart}
+              onDelete={handleDelete}
+              isProcessing={isProcessing}
+            />
           ))}
         </div>
       )}
