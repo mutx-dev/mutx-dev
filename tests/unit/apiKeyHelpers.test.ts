@@ -1,5 +1,6 @@
 import type { components } from "@/app/types/api";
 import {
+  getApiKeyLimit,
   getLatestActiveApiKey,
   getLatestRevokedApiKey,
 } from "@/components/app/apiKeyHelpers";
@@ -87,5 +88,16 @@ describe("api key dashboard selectors", () => {
 
     expect(getLatestRevokedApiKey(keys)).toBeNull();
     expect(getLatestActiveApiKey(keys)).not.toBeNull();
+  });
+
+  it("maps plan quotas to API key limits", () => {
+    expect(getApiKeyLimit("free")).toBe(2);
+    expect(getApiKeyLimit("starter")).toBe(10);
+    expect(getApiKeyLimit("pro")).toBe(50);
+    expect(getApiKeyLimit("enterprise")).toBeNull();
+  });
+
+  it("keeps unknown plans on a safe starter-style limit", () => {
+    expect(getApiKeyLimit("mystery-tier")).toBe(10);
   });
 });
