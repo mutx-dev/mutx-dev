@@ -10,6 +10,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.models import Agent, AgentLog, Deployment, Alert, AlertType
+from src.api.services.webhook_service import trigger_agent_status_event, trigger_deployment_event
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +51,51 @@ def _record_deployment_event(
     )
 
 
+async def _emit_agent_status_webhook(
+    session: AsyncSession,
+    *,
+    agent_id: uuid.UUID,
+    old_status: str,
+    new_status: str,
+    agent_name: str,
+) -> None:
+    try:
+        await trigger_agent_status_event(session, agent_id, old_status, new_status, agent_name)
+    except Exception:
+        logger.exception(
+            "Monitor webhook emission failed for agent.status",
+            extra={"agent_id": str(agent_id), "old_status": old_status, "new_status": new_status},
+        )
+
+
+async def _emit_deployment_webhook(
+    session: AsyncSession,
+    *,
+    deployment_id: uuid.UUID,
+    agent_id: uuid.UUID,
+    event_type: str,
+    status: str,
+) -> None:
+    try:
+        await trigger_deployment_event(
+            session,
+            deployment_id,
+            agent_id,
+            event_type=event_type,
+            status=status,
+        )
+    except Exception:
+        logger.exception(
+            "Monitor webhook emission failed for deployment.event",
+            extra={
+                "agent_id": str(agent_id),
+                "deployment_id": str(deployment_id),
+                "event_type": event_type,
+                "status": status,
+            },
+        )
+
+
 async def monitor_agent_health(session: AsyncSession):
     """
     Main monitoring and self-healing lifecycle:
@@ -65,6 +111,7 @@ async def monitor_agent_health(session: AsyncSession):
     new_agents = result.scalars().all()
     for agent in new_agents:
         if now - agent.created_at > timedelta(seconds=10):
+            old_status = agent.status
             agent.status = "running"
             agent.last_heartbeat = now
 
@@ -88,6 +135,21 @@ async def monitor_agent_health(session: AsyncSession):
                     event_type="monitor_started",
                     status="running",
                 )
+                await _emit_deployment_webhook(
+                    session,
+                    deployment_id=deployment.id,
+                    agent_id=agent.id,
+                    event_type="monitor_started",
+                    status="running",
+                )
+
+            await _emit_agent_status_webhook(
+                session,
+                agent_id=agent.id,
+                old_status=old_status,
+                new_status=agent.status,
+                agent_name=agent.name,
+            )
 
             logger.info(f"Monitor: Agent {agent.name} ({agent.id}) promoted to RUNNING")
 
@@ -99,6 +161,7 @@ async def monitor_agent_health(session: AsyncSession):
         last_hb = agent.last_heartbeat or agent.created_at
         if now - last_hb > timedelta(seconds=STALE_THRESHOLD_SECONDS):
             logger.warning(f"Monitor: Agent {agent.name} ({agent.id}) is STALE. Marking as FAILED.")
+            old_status = agent.status
             agent.status = "failed"
 
             # Create Alert
@@ -130,6 +193,21 @@ async def monitor_agent_health(session: AsyncSession):
                     status="failed",
                     error_message=log.message,
                 )
+                await _emit_deployment_webhook(
+                    session,
+                    deployment_id=deployment.id,
+                    agent_id=agent.id,
+                    event_type="monitor_failed",
+                    status="failed",
+                )
+
+            await _emit_agent_status_webhook(
+                session,
+                agent_id=agent.id,
+                old_status=old_status,
+                new_status=agent.status,
+                agent_name=agent.name,
+            )
 
     # 3. Auto-Heal Failed Agents
     result = await session.execute(select(Agent).where(Agent.status == "failed"))
@@ -138,6 +216,7 @@ async def monitor_agent_health(session: AsyncSession):
     for agent in failed_agents:
         if now - agent.updated_at > timedelta(seconds=HEAL_THRESHOLD_SECONDS):
             logger.info(f"Auto-Healer: Restarting agent {agent.name} ({agent.id})...")
+            old_status = agent.status
             agent.status = "running"
             agent.last_heartbeat = now
 
@@ -173,5 +252,20 @@ async def monitor_agent_health(session: AsyncSession):
                     event_type="monitor_restarted",
                     status="running",
                 )
+                await _emit_deployment_webhook(
+                    session,
+                    deployment_id=deployment.id,
+                    agent_id=agent.id,
+                    event_type="monitor_restarted",
+                    status="running",
+                )
+
+            await _emit_agent_status_webhook(
+                session,
+                agent_id=agent.id,
+                old_status=old_status,
+                new_status=agent.status,
+                agent_name=agent.name,
+            )
 
     await session.commit()
