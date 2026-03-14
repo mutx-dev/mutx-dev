@@ -10,7 +10,7 @@ async def test_registered_agent_api_key_authenticates_runtime_status_and_heartbe
     client: AsyncClient, db_session, test_user
 ):
     register_response = await client.post(
-        "/agents/register",
+        "/api/agents/register",
         json={
             "name": "runtime-auth-contract",
             "description": "runtime auth contract coverage",
@@ -27,13 +27,13 @@ async def test_registered_agent_api_key_authenticates_runtime_status_and_heartbe
 
     runtime_headers = {"Authorization": f"Bearer {api_key}"}
 
-    status_response = await client.get(f"/agents/{agent_id}/status", headers=runtime_headers)
+    status_response = await client.get(f"/api/agents/{agent_id}/status", headers=runtime_headers)
     assert status_response.status_code == 200
     assert status_response.json()["agent_id"] == agent_id
     assert status_response.json()["status"] == "running"
 
     heartbeat_response = await client.post(
-        "/agents/heartbeat",
+        "/api/agents/heartbeat",
         headers=runtime_headers,
         json={
             "agent_id": agent_id,
@@ -49,7 +49,7 @@ async def test_registered_agent_api_key_authenticates_runtime_status_and_heartbe
 
 @pytest.mark.asyncio
 async def test_agent_status_requires_runtime_auth_not_just_agent_id(client_no_auth: AsyncClient, test_agent):
-    unauthenticated_response = await client_no_auth.get(f"/agents/{test_agent.id}/status")
+    unauthenticated_response = await client_no_auth.get(f"/api/agents/{test_agent.id}/status")
 
     assert unauthenticated_response.status_code == 401
     assert unauthenticated_response.json()["detail"] == "Missing authorization header"
@@ -67,7 +67,7 @@ async def test_connected_agent_runtime_sdk_uses_status_auth_contract(client: Asy
     MutxAgentClient = agent_runtime_module.MutxAgentClient
 
     register_response = await client.post(
-        "/agents/register",
+        "/api/agents/register",
         json={
             "name": "sdk-connect-contract",
             "description": "sdk connect contract coverage",
@@ -103,7 +103,7 @@ async def test_connected_agent_runtime_sdk_uses_status_auth_contract(client: Asy
 @pytest.mark.asyncio
 async def test_agent_status_auth_rejects_other_agent_api_key(client: AsyncClient):
     first = await client.post(
-        "/agents/register",
+        "/api/agents/register",
         json={
             "name": "owner-a",
             "description": "ownership check a",
@@ -112,7 +112,7 @@ async def test_agent_status_auth_rejects_other_agent_api_key(client: AsyncClient
         },
     )
     second = await client.post(
-        "/agents/register",
+        "/api/agents/register",
         json={
             "name": "owner-b",
             "description": "ownership check b",
@@ -128,7 +128,7 @@ async def test_agent_status_auth_rejects_other_agent_api_key(client: AsyncClient
     second_payload = second.json()
 
     wrong_auth_response = await client.get(
-        f"/agents/{second_payload['agent_id']}/status",
+        f"/api/agents/{second_payload['agent_id']}/status",
         headers={"Authorization": f"Bearer {first_payload['api_key']}"},
     )
 
@@ -150,7 +150,7 @@ async def test_heartbeat_event_payload_shape_and_timing_contract(client: AsyncCl
     )
 
     register_response = await client.post(
-        "/agents/register",
+        "/api/agents/register",
         json={
             "name": "runtime-heartbeat-shape",
             "description": "heartbeat contract coverage",
@@ -165,7 +165,7 @@ async def test_heartbeat_event_payload_shape_and_timing_contract(client: AsyncCl
 
     # 1) first heartbeat keeps status unchanged => only heartbeat event
     heartbeat_response = await client.post(
-        "/agents/heartbeat",
+        "/api/agents/heartbeat",
         headers={"Authorization": f"Bearer {api_key}"},
         json={
             "agent_id": agent_id,
@@ -201,7 +201,7 @@ async def test_heartbeat_event_payload_shape_and_timing_contract(client: AsyncCl
     emitted_events.clear()
 
     status_change_response = await client.post(
-        "/agents/heartbeat",
+        "/api/agents/heartbeat",
         headers={"Authorization": f"Bearer {api_key}"},
         json={
             "agent_id": agent_id,
@@ -252,7 +252,7 @@ async def test_heartbeat_webhook_failure_does_not_fail_heartbeat_response(client
     )
 
     register_response = await client.post(
-        "/agents/register",
+        "/api/agents/register",
         json={
             "name": "runtime-heartbeat-failure",
             "description": "heartbeat failure coverage",
@@ -266,7 +266,7 @@ async def test_heartbeat_webhook_failure_does_not_fail_heartbeat_response(client
     api_key = payload["api_key"]
 
     response = await client.post(
-        "/agents/heartbeat",
+        "/api/agents/heartbeat",
         headers={"Authorization": f"Bearer {api_key}"},
         json={
             "agent_id": agent_id,

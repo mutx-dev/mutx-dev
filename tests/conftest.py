@@ -41,16 +41,16 @@ def create_test_app() -> FastAPI:
     app = FastAPI(title="MUTX Test API")
     
     # Include routers
-    app.include_router(agents.router)
-    app.include_router(deployments.router)
-    app.include_router(api_keys.router)
-    app.include_router(auth.router)
-    app.include_router(webhooks.router)
-    app.include_router(clawhub.router)
-    app.include_router(agent_runtime.router)
-    app.include_router(newsletter.router)
-    app.include_router(leads.router)
-    app.include_router(ingest.router)
+    app.include_router(agents.router, prefix="/api")
+    app.include_router(deployments.router, prefix="/api")
+    app.include_router(api_keys.router, prefix="/api")
+    app.include_router(auth.router, prefix="/api")
+    app.include_router(webhooks.router, prefix="/api")
+    app.include_router(clawhub.router, prefix="/api")
+    app.include_router(agent_runtime.router, prefix="/api")
+    app.include_router(newsletter.router, prefix="/api")
+    app.include_router(leads.router, prefix="/api")
+    app.include_router(ingest.router, prefix="/api")
     
     # Health check endpoint
     @app.get("/health")

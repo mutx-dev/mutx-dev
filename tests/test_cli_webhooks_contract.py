@@ -53,7 +53,7 @@ def test_webhooks_list_hits_contract_route_and_forwards_filters(monkeypatch) -> 
 
     assert result.exit_code == 0
     assert captured == {
-        "path": "/webhooks",
+        "path": "/api/webhooks",
         "params": {"limit": 25, "skip": 5},
     }
     assert "wh-123 | https://example.com/hook | active | events: agent.status" in result.output
@@ -104,7 +104,7 @@ def test_webhooks_deliveries_hits_live_delivery_route_and_query_contract(monkeyp
 
     assert result.exit_code == 0
     assert captured == {
-        "path": f"/webhooks/{webhook_id}/deliveries",
+        "path": f"/api/webhooks/{webhook_id}/deliveries",
         "params": {
             "skip": 3,
             "limit": 10,
@@ -140,7 +140,7 @@ def test_webhooks_get_hits_contract_route_and_prints_created_timestamp(monkeypat
 
     assert result.exit_code == 0
     assert captured == {
-        "path": "/webhooks/wh-456",
+        "path": "/api/webhooks/wh-456",
         "params": None,
     }
     assert "wh-456 | https://example.com/hook | inactive" in result.output
