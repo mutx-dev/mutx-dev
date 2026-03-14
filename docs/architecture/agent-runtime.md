@@ -12,8 +12,9 @@ This document describes how agents run in mutx.dev, including their lifecycle, m
 * `POST /agents/heartbeat` is the live runtime path for connected agents. It updates `agents.status` and `last_heartbeat` in the control plane.
 * Each runtime heartbeat now emits an `agent.heartbeat` outgoing webhook event for subscribers.
 * When a heartbeat changes the persisted agent status, MUTX also emits an `agent.status` outgoing webhook event.
-* The background monitor in `src/api/services/monitoring.py` still owns stale-agent detection, failure marking, alert resolution, and automatic recovery.
-* More advanced self-healing components remain partially aspirational until they are connected to real schedulers/executors.
+* The background monitor in `src/api/services/monitoring.py` owns stale-agent detection, failure marking, alert resolution, and the active recovery loop.
+* The background monitor now wires tracked agents into `SelfHealingService` in `src/api/services/self_healer.py` (heartbeat-based health checks + recovery handlers) so those paths are now connected to real runtime paths.
+* Advanced self-healing actions such as rollback version trees, recreate, or scale-up/down are still aspirational until they are backed by real execution infrastructure.
 
 ***
 
