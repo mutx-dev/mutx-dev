@@ -1,6 +1,6 @@
 import secrets
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -68,7 +68,7 @@ async def create_api_key(
 
     expires_at = None
     if key_data.expires_in_days:
-        expires_at = datetime.utcnow() + timedelta(days=key_data.expires_in_days)
+        expires_at = datetime.now(timezone.utc) + timedelta(days=key_data.expires_in_days)
 
     api_key = APIKey(
         id=uuid.uuid4(),
