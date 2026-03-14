@@ -16,7 +16,6 @@ from src.api.routes import (
     auth,
     clawhub,
     api_keys,
-    newsletter,
     agent_runtime,
     ingest,
     leads,
@@ -136,7 +135,6 @@ app.include_router(webhooks.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
 app.include_router(clawhub.router, prefix="/api")
 app.include_router(api_keys.router, prefix="/api")
-app.include_router(newsletter.router, prefix="/api")
 app.include_router(leads.router, prefix="/api")
 app.include_router(agent_runtime.router, prefix="/api")
 app.include_router(ingest.router, prefix="/api")
