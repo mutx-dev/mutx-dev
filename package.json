@@ -9,7 +9,8 @@
     "lint": "next lint",
     "generate-types": "openapi-typescript docs/api/openapi.json -o app/types/api.ts",
     "test:app": "jest --runInBand tests/unit",
-    "demo:validate": "bash scripts/demo-validate.sh"
+    "demo:validate": "bash scripts/demo-validate.sh",
+    "release:check": "bash scripts/release-check.sh"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.0",
