@@ -66,6 +66,29 @@ async def test_list_leads_unauthorized(client_no_auth: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_list_leads_internal_unverified_forbidden(client_no_auth: AsyncClient):
+    """Test listing leads is forbidden for internal-domain users without verified email."""
+    import uuid
+
+    from src.api.middleware.auth import get_current_user
+    from src.api.models.models import User
+
+    async def override_get_current_user():
+        return User(
+            id=uuid.uuid4(),
+            email="attacker@mutx.dev",
+            password_hash="hashedpassword",
+            is_active=True,
+            is_email_verified=False,
+            name="Attacker",
+        )
+
+    client_no_auth.app.dependency_overrides[get_current_user] = override_get_current_user
+    response = await client_no_auth.get("/leads")
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_get_lead_internal_user(client: AsyncClient, db_session: AsyncSession):
     """Test fetching a single lead when internal/authenticated."""
     lead = Lead(

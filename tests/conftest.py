@@ -224,6 +224,7 @@ async def test_user(db_session: AsyncSession):
         email="test@mutx.dev",
         password_hash="hashedpassword",
         is_active=True,
+        is_email_verified=True,
         name="Test User",
     )
     db_session.add(user)
