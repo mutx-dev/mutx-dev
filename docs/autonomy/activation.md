@@ -68,7 +68,11 @@ If a generated patch exceeds the configured size or file-count guardrails, the e
 
 If `AUTONOMY_REVIEWER_MAP` is set, the executor also assigns the mapped GitHub login to the PR and leaves a reviewer-routing comment.
 
+When the executor opens or updates a PR, it also posts the required handoff comment: `@codex please review` (idempotent if already present).
+
 If an issue stays labeled `autonomy:claimed` past `AUTONOMY_STALE_CLAIM_MINUTES` and no open PR exists for the claimed branch, the dispatch workflow automatically releases the claim and comments on the issue.
+
+The dispatch workflow writes `autonomy-queue-health.json` each run and uploads it as a workflow artifact. It hard-fails when both open `autonomy:ready` issues and open PRs are zero, and logs a queue-handoff violation when ready issues exist but open PRs are zero.
 
 ## Dispatch Logic
 

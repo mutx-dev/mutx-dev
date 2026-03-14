@@ -123,11 +123,13 @@ jobs:
               });
             }
 
-      - name: Capture autonomy-ready issues
+      - name: Capture autonomy queue and health
+        id: queue_health
         uses: actions/github-script@v7
         with:
           script: |
             const { owner, repo } = context.repo;
+            const fs = require('fs');
             const issues = await github.paginate(github.rest.issues.listForRepo, {
               owner,
               repo,
@@ -135,8 +137,72 @@ jobs:
               labels: 'autonomy:ready',
               per_page: 100,
             });
-            const fs = require('fs');
+            const openPrs = await github.paginate(github.rest.pulls.list, {
+              owner,
+              repo,
+              state: 'open',
+              per_page: 100,
+            });
+
+            const emptyQueueViolation = issues.length === 0 && openPrs.length === 0;
+            const stalledQueueViolation = issues.length > 0 && openPrs.length === 0;
+            const violations = [];
+            if (emptyQueueViolation) {
+              violations.push('queue floor failed: zero autonomy:ready issues and zero open PRs');
+            }
+            if (stalledQueueViolation) {
+              violations.push('queue handoff failed: autonomy:ready issues exist but zero open PRs');
+            }
+
+            const snapshot = {
+              generated_at: new Date().toISOString(),
+              open_autonomy_ready_issues: issues.length,
+              open_pull_requests: openPrs.length,
+              violations,
+            };
+
             fs.writeFileSync('autonomy-queue.json', JSON.stringify(issues, null, 2));
+            fs.writeFileSync('autonomy-queue-health.json', JSON.stringify(snapshot, null, 2));
+
+            const lines = [
+              '## Queue Health',
+              '',
+              `- open \`autonomy:ready\` issues: ${issues.length}`,
+              `- open PRs: ${openPrs.length}`,
+            ];
+            if (violations.length === 0) {
+              lines.push('- status: healthy');
+            } else {
+              lines.push('- status: policy violation');
+              lines.push('');
+              for (const violation of violations) {
+                lines.push(`- violation: ${violation}`);
+                core.warning(`Queue policy violation: ${violation}`);
+              }
+            }
+            await core.summary.addRaw(lines.join('\n')).write();
+
+            core.setOutput('empty_violation', String(emptyQueueViolation));
+            core.setOutput('stalled_violation', String(stalledQueueViolation));
+
+      - name: Upload queue health snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: autonomy-queue-health
+          path: autonomy-queue-health.json
+
+      - name: Enforce queue floor
+        if: ${{ steps.queue_health.outputs.empty_violation == 'true' }}
+        run: |
+          echo "Queue floor violation: no autonomy:ready issues and no open PRs."
+          cat autonomy-queue-health.json
+          exit 1
+
+      - name: Flag stalled queue handoff
+        if: ${{ steps.queue_health.outputs.stalled_violation == 'true' }}
+        run: |
+          echo "Queue handoff violation: autonomy:ready issues exist but there are no open PRs."
+          cat autonomy-queue-health.json
 
       - name: Build work order
         run: python scripts/autonomy/build_work_order.py --queue autonomy-queue.json --output autonomy-work-order.json
