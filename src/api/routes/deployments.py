@@ -28,7 +28,6 @@ from src.api.models.schemas import (
     DeploymentLogsResponse,
     DeploymentMetricsResponse,
     DeploymentVersionHistoryResponse,
-    DeploymentVersionResponse,
     DeploymentRollbackRequest,
 )
 from src.api.middleware.auth import get_current_user
@@ -301,7 +300,7 @@ async def create_deployment(
     await db.flush()  # Get deployment.id
 
     # Create initial version
-    initial_version = _create_deployment_version(deployment, db)
+    _create_deployment_version(deployment, db)
 
     # Record create event
     create_event = DeploymentEventModel(

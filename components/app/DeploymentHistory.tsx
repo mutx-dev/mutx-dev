@@ -49,7 +49,7 @@ function VersionItem({ version, onRollback }: { version: DeploymentVersion; onRo
           </p>
           <p className="text-xs text-slate-500">
             {formatDate(version.created_at)}
-            {config.replicas && ` • ${config.replicas} replica${config.replicas > 1 ? 's' : ''}`}
+            {(config.replicas as number) > 0 && ` • ${config.replicas} replica${(config.replicas as number) > 1 ? 's' : ''}`}
           </p>
         </div>
       </div>
