@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "generate-types": "openapi-typescript docs/api/openapi.json -o app/types/api.ts",
-    "test:app": "jest --runInBand tests/unit/controlPlane.test.ts",
+    "test:app": "jest --runInBand tests/unit",
     "demo:validate": "bash scripts/demo-validate.sh"
   },
   "dependencies": {
