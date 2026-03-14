@@ -178,7 +178,7 @@ export function ApiKeysPageClient() {
               <div key={key.id} className="px-6 py-4 flex items-center justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-white">{key.name}</p>
-                                    <div className="flex gap-4 mt-2 text-xs text-slate-500">
+                  <div className="flex gap-4 mt-2 text-xs text-slate-500">
                     <span>Created: {formatDate(key.created_at)}</span>
                     <span>Last used: {formatDate(key.last_used)}</span>
                   </div>
