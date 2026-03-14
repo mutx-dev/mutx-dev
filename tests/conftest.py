@@ -221,7 +221,7 @@ async def test_user(db_session: AsyncSession):
     
     user = User(
         id=uuid.UUID("11111111-1111-4111-a111-111111111111"),
-        email="test@example.com",
+        email="test@mutx.dev",
         password_hash="hashedpassword",
         is_active=True,
         name="Test User",
