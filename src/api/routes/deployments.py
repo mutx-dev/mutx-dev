@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
@@ -230,7 +230,7 @@ async def kill_deployment(
     deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
 
     deployment.status = "killed"
-    deployment.ended_at = datetime.utcnow()
+    deployment.ended_at = datetime.now(timezone.utc)
 
     # Record kill event
     kill_event = DeploymentEventModel(
@@ -273,7 +273,7 @@ async def create_deployment(
         agent_id=deployment_data.agent_id,
         status="pending",
         replicas=deployment_data.replicas,
-        started_at=datetime.utcnow(),
+        started_at=datetime.now(timezone.utc),
     )
     db.add(deployment)
     await db.flush()  # Get deployment.id
@@ -314,7 +314,7 @@ async def restart_deployment(
 
     # Reset deployment status
     deployment.status = "pending"
-    deployment.started_at = datetime.utcnow()
+    deployment.started_at = datetime.now(timezone.utc)
     deployment.ended_at = None
     deployment.error_message = None
 
