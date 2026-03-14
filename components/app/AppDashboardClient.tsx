@@ -1201,6 +1201,9 @@ export function AppDashboardClient() {
                             {apiKey.is_active ? "Active" : "Revoked"}
                           </span>
                         </div>
+                        <p className="mt-2 font-[family:var(--font-mono)] text-[11px] text-slate-500">
+                          {maskApiKeyId(apiKey.id)}
+                        </p>
                         <div className="mt-2 space-y-1 font-[family:var(--font-mono)] text-[11px] text-slate-500">
                           <p>Created: {formatDate(apiKey.created_at)}</p>
                           <p>Last used: {formatDate(apiKey.last_used)} · {lastUsedRelative}</p>
