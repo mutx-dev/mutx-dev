@@ -62,10 +62,10 @@ export default function AppPreviewPage() {
                 <Github className="h-4 w-4" />
                 GitHub
               </a>
-              <Link href="https://mutx.dev" className="flex items-center gap-2 rounded-xl px-3 py-2 text-cyan-400 transition hover:bg-cyan-400/10">
+              <a href="https://mutx.dev" target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-xl px-3 py-2 text-cyan-400 transition hover:bg-cyan-400/10">
                 <ArrowRight className="h-4 w-4" />
                 Marketing site
-              </Link>
+              </a>
             </div>
           </aside>
 
