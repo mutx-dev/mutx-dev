@@ -2,7 +2,7 @@
 
 import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { AlertCircle, ArrowRight, BookOpen, CheckCircle2, FileText, Github } from 'lucide-react'
+import { AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react'
 import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
 
 import { cn } from '@/lib/utils'
@@ -13,23 +13,6 @@ export type WaitlistFormProps = {
   className?: string
 }
 
-const PUBLIC_PROOF_LINKS = [
-  {
-    href: 'https://docs.mutx.dev',
-    label: 'Docs',
-    icon: BookOpen,
-  },
-  {
-    href: 'https://github.com/fortunexbt/mutx-dev',
-    label: 'GitHub',
-    icon: Github,
-  },
-  {
-    href: 'https://github.com/fortunexbt/mutx-dev/blob/main/ROADMAP.md',
-    label: 'Roadmap',
-    icon: FileText,
-  },
-]
 
 export function WaitlistForm({ source = 'homepage', compact = false, className }: WaitlistFormProps) {
   const initialTurnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? ''
@@ -178,28 +161,10 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
         </div>
 
         <div className="space-y-1 mb-6">
-          <p className="text-lg font-medium text-white sm:text-xl">Request early access</p>
+          <p className="text-lg font-medium text-white sm:text-xl">Join the early access list</p>
           <p className="text-sm text-white/60">
-            Get launch updates and hosted access. For immediate evaluation, start with docs and source.
+            We’re opening hosted access in waves. Join the list for launch updates and priority invites.
           </p>
-        </div>
-
-        <div className="mb-5 rounded-lg border border-white/10 bg-black/40 p-3">
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/50">Public proof</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {PUBLIC_PROOF_LINKS.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-white/80 transition-colors hover:border-white/20 hover:bg-white/10 hover:text-white"
-              >
-                <item.icon className="h-3.5 w-3.5" />
-                {item.label}
-              </a>
-            ))}
-          </div>
         </div>
 
         {success ? (
