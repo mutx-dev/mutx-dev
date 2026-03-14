@@ -21,12 +21,8 @@ export function shouldUseSecureCookies(request: NextRequest) {
 }
 
 export function getCookieDomain(request: NextRequest) {
-  const hostname = request.nextUrl.hostname.toLowerCase()
-
-  if (hostname === 'app.mutx.dev' || hostname === 'mutx.dev') {
-    return '.mutx.dev'
-  }
-
+  // Keep auth cookies host-only to avoid exposing tokens across subdomains.
+  void request
   return undefined
 }
 
