@@ -6,7 +6,7 @@ import pytest
 
 @pytest.mark.asyncio
 async def test_agent_status_requires_agent_auth(client, test_agent):
-    response = await client.get(f'/agents/{test_agent.id}/status')
+    response = await client.get(f'/api/api/agents/{test_agent.id}/status')
 
     assert response.status_code == 401
     assert response.json()['detail'] == 'Missing authorization header'
@@ -20,7 +20,7 @@ async def test_agent_status_returns_authenticated_agent_status(client, db_sessio
     await db_session.commit()
 
     response = await client.get(
-        f'/agents/{test_agent.id}/status',
+        f'/api/api/agents/{test_agent.id}/status',
         headers={'Authorization': f'Bearer {test_agent.api_key}'},
     )
 
@@ -52,7 +52,7 @@ async def test_agent_status_rejects_requests_for_other_agents(
     await db_session.commit()
 
     response = await client.get(
-        f'/agents/{test_agent.id}/status',
+        f'/api/api/agents/{test_agent.id}/status',
         headers={'Authorization': f'Bearer {other_agent.api_key}'},
     )
 
@@ -69,7 +69,7 @@ async def test_runtime_registered_agent_round_trips_metadata_as_json(client):
     }
 
     register_response = await client.post(
-        '/agents/register',
+        '/api/agents/register',
         json={
             'name': 'runtime-json-agent',
             'description': 'runtime-created agent',
@@ -81,7 +81,7 @@ async def test_runtime_registered_agent_round_trips_metadata_as_json(client):
     assert register_response.status_code == 200
     agent_id = register_response.json()['agent_id']
 
-    detail_response = await client.get(f'/agents/{agent_id}')
+    detail_response = await client.get(f'/api/api/agents/{agent_id}')
 
     assert detail_response.status_code == 200
     assert detail_response.json()['config'] == metadata
@@ -90,7 +90,7 @@ async def test_runtime_registered_agent_round_trips_metadata_as_json(client):
 @pytest.mark.asyncio
 async def test_runtime_registered_agent_api_key_authenticates_status_and_heartbeat(client):
     register_response = await client.post(
-        '/agents/register',
+        '/api/agents/register',
         json={
             'name': 'runtime-auth-agent',
             'description': 'runtime-created agent',
@@ -105,7 +105,7 @@ async def test_runtime_registered_agent_api_key_authenticates_status_and_heartbe
     api_key = payload['api_key']
 
     status_response = await client.get(
-        f'/agents/{agent_id}/status',
+        f'/api/api/agents/{agent_id}/status',
         headers={'Authorization': f'Bearer {api_key}'},
     )
 
@@ -113,7 +113,7 @@ async def test_runtime_registered_agent_api_key_authenticates_status_and_heartbe
     assert status_response.json()['agent_id'] == agent_id
 
     heartbeat_response = await client.post(
-        '/agents/heartbeat',
+        '/api/agents/heartbeat',
         headers={'Authorization': f'Bearer {api_key}'},
         json={
             'agent_id': agent_id,
