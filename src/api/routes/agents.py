@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 import logging
@@ -227,7 +227,7 @@ async def deploy_agent(
         agent_id=agent_id,
         status="deploying",
         replicas=1,
-        started_at=datetime.utcnow(),
+        started_at=datetime.now(timezone.utc),
     )
     db.add(deployment)
     await db.flush()  # Get deployment.id
@@ -269,7 +269,7 @@ async def stop_agent(
     deployments = result.scalars().all()
     for deployment in deployments:
         deployment.status = "stopped"
-        deployment.ended_at = datetime.utcnow()
+        deployment.ended_at = datetime.now(timezone.utc)
 
         # Record stop event
         stop_event = DeploymentEventModel(
