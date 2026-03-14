@@ -8,6 +8,8 @@ import {
   Bot,
   CheckCircle2,
   Copy,
+  FileText,
+  GitBranch,
   KeyRound,
   Loader2,
   LogOut,
@@ -22,6 +24,7 @@ import {
 import { Card } from "@/components/ui/Card";
 import { type components } from "@/app/types/api";
 import { getApiKeyLimit, getLatestActiveApiKey, getLatestRevokedApiKey } from "@/components/app/apiKeyHelpers";
+import { LogsViewer, MetricsDashboard, StateTransitions } from "@/components/app/Observability";
 
 type User = components["schemas"]["UserResponse"];
 type Agent = components["schemas"]["AgentResponse"];
@@ -167,6 +170,12 @@ export function AppDashboardClient() {
   const [apiKeyName, setApiKeyName] = useState("App dashboard key");
   const [createdKey, setCreatedKey] = useState<CreateKeyResponse | null>(null);
   const [lastKeyAction, setLastKeyAction] = useState<"created" | "rotated">("created");
+  const [selectedDeploymentId, setSelectedDeploymentId] = useState<string | null>(null);
+  const [observabilityTab, setObservabilityTab] = useState<"logs" | "metrics" | "state">("logs");
+
+  const selectedDeployment = selectedDeploymentId 
+    ? deployments.find(d => d.id === selectedDeploymentId) 
+    : deployments[0] ?? null;
 
   const runningAgents = agents.filter((agent) => agent.status === "running").length;
   const healthyDeployments = deployments.filter(
@@ -1053,6 +1062,95 @@ export function AppDashboardClient() {
               )}
             </div>
           </Card>
+
+          {deployments.length > 0 && (
+            <Card className="border border-white/5 bg-white/[0.01] p-0 overflow-hidden">
+              <div className="flex items-center justify-between border-b border-white/5 p-4">
+                <div className="flex items-center gap-3 text-cyan-400">
+                  <Activity className="h-5 w-5" />
+                  <div>
+                    <h3 className="text-lg font-semibold tracking-tight text-white">
+                      Observability
+                    </h3>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      Logs, metrics, and state transitions
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-b border-white/5 bg-white/[0.02] p-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500">Deployment:</span>
+                    <select
+                      value={selectedDeploymentId ?? ""}
+                      onChange={(e) => setSelectedDeploymentId(e.target.value || null)}
+                      className="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-sm text-white focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20"
+                    >
+                      <option value="">Select a deployment</option>
+                      {deployments.map((deployment) => (
+                        <option key={deployment.id} value={deployment.id}>
+                          {deployment.id.slice(0, 8)}... ({deployment.status})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-black/40 p-1">
+                    {([
+                      { key: "logs", label: "Logs", icon: FileText },
+                      { key: "metrics", label: "Metrics", icon: Activity },
+                      { key: "state", label: "State", icon: GitBranch },
+                    ] as const).map(({ key, label, icon: Icon }) => (
+                      <button
+                        key={key}
+                        onClick={() => setObservabilityTab(key)}
+                        className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                          observabilityTab === key
+                            ? "bg-cyan-400/10 text-cyan-400"
+                            : "text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4">
+                {selectedDeployment ? (
+                  <>
+                    {observabilityTab === "logs" && (
+                      <LogsViewer
+                        deploymentId={selectedDeployment.id}
+                        title={`Logs - ${selectedDeployment.id.slice(0, 8)}`}
+                      />
+                    )}
+                    {observabilityTab === "metrics" && (
+                      <MetricsDashboard
+                        deploymentId={selectedDeployment.id}
+                        title={`Metrics - ${selectedDeployment.id.slice(0, 8)}`}
+                      />
+                    )}
+                    {observabilityTab === "state" && (
+                      <StateTransitions
+                        deploymentId={selectedDeployment.id}
+                        title={`State - ${selectedDeployment.id.slice(0, 8)}`}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-slate-500">
+                    <Activity className="mb-2 h-8 w-8 opacity-50" />
+                    <p className="text-sm">Select a deployment to view observability data</p>
+                  </div>
+                )}
+              </div>
+            </Card>
+          )}
         </div>
 
         <div className="space-y-6">
