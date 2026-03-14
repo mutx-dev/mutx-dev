@@ -163,7 +163,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
         <div className="space-y-1 mb-6">
           <p className="text-lg font-medium text-white sm:text-xl">Join the early access list</p>
           <p className="text-sm text-white/60">
-            We're opening hosted access in waves. Join the list for launch updates and priority invites.
+            We’re opening hosted access in waves. Join the list for launch updates and priority invites.
           </p>
         </div>
 
