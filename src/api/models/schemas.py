@@ -161,6 +161,75 @@ class AgentMetricResponse(BaseModel):
     timestamp: datetime
 
 
+class RunTraceCreate(BaseModel):
+    event_type: str = Field(..., min_length=1, max_length=100)
+    message: Optional[str] = Field(None, max_length=5000)
+    payload: dict[str, Any] = Field(default_factory=dict)
+    timestamp: Optional[datetime] = None
+
+
+class RunCreate(BaseModel):
+    agent_id: uuid.UUID
+    status: str = Field(default="completed", min_length=1, max_length=50)
+    input_text: Optional[str] = None
+    output_text: Optional[str] = None
+    error_message: Optional[str] = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    traces: list[RunTraceCreate] = Field(default_factory=list)
+
+
+class RunTraceResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    run_id: uuid.UUID
+    event_type: str
+    message: Optional[str]
+    payload: dict[str, Any]
+    sequence: int
+    timestamp: datetime
+
+
+class RunResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    agent_id: uuid.UUID
+    status: str
+    input_text: Optional[str]
+    output_text: Optional[str]
+    error_message: Optional[str]
+    metadata: dict[str, Any]
+    started_at: datetime
+    completed_at: Optional[datetime]
+    created_at: datetime
+    trace_count: int = 0
+
+
+class RunDetailResponse(RunResponse):
+    traces: list[RunTraceResponse] = Field(default_factory=list)
+
+
+class RunHistoryResponse(BaseModel):
+    items: list[RunResponse] = Field(default_factory=list)
+    total: int
+    skip: int
+    limit: int
+    agent_id: Optional[uuid.UUID] = None
+    status: Optional[str] = None
+
+
+class RunTraceHistoryResponse(BaseModel):
+    run_id: uuid.UUID
+    items: list[RunTraceResponse] = Field(default_factory=list)
+    total: int
+    skip: int
+    limit: int
+    event_type: Optional[str] = None
+
+
 class AgentStatusUpdate(BaseModel):
     agent_id: uuid.UUID
     status: AgentStatus

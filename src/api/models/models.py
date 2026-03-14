@@ -104,6 +104,9 @@ class User(Base):
     webhooks: Mapped[list["Webhook"]] = relationship(
         "Webhook", back_populates="user", cascade="all, delete-orphan"
     )
+    runs: Mapped[list["AgentRun"]] = relationship(
+        "AgentRun", back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class Agent(Base):
@@ -142,6 +145,9 @@ class Agent(Base):
     )
     agent_metrics: Mapped[list["AgentMetric"]] = relationship(
         "AgentMetric", back_populates="agent", cascade="all, delete-orphan"
+    )
+    runs: Mapped[list["AgentRun"]] = relationship(
+        "AgentRun", back_populates="agent", cascade="all, delete-orphan"
     )
 
 
@@ -295,6 +301,48 @@ class AgentMetric(Base):
     timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
 
     agent: Mapped["Agent"] = relationship("Agent", back_populates="agent_metrics")
+
+
+class AgentRun(Base):
+    __tablename__ = "agent_runs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    agent_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
+    status: Mapped[str] = mapped_column(String(50), default="completed", index=True)
+    input_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    output_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    run_metadata: Mapped[Optional[str]] = mapped_column("metadata", Text, nullable=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+    agent: Mapped["Agent"] = relationship("Agent", back_populates="runs")
+    user: Mapped["User"] = relationship("User", back_populates="runs")
+    traces: Mapped[list["AgentRunTrace"]] = relationship(
+        "AgentRunTrace", back_populates="run", cascade="all, delete-orphan"
+    )
+
+
+class AgentRunTrace(Base):
+    __tablename__ = "agent_run_traces"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agent_runs.id"), nullable=False, index=True
+    )
+    event_type: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    payload: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    sequence: Mapped[int] = mapped_column(Integer, default=0)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+    run: Mapped["AgentRun"] = relationship("AgentRun", back_populates="traces")
 
 
 class WebhookDeliveryLog(Base):

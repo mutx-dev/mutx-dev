@@ -19,6 +19,7 @@ from src.api.routes import (
     agent_runtime,
     ingest,
     leads,
+    runs,
 )
 from src.api.metrics import router as metrics_router, track_request
 from src.api.services.monitor import start_background_monitor
@@ -138,6 +139,7 @@ app.include_router(api_keys.router, prefix="/api")
 app.include_router(leads.router, prefix="/api")
 app.include_router(agent_runtime.router, prefix="/api")
 app.include_router(ingest.router, prefix="/api")
+app.include_router(runs.router, prefix="/api")
 
 
 @app.get("/health", response_model=HealthResponse)
