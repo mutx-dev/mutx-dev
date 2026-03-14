@@ -32,6 +32,15 @@ cd terraform
 terraform apply -var-file=environments/production/terraform.tfvars
 ```
 
+## Health Checks
+
+The API exposes two health check endpoints for Kubernetes/production use:
+
+- `/health` - Liveness probe, returns 200 if the service is alive
+- `/ready` - Readiness probe, returns 503 if not ready to accept traffic
+
+Both endpoints check database connectivity status.
+
 ### Notes
 
 * Backend is environment-scoped via `terraform/environments/<env>/backend.hcl`.
