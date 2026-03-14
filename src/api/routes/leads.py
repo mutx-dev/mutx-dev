@@ -15,6 +15,9 @@ router = APIRouter(prefix="/leads", tags=["leads"])
 
 def _assert_internal_user(current_user: User) -> None:
     """Restrict internal lead access to configured internal email domains."""
+    if not current_user.is_email_verified:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
     settings = get_settings()
     allowed_domains = {
         domain.strip().lower()
