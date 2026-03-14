@@ -10,7 +10,7 @@ class TestNewsletter:
     @pytest.mark.asyncio
     async def test_waitlist_count(self, client: AsyncClient):
         """Test getting waitlist count."""
-        response = await client.get("/newsletter")
+        response = await client.get("/api/newsletter")
         assert response.status_code == 200
         assert "count" in response.json()
 

@@ -60,7 +60,7 @@ class TestAuthEndpoints:
     @pytest.mark.asyncio
     async def test_me_endpoint(self, client: AsyncClient, test_user):
         """Test the /me endpoint."""
-        response = await client.get("/auth/me")
+        response = await client.get("/api/auth/me")
         assert response.status_code == 200
         data = response.json()
         assert data["email"] == test_user.email

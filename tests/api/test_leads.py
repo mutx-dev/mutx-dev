@@ -46,7 +46,7 @@ async def test_capture_lead_minimal(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_list_leads_internal_user(client: AsyncClient, test_user):
     """Test listing leads for an internal user."""
-    response = await client.get("/leads")
+    response = await client.get("/api/leads")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
@@ -54,7 +54,7 @@ async def test_list_leads_internal_user(client: AsyncClient, test_user):
 @pytest.mark.asyncio
 async def test_list_leads_non_internal_forbidden(other_user_client: AsyncClient):
     """Test listing leads is forbidden for non-internal users."""
-    response = await other_user_client.get("/leads")
+    response = await other_user_client.get("/api/leads")
     assert response.status_code == 403
 
 
@@ -136,5 +136,5 @@ async def test_get_lead_unauthorized(client_no_auth: AsyncClient, db_session: As
 @pytest.mark.asyncio
 async def test_get_lead_not_found(client: AsyncClient):
     """Test fetching an unknown lead returns 404."""
-    response = await client.get("/leads/00000000-0000-0000-0000-999999999999")
+    response = await client.get("/api/leads/00000000-0000-0000-0000-999999999999")
     assert response.status_code == 404

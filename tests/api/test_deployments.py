@@ -22,7 +22,7 @@ class TestListDeployments:
     @pytest.mark.asyncio
     async def test_list_deployments_empty(self, client: AsyncClient):
         """Test listing deployments when none exist."""
-        response = await client.get("/deployments")
+        response = await client.get("/api/deployments")
         assert response.status_code == 200
         assert response.json() == []
     
@@ -31,7 +31,7 @@ class TestListDeployments:
         self, client: AsyncClient, test_deployment
     ):
         """Test listing deployments returns all."""
-        response = await client.get("/deployments")
+        response = await client.get("/api/deployments")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 1
@@ -52,7 +52,7 @@ class TestListDeployments:
             db_session.add(deployment)
         await db_session.commit()
         
-        response = await client.get("/deployments?limit=2")
+        response = await client.get("/api/deployments?limit=2")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 2
@@ -112,7 +112,7 @@ class TestListDeployments:
         await db_session.commit()
         
         # Filter by status
-        response = await client.get("/deployments?status=running")
+        response = await client.get("/api/deployments?status=running")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 1

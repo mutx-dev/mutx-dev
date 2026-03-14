@@ -21,7 +21,7 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
     assert "agent.*" in webhook["events"]
 
     # 2. List Webhooks
-    response = await client.get("/webhooks/")
+    response = await client.get("/api/webhooks/")
     assert response.status_code == 200
     webhooks = response.json()
     assert any(w["id"] == webhook_id for w in webhooks)
@@ -78,15 +78,15 @@ async def test_webhook_list_honors_skip_and_limit(client: AsyncClient):
         )
         assert response.status_code == 201
 
-    full_response = await client.get("/webhooks/")
+    full_response = await client.get("/api/webhooks/")
     assert full_response.status_code == 200
     assert len(full_response.json()) == 3
 
-    limited_response = await client.get("/webhooks/?limit=1")
+    limited_response = await client.get("/api/webhooks/?limit=1")
     assert limited_response.status_code == 200
     assert len(limited_response.json()) == 1
 
-    skipped_response = await client.get("/webhooks/?skip=1&limit=10")
+    skipped_response = await client.get("/api/webhooks/?skip=1&limit=10")
     assert skipped_response.status_code == 200
     assert len(skipped_response.json()) == 2
 
