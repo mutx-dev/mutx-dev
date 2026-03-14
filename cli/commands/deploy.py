@@ -201,6 +201,94 @@ def restart_deployment(deployment_id: str):
         click.echo(f"Error: {response.text}", err=True)
 
 
+@deploy_group.command(name="logs")
+@click.argument("deployment_id")
+@click.option("--limit", "-l", default=100, help="Number of log lines to fetch")
+@click.option("--skip", "-s", default=0, help="Number of log lines to skip")
+@click.option("--level", default=None, help="Filter by log level (e.g. ERROR)")
+def deployment_logs(deployment_id: str, limit: int, skip: int, level: Optional[str]):
+    """Get deployment logs"""
+    config = CLIConfig()
+    if not config.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        return
+
+    params = {"limit": limit, "skip": skip}
+    if level:
+        params["level"] = level
+
+    client = get_client(config)
+    response = client.get(f"/deployments/{deployment_id}/logs", params=params)
+
+    if response.status_code == 401:
+        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+        return
+
+    if response.status_code == 200:
+        logs = response.json()
+        if not logs:
+            click.echo("No deployment logs found.")
+            return
+
+        for log in logs:
+            click.echo(
+                " | ".join(
+                    [
+                        str(log.get("timestamp", "")),
+                        str(log.get("level", "unknown")),
+                        str(log.get("message", "")),
+                    ]
+                )
+            )
+    elif response.status_code == 404:
+        click.echo("Error: Deployment not found", err=True)
+    else:
+        click.echo(f"Error: {response.text}", err=True)
+
+
+@deploy_group.command(name="metrics")
+@click.argument("deployment_id")
+@click.option("--limit", "-l", default=100, help="Number of metric points to fetch")
+@click.option("--skip", "-s", default=0, help="Number of metric points to skip")
+def deployment_metrics(deployment_id: str, limit: int, skip: int):
+    """Get deployment metrics"""
+    config = CLIConfig()
+    if not config.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        return
+
+    client = get_client(config)
+    response = client.get(
+        f"/deployments/{deployment_id}/metrics",
+        params={"limit": limit, "skip": skip},
+    )
+
+    if response.status_code == 401:
+        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+        return
+
+    if response.status_code == 200:
+        metrics = response.json()
+        if not metrics:
+            click.echo("No deployment metrics found.")
+            return
+
+        for metric in metrics:
+            click.echo(
+                " | ".join(
+                    [
+                        str(metric.get("timestamp", "")),
+                        f"cpu: {metric.get('cpu_usage', 'n/a')}",
+                        f"memory: {metric.get('memory_usage', 'n/a')}",
+                    ]
+                )
+            )
+    elif response.status_code == 404:
+        click.echo("Error: Deployment not found", err=True)
+    else:
+        click.echo(f"Error: {response.text}", err=True)
+
+
 @deploy_group.command(name="delete")
 @click.argument("deployment_id")
 @click.option("--force", "-f", is_flag=True, help="Force deletion without confirmation")
