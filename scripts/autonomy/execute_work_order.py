@@ -9,6 +9,7 @@ from pathlib import Path
 
 
 DEFAULT_MAX_CHANGED_FILES = 6
+CODEX_REVIEW_COMMENT = "@codex please review"
 
 
 def run(command: list[str], *, cwd: str | None = None, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -113,6 +114,27 @@ def maybe_comment_issue(work_order: dict, brief_path: Path) -> None:
     run(["gh", "issue", "comment", str(work_order["issue"]), "--body", body], check=False)
 
 
+def pr_has_codex_review_comment(pr_ref: str) -> bool:
+    result = run(
+        ["gh", "pr", "view", pr_ref, "--json", "comments", "--jq", ".comments[].body"],
+        check=False,
+    )
+    if result.returncode != 0:
+        return False
+    return CODEX_REVIEW_COMMENT.lower() in result.stdout.lower()
+
+
+def maybe_comment_codex_review(pr_ref: str) -> None:
+    if not os.environ.get("GH_TOKEN"):
+        return
+    if pr_has_codex_review_comment(pr_ref):
+        print("Codex review handoff already present.")
+        return
+    result = run(["gh", "pr", "comment", pr_ref, "--body", CODEX_REVIEW_COMMENT], check=False)
+    if result.returncode != 0:
+        print("Failed to post Codex review handoff comment.")
+
+
 def run_agent_command(work_order: dict, brief_path: Path) -> int:
     template = os.environ.get("AUTONOMY_AGENT_CMD_TEMPLATE", "").strip()
     if not template:
@@ -178,6 +200,7 @@ def maybe_open_pr(work_order: dict, base_branch: str) -> None:
         ],
         check=False,
     )
+    maybe_comment_codex_review(work_order["branch"])
     reviewer_login = resolve_reviewer_login(work_order["reviewer"])
     if reviewer_login and os.environ.get("GH_TOKEN"):
         run(
