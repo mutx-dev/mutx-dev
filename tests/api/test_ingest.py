@@ -60,6 +60,35 @@ async def test_ingest_unauthorized_agent(client: AsyncClient, test_user):
 
 
 @pytest.mark.asyncio
+async def test_agent_runtime_heartbeat_rejects_unknown_status_value(
+    client: AsyncClient, db_session, test_agent
+):
+    from src.api.routes.agent_runtime import get_current_agent
+    from src.api.models.models import AgentStatus
+
+    test_agent.status = AgentStatus.CREATING.value
+    await db_session.commit()
+
+    client.app.dependency_overrides[get_current_agent] = lambda: test_agent
+
+    response = await client.post(
+        "/agents/heartbeat",
+        json={
+            "agent_id": str(test_agent.id),
+            "status": "unexpected_status",
+            "timestamp": datetime.utcnow().isoformat(),
+        },
+    )
+
+    assert response.status_code == 422
+
+    await db_session.refresh(test_agent)
+    assert test_agent.status == AgentStatus.CREATING.value
+
+    client.app.dependency_overrides.pop(get_current_agent, None)
+
+
+@pytest.mark.asyncio
 async def test_agent_runtime_heartbeat_triggers_heartbeat_webhook_without_status_change(
     client: AsyncClient, db_session, test_agent, monkeypatch
 ):
