@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { Github } from 'lucide-react'
 
+import { AnimatedTerminal } from '@/components/AnimatedTerminal'
 import { WaitlistForm } from '@/components/WaitlistForm'
 
 const GITHUB_URL = 'https://github.com/fortunexbt/mutx-dev'
@@ -58,7 +59,7 @@ export default function LandingPage() {
       </nav>
 
       <main className="relative px-5 pb-20 pt-32 sm:px-6 lg:pt-40">
-        <section className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)] lg:items-start">
+        <section className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)] lg:items-start">
           <div className="max-w-2xl">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/65">
               open-source agent control plane
@@ -87,7 +88,8 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div>
+          <div className="space-y-6">
+            <AnimatedTerminal />
             <WaitlistForm source="hero" compact />
           </div>
         </section>
