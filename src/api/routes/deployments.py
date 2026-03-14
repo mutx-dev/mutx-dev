@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
@@ -17,6 +18,7 @@ from src.api.models import (
     AgentLog,
     AgentMetric,
     DeploymentEvent as DeploymentEventModel,
+    DeploymentVersion,
 )
 from src.api.models.schemas import (
     DeploymentResponse,
@@ -25,6 +27,9 @@ from src.api.models.schemas import (
     DeploymentEventHistoryResponse,
     DeploymentLogsResponse,
     DeploymentMetricsResponse,
+    DeploymentVersionHistoryResponse,
+    DeploymentVersionResponse,
+    DeploymentRollbackRequest,
 )
 from src.api.middleware.auth import get_current_user
 
@@ -80,6 +85,7 @@ def _serialize_deployment(deployment: Deployment):
         "id": deployment.id,
         "agent_id": deployment.agent_id,
         "status": deployment.status,
+        "version": deployment.version,
         "replicas": deployment.replicas,
         "node_id": deployment.node_id,
         "started_at": deployment.started_at,
@@ -98,6 +104,21 @@ def _serialize_deployment(deployment: Deployment):
             for event in getattr(deployment, "events", [])
         ],
     }
+
+
+def _create_deployment_version(deployment: Deployment, db: AsyncSession) -> DeploymentVersion:
+    config_snapshot = {
+        "replicas": deployment.replicas,
+        "version": deployment.version,
+    }
+    version = DeploymentVersion(
+        deployment_id=deployment.id,
+        version=1,
+        config_snapshot=json.dumps(config_snapshot),
+        status="current",
+    )
+    db.add(version)
+    return version
 
 
 @router.get("", response_model=list[DeploymentResponse])
@@ -272,11 +293,15 @@ async def create_deployment(
     deployment = Deployment(
         agent_id=deployment_data.agent_id,
         status="pending",
+        version="v1.0.0",
         replicas=deployment_data.replicas,
         started_at=datetime.now(timezone.utc),
     )
     db.add(deployment)
     await db.flush()  # Get deployment.id
+
+    # Create initial version
+    initial_version = _create_deployment_version(deployment, db)
 
     # Record create event
     create_event = DeploymentEventModel(
@@ -387,3 +412,84 @@ async def get_deployment_metrics(
     result = await db.execute(query)
     metrics = result.scalars().all()
     return metrics
+
+
+@router.get("/{deployment_id}/versions", response_model=DeploymentVersionHistoryResponse)
+async def get_deployment_versions(
+    deployment_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get version history for a specific deployment."""
+    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+
+    query = (
+        select(DeploymentVersion)
+        .where(DeploymentVersion.deployment_id == deployment.id)
+        .order_by(DeploymentVersion.created_at.desc())
+    )
+
+    result = await db.execute(query)
+    versions = result.scalars().all()
+
+    return {
+        "deployment_id": deployment.id,
+        "items": versions,
+        "total": len(versions),
+    }
+
+
+@router.post("/{deployment_id}/rollback", response_model=DeploymentResponse)
+async def rollback_deployment(
+    deployment_id: uuid.UUID,
+    rollback_data: DeploymentRollbackRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Rollback a deployment to a specific version."""
+    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+
+    if deployment.status not in ["running", "ready", "stopped", "failed"]:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Cannot rollback deployment with status '{deployment.status}'",
+        )
+
+    target_version_query = select(DeploymentVersion).where(
+        DeploymentVersion.deployment_id == deployment.id,
+        DeploymentVersion.version == rollback_data.version,
+    )
+    result = await db.execute(target_version_query)
+    target_version = result.scalar_one_or_none()
+
+    if not target_version:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Version {rollback_data.version} not found for this deployment",
+        )
+
+    mark_old_query = select(DeploymentVersion).where(
+        DeploymentVersion.deployment_id == deployment.id,
+        DeploymentVersion.status == "current",
+    )
+    old_result = await db.execute(mark_old_query)
+    old_versions = old_result.scalars().all()
+    for old_v in old_versions:
+        old_v.status = "superseded"
+        old_v.rolled_back_at = datetime.now(timezone.utc)
+
+    target_version.status = "current"
+    target_version.rolled_back_at = None
+
+    rollback_event = DeploymentEventModel(
+        deployment_id=deployment.id,
+        event_type="rollback",
+        status=deployment.status,
+    )
+    db.add(rollback_event)
+
+    await db.commit()
+
+    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    logger.info(f"Rolled back deployment {deployment_id} to version {rollback_data.version}")
+    return _serialize_deployment(deployment)
