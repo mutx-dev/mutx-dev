@@ -36,7 +36,19 @@ def compile_uuid_sqlite(_type, _compiler, **_kw):
 
 def create_test_app() -> FastAPI:
     """Create a test FastAPI application."""
-    from src.api.routes import agents, deployments, api_keys, auth, webhooks, clawhub, agent_runtime, newsletter, ingest, leads
+    from src.api.routes import (
+        agents,
+        deployments,
+        api_keys,
+        auth,
+        webhooks,
+        clawhub,
+        agent_runtime,
+        newsletter,
+        ingest,
+        leads,
+        runs,
+    )
     
     app = FastAPI(title="MUTX Test API")
     
@@ -51,6 +63,7 @@ def create_test_app() -> FastAPI:
     app.include_router(newsletter.router, prefix="/api")
     app.include_router(leads.router, prefix="/api")
     app.include_router(ingest.router, prefix="/api")
+    app.include_router(runs.router, prefix="/api")
     
     # Health check endpoint
     @app.get("/health")
