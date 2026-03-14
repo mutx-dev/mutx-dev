@@ -24,7 +24,7 @@ curl -H "X-API-Key: mutx_live_your_key_here" https://api.mutx.dev/agents
 
 ### List Keys
 
-Returns a list of all active API keys associated with your account.
+Returns a list of all API keys (including revoked keys for auditability) associated with your account.
 
 * **Endpoint**: `GET /api-keys`
 * **Auth**: JWT required
