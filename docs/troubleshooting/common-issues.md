@@ -20,8 +20,8 @@ DATABASE_URL=postgresql://mutx:mutx_password@localhost:5432/mutx
 Then confirm Postgres is up:
 
 ```bash
-docker-compose up -d postgres
-docker-compose exec postgres pg_isready -U mutx
+docker compose -f infrastructure/docker/docker-compose.yml up -d postgres
+docker compose -f infrastructure/docker/docker-compose.yml exec postgres pg_isready -U mutx
 ```
 
 ## CLI login works, but agent creation fails

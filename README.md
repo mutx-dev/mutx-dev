@@ -79,9 +79,19 @@ git clone https://github.com/fortunexbt/mutx-dev
 cd mutx-dev
 ```
 
-### Demo Validation
+### Canonical Local Bootstrap
 
-Verify the demo path works locally in one command:
+Start the local MUTX stack from repo root with:
+
+```bash
+./scripts/dev.sh
+```
+
+This is the canonical local entrypoint and uses `infrastructure/docker/docker-compose.yml` explicitly.
+
+### Optional Demo Validation
+
+If you want a one-command demo sanity check, run:
 
 ```bash
 npm run demo:validate
