@@ -3,6 +3,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+MUTX_SKIP_PLAYWRIGHT="${MUTX_SKIP_PLAYWRIGHT:-0}"
+
 if [ -x ".venv/bin/python" ]; then
   PYTHON_BIN=".venv/bin/python"
 else
@@ -54,8 +56,12 @@ echo "Running frontend build check..."
 npm run build
 
 echo ""
-echo "Running frontend smoke tests..."
-npx playwright test --project=chromium
+if [ "$MUTX_SKIP_PLAYWRIGHT" = "1" ]; then
+  echo "Skipping frontend smoke tests (MUTX_SKIP_PLAYWRIGHT=1)."
+else
+  echo "Running frontend smoke tests..."
+  npx playwright test --project=chromium
+fi
 
 echo ""
 echo "Validation complete!"

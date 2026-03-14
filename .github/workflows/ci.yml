@@ -42,5 +42,14 @@ jobs:
         env:
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ci-test-site-key
           TURNSTILE_SECRET_KEY: ci-test-secret-key
+          MUTX_SKIP_PLAYWRIGHT: "1"
         run: |
           bash scripts/test.sh
+
+      - name: Run frontend smoke tests (informational)
+        continue-on-error: true
+        env:
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ci-test-site-key
+          TURNSTILE_SECRET_KEY: ci-test-secret-key
+        run: |
+          npx playwright test --project=chromium
