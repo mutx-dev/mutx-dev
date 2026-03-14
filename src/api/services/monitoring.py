@@ -58,9 +58,12 @@ async def _emit_agent_status_webhook(
     old_status: str,
     new_status: str,
     agent_name: str,
+    user_id: uuid.UUID,
 ) -> None:
     try:
-        await trigger_agent_status_event(session, agent_id, old_status, new_status, agent_name)
+        await trigger_agent_status_event(
+            session, agent_id, old_status, new_status, agent_name, user_id=user_id
+        )
     except Exception:
         logger.exception(
             "Monitor webhook emission failed for agent.status",
@@ -75,6 +78,7 @@ async def _emit_deployment_webhook(
     agent_id: uuid.UUID,
     event_type: str,
     status: str,
+    user_id: uuid.UUID,
 ) -> None:
     try:
         await trigger_deployment_event(
@@ -83,6 +87,7 @@ async def _emit_deployment_webhook(
             agent_id,
             event_type=event_type,
             status=status,
+            user_id=user_id,
         )
     except Exception:
         logger.exception(
@@ -141,6 +146,7 @@ async def monitor_agent_health(session: AsyncSession):
                     agent_id=agent.id,
                     event_type="monitor_started",
                     status="running",
+                    user_id=agent.user_id,
                 )
 
             await _emit_agent_status_webhook(
@@ -149,6 +155,7 @@ async def monitor_agent_health(session: AsyncSession):
                 old_status=old_status,
                 new_status=agent.status,
                 agent_name=agent.name,
+                user_id=agent.user_id,
             )
 
             logger.info(f"Monitor: Agent {agent.name} ({agent.id}) promoted to RUNNING")
@@ -199,6 +206,7 @@ async def monitor_agent_health(session: AsyncSession):
                     agent_id=agent.id,
                     event_type="monitor_failed",
                     status="failed",
+                    user_id=agent.user_id,
                 )
 
             await _emit_agent_status_webhook(
@@ -207,6 +215,7 @@ async def monitor_agent_health(session: AsyncSession):
                 old_status=old_status,
                 new_status=agent.status,
                 agent_name=agent.name,
+                user_id=agent.user_id,
             )
 
     # 3. Auto-Heal Failed Agents
@@ -258,6 +267,7 @@ async def monitor_agent_health(session: AsyncSession):
                     agent_id=agent.id,
                     event_type="monitor_restarted",
                     status="running",
+                    user_id=agent.user_id,
                 )
 
             await _emit_agent_status_webhook(
@@ -266,6 +276,7 @@ async def monitor_agent_health(session: AsyncSession):
                 old_status=old_status,
                 new_status=agent.status,
                 agent_name=agent.name,
+                user_id=agent.user_id,
             )
 
     await session.commit()

@@ -4,7 +4,8 @@ import uuid
 from datetime import datetime, timedelta
 
 from src.api.auth.jwt import create_access_token
-from src.api.models.models import WebhookDeliveryLog
+from src.api.models.models import Webhook, WebhookDeliveryLog
+from src.api.services.webhook_service import trigger_webhook_event
 
 
 @pytest.mark.asyncio
@@ -149,6 +150,46 @@ async def test_webhook_test_trigger(client: AsyncClient, test_user, monkeypatch)
     response = await client.post(f"/webhooks/{webhook_id}/test")
     assert response.status_code == 200
     assert response.json()["status"] == "test_delivered"
+
+
+@pytest.mark.asyncio
+async def test_trigger_webhook_event_scopes_delivery_to_user(
+    db_session, test_user, other_user, monkeypatch
+):
+    import src.api.services.webhook_service as webhook_service
+
+    test_user_webhook = Webhook(
+        user_id=test_user.id,
+        url="https://example.com/test-user",
+        events=["agent.status"],
+        is_active=True,
+    )
+    other_user_webhook = Webhook(
+        user_id=other_user.id,
+        url="https://example.com/other-user",
+        events=["agent.status"],
+        is_active=True,
+    )
+    db_session.add_all([test_user_webhook, other_user_webhook])
+    await db_session.commit()
+
+    delivered_user_ids: list[uuid.UUID] = []
+
+    async def mock_deliver(_session, _db, webhook, _event, _payload):
+        delivered_user_ids.append(webhook.user_id)
+        return True
+
+    monkeypatch.setattr(webhook_service, "deliver_webhook_with_retry", mock_deliver)
+
+    success_count = await trigger_webhook_event(
+        db_session,
+        "agent.status",
+        {"agent_id": "33333333-3333-4333-a333-333333333333"},
+        user_id=test_user.id,
+    )
+
+    assert success_count == 1
+    assert delivered_user_ids == [test_user.id]
 
 
 @pytest.mark.asyncio

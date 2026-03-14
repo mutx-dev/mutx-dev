@@ -173,6 +173,7 @@ async def trigger_webhook_event(
     db: AsyncSession,
     event: str,
     payload: dict,
+    user_id: Optional[uuid.UUID] = None,
 ) -> int:
     """
     Trigger a webhook event to all active webhooks subscribed to the event.
@@ -180,8 +181,13 @@ async def trigger_webhook_event(
     Returns:
         Number of successful deliveries
     """
-    # Get all active webhooks that subscribe to this event
-    result = await db.execute(select(Webhook).where(Webhook.is_active))
+    # Get active webhooks that subscribe to this event.
+    # Scope by user when provided to avoid cross-tenant dispatch.
+    query = select(Webhook).where(Webhook.is_active)
+    if user_id is not None:
+        query = query.where(Webhook.user_id == user_id)
+
+    result = await db.execute(query)
     webhooks = result.scalars().all()
 
     # Filter webhooks by event subscription
@@ -237,6 +243,7 @@ async def trigger_agent_status_event(
     old_status: str,
     new_status: str,
     agent_name: str,
+    user_id: Optional[uuid.UUID] = None,
 ):
     """Trigger agent.status event."""
     await trigger_webhook_event(
@@ -248,6 +255,7 @@ async def trigger_agent_status_event(
             "old_status": old_status,
             "new_status": new_status,
         },
+        user_id=user_id,
     )
 
 
@@ -257,6 +265,7 @@ async def trigger_deployment_event(
     agent_id: uuid.UUID,
     event_type: str,
     status: Optional[str] = None,
+    user_id: Optional[uuid.UUID] = None,
 ):
     """Trigger deployment event."""
     await trigger_webhook_event(
@@ -268,4 +277,5 @@ async def trigger_deployment_event(
             "event_type": event_type,
             "status": status,
         },
+        user_id=user_id,
     )
