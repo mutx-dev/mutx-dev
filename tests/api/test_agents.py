@@ -106,10 +106,10 @@ class TestListAgents:
         assert len(data) == 2
 
     @pytest.mark.asyncio
-    async def test_list_agents_by_user_id(
+    async def test_list_agents_scoped_to_authenticated_user(
         self, client: AsyncClient, test_agent, other_user_client: AsyncClient
     ):
-        """Test listing agents filtered by user_id."""
+        """Test listing agents always uses the authenticated user scope."""
         # Test user can see their own agents
         response = await client.get("/api/agents")
         assert len(response.json()) == 1
@@ -117,6 +117,11 @@ class TestListAgents:
         # Other user sees empty list
         response = await other_user_client.get("/api/agents")
         assert len(response.json()) == 0
+
+        # Supplying user_id in query must not expand access scope
+        response = await other_user_client.get(f"/api/agents?user_id={test_agent.user_id}")
+        assert response.status_code == 200
+        assert response.json() == []
 
 
 class TestGetAgent:
