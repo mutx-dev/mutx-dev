@@ -1,12 +1,8 @@
 import postgres from 'postgres'
 
-// Railway provides the complete DATABASE_URL in the environment
-// We are forcing ssl off entirely to avoid TLS handshakes over the internal proxy.
+// Use DATABASE_URL as provided so SSL/TLS behavior is controlled by connection settings.
 const sql = process.env.DATABASE_URL
-  ? postgres(process.env.DATABASE_URL + '?sslmode=disable', {
-      ssl: false,
-    })
+  ? postgres(process.env.DATABASE_URL)
   : null
 
 export default sql
-
