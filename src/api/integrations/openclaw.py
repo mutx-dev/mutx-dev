@@ -80,37 +80,37 @@ class OpenClawClient:
 
     def list_agents(self, status: Optional[str] = None) -> list[dict[str, Any]]:
         params = {"status": status} if status else None
-        return self._request("GET", "/api/v1/agents", params=params)
+        return self._request("GET", "/api/agents", params=params)
 
     def get_agent(self, agent_id: str) -> AgentStatus:
-        data = self._request("GET", f"/api/v1/agents/{agent_id}")
+        data = self._request("GET", f"/api/agents/{agent_id}")
         return AgentStatus(**data)
 
     def create_agent(self, config: AgentConfig) -> AgentStatus:
-        data = self._request("POST", "/api/v1/agents", data=config.model_dump(exclude_none=True))
+        data = self._request("POST", "/api/agents", data=config.model_dump(exclude_none=True))
         return AgentStatus(**data)
 
     def update_agent(self, agent_id: str, config: AgentConfig) -> AgentStatus:
         data = self._request(
             "PUT",
-            f"/api/v1/agents/{agent_id}",
+            f"/api/agents/{agent_id}",
             data=config.model_dump(exclude_none=True),
         )
         return AgentStatus(**data)
 
     def delete_agent(self, agent_id: str) -> dict[str, str]:
-        return self._request("DELETE", f"/api/v1/agents/{agent_id}")
+        return self._request("DELETE", f"/api/agents/{agent_id}")
 
     def start_agent(self, agent_id: str) -> AgentStatus:
-        data = self._request("POST", f"/api/v1/agents/{agent_id}/start")
+        data = self._request("POST", f"/api/agents/{agent_id}/start")
         return AgentStatus(**data)
 
     def stop_agent(self, agent_id: str) -> AgentStatus:
-        data = self._request("POST", f"/api/v1/agents/{agent_id}/stop")
+        data = self._request("POST", f"/api/agents/{agent_id}/stop")
         return AgentStatus(**data)
 
     def restart_agent(self, agent_id: str) -> AgentStatus:
-        data = self._request("POST", f"/api/v1/agents/{agent_id}/restart")
+        data = self._request("POST", f"/api/agents/{agent_id}/restart")
         return AgentStatus(**data)
 
     def get_agent_logs(
@@ -122,10 +122,10 @@ class OpenClawClient:
         params = {"tail": tail}
         if since:
             params["since"] = since
-        return self._request("GET", f"/api/v1/agents/{agent_id}/logs", params=params)
+        return self._request("GET", f"/api/agents/{agent_id}/logs", params=params)
 
     def get_agent_stats(self, agent_id: str) -> dict[str, Any]:
-        return self._request("GET", f"/api/v1/agents/{agent_id}/stats")
+        return self._request("GET", f"/api/agents/{agent_id}/stats")
 
     def exec_command(
         self,
@@ -135,7 +135,7 @@ class OpenClawClient:
     ) -> dict[str, Any]:
         data = self._request(
             "POST",
-            f"/api/v1/agents/{agent_id}/exec",
+            f"/api/agents/{agent_id}/exec",
             data={"command": command, "timeout": timeout},
         )
         return data
