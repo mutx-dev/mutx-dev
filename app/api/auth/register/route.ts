@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     const nextResponse = NextResponse.json(payload)
     nextResponse.cookies.set('access_token', payload.access_token, {
-      httpOnly: false,
+      httpOnly: true,
       sameSite: 'lax',
       secure: secureCookies,
       domain: cookieDomain,
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       maxAge: payload.expires_in || 1800,
     })
     nextResponse.cookies.set('refresh_token', payload.refresh_token, {
-      httpOnly: false,
+      httpOnly: true,
       sameSite: 'lax',
       secure: secureCookies,
       domain: cookieDomain,
