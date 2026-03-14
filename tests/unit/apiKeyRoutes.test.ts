@@ -63,6 +63,7 @@ describe('API key route proxies', () => {
       headers: {
         Authorization: 'Bearer token',
       },
+      cache: 'no-store',
     })
     expect(response.status).toBe(403)
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
@@ -112,6 +113,7 @@ describe('API key route proxies', () => {
       headers: {
         Authorization: 'Bearer token',
       },
+      cache: 'no-store',
     })
     expect(response.status).toBe(403)
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
@@ -136,6 +138,7 @@ describe('API key route proxies', () => {
       headers: {
         Authorization: 'Bearer token',
       },
+      cache: 'no-store',
     })
     expect(response.status).toBe(403)
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
@@ -160,6 +163,7 @@ describe('API key route proxies', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ name: 'blocked-key' }),
+      cache: 'no-store',
     })
     expect(response.status).toBe(403)
     await expect(response.json()).resolves.toEqual({ detail: 'Forbidden' })
@@ -184,6 +188,7 @@ describe('API key route proxies', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ name: 'overflow-key' }),
+      cache: 'no-store',
     })
     expect(response.status).toBe(409)
     await expect(response.json()).resolves.toEqual({
@@ -209,6 +214,7 @@ describe('API key route proxies', () => {
       headers: {
         Authorization: 'Bearer token',
       },
+      cache: 'no-store',
     })
     expect(response.status).toBe(204)
   })
@@ -236,6 +242,7 @@ describe('API key route proxies', () => {
       headers: {
         Authorization: 'Bearer token',
       },
+      cache: 'no-store',
     })
     expect(response.status).toBe(200)
     await expect(response.json()).resolves.toEqual({
@@ -268,6 +275,7 @@ describe('API key route proxies', () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ name: 'build-key' }),
+      cache: 'no-store',
     })
     expect(response.status).toBe(201)
     await expect(response.json()).resolves.toEqual({
@@ -299,6 +307,7 @@ describe('API key route proxies', () => {
       headers: {
         Authorization: 'Bearer token',
       },
+      cache: 'no-store',
     })
     expect(response.status).toBe(200)
     await expect(response.json()).resolves.toEqual([
