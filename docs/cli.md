@@ -81,6 +81,9 @@ mutx status
 | `mutx deploy scale`   | reliable | uses `POST /deployments/{id}/scale`                                      |
 | `mutx deploy restart` | reliable | uses `POST /deployments/{id}/restart`                                    |
 | `mutx deploy delete`  | reliable | uses `DELETE /deployments/{id}`                                          |
+| `mutx webhooks list` | reliable | uses `GET /webhooks`                                                     |
+| `mutx webhooks get`  | reliable | uses `GET /webhooks/{id}`                                                  |
+| `mutx webhooks deliveries` | reliable | uses `GET /webhooks/{id}/deliveries`                                  |
 
 Intentional omission: there is currently no dedicated `mutx deploy get` command for `GET /deployments/{id}`.
 Use `mutx deploy list` plus deployment-specific `events`, `logs`, and `metrics` commands for targeted inspection.
@@ -110,6 +113,9 @@ mutx deploy create --agent-id YOUR_AGENT_ID --replicas 1
 
 # Restart a failed deployment
 mutx deploy restart YOUR_DEPLOYMENT_ID
+
+# Fetch webhook delivery history
+mutx webhooks deliveries YOUR_WEBHOOK_ID --limit 10
 ```
 
 ## When in Doubt
