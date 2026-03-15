@@ -36,7 +36,7 @@ The following origins are allowed to make cross-origin requests:
 - `https://mutx.dev` - Production marketing site
 - `https://app.mutx.dev` - Production app
 
-To configure additional origins, set the `CORS_ORIGINS` environment variable as a comma-separated list.
+To configure additional origins, set the `CORS_ORIGINS` environment variable as a comma-separated list (or a JSON array).
 
 ### Security Headers
 

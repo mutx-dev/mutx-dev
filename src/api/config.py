@@ -1,8 +1,10 @@
 from functools import lru_cache
+from json import JSONDecodeError, loads
 import secrets
+from typing import Annotated
 
-from pydantic import AliasChoices, Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import AliasChoices, Field, field_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -21,7 +23,7 @@ class Settings(BaseSettings):
         default=8000,
         validation_alias=AliasChoices("API_PORT", "PORT"),
     )
-    cors_origins: list[str] = [
+    cors_origins: Annotated[list[str], NoDecode] = [
         "http://localhost:3000",
         "http://app.localhost:3000",
         "https://mutx.dev",
@@ -71,6 +73,33 @@ class Settings(BaseSettings):
         ),
         description="Email domains allowed to access internal-only endpoints.",
     )
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, value: object) -> object:
+        if not isinstance(value, str):
+            return value
+
+        raw_value = value.strip()
+        if not raw_value:
+            return []
+
+        if raw_value.startswith("["):
+            try:
+                parsed_value = loads(raw_value)
+            except JSONDecodeError as exc:
+                raise ValueError(
+                    "CORS_ORIGINS must be a JSON array or comma-separated list"
+                ) from exc
+            if not isinstance(parsed_value, list):
+                raise ValueError("CORS_ORIGINS JSON value must be an array")
+            return [
+                origin.strip()
+                for origin in parsed_value
+                if isinstance(origin, str) and origin.strip()
+            ]
+
+        return [origin.strip() for origin in raw_value.split(",") if origin.strip()]
 
 
 @lru_cache()
