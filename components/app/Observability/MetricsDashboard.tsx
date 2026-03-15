@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Activity,
   Cpu,
@@ -107,7 +107,7 @@ export function MetricsDashboard({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function loadMetrics() {
+  const loadMetrics = useCallback(async function loadMetrics() {
     if (!agentId && !deploymentId) return;
 
     setLoading(true);
@@ -128,13 +128,13 @@ export function MetricsDashboard({
     } finally {
       setLoading(false);
     }
-  }
+  }, [agentId, deploymentId]);
 
   useEffect(() => {
     loadMetrics();
     const interval = setInterval(loadMetrics, 10000);
     return () => clearInterval(interval);
-  }, [agentId, deploymentId]);
+  }, [agentId, deploymentId, loadMetrics]);
 
   const latestMetric = metrics[0];
   const previousMetric = metrics[1];
