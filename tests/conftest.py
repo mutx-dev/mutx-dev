@@ -2,6 +2,7 @@
 Pytest configuration and fixtures for MUTX API tests.
 """
 import asyncio
+from datetime import datetime
 from collections.abc import AsyncGenerator
 import os
 import uuid
@@ -66,6 +67,20 @@ def create_test_app() -> FastAPI:
     app.include_router(runs.router, prefix="/api")
     
     # Health check endpoint
+    @app.get("/")
+    async def root():
+        return {"message": "mutx.dev API", "version": "1.0.0"}
+
+    @app.get("/ready")
+    async def ready():
+        # Simple ready check for tests
+        return {
+            "status": "ready",
+            "timestamp": datetime.utcnow().isoformat(),
+            "database": "ready",
+            "error": None,
+        }
+
     @app.get("/health")
     async def health():
         return {"status": "ok"}

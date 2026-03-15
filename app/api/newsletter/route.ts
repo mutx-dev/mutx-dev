@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import sql from '@/lib/db'
+import { validateRequest, schemas } from '@/app/api/_lib/validation'
+import { withErrorHandling, badRequest } from '@/app/api/_lib/errors'
 
 export const dynamic = 'force-dynamic'
 
@@ -116,38 +118,37 @@ async function verifyTurnstileToken(request: Request, token: string) {
  * It handles captcha verification, honeypot checks, and direct DB insertion.
  * Backend python API may eventually proxy here or share the same DB.
  */
-export async function POST(request: Request) {
-  try {
+export async function POST(request: Request): Promise<NextResponse> {
+  return withErrorHandling(async (req: Request) => {
     if (!sql) {
       throw new Error('Database not configured')
     }
-    const body = await request.json()
+    
+    const body = await req.json().catch(() => ({}))
     const { email, source, captchaToken, honeypot } = body
 
     // 1. Honeypot check
     if (honeypot) {
-      return NextResponse.json({ success: false, error: 'Invalid input' }, { status: 400 })
+      return badRequest('Invalid input')
     }
 
-    if (!email) {
-      return NextResponse.json({ success: false, error: 'Email is required' }, { status: 400 })
+    // 2. Validate email with schema
+    const validation = await validateRequest(schemas.newsletter, req)
+    if (!validation.success) {
+      return validation.response
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json({ success: false, error: 'Invalid email format' }, { status: 400 })
-    }
-
+    // 3. Validate captcha token
     if (typeof captchaToken !== 'string' || !captchaToken.trim()) {
-      return NextResponse.json({ success: false, error: 'Please complete the verification challenge.' }, { status: 400 })
+      return badRequest('Please complete the verification challenge.')
     }
 
     const isValidCaptcha = await verifyTurnstileToken(request, captchaToken)
     if (!isValidCaptcha) {
-      return NextResponse.json({ success: false, error: 'Verification failed. Please try again.' }, { status: 400 })
+      return badRequest('Verification failed. Please try again.')
     }
 
-    const normalizedEmail = email.toLowerCase().trim()
+    const normalizedEmail = validation.data.email.toLowerCase().trim()
     const normalizedSource = String(source || 'coming-soon').trim().slice(0, 120) || 'coming-soon'
 
     await ensureTableExists()
@@ -183,23 +184,16 @@ export async function POST(request: Request) {
       message,
       emailSent,
     })
-  } catch (error) {
-    console.error('Waitlist error:', error)
-    return NextResponse.json({ success: false, error: 'Failed to join waitlist' }, { status: 500 })
-  }
+  })(request)
 }
 
-export async function GET() {
-  try {
+export async function GET(): Promise<NextResponse> {
+  return withErrorHandling(async () => {
     if (!sql) return NextResponse.json({ count: 24 })
     await ensureTableExists()
     const result = await sql`SELECT COUNT(*) as count FROM waitlist_emails`
     // Start at 24 and add current db entries
     const count = Number(result[0].count) + 24
     return NextResponse.json({ count })
-  } catch (error) {
-    console.error('Waitlist count error:', error)
-    // If DB fails, fallback to just 24
-    return NextResponse.json({ count: 24 })
-  }
+  })(new Request('http://localhost'))
 }

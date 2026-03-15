@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { getApiBaseUrl, getCookieDomain, shouldUseSecureCookies } from '@/app/api/_lib/controlPlane'
+import { validateRequest, schemas } from '@/app/api/_lib/validation'
+import { withErrorHandling } from '@/app/api/_lib/errors'
 
 const API_BASE_URL = getApiBaseUrl()
 
 export const dynamic = 'force-dynamic'
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  return withErrorHandling(async (req: Request) => {
+    const validation = await validateRequest(schemas.register, req)
+    if (!validation.success) {
+      return validation.response
+    }
+
+    const { email, password, name } = validation.data
+    const body = { email, password, name }
+    
     const secureCookies = shouldUseSecureCookies(request)
     const cookieDomain = getCookieDomain(request)
 
@@ -44,8 +53,5 @@ export async function POST(request: NextRequest) {
     })
 
     return nextResponse
-  } catch (error) {
-    console.error('Auth register proxy error:', error)
-    return NextResponse.json({ detail: 'Failed to connect to API' }, { status: 500 })
-  }
+  })(request)
 }

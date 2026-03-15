@@ -1,0 +1,109 @@
+# MUTX Makefile
+# Local development shortcuts
+#
+# Usage:
+#   make help         Show this help
+#   make dev          Start local dev stack (Docker Compose)
+#   make dev-stop     Stop dev stack
+#   make test-api     Run API health tests
+#   make test-auth    Register test user, login, and show token (one-command)
+#   make test         Run full test suite
+#   make lint         Run linters
+
+# Default target
+.PHONY: help
+help:
+	@echo "MUTX Local Development"
+	@echo "======================="
+	@echo ""
+	@echo "  make dev         Start local dev stack (Docker Compose)"
+	@echo "  make dev-stop    Stop dev stack"
+	@echo "  make test-api   Run API health/ready tests"
+	@echo "  make test-auth  Register test user, login, get token (one-command)"
+	@echo "  make test       Run full test suite"
+	@echo "  make lint        Run linters"
+	@echo ""
+	@echo "Quick Auth (one-command):"
+	@echo "  make test-auth   # Registers test user, logs in, shows token + examples"
+	@echo ""
+	@echo "Services:"
+	@echo "  Frontend:  http://localhost:3000"
+	@echo "  Backend:   http://localhost:8000"
+	@echo "  API Docs:  http://localhost:8000/docs"
+
+# Start local dev stack
+.PHONY: dev
+dev:
+	@./scripts/dev.sh
+
+# Stop dev stack
+.PHONY: dev-stop
+dev-stop:
+	@cd infrastructure/docker && docker compose down || true
+
+# Run API tests
+.PHONY: test-api
+test-api:
+	@./scripts/test-api.sh
+
+# Test auth flow - one-command setup for local testing
+.PHONY: test-auth
+test-auth:
+	@echo "🧪 MUTX Auth Flow - One-Command Setup"
+	@echo "======================================"
+	@echo ""
+	@API_URL="$${API_URL:-http://localhost:8000}" && \
+	TEST_EMAIL="test@local.dev" && \
+	TEST_PASS="TestPass123!" && \
+	echo "Registering test user..." && \
+	RESPONSE=$$(curl -sf -X POST "$$API_URL/auth/register" \
+		-H "Content-Type: application/json" \
+		-d "{\"email\":\"$$TEST_EMAIL\",\"name\":\"Test User\",\"password\":\"$$TEST_PASS\"}" 2>/dev/null || echo "{}") && \
+	echo "✓ User registered (or already exists)" && \
+	echo "" && \
+	echo "Logging in..." && \
+	LOGIN_RESP=$$(curl -sf -X POST "$$API_URL/auth/login" \
+		-H "Content-Type: application/json" \
+		-d "{\"email\":\"$$TEST_EMAIL\",\"password\":\"$$TEST_PASS\"}" 2>/dev/null) && \
+	TOKEN=$$(echo "$$LOGIN_RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('access_token',''))" 2>/dev/null || echo "") && \
+	if [ -n "$$TOKEN" ]; then \
+		echo "✓ Login successful!"; \
+		echo ""; \
+		echo "======================================"; \
+		echo "🔑 Your Access Token:"; \
+		echo "======================================"; \
+		echo "$$TOKEN"; \
+		echo ""; \
+		echo "======================================"; \
+		echo "📝 Example Authenticated Requests:"; \
+		echo "======================================"; \
+		echo ""; \
+		echo "curl $$API_URL/auth/me -H \"Authorization: Bearer $$TOKEN\""; \
+		echo ""; \
+		echo "curl \"$$API_URL/agents?limit=5\" -H \"Authorization: Bearer $$TOKEN\""; \
+		echo ""; \
+		ME_RESP=$$(curl -sf "$$API_URL/auth/me" -H "Authorization: Bearer $$TOKEN" 2>/dev/null); \
+		if [ -n "$$ME_RESP" ]; then \
+			echo ""; \
+			echo "✅ Test Request (auth/me):"; \
+			echo "======================================"; \
+			echo "$$ME_RESP" | python3 -m json.tool 2>/dev/null || echo "$$ME_RESP"; \
+		fi; \
+	else \
+		echo "✗ Login failed. Check if API is running: $$API_URL"; \
+		exit 1; \
+	fi
+
+# Run full test suite
+.PHONY: test
+test:
+	@./scripts/test.sh
+
+# Run linters
+.PHONY: lint
+lint:
+	@echo "Running frontend lint..."
+	@npm run lint
+	@echo ""
+	@echo "Running Python lint..."
+	@.venv/bin/ruff check src/api cli sdk || ruff check src/api cli sdk

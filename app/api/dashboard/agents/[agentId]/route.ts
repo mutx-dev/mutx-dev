@@ -1,22 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { getApiBaseUrl, getAuthToken } from '@/app/api/_lib/controlPlane'
+import { withErrorHandling, unauthorized, badRequest } from '@/app/api/_lib/errors'
+import { z } from 'zod'
 
 const API_BASE_URL = getApiBaseUrl()
 
 export const dynamic = 'force-dynamic'
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ agentId: string }> }) {
-  try {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ agentId: string }> }): Promise<NextResponse> {
+  return withErrorHandling(async (req: Request) => {
     const token = await getAuthToken(request)
     if (!token) {
-      return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 })
+      return unauthorized()
     }
 
     const { agentId } = await params
 
-    if (!agentId) {
-      return NextResponse.json({ detail: 'Agent ID is required' }, { status: 400 })
+    // Validate agentId format
+    const idValidation = z.string().uuid('Invalid agent ID').safeParse(agentId)
+    if (!idValidation.success) {
+      return badRequest('Invalid agent ID format')
     }
 
     const response = await fetch(`${API_BASE_URL}/agents/${agentId}`, {
@@ -31,8 +35,5 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
 
     return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('Dashboard agents delete error:', error)
-    return NextResponse.json({ detail: 'Failed to connect to API' }, { status: 500 })
-  }
+  })(request)
 }
