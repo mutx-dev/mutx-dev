@@ -228,7 +228,7 @@ class RunCreate(BaseModel):
     input_text: Optional[str] = None
     output_text: Optional[str] = None
     error_message: Optional[str] = None
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict = Field(default_factory=dict)
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     traces: list[RunTraceCreate] = Field(default_factory=list)
@@ -255,7 +255,7 @@ class RunResponse(BaseModel):
     input_text: Optional[str]
     output_text: Optional[str]
     error_message: Optional[str]
-    metadata: dict[str, Any]
+    metadata: dict
     started_at: datetime
     completed_at: Optional[datetime]
     created_at: datetime
@@ -468,5 +468,5 @@ class UsageEventResponse(BaseModel):
     event_type: str
     user_id: uuid.UUID
     resource_id: Optional[str]
-    metadata: dict[str, Any]
+    metadata: dict
     created_at: datetime
