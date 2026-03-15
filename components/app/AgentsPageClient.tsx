@@ -65,8 +65,8 @@ async function deleteAgent(agentId: string): Promise<void> {
   }
 }
 
-async function stopAgent(agentId: string): Promise<Agent> {
-  return readJson<Agent>(`/api/agents/${encodeURIComponent(agentId)}/stop`, {
+async function stopAgent(agentId: string): Promise<{ status: string }> {
+  return readJson<{ status: string }>(`/api/agents/${encodeURIComponent(agentId)}/stop`, {
     method: "POST",
     cache: "no-store",
   });
@@ -565,8 +565,12 @@ export function AgentsPageClient() {
 
     setStoppingId(agentId);
     try {
-      const updated = await stopAgent(agentId);
-      setAgents((prev) => prev.map((a) => (a.id === agentId ? updated : a)));
+      await stopAgent(agentId);
+      setAgents((prev) =>
+        prev.map((agent) =>
+          agent.id === agentId ? { ...agent, status: "stopped" } : agent,
+        ),
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to stop agent");
     } finally {
