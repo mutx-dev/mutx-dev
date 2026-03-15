@@ -1,10 +1,9 @@
 from functools import lru_cache
 from json import JSONDecodeError, loads
 import secrets
-from typing import Annotated
 
 from pydantic import AliasChoices, Field, field_validator
-from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -23,7 +22,7 @@ class Settings(BaseSettings):
         default=8000,
         validation_alias=AliasChoices("API_PORT", "PORT"),
     )
-    cors_origins: Annotated[list[str], NoDecode] = [
+    cors_origins: list[str] | str = [
         "http://localhost:3000",
         "http://app.localhost:3000",
         "https://mutx.dev",
