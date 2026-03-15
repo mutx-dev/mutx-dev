@@ -297,9 +297,9 @@ class Agents:
             config: New configuration as dict or JSON string
         """
         self._require_sync_client()
-        payload = {'config': config if isinstance(config, str) else json.dumps(config)}
+        payload = {"config": config if isinstance(config, str) else json.dumps(config)}
         response = self._client.patch(
-            f'/agents/{agent_id}/config',
+            f"/agents/{agent_id}/config",
             json=payload,
         )
         response.raise_for_status()
@@ -317,9 +317,9 @@ class Agents:
             config: New configuration as dict or JSON string
         """
         self._require_async_client()
-        payload = {'config': config if isinstance(config, str) else json.dumps(config)}
+        payload = {"config": config if isinstance(config, str) else json.dumps(config)}
         response = await self._client.patch(
-            f'/agents/{agent_id}/config',
+            f"/agents/{agent_id}/config",
             json=payload,
         )
         response.raise_for_status()
