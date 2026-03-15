@@ -415,3 +415,42 @@ class APIKeyHistoryResponse(BaseModel):
     total: int
     skip: int
     limit: int
+
+
+# Usage Event Schemas
+class UsageEventCreate(BaseModel):
+    """Request model for creating a usage event"""
+
+    event_type: str = Field(..., min_length=1, max_length=100, description="Type of event (e.g., 'api_call', 'agent_run')")
+    user_id: Optional[uuid.UUID] = Field(None, description="Associated user ID")
+    session_id: Optional[str] = Field(None, max_length=255, description="Session identifier")
+    source: Optional[str] = Field(None, max_length=50, description="Event source: frontend, api, cli, etc.")
+    event_name: Optional[str] = Field(None, max_length=255, description="Event name/label")
+    extra_data: Optional[str] = Field(None, description="Extra data as JSON string")
+
+
+class UsageEventResponse(BaseModel):
+    """Response model for usage events"""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    event_type: str
+    user_id: Optional[uuid.UUID]
+    session_id: Optional[str]
+    source: Optional[str]
+    event_name: Optional[str]
+    extra_data: Optional[str]
+    timestamp: datetime
+
+
+class UsageEventHistoryResponse(BaseModel):
+    """Paginated response for listing usage events."""
+
+    items: list[UsageEventResponse] = Field(default_factory=list)
+    total: int
+    skip: int
+    limit: int
+    event_type: Optional[str] = None
+    user_id: Optional[uuid.UUID] = None
+    source: Optional[str] = None
