@@ -87,6 +87,9 @@ async def list_deployments(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    # Ownership enforcement: always filter by authenticated user's agent ownership.
+    # Client-supplied user_id query params are ignored - ownership is derived
+    # from the auth token via current_user, not from client input.
     # Filter deployments by agents owned by the current user
     query = (
         select(Deployment)
