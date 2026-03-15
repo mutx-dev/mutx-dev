@@ -648,8 +648,16 @@ export function AgentsPageClient() {
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-            <span className="font-medium">Error:</span> {error}
+          <div className="flex items-center justify-between rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+            <div className="flex items-center gap-2">
+              <span className="font-medium">Error:</span> {error}
+            </div>
+            <button
+              onClick={() => { setError(""); loadAgents(); }}
+              className="rounded-lg border border-rose-500/30 bg-rose-500/20 px-3 py-1 text-xs font-medium text-rose-200 transition hover:bg-rose-500/30"
+            >
+              Retry
+            </button>
           </div>
         )}
 
