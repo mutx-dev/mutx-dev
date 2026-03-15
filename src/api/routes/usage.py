@@ -1,4 +1,5 @@
 """Usage event tracking API"""
+import json
 import logging
 import uuid
 from datetime import datetime, timezone
@@ -38,7 +39,7 @@ async def create_usage_event(
         user_id=current_user.id,
         resource_id=event_data.resource_id,
         event_metadata=(
-            BaseModel.model_dump_json(event_data.metadata) 
+            json.dumps(event_data.metadata) 
             if event_data.metadata 
             else None
         ),

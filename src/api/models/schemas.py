@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
 import uuid
 
 from src.api.models.models import AgentStatus, AgentType
@@ -459,6 +459,8 @@ class UsageEventCreate(BaseModel):
     )
 
 
+import json
+
 class UsageEventResponse(BaseModel):
     """Response model for usage events"""
 
@@ -468,5 +470,17 @@ class UsageEventResponse(BaseModel):
     event_type: str
     user_id: uuid.UUID
     resource_id: Optional[str]
-    metadata: dict
+    event_metadata: Optional[str] = None  # JSON string from DB
     created_at: datetime
+
+    @computed_field
+    @property
+    def metadata(self) -> Optional[dict]:
+        """Deserialize event_metadata JSON string to dict"""
+        if self.event_metadata:
+            try:
+                import json
+                return json.loads(self.event_metadata)
+            except (json.JSONDecodeError, TypeError):
+                return None
+        return None
