@@ -312,7 +312,7 @@ export default function AppPreviewPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
-          <aside className="panel sticky top-4 hidden h-fit rounded-[24px] border border-white/5 bg-white/[0.01] p-5 backdrop-blur-xl lg:min-h-[calc(100vh-2rem)] lg:block">
+          <aside className="panel sticky top-16 hidden h-fit rounded-[24px] border border-white/5 bg-white/[0.01] p-5 backdrop-blur-xl lg:min-h-[calc(100vh-2rem)] lg:block">
             <div className="mb-8 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
                 <Command className="h-5 w-5" />
