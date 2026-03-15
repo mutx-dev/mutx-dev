@@ -60,7 +60,7 @@ def test_api_keys_list_hits_contract_route() -> None:
 
     api_keys.list()
 
-    assert captured["path"] == "/api-keys"
+    assert captured["path"] == "/api/api-keys"
     assert captured["method"] == "GET"
 
 
@@ -78,7 +78,7 @@ def test_api_keys_alist_hits_contract_route() -> None:
     import asyncio
     asyncio.run(api_keys.alist())
 
-    assert captured["path"] == "/api-keys"
+    assert captured["path"] == "/api/api-keys"
     assert captured["method"] == "GET"
 
 
@@ -96,7 +96,7 @@ def test_api_keys_create_hits_contract_route_and_maps_payload() -> None:
 
     api_keys.create(name="my-key", expires_in_days=30)
 
-    assert captured["path"] == "/api-keys"
+    assert captured["path"] == "/api/api-keys"
     assert captured["method"] == "POST"
     assert captured["json"]["name"] == "my-key"
     assert captured["json"]["expires_in_days"] == 30
@@ -132,7 +132,7 @@ def test_api_keys_acreate_hits_contract_route() -> None:
     import asyncio
     asyncio.run(api_keys.acreate(name="async-key"))
 
-    assert captured["path"] == "/api-keys"
+    assert captured["path"] == "/api/api-keys"
     assert captured["method"] == "POST"
 
 
@@ -150,7 +150,7 @@ def test_api_keys_revoke_hits_contract_route() -> None:
 
     api_keys.revoke(key_id)
 
-    assert captured["path"] == f"/api-keys/{key_id}"
+    assert captured["path"] == f"/api/api-keys/{key_id}"
     assert captured["method"] == "DELETE"
 
 
@@ -169,7 +169,7 @@ def test_api_keys_arevoke_hits_contract_route() -> None:
     import asyncio
     asyncio.run(api_keys.arevoke(key_id))
 
-    assert captured["path"] == f"/api-keys/{key_id}"
+    assert captured["path"] == f"/api/api-keys/{key_id}"
     assert captured["method"] == "DELETE"
 
 
@@ -187,7 +187,7 @@ def test_api_keys_rotate_hits_contract_route() -> None:
 
     result = api_keys.rotate(key_id)
 
-    assert captured["path"] == f"/api-keys/{key_id}/rotate"
+    assert captured["path"] == f"/api/api-keys/{key_id}/rotate"
     assert captured["method"] == "POST"
     assert isinstance(result, APIKeyWithSecret)
 
@@ -207,7 +207,7 @@ def test_api_keys_arotate_hits_contract_route() -> None:
     import asyncio
     result = asyncio.run(api_keys.arotate(key_id))
 
-    assert captured["path"] == f"/api-keys/{key_id}/rotate"
+    assert captured["path"] == f"/api/api-keys/{key_id}/rotate"
     assert captured["method"] == "POST"
     assert isinstance(result, APIKeyWithSecret)
 
