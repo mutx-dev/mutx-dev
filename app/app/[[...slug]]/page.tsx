@@ -10,6 +10,7 @@ import { AgentsPageClient } from '@/components/app/AgentsPageClient';
 import { DeploymentsPageClient } from '@/components/app/DeploymentsPageClient';
 import { ErrorBoundary } from '@/components/app/ErrorBoundary';
 import { LogsMetricsStateClient } from '@/components/app/LogsMetricsStateClient';
+import WebhooksPageClient from '@/components/webhooks/WebhooksPageClient';
 import { TerminalWindow } from '@/components/TerminalWindow';
 
 function PageLoadingSkeleton() {
@@ -90,6 +91,7 @@ const navItems = [
   { label: 'Deployments', hint: 'timeline + recovery', href: '/app/deployments', icon: Rocket },
   { label: 'API Keys', hint: 'generate / rotate / revoke', href: '/app/api-keys', icon: KeyRound },
   { label: 'Health', hint: 'proxy reachability', href: '/app/health', icon: LogOut },
+  { label: 'Webhooks', hint: 'event subscriptions', href: '/app/webhooks', icon: Activity },
   { label: 'Observability', hint: 'logs + metrics + state', href: '/app/observability', icon: Activity },
 ]
 
@@ -198,6 +200,25 @@ export default function AppPreviewPage() {
             </div>
           </div>
           <AppDashboardClient />
+        </div>
+      );
+    }
+
+    if (pathname.startsWith('/app/webhooks')) {
+      return (
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
+              <Activity className="h-6 w-6" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-semibold text-white">Webhooks</h1>
+              <p className="mt-1 text-sm text-slate-400">
+                Manage webhook endpoints for real-time notifications
+              </p>
+            </div>
+          </div>
+          <WebhooksPageClient />
         </div>
       );
     }
