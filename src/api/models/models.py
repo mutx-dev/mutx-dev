@@ -108,6 +108,9 @@ class User(Base):
     webhooks: Mapped[list["Webhook"]] = relationship(
         "Webhook", back_populates="user", cascade="all, delete-orphan"
     )
+    usage_events: Mapped[list["UsageEvent"]] = relationship(
+        "UsageEvent", back_populates="user", cascade="all, delete-orphan"
+    )
     runs: Mapped[list["AgentRun"]] = relationship(
         "AgentRun", back_populates="user", cascade="all, delete-orphan"
     )
@@ -448,19 +451,25 @@ class Lead(Base):
 
 
 class UsageEvent(Base):
-    """Track usage events for telemetry and quota enforcement"""
+    """Track API usage events for quota and billing purposes."""
 
     __tablename__ = "usage_events"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    event_type: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
-    resource_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    event_metadata: Mapped[str] = mapped_column(Text, nullable=True)  # JSON string
+    event_type: Mapped[str] = mapped_column(
+        String(50), nullable=False
+    )  # agent_create, deployment_create, api_call, etc.
+    resource_type: Mapped[str] = mapped_column(String(50), nullable=True)  # agent, deployment, etc.
+    resource_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=True)
+    event_metadata: Mapped[str] = mapped_column(
+        Text, nullable=True
+    )  # JSON blob for additional data
+    credits_used: Mapped[float] = mapped_column(Float, default=1.0)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
 
-    user: Mapped["User"] = relationship("User")
+    user: Mapped["User"] = relationship("User", back_populates="usage_events")

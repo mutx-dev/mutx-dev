@@ -22,6 +22,7 @@ from src.api.models import (
     DeploymentEvent as DeploymentEventModel,
     User,
 )
+from src.api.services.usage import track_usage
 from src.api.models.schemas import (
     AgentConfigBase,
     AgentConfigResponse,
@@ -238,6 +239,18 @@ async def create_agent(
         status=AgentStatus.CREATING.value,
     )
     db.add(agent)
+    await db.flush()
+
+    # Track usage event
+    await track_usage(
+        db,
+        user_id=current_user.id,
+        event_type="agent_create",
+        resource_type="agent",
+        resource_id=agent.id,
+        metadata={"agent_type": agent.type.value},
+    )
+
     await db.commit()
     await db.refresh(agent)
     logger.info(f"Created agent: {agent.id}")
