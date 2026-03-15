@@ -44,7 +44,7 @@ export default function RegisterPage() {
         throw new Error(payload.detail || 'Registration failed')
       }
 
-      router.push('/app')
+      router.push('/dashboard')
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed')

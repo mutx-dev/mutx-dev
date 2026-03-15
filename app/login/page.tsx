@@ -31,7 +31,7 @@ export default function LoginPage() {
         throw new Error(payload.detail || 'Login failed')
       }
 
-      router.push('/app')
+      router.push('/dashboard')
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
