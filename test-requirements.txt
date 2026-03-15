@@ -16,6 +16,9 @@ pydantic-settings>=2.1.0
 sqlalchemy>=2.0.48
 asyncpg>=0.29.0
 
+# CLI testing dependencies
+click>=8.0.0
+
 # Auth dependencies  
 python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
