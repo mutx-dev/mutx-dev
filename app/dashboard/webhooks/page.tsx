@@ -1,6 +1,6 @@
 "use client";
 
-import { WebhooksPageClient } from "@/components/webhooks/WebhooksPageClient";
+import WebhooksPageClient from "@/components/webhooks/WebhooksPageClient";
 
 export default function DashboardWebhooksPage() {
   return (
