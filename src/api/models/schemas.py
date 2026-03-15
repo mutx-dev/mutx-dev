@@ -446,15 +446,24 @@ class APIKeyHistoryResponse(BaseModel):
 # Usage Event Schemas
 class UsageEventCreate(BaseModel):
     """Request model for creating a usage event"""
-    event_type: str = Field(..., min_length=1, max_length=100, description="Type of usage event (e.g., api_call, agent_run, deployment)")
+
+    event_type: str = Field(
+        ...,
+        min_length=1,
+        max_length=100,
+        description="Type of usage event (e.g., api_call, agent_run, deployment)",
+    )
     resource_id: Optional[str] = Field(None, max_length=255, description="Resource that was used")
-    metadata: Optional[dict[str, Any]] = Field(default_factory=dict, description="Additional event metadata")
+    metadata: Optional[dict[str, Any]] = Field(
+        default_factory=dict, description="Additional event metadata"
+    )
 
 
 class UsageEventResponse(BaseModel):
     """Response model for usage events"""
+
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: uuid.UUID
     event_type: str
     user_id: uuid.UUID
