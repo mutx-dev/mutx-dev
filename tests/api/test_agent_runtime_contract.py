@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -39,7 +39,7 @@ async def test_registered_agent_api_key_authenticates_runtime_status_and_heartbe
             "agent_id": agent_id,
             "status": "running",
             "message": "contract ok",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         },
     )
 

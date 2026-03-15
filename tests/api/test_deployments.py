@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 """
 Tests for /deployments endpoints.
 """
@@ -533,7 +533,7 @@ class TestRestartDeployment:
     ):
         """Restarting a stopped deployment should reset lifecycle fields and append an event."""
         test_deployment.status = "failed"
-        test_deployment.ended_at = datetime.utcnow()
+        test_deployment.ended_at = datetime.now(timezone.utc)
         test_deployment.error_message = "boot failed"
         test_agent.status = AgentStatus.STOPPED.value
         await db_session.commit()
