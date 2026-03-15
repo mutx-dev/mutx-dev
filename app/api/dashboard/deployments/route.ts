@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 })
     }
 
-    return proxyRequest('GET', '/deployments?limit=20', token)
+    return proxyRequest('GET', '/api/deployments?limit=20', token)
   } catch (error) {
     console.error('Dashboard deployments proxy error:', error)
     return NextResponse.json({ detail: 'Failed to connect to API' }, { status: 500 })
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    return proxyRequest('POST', '/deployments', token, body)
+    return proxyRequest('POST', '/api/deployments', token, body)
   } catch (error) {
     console.error('Dashboard deployments POST error:', error)
     return NextResponse.json({ detail: 'Failed to create deployment' }, { status: 500 })

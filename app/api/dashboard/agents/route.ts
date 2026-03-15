@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 })
     }
 
-    const response = await fetch(`${API_BASE_URL}/agents?limit=20`, {
+    const response = await fetch(`${API_BASE_URL}/api/agents?limit=20`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
     })
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
 
-    const response = await fetch(`${API_BASE_URL}/agents`, {
+    const response = await fetch(`${API_BASE_URL}/api/agents`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,

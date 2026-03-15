@@ -19,7 +19,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return NextResponse.json({ detail: 'Agent ID is required' }, { status: 400 })
     }
 
-    const response = await fetch(`${API_BASE_URL}/agents/${agentId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/agents/${agentId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
