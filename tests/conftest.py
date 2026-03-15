@@ -138,7 +138,11 @@ async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
 async def client(db_session: AsyncSession, test_user):
     """Create test client with database and auth overrides."""
     from src.api.database import get_db
-    from src.api.middleware.auth import get_current_user, get_current_user_or_api_key
+    from src.api.middleware.auth import (
+        get_current_user,
+        get_current_user_jwt_only,
+        get_current_user_or_api_key,
+    )
     from src.api.routes.webhooks import get_webhook_auth
     from src.api.routes.ingest import get_ingest_auth
     
@@ -156,6 +160,9 @@ async def client(db_session: AsyncSession, test_user):
     async def override_get_current_user_or_api_key():
         return test_user
 
+    async def override_get_current_user_jwt_only():
+        return test_user
+
     async def override_get_webhook_auth():
         return test_user
 
@@ -165,6 +172,7 @@ async def client(db_session: AsyncSession, test_user):
     # Override dependencies
     test_app.dependency_overrides[get_db] = override_get_db
     test_app.dependency_overrides[get_current_user] = override_get_current_user
+    test_app.dependency_overrides[get_current_user_jwt_only] = override_get_current_user_jwt_only
     test_app.dependency_overrides[get_current_user_or_api_key] = override_get_current_user_or_api_key
     test_app.dependency_overrides[get_webhook_auth] = override_get_webhook_auth
     test_app.dependency_overrides[get_ingest_auth] = override_get_ingest_auth
@@ -205,7 +213,11 @@ async def client_no_auth(db_session: AsyncSession):
 async def other_user_client(db_session: AsyncSession, other_user):
     """Create test client authenticated as other_user."""
     from src.api.database import get_db
-    from src.api.middleware.auth import get_current_user, get_current_user_or_api_key
+    from src.api.middleware.auth import (
+        get_current_user,
+        get_current_user_jwt_only,
+        get_current_user_or_api_key,
+    )
     from src.api.routes.webhooks import get_webhook_auth
     from src.api.routes.ingest import get_ingest_auth
     
@@ -220,6 +232,9 @@ async def other_user_client(db_session: AsyncSession, other_user):
     async def override_get_current_user_or_api_key():
         return other_user
 
+    async def override_get_current_user_jwt_only():
+        return other_user
+
     async def override_get_webhook_auth():
         return other_user
 
@@ -228,6 +243,7 @@ async def other_user_client(db_session: AsyncSession, other_user):
     
     test_app.dependency_overrides[get_db] = override_get_db
     test_app.dependency_overrides[get_current_user] = override_get_current_user
+    test_app.dependency_overrides[get_current_user_jwt_only] = override_get_current_user_jwt_only
     test_app.dependency_overrides[get_current_user_or_api_key] = override_get_current_user_or_api_key
     test_app.dependency_overrides[get_webhook_auth] = override_get_webhook_auth
     test_app.dependency_overrides[get_ingest_auth] = override_get_ingest_auth

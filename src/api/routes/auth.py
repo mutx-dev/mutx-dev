@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.database import get_db
 from src.api.models.models import User
 from src.api.services.user_service import UserService
-from src.api.middleware.auth import get_current_user
+from src.api.middleware.auth import get_current_user_jwt_only
 from src.api.auth.jwt import (
     create_access_token,
     create_refresh_token,
@@ -148,12 +148,12 @@ async def refresh(request: RefreshRequest, session: AsyncSession = Depends(get_d
 
 
 @router.post("/logout")
-async def logout(current_user: User = Depends(get_current_user)):
+async def logout(current_user: User = Depends(get_current_user_jwt_only)):
     return {"message": "Successfully logged out"}
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_me(current_user: User = Depends(get_current_user)):
+async def get_me(current_user: User = Depends(get_current_user_jwt_only)):
     return UserResponse(
         id=str(current_user.id),
         email=current_user.email,

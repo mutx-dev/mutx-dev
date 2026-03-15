@@ -65,6 +65,25 @@ class TestAuthEndpoints:
         assert data["email"] == test_user.email
         assert data["id"] == str(test_user.id)
 
+
+    @pytest.mark.asyncio
+    async def test_me_endpoint_rejects_bearer_api_key(
+        self, client: AsyncClient, client_no_auth: AsyncClient
+    ):
+        """Test /me endpoint only accepts JWT bearer tokens, not API keys."""
+        key_response = await client.post(
+            "/api/api-keys",
+            json={"name": "auth-me-key"},
+        )
+        assert key_response.status_code == 201
+        managed_api_key = key_response.json()["key"]
+
+        response = await client_no_auth.get(
+            "/api/auth/me",
+            headers={"Authorization": f"Bearer {managed_api_key}"},
+        )
+        assert response.status_code == 401
+
     @pytest.mark.asyncio
     async def test_register_duplicate_email(self, client_no_auth: AsyncClient, db_session: AsyncSession):
         """Test registering with an existing email fails."""

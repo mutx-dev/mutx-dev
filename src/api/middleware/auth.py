@@ -15,8 +15,9 @@ async def _resolve_user_from_bearer_token(
     session: AsyncSession,
     *,
     user_service: UserService | None = None,
+    allow_api_key_fallback: bool = True,
 ) -> Optional[User]:
-    """Resolve an active user from a bearer token (JWT first, then API key fallback)."""
+    """Resolve an active user from a bearer token."""
     service = user_service or UserService(session)
 
     user_id = verify_access_token(token)
@@ -25,9 +26,10 @@ async def _resolve_user_from_bearer_token(
         if user and user.is_active:
             return user
 
-    user = await service.get_user_for_api_key(token)
-    if user and user.is_active:
-        return user
+    if allow_api_key_fallback:
+        user = await service.get_user_for_api_key(token)
+        if user and user.is_active:
+            return user
 
     return None
 
@@ -53,7 +55,49 @@ async def get_current_user(
 
     token = parts[1]
     user_service = UserService(session)
-    user = await _resolve_user_from_bearer_token(token, session, user_service=user_service)
+    user = await _resolve_user_from_bearer_token(
+        token,
+        session,
+        user_service=user_service,
+        allow_api_key_fallback=True,
+    )
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return user
+
+
+async def get_current_user_jwt_only(
+    authorization: Optional[str] = Header(None),
+    session: AsyncSession = Depends(get_db),
+) -> User:
+    if not authorization:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing authorization header",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    parts = authorization.split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authorization header format",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token = parts[1]
+    user_service = UserService(session)
+    user = await _resolve_user_from_bearer_token(
+        token,
+        session,
+        user_service=user_service,
+        allow_api_key_fallback=False,
+    )
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -117,7 +161,12 @@ async def get_current_user_or_api_key(
         parts = authorization.split()
         if len(parts) == 2 and parts[0].lower() == "bearer":
             token = parts[1]
-            user = await _resolve_user_from_bearer_token(token, session, user_service=user_service)
+            user = await _resolve_user_from_bearer_token(
+                token,
+                session,
+                user_service=user_service,
+                allow_api_key_fallback=True,
+            )
             if user:
                 return user
 
