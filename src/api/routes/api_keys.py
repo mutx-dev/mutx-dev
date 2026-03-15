@@ -1,16 +1,15 @@
 import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
-from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models.models import APIKey, User
-from src.api.models.schemas import APIKeyCreate, APIKeyCreateResponse, APIKeyResponse
+from src.api.models.schemas import APIKeyCreate, APIKeyCreateResponse, APIKeyHistoryResponse
 from src.api.services.user_service import hash_api_key
 
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])
@@ -37,16 +36,35 @@ async def count_active_api_keys(db: AsyncSession, user_id: uuid.UUID) -> int:
     return len(result.scalars().all())
 
 
-@router.get("", response_model=List[APIKeyResponse])
+@router.get("", response_model=APIKeyHistoryResponse)
 async def list_api_keys(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """List all API keys for the current user, including revoked keys for auditability."""
-    result = await db.execute(
-        select(APIKey).where(APIKey.user_id == current_user.id).order_by(APIKey.created_at.desc())
+    # Get total count
+    total_stmt = select(func.count()).select_from(APIKey).where(APIKey.user_id == current_user.id)
+    total = (await db.execute(total_stmt)).scalar_one()
+
+    # Get paginated results
+    query = (
+        select(APIKey)
+        .where(APIKey.user_id == current_user.id)
+        .order_by(APIKey.created_at.desc())
+        .offset(skip)
+        .limit(limit)
     )
-    return result.scalars().all()
+    result = await db.execute(query)
+    keys = result.scalars().all()
+
+    return APIKeyHistoryResponse(
+        items=keys,
+        total=total,
+        skip=skip,
+        limit=limit,
+    )
 
 
 @router.post("", response_model=APIKeyCreateResponse, status_code=status.HTTP_201_CREATED)

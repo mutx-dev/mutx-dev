@@ -23,7 +23,11 @@ class TestListAPIKeys:
         """Test listing API keys when none exist."""
         response = await client.get("/api/api-keys")
         assert response.status_code == 200
-        assert response.json() == []
+        data = response.json()
+        assert data["items"] == []
+        assert data["total"] == 0
+        assert data["skip"] == 0
+        assert data["limit"] == 50
 
     @pytest.mark.asyncio
     async def test_list_api_keys_with_data(
@@ -53,9 +57,10 @@ class TestListAPIKeys:
         response = await client.get("/api/api-keys")
         assert response.status_code == 200
         data = response.json()
-        assert [item["name"] for item in data] == ["newer-key", "older-key"]
-        assert data[0]["is_active"] is False
-        assert data[1]["is_active"] is True
+        assert data["total"] == 2
+        assert [item["name"] for item in data["items"]] == ["newer-key", "older-key"]
+        assert data["items"][0]["is_active"] is False
+        assert data["items"][1]["is_active"] is True
 
 
 class TestCreateAPIKey:
