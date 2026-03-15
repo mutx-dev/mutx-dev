@@ -447,10 +447,19 @@ class APIKeyHistoryResponse(BaseModel):
 class UsageEventCreate(BaseModel):
     """Request model for creating a usage event"""
 
-    event_type: str = Field(..., min_length=1, max_length=50, description="Type of event (e.g., agent_create, deployment_create, api_call)")
-    resource_type: Optional[str] = Field(None, max_length=50, description="Type of resource (e.g., agent, deployment)")
+    event_type: str = Field(
+        ...,
+        min_length=1,
+        max_length=50,
+        description="Type of event (e.g., agent_create, deployment_create, api_call)",
+    )
+    resource_type: Optional[str] = Field(
+        None, max_length=50, description="Type of resource (e.g., agent, deployment)"
+    )
     resource_id: Optional[uuid.UUID] = None
-    event_metadata: Optional[dict[str, Any]] = Field(default_factory=dict, description="Additional event data as JSON")
+    event_metadata: Optional[dict[str, Any]] = Field(
+        default_factory=dict, description="Additional event data as JSON"
+    )
     credits_used: float = Field(default=1.0, ge=0.0, description="Number of credits consumed")
 
 

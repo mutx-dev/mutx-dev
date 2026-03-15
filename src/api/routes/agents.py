@@ -240,7 +240,7 @@ async def create_agent(
     )
     db.add(agent)
     await db.flush()
-    
+
     # Track usage event
     await track_usage(
         db,
@@ -250,7 +250,7 @@ async def create_agent(
         resource_id=agent.id,
         metadata={"agent_type": agent.type.value},
     )
-    
+
     await db.commit()
     await db.refresh(agent)
     logger.info(f"Created agent: {agent.id}")

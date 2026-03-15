@@ -452,18 +452,21 @@ class Lead(Base):
 
 class UsageEvent(Base):
     """Track API usage events for quota and billing purposes."""
+
     __tablename__ = "usage_events"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
-    event_type: Mapped[str] = mapped_column(String(50), nullable=False)  # agent_create, deployment_create, api_call, etc.
+    event_type: Mapped[str] = mapped_column(
+        String(50), nullable=False
+    )  # agent_create, deployment_create, api_call, etc.
     resource_type: Mapped[str] = mapped_column(String(50), nullable=True)  # agent, deployment, etc.
-    resource_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), nullable=True
-    )
-    event_metadata: Mapped[str] = mapped_column(Text, nullable=True)  # JSON blob for additional data
+    resource_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=True)
+    event_metadata: Mapped[str] = mapped_column(
+        Text, nullable=True
+    )  # JSON blob for additional data
     credits_used: Mapped[float] = mapped_column(Float, default=1.0)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

@@ -1,4 +1,5 @@
 """Usage tracking service for quota and billing."""
+
 import json
 import uuid
 
