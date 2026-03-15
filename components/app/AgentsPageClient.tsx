@@ -8,6 +8,7 @@ import {
   Clock,
   Copy,
   Plus,
+  Power,
   RefreshCcw,
   Search,
   Server,
@@ -62,6 +63,13 @@ async function deleteAgent(agentId: string): Promise<void> {
     const payload = await response.json().catch(() => ({ detail: "Delete failed" }));
     throw new Error(payload.detail || "Delete failed");
   }
+}
+
+async function stopAgent(agentId: string): Promise<Agent> {
+  return readJson<Agent>(`/api/agents/${encodeURIComponent(agentId)}/stop`, {
+    method: "POST",
+    cache: "no-store",
+  });
 }
 
 function formatDate(value?: string | null) {
@@ -133,9 +141,11 @@ function AgentCardSkeleton() {
   );
 }
 
-function AgentCard({ agent, onDelete, deletingId }: { agent: Agent; onDelete: (id: string) => void; deletingId: string | null }) {
+function AgentCard({ agent, onDelete, onStop, deletingId, stoppingId }: { agent: Agent; onDelete: (id: string) => void; onStop: (id: string) => void; deletingId: string | null; stoppingId: string | null }) {
   const [copied, setCopied] = useState(false);
   const isDeleting = deletingId === agent.id;
+  const isStopping = stoppingId === agent.id;
+  const canStop = agent.status === "running";
 
   const copyId = async () => {
     await navigator.clipboard.writeText(agent.id);
@@ -229,6 +239,18 @@ function AgentCard({ agent, onDelete, deletingId }: { agent: Agent; onDelete: (i
               Copy ID
             </>
           )}
+        </button>
+        <button
+          onClick={() => onStop(agent.id)}
+          disabled={isStopping || !canStop}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-1.5 text-xs text-slate-400 transition hover:border-amber-400/30 hover:text-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isStopping ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Power className="h-3 w-3" />
+          )}
+          Stop
         </button>
         <button
           onClick={() => onDelete(agent.id)}
@@ -454,6 +476,7 @@ export function AgentsPageClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [stoppingId, setStoppingId] = useState<string | null>(null);
 
   const runningAgents = agents.filter((a) => a.status === "running").length;
   const failedAgents = agents.filter(
@@ -535,6 +558,22 @@ export function AgentsPageClient() {
     }
   }
 
+  async function handleStop(agentId: string) {
+    if (!confirm(`Are you sure you want to stop agent ${agentId}?`)) {
+      return;
+    }
+
+    setStoppingId(agentId);
+    try {
+      const updated = await stopAgent(agentId);
+      setAgents((prev) => prev.map((a) => (a.id === agentId ? updated : a)));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to stop agent");
+    } finally {
+      setStoppingId(null);
+    }
+  }
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -552,38 +591,22 @@ export function AgentsPageClient() {
   return (
     <AgentsErrorBoundary>
       <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
-                <Bot className="h-6 w-6" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-semibold text-white">Agents</h1>
-                <p className="mt-1 text-sm text-slate-400">
-                  Live inventory of your agent fleet
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-cyan-500 px-4 py-2.5 text-sm font-medium text-black transition hover:bg-cyan-400"
-            >
-              <Plus className="h-4 w-4" />
-              Create Agent
-            </button>
-            <button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm transition hover:border-cyan-300/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <RefreshCcw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
-              {refreshing ? "Refreshing" : "Refresh"}
-            </button>
-          </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-cyan-500 px-4 py-2.5 text-sm font-medium text-black transition hover:bg-cyan-400"
+          >
+            <Plus className="h-4 w-4" />
+            Create Agent
+          </button>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm transition hover:border-cyan-300/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RefreshCcw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+            {refreshing ? "Refreshing" : "Refresh"}
+          </button>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-3">
@@ -654,7 +677,7 @@ export function AgentsPageClient() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredAgents.map((agent) => (
-              <AgentCard key={agent.id} agent={agent} onDelete={handleDelete} deletingId={deletingId} />
+              <AgentCard key={agent.id} agent={agent} onDelete={handleDelete} onStop={handleStop} deletingId={deletingId} stoppingId={stoppingId} />
             ))}
           </div>
         )}
