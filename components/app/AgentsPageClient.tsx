@@ -469,7 +469,7 @@ export function AgentsPageClient() {
 
   async function loadAgents() {
     try {
-      const data = await readJson<{ agents?: Agent[] } | Agent[]>("/api/dashboard/agents");
+      const data = await readJson<{ agents?: Agent[] } | Agent[]>("/api/agents");
       
       let agentsData: Agent[];
       if (Array.isArray(data)) {
