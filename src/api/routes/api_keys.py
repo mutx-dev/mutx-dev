@@ -1,7 +1,6 @@
 import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
-from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
@@ -10,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models.models import APIKey, User
-from src.api.models.schemas import APIKeyCreate, APIKeyCreateResponse, APIKeyHistoryResponse, APIKeyResponse
+from src.api.models.schemas import APIKeyCreate, APIKeyCreateResponse, APIKeyHistoryResponse
 from src.api.services.user_service import hash_api_key
 
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])
