@@ -169,3 +169,104 @@ class TestAuthEndpoints:
         )
         assert response.status_code == 401
         assert "Invalid email or password" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_logout(self, client: AsyncClient):
+        """Test logout endpoint."""
+        response = await client.post("/api/auth/logout")
+        assert response.status_code == 200
+        assert response.json()["message"] == "Successfully logged out"
+
+    @pytest.mark.asyncio
+    async def test_logout_requires_auth(self, client_no_auth: AsyncClient):
+        """Test logout requires authentication."""
+        response = await client_no_auth.post("/api/auth/logout")
+        assert response.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_forgot_password_existing_user(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+        """Test forgot password for existing user."""
+        from src.api.auth.password import hash_password
+        
+        user = User(
+            id=uuid.uuid4(),
+            email="forgot@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Forgot User",
+            is_active=True,
+        )
+        db_session.add(user)
+        await db_session.commit()
+        
+        response = await client_no_auth.post(
+            "/api/auth/forgot-password",
+            json={"email": "forgot@example.com"},
+        )
+        assert response.status_code == 200
+        # Should return success regardless of whether email exists (to prevent enumeration)
+        assert "If an account exists" in response.json()["message"]
+
+    @pytest.mark.asyncio
+    async def test_forgot_password_nonexistent_user(self, client_no_auth: AsyncClient):
+        """Test forgot password for nonexistent user returns same message."""
+        response = await client_no_auth.post(
+            "/api/auth/forgot-password",
+            json={"email": "nonexistent@example.com"},
+        )
+        assert response.status_code == 200
+        # Should return success to prevent email enumeration
+
+    @pytest.mark.asyncio
+    async def test_resend_verification_existing_unverified(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+        """Test resend verification for unverified user."""
+        from src.api.auth.password import hash_password
+        
+        user = User(
+            id=uuid.uuid4(),
+            email="unverified@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Unverified User",
+            is_active=True,
+            is_email_verified=False,
+        )
+        db_session.add(user)
+        await db_session.commit()
+        
+        response = await client_no_auth.post(
+            "/api/auth/resend-verification",
+            json={"email": "unverified@example.com"},
+        )
+        assert response.status_code == 200
+        assert "Verification email has been sent" in response.json()["message"]
+
+    @pytest.mark.asyncio
+    async def test_resend_verification_already_verified(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+        """Test resend verification for already verified user fails."""
+        from src.api.auth.password import hash_password
+        
+        user = User(
+            id=uuid.uuid4(),
+            email="verified@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Verified User",
+            is_active=True,
+            is_email_verified=True,
+        )
+        db_session.add(user)
+        await db_session.commit()
+        
+        response = await client_no_auth.post(
+            "/api/auth/resend-verification",
+            json={"email": "verified@example.com"},
+        )
+        assert response.status_code == 400
+        assert "already verified" in response.json()["detail"].lower()
+
+    @pytest.mark.asyncio
+    async def test_resend_verification_nonexistent_user(self, client_no_auth: AsyncClient):
+        """Test resend verification for nonexistent user returns success to prevent enumeration."""
+        response = await client_no_auth.post(
+            "/api/auth/resend-verification",
+            json={"email": "nonexistent@example.com"},
+        )
+        assert response.status_code == 200
