@@ -421,10 +421,10 @@ describe('dashboard route proxies', () => {
 
     const response = await GET()
 
-    expect(response.status).toBe(500)
+    expect(response.status).toBe(503)
     await expect(response.json()).resolves.toEqual({
-      status: 'unknown',
-      error: 'Failed to connect to API',
+      status: 'degraded',
+      error: 'Connection failed',
     })
   })
 })
