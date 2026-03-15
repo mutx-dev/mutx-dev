@@ -94,6 +94,17 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json(payload, { status: response.status })
     }
 
+    if (action === 'deploy') {
+      const response = await fetch(`${API_BASE_URL}/agents/${agentId}/deploy`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store',
+      })
+
+      const payload = await response.json().catch(() => ({ detail: 'Failed to deploy agent' }))
+      return NextResponse.json(payload, { status: response.status })
+    }
+
     return badRequest('Invalid action')
   })(request)
 }
