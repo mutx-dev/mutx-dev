@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -24,7 +24,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 def _get_expires_in_seconds(expires_at: datetime) -> int:
-    return max(0, int((expires_at - datetime.utcnow()).total_seconds()))
+    return max(0, int((expires_at - datetime.now(timezone.utc)).total_seconds()))
 
 
 class RegisterRequest(BaseModel):
