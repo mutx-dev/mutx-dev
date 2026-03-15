@@ -251,6 +251,9 @@ async def list_agents(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    # Ownership enforcement: always filter by authenticated user's ID.
+    # Client-supplied user_id query params are ignored - ownership is derived
+    # from the auth token via current_user, not from client input.
     query = select(Agent).order_by(Agent.created_at.desc()).offset(skip).limit(limit)
     query = query.where(Agent.user_id == current_user.id)
     result = await db.execute(query)
