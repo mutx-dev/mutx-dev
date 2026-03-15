@@ -1,0 +1,65 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.egg-info
+.eggs
+.pytest_cache
+.venv
+venv/
+env/
+
+# Node
+node_modules
+npm-debug.log
+.next
+out/
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Tests
+tests/
+*.test.py
+*_test.py
+test_*.py
+.coverage
+htmlcov/
+
+# Documentation
+*.md
+docs/
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Misc
+.env
+.env.*
+!.env.example
+!.env.production.example
+*.log
+tmp/
+temp/
+.DS_Store
+Thumbs.db
+
+# Development files
+Makefile
+scripts/
+ansible/
+terraform/
