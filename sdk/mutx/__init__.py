@@ -2,7 +2,7 @@ import warnings
 
 import httpx
 
-from .agent_runtime import (
+from mutx.agent_runtime import (
     AgentInfo,
     AgentMetrics,
     Command,
@@ -10,18 +10,18 @@ from .agent_runtime import (
     MutxAgentSyncClient,
     create_agent_client,
 )
-from .agents import Agents
-from .api_keys import APIKeys
-from .clawhub import ClawHub
-from .deployments import Deployments
-from .webhooks import Webhooks
+from mutx.agents import Agents
+from mutx.api_keys import APIKeys
+from mutx.clawhub import ClawHub
+from mutx.deployments import Deployments
+from mutx.webhooks import Webhooks
 
 
 class MutxClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.mutx.dev/v1",
+        base_url: str = "https://api.mutx.dev",
         timeout: float = 30.0,
     ):
         self.api_key = api_key
@@ -97,7 +97,7 @@ class MutxAsyncClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.mutx.dev/v1",
+        base_url: str = "https://api.mutx.dev",
         timeout: float = 30.0,
     ):
         warnings.warn(
