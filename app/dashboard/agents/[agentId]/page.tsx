@@ -58,14 +58,14 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
     finally { setActionLoading(false); }
   };
 
-  const handleRestart = async () => {
+  const handleRefresh = async () => {
     setActionLoading(true);
     try {
       // For now, restart is not implemented on backend, so just refresh the agent
       const response = await fetch(`/api/dashboard/agents/${encodeURIComponent(agentId)}`);
       if (!response.ok) throw new Error("Refresh failed");
       setAgent(await response.json());
-    } catch (err) { alert(err instanceof Error ? err.message : "Restart failed"); }
+    } catch (err) { alert(err instanceof Error ? err.message : "Refresh failed"); }
     finally { setActionLoading(false); }
   };
 
@@ -92,7 +92,7 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
       </div>
       <div className="flex gap-3">
         {agent.status === "running" && <button onClick={handleStop} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 disabled:opacity-50"><Power className="h-4 w-4" />Stop</button>}
-        {(agent.status === "stopped" || agent.status === "error") && <button onClick={handleRestart} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-400 disabled:opacity-50"><RefreshCcw className="h-4 w-4" />Restart</button>}
+        {(agent.status === "stopped" || agent.status === "error") && <button onClick={handleRefresh} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-400 disabled:opacity-50"><RefreshCcw className="h-4 w-4" />Refresh</button>}
         <button onClick={handleDelete} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 disabled:opacity-50"><Trash2 className="h-4 w-4" />Delete</button>
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
