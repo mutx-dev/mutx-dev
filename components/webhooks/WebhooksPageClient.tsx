@@ -64,7 +64,7 @@ export default function WebhooksPageClient() {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          active: formData.active,
+          is_active: formData.active,
           url: formData.url,
           name: formData.name,
           events: formData.events.split(",").map(e => e.trim()).filter(Boolean)
