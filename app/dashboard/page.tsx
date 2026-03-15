@@ -17,18 +17,25 @@ interface Deployment {
   created_at: string;
 }
 
+interface HealthStatus {
+  status: "healthy" | "degraded" | "unknown" | string;
+  error?: string;
+}
+
 export default function DashboardPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [deployments, setDeployments] = useState<Deployment[]>([]);
+  const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [agentsRes, deploymentsRes] = await Promise.all([
+        const [agentsRes, deploymentsRes, healthRes] = await Promise.all([
           fetch("/api/dashboard/agents"),
           fetch("/api/dashboard/deployments"),
+          fetch("/api/dashboard/health"),
         ]);
 
         if (!agentsRes.ok || !deploymentsRes.ok) {
@@ -37,6 +44,13 @@ export default function DashboardPage() {
 
         const agentsData = await agentsRes.json();
         const deploymentsData = await deploymentsRes.json();
+        
+        try {
+          const healthData = await healthRes.json();
+          setHealth(healthData);
+        } catch {
+          setHealth({ status: "unknown" });
+        }
 
         setAgents(agentsData.agents || []);
         setDeployments(deploymentsData.deployments || []);
@@ -49,6 +63,17 @@ export default function DashboardPage() {
 
     fetchData();
   }, []);
+
+  const getHealthColor = (status: string) => {
+    switch (status) {
+      case "healthy":
+        return "text-emerald-400 bg-emerald-500/20";
+      case "degraded":
+        return "text-yellow-400 bg-yellow-500/20";
+      default:
+        return "text-slate-400 bg-slate-700";
+    }
+  };
 
   if (loading) {
     return (
@@ -68,9 +93,17 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-        <p className="mt-1 text-slate-400">Overview of your agents and deployments</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+          <p className="mt-1 text-slate-400">Overview of your agents and deployments</p>
+        </div>
+        {health && (
+          <div className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium ${getHealthColor(health.status)}`}>
+            <span className="h-2 w-2 rounded-full bg-current" />
+            API: {health.status}
+          </div>
+        )}
       </div>
 
       {/* Stats Grid */}
