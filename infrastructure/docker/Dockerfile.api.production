@@ -50,7 +50,6 @@ COPY --chown=appuser:appuser pyproject.toml /app/
 # Environment variables for production
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONHASHSEED=0 \
     ENVIRONMENT=production \
     LOG_LEVEL=INFO
 
