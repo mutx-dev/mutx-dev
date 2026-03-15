@@ -51,7 +51,7 @@ def test_webhooks_create_uses_trailing_slash_route_and_is_active_contract_field(
         is_active=False,
     )
 
-    assert captured["path"] == "/api/webhooks/"
+    assert captured["path"] == "/v1/webhooks/"
     assert captured["json"]["is_active"] is False
     assert "active" not in captured["json"]
 
@@ -112,7 +112,7 @@ def test_webhooks_get_deliveries_uses_live_backend_route_and_filters() -> None:
         webhook_id, limit=10, skip=5, event="agent.status", success=False
     )
 
-    assert captured["path"] == f"/api/webhooks/{webhook_id}/deliveries"
+    assert captured["path"] == f"/v1/webhooks/{webhook_id}/deliveries"
     assert captured["params"] == {
         "skip": "5",
         "limit": "10",
