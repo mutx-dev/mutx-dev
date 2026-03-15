@@ -9,7 +9,8 @@ import {
   Loader2, 
   AlertCircle,
   CheckCircle2,
-  Webhook
+  Webhook,
+  X
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 
@@ -128,8 +129,15 @@ export default function WebhooksPageClient() {
     <div className="space-y-6">
       {error && (
         <div className="flex items-center gap-2 p-4 bg-destructive/10 text-destructive rounded-md">
-          <AlertCircle className="h-4 w-4" />
-          {error}
+          <AlertCircle className="h-4 w-4 flex-shrink-0" />
+          <span className="flex-1">{error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="p-1 hover:bg-destructive/20 rounded"
+            aria-label="Dismiss error"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       )}
 
