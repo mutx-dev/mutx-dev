@@ -1,8 +1,17 @@
+import json
 from functools import lru_cache
 import secrets
 
-from pydantic import AliasChoices, Field
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+DEFAULT_CORS_ORIGINS = [
+    "http://localhost:3000",
+    "http://app.localhost:3000",
+    "https://mutx.dev",
+    "https://app.mutx.dev",
+]
 
 
 class Settings(BaseSettings):
@@ -21,12 +30,25 @@ class Settings(BaseSettings):
         default=8000,
         validation_alias=AliasChoices("API_PORT", "PORT"),
     )
-    cors_origins: list[str] = [
-        "http://localhost:3000",
-        "http://app.localhost:3000",
-        "https://mutx.dev",
-        "https://app.mutx.dev",
-    ]
+    cors_origins: list[str] = Field(default=DEFAULT_CORS_ORIGINS)
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v: str | list[str] | None) -> list[str]:
+        if v is None:
+            return DEFAULT_CORS_ORIGINS
+        if isinstance(v, str):
+            # Try JSON array first, then comma-separated
+            try:
+                parsed = json.loads(v)
+                if isinstance(parsed, list):
+                    return parsed
+            except json.JSONDecodeError:
+                pass
+            # Comma-separated
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
+
     log_level: str = "INFO"
     jwt_secret: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
     access_token_expire_minutes: int = 30
