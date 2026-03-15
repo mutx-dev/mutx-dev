@@ -27,7 +27,8 @@ export async function GET(request: NextRequest) {
     }
     
     const data = await response.json();
-    return NextResponse.json(data);
+    const webhooks = Array.isArray(data) ? data : data?.webhooks ?? [];
+    return NextResponse.json({ webhooks });
   } catch (error) {
     console.error("Webhooks GET error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
