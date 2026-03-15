@@ -33,7 +33,7 @@ function MobileNav({ isOpen, onClose, navItems, currentItem }: { isOpen: boolean
   return (
     <div className="fixed inset-0 z-50 lg:hidden">
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <aside className="fixed left-0 top-0 bottom-0 w-72 bg-[#030307] border-r border-white/10 p-5 animate-in slide-in-from-left">
+      <aside className="fixed left-0 top-16 bottom-0 w-72 bg-[#030307] border-r border-white/10 p-5 animate-in slide-in-from-left">
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
@@ -359,7 +359,7 @@ export default function AppPreviewPage() {
             </div>
           </aside>
 
-          <main className="space-y-6 pb-10">
+          <main className="pt-16 space-y-6 pb-10">
             <Suspense fallback={<PageLoadingSkeleton />}>
               {renderContent()}
             </Suspense>
