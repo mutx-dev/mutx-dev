@@ -2,7 +2,7 @@
 
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
@@ -60,7 +60,7 @@ async def validation_exception_handler(
         message="Request validation failed",
         details=details,
         request_id=request_id,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
     )
 
     return JSONResponse(
@@ -97,7 +97,7 @@ async def pydantic_validation_exception_handler(
         message="Data validation failed",
         details=details,
         request_id=request_id,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
     )
 
     return JSONResponse(
@@ -127,7 +127,7 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
         error_code="INTERNAL_ERROR",
         message="An internal error occurred",
         request_id=request_id,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
     )
 
     return JSONResponse(
