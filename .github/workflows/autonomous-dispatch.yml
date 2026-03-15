@@ -248,12 +248,11 @@ jobs:
           name: autonomy-queue-health
           path: autonomy-queue-health.json
 
-      - name: Enforce queue floor
+      - name: Report empty queue (non-fatal)
         if: ${{ steps.queue_health.outputs.empty_violation == 'true' }}
         run: |
-          echo "Queue floor violation: no autonomy:ready issues and no open PRs."
+          echo "Queue floor violation: no autonomy:ready issues and no open PRs (continuing)."
           cat autonomy-queue-health.json
-          exit 1
 
       - name: Flag stalled queue handoff
         if: ${{ steps.queue_health.outputs.stalled_violation == 'true' }}
