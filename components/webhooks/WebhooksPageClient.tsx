@@ -32,6 +32,7 @@ export default function WebhooksPageClient() {
   const [editingWebhook, setEditingWebhook] = useState<Webhook | null>(null);
   const [formData, setFormData] = useState({ url: "", events: "", name: "", active: true });
   const [submitting, setSubmitting] = useState(false);
+  const [testingId, setTestingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchWebhooks();
@@ -97,12 +98,15 @@ export default function WebhooksPageClient() {
   }
 
   async function handleTest(id: string) {
+    setTestingId(id);
     try {
       const res = await fetch(`/api/webhooks/${id}/test`, { method: "POST" });
       if (!res.ok) throw new Error("Failed to test webhook");
       alert("Test event sent!");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setTestingId(null);
     }
   }
 
@@ -274,10 +278,15 @@ export default function WebhooksPageClient() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleTest(webhook.id)}
-                    className="p-2 hover:bg-accent rounded-md"
+                    disabled={testingId === webhook.id}
+                    className="p-2 hover:bg-accent rounded-md disabled:opacity-50"
                     title="Test webhook"
                   >
-                    <Play className="h-4 w-4" />
+                    {testingId === webhook.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Play className="h-4 w-4" />
+                    )}
                   </button>
                   <button
                     onClick={() => startEdit(webhook)}
