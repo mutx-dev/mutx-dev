@@ -2,7 +2,7 @@ import warnings
 
 import httpx
 
-from mutx.agent_runtime import (
+from .agent_runtime import (
     AgentInfo,
     AgentMetrics,
     Command,
@@ -10,11 +10,11 @@ from mutx.agent_runtime import (
     MutxAgentSyncClient,
     create_agent_client,
 )
-from mutx.agents import Agents
-from mutx.api_keys import APIKeys
-from mutx.clawhub import ClawHub
-from mutx.deployments import Deployments
-from mutx.webhooks import Webhooks
+from .agents import Agents
+from .api_keys import APIKeys
+from .clawhub import ClawHub
+from .deployments import Deployments
+from .webhooks import Webhooks
 
 
 class MutxClient:
