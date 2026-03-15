@@ -207,7 +207,7 @@ function DeploymentCard({ deployment, onRestart, onStop, onStart, onDelete, isPr
         </button>
         <button
           className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10"
-          onClick={() => console.log("logs", deployment.id)}
+          onClick={() => {}}
         >
           <Activity className="h-3.5 w-3.5" />
           Logs
