@@ -632,7 +632,7 @@ export function AppDashboardClient() {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex w-full justify-center items-center gap-2 rounded-xl bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex w-full justify-center items-center gap-2 rounded-xl bg-cyan-400 px-5 py-4 sm:py-3 text-base sm:text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

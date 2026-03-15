@@ -252,7 +252,7 @@ export default function AppPreviewPage() {
 
   return (
     <ProtectedRoute>
-      <div className="relative min-h-screen overflow-hidden bg-[#030307] text-slate-100">
+      <div className="relative min-h-screen overflow-hidden overflow-x-hidden bg-[#030307] text-slate-100">
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
           <div className="absolute left-[10%] top-[-10%] h-[40%] w-[40%] rounded-full bg-cyan-500/10 blur-[120px]" />
           <div className="absolute right-[-10%] top-[20%] h-[30%] w-[30%] rounded-full bg-emerald-500/10 blur-[120px]" />
@@ -260,23 +260,24 @@ export default function AppPreviewPage() {
 
         <MobileNav isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} navItems={navItems} currentItem={currentItem} />
 
-        <div className="relative mx-auto max-w-[1400px] px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between lg:hidden mb-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
-              <Command className="h-5 w-5" />
+        <div className="relative mx-auto max-w-[1400px] px-3 sm:px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between lg:hidden mb-6 pt-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
+                <Command className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">app.mutx.dev</p>
+                <p className="text-sm font-semibold text-white">Mission Control</p>
+              </div>
             </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">app.mutx.dev</p>
-              <p className="text-sm font-semibold text-white">Mission Control</p>
-            </div>
+            <button 
+              onClick={() => setMobileMenuOpen(true)} 
+              className="rounded-lg border border-white/10 bg-white/5 p-2.5 sm:p-2 text-slate-400 hover:bg-white/10"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
           </div>
-          <button 
-            onClick={() => setMobileMenuOpen(true)} 
-            className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-400 hover:bg-white/10"
-          >
-            <Menu className="h-6 w-6" />
-          </button>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
@@ -327,14 +328,13 @@ export default function AppPreviewPage() {
             </div>
           </aside>
 
-          <main className="space-y-6 pb-10">
+          <main className="space-y-6 pb-10 pt-4 lg:pt-0 overflow-x-hidden">
             <Suspense fallback={<PageLoadingSkeleton />}>
               {renderContent()}
             </Suspense>
           </main>
         </div>
       </div>
-    </div>
     </ProtectedRoute>
   );
 }

@@ -20,6 +20,7 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
   }
 
   body {
@@ -30,6 +31,7 @@
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   ::selection {
@@ -39,6 +41,21 @@
 
   a {
     color: inherit;
+  }
+
+  input, button, select, textarea, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  button, a, select {
+    cursor: pointer;
+  }
+
+  @media (max-width: 640px) {
+    html {
+      font-size: 14px;
+    }
   }
 }
 
