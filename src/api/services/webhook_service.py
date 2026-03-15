@@ -13,7 +13,7 @@ import hmac
 import json
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 import aiohttp
@@ -57,7 +57,7 @@ async def deliver_webhook(
     payload_json = json.dumps(
         {
             "event": event,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "delivery_id": str(delivery_id),
             "data": payload,
         },
@@ -146,7 +146,7 @@ async def deliver_webhook_with_retry(
             # Update delivery log
             delivery_log.success = True
             delivery_log.status_code = status_code
-            delivery_log.delivered_at = datetime.utcnow()
+            delivery_log.delivered_at = datetime.now(timezone.utc)
             await db.commit()
             return True
 

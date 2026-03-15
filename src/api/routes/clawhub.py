@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -123,7 +123,7 @@ async def install_skill(
             agent_id=agent.id,
             level="info",
             message=f"[ClawHub] Installation requested for skill: {request.skill_id}",
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
         db.add(log)
         await db.commit()
@@ -163,7 +163,7 @@ async def uninstall_skill(
             agent_id=agent.id,
             level="info",
             message=f"[ClawHub] Uninstalled skill: {request.skill_id}",
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
         db.add(log)
         await db.commit()

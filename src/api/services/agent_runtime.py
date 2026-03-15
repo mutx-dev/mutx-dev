@@ -5,7 +5,7 @@ import uuid
 from typing import Optional, List, Dict, Any, AsyncIterator, Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 
 from ..integrations.langchain_agent import (
@@ -112,7 +112,7 @@ class AgentRuntime:
             return
 
         self.state.status = RuntimeStatus.STARTING
-        self.state.started_at = datetime.utcnow()
+        self.state.started_at = datetime.now(timezone.utc)
 
         if self.config.vector_store_enabled and self.config.database_url:
             self._initialize_vector_store()
@@ -174,7 +174,7 @@ class AgentRuntime:
         return "\n".join(results)
 
     async def _handle_get_time(self, params: Dict[str, Any]) -> str:
-        return datetime.utcnow().isoformat()
+        return datetime.now(timezone.utc).isoformat()
 
     async def _handle_calculator(self, params: Dict[str, Any]) -> str:
         _expression = params.get("expression", "0")
@@ -224,7 +224,7 @@ class AgentRuntime:
         if not agent:
             context.status = "error"
             context.error = f"Agent {agent_id} not found"
-            context.completed_at = datetime.utcnow()
+            context.completed_at = datetime.now(timezone.utc)
             self.state.failed_executions += 1
             return context
 
@@ -239,7 +239,7 @@ class AgentRuntime:
             context.output = result.get("output")
             context.status = "completed" if result.get("success") else "error"
             context.error = result.get("error")
-            context.completed_at = datetime.utcnow()
+            context.completed_at = datetime.now(timezone.utc)
             self.state.total_executions += 1
 
             if not result.get("success"):
@@ -248,14 +248,14 @@ class AgentRuntime:
         except asyncio.TimeoutError:
             context.status = "timeout"
             context.error = f"Execution timed out after {timeout} seconds"
-            context.completed_at = datetime.utcnow()
+            context.completed_at = datetime.now(timezone.utc)
             self.state.failed_executions += 1
             logger.error(f"Execution {execution_id} timed out")
 
         except Exception as e:
             context.status = "error"
             context.error = str(e)
-            context.completed_at = datetime.utcnow()
+            context.completed_at = datetime.now(timezone.utc)
             self.state.failed_executions += 1
             logger.error(f"Execution {execution_id} error: {str(e)}")
 

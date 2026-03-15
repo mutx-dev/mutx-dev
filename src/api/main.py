@@ -1,6 +1,6 @@
 import asyncio
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 from fastapi import FastAPI, Request, Response, status
@@ -167,7 +167,7 @@ async def health_check(request: Request):
 
     return HealthResponse(
         status="healthy" if database_ready else "degraded",
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
         database="ready" if database_ready else "unavailable" if database_error else "initializing",
         error=database_error,
     )
@@ -186,7 +186,7 @@ async def readiness_check(request: Request, response: Response):
 
     return {
         "status": "ready" if database_ready else "not_ready",
-        "timestamp": datetime.utcnow(),
+        "timestamp": datetime.now(timezone.utc),
         "database": database_status,
         "error": database_error,
     }

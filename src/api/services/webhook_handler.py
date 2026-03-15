@@ -6,7 +6,7 @@ import hmac
 from typing import Optional, Dict, Any, List, Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
@@ -108,7 +108,7 @@ class AgentStatusUpdateProcessor(EventProcessor):
         processed = ProcessedWebhook(
             webhook_id=webhook_id,
             payload=payload,
-            received_at=datetime.utcnow(),
+            received_at=datetime.now(timezone.utc),
         )
 
         actions_taken = []
@@ -144,7 +144,7 @@ class AgentStatusUpdateProcessor(EventProcessor):
                 await self.self_healing_service.check_and_recover(agent_id)
                 actions_taken.append("recovery_checked")
 
-        processed.processed_at = datetime.utcnow()
+        processed.processed_at = datetime.now(timezone.utc)
         processed.actions_taken = actions_taken
 
         logger.info(f"Processed agent status update for {agent_id}: {status}")
@@ -161,7 +161,7 @@ class DeploymentEventProcessor(EventProcessor):
         processed = ProcessedWebhook(
             webhook_id=webhook_id,
             payload=payload,
-            received_at=datetime.utcnow(),
+            received_at=datetime.now(timezone.utc),
         )
 
         actions_taken = []
@@ -193,7 +193,7 @@ class DeploymentEventProcessor(EventProcessor):
                     )
                 actions_taken.append("version_recorded")
 
-        processed.processed_at = datetime.utcnow()
+        processed.processed_at = datetime.now(timezone.utc)
         processed.actions_taken = actions_taken
 
         logger.info(f"Processed deployment event: {event} for {deployment_id}")
@@ -209,7 +209,7 @@ class MetricsReportProcessor(EventProcessor):
         processed = ProcessedWebhook(
             webhook_id=webhook_id,
             payload=payload,
-            received_at=datetime.utcnow(),
+            received_at=datetime.now(timezone.utc),
         )
 
         actions_taken = []
@@ -232,7 +232,7 @@ class MetricsReportProcessor(EventProcessor):
 
         actions_taken.append("metrics_recorded")
 
-        processed.processed_at = datetime.utcnow()
+        processed.processed_at = datetime.now(timezone.utc)
         processed.actions_taken = actions_taken
 
         return processed
@@ -247,7 +247,7 @@ class HeartbeatProcessor(EventProcessor):
         processed = ProcessedWebhook(
             webhook_id=webhook_id,
             payload=payload,
-            received_at=datetime.utcnow(),
+            received_at=datetime.now(timezone.utc),
         )
 
         agent_id = payload.agent_id
@@ -267,7 +267,7 @@ class HeartbeatProcessor(EventProcessor):
             )
             processed.actions_taken.append("agent_registered")
 
-        processed.processed_at = datetime.utcnow()
+        processed.processed_at = datetime.now(timezone.utc)
 
         return processed
 
@@ -330,7 +330,7 @@ class WebhookHandler:
         signature: Optional[str] = None,
     ) -> ProcessedWebhook:
         webhook_id = str(uuid.uuid4())
-        received_at = datetime.utcnow()
+        received_at = datetime.now(timezone.utc)
 
         try:
             payload_bytes = str(payload).encode()
@@ -444,7 +444,7 @@ def create_status_update_payload(
     return {
         "event_type": WebhookEventType.AGENT_STATUS.value,
         "source": WebhookSource.AGENT.value,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "agent_id": agent_id,
         "data": {
             "status": status,
@@ -464,7 +464,7 @@ def create_heartbeat_payload(
     return {
         "event_type": WebhookEventType.AGENT_HEARTBEAT.value,
         "source": WebhookSource.AGENT.value,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "agent_id": agent_id,
         "data": {
             "agent_name": agent_name,
@@ -483,7 +483,7 @@ def create_metrics_payload(
     return {
         "event_type": WebhookEventType.METRICS_REPORT.value,
         "source": WebhookSource.AGENT.value,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "agent_id": agent_id,
         "data": {
             "latency_ms": latency_ms,
@@ -504,7 +504,7 @@ def create_deployment_event_payload(
     return {
         "event_type": WebhookEventType.DEPLOYMENT_UPDATED.value,
         "source": WebhookSource.DEPLOYMENT.value,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "deployment_id": deployment_id,
         "agent_id": agent_id,
         "data": {
