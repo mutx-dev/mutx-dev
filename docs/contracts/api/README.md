@@ -22,3 +22,32 @@ Use this section for route-level reference and integration details.
 {% hint style="info" %}
 The live FastAPI app does not use a global `/v1` prefix.
 {% endhint %}
+
+## CORS and Security
+
+The API implements CORS and security headers for production use.
+
+### Allowed Origins
+
+The following origins are allowed to make cross-origin requests:
+
+- `http://localhost:3000` - Local development
+- `http://app.localhost:3000` - Local app development  
+- `https://mutx.dev` - Production marketing site
+- `https://app.mutx.dev` - Production app
+
+To configure additional origins, set the `CORS_ORIGINS` environment variable as a comma-separated list.
+
+### Security Headers
+
+The API automatically adds the following security headers to all responses:
+
+- `Strict-Transport-Security: max-age=63072000; includeSubDomains` - HSTS
+- `X-Frame-Options: DENY` - Prevent clickjacking
+- `X-Content-Type-Options: nosniff` - Prevent MIME type sniffing
+- `Referrer-Policy: strict-origin-when-cross-origin` - Referrer policy
+- `Permissions-Policy: geolocation=(), microphone=(), camera=()` - Disable unused features
+
+### CSRF Protection
+
+For state-changing operations (POST, PUT, PATCH, DELETE), the API validates that the request origin is in the allowed origins list. Requests with disallowed origins will receive a 403 Forbidden response.
