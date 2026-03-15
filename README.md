@@ -1,72 +1,81 @@
+
 <p align="center">
-  <img src="https://github.com/fortunexbt/mutx-dev/blob/main/public/logo.png" />
+  <img src="https://github.com/fortunexbt/mutx-dev/blob/main/public/logo.png" width="140" alt="MUTX logo"/>
+</p>
+
+<h1 align="center">MUTX</h1>
+
+<p align="center">
+  <strong>The control plane for AI agents.</strong>
 </p>
 
 <p align="center">
-  <strong>The control plane for deploying, operating, and governing AI agents.</strong>
-</p>
-
-<p align="center">
-  Deploy agents like you deploy services.
-</p>
-
-<p align="center">
-  <a href="https://docs.mutx.dev"><img src="https://img.shields.io/badge/docs-open-black?style=for-the-badge"></a>
-  <a href="https://github.com/fortunexbt/mutx-dev"><img src="https://img.shields.io/github/stars/fortunexbt/mutx-dev?style=for-the-badge"></a>
-  <a href="https://github.com/fortunexbt/mutx-dev/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-black?style=for-the-badge"></a>
+  Deploy, operate, and govern agents like production systems.
 </p>
 
 ---
 
-# What is MUTX
+# MUTX
 
-MUTX is an **industrial control plane for AI agents**.
+MUTX is an **open-source control plane for AI agents**.
 
-It lets you deploy, operate, observe, and govern autonomous agents as production systems.
+Most agent frameworks focus on prompts, reasoning loops, or local orchestration.  
+MUTX focuses on the **operational layer** required to run agents as production systems.
 
-Think:
+This includes:
 
-```
-Vercel → for web apps
-Kubernetes → for containers
-MUTX → for AI agents
-```
+- agent deployment
+- lifecycle management
+- orchestration and scheduling
+- observability and debugging
+- governance and policy controls
+- CLI, API, and SDK interfaces
 
-Capabilities include:
-
-• agent lifecycle management  
-• orchestration and scheduling  
-• observability and debugging  
-• policy and governance  
-• CLI + API + SDK access  
+The goal is simple: treat agents the same way modern teams treat backend services.
 
 ---
 
-# Documentation
+# The Problem
 
-The full documentation lives at:
+Most AI agents today are deployed like scripts.
 
-→ **https://docs.mutx.dev**
+That works for demos, but breaks quickly in real systems.
 
-<p align="center">
-  <a href="https://docs.mutx.dev">
-    <img src="https://docs.mutx.dev/~gitbook/image?url=https%3A%2F%2F2092776695-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FlrUGCvqeS10g6J0hLJNu%252Fuploads%252F0JprPBsUyScuvYUAtdUu%252Fmutx_docs_og_editorial.png%3Falt%3Dmedia%26token%3Dc56634e1-e5d6-4afa-9dbd-d94c8cf71ef7&width=1248&dpr=2&quality=100&sign=cade74dc&sv=2"/>
-  </a>
-</p>
+Once agents interact with APIs, credentials, background jobs, or external services, teams need infrastructure that answers questions like:
 
-Start here:
+- What agents are running?
+- Where are they deployed?
+- What permissions do they have?
+- What changed between runs?
+- Why did something fail?
+- How do we monitor and debug it?
 
-- **Quickstart**  
-  https://docs.mutx.dev/docs/deployment/quickstart
+MUTX exists to provide that layer.
 
-- **Architecture overview**  
-  https://docs.mutx.dev/docs/architecture/overview
+---
 
-- **API reference**  
-  https://docs.mutx.dev/docs/contracts/api
+# The Idea
 
-- **CLI guide**  
-  https://docs.mutx.dev/docs/cli
+Modern software has clear operational primitives.
+
+Web applications   → Vercel  
+Containers         → Kubernetes  
+AI agents          → MUTX  
+
+MUTX is building the infrastructure layer for deploying and operating agents safely at scale.
+
+---
+
+# Project Structure
+
+mutx-dev/
+├── control-plane/       # FastAPI backend services  
+├── cli/                 # MUTX operator CLI  
+├── sdk/                 # Python SDK  
+├── agents/              # agent templates and roles  
+├── infrastructure/      # Docker, Terraform, deployment configs  
+├── docs/                # documentation source  
+└── scripts/             # bootstrap and developer tooling  
 
 ---
 
@@ -79,85 +88,25 @@ git clone https://github.com/fortunexbt/mutx-dev
 cd mutx-dev
 ```
 
-### Canonical Local Bootstrap
-
-Start the local MUTX stack from repo root with:
+Start the local development stack:
 
 ```bash
 ./scripts/dev.sh
 ```
-
-This is the canonical local entrypoint and uses `infrastructure/docker/docker-compose.yml` explicitly.
-
-### Optional Demo Validation
-
-If you want a one-command demo sanity check, run:
-
-```bash
-npm run demo:validate
-```
-
-This validates:
-- API health (`/health`) and readiness (`/ready`),
-- Homepage loads (`/`),
-- App shell loads (`/app`),
-- Static pages load (`/contact`, `/privacy-policy`).
-
-More details in the docs:
-
-https://docs.mutx.dev/docs/deployment/quickstart
-
 ---
 
-# Project structure
+# Documentation
 
-```
-mutx/
- ├── control-plane        # FastAPI control plane
- ├── cli                  # MUTX operator CLI
- ├── sdk                  # Python SDK
- ├── agents               # agent templates and roles
- ├── infrastructure       # deployment and infra
- └── docs                 # GitBook source
-```
+Full documentation:
 
----
+https://docs.mutx.dev
 
-# Architecture
+Key entry points:
 
-MUTX consists of four main layers:
-
-**Control Plane**  
-FastAPI services coordinating agent lifecycle.
-
-**Execution Layer**  
-Agent runtimes and worker nodes.
-
-**Interface Layer**  
-CLI, SDK, and API access.
-
-**Observability Layer**  
-Logs, metrics, and debugging tools.
-
-Full architecture:
-
-https://docs.mutx.dev/docs/architecture/overview
-
----
-
-# Roadmap
-
-Near-term priorities:
-
-- production agent lifecycle
-- scheduling and orchestration
-- policy and governance
-- observability tooling
-- SDK expansion
-
-See:
-
-https://docs.mutx.dev/roadmap
+- Quickstart: https://docs.mutx.dev/docs/deployment/quickstart
+- Architecture: https://docs.mutx.dev/docs/architecture/overview
+- API Reference: https://docs.mutx.dev/docs/contracts/api
+- CLI Guide: https://docs.mutx.dev/docs/cli
 
 ---
 
@@ -167,33 +116,12 @@ Contributions are welcome.
 
 Start here:
 
-- Contributing guide  
-  https://docs.mutx.dev/contributing
-
-- Code of conduct  
-  https://github.com/fortunexbt/mutx-dev/blob/main/CODE_OF_CONDUCT.md
-
----
-
-# Security
-
-Security policy:
-
-https://github.com/fortunexbt/mutx-dev/blob/main/SECURITY.md
+https://docs.mutx.dev/contributing
 
 ---
 
 # License
 
-MIT License.
-
-See:
+MIT License
 
 https://github.com/fortunexbt/mutx-dev/blob/main/LICENSE
-
----
-
-<p align="center">
-  <strong>MUTX</strong><br>
-  Autonomous infrastructure for the agentic era.
-</p>
