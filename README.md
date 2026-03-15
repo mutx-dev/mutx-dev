@@ -93,6 +93,63 @@ Start the local development stack:
 ```bash
 ./scripts/dev.sh
 ```
+
+# Local Development
+
+## Running the Backend
+
+Start the local development stack:
+
+```bash
+./scripts/dev.sh
+```
+
+This starts the FastAPI backend on http://localhost:8000.
+
+## Testing the API
+
+Use the built-in test script to test API endpoints without writing manual curl commands:
+
+```bash
+# Health checks only
+./scripts/test-api.sh
+
+# Full test suite with authentication
+./scripts/test-api.sh --with-auth
+
+# Register a test user
+./scripts/test-api.sh --register
+
+# Login and get token
+./scripts/test-api.sh --login
+
+# Test specific endpoints
+./scripts/test-api.sh --agents
+./scripts/test-api.sh --deployments
+./scripts/test-api.sh --api-keys
+```
+
+The test script handles:
+- User registration and login
+- Token management
+- Authenticated API requests
+- Response validation
+
+## Running Tests
+
+Run the full test suite:
+
+```bash
+./scripts/test.sh
+```
+
+Skip Playwright browser tests:
+
+```bash
+MUTX_SKIP_PLAYWRIGHT=1 ./scripts/test.sh
+```
+
+
 ---
 
 # Documentation
