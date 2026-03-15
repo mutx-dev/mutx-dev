@@ -1098,7 +1098,21 @@ export function AppDashboardClient() {
                   <p className="mt-2 text-white">{deployments.reduce((sum, deployment) => sum + deployment.replicas, 0)} total replicas across the visible fleet</p>
                 </div>
               </div>
-              {refreshing ? (
+              {loadingData.deployments ? (
+                <div className="rounded-xl border border-white/5 border-dashed p-6 text-center text-sm text-slate-500">
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading deployments...
+                  </div>
+                </div>
+              ) : dataErrors.deployments ? (
+                <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-6 text-center text-sm text-rose-400">
+                  <div className="flex items-center justify-center gap-2">
+                    <AlertTriangle className="h-4 w-4" />
+                    {dataErrors.deployments}
+                  </div>
+                </div>
+              ) : refreshing ? (
                 <div className="rounded-xl border border-white/5 border-dashed p-6 text-center text-sm text-slate-500">
                   Refreshing deployment state…
                 </div>

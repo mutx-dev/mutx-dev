@@ -261,7 +261,7 @@ export default function AppPreviewPage() {
         <MobileNav isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} navItems={navItems} currentItem={currentItem} />
 
         <div className="relative mx-auto max-w-[1400px] px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between lg:hidden mb-6">
+          <div className="flex items-center justify-between lg:hidden mb-6 pt-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
               <Command className="h-5 w-5" />
@@ -327,7 +327,7 @@ export default function AppPreviewPage() {
             </div>
           </aside>
 
-          <main className="space-y-6 pb-10">
+          <main className="space-y-6 pb-10 pt-4 lg:pt-0">
             <Suspense fallback={<PageLoadingSkeleton />}>
               {renderContent()}
             </Suspense>
