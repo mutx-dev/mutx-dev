@@ -1,8 +1,39 @@
-import os
 import json
+import os
 from pathlib import Path
 from typing import Optional
+from urllib.parse import urlsplit, urlunsplit
+
 import httpx
+
+
+_LEGACY_API_SUFFIXES = ("/api/v1", "/v1", "/api")
+
+
+def _strip_legacy_suffix(path: str) -> str:
+    normalized_path = path.rstrip("/")
+
+    for suffix in _LEGACY_API_SUFFIXES:
+        if normalized_path == suffix:
+            return ""
+        if normalized_path.endswith(suffix):
+            return normalized_path[: -len(suffix)] or ""
+
+    return normalized_path
+
+
+def normalize_api_url(value: str) -> str:
+    normalized_value = value.strip().rstrip("/")
+    if not normalized_value:
+        return normalized_value
+
+    # urlsplit mis-parses values like localhost:8000 without a scheme.
+    if "://" not in normalized_value:
+        return _strip_legacy_suffix(normalized_value)
+
+    parsed = urlsplit(normalized_value)
+    normalized_path = _strip_legacy_suffix(parsed.path)
+    return urlunsplit(parsed._replace(path=normalized_path))
 
 
 class CLIConfig:
@@ -16,14 +47,18 @@ class CLIConfig:
         if self.config_path.exists():
             try:
                 with open(self.config_path) as f:
-                    return json.load(f)
+                    loaded = json.load(f)
+                    api_url = loaded.get("api_url")
+                    if isinstance(api_url, str):
+                        loaded["api_url"] = normalize_api_url(api_url)
+                    return loaded
             except (json.JSONDecodeError, IOError):
                 pass
         return self._default_config()
 
     def _default_config(self) -> dict:
         return {
-            "api_url": os.getenv("MUTX_API_URL", "http://localhost:8000"),
+            "api_url": normalize_api_url(os.getenv("MUTX_API_URL", "http://localhost:8000")),
             "api_key": None,
             "refresh_token": None,
         }
@@ -35,15 +70,14 @@ class CLIConfig:
 
     @property
     def api_url(self) -> str:
-        return self._config.get("api_url", "http://localhost:8000")
+        stored_api_url = self._config.get("api_url", "http://localhost:8000")
+        if isinstance(stored_api_url, str):
+            return normalize_api_url(stored_api_url)
+        return "http://localhost:8000"
 
     @api_url.setter
     def api_url(self, value: str):
-        # Strip trailing /api to avoid double-path issues
-        # since CLI commands explicitly add /api prefix
-        if value.endswith("/api"):
-            value = value[:-4]
-        self._config["api_url"] = value
+        self._config["api_url"] = normalize_api_url(value)
         self.save()
 
     @property

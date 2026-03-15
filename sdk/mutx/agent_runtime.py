@@ -19,6 +19,8 @@ from typing import Any, Callable, Optional
 
 import httpx
 
+from mutx._url import normalize_api_base_url
+
 logger = logging.getLogger(__name__)
 
 
@@ -88,7 +90,7 @@ class MutxAgentClient:
         agent_id: Optional[str] = None,
         timeout: float = 30.0,
     ):
-        self.mutx_url = mutx_url.rstrip("/")
+        self.mutx_url = normalize_api_base_url(mutx_url)
         self.api_key = api_key
         self.agent_id = agent_id
         self.timeout = timeout
@@ -531,7 +533,7 @@ class MutxAgentSyncClient:
         agent_id: Optional[str] = None,
         timeout: float = 30.0,
     ):
-        self.mutx_url = mutx_url.rstrip("/")
+        self.mutx_url = normalize_api_base_url(mutx_url)
         self.api_key = api_key
         self.agent_id = agent_id
         self.timeout = timeout

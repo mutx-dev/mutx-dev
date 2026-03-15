@@ -15,6 +15,7 @@ from mutx.api_keys import APIKeys
 from mutx.clawhub import ClawHub
 from mutx.deployments import Deployments
 from mutx.webhooks import Webhooks
+from mutx._url import normalize_api_base_url
 
 
 class MutxClient:
@@ -25,7 +26,7 @@ class MutxClient:
         timeout: float = 30.0,
     ):
         self.api_key = api_key
-        self.base_url = base_url.rstrip("/")
+        self.base_url = normalize_api_base_url(base_url)
         self.timeout = timeout
 
         self._client = httpx.Client(
@@ -107,7 +108,7 @@ class MutxAsyncClient:
             stacklevel=2,
         )
         self.api_key = api_key
-        self.base_url = base_url.rstrip("/")
+        self.base_url = normalize_api_base_url(base_url)
         self.timeout = timeout
 
         self._client = httpx.AsyncClient(
