@@ -152,7 +152,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Links */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-3">
         {/* Agents Card */}
         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
           <div className="flex items-center justify-between">
@@ -223,6 +223,20 @@ export default function DashboardPage() {
               ))}
             </ul>
           )}
+        </div>
+
+        {/* Webhooks Card */}
+        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-white">Webhooks</h2>
+            <Link
+              href="/dashboard/webhooks"
+              className="text-sm font-medium text-cyan-400 hover:text-cyan-300"
+            >
+              Manage →
+            </Link>
+          </div>
+          <p className="mt-4 text-slate-400">Configure webhook endpoints for real-time events</p>
         </div>
       </div>
     </div>
