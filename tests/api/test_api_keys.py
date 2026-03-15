@@ -10,6 +10,7 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.auth.jwt import create_access_token
 from src.api.models.models import APIKey
 from src.api.routes.api_keys import MAX_ACTIVE_API_KEYS_PER_USER
 from src.api.services.user_service import verify_api_key
@@ -300,3 +301,41 @@ class TestVerifyAPIKeyCompatibility:
         plain_key = "mutx_live_legacy_example"
         legacy_hash = hashlib.sha256(plain_key.encode()).hexdigest()
         assert verify_api_key(plain_key, legacy_hash)
+
+
+class TestBearerAPIKeyAuth:
+    """Authentication compatibility tests for Bearer API key automation flows."""
+
+    @pytest.mark.asyncio
+    async def test_list_api_keys_with_bearer_managed_api_key(
+        self, client_no_auth: AsyncClient, test_user
+    ):
+        access_token, _ = create_access_token(test_user.id)
+
+        create_response = await client_no_auth.post(
+            "/api/api-keys",
+            json={"name": "automation-key"},
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        assert create_response.status_code == 201
+        created_key = create_response.json()
+
+        list_response = await client_no_auth.get(
+            "/api/api-keys",
+            headers={"Authorization": f"Bearer {created_key['key']}"},
+        )
+        assert list_response.status_code == 200
+        payload = list_response.json()
+        assert payload["total"] == 1
+        assert payload["items"][0]["id"] == created_key["id"]
+
+    @pytest.mark.asyncio
+    async def test_list_api_keys_with_invalid_bearer_api_key_is_unauthorized(
+        self, client_no_auth: AsyncClient
+    ):
+        response = await client_no_auth.get(
+            "/api/api-keys",
+            headers={"Authorization": "Bearer mutx_live_invalid"},
+        )
+
+        assert response.status_code == 401

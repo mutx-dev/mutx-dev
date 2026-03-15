@@ -340,6 +340,29 @@ async def test_webhook_delivery_history_supports_managed_api_key_auth(
 
 
 @pytest.mark.asyncio
+async def test_webhook_create_supports_managed_api_key_in_bearer_header(
+    client_no_auth: AsyncClient, test_user
+):
+    access_token, _ = create_access_token(test_user.id)
+    key_response = await client_no_auth.post(
+        "/api/api-keys",
+        json={"name": "webhook-bearer-key"},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    assert key_response.status_code == 201
+    managed_api_key = key_response.json()["key"]
+
+    response = await client_no_auth.post(
+        "/api/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["agent.*"]},
+        headers={"Authorization": f"Bearer {managed_api_key}"},
+    )
+
+    assert response.status_code == 201
+    assert response.json()["url"] == "https://example.com/webhook"
+
+
+@pytest.mark.asyncio
 async def test_webhook_delivery_history_other_user_forbidden(
     client: AsyncClient, other_user_client: AsyncClient, db_session, test_user
 ):
