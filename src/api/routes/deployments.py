@@ -445,6 +445,10 @@ async def rollback_deployment(
             detail=f"Version {rollback_data.version} not found for this deployment",
         )
 
+    snapshot = json.loads(target_version.config_snapshot)
+    deployment.replicas = int(snapshot.get("replicas", deployment.replicas))
+    deployment.version = snapshot.get("version", deployment.version)
+
     mark_old_query = select(DeploymentVersion).where(
         DeploymentVersion.deployment_id == deployment.id,
         DeploymentVersion.status == "current",
