@@ -147,17 +147,17 @@ app.middleware("http")(track_request)
 # Include metrics router
 app.include_router(metrics_router, tags=["monitoring"])
 
-# Include API routers
-app.include_router(agents.router, prefix="/api")
-app.include_router(deployments.router, prefix="/api")
-app.include_router(webhooks.router, prefix="/api")
-app.include_router(auth.router, prefix="/api")
-app.include_router(clawhub.router, prefix="/api")
-app.include_router(api_keys.router, prefix="/api")
-app.include_router(leads.router, prefix="/api")
-app.include_router(agent_runtime.router, prefix="/api")
-app.include_router(ingest.router, prefix="/api")
-app.include_router(runs.router, prefix="/api")
+# Include API routers with /v1 prefix for proper API versioning
+app.include_router(agents.router, prefix="/v1")
+app.include_router(deployments.router, prefix="/v1")
+app.include_router(webhooks.router, prefix="/v1")
+app.include_router(auth.router, prefix="/v1")
+app.include_router(clawhub.router, prefix="/v1")
+app.include_router(api_keys.router, prefix="/v1")
+app.include_router(leads.router, prefix="/v1")
+app.include_router(agent_runtime.router, prefix="/v1")
+app.include_router(ingest.router, prefix="/v1")
+app.include_router(runs.router, prefix="/v1")
 
 
 @app.get("/health", response_model=HealthResponse)

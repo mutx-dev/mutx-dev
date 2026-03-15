@@ -9,7 +9,7 @@ from src.api.models.models import Agent, AgentStatus
 @pytest.mark.asyncio
 async def test_create_run_persists_trace_data_and_returns_details(client, test_agent):
     response = await client.post(
-        "/api/runs",
+        "/v1/runs",
         json={
             "agent_id": str(test_agent.id),
             "status": "completed",
@@ -42,7 +42,7 @@ async def test_create_run_persists_trace_data_and_returns_details(client, test_a
     assert payload["traces"][0]["event_type"] == "prompt"
     assert payload["traces"][1]["event_type"] == "tool_call"
 
-    runs_response = await client.get(f"/api/runs?agent_id={test_agent.id}")
+    runs_response = await client.get(f"/v1/runs?agent_id={test_agent.id}")
     assert runs_response.status_code == 200
     history = runs_response.json()
     assert history["total"] == 1
@@ -53,7 +53,7 @@ async def test_create_run_persists_trace_data_and_returns_details(client, test_a
 @pytest.mark.asyncio
 async def test_get_run_and_trace_query_support_filters_and_pagination(client, test_agent):
     create_response = await client.post(
-        "/api/runs",
+        "/v1/runs",
         json={
             "agent_id": str(test_agent.id),
             "status": "completed",
@@ -81,13 +81,13 @@ async def test_get_run_and_trace_query_support_filters_and_pagination(client, te
     assert create_response.status_code == 201
     run_id = create_response.json()["id"]
 
-    run_response = await client.get(f"/api/runs/{run_id}")
+    run_response = await client.get(f"/v1/runs/{run_id}")
     assert run_response.status_code == 200
     assert run_response.json()["trace_count"] == 3
     assert len(run_response.json()["traces"]) == 3
 
     traces_response = await client.get(
-        f"/api/runs/{run_id}/traces?event_type=tool_call&skip=0&limit=1"
+        f"/v1/runs/{run_id}/traces?event_type=tool_call&skip=0&limit=1"
     )
     assert traces_response.status_code == 200
 
@@ -103,7 +103,7 @@ async def test_get_run_and_trace_query_support_filters_and_pagination(client, te
 @pytest.mark.asyncio
 async def test_runs_are_scoped_by_authenticated_user(client, other_user_client, test_agent):
     create_response = await client.post(
-        "/api/runs",
+        "/v1/runs",
         json={
             "agent_id": str(test_agent.id),
             "status": "completed",
@@ -114,7 +114,7 @@ async def test_runs_are_scoped_by_authenticated_user(client, other_user_client, 
     assert create_response.status_code == 201
     run_id = create_response.json()["id"]
 
-    forbidden_response = await other_user_client.get(f"/api/runs/{run_id}")
+    forbidden_response = await other_user_client.get(f"/v1/runs/{run_id}")
     assert forbidden_response.status_code == 403
     assert forbidden_response.json()["detail"] == "Not authorized to access this run"
 
@@ -133,7 +133,7 @@ async def test_create_run_rejects_agent_not_owned_by_requesting_user(client, db_
     await db_session.commit()
 
     response = await client.post(
-        "/api/runs",
+        "/v1/runs",
         json={
             "agent_id": str(other_agent.id),
             "status": "completed",
@@ -153,7 +153,7 @@ async def test_create_run_accepts_explicit_timestamps(client, test_agent):
     completed_at = datetime(2026, 3, 14, 10, 0, 1).isoformat()
 
     response = await client.post(
-        "/api/runs",
+        "/v1/runs",
         json={
             "agent_id": str(test_agent.id),
             "status": "completed",
@@ -182,7 +182,7 @@ async def test_list_runs_filter_by_status(client, test_agent):
     # Create multiple runs with different statuses
     for status in ["running", "completed", "failed"]:
         await client.post(
-            "/api/runs",
+            "/v1/runs",
             json={
                 "agent_id": str(test_agent.id),
                 "status": status,
@@ -191,16 +191,16 @@ async def test_list_runs_filter_by_status(client, test_agent):
         )
 
     # Filter by running
-    running = await client.get("/api/runs?status=running")
+    running = await client.get("/v1/runs?status=running")
     assert running.status_code == 200
     assert running.json()["total"] == 1
 
     # Filter by completed
-    completed = await client.get("/api/runs?status=completed")
+    completed = await client.get("/v1/runs?status=completed")
     assert completed.status_code == 200
     assert completed.json()["total"] == 1
 
     # Filter by failed
-    failed = await client.get("/api/runs?status=failed")
+    failed = await client.get("/v1/runs?status=failed")
     assert failed.status_code == 200
     assert failed.json()["total"] == 1

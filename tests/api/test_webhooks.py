@@ -11,7 +11,7 @@ from src.api.models.models import WebhookDeliveryLog
 async def test_webhook_lifecycle(client: AsyncClient, test_user):
     # 1. Create Webhook
     response = await client.post(
-        "/api/webhooks/",
+        "/v1/webhooks/",
         json={"url": "https://example.com/webhook", "events": ["agent.*"], "secret": "test-secret"},
     )
     assert response.status_code == 201
@@ -21,19 +21,19 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
     assert "agent.*" in webhook["events"]
 
     # 2. List Webhooks
-    response = await client.get("/api/webhooks/")
+    response = await client.get("/v1/webhooks/")
     assert response.status_code == 200
     webhooks = response.json()
     assert any(w["id"] == webhook_id for w in webhooks)
 
     # 3. Get Webhook
-    response = await client.get(f"/api/webhooks/{webhook_id}")
+    response = await client.get(f"/v1/webhooks/{webhook_id}")
     assert response.status_code == 200
     assert response.json()["id"] == webhook_id
 
     # 4. Update Webhook
     response = await client.patch(
-        f"/api/webhooks/{webhook_id}", json={"url": "https://example.com/updated", "is_active": False}
+        f"/v1/webhooks/{webhook_id}", json={"url": "https://example.com/updated", "is_active": False}
     )
     assert response.status_code == 200
     data = response.json()
@@ -41,11 +41,11 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
     assert data["is_active"] is False
 
     # 5. Delete Webhook
-    response = await client.delete(f"/api/webhooks/{webhook_id}")
+    response = await client.delete(f"/v1/webhooks/{webhook_id}")
     assert response.status_code == 204
 
     # 6. Verify Deletion
-    response = await client.get(f"/api/webhooks/{webhook_id}")
+    response = await client.get(f"/v1/webhooks/{webhook_id}")
     assert response.status_code == 404
 
 
@@ -58,7 +58,7 @@ async def test_webhook_create_accepts_runtime_status_event_names(
     client: AsyncClient, event_name: str
 ):
     response = await client.post(
-        "/api/webhooks/",
+        "/v1/webhooks/",
         json={"url": "https://example.com/webhook", "events": [event_name]},
     )
 
@@ -70,7 +70,7 @@ async def test_webhook_create_accepts_runtime_status_event_names(
 async def test_webhook_list_honors_skip_and_limit(client: AsyncClient):
     for idx in range(3):
         response = await client.post(
-            "/api/webhooks/",
+            "/v1/webhooks/",
             json={
                 "url": f"https://example.com/webhook-{idx}",
                 "events": ["agent.*"]
@@ -78,21 +78,21 @@ async def test_webhook_list_honors_skip_and_limit(client: AsyncClient):
         )
         assert response.status_code == 201
 
-    full_response = await client.get("/api/webhooks/")
+    full_response = await client.get("/v1/webhooks/")
     assert full_response.status_code == 200
     assert len(full_response.json()) == 3
 
-    limited_response = await client.get("/api/webhooks/?limit=1")
+    limited_response = await client.get("/v1/webhooks/?limit=1")
     assert limited_response.status_code == 200
     assert len(limited_response.json()) == 1
 
-    skipped_response = await client.get("/api/webhooks/?skip=1&limit=10")
+    skipped_response = await client.get("/v1/webhooks/?skip=1&limit=10")
     assert skipped_response.status_code == 200
     assert len(skipped_response.json()) == 2
 
 @pytest.mark.asyncio
 async def test_webhook_unauthorized(client_no_auth: AsyncClient):
-    response = await client_no_auth.get("/api/webhooks/")
+    response = await client_no_auth.get("/v1/webhooks/")
     assert response.status_code == 401
 
 
@@ -101,7 +101,7 @@ async def test_webhook_other_user_forbidden(
     client: AsyncClient, other_user_client: AsyncClient, test_user
 ):
     response = await client.post(
-        "/api/webhooks/",
+        "/v1/webhooks/",
         json={
             "url": "https://example.com/webhook",
             "events": ["agent.*"],
@@ -111,19 +111,19 @@ async def test_webhook_other_user_forbidden(
     assert response.status_code == 201
     webhook_id = response.json()["id"]
 
-    get_response = await other_user_client.get(f"/api/webhooks/{webhook_id}")
+    get_response = await other_user_client.get(f"/v1/webhooks/{webhook_id}")
     assert get_response.status_code == 403
 
     patch_response = await other_user_client.patch(
-        f"/api/webhooks/{webhook_id}",
+        f"/v1/webhooks/{webhook_id}",
         json={"url": "https://example.com/hijacked"},
     )
     assert patch_response.status_code == 403
 
-    delete_response = await other_user_client.delete(f"/api/webhooks/{webhook_id}")
+    delete_response = await other_user_client.delete(f"/v1/webhooks/{webhook_id}")
     assert delete_response.status_code == 403
 
-    test_response = await other_user_client.post(f"/api/webhooks/{webhook_id}/test")
+    test_response = await other_user_client.post(f"/v1/webhooks/{webhook_id}/test")
     assert test_response.status_code == 403
 
 
@@ -141,12 +141,12 @@ async def test_webhook_test_trigger(client: AsyncClient, test_user, monkeypatch)
 
     # Create
     response = await client.post(
-        "/api/webhooks/", json={"url": "https://example.com/webhook", "events": ["*"]}
+        "/v1/webhooks/", json={"url": "https://example.com/webhook", "events": ["*"]}
     )
     webhook_id = response.json()["id"]
 
     # Test
-    response = await client.post(f"/api/webhooks/{webhook_id}/test")
+    response = await client.post(f"/v1/webhooks/{webhook_id}/test")
     assert response.status_code == 200
     assert response.json()["status"] == "test_delivered"
 
@@ -154,7 +154,7 @@ async def test_webhook_test_trigger(client: AsyncClient, test_user, monkeypatch)
 @pytest.mark.asyncio
 async def test_webhook_delivery_history_filters(client: AsyncClient, db_session, test_user):
     create_response = await client.post(
-        "/api/webhooks/",
+        "/v1/webhooks/",
         json={"url": "https://example.com/webhook", "events": ["*"]},
     )
     assert create_response.status_code == 201
@@ -182,7 +182,7 @@ async def test_webhook_delivery_history_filters(client: AsyncClient, db_session,
     await db_session.commit()
 
     response = await client.get(
-        f"/api/webhooks/{webhook_id}/deliveries?event=agent.status&success=false"
+        f"/v1/webhooks/{webhook_id}/deliveries?event=agent.status&success=false"
     )
     assert response.status_code == 200
     data = response.json()
@@ -196,7 +196,7 @@ async def test_webhook_delivery_history_honors_skip_limit_and_desc_order(
     client: AsyncClient, db_session
 ):
     create_response = await client.post(
-        "/api/webhooks/",
+        "/v1/webhooks/",
         json={"url": "https://example.com/webhook", "events": ["*"]},
     )
     assert create_response.status_code == 201
@@ -233,7 +233,7 @@ async def test_webhook_delivery_history_honors_skip_limit_and_desc_order(
     )
     await db_session.commit()
 
-    response = await client.get(f"/api/webhooks/{webhook_id}/deliveries?skip=1&limit=1")
+    response = await client.get(f"/v1/webhooks/{webhook_id}/deliveries?skip=1&limit=1")
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 1
@@ -244,19 +244,19 @@ async def test_webhook_delivery_history_honors_skip_limit_and_desc_order(
 @pytest.mark.asyncio
 async def test_webhook_delivery_history_rejects_invalid_pagination_bounds(client: AsyncClient):
     create_response = await client.post(
-        "/api/webhooks/",
+        "/v1/webhooks/",
         json={"url": "https://example.com/webhook", "events": ["*"]},
     )
     assert create_response.status_code == 201
     webhook_id = create_response.json()["id"]
 
-    negative_skip = await client.get(f"/api/webhooks/{webhook_id}/deliveries?skip=-1")
+    negative_skip = await client.get(f"/v1/webhooks/{webhook_id}/deliveries?skip=-1")
     assert negative_skip.status_code == 422
 
-    zero_limit = await client.get(f"/api/webhooks/{webhook_id}/deliveries?limit=0")
+    zero_limit = await client.get(f"/v1/webhooks/{webhook_id}/deliveries?limit=0")
     assert zero_limit.status_code == 422
 
-    oversized_limit = await client.get(f"/api/webhooks/{webhook_id}/deliveries?limit=501")
+    oversized_limit = await client.get(f"/v1/webhooks/{webhook_id}/deliveries?limit=501")
     assert oversized_limit.status_code == 422
 
 
@@ -265,7 +265,7 @@ async def test_webhook_delivery_history_supports_legacy_user_api_key_auth(
     client: AsyncClient, client_no_auth: AsyncClient, db_session, test_user
 ):
     create_response = await client.post(
-        "/api/webhooks/",
+        "/v1/webhooks/",
         json={"url": "https://example.com/webhook", "events": ["*"]},
     )
     assert create_response.status_code == 201
@@ -285,7 +285,7 @@ async def test_webhook_delivery_history_supports_legacy_user_api_key_auth(
     await db_session.commit()
 
     response = await client_no_auth.get(
-        f"/api/webhooks/{webhook_id}/deliveries",
+        f"/v1/webhooks/{webhook_id}/deliveries",
         headers={"X-API-Key": "legacy-webhook-key"},
     )
 
@@ -302,7 +302,7 @@ async def test_webhook_delivery_history_supports_managed_api_key_auth(
     access_token, _ = create_access_token(test_user.id)
 
     create_response = await client_no_auth.post(
-        "/api/webhooks/",
+        "/v1/webhooks/",
         json={"url": "https://example.com/webhook", "events": ["*"]},
         headers={"Authorization": f"Bearer {access_token}"},
     )
@@ -310,7 +310,7 @@ async def test_webhook_delivery_history_supports_managed_api_key_auth(
     webhook_id = uuid.UUID(create_response.json()["id"])
 
     key_response = await client_no_auth.post(
-        "/api/api-keys",
+        "/v1/api-keys",
         json={"name": "managed-webhook-key"},
         headers={"Authorization": f"Bearer {access_token}"},
     )
@@ -329,7 +329,7 @@ async def test_webhook_delivery_history_supports_managed_api_key_auth(
     await db_session.commit()
 
     response = await client_no_auth.get(
-        f"/api/webhooks/{webhook_id}/deliveries",
+        f"/v1/webhooks/{webhook_id}/deliveries",
         headers={"X-API-Key": managed_api_key},
     )
 
@@ -345,7 +345,7 @@ async def test_webhook_create_supports_managed_api_key_in_bearer_header(
 ):
     access_token, _ = create_access_token(test_user.id)
     key_response = await client_no_auth.post(
-        "/api/api-keys",
+        "/v1/api-keys",
         json={"name": "webhook-bearer-key"},
         headers={"Authorization": f"Bearer {access_token}"},
     )
@@ -353,7 +353,7 @@ async def test_webhook_create_supports_managed_api_key_in_bearer_header(
     managed_api_key = key_response.json()["key"]
 
     response = await client_no_auth.post(
-        "/api/webhooks/",
+        "/v1/webhooks/",
         json={"url": "https://example.com/webhook", "events": ["agent.*"]},
         headers={"Authorization": f"Bearer {managed_api_key}"},
     )
@@ -367,7 +367,7 @@ async def test_webhook_delivery_history_other_user_forbidden(
     client: AsyncClient, other_user_client: AsyncClient, db_session, test_user
 ):
     create_response = await client.post(
-        "/api/webhooks/",
+        "/v1/webhooks/",
         json={"url": "https://example.com/webhook", "events": ["*"]},
     )
     assert create_response.status_code == 201
@@ -384,5 +384,5 @@ async def test_webhook_delivery_history_other_user_forbidden(
     )
     await db_session.commit()
 
-    response = await other_user_client.get(f"/api/webhooks/{webhook_id}/deliveries")
+    response = await other_user_client.get(f"/v1/webhooks/{webhook_id}/deliveries")
     assert response.status_code == 403

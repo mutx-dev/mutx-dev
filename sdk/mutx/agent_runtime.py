@@ -153,7 +153,7 @@ class MutxAgentClient:
         }
 
         try:
-            response = await client.post("/api/agents/register", json=payload)
+            response = await client.post("/v1/agents/register", json=payload)
             response.raise_for_status()
             data = response.json()
 
@@ -204,7 +204,7 @@ class MutxAgentClient:
 
         # Verify connection with a simple request
         try:
-            response = await client.get(f"/api/agents/{agent_id}/status")
+            response = await client.get(f"/v1/agents/{agent_id}/status")
             response.raise_for_status()
             self._registered = True
             logger.info(f"Connected to agent: {self.agent_id}")
@@ -243,7 +243,7 @@ class MutxAgentClient:
         }
 
         try:
-            response = await client.post("/api/agents/heartbeat", json=payload)
+            response = await client.post("/v1/agents/heartbeat", json=payload)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPError as e:
@@ -280,7 +280,7 @@ class MutxAgentClient:
         }
 
         try:
-            response = await client.post("/api/agents/metrics", json=payload)
+            response = await client.post("/v1/agents/metrics", json=payload)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPError as e:
@@ -310,7 +310,7 @@ class MutxAgentClient:
             params["since"] = since.isoformat()
 
         try:
-            response = await client.get("/api/agents/commands", params=params)
+            response = await client.get("/v1/agents/commands", params=params)
             response.raise_for_status()
             data = response.json()
 
@@ -364,7 +364,7 @@ class MutxAgentClient:
         }
 
         try:
-            response = await client.post("/api/agents/commands/acknowledge", json=payload)
+            response = await client.post("/v1/agents/commands/acknowledge", json=payload)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPError as e:
@@ -402,7 +402,7 @@ class MutxAgentClient:
         }
 
         try:
-            response = await client.post("/api/agents/logs", json=payload)
+            response = await client.post("/v1/agents/logs", json=payload)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPError as e:
@@ -566,7 +566,7 @@ class MutxAgentSyncClient:
                 "description": description or "",
                 "metadata": metadata or {},
             }
-            response = client.post("/api/agents/register", json=payload)
+            response = client.post("/v1/agents/register", json=payload)
             response.raise_for_status()
             data = response.json()
 
@@ -598,7 +598,7 @@ class MutxAgentSyncClient:
                 "message": message,
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
-            response = client.post("/api/agents/heartbeat", json=payload)
+            response = client.post("/v1/agents/heartbeat", json=payload)
             response.raise_for_status()
             return response.json()
 
@@ -623,7 +623,7 @@ class MutxAgentSyncClient:
                 "custom": custom or {},
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
-            response = client.post("/api/agents/metrics", json=payload)
+            response = client.post("/v1/agents/metrics", json=payload)
             response.raise_for_status()
             return response.json()
 
@@ -645,7 +645,7 @@ class MutxAgentSyncClient:
                 "metadata": metadata or {},
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
-            response = client.post("/api/agents/logs", json=payload)
+            response = client.post("/v1/agents/logs", json=payload)
             response.raise_for_status()
             return response.json()
 

@@ -11,7 +11,7 @@ class TestClawHubSkillManagement:
     @pytest.mark.asyncio
     async def test_install_skill_requires_auth(self, client_no_auth: AsyncClient, test_agent):
         response = await client_no_auth.post(
-            "/api/clawhub/install",
+            "/v1/clawhub/install",
             json={"agent_id": str(test_agent.id), "skill_id": "web_search"},
         )
 
@@ -36,7 +36,7 @@ class TestClawHubSkillManagement:
         await db_session.refresh(agent)
 
         response = await other_user_client.post(
-            "/api/clawhub/install",
+            "/v1/clawhub/install",
             json={"agent_id": str(agent.id), "skill_id": "web_search"},
         )
 

@@ -22,7 +22,7 @@ class TestListAPIKeys:
     @pytest.mark.asyncio
     async def test_list_api_keys_empty(self, client: AsyncClient):
         """Test listing API keys when none exist."""
-        response = await client.get("/api/api-keys")
+        response = await client.get("/v1/api-keys")
         assert response.status_code == 200
         data = response.json()
         assert data["items"] == []
@@ -55,7 +55,7 @@ class TestListAPIKeys:
         db_session.add(newer_key)
         await db_session.commit()
 
-        response = await client.get("/api/api-keys")
+        response = await client.get("/v1/api-keys")
         assert response.status_code == 200
         data = response.json()
         assert data["total"] == 2
@@ -73,7 +73,7 @@ class TestCreateAPIKey:
     ):
         """Test creating an API key successfully."""
         response = await client.post(
-            "/api/api-keys",
+            "/v1/api-keys",
             json={
                 "name": "new-key",
                 "expires_in_days": 30,
@@ -96,7 +96,7 @@ class TestCreateAPIKey:
     async def test_create_api_key_minimal(self, client: AsyncClient):
         """Test creating an API key with minimal data."""
         response = await client.post(
-            "/api/api-keys",
+            "/v1/api-keys",
             json={"name": "minimal-key"},
         )
         assert response.status_code == 201
@@ -119,7 +119,7 @@ class TestCreateAPIKey:
             )
         await db_session.commit()
 
-        response = await client.post("/api/api-keys", json={"name": "overflow-key"})
+        response = await client.post("/v1/api-keys", json={"name": "overflow-key"})
         assert response.status_code == 409
         assert "Active API key limit reached" in response.json()["detail"]
 
@@ -140,7 +140,7 @@ class TestCreateAPIKey:
             )
         await db_session.commit()
 
-        response = await client.post("/api/api-keys", json={"name": "replacement-key"})
+        response = await client.post("/v1/api-keys", json={"name": "replacement-key"})
         assert response.status_code == 201
         assert response.json()["name"] == "replacement-key"
 
@@ -163,7 +163,7 @@ class TestRevokeAPIKey:
         db_session.add(key)
         await db_session.commit()
 
-        response = await client.delete(f"/api/api-keys/{key.id}")
+        response = await client.delete(f"/v1/api-keys/{key.id}")
         assert response.status_code == 204
 
         result = await db_session.get(APIKey, key.id)
@@ -185,7 +185,7 @@ class TestRevokeAPIKey:
         db_session.add(key)
         await db_session.commit()
 
-        response = await client.delete(f"/api/api-keys/{key.id}")
+        response = await client.delete(f"/v1/api-keys/{key.id}")
         assert response.status_code == 204
 
         result = await db_session.get(APIKey, key.id)
@@ -195,7 +195,7 @@ class TestRevokeAPIKey:
     @pytest.mark.asyncio
     async def test_revoke_api_key_not_found(self, client: AsyncClient):
         """Test revoking non-existent API key returns 404."""
-        response = await client.delete(f"/api/api-keys/{uuid.uuid4()}")
+        response = await client.delete(f"/v1/api-keys/{uuid.uuid4()}")
         assert response.status_code == 404
 
     @pytest.mark.asyncio
@@ -213,7 +213,7 @@ class TestRevokeAPIKey:
         db_session.add(key)
         await db_session.commit()
 
-        response = await client.delete(f"/api/api-keys/{key.id}")
+        response = await client.delete(f"/v1/api-keys/{key.id}")
         assert response.status_code == 404
 
 
@@ -235,7 +235,7 @@ class TestRotateAPIKey:
         db_session.add(key)
         await db_session.commit()
 
-        response = await client.post(f"/api/api-keys/{key.id}/rotate")
+        response = await client.post(f"/v1/api-keys/{key.id}/rotate")
         assert response.status_code == 200
         data = response.json()
         assert data["name"] == "to-rotate"
@@ -270,7 +270,7 @@ class TestRotateAPIKey:
         db_session.add(key)
         await db_session.commit()
 
-        response = await client.post(f"/api/api-keys/{key.id}/rotate")
+        response = await client.post(f"/v1/api-keys/{key.id}/rotate")
         assert response.status_code == 409
         assert "already revoked" in response.json()["detail"]
 
@@ -289,7 +289,7 @@ class TestRotateAPIKey:
         db_session.add(key)
         await db_session.commit()
 
-        response = await client.post(f"/api/api-keys/{key.id}/rotate")
+        response = await client.post(f"/v1/api-keys/{key.id}/rotate")
         assert response.status_code == 404
         assert response.json()["detail"] == "API key not found"
 
@@ -313,7 +313,7 @@ class TestBearerAPIKeyAuth:
         access_token, _ = create_access_token(test_user.id)
 
         create_response = await client_no_auth.post(
-            "/api/api-keys",
+            "/v1/api-keys",
             json={"name": "automation-key"},
             headers={"Authorization": f"Bearer {access_token}"},
         )
@@ -321,7 +321,7 @@ class TestBearerAPIKeyAuth:
         created_key = create_response.json()
 
         list_response = await client_no_auth.get(
-            "/api/api-keys",
+            "/v1/api-keys",
             headers={"Authorization": f"Bearer {created_key['key']}"},
         )
         assert list_response.status_code == 200
@@ -334,7 +334,7 @@ class TestBearerAPIKeyAuth:
         self, client_no_auth: AsyncClient
     ):
         response = await client_no_auth.get(
-            "/api/api-keys",
+            "/v1/api-keys",
             headers={"Authorization": "Bearer mutx_live_invalid"},
         )
 
