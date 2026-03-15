@@ -132,7 +132,7 @@ export default function DashboardPage() {
         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
           <p className="text-sm font-medium text-slate-400">Active Agents</p>
           <p className="mt-2 text-3xl font-bold text-cyan-400">
-            {agents.filter((a) => a.status === "active").length}
+            {agents.filter((a) => a.status === "running").length}
           </p>
         </div>
         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
@@ -172,7 +172,7 @@ export default function DashboardPage() {
                   <span className="text-slate-200">{agent.name}</span>
                   <span
                     className={`rounded-full px-2 py-1 text-xs font-medium ${
-                      agent.status === "active"
+                      agent.status === "running"
                         ? "bg-emerald-500/20 text-emerald-400"
                         : "bg-slate-700 text-slate-400"
                     }`}
