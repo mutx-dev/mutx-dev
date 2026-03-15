@@ -216,7 +216,10 @@ class UserService:
             current_count = result.scalar() or 0
         elif resource == "deployments":
             result = await self.session.execute(
-                select(func.count()).select_from(Deployment).where(Deployment.user_id == user_id)
+                select(func.count())
+                .select_from(Deployment)
+                .join(Agent, Deployment.agent_id == Agent.id)
+                .where(Agent.user_id == user_id)
             )
             current_count = result.scalar() or 0
         elif resource == "api_keys":
