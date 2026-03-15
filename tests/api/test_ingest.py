@@ -115,7 +115,7 @@ class TestIngestMetricsEndpoint:
             json={
                 "agent_id": str(uuid.uuid4()),
                 "cpu_usage": 50.0,
-                "memory_usage": 1024,
+                "memory_usage": 50.0,
             },
         )
         assert response.status_code == 401
@@ -128,7 +128,7 @@ class TestIngestMetricsEndpoint:
             json={
                 "agent_id": str(uuid.uuid4()),
                 "cpu_usage": 50.0,
-                "memory_usage": 1024,
+                "memory_usage": 50.0,
             },
         )
         assert response.status_code == 404

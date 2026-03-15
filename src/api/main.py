@@ -5,11 +5,18 @@ import logging
 
 from fastapi import FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
 
 from src.api.config import get_settings
 from src.api.database import dispose_engine, init_db
 from src.api.models.schemas import HealthResponse
 from src.api.middleware.security import add_security_middleware
+from src.api.exception_handlers import (
+    validation_exception_handler,
+    pydantic_validation_exception_handler,
+    generic_exception_handler,
+)
 from src.api.routes import (
     agents,
     deployments,
@@ -125,6 +132,11 @@ app.add_middleware(
 )
 
 add_security_middleware(app, settings.cors_origins)
+
+# Add custom exception handlers
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(ValidationError, pydantic_validation_exception_handler)
+app.add_exception_handler(Exception, generic_exception_handler)
 
 # Add metrics middleware
 app.middleware("http")(track_request)
