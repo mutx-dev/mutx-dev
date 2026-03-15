@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dashboard - Agents",
-  description: "View and manage your agents",
+  title: "Dashboard - MUTX",
+  description: "View and manage your agents and deployments",
 };
 
 export default function DashboardLayout({
