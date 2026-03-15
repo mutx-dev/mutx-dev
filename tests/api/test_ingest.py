@@ -106,29 +106,121 @@ class TestIngestEndpoints:
 
 class TestIngestMetricsEndpoint:
     """Tests for /ingest/metrics endpoint."""
+import uuid
+
+import pytest
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.api.models.models import Agent, AgentStatus, User
+
+
+class TestIngestAPIKeyAuth:
+    """Tests for API key authentication on ingestion endpoints."""
 
     @pytest.mark.asyncio
-    async def test_metrics_requires_auth(self, client_no_auth: AsyncClient):
-        """Test /ingest/metrics requires authentication."""
+    async def test_agent_status_update_with_api_key(
+        self, client: AsyncClient, client_no_auth: AsyncClient, db_session: AsyncSession, test_user: User
+    ):
+        """Test that an API key can be used to authenticate to /ingest/agent-status."""
+        # First create an API key (requires auth)
+        create_response = await client.post(
+            "/api/api-keys",
+            json={"name": "ingest-key"},
+        )
+        assert create_response.status_code == 201
+        api_key = create_response.json()["key"]
+
+        # Create an agent for the test user
+        agent_id = uuid.uuid4()
+        agent = Agent(
+            id=agent_id,
+            user_id=test_user.id,
+            name="Test Agent",
+            status=AgentStatus.CREATING.value,
+        )
+        db_session.add(agent)
+        await db_session.commit()
+
+        # Use the API key to authenticate (without JWT)
         response = await client_no_auth.post(
-            "/api/ingest/metrics",
+            "/api/ingest/agent-status",
             json={
-                "agent_id": str(uuid.uuid4()),
-                "cpu_usage": 50.0,
-                "memory_usage": 50.0,
+                "agent_id": str(agent_id),
+                "status": "running",
+                "node_id": "test-node",
             },
+            headers={"X-API-Key": api_key},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "updated"
+
+    @pytest.mark.asyncio
+    async def test_agent_status_update_with_invalid_api_key(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession, test_user: User
+    ):
+        """Test that an invalid API key is rejected."""
+        # Create an agent for the test user
+        agent_id = uuid.uuid4()
+        agent = Agent(
+            id=agent_id,
+            user_id=test_user.id,
+            name="Test Agent",
+            status=AgentStatus.CREATING.value,
+        )
+        db_session.add(agent)
+        await db_session.commit()
+
+        # Use an invalid API key
+        response = await client_no_auth.post(
+            "/api/ingest/agent-status",
+            json={
+                "agent_id": str(agent_id),
+                "status": "running",
+                "node_id": "test-node",
+            },
+            headers={"X-API-Key": "mutx_live_invalid_key"},
         )
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_metrics_not_found(self, client: AsyncClient, test_user: User):
-        """Test metrics returns 404 for unknown agent."""
-        response = await client.post(
-            "/api/ingest/metrics",
-            json={
-                "agent_id": str(uuid.uuid4()),
-                "cpu_usage": 50.0,
-                "memory_usage": 50.0,
-            },
+    async def test_agent_status_update_with_revoked_api_key(
+        self, client: AsyncClient, client_no_auth: AsyncClient, db_session: AsyncSession, test_user: User
+    ):
+        """Test that a revoked API key is rejected."""
+        # Create and then revoke an API key (requires auth)
+        create_response = await client.post(
+            "/api/api-keys",
+            json={"name": "revoked-key"},
         )
-        assert response.status_code == 404
+        assert create_response.status_code == 201
+        api_key = create_response.json()["key"]
+        key_id = create_response.json()["id"]
+
+        # Revoke the key
+        revoke_response = await client.delete(f"/api/api-keys/{key_id}")
+        assert revoke_response.status_code == 204
+
+        # Create an agent for the test user
+        agent_id = uuid.uuid4()
+        agent = Agent(
+            id=agent_id,
+            user_id=test_user.id,
+            name="Test Agent",
+            status=AgentStatus.CREATING.value,
+        )
+        db_session.add(agent)
+        await db_session.commit()
+
+        # Use the revoked API key
+        response = await client_no_auth.post(
+            "/api/ingest/agent-status",
+            json={
+                "agent_id": str(agent_id),
+                "status": "running",
+                "node_id": "test-node",
+            },
+            headers={"X-API-Key": api_key},
+        )
+        assert response.status_code == 401

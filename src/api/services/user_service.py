@@ -1,7 +1,7 @@
 import hashlib
 import secrets
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from passlib.exc import UnknownHashError
@@ -91,7 +91,7 @@ class UserService:
 
     async def update_user_plan(self, user_id: uuid.UUID, plan: Plan) -> User:
         await self.session.execute(
-            update(User).where(User.id == user_id).values(plan=plan, updated_at=datetime.utcnow())
+            update(User).where(User.id == user_id).values(plan=plan, updated_at=datetime.now(timezone.utc))
         )
         await self.session.commit()
         user = await self.get_user_by_id(user_id)
@@ -102,7 +102,7 @@ class UserService:
         await self.session.execute(
             update(User)
             .where(User.id == user_id)
-            .values(api_key=new_key, updated_at=datetime.utcnow())
+            .values(api_key=new_key, updated_at=datetime.now(timezone.utc))
         )
         await self.session.commit()
         return new_key
@@ -118,7 +118,7 @@ class UserService:
 
         expires_at = None
         if expires_in_days:
-            expires_at = datetime.utcnow() + timedelta(days=expires_in_days)
+            expires_at = datetime.now(timezone.utc) + timedelta(days=expires_in_days)
 
         api_key = APIKey(
             id=uuid.uuid4(),
@@ -146,7 +146,7 @@ class UserService:
 
         for api_key in api_keys:
             if verify_api_key(plain_key, api_key.key_hash):
-                if api_key.expires_at and api_key.expires_at < datetime.utcnow():
+                if api_key.expires_at and api_key.expires_at < datetime.now(timezone.utc):
                     return None
                 await self.update_api_key_last_used(api_key.id)
                 return api_key
@@ -170,7 +170,7 @@ class UserService:
 
     async def update_api_key_last_used(self, api_key_id: uuid.UUID) -> None:
         await self.session.execute(
-            update(APIKey).where(APIKey.id == api_key_id).values(last_used=datetime.utcnow())
+            update(APIKey).where(APIKey.id == api_key_id).values(last_used=datetime.now(timezone.utc))
         )
         await self.session.commit()
 
@@ -205,7 +205,7 @@ class UserService:
         result = await self.session.execute(
             update(User)
             .where(User.id == user_id)
-            .values(is_active=False, updated_at=datetime.utcnow())
+            .values(is_active=False, updated_at=datetime.now(timezone.utc))
         )
         await self.session.commit()
         return result.rowcount > 0
@@ -235,7 +235,7 @@ class UserService:
             .where(User.id == user.id)
             .values(
                 is_email_verified=True,
-                email_verified_at=datetime.utcnow(),
+                email_verified_at=datetime.now(timezone.utc),
                 email_verification_token=None,
             )
         )
@@ -256,7 +256,7 @@ class UserService:
     async def create_password_reset_token(self, user_id: uuid.UUID) -> str:
         """Create and store a password reset token."""
         token = generate_token()
-        expires_at = datetime.utcnow() + timedelta(hours=PASSWORD_RESET_TOKEN_EXPIRE_HOURS)
+        expires_at = datetime.now(timezone.utc) + timedelta(hours=PASSWORD_RESET_TOKEN_EXPIRE_HOURS)
         await self.session.execute(
             update(User)
             .where(User.id == user_id)
@@ -277,7 +277,7 @@ class UserService:
             return None
 
         # Check if token is expired
-        if user.password_reset_expires_at and user.password_reset_expires_at < datetime.utcnow():
+        if user.password_reset_expires_at and user.password_reset_expires_at < datetime.now(timezone.utc):
             return None
 
         # Update password and clear reset token

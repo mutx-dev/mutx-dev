@@ -159,12 +159,12 @@ class Agents:
         self,
         skip: int = 0,
         limit: int = 50,
-        user_id: Optional[str] = None,
+        
     ) -> list[Agent]:
         self._require_sync_client()
         response = self._client.get(
             "/agents",
-            params={"skip": skip, "limit": limit, "user_id": user_id},
+            params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
         return [Agent(data) for data in response.json()]
@@ -173,12 +173,12 @@ class Agents:
         self,
         skip: int = 0,
         limit: int = 50,
-        user_id: Optional[str] = None,
+        
     ) -> list[Agent]:
         self._require_async_client()
         response = await self._client.get(
             "/agents",
-            params={"skip": skip, "limit": limit, "user_id": user_id},
+            params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
         return [Agent(data) for data in response.json()]
