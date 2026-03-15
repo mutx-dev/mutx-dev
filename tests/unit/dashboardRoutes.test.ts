@@ -39,7 +39,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/auth/me', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api/auth/me', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -63,7 +63,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/agents?limit=20&user_id=user_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api/agents?limit=20&user_id=user_123', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -94,7 +94,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/agents?limit=20&user_id=user_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api/agents?limit=20&user_id=user_123', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -110,16 +110,24 @@ describe('dashboard route proxies', () => {
 
   it('preserves upstream forbidden responses for dashboard deployments proxy', async () => {
     getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      status: 403,
-      json: async () => ({ detail: 'Forbidden' }),
-    })
+    // Mock /auth/me (to get user id) then /deployments (returns 403)
+    ;(global.fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ id: 'user_123' }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: async () => ({ detail: 'Forbidden' }),
+      })
     const { GET } = await import('../../app/api/dashboard/deployments/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments?limit=20', {
+    // Second call is to /deployments with user_id filter
+    expect(global.fetch).toHaveBeenNthCalledWith(2, 'http://localhost:8000/deployments?limit=20&user_id=user_123', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -129,22 +137,30 @@ describe('dashboard route proxies', () => {
 
   it('preserves successful list responses for dashboard deployments proxy', async () => {
     getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ([
-        {
-          id: 'dep_123',
-          agent_id: 'agent_123',
-          status: 'running',
-        },
-      ]),
-    })
+    // Mock /auth/me (to get user id) then /deployments (returns data)
+    ;(global.fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ id: 'user_123' }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ([
+          {
+            id: 'dep_123',
+            agent_id: 'agent_123',
+            status: 'running',
+          },
+        ]),
+      })
     const { GET } = await import('../../app/api/dashboard/deployments/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments?limit=20', {
+    // Second call is to /deployments with user_id filter
+    expect(global.fetch).toHaveBeenNthCalledWith(2, 'http://localhost:8000/deployments?limit=20&user_id=user_123', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
