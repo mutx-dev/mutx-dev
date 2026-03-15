@@ -246,6 +246,14 @@ class TestStopAgent:
         response = await client.post("/api/agents/00000000-0000-0000-0000-999999999999/stop")
         assert response.status_code == 404
 
+    @pytest.mark.asyncio
+    async def test_stop_agent_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_agent
+    ):
+        """Test that users cannot stop other users' agents."""
+        response = await other_user_client.post(f"/api/agents/{test_agent.id}/stop")
+        assert response.status_code == 403
+
 
 class TestAgentLogs:
     """Tests for GET /agents/{agent_id}/logs endpoint."""
@@ -281,3 +289,17 @@ class TestAgentMetrics:
         response = await client.get(f"/api/agents/{test_agent.id}/metrics")
         assert response.status_code == 200
         assert isinstance(response.json(), list)
+
+    @pytest.mark.asyncio
+    async def test_get_agent_metrics_not_found(self, client: AsyncClient):
+        """Test getting metrics for non-existent agent returns 404."""
+        response = await client.get("/api/agents/00000000-0000-0000-0000-999999999999/metrics")
+        assert response.status_code == 404
+
+    @pytest.mark.asyncio
+    async def test_get_agent_metrics_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_agent
+    ):
+        """Test that users cannot access other users' agent metrics."""
+        response = await other_user_client.get(f"/api/agents/{test_agent.id}/metrics")
+        assert response.status_code == 403

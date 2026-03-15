@@ -9,6 +9,7 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.auth.ownership import get_owned_agent, get_owned_deployment
 from src.api.database import get_db
 from src.api.models import (
     Deployment,
@@ -34,49 +35,6 @@ from src.api.middleware.auth import get_current_user
 
 router = APIRouter(prefix="/deployments", tags=["deployments"])
 logger = logging.getLogger(__name__)
-
-
-async def _get_owned_agent(
-    agent_id: uuid.UUID,
-    db: AsyncSession,
-    current_user: User,
-    *,
-    not_found_detail: str,
-    forbidden_detail: str,
-) -> Agent:
-    result = await db.execute(select(Agent).where(Agent.id == agent_id))
-    agent = result.scalar_one_or_none()
-    if not agent:
-        raise HTTPException(status_code=404, detail=not_found_detail)
-    if agent.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail=forbidden_detail)
-    return agent
-
-
-async def _get_deployment_with_ownership(
-    deployment_id: uuid.UUID,
-    db: AsyncSession,
-    current_user: User,
-) -> Deployment:
-    """Get deployment and verify ownership through the agent."""
-    result = await db.execute(
-        select(Deployment)
-        .options(selectinload(Deployment.events))
-        .where(Deployment.id == deployment_id)
-    )
-    deployment = result.scalar_one_or_none()
-    if not deployment:
-        raise HTTPException(status_code=404, detail="Deployment not found")
-
-    await _get_owned_agent(
-        deployment.agent_id,
-        db,
-        current_user,
-        not_found_detail="Deployment not found",
-        forbidden_detail="Not authorized to access this deployment",
-    )
-
-    return deployment
 
 
 def _serialize_deployment(deployment: Deployment):
@@ -140,7 +98,7 @@ async def list_deployments(
         .limit(limit)
     )
     if agent_id:
-        await _get_owned_agent(
+        await get_owned_agent(
             agent_id,
             db,
             current_user,
@@ -161,7 +119,12 @@ async def get_deployment(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    deployment = await get_owned_deployment(
+        deployment_id,
+        db,
+        current_user,
+        include_events=True,
+    )
     return _serialize_deployment(deployment)
 
 
@@ -176,7 +139,7 @@ async def get_deployment_events(
     current_user: User = Depends(get_current_user),
 ):
     """Get paginated lifecycle events for a specific deployment."""
-    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    deployment = await get_owned_deployment(deployment_id, db, current_user)
 
     filters = [DeploymentEventModel.deployment_id == deployment.id]
     if event_type:
@@ -218,7 +181,7 @@ async def scale_deployment(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    deployment = await get_owned_deployment(deployment_id, db, current_user)
 
     if deployment.status not in ["running", "ready"]:
         raise HTTPException(status_code=400, detail="Can only scale running deployments")
@@ -236,7 +199,12 @@ async def scale_deployment(
 
     await db.commit()
     # Re-fetch to ensure events are loaded and attributes are fresh
-    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    deployment = await get_owned_deployment(
+        deployment_id,
+        db,
+        current_user,
+        include_events=True,
+    )
     logger.info(f"Scaled deployment {deployment_id} to {scale_data.replicas} replicas")
     return _serialize_deployment(deployment)
 
@@ -247,7 +215,7 @@ async def kill_deployment(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    deployment = await get_owned_deployment(deployment_id, db, current_user)
 
     deployment.status = "killed"
     deployment.ended_at = datetime.now(timezone.utc)
@@ -276,7 +244,7 @@ async def create_deployment(
     current_user: User = Depends(get_current_user),
 ):
     """Create a new deployment for an agent."""
-    agent = await _get_owned_agent(
+    agent = await get_owned_agent(
         deployment_data.agent_id,
         db,
         current_user,
@@ -315,7 +283,12 @@ async def create_deployment(
 
     await db.commit()
     # Re-fetch to ensure events are loaded and attributes are fresh
-    deployment = await _get_deployment_with_ownership(deployment.id, db, current_user)
+    deployment = await get_owned_deployment(
+        deployment.id,
+        db,
+        current_user,
+        include_events=True,
+    )
     logger.info(f"Created deployment {deployment.id} for agent {deployment_data.agent_id}")
     return _serialize_deployment(deployment)
 
@@ -327,7 +300,7 @@ async def restart_deployment(
     current_user: User = Depends(get_current_user),
 ):
     """Restart an existing deployment."""
-    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    deployment = await get_owned_deployment(deployment_id, db, current_user)
 
     # Can only restart deployments that are stopped, failed, or killed
     if deployment.status not in ["stopped", "failed", "killed"]:
@@ -358,7 +331,12 @@ async def restart_deployment(
 
     await db.commit()
     # Re-fetch to ensure events are loaded and attributes are fresh
-    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    deployment = await get_owned_deployment(
+        deployment_id,
+        db,
+        current_user,
+        include_events=True,
+    )
     logger.info(f"Restarted deployment: {deployment_id}")
     return _serialize_deployment(deployment)
 
@@ -373,7 +351,7 @@ async def get_deployment_logs(
     current_user: User = Depends(get_current_user),
 ):
     """Get logs for a specific deployment."""
-    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    deployment = await get_owned_deployment(deployment_id, db, current_user)
 
     # Query logs for the deployment's agent
     query = (
@@ -397,7 +375,7 @@ async def get_deployment_metrics(
     current_user: User = Depends(get_current_user),
 ):
     """Get metrics for a specific deployment."""
-    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    deployment = await get_owned_deployment(deployment_id, db, current_user)
 
     # Query metrics for the deployment's agent
     query = (
@@ -420,7 +398,7 @@ async def get_deployment_versions(
     current_user: User = Depends(get_current_user),
 ):
     """Get version history for a specific deployment."""
-    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    deployment = await get_owned_deployment(deployment_id, db, current_user)
 
     query = (
         select(DeploymentVersion)
@@ -446,7 +424,7 @@ async def rollback_deployment(
     current_user: User = Depends(get_current_user),
 ):
     """Rollback a deployment to a specific version."""
-    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    deployment = await get_owned_deployment(deployment_id, db, current_user)
 
     if deployment.status not in ["running", "ready", "stopped", "failed"]:
         raise HTTPException(
@@ -489,6 +467,11 @@ async def rollback_deployment(
 
     await db.commit()
 
-    deployment = await _get_deployment_with_ownership(deployment_id, db, current_user)
+    deployment = await get_owned_deployment(
+        deployment_id,
+        db,
+        current_user,
+        include_events=True,
+    )
     logger.info(f"Rolled back deployment {deployment_id} to version {rollback_data.version}")
     return _serialize_deployment(deployment)

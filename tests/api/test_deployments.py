@@ -575,3 +575,30 @@ class TestRestartDeployment:
 
         response = await other_user_client.post(f"/api/deployments/{test_deployment.id}/restart")
         assert response.status_code == 403
+
+
+class TestDeploymentVersions:
+    """Tests for GET /deployments/{deployment_id}/versions endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_versions_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_deployment
+    ):
+        """Test other users cannot read version history for deployments they do not own."""
+        response = await other_user_client.get(f"/api/deployments/{test_deployment.id}/versions")
+        assert response.status_code == 403
+
+
+class TestRollbackDeployment:
+    """Tests for POST /deployments/{deployment_id}/rollback endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_rollback_deployment_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_deployment
+    ):
+        """Test other users cannot rollback deployments they do not own."""
+        response = await other_user_client.post(
+            f"/api/deployments/{test_deployment.id}/rollback",
+            json={"version": 1},
+        )
+        assert response.status_code == 403
