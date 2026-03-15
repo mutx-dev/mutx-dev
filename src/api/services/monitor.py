@@ -26,7 +26,10 @@ def _agent_heartbeat_check(agent_id: str):
             if not last_heartbeat:
                 return False
 
-            return (datetime.now(timezone.utc).replace(tzinfo=None) - last_heartbeat) <= timedelta(
+            if last_heartbeat.tzinfo is None:
+                last_heartbeat = last_heartbeat.replace(tzinfo=timezone.utc)
+
+            return (datetime.now(timezone.utc) - last_heartbeat) <= timedelta(
                 seconds=STALE_THRESHOLD_SECONDS,
             )
 
