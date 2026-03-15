@@ -52,10 +52,14 @@ export default function DashboardPage() {
         const agentsData = await agentsRes.json();
         const deploymentsData = await deploymentsRes.json();
         
-        try {
-          const healthData = await healthRes.json();
-          setHealth(healthData);
-        } catch {
+        if (healthRes.ok) {
+          try {
+            const healthData = await healthRes.json();
+            setHealth(healthData);
+          } catch {
+            setHealth({ status: "unknown" });
+          }
+        } else {
           setHealth({ status: "unknown" });
         }
 
