@@ -19,6 +19,22 @@ groups:
           summary: "High API p95 latency"
           description: "MUTX API p95 latency is above 1s for 10 minutes."
 
+      - alert: HighApiErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{job="mutx-api",status=~"5.."}[5m]))
+            /
+            clamp_min(sum(rate(http_requests_total{job="mutx-api"}[5m])), 0.1)
+          ) > 0.05
+          and
+          sum(rate(http_requests_total{job="mutx-api"}[5m])) > 0.2
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High API 5xx error rate"
+          description: "MUTX API 5xx error rate is above 5% for 10 minutes."
+
       - alert: RedisExporterDown
         expr: up{job="redis-exporter"} == 0
         for: 5m

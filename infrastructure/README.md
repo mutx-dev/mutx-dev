@@ -73,6 +73,13 @@ The monitoring compose file binds UI and exporter ports to localhost by default.
 Stop it with `cd infrastructure && make monitor-down`.
 Prometheus now loads alerting rules from `infrastructure/monitoring/prometheus/alerts.yml` and scrapes the API via `host.docker.internal:8000` (works for local Docker Desktop + Linux host-gateway mapping). Grafana provisioning and dashboard mounts are resolved relative to `infrastructure/docker/docker-compose.monitoring.yml`, so the stack reads from `../monitoring/grafana/...` when launched from `infrastructure/`.
 
+Default monitoring URLs (when using `.env.monitoring.example` defaults):
+
+- Grafana: `http://localhost:3001`
+- Prometheus UI: `http://localhost:9090`
+- Alertmanager UI: `http://localhost:9093`
+- API metrics endpoint: `http://localhost:8000/metrics`
+
 ## CI Drift Detection
 
 A scheduled GitHub Actions workflow now checks Terraform drift daily for both `staging` and `production` using `terraform plan -detailed-exitcode`:
