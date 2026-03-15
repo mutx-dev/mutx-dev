@@ -394,3 +394,11 @@ class LeadResponse(BaseModel):
     message: Optional[str]
     source: Optional[str]
     created_at: datetime
+
+
+class APIKeyHistoryResponse(BaseModel):
+    """Paginated response for listing API keys."""
+    items: list[APIKeyResponse] = Field(default_factory=list)
+    total: int
+    skip: int
+    limit: int
