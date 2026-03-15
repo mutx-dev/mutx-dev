@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 import logging
 
@@ -65,8 +65,8 @@ async def agent_status_update(
 
     old_status = agent.status
     agent.status = status_data.status.value
-    agent.last_heartbeat = datetime.utcnow()
-    agent.updated_at = datetime.utcnow()
+    agent.last_heartbeat = datetime.now(timezone.utc)
+    agent.updated_at = datetime.now(timezone.utc)
 
     log = AgentLog(
         agent_id=agent.id,
@@ -142,14 +142,14 @@ async def deployment_event(
         db.add(error_log)
 
     if event_data.event == "stopped" or event_data.status == "stopped":
-        deployment.ended_at = datetime.utcnow()
+        deployment.ended_at = datetime.now(timezone.utc)
         if agent:
             agent.status = AgentStatus.STOPPED.value
 
     if event_data.event == "healthy" or event_data.status == "running":
         deployment.status = "running"
         if deployment.started_at is None:
-            deployment.started_at = datetime.utcnow()
+            deployment.started_at = datetime.now(timezone.utc)
 
     await db.commit()
 
@@ -177,13 +177,13 @@ async def receive_metrics(
             status_code=403, detail="Not authorized to submit metrics for this agent"
         )
 
-    agent.last_heartbeat = datetime.utcnow()
+    agent.last_heartbeat = datetime.now(timezone.utc)
     metric = AgentMetric(
         agent_id=metrics_data.agent_id,
         cpu_usage=metrics_data.cpu_usage,
         memory_usage=metrics_data.memory_usage,
     )
-    agent.last_heartbeat = datetime.utcnow()
+    agent.last_heartbeat = datetime.now(timezone.utc)
     db.add(metric)
     await db.commit()
 
@@ -195,7 +195,7 @@ async def receive_metrics(
             "agent_id": str(metrics_data.agent_id),
             "cpu_usage": metrics_data.cpu_usage,
             "memory_usage": metrics_data.memory_usage,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         },
     )
 
