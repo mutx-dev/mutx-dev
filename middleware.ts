@@ -31,6 +31,11 @@ export function middleware(request: NextRequest) {
   }
 
   const rewriteUrl = request.nextUrl.clone()
+  
+  if (pathname.startsWith('/dashboard') || pathname.startsWith('/app')) {
+    return NextResponse.next()
+  }
+  
   rewriteUrl.pathname = pathname === '/' ? '/app' : `/app${pathname}`
 
   return NextResponse.rewrite(rewriteUrl)
