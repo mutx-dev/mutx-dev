@@ -4,6 +4,7 @@ Tests for /api-keys endpoints.
 
 import hashlib
 import uuid
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from httpx import AsyncClient
@@ -300,3 +301,28 @@ class TestVerifyAPIKeyCompatibility:
         plain_key = "mutx_live_legacy_example"
         legacy_hash = hashlib.sha256(plain_key.encode()).hexdigest()
         assert verify_api_key(plain_key, legacy_hash)
+
+
+class TestAPIKeyExpirationComparison:
+    """Tests for API key expiration comparisons with naive DB timestamps."""
+
+    @pytest.mark.asyncio
+    async def test_verify_api_key_handles_naive_expiration_datetime(
+        self, db_session: AsyncSession, test_user
+    ):
+        """Naive expires_at values from DB should not crash verification."""
+        from src.api.services.user_service import UserService
+
+        service = UserService(db_session)
+        api_key, plain_key = await service.create_api_key(
+            user_id=test_user.id,
+            name="expiring-key",
+            expires_in_days=1,
+        )
+
+        api_key.expires_at = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(minutes=1)
+        await db_session.commit()
+
+        verified_key = await service.verify_api_key(plain_key, test_user.id)
+
+        assert verified_key is None

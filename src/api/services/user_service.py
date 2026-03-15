@@ -41,6 +41,13 @@ def verify_api_key(plain_key: str, hashed_key: str) -> bool:
         return False
 
 
+def as_utc_datetime(value: datetime) -> datetime:
+    """Normalize datetimes to timezone-aware UTC for safe comparisons."""
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
+
+
 class UserService:
     def __init__(self, session: AsyncSession):
         self.session = session
@@ -146,7 +153,9 @@ class UserService:
 
         for api_key in api_keys:
             if verify_api_key(plain_key, api_key.key_hash):
-                if api_key.expires_at and api_key.expires_at < datetime.now(timezone.utc):
+                if api_key.expires_at and as_utc_datetime(api_key.expires_at) < datetime.now(
+                    timezone.utc
+                ):
                     return None
                 await self.update_api_key_last_used(api_key.id)
                 return api_key
@@ -277,7 +286,9 @@ class UserService:
             return None
 
         # Check if token is expired
-        if user.password_reset_expires_at and user.password_reset_expires_at < datetime.now(timezone.utc):
+        if user.password_reset_expires_at and as_utc_datetime(
+            user.password_reset_expires_at
+        ) < datetime.now(timezone.utc):
             return None
 
         # Update password and clear reset token
