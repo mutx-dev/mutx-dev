@@ -50,6 +50,7 @@ class AgentCreate(BaseModel):
 
 class DeploymentCreate(BaseModel):
     """Request model for creating a deployment"""
+
     agent_id: uuid.UUID
     replicas: int = Field(default=1, ge=1, le=10, description="Number of replicas (1-10)")
 
@@ -149,6 +150,7 @@ class DeploymentVersionHistoryResponse(BaseModel):
 
 class DeploymentRollbackRequest(BaseModel):
     """Request model for rolling back a deployment"""
+
     version: int = Field(..., gt=0, description="Version number to rollback to")
 
 
@@ -276,9 +278,12 @@ class DeploymentEvent(BaseModel):
 
 class MetricsReportRequest(BaseModel):
     """Request model for reporting agent metrics"""
+
     agent_id: uuid.UUID
     cpu_usage: float = Field(..., ge=0.0, le=100.0, description="CPU usage percentage (0-100)")
-    memory_usage: float = Field(..., ge=0.0, le=100.0, description="Memory usage percentage (0-100)")
+    memory_usage: float = Field(
+        ..., ge=0.0, le=100.0, description="Memory usage percentage (0-100)"
+    )
 
 
 class HealthResponse(BaseModel):
@@ -318,12 +323,17 @@ class APIKeyCreateResponse(BaseModel):
 # Webhook Schemas
 class WebhookCreate(BaseModel):
     """Request model for creating a webhook"""
-    url: str = Field(..., max_length=512, min_length=1, description="The URL to receive webhook events")
+
+    url: str = Field(
+        ..., max_length=512, min_length=1, description="The URL to receive webhook events"
+    )
     events: list[str] = Field(
         default_factory=lambda: ["*"],
         description="List of events to subscribe to (e.g., 'agent.status', 'deployment.*', '*' for all)",
     )
-    secret: Optional[str] = Field(None, max_length=512, description="Optional secret for signature verification")
+    secret: Optional[str] = Field(
+        None, max_length=512, description="Optional secret for signature verification"
+    )
     is_active: bool = Field(True, description="Whether the webhook should be active immediately")
 
 
