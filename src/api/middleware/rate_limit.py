@@ -2,7 +2,7 @@
 
 import logging
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Callable
 
 from fastapi import FastAPI, Request, Response
@@ -39,7 +39,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     def _clean_old_requests(self, client_id: str) -> None:
         """Remove requests outside the current window."""
-        cutoff = datetime.utcnow() - timedelta(seconds=self.window_seconds)
+        cutoff = datetime.now(timezone.utc) - timedelta(seconds=self.window_seconds)
         self._requests[client_id] = [ts for ts in self._requests[client_id] if ts > cutoff]
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
@@ -77,7 +77,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             )
 
         # Record this request
-        self._requests[client_id].append(datetime.utcnow())
+        self._requests[client_id].append(datetime.now(timezone.utc))
 
         logger.debug(
             "Rate limit check | client=%s | count=%s | limit=%s | path=%s",
