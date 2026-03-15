@@ -39,7 +39,6 @@ class AgentRegisterRequest(BaseModel):
     name: str
     description: Optional[str] = ""
     metadata: dict[str, Any] = {}
-    metadata: dict[str, Any] = {}
     capabilities: list[str] = []
 
 
@@ -74,7 +73,6 @@ class LogRequest(BaseModel):
     agent_id: str
     level: str = "info"
     message: str
-    metadata: dict[str, Any] = {}
     metadata: dict[str, Any] = {}
     timestamp: str
 
