@@ -6,11 +6,11 @@ from typing import Optional
 
 from passlib.exc import UnknownHashError
 from passlib.context import CryptContext
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.password import hash_password, verify_password
-from src.api.models.models import User, APIKey, Plan
+from src.api.models.models import User, APIKey, Plan, Agent, Deployment
 from src.api.services.email.email_service import (
     generate_token,
     PASSWORD_RESET_TOKEN_EXPIRE_HOURS,
@@ -189,6 +189,10 @@ class UserService:
         return result.rowcount > 0
 
     async def check_plan_limits(self, user_id: uuid.UUID, resource: str) -> bool:
+        """Check if user has not exceeded their plan limits for a given resource.
+        
+        Returns True if under the limit (or unlimited), False if over the limit or user not found.
+        """
         user = await self.get_user_by_id(user_id)
         if not user:
             return False
@@ -202,8 +206,22 @@ class UserService:
 
         limit = plan_limits.get(user.plan, {}).get(resource, 0)
         if limit == -1:
-            return True
-        return True
+            return True  # Unlimited
+        
+        # Count current usage
+        if resource == "agents":
+            result = await self.session.execute(select(func.count()).select_from(Agent).where(Agent.user_id == user_id))
+            current_count = result.scalar() or 0
+        elif resource == "deployments":
+            result = await self.session.execute(select(func.count()).select_from(Deployment).where(Deployment.user_id == user_id))
+            current_count = result.scalar() or 0
+        elif resource == "api_keys":
+            result = await self.session.execute(select(func.count()).select_from(APIKey).where(APIKey.user_id == user_id, APIKey.is_active))
+            current_count = result.scalar() or 0
+        else:
+            return True  # Unknown resource, allow
+        
+        return current_count < limit
 
     async def deactivate_user(self, user_id: uuid.UUID) -> bool:
         result = await self.session.execute(
