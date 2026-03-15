@@ -10,6 +10,28 @@ from src.api.models.models import User
 from src.api.services.user_service import UserService
 
 
+async def _resolve_user_from_bearer_token(
+    token: str,
+    session: AsyncSession,
+    *,
+    user_service: UserService | None = None,
+) -> Optional[User]:
+    """Resolve an active user from a bearer token (JWT first, then API key fallback)."""
+    service = user_service or UserService(session)
+
+    user_id = verify_access_token(token)
+    if user_id:
+        user = await service.get_user_by_id(user_id)
+        if user and user.is_active:
+            return user
+
+    user = await service.get_user_for_api_key(token)
+    if user and user.is_active:
+        return user
+
+    return None
+
+
 async def get_current_user(
     authorization: Optional[str] = Header(None),
     session: AsyncSession = Depends(get_db),
@@ -30,20 +52,12 @@ async def get_current_user(
         )
 
     token = parts[1]
-    user_id = verify_access_token(token)
-    if not user_id:
+    user_service = UserService(session)
+    user = await _resolve_user_from_bearer_token(token, session, user_service=user_service)
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    user_service = UserService(session)
-    user = await user_service.get_user_by_id(user_id)
-    if not user or not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found or inactive",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -62,16 +76,8 @@ async def get_current_user_optional(
         return None
 
     token = parts[1]
-    user_id = verify_access_token(token)
-    if not user_id:
-        return None
-
     user_service = UserService(session)
-    user = await user_service.get_user_by_id(user_id)
-    if not user or not user.is_active:
-        return None
-
-    return user
+    return await _resolve_user_from_bearer_token(token, session, user_service=user_service)
 
 
 async def get_api_key_user(
@@ -104,21 +110,19 @@ async def get_current_user_or_api_key(
     session: AsyncSession = Depends(get_db),
 ) -> User:
     """Authenticate using either JWT Bearer token or API key."""
-    # Try JWT first
+    user_service = UserService(session)
+
+    # Try Authorization header first (JWT or API key in Bearer token)
     if authorization:
         parts = authorization.split()
         if len(parts) == 2 and parts[0].lower() == "bearer":
             token = parts[1]
-            user_id = verify_access_token(token)
-            if user_id:
-                user_service = UserService(session)
-                user = await user_service.get_user_by_id(user_id)
-                if user and user.is_active:
-                    return user
+            user = await _resolve_user_from_bearer_token(token, session, user_service=user_service)
+            if user:
+                return user
 
-    # Try API key
+    # Try explicit API key header
     if x_api_key:
-        user_service = UserService(session)
         user = await user_service.get_user_for_api_key(x_api_key)
         if user:
             return user
