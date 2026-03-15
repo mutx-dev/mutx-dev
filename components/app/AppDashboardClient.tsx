@@ -895,9 +895,15 @@ export function AppDashboardClient() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {summary.map(({ label, value, detail, icon: Icon }) => {
-          const dataKey = label.toLowerCase() as 'health' | 'agents' | 'deployments' | 'api keys';
-          const isLoading = dataKey === 'api keys' ? loadingData.apiKeys : loadingData[dataKey];
-          const error = dataKey === 'api keys' ? dataErrors.apiKeys : dataErrors[dataKey];
+          const dataKeyMap: Record<string, 'health' | 'agents' | 'deployments' | 'apiKeys'> = {
+            'Agents': 'agents',
+            'Deployments': 'deployments',
+            'API Keys': 'apiKeys',
+            'Health': 'health',
+          };
+          const dataKey = dataKeyMap[label] || 'health';
+          const isLoading = loadingData[dataKey];
+          const error = dataErrors[dataKey];
 
           return (
           <Card
@@ -1440,7 +1446,17 @@ export function AppDashboardClient() {
             </div>
 
             <div className="space-y-2 max-h-[340px] overflow-y-auto pr-2 custom-scrollbar">
-              {apiKeys.length ? (
+              {loadingData.apiKeys ? (
+                <div className="flex items-center justify-center gap-2 py-8 text-slate-500">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading API keys...
+                </div>
+              ) : dataErrors.apiKeys ? (
+                <div className="flex items-center justify-center gap-2 py-8 text-rose-400">
+                  <AlertTriangle className="h-4 w-4" />
+                  {dataErrors.apiKeys}
+                </div>
+              ) : apiKeys.length ? (
                 apiKeys.map((apiKey) => {
                   const lastUsedRelative = apiKey.last_used ? formatRelativeDate(apiKey.last_used) : "Never used";
                   const expiresRelative = apiKey.expires_at ? formatRelativeDate(apiKey.expires_at) : "No expiry";
