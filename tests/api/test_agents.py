@@ -18,7 +18,7 @@ class TestCreateAgent:
     async def test_create_agent_success(self, client: AsyncClient, test_user):
         """Test creating an agent successfully."""
         response = await client.post(
-            "/api/agents",
+            "/v1/agents",
             json={
                 "name": "new-agent",
                 "description": "A new test agent",
@@ -46,7 +46,7 @@ class TestCreateAgent:
     async def test_create_agent_invalid_config(self, client: AsyncClient):
         """Test creating an agent with invalid config schema."""
         response = await client.post(
-            "/api/agents",
+            "/v1/agents",
             json={
                 "name": "invalid-config-agent",
                 "type": "openai",
@@ -60,7 +60,7 @@ class TestCreateAgent:
     async def test_create_agent_with_minimal_data(self, client: AsyncClient):
         """Test creating an agent with minimal data."""
         response = await client.post(
-            "/api/agents",
+            "/v1/agents",
             json={
                 "name": "minimal-agent",
             },
@@ -78,14 +78,14 @@ class TestListAgents:
     @pytest.mark.asyncio
     async def test_list_agents_empty(self, client: AsyncClient):
         """Test listing agents when none exist."""
-        response = await client.get("/api/agents")
+        response = await client.get("/v1/agents")
         assert response.status_code == 200
         assert response.json() == []
 
     @pytest.mark.asyncio
     async def test_list_agents_with_data(self, client: AsyncClient, test_agent):
         """Test listing agents returns user's agents."""
-        response = await client.get("/api/agents")
+        response = await client.get("/v1/agents")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 1
@@ -108,7 +108,7 @@ class TestListAgents:
             db_session.add(agent)
         await db_session.commit()
 
-        response = await client.get("/api/agents?limit=2")
+        response = await client.get("/v1/agents?limit=2")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 2
@@ -119,15 +119,15 @@ class TestListAgents:
     ):
         """Test listing agents always uses the authenticated user scope."""
         # Test user can see their own agents
-        response = await client.get("/api/agents")
+        response = await client.get("/v1/agents")
         assert len(response.json()) == 1
 
         # Other user sees empty list
-        response = await other_user_client.get("/api/agents")
+        response = await other_user_client.get("/v1/agents")
         assert len(response.json()) == 0
 
         # Supplying user_id in query must not expand access scope
-        response = await other_user_client.get(f"/api/agents?user_id={test_agent.user_id}")
+        response = await other_user_client.get(f"/v1/agents?user_id={test_agent.user_id}")
         assert response.status_code == 200
         assert response.json() == []
 
@@ -137,14 +137,14 @@ class TestAgentAuthorization:
 
     @pytest.mark.asyncio
     async def test_list_agents_requires_authentication(self, client_no_auth: AsyncClient):
-        response = await client_no_auth.get("/api/agents")
+        response = await client_no_auth.get("/v1/agents")
         assert response.status_code == 401
 
     @pytest.mark.asyncio
     async def test_get_agent_requires_authentication(
         self, client_no_auth: AsyncClient, test_agent
     ):
-        response = await client_no_auth.get(f"/api/agents/{test_agent.id}")
+        response = await client_no_auth.get(f"/v1/agents/{test_agent.id}")
         assert response.status_code == 401
 
 
@@ -154,7 +154,7 @@ class TestGetAgent:
     @pytest.mark.asyncio
     async def test_get_agent_success(self, client: AsyncClient, test_agent):
         """Test getting a specific agent."""
-        response = await client.get(f"/api/agents/{test_agent.id}")
+        response = await client.get(f"/v1/agents/{test_agent.id}")
         assert response.status_code == 200
         data = response.json()
         assert data["id"] == str(test_agent.id)
@@ -163,7 +163,7 @@ class TestGetAgent:
     @pytest.mark.asyncio
     async def test_get_agent_not_found(self, client: AsyncClient):
         """Test getting non-existent agent returns 404."""
-        response = await client.get("/api/agents/00000000-0000-0000-0000-999999999999")
+        response = await client.get("/v1/agents/00000000-0000-0000-0000-999999999999")
         assert response.status_code == 404
 
     @pytest.mark.asyncio
@@ -171,7 +171,7 @@ class TestGetAgent:
         self, client: AsyncClient, test_agent, other_user_client: AsyncClient
     ):
         """Test that users cannot access other users' agents."""
-        response = await other_user_client.get(f"/api/agents/{test_agent.id}")
+        response = await other_user_client.get(f"/v1/agents/{test_agent.id}")
         assert response.status_code == 403
 
 
@@ -195,13 +195,13 @@ class TestDeleteAgent:
         await db_session.commit()
         await db_session.refresh(agent)
 
-        response = await client.delete(f"/api/agents/{agent.id}")
+        response = await client.delete(f"/v1/agents/{agent.id}")
         assert response.status_code == 204
 
     @pytest.mark.asyncio
     async def test_delete_agent_not_found(self, client: AsyncClient):
         """Test deleting non-existent agent returns 404."""
-        response = await client.delete("/api/agents/00000000-0000-0000-0000-999999999999")
+        response = await client.delete("/v1/agents/00000000-0000-0000-0000-999999999999")
         assert response.status_code == 404
 
     @pytest.mark.asyncio
@@ -209,7 +209,7 @@ class TestDeleteAgent:
         self, client: AsyncClient, test_agent, other_user_client: AsyncClient
     ):
         """Test that users cannot delete other users' agents."""
-        response = await other_user_client.delete(f"/api/agents/{test_agent.id}")
+        response = await other_user_client.delete(f"/v1/agents/{test_agent.id}")
         assert response.status_code == 403
 
 
@@ -218,7 +218,7 @@ class TestAgentConfig:
 
     @pytest.mark.asyncio
     async def test_get_agent_config_success(self, client: AsyncClient, test_agent):
-        response = await client.get(f"/api/agents/{test_agent.id}/config")
+        response = await client.get(f"/v1/agents/{test_agent.id}/config")
         assert response.status_code == 200
 
         data = response.json()
@@ -231,7 +231,7 @@ class TestAgentConfig:
     @pytest.mark.asyncio
     async def test_update_agent_config_success(self, client: AsyncClient, test_agent):
         response = await client.patch(
-            f"/api/agents/{test_agent.id}/config",
+            f"/v1/agents/{test_agent.id}/config",
             json={"config": {"model": "gpt-4o-mini", "temperature": 0.2, "max_tokens": 256}},
         )
         assert response.status_code == 200
@@ -247,7 +247,7 @@ class TestAgentConfig:
     @pytest.mark.asyncio
     async def test_update_agent_config_accepts_json_string(self, client: AsyncClient, test_agent):
         response = await client.patch(
-            f"/api/agents/{test_agent.id}/config",
+            f"/v1/agents/{test_agent.id}/config",
             json={"config": json.dumps({"model": "gpt-4o", "temperature": 0.1})},
         )
         assert response.status_code == 200
@@ -260,7 +260,7 @@ class TestAgentConfig:
     @pytest.mark.asyncio
     async def test_update_agent_config_invalid_config(self, client: AsyncClient, test_agent):
         response = await client.patch(
-            f"/api/agents/{test_agent.id}/config",
+            f"/v1/agents/{test_agent.id}/config",
             json={"config": {"model": "gpt-4o", "temperature": 3.5}},
         )
         assert response.status_code == 400
@@ -271,7 +271,7 @@ class TestAgentConfig:
         self, other_user_client: AsyncClient, test_agent
     ):
         response = await other_user_client.patch(
-            f"/api/agents/{test_agent.id}/config",
+            f"/v1/agents/{test_agent.id}/config",
             json={"config": {"model": "gpt-4o", "temperature": 0.3}},
         )
         assert response.status_code == 403
@@ -285,7 +285,7 @@ class TestDeployAgent:
         self, client: AsyncClient, test_agent, db_session: AsyncSession
     ):
         """Test deploying an agent."""
-        response = await client.post(f"/api/agents/{test_agent.id}/deploy")
+        response = await client.post(f"/v1/agents/{test_agent.id}/deploy")
         assert response.status_code == 200
         data = response.json()
         assert "deployment_id" in data
@@ -298,7 +298,7 @@ class TestDeployAgent:
     @pytest.mark.asyncio
     async def test_deploy_agent_not_found(self, client: AsyncClient):
         """Test deploying non-existent agent returns 404."""
-        response = await client.post("/api/agents/00000000-0000-0000-0000-999999999999/deploy")
+        response = await client.post("/v1/agents/00000000-0000-0000-0000-999999999999/deploy")
         assert response.status_code == 404
 
     @pytest.mark.asyncio
@@ -306,7 +306,7 @@ class TestDeployAgent:
         self, client: AsyncClient, test_agent, other_user_client: AsyncClient
     ):
         """Test that users cannot deploy other users' agents."""
-        response = await other_user_client.post(f"/api/agents/{test_agent.id}/deploy")
+        response = await other_user_client.post(f"/v1/agents/{test_agent.id}/deploy")
         assert response.status_code == 403
 
 
@@ -323,7 +323,7 @@ class TestStopAgent:
         test_deployment.status = "running"
         await db_session.commit()
 
-        response = await client.post(f"/api/agents/{test_agent.id}/stop")
+        response = await client.post(f"/v1/agents/{test_agent.id}/stop")
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "stopped"
@@ -331,7 +331,7 @@ class TestStopAgent:
     @pytest.mark.asyncio
     async def test_stop_agent_not_found(self, client: AsyncClient):
         """Test stopping non-existent agent returns 404."""
-        response = await client.post("/api/agents/00000000-0000-0000-0000-999999999999/stop")
+        response = await client.post("/v1/agents/00000000-0000-0000-0000-999999999999/stop")
         assert response.status_code == 404
 
     @pytest.mark.asyncio
@@ -339,7 +339,7 @@ class TestStopAgent:
         self, other_user_client: AsyncClient, test_agent
     ):
         """Test that users cannot stop other users' agents."""
-        response = await other_user_client.post(f"/api/agents/{test_agent.id}/stop")
+        response = await other_user_client.post(f"/v1/agents/{test_agent.id}/stop")
         assert response.status_code == 403
 
 
@@ -349,14 +349,14 @@ class TestAgentLogs:
     @pytest.mark.asyncio
     async def test_get_agent_logs_success(self, client: AsyncClient, test_agent):
         """Test getting agent logs."""
-        response = await client.get(f"/api/agents/{test_agent.id}/logs")
+        response = await client.get(f"/v1/agents/{test_agent.id}/logs")
         assert response.status_code == 200
         assert isinstance(response.json(), list)
 
     @pytest.mark.asyncio
     async def test_get_agent_logs_not_found(self, client: AsyncClient):
         """Test getting logs for non-existent agent returns 404."""
-        response = await client.get("/api/agents/00000000-0000-0000-0000-999999999999/logs")
+        response = await client.get("/v1/agents/00000000-0000-0000-0000-999999999999/logs")
         assert response.status_code == 404
 
     @pytest.mark.asyncio
@@ -364,7 +364,7 @@ class TestAgentLogs:
         self, client: AsyncClient, test_agent, other_user_client: AsyncClient
     ):
         """Test that users cannot access other users' agent logs."""
-        response = await other_user_client.get(f"/api/agents/{test_agent.id}/logs")
+        response = await other_user_client.get(f"/v1/agents/{test_agent.id}/logs")
         assert response.status_code == 403
 
 
@@ -374,14 +374,14 @@ class TestAgentMetrics:
     @pytest.mark.asyncio
     async def test_get_agent_metrics_success(self, client: AsyncClient, test_agent):
         """Test getting agent metrics."""
-        response = await client.get(f"/api/agents/{test_agent.id}/metrics")
+        response = await client.get(f"/v1/agents/{test_agent.id}/metrics")
         assert response.status_code == 200
         assert isinstance(response.json(), list)
 
     @pytest.mark.asyncio
     async def test_get_agent_metrics_not_found(self, client: AsyncClient):
         """Test getting metrics for non-existent agent returns 404."""
-        response = await client.get("/api/agents/00000000-0000-0000-0000-999999999999/metrics")
+        response = await client.get("/v1/agents/00000000-0000-0000-0000-999999999999/metrics")
         assert response.status_code == 404
 
     @pytest.mark.asyncio
@@ -389,5 +389,5 @@ class TestAgentMetrics:
         self, other_user_client: AsyncClient, test_agent
     ):
         """Test that users cannot access other users' agent metrics."""
-        response = await other_user_client.get(f"/api/agents/{test_agent.id}/metrics")
+        response = await other_user_client.get(f"/v1/agents/{test_agent.id}/metrics")
         assert response.status_code == 403

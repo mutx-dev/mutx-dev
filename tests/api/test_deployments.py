@@ -23,7 +23,7 @@ class TestListDeployments:
     @pytest.mark.asyncio
     async def test_list_deployments_empty(self, client: AsyncClient):
         """Test listing deployments when none exist."""
-        response = await client.get("/api/deployments")
+        response = await client.get("/v1/deployments")
         assert response.status_code == 200
         assert response.json() == []
     
@@ -32,7 +32,7 @@ class TestListDeployments:
         self, client: AsyncClient, test_deployment
     ):
         """Test listing deployments returns all."""
-        response = await client.get("/api/deployments")
+        response = await client.get("/v1/deployments")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 1
@@ -53,7 +53,7 @@ class TestListDeployments:
             db_session.add(deployment)
         await db_session.commit()
         
-        response = await client.get("/api/deployments?limit=2")
+        response = await client.get("/v1/deployments?limit=2")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 2
@@ -84,7 +84,7 @@ class TestListDeployments:
         await db_session.commit()
         
         # Filter by agent_id
-        response = await client.get(f"/api/deployments?agent_id={test_agent.id}")
+        response = await client.get(f"/v1/deployments?agent_id={test_agent.id}")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 1
@@ -95,7 +95,7 @@ class TestListDeployments:
         self, other_user_client: AsyncClient, test_agent
     ):
         """Test filtering by another user's agent is forbidden."""
-        response = await other_user_client.get(f"/api/deployments?agent_id={test_agent.id}")
+        response = await other_user_client.get(f"/v1/deployments?agent_id={test_agent.id}")
         assert response.status_code == 403
     
     @pytest.mark.asyncio
@@ -113,7 +113,7 @@ class TestListDeployments:
         await db_session.commit()
         
         # Filter by status
-        response = await client.get("/api/deployments?status=running")
+        response = await client.get("/v1/deployments?status=running")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 1
@@ -128,7 +128,7 @@ class TestGetDeployment:
         self, client: AsyncClient, test_deployment
     ):
         """Test getting a specific deployment."""
-        response = await client.get(f"/api/deployments/{test_deployment.id}")
+        response = await client.get(f"/v1/deployments/{test_deployment.id}")
         assert response.status_code == 200
         data = response.json()
         assert data["id"] == str(test_deployment.id)
@@ -138,7 +138,7 @@ class TestGetDeployment:
     async def test_get_deployment_not_found(self, client: AsyncClient):
         """Test getting non-existent deployment returns 404."""
         response = await client.get(
-            "/api/deployments/00000000-0000-0000-0000-999999999999"
+            "/v1/deployments/00000000-0000-0000-0000-999999999999"
         )
         assert response.status_code == 404
 
@@ -147,7 +147,7 @@ class TestGetDeployment:
         self, other_user_client: AsyncClient, test_deployment
     ):
         """Test other users cannot read deployments they do not own."""
-        response = await other_user_client.get(f"/api/deployments/{test_deployment.id}")
+        response = await other_user_client.get(f"/v1/deployments/{test_deployment.id}")
         assert response.status_code == 403
 
 
@@ -160,7 +160,7 @@ class TestScaleDeployment:
     ):
         """Test scaling a deployment."""
         response = await client.post(
-            f"/api/deployments/{test_deployment.id}/scale",
+            f"/v1/deployments/{test_deployment.id}/scale",
             json={"replicas": 5},
         )
         assert response.status_code == 200
@@ -171,7 +171,7 @@ class TestScaleDeployment:
     async def test_scale_deployment_not_found(self, client: AsyncClient):
         """Test scaling non-existent deployment returns 404."""
         response = await client.post(
-            "/api/deployments/00000000-0000-0000-0000-999999999999/scale",
+            "/v1/deployments/00000000-0000-0000-0000-999999999999/scale",
             json={"replicas": 5},
         )
         assert response.status_code == 404
@@ -186,7 +186,7 @@ class TestScaleDeployment:
         await db_session.commit()
         
         response = await client.post(
-            f"/api/deployments/{test_deployment.id}/scale",
+            f"/v1/deployments/{test_deployment.id}/scale",
             json={"replicas": 5},
         )
         assert response.status_code == 400
@@ -197,7 +197,7 @@ class TestScaleDeployment:
     ):
         """Test other users cannot scale deployments they do not own."""
         response = await other_user_client.post(
-            f"/api/deployments/{test_deployment.id}/scale",
+            f"/v1/deployments/{test_deployment.id}/scale",
             json={"replicas": 5},
         )
         assert response.status_code == 403
@@ -219,7 +219,7 @@ class TestDeploymentEvents:
         db_session.add(event)
         await db_session.commit()
 
-        response = await client.get(f"/api/deployments/{test_deployment.id}/events")
+        response = await client.get(f"/v1/deployments/{test_deployment.id}/events")
         assert response.status_code == 200
         data = response.json()
         assert data["deployment_id"] == str(test_deployment.id)
@@ -250,7 +250,7 @@ class TestDeploymentEvents:
         )
         await db_session.commit()
 
-        response = await client.get(f"/api/deployments/{test_deployment.id}/events?event_type=restart")
+        response = await client.get(f"/v1/deployments/{test_deployment.id}/events?event_type=restart")
         assert response.status_code == 200
         data = response.json()
         assert data["deployment_id"] == str(test_deployment.id)
@@ -287,7 +287,7 @@ class TestDeploymentEvents:
         await db_session.commit()
 
         response = await client.get(
-            f"/api/deployments/{test_deployment.id}/events?status=failed&limit=1"
+            f"/v1/deployments/{test_deployment.id}/events?status=failed&limit=1"
         )
         assert response.status_code == 200
         data = response.json()
@@ -304,7 +304,7 @@ class TestDeploymentEvents:
     async def test_get_deployment_events_empty_history_returns_metadata(
         self, client: AsyncClient, test_deployment
     ):
-        response = await client.get(f"/api/deployments/{test_deployment.id}/events")
+        response = await client.get(f"/v1/deployments/{test_deployment.id}/events")
         assert response.status_code == 200
 
         data = response.json()
@@ -323,7 +323,7 @@ class TestDeploymentEvents:
     async def test_get_deployment_events_other_user_forbidden(
         self, other_user_client: AsyncClient, test_deployment
     ):
-        response = await other_user_client.get(f"/api/deployments/{test_deployment.id}/events")
+        response = await other_user_client.get(f"/v1/deployments/{test_deployment.id}/events")
         assert response.status_code == 403
 
 
@@ -352,7 +352,7 @@ class TestDeploymentLogs:
         )
         await db_session.commit()
 
-        response = await client.get(f"/api/deployments/{test_deployment.id}/logs?level=ERROR&limit=10")
+        response = await client.get(f"/v1/deployments/{test_deployment.id}/logs?level=ERROR&limit=10")
         assert response.status_code == 200
 
         data = response.json()
@@ -365,7 +365,7 @@ class TestDeploymentLogs:
     async def test_get_deployment_logs_other_user_forbidden(
         self, other_user_client: AsyncClient, test_deployment
     ):
-        response = await other_user_client.get(f"/api/deployments/{test_deployment.id}/logs")
+        response = await other_user_client.get(f"/v1/deployments/{test_deployment.id}/logs")
         assert response.status_code == 403
 
 
@@ -394,7 +394,7 @@ class TestDeploymentMetrics:
         )
         await db_session.commit()
 
-        response = await client.get(f"/api/deployments/{test_deployment.id}/metrics?limit=10")
+        response = await client.get(f"/v1/deployments/{test_deployment.id}/metrics?limit=10")
         assert response.status_code == 200
 
         data = response.json()
@@ -407,7 +407,7 @@ class TestDeploymentMetrics:
     async def test_get_deployment_metrics_other_user_forbidden(
         self, other_user_client: AsyncClient, test_deployment
     ):
-        response = await other_user_client.get(f"/api/deployments/{test_deployment.id}/metrics")
+        response = await other_user_client.get(f"/v1/deployments/{test_deployment.id}/metrics")
         assert response.status_code == 403
 
 
@@ -419,7 +419,7 @@ class TestKillDeployment:
         self, client: AsyncClient, test_deployment, db_session: AsyncSession
     ):
         """Test killing a deployment."""
-        response = await client.delete(f"/api/deployments/{test_deployment.id}")
+        response = await client.delete(f"/v1/deployments/{test_deployment.id}")
         assert response.status_code == 204
         
         # Verify deployment status changed
@@ -431,7 +431,7 @@ class TestKillDeployment:
     async def test_kill_deployment_not_found(self, client: AsyncClient):
         """Test killing non-existent deployment returns 404."""
         response = await client.delete(
-            "/api/deployments/00000000-0000-0000-0000-999999999999"
+            "/v1/deployments/00000000-0000-0000-0000-999999999999"
         )
         assert response.status_code == 404
 
@@ -440,7 +440,7 @@ class TestKillDeployment:
         self, other_user_client: AsyncClient, test_deployment
     ):
         """Test other users cannot kill deployments they do not own."""
-        response = await other_user_client.delete(f"/api/deployments/{test_deployment.id}")
+        response = await other_user_client.delete(f"/v1/deployments/{test_deployment.id}")
         assert response.status_code == 403
     
     @pytest.mark.asyncio
@@ -457,7 +457,7 @@ class TestKillDeployment:
         test_deployment.status = "running"
         await db_session.commit()
         
-        response = await client.delete(f"/api/deployments/{test_deployment.id}")
+        response = await client.delete(f"/v1/deployments/{test_deployment.id}")
         assert response.status_code == 204
         
         # Verify agent status changed
@@ -474,7 +474,7 @@ class TestCreateDeployment:
     ):
         """Test other users cannot deploy agents they do not own."""
         response = await other_user_client.post(
-            "/api/deployments",
+            "/v1/deployments",
             json={"agent_id": str(test_agent.id), "replicas": 1},
         )
         assert response.status_code == 403
@@ -491,7 +491,7 @@ class TestCreateDeployment:
         await db_session.commit()
 
         response = await client.post(
-            "/api/deployments",
+            "/v1/deployments",
             json={"agent_id": str(test_agent.id), "replicas": 3},
         )
 
@@ -517,7 +517,7 @@ class TestCreateDeployment:
         await db_session.commit()
 
         response = await client.post(
-            "/api/deployments",
+            "/v1/deployments",
             json={"agent_id": str(test_agent.id), "replicas": 1},
         )
 
@@ -538,7 +538,7 @@ class TestRestartDeployment:
         test_agent.status = AgentStatus.STOPPED.value
         await db_session.commit()
 
-        response = await client.post(f"/api/deployments/{test_deployment.id}/restart")
+        response = await client.post(f"/v1/deployments/{test_deployment.id}/restart")
         assert response.status_code == 200
 
         data = response.json()
@@ -547,7 +547,7 @@ class TestRestartDeployment:
         assert data["ended_at"] is None
         assert data["error_message"] is None
 
-        events_response = await client.get(f"/api/deployments/{test_deployment.id}/events?event_type=restart")
+        events_response = await client.get(f"/v1/deployments/{test_deployment.id}/events?event_type=restart")
         assert events_response.status_code == 200
         events_data = events_response.json()
         assert events_data["total"] == 1
@@ -562,7 +562,7 @@ class TestRestartDeployment:
         self, client: AsyncClient, test_deployment
     ):
         """Running deployments cannot be restarted via the restart contract."""
-        response = await client.post(f"/api/deployments/{test_deployment.id}/restart")
+        response = await client.post(f"/v1/deployments/{test_deployment.id}/restart")
         assert response.status_code == 400
         assert "Cannot restart deployment with status 'running'" in response.json()["detail"]
 
@@ -574,7 +574,7 @@ class TestRestartDeployment:
         test_deployment.status = "stopped"
         await db_session.commit()
 
-        response = await other_user_client.post(f"/api/deployments/{test_deployment.id}/restart")
+        response = await other_user_client.post(f"/v1/deployments/{test_deployment.id}/restart")
         assert response.status_code == 403
 
 
@@ -609,7 +609,7 @@ class TestRollbackDeployment:
         await db_session.commit()
 
         response = await client.post(
-            f"/api/deployments/{test_deployment.id}/rollback",
+            f"/v1/deployments/{test_deployment.id}/rollback",
             json={"version": 1},
         )
 

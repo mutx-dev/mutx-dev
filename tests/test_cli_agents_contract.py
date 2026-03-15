@@ -73,7 +73,7 @@ def test_agents_create_hits_canonical_route_and_renders_agent(monkeypatch) -> No
 
     assert result.exit_code == 0
     assert captured == {
-        "path": "/api/agents",
+        "path": "/v1/agents",
         "json": {
             "name": "test-agent",
             "description": "A test agent",
@@ -114,7 +114,7 @@ def test_agents_create_with_minimal_args(monkeypatch) -> None:
     result = runner.invoke(cli, ["agents", "create", "-n", "minimal-agent"])
 
     assert result.exit_code == 0
-    assert captured["path"] == "/api/agents"
+    assert captured["path"] == "/v1/agents"
     assert captured["json"]["name"] == "minimal-agent"
     assert captured["json"]["description"] == ""
     assert captured["json"]["type"] == "openai"
@@ -157,7 +157,7 @@ def test_agents_deploy_hits_contract_route_and_renders_deployment(monkeypatch) -
 
     assert result.exit_code == 0
     assert captured == {
-        "path": f"/api/agents/{agent_id}/deploy",
+        "path": f"/v1/agents/{agent_id}/deploy",
         "json": None,
     }
     assert f"Deploying agent: {agent_id}" in result.output
@@ -197,7 +197,7 @@ def test_agents_list_hits_canonical_route_and_renders_agents(monkeypatch) -> Non
     result = runner.invoke(cli, ["agents", "list"])
 
     assert result.exit_code == 0
-    assert captured["path"] == "/api/agents"
+    assert captured["path"] == "/v1/agents"
     assert captured["params"] == {"limit": 50, "skip": 0}
     assert agent_id in result.output
     assert "test-agent-1" in result.output
@@ -250,7 +250,7 @@ def test_agents_status_hits_canonical_route_and_renders_agent(monkeypatch) -> No
     result = runner.invoke(cli, ["agents", "status", agent_id])
 
     assert result.exit_code == 0
-    assert captured["path"] == f"/api/agents/{agent_id}"
+    assert captured["path"] == f"/v1/agents/{agent_id}"
     assert f"Agent ID: {agent_id}" in result.output
     assert "Name: test-agent" in result.output
     assert "Description: A test agent" in result.output
@@ -289,7 +289,7 @@ def test_agents_logs_hits_canonical_route_and_renders_logs(monkeypatch) -> None:
     result = runner.invoke(cli, ["agents", "logs", agent_id])
 
     assert result.exit_code == 0
-    assert captured["path"] == f"/api/agents/{agent_id}/logs"
+    assert captured["path"] == f"/v1/agents/{agent_id}/logs"
     assert captured["params"] == {"limit": 100}
     assert "Agent started" in result.output
     assert "WARNING" in result.output
@@ -332,7 +332,7 @@ def test_agents_delete_hits_canonical_route(monkeypatch) -> None:
     result = runner.invoke(cli, ["agents", "delete", agent_id, "--force"])
 
     assert result.exit_code == 0
-    assert captured["path"] == f"/api/agents/{agent_id}"
+    assert captured["path"] == f"/v1/agents/{agent_id}"
     assert f"Deleted agent: {agent_id}" in result.output
 
 

@@ -16,7 +16,7 @@ class TestAuthEndpoints:
     async def test_register_success(self, client_no_auth: AsyncClient):
         """Test user registration."""
         response = await client_no_auth.post(
-            "/api/auth/register",
+            "/v1/auth/register",
             json={
                 "email": "newuser@example.com",
                 "password": "StrongPassword123!",
@@ -45,7 +45,7 @@ class TestAuthEndpoints:
         await db_session.commit()
         
         response = await client_no_auth.post(
-            "/api/auth/login",
+            "/v1/auth/login",
             json={
                 "email": "login@example.com",
                 "password": "StrongPassword123!",
@@ -59,7 +59,7 @@ class TestAuthEndpoints:
     @pytest.mark.asyncio
     async def test_me_endpoint(self, client: AsyncClient, test_user):
         """Test the /me endpoint."""
-        response = await client.get("/api/auth/me")
+        response = await client.get("/v1/auth/me")
         assert response.status_code == 200
         data = response.json()
         assert data["email"] == test_user.email
@@ -83,7 +83,7 @@ class TestAuthEndpoints:
         
         # Try to register with same email
         response = await client_no_auth.post(
-            "/api/auth/register",
+            "/v1/auth/register",
             json={
                 "email": "duplicate@example.com",
                 "password": "StrongPassword123!",
@@ -109,7 +109,7 @@ class TestAuthEndpoints:
         await db_session.commit()
         
         response = await client_no_auth.post(
-            "/api/auth/login",
+            "/v1/auth/login",
             json={
                 "email": "wrongpass@example.com",
                 "password": "WrongPassword456!",
@@ -134,7 +134,7 @@ class TestAuthEndpoints:
         await db_session.commit()
         
         response = await client_no_auth.post(
-            "/api/auth/login",
+            "/v1/auth/login",
             json={
                 "email": "inactive@example.com",
                 "password": "StrongPassword123!",
@@ -146,7 +146,7 @@ class TestAuthEndpoints:
     async def test_register_weak_password(self, client_no_auth: AsyncClient):
         """Test registration with weak password fails."""
         response = await client_no_auth.post(
-            "/api/auth/register",
+            "/v1/auth/register",
             json={
                 "email": "weakpass@example.com",
                 "password": "weak",
@@ -160,7 +160,7 @@ class TestAuthEndpoints:
     async def test_login_nonexistent_user(self, client_no_auth: AsyncClient):
         """Test login with nonexistent user fails."""
         response = await client_no_auth.post(
-            "/api/auth/login",
+            "/v1/auth/login",
             json={
                 "email": "nonexistent@example.com",
                 "password": "SomePassword123!",
@@ -172,14 +172,14 @@ class TestAuthEndpoints:
     @pytest.mark.asyncio
     async def test_logout(self, client: AsyncClient):
         """Test logout endpoint."""
-        response = await client.post("/api/auth/logout")
+        response = await client.post("/v1/auth/logout")
         assert response.status_code == 200
         assert response.json()["message"] == "Successfully logged out"
 
     @pytest.mark.asyncio
     async def test_logout_requires_auth(self, client_no_auth: AsyncClient):
         """Test logout requires authentication."""
-        response = await client_no_auth.post("/api/auth/logout")
+        response = await client_no_auth.post("/v1/auth/logout")
         assert response.status_code == 401
 
     @pytest.mark.asyncio
@@ -198,7 +198,7 @@ class TestAuthEndpoints:
         await db_session.commit()
         
         response = await client_no_auth.post(
-            "/api/auth/forgot-password",
+            "/v1/auth/forgot-password",
             json={"email": "forgot@example.com"},
         )
         assert response.status_code == 200
@@ -209,7 +209,7 @@ class TestAuthEndpoints:
     async def test_forgot_password_nonexistent_user(self, client_no_auth: AsyncClient):
         """Test forgot password for nonexistent user returns same message."""
         response = await client_no_auth.post(
-            "/api/auth/forgot-password",
+            "/v1/auth/forgot-password",
             json={"email": "nonexistent@example.com"},
         )
         assert response.status_code == 200
@@ -232,7 +232,7 @@ class TestAuthEndpoints:
         await db_session.commit()
         
         response = await client_no_auth.post(
-            "/api/auth/resend-verification",
+            "/v1/auth/resend-verification",
             json={"email": "unverified@example.com"},
         )
         assert response.status_code == 200
@@ -255,7 +255,7 @@ class TestAuthEndpoints:
         await db_session.commit()
         
         response = await client_no_auth.post(
-            "/api/auth/resend-verification",
+            "/v1/auth/resend-verification",
             json={"email": "verified@example.com"},
         )
         assert response.status_code == 400
@@ -265,7 +265,7 @@ class TestAuthEndpoints:
     async def test_resend_verification_nonexistent_user(self, client_no_auth: AsyncClient):
         """Test resend verification for nonexistent user returns success to prevent enumeration."""
         response = await client_no_auth.post(
-            "/api/auth/resend-verification",
+            "/v1/auth/resend-verification",
             json={"email": "nonexistent@example.com"},
         )
         assert response.status_code == 200

@@ -18,7 +18,7 @@ class TestIngestEndpoints:
     async def test_agent_status_requires_auth(self, client_no_auth: AsyncClient):
         """Test /ingest/agent-status requires authentication."""
         response = await client_no_auth.post(
-            "/api/ingest/agent-status",
+            "/v1/ingest/agent-status",
             json={
                 "agent_id": str(uuid.uuid4()),
                 "status": "running",
@@ -43,7 +43,7 @@ class TestIngestEndpoints:
         await db_session.commit()
 
         response = await client.post(
-            "/api/ingest/agent-status",
+            "/v1/ingest/agent-status",
             json={
                 "agent_id": str(agent_id),
                 "status": "running",
@@ -60,7 +60,7 @@ class TestIngestEndpoints:
     ):
         """Test agent status update returns 404 for unknown agent."""
         response = await client.post(
-            "/api/ingest/agent-status",
+            "/v1/ingest/agent-status",
             json={
                 "agent_id": str(uuid.uuid4()),
                 "status": "running",
@@ -94,7 +94,7 @@ class TestIngestEndpoints:
         await db_session.commit()
 
         response = await client.post(
-            "/api/ingest/agent-status",
+            "/v1/ingest/agent-status",
             json={
                 "agent_id": str(agent_id),
                 "status": "running",
@@ -125,7 +125,7 @@ class TestIngestAPIKeyAuth:
         """Test that an API key can be used to authenticate to /ingest/agent-status."""
         # First create an API key (requires auth)
         create_response = await client.post(
-            "/api/api-keys",
+            "/v1/api-keys",
             json={"name": "ingest-key"},
         )
         assert create_response.status_code == 201
@@ -144,7 +144,7 @@ class TestIngestAPIKeyAuth:
 
         # Use the API key to authenticate (without JWT)
         response = await client_no_auth.post(
-            "/api/ingest/agent-status",
+            "/v1/ingest/agent-status",
             json={
                 "agent_id": str(agent_id),
                 "status": "running",
@@ -174,7 +174,7 @@ class TestIngestAPIKeyAuth:
 
         # Use an invalid API key
         response = await client_no_auth.post(
-            "/api/ingest/agent-status",
+            "/v1/ingest/agent-status",
             json={
                 "agent_id": str(agent_id),
                 "status": "running",
@@ -191,7 +191,7 @@ class TestIngestAPIKeyAuth:
         """Test that a revoked API key is rejected."""
         # Create and then revoke an API key (requires auth)
         create_response = await client.post(
-            "/api/api-keys",
+            "/v1/api-keys",
             json={"name": "revoked-key"},
         )
         assert create_response.status_code == 201
@@ -199,7 +199,7 @@ class TestIngestAPIKeyAuth:
         key_id = create_response.json()["id"]
 
         # Revoke the key
-        revoke_response = await client.delete(f"/api/api-keys/{key_id}")
+        revoke_response = await client.delete(f"/v1/api-keys/{key_id}")
         assert revoke_response.status_code == 204
 
         # Create an agent for the test user
@@ -215,7 +215,7 @@ class TestIngestAPIKeyAuth:
 
         # Use the revoked API key
         response = await client_no_auth.post(
-            "/api/ingest/agent-status",
+            "/v1/ingest/agent-status",
             json={
                 "agent_id": str(agent_id),
                 "status": "running",

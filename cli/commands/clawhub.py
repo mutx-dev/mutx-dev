@@ -18,7 +18,7 @@ def list_skills():
         return
 
     client = get_client(config)
-    response = client.get("/api/clawhub/skills")
+    response = client.get("/v1/clawhub/skills")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -53,7 +53,7 @@ def install_skill(agent_id: str, skill_id: str):
 
     client = get_client(cli_config)
     response = client.post(
-        "/api/clawhub/install",
+        "/v1/clawhub/install",
         json={
             "agent_id": agent_id,
             "skill_id": skill_id,
@@ -84,7 +84,7 @@ def uninstall_skill(agent_id: str, skill_id: str):
 
     client = get_client(cli_config)
     response = client.post(
-        "/api/clawhub/uninstall",
+        "/v1/clawhub/uninstall",
         json={
             "agent_id": agent_id,
             "skill_id": skill_id,
