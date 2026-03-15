@@ -37,6 +37,24 @@ router = APIRouter(prefix="/agents", tags=["agents"])
 logger = logging.getLogger(__name__)
 
 
+async def _get_owned_agent(
+    agent_id: uuid.UUID,
+    db: AsyncSession,
+    current_user: User,
+    *,
+    not_found_detail: str = "Agent not found",
+    forbidden_detail: str = "Not authorized to access this agent",
+) -> Agent:
+    """Fetch an agent and enforce ownership for the authenticated user."""
+    result = await db.execute(select(Agent).where(Agent.id == agent_id))
+    agent = result.scalar_one_or_none()
+    if not agent:
+        raise HTTPException(status_code=404, detail=not_found_detail)
+    if agent.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail=forbidden_detail)
+    return agent
+
+
 def _validate_agent_config(agent_type: AgentType, config: Any) -> str:
     """Validate and normalize agent configuration based on its type."""
     if config is None:
@@ -169,17 +187,15 @@ async def get_agent(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    agent = await _get_owned_agent(agent_id, db, current_user)
     result = await db.execute(
         select(Agent)
         .options(selectinload(Agent.deployments).selectinload(Deployment.events))
-        .where(Agent.id == agent_id)
+        .where(Agent.id == agent.id)
     )
-    agent = result.scalar_one_or_none()
+    agent = result.scalar_one()
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
-    # Ownership check
-    if agent.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to access this agent")
     return _serialize_agent(agent, include_deployments=True)
 
 
@@ -189,13 +205,12 @@ async def delete_agent(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    result = await db.execute(select(Agent).where(Agent.id == agent_id))
-    agent = result.scalar_one_or_none()
-    if not agent:
-        raise HTTPException(status_code=404, detail="Agent not found")
-    # Ownership check
-    if agent.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to delete this agent")
+    agent = await _get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to delete this agent",
+    )
 
     agent.status = AgentStatus.DELETING.value
     await db.delete(agent)
@@ -209,13 +224,12 @@ async def deploy_agent(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    result = await db.execute(select(Agent).where(Agent.id == agent_id))
-    agent = result.scalar_one_or_none()
-    if not agent:
-        raise HTTPException(status_code=404, detail="Agent not found")
-    # Ownership check
-    if agent.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to deploy this agent")
+    agent = await _get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to deploy this agent",
+    )
 
     deployment = Deployment(
         agent_id=agent_id,
@@ -247,13 +261,12 @@ async def stop_agent(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    result = await db.execute(select(Agent).where(Agent.id == agent_id))
-    agent = result.scalar_one_or_none()
-    if not agent:
-        raise HTTPException(status_code=404, detail="Agent not found")
-    # Ownership check
-    if agent.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to stop this agent")
+    agent = await _get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to stop this agent",
+    )
 
     result = await db.execute(
         select(Deployment).where(
@@ -288,13 +301,12 @@ async def get_agent_logs(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    # Ownership check - verify agent belongs to current user
-    agent_result = await db.execute(select(Agent).where(Agent.id == agent_id))
-    agent = agent_result.scalar_one_or_none()
-    if not agent:
-        raise HTTPException(status_code=404, detail="Agent not found")
-    if agent.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to access this agent's logs")
+    await _get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to access this agent's logs",
+    )
 
     query = select(AgentLog).where(AgentLog.agent_id == agent_id).offset(skip).limit(limit)
     if level:
@@ -313,13 +325,12 @@ async def get_agent_metrics(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    # Ownership check - verify agent belongs to current user
-    agent_result = await db.execute(select(Agent).where(Agent.id == agent_id))
-    agent = agent_result.scalar_one_or_none()
-    if not agent:
-        raise HTTPException(status_code=404, detail="Agent not found")
-    if agent.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to access this agent's metrics")
+    await _get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to access this agent's metrics",
+    )
 
     query = (
         select(AgentMetric)
