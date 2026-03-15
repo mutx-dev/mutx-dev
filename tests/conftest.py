@@ -2,7 +2,7 @@
 Pytest configuration and fixtures for MUTX API tests.
 """
 import asyncio
-from datetime import datetime
+from datetime import datetime, timezone
 from collections.abc import AsyncGenerator
 import os
 import uuid
@@ -76,7 +76,7 @@ def create_test_app() -> FastAPI:
         # Simple ready check for tests
         return {
             "status": "ready",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "database": "ready",
             "error": None,
         }
