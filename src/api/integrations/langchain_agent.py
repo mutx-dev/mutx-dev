@@ -4,7 +4,7 @@ from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
 from enum import Enum
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
@@ -59,7 +59,7 @@ class AgentState:
     name: str
     status: str
     config: AgentConfig
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     last_run: Optional[datetime] = None
     conversation_history: List[Dict[str, Any]] = field(default_factory=list)
 
@@ -172,7 +172,7 @@ class BuiltInTools:
 
     @staticmethod
     def get_timestamp() -> str:
-        return datetime.utcnow().isoformat()
+        return datetime.now(timezone.utc).isoformat()
 
     @staticmethod
     def calculate(expression: str) -> str:
@@ -356,7 +356,7 @@ class LangChainAgent:
                 output = response.content
 
             self.memory_manager.add_ai_message(output)
-            self.state.last_run = datetime.utcnow()
+            self.state.last_run = datetime.now(timezone.utc)
             self.state.conversation_history.append(
                 {
                     "timestamp": self.state.last_run.isoformat(),
@@ -400,7 +400,7 @@ class LangChainAgent:
                 output = response.content
 
             self.memory_manager.add_ai_message(output)
-            self.state.last_run = datetime.utcnow()
+            self.state.last_run = datetime.now(timezone.utc)
             self.state.conversation_history.append(
                 {
                     "timestamp": self.state.last_run.isoformat(),
@@ -448,7 +448,7 @@ class LangChainAgent:
                 response = self.llm.invoke(messages)
                 yield response.content
 
-            self.state.last_run = datetime.utcnow()
+            self.state.last_run = datetime.now(timezone.utc)
             self.state.status = "ready"
 
         except Exception as e:
