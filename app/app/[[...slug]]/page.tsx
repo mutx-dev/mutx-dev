@@ -8,9 +8,11 @@ import Link from 'next/link';
 import { AppDashboardClient } from '@/components/app/AppDashboardClient';
 import { AgentsPageClient } from '@/components/app/AgentsPageClient';
 import { DeploymentsPageClient } from '@/components/app/DeploymentsPageClient';
+import { ApiKeysPageClient } from '@/components/app/ApiKeysPageClient';
 import { ErrorBoundary } from '@/components/app/ErrorBoundary';
 import { LogsMetricsStateClient } from '@/components/app/LogsMetricsStateClient';
 import { TerminalWindow } from '@/components/TerminalWindow';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 function PageLoadingSkeleton() {
   return (
@@ -262,16 +264,17 @@ export default function AppPreviewPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#030307] text-slate-100">
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute left-[10%] top-[-10%] h-[40%] w-[40%] rounded-full bg-cyan-500/10 blur-[120px]" />
-        <div className="absolute right-[-10%] top-[20%] h-[30%] w-[30%] rounded-full bg-emerald-500/10 blur-[120px]" />
-      </div>
+    <ProtectedRoute>
+      <div className="relative min-h-screen overflow-hidden bg-[#030307] text-slate-100">
+        <div className="pointer-events-none fixed inset-0 overflow-hidden">
+          <div className="absolute left-[10%] top-[-10%] h-[40%] w-[40%] rounded-full bg-cyan-500/10 blur-[120px]" />
+          <div className="absolute right-[-10%] top-[20%] h-[30%] w-[30%] rounded-full bg-emerald-500/10 blur-[120px]" />
+        </div>
 
-      <MobileNav isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} navItems={navItems} currentItem={currentItem} />
+        <MobileNav isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} navItems={navItems} currentItem={currentItem} />
 
-      <div className="relative mx-auto max-w-[1400px] px-4 py-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between lg:hidden mb-6">
+        <div className="relative mx-auto max-w-[1400px] px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between lg:hidden mb-6">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
               <Command className="h-5 w-5" />
@@ -345,5 +348,6 @@ export default function AppPreviewPage() {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }
