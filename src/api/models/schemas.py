@@ -441,3 +441,29 @@ class APIKeyHistoryResponse(BaseModel):
     total: int
     skip: int
     limit: int
+
+
+# Usage Event Schemas
+class UsageEventCreate(BaseModel):
+    """Request model for creating a usage event"""
+
+    event_type: str = Field(..., min_length=1, max_length=50, description="Type of event (e.g., agent_create, deployment_create, api_call)")
+    resource_type: Optional[str] = Field(None, max_length=50, description="Type of resource (e.g., agent, deployment)")
+    resource_id: Optional[uuid.UUID] = None
+    event_metadata: Optional[dict[str, Any]] = Field(default_factory=dict, description="Additional event data as JSON")
+    credits_used: float = Field(default=1.0, ge=0.0, description="Number of credits consumed")
+
+
+class UsageEventResponse(BaseModel):
+    """Response model for usage events"""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    user_id: uuid.UUID
+    event_type: str
+    resource_type: Optional[str]
+    resource_id: Optional[uuid.UUID]
+    event_metadata: Optional[dict[str, Any]]
+    credits_used: float
+    created_at: datetime
