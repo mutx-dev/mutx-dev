@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { ArrowRight, Bot, Command, Github, KeyRound, LogOut, Rocket, ShieldCheck, Activity, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 
+import { ApiKeysPageClient } from '@/components/app/ApiKeysPageClient';
 import { AppDashboardClient } from '@/components/app/AppDashboardClient';
 import { AgentsPageClient } from '@/components/app/AgentsPageClient';
 import { DeploymentsPageClient } from '@/components/app/DeploymentsPageClient';
@@ -180,7 +181,7 @@ export default function AppPreviewPage() {
               </p>
             </div>
           </div>
-          <AppDashboardClient />
+          <ApiKeysPageClient />
         </div>
       );
     }
