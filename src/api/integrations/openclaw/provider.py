@@ -1,6 +1,6 @@
 import logging
 from typing import Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 
 from src.api.models import Agent, AgentStatus, AgentLog
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -54,7 +54,7 @@ class OpenClawProvider:
             agent_id=self.agent.id,
             level=level,
             message=f"[OpenClaw] {message}",
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
         session.add(log)
         await session.commit()
