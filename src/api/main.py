@@ -1,6 +1,10 @@
 import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+
+
+import time
+
 import logging
 
 from fastapi import FastAPI, Request, Response, status
@@ -34,6 +38,9 @@ from src.api.metrics import router as metrics_router, track_request
 from src.api.services.monitor import start_background_monitor
 
 settings = get_settings()
+
+# Track startup time for uptime calculation
+start_time = time.time()
 
 logging.basicConfig(
     level=settings.log_level,
@@ -79,6 +86,7 @@ async def _start_monitor_when_database_ready(app: FastAPI) -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting up API...")
+    app.state.start_time = time.time()
     app.state.database_ready = False
     app.state.database_error = None
     app.state.database_error_detail = None
@@ -164,12 +172,18 @@ app.include_router(runs.router, prefix="/v1")
 async def health_check(request: Request):
     database_ready = request.app.state.database_ready
     database_error = request.app.state.database_error
+    uptime = (
+        time.time() - request.app.state.start_time
+        if hasattr(request.app.state, "start_time")
+        else 0
+    )
 
     return HealthResponse(
         status="healthy" if database_ready else "degraded",
         timestamp=datetime.now(timezone.utc),
         database="ready" if database_ready else "unavailable" if database_error else "initializing",
         error=database_error,
+        uptime_seconds=uptime,
     )
 
 

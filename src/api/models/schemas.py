@@ -310,10 +310,13 @@ class MetricsReportRequest(BaseModel):
 
 
 class HealthResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     status: str
     timestamp: datetime
     database: Optional[str] = None
     error: Optional[str] = None
+    version: str = "1.0.0"
+    uptime_seconds: Optional[float] = None
 
 
 # API Key Schemas
