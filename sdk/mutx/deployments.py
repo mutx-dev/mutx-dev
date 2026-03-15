@@ -47,6 +47,7 @@ class Deployment:
         self.agent_id = UUID(data["agent_id"])
         self.status = data["status"]
         self.replicas = data["replicas"]
+        self.version = data.get("version")
         self.node_id = data.get("node_id")
         self.started_at = _parse_datetime(data.get("started_at"))
         self.ended_at = _parse_datetime(data.get("ended_at"))

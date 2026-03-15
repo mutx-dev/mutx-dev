@@ -53,6 +53,7 @@ class Deployment:
         self.agent_id = UUID(data["agent_id"])
         self.status = data["status"]
         self.replicas = data["replicas"]
+        self.version = data.get("version")
         self.node_id = data.get("node_id")
         self.started_at = (
             datetime.fromisoformat(data["started_at"]) if data.get("started_at") else None
