@@ -28,7 +28,13 @@ uvicorn src.api.main:app --reload --port 8000
 npm run dev
 ```
 
-Backend truth checks:
+Backend truth checks (one-command):
+
+```bash
+make test-api
+```
+
+Or test the API manually:
 
 ```bash
 curl http://localhost:8000/health
@@ -43,7 +49,15 @@ Then use:
 
 ## 3. Register or log in
 
-Use either the browser flows or direct API calls.
+Use either the browser flows or the one-command auth setup:
+
+```bash
+make test-auth
+```
+
+This registers a test user, logs in, and shows your access token with example curl commands.
+
+Or do it manually:
 
 ```bash
 BASE_URL=http://localhost:8000
