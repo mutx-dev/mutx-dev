@@ -163,3 +163,184 @@ def test_agents_deploy_hits_contract_route_and_renders_deployment(monkeypatch) -
     assert f"Deploying agent: {agent_id}" in result.output
     assert "Deployment ID:" in result.output
     assert "Status: deploying" in result.output
+
+
+def test_agents_list_hits_canonical_route_and_renders_agents(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+    agent_id = str(uuid.uuid4())
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["params"] = params
+        return DummyResponse(
+            200,
+            [
+                {
+                    "id": agent_id,
+                    "name": "test-agent-1",
+                    "status": "running",
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "name": "test-agent-2",
+                    "status": "stopped",
+                },
+            ],
+        )
+
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["agents", "list"])
+
+    assert result.exit_code == 0
+    assert captured["path"] == "/api/agents"
+    assert captured["params"] == {"limit": 50, "skip": 0}
+    assert agent_id in result.output
+    assert "test-agent-1" in result.output
+    assert "running" in result.output
+
+
+def test_agents_list_with_pagination_options(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["params"] = params
+        return DummyResponse(200, [])
+
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["agents", "list", "-l", "10", "-s", "20"])
+
+    assert result.exit_code == 0
+    assert captured["params"] == {"limit": 10, "skip": 20}
+
+
+def test_agents_status_hits_canonical_route_and_renders_agent(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+    agent_id = str(uuid.uuid4())
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        return DummyResponse(
+            200,
+            {
+                "id": agent_id,
+                "name": "test-agent",
+                "description": "A test agent",
+                "status": "running",
+                "created_at": "2026-03-14T10:00:00",
+            },
+        )
+
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["agents", "status", agent_id])
+
+    assert result.exit_code == 0
+    assert captured["path"] == f"/api/agents/{agent_id}"
+    assert f"Agent ID: {agent_id}" in result.output
+    assert "Name: test-agent" in result.output
+    assert "Description: A test agent" in result.output
+    assert "Status: running" in result.output
+
+
+def test_agents_logs_hits_canonical_route_and_renders_logs(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+    agent_id = str(uuid.uuid4())
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["params"] = params
+        return DummyResponse(
+            200,
+            [
+                {
+                    "timestamp": "2026-03-14T10:00:00",
+                    "level": "INFO",
+                    "message": "Agent started",
+                },
+                {
+                    "timestamp": "2026-03-14T10:01:00",
+                    "level": "WARNING",
+                    "message": "High memory usage",
+                },
+            ],
+        )
+
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["agents", "logs", agent_id])
+
+    assert result.exit_code == 0
+    assert captured["path"] == f"/api/agents/{agent_id}/logs"
+    assert captured["params"] == {"limit": 100}
+    assert "Agent started" in result.output
+    assert "WARNING" in result.output
+
+
+def test_agents_logs_with_level_filter(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["params"] = params
+        return DummyResponse(200, [])
+
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["agents", "logs", "agent-id", "-l", "50", "-L", "ERROR"])
+
+    assert result.exit_code == 0
+    assert captured["params"] == {"limit": 50, "level": "ERROR"}
+
+
+def test_agents_delete_hits_canonical_route(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+    agent_id = str(uuid.uuid4())
+
+    def fake_delete(path: str) -> DummyResponse:
+        captured["path"] = path
+        return DummyResponse(204, None)
+
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client", lambda config: SimpleNamespace(delete=fake_delete)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["agents", "delete", agent_id, "--force"])
+
+    assert result.exit_code == 0
+    assert captured["path"] == f"/api/agents/{agent_id}"
+    assert f"Deleted agent: {agent_id}" in result.output
+
+
+def test_agents_delete_requires_confirmation_without_force(monkeypatch) -> None:
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["agents", "delete", "agent-id"], input="n\n")
+
+    assert result.exit_code == 0
+    assert "Are you sure you want to delete agent" in result.output
