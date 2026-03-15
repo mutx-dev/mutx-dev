@@ -63,6 +63,18 @@ class Settings(BaseSettings):
             "DB_CONNECT_TIMEOUT_SECONDS",
         ),
     )
+    # Rate limiting
+    rate_limit_requests: int = Field(
+        default=100,
+        ge=1,
+        description="Number of requests allowed per time window",
+    )
+    rate_limit_window_seconds: int = Field(
+        default=60,
+        ge=1,
+        description="Time window in seconds for rate limiting",
+    )
+
     internal_user_email_domains: list[str] = Field(
         default=["mutx.dev"],
         validation_alias=AliasChoices(
