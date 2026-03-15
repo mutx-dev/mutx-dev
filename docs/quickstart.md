@@ -14,6 +14,21 @@ This quickstart is for the current repo as it exists now: Next.js frontend plus 
 ./scripts/dev.sh
 ```
 
+Or use the convenient Makefile targets for common operations:
+
+```bash
+make dev          # Start local dev stack (Docker Compose)
+make dev-stop     # Stop dev stack
+make test-api     # Run API health tests
+make test-auth    # Register test user, login, get token (one-command)
+```
+
+**One-command auth setup** (no manual curl needed):
+```bash
+make test-auth
+```
+This registers a test user, logs in, and displays your access token with example authenticated requests.
+
 This is the supported local bootstrap entrypoint. It uses `infrastructure/docker/docker-compose.yml` explicitly, creates `.env` from `.env.example` when needed, and starts PostgreSQL, Redis, API, and frontend containers.
 
 ## 2. Manual split-process workflow (optional)
