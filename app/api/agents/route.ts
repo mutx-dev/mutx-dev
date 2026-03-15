@@ -21,7 +21,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const { searchParams } = new URL(request.url)
     const params = new URLSearchParams(searchParams)
     
-    const response = await fetch(`${API_BASE_URL}/api/agents?${params}`, {
+    const response = await fetch(`${API_BASE_URL}/v1/agents?${params}`, {
       headers: { 
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const body = await req.json()
     
-    const response = await fetch(`${API_BASE_URL}/api/agents`, {
+    const response = await fetch(`${API_BASE_URL}/v1/agents`, {
       method: 'POST',
       headers: { 
         Authorization: `Bearer ${token}`,

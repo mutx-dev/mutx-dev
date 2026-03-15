@@ -21,7 +21,7 @@ export async function GET(
     const { searchParams } = new URL(request.url)
     const paramsStr = searchParams.toString()
     
-    const response = await fetch(`${API_BASE_URL}/api/agents/${id}/logs?${paramsStr}`, {
+    const response = await fetch(`${API_BASE_URL}/v1/agents/${id}/logs?${paramsStr}`, {
       headers: { 
         Authorization: `Bearer ${token}`,
       },

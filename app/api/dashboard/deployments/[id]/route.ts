@@ -21,7 +21,7 @@ export async function GET(
     const path = searchParams.get('path') || ''
 
     if (path === 'versions') {
-      const response = await fetch(`${API_BASE_URL}/deployments/${id}/versions`, {
+      const response = await fetch(`${API_BASE_URL}/v1/deployments/${id}/versions`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       })
@@ -30,7 +30,7 @@ export async function GET(
       return NextResponse.json(payload, { status: response.status })
     }
 
-    const response = await fetch(`${API_BASE_URL}/deployments/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/v1/deployments/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
     })
@@ -59,7 +59,7 @@ export async function POST(
 
     if (action === 'rollback') {
       const body = await request.json()
-      const response = await fetch(`${API_BASE_URL}/deployments/${id}/rollback`, {
+      const response = await fetch(`${API_BASE_URL}/v1/deployments/${id}/rollback`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -74,7 +74,7 @@ export async function POST(
     }
 
     if (action === 'restart') {
-      const response = await fetch(`${API_BASE_URL}/deployments/${id}/restart`, {
+      const response = await fetch(`${API_BASE_URL}/v1/deployments/${id}/restart`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
@@ -86,7 +86,7 @@ export async function POST(
 
     if (action === 'scale') {
       const body = await request.json()
-      const response = await fetch(`${API_BASE_URL}/deployments/${id}/scale`, {
+      const response = await fetch(`${API_BASE_URL}/v1/deployments/${id}/scale`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -118,7 +118,7 @@ export async function DELETE(
       return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 })
     }
 
-    const response = await fetch(`${API_BASE_URL}/deployments/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/v1/deployments/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',

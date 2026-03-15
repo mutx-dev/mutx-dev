@@ -18,7 +18,7 @@ export async function DELETE(
 
     const { id } = await params
 
-    const response = await fetch(`${API_BASE_URL}/api-keys/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/v1/api-keys/${id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
