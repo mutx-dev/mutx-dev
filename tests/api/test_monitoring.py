@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from sqlalchemy import select
@@ -13,7 +13,7 @@ async def test_monitor_marks_latest_deployment_failed_on_stale_heartbeat(
     db_session, test_agent, test_deployment
 ):
     test_agent.status = AgentStatus.RUNNING.value
-    test_agent.last_heartbeat = datetime.utcnow() - timedelta(seconds=121)
+    test_agent.last_heartbeat = datetime.now(timezone.utc) - timedelta(seconds=121)
     test_deployment.status = 'running'
     await db_session.commit()
 
@@ -36,10 +36,10 @@ async def test_monitor_marks_latest_deployment_failed_on_stale_heartbeat(
 @pytest.mark.asyncio
 async def test_monitor_auto_heal_restores_latest_deployment(db_session, test_agent, test_deployment):
     test_agent.status = AgentStatus.FAILED.value
-    test_agent.updated_at = datetime.utcnow() - timedelta(seconds=31)
+    test_agent.updated_at = datetime.now(timezone.utc) - timedelta(seconds=31)
     test_deployment.status = 'failed'
     test_deployment.error_message = 'System: Agent marked as FAILED due to heartbeat timeout (120s).'
-    test_deployment.ended_at = datetime.utcnow()
+    test_deployment.ended_at = datetime.now(timezone.utc)
     await db_session.commit()
 
     await monitor_agent_health(db_session)
@@ -64,7 +64,7 @@ async def test_monitor_resolves_agent_down_alerts_on_recovery(db_session, test_a
     from src.api.models.models import Alert
 
     test_agent.status = AgentStatus.FAILED.value
-    test_agent.updated_at = datetime.utcnow() - timedelta(seconds=31)
+    test_agent.updated_at = datetime.now(timezone.utc) - timedelta(seconds=31)
     test_deployment.status = 'failed'
     alert = Alert(
         agent_id=test_agent.id,
@@ -122,13 +122,13 @@ async def test_monitor_emits_webhook_events_for_failure_and_recovery(
     )
 
     test_agent.status = AgentStatus.RUNNING.value
-    test_agent.last_heartbeat = datetime.utcnow() - timedelta(seconds=121)
+    test_agent.last_heartbeat = datetime.now(timezone.utc) - timedelta(seconds=121)
     test_deployment.status = "running"
     await db_session.commit()
 
     await monitor_agent_health(db_session)
 
-    test_agent.updated_at = datetime.utcnow() - timedelta(seconds=31)
+    test_agent.updated_at = datetime.now(timezone.utc) - timedelta(seconds=31)
     await db_session.commit()
 
     await monitor_agent_health(db_session)
@@ -155,7 +155,7 @@ async def test_monitor_status_transitions_survive_webhook_dispatch_failures(
     monkeypatch.setattr("src.api.services.monitoring.trigger_deployment_event", raise_webhook_failure)
 
     test_agent.status = AgentStatus.RUNNING.value
-    test_agent.last_heartbeat = datetime.utcnow() - timedelta(seconds=121)
+    test_agent.last_heartbeat = datetime.now(timezone.utc) - timedelta(seconds=121)
     test_deployment.status = "running"
     await db_session.commit()
 
