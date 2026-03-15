@@ -226,6 +226,9 @@ export default function WebhooksPageClient() {
             <Card key={webhook.id} className="p-4">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
+                  {webhook.name && (
+                    <p className="font-medium text-foreground">{webhook.name}</p>
+                  )}
                   <div className="flex items-center gap-2">
                     <code className="text-sm bg-muted px-2 py-1 rounded">
                       {webhook.url}
