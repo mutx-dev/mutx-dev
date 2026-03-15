@@ -398,6 +398,7 @@ class LeadResponse(BaseModel):
 
 class APIKeyHistoryResponse(BaseModel):
     """Paginated response for listing API keys."""
+
     items: list[APIKeyResponse] = Field(default_factory=list)
     total: int
     skip: int

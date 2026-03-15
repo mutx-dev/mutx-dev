@@ -47,7 +47,7 @@ async def list_api_keys(
     # Get total count
     total_stmt = select(func.count()).select_from(APIKey).where(APIKey.user_id == current_user.id)
     total = (await db.execute(total_stmt)).scalar_one()
-    
+
     # Get paginated results
     query = (
         select(APIKey)
@@ -58,7 +58,7 @@ async def list_api_keys(
     )
     result = await db.execute(query)
     keys = result.scalars().all()
-    
+
     return APIKeyHistoryResponse(
         items=keys,
         total=total,
