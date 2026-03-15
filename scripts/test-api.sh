@@ -83,8 +83,11 @@ test_endpoint() {
 do_register() {
     print_header "Register Test User"
     
+    local payload
+    payload=$(printf '{"email":"%s","name":"%s","password":"%s"}' "$TEST_EMAIL" "Test User" "$TEST_PASSWORD")
+
     local response
-    response=$(curl -sf -X POST "$API_URL/auth/register"         -H "Content-Type: application/json"         -d "{"email":"$TEST_EMAIL","name":"Test User","password":"$TEST_PASSWORD"}" 2>&1) || true
+    response=$(curl -sf -X POST "$API_URL/auth/register"         -H "Content-Type: application/json"         -d "$payload" 2>&1) || true
     
     if echo "$response" | grep -q "Email already registered"; then
         echo -e "${YELLOW}User already exists, trying login...${NC}"
@@ -103,8 +106,11 @@ do_register() {
 do_login() {
     print_header "Login"
     
+    local payload
+    payload=$(printf '{"email":"%s","password":"%s"}' "$TEST_EMAIL" "$TEST_PASSWORD")
+
     local response
-    response=$(curl -sf -X POST "$API_URL/auth/login"         -H "Content-Type: application/json"         -d "{"email":"$TEST_EMAIL","password":"$TEST_PASSWORD"}" 2>&1) || true
+    response=$(curl -sf -X POST "$API_URL/auth/login"         -H "Content-Type: application/json"         -d "$payload" 2>&1) || true
     
     if echo "$response" | grep -q "access_token"; then
         ACCESS_TOKEN=$(echo "$response" | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))" 2>/dev/null || echo "")
