@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent, useEffect } from "react";
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Check, CheckCircle, Command, Loader2, Lock, Mail, User, Eye, EyeOff, AlertCircle } from "lucide-react";
@@ -38,7 +38,6 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [touched, setTouched] = useState({ email: false, password: false, confirmPassword: false });
@@ -46,6 +45,7 @@ export default function RegisterPage() {
 
   const passwordStrength = getPasswordStrength(password);
   const isFormValid = email && password && confirmPassword && acceptTerms && password === confirmPassword;
+  const isSubmitting = authLoading || success;
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -53,12 +53,6 @@ export default function RegisterPage() {
     if (!emailRegex.test(email)) return "Please enter a valid email address";
     return "";
   };
-
-  useEffect(() => {
-    if (touched.password && password && password.length < 8) {
-      // Password length validation is handled inline
-    }
-  }, [password, touched.password]);
 
   const handleEmailBlur = () => {
     setTouched((prev) => ({ ...prev, email: true }));
@@ -90,8 +84,6 @@ export default function RegisterPage() {
       return;
     }
 
-    setLoading(true);
-
     try {
       await register(email, password, name || undefined);
       setSuccess(true);
@@ -100,8 +92,6 @@ export default function RegisterPage() {
       }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -115,7 +105,7 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="relative flex min-h-screen items-center justify-center bg-[#030307] px-4 py-12">
+      <div className="relative flex min-h-screen items-center justify-center bg-[#030307] px-4 py-8 sm:px-6 lg:px-8">
         <div className="pointer-events-none fixed inset-0 overflow-hidden">
           <div className="absolute left-[10%] top-[-10%] h-[40%] w-[40%] rounded-full bg-cyan-500/10 blur-[120px]" />
           <div className="absolute right-[-10%] top-[20%] h-[30%] w-[30%] rounded-full bg-emerald-500/10 blur-[120px]" />
@@ -144,12 +134,12 @@ export default function RegisterPage() {
         <div className="absolute bottom-[-10%] left-[30%] h-[25%] w-[25%] rounded-full bg-purple-500/10 blur-[100px]" />
       </div>
 
-      <div className="relative w-full max-w-md space-y-6 animate-fade-in">
+      <div className="relative w-full max-w-md space-y-5 sm:space-y-6 animate-fade-in">
         <div className="flex flex-col items-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan-400/10 transition-transform hover:scale-105">
-            <Command className="h-8 w-8 text-cyan-400" />
+          <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-cyan-400/10 transition-transform hover:scale-105">
+            <Command className="h-6 w-6 sm:h-8 sm:w-8 text-cyan-400" />
           </div>
-          <h1 className="mt-6 text-3xl font-bold text-white">Create your account</h1>
+          <h1 className="mt-6 text-2xl sm:text-3xl font-bold text-white">Create your account</h1>
           <p className="mt-2 text-sm text-slate-400">
             Get started with MUTX control plane
           </p>
@@ -174,7 +164,7 @@ export default function RegisterPage() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-black/40 py-3 pl-12 pr-4 text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
+                className="w-full rounded-xl border border-white/10 bg-black/40 py-3.5 sm:py-3 pl-12 pr-4 text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
                 placeholder="John Doe"
               />
             </div>
@@ -196,7 +186,7 @@ export default function RegisterPage() {
                 }}
                 onBlur={handleEmailBlur}
                 required
-                className={`w-full rounded-xl border bg-black/40 py-3 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                className={`w-full rounded-xl border bg-black/40 py-3.5 sm:py-3 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-1 transition-all ${
                   touched.email && emailError
                     ? 'border-red-400/50 focus:border-red-400/50 focus:ring-red-400/20'
                     : touched.email && !emailError && email
@@ -230,13 +220,13 @@ export default function RegisterPage() {
                 onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
                 required
                 minLength={8}
-                className="w-full rounded-xl border border-white/10 bg-black/40 py-3 pl-12 pr-12 text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
+                className="w-full rounded-xl border border-white/10 bg-black/40 py-3.5 sm:py-3 pl-12 pr-12 text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
                 placeholder="Create a strong password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors p-2 -mr-2"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -285,7 +275,7 @@ export default function RegisterPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 onBlur={() => setTouched((prev) => ({ ...prev, confirmPassword: true }))}
                 required
-                className={`w-full rounded-xl border bg-black/40 py-3 pl-12 pr-12 text-white placeholder:text-slate-600 focus:outline-none focus:ring-1 transition-all ${
+                className={`w-full rounded-xl border bg-black/40 py-3.5 sm:py-3 pl-12 pr-12 text-white placeholder:text-slate-600 focus:outline-none focus:ring-1 transition-all ${
                   touched.confirmPassword && confirmPassword && password !== confirmPassword
                     ? 'border-red-400/50 focus:border-red-400/50 focus:ring-red-400/20'
                     : touched.confirmPassword && confirmPassword && password === confirmPassword
@@ -297,7 +287,7 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors p-2 -mr-2"
               >
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -318,7 +308,7 @@ export default function RegisterPage() {
               type="checkbox"
               checked={acceptTerms}
               onChange={(e) => setAcceptTerms(e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded border-white/20 bg-black/20 text-cyan-400 focus:ring-cyan-400/20 focus:ring-offset-0"
+              className="mt-0.5 h-5 w-5 rounded border-white/20 bg-black/20 text-cyan-400 focus:ring-cyan-400/20 focus:ring-offset-0"
             />
             <label htmlFor="terms" className="text-sm text-slate-400">
               I agree to the{" "}
@@ -334,10 +324,10 @@ export default function RegisterPage() {
 
           <button
             type="submit"
-            disabled={loading || !isFormValid}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-500 py-3.5 text-sm font-medium text-black transition-all hover:bg-cyan-400 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+            disabled={isSubmitting || !isFormValid}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-500 py-4 sm:py-3.5 text-base sm:text-sm font-medium text-black transition-all hover:bg-cyan-400 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
           >
-            {loading ? (
+            {isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Creating account...
