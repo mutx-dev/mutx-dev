@@ -16,6 +16,7 @@ import { Card } from "@/components/ui/Card";
 type Webhook = {
   id: string;
   url: string;
+  name: string;
   events: string[];
   active: boolean;
   created_at: string;
@@ -28,7 +29,7 @@ export default function WebhooksPageClient() {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingWebhook, setEditingWebhook] = useState<Webhook | null>(null);
-  const [formData, setFormData] = useState({ url: "", events: "" });
+  const [formData, setFormData] = useState({ url: "", events: "", name: "" });
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -63,6 +64,7 @@ export default function WebhooksPageClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           url: formData.url,
+          name: formData.name,
           events: formData.events.split(",").map(e => e.trim()).filter(Boolean)
         })
       });
@@ -71,7 +73,7 @@ export default function WebhooksPageClient() {
       
       setShowForm(false);
       setEditingWebhook(null);
-      setFormData({ url: "", events: "" });
+      setFormData({ url: "", events: "", name: "" });
       fetchWebhooks();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -106,6 +108,7 @@ export default function WebhooksPageClient() {
     setEditingWebhook(webhook);
     setFormData({ 
       url: webhook.url, 
+      name: webhook.name || "",
       events: webhook.events.join(", ") 
     });
     setShowForm(true);
@@ -129,7 +132,7 @@ export default function WebhooksPageClient() {
           </p>
         </div>
         <button
-          onClick={() => { setShowForm(true); setEditingWebhook(null); setFormData({ url: "", events: "" }); }}
+          onClick={() => { setShowForm(true); setEditingWebhook(null); setFormData({ url: "", events: "", name: "" }); }}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
         >
           <Plus className="h-4 w-4" />
@@ -157,6 +160,17 @@ export default function WebhooksPageClient() {
                 value={formData.url}
                 onChange={e => setFormData({ ...formData, url: e.target.value })}
                 placeholder="https://your-server.com/webhook"
+                className="w-full px-3 py-2 border rounded-md bg-background"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Name</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                placeholder="My Webhook"
                 className="w-full px-3 py-2 border rounded-md bg-background"
                 required
               />
