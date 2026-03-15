@@ -1208,6 +1208,11 @@ export interface components {
          * @enum {string}
          */
         AgentType: "openai" | "anthropic" | "langchain" | "custom";
+        /**
+         * PlanTier
+         * @enum {string}
+         */
+        PlanTier: "free" | "pro" | "enterprise";
         /** CommandAcknowledgeRequest */
         CommandAcknowledgeRequest: {
             /** Command Id */
@@ -1658,7 +1663,7 @@ export interface components {
             /** Name */
             name: string;
             /** Plan */
-            plan: string;
+            plan: components["schemas"]["PlanTier"];
             /** Api Key */
             api_key: string | null;
             /**
