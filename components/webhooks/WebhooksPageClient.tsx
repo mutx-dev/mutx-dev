@@ -29,7 +29,7 @@ export default function WebhooksPageClient() {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingWebhook, setEditingWebhook] = useState<Webhook | null>(null);
-  const [formData, setFormData] = useState({ url: "", events: "", name: "" });
+  const [formData, setFormData] = useState({ url: "", events: "", name: "", active: true });
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -63,6 +63,7 @@ export default function WebhooksPageClient() {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          active: formData.active,
           url: formData.url,
           name: formData.name,
           events: formData.events.split(",").map(e => e.trim()).filter(Boolean)
@@ -73,7 +74,7 @@ export default function WebhooksPageClient() {
       
       setShowForm(false);
       setEditingWebhook(null);
-      setFormData({ url: "", events: "", name: "" });
+      setFormData({ url: "", events: "", name: "", active: true });
       fetchWebhooks();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -109,7 +110,8 @@ export default function WebhooksPageClient() {
     setFormData({ 
       url: webhook.url, 
       name: webhook.name || "",
-      events: webhook.events.join(", ") 
+      events: webhook.events.join(", "),
+      active: webhook.active
     });
     setShowForm(true);
   }
@@ -124,26 +126,22 @@ export default function WebhooksPageClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Webhooks</h1>
-          <p className="text-muted-foreground">
-            Manage webhook endpoints for real-time event notifications
-          </p>
-        </div>
-        <button
-          onClick={() => { setShowForm(true); setEditingWebhook(null); setFormData({ url: "", events: "", name: "" }); }}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-        >
-          <Plus className="h-4 w-4" />
-          Add Webhook
-        </button>
-      </div>
-
       {error && (
         <div className="flex items-center gap-2 p-4 bg-destructive/10 text-destructive rounded-md">
           <AlertCircle className="h-4 w-4" />
           {error}
+        </div>
+      )}
+
+      {!showForm && webhooks.length > 0 && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => { setShowForm(true); setEditingWebhook(null); setFormData({ url: "", events: "", name: "", active: true }); }}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          >
+            <Plus className="h-4 w-4" />
+            Add Webhook
+          </button>
         </div>
       )}
 
@@ -185,6 +183,18 @@ export default function WebhooksPageClient() {
                 className="w-full px-3 py-2 border rounded-md bg-background"
               />
             </div>
+            {editingWebhook && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="active"
+                  checked={formData.active}
+                  onChange={e => setFormData({ ...formData, active: e.target.checked })}
+                  className="h-4 w-4"
+                />
+                <label htmlFor="active" className="text-sm font-medium">Active</label>
+              </div>
+            )}
             <div className="flex gap-2">
               <button
                 type="submit"
@@ -226,6 +236,9 @@ export default function WebhooksPageClient() {
             <Card key={webhook.id} className="p-4">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
+                  {webhook.name && (
+                    <p className="font-medium text-foreground">{webhook.name}</p>
+                  )}
                   <div className="flex items-center gap-2">
                     <code className="text-sm bg-muted px-2 py-1 rounded">
                       {webhook.url}
