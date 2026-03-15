@@ -28,18 +28,42 @@ describe('dashboard route proxies', () => {
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
-  it('preserves upstream forbidden responses for dashboard agents proxy', async () => {
+  it('returns 401 from dashboard agents proxy when user lookup fails', async () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock).mockResolvedValue({
       ok: false,
-      status: 403,
-      json: async () => ({ detail: 'Forbidden' }),
+      status: 401,
+      json: async () => ({ detail: 'Session expired' }),
     })
     const { GET } = await import('../../app/api/dashboard/agents/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/agents?limit=20', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/auth/me', {
+      headers: { Authorization: 'Bearer token' },
+      cache: 'no-store',
+    })
+    expect(response.status).toBe(401)
+  })
+
+  it('preserves upstream forbidden responses for dashboard agents proxy', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ id: 'user_123', email: 'test@example.com' }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: async () => ({ detail: 'Forbidden' }),
+      })
+    const { GET } = await import('../../app/api/dashboard/agents/route')
+
+    const response = await GET(mockRequest())
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/agents?limit=20&user_id=user_123', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -49,22 +73,28 @@ describe('dashboard route proxies', () => {
 
   it('preserves successful list responses for dashboard agents proxy', async () => {
     getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ([
-        {
-          id: 'agent_123',
-          name: 'runtime-agent',
-          status: 'running',
-        },
-      ]),
-    })
+    ;(global.fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ id: 'user_123', email: 'test@example.com' }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => [
+          {
+            id: 'agent_123',
+            name: 'runtime-agent',
+            status: 'running',
+          },
+        ],
+      })
     const { GET } = await import('../../app/api/dashboard/agents/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/agents?limit=20', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/agents?limit=20&user_id=user_123', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
