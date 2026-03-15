@@ -25,6 +25,7 @@ import { Card } from "@/components/ui/Card";
 import { type components } from "@/app/types/api";
 import { getApiKeyLimit, getLatestActiveApiKey, getLatestRevokedApiKey } from "@/components/app/apiKeyHelpers";
 import { LogsViewer, MetricsDashboard, StateTransitions } from "@/components/app/Observability";
+import { useAuth } from "@/components/auth/useAuth";
 
 type User = components["schemas"]["UserResponse"];
 type Agent = components["schemas"]["AgentResponse"];
@@ -153,6 +154,7 @@ const walkthroughSteps = [
 ] as const;
 
 export function AppDashboardClient() {
+  const { user: authUser, loading: authLoading, error: authError, login, register, logout, refreshUser } = useAuth();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -162,7 +164,7 @@ export function AppDashboardClient() {
   const [bootstrapping, setBootstrapping] = useState(true);
   const [error, setError] = useState("");
   const [copiedKey, setCopiedKey] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState(authUser);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
@@ -172,6 +174,18 @@ export function AppDashboardClient() {
   const [lastKeyAction, setLastKeyAction] = useState<"created" | "rotated">("created");
   const [selectedDeploymentId, setSelectedDeploymentId] = useState<string | null>(null);
   const [observabilityTab, setObservabilityTab] = useState<"logs" | "metrics" | "state">("logs");
+
+  useEffect(() => {
+    if (!authLoading) {
+      setUser(authUser);
+    }
+  }, [authUser, authLoading]);
+
+  useEffect(() => {
+    if (!authLoading && authUser) {
+      setBootstrapping(false);
+    }
+  }, [authUser, authLoading]);
 
   const selectedDeployment = selectedDeploymentId 
     ? deployments.find(d => d.id === selectedDeploymentId) 
@@ -248,10 +262,11 @@ export function AppDashboardClient() {
   }, [activeKeys, agents.length, apiKeyLimitReached, deployments.length, health?.error, health?.status, user]);
   const authBoundaryDetail = useMemo(() => {
     if (user?.email) return `Signed in as ${user.email}`;
+    if (authError) return authError;
     if (error) return error;
     if (bootstrapping) return "Checking for an existing operator session";
     return "No operator session established yet";
-  }, [bootstrapping, error, user?.email]);
+  }, [authError, bootstrapping, error, user?.email]);
 
   const deploymentHealthDetail = useMemo(() => {
     if (!deployments.length) {
@@ -363,16 +378,14 @@ export function AppDashboardClient() {
   );
 
   async function loadDashboard() {
-    const [nextUser, nextHealth, nextAgents, nextDeployments, nextKeys] =
+    const [nextHealth, nextAgents, nextDeployments, nextKeys] =
       await Promise.all([
-        readJson<User>("/api/auth/me"),
         readJson<Health>("/api/dashboard/health"),
         readJson<Agent[]>("/api/dashboard/agents"),
         readJson<Deployment[]>("/api/dashboard/deployments"),
         readJson<ApiKey[]>("/api/api-keys"),
       ]);
 
-    setUser(nextUser);
     setHealth(nextHealth);
     setAgents(nextAgents);
     setDeployments(nextDeployments);
@@ -384,11 +397,10 @@ export function AppDashboardClient() {
 
     async function bootstrap() {
       try {
-        await loadDashboard();
-      } catch {
-        if (!cancelled) {
-          setUser(null);
+        if (authUser) {
+          await loadDashboard();
         }
+      } catch {
       } finally {
         if (!cancelled) {
           setBootstrapping(false);
@@ -401,7 +413,7 @@ export function AppDashboardClient() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [authUser]);
 
   async function handleAuthSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -410,17 +422,11 @@ export function AppDashboardClient() {
     setCreatedKey(null);
 
     try {
-      const endpoint =
-        mode === "login" ? "/api/auth/login" : "/api/auth/register";
-      await readJson(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(
-          mode === "login"
-            ? { email, password }
-            : { email, password, name: name || email.split("@")[0] },
-        ),
-      });
+      if (mode === "login") {
+        await login(email, password);
+      } else {
+        await register(email, password, name || email.split("@")[0]);
+      }
 
       await loadDashboard();
     } catch (nextError) {
@@ -455,7 +461,7 @@ export function AppDashboardClient() {
     setCopiedKey(false);
 
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await logout();
       setUser(null);
       setAgents([]);
       setDeployments([]);

@@ -25,7 +25,9 @@ export function middleware(request: NextRequest) {
     pathname === '/sitemap.xml' ||
     pathname.startsWith('/apple-touch-icon') ||
     pathname.startsWith('/android-chrome') ||
-    pathname.startsWith('/site.webmanifest')
+    pathname.startsWith('/site.webmanifest') ||
+    pathname === '/login' ||
+    pathname === '/register'
   ) {
     return NextResponse.next()
   }
