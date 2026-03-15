@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { 
   Bot, Command, Github, KeyRound, LogOut, Rocket, 
-  ShieldCheck, Activity, Menu, X, ArrowRight, LogOut as SignOutIcon
+  ShieldCheck, Activity, Menu, X, ArrowRight
 } from 'lucide-react';
+import { AuthNav } from '@/components/AuthNav';
 import { TerminalWindow } from '@/components/TerminalWindow';
 
 function PageLoadingSkeleton() {
@@ -109,6 +109,8 @@ export default function AppLayout({
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#030307] text-slate-100">
+      <AuthNav />
+      
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute left-[10%] top-[-10%] h-[40%] w-[40%] rounded-full bg-cyan-500/10 blur-[120px]" />
         <div className="absolute right-[-10%] top-[20%] h-[30%] w-[30%] rounded-full bg-emerald-500/10 blur-[120px]" />
@@ -116,7 +118,7 @@ export default function AppLayout({
 
       <MobileNav isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} currentItem={currentItem} />
 
-      <div className="relative mx-auto max-w-[1400px] px-4 py-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-[1400px] px-4 py-4 sm:px-6 lg:px-8 pt-16">
         <div className="flex items-center justify-between lg:hidden mb-6">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
@@ -136,7 +138,7 @@ export default function AppLayout({
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
-          <aside className="panel sticky top-4 hidden h-fit rounded-[24px] border border-white/5 bg-white/[0.01] p-5 backdrop-blur-xl lg:min-h-[calc(100vh-2rem)] lg:block">
+          <aside className="panel sticky top-20 hidden h-fit rounded-[24px] border border-white/5 bg-white/[0.01] p-5 backdrop-blur-xl lg:min-h-[calc(100vh-5rem)] lg:block">
             <div className="mb-8 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
                 <Command className="h-5 w-5" />
@@ -183,7 +185,7 @@ export default function AppLayout({
             </div>
           </aside>
 
-          <main className="space-y-6 pb-10">
+          <main className="space-y-6 pb-10 pt-4">
             <Suspense fallback={<PageLoadingSkeleton />}>
               {children}
             </Suspense>
