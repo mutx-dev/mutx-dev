@@ -66,7 +66,7 @@ async function deleteAgent(agentId: string): Promise<void> {
 }
 
 async function stopAgent(agentId: string): Promise<{ status: string }> {
-  return readJson<{ status: string }>(`/api/agents/${encodeURIComponent(agentId)}/stop`, {
+  return readJson<{ status: string }>(`/api/dashboard/agents/${encodeURIComponent(agentId)}?action=stop`, {
     method: "POST",
     cache: "no-store",
   });

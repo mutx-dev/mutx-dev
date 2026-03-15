@@ -51,7 +51,7 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
   const handleStop = async () => {
     setActionLoading(true);
     try {
-      const response = await fetch(`/api/agents/${encodeURIComponent(agentId)}/stop`, { method: "POST" });
+      const response = await fetch(`/api/dashboard/agents/${encodeURIComponent(agentId)}?action=stop`, { method: "POST" });
       if (!response.ok) throw new Error("Stop failed");
       setAgent(await response.json());
     } catch (err) { alert(err instanceof Error ? err.message : "Stop failed"); }
@@ -61,8 +61,9 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
   const handleRestart = async () => {
     setActionLoading(true);
     try {
-      const response = await fetch(`/api/agents/${encodeURIComponent(agentId)}/restart`, { method: "POST" });
-      if (!response.ok) throw new Error("Restart failed");
+      // For now, restart is not implemented on backend, so just refresh the agent
+      const response = await fetch(`/api/dashboard/agents/${encodeURIComponent(agentId)}`);
+      if (!response.ok) throw new Error("Refresh failed");
       setAgent(await response.json());
     } catch (err) { alert(err instanceof Error ? err.message : "Restart failed"); }
     finally { setActionLoading(false); }

@@ -40,7 +40,7 @@ export default function DeploymentDetailPage({ params }: DeploymentDetailPagePro
   const handleRestart = async () => {
     setActionLoading(true);
     try {
-      const response = await fetch(`/api/deployments/${encodeURIComponent(deploymentId)}/restart`, { method: "POST" });
+      const response = await fetch(`/api/dashboard/deployments/${encodeURIComponent(deploymentId)}?action=restart`, { method: "POST" });
       if (!response.ok) throw new Error("Restart failed");
       setDeployment(await response.json());
     } catch (err) { alert(err instanceof Error ? err.message : "Restart failed"); }
@@ -84,8 +84,8 @@ export default function DeploymentDetailPage({ params }: DeploymentDetailPagePro
         <button onClick={handleDelete} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 disabled:opacity-50"><Trash2 className="h-4 w-4" />Delete</button>
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="p-6"><h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white"><Activity className="h-5 w-5 text-cyan-400" />Deployment Information</h2><dl className="space-y-4"><div className="flex justify-between"><dt className="text-sm text-slate-400">ID</dt><dd className="text-sm text-slate-200">{deployment.id?.slice(0,8)}...</dd></div><div className="flex justify-between"><dt className="text-sm text-slate-400">Status</dt><span className={`px-2 py-1 text-xs ${getStatusColor(deployment.status)}`}>{deployment.status}</span></div></dl></Card>
-        <Card className="p-6"><h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white"><Clock className="h-5 w-5 text-cyan-400" />Timestamps</h2><dl className="space-y-4"><div className="flex justify-between"><dt className="text-sm text-slate-400">Created</dt><dd className="text-sm text-slate-200">{formatDate(deployment.started_at)}</dd></div></dl></Card>
+        <Card className="p-6"><h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white"><Activity className="h-5 w-5 text-cyan-400" />Deployment Information</h2><dl className="space-y-4"><div className="flex justify-between"><dt className="text-sm text-slate-400">ID</dt><dd className="text-sm text-slate-200">{deployment.id?.slice(0,8)}...</dd></div><div className="flex justify-between"><dt className="text-sm text-slate-400">Status</dt><span className={`px-2 py-1 text-xs ${getStatusColor(deployment.status)}`}>{deployment.status}</span></div><div className="flex justify-between"><dt className="text-sm text-slate-400">Replicas</dt><dd className="text-sm text-slate-200">{deployment.replicas || 1}</dd></div></dl></Card>
+        <Card className="p-6"><h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white"><Clock className="h-5 w-5 text-cyan-400" />Timestamps</h2><dl className="space-y-4"><div className="flex justify-between"><dt className="text-sm text-slate-400">Started</dt><dd className="text-sm text-slate-200">{formatDate(deployment.started_at)}</dd></div><div className="flex justify-between"><dt className="text-sm text-slate-400">Ended</dt><dd className="text-sm text-slate-200">{formatDate(deployment.ended_at)}</dd></div></dl></Card>
       </div>
     </div>
   );

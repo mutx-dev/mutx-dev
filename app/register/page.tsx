@@ -88,7 +88,7 @@ export default function RegisterPage() {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-white/80 mb-2">
-                    Name
+                    Name <span className="text-rose-400">*</span>
                   </label>
                   <input
                     id="name"
