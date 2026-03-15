@@ -174,3 +174,33 @@ async def test_create_run_accepts_explicit_timestamps(client, test_agent):
     assert payload["started_at"].startswith("2026-03-14T10:00:00")
     assert payload["completed_at"].startswith("2026-03-14T10:00:01")
     assert payload["traces"][0]["timestamp"].startswith("2026-03-14T10:00:01")
+
+
+@pytest.mark.asyncio
+async def test_list_runs_filter_by_status(client, test_agent):
+    """Test filtering runs by status."""
+    # Create multiple runs with different statuses
+    for status in ["running", "completed", "failed"]:
+        await client.post(
+            "/api/runs",
+            json={
+                "agent_id": str(test_agent.id),
+                "status": status,
+                "traces": [],
+            },
+        )
+
+    # Filter by running
+    running = await client.get("/api/runs?status=running")
+    assert running.status_code == 200
+    assert running.json()["total"] == 1
+
+    # Filter by completed
+    completed = await client.get("/api/runs?status=completed")
+    assert completed.status_code == 200
+    assert completed.json()["total"] == 1
+
+    # Filter by failed
+    failed = await client.get("/api/runs?status=failed")
+    assert failed.status_code == 200
+    assert failed.json()["total"] == 1
