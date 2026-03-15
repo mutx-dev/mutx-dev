@@ -44,6 +44,15 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hostname = getHostname(request)
 
+  // Handle /v1 -> /api redirects for CLI/SDK compatibility
+  // CLI/SDK expect /v1/agents, /v1/deployments etc but API serves at /api/*
+  if (pathname.startsWith('/v1/')) {
+    const newPathname = '/api' + pathname.slice(3) // /v1/agents -> /api/agents
+    const newUrl = request.nextUrl.clone()
+    newUrl.pathname = newPathname
+    return NextResponse.rewrite(newUrl)
+  }
+
   // Apply rate limiting to API routes
   if (pathname.startsWith('/api/')) {
     const rateLimitResult = checkRateLimit(request)
