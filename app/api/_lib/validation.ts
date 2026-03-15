@@ -80,8 +80,7 @@ export const schemas = {
   // API Key schemas
   apiKeyCreate: z.object({
     name: z.string().min(1, 'Name is required').max(100, 'Name too long'),
-    expires_in: z.number().int().positive().max(31536000, 'Max expiry is 1 year').optional(),
-    scopes: z.array(z.string()).optional(),
+    expires_in_days: z.number().int().positive().max(365, 'Max expiry is 365 days').optional(),
   }),
   
   // Agent schemas
