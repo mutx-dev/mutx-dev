@@ -1,6 +1,6 @@
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -98,7 +98,7 @@ async def create_run(
     current_user: User = Depends(get_current_user),
 ):
     agent = await _get_user_agent(request.agent_id, current_user, db)
-    started_at = request.started_at or datetime.utcnow()
+    started_at = request.started_at or datetime.now(timezone.utc)
 
     run = AgentRun(
         agent_id=agent.id,
@@ -122,7 +122,7 @@ async def create_run(
                 message=trace.message,
                 payload=_encode_json(trace.payload),
                 sequence=idx,
-                timestamp=trace.timestamp or datetime.utcnow(),
+                timestamp=trace.timestamp or datetime.now(timezone.utc),
             )
         )
 
