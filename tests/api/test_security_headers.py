@@ -55,6 +55,7 @@ async def test_cors_preflight_allows_configured_origin(security_client: AsyncCli
     assert response.status_code == 200
     assert response.headers["access-control-allow-origin"] == origin
     assert response.headers["access-control-allow-credentials"] == "true"
+    assert response.headers["strict-transport-security"] == HSTS_POLICY
 
 
 @pytest.mark.asyncio
@@ -80,6 +81,7 @@ async def test_security_headers_are_applied_to_responses(security_client: AsyncC
     assert response.headers["x-frame-options"] == "DENY"
     assert response.headers["x-content-type-options"] == "nosniff"
     assert response.headers["referrer-policy"] == "strict-origin-when-cross-origin"
+    assert response.headers["permissions-policy"] == "geolocation=(), microphone=(), camera=()"
 
 
 @pytest.mark.asyncio
