@@ -19,7 +19,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { url, events } = body;
+    const { url, name, events } = body;
 
     if (!url) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
@@ -31,7 +31,7 @@ export async function PATCH(
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ url, events: events || [] }),
+      body: JSON.stringify({ url, name, events: events || [] }),
       cache: "no-store"
     });
 
