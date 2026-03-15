@@ -1,7 +1,7 @@
 """Add email verification and password reset fields
 
 Revision ID: auth_fields_001
-Revises: e8f636a73690_initial_migration_create_all_tables
+Revises: e8f636a73690
 Create Date: 2026-03-09
 
 """
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = "auth_fields_001"
-down_revision: Union[str, None] = "e8f636a73690_initial_migration_create_all_tables"
+down_revision: Union[str, None] = "e8f636a73690"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
