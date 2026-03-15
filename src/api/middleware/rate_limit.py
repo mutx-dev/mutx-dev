@@ -19,7 +19,7 @@ settings = get_settings()
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Simple in-memory rate limiting middleware.
-    
+
     Uses a sliding window approach per IP address.
     For production, consider using Redis-backed storage.
     """
@@ -29,7 +29,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.requests = requests or settings.rate_limit_requests
         self.window_seconds = window_seconds or settings.rate_limit_window_seconds
         self._requests: dict[str, list[datetime]] = defaultdict(list)
-        
+
     def _get_client_ip(self, request: Request) -> str:
         """Extract client IP from request, considering proxies."""
         forwarded = request.headers.get("x-forwarded-for")
@@ -40,9 +40,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     def _clean_old_requests(self, client_id: str) -> None:
         """Remove requests outside the current window."""
         cutoff = datetime.utcnow() - timedelta(seconds=self.window_seconds)
-        self._requests[client_id] = [
-            ts for ts in self._requests[client_id] if ts > cutoff
-        ]
+        self._requests[client_id] = [ts for ts in self._requests[client_id] if ts > cutoff]
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """Process request with rate limiting."""
@@ -53,9 +51,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         client_id = self._get_client_ip(request)
         self._clean_old_requests(client_id)
-        
+
         current_count = len(self._requests[client_id])
-        
+
         if current_count >= self.requests:
             retry_after = self.window_seconds
             logger.warning(
@@ -64,14 +62,14 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                 current_count,
                 self.requests,
             )
-            
+
             response = RateLimitErrorResponse(
                 status="error",
                 error_code="RATE_LIMIT_EXCEEDED",
                 message="Too many requests. Please try again later.",
                 retry_after=retry_after,
             )
-            
+
             return JSONResponse(
                 status_code=429,
                 content=response.model_dump(),
@@ -80,7 +78,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         # Record this request
         self._requests[client_id].append(datetime.utcnow())
-        
+
         logger.debug(
             "Rate limit check | client=%s | count=%s | limit=%s | path=%s",
             client_id,
@@ -88,7 +86,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             self.requests,
             path,
         )
-        
+
         return await call_next(request)
 
 
