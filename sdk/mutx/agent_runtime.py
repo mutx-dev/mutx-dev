@@ -14,7 +14,7 @@ import platform
 import threading
 import time
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Callable, Optional
 
 import httpx
@@ -171,7 +171,7 @@ class MutxAgentClient:
                 name=name,
                 api_key=self.api_key,
                 status=data.get("status", "registered"),
-                registered_at=datetime.utcnow(),
+                registered_at=datetime.now(timezone.utc),
             )
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 401:
@@ -237,7 +237,7 @@ class MutxAgentClient:
             "agent_id": self.agent_id,
             "status": status,
             "message": message,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "platform": platform.system(),
             "hostname": platform.node(),
         }
@@ -276,7 +276,7 @@ class MutxAgentClient:
             "requests_processed": metrics.requests_processed or self._requests_processed,
             "errors_count": metrics.errors_count or self._errors_count,
             "custom": metrics.custom,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
         try:
@@ -360,7 +360,7 @@ class MutxAgentClient:
             "success": success,
             "result": result,
             "error": error,
-            "completed_at": datetime.utcnow().isoformat(),
+            "completed_at": datetime.now(timezone.utc).isoformat(),
         }
 
         try:
@@ -398,7 +398,7 @@ class MutxAgentClient:
             "level": level,
             "message": message,
             "metadata": metadata or {},
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
         try:
@@ -474,7 +474,7 @@ class MutxAgentClient:
                 "No command callback set. Use set_command_callback() or pass callback parameter."
             )
 
-        last_poll = datetime.utcnow()
+        last_poll = datetime.now(timezone.utc)
 
         while True:
             try:
@@ -497,7 +497,7 @@ class MutxAgentClient:
                         )
 
                 if commands:
-                    last_poll = datetime.utcnow()
+                    last_poll = datetime.now(timezone.utc)
 
             except Exception as e:
                 logger.error(f"Command loop error: {e}")
@@ -579,7 +579,7 @@ class MutxAgentSyncClient:
                 name=name,
                 api_key=self.api_key,
                 status=data.get("status", "registered"),
-                registered_at=datetime.utcnow(),
+                registered_at=datetime.now(timezone.utc),
             )
 
     def heartbeat(
@@ -596,7 +596,7 @@ class MutxAgentSyncClient:
                 "agent_id": self.agent_id,
                 "status": status,
                 "message": message,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
             response = client.post("/api/agents/heartbeat", json=payload)
             response.raise_for_status()
@@ -621,7 +621,7 @@ class MutxAgentSyncClient:
                 "requests_processed": self._requests_processed,
                 "errors_count": self._errors_count,
                 "custom": custom or {},
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
             response = client.post("/api/agents/metrics", json=payload)
             response.raise_for_status()
@@ -643,7 +643,7 @@ class MutxAgentSyncClient:
                 "level": level,
                 "message": message,
                 "metadata": metadata or {},
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
             response = client.post("/api/agents/logs", json=payload)
             response.raise_for_status()
