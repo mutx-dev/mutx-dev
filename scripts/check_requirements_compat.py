@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+"""Fail fast on known incompatible pinned dependency combinations."""
+
+from __future__ import annotations
+
+from pathlib import Path
+import re
+import sys
+
+
+PIN_PATTERN = re.compile(r"^\s*([A-Za-z0-9_.-]+)==([0-9][A-Za-z0-9_.-]*)\s*$")
+
+
+def parse_pinned_versions(requirements_path: Path) -> dict[str, str]:
+    versions: dict[str, str] = {}
+    for raw_line in requirements_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        match = PIN_PATTERN.match(line)
+        if not match:
+            continue
+        package, version = match.groups()
+        versions[package.lower()] = version
+    return versions
+
+
+def version_tuple(version: str) -> tuple[int, ...]:
+    parts = []
+    for part in version.split("."):
+        if not part.isdigit():
+            break
+        parts.append(int(part))
+    return tuple(parts)
+
+
+def main() -> int:
+    repo_root = Path(__file__).resolve().parent.parent
+    requirements_path = repo_root / "requirements.txt"
+    versions = parse_pinned_versions(requirements_path)
+
+    pydantic = versions.get("pydantic")
+    pydantic_settings = versions.get("pydantic-settings")
+
+    if pydantic and pydantic_settings:
+        pydantic_version = version_tuple(pydantic)
+        pydantic_settings_version = version_tuple(pydantic_settings)
+        if pydantic_settings_version >= (2, 7, 0) and pydantic_version < (2, 7, 0):
+            print(
+                "ERROR: Incompatible requirements pinning detected.\n"
+                f"- pydantic=={pydantic}\n"
+                f"- pydantic-settings=={pydantic_settings}\n"
+                "pydantic-settings>=2.7.0 requires pydantic>=2.7.0.\n"
+                "Either lower pydantic-settings below 2.7.0 or upgrade pydantic in lockstep."
+            )
+            return 1
+
+    print("Dependency compatibility checks passed.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
