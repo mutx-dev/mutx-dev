@@ -51,6 +51,59 @@ class TestCreateAgent:
         assert "Configuration validation failed" in response.json()["detail"]
 
     @pytest.mark.asyncio
+    async def test_create_agent_typed_config_fields(self, client: AsyncClient):
+        """Test creating an agent with typed LLM config fields."""
+        response = await client.post(
+            "/api/agents",
+            json={
+                "name": "typed-config-agent",
+                "type": "openai",
+                "config": {
+                    "model": "gpt-4o-mini",
+                    "temperature": 0.2,
+                    "max_tokens": 512,
+                    "system_prompt": "You are concise.",
+                    "tools": ["search", "calculator"],
+                },
+            },
+        )
+        assert response.status_code == 201
+        data = response.json()
+        assert data["config"]["model"] == "gpt-4o-mini"
+        assert data["config"]["temperature"] == 0.2
+        assert data["config"]["max_tokens"] == 512
+        assert data["config"]["system_prompt"] == "You are concise."
+        assert data["config"]["tools"] == ["search", "calculator"]
+
+    @pytest.mark.asyncio
+    async def test_create_agent_invalid_tools_config(self, client: AsyncClient):
+        """Test creating an agent with invalid tools entries."""
+        response = await client.post(
+            "/api/agents",
+            json={
+                "name": "invalid-tools-agent",
+                "type": "openai",
+                "config": {"model": "gpt-4o", "tools": ["search", "   "]},
+            },
+        )
+        assert response.status_code == 400
+        assert "Configuration validation failed" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_create_agent_rejects_non_object_json_config(self, client: AsyncClient):
+        """Test config JSON strings must decode to an object."""
+        response = await client.post(
+            "/api/agents",
+            json={
+                "name": "array-config-agent",
+                "type": "openai",
+                "config": "[\"not\", \"an\", \"object\"]",
+            },
+        )
+        assert response.status_code == 400
+        assert "expected a JSON object" in response.json()["detail"]
+
+    @pytest.mark.asyncio
     async def test_create_agent_with_minimal_data(self, client: AsyncClient):
         """Test creating an agent with minimal data."""
         response = await client.post(

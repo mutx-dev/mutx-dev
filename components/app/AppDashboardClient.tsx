@@ -169,6 +169,23 @@ export function AppDashboardClient() {
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [health, setHealth] = useState<Health | null>(null);
+  const [loadingData, setLoadingData] = useState({
+    health: false,
+    agents: false,
+    deployments: false,
+    apiKeys: false,
+  });
+  const [dataErrors, setDataErrors] = useState<{
+    health: string | null;
+    agents: string | null;
+    deployments: string | null;
+    apiKeys: string | null;
+  }>({
+    health: null,
+    agents: null,
+    deployments: null,
+    apiKeys: null,
+  });
   const [apiKeyName, setApiKeyName] = useState("App dashboard key");
   const [createdKey, setCreatedKey] = useState<CreateKeyResponse | null>(null);
   const [lastKeyAction, setLastKeyAction] = useState<"created" | "rotated">("created");
@@ -378,18 +395,74 @@ export function AppDashboardClient() {
   );
 
   async function loadDashboard() {
-    const [nextHealth, nextAgents, nextDeployments, nextKeys] =
-      await Promise.all([
-        readJson<Health>("/api/dashboard/health"),
-        readJson<Agent[]>("/api/dashboard/agents"),
-        readJson<Deployment[]>("/api/dashboard/deployments"),
-        readJson<ApiKey[]>("/api/api-keys"),
-      ]);
+    setLoadingData({
+      health: true,
+      agents: true,
+      deployments: true,
+      apiKeys: true,
+    });
+    setDataErrors({
+      health: null,
+      agents: null,
+      deployments: null,
+      apiKeys: null,
+    });
 
-    setHealth(nextHealth);
-    setAgents(nextAgents);
-    setDeployments(nextDeployments);
-    setApiKeys(nextKeys);
+    try {
+      const [nextHealth, nextAgents, nextDeployments, nextKeys] =
+        await Promise.all([
+          readJson<Health>("/api/dashboard/health"),
+          readJson<Agent[]>("/api/dashboard/agents"),
+          readJson<Deployment[]>("/api/dashboard/deployments"),
+          readJson<ApiKey[]>("/api/api-keys"),
+        ]);
+
+      setHealth(nextHealth);
+      setAgents(nextAgents);
+      setDeployments(nextDeployments);
+      setApiKeys(nextKeys);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load data';
+      setDataErrors(prev => ({ ...prev, health: errorMessage }));
+    } finally {
+      setLoadingData({
+        health: false,
+        agents: false,
+        deployments: false,
+        apiKeys: false,
+      });
+    }
+  }
+
+  async function loadIndividualData(type: 'health' | 'agents' | 'deployments' | 'apiKeys') {
+    setLoadingData(prev => ({ ...prev, [type]: true }));
+    setDataErrors(prev => ({ ...prev, [type]: null }));
+
+    try {
+      switch (type) {
+        case 'health':
+          const healthData = await readJson<Health>('/api/dashboard/health');
+          setHealth(healthData);
+          break;
+        case 'agents':
+          const agentsData = await readJson<Agent[]>('/api/dashboard/agents');
+          setAgents(agentsData);
+          break;
+        case 'deployments':
+          const deploymentsData = await readJson<Deployment[]>('/api/dashboard/deployments');
+          setDeployments(deploymentsData);
+          break;
+        case 'apiKeys':
+          const keysData = await readJson<ApiKey[]>('/api/api-keys');
+          setApiKeys(keysData);
+          break;
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : `Failed to load ${type}`;
+      setDataErrors(prev => ({ ...prev, [type]: errorMessage }));
+    } finally {
+      setLoadingData(prev => ({ ...prev, [type]: false }));
+    }
   }
 
   useEffect(() => {
@@ -820,40 +893,64 @@ export function AppDashboardClient() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {summary.map(({ label, value, detail, icon: Icon }) => (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {summary.map(({ label, value, detail, icon: Icon }) => {
+          const dataKey = label.toLowerCase() as 'health' | 'agents' | 'deployments' | 'api keys';
+          const isLoading = dataKey === 'api keys' ? loadingData.apiKeys : loadingData[dataKey];
+          const error = dataKey === 'api keys' ? dataErrors.apiKeys : dataErrors[dataKey];
+
+          return (
           <Card
             key={label}
             className="border border-white/5 bg-white/[0.01] p-5"
           >
             <div className="mb-4 flex items-center justify-between">
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] text-cyan-400">
-                <Icon className="h-5 w-5" />
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Icon className="h-5 w-5" />
+                )}
               </div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
                 {label}
               </p>
             </div>
 
-            <div className="flex items-center gap-3 text-white">
-              {label === "Health" ? <StatusDot status={value} /> : null}
-              <p className="text-3xl font-semibold capitalize tracking-tight">
-                {value}
-              </p>
-            </div>
-            <p className="mt-2 text-xs text-slate-500">{detail}</p>
-            {label === "Health" ? (
+            {isLoading ? (
+              <div className="flex items-center gap-2 text-slate-400">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                <span className="text-sm">Loading...</span>
+              </div>
+            ) : error ? (
+              <div className="flex items-center gap-2 text-rose-400">
+                <AlertTriangle className="h-4 w-4" />
+                <span className="text-sm">{error}</span>
+              </div>
+            ) : (
               <>
-                <p className="mt-2 text-xs text-slate-500 font-[family:var(--font-mono)]">
-                  database: {health?.database || "unknown"}
-                </p>
-                {health?.error ? (
-                  <p className="mt-2 text-xs text-rose-300">error: {health.error}</p>
+                <div className="flex items-center gap-3 text-white">
+                  {label === "Health" ? <StatusDot status={value} /> : null}
+                  <p className="text-3xl font-semibold capitalize tracking-tight">
+                    {value}
+                  </p>
+                </div>
+                <p className="mt-2 text-xs text-slate-500">{detail}</p>
+                {label === "Health" ? (
+                  <>
+                    <p className="mt-2 text-xs text-slate-500 font-[family:var(--font-mono)]">
+                      database: {health?.database || "unknown"}
+                    </p>
+                    {health?.error ? (
+                      <p className="mt-2 text-xs text-rose-300">error: {health.error}</p>
+                    ) : null}
+                  </>
                 ) : null}
               </>
-            ) : null}
+            )}
           </Card>
-        ))}
+          );
+        })}
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
@@ -886,7 +983,31 @@ export function AppDashboardClient() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {refreshing ? (
+                  {loadingData.agents ? (
+                    <tr>
+                      <td
+                        colSpan={3}
+                        className="px-6 py-12 text-center text-slate-500"
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading agents...
+                        </div>
+                      </td>
+                    </tr>
+                  ) : dataErrors.agents ? (
+                    <tr>
+                      <td
+                        colSpan={3}
+                        className="px-6 py-12 text-center text-rose-400"
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <AlertTriangle className="h-4 w-4" />
+                          {dataErrors.agents}
+                        </div>
+                      </td>
+                    </tr>
+                  ) : refreshing ? (
                     <tr>
                       <td
                         colSpan={3}

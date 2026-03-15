@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic import EmailStr
 from datetime import datetime
 from typing import Optional, Any
@@ -15,27 +15,65 @@ class AgentConfigBase(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-class OpenAIAgentConfig(AgentConfigBase):
-    model: str = Field(default="gpt-4o")
+class LLMGenerationConfig(AgentConfigBase):
+    """Shared typed configuration for LLM-driven agents."""
+
+    model: str = Field(default="gpt-4o", min_length=1, max_length=128)
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
-    system_prompt: Optional[str] = None
-    max_tokens: Optional[int] = Field(default=None, gt=0)
+    max_tokens: int = Field(default=2048, gt=0, le=200000)
+    system_prompt: Optional[str] = Field(default=None, max_length=20000)
+    tools: list[str] = Field(default_factory=list)
+    top_p: float = Field(default=1.0, gt=0.0, le=1.0)
+    frequency_penalty: float = Field(default=0.0, ge=-2.0, le=2.0)
+    presence_penalty: float = Field(default=0.0, ge=-2.0, le=2.0)
+    stop: list[str] = Field(default_factory=list, max_length=16)
+
+    @field_validator("tools")
+    @classmethod
+    def validate_tools(cls, value: list[str]) -> list[str]:
+        normalized = []
+        for tool_name in value:
+            tool_name = tool_name.strip()
+            if not tool_name:
+                raise ValueError("Tool names must be non-empty strings")
+            normalized.append(tool_name)
+        return normalized
+
+    @field_validator("stop")
+    @classmethod
+    def validate_stop_sequences(cls, value: list[str]) -> list[str]:
+        normalized = []
+        for sequence in value:
+            sequence = sequence.strip()
+            if not sequence:
+                raise ValueError("Stop sequences must be non-empty strings")
+            normalized.append(sequence)
+        return normalized
 
 
-class AnthropicAgentConfig(AgentConfigBase):
-    model: str = Field(default="claude-3-5-sonnet-20240620")
+class OpenAIAgentConfig(LLMGenerationConfig):
+    model: str = Field(default="gpt-4o", min_length=1, max_length=128)
+    max_tokens: int = Field(default=4096, gt=0, le=200000)
+
+
+class AnthropicAgentConfig(LLMGenerationConfig):
+    model: str = Field(default="claude-3-5-sonnet-20240620", min_length=1, max_length=128)
     temperature: float = Field(default=0.7, ge=0.0, le=1.0)
-    system_prompt: Optional[str] = None
-    max_tokens: int = Field(default=4096, gt=0)
+    max_tokens: int = Field(default=4096, gt=0, le=200000)
 
 
-class LangChainAgentConfig(AgentConfigBase):
-    chain_id: str
+class LangChainAgentConfig(LLMGenerationConfig):
+    provider: str = Field(default="openai", min_length=1, max_length=50)
+    chain_id: Optional[str] = Field(default=None, min_length=1, max_length=255)
     parameters: dict[str, Any] = Field(default_factory=dict)
+    vector_store_name: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    memory_type: str = Field(default="buffer", min_length=1, max_length=50)
+    max_iterations: int = Field(default=10, gt=0, le=100)
+    verbose: bool = True
 
 
 class CustomAgentConfig(AgentConfigBase):
-    image: str
+    image: str = Field(min_length=1, max_length=512)
     command: list[str] = Field(default_factory=list)
     env: dict[str, str] = Field(default_factory=dict)
 
@@ -44,7 +82,7 @@ class AgentCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=1000)
     type: AgentType = Field(default=AgentType.OPENAI)
-    config: Optional[dict[str, Any]] = None
+    config: Optional[dict[str, Any] | str] = None
     # user_id is set from current_user in the route, not from request body
 
 

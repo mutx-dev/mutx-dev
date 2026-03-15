@@ -6,6 +6,7 @@ from typing import Optional, Any
 import uuid
 import json
 
+from pydantic import BaseModel, ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -36,6 +37,13 @@ from src.api.middleware.auth import get_current_user
 router = APIRouter(prefix="/agents", tags=["agents"])
 logger = logging.getLogger(__name__)
 
+_CONFIG_SCHEMA_BY_TYPE: dict[AgentType, type[BaseModel]] = {
+    AgentType.OPENAI: OpenAIAgentConfig,
+    AgentType.ANTHROPIC: AnthropicAgentConfig,
+    AgentType.LANGCHAIN: LangChainAgentConfig,
+    AgentType.CUSTOM: CustomAgentConfig,
+}
+
 
 async def _get_owned_agent(
     agent_id: uuid.UUID,
@@ -58,33 +66,43 @@ async def _get_owned_agent(
 def _validate_agent_config(agent_type: AgentType, config: Any) -> str:
     """Validate and normalize agent configuration based on its type."""
     if config is None:
-        return "{}"
+        config_dict: dict[str, Any] = {}
 
-    # If it's already a string, try to parse it first to ensure it's valid JSON
-    if isinstance(config, str):
+    elif isinstance(config, str):
         try:
             config_dict = json.loads(config)
-        except json.JSONDecodeError:
-            raise HTTPException(status_code=400, detail="Invalid JSON in agent configuration")
-    else:
+        except json.JSONDecodeError as exc:
+            raise HTTPException(status_code=400, detail="Invalid JSON in agent configuration") from exc
+    elif isinstance(config, BaseModel):
+        config_dict = config.model_dump(exclude_none=True)
+    elif isinstance(config, dict):
         config_dict = config
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid agent configuration payload: expected a JSON object",
+        )
+
+    if not isinstance(config_dict, dict):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid agent configuration payload: expected a JSON object",
+        )
+
+    schema_model = _CONFIG_SCHEMA_BY_TYPE.get(agent_type)
+    if schema_model is None:
+        # Fallback for future types not yet fully schema-guarded
+        return json.dumps(config_dict)
 
     try:
-        if agent_type == AgentType.OPENAI:
-            validated = OpenAIAgentConfig(**config_dict)
-        elif agent_type == AgentType.ANTHROPIC:
-            validated = AnthropicAgentConfig(**config_dict)
-        elif agent_type == AgentType.LANGCHAIN:
-            validated = LangChainAgentConfig(**config_dict)
-        elif agent_type == AgentType.CUSTOM:
-            validated = CustomAgentConfig(**config_dict)
-        else:
-            # Fallback for future types not yet fully schema-guarded
-            return json.dumps(config_dict)
+        validated = schema_model.model_validate(config_dict)
+    except ValidationError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Configuration validation failed: {exc}",
+        ) from exc
 
-        return validated.model_dump_json()
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Configuration validation failed: {str(e)}")
+    return validated.model_dump_json(exclude_none=True)
 
 
 def _serialize_deployment(deployment: Deployment):
