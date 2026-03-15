@@ -1,7 +1,7 @@
 """Rate limiting middleware for the API."""
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Callable
 
 from fastapi import FastAPI, Request, Response
@@ -35,7 +35,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     def _clean_old_requests(self) -> None:
         """Remove requests outside the current window and stale client entries."""
-        cutoff = datetime.utcnow() - timedelta(seconds=self.window_seconds)
+        cutoff = datetime.now(timezone.utc) - timedelta(seconds=self.window_seconds)
         for client_id, timestamps in list(self._requests.items()):
             active_timestamps = [ts for ts in timestamps if ts > cutoff]
             if active_timestamps:
@@ -78,7 +78,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             )
 
         # Record this request
-        self._requests.setdefault(client_id, []).append(datetime.utcnow())
+        self._requests.setdefault(client_id, []).append(datetime.now(timezone.utc))
 
         logger.debug(
             "Rate limit check | client=%s | count=%s | limit=%s | path=%s",

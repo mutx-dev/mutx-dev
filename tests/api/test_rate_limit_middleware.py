@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import FastAPI
 from starlette.requests import Request
@@ -34,7 +34,7 @@ def test_get_client_ip_ignores_x_forwarded_for_header() -> None:
 
 def test_clean_old_requests_removes_stale_client_entries() -> None:
     middleware = RateLimitMiddleware(FastAPI(), requests=5, window_seconds=60)
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
 
     middleware._requests = {
         "stale-client": [now - timedelta(seconds=120)],
