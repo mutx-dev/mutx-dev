@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic'
  */
 async function getCurrentUserId(token: string): Promise<string | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
     })
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     // Filter by user_id to enforce ownership - derived from auth token, not client input
-    const response = await fetch(`${API_BASE_URL}/api/agents?limit=20&user_id=${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/agents?limit=20&user_id=${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
     })
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return validation.response
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/agents`, {
+    const response = await fetch(`${API_BASE_URL}/agents`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,

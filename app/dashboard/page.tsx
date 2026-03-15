@@ -38,6 +38,13 @@ export default function DashboardPage() {
           fetch("/api/dashboard/health"),
         ]);
 
+        // Check for authentication errors first
+        if (agentsRes.status === 401 || deploymentsRes.status === 401) {
+          setError("auth_required");
+          setLoading(false);
+          return;
+        }
+
         if (!agentsRes.ok || !deploymentsRes.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -84,6 +91,16 @@ export default function DashboardPage() {
   }
 
   if (error) {
+    if (error === "auth_required") {
+      return (
+        <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/10 p-4">
+          <p className="text-cyan-400">Please sign in to view your dashboard</p>
+          <a href="/login" className="mt-2 inline-block text-sm font-medium text-cyan-300 hover:text-cyan-200">
+            Sign in →
+          </a>
+        </div>
+      );
+    }
     return (
       <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-red-400">
         {error}
@@ -115,7 +132,7 @@ export default function DashboardPage() {
         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
           <p className="text-sm font-medium text-slate-400">Active Agents</p>
           <p className="mt-2 text-3xl font-bold text-cyan-400">
-            {agents.filter((a) => a.status === "active").length}
+            {agents.filter((a) => a.status === "running").length}
           </p>
         </div>
         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
@@ -155,7 +172,7 @@ export default function DashboardPage() {
                   <span className="text-slate-200">{agent.name}</span>
                   <span
                     className={`rounded-full px-2 py-1 text-xs font-medium ${
-                      agent.status === "active"
+                      agent.status === "running"
                         ? "bg-emerald-500/20 text-emerald-400"
                         : "bg-slate-700 text-slate-400"
                     }`}

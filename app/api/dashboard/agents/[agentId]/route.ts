@@ -8,6 +8,32 @@ const API_BASE_URL = getApiBaseUrl()
 
 export const dynamic = 'force-dynamic'
 
+export async function GET(request: NextRequest, { params }: { params: Promise<{ agentId: string }> }): Promise<NextResponse> {
+  return withErrorHandling(async (req: Request) => {
+    const token = await getAuthToken(request)
+    if (!token) {
+      return unauthorized()
+    }
+
+    const { agentId } = await params
+
+    // Validate agentId format
+    const idValidation = z.string().uuid('Invalid agent ID').safeParse(agentId)
+    if (!idValidation.success) {
+      return badRequest('Invalid agent ID format')
+    }
+
+    const response = await fetch(`${API_BASE_URL}/agents/${agentId}`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    })
+
+    const payload = await response.json().catch(() => ({ detail: 'Failed to fetch agent' }))
+    return NextResponse.json(payload, { status: response.status })
+  })(request)
+}
+
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ agentId: string }> }): Promise<NextResponse> {
   return withErrorHandling(async (req: Request) => {
     const token = await getAuthToken(request)
