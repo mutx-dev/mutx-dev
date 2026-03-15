@@ -3,7 +3,6 @@
 import logging
 import uuid
 from datetime import datetime
-from typing import Any
 
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
@@ -13,10 +12,6 @@ from pydantic import ValidationError
 from src.api.models.error_schemas import (
     ErrorDetail,
     ValidationErrorResponse,
-    RateLimitErrorResponse,
-    NotFoundErrorResponse,
-    UnauthorizedErrorResponse,
-    ForbiddenErrorResponse,
     InternalErrorResponse,
 )
 
