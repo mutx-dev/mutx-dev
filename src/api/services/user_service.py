@@ -146,7 +146,7 @@ class UserService:
 
         for api_key in api_keys:
             if verify_api_key(plain_key, api_key.key_hash):
-                if api_key.expires_at and api_key.expires_at < datetime.now(timezone.utc):
+                if api_key.expires_at and api_key.expires_at < datetime.now(timezone.utc).replace(tzinfo=None):
                     return None
                 await self.update_api_key_last_used(api_key.id)
                 return api_key
@@ -277,7 +277,7 @@ class UserService:
             return None
 
         # Check if token is expired
-        if user.password_reset_expires_at and user.password_reset_expires_at < datetime.now(timezone.utc):
+        if user.password_reset_expires_at and user.password_reset_expires_at < datetime.now(timezone.utc).replace(tzinfo=None):
             return None
 
         # Update password and clear reset token
