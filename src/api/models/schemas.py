@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
-from pydantic import EmailStr
 from datetime import datetime
-from typing import Optional, Any
+from typing import Any, Optional
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 import uuid
 
 from src.api.models.models import AgentStatus, AgentType
@@ -13,19 +13,20 @@ class AgentConfigBase(BaseModel):
     """Base schema for specialized agent configurations"""
 
     model_config = ConfigDict(extra="forbid")
+    name: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    system_prompt: Optional[str] = Field(default=None, max_length=16000)
+    version: int = Field(default=1, ge=1)
 
 
 class OpenAIAgentConfig(AgentConfigBase):
-    model: str = Field(default="gpt-4o")
+    model: str = Field(default="gpt-4o", min_length=1, max_length=255)
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
-    system_prompt: Optional[str] = None
     max_tokens: Optional[int] = Field(default=None, gt=0)
 
 
 class AnthropicAgentConfig(AgentConfigBase):
-    model: str = Field(default="claude-3-5-sonnet-20240620")
+    model: str = Field(default="claude-3-5-sonnet-20240620", min_length=1, max_length=255)
     temperature: float = Field(default=0.7, ge=0.0, le=1.0)
-    system_prompt: Optional[str] = None
     max_tokens: int = Field(default=4096, gt=0)
 
 
@@ -40,12 +41,24 @@ class CustomAgentConfig(AgentConfigBase):
     env: dict[str, str] = Field(default_factory=dict)
 
 
+AgentConfigSchema = (
+    OpenAIAgentConfig | AnthropicAgentConfig | LangChainAgentConfig | CustomAgentConfig
+)
+
+
 class AgentCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=1000)
     type: AgentType = Field(default=AgentType.OPENAI)
-    config: Optional[dict[str, Any]] = None
+    config: Optional[dict[str, Any] | str] = None
     # user_id is set from current_user in the route, not from request body
+
+
+class AgentConfigUpdateRequest(BaseModel):
+    config: dict[str, Any] | str = Field(
+        ...,
+        description="Updated agent configuration payload. Can be a JSON object or JSON string.",
+    )
 
 
 class DeploymentCreate(BaseModel):
@@ -160,8 +173,10 @@ class AgentResponse(BaseModel):
     id: uuid.UUID
     name: str
     description: Optional[str]
+    type: AgentType
     status: str
-    config: Optional[dict[str, Any]]
+    config: Optional[AgentConfigSchema | dict[str, Any]]
+    config_version: int = Field(default=1, ge=1)
     created_at: datetime
     updated_at: datetime
     user_id: uuid.UUID
@@ -169,6 +184,14 @@ class AgentResponse(BaseModel):
 
 class AgentDetailResponse(AgentResponse):
     deployments: list[DeploymentResponse] = Field(default_factory=list)
+
+
+class AgentConfigResponse(BaseModel):
+    agent_id: uuid.UUID
+    type: AgentType
+    config: AgentConfigSchema | dict[str, Any]
+    config_version: int = Field(..., ge=1)
+    updated_at: datetime
 
 
 class AgentLogResponse(BaseModel):
