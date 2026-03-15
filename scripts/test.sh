@@ -25,6 +25,9 @@ if [ -z "$PYTHON_BIN" ]; then
   exit 1
 fi
 
+echo "Checking pinned dependency compatibility..."
+"$PYTHON_BIN" scripts/check_requirements_compat.py
+
 if [ -x ".venv/bin/ruff" ]; then
   RUFF_BIN=".venv/bin/ruff"
 else
