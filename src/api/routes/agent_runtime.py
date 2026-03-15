@@ -14,7 +14,7 @@ These endpoints are used by agents to connect to MUTX:
 import logging
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -157,7 +157,7 @@ async def heartbeat(
 
     # Update agent status and last heartbeat
     previous_status = agent.status
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     heartbeat_timestamp = now.isoformat()
     new_status = request.status.value
     agent.status = new_status
@@ -231,7 +231,7 @@ async def report_metrics(
         agent_id=agent.id,
         cpu_usage=request.cpu_usage,
         memory_usage=request.memory_usage,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
     )
     db.add(metric)
 
@@ -311,7 +311,7 @@ async def acknowledge_command(
     command.status = "completed" if request.success else "failed"
     command.result = request.result
     command.error_message = request.error
-    command.completed_at = datetime.utcnow()
+    command.completed_at = datetime.now(timezone.utc)
 
     await db.commit()
 
@@ -337,7 +337,7 @@ async def submit_log(
         level=request.level,
         message=request.message,
         meta_data=request.metadata,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
     )
     db.add(log_entry)
 
@@ -366,7 +366,11 @@ async def get_agent_status(
 
     uptime = 0.0
     if current_agent.created_at:
-        uptime = (datetime.utcnow() - current_agent.created_at).total_seconds()
+        # Handle both naive and timezone-aware datetimes
+        created = current_agent.created_at
+        if created.tzinfo is None:
+            created = created.replace(tzinfo=timezone.utc)
+        uptime = (datetime.now(timezone.utc) - created).total_seconds()
 
     return AgentStatusResponse(
         agent_id=str(current_agent.id),

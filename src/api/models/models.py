@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from sqlalchemy import Boolean, DateTime, Enum as SQLEnum, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -82,9 +82,13 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=True)
     plan: Mapped[Plan] = mapped_column(SQLEnum(Plan), default=Plan.FREE)
     api_key: Mapped[str] = mapped_column(String(64), unique=True, nullable=True, index=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     # Email verification fields
@@ -125,9 +129,13 @@ class Agent(Base):
         String(128), nullable=True, index=True
     )  # Agent API key for self-auth
     last_heartbeat: Mapped[datetime] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
 
     user: Mapped["User"] = relationship("User", back_populates="agents")
@@ -161,7 +169,9 @@ class Deployment(Base):
     status: Mapped[str] = mapped_column(String(50), default="pending")
     region: Mapped[str] = mapped_column(String(50), nullable=True)
     version: Mapped[str] = mapped_column(String(50), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     replicas: Mapped[int] = mapped_column(Integer, default=1)
     node_id: Mapped[str] = mapped_column(String(255), nullable=True)
     started_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
@@ -188,7 +198,9 @@ class DeploymentEvent(Base):
     status: Mapped[str] = mapped_column(String(50), nullable=False)
     node_id: Mapped[str] = mapped_column(String(255), nullable=True)
     error_message: Mapped[str] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
     deployment: Mapped["Deployment"] = relationship("Deployment", back_populates="events")
 
@@ -203,7 +215,9 @@ class DeploymentVersion(Base):
     version: Mapped[int] = mapped_column(Integer, nullable=False)
     config_snapshot: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(String(50), default="current")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     rolled_back_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
     deployment: Mapped["Deployment"] = relationship("Deployment", back_populates="versions")
@@ -219,7 +233,9 @@ class APIKey(Base):
     key_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     last_used: Mapped[datetime] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
@@ -237,7 +253,9 @@ class Webhook(Base):
     events: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
     secret: Mapped[str] = mapped_column(String(255), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
     user: Mapped["User"] = relationship("User", back_populates="webhooks")
 
@@ -253,7 +271,9 @@ class Metrics(Base):
     memory: Mapped[float] = mapped_column(Float, nullable=True)
     requests: Mapped[int] = mapped_column(Integer, default=0)
     latency: Mapped[float] = mapped_column(Float, nullable=True)
-    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )
 
     agent: Mapped["Agent"] = relationship("Agent", back_populates="metrics")
 
@@ -268,7 +288,9 @@ class Alert(Base):
     type: Mapped[AlertType] = mapped_column(SQLEnum(AlertType), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
     resolved: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     resolved_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
     agent: Mapped["Agent"] = relationship("Agent", back_populates="alerts")
@@ -285,7 +307,9 @@ class AgentLog(Base):
     message: Mapped[str] = mapped_column(Text, nullable=False)
     extra_data: Mapped[str] = mapped_column(Text, nullable=True)
     meta_data: Mapped[Optional[dict]] = mapped_column(Text, nullable=True)  # Renamed to meta_data
-    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )
 
     agent: Mapped["Agent"] = relationship("Agent", back_populates="logs")
 
@@ -302,7 +326,9 @@ class Command(Base):
     status: Mapped[str] = mapped_column(String(50), default="pending")
     result: Mapped[Optional[dict]] = mapped_column(Text, nullable=True)
     error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     agent: Mapped["Agent"] = relationship("Agent")
@@ -317,7 +343,9 @@ class AgentMetric(Base):
     )
     cpu_usage: Mapped[float] = mapped_column(Float, nullable=True)
     memory_usage: Mapped[float] = mapped_column(Float, nullable=True)
-    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )
 
     agent: Mapped["Agent"] = relationship("Agent", back_populates="agent_metrics")
 
@@ -337,9 +365,13 @@ class AgentRun(Base):
     output_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     run_metadata: Mapped[Optional[str]] = mapped_column("metadata", Text, nullable=True)
-    started_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )
 
     agent: Mapped["Agent"] = relationship("Agent", back_populates="runs")
     user: Mapped["User"] = relationship("User", back_populates="runs")
@@ -359,7 +391,9 @@ class AgentRunTrace(Base):
     message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     payload: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     sequence: Mapped[int] = mapped_column(Integer, default=0)
-    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )
 
     run: Mapped["AgentRun"] = relationship("AgentRun", back_populates="traces")
 
@@ -380,7 +414,9 @@ class WebhookDeliveryLog(Base):
     success: Mapped[bool] = mapped_column(Boolean, default=False)
     error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     attempts: Mapped[int] = mapped_column(Integer, default=1)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
     delivered_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     webhook: Mapped["Webhook"] = relationship("Webhook")
@@ -392,7 +428,9 @@ class WaitlistSignup(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     source: Mapped[Optional[str]] = mapped_column(String(120), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )
 
 
 class Lead(Base):
@@ -404,4 +442,6 @@ class Lead(Base):
     company: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     source: Mapped[Optional[str]] = mapped_column(String(120), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 import pytest
@@ -16,7 +16,7 @@ async def test_agent_status_requires_agent_auth(client, test_agent):
 async def test_agent_status_returns_authenticated_agent_status(client, db_session, test_agent):
     test_agent.api_key = 'mutx_agent_status_test_key'
     test_agent.status = 'running'
-    test_agent.last_heartbeat = datetime.utcnow()
+    test_agent.last_heartbeat = datetime.now(timezone.utc)
     await db_session.commit()
 
     response = await client.get(
@@ -119,7 +119,7 @@ async def test_runtime_registered_agent_api_key_authenticates_status_and_heartbe
             'agent_id': agent_id,
             'status': 'running',
             'message': 'demo heartbeat',
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
         },
     )
 
