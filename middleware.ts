@@ -40,6 +40,10 @@ function isAppHost(hostname: string) {
   return hostname === 'app.mutx.dev' || hostname === 'app.localhost'
 }
 
+function isPrimaryWebHost(hostname: string) {
+  return hostname === 'mutx.dev' || hostname === 'www.mutx.dev'
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hostname = getHostname(request)
@@ -65,6 +69,16 @@ export function middleware(request: NextRequest) {
     }
 
     return response
+  }
+
+  // Keep app.mutx.dev as the canonical operator surface in production.
+  if (isPrimaryWebHost(hostname) && (pathname === '/app' || pathname.startsWith('/app/'))) {
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.hostname = 'app.mutx.dev'
+    redirectUrl.protocol = 'https'
+    redirectUrl.port = ''
+    redirectUrl.pathname = pathname.replace(/^\/app/, '') || '/'
+    return NextResponse.redirect(redirectUrl, 308)
   }
 
   if (!isAppHost(hostname)) {
