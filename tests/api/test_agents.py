@@ -2,6 +2,8 @@
 Tests for /agents endpoints.
 """
 
+import json
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,12 +30,16 @@ class TestCreateAgent:
         data = response.json()
         assert data["name"] == "new-agent"
         assert data["description"] == "A new test agent"
+        assert data["type"] == "openai"
         assert data["status"] == "creating"
+        assert data["config_version"] == 1
 
         # Verify validated config
         config = data["config"]
+        assert config["name"] == "new-agent"
         assert config["model"] == "gpt-4o"
         assert config["temperature"] == 0.7
+        assert config["version"] == 1
         assert "id" in data
 
     @pytest.mark.asyncio
@@ -62,6 +68,8 @@ class TestCreateAgent:
         assert response.status_code == 201
         data = response.json()
         assert data["name"] == "minimal-agent"
+        assert data["config"]["name"] == "minimal-agent"
+        assert data["config_version"] == 1
 
 
 class TestListAgents:
@@ -186,6 +194,70 @@ class TestDeleteAgent:
     ):
         """Test that users cannot delete other users' agents."""
         response = await other_user_client.delete(f"/api/agents/{test_agent.id}")
+        assert response.status_code == 403
+
+
+class TestAgentConfig:
+    """Tests for /agents/{agent_id}/config endpoints."""
+
+    @pytest.mark.asyncio
+    async def test_get_agent_config_success(self, client: AsyncClient, test_agent):
+        response = await client.get(f"/api/agents/{test_agent.id}/config")
+        assert response.status_code == 200
+
+        data = response.json()
+        assert data["agent_id"] == str(test_agent.id)
+        assert data["type"] == "openai"
+        assert data["config"]["model"] == "gpt-4"
+        assert data["config"]["temperature"] == 0.7
+        assert data["config_version"] == 1
+
+    @pytest.mark.asyncio
+    async def test_update_agent_config_success(self, client: AsyncClient, test_agent):
+        response = await client.patch(
+            f"/api/agents/{test_agent.id}/config",
+            json={"config": {"model": "gpt-4o-mini", "temperature": 0.2, "max_tokens": 256}},
+        )
+        assert response.status_code == 200
+
+        data = response.json()
+        assert data["config"]["name"] == test_agent.name
+        assert data["config"]["model"] == "gpt-4o-mini"
+        assert data["config"]["temperature"] == 0.2
+        assert data["config"]["max_tokens"] == 256
+        assert data["config"]["version"] == 2
+        assert data["config_version"] == 2
+
+    @pytest.mark.asyncio
+    async def test_update_agent_config_accepts_json_string(self, client: AsyncClient, test_agent):
+        response = await client.patch(
+            f"/api/agents/{test_agent.id}/config",
+            json={"config": json.dumps({"model": "gpt-4o", "temperature": 0.1})},
+        )
+        assert response.status_code == 200
+
+        data = response.json()
+        assert data["config"]["model"] == "gpt-4o"
+        assert data["config"]["temperature"] == 0.1
+        assert data["config"]["version"] == 2
+
+    @pytest.mark.asyncio
+    async def test_update_agent_config_invalid_config(self, client: AsyncClient, test_agent):
+        response = await client.patch(
+            f"/api/agents/{test_agent.id}/config",
+            json={"config": {"model": "gpt-4o", "temperature": 3.5}},
+        )
+        assert response.status_code == 400
+        assert "Configuration validation failed" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_update_agent_config_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_agent
+    ):
+        response = await other_user_client.patch(
+            f"/api/agents/{test_agent.id}/config",
+            json={"config": {"model": "gpt-4o", "temperature": 0.3}},
+        )
         assert response.status_code == 403
 
 

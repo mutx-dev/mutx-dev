@@ -13,7 +13,8 @@ Runtime-facing endpoints such as heartbeat, command polling, log submission, and
 
 * Routes are mounted at `/agents`, not `/v1/agents`.
 * `POST /agents` derives ownership from the authenticated user instead of accepting `user_id` in the request body.
-* `config` is currently modeled as a string field, so JSON config should be sent as a string payload.
+* `config` is typed and validated per agent type (OpenAI, Anthropic, LangChain, Custom).
+* Config payloads can be sent as JSON objects (recommended) or JSON strings.
 * Control-plane routes enforce user ownership; runtime status enforces agent identity match.
 
 ## Routes
@@ -23,6 +24,8 @@ Runtime-facing endpoints such as heartbeat, command polling, log submission, and
 | `POST /agents`                   | Create an agent record                                |
 | `GET /agents`                    | List agents                                           |
 | `GET /agents/{agent_id}`         | Get one agent with deployments                        |
+| `GET /agents/{agent_id}/config`  | Read normalized typed config + config version         |
+| `PATCH /agents/{agent_id}/config`| Update config with schema validation + version bump   |
 | `GET /agents/{agent_id}/status`  | Get runtime status for the authenticated agent        |
 | `DELETE /agents/{agent_id}`      | Delete an agent                                       |
 | `POST /agents/{agent_id}/deploy` | Create a deployment record and mark the agent running |
@@ -43,7 +46,13 @@ curl -X POST "$BASE_URL/agents" \
   -d '{
     "name": "Support Bot",
     "description": "Handles inbound support tasks",
-    "config": "{\"model\":\"gpt-4\"}"
+    "type": "openai",
+    "config": {
+      "model": "gpt-4o",
+      "temperature": 0.2,
+      "max_tokens": 1024,
+      "system_prompt": "You are a concise support assistant."
+    }
   }'
 ```
 
@@ -54,13 +63,34 @@ Example response:
   "id": "uuid",
   "name": "Support Bot",
   "description": "Handles inbound support tasks",
+  "type": "openai",
   "status": "creating",
-  "config": "{\"model\":\"gpt-4\"}",
+  "config": {
+    "name": "Support Bot",
+    "model": "gpt-4o",
+    "temperature": 0.2,
+    "max_tokens": 1024,
+    "system_prompt": "You are a concise support assistant.",
+    "version": 1
+  },
+  "config_version": 1,
   "created_at": "2026-03-08T10:00:00Z",
   "updated_at": "2026-03-08T10:00:00Z",
   "user_id": "uuid"
 }
 ```
+
+## Config Schema
+
+The control plane validates config payloads by `type`:
+
+* Shared fields: `name` (optional string), `system_prompt` (optional string), `version` (int, default `1`)
+* OpenAI: `model` (string), `temperature` (`0.0` to `2.0`), `max_tokens` (optional int > 0)
+* Anthropic: `model` (string), `temperature` (`0.0` to `1.0`), `max_tokens` (int > 0)
+* LangChain: `chain_id` (string), `parameters` (object)
+* Custom: `image` (string), `command` (string array), `env` (string map)
+
+Unknown keys are rejected (`extra=forbid`) for typed models.
 
 ## List Agents
 
@@ -83,6 +113,29 @@ curl "$BASE_URL/agents/YOUR_AGENT_ID" \
 ```
 
 The detail response includes a `deployments` array.
+
+## Get Agent Config
+
+```bash
+curl "$BASE_URL/agents/YOUR_AGENT_ID/config" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+## Update Agent Config
+
+Config updates are validated and auto-increment the config version.
+
+```bash
+curl -X PATCH "$BASE_URL/agents/YOUR_AGENT_ID/config" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "config": {
+      "model": "gpt-4o-mini",
+      "temperature": 0.1
+    }
+  }'
+```
 
 ## Get Runtime Status
 
