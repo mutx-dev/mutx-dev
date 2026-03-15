@@ -165,7 +165,12 @@ export default function DashboardPage() {
             </Link>
           </div>
           {agents.length === 0 ? (
-            <p className="mt-4 text-slate-400">No agents yet</p>
+            <div className="mt-4 space-y-3">
+              <p className="text-slate-400">No agents yet</p>
+              <Link href="/dashboard/agents" className="inline-flex items-center gap-2 rounded-lg bg-cyan-500/20 px-4 py-2 text-sm font-medium text-cyan-400 hover:bg-cyan-500/30">
+                Create your first agent →
+              </Link>
+            </div>
           ) : (
             <ul className="mt-4 space-y-3">
               {agents.slice(0, 3).map((agent) => (
@@ -201,7 +206,12 @@ export default function DashboardPage() {
             </Link>
           </div>
           {deployments.length === 0 ? (
-            <p className="mt-4 text-slate-400">No deployments yet</p>
+            <div className="mt-4 space-y-3">
+              <p className="text-slate-400">No deployments yet</p>
+              <Link href="/dashboard/agents" className="inline-flex items-center gap-2 rounded-lg bg-cyan-500/20 px-4 py-2 text-sm font-medium text-cyan-400 hover:bg-cyan-500/30">
+                Deploy an agent →
+              </Link>
+            </div>
           ) : (
             <ul className="mt-4 space-y-3">
               {deployments.slice(0, 3).map((deployment) => (
