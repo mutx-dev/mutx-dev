@@ -175,6 +175,10 @@ async def test_agent_heartbeat_check_uses_stale_threshold_and_created_at_fallbac
         last_heartbeat=None,
         created_at=now - timedelta(seconds=STALE_THRESHOLD_SECONDS - 1),
     )
+    with_only_created_at_timezone_aware = SimpleNamespace(
+        last_heartbeat=None,
+        created_at=datetime.now(timezone.utc) - timedelta(seconds=STALE_THRESHOLD_SECONDS - 1),
+    )
     without_timestamps = SimpleNamespace(last_heartbeat=None, created_at=None)
 
     agent_id = str(uuid.uuid4())
@@ -199,6 +203,16 @@ async def test_agent_heartbeat_check_uses_stale_threshold_and_created_at_fallbac
         monitor_module.database_module,
         "async_session_maker",
         lambda: _fake_session_maker(_FakeExecuteResult(scalar_value=with_only_created_at)),
+    )
+    check = monitor_module._agent_heartbeat_check(agent_id)
+    assert await check() is True
+
+    monkeypatch.setattr(
+        monitor_module.database_module,
+        "async_session_maker",
+        lambda: _fake_session_maker(
+            _FakeExecuteResult(scalar_value=with_only_created_at_timezone_aware)
+        ),
     )
     check = monitor_module._agent_heartbeat_check(agent_id)
     assert await check() is True
