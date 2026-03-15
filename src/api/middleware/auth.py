@@ -104,22 +104,32 @@ async def get_current_user_or_api_key(
     session: AsyncSession = Depends(get_db),
 ) -> User:
     """Authenticate using either JWT Bearer token or API key."""
+    # Track the bearer token for fallback API key check
+    bearer_token = None
+
     # Try JWT first
     if authorization:
         parts = authorization.split()
         if len(parts) == 2 and parts[0].lower() == "bearer":
-            token = parts[1]
-            user_id = verify_access_token(token)
+            bearer_token = parts[1]
+            user_id = verify_access_token(bearer_token)
             if user_id:
                 user_service = UserService(session)
                 user = await user_service.get_user_by_id(user_id)
                 if user and user.is_active:
                     return user
 
-    # Try API key
+    # Try API key from X-API-Key header
     if x_api_key:
         user_service = UserService(session)
         user = await user_service.get_user_for_api_key(x_api_key)
+        if user:
+            return user
+
+    # Fallback: check if bearer token is a valid API key (for SDK compatibility)
+    if bearer_token:
+        user_service = UserService(session)
+        user = await user_service.get_user_for_api_key(bearer_token)
         if user:
             return user
 
