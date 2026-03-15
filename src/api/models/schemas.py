@@ -41,7 +41,9 @@ class CustomAgentConfig(AgentConfigBase):
     env: dict[str, str] = Field(default_factory=dict)
 
 
-AgentConfigSchema = OpenAIAgentConfig | AnthropicAgentConfig | LangChainAgentConfig | CustomAgentConfig
+AgentConfigSchema = (
+    OpenAIAgentConfig | AnthropicAgentConfig | LangChainAgentConfig | CustomAgentConfig
+)
 
 
 class AgentCreate(BaseModel):

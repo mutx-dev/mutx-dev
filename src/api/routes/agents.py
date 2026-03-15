@@ -59,7 +59,9 @@ def _parse_agent_config_payload(config: Any) -> dict[str, Any]:
         try:
             config_dict = json.loads(config)
         except json.JSONDecodeError as exc:
-            raise HTTPException(status_code=400, detail="Invalid JSON in agent configuration") from exc
+            raise HTTPException(
+                status_code=400, detail="Invalid JSON in agent configuration"
+            ) from exc
     else:
         config_dict = config
 
