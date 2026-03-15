@@ -35,9 +35,7 @@ http_response_size_bytes = Histogram(
 )
 
 # Active connections
-http_connections_active = Gauge(
-    "http_connections_active", "Number of active HTTP connections"
-)
+http_connections_active = Gauge("http_connections_active", "Number of active HTTP connections")
 
 # Database metrics
 db_pool_size = Gauge("db_pool_size", "Database connection pool size")
@@ -55,7 +53,9 @@ mutx_agents_total = Gauge("mutx_agents_total", "Total number of agents")
 mutx_agents_active = Gauge("mutx_agents_active", "Number of active agents")
 
 mutx_agent_tasks_total = Counter(
-    "mutx_agent_tasks_total", "Total agent tasks processed", ["status"]  # success, failed, timeout
+    "mutx_agent_tasks_total",
+    "Total agent tasks processed",
+    ["status"],  # success, failed, timeout
 )
 
 mutx_agent_task_duration_seconds = Histogram(
@@ -80,9 +80,7 @@ mutx_queue_size = Gauge("mutx_queue_size", "Current size of agent task queue")
 mutx_api_calls_total = Counter("mutx_api_calls_total", "Total API calls", ["endpoint"])
 
 # Error metrics
-mutx_errors_total = Counter(
-    "mutx_errors_total", "Total errors by type", ["type", "endpoint"]
-)
+mutx_errors_total = Counter("mutx_errors_total", "Total errors by type", ["type", "endpoint"])
 
 router = APIRouter()
 
@@ -97,18 +95,15 @@ async def metrics():
 async def track_request(request: Request, call_next):
     """Track HTTP request metrics."""
     start_time = time.time()
-    
+
     # Track active connections
     http_connections_active.inc()
-    
+
     try:
         response = await call_next(request)
     except Exception as e:
         # Track errors
-        mutx_errors_total.labels(
-            type=type(e).__name__,
-            endpoint=request.url.path
-        ).inc()
+        mutx_errors_total.labels(type=type(e).__name__, endpoint=request.url.path).inc()
         raise
     finally:
         http_connections_active.dec()
@@ -117,11 +112,7 @@ async def track_request(request: Request, call_next):
     path = request.url.path
 
     # Track request count
-    http_requests_total.labels(
-        method=request.method, 
-        path=path, 
-        status=response.status_code
-    ).inc()
+    http_requests_total.labels(method=request.method, path=path, status=response.status_code).inc()
 
     # Track duration
     http_request_duration_seconds.labels(method=request.method, path=path).observe(duration)

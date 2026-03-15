@@ -172,7 +172,11 @@ app.include_router(runs.router, prefix="/v1")
 async def health_check(request: Request):
     database_ready = request.app.state.database_ready
     database_error = request.app.state.database_error
-    uptime = time.time() - request.app.state.start_time if hasattr(request.app.state, 'start_time') else 0
+    uptime = (
+        time.time() - request.app.state.start_time
+        if hasattr(request.app.state, "start_time")
+        else 0
+    )
 
     return HealthResponse(
         status="healthy" if database_ready else "degraded",
