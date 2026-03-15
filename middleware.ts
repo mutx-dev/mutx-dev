@@ -4,18 +4,41 @@ import { NextResponse } from 'next/server'
 // Rate limiting configuration
 const RATE_LIMIT = 100 // requests per window
 const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute in ms
+const MAX_RATE_LIMIT_ENTRIES = 10_000
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
 
 function getClientIp(request: NextRequest): string {
-  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-         request.headers.get('x-real-ip') ||
-         request.ip ||
-         'unknown'
+  return request.ip || 'unknown'
+}
+
+function pruneRateLimitMap(now: number) {
+  for (const [ip, record] of rateLimitMap.entries()) {
+    if (now > record.resetTime) {
+      rateLimitMap.delete(ip)
+    }
+  }
+
+  if (rateLimitMap.size < MAX_RATE_LIMIT_ENTRIES) {
+    return
+  }
+
+  const overflow = rateLimitMap.size - MAX_RATE_LIMIT_ENTRIES + 1
+  let removed = 0
+
+  for (const ip of rateLimitMap.keys()) {
+    rateLimitMap.delete(ip)
+    removed++
+
+    if (removed >= overflow) {
+      break
+    }
+  }
 }
 
 function checkRateLimit(request: NextRequest): { allowed: boolean; remaining: number; resetTime: number } {
   const ip = getClientIp(request)
   const now = Date.now()
+  pruneRateLimitMap(now)
   const record = rateLimitMap.get(ip)
 
   if (!record || now > record.resetTime) {
