@@ -43,32 +43,27 @@ function isAppHost(hostname: string) {
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hostname = getHostname(request)
+  const v1ApiAlias = pathname.startsWith('/v1/')
+  const apiPath = v1ApiAlias ? `/api${pathname.slice(3)}` : pathname
 
-  // Handle /v1 -> /api redirects for CLI/SDK compatibility
-  // CLI/SDK expect /v1/agents, /v1/deployments etc but API serves at /api/*
-  if (pathname.startsWith('/v1/')) {
-    const newPathname = '/api' + pathname.slice(3) // /v1/agents -> /api/agents
-    const newUrl = request.nextUrl.clone()
-    newUrl.pathname = newPathname
-    return NextResponse.rewrite(newUrl)
-  }
-
-  // Apply rate limiting to API routes
-  if (pathname.startsWith('/api/')) {
+  // Apply rate limiting to API routes and /v1 aliases
+  if (apiPath.startsWith('/api/')) {
     const rateLimitResult = checkRateLimit(request)
-    
-    const response = NextResponse.next()
+
+    const response = v1ApiAlias
+      ? NextResponse.rewrite(new URL(apiPath, request.url))
+      : NextResponse.next()
     response.headers.set('X-RateLimit-Limit', String(RATE_LIMIT))
     response.headers.set('X-RateLimit-Remaining', String(rateLimitResult.remaining))
     response.headers.set('X-RateLimit-Reset', String(Math.ceil(rateLimitResult.resetTime / 1000)))
-    
+
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Too many requests', message: 'Rate limit exceeded. Please try again later.' },
         { status: 429, headers: Object.fromEntries(response.headers.entries()) }
       )
     }
-    
+
     return response
   }
 
