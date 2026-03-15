@@ -61,7 +61,7 @@ def test_deploy_events_hits_contract_route_and_renders_items(monkeypatch) -> Non
 
     assert result.exit_code == 0
     assert captured == {
-        "path": "/api/deployments/dep-123/events",
+        "path": "/v1/deployments/dep-123/events",
         "params": {
             "limit": 25,
             "skip": 10,
@@ -102,7 +102,7 @@ def test_deploy_list_passes_agent_and_status_filters(monkeypatch) -> None:
 
     assert result.exit_code == 0
     assert captured == {
-        "path": "/api/deployments",
+        "path": "/v1/deployments",
         "params": {
             "limit": 5,
             "skip": 2,
@@ -132,7 +132,7 @@ def test_deploy_create_hits_canonical_route_with_replicas(monkeypatch) -> None:
 
     assert result.exit_code == 0
     assert captured == {
-        "path": "/api/deployments",
+        "path": "/v1/deployments",
         "json": {"agent_id": "agent-123", "replicas": 3},
     }
     assert "Created deployment: dep-456" in result.output
@@ -155,7 +155,7 @@ def test_deploy_restart_hits_contract_route_and_renders_status(monkeypatch) -> N
 
     assert result.exit_code == 0
     assert captured == {
-        "path": "/api/deployments/dep-789/restart",
+        "path": "/v1/deployments/dep-789/restart",
         "json": None,
     }
     assert "Restarted deployment: dep-789" in result.output
@@ -190,7 +190,7 @@ def test_deploy_logs_hits_contract_route_and_supports_level_filter(monkeypatch) 
 
     assert result.exit_code == 0
     assert captured == {
-        "path": "/api/deployments/dep-123/logs",
+        "path": "/v1/deployments/dep-123/logs",
         "params": {
             "limit": 20,
             "skip": 3,
@@ -228,7 +228,7 @@ def test_deploy_metrics_hits_contract_route_and_renders_points(monkeypatch) -> N
 
     assert result.exit_code == 0
     assert captured == {
-        "path": "/api/deployments/dep-123/metrics",
+        "path": "/v1/deployments/dep-123/metrics",
         "params": {
             "limit": 10,
             "skip": 1,

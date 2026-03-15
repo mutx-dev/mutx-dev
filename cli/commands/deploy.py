@@ -29,7 +29,7 @@ def list_deployments(limit: int, skip: int, agent_id: Optional[str], status: Opt
         params["status"] = status
 
     client = get_client(config)
-    response = client.get("/api/deployments", params=params)
+    response = client.get("/v1/deployments", params=params)
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -66,7 +66,7 @@ def create_deployment(agent_id: str, replicas: int):
         return
 
     client = get_client(config)
-    response = client.post("/api/deployments", json={"agent_id": agent_id, "replicas": replicas})
+    response = client.post("/v1/deployments", json={"agent_id": agent_id, "replicas": replicas})
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -95,7 +95,7 @@ def scale_deployment(deployment_id: str, replicas: int):
 
     client = get_client(config)
     response = client.post(
-        f"/api/deployments/{deployment_id}/scale",
+        f"/v1/deployments/{deployment_id}/scale",
         json={"replicas": replicas},
     )
 
@@ -140,7 +140,7 @@ def deployment_events(
         params["status"] = status
 
     client = get_client(config)
-    response = client.get(f"/api/deployments/{deployment_id}/events", params=params)
+    response = client.get(f"/v1/deployments/{deployment_id}/events", params=params)
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -183,7 +183,7 @@ def restart_deployment(deployment_id: str):
         return
 
     client = get_client(config)
-    response = client.post(f"/api/deployments/{deployment_id}/restart")
+    response = client.post(f"/v1/deployments/{deployment_id}/restart")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -218,7 +218,7 @@ def deployment_logs(deployment_id: str, limit: int, skip: int, level: Optional[s
         params["level"] = level
 
     client = get_client(config)
-    response = client.get(f"/api/deployments/{deployment_id}/logs", params=params)
+    response = client.get(f"/v1/deployments/{deployment_id}/logs", params=params)
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -259,7 +259,7 @@ def deployment_metrics(deployment_id: str, limit: int, skip: int):
 
     client = get_client(config)
     response = client.get(
-        f"/api/deployments/{deployment_id}/metrics",
+        f"/v1/deployments/{deployment_id}/metrics",
         params={"limit": limit, "skip": skip},
     )
 
@@ -304,7 +304,7 @@ def delete_deployment(deployment_id: str, force: bool):
             return
 
     client = get_client(config_obj)
-    response = client.delete(f"/api/deployments/{deployment_id}")
+    response = client.delete(f"/v1/deployments/{deployment_id}")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
