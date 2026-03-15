@@ -30,7 +30,7 @@ export function ApiKeysPageClient() {
         throw new Error(data.detail || 'Failed to fetch API keys');
       }
       const data = await res.json();
-      setKeys(Array.isArray(data) ? data : (data.keys || []));
+      setKeys(Array.isArray(data) ? data : (data.items || []));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load API keys');
     } finally {
