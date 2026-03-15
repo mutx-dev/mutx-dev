@@ -285,6 +285,46 @@ class Agents:
         response.raise_for_status()
         return [AgentMetric(data) for data in response.json()]
 
+    def update_config(
+        self,
+        agent_id: UUID | str,
+        config: dict[str, Any] | str,
+    ) -> AgentDetail:
+        """Update agent configuration.
+
+        Args:
+            agent_id: The agent UUID
+            config: New configuration as dict or JSON string
+        """
+        self._require_sync_client()
+        payload = {"config": config if isinstance(config, str) else json.dumps(config)}
+        response = self._client.patch(
+            f"/agents/{agent_id}/config",
+            json=payload,
+        )
+        response.raise_for_status()
+        return AgentDetail(response.json())
+
+    async def aupdate_config(
+        self,
+        agent_id: UUID | str,
+        config: dict[str, Any] | str,
+    ) -> AgentDetail:
+        """Update agent configuration (async).
+
+        Args:
+            agent_id: The agent UUID
+            config: New configuration as dict or JSON string
+        """
+        self._require_async_client()
+        payload = {"config": config if isinstance(config, str) else json.dumps(config)}
+        response = await self._client.patch(
+            f"/agents/{agent_id}/config",
+            json=payload,
+        )
+        response.raise_for_status()
+        return AgentDetail(response.json())
+
     def stream_logs(
         self,
         agent_id: UUID | str,
