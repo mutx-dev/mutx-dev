@@ -30,7 +30,7 @@ def _skill_payload(**overrides: Any) -> dict[str, Any]:
 
 def test_clawhub_list_skills_parses_sync_skill_payloads() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
-        assert request.url.path == "/clawhub/skills"
+        assert request.url.path == "/api/clawhub/skills"
         return httpx.Response(200, json=[_skill_payload()])
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
@@ -46,7 +46,7 @@ def test_clawhub_list_skills_parses_sync_skill_payloads() -> None:
 @pytest.mark.asyncio
 async def test_clawhub_alist_skills_parses_async_skill_payloads() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
-        assert request.url.path == "/clawhub/skills"
+        assert request.url.path == "/api/clawhub/skills"
         return httpx.Response(200, json=[_skill_payload(name="async-skill")])
 
     async with httpx.AsyncClient(
@@ -79,7 +79,7 @@ async def test_clawhub_ainstall_skill_returns_json_without_awaiting_plain_dict()
 
         result = await clawhub.ainstall_skill(agent_id=uuid.uuid4(), skill_id="skill-demo")
 
-    assert captured["path"] == "/clawhub/install"
+    assert captured["path"] == "/api/clawhub/install"
     assert captured["json"]["skill_id"] == "skill-demo"
     assert result["ok"] is True
 
@@ -101,6 +101,6 @@ async def test_clawhub_auninstall_skill_returns_json_without_awaiting_plain_dict
 
         result = await clawhub.auninstall_skill(agent_id=uuid.uuid4(), skill_id="skill-demo")
 
-    assert captured["path"] == "/clawhub/uninstall"
+    assert captured["path"] == "/api/clawhub/uninstall"
     assert captured["json"]["skill_id"] == "skill-demo"
     assert result["ok"] is True

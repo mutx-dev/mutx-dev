@@ -56,7 +56,7 @@ def test_agents_create_accepts_dict_config_and_sends_backend_json_string_contrac
         config={"model": "gpt-4o", "temperature": 0.1},
     )
 
-    assert captured["path"] == "/agents"
+    assert captured["path"] == "/api/agents"
     assert isinstance(captured["json"]["config"], dict)
     assert captured["json"]["config"]["model"] == "gpt-4o"
 
