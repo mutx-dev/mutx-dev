@@ -4,7 +4,7 @@ Monitoring and Self-Healing logic for MUTX.
 
 import logging
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -103,14 +103,18 @@ async def monitor_agent_health(session: AsyncSession):
     2. Mark 'running' agents as 'failed' if heartbeat is missing
     3. Auto-heal 'failed' agents back to 'running'
     """
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
 
     # 1. Promote CREATING -> RUNNING
     # This simulates the completion of provisioning
     result = await session.execute(select(Agent).where(Agent.status == "creating"))
     new_agents = result.scalars().all()
     for agent in new_agents:
-        if now - agent.created_at > timedelta(seconds=10):
+        # Handle both naive and timezone-aware datetimes
+        created = agent.created_at
+        if created and created.tzinfo is None:
+            created = created.replace(tzinfo=timezone.utc)
+        if created and now - created > timedelta(seconds=10):
             old_status = agent.status
             agent.status = "running"
             agent.last_heartbeat = now
@@ -159,7 +163,11 @@ async def monitor_agent_health(session: AsyncSession):
 
     for agent in running_agents:
         last_hb = agent.last_heartbeat or agent.created_at
-        if now - last_hb > timedelta(seconds=STALE_THRESHOLD_SECONDS):
+        # Handle both naive and timezone-aware datetimes
+        if last_hb:
+            if last_hb.tzinfo is None:
+                last_hb = last_hb.replace(tzinfo=timezone.utc)
+        if last_hb and now - last_hb > timedelta(seconds=STALE_THRESHOLD_SECONDS):
             logger.warning(f"Monitor: Agent {agent.name} ({agent.id}) is STALE. Marking as FAILED.")
             old_status = agent.status
             agent.status = "failed"
@@ -214,7 +222,11 @@ async def monitor_agent_health(session: AsyncSession):
     failed_agents = result.scalars().all()
 
     for agent in failed_agents:
-        if now - agent.updated_at > timedelta(seconds=HEAL_THRESHOLD_SECONDS):
+        # Handle both naive and timezone-aware datetimes
+        updated = agent.updated_at
+        if updated and updated.tzinfo is None:
+            updated = updated.replace(tzinfo=timezone.utc)
+        if updated and now - updated > timedelta(seconds=HEAL_THRESHOLD_SECONDS):
             logger.info(f"Auto-Healer: Restarting agent {agent.name} ({agent.id})...")
             old_status = agent.status
             agent.status = "running"
