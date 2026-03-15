@@ -6,10 +6,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AlertCircle, ArrowRight, Loader2 } from 'lucide-react'
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -18,8 +19,14 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
+    if (password !== confirmPassword) {
+      setError('Passwords do not match')
+      setLoading(false)
+      return
+    }
+
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -28,13 +35,13 @@ export default function LoginPage() {
       const payload = await response.json()
 
       if (!response.ok) {
-        throw new Error(payload.detail || 'Login failed')
+        throw new Error(payload.detail || 'Registration failed')
       }
 
       router.push('/app')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
+      setError(err instanceof Error ? err.message : 'Registration failed')
     } finally {
       setLoading(false)
     }
@@ -58,8 +65,8 @@ export default function LoginPage() {
       <main className="relative flex min-h-screen items-center justify-center px-5 py-20 sm:px-6">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-medium tracking-tight text-white">Welcome back</h1>
-            <p className="mt-2 text-white/62">Sign in to your account to continue</p>
+            <h1 className="text-3xl font-medium tracking-tight text-white">Create your account</h1>
+            <p className="mt-2 text-white/62">Sign up to start using MUTX</p>
           </div>
 
           <div className="panel relative overflow-hidden rounded-[28px] border border-white/10 p-8">
@@ -96,6 +103,21 @@ export default function LoginPage() {
                   />
                 </div>
 
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-white/80 mb-2">
+                    Confirm password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    className="w-full rounded-lg border border-white/10 bg-black px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/30 transition-colors"
+                  />
+                </div>
+
                 {error && (
                   <div className="flex items-center gap-2 text-sm text-red-400">
                     <AlertCircle className="h-4 w-4" />
@@ -111,11 +133,11 @@ export default function LoginPage() {
                   {loading ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Signing in...
+                      Creating account...
                     </>
                   ) : (
                     <>
-                      Sign in
+                      Sign up
                       <ArrowRight className="h-4 w-4" />
                     </>
                   )}
@@ -123,9 +145,9 @@ export default function LoginPage() {
               </form>
 
               <p className="mt-6 text-center text-sm text-white/60">
-                Don&apos;t have an account?{' '}
-                <Link href="/register" className="text-white hover:underline">
-                  Create one
+                Already have an account?{' '}
+                <Link href="/login" className="text-white hover:underline">
+                  Sign in
                 </Link>
               </p>
             </div>
