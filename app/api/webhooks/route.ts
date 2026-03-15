@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getApiBaseUrl, getAuthToken } from "@/app/api/_lib/controlPlane";
+import { validateRequest, schemas } from "@/app/api/_lib/validation";
+import { withErrorHandling, unauthorized } from "@/app/api/_lib/errors";
 
 const API_BASE_URL = getApiBaseUrl();
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: NextRequest) {
-  const token = await getAuthToken(request);
-  
-  if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  return withErrorHandling(async (req: Request) => {
+    const token = await getAuthToken(request);
+    
+    if (!token) {
+      return unauthorized()
+    }
 
-  try {
     const response = await fetch(`${API_BASE_URL}/webhooks`, {
       headers: { 
         Authorization: `Bearer ${token}`,
@@ -29,25 +31,20 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
     const webhooks = Array.isArray(data) ? data : data?.webhooks ?? [];
     return NextResponse.json({ webhooks });
-  } catch (error) {
-    console.error("Webhooks GET error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
+  })(request)
 }
 
-export async function POST(request: NextRequest) {
-  const token = await getAuthToken(request);
-  
-  if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  return withErrorHandling(async (req: Request) => {
+    const token = await getAuthToken(request);
+    
+    if (!token) {
+      return unauthorized()
+    }
 
-  try {
-    const body = await request.json();
-    const { url, events } = body;
-
-    if (!url) {
-      return NextResponse.json({ error: "URL is required" }, { status: 400 });
+    const validation = await validateRequest(schemas.webhookCreate, req)
+    if (!validation.success) {
+      return validation.response
     }
 
     const response = await fetch(`${API_BASE_URL}/webhooks`, {
@@ -56,7 +53,7 @@ export async function POST(request: NextRequest) {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ url, events: events || [] })
+      body: JSON.stringify(validation.data)
     });
     
     if (!response.ok) {
@@ -66,8 +63,5 @@ export async function POST(request: NextRequest) {
     
     const data = await response.json();
     return NextResponse.json(data, { status: 201 });
-  } catch (error) {
-    console.error("Webhooks POST error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
+  })(request)
 }
