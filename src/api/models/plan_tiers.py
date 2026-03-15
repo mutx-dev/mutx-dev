@@ -7,7 +7,7 @@ resource quotas. Used for plan enforcement and UI display.
 from __future__ import annotations
 
 from enum import Enum
-from typing import Optional
+
 
 
 class PlanTier(str, Enum):
