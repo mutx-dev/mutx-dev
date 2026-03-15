@@ -132,6 +132,22 @@ class TestListAgents:
         assert response.json() == []
 
 
+class TestAgentAuthorization:
+    """Authorization guardrails for /agents endpoints."""
+
+    @pytest.mark.asyncio
+    async def test_list_agents_requires_authentication(self, client_no_auth: AsyncClient):
+        response = await client_no_auth.get("/api/agents")
+        assert response.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_get_agent_requires_authentication(
+        self, client_no_auth: AsyncClient, test_agent
+    ):
+        response = await client_no_auth.get(f"/api/agents/{test_agent.id}")
+        assert response.status_code == 401
+
+
 class TestGetAgent:
     """Tests for GET /agents/{agent_id} endpoint."""
 

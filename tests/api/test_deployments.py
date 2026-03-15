@@ -96,6 +96,28 @@ class TestListDeployments:
         """Test filtering by another user's agent is forbidden."""
         response = await other_user_client.get(f"/api/deployments?agent_id={test_agent.id}")
         assert response.status_code == 403
+
+    @pytest.mark.asyncio
+    async def test_list_deployments_scoped_to_authenticated_user(
+        self, client: AsyncClient, other_user_client: AsyncClient, test_deployment
+    ):
+        """Deployment list must not include resources owned by other users."""
+        response = await client.get("/api/deployments")
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+
+        response = await other_user_client.get("/api/deployments")
+        assert response.status_code == 200
+        assert response.json() == []
+
+    @pytest.mark.asyncio
+    async def test_list_deployments_ignores_client_supplied_user_id(
+        self, other_user_client: AsyncClient, test_agent
+    ):
+        """Client-supplied user filters must never expand ownership scope."""
+        response = await other_user_client.get(f"/api/deployments?user_id={test_agent.user_id}")
+        assert response.status_code == 200
+        assert response.json() == []
     
     @pytest.mark.asyncio
     async def test_list_deployments_by_status(
@@ -148,6 +170,22 @@ class TestGetDeployment:
         """Test other users cannot read deployments they do not own."""
         response = await other_user_client.get(f"/api/deployments/{test_deployment.id}")
         assert response.status_code == 403
+
+
+class TestDeploymentAuthorization:
+    """Authorization guardrails for /deployments endpoints."""
+
+    @pytest.mark.asyncio
+    async def test_list_deployments_requires_authentication(self, client_no_auth: AsyncClient):
+        response = await client_no_auth.get("/api/deployments")
+        assert response.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_requires_authentication(
+        self, client_no_auth: AsyncClient, test_deployment
+    ):
+        response = await client_no_auth.get(f"/api/deployments/{test_deployment.id}")
+        assert response.status_code == 401
 
 
 class TestScaleDeployment:
