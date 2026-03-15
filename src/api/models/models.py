@@ -449,11 +449,14 @@ class Lead(Base):
 
 class UsageEvent(Base):
     """Track usage events for telemetry and quota enforcement"""
+
     __tablename__ = "usage_events"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     event_type: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
     resource_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     event_metadata: Mapped[str] = mapped_column(Text, nullable=True)  # JSON string
     created_at: Mapped[datetime] = mapped_column(
