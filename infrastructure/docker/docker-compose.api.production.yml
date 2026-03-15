@@ -1,0 +1,103 @@
+# Production docker-compose for API only
+# Use with external PostgreSQL and Redis services
+# docker-compose -f docker-compose.api.production.yml up -d
+# Use with local DB: docker-compose -f docker-compose.api.production.yml --profile db up -d
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+      target: production
+    image: mutx-api:latest
+    container_name: mutx-api-prod
+    restart: always
+    expose:
+      - "8000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_SSL_MODE=${DATABASE_SSL_MODE:-require}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - JWT_SECRET=${JWT_SECRET:-}
+      - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
+      - JWT_EXPIRATION_MINUTES=${JWT_EXPIRATION_MINUTES:-60}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - ENVIRONMENT=production
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - api-network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+
+  # Optional: Local postgres for development/testing
+  # Use: docker-compose -f docker-compose.api.production.yml --profile db up -d
+  postgres:
+    image: postgres:16-alpine
+    container_name: mutx-api-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mutx}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+      POSTGRES_DB: ${POSTGRES_DB:-mutx}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mutx}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - api-network
+    profiles:
+      - db
+
+  # Optional: Local redis for development/testing
+  # Use: docker-compose -f docker-compose.api.production.yml --profile db up -d
+  redis:
+    image: redis:7-alpine
+    container_name: mutx-api-redis-prod
+    restart: always
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - api-network
+    profiles:
+      - db
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  api-network:
+    driver: bridge
+    name: mutx-api-network
