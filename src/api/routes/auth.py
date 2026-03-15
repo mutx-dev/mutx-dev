@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, ConfigDict, EmailStr
@@ -21,6 +21,9 @@ from src.api.services.email.email_service import (
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+# Plan tier definitions for the API
+PlanTier = Literal["free", "starter", "pro", "enterprise"]
 
 
 def _get_expires_in_seconds(expires_at: datetime) -> int:
@@ -53,7 +56,7 @@ class UserResponse(BaseModel):
     id: str
     email: str
     name: str
-    plan: str
+    plan: PlanTier
     api_key: Optional[str]
     created_at: datetime
     is_active: bool
