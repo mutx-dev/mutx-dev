@@ -126,26 +126,22 @@ export default function WebhooksPageClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Webhooks</h1>
-          <p className="text-muted-foreground">
-            Manage webhook endpoints for real-time event notifications
-          </p>
-        </div>
-        <button
-          onClick={() => { setShowForm(true); setEditingWebhook(null); setFormData({ url: "", events: "", name: "", active: true }); }}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-        >
-          <Plus className="h-4 w-4" />
-          Add Webhook
-        </button>
-      </div>
-
       {error && (
         <div className="flex items-center gap-2 p-4 bg-destructive/10 text-destructive rounded-md">
           <AlertCircle className="h-4 w-4" />
           {error}
+        </div>
+      )}
+
+      {!showForm && webhooks.length > 0 && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => { setShowForm(true); setEditingWebhook(null); setFormData({ url: "", events: "", name: "", active: true }); }}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          >
+            <Plus className="h-4 w-4" />
+            Add Webhook
+          </button>
         </div>
       )}
 
