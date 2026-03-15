@@ -169,3 +169,196 @@ class TestAuthEndpoints:
         )
         assert response.status_code == 401
         assert "Invalid email or password" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_refresh_token_success(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+        """Test token refresh."""
+        from src.api.auth.jwt import create_refresh_token
+        
+        # Create a user with a valid refresh token
+        user = User(
+            id=uuid.uuid4(),
+            email="refresh@example.com",
+            password_hash="hashedpassword",
+            name="Refresh User",
+            is_active=True,
+        )
+        db_session.add(user)
+        await db_session.commit()
+        
+        refresh_token, _ = create_refresh_token(user.id)
+        
+        response = await client_no_auth.post(
+            "/api/auth/refresh",
+            json={"refresh_token": refresh_token},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "access_token" in data
+        assert "refresh_token" in data
+        assert data["token_type"] == "bearer"
+
+    @pytest.mark.asyncio
+    async def test_refresh_token_invalid(self, client_no_auth: AsyncClient):
+        """Test token refresh with invalid token fails."""
+        response = await client_no_auth.post(
+            "/api/auth/refresh",
+            json={"refresh_token": "invalid_token"},
+        )
+        assert response.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_logout_success(self, client: AsyncClient, test_user):
+        """Test logout endpoint."""
+        response = await client.post("/api/auth/logout")
+        assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_forgot_password_success(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+        """Test forgot password endpoint."""
+        from src.api.auth.password import hash_password
+        
+        user = User(
+            id=uuid.uuid4(),
+            email="forgot@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Forgot User",
+            is_active=True,
+        )
+        db_session.add(user)
+        await db_session.commit()
+        
+        response = await client_no_auth.post(
+            "/api/auth/forgot-password",
+            json={"email": "forgot@example.com"},
+        )
+        assert response.status_code == 200
+        assert "message" in response.json()
+
+    @pytest.mark.asyncio
+    async def test_forgot_password_nonexistent(self, client_no_auth: AsyncClient):
+        """Test forgot password with nonexistent email."""
+        response = await client_no_auth.post(
+            "/api/auth/forgot-password",
+            json={"email": "nonexistent@example.com"},
+        )
+        # Should still return 200 to prevent email enumeration
+        assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_reset_password_success(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+        """Test reset password endpoint."""
+        from src.api.auth.password import hash_password
+        
+        user = User(
+            id=uuid.uuid4(),
+            email="reset@example.com",
+            password_hash=hash_password("OldPassword123!"),
+            name="Reset User",
+            is_active=True,
+            password_reset_token="valid_reset_token",
+            password_reset_expires_at=None,  # Never expires for test
+        )
+        db_session.add(user)
+        await db_session.commit()
+        
+        response = await client_no_auth.post(
+            "/api/auth/reset-password",
+            json={
+                "token": "valid_reset_token",
+                "new_password": "NewPassword456!",
+            },
+        )
+        assert response.status_code == 200
+        assert "message" in response.json()
+
+    @pytest.mark.asyncio
+    async def test_reset_password_invalid_token(self, client_no_auth: AsyncClient):
+        """Test reset password with invalid token fails."""
+        response = await client_no_auth.post(
+            "/api/auth/reset-password",
+            json={
+                "token": "invalid_token",
+                "new_password": "NewPassword456!",
+            },
+        )
+        assert response.status_code == 400
+
+    @pytest.mark.asyncio
+    async def test_verify_email_success(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+        """Test email verification endpoint."""
+        from src.api.auth.password import hash_password
+        
+        user = User(
+            id=uuid.uuid4(),
+            email="verify@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Verify User",
+            is_active=True,
+            email_verification_token="valid_verify_token",
+            is_email_verified=False,
+        )
+        db_session.add(user)
+        await db_session.commit()
+        
+        response = await client_no_auth.post(
+            "/api/auth/verify-email",
+            json={"token": "valid_verify_token"},
+        )
+        assert response.status_code == 200
+        assert "message" in response.json()
+
+    @pytest.mark.asyncio
+    async def test_verify_email_invalid_token(self, client_no_auth: AsyncClient):
+        """Test verify email with invalid token fails."""
+        response = await client_no_auth.post(
+            "/api/auth/verify-email",
+            json={"token": "invalid_token"},
+        )
+        assert response.status_code == 400
+
+    @pytest.mark.asyncio
+    async def test_resend_verification_success(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+        """Test resend verification email endpoint."""
+        from src.api.auth.password import hash_password
+        
+        user = User(
+            id=uuid.uuid4(),
+            email="resend@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Resend User",
+            is_active=True,
+            is_email_verified=False,
+        )
+        db_session.add(user)
+        await db_session.commit()
+        
+        response = await client_no_auth.post(
+            "/api/auth/resend-verification",
+            json={"email": "resend@example.com"},
+        )
+        assert response.status_code == 200
+        assert "message" in response.json()
+
+    @pytest.mark.asyncio
+    async def test_resend_verification_already_verified(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+        """Test resend verification for already verified email."""
+        from src.api.auth.password import hash_password
+        
+        user = User(
+            id=uuid.uuid4(),
+            email="alreadyverified@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Already Verified User",
+            is_active=True,
+            is_email_verified=True,
+        )
+        db_session.add(user)
+        await db_session.commit()
+        
+        response = await client_no_auth.post(
+            "/api/auth/resend-verification",
+            json={"email": "alreadyverified@example.com"},
+        )
+        assert response.status_code == 400
+        assert "already verified" in response.json()["detail"].lower()
