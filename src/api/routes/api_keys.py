@@ -9,7 +9,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models.models import APIKey, User
-from src.api.models.schemas import APIKeyCreate, APIKeyCreateResponse, APIKeyHistoryResponse
+from src.api.models.schemas import (
+    APIKeyCreate,
+    APIKeyCreateResponse,
+    APIKeyHistoryResponse,
+    APIKeyResponse,
+)
 from src.api.services.user_service import hash_api_key
 
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])
@@ -65,6 +70,21 @@ async def list_api_keys(
         skip=skip,
         limit=limit,
     )
+
+
+@router.get("/{key_id}", response_model=APIKeyResponse)
+async def get_api_key(
+    key_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get a single API key by ID."""
+    api_key = await get_owned_api_key(db, current_user.id, key_id)
+
+    if not api_key:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="API key not found")
+
+    return api_key
 
 
 @router.post("", response_model=APIKeyCreateResponse, status_code=status.HTTP_201_CREATED)
