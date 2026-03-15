@@ -159,7 +159,6 @@ class Agents:
         self,
         skip: int = 0,
         limit: int = 50,
-
     ) -> list[Agent]:
         self._require_sync_client()
         response = self._client.get(
@@ -173,7 +172,6 @@ class Agents:
         self,
         skip: int = 0,
         limit: int = 50,
-
     ) -> list[Agent]:
         self._require_async_client()
         response = await self._client.get(
