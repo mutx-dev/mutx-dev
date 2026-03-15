@@ -18,6 +18,7 @@ from src.api.models.models import (
     AgentStatus,
     AlertType,
     Command,
+    UsageEvent,
 )
 
 from src.api.models.plan_tiers import (
@@ -55,4 +56,5 @@ __all__ = [
     "AgentStatus",
     "AlertType",
     "Command",
+    "UsageEvent",
 ]

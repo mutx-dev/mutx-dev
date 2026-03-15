@@ -13,6 +13,7 @@ from src.api.auth.ownership import get_owned_agent, get_owned_deployment
 from src.api.database import get_db
 from src.api.models import (
     Deployment,
+    UsageEvent,
     Agent,
     AgentStatus,
     User,
@@ -210,6 +211,18 @@ async def scale_deployment(
         include_events=True,
     )
     logger.info(f"Scaled deployment {deployment_id} to {scale_data.replicas} replicas")
+    
+    # Track usage event
+    usage_event = UsageEvent(
+        event_type="deployment_scaled",
+        user_id=current_user.id,
+        resource_id=str(deployment_id),
+        event_metadata=f'{{"replicas": {scale_data.replicas}}}',
+        created_at=datetime.now(timezone.utc),
+    )
+    db.add(usage_event)
+    await db.commit()
+    
     return _serialize_deployment(deployment)
 
 
@@ -238,6 +251,18 @@ async def kill_deployment(
         agent.status = AgentStatus.STOPPED.value
 
     await db.commit()
+    
+    # Track usage event
+    usage_event = UsageEvent(
+        event_type="deployment_killed",
+        user_id=current_user.id,
+        resource_id=str(deployment_id),
+        event_metadata=None,
+        created_at=datetime.now(timezone.utc),
+    )
+    db.add(usage_event)
+    await db.commit()
+    
     logger.info(f"Killed deployment: {deployment_id}")
 
 
@@ -304,6 +329,18 @@ async def create_deployment(
         include_events=True,
     )
     logger.info(f"Created deployment {deployment.id} for agent {deployment_data.agent_id}")
+    
+    # Track usage event
+    usage_event = UsageEvent(
+        event_type="deployment_created",
+        user_id=current_user.id,
+        resource_id=str(deployment.id),
+        event_metadata=f'{{"agent_id": "{deployment_data.agent_id}"}}',
+        created_at=datetime.now(timezone.utc),
+    )
+    db.add(usage_event)
+    await db.commit()
+    
     return _serialize_deployment(deployment)
 
 
@@ -352,6 +389,18 @@ async def restart_deployment(
         include_events=True,
     )
     logger.info(f"Restarted deployment: {deployment_id}")
+    
+    # Track usage event
+    usage_event = UsageEvent(
+        event_type="deployment_restarted",
+        user_id=current_user.id,
+        resource_id=str(deployment_id),
+        event_metadata=None,
+        created_at=datetime.now(timezone.utc),
+    )
+    db.add(usage_event)
+    await db.commit()
+    
     return _serialize_deployment(deployment)
 
 
