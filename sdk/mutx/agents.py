@@ -291,7 +291,7 @@ class Agents:
         config: dict[str, Any] | str,
     ) -> AgentDetail:
         """Update agent configuration.
-        
+
         Args:
             agent_id: The agent UUID
             config: New configuration as dict or JSON string
@@ -311,7 +311,7 @@ class Agents:
         config: dict[str, Any] | str,
     ) -> AgentDetail:
         """Update agent configuration (async).
-        
+
         Args:
             agent_id: The agent UUID
             config: New configuration as dict or JSON string
