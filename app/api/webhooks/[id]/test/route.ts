@@ -19,7 +19,7 @@ export async function POST(
   try {
     const { id } = await params;
 
-    const response = await fetch(`${API_BASE_URL}/webhooks/${id}/test`, {
+    const response = await fetch(`${API_BASE_URL}/v1/webhooks/${id}/test`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

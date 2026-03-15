@@ -25,7 +25,7 @@ export async function PATCH(
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
-    const response = await fetch(`${API_BASE_URL}/webhooks/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/v1/webhooks/${id}`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -61,7 +61,7 @@ export async function DELETE(
   try {
     const { id } = await params;
 
-    const response = await fetch(`${API_BASE_URL}/webhooks/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/v1/webhooks/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,

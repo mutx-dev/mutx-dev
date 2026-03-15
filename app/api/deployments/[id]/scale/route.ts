@@ -20,7 +20,7 @@ export async function POST(
     const { id } = await params
     const body = await req.json()
     
-    const response = await fetch(`${API_BASE_URL}/api/deployments/${id}/scale`, {
+    const response = await fetch(`${API_BASE_URL}/v1/deployments/${id}/scale`, {
       method: 'POST',
       headers: { 
         Authorization: `Bearer ${token}`,

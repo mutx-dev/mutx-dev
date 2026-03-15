@@ -39,7 +39,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/auth/me', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/me', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -63,7 +63,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/agents?limit=20&user_id=user_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/agents?limit=20&user_id=user_123', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -94,7 +94,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/agents?limit=20&user_id=user_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/agents?limit=20&user_id=user_123', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -130,7 +130,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/auth/me', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/me', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -154,7 +154,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments?limit=20&user_id=user_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments?limit=20&user_id=user_123', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -185,7 +185,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments?limit=20&user_id=user_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments?limit=20&user_id=user_123', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -212,7 +212,7 @@ describe('dashboard route proxies', () => {
       json: async () => ({ agent_id: '123e4567-e89b-12d3-a456-426614174000' }),
     } as NextRequest)
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer token',
@@ -235,11 +235,11 @@ describe('dashboard route proxies', () => {
     const { POST } = await import('../../app/api/dashboard/deployments/[id]/route')
 
     const response = await POST(
-      { url: 'http://localhost:3000/api/dashboard/deployments/dep_123?action=restart' } as NextRequest,
+      { url: 'http://localhost:3000/api/dashboard/v1/deployments/dep_123?action=restart' } as NextRequest,
       { params: Promise.resolve({ id: 'dep_123' }) }
     )
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments/dep_123/restart', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments/dep_123/restart', {
       method: 'POST',
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
@@ -262,7 +262,7 @@ describe('dashboard route proxies', () => {
       { params: Promise.resolve({ id: 'dep_123' }) }
     )
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments/dep_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments/dep_123', {
       method: 'DELETE',
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
@@ -282,7 +282,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/auth/me', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/me', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -316,7 +316,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/auth/me', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/me', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -381,7 +381,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -402,7 +402,7 @@ describe('dashboard route proxies', () => {
       json: async () => ({ name: 'Demo key' }),
     } as NextRequest)
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer token',

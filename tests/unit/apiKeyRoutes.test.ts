@@ -59,7 +59,7 @@ describe('API key route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys', {
       headers: {
         Authorization: 'Bearer token',
       },
@@ -108,7 +108,7 @@ describe('API key route proxies', () => {
       params: Promise.resolve({ id: 'key_123' }),
     })
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys/key_123/rotate', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys/key_123/rotate', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer token',
@@ -133,7 +133,7 @@ describe('API key route proxies', () => {
       params: Promise.resolve({ id: 'key_123' }),
     })
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys/key_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys/key_123', {
       method: 'DELETE',
       headers: {
         Authorization: 'Bearer token',
@@ -156,7 +156,7 @@ describe('API key route proxies', () => {
 
     const response = await POST(mockJsonRequest({ name: 'blocked-key' }))
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer token',
@@ -181,7 +181,7 @@ describe('API key route proxies', () => {
 
     const response = await POST(mockJsonRequest({ name: 'overflow-key' }))
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer token',
@@ -209,7 +209,7 @@ describe('API key route proxies', () => {
       params: Promise.resolve({ id: 'key_123' }),
     })
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys/key_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys/key_123', {
       method: 'DELETE',
       headers: {
         Authorization: 'Bearer token',
@@ -237,7 +237,7 @@ describe('API key route proxies', () => {
       params: Promise.resolve({ id: 'key_123' }),
     })
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys/key_123/rotate', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys/key_123/rotate', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer token',
@@ -268,7 +268,7 @@ describe('API key route proxies', () => {
 
     const response = await POST(mockJsonRequest({ name: 'build-key' }))
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer token',
@@ -303,7 +303,7 @@ describe('API key route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/api-keys', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys', {
       headers: {
         Authorization: 'Bearer token',
       },

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return unauthorized()
     }
 
-    const response = await fetch(`${API_BASE_URL}/webhooks`, {
+    const response = await fetch(`${API_BASE_URL}/v1/webhooks`, {
       headers: { 
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json"
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return validation.response
     }
 
-    const response = await fetch(`${API_BASE_URL}/webhooks`, {
+    const response = await fetch(`${API_BASE_URL}/v1/webhooks`, {
       method: "POST",
       headers: { 
         Authorization: `Bearer ${token}`,

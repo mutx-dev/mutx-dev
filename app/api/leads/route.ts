@@ -29,7 +29,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       source: validation.data.source || 'contact-page',
     }
 
-    const response = await fetch(`${API_BASE_URL}/leads`, {
+    const response = await fetch(`${API_BASE_URL}/v1/leads`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

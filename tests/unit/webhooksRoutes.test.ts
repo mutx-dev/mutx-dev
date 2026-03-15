@@ -52,7 +52,7 @@ describe('Webhooks route proxies', () => {
 
       const response = await GET(mockRequest())
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/webhooks', {
+      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/webhooks', {
         headers: {
           Authorization: 'Bearer token',
           'Content-Type': 'application/json',
@@ -190,7 +190,7 @@ describe('Webhooks route proxies', () => {
       }))
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:8000/webhooks',
+        'http://localhost:8000/v1/webhooks',
         expect.objectContaining({
           method: 'POST',
           headers: {
@@ -233,7 +233,7 @@ describe('Webhooks route proxies', () => {
       }))
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:8000/webhooks',
+        'http://localhost:8000/v1/webhooks',
         expect.objectContaining({
           method: 'POST',
           headers: {

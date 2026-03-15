@@ -23,7 +23,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return badRequest('Invalid agent ID format')
     }
 
-    const response = await fetch(`${API_BASE_URL}/agents/${agentId}`, {
+    const response = await fetch(`${API_BASE_URL}/v1/agents/${agentId}`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
@@ -49,7 +49,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return badRequest('Invalid agent ID format')
     }
 
-    const response = await fetch(`${API_BASE_URL}/agents/${agentId}`, {
+    const response = await fetch(`${API_BASE_URL}/v1/agents/${agentId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const action = searchParams.get('action')
 
     if (action === 'stop') {
-      const response = await fetch(`${API_BASE_URL}/agents/${agentId}/stop`, {
+      const response = await fetch(`${API_BASE_URL}/v1/agents/${agentId}/stop`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     if (action === 'deploy') {
-      const response = await fetch(`${API_BASE_URL}/agents/${agentId}/deploy`, {
+      const response = await fetch(`${API_BASE_URL}/v1/agents/${agentId}/deploy`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',

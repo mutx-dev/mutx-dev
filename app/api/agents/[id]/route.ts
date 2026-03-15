@@ -19,7 +19,7 @@ export async function GET(
 
     const { id } = await params
     
-    const response = await fetch(`${API_BASE_URL}/api/agents/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/v1/agents/${id}`, {
       headers: { 
         Authorization: `Bearer ${token}`,
       },
@@ -43,7 +43,7 @@ export async function DELETE(
 
     const { id } = await params
     
-    const response = await fetch(`${API_BASE_URL}/api/agents/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/v1/agents/${id}`, {
       method: 'DELETE',
       headers: { 
         Authorization: `Bearer ${token}`,
