@@ -61,7 +61,7 @@ def _serialize_run(run: AgentRun) -> RunResponse:
         input_text=run.input_text,
         output_text=run.output_text,
         error_message=run.error_message,
-        event_metadata=run.run_metadata or "",
+        metadata=_decode_json(run.run_metadata),
         started_at=run.started_at,
         completed_at=run.completed_at,
         created_at=run.created_at,
@@ -107,7 +107,7 @@ async def create_run(
         input_text=request.input_text,
         output_text=request.output_text,
         error_message=request.error_message,
-        run_metadata=_encode_json(request.event_metadata),
+        run_metadata=_encode_json(request.metadata),
         started_at=started_at,
         completed_at=request.completed_at,
     )
