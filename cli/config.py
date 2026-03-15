@@ -39,6 +39,10 @@ class CLIConfig:
 
     @api_url.setter
     def api_url(self, value: str):
+        # Strip trailing /api to avoid double-path issues
+        # since CLI commands explicitly add /api prefix
+        if value.endswith("/api"):
+            value = value[:-4]
         self._config["api_url"] = value
         self.save()
 

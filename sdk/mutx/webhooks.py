@@ -75,7 +75,7 @@ class Webhooks:
     ) -> Webhook:
         self._require_sync_client()
         response = self._client.post(
-            "/webhooks/",
+            "/api/webhooks/",
             json={
                 "url": url,
                 "events": events,
@@ -95,7 +95,7 @@ class Webhooks:
     ) -> Webhook:
         self._require_async_client()
         response = await self._client.post(
-            "/webhooks/",
+            "/api/webhooks/",
             json={
                 "url": url,
                 "events": events,
@@ -113,7 +113,7 @@ class Webhooks:
     ) -> list[Webhook]:
         self._require_sync_client()
         response = self._client.get(
-            "/webhooks/",
+            "/api/webhooks/",
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
@@ -126,7 +126,7 @@ class Webhooks:
     ) -> list[Webhook]:
         self._require_async_client()
         response = await self._client.get(
-            "/webhooks/",
+            "/api/webhooks/",
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
@@ -134,24 +134,24 @@ class Webhooks:
 
     def get(self, webhook_id: UUID | str) -> Webhook:
         self._require_sync_client()
-        response = self._client.get(f"/webhooks/{webhook_id}")
+        response = self._client.get(f"/api/webhooks/{webhook_id}")
         response.raise_for_status()
         return Webhook(response.json())
 
     async def aget(self, webhook_id: UUID | str) -> Webhook:
         self._require_async_client()
-        response = await self._client.get(f"/webhooks/{webhook_id}")
+        response = await self._client.get(f"/api/webhooks/{webhook_id}")
         response.raise_for_status()
         return Webhook(response.json())
 
     def delete(self, webhook_id: UUID | str) -> None:
         self._require_sync_client()
-        response = self._client.delete(f"/webhooks/{webhook_id}")
+        response = self._client.delete(f"/api/webhooks/{webhook_id}")
         response.raise_for_status()
 
     async def adelete(self, webhook_id: UUID | str) -> None:
         self._require_async_client()
-        response = await self._client.delete(f"/webhooks/{webhook_id}")
+        response = await self._client.delete(f"/api/webhooks/{webhook_id}")
         response.raise_for_status()
 
     def get_deliveries(
@@ -170,7 +170,7 @@ class Webhooks:
             params["success"] = success
 
         response = self._client.get(
-            f"/webhooks/{webhook_id}/deliveries",
+            f"/api/webhooks/{webhook_id}/deliveries",
             params=params,
         )
         response.raise_for_status()
@@ -192,7 +192,7 @@ class Webhooks:
             params["success"] = success
 
         response = await self._client.get(
-            f"/webhooks/{webhook_id}/deliveries",
+            f"/api/webhooks/{webhook_id}/deliveries",
             params=params,
         )
         response.raise_for_status()
@@ -218,7 +218,7 @@ class Webhooks:
         if is_active is not None:
             payload["is_active"] = is_active
 
-        response = self._client.patch(f"/webhooks/{webhook_id}", json=payload)
+        response = self._client.patch(f"/api/webhooks/{webhook_id}", json=payload)
         response.raise_for_status()
         return Webhook(response.json())
 
@@ -242,18 +242,18 @@ class Webhooks:
         if is_active is not None:
             payload["is_active"] = is_active
 
-        response = await self._client.patch(f"/webhooks/{webhook_id}", json=payload)
+        response = await self._client.patch(f"/api/webhooks/{webhook_id}", json=payload)
         response.raise_for_status()
         return Webhook(response.json())
 
     def test(self, webhook_id: UUID | str) -> dict[str, Any]:
         self._require_sync_client()
-        response = self._client.post(f"/webhooks/{webhook_id}/test")
+        response = self._client.post(f"/api/webhooks/{webhook_id}/test")
         response.raise_for_status()
         return response.json()
 
     async def atest(self, webhook_id: UUID | str) -> dict[str, Any]:
         self._require_async_client()
-        response = await self._client.post(f"/webhooks/{webhook_id}/test")
+        response = await self._client.post(f"/api/webhooks/{webhook_id}/test")
         response.raise_for_status()
         return response.json()

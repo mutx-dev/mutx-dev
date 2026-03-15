@@ -86,7 +86,7 @@ class Deployments:
         """Create a deployment via /deployments (canonical backend route)."""
         self._require_sync_client()
         response = self._client.post(
-            "/deployments",
+            "/api/deployments",
             json={"agent_id": str(agent_id), "replicas": replicas},
         )
         response.raise_for_status()
@@ -96,7 +96,7 @@ class Deployments:
         """Create a deployment via /deployments (canonical backend route)."""
         self._require_async_client()
         response = await self._client.post(
-            "/deployments",
+            "/api/deployments",
             json={"agent_id": str(agent_id), "replicas": replicas},
         )
         response.raise_for_status()
@@ -109,14 +109,14 @@ class Deployments:
         {"deployment_id": ..., "status": ...}
         """
         self._require_sync_client()
-        response = self._client.post(f"/agents/{agent_id}/deploy")
+        response = self._client.post(f"/api/agents/{agent_id}/deploy")
         response.raise_for_status()
         return response.json()
 
     async def acreate_for_agent(self, agent_id: UUID | str) -> dict[str, Any]:
         """Create deployment via legacy/live route /agents/{agent_id}/deploy."""
         self._require_async_client()
-        response = await self._client.post(f"/agents/{agent_id}/deploy")
+        response = await self._client.post(f"/api/agents/{agent_id}/deploy")
         response.raise_for_status()
         return response.json()
 
@@ -134,7 +134,7 @@ class Deployments:
             params["status"] = status
 
         self._require_sync_client()
-        response = self._client.get("/deployments", params=params)
+        response = self._client.get("/api/deployments", params=params)
         response.raise_for_status()
         return [Deployment(data) for data in response.json()]
 
@@ -152,19 +152,19 @@ class Deployments:
             params["status"] = status
 
         self._require_async_client()
-        response = await self._client.get("/deployments", params=params)
+        response = await self._client.get("/api/deployments", params=params)
         response.raise_for_status()
         return [Deployment(data) for data in response.json()]
 
     def get(self, deployment_id: UUID | str) -> Deployment:
         self._require_sync_client()
-        response = self._client.get(f"/deployments/{deployment_id}")
+        response = self._client.get(f"/api/deployments/{deployment_id}")
         response.raise_for_status()
         return Deployment(response.json())
 
     async def aget(self, deployment_id: UUID | str) -> Deployment:
         self._require_async_client()
-        response = await self._client.get(f"/deployments/{deployment_id}")
+        response = await self._client.get(f"/api/deployments/{deployment_id}")
         response.raise_for_status()
         return Deployment(response.json())
 
@@ -184,7 +184,7 @@ class Deployments:
 
         self._require_sync_client()
         response = self._client.get(
-            f"/deployments/{deployment_id}/events",
+            f"/api/deployments/{deployment_id}/events",
             params=params,
         )
         response.raise_for_status()
@@ -206,7 +206,7 @@ class Deployments:
 
         self._require_async_client()
         response = await self._client.get(
-            f"/deployments/{deployment_id}/events",
+            f"/api/deployments/{deployment_id}/events",
             params=params,
         )
         response.raise_for_status()
@@ -215,7 +215,7 @@ class Deployments:
     def scale(self, deployment_id: UUID | str, replicas: int) -> Deployment:
         self._require_sync_client()
         response = self._client.post(
-            f"/deployments/{deployment_id}/scale",
+            f"/api/deployments/{deployment_id}/scale",
             json={"replicas": replicas},
         )
         response.raise_for_status()
@@ -224,7 +224,7 @@ class Deployments:
     async def ascale(self, deployment_id: UUID | str, replicas: int) -> Deployment:
         self._require_async_client()
         response = await self._client.post(
-            f"/deployments/{deployment_id}/scale",
+            f"/api/deployments/{deployment_id}/scale",
             json={"replicas": replicas},
         )
         response.raise_for_status()
@@ -232,24 +232,24 @@ class Deployments:
 
     def restart(self, deployment_id: UUID | str) -> Deployment:
         self._require_sync_client()
-        response = self._client.post(f"/deployments/{deployment_id}/restart")
+        response = self._client.post(f"/api/deployments/{deployment_id}/restart")
         response.raise_for_status()
         return Deployment(response.json())
 
     async def arestart(self, deployment_id: UUID | str) -> Deployment:
         self._require_async_client()
-        response = await self._client.post(f"/deployments/{deployment_id}/restart")
+        response = await self._client.post(f"/api/deployments/{deployment_id}/restart")
         response.raise_for_status()
         return Deployment(response.json())
 
     def delete(self, deployment_id: UUID | str) -> None:
         self._require_sync_client()
-        response = self._client.delete(f"/deployments/{deployment_id}")
+        response = self._client.delete(f"/api/deployments/{deployment_id}")
         response.raise_for_status()
 
     async def adelete(self, deployment_id: UUID | str) -> None:
         self._require_async_client()
-        response = await self._client.delete(f"/deployments/{deployment_id}")
+        response = await self._client.delete(f"/api/deployments/{deployment_id}")
         response.raise_for_status()
 
     def logs(
@@ -265,7 +265,7 @@ class Deployments:
 
         self._require_sync_client()
         response = self._client.get(
-            f"/deployments/{deployment_id}/logs",
+            f"/api/deployments/{deployment_id}/logs",
             params=params,
         )
         response.raise_for_status()
@@ -284,7 +284,7 @@ class Deployments:
 
         self._require_async_client()
         response = await self._client.get(
-            f"/deployments/{deployment_id}/logs",
+            f"/api/deployments/{deployment_id}/logs",
             params=params,
         )
         response.raise_for_status()
@@ -298,7 +298,7 @@ class Deployments:
     ) -> list[dict[str, Any]]:
         self._require_sync_client()
         response = self._client.get(
-            f"/deployments/{deployment_id}/metrics",
+            f"/api/deployments/{deployment_id}/metrics",
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
@@ -312,7 +312,7 @@ class Deployments:
     ) -> list[dict[str, Any]]:
         self._require_async_client()
         response = await self._client.get(
-            f"/deployments/{deployment_id}/metrics",
+            f"/api/deployments/{deployment_id}/metrics",
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
