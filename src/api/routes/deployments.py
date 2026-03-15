@@ -32,6 +32,7 @@ from src.api.models.schemas import (
     DeploymentRollbackRequest,
 )
 from src.api.middleware.auth import get_current_user
+from src.api.services.usage import track_usage
 
 router = APIRouter(prefix="/deployments", tags=["deployments"])
 logger = logging.getLogger(__name__)
@@ -283,6 +284,16 @@ async def create_deployment(
 
     # Update agent status
     agent.status = AgentStatus.RUNNING.value
+
+    # Track usage event
+    await track_usage(
+        db,
+        user_id=current_user.id,
+        event_type="deployment_create",
+        resource_type="deployment",
+        resource_id=deployment.id,
+        metadata={"replicas": deployment.replicas},
+    )
 
     await db.commit()
     # Re-fetch to ensure events are loaded and attributes are fresh
