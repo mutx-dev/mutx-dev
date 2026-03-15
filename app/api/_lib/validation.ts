@@ -100,7 +100,7 @@ export const schemas = {
   
   // Deployment schemas
   deploymentCreate: z.object({
-    agent_id: z.string().uuid('Invalid agent ID'),
+    agent_id: z.string().uuid('Invalid agent ID'), replicas: z.number().int().positive().max(10, 'Max replicas is 10').optional(),
     environment: z.enum(['development', 'staging', 'production']).optional(),
     config: z.record(z.string(), z.unknown()).optional(),
   }),
