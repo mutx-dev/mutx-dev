@@ -16,7 +16,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: "sh -c 'cp -R .next/static .next/standalone/.next/static && cp -R public .next/standalone/public && PORT=" + port + " HOSTNAME=127.0.0.1 node .next/standalone/server.js'",
+    command: "npm run start",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
