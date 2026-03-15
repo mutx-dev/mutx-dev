@@ -466,7 +466,7 @@ export function DeploymentsPageClient() {
   async function handleRestart(deploymentId: string) {
     setProcessingIds(prev => new Set(prev).add(deploymentId));
     try {
-      await writeJson<Deployment>(`/api/dashboard/deployments/${deploymentId}`, {
+      await writeJson<Deployment>(`/api/dashboard/deployments/${deploymentId}?action=restart`, {
         method: "POST",
       });
       await loadDeployments();
@@ -484,10 +484,10 @@ export function DeploymentsPageClient() {
   async function handleStop(deploymentId: string) {
     setProcessingIds(prev => new Set(prev).add(deploymentId));
     try {
-      await writeJson<Deployment>(`/api/dashboard/deployments/${deploymentId}`, {
+      await writeJson<Deployment>(`/api/dashboard/deployments/${deploymentId}?action=scale`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "scale", replicas: 0 }),
+        body: JSON.stringify({ replicas: 0 }),
       });
       await loadDeployments();
     } catch (err) {
@@ -505,10 +505,10 @@ export function DeploymentsPageClient() {
     setProcessingIds(prev => new Set(prev).add(deploymentId));
     try {
       const deployment = deployments.find(d => d.id === deploymentId);
-      await writeJson<Deployment>(`/api/dashboard/deployments/${deploymentId}`, {
+      await writeJson<Deployment>(`/api/dashboard/deployments/${deploymentId}?action=scale`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "scale", replicas: deployment?.replicas || 1 }),
+        body: JSON.stringify({ replicas: deployment?.replicas || 1 }),
       });
       await loadDeployments();
     } catch (err) {

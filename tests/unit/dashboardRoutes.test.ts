@@ -128,17 +128,76 @@ describe('dashboard route proxies', () => {
     ])
   })
 
-  it('returns 401 from dashboard deployments proxy when no auth token exists', async () => {
-    getAuthToken.mockResolvedValue(null)
-    const { GET } = await import('../../app/api/dashboard/deployments/route')
+  it('proxies deployment creation requests', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 201,
+      json: async () => ({ id: 'dep_123', status: 'pending' }),
+    })
+    const { POST } = await import('../../app/api/dashboard/deployments/route')
 
-    const response = await GET(mockRequest())
+    const response = await POST({
+      json: async () => ({ agent_id: 'agent_123', replicas: 2 }),
+    } as NextRequest)
 
-    expect(response.status).toBe(401)
-    await expect(response.json()).resolves.toEqual({ detail: 'Unauthorized' })
-    expect(global.fetch).not.toHaveBeenCalled()
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ agent_id: 'agent_123', replicas: 2 }),
+      cache: 'no-store',
+    })
+    expect(response.status).toBe(201)
+    await expect(response.json()).resolves.toEqual({ id: 'dep_123', status: 'pending' })
   })
 
+  it('proxies deployment restart actions', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ id: 'dep_123', status: 'pending' }),
+    })
+    const { POST } = await import('../../app/api/dashboard/deployments/[id]/route')
+
+    const response = await POST(
+      { url: 'http://localhost:3000/api/dashboard/deployments/dep_123?action=restart' } as NextRequest,
+      { params: Promise.resolve({ id: 'dep_123' }) }
+    )
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments/dep_123/restart', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer token' },
+      cache: 'no-store',
+    })
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({ id: 'dep_123', status: 'pending' })
+  })
+
+  it('proxies deployment delete actions', async () => {
+    getAuthToken.mockResolvedValue('token')
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 204,
+      json: async () => ({}),
+    })
+    const { DELETE } = await import('../../app/api/dashboard/deployments/[id]/route')
+
+    const response = await DELETE(
+      mockRequest(),
+      { params: Promise.resolve({ id: 'dep_123' }) }
+    )
+
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments/dep_123', {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer token' },
+      cache: 'no-store',
+    })
+    expect(response.status).toBe(204)
+  })
 
 
   it('preserves upstream unauthorized responses for auth me proxy', async () => {
