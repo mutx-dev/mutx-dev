@@ -89,7 +89,7 @@ async def test_agents_async_methods_are_awaited_with_async_client() -> None:
         agents = Agents(client)
         agent = await agents.acreate(name="async-agent", config={"model": "gpt-4o"})
 
-    assert captured["path"] == "/api/agents"
+    assert captured["path"] == "/v1/agents"
     assert captured["json"]["name"] == "async-agent"
     assert captured["json"]["config"]["model"] == "gpt-4o"
     assert agent.name == "async-agent"
@@ -123,7 +123,7 @@ async def test_deployments_async_methods_are_awaited_with_async_client() -> None
         deployments = Deployments(client)
         deployment = await deployments.acreate(str(uuid.uuid4()), replicas=2)
 
-    assert captured["path"] == "/api/deployments"
+    assert captured["path"] == "/v1/deployments"
     assert deployment.status in {"running", "pending", "creating"}
 
 
@@ -142,7 +142,7 @@ async def test_api_keys_async_methods_are_awaited_with_async_client() -> None:
         api_keys = APIKeys(client)
         key = await api_keys.acreate("test-key")
 
-    assert captured["path"] == "/api/api-keys"
+    assert captured["path"] == "/v1/api-keys"
     assert key.name == "ci-key"
     assert key.key == "mutx_test_key"
 
@@ -162,6 +162,6 @@ async def test_webhooks_async_methods_are_awaited_with_async_client() -> None:
         webhooks = Webhooks(client)
         webhook = await webhooks.acreate(url="https://example.com/hook", events=["agent.started"])
 
-    assert captured["path"] == "/api/webhooks/"
+    assert captured["path"] == "/v1/webhooks/"
     assert webhook.url == "https://example.com/webhook"
     assert webhook.events == ["agent.started", "agent.stopped"]

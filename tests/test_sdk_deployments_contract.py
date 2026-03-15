@@ -81,7 +81,7 @@ def test_deployments_create_hits_canonical_route_and_maps_payload() -> None:
     with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
         deployment = Deployments(client).create(agent_id, replicas=3)
 
-    assert captured["path"] == "/api/deployments"
+    assert captured["path"] == "/v1/deployments"
     assert json.loads(captured["body"]) == {"agent_id": str(agent_id), "replicas": 3}
     assert deployment.agent_id == agent_id
     assert deployment.status == "pending"
@@ -107,7 +107,7 @@ async def test_deployments_acreate_hits_canonical_route_and_maps_payload() -> No
     ) as client:
         deployment = await Deployments(client).acreate(agent_id, replicas=2)
 
-    assert captured["path"] == "/api/deployments"
+    assert captured["path"] == "/v1/deployments"
     assert json.loads(captured["body"]) == {"agent_id": str(agent_id), "replicas": 2}
     assert deployment.agent_id == agent_id
     assert deployment.status == "pending"
@@ -126,7 +126,7 @@ def test_deployments_restart_hits_contract_route_and_maps_payload() -> None:
     with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
         deployment = Deployments(client).restart(deployment_id)
 
-    assert captured["path"] == f"/api/deployments/{deployment_id}/restart"
+    assert captured["path"] == f"/v1/deployments/{deployment_id}/restart"
     assert captured["body"] == ""
     assert deployment.id == deployment_id
     assert deployment.status == "pending"
@@ -148,7 +148,7 @@ async def test_deployments_arestart_hits_contract_route_and_maps_payload() -> No
     ) as client:
         deployment = await Deployments(client).arestart(deployment_id)
 
-    assert captured["path"] == f"/api/deployments/{deployment_id}/restart"
+    assert captured["path"] == f"/v1/deployments/{deployment_id}/restart"
     assert captured["body"] == ""
     assert deployment.id == deployment_id
     assert deployment.status == "pending"
@@ -180,7 +180,7 @@ def test_deployments_events_hits_contract_route_and_maps_payload() -> None:
             status="failed",
         )
 
-    assert captured["path"] == f"/api/deployments/{deployment_id}/events"
+    assert captured["path"] == f"/v1/deployments/{deployment_id}/events"
     assert captured["query"] == {
         "skip": "3",
         "limit": "25",
@@ -209,7 +209,7 @@ async def test_deployments_aevents_hits_contract_route_and_maps_payload() -> Non
     ) as client:
         history = await Deployments(client).aevents(deployment_id, skip=1, limit=10)
 
-    assert captured["path"] == f"/api/deployments/{deployment_id}/events"
+    assert captured["path"] == f"/v1/deployments/{deployment_id}/events"
     assert captured["query"] == {"skip": "1", "limit": "10"}
     assert history.deployment_id == deployment_id
     assert history.items[0].status == "running"
@@ -281,7 +281,7 @@ def test_deployments_logs_support_level_filter_param() -> None:
         payload = Deployments(client).logs(deployment_id, skip=2, limit=50, level="ERROR")
 
     assert payload == []
-    assert captured["path"] == f"/api/deployments/{deployment_id}/logs"
+    assert captured["path"] == f"/v1/deployments/{deployment_id}/logs"
     assert captured["query"] == {"skip": "2", "limit": "50", "level": "ERROR"}
 
 
@@ -302,7 +302,7 @@ async def test_deployments_alogs_support_level_filter_param() -> None:
         payload = await Deployments(client).alogs(deployment_id, skip=4, limit=75, level="INFO")
 
     assert payload == []
-    assert captured["path"] == f"/api/deployments/{deployment_id}/logs"
+    assert captured["path"] == f"/v1/deployments/{deployment_id}/logs"
     assert captured["query"] == {"skip": "4", "limit": "75", "level": "INFO"}
 
 
@@ -318,7 +318,7 @@ def test_deployments_metrics_hits_contract_route_and_query_params() -> None:
     with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
         payload = Deployments(client).metrics(deployment_id, skip=5, limit=15)
 
-    assert captured["path"] == f"/api/deployments/{deployment_id}/metrics"
+    assert captured["path"] == f"/v1/deployments/{deployment_id}/metrics"
     assert captured["query"] == {"skip": "5", "limit": "15"}
     assert payload[0]["cpu_usage"] == 0.61
     assert payload[0]["memory_usage"] == 0.44
@@ -340,6 +340,6 @@ async def test_deployments_ametrics_hits_contract_route_and_query_params() -> No
     ) as client:
         payload = await Deployments(client).ametrics(deployment_id, skip=6, limit=12)
 
-    assert captured["path"] == f"/api/deployments/{deployment_id}/metrics"
+    assert captured["path"] == f"/v1/deployments/{deployment_id}/metrics"
     assert captured["query"] == {"skip": "6", "limit": "12"}
     assert payload[0]["cpu_usage"] == 0.61
