@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
+import { ErrorBoundary } from "@/components/app/ErrorBoundary";
 import { type components } from "@/app/types/api";
 
 type DeploymentEventResponse = components["schemas"]["DeploymentEventResponse"];
@@ -156,6 +157,17 @@ async function fetchEvents(deploymentId: string): Promise<DeploymentEventRespons
 }
 
 export function StateTransitions({
+  deploymentId,
+  title = "State Transitions",
+}: StateTransitionsProps) {
+  return (
+    <ErrorBoundary>
+      <StateTransitionsContent deploymentId={deploymentId} title={title} />
+    </ErrorBoundary>
+  );
+}
+
+function StateTransitionsContent({
   deploymentId,
   title = "State Transitions",
 }: StateTransitionsProps) {

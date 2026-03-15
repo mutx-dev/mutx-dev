@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
+import { ErrorBoundary } from "@/components/app/ErrorBoundary";
 import { type components } from "@/app/types/api";
 
 type AgentLogResponse = components["schemas"]["AgentLogResponse"];
@@ -56,12 +57,26 @@ function formatTimestamp(timestamp?: string | null) {
   }
 }
 
-function formatMetadata(metadata: string): string {
-  try {
-    return JSON.stringify(JSON.parse(metadata), null, 2);
-  } catch {
-    return metadata;
+function formatExtraData(extraData: unknown): string {
+  if (extraData === null || extraData === undefined) return "";
+  if (typeof extraData === "string") {
+    try {
+      return JSON.stringify(JSON.parse(extraData), null, 2);
+    } catch {
+      return extraData;
+    }
   }
+  if (typeof extraData === "object") {
+    return JSON.stringify(extraData, null, 2);
+  }
+  return String(extraData);
+}
+
+function serializeExtraData(extraData: unknown): string {
+  if (extraData === null || extraData === undefined) return "";
+  if (typeof extraData === "string") return extraData;
+  if (typeof extraData === "object") return JSON.stringify(extraData);
+  return String(extraData);
 }
 
 async function fetchLogs<T>(url: string): Promise<T[]> {
@@ -73,6 +88,18 @@ async function fetchLogs<T>(url: string): Promise<T[]> {
 }
 
 export function LogsViewer({
+  agentId,
+  deploymentId,
+  title = "Logs",
+}: LogsViewerProps) {
+  return (
+    <ErrorBoundary>
+      <LogsViewerContent agentId={agentId} deploymentId={deploymentId} title={title} />
+    </ErrorBoundary>
+  );
+}
+
+function LogsViewerContent({
   agentId,
   deploymentId,
   title = "Logs",
@@ -125,9 +152,10 @@ export function LogsViewer({
     }
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
+      const extraDataStr = serializeExtraData(log.extra_data);
       return (
         log.message?.toLowerCase().includes(query) ||
-        log.extra_data?.toLowerCase().includes(query)
+        extraDataStr.toLowerCase().includes(query)
       );
     }
     return true;
@@ -292,7 +320,7 @@ export function LogsViewer({
                           Metadata
                         </p>
                         <pre className="text-xs text-slate-400 overflow-x-auto">
-                          {formatMetadata(log.extra_data)}
+                          {formatExtraData(log.extra_data)}
                         </pre>
                       </div>
                     )}

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
+import { ErrorBoundary } from "@/components/app/ErrorBoundary";
 import { type components } from "@/app/types/api";
 
 type AgentMetricResponse = components["schemas"]["AgentMetricResponse"];
@@ -99,6 +100,18 @@ async function fetchMetrics<T>(url: string): Promise<T[]> {
 }
 
 export function MetricsDashboard({
+  agentId,
+  deploymentId,
+  title = "Metrics",
+}: MetricsDashboardProps) {
+  return (
+    <ErrorBoundary>
+      <MetricsDashboardContent agentId={agentId} deploymentId={deploymentId} title={title} />
+    </ErrorBoundary>
+  );
+}
+
+function MetricsDashboardContent({
   agentId,
   deploymentId,
   title = "Metrics",
