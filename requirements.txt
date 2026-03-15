@@ -2,6 +2,7 @@
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
 pydantic==2.5.3
+# keep pydantic-settings <2.7.0 while pydantic remains <2.7.0
 pydantic-settings==2.1.0
 
 # Database
