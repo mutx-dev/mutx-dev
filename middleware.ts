@@ -1,9 +1,7 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { CURRENT_API_VERSION } from './app/api/_lib/versioning'
 
-// Rate limiting configuration
-// const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
+// const CURRENT_API_VERSION = 'v1'
 
 function getClientIp(request: NextRequest): string {
   return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
@@ -23,8 +21,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
-
   // Check rate limit (applies to all matched routes)
   const { allowed, remaining, resetTime } = checkRateLimit(request)
 
@@ -33,11 +29,6 @@ export function middleware(request: NextRequest) {
   response.headers.set('X-RateLimit-Limit', '100')
   response.headers.set('X-RateLimit-Remaining', String(remaining))
   response.headers.set('X-RateLimit-Reset', String(resetTime))
-
-  // Add API version header for API routes
-  if (isApiRoute) {
-    response.headers.set('X-API-Version', CURRENT_API_VERSION)
-  }
 
   if (!allowed) {
     const headers = new Headers(response.headers)
