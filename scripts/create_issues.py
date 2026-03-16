@@ -1664,7 +1664,8 @@ ISSUES: list[Issue] = [
     ),
 ]
 
-assert len(ISSUES) == 100, f"Expected 100 issues, got {len(ISSUES)}"
+if len(ISSUES) != 100:
+    raise ValueError(f"Expected 100 issues, got {len(ISSUES)}")
 
 
 # ---------------------------------------------------------------------------
@@ -1679,7 +1680,10 @@ def dry_run(issues: list[Issue]) -> None:
         print(f"Issue {idx}/100")
         print(f"  Title:  {issue.title}")
         print(f"  Labels: {labels}")
-        print(f"  Body:\n{issue.body[:200]}...")
+        body_preview = issue.body[:200]
+        if len(issue.body) > 200:
+            body_preview += "..."
+        print(f"  Body:\n{body_preview}")
     print(f"\n{'='*72}")
     print(f"Total: {len(issues)} issues ready to create.")
     print("Run with --execute to create them.\n")
