@@ -4,7 +4,7 @@
     "backend": {
       "build": {
         "builder": "DOCKERFILE",
-        "dockerfilePath": "Dockerfile.backend"
+        "dockerfilePath": "infrastructure/docker/Dockerfile.backend"
       },
       "deploy": {
         "startCommand": "sh -c 'uvicorn src.api.main:app --host 0.0.0.0 --port ${PORT:-8000}'"
@@ -13,7 +13,7 @@
     "frontend": {
       "build": {
         "builder": "DOCKERFILE",
-        "dockerfilePath": "Dockerfile.frontend"
+        "dockerfilePath": "infrastructure/docker/Dockerfile.frontend"
       },
       "deploy": {
         "startCommand": "node server.js"
