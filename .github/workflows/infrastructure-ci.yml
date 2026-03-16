@@ -1,0 +1,108 @@
+name: Infrastructure CI
+
+permissions:
+  contents: read
+
+on:
+  push:
+    paths:
+      - 'infrastructure/**'
+      - '.github/workflows/infrastructure-ci.yml'
+  pull_request:
+    paths:
+      - 'infrastructure/**'
+      - '.github/workflows/infrastructure-ci.yml'
+
+concurrency:
+  group: infra-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform -chdir=infrastructure/terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform init
+        run: |
+          for env in staging production; do
+            terraform -chdir=infrastructure/terraform init \
+              -backend=false \
+              -backend-config=environments/$env/backend.hcl
+          done
+
+      - name: Terraform validate
+        run: terraform -chdir=infrastructure/terraform validate
+
+  ansible:
+    name: Ansible
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ansible-lint
+        run: pip install ansible-lint
+
+      - name: Run ansible-lint
+        run: ansible-lint infrastructure/ansible/
+
+  dockerfile:
+    name: Dockerfile Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run hadolint
+        run: |
+          # Install hadolint
+          curl -sL https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 -o /usr/local/bin/hadolint
+          chmod +x /usr/local/bin/hadolint
+
+          # Lint Dockerfiles
+          hadolint infrastructure/docker/Dockerfile.api
+          hadolint infrastructure/docker/Dockerfile.backend
+          hadolint infrastructure/docker/Dockerfile.frontend
+          hadolint infrastructure/docker/Dockerfile.api.production
+
+  docker-compose:
+    name: Docker Compose
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Compose
+        run: |
+          curl -sL https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
+
+      - name: Validate docker-compose files
+        run: |
+          docker-compose -f infrastructure/docker/docker-compose.yml config --quiet
+          docker-compose -f infrastructure/docker/docker-compose.prod.yml config --quiet
+          docker-compose -f infrastructure/docker/docker-compose.production.yml config --quiet
+          docker-compose -f infrastructure/docker/docker-compose.monitoring.yml config --quiet
+          docker-compose -f infrastructure/docker/otel-compose.yml config --quiet
