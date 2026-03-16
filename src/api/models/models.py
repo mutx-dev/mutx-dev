@@ -488,3 +488,33 @@ class AnalyticsEvent(Base):
     )
 
     user: Mapped[Optional["User"]] = relationship("User")
+
+
+class AgentResourceUsage(Base):
+    """Track resource usage for agents (tokens, API calls, cost)."""
+
+    __tablename__ = "agent_resource_usage"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    agent_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True
+    )
+    # Token usage
+    prompt_tokens: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, default=0)
+    completion_tokens: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, default=0)
+    total_tokens: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, default=0)
+    # API call tracking
+    api_calls: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    # Cost tracking (in USD)
+    cost_usd: Mapped[Optional[float]] = mapped_column(Float, nullable=True, default=0.0)
+    # Metadata
+    model: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    metadata: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON string
+    # Timestamps
+    period_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    period_end: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+
+    agent: Mapped["Agent"] = relationship("Agent")

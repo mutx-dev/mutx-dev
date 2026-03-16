@@ -37,11 +37,22 @@ class RuntimeMessage(TypedDict, total=False):
     tool_calls: list[RuntimeToolCall]
 
 
+class RuntimeUsage(TypedDict, total=False):
+    """Resource usage from a runtime execution."""
+    prompt_tokens: int
+    completion_tokens: int
+    total_tokens: int
+    api_calls: int
+    cost_usd: float | None
+    model: str | None
+
+
 class RuntimeResult(TypedDict, total=False):
     message: RuntimeMessage
     content: str | None
     tool_calls: list[RuntimeToolCall]
     raw_response: Any
+    usage: RuntimeUsage
 
 
 class RuntimeStreamEvent(TypedDict, total=False):
@@ -50,6 +61,7 @@ class RuntimeStreamEvent(TypedDict, total=False):
     tool_call: RuntimeToolCall
     error: str
     raw_event: Any
+    usage: RuntimeUsage
 
 
 ToolHandler = Callable[[dict[str, Any]], Any | Awaitable[Any]]

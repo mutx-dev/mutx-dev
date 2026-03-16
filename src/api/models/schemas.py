@@ -215,6 +215,22 @@ class AgentMetricResponse(BaseModel):
     timestamp: datetime
 
 
+
+class AgentResourceUsageResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    agent_id: uuid.UUID
+    prompt_tokens: Optional[int] = 0
+    completion_tokens: Optional[int] = 0
+    total_tokens: Optional[int] = 0
+    api_calls: int = 0
+    cost_usd: Optional[float] = 0.0
+    model: Optional[str] = None
+    metadata: Optional[dict] = None
+    period_start: datetime
+    period_end: Optional[datetime] = None
+    created_at: datetime
 class RunTraceCreate(BaseModel):
     event_type: str = Field(..., min_length=1, max_length=100)
     message: Optional[str] = Field(None, max_length=5000)
