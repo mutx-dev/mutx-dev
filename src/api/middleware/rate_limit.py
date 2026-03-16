@@ -119,8 +119,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._requests.setdefault(client_id, []).append(datetime.now(timezone.utc))
 
         logger.debug(
-            "Rate limit check | client=%s | count=%s | limit=%s | path=%s",
-            client_id,
+            "Rate limit check | client_fp=%s | count=%s | limit=%s | path=%s",
+            self._fingerprint(client_id),
             current_count + 1,
             self.requests,
             path,
