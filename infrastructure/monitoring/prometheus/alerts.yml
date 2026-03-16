@@ -135,3 +135,121 @@ groups:
         annotations:
           summary: "PostgreSQL slow queries detected"
           description: "Average query execution time is above 1 second."
+
+      - alert: MutxWorkerDown
+        expr: up{job="mutx-worker"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MUTX worker is down"
+          description: "Worker cannot be scraped for more than 2 minutes."
+
+      - alert: MutxSchedulerDown
+        expr: up{job="mutx-scheduler"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MUTX scheduler is down"
+          description: "Scheduler cannot be scraped for more than 2 minutes."
+
+      - alert: AgentExecutionFailureRate
+        expr: sum(rate(agent_executions_total{status="failed"}[5m])) / sum(rate(agent_executions_total[5m])) > 0.10
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High agent execution failure rate"
+          description: "More than 10% of agent executions are failing."
+
+      - alert: TaskQueueBacklog
+        expr: mutx_tasks_pending > 1000
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Task queue backlog growing"
+          description: "More than 1000 tasks are pending execution."
+
+      - alert: TaskQueueStalled
+        expr: mutx_tasks_pending > 5000
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Task queue stalled - critical backlog"
+          description: "More than 5000 tasks are pending - system may be stalled."
+
+      - alert: AuthTokenExpirationWarning
+        expr: time() - auth_token_expiry < 3600
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Auth token expiring soon"
+          description: "Authentication token will expire within 1 hour."
+
+      - alert: WebhookDeliveryFailure
+        expr: sum(rate(webhook_delivery_failed_total[5m])) / sum(rate(webhook_delivery_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High webhook delivery failure rate"
+          description: "More than 5% of webhook deliveries are failing."
+
+      - alert: LLMProviderRateLimit
+        expr: llm_requests_ratelimited_total > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "LLM provider rate limit hit"
+          description: "Requests are being rate limited by the LLM provider."
+
+      - alert: LLMProviderError
+        expr: sum(rate(llm_requests_errors_total[5m])) / sum(rate(llm_requests_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High LLM provider error rate"
+          description: "More than 5% of LLM requests are failing."
+
+      - alert: RedisConnectionFailure
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis server is not responding."
+
+      - alert: PostgresConnectionFailure
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL server is not responding."
+
+      - alert: CertificateExpirationWarning
+        expr: (certify_not_after - time()) < 2592000
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "TLS certificate expiring soon"
+          description: "Certificate will expire within 30 days."
+
+      - alert: CertificateExpirationCritical
+        expr: (certify_not_after - time()) < 604800
+        for: 1h
+        labels:
+          severity: critical
+        annotations:
+          summary: "TLS certificate expiring critically soon"
+          description: "Certificate will expire within 7 days."
+
