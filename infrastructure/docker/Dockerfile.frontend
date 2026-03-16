@@ -9,14 +9,20 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 # -----------------------------------------------------------------------------
 # Stage 2: Deps - Install dependencies only
 # -----------------------------------------------------------------------------
 FROM base AS deps
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # -----------------------------------------------------------------------------
 # Stage 3: Builder - Build the application
@@ -24,10 +30,13 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /app
 
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package.json ./
-COPY --from=deps /app/package-lock.json ./
+# package-lock.json not used with pnpm
 
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
@@ -35,13 +44,16 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
 COPY . .
-RUN npm run build
+RUN pnpm run build
 
 # -----------------------------------------------------------------------------
 # Stage 4: Runner - Production runtime
 # -----------------------------------------------------------------------------
 FROM node:20-alpine AS runner
 WORKDIR /app
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -66,14 +78,17 @@ CMD ["node", "server.js"]
 FROM base AS development
 WORKDIR /app
 
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package.json ./
-COPY --from=deps /app/package-lock.json ./
+# package-lock.json not used with pnpm
 
 COPY . .
 ENV NODE_ENV=development
 ENV NEXT_TELEMETRY_DISABLED=1
 
 EXPOSE 3000
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]
