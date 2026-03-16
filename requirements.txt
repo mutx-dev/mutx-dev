@@ -45,3 +45,18 @@ aiosqlite==0.20.0
 langchain-core>=0.1.52,<0.2.0
 bcrypt>=4.0.0
 # Updated Mon Mar 16 10:24:07 CET 2026
+
+
+
+
+# OpenTelemetry - Issue #1029
+deprecated
+opentelemetry-api>=1.22.0
+opentelemetry-sdk>=1.22.0
+opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-exporter-otlp-proto-http
+opentelemetry-exporter-jaeger-thrift
+opentelemetry-exporter-zipkin-proto-http
+opentelemetry-exporter-prometheus
+opentelemetry-instrumentation-fastapi
+opentelemetry-instrumentation-httpx
