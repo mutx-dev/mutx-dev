@@ -11,6 +11,13 @@ export const dynamic = 'force-dynamic'
 // Ownership is derived from the authenticated user, not client-supplied values
 const BLOCKED_QUERY_PARAMS = ['user_id', 'owner_id', 'owner']
 
+// Allow-list validation for agent IDs passed via query parameters.
+// Adjust the pattern if agent IDs follow a stricter format (e.g., UUID).
+function isValidAgentId(agentId: string): boolean {
+  // Alphanumeric, underscore, and hyphen, with a reasonable length limit.
+  return /^[a-zA-Z0-9_-]{1,128}$/.test(agentId)
+}
+
 /**
  * Filter out client-supplied ownership parameters.
  * Ownership is derived from the authenticated user.
@@ -44,6 +51,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // If filtering by agent_id, validate ownership of that agent
     const agentId = searchParams.get('agent_id')
     if (agentId) {
+      if (!isValidAgentId(agentId)) {
+        return NextResponse.json({ detail: 'Invalid agent_id' }, { status: 400 })
+      }
+
       const user = await getCurrentUser(request)
       if (!user) {
         return unauthorized()
