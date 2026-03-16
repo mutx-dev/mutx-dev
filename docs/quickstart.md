@@ -2,6 +2,8 @@
 
 This quickstart is for the current repo as it exists now: Next.js frontend plus FastAPI control plane.
 
+For a complete first-time setup path (including prerequisites, `pnpm`, `.env`, and validation), use [Deployment Local Developer Bootstrap](./deployment/local-developer-bootstrap.md).
+
 ## What you will run
 
 - Next.js site/app surface on port `3000`
@@ -41,26 +43,46 @@ Then use:
 - `http://localhost:3000/app` for the app shell preview
 - `http://localhost:3000/api/*` for the Next.js same-origin proxy layer
 
-## 3. Register or log in
+## 3. Bootstrap auth and API checks (no manual curl required)
 
-Use either the browser flows or direct API calls.
+Use the built-in make targets to register/login and run authenticated API checks:
+
+```bash
+make test-auth
+make test-api-auth
+```
+
+These commands remove the need to manually build `curl` auth headers and token plumbing for local verification.
+
+If you need direct API calls instead, use:
 
 ```bash
 BASE_URL=http://localhost:8000
+curl -X POST "$BASE_URL/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
 
-curl -X POST "$BASE_URL/auth/register"   -H "Content-Type: application/json"   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
-
-curl -X POST "$BASE_URL/auth/login"   -H "Content-Type: application/json"   -d '{"email":"you@example.com","password":"StrongPass1!"}'
+curl -X POST "$BASE_URL/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","password":"StrongPass1!"}'
 ```
 
 ## 4. Inspect real resources
 
+Use the API helper script:
+
 ```bash
-curl "$BASE_URL/agents?limit=10&skip=0"   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+./scripts/test-api.sh --agents
+./scripts/test-api.sh --deployments
+./scripts/test-api.sh --api-keys
+```
 
-curl "$BASE_URL/deployments?limit=10"   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+Or call endpoints directly:
 
-curl "$BASE_URL/api-keys"   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```bash
+curl "$BASE_URL/agents?limit=10&skip=0" -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+curl "$BASE_URL/deployments?limit=10" -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+curl "$BASE_URL/api-keys" -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ## Same-origin browser proxies

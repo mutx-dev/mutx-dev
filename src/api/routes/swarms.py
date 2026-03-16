@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 # Swarm models (stored in memory for now, could be extended to DB)
 class Swarm:
     """In-memory swarm representation."""
+
     def __init__(
         self,
         id: uuid.UUID,
@@ -105,17 +106,19 @@ async def _serialize_swarm(swarm: Swarm, db: AsyncSession) -> SwarmResponse:
             deploy_result = await db.execute(
                 select(Deployment).where(
                     Deployment.agent_id == agent_id,
-                    Deployment.status.in_(["running", "ready", "deploying"])
+                    Deployment.status.in_(["running", "ready", "deploying"]),
                 )
             )
             deployment = deploy_result.scalar_one_or_none()
-            agents.append(SwarmAgentResponse(
-                agent_id=agent.id,
-                agent_name=agent.name,
-                status=agent.status,
-                replicas=deployment.replicas if deployment else 0,
-            ))
-    
+            agents.append(
+                SwarmAgentResponse(
+                    agent_id=agent.id,
+                    agent_name=agent.name,
+                    status=agent.status,
+                    replicas=deployment.replicas if deployment else 0,
+                )
+            )
+
     return SwarmResponse(
         id=swarm.id,
         name=swarm.name,
@@ -139,7 +142,7 @@ async def list_swarms(
     """List all swarms for the current user."""
     user_swarms = [s for s in _swarms.values() if s.user_id == current_user.id]
     total = len(user_swarms)
-    paginated = user_swarms[skip:skip + limit]
+    paginated = user_swarms[skip : skip + limit]
     return SwarmListResponse(
         items=[await _serialize_swarm(s, db) for s in paginated],
         total=total,
@@ -160,10 +163,9 @@ async def create_swarm(
         agent = agent_result.scalar_one_or_none()
         if not agent:
             raise HTTPException(
-                status_code=400,
-                detail=f"Agent {agent_id} not found or not owned by user"
+                status_code=400, detail=f"Agent {agent_id} not found or not owned by user"
             )
-    
+
     swarm = Swarm(
         id=uuid.uuid4(),
         name=swarm_data.name,
@@ -206,14 +208,13 @@ async def scale_swarm(
     if scale_data.replicas < swarm.min_replicas or scale_data.replicas > swarm.max_replicas:
         raise HTTPException(
             status_code=400,
-            detail=f"Replicas must be between {swarm.min_replicas} and {swarm.max_replicas}"
+            detail=f"Replicas must be between {swarm.min_replicas} and {swarm.max_replicas}",
         )
 
     for agent_id in swarm.agent_ids:
         deploy_result = await db.execute(
             select(Deployment).where(
-                Deployment.agent_id == agent_id,
-                Deployment.status.in_(["running", "ready"])
+                Deployment.agent_id == agent_id, Deployment.status.in_(["running", "ready"])
             )
         )
         deployment = deploy_result.scalar_one_or_none()

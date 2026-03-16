@@ -1,0 +1,163 @@
+---
+description: Comprehensive local setup flow from prerequisites to validated API access.
+icon: wrench
+---
+
+# Local Developer Bootstrap
+
+Use this guide when setting up the repository for local development the first time.
+
+## 1. Prerequisites
+
+Install the following on your machine:
+
+* Git
+* Node.js 20 LTS recommended (`18+` minimum)
+* `pnpm` (recommended) or `npm`
+* Python `3.10+`
+* Docker + Docker Compose v2
+* `make` and `curl` (recommended for local verification commands)
+
+Quick check:
+
+```bash
+git --version
+node -v
+corepack enable
+pnpm -v
+python3 --version
+docker --version
+docker compose version
+make --version
+curl --version
+```
+
+If you prefer npm:
+
+```bash
+npm -v
+```
+
+## 2. Clone and Setup
+
+```bash
+git clone https://github.com/mutx-dev/mutx-dev.git
+cd mutx-dev
+
+# Frontend deps (preferred)
+pnpm install
+
+# npm fallback
+# npm install
+
+# Python deps
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e ".[dev]"
+```
+
+## 3. Environment Configuration
+
+Create your local environment file:
+
+```bash
+cp .env.example .env
+```
+
+Minimum values to confirm in `.env`:
+
+```bash
+DATABASE_URL=postgresql://mutx:mutx_password@localhost:5432/mutx
+DATABASE_SSL_MODE=disable
+JWT_SECRET=replace-with-a-stable-secret
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:8000
+REDIS_URL=redis://localhost:6379/0
+ENVIRONMENT=development
+```
+
+Generate a local JWT secret:
+
+```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+Optional integration keys (safe to leave empty for local bootstrap):
+
+* `RESEND_API_KEY`
+* `TELEGRAM_BOT_TOKEN`
+* `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+* `TURNSTILE_SECRET_KEY`
+
+Note: `./scripts/dev.sh` auto-creates `.env` from `.env.example` and generates a `JWT_SECRET` if `.env` is missing.
+
+## 4. Running Locally
+
+Preferred one-command flow:
+
+```bash
+./scripts/dev.sh
+```
+
+Equivalent Make target:
+
+```bash
+make dev
+```
+
+This starts PostgreSQL, Redis, FastAPI, and Next.js via Docker Compose.
+
+Local URLs:
+
+* Frontend: `http://localhost:3000`
+* App shell: `http://localhost:3000/app`
+* API: `http://localhost:8000`
+* API docs: `http://localhost:8000/docs`
+
+Manual split-process mode (optional):
+
+```bash
+docker compose -f infrastructure/docker/docker-compose.yml up -d postgres redis
+
+# Terminal 1 (API)
+source .venv/bin/activate
+uvicorn src.api.main:app --reload --port 8000
+
+# Terminal 2 (web)
+pnpm dev
+# npm run dev
+```
+
+## 5. Testing the Setup
+
+Basic API health checks:
+
+```bash
+./scripts/test-api.sh
+```
+
+Auth bootstrap without manual curl token plumbing:
+
+```bash
+make test-auth
+make test-api-auth
+```
+
+`make test-auth` registers/logs in a test user and prints a ready-to-use token.
+
+`make test-api-auth` runs authenticated endpoint checks through `scripts/test-api.sh --with-auth`.
+
+Full repository validation:
+
+```bash
+./scripts/test.sh
+```
+
+Skip Playwright when you only need local API + build checks:
+
+```bash
+MUTX_SKIP_PLAYWRIGHT=1 ./scripts/test.sh
+```
+
+For common local failures, see [Common Issues](../troubleshooting/common-issues.md).

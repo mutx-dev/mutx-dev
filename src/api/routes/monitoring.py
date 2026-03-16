@@ -4,7 +4,7 @@ Monitoring routes for system health and alerts.
 
 import logging
 import uuid
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -69,16 +69,16 @@ async def get_health(
 ):
     """Get system health status."""
     from src.api.main import start_time
-    
+
     # Check database connectivity
     db_status = "healthy"
     try:
         await db.execute(select(1))
     except Exception:
         db_status = "unhealthy"
-    
+
     uptime = datetime.now(timezone.utc).timestamp() - start_time
-    
+
     return HealthStatusResponse(
         status=db_status,
         timestamp=datetime.now(timezone.utc),
@@ -100,9 +100,9 @@ async def list_alerts(
     """List alerts for the user's agents."""
     # Filter by user's agents
     agent_subquery = select(Agent.id).where(Agent.user_id == current_user.id)
-    
+
     query = select(Alert).where(Alert.agent_id.in_(agent_subquery))
-    
+
     if agent_id:
         # Verify ownership
         agent_result = await db.execute(
@@ -111,31 +111,30 @@ async def list_alerts(
         if not agent_result.scalar_one_or_none():
             raise HTTPException(status_code=404, detail="Agent not found")
         query = query.where(Alert.agent_id == agent_id)
-    
+
     if resolved is not None:
         query = query.where(Alert.resolved == resolved)
-    
+
     if alert_type:
         query = query.where(Alert.type == alert_type)
-    
+
     # Count total
     count_query = select(func.count()).select_from(query.subquery())
     total = (await db.execute(count_query)).scalar_one() or 0
-    
+
     # Get unresolved count
-    unresolved_query = select(func.count()).select_from(Alert).where(
-        and_(
-            Alert.agent_id.in_(agent_subquery),
-            Alert.resolved == False
-        )
+    unresolved_query = (
+        select(func.count())
+        .select_from(Alert)
+        .where(and_(Alert.agent_id.in_(agent_subquery), not Alert.resolved))
     )
     unresolved_count = (await db.execute(unresolved_query)).scalar_one() or 0
-    
+
     # Apply pagination
     query = query.order_by(Alert.created_at.desc()).offset(skip).limit(limit)
     result = await db.execute(query)
     alerts = result.scalars().all()
-    
+
     return AlertListResponse(
         items=[_serialize_alert(a) for a in alerts],
         total=total,
@@ -158,18 +157,18 @@ async def resolve_alert(
         .where(Alert.id == alert_id, Agent.user_id == current_user.id)
     )
     alert = alert_result.scalar_one_or_none()
-    
+
     if not alert:
         raise HTTPException(status_code=404, detail="Alert not found")
-    
+
     alert.resolved = resolve_data.resolved
     if resolve_data.resolved:
         alert.resolved_at = datetime.now(timezone.utc)
     else:
         alert.resolved_at = None
-    
+
     await db.commit()
     await db.refresh(alert)
-    
+
     logger.info(f"Alert {alert_id} resolved: {resolve_data.resolved}")
     return _serialize_alert(alert)
