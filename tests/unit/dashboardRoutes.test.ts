@@ -105,7 +105,7 @@ describe('dashboard route proxies', () => {
       json: async () => ([
         {
           id: 'dep_123',
-          agent_id: 'agent_123',
+          agent_id: '00000000-0000-0000-0000-000000000001',
           status: 'running',
         },
       ]),
@@ -122,7 +122,7 @@ describe('dashboard route proxies', () => {
     await expect(response.json()).resolves.toEqual([
       {
         id: 'dep_123',
-        agent_id: 'agent_123',
+        agent_id: '00000000-0000-0000-0000-000000000001',
         status: 'running',
       },
     ])
@@ -138,7 +138,7 @@ describe('dashboard route proxies', () => {
     const { POST } = await import('../../app/api/dashboard/deployments/route')
 
     const response = await POST({
-      json: async () => ({ agent_id: 'agent_123', replicas: 2 }),
+      json: async () => ({ agent_id: '00000000-0000-0000-0000-000000000001', replicas: 2 }),
     } as NextRequest)
 
     expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments', {
@@ -147,7 +147,7 @@ describe('dashboard route proxies', () => {
         Authorization: 'Bearer token',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ agent_id: 'agent_123', replicas: 2 }),
+      body: JSON.stringify({ agent_id: '00000000-0000-0000-0000-000000000001', replicas: 2 }),
       cache: 'no-store',
     })
     expect(response.status).toBe(201)
@@ -226,7 +226,7 @@ describe('dashboard route proxies', () => {
     const response = await GET(mockRequest())
 
     expect(response.status).toBe(401)
-    await expect(response.json()).resolves.toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' }, status: 'error' })
+    await expect(response.json()).resolves.toEqual({ detail: 'Unauthorized' })
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
