@@ -259,3 +259,24 @@ groups:
         annotations:
           summary: "MUTX API is down"
           description: "Prometheus cannot scrape mutx-api - service unavailable."
+
+      # Queue-specific alerts for self-healing
+      - alert: TaskQueueBacklog
+        expr: sum(rate(mutx_task_queue_size[5m])) > 1000
+        for: 15m
+        labels:
+          severity: warning
+          self_heal: "queue"
+        annotations:
+          summary: "Task queue backlog building"
+          description: "Task queue backlog exceeds 1000 items for 15 minutes. Will trigger queue drain."
+
+      - alert: TaskQueueStalled
+        expr: sum(rate(mutx_tasks_stalled_total[5m])) > 0
+        for: 5m
+        labels:
+          severity: critical
+          self_heal: "queue"
+        annotations:
+          summary: "Tasks stalled in queue"
+          description: "Detected stalled tasks. Will trigger queue recovery."
