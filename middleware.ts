@@ -31,19 +31,39 @@ function checkRateLimit(request: NextRequest): { allowed: boolean; remaining: nu
   return { allowed: true, remaining: RATE_LIMIT - record.count, resetTime: record.resetTime }
 }
 
+export function generateRequestId(): string {
+  return crypto.randomUUID()
+}
+
 export function middleware(request: NextRequest) {
-  // Skip static files and API routes for rate limiting
-  if (request.nextUrl.pathname.startsWith('/_next') ||
-      request.nextUrl.pathname.startsWith('/static') ||
-      request.nextUrl.pathname.includes('.')) {
+  const { pathname } = request.nextUrl
+
+  // Skip static files
+  if (pathname.startsWith('/_next') ||
+      pathname.startsWith('/static') ||
+      pathname.includes('.')) {
     return NextResponse.next()
   }
 
-  // Check rate limit
+  // Use existing request ID from client or generate a new one
+  const requestId = request.headers.get('x-request-id') || generateRequestId()
+
+  // Forward the request ID to route handlers via request headers
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-request-id', requestId)
+
+  // API routes: attach request ID only (no rate limiting)
+  if (pathname.startsWith('/api')) {
+    const response = NextResponse.next({ request: { headers: requestHeaders } })
+    response.headers.set('X-Request-ID', requestId)
+    return response
+  }
+
+  // Non-API routes: apply rate limiting as well
   const { allowed, remaining, resetTime } = checkRateLimit(request)
 
-  // Add rate limit headers
-  const response = NextResponse.next()
+  const response = NextResponse.next({ request: { headers: requestHeaders } })
+  response.headers.set('X-Request-ID', requestId)
   response.headers.set('X-RateLimit-Limit', String(RATE_LIMIT))
   response.headers.set('X-RateLimit-Remaining', String(remaining))
   response.headers.set('X-RateLimit-Reset', String(resetTime))
@@ -57,6 +77,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 }

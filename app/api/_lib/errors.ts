@@ -96,10 +96,12 @@ export function withErrorHandling(
   handler: (request: Request) => Promise<NextResponse>
 ) {
   return async function (request: Request): Promise<NextResponse> {
+    const requestId = request.headers?.get?.('x-request-id') ?? undefined
+    const logPrefix = requestId ? `[${requestId}] ` : ''
     try {
       return await handler(request)
     } catch (error) {
-      console.error('Route handler error:', error)
+      console.error(`${logPrefix}Route handler error:`, error)
       
       if (error instanceof SyntaxError && 'status' in error && error.status === 400) {
         return badRequest('Invalid JSON in request body')
