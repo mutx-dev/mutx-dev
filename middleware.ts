@@ -9,7 +9,6 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
 function getClientIp(request: NextRequest): string {
   return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
          request.headers.get('x-real-ip') ||
-         request.ip ||
          'unknown'
 }
 
@@ -32,82 +31,32 @@ function checkRateLimit(request: NextRequest): { allowed: boolean; remaining: nu
   return { allowed: true, remaining: RATE_LIMIT - record.count, resetTime: record.resetTime }
 }
 
-function getHostname(request: NextRequest) {
-  return request.headers.get('host')?.split(':')[0]?.toLowerCase() || ''
-}
-
-function isAppHost(hostname: string) {
-  return hostname === 'app.mutx.dev' || hostname === 'app.localhost'
-}
-
-function isPrimaryWebHost(hostname: string) {
-  return hostname === 'mutx.dev' || hostname === 'www.mutx.dev'
-}
-
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  const hostname = getHostname(request)
-  const v1ApiAlias = pathname.startsWith('/v1/')
-  const apiPath = v1ApiAlias ? `/api${pathname}` : pathname
-
-  // Apply rate limiting to API routes and /v1 aliases
-  if (apiPath.startsWith('/api/')) {
-    const rateLimitResult = checkRateLimit(request)
-
-    const response = v1ApiAlias
-      ? NextResponse.rewrite(new URL(apiPath, request.url))
-      : NextResponse.next()
-    response.headers.set('X-RateLimit-Limit', String(RATE_LIMIT))
-    response.headers.set('X-RateLimit-Remaining', String(rateLimitResult.remaining))
-    response.headers.set('X-RateLimit-Reset', String(Math.ceil(rateLimitResult.resetTime / 1000)))
-
-    if (!rateLimitResult.allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests', message: 'Rate limit exceeded. Please try again later.' },
-        { status: 429, headers: Object.fromEntries(response.headers.entries()) }
-      )
-    }
-
-    return response
-  }
-
-  // Keep app.mutx.dev as the canonical operator surface in production.
-  if (isPrimaryWebHost(hostname) && (pathname === '/app' || pathname.startsWith('/app/'))) {
-    const redirectUrl = request.nextUrl.clone()
-    redirectUrl.hostname = 'app.mutx.dev'
-    redirectUrl.protocol = 'https'
-    redirectUrl.port = ''
-    redirectUrl.pathname = pathname.replace(/^\/app/, '') || '/'
-    return NextResponse.redirect(redirectUrl, 308)
-  }
-
-  if (!isAppHost(hostname)) {
+  // Skip static files and API routes for rate limiting
+  if (request.nextUrl.pathname.startsWith('/_next') ||
+      request.nextUrl.pathname.startsWith('/static') ||
+      request.nextUrl.pathname.includes('.')) {
     return NextResponse.next()
   }
 
-  if (
-    pathname.startsWith('/_next') ||
-    pathname === '/favicon.ico' ||
-    pathname === '/robots.txt' ||
-    pathname === '/sitemap.xml' ||
-    pathname.startsWith('/apple-touch-icon') ||
-    pathname.startsWith('/android-chrome') ||
-    pathname.startsWith('/site.webmanifest')
-  ) {
-    return NextResponse.next()
+  // Check rate limit
+  const { allowed, remaining, resetTime } = checkRateLimit(request)
+
+  // Add rate limit headers
+  const response = NextResponse.next()
+  response.headers.set('X-RateLimit-Limit', String(RATE_LIMIT))
+  response.headers.set('X-RateLimit-Remaining', String(remaining))
+  response.headers.set('X-RateLimit-Reset', String(resetTime))
+
+  if (!allowed) {
+    return new NextResponse('Too Many Requests', { status: 429, headers: response.headers })
   }
 
-  const rewriteUrl = request.nextUrl.clone()
-  
-  if (pathname.startsWith('/dashboard') || pathname.startsWith('/app')) {
-    return NextResponse.next()
-  }
-  
-  rewriteUrl.pathname = pathname === '/' ? '/app' : `/app${pathname}`
-
-  return NextResponse.rewrite(rewriteUrl)
+  return response
 }
 
 export const config = {
-  matcher: ['/((?!.*\\..*).*)', '/', '/favicon.ico', '/robots.txt', '/sitemap.xml'],
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 }
