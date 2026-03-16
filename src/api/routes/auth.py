@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.database import get_db
 from src.api.models.models import User
 from src.api.services.user_service import UserService
+from src.api.services.analytics import log_analytics_event, AnalyticsEventType
 from src.api.middleware.auth import get_current_user
 from src.api.auth.jwt import (
     create_access_token,
@@ -93,6 +94,14 @@ async def register(request: RegisterRequest, session: AsyncSession = Depends(get
     access_token, access_token_expires_at = create_access_token(user.id)
     refresh_token, _ = create_refresh_token(user.id)
 
+    # Track analytics event
+    await log_analytics_event(
+        session,
+        event_name="User logged in",
+        event_type=AnalyticsEventType.USER_LOGIN,
+        user_id=user.id,
+    )
+
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
@@ -122,6 +131,14 @@ async def login(request: LoginRequest, session: AsyncSession = Depends(get_db)):
 
     access_token, access_token_expires_at = create_access_token(user.id)
     refresh_token, _ = create_refresh_token(user.id)
+
+    # Track analytics event
+    await log_analytics_event(
+        session,
+        event_name="User logged in",
+        event_type=AnalyticsEventType.USER_LOGIN,
+        user_id=user.id,
+    )
 
     return TokenResponse(
         access_token=access_token,
