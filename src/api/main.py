@@ -42,6 +42,7 @@ from src.api.routes import (
     analytics,
 )
 from src.api.metrics import router as metrics_router, track_request, setup_opentelemetry
+from src.api.logging import setup_logging, get_logger as get_log_logger
 from src.api.services.monitor import start_background_monitor
 
 settings = get_settings()
@@ -49,11 +50,11 @@ settings = get_settings()
 # Track startup time for uptime calculation
 start_time = time.time()
 
-logging.basicConfig(
+setup_logging(
     level=settings.log_level,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    format=settings.log_format,
 )
-logger = logging.getLogger(__name__)
+logger = get_log_logger(__name__)
 
 
 async def _initialize_database(app: FastAPI) -> None:

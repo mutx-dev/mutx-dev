@@ -29,6 +29,7 @@ class Settings(BaseSettings):
         "https://app.mutx.dev",
     ]
     log_level: str = "INFO"
+    log_format: str = "json"
     jwt_secret: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
