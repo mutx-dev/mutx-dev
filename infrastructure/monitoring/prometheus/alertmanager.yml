@@ -10,7 +10,7 @@ route:
         - severity="critical"
       receiver: 'self-heal'
       continue: true
-    
+
     # Webhook notifications
     - matchers:
         - notify="webhook"
@@ -19,7 +19,7 @@ route:
 # Receiver definitions
 receivers:
   - name: 'null'
-  
+
   - name: 'web.hook'
     webhook_configs:
       - url: 'http://127.0.0.1:5001/'
