@@ -3,7 +3,7 @@ OpenTelemetry support for MUTX agents.
 
 Enable via environment variables:
     MUTX_OTEL_ENABLED=true
-    MUTX_OTEL_EXPORTER=otlp_http  # or otlp_grpc, console
+    MUTX_OTEL_EXPORTER=otlp_http  # or otlp_grpc, console, jaeger, zipkin
     MUTX_OTEL_ENDPOINT=https://your-otel-collector:4318
     MUTX_OTEL_SERVICE_NAME=mutx-backend
     MUTX_OTEL_MASK_INPUT=true
@@ -34,7 +34,6 @@ def init_otel():
         from opentelemetry.sdk.trace import TracerProvider
         from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
         from opentelemetry.sdk.resources import Resource, SERVICE_NAME
-        from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
         from opentelemetry.trace import Status, StatusCode
         from opentelemetry.trace.propagation import set_span_in_context
         from opentelemetry.sdk.propagate import set_global_textmap
@@ -47,8 +46,34 @@ def init_otel():
         exporter_type = os.getenv("MUTX_OTEL_EXPORTER", "console")
         endpoint = os.getenv("MUTX_OTEL_ENDPOINT", "")
         
+        # Support multiple exporters
         if exporter_type == "otlp_http":
+            from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+            headers = os.getenv("MUTX_OTEL_HEADERS", "")
+            parsed_headers = {}
+            if headers:
+                for header in headers.split(","):
+                    if "=" in header:
+                        key, value = header.split("=", 1)
+                        parsed_headers[key.strip()] = value.strip()
+            span_exporter = OTLPSpanExporter(endpoint=endpoint, headers=parsed_headers)
+        elif exporter_type == "otlp_grpc":
+            from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
             span_exporter = OTLPSpanExporter(endpoint=endpoint)
+        elif exporter_type == "jaeger":
+            from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+            from opentelemetry.exporter.jaeger.thrift.gen.agent import Agent as JaegerAgent
+            from thriftpy2.transport import TSocket
+            jaeger_host = os.getenv("MUTX_OTEL_JAEGER_HOST", "localhost")
+            jaeger_port = int(os.getenv("MUTX_OTEL_JAEGER_PORT", "6831"))
+            span_exporter = JaegerExporter(
+                agent_host_name=jaeger_host,
+                agent_port=jaeger_port,
+            )
+        elif exporter_type == "zipkin":
+            from opentelemetry.exporter.zipkin.proto.http import ZipkinExporter
+            zipkin_endpoint = os.getenv("MUTX_OTEL_ZIPKIN_ENDPOINT", "http://localhost:9411/api/v2/spans")
+            span_exporter = ZipkinExporter(endpoint=zipkin_endpoint)
         else:
             span_exporter = ConsoleSpanExporter()
         
@@ -58,7 +83,13 @@ def init_otel():
         _tracer = trace.get_tracer(__name__)
         
         return _tracer, True
-    except ImportError:
+    except ImportError as e:
+        import logging
+        logging.warning(f"OpenTelemetry import error: {e}")
+        return None, False
+    except Exception as e:
+        import logging
+        logging.warning(f"OpenTelemetry setup error: {e}")
         return None, False
 
 

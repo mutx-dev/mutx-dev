@@ -16,6 +16,8 @@ from ..integrations.langchain_agent import (
     LLMProvider,
     ToolDefinition,
 )
+from ..integrations.telemetry import trace_async, is_otel_enabled
+
 from ..integrations.vector_store import (
     VectorStoreConfig,
     VectorStoreRegistry,
@@ -192,17 +194,39 @@ class AgentRuntime:
         vector_store_name: Optional[str] = None,
         **kwargs,
     ) -> LangChainAgent:
-        provider_enum = LLMProvider(provider.lower())
-        config = AgentConfig(
-            name=name,
-            provider=provider_enum,
-            model=model,
-            system_prompt=system_prompt,
-            tools=tools or [],
-            vector_store_name=vector_store_name,
-            **kwargs,
-        )
-        agent = AgentRegistry.create_agent(config)
+        # Instrument agent creation with tracing
+        if is_otel_enabled():
+            from opentelemetry import trace
+            tracer = trace.get_tracer(__name__)
+            with tracer.start_as_current_span("agent.initialize") as span:
+                span.set_attribute("agent.name", name)
+                span.set_attribute("agent.provider", provider)
+                span.set_attribute("agent.model", model)
+                provider_enum = LLMProvider(provider.lower())
+                config = AgentConfig(
+                    name=name,
+                    provider=provider_enum,
+                    model=model,
+                    system_prompt=system_prompt,
+                    tools=tools or [],
+                    vector_store_name=vector_store_name,
+                    **kwargs,
+                )
+                agent = AgentRegistry.create_agent(config)
+                span.set_attribute("agent.id", agent.agent_id)
+        else:
+            provider_enum = LLMProvider(provider.lower())
+            config = AgentConfig(
+                name=name,
+                provider=provider_enum,
+                model=model,
+                system_prompt=system_prompt,
+                tools=tools or [],
+                vector_store_name=vector_store_name,
+                **kwargs,
+            )
+            agent = AgentRegistry.create_agent(config)
+        
         self.state.active_agents += 1
         logger.info(f"Created agent {agent.agent_id} in runtime {self.runtime_id}")
         return agent
