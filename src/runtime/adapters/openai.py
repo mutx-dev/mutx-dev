@@ -14,7 +14,6 @@ from ..base import (
     RuntimeConfig,
     RuntimeMessage,
     RuntimeResult,
-    RuntimeStreamEvent,
     RuntimeToolCall,
     RuntimeToolDefinition,
     ToolHandler,

@@ -4,7 +4,6 @@ Tests for /ingest endpoints.
 import uuid
 
 import pytest
-import pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -106,13 +105,12 @@ class TestIngestEndpoints:
 
 class TestIngestMetricsEndpoint:
     """Tests for /ingest/metrics endpoint."""
-import uuid
 
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.models.models import Agent, AgentStatus, User
+from src.api.models.models import User
 
 
 class TestIngestAPIKeyAuth:
