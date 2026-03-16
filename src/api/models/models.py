@@ -467,3 +467,24 @@ class UsageEvent(Base):
     )
 
     user: Mapped["User"] = relationship("User")
+
+
+class AnalyticsEvent(Base):
+    """Simple analytics events for usage telemetry (quick win for issue #264)"""
+
+    __tablename__ = "analytics_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    event_name: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    user_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=True, index=True
+    )
+    # Event types: agent_run.started, agent_run.completed, agent_run.failed,
+    # api_key.created, api_key.used, api_key.expired, user.login, user.logout
+    event_type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    properties: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON string
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
+    )
+
+    user: Mapped[Optional["User"]] = relationship("User")
