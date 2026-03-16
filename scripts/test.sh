@@ -44,7 +44,7 @@ echo "Using Python interpreter: $PYTHON_BIN"
 
 echo "Running Python lint and format checks..."
 "$RUFF_BIN" check src/api cli sdk
-"$BLACK_BIN" --check src/api cli sdk
+"$RUFF_BIN" format --check src/api cli sdk
 
 echo ""
 echo "Running Python compile check..."
