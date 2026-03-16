@@ -66,6 +66,25 @@ MUTX is building the infrastructure layer for deploying and operating agents saf
 
 ---
 
+# Local Development
+
+## Quick Start (Makefile)
+
+```bash
+make help              # Show all available commands
+make dev               # Start local dev stack (Docker Compose)
+make test-auth         # Register test user, login, get token (one-command)
+make test-api          # Run API health tests
+make lint              # Run linters
+```
+
+After `make test-auth`, you will have:
+- A registered test user
+- A valid access token
+- Ready-to-copy curl examples
+
+Frontend: http://localhost:3000 | Backend: http://localhost:8000 | API Docs: http://localhost:8000/docs
+
 # Project Structure
 
 mutx-dev/
