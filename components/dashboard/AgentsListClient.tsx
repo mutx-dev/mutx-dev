@@ -89,6 +89,12 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
   async function fetchAgents() {
     try {
       const response = await fetch("/api/dashboard/agents", { cache: "no-store" });
+      if (response.status === 401) {
+        setError("auth_required");
+        setLoading(false);
+        setRefreshing(false);
+        return;
+      }
       if (!response.ok) {
         throw new Error("Failed to fetch agents");
       }
@@ -158,6 +164,20 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
           </div>
         </div>
         <AgentListSkeleton />
+      </div>
+    );
+  }
+
+  if (error === "auth_required") {
+    return (
+      <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/10 p-4">
+        <p className="text-cyan-400">Please sign in to view your agents</p>
+        <a
+          href="/login"
+          className="mt-2 inline-block text-sm font-medium text-cyan-300 hover:text-cyan-200"
+        >
+          Sign in →
+        </a>
       </div>
     );
   }
