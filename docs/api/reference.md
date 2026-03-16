@@ -32,6 +32,7 @@ jq -r '.paths | keys[]' docs/api/openapi.json | sort
 - Deployments: [deployments.md](./deployments.md)
 - Webhooks and ingestion: [webhooks.md](./webhooks.md)
 - Leads: [leads.md](./leads.md)
+- Usage: [usage.md](./usage.md)
 
 ## Hosted Surfaces
 
