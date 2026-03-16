@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, Header, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from datetime import datetime, timezone
@@ -37,9 +37,16 @@ async def get_ingest_auth(
         None, alias="X-API-Key", description="API key for ingestion authentication"
     ),
     session: AsyncSession = Depends(get_db),
+    *,
+    request: Request,
 ) -> User:
     """Authenticate ingestion requests via JWT or API key."""
-    user = await get_current_user_or_api_key(authorization, x_api_key, session)
+    user = await get_current_user_or_api_key(
+        request=request,
+        authorization=authorization,
+        x_api_key=x_api_key,
+        session=session,
+    )
     if not user:
         raise HTTPException(
             status_code=401,

@@ -44,9 +44,33 @@ async def test_capture_lead_minimal(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_capture_contact_alias_success(client: AsyncClient):
+    """Test /contacts alias captures leads."""
+    response = await client.post(
+        "/v1/contacts",
+        json={
+            "email": "contact@example.com",
+            "name": "Contact Name",
+        },
+    )
+    assert response.status_code == 201
+    data = response.json()
+    assert data["email"] == "contact@example.com"
+    assert data["name"] == "Contact Name"
+
+
+@pytest.mark.asyncio
 async def test_list_leads_internal_user(client: AsyncClient, test_user):
     """Test listing leads for an internal user."""
     response = await client.get("/v1/leads")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
+
+@pytest.mark.asyncio
+async def test_list_contacts_alias_internal_user(client: AsyncClient):
+    """Test /contacts alias for listing."""
+    response = await client.get("/v1/contacts")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
@@ -138,3 +162,87 @@ async def test_get_lead_not_found(client: AsyncClient):
     """Test fetching an unknown lead returns 404."""
     response = await client.get("/v1/leads/00000000-0000-0000-0000-999999999999")
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_update_lead_internal_user(client: AsyncClient, db_session: AsyncSession):
+    lead = Lead(
+        email="update-me@example.com",
+        name="Old Name",
+        company="Old Co",
+        source="docs",
+    )
+    db_session.add(lead)
+    await db_session.commit()
+    await db_session.refresh(lead)
+
+    response = await client.patch(
+        f"/v1/leads/{lead.id}",
+        json={
+            "name": "New Name",
+            "company": "New Co",
+            "message": "Interested in enterprise.",
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["name"] == "New Name"
+    assert data["company"] == "New Co"
+    assert data["message"] == "Interested in enterprise."
+
+
+@pytest.mark.asyncio
+async def test_update_contact_alias_internal_user(client: AsyncClient, db_session: AsyncSession):
+    lead = Lead(
+        email="alias-update@example.com",
+        name="Alias",
+        source="docs",
+    )
+    db_session.add(lead)
+    await db_session.commit()
+    await db_session.refresh(lead)
+
+    response = await client.patch(
+        f"/v1/contacts/{lead.id}",
+        json={"source": "partner-referral"},
+    )
+    assert response.status_code == 200
+    assert response.json()["source"] == "partner-referral"
+
+
+@pytest.mark.asyncio
+async def test_update_lead_requires_payload(client: AsyncClient, db_session: AsyncSession):
+    lead = Lead(email="empty-update@example.com", source="docs")
+    db_session.add(lead)
+    await db_session.commit()
+    await db_session.refresh(lead)
+
+    response = await client.patch(f"/v1/leads/{lead.id}", json={})
+    assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_delete_lead_internal_user(client: AsyncClient, db_session: AsyncSession):
+    lead = Lead(email="delete-me@example.com", source="docs")
+    db_session.add(lead)
+    await db_session.commit()
+    await db_session.refresh(lead)
+
+    delete_response = await client.delete(f"/v1/leads/{lead.id}")
+    assert delete_response.status_code == 204
+
+    get_response = await client.get(f"/v1/leads/{lead.id}")
+    assert get_response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_delete_contact_alias_non_internal_forbidden(
+    other_user_client: AsyncClient, db_session: AsyncSession
+):
+    lead = Lead(email="forbidden-delete@example.com", source="docs")
+    db_session.add(lead)
+    await db_session.commit()
+    await db_session.refresh(lead)
+
+    response = await other_user_client.delete(f"/v1/contacts/{lead.id}")
+    assert response.status_code == 403
