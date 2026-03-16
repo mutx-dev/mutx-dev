@@ -27,7 +27,7 @@ httpx==0.26.0
 langchain==0.1.20
 langchain-openai==0.0.5
 langchain-anthropic==0.1.1
-langchain-community==0.0.38
+langchain-community==0.3.27
 langchain-text-splitters==0.0.1
 pgvector==0.2.3
 numpy==1.26.3
