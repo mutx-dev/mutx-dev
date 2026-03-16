@@ -91,7 +91,9 @@ class UserService:
 
     async def update_user_plan(self, user_id: uuid.UUID, plan: Plan) -> User:
         await self.session.execute(
-            update(User).where(User.id == user_id).values(plan=plan, updated_at=datetime.now(timezone.utc))
+            update(User)
+            .where(User.id == user_id)
+            .values(plan=plan, updated_at=datetime.now(timezone.utc))
         )
         await self.session.commit()
         user = await self.get_user_by_id(user_id)
@@ -146,7 +148,9 @@ class UserService:
 
         for api_key in api_keys:
             if verify_api_key(plain_key, api_key.key_hash):
-                if api_key.expires_at and api_key.expires_at < datetime.now(timezone.utc).replace(tzinfo=None):
+                if api_key.expires_at and api_key.expires_at < datetime.now(timezone.utc).replace(
+                    tzinfo=None
+                ):
                     return None
                 await self.update_api_key_last_used(api_key.id)
                 return api_key
@@ -170,7 +174,9 @@ class UserService:
 
     async def update_api_key_last_used(self, api_key_id: uuid.UUID) -> None:
         await self.session.execute(
-            update(APIKey).where(APIKey.id == api_key_id).values(last_used=datetime.now(timezone.utc))
+            update(APIKey)
+            .where(APIKey.id == api_key_id)
+            .values(last_used=datetime.now(timezone.utc))
         )
         await self.session.commit()
 
@@ -277,7 +283,9 @@ class UserService:
             return None
 
         # Check if token is expired
-        if user.password_reset_expires_at and user.password_reset_expires_at < datetime.now(timezone.utc).replace(tzinfo=None):
+        if user.password_reset_expires_at and user.password_reset_expires_at < datetime.now(
+            timezone.utc
+        ).replace(tzinfo=None):
             return None
 
         # Update password and clear reset token
