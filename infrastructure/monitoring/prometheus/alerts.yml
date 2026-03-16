@@ -135,3 +135,127 @@ groups:
         annotations:
           summary: "PostgreSQL slow queries detected"
           description: "Average query execution time is above 1 second."
+
+      # Critical conditions - Queue & Agent alerts
+      - alert: HighQueueBacklog
+        expr: mutx_queue_size > 100
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High queue backlog detected"
+          description: "Agent task queue has over 100 pending tasks for 15 minutes - possible processing delay."
+
+      - alert: CriticalQueueBacklog
+        expr: mutx_queue_size > 500
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical queue backlog"
+          description: "Agent task queue has over 500 pending tasks - immediate attention required."
+
+      - alert: NoActiveAgents
+        expr: mutx_agents_active == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "No active agents"
+          description: "No agents are currently active - system may be unresponsive."
+
+      - alert: HighAgentTaskFailureRate
+        expr: sum(rate(mutx_agent_tasks_total{status="failed"}[5m])) / sum(rate(mutx_agent_tasks_total[5m])) > 0.20
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High agent task failure rate"
+          description: "More than 20% of agent tasks are failing - investigate agent errors."
+
+      - alert: AgentTaskTimeout
+        expr: sum(rate(mutx_agent_tasks_total{status="timeout"}[5m])) / sum(rate(mutx_agent_tasks_total[5m])) > 0.10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High agent task timeout rate"
+          description: "More than 10% of agent tasks are timing out."
+
+      # Deployment alerts
+      - alert: HighDeploymentFailureRate
+        expr: sum(rate(mutx_deployments_by_status{status="failed"}[5m])) / sum(rate(mutx_deployments_by_status[5m])) > 0.15
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High deployment failure rate"
+          description: "More than 15% of deployments are failing."
+
+      # Authentication alerts
+      - alert: HighAuthFailureRate
+        expr: sum(rate(http_requests_total{job="mutx-api",status="401"}[5m])) / sum(rate(http_requests_total{job="mutx-api"}[5m])) > 0.10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High authentication failure rate"
+          description: "More than 10% of requests are returning 401 - possible brute force attack."
+
+      - alert: CriticalAuthFailureRate
+        expr: sum(rate(http_requests_total{job="mutx-api",status="401"}[5m])) / sum(rate(http_requests_total{job="mutx-api"}[5m])) > 0.30
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical authentication failure rate"
+          description: "More than 30% of requests are returning 401 - probable security incident."
+
+      # Redis alerts
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis memory usage above 90%"
+          description: "Redis is using more than 90% of available memory."
+
+      - alert: RedisCriticalMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis memory usage critical"
+          description: "Redis is using more than 95% of available memory - eviction imminent."
+
+      # Critical error spike
+      - alert: CriticalErrorSpike
+        expr: sum(rate(mutx_errors_total[5m])) > 10
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical error spike detected"
+          description: "More than 10 errors per second detected - investigate immediately."
+
+      # Database critical
+      - alert: PostgresCriticalConnectionExhaustion
+        expr: pg_stat_activity_count / pg_settings_max_connections > 0.95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL connection pool critical"
+          description: "Database is using more than 95% of available connections - service degradation imminent."
+
+      # API availability
+      - alert: MutxApiDegraded
+        expr: up{job="mutx-api"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "MUTX API is down"
+          description: "Prometheus cannot scrape mutx-api - service unavailable."
