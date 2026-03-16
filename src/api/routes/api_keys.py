@@ -21,8 +21,6 @@ from src.api.services.user_service import hash_api_key
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])
 
 
-
-
 def generate_api_key() -> str:
     """Generate a new API key with 'mutx_live_' prefix."""
     random_part = secrets.token_urlsafe(32)
