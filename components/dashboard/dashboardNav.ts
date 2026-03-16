@@ -3,10 +3,12 @@ import {
   ArrowRight,
   Bot,
   Command,
+  Key,
   Layers,
   LogOut,
   Rocket,
   ShieldCheck,
+  Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -23,6 +25,12 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     description: "Fleet summary and agents",
     href: "/dashboard",
     icon: ShieldCheck,
+  },
+  {
+    title: "Agents",
+    description: "Manage your agent fleet",
+    href: "/dashboard/agents",
+    icon: Users,
   },
   {
     title: "Spawn",
@@ -65,6 +73,12 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     description: "Manage agent deployments",
     href: "/dashboard/deployments",
     icon: Layers,
+  },
+  {
+    title: "API Keys",
+    description: "Manage API access keys",
+    href: "/dashboard/api-keys",
+    icon: Key,
   },
 ];
 
