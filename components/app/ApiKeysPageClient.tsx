@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { KeyRound, Plus, RefreshCw, Trash2, AlertCircle, Loader2 } from 'lucide-react';
+import { KeyRound, Plus, RefreshCw, Trash2, AlertCircle, Loader2, Copy, Check } from 'lucide-react';
 
 interface ApiKey {
   id: string;
@@ -18,6 +18,7 @@ export function ApiKeysPageClient() {
   const [newKeyName, setNewKeyName] = useState('');
   const [creating, setCreating] = useState(false);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const [rotatingId, setRotatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -110,6 +111,13 @@ export function ApiKeysPageClient() {
     });
   };
 
+  const copyToClipboard = async () => {
+    if (!createdKey) return;
+    await navigator.clipboard.writeText(createdKey);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -130,6 +138,13 @@ export function ApiKeysPageClient() {
               <code className="mt-3 block rounded-lg bg-black/30 px-3 py-2 text-sm font-mono text-amber-200 break-all">
                 {createdKey}
               </code>
+              <button
+                onClick={copyToClipboard}
+                className="mt-2 flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-sm text-amber-200 hover:bg-white/20"
+              >
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied ? 'Copied!' : 'Copy to clipboard'}
+              </button>
             </div>
           </div>
         </div>
