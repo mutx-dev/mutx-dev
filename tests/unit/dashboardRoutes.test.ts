@@ -28,7 +28,7 @@ describe('dashboard route proxies', () => {
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
-  it('returns 401 from dashboard agents proxy when user lookup fails', async () => {
+  it('returns 401 from dashboard agents proxy when auth fails', async () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock).mockResolvedValue({
       ok: false,
@@ -48,12 +48,11 @@ describe('dashboard route proxies', () => {
 
   it('preserves upstream forbidden responses for dashboard agents proxy', async () => {
     getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: false,
-        status: 403,
-        json: async () => ({ detail: 'Forbidden' }),
-      })
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 403,
+      json: async () => ({ detail: 'Forbidden' }),
+    })
     const { GET } = await import('../../app/api/dashboard/agents/route')
 
     const response = await GET(mockRequest())
@@ -68,18 +67,17 @@ describe('dashboard route proxies', () => {
 
   it('preserves successful list responses for dashboard agents proxy', async () => {
     getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => [
-          {
-            id: 'agent_123',
-            name: 'runtime-agent',
-            status: 'running',
-          },
-        ],
-      })
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => [
+        {
+          id: 'agent_123',
+          name: 'runtime-agent',
+          status: 'running',
+        },
+      ],
+    })
     const { GET } = await import('../../app/api/dashboard/agents/route')
 
     const response = await GET(mockRequest())
@@ -109,7 +107,7 @@ describe('dashboard route proxies', () => {
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
-  it('returns 401 from dashboard deployments proxy when user lookup fails', async () => {
+  it('returns 401 from dashboard deployments proxy when auth fails', async () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock).mockResolvedValue({
       ok: false,
@@ -129,12 +127,11 @@ describe('dashboard route proxies', () => {
 
   it('preserves upstream forbidden responses for dashboard deployments proxy', async () => {
     getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: false,
-        status: 403,
-        json: async () => ({ detail: 'Forbidden' }),
-      })
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 403,
+      json: async () => ({ detail: 'Forbidden' }),
+    })
     const { GET } = await import('../../app/api/dashboard/deployments/route')
 
     const response = await GET(mockRequest())
@@ -149,18 +146,17 @@ describe('dashboard route proxies', () => {
 
   it('preserves successful list responses for dashboard deployments proxy', async () => {
     getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => [
-          {
-            id: 'dep_123',
-            agent_id: 'agent_123',
-            status: 'running',
-          },
-        ],
-      })
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => [
+        {
+          id: 'dep_123',
+          agent_id: 'agent_123',
+          status: 'running',
+        },
+      ],
+    })
     const { GET } = await import('../../app/api/dashboard/deployments/route')
 
     const response = await GET(mockRequest())
