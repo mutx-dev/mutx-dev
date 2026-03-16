@@ -157,6 +157,80 @@ class TestCreateAPIKey:
         assert response.json()["name"] == "replacement-key"
 
 
+class TestGetAPIKey:
+    """Tests for GET /api-keys/{key_id} endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_get_api_key_success(
+        self, client: AsyncClient, db_session: AsyncSession, test_user
+    ):
+        """Test getting an API key by ID returns the key details."""
+        key = APIKey(
+            id=uuid.uuid4(),
+            user_id=test_user.id,
+            key_hash="test_hash",
+            name="my-key",
+            is_active=True,
+        )
+        db_session.add(key)
+        await db_session.commit()
+
+        response = await client.get(f"/v1/api-keys/{key.id}")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["id"] == str(key.id)
+        assert data["name"] == "my-key"
+        assert data["is_active"] is True
+
+    @pytest.mark.asyncio
+    async def test_get_api_key_returns_revoked_key(
+        self, client: AsyncClient, db_session: AsyncSession, test_user
+    ):
+        """Test getting a revoked API key still returns its details."""
+        key = APIKey(
+            id=uuid.uuid4(),
+            user_id=test_user.id,
+            key_hash="revoked_hash",
+            name="revoked-key",
+            is_active=False,
+        )
+        db_session.add(key)
+        await db_session.commit()
+
+        response = await client.get(f"/v1/api-keys/{key.id}")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["id"] == str(key.id)
+        assert data["name"] == "revoked-key"
+        assert data["is_active"] is False
+
+    @pytest.mark.asyncio
+    async def test_get_api_key_not_found(self, client: AsyncClient):
+        """Test getting non-existent API key returns 404."""
+        response = await client.get(f"/v1/api-keys/{uuid.uuid4()}")
+        assert response.status_code == 404
+        assert response.json()["detail"] == "API key not found"
+
+    @pytest.mark.asyncio
+    async def test_get_other_user_api_key_not_found(
+        self, client: AsyncClient, db_session: AsyncSession, other_user
+    ):
+        """Test getting another user's API key does not leak its existence."""
+        key = APIKey(
+            id=uuid.uuid4(),
+            user_id=other_user.id,
+            key_hash="other_hash",
+            name="other-key",
+            is_active=True,
+        )
+        db_session.add(key)
+        await db_session.commit()
+
+        response = await client.get(f"/v1/api-keys/{key.id}")
+        assert response.status_code == 404
+        assert response.json()["detail"] == "API key not found"
+
+
 class TestRevokeAPIKey:
     """Tests for DELETE /api-keys/{key_id} endpoint."""
 
