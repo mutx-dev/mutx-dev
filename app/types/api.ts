@@ -24,7 +24,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/agents": {
+    "/v1/agents": {
         parameters: {
             query?: never;
             header?: never;
@@ -32,17 +32,17 @@ export interface paths {
             cookie?: never;
         };
         /** List Agents */
-        get: operations["list_agents_agents_get"];
+        get: operations["list_agents_v1_agents_get"];
         put?: never;
         /** Create Agent */
-        post: operations["create_agent_agents_post"];
+        post: operations["create_agent_v1_agents_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/agents/{agent_id}": {
+    "/v1/agents/{agent_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -50,17 +50,35 @@ export interface paths {
             cookie?: never;
         };
         /** Get Agent */
-        get: operations["get_agent_agents__agent_id__get"];
+        get: operations["get_agent_v1_agents__agent_id__get"];
         put?: never;
         post?: never;
         /** Delete Agent */
-        delete: operations["delete_agent_agents__agent_id__delete"];
+        delete: operations["delete_agent_v1_agents__agent_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/agents/{agent_id}/deploy": {
+    "/v1/agents/{agent_id}/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Agent Config */
+        get: operations["get_agent_config_v1_agents__agent_id__config_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Agent Config */
+        patch: operations["update_agent_config_v1_agents__agent_id__config_patch"];
+        trace?: never;
+    };
+    "/v1/agents/{agent_id}/deploy": {
         parameters: {
             query?: never;
             header?: never;
@@ -70,14 +88,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Deploy Agent */
-        post: operations["deploy_agent_agents__agent_id__deploy_post"];
+        post: operations["deploy_agent_v1_agents__agent_id__deploy_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/agents/{agent_id}/stop": {
+    "/v1/agents/{agent_id}/stop": {
         parameters: {
             query?: never;
             header?: never;
@@ -87,14 +105,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Stop Agent */
-        post: operations["stop_agent_agents__agent_id__stop_post"];
+        post: operations["stop_agent_v1_agents__agent_id__stop_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/agents/{agent_id}/logs": {
+    "/v1/agents/{agent_id}/logs": {
         parameters: {
             query?: never;
             header?: never;
@@ -102,7 +120,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get Agent Logs */
-        get: operations["get_agent_logs_agents__agent_id__logs_get"];
+        get: operations["get_agent_logs_v1_agents__agent_id__logs_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -111,7 +129,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/agents/{agent_id}/metrics": {
+    "/v1/agents/{agent_id}/metrics": {
         parameters: {
             query?: never;
             header?: never;
@@ -119,7 +137,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get Agent Metrics */
-        get: operations["get_agent_metrics_agents__agent_id__metrics_get"];
+        get: operations["get_agent_metrics_v1_agents__agent_id__metrics_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -128,7 +146,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/deployments": {
+    "/v1/deployments": {
         parameters: {
             query?: never;
             header?: never;
@@ -136,20 +154,20 @@ export interface paths {
             cookie?: never;
         };
         /** List Deployments */
-        get: operations["list_deployments_deployments_get"];
+        get: operations["list_deployments_v1_deployments_get"];
         put?: never;
         /**
          * Create Deployment
          * @description Create a new deployment for an agent.
          */
-        post: operations["create_deployment_deployments_post"];
+        post: operations["create_deployment_v1_deployments_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/deployments/{deployment_id}": {
+    "/v1/deployments/{deployment_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -157,17 +175,17 @@ export interface paths {
             cookie?: never;
         };
         /** Get Deployment */
-        get: operations["get_deployment_deployments__deployment_id__get"];
+        get: operations["get_deployment_v1_deployments__deployment_id__get"];
         put?: never;
         post?: never;
         /** Kill Deployment */
-        delete: operations["kill_deployment_deployments__deployment_id__delete"];
+        delete: operations["kill_deployment_v1_deployments__deployment_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/deployments/{deployment_id}/events": {
+    "/v1/deployments/{deployment_id}/events": {
         parameters: {
             query?: never;
             header?: never;
@@ -178,7 +196,7 @@ export interface paths {
          * Get Deployment Events
          * @description Get paginated lifecycle events for a specific deployment.
          */
-        get: operations["get_deployment_events_deployments__deployment_id__events_get"];
+        get: operations["get_deployment_events_v1_deployments__deployment_id__events_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -187,7 +205,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/deployments/{deployment_id}/scale": {
+    "/v1/deployments/{deployment_id}/scale": {
         parameters: {
             query?: never;
             header?: never;
@@ -197,14 +215,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Scale Deployment */
-        post: operations["scale_deployment_deployments__deployment_id__scale_post"];
+        post: operations["scale_deployment_v1_deployments__deployment_id__scale_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/deployments/{deployment_id}/restart": {
+    "/v1/deployments/{deployment_id}/restart": {
         parameters: {
             query?: never;
             header?: never;
@@ -217,14 +235,14 @@ export interface paths {
          * Restart Deployment
          * @description Restart an existing deployment.
          */
-        post: operations["restart_deployment_deployments__deployment_id__restart_post"];
+        post: operations["restart_deployment_v1_deployments__deployment_id__restart_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/deployments/{deployment_id}/logs": {
+    "/v1/deployments/{deployment_id}/logs": {
         parameters: {
             query?: never;
             header?: never;
@@ -235,7 +253,7 @@ export interface paths {
          * Get Deployment Logs
          * @description Get logs for a specific deployment.
          */
-        get: operations["get_deployment_logs_deployments__deployment_id__logs_get"];
+        get: operations["get_deployment_logs_v1_deployments__deployment_id__logs_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -244,7 +262,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/deployments/{deployment_id}/metrics": {
+    "/v1/deployments/{deployment_id}/metrics": {
         parameters: {
             query?: never;
             header?: never;
@@ -255,7 +273,7 @@ export interface paths {
          * Get Deployment Metrics
          * @description Get metrics for a specific deployment.
          */
-        get: operations["get_deployment_metrics_deployments__deployment_id__metrics_get"];
+        get: operations["get_deployment_metrics_v1_deployments__deployment_id__metrics_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -264,7 +282,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/webhooks/": {
+    "/v1/deployments/{deployment_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Deployment Versions
+         * @description Get version history for a specific deployment.
+         */
+        get: operations["get_deployment_versions_v1_deployments__deployment_id__versions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/deployments/{deployment_id}/rollback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rollback Deployment
+         * @description Rollback a deployment to a specific version.
+         */
+        post: operations["rollback_deployment_v1_deployments__deployment_id__rollback_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/webhooks/": {
         parameters: {
             query?: never;
             header?: never;
@@ -275,20 +333,20 @@ export interface paths {
          * List Webhooks
          * @description List all webhooks registered by the authenticated user.
          */
-        get: operations["list_webhooks_webhooks__get"];
+        get: operations["list_webhooks_v1_webhooks__get"];
         put?: never;
         /**
          * Create Webhook
          * @description Register a new webhook endpoint.
          */
-        post: operations["create_webhook_webhooks__post"];
+        post: operations["create_webhook_v1_webhooks__post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/webhooks/{webhook_id}": {
+    "/v1/webhooks/{webhook_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -299,24 +357,24 @@ export interface paths {
          * Get Webhook
          * @description Get a specific webhook by ID.
          */
-        get: operations["get_webhook_webhooks__webhook_id__get"];
+        get: operations["get_webhook_v1_webhooks__webhook_id__get"];
         put?: never;
         post?: never;
         /**
          * Delete Webhook
          * @description Delete a webhook.
          */
-        delete: operations["delete_webhook_webhooks__webhook_id__delete"];
+        delete: operations["delete_webhook_v1_webhooks__webhook_id__delete"];
         options?: never;
         head?: never;
         /**
          * Update Webhook
          * @description Update an existing webhook.
          */
-        patch: operations["update_webhook_webhooks__webhook_id__patch"];
+        patch: operations["update_webhook_v1_webhooks__webhook_id__patch"];
         trace?: never;
     };
-    "/webhooks/{webhook_id}/test": {
+    "/v1/webhooks/{webhook_id}/test": {
         parameters: {
             query?: never;
             header?: never;
@@ -329,14 +387,14 @@ export interface paths {
          * Test Webhook
          * @description Send a test event to a webhook to verify it's working.
          */
-        post: operations["test_webhook_webhooks__webhook_id__test_post"];
+        post: operations["test_webhook_v1_webhooks__webhook_id__test_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/webhooks/{webhook_id}/deliveries": {
+    "/v1/webhooks/{webhook_id}/deliveries": {
         parameters: {
             query?: never;
             header?: never;
@@ -347,7 +405,7 @@ export interface paths {
          * List Webhook Deliveries
          * @description List delivery attempts for a webhook owned by the authenticated user.
          */
-        get: operations["list_webhook_deliveries_webhooks__webhook_id__deliveries_get"];
+        get: operations["list_webhook_deliveries_v1_webhooks__webhook_id__deliveries_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -356,7 +414,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/register": {
+    "/v1/auth/register": {
         parameters: {
             query?: never;
             header?: never;
@@ -366,14 +424,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Register */
-        post: operations["register_auth_register_post"];
+        post: operations["register_v1_auth_register_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/login": {
+    "/v1/auth/login": {
         parameters: {
             query?: never;
             header?: never;
@@ -383,14 +441,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Login */
-        post: operations["login_auth_login_post"];
+        post: operations["login_v1_auth_login_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/refresh": {
+    "/v1/auth/refresh": {
         parameters: {
             query?: never;
             header?: never;
@@ -400,14 +458,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Refresh */
-        post: operations["refresh_auth_refresh_post"];
+        post: operations["refresh_v1_auth_refresh_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/logout": {
+    "/v1/auth/logout": {
         parameters: {
             query?: never;
             header?: never;
@@ -417,14 +475,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Logout */
-        post: operations["logout_auth_logout_post"];
+        post: operations["logout_v1_auth_logout_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/me": {
+    "/v1/auth/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -432,7 +490,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get Me */
-        get: operations["get_me_auth_me_get"];
+        get: operations["get_me_v1_auth_me_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -441,7 +499,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/forgot-password": {
+    "/v1/auth/forgot-password": {
         parameters: {
             query?: never;
             header?: never;
@@ -454,14 +512,14 @@ export interface paths {
          * Forgot Password
          * @description Request a password reset email.
          */
-        post: operations["forgot_password_auth_forgot_password_post"];
+        post: operations["forgot_password_v1_auth_forgot_password_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/reset-password": {
+    "/v1/auth/reset-password": {
         parameters: {
             query?: never;
             header?: never;
@@ -474,14 +532,14 @@ export interface paths {
          * Reset Password
          * @description Reset password using token.
          */
-        post: operations["reset_password_auth_reset_password_post"];
+        post: operations["reset_password_v1_auth_reset_password_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/verify-email": {
+    "/v1/auth/verify-email": {
         parameters: {
             query?: never;
             header?: never;
@@ -494,14 +552,14 @@ export interface paths {
          * Verify Email
          * @description Verify email with token.
          */
-        post: operations["verify_email_auth_verify_email_post"];
+        post: operations["verify_email_v1_auth_verify_email_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/auth/resend-verification": {
+    "/v1/auth/resend-verification": {
         parameters: {
             query?: never;
             header?: never;
@@ -514,14 +572,14 @@ export interface paths {
          * Resend Verification
          * @description Resend verification email.
          */
-        post: operations["resend_verification_auth_resend_verification_post"];
+        post: operations["resend_verification_v1_auth_resend_verification_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/clawhub/skills": {
+    "/v1/clawhub/skills": {
         parameters: {
             query?: never;
             header?: never;
@@ -532,7 +590,7 @@ export interface paths {
          * List Available Skills
          * @description Returns the current trending skills from ClawHub.
          */
-        get: operations["list_available_skills_clawhub_skills_get"];
+        get: operations["list_available_skills_v1_clawhub_skills_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -541,7 +599,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/clawhub/install": {
+    "/v1/clawhub/install": {
         parameters: {
             query?: never;
             header?: never;
@@ -554,14 +612,14 @@ export interface paths {
          * Install Skill
          * @description Installs a skill to an agent's configuration.
          */
-        post: operations["install_skill_clawhub_install_post"];
+        post: operations["install_skill_v1_clawhub_install_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/clawhub/uninstall": {
+    "/v1/clawhub/uninstall": {
         parameters: {
             query?: never;
             header?: never;
@@ -574,14 +632,14 @@ export interface paths {
          * Uninstall Skill
          * @description Removes a skill from an agent's configuration.
          */
-        post: operations["uninstall_skill_clawhub_uninstall_post"];
+        post: operations["uninstall_skill_v1_clawhub_uninstall_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api-keys": {
+    "/v1/api-keys": {
         parameters: {
             query?: never;
             header?: never;
@@ -592,40 +650,44 @@ export interface paths {
          * List Api Keys
          * @description List all API keys for the current user, including revoked keys for auditability.
          */
-        get: operations["list_api_keys_api_keys_get"];
+        get: operations["list_api_keys_v1_api_keys_get"];
         put?: never;
         /**
          * Create Api Key
          * @description Create a new API key.
          */
-        post: operations["create_api_key_api_keys_post"];
+        post: operations["create_api_key_v1_api_keys_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api-keys/{key_id}": {
+    "/v1/api-keys/{key_id}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Get Api Key
+         * @description Get a single API key by ID.
+         */
+        get: operations["get_api_key_v1_api_keys__key_id__get"];
         put?: never;
         post?: never;
         /**
          * Revoke Api Key
          * @description Revoke an API key without deleting its record.
          */
-        delete: operations["revoke_api_key_api_keys__key_id__delete"];
+        delete: operations["revoke_api_key_v1_api_keys__key_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api-keys/{key_id}/rotate": {
+    "/v1/api-keys/{key_id}/rotate": {
         parameters: {
             query?: never;
             header?: never;
@@ -638,38 +700,14 @@ export interface paths {
          * Rotate Api Key
          * @description Rotate an active API key by revoking the old one and issuing a new one.
          */
-        post: operations["rotate_api_key_api_keys__key_id__rotate_post"];
+        post: operations["rotate_api_key_v1_api_keys__key_id__rotate_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/newsletter": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Waitlist Count */
-        get: operations["get_waitlist_count_newsletter_get"];
-        put?: never;
-        /**
-         * Create Waitlist Signup
-         * @description BACKEND WAITLIST API (DEPRECATED)
-         *     Submit waitlist signups.
-         *     NOTE: For web-based submissions, prefer the Next.js API route
-         *     (app/api/newsletter/route.ts) which includes Cloudflare Turnstile verification.
-         */
-        post: operations["create_waitlist_signup_newsletter_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/leads": {
+    "/v1/leads": {
         parameters: {
             query?: never;
             header?: never;
@@ -679,23 +717,23 @@ export interface paths {
         /**
          * List Leads
          * @description List captured leads.
-         *     Restricted to authenticated users (internal/admin use).
+         *     Restricted to internal/admin users.
          */
-        get: operations["list_leads_leads_get"];
+        get: operations["list_leads_v1_leads_get"];
         put?: never;
         /**
          * Capture Lead
          * @description Capture a new contact lead.
          *     Public endpoint for landing pages and onboarding.
          */
-        post: operations["capture_lead_leads_post"];
+        post: operations["capture_lead_v1_leads_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/leads/{lead_id}": {
+    "/v1/leads/{lead_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -706,16 +744,78 @@ export interface paths {
          * Get Lead
          * @description Get a specific lead by ID.
          */
-        get: operations["get_lead_leads__lead_id__get"];
+        get: operations["get_lead_v1_leads__lead_id__get"];
         put?: never;
         post?: never;
+        /**
+         * Delete Lead
+         * @description Delete a specific lead/contact.
+         */
+        delete: operations["delete_lead_v1_leads__lead_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Lead
+         * @description Update a specific lead/contact.
+         */
+        patch: operations["update_lead_v1_leads__lead_id__patch"];
+        trace?: never;
+    };
+    "/v1/contacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Leads
+         * @description List captured leads.
+         *     Restricted to internal/admin users.
+         */
+        get: operations["list_leads_v1_contacts_get"];
+        put?: never;
+        /**
+         * Capture Lead
+         * @description Capture a new contact lead.
+         *     Public endpoint for landing pages and onboarding.
+         */
+        post: operations["capture_lead_v1_contacts_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/agents/register": {
+    "/v1/contacts/{lead_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Lead
+         * @description Get a specific lead by ID.
+         */
+        get: operations["get_lead_v1_contacts__lead_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Lead
+         * @description Delete a specific lead/contact.
+         */
+        delete: operations["delete_lead_v1_contacts__lead_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Lead
+         * @description Update a specific lead/contact.
+         */
+        patch: operations["update_lead_v1_contacts__lead_id__patch"];
+        trace?: never;
+    };
+    "/v1/agents/register": {
         parameters: {
             query?: never;
             header?: never;
@@ -730,14 +830,14 @@ export interface paths {
          *
          *     Returns agent_id and api_key that the agent should use for subsequent requests.
          */
-        post: operations["register_agent_agents_register_post"];
+        post: operations["register_agent_v1_agents_register_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/agents/heartbeat": {
+    "/v1/agents/heartbeat": {
         parameters: {
             query?: never;
             header?: never;
@@ -750,14 +850,14 @@ export interface paths {
          * Heartbeat
          * @description Update agent heartbeat status.
          */
-        post: operations["heartbeat_agents_heartbeat_post"];
+        post: operations["heartbeat_v1_agents_heartbeat_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/agents/metrics": {
+    "/v1/agents/metrics": {
         parameters: {
             query?: never;
             header?: never;
@@ -770,14 +870,14 @@ export interface paths {
          * Report Metrics
          * @description Report agent metrics to MUTX.
          */
-        post: operations["report_metrics_agents_metrics_post"];
+        post: operations["report_metrics_v1_agents_metrics_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/agents/commands": {
+    "/v1/agents/commands": {
         parameters: {
             query?: never;
             header?: never;
@@ -788,7 +888,7 @@ export interface paths {
          * Poll Commands
          * @description Poll for pending commands for this agent.
          */
-        get: operations["poll_commands_agents_commands_get"];
+        get: operations["poll_commands_v1_agents_commands_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -797,7 +897,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/agents/commands/acknowledge": {
+    "/v1/agents/commands/acknowledge": {
         parameters: {
             query?: never;
             header?: never;
@@ -810,14 +910,14 @@ export interface paths {
          * Acknowledge Command
          * @description Acknowledge command execution.
          */
-        post: operations["acknowledge_command_agents_commands_acknowledge_post"];
+        post: operations["acknowledge_command_v1_agents_commands_acknowledge_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/agents/logs": {
+    "/v1/agents/logs": {
         parameters: {
             query?: never;
             header?: never;
@@ -830,14 +930,14 @@ export interface paths {
          * Submit Log
          * @description Submit a log entry from the agent.
          */
-        post: operations["submit_log_agents_logs_post"];
+        post: operations["submit_log_v1_agents_logs_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/agents/{agent_id}/status": {
+    "/v1/agents/{agent_id}/status": {
         parameters: {
             query?: never;
             header?: never;
@@ -848,7 +948,7 @@ export interface paths {
          * Get Agent Status
          * @description Get status for the authenticated agent.
          */
-        get: operations["get_agent_status_agents__agent_id__status_get"];
+        get: operations["get_agent_status_v1_agents__agent_id__status_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -857,7 +957,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/ingest/agent-status": {
+    "/v1/ingest/agent-status": {
         parameters: {
             query?: never;
             header?: never;
@@ -870,14 +970,14 @@ export interface paths {
          * Agent Status Update
          * @description Update an agent status and append logs (Ingestion).
          */
-        post: operations["agent_status_update_ingest_agent_status_post"];
+        post: operations["agent_status_update_v1_ingest_agent_status_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/ingest/deployment": {
+    "/v1/ingest/deployment": {
         parameters: {
             query?: never;
             header?: never;
@@ -890,14 +990,14 @@ export interface paths {
          * Deployment Event
          * @description Update deployment state and related agent state (Ingestion).
          */
-        post: operations["deployment_event_ingest_deployment_post"];
+        post: operations["deployment_event_v1_ingest_deployment_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/ingest/metrics": {
+    "/v1/ingest/metrics": {
         parameters: {
             query?: never;
             header?: never;
@@ -910,7 +1010,188 @@ export interface paths {
          * Receive Metrics
          * @description Record agent metrics (Ingestion).
          */
-        post: operations["receive_metrics_ingest_metrics_post"];
+        post: operations["receive_metrics_v1_ingest_metrics_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Runs */
+        get: operations["list_runs_v1_runs_get"];
+        put?: never;
+        /** Create Run */
+        post: operations["create_run_v1_runs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Run */
+        get: operations["get_run_v1_runs__run_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runs/{run_id}/traces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Run Traces */
+        get: operations["list_run_traces_v1_runs__run_id__traces_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/rag/embed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate Embedding
+         * @description Generate embeddings for text input using OpenAI's embedding models.
+         *
+         *     Supports text-embedding-3-small, text-embedding-3-large, and text-embedding-ada-002.
+         */
+        post: operations["generate_embedding_v1_rag_embed_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/rag/embed/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate Batch Embeddings
+         * @description Generate embeddings for multiple texts in a single request.
+         */
+        post: operations["generate_batch_embeddings_v1_rag_embed_batch_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/rag/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Similarity Search
+         * @description Simple similarity search endpoint.
+         *
+         *     Note: Full implementation requires pgvector and a document store.
+         *     This is a placeholder that demonstrates the API contract.
+         */
+        post: operations["similarity_search_v1_rag_search_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/rag/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Rag Health
+         * @description Health check for RAG service.
+         */
+        get: operations["rag_health_v1_rag_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/usage/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Usage Events
+         * @description List usage events for the authenticated user.
+         */
+        get: operations["list_usage_events_v1_usage_events_get"];
+        put?: never;
+        /**
+         * Create Usage Event
+         * @description Record a usage event for tracking API usage and quotas.
+         */
+        post: operations["create_usage_event_v1_usage_events_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/usage/events/{event_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Usage Event
+         * @description Get a specific usage event.
+         */
+        get: operations["get_usage_event_v1_usage_events__event_id__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -968,6 +1249,255 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/analytics/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Analytics Summary */
+        get: operations["get_analytics_summary_v1_analytics_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/analytics/agents/{agent_id}/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Agent Metrics Summary */
+        get: operations["get_agent_metrics_summary_v1_analytics_agents__agent_id__summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/analytics/timeseries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Analytics Timeseries */
+        get: operations["get_analytics_timeseries_v1_analytics_timeseries_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/analytics/costs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Cost Summary */
+        get: operations["get_cost_summary_v1_analytics_costs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/analytics/budget": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Budget */
+        get: operations["get_budget_v1_analytics_budget_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/monitoring/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Health
+         * @description Get system health status.
+         */
+        get: operations["get_health_v1_monitoring_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/monitoring/alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Alerts
+         * @description List alerts for the user's agents.
+         */
+        get: operations["list_alerts_v1_monitoring_alerts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/monitoring/alerts/{alert_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Resolve Alert
+         * @description Resolve or unresolve an alert.
+         */
+        patch: operations["resolve_alert_v1_monitoring_alerts__alert_id__patch"];
+        trace?: never;
+    };
+    "/v1/swarms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Swarms
+         * @description List all swarms for the current user.
+         */
+        get: operations["list_swarms_v1_swarms_get"];
+        put?: never;
+        /**
+         * Create Swarm
+         * @description Create a new swarm.
+         */
+        post: operations["create_swarm_v1_swarms_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/swarms/{swarm_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Swarm
+         * @description Get swarm details.
+         */
+        get: operations["get_swarm_v1_swarms__swarm_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/swarms/{swarm_id}/scale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Scale Swarm
+         * @description Scale all agents in a swarm to the specified replicas.
+         */
+        post: operations["scale_swarm_v1_swarms__swarm_id__scale_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/budgets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Budget
+         * @description Get current user's budget and credits.
+         */
+        get: operations["get_budget_v1_budgets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/budgets/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Usage Breakdown
+         * @description Get detailed usage breakdown by agent and event type.
+         */
+        get: operations["get_usage_breakdown_v1_budgets_usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1001,6 +1531,20 @@ export interface components {
             /** Expires At */
             expires_at: string | null;
         };
+        /**
+         * APIKeyHistoryResponse
+         * @description Paginated response for listing API keys.
+         */
+        APIKeyHistoryResponse: {
+            /** Items */
+            items?: components["schemas"]["APIKeyResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+        };
         /** APIKeyResponse */
         APIKeyResponse: {
             /**
@@ -1022,6 +1566,32 @@ export interface components {
             /** Is Active */
             is_active: boolean;
         };
+        /** AgentConfigResponse */
+        AgentConfigResponse: {
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            type: components["schemas"]["AgentType"];
+            /** Config */
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | Record<string, never>;
+            /** Config Version */
+            config_version: number;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** AgentConfigUpdateRequest */
+        AgentConfigUpdateRequest: {
+            /**
+             * Config
+             * @description Updated agent configuration payload. Can be a JSON object or JSON string.
+             */
+            config: Record<string, never> | string;
+        };
         /** AgentCreate */
         AgentCreate: {
             /** Name */
@@ -1031,7 +1601,7 @@ export interface components {
             /** @default openai */
             type: components["schemas"]["AgentType"];
             /** Config */
-            config?: Record<string, never> | null;
+            config?: Record<string, never> | string | null;
         };
         /** AgentDetailResponse */
         AgentDetailResponse: {
@@ -1044,10 +1614,16 @@ export interface components {
             name: string;
             /** Description */
             description: string | null;
+            type: components["schemas"]["AgentType"];
             /** Status */
             status: string;
             /** Config */
-            config: Record<string, never> | null;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | Record<string, never> | null;
+            /**
+             * Config Version
+             * @default 1
+             */
+            config_version: number;
             /**
              * Created At
              * Format: date-time
@@ -1112,6 +1688,40 @@ export interface components {
              */
             timestamp: string;
         };
+        /** AgentMetricsSummary */
+        AgentMetricsSummary: {
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /** Agent Name */
+            agent_name: string;
+            /** Total Runs */
+            total_runs: number;
+            /** Successful Runs */
+            successful_runs: number;
+            /** Failed Runs */
+            failed_runs: number;
+            /** Avg Cpu */
+            avg_cpu: number | null;
+            /** Avg Memory */
+            avg_memory: number | null;
+            /** Total Requests */
+            total_requests: number;
+            /** Avg Latency Ms */
+            avg_latency_ms: number | null;
+            /**
+             * Period Start
+             * Format: date-time
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date-time
+             */
+            period_end: string;
+        };
         /** AgentRegisterRequest */
         AgentRegisterRequest: {
             /** Name */
@@ -1154,10 +1764,16 @@ export interface components {
             name: string;
             /** Description */
             description: string | null;
+            type: components["schemas"]["AgentType"];
             /** Status */
             status: string;
             /** Config */
-            config: Record<string, never> | null;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | Record<string, never> | null;
+            /**
+             * Config Version
+             * @default 1
+             */
+            config_version: number;
             /**
              * Created At
              * Format: date-time
@@ -1208,6 +1824,190 @@ export interface components {
          * @enum {string}
          */
         AgentType: "openai" | "anthropic" | "langchain" | "custom";
+        /** AlertListResponse */
+        AlertListResponse: {
+            /** Items */
+            items: components["schemas"]["AlertResponse"][];
+            /** Total */
+            total: number;
+            /** Unresolved Count */
+            unresolved_count: number;
+        };
+        /** AlertResolveRequest */
+        AlertResolveRequest: {
+            /**
+             * Resolved
+             * @default true
+             */
+            resolved: boolean;
+        };
+        /** AlertResponse */
+        AlertResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            type: components["schemas"]["AlertType"];
+            /** Message */
+            message: string;
+            /** Resolved */
+            resolved: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Resolved At */
+            resolved_at?: string | null;
+        };
+        /**
+         * AlertType
+         * @enum {string}
+         */
+        AlertType: "cpu_high" | "memory_high" | "agent_down" | "deployment_failed" | "quota_exceeded";
+        /** AnalyticsSummaryResponse */
+        AnalyticsSummaryResponse: {
+            /** Total Agents */
+            total_agents: number;
+            /** Active Agents */
+            active_agents: number;
+            /** Total Deployments */
+            total_deployments: number;
+            /** Active Deployments */
+            active_deployments: number;
+            /** Total Runs */
+            total_runs: number;
+            /** Successful Runs */
+            successful_runs: number;
+            /** Failed Runs */
+            failed_runs: number;
+            /** Total Api Calls */
+            total_api_calls: number;
+            /** Avg Latency Ms */
+            avg_latency_ms: number;
+            /**
+             * Period Start
+             * Format: date-time
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date-time
+             */
+            period_end: string;
+        };
+        /** AnalyticsTimeSeries */
+        AnalyticsTimeSeries: {
+            /**
+             * Timestamp
+             * Format: date-time
+             */
+            timestamp: string;
+            /** Value */
+            value: number;
+            /** Label */
+            label?: string | null;
+        };
+        /** AnalyticsTimeSeriesResponse */
+        AnalyticsTimeSeriesResponse: {
+            /** Metric */
+            metric: string;
+            /** Interval */
+            interval: string;
+            /** Data */
+            data: components["schemas"]["AnalyticsTimeSeries"][];
+            /**
+             * Period Start
+             * Format: date-time
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date-time
+             */
+            period_end: string;
+        };
+        /** AnthropicAgentConfig */
+        AnthropicAgentConfig: {
+            /** Name */
+            name?: string | null;
+            /** System Prompt */
+            system_prompt?: string | null;
+            /**
+             * Version
+             * @default 1
+             */
+            version: number;
+            /**
+             * Model
+             * @default claude-3-5-sonnet-20240620
+             */
+            model: string;
+            /**
+             * Temperature
+             * @default 0.7
+             */
+            temperature: number;
+            /**
+             * Max Tokens
+             * @default 4096
+             */
+            max_tokens: number;
+        };
+        /**
+         * BatchEmbedRequest
+         * @description Request model for batch embedding generation.
+         */
+        BatchEmbedRequest: {
+            /** Texts */
+            texts: string[];
+            /**
+             * Model
+             * @default text-embedding-3-small
+             */
+            model: string;
+        };
+        /**
+         * BatchEmbedResponse
+         * @description Response model for batch embedding generation.
+         */
+        BatchEmbedResponse: {
+            /** Embeddings */
+            embeddings: number[][];
+            /** Model */
+            model: string;
+            /** Total Tokens */
+            total_tokens: number;
+        };
+        /** BudgetResponse */
+        BudgetResponse: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Plan */
+            plan: string;
+            /** Credits Total */
+            credits_total: number;
+            /** Credits Used */
+            credits_used: number;
+            /** Credits Remaining */
+            credits_remaining: number;
+            /**
+             * Reset Date
+             * Format: date-time
+             */
+            reset_date: string;
+            /** Usage Percentage */
+            usage_percentage: number;
+        };
         /** CommandAcknowledgeRequest */
         CommandAcknowledgeRequest: {
             /** Command Id */
@@ -1239,7 +2039,57 @@ export interface components {
             /** Commands */
             commands: components["schemas"]["CommandResponse"][];
         };
-        /** DeploymentCreate */
+        /** CostSummaryResponse */
+        CostSummaryResponse: {
+            /** Total Credits Used */
+            total_credits_used: number;
+            /** Credits Remaining */
+            credits_remaining: number;
+            /** Credits Total */
+            credits_total: number;
+            /** Usage By Event Type */
+            usage_by_event_type: {
+                [key: string]: number;
+            };
+            /** Usage By Agent */
+            usage_by_agent: {
+                [key: string]: number;
+            };
+            /**
+             * Period Start
+             * Format: date-time
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date-time
+             */
+            period_end: string;
+        };
+        /** CustomAgentConfig */
+        CustomAgentConfig: {
+            /** Name */
+            name?: string | null;
+            /** System Prompt */
+            system_prompt?: string | null;
+            /**
+             * Version
+             * @default 1
+             */
+            version: number;
+            /** Image */
+            image: string;
+            /** Command */
+            command?: string[];
+            /** Env */
+            env?: {
+                [key: string]: string;
+            };
+        };
+        /**
+         * DeploymentCreate
+         * @description Request model for creating a deployment
+         */
         DeploymentCreate: {
             /**
              * Agent Id
@@ -1248,6 +2098,7 @@ export interface components {
             agent_id: string;
             /**
              * Replicas
+             * @description Number of replicas (1-10)
              * @default 1
              */
             replicas: number;
@@ -1388,6 +2239,8 @@ export interface components {
             agent_id: string;
             /** Status */
             status: string;
+            /** Version */
+            version?: string | null;
             /** Replicas */
             replicas: number;
             /** Node Id */
@@ -1401,10 +2254,90 @@ export interface components {
             /** Events */
             events?: components["schemas"]["DeploymentEventResponse"][];
         };
+        /**
+         * DeploymentRollbackRequest
+         * @description Request model for rolling back a deployment
+         */
+        DeploymentRollbackRequest: {
+            /**
+             * Version
+             * @description Version number to rollback to
+             */
+            version: number;
+        };
         /** DeploymentScale */
         DeploymentScale: {
             /** Replicas */
             replicas: number;
+        };
+        /**
+         * DeploymentVersionHistoryResponse
+         * @description Response model for deployment version history
+         */
+        DeploymentVersionHistoryResponse: {
+            /**
+             * Deployment Id
+             * Format: uuid
+             */
+            deployment_id: string;
+            /** Items */
+            items: components["schemas"]["DeploymentVersionResponse"][];
+            /** Total */
+            total: number;
+        };
+        /**
+         * DeploymentVersionResponse
+         * @description Response model for deployment version
+         */
+        DeploymentVersionResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Deployment Id
+             * Format: uuid
+             */
+            deployment_id: string;
+            /** Version */
+            version: number;
+            /** Config Snapshot */
+            config_snapshot: string;
+            /** Status */
+            status: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Rolled Back At */
+            rolled_back_at?: string | null;
+        };
+        /**
+         * EmbedRequest
+         * @description Request model for embedding generation.
+         */
+        EmbedRequest: {
+            /** Text */
+            text: string;
+            /**
+             * Model
+             * @default text-embedding-3-small
+             */
+            model: string;
+        };
+        /**
+         * EmbedResponse
+         * @description Response model for embedding generation.
+         */
+        EmbedResponse: {
+            /** Embedding */
+            embedding: number[];
+            /** Model */
+            model: string;
+            /** Tokens */
+            tokens: number;
         };
         /** ForgotPasswordRequest */
         ForgotPasswordRequest: {
@@ -1432,16 +2365,39 @@ export interface components {
             database?: string | null;
             /** Error */
             error?: string | null;
+            /**
+             * Version
+             * @default 1.0.0
+             */
+            version: string;
+            /** Uptime Seconds */
+            uptime_seconds?: number | null;
+        };
+        /** HealthStatusResponse */
+        HealthStatusResponse: {
+            /** Status */
+            status: string;
+            /**
+             * Timestamp
+             * Format: date-time
+             */
+            timestamp: string;
+            /** Database */
+            database: string;
+            /** Uptime Seconds */
+            uptime_seconds: number;
+            /**
+             * Version
+             * @default 1.0.0
+             */
+            version: string;
         };
         /** HeartbeatRequest */
         HeartbeatRequest: {
             /** Agent Id */
             agent_id: string;
-            /**
-             * Status
-             * @default running
-             */
-            status: string;
+            /** @default running */
+            status: components["schemas"]["AgentStatus"];
             /** Message */
             message?: string | null;
             /** Timestamp */
@@ -1460,6 +2416,22 @@ export interface components {
             agent_id: string;
             /** Skill Id */
             skill_id: string;
+        };
+        /** LangChainAgentConfig */
+        LangChainAgentConfig: {
+            /** Name */
+            name?: string | null;
+            /** System Prompt */
+            system_prompt?: string | null;
+            /**
+             * Version
+             * @default 1
+             */
+            version: number;
+            /** Chain Id */
+            chain_id: string;
+            /** Parameters */
+            parameters?: Record<string, never>;
         };
         /** LeadCreate */
         LeadCreate: {
@@ -1500,6 +2472,19 @@ export interface components {
              */
             created_at: string;
         };
+        /** LeadUpdate */
+        LeadUpdate: {
+            /** Email */
+            email?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Company */
+            company?: string | null;
+            /** Message */
+            message?: string | null;
+            /** Source */
+            source?: string | null;
+        };
         /** LogRequest */
         LogRequest: {
             /** Agent Id */
@@ -1534,16 +2519,25 @@ export interface components {
             /** Message */
             message: string;
         };
-        /** MetricsReportRequest */
+        /**
+         * MetricsReportRequest
+         * @description Request model for reporting agent metrics
+         */
         MetricsReportRequest: {
             /**
              * Agent Id
              * Format: uuid
              */
             agent_id: string;
-            /** Cpu Usage */
+            /**
+             * Cpu Usage
+             * @description CPU usage percentage (0-100)
+             */
             cpu_usage: number;
-            /** Memory Usage */
+            /**
+             * Memory Usage
+             * @description Memory usage percentage (0-100)
+             */
             memory_usage: number;
         };
         /** MetricsRequest */
@@ -1579,9 +2573,33 @@ export interface components {
              * Custom
              * @default {}
              */
-            custom: Record<string, never> | null;
+            custom: Record<string, never>;
             /** Timestamp */
             timestamp: string;
+        };
+        /** OpenAIAgentConfig */
+        OpenAIAgentConfig: {
+            /** Name */
+            name?: string | null;
+            /** System Prompt */
+            system_prompt?: string | null;
+            /**
+             * Version
+             * @default 1
+             */
+            version: number;
+            /**
+             * Model
+             * @default gpt-4o
+             */
+            model: string;
+            /**
+             * Temperature
+             * @default 0.7
+             */
+            temperature: number;
+            /** Max Tokens */
+            max_tokens?: number | null;
         };
         /** RefreshRequest */
         RefreshRequest: {
@@ -1615,6 +2633,213 @@ export interface components {
             /** New Password */
             new_password: string;
         };
+        /** RunCreate */
+        RunCreate: {
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /**
+             * Status
+             * @default completed
+             */
+            status: string;
+            /** Input Text */
+            input_text?: string | null;
+            /** Output Text */
+            output_text?: string | null;
+            /** Error Message */
+            error_message?: string | null;
+            /** Metadata */
+            metadata?: Record<string, never>;
+            /** Started At */
+            started_at?: string | null;
+            /** Completed At */
+            completed_at?: string | null;
+            /** Traces */
+            traces?: components["schemas"]["RunTraceCreate"][];
+        };
+        /** RunDetailResponse */
+        RunDetailResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /** Status */
+            status: string;
+            /** Input Text */
+            input_text: string | null;
+            /** Output Text */
+            output_text: string | null;
+            /** Error Message */
+            error_message: string | null;
+            /** Metadata */
+            metadata: Record<string, never>;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Completed At */
+            completed_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Trace Count
+             * @default 0
+             */
+            trace_count: number;
+            /** Traces */
+            traces?: components["schemas"]["RunTraceResponse"][];
+        };
+        /** RunHistoryResponse */
+        RunHistoryResponse: {
+            /** Items */
+            items?: components["schemas"]["RunResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Agent Id */
+            agent_id?: string | null;
+            /** Status */
+            status?: string | null;
+        };
+        /** RunResponse */
+        RunResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /** Status */
+            status: string;
+            /** Input Text */
+            input_text: string | null;
+            /** Output Text */
+            output_text: string | null;
+            /** Error Message */
+            error_message: string | null;
+            /** Metadata */
+            metadata: Record<string, never>;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Completed At */
+            completed_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Trace Count
+             * @default 0
+             */
+            trace_count: number;
+        };
+        /** RunTraceCreate */
+        RunTraceCreate: {
+            /** Event Type */
+            event_type: string;
+            /** Message */
+            message?: string | null;
+            /** Payload */
+            payload?: Record<string, never>;
+            /** Timestamp */
+            timestamp?: string | null;
+        };
+        /** RunTraceHistoryResponse */
+        RunTraceHistoryResponse: {
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /** Items */
+            items?: components["schemas"]["RunTraceResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Event Type */
+            event_type?: string | null;
+        };
+        /** RunTraceResponse */
+        RunTraceResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /** Event Type */
+            event_type: string;
+            /** Message */
+            message: string | null;
+            /** Payload */
+            payload: Record<string, never>;
+            /** Sequence */
+            sequence: number;
+            /**
+             * Timestamp
+             * Format: date-time
+             */
+            timestamp: string;
+        };
+        /**
+         * SearchRequest
+         * @description Request model for similarity search.
+         */
+        SearchRequest: {
+            /** Query */
+            query: string;
+            /**
+             * Top K
+             * @default 5
+             */
+            top_k: number;
+            /**
+             * Model
+             * @default text-embedding-3-small
+             */
+            model: string;
+        };
+        /**
+         * SearchResult
+         * @description Single search result.
+         */
+        SearchResult: {
+            /** Text */
+            text: string;
+            /** Score */
+            score: number;
+        };
         /** Skill */
         Skill: {
             /** Id */
@@ -1635,6 +2860,87 @@ export interface components {
              */
             is_official: boolean;
         };
+        /** SwarmAgentResponse */
+        SwarmAgentResponse: {
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /** Agent Name */
+            agent_name: string;
+            /** Status */
+            status: string;
+            /** Replicas */
+            replicas: number;
+        };
+        /** SwarmCreate */
+        SwarmCreate: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Agent Ids */
+            agent_ids: string[];
+            /**
+             * Min Replicas
+             * @default 1
+             */
+            min_replicas: number;
+            /**
+             * Max Replicas
+             * @default 10
+             */
+            max_replicas: number;
+        };
+        /** SwarmListResponse */
+        SwarmListResponse: {
+            /** Items */
+            items: components["schemas"]["SwarmResponse"][];
+            /** Total */
+            total: number;
+        };
+        /** SwarmResponse */
+        SwarmResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Agent Ids */
+            agent_ids: string[];
+            /** Min Replicas */
+            min_replicas: number;
+            /** Max Replicas */
+            max_replicas: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Agents
+             * @default []
+             */
+            agents: components["schemas"]["SwarmAgentResponse"][];
+        };
+        /** SwarmScale */
+        SwarmScale: {
+            /**
+             * Replicas
+             * @description Target replicas per agent
+             */
+            replicas: number;
+        };
         /** TokenResponse */
         TokenResponse: {
             /** Access Token */
@@ -1648,6 +2954,119 @@ export interface components {
             token_type: string;
             /** Expires In */
             expires_in: number;
+        };
+        /** UsageBreakdownResponse */
+        UsageBreakdownResponse: {
+            /** Total Credits Used */
+            total_credits_used: number;
+            /** Credits Remaining */
+            credits_remaining: number;
+            /** Credits Total */
+            credits_total: number;
+            /**
+             * Period Start
+             * Format: date-time
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date-time
+             */
+            period_end: string;
+            /** Usage By Agent */
+            usage_by_agent: components["schemas"]["UsageByAgent"][];
+            /** Usage By Type */
+            usage_by_type: components["schemas"]["UsageByType"][];
+        };
+        /** UsageByAgent */
+        UsageByAgent: {
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /** Agent Name */
+            agent_name: string;
+            /** Credits Used */
+            credits_used: number;
+            /** Event Count */
+            event_count: number;
+        };
+        /** UsageByType */
+        UsageByType: {
+            /** Event Type */
+            event_type: string;
+            /** Credits Used */
+            credits_used: number;
+            /** Event Count */
+            event_count: number;
+        };
+        /**
+         * UsageEventCreate
+         * @description Request model for creating a usage event
+         */
+        UsageEventCreate: {
+            /**
+             * Event Type
+             * @description Type of usage event (e.g., api_call, agent_run, deployment)
+             */
+            event_type: string;
+            /**
+             * Resource Id
+             * @description Resource that was used
+             */
+            resource_id?: string | null;
+            /**
+             * Metadata
+             * @description Additional event metadata
+             */
+            metadata?: Record<string, never> | null;
+        };
+        /**
+         * UsageEventListResponse
+         * @description Paginated response for usage events
+         */
+        UsageEventListResponse: {
+            /** Items */
+            items: components["schemas"]["UsageEventResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+        };
+        /**
+         * UsageEventResponse
+         * @description Response model for usage events
+         */
+        UsageEventResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Event Type */
+            event_type: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Resource Id */
+            resource_id: string | null;
+            /** Event Metadata */
+            event_metadata?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Metadata
+             * @description Deserialize event_metadata JSON string to dict
+             */
+            readonly metadata: Record<string, never> | null;
         };
         /** UserResponse */
         UserResponse: {
@@ -1688,37 +3107,10 @@ export interface components {
             /** Token */
             token: string;
         };
-        /** WaitlistCountResponse */
-        WaitlistCountResponse: {
-            /** Count */
-            count: number;
-        };
-        /** WaitlistSignupCreate */
-        WaitlistSignupCreate: {
-            /**
-             * Email
-             * Format: email
-             */
-            email: string;
-            /** Source */
-            source?: string | null;
-        };
-        /** WaitlistSignupResponse */
-        WaitlistSignupResponse: {
-            /**
-             * Success
-             * @default true
-             */
-            success: boolean;
-            /** Message */
-            message: string;
-            /**
-             * Duplicate
-             * @default false
-             */
-            duplicate: boolean;
-        };
-        /** WebhookCreate */
+        /**
+         * WebhookCreate
+         * @description Request model for creating a webhook
+         */
         WebhookCreate: {
             /**
              * Url
@@ -1735,6 +3127,12 @@ export interface components {
              * @description Optional secret for signature verification
              */
             secret?: string | null;
+            /**
+             * Is Active
+             * @description Whether the webhook should be active immediately
+             * @default true
+             */
+            is_active: boolean;
         };
         /**
          * WebhookDelivery
@@ -1835,12 +3233,11 @@ export interface operations {
             };
         };
     };
-    list_agents_agents_get: {
+    list_agents_v1_agents_get: {
         parameters: {
             query?: {
                 skip?: number;
                 limit?: number;
-                user_id?: string | null;
             };
             header?: {
                 authorization?: string | null;
@@ -1870,7 +3267,7 @@ export interface operations {
             };
         };
     };
-    create_agent_agents_post: {
+    create_agent_v1_agents_post: {
         parameters: {
             query?: never;
             header?: {
@@ -1905,7 +3302,7 @@ export interface operations {
             };
         };
     };
-    get_agent_agents__agent_id__get: {
+    get_agent_v1_agents__agent_id__get: {
         parameters: {
             query?: never;
             header?: {
@@ -1938,7 +3335,7 @@ export interface operations {
             };
         };
     };
-    delete_agent_agents__agent_id__delete: {
+    delete_agent_v1_agents__agent_id__delete: {
         parameters: {
             query?: never;
             header?: {
@@ -1969,7 +3366,77 @@ export interface operations {
             };
         };
     };
-    deploy_agent_agents__agent_id__deploy_post: {
+    get_agent_config_v1_agents__agent_id__config_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentConfigResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_agent_config_v1_agents__agent_id__config_patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgentConfigUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentConfigResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deploy_agent_v1_agents__agent_id__deploy_post: {
         parameters: {
             query?: never;
             header?: {
@@ -2002,7 +3469,7 @@ export interface operations {
             };
         };
     };
-    stop_agent_agents__agent_id__stop_post: {
+    stop_agent_v1_agents__agent_id__stop_post: {
         parameters: {
             query?: never;
             header?: {
@@ -2035,7 +3502,7 @@ export interface operations {
             };
         };
     };
-    get_agent_logs_agents__agent_id__logs_get: {
+    get_agent_logs_v1_agents__agent_id__logs_get: {
         parameters: {
             query?: {
                 skip?: number;
@@ -2072,7 +3539,7 @@ export interface operations {
             };
         };
     };
-    get_agent_metrics_agents__agent_id__metrics_get: {
+    get_agent_metrics_v1_agents__agent_id__metrics_get: {
         parameters: {
             query?: {
                 skip?: number;
@@ -2108,7 +3575,7 @@ export interface operations {
             };
         };
     };
-    list_deployments_deployments_get: {
+    list_deployments_v1_deployments_get: {
         parameters: {
             query?: {
                 skip?: number;
@@ -2144,7 +3611,7 @@ export interface operations {
             };
         };
     };
-    create_deployment_deployments_post: {
+    create_deployment_v1_deployments_post: {
         parameters: {
             query?: never;
             header?: {
@@ -2179,7 +3646,7 @@ export interface operations {
             };
         };
     };
-    get_deployment_deployments__deployment_id__get: {
+    get_deployment_v1_deployments__deployment_id__get: {
         parameters: {
             query?: never;
             header?: {
@@ -2212,7 +3679,7 @@ export interface operations {
             };
         };
     };
-    kill_deployment_deployments__deployment_id__delete: {
+    kill_deployment_v1_deployments__deployment_id__delete: {
         parameters: {
             query?: never;
             header?: {
@@ -2243,7 +3710,7 @@ export interface operations {
             };
         };
     };
-    get_deployment_events_deployments__deployment_id__events_get: {
+    get_deployment_events_v1_deployments__deployment_id__events_get: {
         parameters: {
             query?: {
                 skip?: number;
@@ -2281,7 +3748,7 @@ export interface operations {
             };
         };
     };
-    scale_deployment_deployments__deployment_id__scale_post: {
+    scale_deployment_v1_deployments__deployment_id__scale_post: {
         parameters: {
             query?: never;
             header?: {
@@ -2318,7 +3785,7 @@ export interface operations {
             };
         };
     };
-    restart_deployment_deployments__deployment_id__restart_post: {
+    restart_deployment_v1_deployments__deployment_id__restart_post: {
         parameters: {
             query?: never;
             header?: {
@@ -2351,7 +3818,7 @@ export interface operations {
             };
         };
     };
-    get_deployment_logs_deployments__deployment_id__logs_get: {
+    get_deployment_logs_v1_deployments__deployment_id__logs_get: {
         parameters: {
             query?: {
                 skip?: number;
@@ -2388,7 +3855,7 @@ export interface operations {
             };
         };
     };
-    get_deployment_metrics_deployments__deployment_id__metrics_get: {
+    get_deployment_metrics_v1_deployments__deployment_id__metrics_get: {
         parameters: {
             query?: {
                 skip?: number;
@@ -2424,9 +3891,82 @@ export interface operations {
             };
         };
     };
-    list_webhooks_webhooks__get: {
+    get_deployment_versions_v1_deployments__deployment_id__versions_get: {
         parameters: {
             query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                deployment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentVersionHistoryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rollback_deployment_v1_deployments__deployment_id__rollback_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                deployment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeploymentRollbackRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeploymentResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_webhooks_v1_webhooks__get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+            };
             header?: {
                 /** @description Bearer token for JWT auth */
                 authorization?: string | null;
@@ -2458,7 +3998,7 @@ export interface operations {
             };
         };
     };
-    create_webhook_webhooks__post: {
+    create_webhook_v1_webhooks__post: {
         parameters: {
             query?: never;
             header?: {
@@ -2496,7 +4036,7 @@ export interface operations {
             };
         };
     };
-    get_webhook_webhooks__webhook_id__get: {
+    get_webhook_v1_webhooks__webhook_id__get: {
         parameters: {
             query?: never;
             header?: {
@@ -2532,7 +4072,7 @@ export interface operations {
             };
         };
     };
-    delete_webhook_webhooks__webhook_id__delete: {
+    delete_webhook_v1_webhooks__webhook_id__delete: {
         parameters: {
             query?: never;
             header?: {
@@ -2566,7 +4106,7 @@ export interface operations {
             };
         };
     };
-    update_webhook_webhooks__webhook_id__patch: {
+    update_webhook_v1_webhooks__webhook_id__patch: {
         parameters: {
             query?: never;
             header?: {
@@ -2606,7 +4146,7 @@ export interface operations {
             };
         };
     };
-    test_webhook_webhooks__webhook_id__test_post: {
+    test_webhook_v1_webhooks__webhook_id__test_post: {
         parameters: {
             query?: never;
             header?: {
@@ -2642,7 +4182,7 @@ export interface operations {
             };
         };
     };
-    list_webhook_deliveries_webhooks__webhook_id__deliveries_get: {
+    list_webhook_deliveries_v1_webhooks__webhook_id__deliveries_get: {
         parameters: {
             query?: {
                 event?: string | null;
@@ -2683,7 +4223,7 @@ export interface operations {
             };
         };
     };
-    register_auth_register_post: {
+    register_v1_auth_register_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2716,7 +4256,7 @@ export interface operations {
             };
         };
     };
-    login_auth_login_post: {
+    login_v1_auth_login_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2749,7 +4289,7 @@ export interface operations {
             };
         };
     };
-    refresh_auth_refresh_post: {
+    refresh_v1_auth_refresh_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2782,7 +4322,7 @@ export interface operations {
             };
         };
     };
-    logout_auth_logout_post: {
+    logout_v1_auth_logout_post: {
         parameters: {
             query?: never;
             header?: {
@@ -2813,7 +4353,7 @@ export interface operations {
             };
         };
     };
-    get_me_auth_me_get: {
+    get_me_v1_auth_me_get: {
         parameters: {
             query?: never;
             header?: {
@@ -2844,7 +4384,7 @@ export interface operations {
             };
         };
     };
-    forgot_password_auth_forgot_password_post: {
+    forgot_password_v1_auth_forgot_password_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2877,7 +4417,7 @@ export interface operations {
             };
         };
     };
-    reset_password_auth_reset_password_post: {
+    reset_password_v1_auth_reset_password_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2910,7 +4450,7 @@ export interface operations {
             };
         };
     };
-    verify_email_auth_verify_email_post: {
+    verify_email_v1_auth_verify_email_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2943,7 +4483,7 @@ export interface operations {
             };
         };
     };
-    resend_verification_auth_resend_verification_post: {
+    resend_verification_v1_auth_resend_verification_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2976,7 +4516,7 @@ export interface operations {
             };
         };
     };
-    list_available_skills_clawhub_skills_get: {
+    list_available_skills_v1_clawhub_skills_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -2996,10 +4536,12 @@ export interface operations {
             };
         };
     };
-    install_skill_clawhub_install_post: {
+    install_skill_v1_clawhub_install_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -3029,10 +4571,12 @@ export interface operations {
             };
         };
     };
-    uninstall_skill_clawhub_uninstall_post: {
+    uninstall_skill_v1_clawhub_uninstall_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -3062,9 +4606,12 @@ export interface operations {
             };
         };
     };
-    list_api_keys_api_keys_get: {
+    list_api_keys_v1_api_keys_get: {
         parameters: {
-            query?: never;
+            query?: {
+                skip?: number;
+                limit?: number;
+            };
             header?: {
                 authorization?: string | null;
             };
@@ -3079,7 +4626,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["APIKeyResponse"][];
+                    "application/json": components["schemas"]["APIKeyHistoryResponse"];
                 };
             };
             /** @description Validation Error */
@@ -3093,7 +4640,7 @@ export interface operations {
             };
         };
     };
-    create_api_key_api_keys_post: {
+    create_api_key_v1_api_keys_post: {
         parameters: {
             query?: never;
             header?: {
@@ -3128,7 +4675,40 @@ export interface operations {
             };
         };
     };
-    revoke_api_key_api_keys__key_id__delete: {
+    get_api_key_v1_api_keys__key_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                key_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["APIKeyResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_api_key_v1_api_keys__key_id__delete: {
         parameters: {
             query?: never;
             header?: {
@@ -3159,7 +4739,7 @@ export interface operations {
             };
         };
     };
-    rotate_api_key_api_keys__key_id__rotate_post: {
+    rotate_api_key_v1_api_keys__key_id__rotate_post: {
         parameters: {
             query?: never;
             header?: {
@@ -3192,60 +4772,7 @@ export interface operations {
             };
         };
     };
-    get_waitlist_count_newsletter_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WaitlistCountResponse"];
-                };
-            };
-        };
-    };
-    create_waitlist_signup_newsletter_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["WaitlistSignupCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WaitlistSignupResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_leads_leads_get: {
+    list_leads_v1_leads_get: {
         parameters: {
             query?: {
                 skip?: number;
@@ -3279,7 +4806,7 @@ export interface operations {
             };
         };
     };
-    capture_lead_leads_post: {
+    capture_lead_v1_leads_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -3312,7 +4839,7 @@ export interface operations {
             };
         };
     };
-    get_lead_leads__lead_id__get: {
+    get_lead_v1_leads__lead_id__get: {
         parameters: {
             query?: never;
             header?: {
@@ -3345,7 +4872,243 @@ export interface operations {
             };
         };
     };
-    register_agent_agents_register_post: {
+    delete_lead_v1_leads__lead_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_lead_v1_leads__lead_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_leads_v1_contacts_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    capture_lead_v1_contacts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_lead_v1_contacts__lead_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_lead_v1_contacts__lead_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_lead_v1_contacts__lead_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    register_agent_v1_agents_register_post: {
         parameters: {
             query?: never;
             header?: {
@@ -3380,7 +5143,7 @@ export interface operations {
             };
         };
     };
-    heartbeat_agents_heartbeat_post: {
+    heartbeat_v1_agents_heartbeat_post: {
         parameters: {
             query?: never;
             header?: {
@@ -3415,7 +5178,7 @@ export interface operations {
             };
         };
     };
-    report_metrics_agents_metrics_post: {
+    report_metrics_v1_agents_metrics_post: {
         parameters: {
             query?: never;
             header?: {
@@ -3450,7 +5213,7 @@ export interface operations {
             };
         };
     };
-    poll_commands_agents_commands_get: {
+    poll_commands_v1_agents_commands_get: {
         parameters: {
             query: {
                 agent_id: string;
@@ -3484,7 +5247,7 @@ export interface operations {
             };
         };
     };
-    acknowledge_command_agents_commands_acknowledge_post: {
+    acknowledge_command_v1_agents_commands_acknowledge_post: {
         parameters: {
             query?: never;
             header?: {
@@ -3519,7 +5282,7 @@ export interface operations {
             };
         };
     };
-    submit_log_agents_logs_post: {
+    submit_log_v1_agents_logs_post: {
         parameters: {
             query?: never;
             header?: {
@@ -3554,7 +5317,7 @@ export interface operations {
             };
         };
     };
-    get_agent_status_agents__agent_id__status_get: {
+    get_agent_status_v1_agents__agent_id__status_get: {
         parameters: {
             query?: never;
             header?: {
@@ -3587,7 +5350,7 @@ export interface operations {
             };
         };
     };
-    agent_status_update_ingest_agent_status_post: {
+    agent_status_update_v1_ingest_agent_status_post: {
         parameters: {
             query?: never;
             header?: {
@@ -3625,7 +5388,7 @@ export interface operations {
             };
         };
     };
-    deployment_event_ingest_deployment_post: {
+    deployment_event_v1_ingest_deployment_post: {
         parameters: {
             query?: never;
             header?: {
@@ -3663,7 +5426,7 @@ export interface operations {
             };
         };
     };
-    receive_metrics_ingest_metrics_post: {
+    receive_metrics_v1_ingest_metrics_post: {
         parameters: {
             query?: never;
             header?: {
@@ -3688,6 +5451,370 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_runs_v1_runs_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                agent_id?: string | null;
+                status?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunHistoryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_run_v1_runs_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_run_v1_runs__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_run_traces_v1_runs__run_id__traces_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                event_type?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunTraceHistoryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_embedding_v1_rag_embed_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmbedRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmbedResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_batch_embeddings_v1_rag_embed_batch_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BatchEmbedRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchEmbedResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    similarity_search_v1_rag_search_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SearchRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchResult"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rag_health_v1_rag_health_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    list_usage_events_v1_usage_events_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                event_type?: string | null;
+                resource_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageEventListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_usage_event_v1_usage_events_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UsageEventCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageEventResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_usage_event_v1_usage_events__event_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageEventResponse"];
                 };
             };
             /** @description Validation Error */
@@ -3757,6 +5884,476 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    get_analytics_summary_v1_analytics_summary_get: {
+        parameters: {
+            query?: {
+                period_start?: string | null;
+                period_end?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnalyticsSummaryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_agent_metrics_summary_v1_analytics_agents__agent_id__summary_get: {
+        parameters: {
+            query?: {
+                period_start?: string | null;
+                period_end?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentMetricsSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_analytics_timeseries_v1_analytics_timeseries_get: {
+        parameters: {
+            query: {
+                metric: string;
+                interval?: string;
+                period_start?: string | null;
+                period_end?: string | null;
+                agent_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnalyticsTimeSeriesResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_cost_summary_v1_analytics_costs_get: {
+        parameters: {
+            query?: {
+                period_start?: string | null;
+                period_end?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CostSummaryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_budget_v1_analytics_budget_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_health_v1_monitoring_health_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HealthStatusResponse"];
+                };
+            };
+        };
+    };
+    list_alerts_v1_monitoring_alerts_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                agent_id?: string | null;
+                resolved?: boolean | null;
+                alert_type?: components["schemas"]["AlertType"] | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resolve_alert_v1_monitoring_alerts__alert_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                alert_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlertResolveRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_swarms_v1_swarms_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwarmListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_swarm_v1_swarms_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SwarmCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwarmResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_swarm_v1_swarms__swarm_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                swarm_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwarmResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    scale_swarm_v1_swarms__swarm_id__scale_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                swarm_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SwarmScale"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwarmResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_budget_v1_budgets_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_usage_breakdown_v1_budgets_usage_get: {
+        parameters: {
+            query?: {
+                period_start?: string | null;
+                period_end?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageBreakdownResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

@@ -55,6 +55,19 @@ echo "Running Python API test suite..."
 "$PYTHON_BIN" -m pytest tests/api --maxfail=1 -q
 
 echo ""
+echo "Generating OpenAPI spec from FastAPI app..."
+"$PYTHON_BIN" scripts/generate_openapi.py
+
+echo ""
+echo "Checking generated OpenAPI spec is committed..."
+git diff --exit-code -- docs/api/openapi.json || {
+  echo ""
+  echo "ERROR: docs/api/openapi.json is out of sync with the FastAPI app."
+  echo "Run 'make generate-spec' (or 'python scripts/generate_openapi.py') and commit the result."
+  exit 1
+}
+
+echo ""
 echo "Generating frontend API types..."
 npm run generate-types
 
@@ -64,7 +77,12 @@ npm run test:app
 
 echo ""
 echo "Checking generated frontend API types are committed..."
-git diff --exit-code -- app/types/api.ts
+git diff --exit-code -- app/types/api.ts || {
+  echo ""
+  echo "ERROR: app/types/api.ts is out of sync with docs/api/openapi.json."
+  echo "Run 'make generate-spec' (or 'npm run generate-types') and commit the result."
+  exit 1
+}
 
 echo ""
 echo "Running frontend lint..."

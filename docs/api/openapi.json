@@ -2,6 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "mutx.dev API",
+    "description": "API for the mutx platform",
     "version": "1.0.0"
   },
   "paths": {
@@ -25,13 +26,13 @@
         }
       }
     },
-    "/agents": {
+    "/v1/agents": {
       "post": {
         "tags": [
           "agents"
         ],
         "summary": "Create Agent",
-        "operationId": "create_agent_agents_post",
+        "operationId": "create_agent_v1_agents_post",
         "parameters": [
           {
             "name": "authorization",
@@ -88,7 +89,7 @@
           "agents"
         ],
         "summary": "List Agents",
-        "operationId": "list_agents_agents_get",
+        "operationId": "list_agents_v1_agents_get",
         "parameters": [
           {
             "name": "skip",
@@ -111,23 +112,6 @@
               "minimum": 1,
               "default": 50,
               "title": "Limit"
-            }
-          },
-          {
-            "name": "user_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "uuid"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "User Id"
             }
           },
           {
@@ -157,7 +141,7 @@
                   "items": {
                     "$ref": "#/components/schemas/AgentResponse"
                   },
-                  "title": "Response List Agents Agents Get"
+                  "title": "Response List Agents V1 Agents Get"
                 }
               }
             }
@@ -175,13 +159,13 @@
         }
       }
     },
-    "/agents/{agent_id}": {
+    "/v1/agents/{agent_id}": {
       "get": {
         "tags": [
           "agents"
         ],
         "summary": "Get Agent",
-        "operationId": "get_agent_agents__agent_id__get",
+        "operationId": "get_agent_v1_agents__agent_id__get",
         "parameters": [
           {
             "name": "agent_id",
@@ -238,7 +222,7 @@
           "agents"
         ],
         "summary": "Delete Agent",
-        "operationId": "delete_agent_agents__agent_id__delete",
+        "operationId": "delete_agent_v1_agents__agent_id__delete",
         "parameters": [
           {
             "name": "agent_id",
@@ -284,13 +268,139 @@
         }
       }
     },
-    "/agents/{agent_id}/deploy": {
+    "/v1/agents/{agent_id}/config": {
+      "get": {
+        "tags": [
+          "agents"
+        ],
+        "summary": "Get Agent Config",
+        "operationId": "get_agent_config_v1_agents__agent_id__config_get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentConfigResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "agents"
+        ],
+        "summary": "Update Agent Config",
+        "operationId": "update_agent_config_v1_agents__agent_id__config_patch",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentConfigUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentConfigResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/agents/{agent_id}/deploy": {
       "post": {
         "tags": [
           "agents"
         ],
         "summary": "Deploy Agent",
-        "operationId": "deploy_agent_agents__agent_id__deploy_post",
+        "operationId": "deploy_agent_v1_agents__agent_id__deploy_post",
         "parameters": [
           {
             "name": "agent_id",
@@ -326,7 +436,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "title": "Response Deploy Agent Agents  Agent Id  Deploy Post"
+                  "title": "Response Deploy Agent V1 Agents  Agent Id  Deploy Post"
                 }
               }
             }
@@ -344,13 +454,13 @@
         }
       }
     },
-    "/agents/{agent_id}/stop": {
+    "/v1/agents/{agent_id}/stop": {
       "post": {
         "tags": [
           "agents"
         ],
         "summary": "Stop Agent",
-        "operationId": "stop_agent_agents__agent_id__stop_post",
+        "operationId": "stop_agent_v1_agents__agent_id__stop_post",
         "parameters": [
           {
             "name": "agent_id",
@@ -386,7 +496,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "title": "Response Stop Agent Agents  Agent Id  Stop Post"
+                  "title": "Response Stop Agent V1 Agents  Agent Id  Stop Post"
                 }
               }
             }
@@ -404,13 +514,13 @@
         }
       }
     },
-    "/agents/{agent_id}/logs": {
+    "/v1/agents/{agent_id}/logs": {
       "get": {
         "tags": [
           "agents"
         ],
         "summary": "Get Agent Logs",
-        "operationId": "get_agent_logs_agents__agent_id__logs_get",
+        "operationId": "get_agent_logs_v1_agents__agent_id__logs_get",
         "parameters": [
           {
             "name": "agent_id",
@@ -488,7 +598,7 @@
                   "items": {
                     "$ref": "#/components/schemas/AgentLogResponse"
                   },
-                  "title": "Response Get Agent Logs Agents  Agent Id  Logs Get"
+                  "title": "Response Get Agent Logs V1 Agents  Agent Id  Logs Get"
                 }
               }
             }
@@ -506,13 +616,13 @@
         }
       }
     },
-    "/agents/{agent_id}/metrics": {
+    "/v1/agents/{agent_id}/metrics": {
       "get": {
         "tags": [
           "agents"
         ],
         "summary": "Get Agent Metrics",
-        "operationId": "get_agent_metrics_agents__agent_id__metrics_get",
+        "operationId": "get_agent_metrics_v1_agents__agent_id__metrics_get",
         "parameters": [
           {
             "name": "agent_id",
@@ -574,7 +684,7 @@
                   "items": {
                     "$ref": "#/components/schemas/AgentMetricResponse"
                   },
-                  "title": "Response Get Agent Metrics Agents  Agent Id  Metrics Get"
+                  "title": "Response Get Agent Metrics V1 Agents  Agent Id  Metrics Get"
                 }
               }
             }
@@ -592,13 +702,13 @@
         }
       }
     },
-    "/deployments": {
+    "/v1/deployments": {
       "get": {
         "tags": [
           "deployments"
         ],
         "summary": "List Deployments",
-        "operationId": "list_deployments_deployments_get",
+        "operationId": "list_deployments_v1_deployments_get",
         "parameters": [
           {
             "name": "skip",
@@ -683,7 +793,7 @@
                   "items": {
                     "$ref": "#/components/schemas/DeploymentResponse"
                   },
-                  "title": "Response List Deployments Deployments Get"
+                  "title": "Response List Deployments V1 Deployments Get"
                 }
               }
             }
@@ -706,7 +816,7 @@
         ],
         "summary": "Create Deployment",
         "description": "Create a new deployment for an agent.",
-        "operationId": "create_deployment_deployments_post",
+        "operationId": "create_deployment_v1_deployments_post",
         "parameters": [
           {
             "name": "authorization",
@@ -759,13 +869,13 @@
         }
       }
     },
-    "/deployments/{deployment_id}": {
+    "/v1/deployments/{deployment_id}": {
       "get": {
         "tags": [
           "deployments"
         ],
         "summary": "Get Deployment",
-        "operationId": "get_deployment_deployments__deployment_id__get",
+        "operationId": "get_deployment_v1_deployments__deployment_id__get",
         "parameters": [
           {
             "name": "deployment_id",
@@ -822,7 +932,7 @@
           "deployments"
         ],
         "summary": "Kill Deployment",
-        "operationId": "kill_deployment_deployments__deployment_id__delete",
+        "operationId": "kill_deployment_v1_deployments__deployment_id__delete",
         "parameters": [
           {
             "name": "deployment_id",
@@ -868,14 +978,14 @@
         }
       }
     },
-    "/deployments/{deployment_id}/events": {
+    "/v1/deployments/{deployment_id}/events": {
       "get": {
         "tags": [
           "deployments"
         ],
         "summary": "Get Deployment Events",
         "description": "Get paginated lifecycle events for a specific deployment.",
-        "operationId": "get_deployment_events_deployments__deployment_id__events_get",
+        "operationId": "get_deployment_events_v1_deployments__deployment_id__events_get",
         "parameters": [
           {
             "name": "deployment_id",
@@ -983,13 +1093,13 @@
         }
       }
     },
-    "/deployments/{deployment_id}/scale": {
+    "/v1/deployments/{deployment_id}/scale": {
       "post": {
         "tags": [
           "deployments"
         ],
         "summary": "Scale Deployment",
-        "operationId": "scale_deployment_deployments__deployment_id__scale_post",
+        "operationId": "scale_deployment_v1_deployments__deployment_id__scale_post",
         "parameters": [
           {
             "name": "deployment_id",
@@ -1052,14 +1162,14 @@
         }
       }
     },
-    "/deployments/{deployment_id}/restart": {
+    "/v1/deployments/{deployment_id}/restart": {
       "post": {
         "tags": [
           "deployments"
         ],
         "summary": "Restart Deployment",
         "description": "Restart an existing deployment.",
-        "operationId": "restart_deployment_deployments__deployment_id__restart_post",
+        "operationId": "restart_deployment_v1_deployments__deployment_id__restart_post",
         "parameters": [
           {
             "name": "deployment_id",
@@ -1112,14 +1222,14 @@
         }
       }
     },
-    "/deployments/{deployment_id}/logs": {
+    "/v1/deployments/{deployment_id}/logs": {
       "get": {
         "tags": [
           "deployments"
         ],
         "summary": "Get Deployment Logs",
         "description": "Get logs for a specific deployment.",
-        "operationId": "get_deployment_logs_deployments__deployment_id__logs_get",
+        "operationId": "get_deployment_logs_v1_deployments__deployment_id__logs_get",
         "parameters": [
           {
             "name": "deployment_id",
@@ -1197,7 +1307,7 @@
                   "items": {
                     "$ref": "#/components/schemas/DeploymentLogsResponse"
                   },
-                  "title": "Response Get Deployment Logs Deployments  Deployment Id  Logs Get"
+                  "title": "Response Get Deployment Logs V1 Deployments  Deployment Id  Logs Get"
                 }
               }
             }
@@ -1215,14 +1325,14 @@
         }
       }
     },
-    "/deployments/{deployment_id}/metrics": {
+    "/v1/deployments/{deployment_id}/metrics": {
       "get": {
         "tags": [
           "deployments"
         ],
         "summary": "Get Deployment Metrics",
         "description": "Get metrics for a specific deployment.",
-        "operationId": "get_deployment_metrics_deployments__deployment_id__metrics_get",
+        "operationId": "get_deployment_metrics_v1_deployments__deployment_id__metrics_get",
         "parameters": [
           {
             "name": "deployment_id",
@@ -1284,7 +1394,7 @@
                   "items": {
                     "$ref": "#/components/schemas/DeploymentMetricsResponse"
                   },
-                  "title": "Response Get Deployment Metrics Deployments  Deployment Id  Metrics Get"
+                  "title": "Response Get Deployment Metrics V1 Deployments  Deployment Id  Metrics Get"
                 }
               }
             }
@@ -1302,14 +1412,144 @@
         }
       }
     },
-    "/webhooks/": {
+    "/v1/deployments/{deployment_id}/versions": {
+      "get": {
+        "tags": [
+          "deployments"
+        ],
+        "summary": "Get Deployment Versions",
+        "description": "Get version history for a specific deployment.",
+        "operationId": "get_deployment_versions_v1_deployments__deployment_id__versions_get",
+        "parameters": [
+          {
+            "name": "deployment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Deployment Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeploymentVersionHistoryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/deployments/{deployment_id}/rollback": {
+      "post": {
+        "tags": [
+          "deployments"
+        ],
+        "summary": "Rollback Deployment",
+        "description": "Rollback a deployment to a specific version.",
+        "operationId": "rollback_deployment_v1_deployments__deployment_id__rollback_post",
+        "parameters": [
+          {
+            "name": "deployment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Deployment Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeploymentRollbackRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeploymentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/webhooks/": {
       "post": {
         "tags": [
           "webhooks"
         ],
         "summary": "Create Webhook",
         "description": "Register a new webhook endpoint.",
-        "operationId": "create_webhook_webhooks__post",
+        "operationId": "create_webhook_v1_webhooks__post",
         "parameters": [
           {
             "name": "authorization",
@@ -1387,8 +1627,31 @@
         ],
         "summary": "List Webhooks",
         "description": "List all webhooks registered by the authenticated user.",
-        "operationId": "list_webhooks_webhooks__get",
+        "operationId": "list_webhooks_v1_webhooks__get",
         "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
           {
             "name": "authorization",
             "in": "header",
@@ -1436,7 +1699,7 @@
                   "items": {
                     "$ref": "#/components/schemas/WebhookResponse"
                   },
-                  "title": "Response List Webhooks Webhooks  Get"
+                  "title": "Response List Webhooks V1 Webhooks  Get"
                 }
               }
             }
@@ -1454,14 +1717,14 @@
         }
       }
     },
-    "/webhooks/{webhook_id}": {
+    "/v1/webhooks/{webhook_id}": {
       "get": {
         "tags": [
           "webhooks"
         ],
         "summary": "Get Webhook",
         "description": "Get a specific webhook by ID.",
-        "operationId": "get_webhook_webhooks__webhook_id__get",
+        "operationId": "get_webhook_v1_webhooks__webhook_id__get",
         "parameters": [
           {
             "name": "webhook_id",
@@ -1539,7 +1802,7 @@
         ],
         "summary": "Update Webhook",
         "description": "Update an existing webhook.",
-        "operationId": "update_webhook_webhooks__webhook_id__patch",
+        "operationId": "update_webhook_v1_webhooks__webhook_id__patch",
         "parameters": [
           {
             "name": "webhook_id",
@@ -1627,7 +1890,7 @@
         ],
         "summary": "Delete Webhook",
         "description": "Delete a webhook.",
-        "operationId": "delete_webhook_webhooks__webhook_id__delete",
+        "operationId": "delete_webhook_v1_webhooks__webhook_id__delete",
         "parameters": [
           {
             "name": "webhook_id",
@@ -1693,14 +1956,14 @@
         }
       }
     },
-    "/webhooks/{webhook_id}/test": {
+    "/v1/webhooks/{webhook_id}/test": {
       "post": {
         "tags": [
           "webhooks"
         ],
         "summary": "Test Webhook",
         "description": "Send a test event to a webhook to verify it's working.",
-        "operationId": "test_webhook_webhooks__webhook_id__test_post",
+        "operationId": "test_webhook_v1_webhooks__webhook_id__test_post",
         "parameters": [
           {
             "name": "webhook_id",
@@ -1771,14 +2034,14 @@
         }
       }
     },
-    "/webhooks/{webhook_id}/deliveries": {
+    "/v1/webhooks/{webhook_id}/deliveries": {
       "get": {
         "tags": [
           "webhooks"
         ],
         "summary": "List Webhook Deliveries",
         "description": "List delivery attempts for a webhook owned by the authenticated user.",
-        "operationId": "list_webhook_deliveries_webhooks__webhook_id__deliveries_get",
+        "operationId": "list_webhook_deliveries_v1_webhooks__webhook_id__deliveries_get",
         "parameters": [
           {
             "name": "webhook_id",
@@ -1828,6 +2091,7 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 0,
               "default": 0,
               "title": "Skip"
             }
@@ -1838,6 +2102,8 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
               "default": 50,
               "title": "Limit"
             }
@@ -1889,7 +2155,7 @@
                   "items": {
                     "$ref": "#/components/schemas/WebhookDelivery"
                   },
-                  "title": "Response List Webhook Deliveries Webhooks  Webhook Id  Deliveries Get"
+                  "title": "Response List Webhook Deliveries V1 Webhooks  Webhook Id  Deliveries Get"
                 }
               }
             }
@@ -1907,13 +2173,13 @@
         }
       }
     },
-    "/auth/register": {
+    "/v1/auth/register": {
       "post": {
         "tags": [
           "auth"
         ],
         "summary": "Register",
-        "operationId": "register_auth_register_post",
+        "operationId": "register_v1_auth_register_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1948,13 +2214,13 @@
         }
       }
     },
-    "/auth/login": {
+    "/v1/auth/login": {
       "post": {
         "tags": [
           "auth"
         ],
         "summary": "Login",
-        "operationId": "login_auth_login_post",
+        "operationId": "login_v1_auth_login_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1989,13 +2255,13 @@
         }
       }
     },
-    "/auth/refresh": {
+    "/v1/auth/refresh": {
       "post": {
         "tags": [
           "auth"
         ],
         "summary": "Refresh",
-        "operationId": "refresh_auth_refresh_post",
+        "operationId": "refresh_v1_auth_refresh_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2030,13 +2296,13 @@
         }
       }
     },
-    "/auth/logout": {
+    "/v1/auth/logout": {
       "post": {
         "tags": [
           "auth"
         ],
         "summary": "Logout",
-        "operationId": "logout_auth_logout_post",
+        "operationId": "logout_v1_auth_logout_post",
         "parameters": [
           {
             "name": "authorization",
@@ -2077,13 +2343,13 @@
         }
       }
     },
-    "/auth/me": {
+    "/v1/auth/me": {
       "get": {
         "tags": [
           "auth"
         ],
         "summary": "Get Me",
-        "operationId": "get_me_auth_me_get",
+        "operationId": "get_me_v1_auth_me_get",
         "parameters": [
           {
             "name": "authorization",
@@ -2126,14 +2392,14 @@
         }
       }
     },
-    "/auth/forgot-password": {
+    "/v1/auth/forgot-password": {
       "post": {
         "tags": [
           "auth"
         ],
         "summary": "Forgot Password",
         "description": "Request a password reset email.",
-        "operationId": "forgot_password_auth_forgot_password_post",
+        "operationId": "forgot_password_v1_auth_forgot_password_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2168,14 +2434,14 @@
         }
       }
     },
-    "/auth/reset-password": {
+    "/v1/auth/reset-password": {
       "post": {
         "tags": [
           "auth"
         ],
         "summary": "Reset Password",
         "description": "Reset password using token.",
-        "operationId": "reset_password_auth_reset_password_post",
+        "operationId": "reset_password_v1_auth_reset_password_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2210,14 +2476,14 @@
         }
       }
     },
-    "/auth/verify-email": {
+    "/v1/auth/verify-email": {
       "post": {
         "tags": [
           "auth"
         ],
         "summary": "Verify Email",
         "description": "Verify email with token.",
-        "operationId": "verify_email_auth_verify_email_post",
+        "operationId": "verify_email_v1_auth_verify_email_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2252,14 +2518,14 @@
         }
       }
     },
-    "/auth/resend-verification": {
+    "/v1/auth/resend-verification": {
       "post": {
         "tags": [
           "auth"
         ],
         "summary": "Resend Verification",
         "description": "Resend verification email.",
-        "operationId": "resend_verification_auth_resend_verification_post",
+        "operationId": "resend_verification_v1_auth_resend_verification_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2294,14 +2560,14 @@
         }
       }
     },
-    "/clawhub/skills": {
+    "/v1/clawhub/skills": {
       "get": {
         "tags": [
           "clawhub"
         ],
         "summary": "List Available Skills",
         "description": "Returns the current trending skills from ClawHub.",
-        "operationId": "list_available_skills_clawhub_skills_get",
+        "operationId": "list_available_skills_v1_clawhub_skills_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2312,7 +2578,7 @@
                     "$ref": "#/components/schemas/Skill"
                   },
                   "type": "array",
-                  "title": "Response List Available Skills Clawhub Skills Get"
+                  "title": "Response List Available Skills V1 Clawhub Skills Get"
                 }
               }
             }
@@ -2320,23 +2586,41 @@
         }
       }
     },
-    "/clawhub/install": {
+    "/v1/clawhub/install": {
       "post": {
         "tags": [
           "clawhub"
         ],
         "summary": "Install Skill",
         "description": "Installs a skill to an agent's configuration.",
-        "operationId": "install_skill_clawhub_install_post",
+        "operationId": "install_skill_v1_clawhub_install_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/InstallSkillRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -2360,23 +2644,41 @@
         }
       }
     },
-    "/clawhub/uninstall": {
+    "/v1/clawhub/uninstall": {
       "post": {
         "tags": [
           "clawhub"
         ],
         "summary": "Uninstall Skill",
         "description": "Removes a skill from an agent's configuration.",
-        "operationId": "uninstall_skill_clawhub_uninstall_post",
+        "operationId": "uninstall_skill_v1_clawhub_uninstall_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/InstallSkillRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -2400,15 +2702,38 @@
         }
       }
     },
-    "/api-keys": {
+    "/v1/api-keys": {
       "get": {
         "tags": [
           "api-keys"
         ],
         "summary": "List Api Keys",
         "description": "List all API keys for the current user, including revoked keys for auditability.",
-        "operationId": "list_api_keys_api_keys_get",
+        "operationId": "list_api_keys_v1_api_keys_get",
         "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
           {
             "name": "authorization",
             "in": "header",
@@ -2432,11 +2757,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/APIKeyResponse"
-                  },
-                  "title": "Response List Api Keys Api Keys Get"
+                  "$ref": "#/components/schemas/APIKeyHistoryResponse"
                 }
               }
             }
@@ -2459,7 +2780,7 @@
         ],
         "summary": "Create Api Key",
         "description": "Create a new API key.",
-        "operationId": "create_api_key_api_keys_post",
+        "operationId": "create_api_key_v1_api_keys_post",
         "parameters": [
           {
             "name": "authorization",
@@ -2512,14 +2833,72 @@
         }
       }
     },
-    "/api-keys/{key_id}": {
+    "/v1/api-keys/{key_id}": {
+      "get": {
+        "tags": [
+          "api-keys"
+        ],
+        "summary": "Get Api Key",
+        "description": "Get a single API key by ID.",
+        "operationId": "get_api_key_v1_api_keys__key_id__get",
+        "parameters": [
+          {
+            "name": "key_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Key Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIKeyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "api-keys"
         ],
         "summary": "Revoke Api Key",
         "description": "Revoke an API key without deleting its record.",
-        "operationId": "revoke_api_key_api_keys__key_id__delete",
+        "operationId": "revoke_api_key_v1_api_keys__key_id__delete",
         "parameters": [
           {
             "name": "key_id",
@@ -2565,14 +2944,14 @@
         }
       }
     },
-    "/api-keys/{key_id}/rotate": {
+    "/v1/api-keys/{key_id}/rotate": {
       "post": {
         "tags": [
           "api-keys"
         ],
         "summary": "Rotate Api Key",
         "description": "Rotate an active API key by revoking the old one and issuing a new one.",
-        "operationId": "rotate_api_key_api_keys__key_id__rotate_post",
+        "operationId": "rotate_api_key_v1_api_keys__key_id__rotate_post",
         "parameters": [
           {
             "name": "key_id",
@@ -2625,75 +3004,14 @@
         }
       }
     },
-    "/newsletter": {
-      "get": {
-        "tags": [
-          "newsletter"
-        ],
-        "summary": "Get Waitlist Count",
-        "operationId": "get_waitlist_count_newsletter_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WaitlistCountResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "newsletter"
-        ],
-        "summary": "Create Waitlist Signup",
-        "description": "BACKEND WAITLIST API (DEPRECATED)\nSubmit waitlist signups.\nNOTE: For web-based submissions, prefer the Next.js API route\n(app/api/newsletter/route.ts) which includes Cloudflare Turnstile verification.",
-        "operationId": "create_waitlist_signup_newsletter_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WaitlistSignupCreate"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WaitlistSignupResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/leads": {
+    "/v1/leads": {
       "post": {
         "tags": [
           "leads"
         ],
         "summary": "Capture Lead",
         "description": "Capture a new contact lead.\nPublic endpoint for landing pages and onboarding.",
-        "operationId": "capture_lead_leads_post",
+        "operationId": "capture_lead_v1_leads_post",
         "requestBody": {
           "required": true,
           "content": {
@@ -2732,8 +3050,8 @@
           "leads"
         ],
         "summary": "List Leads",
-        "description": "List captured leads.\nRestricted to authenticated users (internal/admin use).",
-        "operationId": "list_leads_leads_get",
+        "description": "List captured leads.\nRestricted to internal/admin users.",
+        "operationId": "list_leads_v1_leads_get",
         "parameters": [
           {
             "name": "skip",
@@ -2785,7 +3103,7 @@
                   "items": {
                     "$ref": "#/components/schemas/LeadResponse"
                   },
-                  "title": "Response List Leads Leads Get"
+                  "title": "Response List Leads V1 Leads Get"
                 }
               }
             }
@@ -2803,14 +3121,14 @@
         }
       }
     },
-    "/leads/{lead_id}": {
+    "/v1/leads/{lead_id}": {
       "get": {
         "tags": [
           "leads"
         ],
         "summary": "Get Lead",
         "description": "Get a specific lead by ID.",
-        "operationId": "get_lead_leads__lead_id__get",
+        "operationId": "get_lead_v1_leads__lead_id__get",
         "parameters": [
           {
             "name": "lead_id",
@@ -2861,16 +3179,431 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "Update Lead",
+        "description": "Update a specific lead/contact.",
+        "operationId": "update_lead_v1_leads__lead_id__patch",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "Delete Lead",
+        "description": "Delete a specific lead/contact.",
+        "operationId": "delete_lead_v1_leads__lead_id__delete",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
-    "/agents/register": {
+    "/v1/contacts": {
+      "post": {
+        "tags": [
+          "contacts"
+        ],
+        "summary": "Capture Lead",
+        "description": "Capture a new contact lead.\nPublic endpoint for landing pages and onboarding.",
+        "operationId": "capture_lead_v1_contacts_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "contacts"
+        ],
+        "summary": "List Leads",
+        "description": "List captured leads.\nRestricted to internal/admin users.",
+        "operationId": "list_leads_v1_contacts_get",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LeadResponse"
+                  },
+                  "title": "Response List Leads V1 Contacts Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/contacts/{lead_id}": {
+      "get": {
+        "tags": [
+          "contacts"
+        ],
+        "summary": "Get Lead",
+        "description": "Get a specific lead by ID.",
+        "operationId": "get_lead_v1_contacts__lead_id__get",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "contacts"
+        ],
+        "summary": "Update Lead",
+        "description": "Update a specific lead/contact.",
+        "operationId": "update_lead_v1_contacts__lead_id__patch",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "contacts"
+        ],
+        "summary": "Delete Lead",
+        "description": "Delete a specific lead/contact.",
+        "operationId": "delete_lead_v1_contacts__lead_id__delete",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/agents/register": {
       "post": {
         "tags": [
           "agent-runtime"
         ],
         "summary": "Register Agent",
         "description": "Register a new agent with MUTX.\n\nReturns agent_id and api_key that the agent should use for subsequent requests.",
-        "operationId": "register_agent_agents_register_post",
+        "operationId": "register_agent_v1_agents_register_post",
         "parameters": [
           {
             "name": "authorization",
@@ -2923,14 +3656,14 @@
         }
       }
     },
-    "/agents/heartbeat": {
+    "/v1/agents/heartbeat": {
       "post": {
         "tags": [
           "agent-runtime"
         ],
         "summary": "Heartbeat",
         "description": "Update agent heartbeat status.",
-        "operationId": "heartbeat_agents_heartbeat_post",
+        "operationId": "heartbeat_v1_agents_heartbeat_post",
         "parameters": [
           {
             "name": "authorization",
@@ -2981,14 +3714,14 @@
         }
       }
     },
-    "/agents/metrics": {
+    "/v1/agents/metrics": {
       "post": {
         "tags": [
           "agent-runtime"
         ],
         "summary": "Report Metrics",
         "description": "Report agent metrics to MUTX.",
-        "operationId": "report_metrics_agents_metrics_post",
+        "operationId": "report_metrics_v1_agents_metrics_post",
         "parameters": [
           {
             "name": "authorization",
@@ -3039,14 +3772,14 @@
         }
       }
     },
-    "/agents/commands": {
+    "/v1/agents/commands": {
       "get": {
         "tags": [
           "agent-runtime"
         ],
         "summary": "Poll Commands",
         "description": "Poll for pending commands for this agent.",
-        "operationId": "poll_commands_agents_commands_get",
+        "operationId": "poll_commands_v1_agents_commands_get",
         "parameters": [
           {
             "name": "agent_id",
@@ -3114,14 +3847,14 @@
         }
       }
     },
-    "/agents/commands/acknowledge": {
+    "/v1/agents/commands/acknowledge": {
       "post": {
         "tags": [
           "agent-runtime"
         ],
         "summary": "Acknowledge Command",
         "description": "Acknowledge command execution.",
-        "operationId": "acknowledge_command_agents_commands_acknowledge_post",
+        "operationId": "acknowledge_command_v1_agents_commands_acknowledge_post",
         "parameters": [
           {
             "name": "authorization",
@@ -3172,14 +3905,14 @@
         }
       }
     },
-    "/agents/logs": {
+    "/v1/agents/logs": {
       "post": {
         "tags": [
           "agent-runtime"
         ],
         "summary": "Submit Log",
         "description": "Submit a log entry from the agent.",
-        "operationId": "submit_log_agents_logs_post",
+        "operationId": "submit_log_v1_agents_logs_post",
         "parameters": [
           {
             "name": "authorization",
@@ -3230,14 +3963,14 @@
         }
       }
     },
-    "/agents/{agent_id}/status": {
+    "/v1/agents/{agent_id}/status": {
       "get": {
         "tags": [
           "agent-runtime"
         ],
         "summary": "Get Agent Status",
         "description": "Get status for the authenticated agent.",
-        "operationId": "get_agent_status_agents__agent_id__status_get",
+        "operationId": "get_agent_status_v1_agents__agent_id__status_get",
         "parameters": [
           {
             "name": "agent_id",
@@ -3289,14 +4022,14 @@
         }
       }
     },
-    "/ingest/agent-status": {
+    "/v1/ingest/agent-status": {
       "post": {
         "tags": [
           "ingest"
         ],
         "summary": "Agent Status Update",
         "description": "Update an agent status and append logs (Ingestion).",
-        "operationId": "agent_status_update_ingest_agent_status_post",
+        "operationId": "agent_status_update_v1_ingest_agent_status_post",
         "parameters": [
           {
             "name": "authorization",
@@ -3367,14 +4100,14 @@
         }
       }
     },
-    "/ingest/deployment": {
+    "/v1/ingest/deployment": {
       "post": {
         "tags": [
           "ingest"
         ],
         "summary": "Deployment Event",
         "description": "Update deployment state and related agent state (Ingestion).",
-        "operationId": "deployment_event_ingest_deployment_post",
+        "operationId": "deployment_event_v1_ingest_deployment_post",
         "parameters": [
           {
             "name": "authorization",
@@ -3445,14 +4178,14 @@
         }
       }
     },
-    "/ingest/metrics": {
+    "/v1/ingest/metrics": {
       "post": {
         "tags": [
           "ingest"
         ],
         "summary": "Receive Metrics",
         "description": "Record agent metrics (Ingestion).",
-        "operationId": "receive_metrics_ingest_metrics_post",
+        "operationId": "receive_metrics_v1_ingest_metrics_post",
         "parameters": [
           {
             "name": "authorization",
@@ -3523,6 +4256,698 @@
         }
       }
     },
+    "/v1/runs": {
+      "post": {
+        "tags": [
+          "runs"
+        ],
+        "summary": "Create Run",
+        "operationId": "create_run_v1_runs_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "runs"
+        ],
+        "summary": "List Runs",
+        "operationId": "list_runs_v1_runs_get",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "agent_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunHistoryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/runs/{run_id}": {
+      "get": {
+        "tags": [
+          "runs"
+        ],
+        "summary": "Get Run",
+        "operationId": "get_run_v1_runs__run_id__get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunDetailResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/runs/{run_id}/traces": {
+      "get": {
+        "tags": [
+          "runs"
+        ],
+        "summary": "List Run Traces",
+        "operationId": "list_run_traces_v1_runs__run_id__traces_get",
+        "parameters": [
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Run Id"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "event_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Event Type"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunTraceHistoryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/rag/embed": {
+      "post": {
+        "tags": [
+          "rag"
+        ],
+        "summary": "Generate Embedding",
+        "description": "Generate embeddings for text input using OpenAI's embedding models.\n\nSupports text-embedding-3-small, text-embedding-3-large, and text-embedding-ada-002.",
+        "operationId": "generate_embedding_v1_rag_embed_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmbedRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmbedResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/rag/embed/batch": {
+      "post": {
+        "tags": [
+          "rag"
+        ],
+        "summary": "Generate Batch Embeddings",
+        "description": "Generate embeddings for multiple texts in a single request.",
+        "operationId": "generate_batch_embeddings_v1_rag_embed_batch_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchEmbedRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchEmbedResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/rag/search": {
+      "post": {
+        "tags": [
+          "rag"
+        ],
+        "summary": "Similarity Search",
+        "description": "Simple similarity search endpoint.\n\nNote: Full implementation requires pgvector and a document store.\nThis is a placeholder that demonstrates the API contract.",
+        "operationId": "similarity_search_v1_rag_search_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SearchResult"
+                  },
+                  "type": "array",
+                  "title": "Response Similarity Search V1 Rag Search Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/rag/health": {
+      "get": {
+        "tags": [
+          "rag"
+        ],
+        "summary": "Rag Health",
+        "description": "Health check for RAG service.",
+        "operationId": "rag_health_v1_rag_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/usage/events": {
+      "post": {
+        "tags": [
+          "usage"
+        ],
+        "summary": "Create Usage Event",
+        "description": "Record a usage event for tracking API usage and quotas.",
+        "operationId": "create_usage_event_v1_usage_events_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsageEventCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageEventResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "usage"
+        ],
+        "summary": "List Usage Events",
+        "description": "List usage events for the authenticated user.",
+        "operationId": "list_usage_events_v1_usage_events_get",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "event_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Event Type"
+            }
+          },
+          {
+            "name": "resource_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resource Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageEventListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/usage/events/{event_id}": {
+      "get": {
+        "tags": [
+          "usage"
+        ],
+        "summary": "Get Usage Event",
+        "description": "Get a specific usage event.",
+        "operationId": "get_usage_event_v1_usage_events__event_id__get",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Event Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageEventResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health Check",
@@ -3567,6 +4992,1032 @@
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/summary": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Analytics Summary",
+        "operationId": "get_analytics_summary_v1_analytics_summary_get",
+        "parameters": [
+          {
+            "name": "period_start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period Start"
+            }
+          },
+          {
+            "name": "period_end",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period End"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsSummaryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/agents/{agent_id}/summary": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Agent Metrics Summary",
+        "operationId": "get_agent_metrics_summary_v1_analytics_agents__agent_id__summary_get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "period_start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period Start"
+            }
+          },
+          {
+            "name": "period_end",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period End"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentMetricsSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/timeseries": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Analytics Timeseries",
+        "operationId": "get_analytics_timeseries_v1_analytics_timeseries_get",
+        "parameters": [
+          {
+            "name": "metric",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Metric"
+            }
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "hour",
+              "title": "Interval"
+            }
+          },
+          {
+            "name": "period_start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period Start"
+            }
+          },
+          {
+            "name": "period_end",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period End"
+            }
+          },
+          {
+            "name": "agent_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsTimeSeriesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/costs": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Cost Summary",
+        "operationId": "get_cost_summary_v1_analytics_costs_get",
+        "parameters": [
+          {
+            "name": "period_start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period Start"
+            }
+          },
+          {
+            "name": "period_end",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period End"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CostSummaryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/budget": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Get Budget",
+        "operationId": "get_budget_v1_analytics_budget_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/monitoring/health": {
+      "get": {
+        "tags": [
+          "monitoring"
+        ],
+        "summary": "Get Health",
+        "description": "Get system health status.",
+        "operationId": "get_health_v1_monitoring_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/monitoring/alerts": {
+      "get": {
+        "tags": [
+          "monitoring"
+        ],
+        "summary": "List Alerts",
+        "description": "List alerts for the user's agents.",
+        "operationId": "list_alerts_v1_monitoring_alerts_get",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "agent_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "resolved",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resolved"
+            }
+          },
+          {
+            "name": "alert_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/AlertType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Alert Type"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/monitoring/alerts/{alert_id}": {
+      "patch": {
+        "tags": [
+          "monitoring"
+        ],
+        "summary": "Resolve Alert",
+        "description": "Resolve or unresolve an alert.",
+        "operationId": "resolve_alert_v1_monitoring_alerts__alert_id__patch",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Alert Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertResolveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/swarms": {
+      "get": {
+        "tags": [
+          "swarms"
+        ],
+        "summary": "List Swarms",
+        "description": "List all swarms for the current user.",
+        "operationId": "list_swarms_v1_swarms_get",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwarmListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "swarms"
+        ],
+        "summary": "Create Swarm",
+        "description": "Create a new swarm.",
+        "operationId": "create_swarm_v1_swarms_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwarmCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwarmResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/swarms/{swarm_id}": {
+      "get": {
+        "tags": [
+          "swarms"
+        ],
+        "summary": "Get Swarm",
+        "description": "Get swarm details.",
+        "operationId": "get_swarm_v1_swarms__swarm_id__get",
+        "parameters": [
+          {
+            "name": "swarm_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Swarm Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwarmResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/swarms/{swarm_id}/scale": {
+      "post": {
+        "tags": [
+          "swarms"
+        ],
+        "summary": "Scale Swarm",
+        "description": "Scale all agents in a swarm to the specified replicas.",
+        "operationId": "scale_swarm_v1_swarms__swarm_id__scale_post",
+        "parameters": [
+          {
+            "name": "swarm_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Swarm Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwarmScale"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwarmResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/budgets": {
+      "get": {
+        "tags": [
+          "budgets"
+        ],
+        "summary": "Get Budget",
+        "description": "Get current user's budget and credits.",
+        "operationId": "get_budget_v1_budgets_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/budgets/usage": {
+      "get": {
+        "tags": [
+          "budgets"
+        ],
+        "summary": "Get Usage Breakdown",
+        "description": "Get detailed usage breakdown by agent and event type.",
+        "operationId": "get_usage_breakdown_v1_budgets_usage_get",
+        "parameters": [
+          {
+            "name": "period_start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period Start"
+            }
+          },
+          {
+            "name": "period_end",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period End"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageBreakdownResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -3646,6 +6097,37 @@
         "title": "APIKeyCreateResponse",
         "description": "Response containing the newly created API key - only shown once!"
       },
+      "APIKeyHistoryResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/APIKeyResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "APIKeyHistoryResponse",
+        "description": "Paginated response for listing API keys."
+      },
       "APIKeyResponse": {
         "properties": {
           "id": {
@@ -3702,6 +6184,78 @@
         ],
         "title": "APIKeyResponse"
       },
+      "AgentConfigResponse": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AgentType"
+          },
+          "config": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OpenAIAgentConfig"
+              },
+              {
+                "$ref": "#/components/schemas/AnthropicAgentConfig"
+              },
+              {
+                "$ref": "#/components/schemas/LangChainAgentConfig"
+              },
+              {
+                "$ref": "#/components/schemas/CustomAgentConfig"
+              },
+              {
+                "type": "object"
+              }
+            ],
+            "title": "Config"
+          },
+          "config_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Config Version"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "type",
+          "config",
+          "config_version",
+          "updated_at"
+        ],
+        "title": "AgentConfigResponse"
+      },
+      "AgentConfigUpdateRequest": {
+        "properties": {
+          "config": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Config",
+            "description": "Updated agent configuration payload. Can be a JSON object or JSON string."
+          }
+        },
+        "type": "object",
+        "required": [
+          "config"
+        ],
+        "title": "AgentConfigUpdateRequest"
+      },
       "AgentCreate": {
         "properties": {
           "name": {
@@ -3734,6 +6288,9 @@
             "anyOf": [
               {
                 "type": "object"
+              },
+              {
+                "type": "string"
               },
               {
                 "type": "null"
@@ -3770,12 +6327,27 @@
             ],
             "title": "Description"
           },
+          "type": {
+            "$ref": "#/components/schemas/AgentType"
+          },
           "status": {
             "type": "string",
             "title": "Status"
           },
           "config": {
             "anyOf": [
+              {
+                "$ref": "#/components/schemas/OpenAIAgentConfig"
+              },
+              {
+                "$ref": "#/components/schemas/AnthropicAgentConfig"
+              },
+              {
+                "$ref": "#/components/schemas/LangChainAgentConfig"
+              },
+              {
+                "$ref": "#/components/schemas/CustomAgentConfig"
+              },
               {
                 "type": "object"
               },
@@ -3784,6 +6356,12 @@
               }
             ],
             "title": "Config"
+          },
+          "config_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Config Version",
+            "default": 1
           },
           "created_at": {
             "type": "string",
@@ -3813,6 +6391,7 @@
           "id",
           "name",
           "description",
+          "type",
           "status",
           "config",
           "created_at",
@@ -3919,6 +6498,93 @@
         ],
         "title": "AgentMetricResponse"
       },
+      "AgentMetricsSummary": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "agent_name": {
+            "type": "string",
+            "title": "Agent Name"
+          },
+          "total_runs": {
+            "type": "integer",
+            "title": "Total Runs"
+          },
+          "successful_runs": {
+            "type": "integer",
+            "title": "Successful Runs"
+          },
+          "failed_runs": {
+            "type": "integer",
+            "title": "Failed Runs"
+          },
+          "avg_cpu": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Cpu"
+          },
+          "avg_memory": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Memory"
+          },
+          "total_requests": {
+            "type": "integer",
+            "title": "Total Requests"
+          },
+          "avg_latency_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Latency Ms"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "agent_name",
+          "total_runs",
+          "successful_runs",
+          "failed_runs",
+          "avg_cpu",
+          "avg_memory",
+          "total_requests",
+          "avg_latency_ms",
+          "period_start",
+          "period_end"
+        ],
+        "title": "AgentMetricsSummary"
+      },
       "AgentRegisterRequest": {
         "properties": {
           "name": {
@@ -4007,12 +6673,27 @@
             ],
             "title": "Description"
           },
+          "type": {
+            "$ref": "#/components/schemas/AgentType"
+          },
           "status": {
             "type": "string",
             "title": "Status"
           },
           "config": {
             "anyOf": [
+              {
+                "$ref": "#/components/schemas/OpenAIAgentConfig"
+              },
+              {
+                "$ref": "#/components/schemas/AnthropicAgentConfig"
+              },
+              {
+                "$ref": "#/components/schemas/LangChainAgentConfig"
+              },
+              {
+                "$ref": "#/components/schemas/CustomAgentConfig"
+              },
               {
                 "type": "object"
               },
@@ -4021,6 +6702,12 @@
               }
             ],
             "title": "Config"
+          },
+          "config_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Config Version",
+            "default": 1
           },
           "created_at": {
             "type": "string",
@@ -4043,6 +6730,7 @@
           "id",
           "name",
           "description",
+          "type",
           "status",
           "config",
           "created_at",
@@ -4147,6 +6835,394 @@
         ],
         "title": "AgentType"
       },
+      "AlertListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AlertResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "unresolved_count": {
+            "type": "integer",
+            "title": "Unresolved Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "unresolved_count"
+        ],
+        "title": "AlertListResponse"
+      },
+      "AlertResolveRequest": {
+        "properties": {
+          "resolved": {
+            "type": "boolean",
+            "title": "Resolved",
+            "default": true
+          }
+        },
+        "type": "object",
+        "title": "AlertResolveRequest"
+      },
+      "AlertResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "type": {
+            "$ref": "#/components/schemas/AlertType"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "resolved": {
+            "type": "boolean",
+            "title": "Resolved"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "agent_id",
+          "type",
+          "message",
+          "resolved",
+          "created_at"
+        ],
+        "title": "AlertResponse"
+      },
+      "AlertType": {
+        "type": "string",
+        "enum": [
+          "cpu_high",
+          "memory_high",
+          "agent_down",
+          "deployment_failed",
+          "quota_exceeded"
+        ],
+        "title": "AlertType"
+      },
+      "AnalyticsSummaryResponse": {
+        "properties": {
+          "total_agents": {
+            "type": "integer",
+            "title": "Total Agents"
+          },
+          "active_agents": {
+            "type": "integer",
+            "title": "Active Agents"
+          },
+          "total_deployments": {
+            "type": "integer",
+            "title": "Total Deployments"
+          },
+          "active_deployments": {
+            "type": "integer",
+            "title": "Active Deployments"
+          },
+          "total_runs": {
+            "type": "integer",
+            "title": "Total Runs"
+          },
+          "successful_runs": {
+            "type": "integer",
+            "title": "Successful Runs"
+          },
+          "failed_runs": {
+            "type": "integer",
+            "title": "Failed Runs"
+          },
+          "total_api_calls": {
+            "type": "integer",
+            "title": "Total Api Calls"
+          },
+          "avg_latency_ms": {
+            "type": "number",
+            "title": "Avg Latency Ms"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_agents",
+          "active_agents",
+          "total_deployments",
+          "active_deployments",
+          "total_runs",
+          "successful_runs",
+          "failed_runs",
+          "total_api_calls",
+          "avg_latency_ms",
+          "period_start",
+          "period_end"
+        ],
+        "title": "AnalyticsSummaryResponse"
+      },
+      "AnalyticsTimeSeries": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "value"
+        ],
+        "title": "AnalyticsTimeSeries"
+      },
+      "AnalyticsTimeSeriesResponse": {
+        "properties": {
+          "metric": {
+            "type": "string",
+            "title": "Metric"
+          },
+          "interval": {
+            "type": "string",
+            "title": "Interval"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AnalyticsTimeSeries"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "metric",
+          "interval",
+          "data",
+          "period_start",
+          "period_end"
+        ],
+        "title": "AnalyticsTimeSeriesResponse"
+      },
+      "AnthropicAgentConfig": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "system_prompt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 16000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System Prompt"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version",
+            "default": 1
+          },
+          "model": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Model",
+            "default": "claude-3-5-sonnet-20240620"
+          },
+          "temperature": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Temperature",
+            "default": 0.7
+          },
+          "max_tokens": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Max Tokens",
+            "default": 4096
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "AnthropicAgentConfig"
+      },
+      "BatchEmbedRequest": {
+        "properties": {
+          "texts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Texts"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "default": "text-embedding-3-small"
+          }
+        },
+        "type": "object",
+        "required": [
+          "texts"
+        ],
+        "title": "BatchEmbedRequest",
+        "description": "Request model for batch embedding generation."
+      },
+      "BatchEmbedResponse": {
+        "properties": {
+          "embeddings": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Embeddings"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "total_tokens": {
+            "type": "integer",
+            "title": "Total Tokens"
+          }
+        },
+        "type": "object",
+        "required": [
+          "embeddings",
+          "model",
+          "total_tokens"
+        ],
+        "title": "BatchEmbedResponse",
+        "description": "Response model for batch embedding generation."
+      },
+      "BudgetResponse": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "plan": {
+            "type": "string",
+            "title": "Plan"
+          },
+          "credits_total": {
+            "type": "number",
+            "title": "Credits Total"
+          },
+          "credits_used": {
+            "type": "number",
+            "title": "Credits Used"
+          },
+          "credits_remaining": {
+            "type": "number",
+            "title": "Credits Remaining"
+          },
+          "reset_date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Reset Date"
+          },
+          "usage_percentage": {
+            "type": "number",
+            "title": "Usage Percentage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "plan",
+          "credits_total",
+          "credits_used",
+          "credits_remaining",
+          "reset_date",
+          "usage_percentage"
+        ],
+        "title": "BudgetResponse"
+      },
       "CommandAcknowledgeRequest": {
         "properties": {
           "command_id": {
@@ -4241,6 +7317,116 @@
         ],
         "title": "CommandsListResponse"
       },
+      "CostSummaryResponse": {
+        "properties": {
+          "total_credits_used": {
+            "type": "number",
+            "title": "Total Credits Used"
+          },
+          "credits_remaining": {
+            "type": "number",
+            "title": "Credits Remaining"
+          },
+          "credits_total": {
+            "type": "number",
+            "title": "Credits Total"
+          },
+          "usage_by_event_type": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Usage By Event Type"
+          },
+          "usage_by_agent": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Usage By Agent"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_credits_used",
+          "credits_remaining",
+          "credits_total",
+          "usage_by_event_type",
+          "usage_by_agent",
+          "period_start",
+          "period_end"
+        ],
+        "title": "CostSummaryResponse"
+      },
+      "CustomAgentConfig": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "system_prompt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 16000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System Prompt"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version",
+            "default": 1
+          },
+          "image": {
+            "type": "string",
+            "title": "Image"
+          },
+          "command": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Command"
+          },
+          "env": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Env"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "image"
+        ],
+        "title": "CustomAgentConfig"
+      },
       "DeploymentCreate": {
         "properties": {
           "agent_id": {
@@ -4250,7 +7436,10 @@
           },
           "replicas": {
             "type": "integer",
+            "maximum": 10.0,
+            "minimum": 1.0,
             "title": "Replicas",
+            "description": "Number of replicas (1-10)",
             "default": 1
           }
         },
@@ -4258,7 +7447,8 @@
         "required": [
           "agent_id"
         ],
-        "title": "DeploymentCreate"
+        "title": "DeploymentCreate",
+        "description": "Request model for creating a deployment"
       },
       "DeploymentEvent": {
         "properties": {
@@ -4553,6 +7743,17 @@
             "type": "string",
             "title": "Status"
           },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
           "replicas": {
             "type": "integer",
             "title": "Replicas"
@@ -4623,6 +7824,22 @@
         ],
         "title": "DeploymentResponse"
       },
+      "DeploymentRollbackRequest": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Version",
+            "description": "Version number to rollback to"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "DeploymentRollbackRequest",
+        "description": "Request model for rolling back a deployment"
+      },
       "DeploymentScale": {
         "properties": {
           "replicas": {
@@ -4635,6 +7852,134 @@
           "replicas"
         ],
         "title": "DeploymentScale"
+      },
+      "DeploymentVersionHistoryResponse": {
+        "properties": {
+          "deployment_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Deployment Id"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DeploymentVersionResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "deployment_id",
+          "items",
+          "total"
+        ],
+        "title": "DeploymentVersionHistoryResponse",
+        "description": "Response model for deployment version history"
+      },
+      "DeploymentVersionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "deployment_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Deployment Id"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "config_snapshot": {
+            "type": "string",
+            "title": "Config Snapshot"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "rolled_back_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rolled Back At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "deployment_id",
+          "version",
+          "config_snapshot",
+          "status",
+          "created_at"
+        ],
+        "title": "DeploymentVersionResponse",
+        "description": "Response model for deployment version"
+      },
+      "EmbedRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "default": "text-embedding-3-small"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "EmbedRequest",
+        "description": "Request model for embedding generation."
+      },
+      "EmbedResponse": {
+        "properties": {
+          "embedding": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Embedding"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "tokens": {
+            "type": "integer",
+            "title": "Tokens"
+          }
+        },
+        "type": "object",
+        "required": [
+          "embedding",
+          "model",
+          "tokens"
+        ],
+        "title": "EmbedResponse",
+        "description": "Response model for embedding generation."
       },
       "ForgotPasswordRequest": {
         "properties": {
@@ -4695,6 +8040,22 @@
               }
             ],
             "title": "Error"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version",
+            "default": "1.0.0"
+          },
+          "uptime_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uptime Seconds"
           }
         },
         "type": "object",
@@ -4704,6 +8065,40 @@
         ],
         "title": "HealthResponse"
       },
+      "HealthStatusResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "database": {
+            "type": "string",
+            "title": "Database"
+          },
+          "uptime_seconds": {
+            "type": "number",
+            "title": "Uptime Seconds"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version",
+            "default": "1.0.0"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "timestamp",
+          "database",
+          "uptime_seconds"
+        ],
+        "title": "HealthStatusResponse"
+      },
       "HeartbeatRequest": {
         "properties": {
           "agent_id": {
@@ -4711,8 +8106,11 @@
             "title": "Agent Id"
           },
           "status": {
-            "type": "string",
-            "title": "Status",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AgentStatus"
+              }
+            ],
             "default": "running"
           },
           "message": {
@@ -4778,6 +8176,55 @@
           "skill_id"
         ],
         "title": "InstallSkillRequest"
+      },
+      "LangChainAgentConfig": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "system_prompt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 16000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System Prompt"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version",
+            "default": 1
+          },
+          "chain_id": {
+            "type": "string",
+            "title": "Chain Id"
+          },
+          "parameters": {
+            "type": "object",
+            "title": "Parameters"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "chain_id"
+        ],
+        "title": "LangChainAgentConfig"
       },
       "LeadCreate": {
         "properties": {
@@ -4914,6 +8361,72 @@
         ],
         "title": "LeadResponse"
       },
+      "LeadUpdate": {
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "title": "LeadUpdate"
+      },
       "LogRequest": {
         "properties": {
           "agent_id": {
@@ -4988,11 +8501,17 @@
           },
           "cpu_usage": {
             "type": "number",
-            "title": "Cpu Usage"
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Cpu Usage",
+            "description": "CPU usage percentage (0-100)"
           },
           "memory_usage": {
             "type": "number",
-            "title": "Memory Usage"
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Memory Usage",
+            "description": "Memory usage percentage (0-100)"
           }
         },
         "type": "object",
@@ -5001,7 +8520,8 @@
           "cpu_usage",
           "memory_usage"
         ],
-        "title": "MetricsReportRequest"
+        "title": "MetricsReportRequest",
+        "description": "Request model for reporting agent metrics"
       },
       "MetricsRequest": {
         "properties": {
@@ -5070,14 +8590,7 @@
             "default": 0
           },
           "custom": {
-            "anyOf": [
-              {
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "object",
             "title": "Custom",
             "default": {}
           },
@@ -5092,6 +8605,70 @@
           "timestamp"
         ],
         "title": "MetricsRequest"
+      },
+      "OpenAIAgentConfig": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "system_prompt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 16000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System Prompt"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version",
+            "default": 1
+          },
+          "model": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Model",
+            "default": "gpt-4o"
+          },
+          "temperature": {
+            "type": "number",
+            "maximum": 2.0,
+            "minimum": 0.0,
+            "title": "Temperature",
+            "default": 0.7
+          },
+          "max_tokens": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Tokens"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "OpenAIAgentConfig"
       },
       "RefreshRequest": {
         "properties": {
@@ -5162,6 +8739,533 @@
         ],
         "title": "ResetPasswordRequest"
       },
+      "RunCreate": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "status": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 1,
+            "title": "Status",
+            "default": "completed"
+          },
+          "input_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Text"
+          },
+          "output_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Text"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "metadata": {
+            "type": "object",
+            "title": "Metadata"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "traces": {
+            "items": {
+              "$ref": "#/components/schemas/RunTraceCreate"
+            },
+            "type": "array",
+            "title": "Traces"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id"
+        ],
+        "title": "RunCreate"
+      },
+      "RunDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "input_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Text"
+          },
+          "output_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Text"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "metadata": {
+            "type": "object",
+            "title": "Metadata"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "trace_count": {
+            "type": "integer",
+            "title": "Trace Count",
+            "default": 0
+          },
+          "traces": {
+            "items": {
+              "$ref": "#/components/schemas/RunTraceResponse"
+            },
+            "type": "array",
+            "title": "Traces"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "agent_id",
+          "status",
+          "input_text",
+          "output_text",
+          "error_message",
+          "metadata",
+          "started_at",
+          "completed_at",
+          "created_at"
+        ],
+        "title": "RunDetailResponse"
+      },
+      "RunHistoryResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RunResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "RunHistoryResponse"
+      },
+      "RunResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "input_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Text"
+          },
+          "output_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Text"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "metadata": {
+            "type": "object",
+            "title": "Metadata"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "trace_count": {
+            "type": "integer",
+            "title": "Trace Count",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "agent_id",
+          "status",
+          "input_text",
+          "output_text",
+          "error_message",
+          "metadata",
+          "started_at",
+          "completed_at",
+          "created_at"
+        ],
+        "title": "RunResponse"
+      },
+      "RunTraceCreate": {
+        "properties": {
+          "event_type": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Event Type"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "payload": {
+            "type": "object",
+            "title": "Payload"
+          },
+          "timestamp": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_type"
+        ],
+        "title": "RunTraceCreate"
+      },
+      "RunTraceHistoryResponse": {
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Run Id"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RunTraceResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "event_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "run_id",
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "RunTraceHistoryResponse"
+      },
+      "RunTraceResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "run_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Run Id"
+          },
+          "event_type": {
+            "type": "string",
+            "title": "Event Type"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "payload": {
+            "type": "object",
+            "title": "Payload"
+          },
+          "sequence": {
+            "type": "integer",
+            "title": "Sequence"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "run_id",
+          "event_type",
+          "message",
+          "payload",
+          "sequence",
+          "timestamp"
+        ],
+        "title": "RunTraceResponse"
+      },
+      "SearchRequest": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "top_k": {
+            "type": "integer",
+            "title": "Top K",
+            "default": 5
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "default": "text-embedding-3-small"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query"
+        ],
+        "title": "SearchRequest",
+        "description": "Request model for similarity search."
+      },
+      "SearchResult": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "score"
+        ],
+        "title": "SearchResult",
+        "description": "Single search result."
+      },
       "Skill": {
         "properties": {
           "id": {
@@ -5205,6 +9309,194 @@
         ],
         "title": "Skill"
       },
+      "SwarmAgentResponse": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "agent_name": {
+            "type": "string",
+            "title": "Agent Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "replicas": {
+            "type": "integer",
+            "title": "Replicas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "agent_name",
+          "status",
+          "replicas"
+        ],
+        "title": "SwarmAgentResponse"
+      },
+      "SwarmCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "agent_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Agent Ids"
+          },
+          "min_replicas": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Min Replicas",
+            "default": 1
+          },
+          "max_replicas": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Max Replicas",
+            "default": 10
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "agent_ids"
+        ],
+        "title": "SwarmCreate"
+      },
+      "SwarmListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SwarmResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "SwarmListResponse"
+      },
+      "SwarmResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "agent_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Agent Ids"
+          },
+          "min_replicas": {
+            "type": "integer",
+            "title": "Min Replicas"
+          },
+          "max_replicas": {
+            "type": "integer",
+            "title": "Max Replicas"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "agents": {
+            "items": {
+              "$ref": "#/components/schemas/SwarmAgentResponse"
+            },
+            "type": "array",
+            "title": "Agents",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "agent_ids",
+          "min_replicas",
+          "max_replicas",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "SwarmResponse"
+      },
+      "SwarmScale": {
+        "properties": {
+          "replicas": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Replicas",
+            "description": "Target replicas per agent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "replicas"
+        ],
+        "title": "SwarmScale"
+      },
       "TokenResponse": {
         "properties": {
           "access_token": {
@@ -5232,6 +9524,252 @@
           "expires_in"
         ],
         "title": "TokenResponse"
+      },
+      "UsageBreakdownResponse": {
+        "properties": {
+          "total_credits_used": {
+            "type": "number",
+            "title": "Total Credits Used"
+          },
+          "credits_remaining": {
+            "type": "number",
+            "title": "Credits Remaining"
+          },
+          "credits_total": {
+            "type": "number",
+            "title": "Credits Total"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period End"
+          },
+          "usage_by_agent": {
+            "items": {
+              "$ref": "#/components/schemas/UsageByAgent"
+            },
+            "type": "array",
+            "title": "Usage By Agent"
+          },
+          "usage_by_type": {
+            "items": {
+              "$ref": "#/components/schemas/UsageByType"
+            },
+            "type": "array",
+            "title": "Usage By Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_credits_used",
+          "credits_remaining",
+          "credits_total",
+          "period_start",
+          "period_end",
+          "usage_by_agent",
+          "usage_by_type"
+        ],
+        "title": "UsageBreakdownResponse"
+      },
+      "UsageByAgent": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "agent_name": {
+            "type": "string",
+            "title": "Agent Name"
+          },
+          "credits_used": {
+            "type": "number",
+            "title": "Credits Used"
+          },
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "agent_name",
+          "credits_used",
+          "event_count"
+        ],
+        "title": "UsageByAgent"
+      },
+      "UsageByType": {
+        "properties": {
+          "event_type": {
+            "type": "string",
+            "title": "Event Type"
+          },
+          "credits_used": {
+            "type": "number",
+            "title": "Credits Used"
+          },
+          "event_count": {
+            "type": "integer",
+            "title": "Event Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_type",
+          "credits_used",
+          "event_count"
+        ],
+        "title": "UsageByType"
+      },
+      "UsageEventCreate": {
+        "properties": {
+          "event_type": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Event Type",
+            "description": "Type of usage event (e.g., api_call, agent_run, deployment)"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id",
+            "description": "Resource that was used"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata",
+            "description": "Additional event metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_type"
+        ],
+        "title": "UsageEventCreate",
+        "description": "Request model for creating a usage event"
+      },
+      "UsageEventListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/UsageEventResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "skip": {
+            "type": "integer",
+            "title": "Skip"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "skip",
+          "limit"
+        ],
+        "title": "UsageEventListResponse",
+        "description": "Paginated response for usage events"
+      },
+      "UsageEventResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "event_type": {
+            "type": "string",
+            "title": "Event Type"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "resource_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Id"
+          },
+          "event_metadata": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Metadata"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata",
+            "description": "Deserialize event_metadata JSON string to dict",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "event_type",
+          "user_id",
+          "resource_id",
+          "created_at",
+          "metadata"
+        ],
+        "title": "UsageEventResponse",
+        "description": "Response model for usage events"
       },
       "UserResponse": {
         "properties": {
@@ -5335,72 +9873,12 @@
         ],
         "title": "VerifyEmailRequest"
       },
-      "WaitlistCountResponse": {
-        "properties": {
-          "count": {
-            "type": "integer",
-            "title": "Count"
-          }
-        },
-        "type": "object",
-        "required": [
-          "count"
-        ],
-        "title": "WaitlistCountResponse"
-      },
-      "WaitlistSignupCreate": {
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email",
-            "title": "Email"
-          },
-          "source": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Source"
-          }
-        },
-        "type": "object",
-        "required": [
-          "email"
-        ],
-        "title": "WaitlistSignupCreate"
-      },
-      "WaitlistSignupResponse": {
-        "properties": {
-          "success": {
-            "type": "boolean",
-            "title": "Success",
-            "default": true
-          },
-          "message": {
-            "type": "string",
-            "title": "Message"
-          },
-          "duplicate": {
-            "type": "boolean",
-            "title": "Duplicate",
-            "default": false
-          }
-        },
-        "type": "object",
-        "required": [
-          "message"
-        ],
-        "title": "WaitlistSignupResponse"
-      },
       "WebhookCreate": {
         "properties": {
           "url": {
             "type": "string",
             "maxLength": 512,
+            "minLength": 1,
             "title": "Url",
             "description": "The URL to receive webhook events"
           },
@@ -5415,7 +9893,8 @@
           "secret": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 512
               },
               {
                 "type": "null"
@@ -5423,13 +9902,20 @@
             ],
             "title": "Secret",
             "description": "Optional secret for signature verification"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "description": "Whether the webhook should be active immediately",
+            "default": true
           }
         },
         "type": "object",
         "required": [
           "url"
         ],
-        "title": "WebhookCreate"
+        "title": "WebhookCreate",
+        "description": "Request model for creating a webhook"
       },
       "WebhookDelivery": {
         "properties": {

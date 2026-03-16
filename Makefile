@@ -17,6 +17,7 @@ help:
 	@echo "MUTX Local Development"
 	@echo "======================="
 	@echo ""
+	@echo "  make generate-spec   Generate OpenAPI spec and frontend types"
 	@echo "  make dev         Start local dev stack (Docker Compose)"
 	@echo "  make dev-stop    Stop dev stack"
 	@echo "  make test-api   Run API health/ready tests"
@@ -101,6 +102,14 @@ test-auth:
 		echo "✗ Login failed. Check if API is running: $$API_URL"; \
 		exit 1; \
 	fi
+
+# Generate OpenAPI spec and frontend types
+.PHONY: generate-spec
+generate-spec:
+	@echo "Generating OpenAPI spec from FastAPI app..."
+	@python scripts/generate_openapi.py
+	@echo "Generating frontend API types..."
+	@npm run generate-types
 
 # Run full test suite
 .PHONY: test
