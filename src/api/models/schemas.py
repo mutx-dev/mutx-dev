@@ -459,7 +459,6 @@ class UsageEventCreate(BaseModel):
     )
 
 
-import json
 
 class UsageEventResponse(BaseModel):
     """Response model for usage events"""
