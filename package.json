@@ -10,7 +10,8 @@
     "generate-types": "openapi-typescript docs/api/openapi.json -o app/types/api.ts",
     "test:app": "jest --runInBand tests/unit",
     "demo:validate": "bash scripts/demo-validate.sh",
-    "release:check": "bash scripts/release-check.sh"
+    "release:check": "bash scripts/release-check.sh",
+    "tauri": "tauri"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.0",
@@ -37,6 +38,7 @@
     "react-turnstile": "^1.1.5",
     "resend": "^6.9.3",
     "sharp": "^0.33.5",
+    "sonner": "^1.7.0",
     "tailwind-merge": "^2.4.0",
     "three": "^0.169.0"
   },
