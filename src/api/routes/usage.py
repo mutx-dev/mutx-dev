@@ -1,11 +1,11 @@
 """Usage tracking routes for quota and billing."""
+import json
 import uuid
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from src.api.database import get_db
 from src.api.models import User, UsageEvent
@@ -15,6 +15,16 @@ from src.api.routes.auth import get_current_user
 router = APIRouter(prefix="/usage", tags=["usage"])
 
 
+def _deserialize_metadata(event: UsageEvent) -> Optional[dict]:
+    """Deserialize event_metadata from JSON string to dict."""
+    if not event.event_metadata:
+        return None
+    try:
+        return json.loads(event.event_metadata)
+    except json.JSONDecodeError:
+        return event.event_metadata
+
+
 @router.post("/events", response_model=UsageEventResponse, status_code=201)
 async def create_usage_event(
     event_data: UsageEventCreate,
@@ -22,8 +32,6 @@ async def create_usage_event(
     current_user: User = Depends(get_current_user),
 ):
     """Track a usage event for quota and billing purposes."""
-    import json
-
     event = UsageEvent(
         user_id=current_user.id,
         event_type=event_data.event_type,
@@ -35,6 +43,8 @@ async def create_usage_event(
     db.add(event)
     await db.commit()
     await db.refresh(event)
+    # Deserialize metadata for response
+    event.event_metadata = _deserialize_metadata(event)
     return event
 
 
@@ -55,4 +65,7 @@ async def list_usage_events(
     query = query.order_by(UsageEvent.created_at.desc()).offset(skip).limit(limit)
     result = await db.execute(query)
     events = result.scalars().all()
+    # Deserialize metadata for response
+    for event in events:
+        event.event_metadata = _deserialize_metadata(event)
     return events
