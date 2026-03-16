@@ -147,7 +147,7 @@ describe('dashboard route proxies', () => {
         Authorization: 'Bearer token',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ agent_id: '00000000-0000-0000-0000-000000000001', replicas: 2 }),
+      body: JSON.stringify({ agent_id: '00000000-0000-0000-0000-000000000001', environment: "development" }),
       cache: 'no-store',
     })
     expect(response.status).toBe(201)
