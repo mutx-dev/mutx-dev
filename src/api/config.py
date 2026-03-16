@@ -1,14 +1,21 @@
+
 from functools import lru_cache
 from json import JSONDecodeError, loads
+import os
+import re
 import secrets
 
-from pydantic import AliasChoices, Field, field_validator
+from pydantic import AliasChoices, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=False, extra="ignore")
 
+    environment: str = Field(
+        default="development",
+        validation_alias=AliasChoices("ENVIRONMENT", "ENV"),
+    )
     database_url: str = Field(
         default="postgresql://user:password@localhost:5432/mutx",
         validation_alias=AliasChoices("DATABASE_URL", "DB_URL"),
@@ -96,6 +103,9 @@ class Settings(BaseSettings):
         description="Email domains allowed to access internal-only endpoints.",
     )
 
+    # Store whether JWT_SECRET was user-provided or auto-generated
+    _jwt_secret_was_auto_generated: bool = False
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def parse_cors_origins(cls, value: object) -> object:
@@ -122,6 +132,89 @@ class Settings(BaseSettings):
             ]
 
         return [origin.strip() for origin in raw_value.split(",") if origin.strip()]
+
+    @model_validator(mode="after")
+    def validate_environment_variables(self) -> "Settings":
+        """Validate required environment variables on startup."""
+        errors: list[str] = []
+        warnings: list[str] = []
+
+        # Check if running in production
+        is_production = self.environment.lower() in ("production", "prod")
+
+        # Validate JWT_SECRET
+        jwt_env_value = os.environ.get("JWT_SECRET") or os.environ.get("jwt_secret")
+        if jwt_env_value is None:
+            # JWT_SECRET was not set, using auto-generated default
+            self._jwt_secret_was_auto_generated = True
+            if is_production:
+                errors.append(
+                    "JWT_SECRET environment variable must be set in production. "
+                    "Generate one with: python3 -c \"import secrets; print(secrets.token_urlsafe(32))\""
+                )
+            else:
+                warnings.append(
+                    "JWT_SECRET is not set; using auto-generated secret. "
+                    "This is fine for development but should be set in production."
+                )
+        elif len(jwt_env_value) < 32:
+            errors.append(
+                f"JWT_SECRET must be at least 32 characters long, got {len(jwt_env_value)}"
+            )
+
+        # Validate DATABASE_URL when database is required on startup
+        if self.database_required_on_startup:
+            db_env_value = os.environ.get("DATABASE_URL") or os.environ.get("DB_URL")
+            if db_env_value is None:
+                # Using default value - likely not configured
+                if "postgresql://user:password@localhost" in self.database_url:
+                    errors.append(
+                        "DATABASE_URL environment variable must be set when "
+                        "DATABASE_REQUIRED_ON_STARTUP is true"
+                    )
+
+        # Validate database URL format
+        if self.database_url:
+            db_url = self.database_url.lower()
+            if not db_url.startswith(("postgresql://", "postgres://")):
+                errors.append(
+                    f"DATABASE_URL must be a valid PostgreSQL connection string, "
+                    f"got: {self.database_url[:50]}..."
+                )
+
+        # Production-specific validations
+        if is_production:
+            # Check for default/insecure values
+            if self.database_url == "postgresql://user:password@localhost:5432/mutx":
+                errors.append(
+                    "DATABASE_URL appears to be using default values. "
+                    "Please configure a production database."
+                )
+
+            # Check CORS origins for production
+            if "localhost" in str(self.cors_origins):
+                warnings.append(
+                    "CORS_ORIGINS contains localhost origins. "
+                    "This may not be suitable for production."
+                )
+
+        # Raise errors if any
+        if errors:
+            error_message = "Environment variable validation failed:\n" + "\n".join(f"  - {e}" for e in errors)
+            raise ValueError(error_message)
+
+        # Log warnings (these will be captured by the caller)
+        if warnings:
+            warning_message = "Environment variable warnings:\n" + "\n".join(f"  - {w}" for w in warnings)
+            import logging
+            logging.warning(warning_message)
+
+        return self
+
+    @property
+    def is_production(self) -> bool:
+        """Check if running in production mode."""
+        return self.environment.lower() in ("production", "prod")
 
 
 @lru_cache()
