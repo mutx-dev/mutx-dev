@@ -17,6 +17,7 @@ from src.api.models.schemas import (
     RunDetailResponse,
     RunHistoryResponse,
     RunResponse,
+    RunTraceCreate,
     RunTraceHistoryResponse,
     RunTraceResponse,
 )
@@ -248,4 +249,71 @@ async def list_run_traces(
         skip=skip,
         limit=limit,
         event_type=event_type,
+    )
+
+
+@router.post("/{run_id}/traces", response_model=RunTraceHistoryResponse, status_code=status.HTTP_201_CREATED)
+async def add_run_traces(
+    run_id: uuid.UUID,
+    traces: list[RunTraceCreate],
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=500),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Add traces to an existing run.
+    
+    This endpoint allows adding execution traces to a run after it has been created.
+    Traces are used to track the step-by-step execution of an agent.
+    """
+    run = await _get_user_run(run_id, current_user, db)
+    
+    # Get the current max sequence to continue from
+    max_seq_result = await db.execute(
+        select(func.max(AgentRunTrace.sequence)).where(AgentRunTrace.run_id == run.id)
+    )
+    current_max_seq = max_seq_result.scalar() or -1
+    
+    # Add new traces
+    new_traces = []
+    for idx, trace in enumerate(traces):
+        new_trace = AgentRunTrace(
+            run_id=run.id,
+            event_type=trace.event_type,
+            message=trace.message,
+            payload=_encode_json(trace.payload),
+            sequence=current_max_seq + 1 + idx,
+            timestamp=trace.timestamp or datetime.now(timezone.utc),
+        )
+        db.add(new_trace)
+        new_traces.append(new_trace)
+    
+    await db.commit()
+    
+    # Refresh the new traces
+    for trace in new_traces:
+        await db.refresh(trace)
+    
+    # Fetch all traces for the run (respecting limit)
+    trace_filters = [AgentRunTrace.run_id == run.id]
+    
+    total_stmt = select(func.count()).select_from(AgentRunTrace).where(*trace_filters)
+    total = (await db.execute(total_stmt)).scalar_one()
+    
+    traces_query = (
+        select(AgentRunTrace)
+        .where(*trace_filters)
+        .order_by(AgentRunTrace.sequence.asc(), AgentRunTrace.timestamp.asc())
+        .offset(skip)
+        .limit(limit)
+    )
+    all_traces = (await db.execute(traces_query)).scalars().all()
+    
+    return RunTraceHistoryResponse(
+        run_id=run.id,
+        items=[_serialize_trace(trace) for trace in all_traces],
+        total=total,
+        skip=skip,
+        limit=limit,
     )
