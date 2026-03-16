@@ -206,3 +206,123 @@ async def test_list_runs_filter_by_status(client, test_agent):
     failed = await client.get("/v1/runs?status=failed")
     assert failed.status_code == 200
     assert failed.json()["total"] == 1
+
+
+@pytest.mark.asyncio
+async def test_add_traces_to_existing_run(client, test_agent):
+    """Test adding traces to an existing run."""
+    # First create a run without traces
+    create_response = await client.post(
+        "/v1/runs",
+        json={
+            "agent_id": str(test_agent.id),
+            "status": "running",
+            "input_text": "Test run for adding traces",
+            "traces": [],
+        },
+    )
+    assert create_response.status_code == 201
+    run_id = create_response.json()["id"]
+
+    # Add traces to the run
+    add_traces_response = await client.post(
+        f"/v1/runs/{run_id}/traces",
+        json=[
+            {
+                "event_type": "step_start",
+                "message": "Starting execution",
+                "payload": {"step": 1},
+            },
+            {
+                "event_type": "tool_call",
+                "message": "Calling API",
+                "payload": {"tool": "fetch_data"},
+            },
+            {
+                "event_type": "step_complete",
+                "message": "Step completed",
+                "payload": {"step": 1, "success": True},
+            },
+        ],
+    )
+    assert add_traces_response.status_code == 201
+    traces_payload = add_traces_response.json()
+    
+    assert traces_payload["run_id"] == run_id
+    assert traces_payload["total"] == 3
+    assert len(traces_payload["items"]) == 3
+    assert traces_payload["items"][0]["event_type"] == "step_start"
+    assert traces_payload["items"][1]["event_type"] == "tool_call"
+    assert traces_payload["items"][2]["event_type"] == "step_complete"
+
+    # Verify traces were actually saved by fetching again
+    get_traces_response = await client.get(f"/v1/runs/{run_id}/traces")
+    assert get_traces_response.status_code == 200
+    get_payload = get_traces_response.json()
+    assert get_payload["total"] == 3
+
+
+@pytest.mark.asyncio
+async def test_add_traces_continues_sequence(client, test_agent):
+    """Test that adding traces continues the sequence counter."""
+    # Create a run with initial traces
+    create_response = await client.post(
+        "/v1/runs",
+        json={
+            "agent_id": str(test_agent.id),
+            "status": "running",
+            "traces": [
+                {
+                    "event_type": "init",
+                    "message": "Initialized",
+                },
+            ],
+        },
+    )
+    assert create_response.status_code == 201
+    run_id = create_response.json()["id"]
+
+    # Add more traces
+    add_response = await client.post(
+        f"/v1/runs/{run_id}/traces",
+        json=[
+            {
+                "event_type": "step",
+                "message": "First step",
+            },
+        ],
+    )
+    assert add_response.status_code == 201
+    
+    # Verify sequences are correct
+    traces = add_response.json()["items"]
+    assert traces[0]["sequence"] == 0  # init
+    assert traces[1]["sequence"] == 1  # first added trace
+
+
+@pytest.mark.asyncio
+async def test_add_traces_requires_authorization(client, test_agent, other_user_client):
+    """Test that adding traces requires proper authorization."""
+    # Create a run as test_agent user
+    create_response = await client.post(
+        "/v1/runs",
+        json={
+            "agent_id": str(test_agent.id),
+            "status": "completed",
+            "traces": [],
+        },
+    )
+    assert create_response.status_code == 201
+    run_id = create_response.json()["id"]
+
+    # Try to add traces as a different user
+    forbidden_response = await other_user_client.post(
+        f"/v1/runs/{run_id}/traces",
+        json=[
+            {
+                "event_type": "unauthorized",
+                "message": "Should fail",
+            },
+        ],
+    )
+    assert forbidden_response.status_code == 403
