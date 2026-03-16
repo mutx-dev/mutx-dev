@@ -13,7 +13,14 @@ def agents_group():
 @agents_group.command(name="list")
 @click.option("--limit", "-l", default=50, help="Number of agents to list")
 @click.option("--skip", "-s", default=0, help="Number of agents to skip")
-def list_agents(limit: int, skip: int):
+@click.option(
+    "--format",
+    "-f",
+    type=click.Choice(["table", "simple"]),
+    default="table",
+    help="Output format",
+)
+def list_agents(limit: int, skip: int, format: str):
     """List all agents"""
     config = CLIConfig()
     if not config.is_authenticated():
@@ -36,8 +43,22 @@ def list_agents(limit: int, skip: int):
         click.echo("No agents found.")
         return
 
-    for agent in agents:
-        click.echo(f"{agent['id']} | {agent['name']} | {agent['status']}")
+    if format == "table":
+        # Print table header
+        header = f"{'ID':<40} {'NAME':<30} {'STATUS':<12}"
+        click.echo(header)
+        click.echo("-" * len(header))
+
+        # Print each agent row
+        for agent in agents:
+            agent_id = agent.get("id", "")[:38]
+            name = agent.get("name", "")[:28]
+            status = agent.get("status", "")[:10]
+            click.echo(f"{agent_id:<40} {name:<30} {status:<12}")
+    else:
+        # Simple format (original)
+        for agent in agents:
+            click.echo(f"{agent['id']} | {agent['name']} | {agent['status']}")
 
 
 @agents_group.command(name="create")

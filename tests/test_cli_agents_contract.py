@@ -343,3 +343,76 @@ def test_agents_delete_requires_confirmation_without_force(monkeypatch) -> None:
 
     assert result.exit_code == 0
     assert "Are you sure you want to delete agent" in result.output
+
+def test_agents_list_with_table_format(monkeypatch) -> None:
+    """Test that table format outputs properly formatted table"""
+    captured: dict[str, Any] = {}
+    agent_id = str(uuid.uuid4())
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["params"] = params
+        return DummyResponse(
+            200,
+            [
+                {
+                    "id": agent_id,
+                    "name": "test-agent-1",
+                    "status": "running",
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "name": "test-agent-2",
+                    "status": "stopped",
+                },
+            ],
+        )
+
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["agents", "list", "--format", "table"])
+
+    assert result.exit_code == 0
+    assert captured["path"] == "/v1/agents"
+    assert "ID" in result.output
+    assert "NAME" in result.output
+    assert "STATUS" in result.output
+    assert "test-agent-1" in result.output
+    assert "running" in result.output
+
+
+def test_agents_list_with_simple_format(monkeypatch) -> None:
+    """Test that simple format outputs pipe-separated values"""
+    captured: dict[str, Any] = {}
+    agent_id = str(uuid.uuid4())
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["params"] = params
+        return DummyResponse(
+            200,
+            [
+                {
+                    "id": agent_id,
+                    "name": "test-agent-1",
+                    "status": "running",
+                },
+            ],
+        )
+
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["agents", "list", "--format", "simple"])
+
+    assert result.exit_code == 0
+    assert " | " in result.output
+    assert agent_id in result.output
+
