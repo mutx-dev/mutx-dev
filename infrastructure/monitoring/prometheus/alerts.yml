@@ -253,3 +253,57 @@ groups:
           summary: "TLS certificate expiring critically soon"
           description: "Certificate will expire within 7 days."
 
+
+      - alert: NoActiveAgents
+        expr: mutx_agents_total > 0 and mutx_agents_active == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "No agents active despite configured agents"
+          description: "System has {{ $value }} agents configured but none are running."
+
+      - alert: DatabasePoolOverflow
+        expr: db_pool_overflow > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database connection pool overflow active"
+          description: "Using {{ $value }} overflow connections - consider increasing pool size."
+
+      - alert: HighHTTPActiveConnections
+        expr: http_connections_active > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of active HTTP connections"
+          description: "{{ $value }} concurrent connections - possible load issue."
+
+      - alert: CriticalHTTPActiveConnections
+        expr: http_connections_active > 5000
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical number of active HTTP connections"
+          description: "{{ $value }} concurrent connections - immediate intervention required."
+
+      - alert: AgentTaskTimeoutRate
+        expr: sum(rate(mutx_agent_tasks_total{status="timeout"}[5m])) > 0.1
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High rate of agent task timeouts"
+          description: "More than 10% of tasks are timing out."
+
+      - alert: DeploymentFailureRate
+        expr: sum(rate(mutx_deployments_by_status{status="failed"}[5m])) / sum(rate(mutx_deployments_by_status[5m])) > 0.15
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High deployment failure rate"
+          description: "More than 15% of deployments are failing."
