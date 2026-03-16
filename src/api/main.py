@@ -25,6 +25,9 @@ from src.api.exception_handlers import (
 from src.api.routes import (
     agents,
     deployments,
+    monitoring,
+    swarms,
+    budgets,
     webhooks,
     auth,
     clawhub,
@@ -34,6 +37,7 @@ from src.api.routes import (
     leads,
     usage,
     runs,
+    analytics,
 )
 from src.api.metrics import router as metrics_router, track_request
 from src.api.services.monitor import start_background_monitor
@@ -222,3 +226,7 @@ if __name__ == "__main__":
         port=settings.api_port,
         reload=True,
     )
+app.include_router(analytics.router, prefix="/v1")
+app.include_router(monitoring.router, prefix="/v1")
+app.include_router(swarms.router, prefix="/v1")
+app.include_router(budgets.router, prefix="/v1")

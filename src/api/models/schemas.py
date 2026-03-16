@@ -483,3 +483,62 @@ class UsageEventResponse(BaseModel):
             except (json.JSONDecodeError, TypeError):
                 return None
         return None
+
+
+# Analytics & Monitoring Schemas
+class AnalyticsSummaryResponse(BaseModel):
+    total_agents: int
+    active_agents: int
+    total_deployments: int
+    active_deployments: int
+    total_runs: int
+    successful_runs: int
+    failed_runs: int
+    total_api_calls: int
+    avg_latency_ms: float
+    period_start: datetime
+    period_end: datetime
+
+class AgentMetricsSummary(BaseModel):
+    agent_id: uuid.UUID
+    agent_name: str
+    total_runs: int
+    successful_runs: int
+    failed_runs: int
+    avg_cpu: Optional[float]
+    avg_memory: Optional[float]
+    total_requests: int
+    avg_latency_ms: Optional[float]
+    period_start: datetime
+    period_end: datetime
+
+class AnalyticsTimeSeries(BaseModel):
+    timestamp: datetime
+    value: float
+    label: Optional[str] = None
+
+class AnalyticsTimeSeriesResponse(BaseModel):
+    metric: str
+    interval: str
+    data: list[AnalyticsTimeSeries]
+    period_start: datetime
+    period_end: datetime
+
+class CostSummaryResponse(BaseModel):
+    total_credits_used: float
+    credits_remaining: float
+    credits_total: float
+    usage_by_event_type: dict[str, float]
+    usage_by_agent: dict[str, float]
+    period_start: datetime
+    period_end: datetime
+
+class BudgetResponse(BaseModel):
+    user_id: uuid.UUID
+    plan: str
+    credits_total: float
+    credits_used: float
+    credits_remaining: float
+    reset_date: datetime
+    usage_percentage: float
+
