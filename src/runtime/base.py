@@ -38,7 +38,7 @@ class RuntimeMessage(TypedDict, total=False):
 
 
 class RuntimeUsage(TypedDict, total=False):
-    """Resource usage from a runtime execution."""
+    """Usage statistics from model execution."""
     prompt_tokens: int
     completion_tokens: int
     total_tokens: int
@@ -61,7 +61,6 @@ class RuntimeStreamEvent(TypedDict, total=False):
     tool_call: RuntimeToolCall
     error: str
     raw_event: Any
-    usage: RuntimeUsage
 
 
 ToolHandler = Callable[[dict[str, Any]], Any | Awaitable[Any]]

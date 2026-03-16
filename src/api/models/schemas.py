@@ -227,10 +227,25 @@ class AgentResourceUsageResponse(BaseModel):
     api_calls: int = 0
     cost_usd: Optional[float] = 0.0
     model: Optional[str] = None
-    metadata: Optional[dict] = None
+    extra_metadata: Optional[dict] = None
     period_start: datetime
     period_end: Optional[datetime] = None
     created_at: datetime
+
+
+class AgentResourceUsageCreate(BaseModel):
+    """Request schema for creating agent resource usage record."""
+
+    prompt_tokens: Optional[int] = Field(default=0, ge=0)
+    completion_tokens: Optional[int] = Field(default=0, ge=0)
+    total_tokens: Optional[int] = Field(default=0, ge=0)
+    api_calls: int = Field(default=0, ge=0)
+    cost_usd: Optional[float] = Field(default=0.0, ge=0.0)
+    model: Optional[str] = Field(default=None, max_length=100)
+    extra_metadata: Optional[dict[str, Any]] = Field(default_factory=dict)
+    period_start: datetime
+    period_end: Optional[datetime] = None
+
 class RunTraceCreate(BaseModel):
     event_type: str = Field(..., min_length=1, max_length=100)
     message: Optional[str] = Field(None, max_length=5000)

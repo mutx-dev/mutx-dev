@@ -509,7 +509,7 @@ class AgentResourceUsage(Base):
     cost_usd: Mapped[Optional[float]] = mapped_column(Float, nullable=True, default=0.0)
     # Metadata
     model: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
-    metadata: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON string
+    extra_metadata: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON string
     # Timestamps
     period_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     period_end: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
