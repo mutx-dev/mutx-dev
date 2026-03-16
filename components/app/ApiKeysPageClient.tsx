@@ -200,13 +200,16 @@ export function ApiKeysPageClient() {
               <div key={key.id} className="px-6 py-4 flex items-center justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-white">{key.name}</p>
-                  <button
-                    onClick={() => handleCopyId(key.id)}
-                    className="flex items-center gap-1 rounded p-1 text-slate-500 hover:text-cyan-400 transition-colors"
-                    title="Copy API key ID"
-                  >
-                    {copiedId === key.id ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-                  </button>
+                  <div className="flex items-center gap-2 mt-2">
+                    <code className="text-xs text-slate-500 font-mono">{key.id}</code>
+                    <button
+                      onClick={() => handleCopyId(key.id)}
+                      className="flex items-center gap-1 rounded p-1 text-slate-500 hover:text-cyan-400 transition-colors"
+                      title="Copy API key ID"
+                    >
+                      {copiedId === key.id ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                    </button>
+                  </div>
                   <div className="flex gap-4 mt-2 text-xs text-slate-500">
                     <span>Created: {formatDate(key.created_at)}</span>
                     <span>Last used: {formatDate(key.last_used)}</span>
