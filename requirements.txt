@@ -18,7 +18,7 @@ botocore==1.34.25
 # Security
 python-jose[cryptography]==3.3.0
 #passlib removed - using bcrypt directly
-python-multipart==0.0.6
+python-multipart==0.0.22
 email-validator==2.1.0
 # Agent & AI
 openai==1.10.0
