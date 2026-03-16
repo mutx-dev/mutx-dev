@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
 import uuid
 
 from src.api.models.models import AgentStatus, AgentType
@@ -228,7 +228,7 @@ class RunCreate(BaseModel):
     input_text: Optional[str] = None
     output_text: Optional[str] = None
     error_message: Optional[str] = None
-    metadata: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict = Field(default_factory=dict)
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     traces: list[RunTraceCreate] = Field(default_factory=list)
@@ -255,7 +255,7 @@ class RunResponse(BaseModel):
     input_text: Optional[str]
     output_text: Optional[str]
     error_message: Optional[str]
-    metadata: dict[str, Any]
+    metadata: dict
     started_at: datetime
     completed_at: Optional[datetime]
     created_at: datetime
@@ -450,17 +450,13 @@ class UsageEventCreate(BaseModel):
     event_type: str = Field(
         ...,
         min_length=1,
-        max_length=50,
-        description="Type of event (e.g., agent_create, deployment_create, api_call)",
+        max_length=100,
+        description="Type of usage event (e.g., api_call, agent_run, deployment)",
     )
-    resource_type: Optional[str] = Field(
-        None, max_length=50, description="Type of resource (e.g., agent, deployment)"
+    resource_id: Optional[str] = Field(None, max_length=255, description="Resource that was used")
+    metadata: Optional[dict[str, Any]] = Field(
+        default_factory=dict, description="Additional event metadata"
     )
-    resource_id: Optional[uuid.UUID] = None
-    event_metadata: Optional[dict[str, Any]] = Field(
-        default_factory=dict, description="Additional event data as JSON"
-    )
-    credits_used: float = Field(default=1.0, ge=0.0, description="Number of credits consumed")
 
 
 class UsageEventResponse(BaseModel):
@@ -469,10 +465,21 @@ class UsageEventResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
-    user_id: uuid.UUID
     event_type: str
-    resource_type: Optional[str]
-    resource_id: Optional[uuid.UUID]
-    event_metadata: Optional[dict[str, Any]]
-    credits_used: float
+    user_id: uuid.UUID
+    resource_id: Optional[str]
+    event_metadata: Optional[str] = None  # JSON string from DB
     created_at: datetime
+
+    @computed_field
+    @property
+    def metadata(self) -> Optional[dict]:
+        """Deserialize event_metadata JSON string to dict"""
+        if self.event_metadata:
+            try:
+                import json
+
+                return json.loads(self.event_metadata)
+            except (json.JSONDecodeError, TypeError):
+                return None
+        return None

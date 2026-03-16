@@ -10,7 +10,7 @@ from sqlalchemy.orm import selectinload
 
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
-from src.api.models import Agent, AgentRun, AgentRunTrace, User
+from src.api.models import Agent, AgentRun, AgentRunTrace, User, UsageEvent
 from src.api.models.schemas import (
     RunCreate,
     RunDetailResponse,
@@ -126,6 +126,17 @@ async def create_run(
             )
         )
 
+    await db.commit()
+
+    # Track usage event
+    usage_event = UsageEvent(
+        event_type="agent_run_created",
+        user_id=current_user.id,
+        resource_id=str(run.id),
+        event_metadata=f'{{"agent_id": "{agent.id}"}}',
+        created_at=datetime.now(timezone.utc),
+    )
+    db.add(usage_event)
     await db.commit()
 
     persisted_run = await _get_user_run(run.id, current_user, db)

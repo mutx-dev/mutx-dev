@@ -13,6 +13,7 @@ from src.api.auth.ownership import get_owned_agent
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models import (
+    UsageEvent,
     Agent,
     AgentLog,
     AgentMetric,
@@ -247,13 +248,27 @@ async def create_agent(
         user_id=current_user.id,
         event_type="agent_create",
         resource_type="agent",
-        resource_id=agent.id,
+        resource_id=str(agent.id),
         metadata={"agent_type": agent.type.value},
     )
 
     await db.commit()
     await db.refresh(agent)
     logger.info(f"Created agent: {agent.id}")
+
+    # Track usage event
+    usage_event = UsageEvent(
+        event_type="agent_created",
+        user_id=current_user.id,
+        resource_id=str(agent.id),
+        resource_type="agent",
+        credits_used=1.0,
+        event_metadata=None,
+        created_at=datetime.now(timezone.utc),
+    )
+    db.add(usage_event)
+    await db.commit()
+
     return _serialize_agent(agent)
 
 
@@ -385,6 +400,20 @@ async def deploy_agent(
     await db.commit()
     await db.refresh(deployment)
     logger.info(f"Deployed agent: {agent_id}, deployment: {deployment.id}")
+
+    # Track usage event
+    usage_event = UsageEvent(
+        event_type="agent_deployed",
+        user_id=current_user.id,
+        resource_id=str(agent_id),
+        resource_type="agent",
+        credits_used=1.0,
+        event_metadata=f'{{"deployment_id": "{deployment.id}"}}',
+        created_at=datetime.now(timezone.utc),
+    )
+    db.add(usage_event)
+    await db.commit()
+
     return {"deployment_id": deployment.id, "status": "deploying"}
 
 
@@ -420,6 +449,20 @@ async def stop_agent(
 
     agent.status = AgentStatus.STOPPED.value
     await db.commit()
+
+    # Track usage event
+    usage_event = UsageEvent(
+        event_type="agent_stopped",
+        user_id=current_user.id,
+        resource_id=str(agent_id),
+        resource_type="agent",
+        credits_used=1.0,
+        event_metadata=None,
+        created_at=datetime.now(timezone.utc),
+    )
+    db.add(usage_event)
+    await db.commit()
+
     logger.info(f"Stopped agent: {agent_id}")
     return {"status": "stopped"}
 
