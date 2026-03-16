@@ -20,9 +20,12 @@ router = APIRouter(prefix="/analytics", tags=["analytics"])
 logger = logging.getLogger(__name__)
 
 def _parse_datetime(dt_str):
-    if not dt_str: return None
-    try: return datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
-    except (ValueError, AttributeError): return None
+    if not dt_str:
+        return None
+    try:
+        return datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+    except (ValueError, AttributeError):
+        return None
 
 
 @router.get("/summary", response_model=AnalyticsSummaryResponse)
@@ -33,10 +36,14 @@ async def get_analytics_summary(
     current_user: User = Depends(get_current_user),
 ):
     now = datetime.now(timezone.utc)
-    if period_start == "24h": period_start_dt = now - timedelta(hours=24)
-    elif period_start == "7d": period_start_dt = now - timedelta(days=7)
-    elif period_start == "30d": period_start_dt = now - timedelta(days=30)
-    else: period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=30))
+    if period_start == "24h":
+        period_start_dt = now - timedelta(hours=24)
+    elif period_start == "7d":
+        period_start_dt = now - timedelta(days=7)
+    elif period_start == "30d":
+        period_start_dt = now - timedelta(days=30)
+    else:
+        period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=30))
     period_end_dt = _parse_datetime(period_end) or now
     
     agent_query = select(Agent).where(Agent.user_id == current_user.id)
@@ -102,10 +109,14 @@ async def get_agent_metrics_summary(
     if not agent: raise HTTPException(status_code=404, detail="Agent not found")
     
     now = datetime.now(timezone.utc)
-    if period_start == "24h": period_start_dt = now - timedelta(hours=24)
-    elif period_start == "7d": period_start_dt = now - timedelta(days=7)
-    elif period_start == "30d": period_start_dt = now - timedelta(days=30)
-    else: period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=30))
+    if period_start == "24h":
+        period_start_dt = now - timedelta(hours=24)
+    elif period_start == "7d":
+        period_start_dt = now - timedelta(days=7)
+    elif period_start == "30d":
+        period_start_dt = now - timedelta(days=30)
+    else:
+        period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=30))
     period_end_dt = _parse_datetime(period_end) or now
     
     runs_result = await db.execute(select(AgentRun).where(
@@ -147,10 +158,14 @@ async def get_analytics_timeseries(
     db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user),
 ):
     now = datetime.now(timezone.utc)
-    if period_start == "24h": period_start_dt = now - timedelta(hours=24)
-    elif period_start == "7d": period_start_dt = now - timedelta(days=7)
-    elif period_start == "30d": period_start_dt = now - timedelta(days=30)
-    else: period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=30))
+    if period_start == "24h":
+        period_start_dt = now - timedelta(hours=24)
+    elif period_start == "7d":
+        period_start_dt = now - timedelta(days=7)
+    elif period_start == "30d":
+        period_start_dt = now - timedelta(days=30)
+    else:
+        period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=30))
     period_end_dt = _parse_datetime(period_end) or now
     
     data = []
@@ -185,10 +200,14 @@ async def get_cost_summary(
     db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user),
 ):
     now = datetime.now(timezone.utc)
-    if period_start == "24h": period_start_dt = now - timedelta(hours=24)
-    elif period_start == "7d": period_start_dt = now - timedelta(days=7)
-    elif period_start == "30d": period_start_dt = now - timedelta(days=30)
-    else: period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=30))
+    if period_start == "24h":
+        period_start_dt = now - timedelta(hours=24)
+    elif period_start == "7d":
+        period_start_dt = now - timedelta(days=7)
+    elif period_start == "30d":
+        period_start_dt = now - timedelta(days=30)
+    else:
+        period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=30))
     period_end_dt = _parse_datetime(period_end) or now
     
     result = await db.execute(select(UsageEvent).where(
