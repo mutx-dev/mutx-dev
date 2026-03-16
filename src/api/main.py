@@ -18,6 +18,7 @@ from src.api.models.schemas import HealthResponse
 from src.api.middleware.auth import add_authentication_middleware
 from src.api.middleware.security import add_security_middleware
 from src.api.middleware.rate_limit import add_rate_limiting
+from src.api.logging_config import setup_json_logging
 from src.api.exception_handlers import (
     validation_exception_handler,
     pydantic_validation_exception_handler,
@@ -49,9 +50,11 @@ settings = get_settings()
 # Track startup time for uptime calculation
 start_time = time.time()
 
-logging.basicConfig(
-    level=settings.log_level,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+# Setup logging - use JSON format if configured
+setup_json_logging(
+    log_level=settings.log_level,
+    json_format=settings.json_logging,
+    log_file=settings.log_file
 )
 logger = logging.getLogger(__name__)
 
@@ -177,6 +180,10 @@ app.include_router(ingest.router, prefix="/v1")
 app.include_router(runs.router, prefix="/v1")
 app.include_router(rag.router, prefix="/v1")
 app.include_router(usage.router, prefix="/v1")
+app.include_router(analytics.router, prefix="/v1")
+app.include_router(monitoring.router, prefix="/v1")
+app.include_router(swarms.router, prefix="/v1")
+app.include_router(budgets.router, prefix="/v1")
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -231,7 +238,3 @@ if __name__ == "__main__":
         port=settings.api_port,
         reload=True,
     )
-app.include_router(analytics.router, prefix="/v1")
-app.include_router(monitoring.router, prefix="/v1")
-app.include_router(swarms.router, prefix="/v1")
-app.include_router(budgets.router, prefix="/v1")

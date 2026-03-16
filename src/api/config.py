@@ -29,6 +29,16 @@ class Settings(BaseSettings):
         "https://app.mutx.dev",
     ]
     log_level: str = "INFO"
+    json_logging: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("JSON_LOGGING", "LOG_JSON"),
+        description="Enable structured JSON logging output",
+    )
+    log_file: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("LOG_FILE", "LOG_PATH"),
+        description="Optional file path for log output",
+    )
     jwt_secret: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
