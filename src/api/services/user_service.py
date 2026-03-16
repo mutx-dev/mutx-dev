@@ -31,6 +31,7 @@ def hash_api_key(key: str) -> str:
 
 def verify_api_key(plain_key: str, hashed_key: str) -> bool:
     import hashlib
+
     # Legacy SHA256 check (for old keys created before bcrypt migration)
     # SHA256 hashes are 64 hex chars = 64 bytes
     if len(hashed_key) == 64:
