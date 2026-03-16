@@ -9,6 +9,7 @@ import {
   Rocket,
   ShieldCheck,
   Users,
+  BarChart3,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -49,6 +50,12 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     description: "Usage and health telemetry",
     href: "/dashboard/monitoring",
     icon: Activity,
+  },
+  {
+    title: "Analytics",
+    description: "Usage telemetry and insights",
+    href: "/dashboard/analytics",
+    icon: BarChart3,
   },
   {
     title: "Orchestration",
