@@ -36,7 +36,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     @staticmethod
     def _fingerprint(value: str) -> str:
-        return hashlib.sha256(value.encode()).hexdigest()[:24]
+        return value[:24]
 
     def _extract_api_key_token(self, request: Request) -> str | None:
         x_api_key = request.headers.get("X-API-Key")
