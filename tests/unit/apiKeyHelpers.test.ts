@@ -107,7 +107,7 @@ describe("api key dashboard selectors", () => {
       baseKey({
         id: "older-revoked",
         name: "Older Revoked",
-        created_at: null,
+        created_at: undefined,
         is_active: false,
       }),
     ];

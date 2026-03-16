@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   FileText,
   RefreshCcw,
@@ -85,7 +85,7 @@ export function LogsViewer({
   const [expandedLog, setExpandedLog] = useState<string | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
 
-  async function loadLogs() {
+  const loadLogs = useCallback(async () => {
     if (!agentId && !deploymentId) return;
 
     setLoading(true);
@@ -106,18 +106,18 @@ export function LogsViewer({
     } finally {
       setLoading(false);
     }
-  }
+  }, [agentId, deploymentId]);
 
   useEffect(() => {
     loadLogs();
-  }, [agentId, deploymentId]);
+  }, [loadLogs]);
 
   useEffect(() => {
     if (!autoRefresh) return;
 
     const interval = setInterval(loadLogs, 5000);
     return () => clearInterval(interval);
-  }, [autoRefresh, agentId, deploymentId]);
+  }, [autoRefresh, loadLogs]);
 
   const filteredLogs = logs.filter((log) => {
     if (levelFilter !== "all" && log.level?.toLowerCase() !== levelFilter) {

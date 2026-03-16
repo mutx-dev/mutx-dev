@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   GitBranch,
   RefreshCcw,
@@ -163,7 +163,7 @@ export function StateTransitions({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function loadEvents() {
+  const loadEvents = useCallback(async () => {
     if (!deploymentId) return;
 
     setLoading(true);
@@ -177,13 +177,13 @@ export function StateTransitions({
     } finally {
       setLoading(false);
     }
-  }
+  }, [deploymentId]);
 
   useEffect(() => {
     loadEvents();
     const interval = setInterval(loadEvents, 10000);
     return () => clearInterval(interval);
-  }, [deploymentId]);
+  }, [loadEvents]);
 
   const sortedEvents = [...events].sort(
     (a, b) =>
