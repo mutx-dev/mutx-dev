@@ -17,6 +17,17 @@ function mockJsonRequest(body: unknown) {
   } as NextRequest
 }
 
+function mockRequestWithUrl(url: string) {
+  return { url } as NextRequest
+}
+
+function mockJsonRequestWithUrl(body: unknown, url: string) {
+  return {
+    json: async () => body,
+    url,
+  } as NextRequest
+}
+
 describe('Webhooks route proxies', () => {
   beforeEach(() => {
     getAuthToken.mockReset()
@@ -266,6 +277,289 @@ describe('Webhooks route proxies', () => {
 
       expect(response.status).toBe(409)
       await expect(response.json()).resolves.toEqual({ error: 'Webhook with this name already exists' })
+    })
+  })
+
+  describe('PATCH /api/webhooks/[id]', () => {
+    it('returns 401 when no auth token exists', async () => {
+      getAuthToken.mockResolvedValue(null)
+      const { PATCH } = await import('../../app/api/webhooks/[id]/route')
+
+      const response = await PATCH(
+        mockJsonRequest({ url: 'https://example.com/webhook', name: 'my-webhook', events: ['agent.deployed'] }),
+        { params: Promise.resolve({ id: 'wh_123' }) }
+      )
+
+      expect(response.status).toBe(401)
+      await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' })
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('returns 400 when url is missing', async () => {
+      getAuthToken.mockResolvedValue('token')
+      const { PATCH } = await import('../../app/api/webhooks/[id]/route')
+
+      const response = await PATCH(
+        mockJsonRequest({ name: 'my-webhook', events: ['agent.deployed'] }),
+        { params: Promise.resolve({ id: 'wh_123' }) }
+      )
+
+      expect(response.status).toBe(400)
+      await expect(response.json()).resolves.toEqual({ error: 'URL is required' })
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('proxies valid PATCH request to backend and returns updated webhook', async () => {
+      getAuthToken.mockResolvedValue('token')
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          id: 'wh_123',
+          name: 'updated-webhook',
+          url: 'https://example.com/updated',
+          events: ['agent.deployed', 'agent.stopped'],
+          active: true,
+        }),
+      })
+
+      const { PATCH } = await import('../../app/api/webhooks/[id]/route')
+
+      const response = await PATCH(
+        mockJsonRequest({ url: 'https://example.com/updated', name: 'updated-webhook', events: ['agent.deployed', 'agent.stopped'] }),
+        { params: Promise.resolve({ id: 'wh_123' }) }
+      )
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:8000/v1/webhooks/wh_123',
+        expect.objectContaining({
+          method: 'PATCH',
+          headers: {
+            Authorization: 'Bearer token',
+            'Content-Type': 'application/json',
+          },
+        })
+      )
+      expect(response.status).toBe(200)
+      await expect(response.json()).resolves.toEqual({
+        id: 'wh_123',
+        name: 'updated-webhook',
+        url: 'https://example.com/updated',
+        events: ['agent.deployed', 'agent.stopped'],
+        active: true,
+      })
+    })
+
+    it('handles backend error responses', async () => {
+      getAuthToken.mockResolvedValue('token')
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 404,
+        json: async () => ({ detail: 'Webhook not found' }),
+      })
+
+      const { PATCH } = await import('../../app/api/webhooks/[id]/route')
+
+      const response = await PATCH(
+        mockJsonRequest({ url: 'https://example.com/webhook', name: 'gone', events: [] }),
+        { params: Promise.resolve({ id: 'wh_missing' }) }
+      )
+
+      expect(response.status).toBe(404)
+      await expect(response.json()).resolves.toEqual({ error: 'Webhook not found' })
+    })
+  })
+
+  describe('DELETE /api/webhooks/[id]', () => {
+    it('returns 401 when no auth token exists', async () => {
+      getAuthToken.mockResolvedValue(null)
+      const { DELETE } = await import('../../app/api/webhooks/[id]/route')
+
+      const response = await DELETE(mockRequest(), { params: Promise.resolve({ id: 'wh_123' }) })
+
+      expect(response.status).toBe(401)
+      await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' })
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('proxies valid DELETE request to backend and returns 204', async () => {
+      getAuthToken.mockResolvedValue('token')
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 204,
+      })
+
+      const { DELETE } = await import('../../app/api/webhooks/[id]/route')
+
+      const response = await DELETE(mockRequest(), { params: Promise.resolve({ id: 'wh_123' }) })
+
+      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/webhooks/wh_123', {
+        method: 'DELETE',
+        headers: {
+          Authorization: 'Bearer token',
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+      })
+      expect(response.status).toBe(204)
+    })
+
+    it('handles backend error responses', async () => {
+      getAuthToken.mockResolvedValue('token')
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 404,
+        json: async () => ({ detail: 'Webhook not found' }),
+      })
+
+      const { DELETE } = await import('../../app/api/webhooks/[id]/route')
+
+      const response = await DELETE(mockRequest(), { params: Promise.resolve({ id: 'wh_missing' }) })
+
+      expect(response.status).toBe(404)
+      await expect(response.json()).resolves.toEqual({ error: 'Webhook not found' })
+    })
+  })
+
+  describe('POST /api/webhooks/[id]/test', () => {
+    it('returns 401 when no auth token exists', async () => {
+      getAuthToken.mockResolvedValue(null)
+      const { POST } = await import('../../app/api/webhooks/[id]/test/route')
+
+      const response = await POST(mockRequest(), { params: Promise.resolve({ id: 'wh_123' }) })
+
+      expect(response.status).toBe(401)
+      await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' })
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('proxies valid POST request to backend and returns test result', async () => {
+      getAuthToken.mockResolvedValue('token')
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ success: true, status_code: 200, response_body: 'OK' }),
+      })
+
+      const { POST } = await import('../../app/api/webhooks/[id]/test/route')
+
+      const response = await POST(mockRequest(), { params: Promise.resolve({ id: 'wh_123' }) })
+
+      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/webhooks/wh_123/test', {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer token',
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+      })
+      expect(response.status).toBe(200)
+      await expect(response.json()).resolves.toEqual({ success: true, status_code: 200, response_body: 'OK' })
+    })
+
+    it('handles backend error responses', async () => {
+      getAuthToken.mockResolvedValue('token')
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 404,
+        json: async () => ({ detail: 'Webhook not found' }),
+      })
+
+      const { POST } = await import('../../app/api/webhooks/[id]/test/route')
+
+      const response = await POST(mockRequest(), { params: Promise.resolve({ id: 'wh_missing' }) })
+
+      expect(response.status).toBe(404)
+      await expect(response.json()).resolves.toEqual({ error: 'Webhook not found' })
+    })
+  })
+
+  describe('GET /api/webhooks/[id]/deliveries', () => {
+    it('returns 401 when no auth token exists', async () => {
+      getAuthToken.mockResolvedValue(null)
+      const { GET } = await import('../../app/api/webhooks/[id]/deliveries/route')
+
+      const response = await GET(
+        mockRequestWithUrl('http://localhost:3000/api/webhooks/wh_123/deliveries'),
+        { params: Promise.resolve({ id: 'wh_123' }) }
+      )
+
+      expect(response.status).toBe(401)
+      await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' })
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('proxies request to backend with default limit and returns deliveries', async () => {
+      getAuthToken.mockResolvedValue('token')
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ([
+          { id: 'del_1', webhook_id: 'wh_123', success: true, status_code: 200, created_at: '2024-01-01T00:00:00Z' },
+        ]),
+      })
+
+      const { GET } = await import('../../app/api/webhooks/[id]/deliveries/route')
+
+      const response = await GET(
+        mockRequestWithUrl('http://localhost:3000/api/webhooks/wh_123/deliveries'),
+        { params: Promise.resolve({ id: 'wh_123' }) }
+      )
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:8000/v1/webhooks/wh_123/deliveries?limit=50',
+        expect.objectContaining({
+          headers: {
+            Authorization: 'Bearer token',
+            'Content-Type': 'application/json',
+          },
+          cache: 'no-store',
+        })
+      )
+      expect(response.status).toBe(200)
+      const json = await response.json()
+      expect(json.deliveries).toHaveLength(1)
+      expect(json.deliveries[0].id).toBe('del_1')
+    })
+
+    it('forwards event and success query params to backend', async () => {
+      getAuthToken.mockResolvedValue('token')
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => [],
+      })
+
+      const { GET } = await import('../../app/api/webhooks/[id]/deliveries/route')
+
+      await GET(
+        mockRequestWithUrl('http://localhost:3000/api/webhooks/wh_123/deliveries?event=agent.deployed&success=true&limit=10'),
+        { params: Promise.resolve({ id: 'wh_123' }) }
+      )
+
+      const calledUrl: string = (global.fetch as jest.Mock).mock.calls[0][0]
+      expect(calledUrl).toContain('event=agent.deployed')
+      expect(calledUrl).toContain('success=true')
+      expect(calledUrl).toContain('limit=10')
+    })
+
+    it('handles backend error responses', async () => {
+      getAuthToken.mockResolvedValue('token')
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        status: 404,
+        json: async () => ({ detail: 'Webhook not found' }),
+      })
+
+      const { GET } = await import('../../app/api/webhooks/[id]/deliveries/route')
+
+      const response = await GET(
+        mockRequestWithUrl('http://localhost:3000/api/webhooks/wh_missing/deliveries'),
+        { params: Promise.resolve({ id: 'wh_missing' }) }
+      )
+
+      expect(response.status).toBe(404)
+      await expect(response.json()).resolves.toEqual({ error: 'Webhook not found' })
     })
   })
 })
