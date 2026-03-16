@@ -1,9 +1,11 @@
-import bcrypt
+import hashlib
 import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+from passlib.exc import UnknownHashError
+from passlib.context import CryptContext
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,6 +15,8 @@ from src.api.services.email.email_service import (
     generate_token,
     PASSWORD_RESET_TOKEN_EXPIRE_HOURS,
 )
+
+api_key_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def generate_api_key() -> str:
@@ -24,24 +28,23 @@ def generate_user_api_key() -> str:
 
 
 def hash_api_key(key: str) -> str:
-    # Use bcrypt for API key hashing
-    # Truncate to 72 bytes (bcrypt limitation)
-    return bcrypt.hashpw(key[:72].encode(), bcrypt.gensalt()).decode()
+    # Use a computationally expensive hash (bcrypt via passlib) for API keys
+    # Truncate to 72 bytes (bcrypt limitation) - key derivation handles the rest
+    return api_key_context.hash(key[:72])
 
 
 def verify_api_key(plain_key: str, hashed_key: str) -> bool:
-    import hashlib
-
     # Legacy SHA256 check (for old keys created before bcrypt migration)
-    # SHA256 hashes are 64 hex chars = 64 bytes
-    if len(hashed_key) == 64:
-        sha256_hash = hashlib.sha256(plain_key.encode()).hexdigest()
-        if secrets.compare_digest(sha256_hash, hashed_key):
-            return True
-    # bcrypt verification - truncate to 72 bytes (bcrypt limitation)
+    # SHA256 hashes are 64 hex chars = 64 bytes, safe for bcrypt comparison
+    import hashlib
+    sha256_hash = hashlib.sha256(plain_key.encode()).hexdigest()
+    if secrets.compare_digest(sha256_hash, hashed_key):
+        return True
+
     try:
-        return bcrypt.checkpw(plain_key[:72].encode(), hashed_key.encode())
-    except (ValueError, TypeError):
+        # bcrypt check - truncate to 72 bytes (bcrypt limitation)
+        return api_key_context.verify(plain_key[:72], hashed_key)
+    except (UnknownHashError, ValueError):
         return False
 
 
@@ -163,7 +166,9 @@ class UserService:
         auth_context = await self.authenticate_api_key(plain_key)
         return auth_context[0] if auth_context else None
 
-    async def authenticate_api_key(self, plain_key: str) -> Optional[tuple[User, uuid.UUID | None]]:
+    async def authenticate_api_key(
+        self, plain_key: str
+    ) -> Optional[tuple[User, uuid.UUID | None]]:
         """Authenticate legacy or managed API keys.
 
         Returns the active user and a managed API key ID when present.
