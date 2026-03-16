@@ -242,8 +242,10 @@ class LangChainAgent:
                 ToolDefinition(
                     name="search_documents",
                     description="Search through documents using semantic similarity. Use this to find relevant information from uploaded documents.",
-                    function=lambda kwargs, vector_store_name=vector_store_name: BuiltInTools.search_documents(
-                        vector_store_name, kwargs.get("query", ""), kwargs.get("k", 4)
+                    function=lambda kwargs, vector_store_name=vector_store_name: (
+                        BuiltInTools.search_documents(
+                            vector_store_name, kwargs.get("query", ""), kwargs.get("k", 4)
+                        )
                     ),
                 )
             )

@@ -507,6 +507,7 @@ class AnalyticsSummaryResponse(BaseModel):
     period_start: datetime
     period_end: datetime
 
+
 class AgentMetricsSummary(BaseModel):
     agent_id: uuid.UUID
     agent_name: str
@@ -520,10 +521,12 @@ class AgentMetricsSummary(BaseModel):
     period_start: datetime
     period_end: datetime
 
+
 class AnalyticsTimeSeries(BaseModel):
     timestamp: datetime
     value: float
     label: Optional[str] = None
+
 
 class AnalyticsTimeSeriesResponse(BaseModel):
     metric: str
@@ -531,6 +534,7 @@ class AnalyticsTimeSeriesResponse(BaseModel):
     data: list[AnalyticsTimeSeries]
     period_start: datetime
     period_end: datetime
+
 
 class CostSummaryResponse(BaseModel):
     total_credits_used: float
@@ -540,6 +544,7 @@ class CostSummaryResponse(BaseModel):
     usage_by_agent: dict[str, float]
     period_start: datetime
     period_end: datetime
+
 
 class BudgetResponse(BaseModel):
     user_id: uuid.UUID

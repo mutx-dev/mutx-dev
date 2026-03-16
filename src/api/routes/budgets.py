@@ -8,7 +8,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -78,22 +78,20 @@ async def get_budget(
 ):
     """Get current user's budget and credits."""
     result = await db.execute(
-        select(func.sum(UsageEvent.credits_used)).where(
-            UsageEvent.user_id == current_user.id
-        )
+        select(func.sum(UsageEvent.credits_used)).where(UsageEvent.user_id == current_user.id)
     )
     credits_used = result.scalar_one() or 0.0
-    
+
     credits_total = PLAN_CREDITS.get(current_user.plan, 100)
     credits_remaining = max(0, credits_total - credits_used)
-    
+
     now = datetime.now(timezone.utc)
     # Reset date is first day of next month
     if now.month == 12:
         reset_date = datetime(now.year + 1, 1, 1, tzinfo=timezone.utc)
     else:
         reset_date = datetime(now.year, now.month + 1, 1, tzinfo=timezone.utc)
-    
+
     return BudgetResponse(
         user_id=current_user.id,
         plan=current_user.plan.value,
@@ -114,7 +112,7 @@ async def get_usage_breakdown(
 ):
     """Get detailed usage breakdown by agent and event type."""
     now = datetime.now(timezone.utc)
-    
+
     if period_start == "24h":
         period_start_dt = now - timedelta(hours=24)
     elif period_start == "7d":
@@ -123,9 +121,9 @@ async def get_usage_breakdown(
         period_start_dt = now - timedelta(days=30)
     else:
         period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=30))
-    
+
     period_end_dt = _parse_datetime(period_end) or now
-    
+
     # Get all usage events in period
     result = await db.execute(
         select(UsageEvent).where(
@@ -137,7 +135,7 @@ async def get_usage_breakdown(
         )
     )
     events = result.scalars().all()
-    
+
     # Aggregate by agent
     agent_usage = {}
     for event in events:
@@ -146,27 +144,27 @@ async def get_usage_breakdown(
                 agent_usage[event.resource_id] = {"credits": 0, "count": 0}
             agent_usage[event.resource_id]["credits"] += event.credits_used or 0
             agent_usage[event.resource_id]["count"] += 1
-    
+
     # Get agent names
     usage_by_agent = []
     for agent_id_str, data in agent_usage.items():
         try:
             agent_id = uuid.UUID(agent_id_str)
-            agent_result = await db.execute(
-                select(Agent).where(Agent.id == agent_id)
-            )
+            agent_result = await db.execute(select(Agent).where(Agent.id == agent_id))
             agent = agent_result.scalar_one_or_none()
             agent_name = agent.name if agent else f"Unknown ({agent_id_str[:8]})"
         except ValueError:
             agent_name = f"Unknown ({agent_id_str[:8]})"
-        
-        usage_by_agent.append(UsageByAgent(
-            agent_id=uuid.UUID(agent_id_str) if agent_id_str else uuid.UUID(),
-            agent_name=agent_name,
-            credits_used=round(data["credits"], 2),
-            event_count=data["count"],
-        ))
-    
+
+        usage_by_agent.append(
+            UsageByAgent(
+                agent_id=uuid.UUID(agent_id_str) if agent_id_str else uuid.UUID(),
+                agent_name=agent_name,
+                credits_used=round(data["credits"], 2),
+                event_count=data["count"],
+            )
+        )
+
     # Aggregate by event type
     type_usage = {}
     for event in events:
@@ -175,7 +173,7 @@ async def get_usage_breakdown(
             type_usage[event_type] = {"credits": 0, "count": 0}
         type_usage[event_type]["credits"] += event.credits_used or 0
         type_usage[event_type]["count"] += 1
-    
+
     usage_by_type = [
         UsageByType(
             event_type=event_type,
@@ -184,11 +182,11 @@ async def get_usage_breakdown(
         )
         for event_type, data in type_usage.items()
     ]
-    
+
     # Calculate totals
     total_credits = sum(data["credits"] for data in agent_usage.values())
     credits_total = PLAN_CREDITS.get(current_user.plan, 100)
-    
+
     return UsageBreakdownResponse(
         total_credits_used=round(total_credits, 2),
         credits_remaining=max(0, credits_total - total_credits),
