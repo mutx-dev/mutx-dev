@@ -11,6 +11,7 @@ from sqlalchemy.orm import selectinload
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models import Agent, AgentRun, AgentRunTrace, User, UsageEvent
+from src.api.services.analytics import log_analytics_event, AnalyticsEventType
 from src.api.models.schemas import (
     RunCreate,
     RunDetailResponse,
@@ -127,6 +128,15 @@ async def create_run(
         )
 
     await db.commit()
+
+    # Track analytics event
+    await log_analytics_event(
+        db,
+        event_name="Agent run created",
+        event_type=AnalyticsEventType.AGENT_RUN_STARTED,
+        user_id=current_user.id,
+        properties={"agent_id": str(agent.id), "run_id": str(run.id)},
+    )
 
     # Track usage event
     usage_event = UsageEvent(
