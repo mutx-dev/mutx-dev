@@ -77,9 +77,6 @@ def setup_telemetry(service_name: str | None = None) -> trace.Tracer:
     # Create resource with service name
     resource = Resource(attributes={SERVICE_NAME: name})
     
-    # Create tracer provider with default sampler
-    provider = TracerProvider(resource=resource)
-    
     # Configure sampler based on env
     sampler_type = os.getenv("OTEL_TRACES_SAMPLER", "parentbased_traceidratio")
     sampler_arg = os.getenv("OTEL_TRACES_SAMPLER_ARG", "0.1")
