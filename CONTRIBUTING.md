@@ -52,6 +52,24 @@ Good contribution shapes:
 - Update the closest docs when behavior changes.
 - Do not bundle unrelated cleanup with the main change.
 
+### Updating the Changelog
+
+When your change affects users, update [CHANGELOG.md](CHANGELOG.md):
+
+1. Add your change under the `[Unreleased]` section
+2. Use the appropriate type:
+   - **Added**: New features
+   - **Changed**: Changes to existing functionality
+   - **Fixed**: Bug fixes
+   - **Security**: Security-related changes
+3. Be descriptive but concise
+
+Example:
+```markdown
+### Added
+- New `/agents/list` endpoint for bulk agent retrieval
+```
+
 ## Validation
 
 Use the smallest relevant validation set for your change.
@@ -78,6 +96,30 @@ npx playwright test --list
 ```
 
 Important: current Playwright specs target `https://mutx.dev`, not localhost.
+
+## Release Process
+
+For maintainers releasing new versions:
+
+1. **Update versions** in:
+   - `package.json` (frontend/app)
+   - `pyproject.toml` (CLI/SDK)
+
+2. **Update CHANGELOG.md**:
+   - Move `[Unreleased]` items to a new version section
+   - Add release date
+   - Create GitHub Release with the notes
+
+3. **Run validation**:
+   ```bash
+   npm run release:check
+   ```
+
+4. **Tag and publish**:
+   - Frontend: `git tag v1.0.0 && git push origin v1.0.0`
+   - CLI: `git tag cli-v0.1.0 && git push origin cli-v0.1.0`
+
+See [docs/changelog-status.md](docs/changelog-status.md) for full release documentation.
 
 ## Source Of Truth
 
