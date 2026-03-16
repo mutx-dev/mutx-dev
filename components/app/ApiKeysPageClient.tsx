@@ -23,6 +23,7 @@ export function ApiKeysPageClient() {
   const [rotatingId, setRotatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isMac, setIsMac] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const fetchKeys = async () => {
@@ -65,6 +66,8 @@ export function ApiKeysPageClient() {
       }
     }
     document.addEventListener('keydown', handleKeyDown);
+    // Detect Mac OS
+    setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.platform));
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
