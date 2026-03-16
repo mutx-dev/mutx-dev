@@ -21,6 +21,7 @@ from src.api.models import (
     AgentType,
     Deployment,
     DeploymentEvent as DeploymentEventModel,
+    AgentVersion,
     User,
 )
 from src.api.services.usage import track_usage
@@ -33,6 +34,9 @@ from src.api.models.schemas import (
     AgentLogResponse,
     AgentMetricResponse,
     AgentResponse,
+    AgentVersionResponse,
+    AgentVersionHistoryResponse,
+    AgentRollbackRequest,
     AnthropicAgentConfig,
     CustomAgentConfig,
     LangChainAgentConfig,
@@ -192,6 +196,19 @@ def _serialize_agent_config(agent: Agent) -> dict[str, Any]:
     }
 
 
+def _create_agent_version(agent: Agent, db: AsyncSession) -> AgentVersion:
+    """Create a new version entry for the agent config."""
+    config_snapshot = agent.config
+    version = AgentVersion(
+        agent_id=agent.id,
+        version=_extract_config_version(_deserialize_agent_config(config_snapshot)),
+        config_snapshot=config_snapshot,
+        status="current",
+    )
+    db.add(version)
+    return version
+
+
 def _serialize_agent(agent: Agent, include_deployments: bool = False):
     raw_config = _deserialize_agent_config(agent.config)
     config_dict = _normalize_agent_config_for_response(agent.type, raw_config)
@@ -335,6 +352,10 @@ async def update_agent_config(
     )
     current_config = _deserialize_agent_config(agent.config)
     current_version = _extract_config_version(current_config)
+    
+    # Create version snapshot of current config before updating
+    _create_agent_version(agent, db)
+    
     config_json, _normalized_config = _validate_agent_config(
         agent.type,
         request.config,
@@ -345,6 +366,97 @@ async def update_agent_config(
     await db.commit()
     await db.refresh(agent)
     logger.info(f"Updated config for agent: {agent_id}")
+    return _serialize_agent_config(agent)
+
+
+@router.get("/{agent_id}/versions", response_model=AgentVersionHistoryResponse)
+async def get_agent_versions(
+    agent_id: uuid.UUID,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get version history for a specific agent."""
+    agent = await get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to view this agent",
+    )
+
+    query = (
+        select(AgentVersion)
+        .where(AgentVersion.agent_id == agent.id)
+        .order_by(AgentVersion.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    result = await db.execute(query)
+    versions = result.scalars().all()
+
+    return {
+        "agent_id": agent.id,
+        "items": versions,
+        "total": len(versions),
+    }
+
+
+@router.post("/{agent_id}/rollback", response_model=AgentConfigResponse)
+async def rollback_agent(
+    agent_id: uuid.UUID,
+    rollback_data: AgentRollbackRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Rollback an agent to a specific version."""
+    agent = await get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to rollback this agent",
+    )
+
+    # Only allow rollback if agent is not currently running
+    if agent.status == AgentStatus.RUNNING.value:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot rollback agent while it is running. Stop the agent first.",
+        )
+
+    target_version_query = select(AgentVersion).where(
+        AgentVersion.agent_id == agent.id,
+        AgentVersion.version == rollback_data.version,
+    )
+    result = await db.execute(target_version_query)
+    target_version = result.scalar_one_or_none()
+
+    if not target_version:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Version {rollback_data.version} not found for this agent",
+        )
+
+    # Mark current versions as rolled back
+    old_result = await db.execute(
+        select(AgentVersion).where(
+            AgentVersion.agent_id == agent.id,
+            AgentVersion.status == "current",
+        )
+    )
+    old_versions = old_result.scalars().all()
+    for old_v in old_versions:
+        old_v.status = "rolled_back"
+        old_v.rolled_back_at = datetime.now(timezone.utc)
+
+    # Restore target version
+    agent.config = target_version.config_snapshot
+    target_version.status = "current"
+    target_version.rolled_back_at = None
+
+    await db.commit()
+    await db.refresh(agent)
+    logger.info(f"Rolled back agent {agent_id} to version {rollback_data.version}")
     return _serialize_agent_config(agent)
 
 
