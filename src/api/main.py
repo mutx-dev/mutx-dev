@@ -38,6 +38,7 @@ from src.api.routes import (
     leads,
     usage,
     runs,
+    rag,
     analytics,
 )
 from src.api.metrics import router as metrics_router, track_request
@@ -174,6 +175,7 @@ app.include_router(leads.contacts_router, prefix="/v1")
 app.include_router(agent_runtime.router, prefix="/v1")
 app.include_router(ingest.router, prefix="/v1")
 app.include_router(runs.router, prefix="/v1")
+app.include_router(rag.router, prefix="/v1")
 app.include_router(usage.router, prefix="/v1")
 
 
