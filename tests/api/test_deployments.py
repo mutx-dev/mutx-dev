@@ -515,7 +515,6 @@ class TestCreateDeployment:
         assert response.status_code == 400
         assert response.json() == {"detail": "Cannot deploy an agent that is being deleted"}
 
-
     @pytest.mark.asyncio
     async def test_create_deployment_missing_fields_returns_422(
         self, client: AsyncClient, test_agent
@@ -547,9 +546,7 @@ class TestCreateDeployment:
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_create_deployment_invalid_agent_returns_404(
-        self, client: AsyncClient
-    ):
+    async def test_create_deployment_invalid_agent_returns_404(self, client: AsyncClient):
         """Test creating deployment with non-existent agent returns 404."""
         fake_agent_id = "00000000-0000-0000-0000-000000000001"
         response = await client.post(
@@ -654,4 +651,3 @@ class TestRollbackDeployment:
         data = response.json()
         assert data["version"] == "v1.0.0"
         assert data["replicas"] == 2
-
