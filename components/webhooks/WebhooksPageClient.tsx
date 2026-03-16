@@ -15,6 +15,8 @@ import {
   Clock,
   ChevronDown,
   ChevronUp,
+  Copy,
+  Check,
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 
@@ -51,6 +53,7 @@ export default function WebhooksPageClient() {
   const [formData, setFormData] = useState({ url: "", events: "", is_active: true });
   const [submitting, setSubmitting] = useState(false);
   const [testingId, setTestingId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchWebhooks();
@@ -145,6 +148,12 @@ export default function WebhooksPageClient() {
     } finally {
       setTestingId(null);
     }
+  }
+
+  async function handleCopyId(id: string) {
+    await navigator.clipboard.writeText(id);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   }
 
   function startEdit(webhook: Webhook) {
@@ -404,6 +413,13 @@ export default function WebhooksPageClient() {
                       ) : (
                         <AlertCircle className="h-4 w-4 text-amber-500" />
                       )}
+                      <button
+                        onClick={() => handleCopyId(webhook.id)}
+                        className="flex items-center gap-1 rounded p-1 text-slate-500 hover:text-cyan-400 transition-colors"
+                        title="Copy webhook ID"
+                      >
+                        {copiedId === webhook.id ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                      </button>
                     </div>
                     <div className="flex gap-1 flex-wrap">
                       {webhook.events.map((event) => (
