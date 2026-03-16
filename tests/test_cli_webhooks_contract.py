@@ -46,7 +46,9 @@ def test_webhooks_list_hits_contract_route_and_forwards_filters(monkeypatch) -> 
         )
 
     monkeypatch.setattr("cli.commands.webhooks.CLIConfig", DummyConfig)
-    monkeypatch.setattr("cli.commands.webhooks.get_client", lambda config: SimpleNamespace(get=fake_get))
+    monkeypatch.setattr(
+        "cli.commands.webhooks.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
 
     runner = CliRunner()
     result = runner.invoke(cli, ["webhooks", "list", "--limit", "25", "--skip", "5"])
@@ -82,7 +84,9 @@ def test_webhooks_deliveries_hits_live_delivery_route_and_query_contract(monkeyp
         )
 
     monkeypatch.setattr("cli.commands.webhooks.CLIConfig", DummyConfig)
-    monkeypatch.setattr("cli.commands.webhooks.get_client", lambda config: SimpleNamespace(get=fake_get))
+    monkeypatch.setattr(
+        "cli.commands.webhooks.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
 
     runner = CliRunner()
     result = runner.invoke(
@@ -112,7 +116,9 @@ def test_webhooks_deliveries_hits_live_delivery_route_and_query_contract(monkeyp
             "success": True,
         },
     }
-    assert "delivery-1 | event=agent.status | success=False | attempts=2 | status=502" in result.output
+    assert (
+        "delivery-1 | event=agent.status | success=False | attempts=2 | status=502" in result.output
+    )
 
 
 def test_webhooks_get_hits_contract_route_and_prints_created_timestamp(monkeypatch) -> None:
@@ -133,7 +139,9 @@ def test_webhooks_get_hits_contract_route_and_prints_created_timestamp(monkeypat
         )
 
     monkeypatch.setattr("cli.commands.webhooks.CLIConfig", DummyConfig)
-    monkeypatch.setattr("cli.commands.webhooks.get_client", lambda config: SimpleNamespace(get=fake_get))
+    monkeypatch.setattr(
+        "cli.commands.webhooks.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
 
     runner = CliRunner()
     result = runner.invoke(cli, ["webhooks", "get", "wh-456"])

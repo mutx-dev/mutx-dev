@@ -1,4 +1,5 @@
 from datetime import datetime
+
 """
 Tests for /deployments endpoints.
 """
@@ -18,25 +19,23 @@ from src.api.models.models import (
 
 class TestListDeployments:
     """Tests for GET /deployments endpoint."""
-    
+
     @pytest.mark.asyncio
     async def test_list_deployments_empty(self, client: AsyncClient):
         """Test listing deployments when none exist."""
         response = await client.get("/api/deployments")
         assert response.status_code == 200
         assert response.json() == []
-    
+
     @pytest.mark.asyncio
-    async def test_list_deployments_with_data(
-        self, client: AsyncClient, test_deployment
-    ):
+    async def test_list_deployments_with_data(self, client: AsyncClient, test_deployment):
         """Test listing deployments returns all."""
         response = await client.get("/api/deployments")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 1
         assert data[0]["id"] == str(test_deployment.id)
-    
+
     @pytest.mark.asyncio
     async def test_list_deployments_pagination(
         self, client: AsyncClient, db_session: AsyncSession, test_agent
@@ -51,12 +50,12 @@ class TestListDeployments:
             )
             db_session.add(deployment)
         await db_session.commit()
-        
+
         response = await client.get("/api/deployments?limit=2")
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 2
-    
+
     @pytest.mark.asyncio
     async def test_list_deployments_by_agent_id(
         self, client: AsyncClient, test_deployment, db_session: AsyncSession, test_agent
@@ -73,7 +72,7 @@ class TestListDeployments:
         db_session.add(other_agent)
         await db_session.commit()
         await db_session.refresh(other_agent)
-        
+
         other_deployment = Deployment(
             agent_id=other_agent.id,
             status="running",
@@ -81,7 +80,7 @@ class TestListDeployments:
         )
         db_session.add(other_deployment)
         await db_session.commit()
-        
+
         # Filter by agent_id
         response = await client.get(f"/api/deployments?agent_id={test_agent.id}")
         assert response.status_code == 200
@@ -96,7 +95,7 @@ class TestListDeployments:
         """Test filtering by another user's agent is forbidden."""
         response = await other_user_client.get(f"/api/deployments?agent_id={test_agent.id}")
         assert response.status_code == 403
-    
+
     @pytest.mark.asyncio
     async def test_list_deployments_by_status(
         self, client: AsyncClient, test_deployment, db_session: AsyncSession, test_agent
@@ -110,7 +109,7 @@ class TestListDeployments:
         )
         db_session.add(stopped_deployment)
         await db_session.commit()
-        
+
         # Filter by status
         response = await client.get("/api/deployments?status=running")
         assert response.status_code == 200
@@ -121,24 +120,20 @@ class TestListDeployments:
 
 class TestGetDeployment:
     """Tests for GET /deployments/{deployment_id} endpoint."""
-    
+
     @pytest.mark.asyncio
-    async def test_get_deployment_success(
-        self, client: AsyncClient, test_deployment
-    ):
+    async def test_get_deployment_success(self, client: AsyncClient, test_deployment):
         """Test getting a specific deployment."""
         response = await client.get(f"/api/deployments/{test_deployment.id}")
         assert response.status_code == 200
         data = response.json()
         assert data["id"] == str(test_deployment.id)
         assert data["status"] == test_deployment.status
-    
+
     @pytest.mark.asyncio
     async def test_get_deployment_not_found(self, client: AsyncClient):
         """Test getting non-existent deployment returns 404."""
-        response = await client.get(
-            "/api/deployments/00000000-0000-0000-0000-999999999999"
-        )
+        response = await client.get("/api/deployments/00000000-0000-0000-0000-999999999999")
         assert response.status_code == 404
 
     @pytest.mark.asyncio
@@ -152,11 +147,9 @@ class TestGetDeployment:
 
 class TestScaleDeployment:
     """Tests for POST /deployments/{deployment_id}/scale endpoint."""
-    
+
     @pytest.mark.asyncio
-    async def test_scale_deployment_success(
-        self, client: AsyncClient, test_deployment
-    ):
+    async def test_scale_deployment_success(self, client: AsyncClient, test_deployment):
         """Test scaling a deployment."""
         response = await client.post(
             f"/api/deployments/{test_deployment.id}/scale",
@@ -165,7 +158,7 @@ class TestScaleDeployment:
         assert response.status_code == 200
         data = response.json()
         assert data["replicas"] == 5
-    
+
     @pytest.mark.asyncio
     async def test_scale_deployment_not_found(self, client: AsyncClient):
         """Test scaling non-existent deployment returns 404."""
@@ -174,7 +167,7 @@ class TestScaleDeployment:
             json={"replicas": 5},
         )
         assert response.status_code == 404
-    
+
     @pytest.mark.asyncio
     async def test_scale_deployment_invalid_status(
         self, client: AsyncClient, test_deployment, db_session: AsyncSession
@@ -183,7 +176,7 @@ class TestScaleDeployment:
         # Change to stopped status
         test_deployment.status = "stopped"
         await db_session.commit()
-        
+
         response = await client.post(
             f"/api/deployments/{test_deployment.id}/scale",
             json={"replicas": 5},
@@ -249,7 +242,9 @@ class TestDeploymentEvents:
         )
         await db_session.commit()
 
-        response = await client.get(f"/api/deployments/{test_deployment.id}/events?event_type=restart")
+        response = await client.get(
+            f"/api/deployments/{test_deployment.id}/events?event_type=restart"
+        )
         assert response.status_code == 200
         data = response.json()
         assert data["deployment_id"] == str(test_deployment.id)
@@ -351,7 +346,9 @@ class TestDeploymentLogs:
         )
         await db_session.commit()
 
-        response = await client.get(f"/api/deployments/{test_deployment.id}/logs?level=ERROR&limit=10")
+        response = await client.get(
+            f"/api/deployments/{test_deployment.id}/logs?level=ERROR&limit=10"
+        )
         assert response.status_code == 200
 
         data = response.json()
@@ -412,7 +409,7 @@ class TestDeploymentMetrics:
 
 class TestKillDeployment:
     """Tests for DELETE /deployments/{deployment_id} endpoint."""
-    
+
     @pytest.mark.asyncio
     async def test_kill_deployment_success(
         self, client: AsyncClient, test_deployment, db_session: AsyncSession
@@ -420,18 +417,16 @@ class TestKillDeployment:
         """Test killing a deployment."""
         response = await client.delete(f"/api/deployments/{test_deployment.id}")
         assert response.status_code == 204
-        
+
         # Verify deployment status changed
         await db_session.refresh(test_deployment)
         assert test_deployment.status == "killed"
         assert test_deployment.ended_at is not None
-    
+
     @pytest.mark.asyncio
     async def test_kill_deployment_not_found(self, client: AsyncClient):
         """Test killing non-existent deployment returns 404."""
-        response = await client.delete(
-            "/api/deployments/00000000-0000-0000-0000-999999999999"
-        )
+        response = await client.delete("/api/deployments/00000000-0000-0000-0000-999999999999")
         assert response.status_code == 404
 
     @pytest.mark.asyncio
@@ -441,7 +436,7 @@ class TestKillDeployment:
         """Test other users cannot kill deployments they do not own."""
         response = await other_user_client.delete(f"/api/deployments/{test_deployment.id}")
         assert response.status_code == 403
-    
+
     @pytest.mark.asyncio
     async def test_kill_deployment_stops_agent(
         self,
@@ -455,10 +450,10 @@ class TestKillDeployment:
         test_agent.status = AgentStatus.RUNNING.value
         test_deployment.status = "running"
         await db_session.commit()
-        
+
         response = await client.delete(f"/api/deployments/{test_deployment.id}")
         assert response.status_code == 204
-        
+
         # Verify agent status changed
         await db_session.refresh(test_agent)
         assert test_agent.status == AgentStatus.STOPPED.value
@@ -477,9 +472,6 @@ class TestCreateDeployment:
             json={"agent_id": str(test_agent.id), "replicas": 1},
         )
         assert response.status_code == 403
-
-
-
 
     @pytest.mark.asyncio
     async def test_create_deployment_records_create_event_and_sets_agent_running(
@@ -506,7 +498,6 @@ class TestCreateDeployment:
         await db_session.refresh(test_agent)
         assert test_agent.status == AgentStatus.RUNNING.value
 
-
     @pytest.mark.asyncio
     async def test_create_deployment_rejects_agents_being_deleted(
         self, client: AsyncClient, test_agent, db_session: AsyncSession
@@ -522,6 +513,7 @@ class TestCreateDeployment:
 
         assert response.status_code == 400
         assert response.json() == {"detail": "Cannot deploy an agent that is being deleted"}
+
 
 class TestRestartDeployment:
     """Tests for POST /deployments/{deployment_id}/restart endpoint."""
@@ -546,7 +538,9 @@ class TestRestartDeployment:
         assert data["ended_at"] is None
         assert data["error_message"] is None
 
-        events_response = await client.get(f"/api/deployments/{test_deployment.id}/events?event_type=restart")
+        events_response = await client.get(
+            f"/api/deployments/{test_deployment.id}/events?event_type=restart"
+        )
         assert events_response.status_code == 200
         events_data = events_response.json()
         assert events_data["total"] == 1
@@ -621,7 +615,9 @@ class TestDeploymentVersionsComprehensive:
     @pytest.mark.asyncio
     async def test_get_deployment_versions_not_found(self, client: AsyncClient):
         """Test getting versions for non-existent deployment returns 404."""
-        response = await client.get("/api/deployments/00000000-0000-0000-0000-999999999999/versions")
+        response = await client.get(
+            "/api/deployments/00000000-0000-0000-0000-999999999999/versions"
+        )
         assert response.status_code == 404
 
 
@@ -629,9 +625,7 @@ class TestRollbackDeploymentComprehensive:
     """Comprehensive tests for POST /deployments/{deployment_id}/rollback endpoint."""
 
     @pytest.mark.asyncio
-    async def test_rollback_deployment_success(
-        self, client: AsyncClient, test_deployment
-    ):
+    async def test_rollback_deployment_success(self, client: AsyncClient, test_deployment):
         """Test successfully rolling back a deployment."""
         response = await client.post(
             f"/api/deployments/{test_deployment.id}/rollback",
@@ -650,9 +644,7 @@ class TestRollbackDeploymentComprehensive:
         assert response.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_rollback_deployment_invalid_version(
-        self, client: AsyncClient, test_deployment
-    ):
+    async def test_rollback_deployment_invalid_version(self, client: AsyncClient, test_deployment):
         """Test rolling back with invalid version returns error."""
         response = await client.post(
             f"/api/deployments/{test_deployment.id}/rollback",

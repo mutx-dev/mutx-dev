@@ -120,7 +120,9 @@ async def test_runs_are_scoped_by_authenticated_user(client, other_user_client, 
 
 
 @pytest.mark.asyncio
-async def test_create_run_rejects_agent_not_owned_by_requesting_user(client, db_session, other_user):
+async def test_create_run_rejects_agent_not_owned_by_requesting_user(
+    client, db_session, other_user
+):
     other_agent = Agent(
         id=uuid.UUID("66666666-6666-4666-a666-666666666666"),
         name="other-agent",

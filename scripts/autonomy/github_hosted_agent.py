@@ -23,7 +23,9 @@ def build_prompt(agent: str, brief: str, work_order: dict) -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Build a GitHub-hosted prompt bundle for a MUTX work order")
+    parser = argparse.ArgumentParser(
+        description="Build a GitHub-hosted prompt bundle for a MUTX work order"
+    )
     parser.add_argument("--agent", required=True)
     parser.add_argument("--brief", required=True)
     parser.add_argument("--work-order", required=True)
@@ -42,7 +44,9 @@ def main() -> int:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(prompt)
     print(f"Prompt artifact written to {output_path}")
-    print("Replace this wrapper with your model invocation, or call it from AUTONOMY_AGENT_CMD_TEMPLATE.")
+    print(
+        "Replace this wrapper with your model invocation, or call it from AUTONOMY_AGENT_CMD_TEMPLATE."
+    )
     return 0
 
 

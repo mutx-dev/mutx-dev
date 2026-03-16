@@ -78,7 +78,9 @@ def test_deployments_create_hits_canonical_route_and_maps_payload() -> None:
             json=_deployment_payload(agent_id=str(agent_id), status="pending", replicas=3),
         )
 
-    with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+    with httpx.Client(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
         deployment = Deployments(client).create(agent_id, replicas=3)
 
     assert captured["path"] == "/deployments"
@@ -121,9 +123,13 @@ def test_deployments_restart_hits_contract_route_and_maps_payload() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
         captured["body"] = request.content.decode()
-        return httpx.Response(200, json=_deployment_payload(id=str(deployment_id), status="pending"))
+        return httpx.Response(
+            200, json=_deployment_payload(id=str(deployment_id), status="pending")
+        )
 
-    with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+    with httpx.Client(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
         deployment = Deployments(client).restart(deployment_id)
 
     assert captured["path"] == f"/deployments/{deployment_id}/restart"
@@ -140,7 +146,9 @@ async def test_deployments_arestart_hits_contract_route_and_maps_payload() -> No
     def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
         captured["body"] = request.content.decode()
-        return httpx.Response(200, json=_deployment_payload(id=str(deployment_id), status="pending"))
+        return httpx.Response(
+            200, json=_deployment_payload(id=str(deployment_id), status="pending")
+        )
 
     async with httpx.AsyncClient(
         base_url="https://api.test",
@@ -171,7 +179,9 @@ def test_deployments_events_hits_contract_route_and_maps_payload() -> None:
             ),
         )
 
-    with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+    with httpx.Client(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
         history = Deployments(client).events(
             deployment_id,
             skip=3,
@@ -277,7 +287,9 @@ def test_deployments_logs_support_level_filter_param() -> None:
         captured["query"] = dict(request.url.params)
         return httpx.Response(200, json=[])
 
-    with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+    with httpx.Client(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
         payload = Deployments(client).logs(deployment_id, skip=2, limit=50, level="ERROR")
 
     assert payload == []
@@ -315,7 +327,9 @@ def test_deployments_metrics_hits_contract_route_and_query_params() -> None:
         captured["query"] = dict(request.url.params)
         return httpx.Response(200, json=_metrics_payload())
 
-    with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
+    with httpx.Client(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
         payload = Deployments(client).metrics(deployment_id, skip=5, limit=15)
 
     assert captured["path"] == f"/deployments/{deployment_id}/metrics"

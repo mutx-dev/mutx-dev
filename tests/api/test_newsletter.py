@@ -1,8 +1,10 @@
 """
 Tests for /newsletter endpoints.
 """
+
 import pytest
 from httpx import AsyncClient
+
 
 class TestNewsletter:
     """Tests for waitlist/newsletter."""
@@ -18,8 +20,7 @@ class TestNewsletter:
     async def test_waitlist_signup(self, client: AsyncClient):
         """Test signing up for waitlist."""
         response = await client.post(
-            "/api/newsletter",
-            json={"email": "test-news@example.com", "source": "test"}
+            "/api/newsletter", json={"email": "test-news@example.com", "source": "test"}
         )
         assert response.status_code == 200
         assert response.json()["message"] == "You're on the list!"
@@ -29,14 +30,8 @@ class TestNewsletter:
     async def test_waitlist_duplicate_signup(self, client: AsyncClient):
         """Test duplicate signup."""
         # First signup
-        await client.post(
-            "/api/newsletter",
-            json={"email": "dup@example.com"}
-        )
+        await client.post("/api/newsletter", json={"email": "dup@example.com"})
         # Second signup
-        response = await client.post(
-            "/api/newsletter",
-            json={"email": "dup@example.com"}
-        )
+        response = await client.post("/api/newsletter", json={"email": "dup@example.com"})
         assert response.status_code == 200
         assert response.json()["duplicate"] is True

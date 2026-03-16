@@ -1,6 +1,7 @@
 """
 Pytest configuration and fixtures for MUTX API tests.
 """
+
 import asyncio
 from datetime import datetime
 from collections.abc import AsyncGenerator
@@ -50,9 +51,9 @@ def create_test_app() -> FastAPI:
         leads,
         runs,
     )
-    
+
     app = FastAPI(title="MUTX Test API")
-    
+
     # Include routers
     app.include_router(agents.router, prefix="/api")
     app.include_router(deployments.router, prefix="/api")
@@ -65,7 +66,7 @@ def create_test_app() -> FastAPI:
     app.include_router(leads.router, prefix="/api")
     app.include_router(ingest.router, prefix="/api")
     app.include_router(runs.router, prefix="/api")
-    
+
     # Health check endpoint
     @app.get("/")
     async def root():
@@ -84,7 +85,7 @@ def create_test_app() -> FastAPI:
     @app.get("/health")
     async def health():
         return {"status": "ok"}
-    
+
     return app
 
 
@@ -105,31 +106,29 @@ async def test_engine():
     # errors.
     from src.api.models import models as _models  # noqa: F401
     from src.api.database import Base
-    
+
     engine = create_async_engine(
         TEST_DATABASE_URL,
         connect_args={"check_same_thread": False} if "sqlite" in TEST_DATABASE_URL else {},
         poolclass=StaticPool if "sqlite" in TEST_DATABASE_URL else None,
     )
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     yield engine
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-    
+
     await engine.dispose()
 
 
 @pytest_asyncio.fixture(scope="function")
 async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
     """Create test database session."""
-    async_session = sessionmaker(
-        test_engine, class_=AsyncSession, expire_on_commit=False
-    )
-    
+    async_session = sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
+
     async with async_session() as session:
         yield session
 
@@ -141,17 +140,17 @@ async def client(db_session: AsyncSession, test_user):
     from src.api.middleware.auth import get_current_user, get_current_user_or_api_key
     from src.api.routes.webhooks import get_webhook_auth
     from src.api.routes.ingest import get_ingest_auth
-    
+
     # Create test app
     test_app = create_test_app()
-    
+
     async def override_get_db():
         yield db_session
-    
+
     # Override get_current_user to return test user
     async def override_get_current_user():
         return test_user
-    
+
     # Override get_current_user_or_api_key to return test user
     async def override_get_current_user_or_api_key():
         return test_user
@@ -161,21 +160,20 @@ async def client(db_session: AsyncSession, test_user):
 
     async def override_get_ingest_auth():
         return test_user
-    
+
     # Override dependencies
     test_app.dependency_overrides[get_db] = override_get_db
     test_app.dependency_overrides[get_current_user] = override_get_current_user
-    test_app.dependency_overrides[get_current_user_or_api_key] = override_get_current_user_or_api_key
+    test_app.dependency_overrides[get_current_user_or_api_key] = (
+        override_get_current_user_or_api_key
+    )
     test_app.dependency_overrides[get_webhook_auth] = override_get_webhook_auth
     test_app.dependency_overrides[get_ingest_auth] = override_get_ingest_auth
-    
-    async with AsyncClient(
-        transport=ASGITransport(app=test_app),
-        base_url="http://test"
-    ) as client:
+
+    async with AsyncClient(transport=ASGITransport(app=test_app), base_url="http://test") as client:
         client.app = test_app
         yield client
-    
+
     test_app.dependency_overrides.clear()
 
 
@@ -183,21 +181,18 @@ async def client(db_session: AsyncSession, test_user):
 async def client_no_auth(db_session: AsyncSession):
     """Create test client without auth override (for testing auth)."""
     from src.api.database import get_db
-    
+
     test_app = create_test_app()
-    
+
     async def override_get_db():
         yield db_session
-    
+
     test_app.dependency_overrides[get_db] = override_get_db
-    
-    async with AsyncClient(
-        transport=ASGITransport(app=test_app),
-        base_url="http://test"
-    ) as client:
+
+    async with AsyncClient(transport=ASGITransport(app=test_app), base_url="http://test") as client:
         client.app = test_app
         yield client
-    
+
     test_app.dependency_overrides.clear()
 
 
@@ -208,15 +203,15 @@ async def other_user_client(db_session: AsyncSession, other_user):
     from src.api.middleware.auth import get_current_user, get_current_user_or_api_key
     from src.api.routes.webhooks import get_webhook_auth
     from src.api.routes.ingest import get_ingest_auth
-    
+
     test_app = create_test_app()
-    
+
     async def override_get_db():
         yield db_session
-    
+
     async def override_get_current_user():
         return other_user
-    
+
     async def override_get_current_user_or_api_key():
         return other_user
 
@@ -225,20 +220,19 @@ async def other_user_client(db_session: AsyncSession, other_user):
 
     async def override_get_ingest_auth():
         return other_user
-    
+
     test_app.dependency_overrides[get_db] = override_get_db
     test_app.dependency_overrides[get_current_user] = override_get_current_user
-    test_app.dependency_overrides[get_current_user_or_api_key] = override_get_current_user_or_api_key
+    test_app.dependency_overrides[get_current_user_or_api_key] = (
+        override_get_current_user_or_api_key
+    )
     test_app.dependency_overrides[get_webhook_auth] = override_get_webhook_auth
     test_app.dependency_overrides[get_ingest_auth] = override_get_ingest_auth
-    
-    async with AsyncClient(
-        transport=ASGITransport(app=test_app),
-        base_url="http://test"
-    ) as client:
+
+    async with AsyncClient(transport=ASGITransport(app=test_app), base_url="http://test") as client:
         client.app = test_app
         yield client
-    
+
     test_app.dependency_overrides.clear()
 
 
@@ -246,7 +240,7 @@ async def other_user_client(db_session: AsyncSession, other_user):
 async def test_user(db_session: AsyncSession):
     """Create a test user."""
     from src.api.models.models import User
-    
+
     user = User(
         id=uuid.UUID("11111111-1111-4111-a111-111111111111"),
         email="test@mutx.dev",
@@ -264,7 +258,7 @@ async def test_user(db_session: AsyncSession):
 async def other_user(db_session: AsyncSession):
     """Create another test user for authorization tests."""
     from src.api.models.models import User
-    
+
     user = User(
         id=uuid.UUID("22222222-2222-4222-a222-222222222222"),
         email="other@example.com",
@@ -281,7 +275,7 @@ async def other_user(db_session: AsyncSession):
 async def test_agent(db_session: AsyncSession, test_user):
     """Create a test agent."""
     from src.api.models.models import Agent, AgentStatus
-    
+
     agent = Agent(
         id=uuid.UUID("33333333-3333-4333-a333-333333333333"),
         name="test-agent",
@@ -299,7 +293,7 @@ async def test_agent(db_session: AsyncSession, test_user):
 async def test_deployment(db_session: AsyncSession, test_agent):
     """Create a test deployment."""
     from src.api.models.models import Deployment
-    
+
     deployment = Deployment(
         id=uuid.UUID("44444444-4444-4444-a444-444444444444"),
         agent_id=test_agent.id,

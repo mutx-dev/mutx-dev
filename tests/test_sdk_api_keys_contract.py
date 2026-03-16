@@ -8,7 +8,6 @@ from __future__ import annotations
 import json
 import sys
 import uuid
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -76,6 +75,7 @@ def test_api_keys_alist_hits_contract_route() -> None:
     api_keys = APIKeys(client)
 
     import asyncio
+
     asyncio.run(api_keys.alist())
 
     assert captured["path"] == "/api-keys"
@@ -130,6 +130,7 @@ def test_api_keys_acreate_hits_contract_route() -> None:
     api_keys = APIKeys(client)
 
     import asyncio
+
     asyncio.run(api_keys.acreate(name="async-key"))
 
     assert captured["path"] == "/api-keys"
@@ -167,6 +168,7 @@ def test_api_keys_arevoke_hits_contract_route() -> None:
     api_keys = APIKeys(client)
 
     import asyncio
+
     asyncio.run(api_keys.arevoke(key_id))
 
     assert captured["path"] == f"/api-keys/{key_id}"
@@ -205,6 +207,7 @@ def test_api_keys_arotate_hits_contract_route() -> None:
     api_keys = APIKeys(client)
 
     import asyncio
+
     result = asyncio.run(api_keys.arotate(key_id))
 
     assert captured["path"] == f"/api-keys/{key_id}/rotate"
@@ -221,10 +224,12 @@ def test_api_key_parses_required_fields() -> None:
 
 
 def test_api_key_parses_optional_fields() -> None:
-    key = APIKey(_api_key_payload(
-        last_used="2026-03-14T10:00:00",
-        expires_at="2026-04-14T10:00:00",
-    ))
+    key = APIKey(
+        _api_key_payload(
+            last_used="2026-03-14T10:00:00",
+            expires_at="2026-04-14T10:00:00",
+        )
+    )
 
     assert key.last_used is not None
     assert key.expires_at is not None

@@ -1,10 +1,10 @@
 """
 Tests for /ingest endpoints.
 """
+
 import uuid
 
 import pytest
-import pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -55,9 +55,7 @@ class TestIngestEndpoints:
         assert data["status"] == "updated"
 
     @pytest.mark.asyncio
-    async def test_agent_status_update_not_found(
-        self, client: AsyncClient, test_user: User
-    ):
+    async def test_agent_status_update_not_found(self, client: AsyncClient, test_user: User):
         """Test agent status update returns 404 for unknown agent."""
         response = await client.post(
             "/api/ingest/agent-status",
@@ -106,13 +104,13 @@ class TestIngestEndpoints:
 
 class TestIngestMetricsEndpoint:
     """Tests for /ingest/metrics endpoint."""
-import uuid
+
 
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.models.models import Agent, AgentStatus, User
+from src.api.models.models import User
 
 
 class TestIngestAPIKeyAuth:
@@ -120,7 +118,11 @@ class TestIngestAPIKeyAuth:
 
     @pytest.mark.asyncio
     async def test_agent_status_update_with_api_key(
-        self, client: AsyncClient, client_no_auth: AsyncClient, db_session: AsyncSession, test_user: User
+        self,
+        client: AsyncClient,
+        client_no_auth: AsyncClient,
+        db_session: AsyncSession,
+        test_user: User,
     ):
         """Test that an API key can be used to authenticate to /ingest/agent-status."""
         # First create an API key (requires auth)
@@ -186,7 +188,11 @@ class TestIngestAPIKeyAuth:
 
     @pytest.mark.asyncio
     async def test_agent_status_update_with_revoked_api_key(
-        self, client: AsyncClient, client_no_auth: AsyncClient, db_session: AsyncSession, test_user: User
+        self,
+        client: AsyncClient,
+        client_no_auth: AsyncClient,
+        db_session: AsyncSession,
+        test_user: User,
     ):
         """Test that a revoked API key is rejected."""
         # Create and then revoke an API key (requires auth)

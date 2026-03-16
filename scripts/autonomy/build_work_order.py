@@ -111,7 +111,9 @@ def build_work_order(issue: dict[str, Any]) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Choose the next autonomous MUTX work order")
     parser.add_argument("--queue", required=True, help="JSON file containing GitHub issue payloads")
-    parser.add_argument("--output", required=True, help="Path to write the selected work order JSON")
+    parser.add_argument(
+        "--output", required=True, help="Path to write the selected work order JSON"
+    )
     args = parser.parse_args()
 
     queue_path = Path(args.queue)

@@ -121,16 +121,21 @@ def test_agent_detail_parses_nested_deployments_and_events() -> None:
 
 def test_agent_logs_maps_backend_extra_data_field_to_sdk_aliases() -> None:
     agent_id = uuid.uuid4()
-    log_payload = [{
-        "id": str(uuid.uuid4()),
-        "agent_id": str(agent_id),
-        "level": "INFO",
-        "message": "ready",
-        "extra_data": '{"deployment_id":"abc"}',
-        "timestamp": "2026-03-12T10:15:00",
-    }]
+    log_payload = [
+        {
+            "id": str(uuid.uuid4()),
+            "agent_id": str(agent_id),
+            "level": "INFO",
+            "message": "ready",
+            "extra_data": '{"deployment_id":"abc"}',
+            "timestamp": "2026-03-12T10:15:00",
+        }
+    ]
 
-    client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(lambda request: httpx.Response(200, json=log_payload)))
+    client = httpx.Client(
+        base_url="https://api.test",
+        transport=httpx.MockTransport(lambda request: httpx.Response(200, json=log_payload)),
+    )
     logs = Agents(client).logs(agent_id)
 
     assert logs[0].extra_data == '{"deployment_id":"abc"}'

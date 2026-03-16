@@ -48,7 +48,9 @@ async def test_registered_agent_api_key_authenticates_runtime_status_and_heartbe
 
 
 @pytest.mark.asyncio
-async def test_agent_status_requires_runtime_auth_not_just_agent_id(client_no_auth: AsyncClient, test_agent):
+async def test_agent_status_requires_runtime_auth_not_just_agent_id(
+    client_no_auth: AsyncClient, test_agent
+):
     unauthenticated_response = await client_no_auth.get(f"/api/agents/{test_agent.id}/status")
 
     assert unauthenticated_response.status_code == 401
@@ -82,7 +84,7 @@ async def test_connected_agent_runtime_sdk_uses_status_auth_contract(client: Asy
     sdk_client = MutxAgentClient(mutx_url="http://testserver")
 
     transport = client._transport
-    sdk_client._client = __import__('httpx').AsyncClient(
+    sdk_client._client = __import__("httpx").AsyncClient(
         transport=transport,
         base_url="http://testserver",
         timeout=sdk_client.timeout,
@@ -231,7 +233,9 @@ async def test_heartbeat_event_payload_shape_and_timing_contract(client: AsyncCl
 
 
 @pytest.mark.asyncio
-async def test_heartbeat_webhook_failure_does_not_fail_heartbeat_response(client: AsyncClient, monkeypatch):
+async def test_heartbeat_webhook_failure_does_not_fail_heartbeat_response(
+    client: AsyncClient, monkeypatch
+):
     call_log = {
         "agent.heartbeat": 0,
         "agent.status": 0,

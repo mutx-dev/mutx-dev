@@ -24,7 +24,9 @@ mutx_agents_total = Gauge("mutx_agents_total", "Total number of agents")
 mutx_agents_active = Gauge("mutx_agents_active", "Number of active agents")
 
 mutx_agent_tasks_total = Counter(
-    "mutx_agent_tasks_total", "Total agent tasks processed", ["status"]  # success, failed, timeout
+    "mutx_agent_tasks_total",
+    "Total agent tasks processed",
+    ["status"],  # success, failed, timeout
 )
 
 mutx_agent_task_duration_seconds = Histogram(
