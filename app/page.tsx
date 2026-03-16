@@ -62,6 +62,10 @@ export default function LandingPage() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false)
+        return
+      }
       if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
         const target = e.target as HTMLElement
         if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
@@ -72,7 +76,7 @@ export default function LandingPage() {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [copyDemoCommand])
+  }, [copyDemoCommand, mobileMenuOpen])
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white/20">
