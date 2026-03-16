@@ -103,20 +103,22 @@ describe('addVersionHeaders', () => {
 
   it('adds Deprecation: true for a deprecated version', () => {
     // Use jest.replaceProperty so we don't mutate the shared exported constant
-    jest.replaceProperty(
+    const replaced = jest.replaceProperty(
       require('../../app/api/_lib/versioning'),
       'DEPRECATED_API_VERSIONS',
       ['v1']
     )
 
-    // Re-import the function bound to the updated module state
-    const { addVersionHeaders: addHeaders } = require('../../app/api/_lib/versioning')
+    try {
+      // Re-import the function bound to the updated module state
+      const { addVersionHeaders: addHeaders } = require('../../app/api/_lib/versioning')
 
-    const response = NextResponse.json({ ok: true })
-    addHeaders(response, 'v1')
-    expect(response.headers.get('Deprecation')).toBe('true')
-
-    jest.restoreAllMocks()
+      const response = NextResponse.json({ ok: true })
+      addHeaders(response, 'v1')
+      expect(response.headers.get('Deprecation')).toBe('true')
+    } finally {
+      replaced.restore()
+    }
   })
 })
 
