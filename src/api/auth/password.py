@@ -1,20 +1,23 @@
 import re
 from typing import Optional
 
-from passlib.context import CryptContext
+import bcrypt
 
 # Fallback to pbkdf2_sha256 if bcrypt is acting up with newer python/library versions
-pwd_context = CryptContext(schemes=["pbkdf2_sha256", "bcrypt"], deprecated="auto")
+# Using bcrypt directly for password hashing
 
 MIN_PASSWORD_LENGTH = 8
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
+    except (ValueError, TypeError):
+        return False
 
 
 def validate_password_strength(password: str) -> tuple[bool, Optional[str]]:

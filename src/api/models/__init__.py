@@ -19,6 +19,7 @@ from src.api.models.models import (
     AlertType,
     Command,
     UsageEvent,
+    AnalyticsEvent,
 )
 
 from src.api.models.plan_tiers import (
@@ -57,4 +58,5 @@ __all__ = [
     "AlertType",
     "Command",
     "UsageEvent",
+    "AnalyticsEvent",
 ]
