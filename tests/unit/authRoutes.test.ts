@@ -11,8 +11,42 @@ jest.mock('../../app/api/_lib/controlPlane', () => ({
   shouldUseSecureCookies,
 }))
 
-function mockRequest() {
-  return {} as NextRequest
+function mockRequest(options?: {
+  url?: string
+  method?: string
+  headers?: Record<string, string>
+  cookies?: Record<string, string>
+}) {
+  const url = options?.url ?? 'http://localhost/'
+  const method = options?.method ?? 'GET'
+  const headers = new Headers(options?.headers ?? {})
+  const cookieStore = new Map<string, string>(Object.entries(options?.cookies ?? {}))
+
+  const cookies = {
+    get(name: string) {
+      const value = cookieStore.get(name)
+      return value !== undefined ? { name, value } : undefined
+    },
+    set(name: string, value: string) {
+      cookieStore.set(name, value)
+    },
+    delete(name: string) {
+      cookieStore.delete(name)
+    },
+    has(name: string) {
+      return cookieStore.has(name)
+    },
+  }
+
+  const nextUrl = new URL(url)
+
+  return {
+    method,
+    url,
+    headers,
+    cookies,
+    nextUrl,
+  } as unknown as NextRequest
 }
 
 function mockJsonRequest(body: unknown) {
@@ -22,11 +56,17 @@ function mockJsonRequest(body: unknown) {
 }
 
 describe('auth route handlers', () => {
+  let fetchSpy: jest.SpyInstance
+
   beforeEach(() => {
     getAuthToken.mockReset()
     getCookieDomain.mockReturnValue(undefined)
     shouldUseSecureCookies.mockReturnValue(false)
-    global.fetch = jest.fn()
+    fetchSpy = jest.spyOn(global, 'fetch' as any).mockImplementation(jest.fn())
+  })
+
+  afterEach(() => {
+    fetchSpy.mockRestore()
   })
 
   describe('POST /api/auth/login', () => {
