@@ -9,13 +9,15 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, Field
-from sqlalchemy import select
+from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
-from src.api.models import Agent, Deployment, User
+from src.api.models import Agent, AgentStatus, Deployment, User
+from src.api.models.schemas import DeploymentResponse
 
 router = APIRouter(prefix="/swarms", tags=["swarms"])
 logger = logging.getLogger(__name__)
