@@ -197,6 +197,7 @@ class AgentRuntime:
         # Instrument agent creation with tracing
         if is_otel_enabled():
             from opentelemetry import trace
+
             tracer = trace.get_tracer(__name__)
             with tracer.start_as_current_span("agent.initialize") as span:
                 span.set_attribute("agent.name", name)
@@ -226,7 +227,7 @@ class AgentRuntime:
                 **kwargs,
             )
             agent = AgentRegistry.create_agent(config)
-        
+
         self.state.active_agents += 1
         logger.info(f"Created agent {agent.agent_id} in runtime {self.runtime_id}")
         return agent
