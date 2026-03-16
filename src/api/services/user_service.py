@@ -28,7 +28,8 @@ def generate_user_api_key() -> str:
 
 
 def hash_api_key(key: str) -> str:
-    return hashlib.sha256(key.encode()).hexdigest()
+    # Use a computationally expensive hash (bcrypt via passlib) for API keys
+    return api_key_context.hash(key)
 
 
 def verify_api_key(plain_key: str, hashed_key: str) -> bool:
