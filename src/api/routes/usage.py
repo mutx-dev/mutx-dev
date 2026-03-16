@@ -1,4 +1,5 @@
 """Usage event tracking API"""
+
 import json
 import logging
 import uuid
@@ -21,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 class UsageEventListResponse(BaseModel):
     """Paginated response for usage events"""
+
     items: list[UsageEventResponse]
     total: int
     skip: int
@@ -38,11 +40,7 @@ async def create_usage_event(
         event_type=event_data.event_type,
         user_id=current_user.id,
         resource_id=event_data.resource_id,
-        event_metadata=(
-            json.dumps(event_data.metadata) 
-            if event_data.metadata 
-            else None
-        ),
+        event_metadata=(json.dumps(event_data.metadata) if event_data.metadata else None),
         created_at=datetime.now(timezone.utc),
     )
     db.add(usage_event)
@@ -64,22 +62,22 @@ async def list_usage_events(
     """List usage events for the authenticated user."""
     # Filter by current user's events
     query = select(UsageEvent).where(UsageEvent.user_id == current_user.id)
-    
+
     if event_type:
         query = query.where(UsageEvent.event_type == event_type)
     if resource_id:
         query = query.where(UsageEvent.resource_id == resource_id)
-    
+
     # Get total count
     count_query = select(func.count()).select_from(query.subquery())
     total_result = await db.execute(count_query)
     total = total_result.scalar_one()
-    
+
     # Apply pagination
     query = query.order_by(UsageEvent.created_at.desc()).offset(skip).limit(limit)
     result = await db.execute(query)
     events = result.scalars().all()
-    
+
     return UsageEventListResponse(
         items=events,
         total=total,
@@ -96,14 +94,14 @@ async def get_usage_event(
 ):
     """Get a specific usage event."""
     query = select(UsageEvent).where(
-        UsageEvent.id == event_id,
-        UsageEvent.user_id == current_user.id
+        UsageEvent.id == event_id, UsageEvent.user_id == current_user.id
     )
     result = await db.execute(query)
     event = result.scalar_one_or_none()
-    
+
     if not event:
         from fastapi import HTTPException
+
         raise HTTPException(status_code=404, detail="Usage event not found")
-    
+
     return event

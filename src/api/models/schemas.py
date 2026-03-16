@@ -459,7 +459,6 @@ class UsageEventCreate(BaseModel):
     )
 
 
-
 class UsageEventResponse(BaseModel):
     """Response model for usage events"""
 
@@ -479,6 +478,7 @@ class UsageEventResponse(BaseModel):
         if self.event_metadata:
             try:
                 import json
+
                 return json.loads(self.event_metadata)
             except (json.JSONDecodeError, TypeError):
                 return None
