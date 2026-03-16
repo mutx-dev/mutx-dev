@@ -18,8 +18,7 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
-import pydantic
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -124,7 +123,7 @@ class AgentVersionHistoryResponse(BaseModel):
 class AgentRollbackRequest(BaseModel):
     """Request model for rolling back an agent to a specific version."""
 
-    version: int = pydantic.Field(..., description="The version number to rollback to")
+    version: int = Field(..., description="The version number to rollback to")
 
 
 # --- Routes ---
