@@ -15,16 +15,18 @@ async def track_usage(
     user_id: uuid.UUID,
     event_type: str,
     resource_type: Optional[str] = None,
-    resource_id: Optional[uuid.UUID] = None,
+    resource_id: Optional[str] = None,
     metadata: Optional[dict] = None,
     credits_used: float = 1.0,
 ) -> UsageEvent:
     """Track a usage event for quota and billing purposes."""
+    # Convert UUID to string for SQLite compatibility
+    resource_id_str = str(resource_id) if resource_id else None
     event = UsageEvent(
         user_id=user_id,
         event_type=event_type,
         resource_type=resource_type,
-        resource_id=resource_id,
+        resource_id=resource_id_str,
         event_metadata=json.dumps(metadata) if metadata else None,
         credits_used=credits_used,
     )

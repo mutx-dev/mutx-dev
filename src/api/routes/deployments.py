@@ -216,7 +216,7 @@ async def scale_deployment(
     usage_event = UsageEvent(
         event_type="deployment_scaled",
         user_id=current_user.id,
-        resource_id=deployment_id, resource_type="deployment", credits_used=1.0,
+        resource_id=str(deployment_id), resource_type="deployment", credits_used=1.0,
         event_metadata=f'{{"replicas": {scale_data.replicas}}}',
         created_at=datetime.now(timezone.utc),
     )
@@ -256,7 +256,7 @@ async def kill_deployment(
     usage_event = UsageEvent(
         event_type="deployment_killed",
         user_id=current_user.id,
-        resource_id=deployment_id, resource_type="deployment", credits_used=1.0,
+        resource_id=str(deployment_id), resource_type="deployment", credits_used=1.0,
         event_metadata=None,
         created_at=datetime.now(timezone.utc),
     )
@@ -316,7 +316,7 @@ async def create_deployment(
         user_id=current_user.id,
         event_type="deployment_create",
         resource_type="deployment",
-        resource_id=deployment.id,
+        resource_id=str(deployment.id),
         metadata={"replicas": deployment.replicas},
     )
 
@@ -384,7 +384,7 @@ async def restart_deployment(
     usage_event = UsageEvent(
         event_type="deployment_restarted",
         user_id=current_user.id,
-        resource_id=deployment_id, resource_type="deployment", credits_used=1.0,
+        resource_id=str(deployment_id), resource_type="deployment", credits_used=1.0,
         event_metadata=None,
         created_at=datetime.now(timezone.utc),
     )
