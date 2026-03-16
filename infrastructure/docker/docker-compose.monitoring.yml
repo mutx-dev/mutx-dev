@@ -25,6 +25,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+      start_period: 30s
 
   alertmanager:
     image: prom/alertmanager:v0.27.0
@@ -40,6 +41,12 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9093/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   grafana:
     image: grafana/grafana:11.2.2
@@ -62,6 +69,12 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   node-exporter:
     image: prom/node-exporter:v1.8.2
@@ -79,6 +92,12 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9100/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   redis-exporter:
     image: oliver006/redis_exporter:v1.62.0
@@ -93,6 +112,12 @@ services:
       - redis
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9121/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:v0.16.0
@@ -106,6 +131,12 @@ services:
       - postgres
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9187/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   redis:
     image: redis:7-alpine
@@ -118,6 +149,12 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   postgres:
     image: postgres:16-alpine
@@ -133,6 +170,12 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mutx}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 volumes:
   prometheus_data:
