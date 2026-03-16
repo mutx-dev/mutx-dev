@@ -1,0 +1,11 @@
+# Disable Swift analysis - no Swift code in this repository
+disable-default-queries: false
+
+paths-ignore:
+  - '**/*.swift'
+  - '**/*.m'
+  - '**/*.mm'
+  - '**/*.h'
+
+queries:
+  - uses: security-and-quality
