@@ -35,16 +35,6 @@ const EVENT_TYPES = [
   "unhealthy",
 ] as const;
 
-function formatRelativeTime(timestamp?: string | null) {
-  if (!timestamp) return "Never";
-
-  const then = new Date(timestamp).getTime();
-  if (Number.isNaN(then)) return "Invalid";
-
-  const diffMs = then - Date.now();
-  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
-  const minutes = Math.round(diffMs / 60000);
-
   if (Math.abs(minutes) < 60) {
     return rtf.format(minutes, "minute");
   }
