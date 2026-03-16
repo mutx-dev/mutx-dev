@@ -67,6 +67,10 @@ export const schemas = {
     password: z.string().min(8, 'Password must be at least 8 characters'),
     name: z.string().min(1, 'Name is required').max(100, 'Name too long'),
   }),
+
+  refresh: z.object({
+    refresh_token: z.string().min(1, 'Refresh token is required'),
+  }),
   
   // Lead schema
   lead: z.object({

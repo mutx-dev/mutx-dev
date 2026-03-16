@@ -38,3 +38,31 @@ export async function getAuthToken(request: NextRequest): Promise<string | null>
 
   return null
 }
+
+export function getRefreshToken(request: NextRequest): string | null {
+  return request.cookies.get('refresh_token')?.value ?? null
+}
+
+export async function refreshAuthToken(
+  request: NextRequest,
+  refreshToken: string
+): Promise<{ access_token: string; refresh_token?: string; expires_in: number } | null> {
+  const apiBaseUrl = getApiBaseUrl()
+  
+  try {
+    const response = await fetch(`${apiBaseUrl}/v1/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+      cache: 'no-store',
+    })
+
+    if (!response.ok) {
+      return null
+    }
+
+    return await response.json()
+  } catch {
+    return null
+  }
+}
