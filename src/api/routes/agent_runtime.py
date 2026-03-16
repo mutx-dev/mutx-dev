@@ -380,3 +380,65 @@ async def get_agent_status(
         ),
         uptime_seconds=uptime,
     )
+
+
+class AgentResourceUsageResponse(BaseModel):
+    agent_id: str
+    metrics: list[dict]
+    summary: dict
+
+
+@router.get("/{agent_id}/resources", response_model=AgentResourceUsageResponse)
+async def get_agent_resources(
+    agent_id: str,
+    limit: int = Query(100, ge=1, le=1000),
+    hours: Optional[int] = Query(24, ge=1, le=168),
+    db: AsyncSession = Depends(get_db),
+    agent: Agent = Depends(get_current_agent),
+):
+    """Get resource usage history for the authenticated agent."""
+    if str(agent.id) != agent_id:
+        raise HTTPException(status_code=403, detail="Agent ID mismatch")
+
+    # Get metrics from the last N hours
+    from datetime import timedelta
+
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+
+    query = (
+        select(AgentMetric)
+        .where(AgentMetric.agent_id == agent.id)
+        .where(AgentMetric.timestamp >= cutoff)
+        .order_by(AgentMetric.timestamp.desc())
+        .limit(limit)
+    )
+
+    result = await db.execute(query)
+    metrics = result.scalars().all()
+
+    # Calculate summary statistics
+    cpu_values = [m.cpu_usage for m in metrics if m.cpu_usage is not None]
+    memory_values = [m.memory_usage for m in metrics if m.memory_usage is not None]
+
+    summary = {}
+    if cpu_values:
+        summary["cpu_avg"] = sum(cpu_values) / len(cpu_values)
+        summary["cpu_max"] = max(cpu_values)
+        summary["cpu_min"] = min(cpu_values)
+    if memory_values:
+        summary["memory_avg"] = sum(memory_values) / len(memory_values)
+        summary["memory_max"] = max(memory_values)
+        summary["memory_min"] = min(memory_values)
+
+    return AgentResourceUsageResponse(
+        agent_id=str(agent.id),
+        metrics=[
+            {
+                "cpu_usage": m.cpu_usage,
+                "memory_usage": m.memory_usage,
+                "timestamp": m.timestamp.isoformat(),
+            }
+            for m in metrics
+        ],
+        summary=summary,
+    )
