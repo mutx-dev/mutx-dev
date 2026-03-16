@@ -35,7 +35,6 @@
     }
   },
   "dependencies": {
-    "@capacitor/cli": "^8.2.0",
     "@capacitor/core": "^8.2.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-dialog": "^1.1.1",
@@ -66,6 +65,7 @@
     "three": "^0.169.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.2.0",
     "@playwright/test": "^1.58.2",
     "@types/jest": "^30.0.0",
     "@types/node": "25.3.5",
