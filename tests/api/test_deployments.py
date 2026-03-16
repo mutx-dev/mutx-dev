@@ -516,6 +516,49 @@ class TestCreateDeployment:
         assert response.json() == {"detail": "Cannot deploy an agent that is being deleted"}
 
 
+    @pytest.mark.asyncio
+    async def test_create_deployment_missing_fields_returns_422(
+        self, client: AsyncClient, test_agent
+    ):
+        """Test creating deployment with missing required fields returns 422."""
+        # Missing agent_id
+        response = await client.post(
+            "/v1/deployments",
+            json={"replicas": 1},
+        )
+        assert response.status_code == 422
+
+        # Invalid replicas value (below min)
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": str(test_agent.id), "replicas": 0},
+        )
+        assert response.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_unauthenticated_returns_401(
+        self, client_no_auth: AsyncClient, test_agent
+    ):
+        """Test creating deployment without authentication returns 401."""
+        response = await client_no_auth.post(
+            "/v1/deployments",
+            json={"agent_id": str(test_agent.id), "replicas": 1},
+        )
+        assert response.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_invalid_agent_returns_404(
+        self, client: AsyncClient
+    ):
+        """Test creating deployment with non-existent agent returns 404."""
+        fake_agent_id = "00000000-0000-0000-0000-000000000001"
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": fake_agent_id, "replicas": 1},
+        )
+        assert response.status_code == 404
+
+
 class TestRestartDeployment:
     """Tests for POST /deployments/{deployment_id}/restart endpoint."""
 
@@ -611,3 +654,4 @@ class TestRollbackDeployment:
         data = response.json()
         assert data["version"] == "v1.0.0"
         assert data["replicas"] == 2
+
