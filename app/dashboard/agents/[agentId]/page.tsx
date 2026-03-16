@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Bot, Calendar, Clock, Copy, Power, RefreshCcw, Trash2, Loader2, Activity } from "lucide-react";
+import { ArrowLeft, Bot, Calendar, Clock, Copy, Power, RefreshCcw, Rocket, Trash2, Loader2, Activity } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { type components } from "@/app/types/api";
 
@@ -58,10 +58,19 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
     finally { setActionLoading(false); }
   };
 
+  const handleDeploy = async () => {
+    setActionLoading(true);
+    try {
+      const response = await fetch(`/api/dashboard/agents/${encodeURIComponent(agentId)}?action=deploy`, { method: "POST" });
+      if (!response.ok) throw new Error("Deploy failed");
+      setAgent(await response.json());
+    } catch (err) { alert(err instanceof Error ? err.message : "Deploy failed"); }
+    finally { setActionLoading(false); }
+  };
+
   const handleRefresh = async () => {
     setActionLoading(true);
     try {
-      // For now, restart is not implemented on backend, so just refresh the agent
       const response = await fetch(`/api/dashboard/agents/${encodeURIComponent(agentId)}`);
       if (!response.ok) throw new Error("Refresh failed");
       setAgent(await response.json());
@@ -71,7 +80,7 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
 
   const formatDate = (v?: string|null) => v ? new Date(v).toLocaleString() : "N/A";
   const getStatusColor = (s: string) => {
-    switch(s) { case "running": return "bg-emerald-500/20 text-emerald-400"; case "stopped": return "bg-slate-700 text-slate-400"; default: return "bg-slate-700 text-slate-400"; }
+    switch(s) { case "running": return "bg-emerald-500/20 text-emerald-400"; case "stopped": return "bg-slate-700 text-slate-400"; case "deployed": return "bg-cyan-500/20 text-cyan-400"; default: return "bg-slate-700 text-slate-400"; }
   };
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-cyan-400" /></div>;
@@ -92,7 +101,8 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
       </div>
       <div className="flex gap-3">
         {agent.status === "running" && <button onClick={handleStop} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 disabled:opacity-50"><Power className="h-4 w-4" />Stop</button>}
-        {(agent.status === "stopped" || agent.status === "error") && <button onClick={handleRefresh} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-400 disabled:opacity-50"><RefreshCcw className="h-4 w-4" />Refresh</button>}
+        {(agent.status === "stopped" || agent.status === "error" || agent.status === "deployed") && <button onClick={handleDeploy} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-50"><Rocket className="h-4 w-4" />Deploy</button>}
+        <button onClick={handleRefresh} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 disabled:opacity-50"><RefreshCcw className="h-4 w-4" />Refresh</button>
         <button onClick={handleDelete} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 disabled:opacity-50"><Trash2 className="h-4 w-4" />Delete</button>
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
