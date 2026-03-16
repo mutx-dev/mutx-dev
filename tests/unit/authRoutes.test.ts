@@ -28,7 +28,7 @@ describe('auth route handlers', () => {
     getAuthToken.mockReset()
     getCookieDomain.mockReturnValue(undefined)
     shouldUseSecureCookies.mockReturnValue(false)
-    fetchSpy = jest.spyOn(global, 'fetch' as any).mockImplementation(jest.fn())
+    fetchSpy = jest.spyOn(global as typeof globalThis, 'fetch').mockImplementation(jest.fn())
   })
 
   afterEach(() => {
@@ -249,7 +249,7 @@ describe('auth route handlers', () => {
     it('returns 200 with success payload', async () => {
       const { POST } = await import('../../app/api/auth/logout/route')
 
-      const response = await POST()
+      const response = await POST(mockRequest())
 
       expect(response.status).toBe(200)
       await expect(response.json()).resolves.toEqual({ success: true })
@@ -258,7 +258,7 @@ describe('auth route handlers', () => {
     it('clears auth cookies by setting maxAge to 0', async () => {
       const { POST } = await import('../../app/api/auth/logout/route')
 
-      const response = await POST()
+      const response = await POST(mockRequest())
 
       const setCookieHeader = response.headers.get('set-cookie')
       expect(setCookieHeader).toContain('access_token=')
@@ -269,7 +269,7 @@ describe('auth route handlers', () => {
     it('does not call the backend API', async () => {
       const { POST } = await import('../../app/api/auth/logout/route')
 
-      await POST()
+      await POST(mockRequest())
 
       expect(global.fetch).not.toHaveBeenCalled()
     })
