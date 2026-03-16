@@ -19,6 +19,7 @@ export function ApiKeysPageClient() {
   const [creating, setCreating] = useState(false);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [rotatingId, setRotatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -111,6 +112,12 @@ export function ApiKeysPageClient() {
     });
   };
 
+  const handleCopyId = async (id: string) => {
+    await navigator.clipboard.writeText(id);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   const copyToClipboard = async () => {
     if (!createdKey) return;
     await navigator.clipboard.writeText(createdKey);
@@ -193,6 +200,13 @@ export function ApiKeysPageClient() {
               <div key={key.id} className="px-6 py-4 flex items-center justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-white">{key.name}</p>
+                  <button
+                    onClick={() => handleCopyId(key.id)}
+                    className="flex items-center gap-1 rounded p-1 text-slate-500 hover:text-cyan-400 transition-colors"
+                    title="Copy API key ID"
+                  >
+                    {copiedId === key.id ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                  </button>
                   <div className="flex gap-4 mt-2 text-xs text-slate-500">
                     <span>Created: {formatDate(key.created_at)}</span>
                     <span>Last used: {formatDate(key.last_used)}</span>
