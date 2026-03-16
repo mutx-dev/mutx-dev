@@ -17,6 +17,7 @@ from src.api.models import (
     Agent,
     AgentLog,
     AgentMetric,
+    AgentResourceUsage,
     AgentStatus,
     AgentType,
     Deployment,
@@ -28,6 +29,8 @@ from src.api.models.schemas import (
     AgentConfigBase,
     AgentConfigResponse,
     AgentConfigUpdateRequest,
+    AgentResourceUsageCreate,
+    AgentResourceUsageResponse,
     AgentCreate,
     AgentDetailResponse,
     AgentLogResponse,
@@ -517,3 +520,78 @@ async def get_agent_metrics(
     result = await db.execute(query)
     metrics = result.scalars().all()
     return metrics
+
+
+# --- Resource Usage Routes ---
+
+from src.api.models import AgentResourceUsage
+from src.api.models.schemas import AgentResourceUsageCreate, AgentResourceUsageResponse
+
+
+@router.post(
+    "/{agent_id}/resource-usage",
+    response_model=AgentResourceUsageResponse,
+    status_code=201,
+)
+async def create_agent_resource_usage(
+    agent_id: uuid.UUID,
+    request: AgentResourceUsageCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Record resource usage for an agent (tokens, API calls, cost)."""
+    await get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to access this agent's resource usage",
+    )
+
+    usage = AgentResourceUsage(
+        agent_id=agent_id,
+        prompt_tokens=request.prompt_tokens,
+        completion_tokens=request.completion_tokens,
+        total_tokens=request.total_tokens,
+        api_calls=request.api_calls,
+        cost_usd=request.cost_usd,
+        model=request.model,
+        extra_metadata=(json.dumps(request.extra_metadata) if request.extra_metadata else None),
+        period_start=request.period_start,
+        period_end=request.period_end,
+    )
+    db.add(usage)
+    await db.commit()
+    await db.refresh(usage)
+    logger.info(f"Recorded resource usage for agent: {agent_id}")
+    return usage
+
+
+@router.get(
+    "/{agent_id}/resource-usage",
+    response_model=list[AgentResourceUsageResponse],
+)
+async def list_agent_resource_usage(
+    agent_id: uuid.UUID,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """List resource usage records for an agent."""
+    await get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to access this agent's resource usage",
+    )
+
+    query = (
+        select(AgentResourceUsage)
+        .where(AgentResourceUsage.agent_id == agent_id)
+        .order_by(AgentResourceUsage.period_start.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    result = await db.execute(query)
+    usages = result.scalars().all()
+    return usages

@@ -37,11 +37,22 @@ class RuntimeMessage(TypedDict, total=False):
     tool_calls: list[RuntimeToolCall]
 
 
+class RuntimeUsage(TypedDict, total=False):
+    """Usage statistics from model execution."""
+    prompt_tokens: int
+    completion_tokens: int
+    total_tokens: int
+    api_calls: int
+    cost_usd: float | None
+    model: str | None
+
+
 class RuntimeResult(TypedDict, total=False):
     message: RuntimeMessage
     content: str | None
     tool_calls: list[RuntimeToolCall]
     raw_response: Any
+    usage: RuntimeUsage
 
 
 class RuntimeStreamEvent(TypedDict, total=False):
