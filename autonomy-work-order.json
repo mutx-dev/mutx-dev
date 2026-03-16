@@ -1,17 +1,17 @@
 {
-  "acceptance": "## Summary\nThe repo contract says queue health must stay non-empty and every PR should get an `@codex please review` comment, but the current autonomy tooling mostly summarizes state instead of enforcing those invariants.\n\n## Why This Matters\n- queue health is part of the repo's operating model, not optional ceremony\n- required review handoff should be automatic if PR creation is automated\n- job summaries alone are too ephemeral for real operational continuity\n\n## Evidence\n- `AGENTS.md:169`\n- `AGENTS.md:170`\n- `AGENTS.md:173`\n- `.github/workflows/autonomous-shipping.yml:64`\n- `.github/workflows/autonomous-shipping.yml:69`\n- `.github/workflows/autonomous-shipping.yml:70`\n- `docs/autonomy/ACTIVATION.md:95`\n- `scripts/autonomy/execute_work_order.py:156`\n\n## Acceptance Criteria\n- automation detects and reports zero-PR / zero-ready-issue queue states against repo policy\n- PR creation flow adds the required `@codex please review` comment automatically\n- queue status is persisted somewhere actionable, not only an ephemeral job summary\n- autonomy docs match the implemented behavior\n\n## Notes\nThis is adjacent to `#96`, but it is better treated as queue-governance tooling rather than generic CI truthfulness.\n",
-  "agent": "observability-sre",
-  "branch": "autonomy/observability-sre/issue-112-enforce-queue-health-and-codex-review-handoff-in",
-  "issue": 112,
+  "acceptance": "Autonomous task: test(api): add route tests for POST /deployments",
+  "agent": "control-plane-steward",
+  "branch": "autonomy/control-plane-steward/issue-947-test-api-add-route-tests-for-post-deployments",
+  "issue": 947,
   "labels": [
-    "area:ops",
-    "area:docs",
-    "risk:medium",
+    "area:api",
+    "area:test",
+    "risk:low",
     "autonomy:ready",
-    "size:m"
+    "size:s"
   ],
   "lane": "staging-first",
-  "reviewer": "control-plane-steward",
-  "title": "Enforce queue health and Codex review handoff in autonomy tooling",
-  "url": "https://github.com/fortunexbt/mutx-dev/issues/112"
+  "reviewer": "qa-reliability-engineer",
+  "title": "test(api): add route tests for POST /deployments",
+  "url": "https://github.com/mutx-dev/mutx-dev/issues/947"
 }
