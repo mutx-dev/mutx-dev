@@ -3,6 +3,7 @@ import {
   ArrowRight,
   Bot,
   Command,
+  Layers,
   LogOut,
   Rocket,
   ShieldCheck,
@@ -58,6 +59,12 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     description: "Execution timeline",
     href: "/dashboard/history",
     icon: ArrowRight,
+  },
+  {
+    title: "Deployments",
+    description: "Manage agent deployments",
+    href: "/dashboard/deployments",
+    icon: Layers,
   },
 ];
 
