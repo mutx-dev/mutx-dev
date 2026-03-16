@@ -45,3 +45,17 @@ aiosqlite==0.20.0
 langchain-core>=0.1.52,<0.2.0
 bcrypt>=4.0.0
 # Updated Mon Mar 16 10:24:07 CET 2026
+
+# OpenTelemetry - Phase 3
+opentelemetry-api==1.22.0
+opentelemetry-sdk==1.22.0
+opentelemetry-exporter-otlp-proto-http==1.22.0
+opentelemetry-exporter-otlp-proto-grpc==1.22.0
+opentelemetry-instrumentation-fastapi==0.43b0
+opentelemetry-sdk-extension-aws==1.4.1
+
+# OpenTelemetry
+opentelemetry-api>=1.22.0
+opentelemetry-sdk>=1.22.0
+opentelemetry-exporter-otlp>=1.22.0
+opentelemetry-propagator-b3>=1.22.0

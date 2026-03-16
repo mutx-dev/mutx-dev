@@ -41,7 +41,7 @@ from src.api.routes import (
     rag,
     analytics,
 )
-from src.api.metrics import router as metrics_router, track_request
+from src.api.metrics import router as metrics_router, track_request, setup_opentelemetry
 from src.api.services.monitor import start_background_monitor
 
 settings = get_settings()
@@ -137,6 +137,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+# Set up OpenTelemetry FastAPI instrumentation (Phase 3)
+setup_opentelemetry(app, service_name="mutx-backend")
+
 
 # Add CORS middleware
 app.add_middleware(

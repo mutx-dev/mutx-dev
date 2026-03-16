@@ -1,10 +1,23 @@
 """
 Prometheus metrics for MUTX API monitoring.
+
+Phase 3+4: HTTP Instrumentation + Metrics Export
+- FastAPI middleware for automatic request tracing (OpenTelemetry)
+- Response time metrics
+- Prometheus metrics endpoint at /metrics
+- Custom metrics: agents_running, tokens_used, requests_total, errors_total
 """
 
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
 from fastapi import APIRouter, Response, Request
 import time
+from typing import Callable
+
+# Custom metrics for Issue #1029
+agents_running = Gauge("agents_running", "Number of currently running agents")
+tokens_used = Counter("tokens_used", "Total tokens used", ["model", "endpoint"])
+requests_total = Counter("requests_total", "Total HTTP requests received")
+errors_total = Counter("errors_total", "Total errors encountered", ["type", "endpoint"])
 
 # HTTP metrics
 http_requests_total = Counter(
@@ -79,7 +92,7 @@ mutx_queue_size = Gauge("mutx_queue_size", "Current size of agent task queue")
 # API metrics
 mutx_api_calls_total = Counter("mutx_api_calls_total", "Total API calls", ["endpoint"])
 
-# Error metrics
+# Error metrics (alias for errors_total for backward compatibility)
 mutx_errors_total = Counter("mutx_errors_total", "Total errors by type", ["type", "endpoint"])
 
 router = APIRouter()
@@ -98,12 +111,18 @@ async def track_request(request: Request, call_next):
 
     # Track active connections
     http_connections_active.inc()
+    
+    # Increment total requests
+    requests_total.inc()
 
     try:
         response = await call_next(request)
     except Exception as e:
-        # Track errors
-        mutx_errors_total.labels(type=type(e).__name__, endpoint=request.url.path).inc()
+        # Track errors using both metrics
+        error_type = type(e).__name__
+        endpoint = request.url.path
+        errors_total.labels(type=error_type, endpoint=endpoint).inc()
+        mutx_errors_total.labels(type=error_type, endpoint=endpoint).inc()
         raise
     finally:
         http_connections_active.dec()
@@ -118,3 +137,87 @@ async def track_request(request: Request, call_next):
     http_request_duration_seconds.labels(method=request.method, path=path).observe(duration)
 
     return response
+
+
+# OpenTelemetry FastAPI instrumentation
+def setup_opentelemetry(app, service_name: str = "mutx-backend"):
+    """
+    Set up OpenTelemetry instrumentation for FastAPI.
+    
+    This enables automatic request tracing using opentelemetry-instrumentation-fastapi.
+    """
+    try:
+        from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+        from opentelemetry import trace
+        from opentelemetry.sdk.trace import TracerProvider
+        from opentelemetry.sdk.trace.export import BatchSpanProcessor
+        from opentelemetry.sdk.resources import Resource, SERVICE_NAME
+        from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+        from opentelemetry.sdk.propagate import set_global_textmap
+        from opentelemetry.propagators.b3 import B3MultiFormatPropagator
+        import os
+        
+        # Configure resource
+        resource = Resource.create({SERVICE_NAME: service_name})
+        
+        # Create tracer provider
+        provider = TracerProvider(resource=resource)
+        
+        # Configure OTLP exporter if enabled
+        otel_enabled = os.getenv("MUTX_OTEL_ENABLED", "false").lower() == "true"
+        
+        if otel_enabled:
+            endpoint = os.getenv("MUTX_OTEL_ENDPOINT", "")
+            headers = os.getenv("MUTX_OTEL_HEADERS", "")
+            
+            # Parse headers
+            parsed_headers = {}
+            if headers:
+                for header in headers.split(","):
+                    if "=" in header:
+                        key, value = header.split("=", 1)
+                        parsed_headers[key.strip()] = value.strip()
+            
+            # Add OTLP exporter
+            if endpoint:
+                span_exporter = OTLPSpanExporter(
+                    endpoint=endpoint,
+                    headers=parsed_headers,
+                )
+                provider.add_span_processor(BatchSpanProcessor(span_exporter))
+        
+        # Set tracer provider
+        trace.set_tracer_provider(provider)
+        
+        # Set up B3 propagation
+        set_global_textmap(B3MultiFormatPropagator())
+        
+        # Instrument FastAPI
+        FastAPIInstrumentor.instrument_app(app)
+        
+        return True
+    except ImportError as e:
+        # OpenTelemetry packages not installed
+        import logging
+        logging.warning(f"OpenTelemetry instrumentation not available: {e}")
+        return False
+    except Exception as e:
+        import logging
+        logging.warning(f"Failed to set up OpenTelemetry: {e}")
+        return False
+
+
+# Helper functions to update custom metrics
+def increment_tokens_used(model: str, endpoint: str, tokens: int = 1):
+    """Increment tokens_used counter."""
+    tokens_used.labels(model=model, endpoint=endpoint).inc(tokens)
+
+
+def set_agents_running(count: int):
+    """Set the current number of running agents."""
+    agents_running.set(count)
+
+
+def increment_errors(error_type: str, endpoint: str):
+    """Increment errors_total counter."""
+    errors_total.labels(type=error_type, endpoint=endpoint).inc()
