@@ -2,15 +2,37 @@
   "name": "mutx",
   "version": "1.0.0",
   "private": true,
+  "main": "desktop/main.cjs",
   "scripts": {
     "dev": "next dev",
     "build": "next build --no-lint",
     "start": "next start",
     "lint": "next lint",
+    "desktop:start": "electron .",
+    "desktop:dev": "bash -lc 'npm run dev & NEXT_PID=$!; trap \"kill $NEXT_PID\" EXIT; until curl -fsS http://127.0.0.1:3000 >/dev/null; do sleep 1; done; MUTX_DESKTOP_URL=http://127.0.0.1:3000 electron .'",
+    "desktop:build": "npm run build && electron-builder --mac --publish never",
     "generate-types": "openapi-typescript docs/api/openapi.json -o app/types/api.ts",
     "test:app": "jest --runInBand tests/unit",
     "demo:validate": "bash scripts/demo-validate.sh",
     "release:check": "bash scripts/release-check.sh"
+  },
+  "build": {
+    "appId": "dev.mutx.desktop",
+    "productName": "MUTX",
+    "directories": {
+      "output": "dist/desktop"
+    },
+    "files": [
+      "desktop/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    }
   },
   "dependencies": {
     "@capacitor/cli": "^8.2.0",
@@ -51,6 +73,8 @@
     "@types/react": "19.2.14",
     "@types/three": "^0.169.0",
     "autoprefixer": "^10.4.17",
+    "electron": "^39.1.0",
+    "electron-builder": "^26.0.12",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.1.0",
     "jest": "^30.2.0",
