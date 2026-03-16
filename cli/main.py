@@ -5,6 +5,7 @@ from cli.commands.agents import agents_group
 from cli.commands.api_keys import api_keys_group
 from cli.commands.clawhub import clawhub_group
 from cli.commands.deploy import deploy_group
+from cli.commands.config import config_group
 from cli.commands.webhooks import webhooks_group
 
 
@@ -104,6 +105,7 @@ cli.add_command(agents_group)
 cli.add_command(api_keys_group)
 cli.add_command(clawhub_group)
 cli.add_command(deploy_group)
+cli.add_command(config_group)
 cli.add_command(webhooks_group)
 
 
