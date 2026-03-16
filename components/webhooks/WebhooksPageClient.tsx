@@ -57,6 +57,7 @@ export default function WebhooksPageClient() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
     fetchWebhooks();
@@ -67,6 +68,11 @@ export default function WebhooksPageClient() {
       fetchDeliveries(viewingDeliveries.id);
     }
   }, [viewingDeliveries]);
+
+  // Detect Mac OS
+  useEffect(() => {
+    setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.platform));
+  }, []);
 
   // Keyboard shortcut: Cmd/Ctrl + K to focus search
   useEffect(() => {
@@ -325,7 +331,7 @@ export default function WebhooksPageClient() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search webhooks... (⌘K)"
+            placeholder={isMac ? "Search webhooks... (⌘K)" : "Search webhooks... (Ctrl+K)"}
             className="w-full rounded-lg border border-white/10 bg-black/40 py-2 pl-10 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none"
           />
         </div>

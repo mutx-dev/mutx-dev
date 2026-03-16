@@ -478,6 +478,7 @@ export function AgentsPageClient() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [stoppingId, setStoppingId] = useState<string | null>(null);
+  const [isMac, setIsMac] = useState(false);
 
   const runningAgents = agents.filter((a) => a.status === "running").length;
   const failedAgents = agents.filter(
@@ -531,6 +532,11 @@ export function AgentsPageClient() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  // Detect Mac OS
+  useEffect(() => {
+    setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.platform));
   }, []);
 
   // Keyboard shortcut: Cmd/Ctrl + K to focus search
@@ -690,7 +696,7 @@ export function AgentsPageClient() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search agents by name, ID, or description... (⌘K)"
+            placeholder={isMac ? "Search agents by name, ID, or description... (⌘K)" : "Search agents by name, ID, or description... (Ctrl+K)"}
             className="w-full rounded-xl border border-white/10 bg-black/40 py-3 pl-12 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
           />
         </div>
