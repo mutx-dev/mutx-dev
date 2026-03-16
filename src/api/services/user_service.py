@@ -28,15 +28,22 @@ def generate_user_api_key() -> str:
 
 
 def hash_api_key(key: str) -> str:
-    return hashlib.sha256(key.encode()).hexdigest()
+    # Use a computationally expensive hash (bcrypt via passlib) for API keys
+    # Truncate to 72 bytes (bcrypt limitation) - key derivation handles the rest
+    return api_key_context.hash(key[:72])
 
 
 def verify_api_key(plain_key: str, hashed_key: str) -> bool:
-    if secrets.compare_digest(hash_api_key(plain_key), hashed_key):
+    # Legacy SHA256 check (for old keys created before bcrypt migration)
+    # SHA256 hashes are 64 hex chars = 64 bytes, safe for bcrypt comparison
+    import hashlib
+    sha256_hash = hashlib.sha256(plain_key.encode()).hexdigest()
+    if secrets.compare_digest(sha256_hash, hashed_key):
         return True
 
     try:
-        return api_key_context.verify(plain_key, hashed_key)
+        # bcrypt check - truncate to 72 bytes (bcrypt limitation)
+        return api_key_context.verify(plain_key[:72], hashed_key)
     except (UnknownHashError, ValueError):
         return False
 
