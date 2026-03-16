@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
-from sqlalchemy import Boolean, DateTime, Enum as SQLEnum, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, CheckConstraint, DateTime, Enum as SQLEnum, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID, ARRAY as PG_ARRAY
 import enum
@@ -451,6 +451,10 @@ class UsageEvent(Base):
     """Track usage events for telemetry and quota enforcement"""
 
     __tablename__ = "usage_events"
+    __table_args__ = (
+        CheckConstraint("credits_used >= 0", name="usage_event_credits_positive"),
+        CheckConstraint("credits_used <= 1000000", name="usage_event_credits_max"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     event_type: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
