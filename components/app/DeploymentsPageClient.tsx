@@ -14,6 +14,8 @@ import {
   Search,
   Server,
   Trash2,
+  Copy,
+  Check,
   X,
 } from "lucide-react";
 import { DeploymentSortSelect } from "./DeploymentSortSelect";
@@ -134,18 +136,28 @@ interface DeploymentCardProps {
   onStart: (id: string) => void;
   onDelete: (id: string) => void;
   isProcessing: (id: string) => boolean;
+  copiedId: string | null;
+  onCopyId: (id: string) => void;
 }
 
-function DeploymentCard({ deployment, onRestart, onStop, onStart, onDelete, isProcessing }: DeploymentCardProps) {
+function DeploymentCard({ deployment, onRestart, onStop, onStart, onDelete, isProcessing, copiedId, onCopyId }: DeploymentCardProps) {
   const processing = isProcessing(deployment.id);
+  const copied = copiedId === deployment.id;
 
   return (
     <Card className="border border-white/5 bg-white/[0.02] p-5 transition hover:border-emerald-400/20">
       <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 flex items-center gap-2">
           <p className="truncate text-sm font-medium text-white">
             {deployment.id}
           </p>
+          <button
+            onClick={() => onCopyId(deployment.id)}
+            className="text-slate-500 hover:text-cyan-400 transition-colors"
+            title="Copy ID"
+          >
+            {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+          </button>
           <p className="mt-1 text-xs text-slate-500">
             Agent: {deployment.agent_id}
           </p>
@@ -374,6 +386,7 @@ export function DeploymentsPageClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"date"|"status"|"agent">("date");
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const runningDeployments = deployments.filter(
@@ -547,6 +560,12 @@ export function DeploymentsPageClient() {
   function isProcessing(id: string) {
     return processingIds.has(id);
   }
+
+  const handleCopyId = async (id: string) => {
+    await navigator.clipboard.writeText(id);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -754,6 +773,8 @@ export function DeploymentsPageClient() {
               onStart={handleStart}
               onDelete={handleDelete}
               isProcessing={isProcessing}
+              copiedId={copiedId}
+              onCopyId={handleCopyId}
             />
           ))}
         </div>
