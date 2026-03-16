@@ -12,6 +12,7 @@ from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTEN
 from fastapi import APIRouter, Response, Request
 import time
 
+
 # Custom metrics for Issue #1029
 agents_running = Gauge("agents_running", "Number of currently running agents")
 tokens_used = Counter("tokens_used", "Total tokens used", ["model", "endpoint"])
@@ -110,7 +111,7 @@ async def track_request(request: Request, call_next):
 
     # Track active connections
     http_connections_active.inc()
-    
+
     # Increment total requests
     requests_total.inc()
 
@@ -142,7 +143,7 @@ async def track_request(request: Request, call_next):
 def setup_opentelemetry(app, service_name: str = "mutx-backend"):
     """
     Set up OpenTelemetry instrumentation for FastAPI.
-    
+
     This enables automatic request tracing using opentelemetry-instrumentation-fastapi.
     """
     try:
@@ -155,20 +156,20 @@ def setup_opentelemetry(app, service_name: str = "mutx-backend"):
         from opentelemetry.sdk.propagate import set_global_textmap
         from opentelemetry.propagators.b3 import B3MultiFormatPropagator
         import os
-        
+
         # Configure resource
         resource = Resource.create({SERVICE_NAME: service_name})
-        
+
         # Create tracer provider
         provider = TracerProvider(resource=resource)
-        
+
         # Configure OTLP exporter if enabled
         otel_enabled = os.getenv("MUTX_OTEL_ENABLED", "false").lower() == "true"
-        
+
         if otel_enabled:
             endpoint = os.getenv("MUTX_OTEL_ENDPOINT", "")
             headers = os.getenv("MUTX_OTEL_HEADERS", "")
-            
+
             # Parse headers
             parsed_headers = {}
             if headers:
@@ -176,7 +177,7 @@ def setup_opentelemetry(app, service_name: str = "mutx-backend"):
                     if "=" in header:
                         key, value = header.split("=", 1)
                         parsed_headers[key.strip()] = value.strip()
-            
+
             # Add OTLP exporter
             if endpoint:
                 span_exporter = OTLPSpanExporter(
@@ -184,24 +185,26 @@ def setup_opentelemetry(app, service_name: str = "mutx-backend"):
                     headers=parsed_headers,
                 )
                 provider.add_span_processor(BatchSpanProcessor(span_exporter))
-        
+
         # Set tracer provider
         trace.set_tracer_provider(provider)
-        
+
         # Set up B3 propagation
         set_global_textmap(B3MultiFormatPropagator())
-        
+
         # Instrument FastAPI
         FastAPIInstrumentor.instrument_app(app)
-        
+
         return True
     except ImportError as e:
         # OpenTelemetry packages not installed
         import logging
+
         logging.warning(f"OpenTelemetry instrumentation not available: {e}")
         return False
     except Exception as e:
         import logging
+
         logging.warning(f"Failed to set up OpenTelemetry: {e}")
         return False
 
