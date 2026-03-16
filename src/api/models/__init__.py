@@ -18,6 +18,7 @@ from src.api.models.models import (
     AgentStatus,
     AlertType,
     Command,
+    UsageEvent,
 )
 
 __all__ = [
@@ -40,4 +41,5 @@ __all__ = [
     "AgentStatus",
     "AlertType",
     "Command",
+    "UsageEvent",
 ]
