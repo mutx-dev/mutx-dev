@@ -101,7 +101,8 @@ def setup_logging(level: str = "INFO", format: str = "json") -> None:
 
 
 # Backwards compatibility alias
-setup_json_logging = lambda level="INFO": setup_logging(level, "json")
+def setup_json_logging(level="INFO"):
+    return setup_logging(level, "json")
 
 
 def get_logger(name: str) -> logging.Logger:

@@ -34,7 +34,6 @@ from src.api.models.schemas import (
     AgentLogResponse,
     AgentMetricResponse,
     AgentResponse,
-    AgentVersionResponse,
     AgentVersionHistoryResponse,
     AgentRollbackRequest,
     AnthropicAgentConfig,

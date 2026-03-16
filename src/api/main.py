@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 
 import time
 
-import logging
 
 from fastapi import FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
