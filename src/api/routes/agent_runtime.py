@@ -25,6 +25,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_agent, get_current_user
 from src.api.models import Agent, AgentLog, AgentMetric, AgentStatus, AgentVersion, Command, User
+from src.api.models.schemas import AgentResponse
 from src.api.services.webhook_service import trigger_webhook_event
 
 logger = logging.getLogger(__name__)
@@ -102,6 +103,21 @@ class AgentStatusResponse(BaseModel):
     status: str
     last_heartbeat: Optional[str]
     uptime_seconds: float
+
+
+class AgentVersionItem(BaseModel):
+    id: str
+    agent_id: str
+    version: int
+    config_snapshot: str
+    status: str
+    created_at: str
+
+
+class AgentVersionHistoryResponse(BaseModel):
+    agent_id: str
+    items: list[AgentVersionItem]
+    total: int
 
 
 # --- Routes ---
@@ -430,11 +446,21 @@ async def get_agent_versions(
     result = await db.execute(query)
     versions = result.scalars().all()
 
-    return {
-        "agent_id": agent.id,
-        "items": versions,
-        "total": len(versions),
-    }
+    return AgentVersionHistoryResponse(
+        agent_id=str(agent.id),
+        items=[
+            AgentVersionItem(
+                id=str(v.id),
+                agent_id=str(v.agent_id),
+                version=v.version,
+                config_snapshot=v.config_snapshot,
+                status=v.status,
+                created_at=v.created_at.isoformat(),
+            )
+            for v in versions
+        ],
+        total=len(versions),
+    )
 
 
 @router.post("/{agent_id}/rollback", response_model=AgentResponse)
