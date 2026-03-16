@@ -457,8 +457,10 @@ class UsageEvent(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
-    resource_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    event_metadata: Mapped[str] = mapped_column(Text, nullable=True)  # JSON string
+    resource_type: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
+    resource_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), nullable=True)
+    credits_used: Mapped[float] = mapped_column(Float, nullable=False, default=1.0)
+    event_metadata: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON string
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
     )

@@ -216,7 +216,7 @@ async def scale_deployment(
     usage_event = UsageEvent(
         event_type="deployment_scaled",
         user_id=current_user.id,
-        resource_id=str(deployment_id),
+        resource_id=deployment_id, resource_type="deployment", credits_used=1.0,
         event_metadata=f'{{"replicas": {scale_data.replicas}}}',
         created_at=datetime.now(timezone.utc),
     )
@@ -256,7 +256,7 @@ async def kill_deployment(
     usage_event = UsageEvent(
         event_type="deployment_killed",
         user_id=current_user.id,
-        resource_id=str(deployment_id),
+        resource_id=deployment_id, resource_type="deployment", credits_used=1.0,
         event_metadata=None,
         created_at=datetime.now(timezone.utc),
     )
@@ -329,16 +329,6 @@ async def create_deployment(
         include_events=True,
     )
     logger.info(f"Created deployment {deployment.id} for agent {deployment_data.agent_id}")
-    
-    # Track usage event
-    usage_event = UsageEvent(
-        event_type="deployment_created",
-        user_id=current_user.id,
-        resource_id=str(deployment.id),
-        event_metadata=f'{{"agent_id": "{deployment_data.agent_id}"}}',
-        created_at=datetime.now(timezone.utc),
-    )
-    db.add(usage_event)
     await db.commit()
     
     return _serialize_deployment(deployment)
@@ -394,7 +384,7 @@ async def restart_deployment(
     usage_event = UsageEvent(
         event_type="deployment_restarted",
         user_id=current_user.id,
-        resource_id=str(deployment_id),
+        resource_id=deployment_id, resource_type="deployment", credits_used=1.0,
         event_metadata=None,
         created_at=datetime.now(timezone.utc),
     )

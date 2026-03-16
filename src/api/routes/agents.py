@@ -260,7 +260,7 @@ async def create_agent(
     usage_event = UsageEvent(
         event_type="agent_created",
         user_id=current_user.id,
-        resource_id=str(agent.id),
+        resource_id=agent.id, resource_type="agent", credits_used=1.0,
         event_metadata=None,
         created_at=datetime.now(timezone.utc),
     )
@@ -403,7 +403,7 @@ async def deploy_agent(
     usage_event = UsageEvent(
         event_type="agent_deployed",
         user_id=current_user.id,
-        resource_id=str(agent_id),
+        resource_id=agent_id, resource_type="agent", credits_used=1.0,
         event_metadata=f'{{"deployment_id": "{deployment.id}"}}',
         created_at=datetime.now(timezone.utc),
     )
@@ -450,7 +450,7 @@ async def stop_agent(
     usage_event = UsageEvent(
         event_type="agent_stopped",
         user_id=current_user.id,
-        resource_id=str(agent_id),
+        resource_id=agent_id, resource_type="agent", credits_used=1.0,
         event_metadata=None,
         created_at=datetime.now(timezone.utc),
     )
