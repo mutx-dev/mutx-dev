@@ -27,6 +27,7 @@
   * [Deployment](docs/deployment/README.md)
     * [DigitalOcean Deployment](docs/deployment/digitalocean.md)
     * [Docker Guide](docs/deployment/docker.md)
+    * [Local Developer Bootstrap](docs/deployment/local-developer-bootstrap.md)
     * [Quickstart](docs/deployment/quickstart.md)
     * [v0.1 Release Runbook](docs/deployment/release-v0.1.md)
     * [Railway Deployment](docs/deployment/railway.md)

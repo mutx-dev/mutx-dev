@@ -6,6 +6,7 @@
 #   make dev          Start local dev stack (Docker Compose)
 #   make dev-stop     Stop dev stack
 #   make test-api     Run API health tests
+#   make test-api-auth Run API tests with auth bootstrap
 #   make test-auth    Register test user, login, and show token (one-command)
 #   make test         Run full test suite
 #   make lint         Run linters
@@ -19,6 +20,7 @@ help:
 	@echo "  make dev         Start local dev stack (Docker Compose)"
 	@echo "  make dev-stop    Stop dev stack"
 	@echo "  make test-api   Run API health/ready tests"
+	@echo "  make test-api-auth Run API checks with auth bootstrap"
 	@echo "  make test-auth  Register test user, login, get token (one-command)"
 	@echo "  make test       Run full test suite"
 	@echo "  make lint        Run linters"
@@ -45,6 +47,12 @@ dev-stop:
 .PHONY: test-api
 test-api:
 	@./scripts/test-api.sh
+
+# Run API tests with auth bootstrap
+.PHONY: test-api-auth
+test-api-auth:
+	@./scripts/test-api.sh --register
+	@./scripts/test-api.sh --with-auth
 
 # Test auth flow - one-command setup for local testing
 .PHONY: test-auth

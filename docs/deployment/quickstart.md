@@ -7,6 +7,8 @@ icon: bolt
 
 This guide follows the current repo layout and route contracts.
 
+For a full clone-to-validation onboarding flow (including `pnpm`, `.env` details, and local test targets), see [Local Developer Bootstrap](./local-developer-bootstrap.md).
+
 {% stepper %}
 {% step %}
 ### Check prerequisites
