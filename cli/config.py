@@ -23,7 +23,7 @@ class CLIConfig:
 
     def _default_config(self) -> dict:
         return {
-            "api_url": os.getenv("MUTX_API_URL", "http://localhost:8000"),
+            "api_url": os.getenv("MUTX_API_URL", "https://api.mutx.dev"),
             "api_key": None,
             "refresh_token": None,
         }
@@ -35,7 +35,7 @@ class CLIConfig:
 
     @property
     def api_url(self) -> str:
-        return self._config.get("api_url", "http://localhost:8000")
+        return self._config.get("api_url", "https://api.mutx.dev")
 
     @api_url.setter
     def api_url(self, value: str):
