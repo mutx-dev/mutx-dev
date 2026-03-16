@@ -24,7 +24,7 @@ describe('dashboard route proxies', () => {
     const response = await GET(mockRequest())
 
     expect(response.status).toBe(401)
-    await expect(response.json()).resolves.toEqual({ detail: 'Unauthorized' })
+    await expect(response.json()).resolves.toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' }, status: 'error' })
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
@@ -226,7 +226,7 @@ describe('dashboard route proxies', () => {
     const response = await GET(mockRequest())
 
     expect(response.status).toBe(401)
-    await expect(response.json()).resolves.toEqual({ detail: 'Unauthorized' })
+    await expect(response.json()).resolves.toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' }, status: 'error' })
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
