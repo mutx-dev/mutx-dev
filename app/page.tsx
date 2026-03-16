@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
-import { Check, Copy, Github } from 'lucide-react'
+import { Check, Copy, Github, Menu, X } from 'lucide-react'
 
 import { AnimatedTerminal } from '@/components/AnimatedTerminal'
 import { WaitlistForm } from '@/components/WaitlistForm'
@@ -23,9 +23,21 @@ const links = [
 export default function LandingPage() {
   const [demoCommandCopied, setDemoCommandCopied] = useState(false)
   const [isMac, setIsMac] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.platform))
+  }, [])
+
+  // Close mobile menu on resize to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false)
+      }
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   const copyDemoCommand = useCallback(async () => {
@@ -89,17 +101,56 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-3 text-white/60">
-            <a href={GITHUB_URL} target="_blank" rel="noreferrer" aria-label="GitHub" className="transition hover:text-white">
+          <div className="flex items-center gap-3">
+            <a href={GITHUB_URL} target="_blank" rel="noreferrer" aria-label="GitHub" className="hidden text-white/60 transition hover:text-white sm:block">
               <Github className="h-5 w-5" />
             </a>
-            <a href={X_URL} target="_blank" rel="noreferrer" aria-label="X" className="transition hover:text-white">
+            <a href={X_URL} target="_blank" rel="noreferrer" aria-label="X" className="hidden text-white/60 transition hover:text-white sm:block">
               <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-current">
                 <path d="M18.244 2H21.5l-7.11 8.13L22.75 22h-6.54l-5.12-6.69L5.24 22H2l7.6-8.69L1.25 2h6.71l4.63 6.1L18.244 2Zm-1.147 18h1.803L6.98 3.894H5.045L17.097 20Z" />
               </svg>
             </a>
+            <button
+              type="button"
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+              className="block text-white/60 transition hover:text-white md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile menu dropdown */}
+        {mobileMenuOpen && (
+          <div className="border-t border-white/10 bg-black/95 md:hidden">
+            <div className="flex flex-col gap-1 px-5 py-4">
+              {links.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  target={item.href.startsWith('http') ? '_blank' : undefined}
+                  rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
+                  className="rounded-lg px-3 py-2 text-sm text-white/70 transition hover:bg-white/5 hover:text-white"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.label}
+                </a>
+              ))}
+              <div className="mt-2 flex gap-3 border-t border-white/10 pt-4">
+                <a href={GITHUB_URL} target="_blank" rel="noreferrer" aria-label="GitHub" className="text-white/60 transition hover:text-white">
+                  <Github className="h-5 w-5" />
+                </a>
+                <a href={X_URL} target="_blank" rel="noreferrer" aria-label="X" className="text-white/60 transition hover:text-white">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-current">
+                    <path d="M18.244 2H21.5l-7.11 8.13L22.75 22h-6.54l-5.12-6.69L5.24 22H2l7.6-8.69L1.25 2h6.71l4.63 6.1L18.244 2Zm-1.147 18h1.803L6.98 3.894H5.045L17.097 20Z" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       <main className="relative px-5 pb-20 pt-32 sm:px-6 lg:pt-40">
