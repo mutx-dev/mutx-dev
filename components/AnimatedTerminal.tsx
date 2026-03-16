@@ -43,22 +43,11 @@ const toneClass: Record<string, string> = {
 export function AnimatedTerminal() {
   const [visibleSteps, setVisibleSteps] = useState(0)
   const [typing, setTyping] = useState('')
-  const containerRef = useRef<HTMLDivElement | null>(null)
 
   const renderedSteps = useMemo(() => steps.slice(0, visibleSteps), [visibleSteps])
 
   useEffect(() => {
     let currentStep = 0
-    let cancelled = false
-
-    const run = async () => {
-      while (!cancelled) {
-        if (currentStep >= steps.length) {
-          currentStep = 0
-          setVisibleSteps(0)
-          await new Promise((resolve) => setTimeout(resolve, 900))
-          continue
-        }
 
         const step = steps[currentStep]
 
