@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Plus,
+  Search,
   Trash2,
   Edit2,
   Play,
@@ -54,6 +55,8 @@ export default function WebhooksPageClient() {
   const [submitting, setSubmitting] = useState(false);
   const [testingId, setTestingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchWebhooks();
@@ -64,6 +67,28 @@ export default function WebhooksPageClient() {
       fetchDeliveries(viewingDeliveries.id);
     }
   }, [viewingDeliveries]);
+
+  // Keyboard shortcut: Cmd/Ctrl + K to focus search
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Filter webhooks based on search query
+  const filteredWebhooks = searchQuery
+    ? webhooks.filter(w => 
+        w.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        w.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        w.events.some(e => e.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    : webhooks;
 
   async function fetchWebhooks() {
     try {
@@ -292,7 +317,21 @@ export default function WebhooksPageClient() {
         </Card>
       )}
 
-      {!showForm && !viewingDeliveries && webhooks.length > 0 && (
+            {!showForm && !viewingDeliveries && webhooks.length > 0 && (
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search webhooks... (⌘K)"
+            className="w-full rounded-lg border border-white/10 bg-black/40 py-2 pl-10 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none"
+          />
+        </div>
+      )}
+
+      {!showForm && !viewingDeliveries && filteredWebhooks.length > 0 && (
         <div className="flex justify-end">
           <button
             onClick={() => {
@@ -382,7 +421,7 @@ export default function WebhooksPageClient() {
         </Card>
       )}
 
-      {webhooks.length === 0 && !showForm && !viewingDeliveries ? (
+      {filteredWebhooks.length === 0 && !showForm && !viewingDeliveries ? (
         <Card className="p-12 text-center">
           <Webhook className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
           <h3 className="text-lg font-semibold mb-2">No webhooks configured</h3>
@@ -400,7 +439,7 @@ export default function WebhooksPageClient() {
       ) : (
         !viewingDeliveries && (
           <div className="space-y-4">
-            {webhooks.map((webhook) => (
+            {filteredWebhooks.map((webhook) => (
               <Card key={webhook.id} className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
