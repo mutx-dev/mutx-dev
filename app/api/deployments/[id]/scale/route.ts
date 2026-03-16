@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { getApiBaseUrl, getAuthToken } from '@/app/api/_lib/controlPlane'
 import { withErrorHandling, unauthorized } from '@/app/api/_lib/errors'
+import { checkDeploymentOwnership } from '@/app/api/_lib/ownership'
 
 const API_BASE_URL = getApiBaseUrl()
 
@@ -18,6 +19,13 @@ export async function POST(
     }
 
     const { id } = await params
+    
+    // Check ownership before proceeding
+    const ownershipError = await checkDeploymentOwnership(request, id)
+    if (ownershipError) {
+      return ownershipError
+    }
+    
     const body = await req.json()
     
     const response = await fetch(`${API_BASE_URL}/v1/deployments/${id}/scale`, {
