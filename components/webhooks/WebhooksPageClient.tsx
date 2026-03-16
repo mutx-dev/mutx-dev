@@ -10,8 +10,10 @@ import {
   AlertCircle,
   CheckCircle2,
   Webhook,
-  X
+  X,
+  Eye
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 
 type Webhook = {
@@ -25,6 +27,7 @@ type Webhook = {
 };
 
 export default function WebhooksPageClient() {
+  const router = useRouter();
   const [webhooks, setWebhooks] = useState<Webhook[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -276,6 +279,13 @@ export default function WebhooksPageClient() {
                   </p>
                 </div>
                 <div className="flex gap-2">
+                  <button
+                    onClick={() => router.push(`/dashboard/webhooks/${webhook.id}`)}
+                    className="p-2 hover:bg-accent rounded-md"
+                    title="View delivery history"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
                   <button
                     onClick={() => handleTest(webhook.id)}
                     disabled={testingId === webhook.id}

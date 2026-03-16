@@ -10,6 +10,13 @@ module.exports = {
       colors: {
         background: '#000000',
         surface: '#0a0a0a',
+        'bg-canvas': '#000000',
+        'bg-surface': '#111111',
+        'bg-sidebar': '#0B0B0B',
+        'text-primary': '#FFFFFF',
+        'text-secondary': '#A3A3A3',
+        'border-subtle': '#2A2A2A',
+        'signal-accent': '#4DA3FF',
         slate: {
           200: '#e2e8f0',
           300: '#cbd5e1',
@@ -17,6 +24,14 @@ module.exports = {
           500: '#64748b',
           600: '#475569',
         },
+      },
+      borderRadius: {
+        'md': '10px',
+        'lg': '12px',
+      },
+      fontFamily: {
+        sans: ['var(--font-display)', 'Space Grotesk', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'JetBrains Mono', 'monospace'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
