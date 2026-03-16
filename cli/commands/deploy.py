@@ -10,6 +10,24 @@ def deploy_group():
     pass
 
 
+STATUS_INDICATORS = {
+    "running": ("●", "green"),
+    "ready": ("●", "green"),
+    "pending": ("○", "yellow"),
+    "creating": ("○", "yellow"),
+    "deleting": ("○", "yellow"),
+    "stopped": ("◌", "white"),
+    "killed": ("◌", "white"),
+    "failed": ("✕", "red"),
+    "error": ("✕", "red"),
+}
+
+
+def get_status_indicator(status: str) -> tuple:
+    """Get the indicator emoji and color for a deployment status."""
+    return STATUS_INDICATORS.get(status.lower(), ("○", "white"))
+
+
 @deploy_group.command(name="list")
 @click.option("--limit", "-l", default=50, help="Number of deployments to list")
 @click.option("--skip", "-s", default=0, help="Number of deployments to skip")
@@ -44,9 +62,14 @@ def list_deployments(limit: int, skip: int, agent_id: Optional[str], status: Opt
         click.echo("No deployments found.")
         return
 
+    click.echo(click.style("Deployments:", bold=True))
+    click.echo("-" * 70)
+
     for dep in deployments:
+        indicator, color = get_status_indicator(dep["status"])
+        styled_indicator = click.style(indicator, fg=color)
         click.echo(
-            f"{dep['id']} | {dep['agent_id']} | {dep['status']} | replicas: {dep.get('replicas', 1)}"
+            f"{styled_indicator} {dep['id']} | {dep['agent_id']} | {dep['status']} | replicas: {dep.get('replicas', 1)}"
         )
 
 
