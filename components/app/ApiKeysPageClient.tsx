@@ -23,7 +23,6 @@ export function ApiKeysPageClient() {
   const [rotatingId, setRotatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isMac, setIsMac] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const fetchKeys = async () => {
@@ -66,8 +65,6 @@ export function ApiKeysPageClient() {
       }
     }
     document.addEventListener('keydown', handleKeyDown);
-    // Detect Mac OS
-    setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.platform));
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
@@ -221,7 +218,7 @@ export function ApiKeysPageClient() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={isMac ? "Search keys by name or ID... (⌘K)" : "Search keys by name or ID... (Ctrl+K)"}
+              placeholder="Search keys by name or ID... (⌘K)"
               className="w-full rounded-lg border border-white/10 bg-black/40 py-2 pl-10 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20"
             />
           </div>
