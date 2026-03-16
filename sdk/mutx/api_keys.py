@@ -26,6 +26,10 @@ class APIKey:
     def __repr__(self) -> str:
         return f"APIKey(id={self.id}, name={self.name}, active={self.is_active})"
 
+    def dict(self) -> dict[str, Any]:
+        """Return the raw API response payload as a plain dict."""
+        return dict(self._data)
+
 
 class APIKeyWithSecret(APIKey):
     """Returned on create/rotate — includes the plain key (shown once)."""
@@ -37,6 +41,10 @@ class APIKeyWithSecret(APIKey):
     def __repr__(self) -> str:
         prefix = self.key[:16] + "…" if len(self.key) > 16 else self.key
         return f"APIKeyWithSecret(id={self.id}, name={self.name}, key={prefix})"
+
+    def dict(self) -> dict[str, Any]:
+        """Return the raw API response payload as a plain dict."""
+        return dict(self._data)
 
 
 class APIKeys:

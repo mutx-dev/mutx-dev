@@ -6,6 +6,8 @@ from uuid import UUID
 
 import httpx
 
+from mutx.models import AgentActionResponse, DeploymentLog, DeploymentMetric
+
 
 def _parse_datetime(value: str | None) -> datetime | None:
     if value is None:
@@ -27,6 +29,10 @@ class DeploymentEvent:
         self.created_at = _parse_datetime(data["created_at"])
         self._data = data
 
+    def dict(self) -> dict[str, Any]:
+        """Return the raw API response payload as a plain dict."""
+        return dict(self._data)
+
 
 class DeploymentEventHistory:
     def __init__(self, data: dict[str, Any]):
@@ -39,6 +45,10 @@ class DeploymentEventHistory:
         self.event_type = data.get("event_type")
         self.status = data.get("status")
         self._data = data
+
+    def dict(self) -> dict[str, Any]:
+        """Return the raw API response payload as a plain dict."""
+        return dict(self._data)
 
 
 class Deployment:
@@ -56,6 +66,10 @@ class Deployment:
 
     def __repr__(self) -> str:
         return f"Deployment(id={self.id}, agent_id={self.agent_id}, status={self.status})"
+
+    def dict(self) -> dict[str, Any]:
+        """Return the raw API response payload as a plain dict."""
+        return dict(self._data)
 
 
 class Deployments:
@@ -102,7 +116,7 @@ class Deployments:
         response.raise_for_status()
         return Deployment(response.json())
 
-    def create_for_agent(self, agent_id: UUID | str) -> dict[str, Any]:
+    def create_for_agent(self, agent_id: UUID | str) -> AgentActionResponse:
         """Create deployment via legacy/live route /agents/{agent_id}/deploy.
 
         This endpoint currently returns a lightweight payload:
@@ -111,14 +125,14 @@ class Deployments:
         self._require_sync_client()
         response = self._client.post(f"/v1/agents/{agent_id}/deploy")
         response.raise_for_status()
-        return response.json()
+        return AgentActionResponse.model_validate(response.json())
 
-    async def acreate_for_agent(self, agent_id: UUID | str) -> dict[str, Any]:
+    async def acreate_for_agent(self, agent_id: UUID | str) -> AgentActionResponse:
         """Create deployment via legacy/live route /agents/{agent_id}/deploy."""
         self._require_async_client()
         response = await self._client.post(f"/v1/agents/{agent_id}/deploy")
         response.raise_for_status()
-        return response.json()
+        return AgentActionResponse.model_validate(response.json())
 
     def list(
         self,
@@ -258,7 +272,7 @@ class Deployments:
         skip: int = 0,
         limit: int = 100,
         level: Optional[str] = None,
-    ) -> list[dict[str, Any]]:
+    ) -> list[DeploymentLog]:
         params: dict[str, Any] = {"skip": skip, "limit": limit}
         if level:
             params["level"] = level
@@ -269,7 +283,7 @@ class Deployments:
             params=params,
         )
         response.raise_for_status()
-        return response.json()
+        return [DeploymentLog.model_validate(entry) for entry in response.json()]
 
     async def alogs(
         self,
@@ -277,7 +291,7 @@ class Deployments:
         skip: int = 0,
         limit: int = 100,
         level: Optional[str] = None,
-    ) -> list[dict[str, Any]]:
+    ) -> list[DeploymentLog]:
         params: dict[str, Any] = {"skip": skip, "limit": limit}
         if level:
             params["level"] = level
@@ -288,32 +302,32 @@ class Deployments:
             params=params,
         )
         response.raise_for_status()
-        return response.json()
+        return [DeploymentLog.model_validate(entry) for entry in response.json()]
 
     def metrics(
         self,
         deployment_id: UUID | str,
         skip: int = 0,
         limit: int = 100,
-    ) -> list[dict[str, Any]]:
+    ) -> list[DeploymentMetric]:
         self._require_sync_client()
         response = self._client.get(
             f"/v1/deployments/{deployment_id}/metrics",
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
-        return response.json()
+        return [DeploymentMetric.model_validate(entry) for entry in response.json()]
 
     async def ametrics(
         self,
         deployment_id: UUID | str,
         skip: int = 0,
         limit: int = 100,
-    ) -> list[dict[str, Any]]:
+    ) -> list[DeploymentMetric]:
         self._require_async_client()
         response = await self._client.get(
             f"/v1/deployments/{deployment_id}/metrics",
             params={"skip": skip, "limit": limit},
         )
         response.raise_for_status()
-        return response.json()
+        return [DeploymentMetric.model_validate(entry) for entry in response.json()]

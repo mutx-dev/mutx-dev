@@ -14,6 +14,7 @@ from mutx.agents import Agents
 from mutx.api_keys import APIKeys
 from mutx.clawhub import ClawHub
 from mutx.deployments import Deployments
+from mutx.models import AgentActionResponse, DeploymentLog, DeploymentMetric, WebhookTestResult
 from mutx.webhooks import Webhooks
 
 
@@ -183,9 +184,13 @@ __all__ = [
     "AgentInfo",
     "Command",
     "AgentMetrics",
+    "AgentActionResponse",
     "APIKeys",
     "ClawHub",
+    "DeploymentLog",
+    "DeploymentMetric",
     "Deployments",
+    "WebhookTestResult",
     "Webhooks",
     "create_agent_client",
 ]

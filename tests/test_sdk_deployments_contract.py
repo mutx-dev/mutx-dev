@@ -334,8 +334,8 @@ def test_deployments_metrics_hits_contract_route_and_query_params() -> None:
 
     assert captured["path"] == f"/v1/deployments/{deployment_id}/metrics"
     assert captured["query"] == {"skip": "5", "limit": "15"}
-    assert payload[0]["cpu_usage"] == 0.61
-    assert payload[0]["memory_usage"] == 0.44
+    assert payload[0].cpu_usage == 0.61
+    assert payload[0].memory_usage == 0.44
 
 
 @pytest.mark.asyncio
@@ -356,4 +356,4 @@ async def test_deployments_ametrics_hits_contract_route_and_query_params() -> No
 
     assert captured["path"] == f"/v1/deployments/{deployment_id}/metrics"
     assert captured["query"] == {"skip": "6", "limit": "12"}
-    assert payload[0]["cpu_usage"] == 0.61
+    assert payload[0].cpu_usage == 0.61

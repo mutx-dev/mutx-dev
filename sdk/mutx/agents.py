@@ -7,6 +7,8 @@ from uuid import UUID
 
 import httpx
 
+from mutx.models import AgentActionResponse
+
 
 class Agent:
     def __init__(self, data: dict[str, Any]):
@@ -34,6 +36,10 @@ class Agent:
     def __repr__(self) -> str:
         return f"Agent(id={self.id}, name={self.name}, status={self.status})"
 
+    def dict(self) -> dict[str, Any]:
+        """Return the raw API response payload as a plain dict."""
+        return dict(self._data)
+
 
 class DeploymentEvent:
     def __init__(self, data: dict[str, Any]) -> None:
@@ -45,6 +51,10 @@ class DeploymentEvent:
         self.error_message = data.get("error_message")
         self.created_at = datetime.fromisoformat(data["created_at"])
         self._data = data
+
+    def dict(self) -> dict[str, Any]:
+        """Return the raw API response payload as a plain dict."""
+        return dict(self._data)
 
 
 class Deployment:
@@ -61,6 +71,10 @@ class Deployment:
         self.error_message = data.get("error_message")
         self.events = [DeploymentEvent(item) for item in data.get("events", [])]
         self._data = data
+
+    def dict(self) -> dict[str, Any]:
+        """Return the raw API response payload as a plain dict."""
+        return dict(self._data)
 
 
 class AgentDetail(Agent):
@@ -80,6 +94,10 @@ class AgentLog:
         self.metadata = data.get("metadata", self.extra_data)
         self._data = data
 
+    def dict(self) -> dict[str, Any]:
+        """Return the raw API response payload as a plain dict."""
+        return dict(self._data)
+
 
 class AgentMetric:
     def __init__(self, data: dict[str, Any]):
@@ -89,6 +107,10 @@ class AgentMetric:
         self.memory_usage = data.get("memory_usage")
         self.timestamp = datetime.fromisoformat(data["timestamp"])
         self._data = data
+
+    def dict(self) -> dict[str, Any]:
+        """Return the raw API response payload as a plain dict."""
+        return dict(self._data)
 
 
 class Agents:
@@ -203,29 +225,29 @@ class Agents:
         response = await self._client.delete(f"/v1/agents/{agent_id}")
         response.raise_for_status()
 
-    def deploy(self, agent_id: UUID | str) -> dict[str, Any]:
+    def deploy(self, agent_id: UUID | str) -> AgentActionResponse:
         self._require_sync_client()
         response = self._client.post(f"/v1/agents/{agent_id}/deploy")
         response.raise_for_status()
-        return response.json()
+        return AgentActionResponse.model_validate(response.json())
 
-    async def adeploy(self, agent_id: UUID | str) -> dict[str, Any]:
+    async def adeploy(self, agent_id: UUID | str) -> AgentActionResponse:
         self._require_async_client()
         response = await self._client.post(f"/v1/agents/{agent_id}/deploy")
         response.raise_for_status()
-        return response.json()
+        return AgentActionResponse.model_validate(response.json())
 
-    def stop(self, agent_id: UUID | str) -> dict[str, Any]:
+    def stop(self, agent_id: UUID | str) -> AgentActionResponse:
         self._require_sync_client()
         response = self._client.post(f"/v1/agents/{agent_id}/stop")
         response.raise_for_status()
-        return response.json()
+        return AgentActionResponse.model_validate(response.json())
 
-    async def astop(self, agent_id: UUID | str) -> dict[str, Any]:
+    async def astop(self, agent_id: UUID | str) -> AgentActionResponse:
         self._require_async_client()
         response = await self._client.post(f"/v1/agents/{agent_id}/stop")
         response.raise_for_status()
-        return response.json()
+        return AgentActionResponse.model_validate(response.json())
 
     def logs(
         self,

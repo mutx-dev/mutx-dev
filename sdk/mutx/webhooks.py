@@ -6,6 +6,8 @@ from uuid import UUID
 
 import httpx
 
+from mutx.models import WebhookTestResult
+
 
 class Webhook:
     def __init__(self, data: dict[str, Any]):
@@ -21,6 +23,10 @@ class Webhook:
 
     def __repr__(self) -> str:
         return f"Webhook(id={self.id}, url={self.url}, is_active={self.is_active})"
+
+    def dict(self) -> dict[str, Any]:
+        """Return the raw API response payload as a plain dict."""
+        return dict(self._data)
 
 
 class WebhookDelivery:
@@ -40,6 +46,10 @@ class WebhookDelivery:
 
     def __repr__(self) -> str:
         return f"WebhookDelivery(id={self.id}, event={self.event}, success={self.success})"
+
+    def dict(self) -> dict[str, Any]:
+        """Return the raw API response payload as a plain dict."""
+        return dict(self._data)
 
 
 class Webhooks:
@@ -246,14 +256,14 @@ class Webhooks:
         response.raise_for_status()
         return Webhook(response.json())
 
-    def test(self, webhook_id: UUID | str) -> dict[str, Any]:
+    def test(self, webhook_id: UUID | str) -> WebhookTestResult:
         self._require_sync_client()
         response = self._client.post(f"/v1/webhooks/{webhook_id}/test")
         response.raise_for_status()
-        return response.json()
+        return WebhookTestResult.model_validate(response.json())
 
-    async def atest(self, webhook_id: UUID | str) -> dict[str, Any]:
+    async def atest(self, webhook_id: UUID | str) -> WebhookTestResult:
         self._require_async_client()
         response = await self._client.post(f"/v1/webhooks/{webhook_id}/test")
         response.raise_for_status()
-        return response.json()
+        return WebhookTestResult.model_validate(response.json())
