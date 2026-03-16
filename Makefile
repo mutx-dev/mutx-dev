@@ -115,3 +115,13 @@ lint:
 	@echo ""
 	@echo "Running Python lint..."
 	@.venv/bin/ruff check src/api cli sdk || ruff check src/api cli sdk
+
+# Seed data targets
+.PHONY: seed
+seed: test-auth
+	@./scripts/seed.sh
+
+.PHONY: seed-only
+seed-only:
+	@./scripts/seed.sh
+
