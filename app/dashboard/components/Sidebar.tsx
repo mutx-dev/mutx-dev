@@ -13,7 +13,8 @@ import {
   Zap, 
   Webhook, 
   Key, 
-  Activity 
+  Activity,
+  X
 } from "lucide-react";
 
 const navItems = [
@@ -34,10 +35,10 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-[280px] border-r border-[rgba(255,255,255,0.06)] bg-[#0a0a0e]/80 backdrop-blur-xl">
+    <aside className="h-full w-[280px] border-r border-[rgba(255,255,255,0.06)] bg-[#0a0a0e]/80 backdrop-blur-xl">
       <div className="flex h-full flex-col">
         {/* Logo */}
-        <div className="flex h-16 items-center gap-3 border-b border-[rgba(255,255,255,0.06)] px-6">
+        <div className="flex h-16 shrink-0 items-center gap-3 border-b border-[rgba(255,255,255,0.06)] px-6">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#22d3ee]">
             <Zap className="h-5 w-5 text-black" />
           </div>
@@ -62,10 +63,10 @@ export function Sidebar() {
                         : "text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.05)] hover:text-white"
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
-                    <span>{item.label}</span>
+                    <Icon className="h-4 w-4 shrink-0" />
+                    <span className="truncate">{item.label}</span>
                     {isActive && (
-                      <div className="ml-auto h-1.5 w-1.5 rounded-full bg-[#22d3ee]" />
+                      <div className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-[#22d3ee]" />
                     )}
                   </Link>
                 </li>
