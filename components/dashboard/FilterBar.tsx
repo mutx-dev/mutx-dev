@@ -42,6 +42,13 @@ export function FilterBar({
 }: FilterBarProps) {
   const canReset = Boolean(onReset) && (searchValue.length > 0 || filters.some((filter) => filter.value.length > 0));
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape" && searchValue) {
+      onSearchChange("");
+      onReset?.();
+    }
+  };
+
   return (
     <section
       className={cn("rounded-xl border p-3", className)}
@@ -65,6 +72,7 @@ export function FilterBar({
           <input
             value={searchValue}
             onChange={(event) => onSearchChange(event.currentTarget.value)}
+            onKeyDown={handleKeyDown}
             placeholder={searchPlaceholder}
             className="w-full border-0 bg-transparent text-sm outline-none"
             style={{ color: dashboardTokens.textPrimary }}
