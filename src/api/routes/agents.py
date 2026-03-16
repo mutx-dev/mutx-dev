@@ -23,6 +23,7 @@ from src.api.models import (
     DeploymentEvent as DeploymentEventModel,
     User,
 )
+from src.api.models.plan_tiers import PlanTier, get_quota
 from src.api.services.usage import track_usage
 from src.api.models.schemas import (
     AgentConfigBase,
@@ -224,6 +225,16 @@ async def create_agent(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    # Check agent quota
+    quota = get_quota(current_user.plan.value)
+    result = await db.execute(select(Agent).where(Agent.user_id == current_user.id))
+    existing_agents = result.scalars().all()
+    if quota.max_agents != -1 and len(existing_agents) >= quota.max_agents:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Agent limit reached ({quota.max_agents}). Upgrade your plan to create more agents."
+        )
+
     config_json, _normalized_config = _validate_agent_config(
         agent_data.type,
         agent_data.config,
