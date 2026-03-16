@@ -391,3 +391,97 @@ class TestAgentMetrics:
         """Test that users cannot access other users' agent metrics."""
         response = await other_user_client.get(f"/v1/agents/{test_agent.id}/metrics")
         assert response.status_code == 403
+
+
+class TestAgentQuotaEnforcement:
+    """Tests for agent quota enforcement based on plan tier."""
+
+    @pytest.mark.asyncio
+    async def test_create_agent_enforces_quota_limit(
+        self, client: AsyncClient, test_user, db_session: AsyncSession
+    ):
+        """Test that creating agents beyond quota limit returns 403."""
+        from src.api.models.plan_tiers import PlanTier
+        
+        # Update user to free plan (max 3 agents)
+        test_user.plan = PlanTier.FREE
+        await db_session.commit()
+        
+        # Create 3 agents (at quota limit)
+        for i in range(3):
+            agent = Agent(
+                name=f"quota-test-agent-{i}",
+                description=f"Agent {i}",
+                config="{}",
+                user_id=test_user.id,
+                status=AgentStatus.CREATING,
+            )
+            db_session.add(agent)
+        await db_session.commit()
+        
+        # Try to create 4th agent - should fail
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "name": "quota-exceeded-agent",
+                "type": "openai",
+            },
+        )
+        assert response.status_code == 403
+        assert "Agent limit reached" in response.json()["detail"]
+        assert "Upgrade your plan" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_create_agent_allowed_at_quota_limit(
+        self, client: AsyncClient, test_user, db_session: AsyncSession
+    ):
+        """Test that creating agents up to quota limit succeeds."""
+        from src.api.models.plan_tiers import PlanTier
+        
+        # Update user to free plan (max 3 agents)
+        test_user.plan = PlanTier.FREE
+        await db_session.commit()
+        
+        # Create 2 agents (under quota)
+        for i in range(2):
+            agent = Agent(
+                name=f"quota-test-agent-{i}",
+                description=f"Agent {i}",
+                config="{}",
+                user_id=test_user.id,
+                status=AgentStatus.CREATING,
+            )
+            db_session.add(agent)
+        await db_session.commit()
+        
+        # Create 3rd agent - should succeed
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "name": "third-agent",
+                "type": "openai",
+            },
+        )
+        assert response.status_code == 201
+
+    @pytest.mark.asyncio
+    async def test_enterprise_plan_allows_unlimited_agents(
+        self, client: AsyncClient, test_user, db_session: AsyncSession
+    ):
+        """Test that enterprise plan has unlimited agents."""
+        from src.api.models.plan_tiers import PlanTier
+        
+        # Update user to enterprise plan
+        test_user.plan = PlanTier.ENTERPRISE
+        await db_session.commit()
+        
+        # Create many agents - should all succeed
+        for i in range(10):
+            response = await client.post(
+                "/v1/agents",
+                json={
+                    "name": f"enterprise-agent-{i}",
+                    "type": "openai",
+                },
+            )
+            assert response.status_code == 201
