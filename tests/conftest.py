@@ -68,6 +68,7 @@ def create_test_app() -> FastAPI:
     app.include_router(agent_runtime.router, prefix="/v1")
     app.include_router(newsletter.router, prefix="/v1")
     app.include_router(leads.router, prefix="/v1")
+    app.include_router(leads.contacts_router, prefix="/v1")
     app.include_router(ingest.router, prefix="/v1")
     app.include_router(runs.router, prefix="/v1")
     app.include_router(usage.router, prefix="/v1")
