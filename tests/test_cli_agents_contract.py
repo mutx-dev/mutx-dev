@@ -343,3 +343,32 @@ def test_agents_delete_requires_confirmation_without_force(monkeypatch) -> None:
 
     assert result.exit_code == 0
     assert "Are you sure you want to delete agent" in result.output
+
+
+def test_agents_stop_hits_canonical_route_and_renders_status(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+    agent_id = str(uuid.uuid4())
+
+    def fake_post(path: str, json: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["json"] = json
+        return DummyResponse(
+            200,
+            {"status": "stopped"},
+        )
+
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client", lambda config: SimpleNamespace(post=fake_post)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["agents", "stop", agent_id])
+
+    assert result.exit_code == 0
+    assert captured == {
+        "path": f"/v1/agents/{agent_id}/stop",
+        "json": None,
+    }
+    assert f"Stopped agent: {agent_id}" in result.output
+    assert "Status: stopped" in result.output

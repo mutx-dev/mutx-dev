@@ -269,3 +269,57 @@ def test_deploy_metrics_hits_contract_route_and_renders_points(monkeypatch) -> N
         },
     }
     assert "2026-03-12T15:10:00 | cpu: 0.5 | memory: 0.75" in result.output
+
+
+def test_deploy_scale_hits_canonical_route_and_renders_replica_count(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_post(path: str, json: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["json"] = json
+        return DummyResponse(200, {"id": "dep-scale-1", "replicas": 5})
+
+    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.deploy.get_client", lambda config: SimpleNamespace(post=fake_post)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["deploy", "scale", "dep-scale-1", "--replicas", "5"])
+
+    assert result.exit_code == 0
+    assert captured == {
+        "path": "/v1/deployments/dep-scale-1/scale",
+        "json": {"replicas": 5},
+    }
+    assert "Scaled deployment dep-scale-1 to 5 replicas" in result.output
+
+
+def test_deploy_delete_hits_canonical_route(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_delete(path: str) -> DummyResponse:
+        captured["path"] = path
+        return DummyResponse(204, None)
+
+    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.deploy.get_client", lambda config: SimpleNamespace(delete=fake_delete)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["deploy", "delete", "dep-del-1", "--force"])
+
+    assert result.exit_code == 0
+    assert captured == {"path": "/v1/deployments/dep-del-1"}
+    assert "Deleted deployment: dep-del-1" in result.output
+
+
+def test_deploy_delete_requires_confirmation_without_force(monkeypatch) -> None:
+    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["deploy", "delete", "dep-del-2"], input="n\n")
+
+    assert result.exit_code == 0
+    assert "Are you sure you want to delete deployment" in result.output
