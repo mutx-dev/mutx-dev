@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
+from src.api.models import get_quota
 from src.api.models.models import APIKey, User
 from src.api.models.schemas import (
     APIKeyCreate,
@@ -20,7 +21,6 @@ from src.api.services.user_service import hash_api_key
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])
 
 
-MAX_ACTIVE_API_KEYS_PER_USER = 10
 
 
 def generate_api_key() -> str:
@@ -95,10 +95,12 @@ async def create_api_key(
 ):
     """Create a new API key."""
     active_key_count = await count_active_api_keys(db, current_user.id)
-    if active_key_count >= MAX_ACTIVE_API_KEYS_PER_USER:
+    quota = get_quota(current_user.plan)
+    max_keys = quota.max_api_keys
+    if max_keys != -1 and active_key_count >= max_keys:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Active API key limit reached ({MAX_ACTIVE_API_KEYS_PER_USER})",
+            detail=f"Active API key limit reached for your plan ({current_user.plan.value}): {max_keys} keys",
         )
 
     plain_key = generate_api_key()

@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.jwt import create_access_token
 from src.api.models.models import APIKey
-from src.api.routes.api_keys import MAX_ACTIVE_API_KEYS_PER_USER
+from src.api.models import get_quota, PlanTier
 from src.api.services.user_service import verify_api_key
 
 
@@ -107,7 +107,13 @@ class TestCreateAPIKey:
         self, client: AsyncClient, db_session: AsyncSession, test_user
     ):
         """Test that creating an API key fails once the active key limit is reached."""
-        for index in range(MAX_ACTIVE_API_KEYS_PER_USER):
+        # Set user to PRO plan (50 keys) for this test
+        test_user.plan = PlanTier.PRO
+        db_session.add(test_user)
+        await db_session.commit()
+        
+        quota = get_quota(test_user.plan)
+        for index in range(quota.max_api_keys):
             db_session.add(
                 APIKey(
                     id=uuid.uuid4(),
@@ -128,7 +134,13 @@ class TestCreateAPIKey:
         self, client: AsyncClient, db_session: AsyncSession, test_user
     ):
         """Test that revoked keys do not count against the active key limit."""
-        for index in range(MAX_ACTIVE_API_KEYS_PER_USER):
+        # Set user to PRO plan (50 keys) for this test
+        test_user.plan = PlanTier.PRO
+        db_session.add(test_user)
+        await db_session.commit()
+        
+        quota = get_quota(test_user.plan)
+        for index in range(quota.max_api_keys):
             db_session.add(
                 APIKey(
                     id=uuid.uuid4(),
