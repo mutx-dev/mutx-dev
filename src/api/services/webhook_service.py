@@ -37,6 +37,23 @@ def generate_signature(payload: str, secret: str) -> str:
     return hmac.new(secret.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
+def verify_signature(payload: bytes, signature: str, secret: str) -> bool:
+    """Verify HMAC-SHA256 webhook signature.
+
+    Accepts signatures with or without the 'sha256=' prefix, as sent in
+    the X-Webhook-Signature header by ``deliver_webhook``.
+    """
+    if not secret:
+        return True
+    if not signature:
+        return False
+    # Strip the "sha256=" prefix if present
+    if signature.startswith("sha256="):
+        signature = signature[7:]
+    expected = hmac.new(secret.encode("utf-8"), payload, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, signature)
+
+
 async def deliver_webhook(
     session: aiohttp.ClientSession,
     webhook: Webhook,

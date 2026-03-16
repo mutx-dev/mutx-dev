@@ -385,3 +385,131 @@ async def test_webhook_delivery_history_other_user_forbidden(
 
     response = await other_user_client.get(f"/v1/webhooks/{webhook_id}/deliveries")
     assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_webhook_verify_valid_signature(client: AsyncClient):
+    import hashlib
+    import hmac
+    import json
+
+    secret = "test-secret-123"
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["agent.*"], "secret": secret},
+    )
+    assert response.status_code == 201
+    webhook_id = response.json()["id"]
+
+    payload = json.dumps({"event": "agent.status", "data": {}}).encode("utf-8")
+    signature = "sha256=" + hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
+
+    response = await client.post(
+        f"/v1/webhooks/{webhook_id}/verify",
+        content=payload,
+        headers={"Content-Type": "application/json", "X-Webhook-Signature": signature},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"valid": True}
+
+
+@pytest.mark.asyncio
+async def test_webhook_verify_invalid_signature(client: AsyncClient):
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["agent.*"], "secret": "my-secret"},
+    )
+    assert response.status_code == 201
+    webhook_id = response.json()["id"]
+
+    response = await client.post(
+        f"/v1/webhooks/{webhook_id}/verify",
+        content=b'{"event":"agent.status"}',
+        headers={
+            "Content-Type": "application/json",
+            "X-Webhook-Signature": "sha256=invalidsignature",
+        },
+    )
+    assert response.status_code == 200
+    assert response.json() == {"valid": False}
+
+
+@pytest.mark.asyncio
+async def test_webhook_verify_missing_signature(client: AsyncClient):
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["agent.*"], "secret": "my-secret"},
+    )
+    assert response.status_code == 201
+    webhook_id = response.json()["id"]
+
+    response = await client.post(
+        f"/v1/webhooks/{webhook_id}/verify",
+        content=b'{"event":"agent.status"}',
+        headers={"Content-Type": "application/json"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"valid": False}
+
+
+@pytest.mark.asyncio
+async def test_webhook_verify_no_secret_configured(client: AsyncClient):
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["agent.*"]},
+    )
+    assert response.status_code == 201
+    webhook_id = response.json()["id"]
+
+    response = await client.post(
+        f"/v1/webhooks/{webhook_id}/verify",
+        content=b'{"event":"agent.status"}',
+        headers={"Content-Type": "application/json"},
+    )
+    assert response.status_code == 400
+    assert "secret" in response.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_webhook_verify_wrong_user_forbidden(
+    client: AsyncClient, other_user_client: AsyncClient
+):
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["agent.*"], "secret": "my-secret"},
+    )
+    assert response.status_code == 201
+    webhook_id = response.json()["id"]
+
+    response = await other_user_client.post(
+        f"/v1/webhooks/{webhook_id}/verify",
+        content=b'{"event":"agent.status"}',
+        headers={"Content-Type": "application/json"},
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_webhook_verify_signature_without_prefix(client: AsyncClient):
+    """Verify that signatures without 'sha256=' prefix are also accepted."""
+    import hashlib
+    import hmac
+
+    secret = "prefix-test-secret"
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["agent.*"], "secret": secret},
+    )
+    assert response.status_code == 201
+    webhook_id = response.json()["id"]
+
+    payload = b'{"event":"agent.status"}'
+    raw_signature = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
+
+    response = await client.post(
+        f"/v1/webhooks/{webhook_id}/verify",
+        content=payload,
+        headers={"Content-Type": "application/json", "X-Webhook-Signature": raw_signature},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"valid": True}

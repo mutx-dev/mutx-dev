@@ -220,6 +220,33 @@ async def test_webhook(
         )
 
 
+@router.post("/{webhook_id}/verify")
+async def verify_webhook_signature(
+    webhook_id: uuid.UUID,
+    request: Request,
+    x_webhook_signature: Optional[str] = Header(None, alias="X-Webhook-Signature"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_webhook_auth),
+):
+    """Verify that a webhook payload signature is valid for this webhook's secret.
+
+    Useful for debugging and testing webhook consumers.  The raw request body
+    is compared against the HMAC-SHA256 signature in the X-Webhook-Signature
+    header using the webhook's configured secret.
+    """
+    webhook = await _get_owned_webhook(webhook_id, db, current_user)
+
+    if not webhook.secret:
+        raise HTTPException(status_code=400, detail="Webhook does not have a secret configured")
+
+    from src.api.services.webhook_service import verify_signature
+
+    payload = await request.body()
+    valid = verify_signature(payload, x_webhook_signature or "", webhook.secret)
+
+    return {"valid": valid}
+
+
 @router.get("/{webhook_id}/deliveries", response_model=list[WebhookDelivery])
 async def list_webhook_deliveries(
     webhook_id: uuid.UUID,
