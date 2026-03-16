@@ -540,6 +540,10 @@ export function AgentsPageClient() {
         e.preventDefault();
         searchInputRef.current?.focus();
       }
+      if (e.key === 'Escape' && document.activeElement === searchInputRef.current) {
+        setSearchQuery('');
+        searchInputRef.current?.blur();
+      }
     }
 
     document.addEventListener('keydown', handleKeyDown);

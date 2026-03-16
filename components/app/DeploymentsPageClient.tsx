@@ -598,6 +598,23 @@ export function DeploymentsPageClient() {
     return () => clearInterval(interval);
   }, []);
 
+  // Keyboard shortcut: Cmd/Ctrl + K to focus search, Escape to clear
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+      if (e.key === 'Escape' && document.activeElement === searchInputRef.current) {
+        setSearchQuery('');
+        searchInputRef.current?.blur();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   async function handleRefresh() {
     setRefreshing(true);
     await Promise.all([loadDeployments(), loadAgents()]);
