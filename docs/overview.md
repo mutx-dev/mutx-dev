@@ -4,6 +4,8 @@ MUTX is an open-source control plane for operating AI agents with clearer bounda
 
 Today the repo exposes three distinct public surfaces, and understanding that split is the fastest way to orient yourself.
 
+For a detailed supported-vs-aspirational matrix, see [Surface Matrix](surfaces.md).
+
 ## The three surfaces
 
 ### `mutx.dev`

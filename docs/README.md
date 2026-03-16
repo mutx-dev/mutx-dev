@@ -19,6 +19,7 @@ Use this directory to understand what exists now, how to get started, and how th
 
 ### Product surfaces
 - [Platform Overview](./overview.md) - what MUTX is and how the public surfaces split
+- [Surface Matrix](./surfaces.md) - supported vs aspirational surface status
 - [Quickstart](./quickstart.md) - local bootstrap for API and web
 - [Local Developer Bootstrap](./deployment/local-developer-bootstrap.md) - full clone-to-validation local setup
 - [App and Dashboard](./app-dashboard.md) - what the current app surface does today

@@ -64,6 +64,6 @@ This matrix tracks the current repo state and where contributors can help next.
 ### `area:docs`
 
 * keep examples aligned with real routes
-* document supported versus aspirational surfaces clearly
+* document supported versus aspirational surfaces clearly (see [Surface Matrix](../docs/surfaces.md))
 
 For priority and sequencing, see `ROADMAP.md`.
