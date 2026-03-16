@@ -33,11 +33,20 @@ type ApiKey = components["schemas"]["APIKeyResponse"];
 type Health = components["schemas"]["HealthResponse"];
 type CreateKeyResponse = components["schemas"]["APIKeyCreateResponse"];
 
+// Session expiry error marker
+const SESSION_EXPIRED_ERROR = "SESSION_EXPIRED";
+
 async function readJson<T>(
   input: RequestInfo | URL,
   init?: RequestInit,
 ): Promise<T> {
   const response = await fetch(input, { ...init, cache: "no-store" });
+  
+  // Handle 401 as session expiry specifically
+  if (response.status === 401) {
+    throw new Error(SESSION_EXPIRED_ERROR);
+  }
+  
   const payload = await response
     .json()
     .catch(() => ({ detail: "Request failed" }));
@@ -161,6 +170,7 @@ export function AppDashboardClient() {
   const [refreshing, setRefreshing] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [error, setError] = useState("");
+  const [sessionExpired, setSessionExpired] = useState(false);
   const [copiedKey, setCopiedKey] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -385,8 +395,14 @@ export function AppDashboardClient() {
     async function bootstrap() {
       try {
         await loadDashboard();
-      } catch {
+      } catch (err) {
         if (!cancelled) {
+          // Check if this is a session expiry
+          const isSessionExpired = err instanceof Error && err.message === SESSION_EXPIRED_ERROR;
+          if (isSessionExpired) {
+            setSessionExpired(true);
+            setError("Your session has expired. Please log in again.");
+          }
           setUser(null);
         }
       } finally {
@@ -437,13 +453,20 @@ export function AppDashboardClient() {
   async function handleRefresh() {
     setRefreshing(true);
     setError("");
+    setSessionExpired(false);
 
     try {
       await loadDashboard();
     } catch (nextError) {
-      setError(
-        nextError instanceof Error ? nextError.message : "Refresh failed",
-      );
+      // Check if this is a session expiry
+      const isSessionExpired = nextError instanceof Error && nextError.message === SESSION_EXPIRED_ERROR;
+      if (isSessionExpired) {
+        setSessionExpired(true);
+        setError("Your session has expired. Please log in again.");
+        setUser(null);
+      } else {
+        setError(nextError instanceof Error ? nextError.message : "Refresh failed");
+      }
     } finally {
       setRefreshing(false);
     }
@@ -638,9 +661,16 @@ export function AppDashboardClient() {
           </form>
 
           {error ? (
-            <div className="mt-4 flex items-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+            <div className={`mt-4 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm ${
+              sessionExpired
+                ? "border-amber-400/30 bg-amber-400/10 text-amber-200"
+                : "border-rose-500/20 bg-rose-500/10 text-rose-200"
+            }`}>
               <XCircle className="h-4 w-4 shrink-0" />
               {error}
+              {sessionExpired && (
+                <span className="ml-2 text-xs">(Your session may have expired)</span>
+              )}
             </div>
           ) : null}
         </Card>
@@ -653,9 +683,9 @@ export function AppDashboardClient() {
           <div className="space-y-3">
             {[
               {
-                label: "Auth Boundary",
+                label: sessionExpired ? "Session Expired" : "Auth Boundary",
                 route: "/api/auth/*",
-                status: authBoundaryDetail,
+                status: sessionExpired ? "Please re-authenticate to continue" : authBoundaryDetail,
               },
               {
                 label: "Agents",
