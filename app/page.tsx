@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
-import { Check, Copy, Github, Menu, X } from 'lucide-react'
+import { Check, Copy, Github, Menu, X, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 
 import { AnimatedTerminal } from '@/components/AnimatedTerminal'
 import { WaitlistForm } from '@/components/WaitlistForm'
@@ -17,16 +18,32 @@ const links = [
   { label: 'docs', href: DOCS_URL },
   { label: 'github', href: GITHUB_URL },
   { label: 'contact', href: '/contact' },
-  { label: 'app', href: '/app' },
 ]
 
 export default function LandingPage() {
   const [demoCommandCopied, setDemoCommandCopied] = useState(false)
   const [isMac, setIsMac] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+  const [checkingAuth, setCheckingAuth] = useState(true)
 
   useEffect(() => {
     setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.platform))
+  }, [])
+
+  // Check authentication status on mount
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/auth/me', { credentials: 'include' })
+        setIsAuthenticated(res.ok)
+      } catch {
+        setIsAuthenticated(false)
+      } finally {
+        setCheckingAuth(false)
+      }
+    }
+    checkAuth()
   }, [])
 
   // Close mobile menu on resize to desktop
@@ -103,6 +120,24 @@ export default function LandingPage() {
                 {item.label}
               </a>
             ))}
+            {/* Auth-aware dashboard link */}
+            {!checkingAuth && isAuthenticated && (
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-400 transition hover:border-cyan-500/50 hover:bg-cyan-500/20"
+              >
+                Dashboard
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            )}
+            {!checkingAuth && !isAuthenticated && (
+              <Link
+                href="/login"
+                className="inline-flex items-center rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/[0.08]"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
@@ -142,6 +177,26 @@ export default function LandingPage() {
                   {item.label}
                 </a>
               ))}
+              {/* Mobile auth-aware buttons */}
+              {!checkingAuth && isAuthenticated && (
+                <Link
+                  href="/dashboard"
+                  className="mt-2 flex items-center justify-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-sm font-medium text-cyan-400 transition hover:border-cyan-500/50 hover:bg-cyan-500/20"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Dashboard
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              )}
+              {!checkingAuth && !isAuthenticated && (
+                <Link
+                  href="/login"
+                  className="mt-2 flex items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/[0.08]"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Sign In
+                </Link>
+              )}
               <div className="mt-2 flex gap-3 border-t border-white/10 pt-4">
                 <a href={GITHUB_URL} target="_blank" rel="noreferrer" aria-label="GitHub" className="text-white/60 transition hover:text-white">
                   <Github className="h-5 w-5" />
@@ -184,6 +239,16 @@ export default function LandingPage() {
                   {item.label}
                 </a>
               ))}
+              {/* CTA button for unauthenticated users */}
+              {!checkingAuth && !isAuthenticated && (
+                <Link
+                  href="/login"
+                  className="inline-flex items-center rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-5 py-3 text-sm font-medium text-cyan-400 transition hover:border-cyan-500/50 hover:bg-cyan-500/20"
+                >
+                  Sign In
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              )}
             </div>
 
             <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm">
