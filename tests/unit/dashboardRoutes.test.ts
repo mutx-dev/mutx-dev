@@ -39,7 +39,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/me', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/agents?limit=20', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -50,11 +50,6 @@ describe('dashboard route proxies', () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock)
       .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => ({ id: 'user_123', email: 'test@example.com' }),
-      })
-      .mockResolvedValueOnce({
         ok: false,
         status: 403,
         json: async () => ({ detail: 'Forbidden' }),
@@ -63,7 +58,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/agents?limit=20&user_id=user_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/agents?limit=20', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -74,11 +69,6 @@ describe('dashboard route proxies', () => {
   it('preserves successful list responses for dashboard agents proxy', async () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => ({ id: 'user_123', email: 'test@example.com' }),
-      })
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
@@ -94,7 +84,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/agents?limit=20&user_id=user_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/agents?limit=20', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -130,7 +120,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/me', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments?limit=20', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -141,11 +131,6 @@ describe('dashboard route proxies', () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock)
       .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => ({ id: 'user_123', email: 'test@example.com' }),
-      })
-      .mockResolvedValueOnce({
         ok: false,
         status: 403,
         json: async () => ({ detail: 'Forbidden' }),
@@ -154,7 +139,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments?limit=20&user_id=user_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments?limit=20', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
@@ -165,11 +150,6 @@ describe('dashboard route proxies', () => {
   it('preserves successful list responses for dashboard deployments proxy', async () => {
     getAuthToken.mockResolvedValue('token')
     ;(global.fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => ({ id: 'user_123', email: 'test@example.com' }),
-      })
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
@@ -185,7 +165,7 @@ describe('dashboard route proxies', () => {
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments?limit=20&user_id=user_123', {
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments?limit=20', {
       headers: { Authorization: 'Bearer token' },
       cache: 'no-store',
     })
