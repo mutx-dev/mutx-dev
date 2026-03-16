@@ -7,10 +7,11 @@ const nextConfig = {
   },
   output: 'standalone',
   async rewrites() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://zooming-youth-production-3eb8.up.railway.app';
     return [
       {
         source: '/api/:path*',
-        destination: 'https://zooming-youth-production-3eb8.up.railway.app/:path*',
+        destination: `${apiUrl}/:path*`,
       },
     ];
   },
