@@ -1,6 +1,6 @@
 "use client";
 
-import { Component, type FormEvent, type ReactNode, type ErrorInfo, useState, useEffect } from "react";
+import { Component, type FormEvent, type ReactNode, type ErrorInfo, useState, useEffect, useRef } from "react";
 import {
   Bot,
   Activity,
@@ -474,6 +474,7 @@ export function AgentsPageClient() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [stoppingId, setStoppingId] = useState<string | null>(null);
@@ -530,6 +531,19 @@ export function AgentsPageClient() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  // Keyboard shortcut: Cmd/Ctrl + K to focus search
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   async function handleRefresh() {
@@ -668,10 +682,11 @@ export function AgentsPageClient() {
         <div className="relative">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
           <input
+            ref={searchInputRef}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search agents by name, ID, or description..."
+            placeholder="Search agents by name, ID, or description... (⌘K)"
             className="w-full rounded-xl border border-white/10 bg-black/40 py-3 pl-12 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20 transition-all"
           />
         </div>
