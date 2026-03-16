@@ -3,7 +3,7 @@ description: Install, configure, authenticate, and use the CLI against live rout
 icon: terminal
 ---
 
-# CLI Guide
+# CLI Command Reference
 
 The CLI is a Click application defined in `cli/` and installed from the repo root.
 
@@ -62,33 +62,66 @@ mutx whoami
 mutx status
 ```
 
-## Commands That Map Cleanly to Current Routes
+## Commands
 
-| Command              | Status   | Notes                                                                    |
-| -------------------- | -------- | ------------------------------------------------------------------------ |
-| `mutx status`        | reliable | shows API URL and auth state                                             |
-| `mutx login`         | reliable | uses `/auth/login`                                                       |
-| `mutx logout`        | reliable | clears local tokens and tells you how to confirm the resulting CLI state |
-| `mutx whoami`        | reliable | uses `/auth/me`                                                          |
-| `mutx agents list`   | reliable | uses `GET /agents`                                                       |
-| `mutx agents status` | reliable | uses `GET /agents/{id}`                                                  |
-| `mutx agents logs`   | reliable | uses `GET /agents/{id}/logs`                                             |
-| `mutx agents deploy` | reliable | uses `POST /agents/{id}/deploy`                                          |
-| `mutx agents delete` | reliable | uses `DELETE /agents/{id}`                                               |
-| `mutx deploy list`   | reliable | uses `GET /deployments`                                                  |
-| `mutx deploy create` | reliable | uses `POST /deployments`                                                 |
-| `mutx deploy events` | reliable | uses `GET /deployments/{id}/events`                                      |
-| `mutx deploy scale`   | reliable | uses `POST /deployments/{id}/scale`                                      |
-| `mutx deploy restart` | reliable | uses `POST /deployments/{id}/restart`                                    |
-| `mutx deploy delete`  | reliable | uses `DELETE /deployments/{id}`                                          |
-| `mutx webhooks list` | reliable | uses `GET /webhooks`                                                     |
-| `mutx webhooks get`  | reliable | uses `GET /webhooks/{id}`                                                  |
-| `mutx webhooks deliveries` | reliable | uses `GET /webhooks/{id}/deliveries`                                  |
+### Authentication
 
-Intentional omission: there is currently no dedicated `mutx deploy get` command for `GET /deployments/{id}`.
-Use `mutx deploy list` plus deployment-specific `events`, `logs`, and `metrics` commands for targeted inspection.
+| Command | Description |
+| ------- |-------------|
+| `mutx status` | Show API URL and auth state |
+| `mutx login --email <email>` | Login to mutx.dev (prompts for password) |
+| `mutx logout` | Clear local tokens |
+| `mutx whoami` | Show current user info |
 
-`mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`.
+### Agents
+
+| Command | Description |
+| ------- |-------------|
+| `mutx agents list` | List all agents |
+| `mutx agents create --name <name>` | Create a new agent |
+| `mutx agents status <agent_id>` | Get agent status |
+| `mutx agents logs <agent_id>` | Get agent logs |
+| `mutx agents deploy <agent_id>` | Deploy an agent |
+| `mutx agents stop <agent_id>` | Stop a running agent |
+| `mutx agents delete <agent_id>` | Delete an agent |
+
+### Deployments
+
+| Command | Description |
+| ------- |-------------|
+| `mutx deploy list` | List all deployments |
+| `mutx deploy create --agent-id <id>` | Create a deployment |
+| `mutx deploy events <deployment_id>` | Get deployment events |
+| `mutx deploy logs <deployment_id>` | Get deployment logs |
+| `mutx deploy metrics <deployment_id>` | Get deployment metrics |
+| `mutx deploy scale <deployment_id>` | Scale deployment replicas |
+| `mutx deploy restart <deployment_id>` | Restart a deployment |
+| `mutx deploy delete <deployment_id>` | Delete a deployment |
+
+### API Keys
+
+| Command | Description |
+| ------- |-------------|
+| `mutx api-keys list` | List all API keys |
+| `mutx api-keys create --name <name>` | Create a new API key |
+| `mutx api-keys revoke <key_id>` | Revoke an API key |
+| `mutx api-keys rotate <key_id>` | Rotate an API key |
+
+### ClawHub
+
+| Command | Description |
+| ------- |-------------|
+| `mutx clawhub list` | List trending skills |
+| `mutx clawhub install --agent-id <id> --skill-id <id>` | Install a skill to an agent |
+| `mutx clawhub uninstall --agent-id <id> --skill-id <id>` | Uninstall a skill from an agent |
+
+### Webhooks
+
+| Command | Description |
+| ------- |-------------|
+| `mutx webhooks list` | List all webhooks |
+| `mutx webhooks get <webhook_id>` | Get webhook details |
+| `mutx webhooks deliveries <webhook_id>` | Get webhook delivery history |
 
 ## Example Session
 
