@@ -8,6 +8,7 @@ import { Command, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+import { DarkModeToggle } from "./DarkModeToggle";
 import { DASHBOARD_NAV_ITEMS, isDashboardNavItemActive } from "./dashboardNav";
 
 interface DashboardShellProps {

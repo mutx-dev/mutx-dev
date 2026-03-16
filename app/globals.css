@@ -12,6 +12,39 @@
     --line: rgba(255, 255, 255, 0.1);
     --primary: #ffffff;
     --accent: #333333;
+    /* dashboard-specific tokens (dark default) */
+    --dashboard-bg: #030307;
+    --dashboard-panel-bg: rgba(0, 0, 0, 0.3);
+    --dashboard-sidebar-bg: rgba(0, 0, 0, 0.3);
+    --dashboard-border: rgba(255, 255, 255, 0.1);
+    --dashboard-text-primary: #f1f5f9;
+    --dashboard-text-secondary: #94a3b8;
+    --dashboard-text-muted: #64748b;
+    --dashboard-blur-bg: rgba(0, 0, 0, 0.18);
+    --dashboard-glow-primary: rgba(34, 211, 238, 0.1);
+    --dashboard-glow-secondary: rgba(52, 211, 153, 0.1);
+  }
+
+  .light {
+    --background: #f8fafc;
+    --surface: #f1f5f9;
+    --surface-strong: #e2e8f0;
+    --foreground: #0f172a;
+    --muted: #64748b;
+    --line: rgba(0, 0, 0, 0.08);
+    --primary: #0f172a;
+    --accent: #e2e8f0;
+    /* dashboard-specific tokens (light override) */
+    --dashboard-bg: #f1f5f9;
+    --dashboard-panel-bg: rgba(255, 255, 255, 0.7);
+    --dashboard-sidebar-bg: rgba(255, 255, 255, 0.8);
+    --dashboard-border: rgba(0, 0, 0, 0.08);
+    --dashboard-text-primary: #0f172a;
+    --dashboard-text-secondary: #475569;
+    --dashboard-text-muted: #94a3b8;
+    --dashboard-blur-bg: rgba(255, 255, 255, 0.6);
+    --dashboard-glow-primary: rgba(34, 211, 238, 0.06);
+    --dashboard-glow-secondary: rgba(52, 211, 153, 0.06);
   }
 
   * {
