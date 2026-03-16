@@ -12,6 +12,21 @@ Thanks for helping improve `mutx.dev`.
 
 Use the canonical quickstart in `docs/deployment/quickstart.md`.
 
+### Quick Start (Makefile)
+
+For rapid local development, use the Makefile targets:
+
+```bash
+make help              # Show available targets
+make dev               # Start local dev stack (Docker Compose)
+make test-auth         # Register test user, login, get token (one-command)
+make test-api          # Run API health tests
+make test              # Run full test suite
+make lint              # Run linters
+```
+
+This starts the FastAPI backend on http://localhost:8000 with API docs at http://localhost:8000/docs.
+
 ## What To Work On
 
 The best starting points live in:
