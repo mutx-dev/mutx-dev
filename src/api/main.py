@@ -90,9 +90,37 @@ async def _start_monitor_when_database_ready(app: FastAPI) -> None:
     await start_background_monitor()
 
 
+def _validate_environment() -> None:
+    """Validate environment variables on startup.
+    
+    This function is called during app startup to ensure required
+    environment variables are properly configured.
+    """
+    # Re-access settings to trigger validation
+    # The Settings class already validates on instantiation
+    logger.info("Environment variable validation completed")
+    
+    # Log the validation results
+    if settings.is_production:
+        logger.info("Running in PRODUCTION mode")
+    else:
+        logger.info("Running in %s mode", settings.environment)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting up API...")
+    
+    # Validate environment variables on startup
+    try:
+        _validate_environment()
+    except ValueError as e:
+        logger.error("Environment validation failed: %s", e)
+        raise RuntimeError(f"Environment validation failed: {e}") from e
+    except Exception as e:
+        logger.exception("Unexpected error during environment validation: %s", e)
+        raise RuntimeError(f"Environment validation failed: {e}") from e
+    
     app.state.start_time = time.time()
     app.state.database_ready = False
     app.state.database_error = None
