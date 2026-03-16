@@ -165,9 +165,7 @@ class UserService:
         auth_context = await self.authenticate_api_key(plain_key)
         return auth_context[0] if auth_context else None
 
-    async def authenticate_api_key(
-        self, plain_key: str
-    ) -> Optional[tuple[User, uuid.UUID | None]]:
+    async def authenticate_api_key(self, plain_key: str) -> Optional[tuple[User, uuid.UUID | None]]:
         """Authenticate legacy or managed API keys.
 
         Returns the active user and a managed API key ID when present.
