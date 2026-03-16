@@ -22,11 +22,17 @@ function mockJsonRequest(body: unknown) {
 }
 
 describe('auth route handlers', () => {
+  let fetchSpy: jest.SpyInstance
+
   beforeEach(() => {
     getAuthToken.mockReset()
     getCookieDomain.mockReturnValue(undefined)
     shouldUseSecureCookies.mockReturnValue(false)
-    global.fetch = jest.fn()
+    fetchSpy = jest.spyOn(global, 'fetch' as any).mockImplementation(jest.fn())
+  })
+
+  afterEach(() => {
+    fetchSpy.mockRestore()
   })
 
   describe('POST /api/auth/login', () => {
@@ -227,7 +233,7 @@ describe('auth route handlers', () => {
         body: JSON.stringify({ email: 'newuser@mutx.dev', password: 'securepassword123', name: 'New User' }),
         cache: 'no-store',
       })
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(201)
       await expect(response.json()).resolves.toEqual({
         access_token: 'new_access_token',
         refresh_token: 'new_refresh_token',
