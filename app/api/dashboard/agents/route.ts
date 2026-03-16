@@ -9,27 +9,10 @@ const API_BASE_URL = getApiBaseUrl()
 export const dynamic = 'force-dynamic'
 
 /**
- * Get the current user's ID from the auth token.
- * Returns null if the user cannot be determined.
+ * Dashboard agents endpoint.
+ * Ownership is enforced by the backend - it derives ownership from the auth token.
+ * No need to pass user_id or call /auth/me first.
  */
-async function getCurrentUserId(token: string): Promise<string | null> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/v1/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: 'no-store',
-    })
-    
-    if (!response.ok) {
-      return null
-    }
-    
-    const user = await response.json()
-    return user.id || null
-  } catch {
-    return null
-  }
-}
-
 export async function GET(request: NextRequest): Promise<NextResponse> {
   return withErrorHandling(async (req: Request) => {
     const token = await getAuthToken(request)
@@ -37,14 +20,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return unauthorized()
     }
 
-    // Get the current user's ID to enforce ownership
-    const userId = await getCurrentUserId(token)
-    if (!userId) {
-      return unauthorized()
-    }
-
-    // Filter by user_id to enforce ownership - derived from auth token, not client input
-    const response = await fetch(`${API_BASE_URL}/v1/agents?limit=20&user_id=${userId}`, {
+    // Backend enforces ownership from auth token - no user_id needed
+    const response = await fetch(`${API_BASE_URL}/v1/agents?limit=20`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
     })
