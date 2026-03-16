@@ -54,3 +54,8 @@ test-results/
 # Autonomy artifacts
 .autonomy/
 
+
+# Capacitor build outputs
+out/
+android/app/src/main/assets/
+
