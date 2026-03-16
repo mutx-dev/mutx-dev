@@ -21,7 +21,7 @@ def list_agents(limit: int, skip: int):
         return
 
     client = get_client(config)
-    response = client.get("/v1/agents", params={"limit": limit, "skip": skip})
+    response = client.get(/agents", params={"limit": limit, "skip": skip})
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -69,7 +69,7 @@ def create_agent(name: str, description: str, agent_type: str, config: str):
 
     client = get_client(cli_config)
     response = client.post(
-        "/v1/agents",
+        /agents",
         json={
             "name": name,
             "description": description,
@@ -104,7 +104,7 @@ def delete_agent(agent_id: str, force: bool):
             return
 
     client = get_client(config_obj)
-    response = client.delete(f"/v1/agents/{agent_id}")
+    response = client.delete(f/agents/{agent_id}")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -128,7 +128,7 @@ def deploy_agent(agent_id: str):
         return
 
     client = get_client(config_obj)
-    response = client.post(f"/v1/agents/{agent_id}/deploy")
+    response = client.post(f/agents/{agent_id}/deploy")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -161,7 +161,7 @@ def get_logs(agent_id: str, limit: int, level: Optional[str]):
         params["level"] = level
 
     client = get_client(config_obj)
-    response = client.get(f"/v1/agents/{agent_id}/logs", params=params)
+    response = client.get(f/agents/{agent_id}/logs", params=params)
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -194,7 +194,7 @@ def stop_agent(agent_id: str):
         return
 
     client = get_client(config_obj)
-    response = client.post(f"/v1/agents/{agent_id}/stop")
+    response = client.post(f/agents/{agent_id}/stop")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -220,7 +220,7 @@ def get_status(agent_id: str):
         return
 
     client = get_client(config_obj)
-    response = client.get(f"/v1/agents/{agent_id}")
+    response = client.get(f/agents/{agent_id}")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)

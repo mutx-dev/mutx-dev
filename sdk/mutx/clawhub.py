@@ -29,7 +29,7 @@ class ClawHub:
         """Returns the current trending skills from ClawHub."""
         if isinstance(self._client, httpx.AsyncClient):
             raise RuntimeError("Use alist_skills() for async clients")
-        response = self._client.get("/v1/clawhub/skills")
+        response = self._client.get(/clawhub/skills")
         response.raise_for_status()
         return [Skill(data) for data in response.json()]
 
@@ -37,7 +37,7 @@ class ClawHub:
         """Returns the current trending skills from ClawHub (Async)."""
         if not isinstance(self._client, httpx.AsyncClient):
             raise RuntimeError("Use list_skills() for sync clients")
-        response = await self._client.get("/v1/clawhub/skills")
+        response = await self._client.get(/clawhub/skills")
         response.raise_for_status()
         return [Skill(data) for data in response.json()]
 
@@ -46,7 +46,7 @@ class ClawHub:
         if isinstance(self._client, httpx.AsyncClient):
             raise RuntimeError("Use ainstall_skill() for async clients")
         response = self._client.post(
-            "/v1/clawhub/install",
+            /clawhub/install",
             json={"agent_id": str(agent_id), "skill_id": skill_id},
         )
         response.raise_for_status()
@@ -57,7 +57,7 @@ class ClawHub:
         if not isinstance(self._client, httpx.AsyncClient):
             raise RuntimeError("Use install_skill() for sync clients")
         response = await self._client.post(
-            "/v1/clawhub/install",
+            /clawhub/install",
             json={"agent_id": str(agent_id), "skill_id": skill_id},
         )
         response.raise_for_status()
@@ -68,7 +68,7 @@ class ClawHub:
         if isinstance(self._client, httpx.AsyncClient):
             raise RuntimeError("Use auninstall_skill() for async clients")
         response = self._client.post(
-            "/v1/clawhub/uninstall",
+            /clawhub/uninstall",
             json={"agent_id": str(agent_id), "skill_id": skill_id},
         )
         response.raise_for_status()
@@ -79,7 +79,7 @@ class ClawHub:
         if not isinstance(self._client, httpx.AsyncClient):
             raise RuntimeError("Use uninstall_skill() for sync clients")
         response = await self._client.post(
-            "/v1/clawhub/uninstall",
+            /clawhub/uninstall",
             json={"agent_id": str(agent_id), "skill_id": skill_id},
         )
         response.raise_for_status()

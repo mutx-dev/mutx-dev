@@ -163,20 +163,20 @@ app.middleware("http")(track_request)
 # Include metrics router
 app.include_router(metrics_router, tags=["monitoring"])
 
-# Include API routers with /v1 prefix for proper API versioning
-app.include_router(agents.router, prefix="/v1")
-app.include_router(deployments.router, prefix="/v1")
-app.include_router(webhooks.router, prefix="/v1")
-app.include_router(auth.router, prefix="/v1")
-app.include_router(clawhub.router, prefix="/v1")
-app.include_router(api_keys.router, prefix="/v1")
-app.include_router(leads.router, prefix="/v1")
-app.include_router(leads.contacts_router, prefix="/v1")
-app.include_router(agent_runtime.router, prefix="/v1")
-app.include_router(ingest.router, prefix="/v1")
-app.include_router(runs.router, prefix="/v1")
-app.include_router(rag.router, prefix="/v1")
-app.include_router(usage.router, prefix="/v1")
+# Include API routers
+app.include_router(agents.router, prefix="")
+app.include_router(deployments.router, prefix="")
+app.include_router(webhooks.router, prefix="")
+app.include_router(auth.router, prefix="")
+app.include_router(clawhub.router, prefix="")
+app.include_router(api_keys.router, prefix="")
+app.include_router(leads.router, prefix="")
+app.include_router(leads.contacts_router, prefix="")
+app.include_router(agent_runtime.router, prefix="")
+app.include_router(ingest.router, prefix="")
+app.include_router(runs.router, prefix="")
+app.include_router(rag.router, prefix="")
+app.include_router(usage.router, prefix="")
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -231,7 +231,7 @@ if __name__ == "__main__":
         port=settings.api_port,
         reload=True,
     )
-app.include_router(analytics.router, prefix="/v1")
-app.include_router(monitoring.router, prefix="/v1")
-app.include_router(swarms.router, prefix="/v1")
-app.include_router(budgets.router, prefix="/v1")
+app.include_router(analytics.router, prefix="")
+app.include_router(monitoring.router, prefix="")
+app.include_router(swarms.router, prefix="")
+app.include_router(budgets.router, prefix="")

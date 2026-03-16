@@ -35,7 +35,7 @@ def login(email: str, password: str, api_url: str):
 
     client = get_client(config)
     response = client.post(
-        "/v1/auth/login",
+        /auth/login",
         json={"email": email, "password": password},
     )
 
@@ -74,7 +74,7 @@ def whoami():
         return
 
     client = get_client(config)
-    response = client.get("/v1/auth/me")
+    response = client.get(/auth/me")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)

@@ -21,7 +21,7 @@ def list_webhooks(limit: int, skip: int):
         return
 
     client = get_client(config)
-    response = client.get("/v1/webhooks", params={"limit": limit, "skip": skip})
+    response = client.get(/webhooks", params={"limit": limit, "skip": skip})
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -68,7 +68,7 @@ def webhook_deliveries(
         params["success"] = success.lower() == "true"
 
     client = get_client(config)
-    response = client.get(f"/v1/webhooks/{webhook_id}/deliveries", params=params)
+    response = client.get(f/webhooks/{webhook_id}/deliveries", params=params)
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
@@ -99,7 +99,7 @@ def get_webhook(webhook_id: str):
         return
 
     client = get_client(config)
-    response = client.get(f"/v1/webhooks/{webhook_id}")
+    response = client.get(f/webhooks/{webhook_id}")
 
     if response.status_code == 401:
         click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
