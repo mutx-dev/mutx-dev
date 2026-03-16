@@ -13,9 +13,6 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 ## Now
 
-- Auth and ownership on `/agents` and `/deployments`
-  - derive ownership from the authenticated user instead of trusting client-supplied `user_id`
-  - add per-user access checks before this becomes a real multi-user control plane
 - CLI, SDK, and API contract alignment
   - remove stale `/v1` and `/api/v1` assumptions
   - fix broken create/deploy flows before adding more client features
@@ -45,6 +42,19 @@ It is a guide for contributors, not a promise of exact delivery order.
 - Quotas and plan enforcement
 - Vector and RAG feature completion
 - Expanded runtime support beyond the current foundations
+
+## Shipped (Last 30 Days)
+
+- [PR#562] fix(dashboard): trust backend ownership enforcement, remove redundant /auth/me calls - merged 2026-03-16
+- [PR#553] fix(dashboard): trust backend ownership enforcement - merged 2026-03-16
+- [PR#550] fix(api): use plan-based quota for API key limits - merged 2026-03-16
+- [PR#541] feat(frontend): add copy ID button to API keys list - merged 2026-03-16
+- [PR#540] feat(frontend): add copy ID button to agent detail page - merged 2026-03-16
+- [PR#539] feat(frontend): add Deploy button for stopped agents on agent detail page - merged 2026-03-16
+- [PR#537] feat(frontend): add Deploy button for stopped agents on agent detail page - merged 2026-03-16
+- [PR#536] feat(api): add usage event model and tracking - merged 2026-03-16
+- [PR#535] test(api): add test coverage for usage routes - merged 2026-03-16
+- [PR#533] feat(webhooks): add delivery history viewing - merged 2026-03-16
 
 ## Contributor-Ready Lanes
 
