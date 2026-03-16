@@ -516,6 +516,42 @@ class TestCreateDeployment:
         assert response.json() == {"detail": "Cannot deploy an agent that is being deleted"}
 
 
+    @pytest.mark.asyncio
+    async def test_create_deployment_not_found(self, client: AsyncClient):
+        """Test creating deployment for non-existent agent returns 404."""
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": "00000000-0000-0000-0000-999999999999", "replicas": 1},
+        )
+        assert response.status_code == 404
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_with_default_replicas(
+        self, client: AsyncClient, test_agent, db_session: AsyncSession
+    ):
+        """Test creating deployment uses default replicas when not specified."""
+        test_agent.status = AgentStatus.STOPPED.value
+        await db_session.commit()
+
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": str(test_agent.id)},
+        )
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["replicas"] == 1
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_invalid_agent_id_format(self, client: AsyncClient):
+        """Test creating deployment with invalid agent_id format returns 422."""
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": "not-a-valid-uuid", "replicas": 1},
+        )
+        assert response.status_code == 422
+
+
 class TestRestartDeployment:
     """Tests for POST /deployments/{deployment_id}/restart endpoint."""
 
@@ -611,3 +647,4 @@ class TestRollbackDeployment:
         data = response.json()
         assert data["version"] == "v1.0.0"
         assert data["replicas"] == 2
+
