@@ -14,6 +14,7 @@ from mutx.agents import Agents
 from mutx.api_keys import APIKeys
 from mutx.clawhub import ClawHub
 from mutx.deployments import Deployments
+from mutx.leads import Leads, Contacts
 from mutx.webhooks import Webhooks
 
 
@@ -41,6 +42,8 @@ class MutxClient:
         self.api_keys = APIKeys(self._client)
         self.clawhub = ClawHub(self._client)
         self.deployments = Deployments(self._client)
+        self.leads = Leads(self._client)
+        self.contacts = Contacts(self._client)
         self.webhooks = Webhooks(self._client)
 
     def __enter__(self):
@@ -85,6 +88,22 @@ class MutxClient:
         self._deployments = value
 
     @property
+    def leads(self) -> Leads:
+        return self._leads
+
+    @leads.setter
+    def leads(self, value: Leads):
+        self._leads = value
+
+    @property
+    def contacts(self) -> Contacts:
+        return self._contacts
+
+    @contacts.setter
+    def contacts(self, value: Contacts):
+        self._contacts = value
+
+    @property
     def webhooks(self) -> Webhooks:
         return self._webhooks
 
@@ -123,6 +142,8 @@ class MutxAsyncClient:
         self.api_keys = APIKeys(self._client)
         self.clawhub = ClawHub(self._client)
         self.deployments = Deployments(self._client)
+        self.leads = Leads(self._client)
+        self.contacts = Contacts(self._client)
         self.webhooks = Webhooks(self._client)
 
     async def __aenter__(self):
@@ -167,6 +188,22 @@ class MutxAsyncClient:
         self._deployments = value
 
     @property
+    def leads(self) -> Leads:
+        return self._leads
+
+    @leads.setter
+    def leads(self, value: Leads):
+        self._leads = value
+
+    @property
+    def contacts(self) -> Contacts:
+        return self._contacts
+
+    @contacts.setter
+    def contacts(self, value: Contacts):
+        self._contacts = value
+
+    @property
     def webhooks(self) -> Webhooks:
         return self._webhooks
 
@@ -185,7 +222,9 @@ __all__ = [
     "AgentMetrics",
     "APIKeys",
     "ClawHub",
+    "Contacts",
     "Deployments",
+    "Leads",
     "Webhooks",
     "create_agent_client",
 ]
