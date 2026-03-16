@@ -88,7 +88,7 @@ router = APIRouter()
 @router.get("/metrics")
 async def metrics():
     """Prometheus metrics endpoint."""
-    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+    return Response(content=generate_latest(), media_type="text/plain; version=0.0.4")
 
 
 # Middleware for HTTP metrics
