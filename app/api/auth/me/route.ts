@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   try {
     const token = await getAuthToken(request)
     if (!token) {
-      return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' }, status: 'error' }, { status: 401 })
     }
 
     const response = await fetch(`${API_BASE_URL}/auth/me`, {
