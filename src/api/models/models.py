@@ -7,6 +7,7 @@ from sqlalchemy.dialects.postgresql import UUID, ARRAY as PG_ARRAY
 import enum
 
 from src.api.database import Base
+from src.api.models.plan_tiers import PlanTier
 
 
 def ARRAY(type_):
@@ -43,11 +44,6 @@ def ARRAY(type_):
     return ArrayType()
 
 
-class Plan(str, enum.Enum):
-    FREE = "free"
-    STARTER = "starter"
-    PRO = "pro"
-    ENTERPRISE = "enterprise"
 
 
 class AgentType(str, enum.Enum):
@@ -80,7 +76,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=True)
-    plan: Mapped[Plan] = mapped_column(SQLEnum(Plan), default=Plan.FREE)
+    plan: Mapped[PlanTier] = mapped_column(SQLEnum(PlanTier), default=PlanTier.FREE)
     api_key: Mapped[str] = mapped_column(String(64), unique=True, nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

@@ -10,7 +10,8 @@ from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.password import hash_password, verify_password
-from src.api.models.models import User, APIKey, Plan, Agent, Deployment
+from src.api.models.models import User, APIKey, Agent, Deployment
+from src.api.models.plan_tiers import PlanTier
 from src.api.services.email.email_service import (
     generate_token,
     PASSWORD_RESET_TOKEN_EXPIRE_HOURS,
@@ -50,7 +51,7 @@ class UserService:
         email: str,
         name: str,
         password: Optional[str] = None,
-        plan: Plan = Plan.FREE,
+        plan: Plan = PlanTier.FREE,
     ) -> User:
         password_hash = None
         if password:
@@ -198,10 +199,10 @@ class UserService:
             return False
 
         plan_limits = {
-            Plan.FREE: {"agents": 3, "deployments": 5, "api_keys": 2},
-            Plan.STARTER: {"agents": 10, "deployments": 20, "api_keys": 10},
-            Plan.PRO: {"agents": 50, "deployments": 100, "api_keys": 50},
-            Plan.ENTERPRISE: {"agents": -1, "deployments": -1, "api_keys": -1},
+            PlanTier.FREE: {"agents": 3, "deployments": 5, "api_keys": 2},
+            PlanTier.STARTER: {"agents": 10, "deployments": 20, "api_keys": 10},
+            PlanTier.PRO: {"agents": 50, "deployments": 100, "api_keys": 50},
+            PlanTier.ENTERPRISE: {"agents": -1, "deployments": -1, "api_keys": -1},
         }
 
         limit = plan_limits.get(user.plan, {}).get(resource, 0)
