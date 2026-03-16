@@ -422,6 +422,14 @@ class LeadCreate(BaseModel):
     source: Optional[str] = Field(None, max_length=120)
 
 
+class LeadUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    name: Optional[str] = Field(None, max_length=255)
+    company: Optional[str] = Field(None, max_length=255)
+    message: Optional[str] = Field(None, max_length=5000)
+    source: Optional[str] = Field(None, max_length=120)
+
+
 class LeadResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -541,4 +549,3 @@ class BudgetResponse(BaseModel):
     credits_remaining: float
     reset_date: datetime
     usage_percentage: float
-

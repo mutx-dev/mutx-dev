@@ -1,16 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+import uuid
+from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
-import uuid
 
 from src.api.config import get_settings
 from src.api.database import get_db
-from src.api.models.models import Lead, User
-from src.api.models.schemas import LeadCreate, LeadResponse
 from src.api.middleware.auth import get_current_user
+from src.api.models.models import Lead, User
+from src.api.models.schemas import LeadCreate, LeadResponse, LeadUpdate
 
 router = APIRouter(prefix="/leads", tags=["leads"])
+contacts_router = APIRouter(prefix="/contacts", tags=["contacts"])
 
 
 def _assert_internal_user(current_user: User) -> None:
@@ -30,7 +32,15 @@ def _assert_internal_user(current_user: User) -> None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
 
+def _normalize_optional_text(value: str | None) -> str | None:
+    if value is None:
+        return None
+    normalized = value.strip()
+    return normalized or None
+
+
 @router.post("", response_model=LeadResponse, status_code=status.HTTP_201_CREATED)
+@contacts_router.post("", response_model=LeadResponse, status_code=status.HTTP_201_CREATED)
 async def capture_lead(
     payload: LeadCreate,
     db: AsyncSession = Depends(get_db),
@@ -41,10 +51,10 @@ async def capture_lead(
     """
     lead = Lead(
         email=payload.email.lower().strip(),
-        name=payload.name.strip() if payload.name else None,
-        company=payload.company.strip() if payload.company else None,
-        message=payload.message.strip() if payload.message else None,
-        source=payload.source.strip() if payload.source else "direct",
+        name=_normalize_optional_text(payload.name),
+        company=_normalize_optional_text(payload.company),
+        message=_normalize_optional_text(payload.message),
+        source=_normalize_optional_text(payload.source) or "direct",
     )
     db.add(lead)
     await db.commit()
@@ -53,6 +63,7 @@ async def capture_lead(
 
 
 @router.get("", response_model=List[LeadResponse])
+@contacts_router.get("", response_model=List[LeadResponse])
 async def list_leads(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
@@ -72,6 +83,7 @@ async def list_leads(
 
 
 @router.get("/{lead_id}", response_model=LeadResponse)
+@contacts_router.get("/{lead_id}", response_model=LeadResponse)
 async def get_lead(
     lead_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
@@ -84,3 +96,59 @@ async def get_lead(
     if not lead:
         raise HTTPException(status_code=404, detail="Lead not found")
     return lead
+
+
+@router.patch("/{lead_id}", response_model=LeadResponse)
+@contacts_router.patch("/{lead_id}", response_model=LeadResponse)
+async def update_lead(
+    lead_id: uuid.UUID,
+    payload: LeadUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update a specific lead/contact."""
+    _assert_internal_user(current_user)
+
+    result = await db.execute(select(Lead).where(Lead.id == lead_id))
+    lead = result.scalar_one_or_none()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead not found")
+
+    updates = payload.model_dump(exclude_unset=True)
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields provided for update")
+
+    if "email" in updates and updates["email"] is not None:
+        lead.email = updates["email"].lower().strip()
+    if "name" in updates:
+        lead.name = _normalize_optional_text(updates["name"])
+    if "company" in updates:
+        lead.company = _normalize_optional_text(updates["company"])
+    if "message" in updates:
+        lead.message = _normalize_optional_text(updates["message"])
+    if "source" in updates:
+        lead.source = _normalize_optional_text(updates["source"])
+
+    await db.commit()
+    await db.refresh(lead)
+    return lead
+
+
+@router.delete("/{lead_id}", status_code=status.HTTP_204_NO_CONTENT)
+@contacts_router.delete("/{lead_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_lead(
+    lead_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Delete a specific lead/contact."""
+    _assert_internal_user(current_user)
+
+    result = await db.execute(select(Lead).where(Lead.id == lead_id))
+    lead = result.scalar_one_or_none()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead not found")
+
+    await db.delete(lead)
+    await db.commit()
+    return None

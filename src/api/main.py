@@ -15,6 +15,7 @@ from pydantic import ValidationError
 from src.api.config import get_settings
 from src.api.database import dispose_engine, init_db
 from src.api.models.schemas import HealthResponse
+from src.api.middleware.auth import add_authentication_middleware
 from src.api.middleware.security import add_security_middleware
 from src.api.middleware.rate_limit import add_rate_limiting
 from src.api.exception_handlers import (
@@ -148,6 +149,7 @@ app.add_middleware(
 add_security_middleware(app, settings.cors_origins)
 
 add_rate_limiting(app)
+add_authentication_middleware(app)
 
 # Add custom exception handlers
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
@@ -168,6 +170,7 @@ app.include_router(auth.router, prefix="/v1")
 app.include_router(clawhub.router, prefix="/v1")
 app.include_router(api_keys.router, prefix="/v1")
 app.include_router(leads.router, prefix="/v1")
+app.include_router(leads.contacts_router, prefix="/v1")
 app.include_router(agent_runtime.router, prefix="/v1")
 app.include_router(ingest.router, prefix="/v1")
 app.include_router(runs.router, prefix="/v1")
