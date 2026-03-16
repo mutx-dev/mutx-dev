@@ -385,3 +385,153 @@ async def test_webhook_delivery_history_other_user_forbidden(
 
     response = await other_user_client.get(f"/v1/webhooks/{webhook_id}/deliveries")
     assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_webhook_create_rejects_invalid_url(client: AsyncClient):
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "not-a-valid-url", "events": ["agent.*"]},
+    )
+    assert response.status_code == 400
+    assert "http:// or https://" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_webhook_create_rejects_invalid_event(client: AsyncClient):
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["invalid.event"]},
+    )
+    assert response.status_code == 400
+    assert "Invalid event" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_webhook_update_rejects_invalid_url(client: AsyncClient):
+    # Create first
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["agent.*"]},
+    )
+    assert response.status_code == 201
+    webhook_id = response.json()["id"]
+
+    # Try invalid update
+    response = await client.patch(
+        f"/v1/webhooks/{webhook_id}",
+        json={"url": "ftp://example.com"},
+    )
+    assert response.status_code == 400
+    assert "http:// or https://" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_webhook_update_rejects_invalid_event(client: AsyncClient):
+    # Create first
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["agent.*"]},
+    )
+    assert response.status_code == 201
+    webhook_id = response.json()["id"]
+
+    # Try invalid event
+    response = await client.patch(
+        f"/v1/webhooks/{webhook_id}",
+        json={"events": ["nonexistent.event"]},
+    )
+    assert response.status_code == 400
+    assert "Invalid event" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_webhook_get_nonexistent_returns_404(client: AsyncClient):
+    response = await client.get("/v1/webhooks/00000000-0000-0000-0000-000000000000")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_webhook_update_nonexistent_returns_404(client: AsyncClient):
+    response = await client.patch(
+        "/v1/webhooks/00000000-0000-0000-0000-000000000000",
+        json={"url": "https://example.com"},
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_webhook_delete_nonexistent_returns_404(client: AsyncClient):
+    response = await client.delete("/v1/webhooks/00000000-0000-0000-0000-000000000000")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_webhook_test_nonexistent_returns_404(client: AsyncClient):
+    response = await client.post("/v1/webhooks/00000000-0000-0000-0000-000000000000/test")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_webhook_deliveries_nonexistent_returns_404(client: AsyncClient):
+    response = await client.get("/v1/webhooks/00000000-0000-0000-0000-000000000000/deliveries")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_webhook_delivery_history_empty(client: AsyncClient):
+    # Create webhook
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["*"]},
+    )
+    assert response.status_code == 201
+    webhook_id = response.json()["id"]
+
+    # Get deliveries (should be empty list)
+    response = await client.get(f"/v1/webhooks/{webhook_id}/deliveries")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+@pytest.mark.asyncio
+async def test_webhook_test_delivery_failure_returns_502(client: AsyncClient, test_user, monkeypatch):
+    import src.api.services.webhook_service
+
+    async def mock_deliver_failure(*args, **kwargs):
+        return False
+
+    monkeypatch.setattr(
+        src.api.services.webhook_service, "deliver_webhook_with_retry", mock_deliver_failure
+    )
+
+    # Create
+    response = await client.post(
+        "/v1/webhooks/", json={"url": "https://example.com/webhook", "events": ["*"]}
+    )
+    webhook_id = response.json()["id"]
+
+    # Test - should fail
+    response = await client.post(f"/v1/webhooks/{webhook_id}/test")
+    assert response.status_code == 502
+    assert "delivery failed" in response.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_webhook_create_defaults_is_active_to_true(client: AsyncClient):
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["agent.*"]},
+    )
+    assert response.status_code == 201
+    assert response.json()["is_active"] is True
+
+
+@pytest.mark.asyncio
+async def test_webhook_create_with_is_active_false(client: AsyncClient):
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["agent.*"], "is_active": False},
+    )
+    assert response.status_code == 201
+    assert response.json()["is_active"] is False
