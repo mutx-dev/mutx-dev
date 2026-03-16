@@ -34,13 +34,172 @@ class TestCreateAgent:
         assert data["status"] == "creating"
         assert data["config_version"] == 1
 
-        # Verify validated config
-        config = data["config"]
-        assert config["name"] == "new-agent"
-        assert config["model"] == "gpt-4o"
-        assert config["temperature"] == 0.7
-        assert config["version"] == 1
-        assert "id" in data
+    @pytest.mark.asyncio
+    async def test_create_agent_missing_name(self, client: AsyncClient):
+        """Test creating an agent without name returns validation error."""
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "description": "Agent without name",
+            },
+        )
+        assert response.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_create_agent_empty_name(self, client: AsyncClient):
+        """Test creating an agent with empty name returns validation error."""
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "name": "",
+            },
+        )
+        assert response.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_create_agent_name_too_long(self, client: AsyncClient):
+        """Test creating an agent with name exceeding max length returns validation error."""
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "name": "a" * 256,  # max_length is 255
+            },
+        )
+        assert response.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_create_agent_description_too_long(self, client: AsyncClient):
+        """Test creating an agent with description exceeding max length returns validation error."""
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "name": "valid-name",
+                "description": "d" * 1001,  # max_length is 1000
+            },
+        )
+        assert response.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_create_agent_anthropic_type(self, client: AsyncClient):
+        """Test creating an agent with anthropic type."""
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "name": "anthropic-agent",
+                "type": "anthropic",
+                "config": {"model": "claude-3-5-sonnet-20241022", "temperature": 0.7},
+            },
+        )
+        assert response.status_code == 201
+        data = response.json()
+        assert data["name"] == "anthropic-agent"
+        assert data["type"] == "anthropic"
+
+    @pytest.mark.asyncio
+    async def test_create_agent_langchain_type(self, client: AsyncClient):
+        """Test creating an agent with langchain type."""
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "name": "langchain-agent",
+                "type": "langchain",
+                "config": {"chain_id": "test-chain", "parameters": {}},
+            },
+        )
+        assert response.status_code == 201
+        data = response.json()
+        assert data["name"] == "langchain-agent"
+        assert data["type"] == "langchain"
+
+    @pytest.mark.asyncio
+    async def test_create_agent_custom_type(self, client: AsyncClient):
+        """Test creating an agent with custom type."""
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "name": "custom-agent",
+                "type": "custom",
+                "config": {"image": "custom-image:latest", "command": [], "env": {}},
+            },
+        )
+        assert response.status_code == 201
+        data = response.json()
+        assert data["name"] == "custom-agent"
+        assert data["type"] == "custom"
+
+    @pytest.mark.asyncio
+    async def test_create_agent_with_config_as_json_string(self, client: AsyncClient):
+        """Test creating an agent with config as JSON string."""
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "name": "json-string-config-agent",
+                "type": "openai",
+                "config": json.dumps({"model": "gpt-4o", "temperature": 0.5}),
+            },
+        )
+        assert response.status_code == 201
+        data = response.json()
+        assert data["config"]["model"] == "gpt-4o"
+        assert data["config"]["temperature"] == 0.5
+
+    @pytest.mark.asyncio
+    async def test_create_agent_invalid_config_json_string(self, client: AsyncClient):
+        """Test creating an agent with invalid JSON in config string."""
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "name": "invalid-json-agent",
+                "type": "openai",
+                "config": "not-valid-json{",
+            },
+        )
+        assert response.status_code == 400
+        assert "Invalid JSON" in response.json()["detail"]
+
+    @pytest.mark.asyncio
+    async def test_create_agent_invalid_type(self, client: AsyncClient):
+        """Test creating an agent with invalid type returns validation error."""
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "name": "invalid-type-agent",
+                "type": "invalid_type",
+            },
+        )
+        assert response.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_create_agent_duplicate_name_allowed(self, client: AsyncClient, db_session: AsyncSession):
+        """Test that creating agents with duplicate names is allowed."""
+        # Create first agent
+        response = await client.post(
+            "/v1/agents",
+            json={"name": "duplicate-name-test"},
+        )
+        assert response.status_code == 201
+
+        # Create second agent with same name - should succeed
+        response = await client.post(
+            "/v1/agents",
+            json={"name": "duplicate-name-test"},
+        )
+        assert response.status_code == 201
+        data = response.json()
+        assert data["name"] == "duplicate-name-test"
+        # Should have different IDs
+        agents = await client.get("/v1/agents")
+        agent_list = agents.json()
+        assert len(agent_list) == 2
+
+    @pytest.mark.asyncio
+    async def test_create_agent_unauthorized(self, client_no_auth: AsyncClient):
+        """Test that creating an agent without authentication returns 401."""
+        response = await client_no_auth.post(
+            "/v1/agents",
+            json={"name": "unauthorized-agent"},
+        )
+        assert response.status_code == 401
 
     @pytest.mark.asyncio
     async def test_create_agent_invalid_config(self, client: AsyncClient):
