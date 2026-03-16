@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
+import { CURRENT_API_VERSION } from './app/api/_lib/versioning'
 
 // Rate limiting configuration
 const RATE_LIMIT = 100 // requests per window
@@ -32,24 +33,32 @@ function checkRateLimit(request: NextRequest): { allowed: boolean; remaining: nu
 }
 
 export function middleware(request: NextRequest) {
-  // Skip static files and API routes for rate limiting
+  // Skip static files
   if (request.nextUrl.pathname.startsWith('/_next') ||
       request.nextUrl.pathname.startsWith('/static') ||
       request.nextUrl.pathname.includes('.')) {
     return NextResponse.next()
   }
 
-  // Check rate limit
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
+
+  // Check rate limit (applies to all matched routes)
   const { allowed, remaining, resetTime } = checkRateLimit(request)
 
-  // Add rate limit headers
+  // Build base response with rate limit headers
   const response = NextResponse.next()
   response.headers.set('X-RateLimit-Limit', String(RATE_LIMIT))
   response.headers.set('X-RateLimit-Remaining', String(remaining))
   response.headers.set('X-RateLimit-Reset', String(resetTime))
 
+  // Add API version header for API routes
+  if (isApiRoute) {
+    response.headers.set('X-API-Version', CURRENT_API_VERSION)
+  }
+
   if (!allowed) {
-    return new NextResponse('Too Many Requests', { status: 429, headers: response.headers })
+    const headers = new Headers(response.headers)
+    return new NextResponse('Too Many Requests', { status: 429, headers })
   }
 
   return response
@@ -57,6 +66,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 }
