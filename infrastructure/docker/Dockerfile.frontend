@@ -10,7 +10,6 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # -----------------------------------------------------------------------------
 # Stage 2: Deps - Install dependencies only
@@ -19,10 +18,9 @@ FROM base AS deps
 WORKDIR /app
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
 
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --no-frozen-lockfile
+COPY package.json package-lock.json ./
+RUN npm install --frozen-lockfile
 
 # -----------------------------------------------------------------------------
 # Stage 3: Builder - Build the application
@@ -31,7 +29,6 @@ FROM base AS builder
 WORKDIR /app
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
@@ -44,7 +41,7 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
 COPY . .
-RUN pnpm run build
+RUN npm run build
 
 # -----------------------------------------------------------------------------
 # Stage 4: Runner - Production runtime
@@ -53,7 +50,6 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -79,7 +75,6 @@ FROM base AS development
 WORKDIR /app
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
@@ -91,4 +86,4 @@ ENV NODE_ENV=development
 ENV NEXT_TELEMETRY_DISABLED=1
 
 EXPOSE 3000
-CMD ["pnpm", "run", "dev"]
+CMD ["npm", "run", "dev"]
