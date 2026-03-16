@@ -111,7 +111,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
             return JSONResponse(
                 status_code=429,
-                content=response.model_dump(),
+                content=response.model_dump(mode="json"),
                 headers={"Retry-After": str(retry_after)},
             )
 
