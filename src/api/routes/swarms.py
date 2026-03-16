@@ -53,7 +53,7 @@ _swarms: dict[uuid.UUID, Swarm] = {}
 class SwarmCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=1000)
-    agent_ids: list[uuid.UUID] = Field(..., min_items=1, max_items=20)
+    agent_ids: list[uuid.UUID] = Field(..., min_length=1, max_length=20)
     min_replicas: int = Field(default=1, ge=1, le=10)
     max_replicas: int = Field(default=10, ge=1, le=50)
 
