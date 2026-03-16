@@ -4,7 +4,7 @@ Monitoring routes for system health and alerts.
 
 import logging
 import uuid
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -126,7 +126,7 @@ async def list_alerts(
     unresolved_query = select(func.count()).select_from(Alert).where(
         and_(
             Alert.agent_id.in_(agent_subquery),
-            Alert.resolved == False
+            not Alert.resolved
         )
     )
     unresolved_count = (await db.execute(unresolved_query)).scalar_one() or 0
