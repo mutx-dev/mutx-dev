@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bot, RefreshCw, Search, Server, Activity } from "lucide-react";
+import { AlertCircle, Bot, RefreshCw, Search, Server, Activity } from "lucide-react";
 
 import { AgentCard, type AgentCardProps } from "./AgentCard";
 import { EmptyState } from "./EmptyState";
@@ -84,6 +84,7 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
   const [loading, setLoading] = useState(!initialAgents);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   async function fetchAgents() {
     try {
@@ -96,6 +97,7 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
       setAgents(agentsData);
     } catch (error) {
       console.error("Failed to fetch agents:", error);
+      setError(error instanceof Error ? error.message : "Failed to fetch agents");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -221,6 +223,23 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
       </div>
 
       <div className="flex items-center gap-3">
+
+      {error ? (
+        <div className="flex items-center gap-3 rounded-lg border border-red-400/20 bg-red-400/10 p-4">
+          <AlertCircle className="h-5 w-5 text-red-400 shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm text-red-300">{error}</p>
+          </div>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="shrink-0 rounded-lg border border-red-400/20 bg-red-400/10 px-3 py-1.5 text-xs text-red-300 hover:bg-red-400/20"
+          >
+            Retry
+          </button>
+        </div>
+      ) : null}
+
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
           <input
