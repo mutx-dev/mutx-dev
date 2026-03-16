@@ -22,11 +22,17 @@ function mockJsonRequest(body: unknown) {
 }
 
 describe('auth route handlers', () => {
+  let fetchSpy: jest.SpyInstance
+
   beforeEach(() => {
     getAuthToken.mockReset()
     getCookieDomain.mockReturnValue(undefined)
     shouldUseSecureCookies.mockReturnValue(false)
-    global.fetch = jest.fn()
+    fetchSpy = jest.spyOn(global, 'fetch' as any).mockImplementation(jest.fn())
+  })
+
+  afterEach(() => {
+    fetchSpy.mockRestore()
   })
 
   describe('POST /api/auth/login', () => {
