@@ -16,6 +16,7 @@
       * [Webhooks and Ingestion API](docs/contracts/api/webhooks.md)
   * [CLI Guide](docs/cli.md)
   * [Project Status](docs/project-status.md)
+  * [Surface Matrix](docs/surfaces.md)
   * [Architecture](docs/architecture/README.md)
     * [Agent Runtime](docs/architecture/agent-runtime.md)
     * [Infrastructure](docs/architecture/infrastructure.md)
