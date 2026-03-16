@@ -2,9 +2,10 @@
 
 import os
 import logging
+from typing import Optional
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 from openai import AsyncOpenAI
 
@@ -15,7 +16,7 @@ router = APIRouter(prefix="/rag", tags=["rag"])
 
 class EmbedRequest(BaseModel):
     """Request model for embedding generation."""
-    text: str
+    text: str = Field(..., min_length=1)
     model: str = "text-embedding-3-small"
 
 
@@ -33,14 +34,20 @@ EMBEDDING_MODELS = {
     "text-embedding-ada-002": 1536,
 }
 
+# Module-level singleton to avoid creating a new httpx client per request
+_client: Optional[AsyncOpenAI] = None
 
-def get_client() -> AsyncOpenAI:
+
+def get_client() -> Optional[AsyncOpenAI]:
     """Get OpenAI client with API key from environment."""
+    global _client
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         logger.warning("OPENAI_API_KEY not set - embeddings will use placeholder")
         return None
-    return AsyncOpenAI(api_key=api_key)
+    if _client is None:
+        _client = AsyncOpenAI(api_key=api_key)
+    return _client
 
 
 @router.post("/embed", response_model=EmbedResponse)
@@ -67,7 +74,7 @@ async def generate_embedding(request: EmbedRequest) -> EmbedResponse:
         return EmbedResponse(
             embedding=embedding,
             model=request.model,
-            tokens=len(request.text.split())
+            tokens=0,  # No API key; real token count unavailable
         )
     
     try:
@@ -75,22 +82,34 @@ async def generate_embedding(request: EmbedRequest) -> EmbedResponse:
             model=request.model,
             input=request.text,
         )
-        
+
+        if not response.data:
+            raise HTTPException(status_code=502, detail="Empty embedding response from provider")
+
         embedding_data = response.data[0]
         return EmbedResponse(
             embedding=embedding_data.embedding,
             model=request.model,
-            tokens=embedding_data.usage.tokens
+            tokens=response.usage.total_tokens,
         )
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Embedding generation failed: {e}")
-        raise HTTPException(status_code=500, detail=f"Embedding generation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Embedding generation failed")
 
 
 class BatchEmbedRequest(BaseModel):
     """Request model for batch embedding generation."""
-    texts: list[str]
+    texts: list[str] = Field(..., min_length=1, max_length=2048)
     model: str = "text-embedding-3-small"
+
+    @field_validator("texts")
+    @classmethod
+    def texts_not_empty(cls, v: list[str]) -> list[str]:
+        if any(not t.strip() for t in v):
+            raise ValueError("texts must not contain empty strings")
+        return v
 
 
 class BatchEmbedResponse(BaseModel):
@@ -115,12 +134,11 @@ async def generate_batch_embeddings(request: BatchEmbedRequest) -> BatchEmbedRes
     
     if client is None:
         dimension = EMBEDDING_MODELS[request.model]
-        embeddings = [[0.0] * dimension] * len(request.texts)
-        total_tokens = sum(len(t.split()) for t in request.texts)
+        embeddings = [[0.0] * dimension for _ in request.texts]
         return BatchEmbedResponse(
             embeddings=embeddings,
             model=request.model,
-            total_tokens=total_tokens
+            total_tokens=0,  # No API key; real token count unavailable
         )
     
     try:
@@ -136,17 +154,17 @@ async def generate_batch_embeddings(request: BatchEmbedRequest) -> BatchEmbedRes
         return BatchEmbedResponse(
             embeddings=embeddings,
             model=request.model,
-            total_tokens=response.usage.tokens
+            total_tokens=response.usage.total_tokens,
         )
     except Exception as e:
         logger.error(f"Batch embedding generation failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Batch embedding generation failed")
 
 
 class SearchRequest(BaseModel):
     """Request model for similarity search."""
-    query: str
-    top_k: int = 5
+    query: str = Field(..., min_length=1)
+    top_k: int = Field(default=5, ge=1, le=100)
     model: str = "text-embedding-3-small"
 
 
