@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import os
 from contextlib import asynccontextmanager
-from typing import Any
 
 _tracer = None
 _otel_enabled = False
