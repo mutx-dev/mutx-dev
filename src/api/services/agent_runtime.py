@@ -16,7 +16,7 @@ from ..integrations.langchain_agent import (
     LLMProvider,
     ToolDefinition,
 )
-from ..integrations.telemetry import trace_async, is_otel_enabled
+from ..integrations.telemetry import is_otel_enabled
 
 from ..integrations.vector_store import (
     VectorStoreConfig,
