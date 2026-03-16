@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { KeyRound, Plus, RefreshCw, Trash2, AlertCircle, Loader2, Copy, Check } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { KeyRound, Search, Plus, RefreshCw, Trash2, AlertCircle, Loader2, Copy, Check } from 'lucide-react';
 
 interface ApiKey {
   id: string;
@@ -22,6 +22,9 @@ export function ApiKeysPageClient() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [rotatingId, setRotatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isMac, setIsMac] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const fetchKeys = async () => {
     try {
@@ -42,6 +45,30 @@ export function ApiKeysPageClient() {
 
   useEffect(() => {
     fetchKeys();
+  }, []);
+
+  // Filter keys based on search query
+  const filteredKeys = keys.filter(key =>
+    key.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    key.id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Keyboard shortcut: Cmd/Ctrl + K to focus search, Escape to clear
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+      if (e.key === 'Escape' && document.activeElement === searchInputRef.current) {
+        setSearchQuery('');
+        searchInputRef.current?.blur();
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    // Detect Mac OS
+    setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.platform));
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const createKey = async (e: React.FormEvent) => {
@@ -187,16 +214,32 @@ export function ApiKeysPageClient() {
       <div className="rounded-xl border border-white/10 bg-white/[0.01] overflow-hidden">
         <div className="px-6 py-4 border-b border-white/10">
           <h3 className="text-lg font-medium text-white">Your API Keys</h3>
-          <p className="text-sm text-slate-400 mt-1">{keys.length} key{keys.length !== 1 ? 's' : ''}</p>
+          <div className="relative mt-3">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={isMac ? "Search keys by name or ID... (⌘K)" : "Search keys by name or ID... (Ctrl+K)"}
+              className="w-full rounded-lg border border-white/10 bg-black/40 py-2 pl-10 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20"
+            />
+          </div>
+          <p className="text-sm text-slate-400 mt-3">{filteredKeys.length} of {keys.length} keys</p>
         </div>
         {keys.length === 0 ? (
           <div className="px-6 py-12 text-center">
             <KeyRound className="mx-auto h-12 w-12 text-slate-600" />
             <p className="mt-4 text-slate-400">No API keys yet</p>
           </div>
+        ) : filteredKeys.length === 0 && searchQuery ? (
+          <div className="px-6 py-12 text-center">
+            <Search className="mx-auto h-12 w-12 text-slate-600" />
+            <p className="mt-4 text-slate-400">No keys match your search</p>
+          </div>
         ) : (
           <div className="divide-y divide-white/5">
-            {keys.map((key) => (
+            {filteredKeys.map((key) => (
               <div key={key.id} className="px-6 py-4 flex items-center justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-white">{key.name}</p>

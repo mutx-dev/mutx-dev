@@ -388,6 +388,7 @@ export function DeploymentsPageClient() {
   const [sortBy, setSortBy] = useState<"date"|"status"|"agent">("date");
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isMac, setIsMac] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const runningDeployments = deployments.filter(
@@ -753,7 +754,7 @@ export function DeploymentsPageClient() {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search deployments by ID, agent ID, or status..."
+          placeholder={isMac ? "Search deployments by ID, agent ID, or status... (⌘K)" : "Search deployments by ID, agent ID, or status... (Ctrl+K)"}
           className="w-full rounded-xl border border-white/10 bg-black/40 py-3 pl-12 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-emerald-400 focus:outline-none"
         />
       </div>
