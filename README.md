@@ -85,6 +85,27 @@ After `make test-auth`, you will have:
 
 Frontend: http://localhost:3000 | Backend: http://localhost:8000 | API Docs: http://localhost:8000/docs
 
+## macOS Desktop Shell (Electron)
+
+Issue `#375` adds a first-pass native desktop wrapper around the existing web app.
+
+```bash
+# Launch desktop app pointed to your local Next.js dev server
+npm run desktop:dev
+
+# Launch desktop app shell (defaults to https://mutx.dev)
+npm run desktop:start
+
+# Build unsigned macOS artifacts (.dmg + .zip) into dist/desktop
+npm run desktop:build
+```
+
+Override the loaded app URL if needed:
+
+```bash
+MUTX_DESKTOP_URL=http://127.0.0.1:3000 npm run desktop:start
+```
+
 # Project Structure
 
 mutx-dev/
