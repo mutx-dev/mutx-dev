@@ -16,6 +16,7 @@ export function ApiKeysPageClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [newKeyName, setNewKeyName] = useState('');
+  const [newKeyExpires, setNewKeyExpires] = useState<number | null>(null);
   const [creating, setCreating] = useState(false);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -80,7 +81,7 @@ export function ApiKeysPageClient() {
       const res = await fetch('/api/api-keys', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newKeyName.trim() }),
+        body: JSON.stringify({ name: newKeyName.trim(), expires_in_days: newKeyExpires }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({ detail: 'Failed to create' }));
@@ -89,6 +90,7 @@ export function ApiKeysPageClient() {
       const data = await res.json();
       setCreatedKey(data.key);
       setNewKeyName('');
+      setNewKeyExpires(null);
       fetchKeys();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create API key');
@@ -201,6 +203,18 @@ export function ApiKeysPageClient() {
             placeholder="e.g., Production API Key"
             className="flex-1 rounded-lg border border-white/10 bg-black/20 px-4 py-2.5 text-white placeholder:text-slate-500 focus:border-cyan-400/50 focus:outline-none"
           />
+          <select
+            value={newKeyExpires ?? ''}
+            onChange={(e) => setNewKeyExpires(e.target.value ? Number(e.target.value) : null)}
+            className="rounded-lg border border-white/10 bg-black/20 px-3 py-2.5 text-sm text-white"
+          >
+            <option value="">Never</option>
+            <option value="30">30 days</option>
+            <option value="60">60 days</option>
+            <option value="90">90 days</option>
+            <option value="180">6 months</option>
+            <option value="365">1 year</option>
+          </select>
           <button
             type="submit"
             disabled={creating || !newKeyName.trim()}
@@ -255,7 +269,7 @@ export function ApiKeysPageClient() {
                   </div>
                   <div className="flex gap-4 mt-2 text-xs text-slate-500">
                     <span>Created: {formatDate(key.created_at)}</span>
-                    <span>Last used: {formatDate(key.last_used)}</span>
+                    <span>Expires: {formatDate(key.expires_at)}</span>
                   </div>
                 </div>
                 <div className="flex gap-2">
