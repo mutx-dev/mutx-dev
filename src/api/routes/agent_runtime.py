@@ -18,7 +18,8 @@ from datetime import datetime, timezone
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+import pydantic
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -122,7 +123,8 @@ class AgentVersionHistoryResponse(BaseModel):
 
 class AgentRollbackRequest(BaseModel):
     """Request model for rolling back an agent to a specific version."""
-    version: int = Field(..., description="The version number to rollback to")
+
+    version: int = pydantic.Field(..., description="The version number to rollback to")
 
 
 # --- Routes ---
@@ -410,10 +412,12 @@ async def get_agent_status(
 
 def _create_agent_version(agent: Agent, db: AsyncSession) -> AgentVersion:
     """Create a new version snapshot for an agent."""
-    config_snapshot = json.dumps({
-        "config": agent.config,
-        "type": agent.type.value if agent.type else None,
-    })
+    config_snapshot = json.dumps(
+        {
+            "config": agent.config,
+            "type": agent.type.value if agent.type else None,
+        }
+    )
     version = AgentVersion(
         agent_id=agent.id,
         version=1,
@@ -507,6 +511,7 @@ async def rollback_agent(
         agent.config = snapshot["config"]
     if snapshot.get("type"):
         from src.api.models import AgentType
+
         agent.type = AgentType(snapshot["type"])
 
     # Mark old current versions as superseded
@@ -525,16 +530,15 @@ async def rollback_agent(
     target_version.rolled_back_at = None
 
     await db.commit()
-    
+
     # Re-fetch to ensure fresh data
-    result = await db.execute(
-        select(Agent).where(Agent.id == agent_id)
-    )
+    result = await db.execute(select(Agent).where(Agent.id == agent_id))
     agent = result.scalar_one_or_none()
-    
+
     logger.info(f"Rolled back agent {agent_id} to version {rollback_data.version}")
-    
+
     from src.api.models.schemas import AgentResponse as AgentResponseSchema
+
     return AgentResponseSchema(
         id=agent.id,
         name=agent.name,
