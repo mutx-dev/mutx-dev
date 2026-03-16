@@ -120,6 +120,11 @@ class AgentVersionHistoryResponse(BaseModel):
     total: int
 
 
+class AgentRollbackRequest(BaseModel):
+    """Request model for rolling back an agent to a specific version."""
+    version: int = Field(..., description="The version number to rollback to")
+
+
 # --- Routes ---
 
 
