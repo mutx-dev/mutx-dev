@@ -1,0 +1,166 @@
+version: '3.8'
+
+# OpenTelemetry Docker Compose Examples
+# Usage: docker-compose -f otel-compose.yml up -d <service>
+# Services: tempo, jaeger, otel-collector
+
+services:
+  # ============================================
+  # Option 1: Grafana Tempo + Grafana + Prometheus
+  # Best for: Production tracing with metrics
+  # ============================================
+  tempo:
+    image: grafana/tempo:2.4.1
+    container_name: mutx-tempo
+    command: ["-config.file=/tempo.yaml"]
+    volumes:
+      - ./tempo.yaml:/tempo.yaml:ro
+      - tempo_data:/tempo
+    ports:
+      - "3200:3200"     # tempo query
+      - "4317:4317"     # OTLP gRPC
+      - "4318:4318"     # OTLP HTTP
+      - "9411:9411"     # zipkin
+    restart: unless-stopped
+    networks:
+      - otel
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: mutx-prometheus-otel
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    restart: unless-stopped
+    networks:
+      - otel
+
+  grafana:
+    image: grafana/grafana:11.2.2
+    container_name: mutx-grafana-otel
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./grafana-provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+    networks:
+      - otel
+    depends_on:
+      - tempo
+      - prometheus
+
+  # ============================================
+  # Option 2: Jaeger (All-in-One)
+  # Best for: Quick development setup
+  # ============================================
+  jaeger:
+    image: jaegertracing/all-in-one:1.54
+    container_name: mutx-jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/var/lib/jaeger/data
+      - BADGER_DIRECTORY_KEY=/var/lib/jaeger/index
+    ports:
+      - "16686:16686"     # Jaeger UI
+      - "4317:4317"       # OTLP gRPC
+      - "4318:4318"       # OTLP HTTP
+      - "14268:14268"     # Jaeger HTTP
+      - "14250:14250"     # Jaeger gRPC
+    volumes:
+      - jaeger_data:/var/lib/jaeger
+    restart: unless-stopped
+    networks:
+      - otel
+
+  # ============================================
+  # Option 3: OpenTelemetry Collector + Prometheus + Grafana
+  # Best for: Full control over telemetry pipeline
+  # ============================================
+  otel-collector:
+    image: otel/opentelemetry-collector:0.102.1
+    container_name: mutx-otel-collector
+    command: ["--config=/etc/otelcol-contrib/otelcol-contrib.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol-contrib/otelcol-contrib.yaml:ro
+    ports:
+      - "4317:4317"       # OTLP gRPC receiver
+      - "4318:4318"       # OTLP HTTP receiver
+      - "8888:8888"       # Prometheus metrics exposed by the collector
+      - "8889:8889"       # Prometheus metrics exporter
+      - "17000:17000"     # zipkin receiver
+    restart: unless-stopped
+    networks:
+      - otel
+    depends_on:
+      - prometheus
+      - grafana
+
+  prometheus-for-collector:
+    image: prom/prometheus:v2.54.1
+    container_name: mutx-prometheus-collector
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus-collector.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_collector_data:/prometheus
+    restart: unless-stopped
+    networks:
+      - otel
+
+  grafana-for-collector:
+    image: grafana/grafana:11.2.2
+    container_name: mutx-grafana-collector
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3002:3000"
+    volumes:
+      - ./grafana-provisioning:/etc/grafana/provisioning:ro
+      - grafana_collector_data:/var/lib/grafana
+    restart: unless-stopped
+    networks:
+      - otel
+
+  # ============================================
+  # Zipkin (Optional standalone)
+  # ============================================
+  zipkin:
+    image: openzipkin/zipkin:3.0
+    container_name: mutx-zipkin
+    ports:
+      - "9411:9411"
+    restart: unless-stopped
+    networks:
+      - otel
+
+volumes:
+  tempo_data:
+  prometheus_data:
+  grafana_data:
+  jaeger_data:
+  prometheus_collector_data:
+  grafana_collector_data:
+
+networks:
+  otel:
+    driver: bridge
