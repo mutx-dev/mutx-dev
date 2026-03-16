@@ -58,9 +58,6 @@ export function middleware(request: NextRequest) {
 
   if (!allowed) {
     const headers = new Headers(response.headers)
-    if (isApiRoute) {
-      headers.set('X-API-Version', CURRENT_API_VERSION)
-    }
     return new NextResponse('Too Many Requests', { status: 429, headers })
   }
 

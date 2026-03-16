@@ -102,19 +102,21 @@ describe('addVersionHeaders', () => {
   })
 
   it('adds Deprecation: true for a deprecated version', () => {
-    // Temporarily inject a deprecated version for this test
-    const original = [...DEPRECATED_API_VERSIONS]
-    ;(DEPRECATED_API_VERSIONS as string[]).push('v1')
+    // Use jest.replaceProperty so we don't mutate the shared exported constant
+    jest.replaceProperty(
+      require('../../app/api/_lib/versioning'),
+      'DEPRECATED_API_VERSIONS',
+      ['v1']
+    )
 
-    try {
-      const response = NextResponse.json({ ok: true })
-      addVersionHeaders(response, 'v1')
-      expect(response.headers.get('Deprecation')).toBe('true')
-    } finally {
-      // Restore
-      ;(DEPRECATED_API_VERSIONS as string[]).length = 0
-      ;(DEPRECATED_API_VERSIONS as string[]).push(...original)
-    }
+    // Re-import the function bound to the updated module state
+    const { addVersionHeaders: addHeaders } = require('../../app/api/_lib/versioning')
+
+    const response = NextResponse.json({ ok: true })
+    addHeaders(response, 'v1')
+    expect(response.headers.get('Deprecation')).toBe('true')
+
+    jest.restoreAllMocks()
   })
 })
 
