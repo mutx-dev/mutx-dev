@@ -158,6 +158,27 @@ class Agent(Base):
     runs: Mapped[list["AgentRun"]] = relationship(
         "AgentRun", back_populates="agent", cascade="all, delete-orphan"
     )
+    versions: Mapped[list["AgentVersion"]] = relationship(
+        "AgentVersion", back_populates="agent", cascade="all, delete-orphan"
+    )
+
+
+class AgentVersion(Base):
+    __tablename__ = "agent_versions"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    agent_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True
+    )
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+    config_snapshot: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(50), default="current")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    rolled_back_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+
+    agent: Mapped["Agent"] = relationship("Agent", back_populates="versions")
 
 
 class Deployment(Base):

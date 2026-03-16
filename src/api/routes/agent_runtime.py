@@ -24,7 +24,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_agent, get_current_user
-from src.api.models import Agent, AgentLog, AgentMetric, AgentStatus, Command, User
+from src.api.models import Agent, AgentLog, AgentMetric, AgentStatus, AgentVersion, Command, User
 from src.api.services.webhook_service import trigger_webhook_event
 
 logger = logging.getLogger(__name__)
@@ -131,6 +131,11 @@ async def register_agent(
     )
 
     db.add(agent)
+    await db.flush()  # Get agent.id before creating version
+
+    # Create initial version
+    _create_agent_version(agent, db)
+
     await db.commit()
     await db.refresh(agent)
 
@@ -379,4 +384,134 @@ async def get_agent_status(
             current_agent.last_heartbeat.isoformat() if current_agent.last_heartbeat else None
         ),
         uptime_seconds=uptime,
+    )
+
+
+def _create_agent_version(agent: Agent, db: AsyncSession) -> AgentVersion:
+    """Create a new version snapshot for an agent."""
+    config_snapshot = json.dumps({
+        "config": agent.config,
+        "type": agent.type.value if agent.type else None,
+    })
+    version = AgentVersion(
+        agent_id=agent.id,
+        version=1,
+        config_snapshot=config_snapshot,
+        status="current",
+    )
+    db.add(version)
+    return version
+
+
+@router.get("/{agent_id}/versions", response_model=AgentVersionHistoryResponse)
+async def get_agent_versions(
+    agent_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get version history for a specific agent."""
+    # Verify ownership
+    result = await db.execute(
+        select(Agent).where(
+            Agent.id == agent_id,
+            Agent.user_id == current_user.id,
+        )
+    )
+    agent = result.scalar_one_or_none()
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found or not authorized")
+
+    query = (
+        select(AgentVersion)
+        .where(AgentVersion.agent_id == agent.id)
+        .order_by(AgentVersion.created_at.desc())
+    )
+
+    result = await db.execute(query)
+    versions = result.scalars().all()
+
+    return {
+        "agent_id": agent.id,
+        "items": versions,
+        "total": len(versions),
+    }
+
+
+@router.post("/{agent_id}/rollback", response_model=AgentResponse)
+async def rollback_agent(
+    agent_id: uuid.UUID,
+    rollback_data: AgentRollbackRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Rollback an agent to a specific version."""
+    # Verify ownership
+    result = await db.execute(
+        select(Agent).where(
+            Agent.id == agent_id,
+            Agent.user_id == current_user.id,
+        )
+    )
+    agent = result.scalar_one_or_none()
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found or not authorized")
+
+    # Find target version
+    target_version_query = select(AgentVersion).where(
+        AgentVersion.agent_id == agent.id,
+        AgentVersion.version == rollback_data.version,
+    )
+    version_result = await db.execute(target_version_query)
+    target_version = version_result.scalar_one_or_none()
+
+    if not target_version:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Version {rollback_data.version} not found for this agent",
+        )
+
+    # Restore config from snapshot
+    snapshot = json.loads(target_version.config_snapshot)
+    if snapshot.get("config"):
+        agent.config = snapshot["config"]
+    if snapshot.get("type"):
+        from src.api.models import AgentType
+        agent.type = AgentType(snapshot["type"])
+
+    # Mark old current versions as superseded
+    old_versions_query = select(AgentVersion).where(
+        AgentVersion.agent_id == agent.id,
+        AgentVersion.status == "current",
+    )
+    old_result = await db.execute(old_versions_query)
+    old_versions = old_result.scalars().all()
+    for old_v in old_versions:
+        old_v.status = "superseded"
+        old_v.rolled_back_at = datetime.now(timezone.utc)
+
+    # Mark target as current
+    target_version.status = "current"
+    target_version.rolled_back_at = None
+
+    await db.commit()
+    
+    # Re-fetch to ensure fresh data
+    result = await db.execute(
+        select(Agent).where(Agent.id == agent_id)
+    )
+    agent = result.scalar_one_or_none()
+    
+    logger.info(f"Rolled back agent {agent_id} to version {rollback_data.version}")
+    
+    from src.api.models.schemas import AgentResponse as AgentResponseSchema
+    return AgentResponseSchema(
+        id=agent.id,
+        name=agent.name,
+        description=agent.description,
+        type=agent.type,
+        status=agent.status,
+        user_id=agent.user_id,
+        config=agent.config,
+        created_at=agent.created_at,
+        updated_at=agent.updated_at,
     )

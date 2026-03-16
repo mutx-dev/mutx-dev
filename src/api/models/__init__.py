@@ -1,6 +1,7 @@
 from src.api.models.models import (
     User,
     Agent,
+    AgentVersion,
     Deployment,
     APIKey,
     Webhook,
@@ -34,6 +35,7 @@ from src.api.models.plan_tiers import (
 __all__ = [
     "User",
     "Agent",
+    "AgentVersion",
     "Deployment",
     "APIKey",
     "Webhook",

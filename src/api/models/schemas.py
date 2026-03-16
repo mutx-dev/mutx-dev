@@ -167,6 +167,34 @@ class DeploymentRollbackRequest(BaseModel):
     version: int = Field(..., gt=0, description="Version number to rollback to")
 
 
+class AgentVersionResponse(BaseModel):
+    """Response model for agent version"""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    agent_id: uuid.UUID
+    version: int
+    config_snapshot: str
+    status: str
+    created_at: datetime
+    rolled_back_at: Optional[datetime] = None
+
+
+class AgentVersionHistoryResponse(BaseModel):
+    """Response model for agent version history"""
+
+    agent_id: uuid.UUID
+    items: list[AgentVersionResponse]
+    total: int
+
+
+class AgentRollbackRequest(BaseModel):
+    """Request model for rolling back an agent"""
+
+    version: int = Field(..., gt=0, description="Version number to rollback to")
+
+
 class AgentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
