@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import copy
 import inspect
 import json
+from collections.abc import AsyncGenerator, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -35,13 +37,13 @@ class OpenAIConfig(RuntimeConfig):
 
     def to_client_kwargs(self) -> dict[str, Any]:
         kwargs: dict[str, Any] = {}
-        if self.api_key:
+        if self.api_key is not None:
             kwargs["api_key"] = self.api_key
-        if self.base_url:
+        if self.base_url is not None:
             kwargs["base_url"] = self.base_url
-        if self.organization:
+        if self.organization is not None:
             kwargs["organization"] = self.organization
-        if self.project:
+        if self.project is not None:
             kwargs["project"] = self.project
         return kwargs
 
@@ -74,13 +76,13 @@ class OpenAIAdapter(AgentRuntime):
 
     async def execute(
         self,
-        messages: list[RuntimeMessage],
+        messages: Sequence[RuntimeMessage],
         *,
-        tools: list[RuntimeToolDefinition] | None = None,
-        tool_handlers: dict[str, ToolHandler] | None = None,
+        tools: Sequence[RuntimeToolDefinition] | None = None,
+        tool_handlers: Mapping[str, ToolHandler] | None = None,
         **kwargs: Any,
     ) -> RuntimeResult:
-        conversation: list[RuntimeMessage] = [dict(message) for message in messages]
+        conversation: list[RuntimeMessage] = copy.deepcopy(list(messages))
         active_tools = list(tools) if tools is not None else self.list_tools()
         handlers = dict(tool_handlers or {})
         max_roundtrips = int(kwargs.pop("max_tool_roundtrips", self.config.max_tool_roundtrips))
@@ -102,7 +104,7 @@ class OpenAIAdapter(AgentRuntime):
             runtime_message = self._message_to_runtime_message(message)
             conversation.append(runtime_message)
 
-            tool_calls = self._extract_tool_calls(message)
+            tool_calls = OpenAIAdapter._extract_tool_calls(message)
             last_message = runtime_message
             last_tool_calls = tool_calls
 
@@ -136,12 +138,12 @@ class OpenAIAdapter(AgentRuntime):
 
     async def stream(
         self,
-        messages: list[RuntimeMessage],
+        messages: Sequence[RuntimeMessage],
         *,
-        tools: list[RuntimeToolDefinition] | None = None,
+        tools: Sequence[RuntimeToolDefinition] | None = None,
         **kwargs: Any,
-    ) -> Any:
-        conversation: list[RuntimeMessage] = [dict(message) for message in messages]
+    ) -> AsyncGenerator[RuntimeStreamEvent, None]:
+        conversation: list[RuntimeMessage] = copy.deepcopy(list(messages))
         active_tools = list(tools) if tools is not None else self.list_tools()
 
         try:
@@ -157,43 +159,47 @@ class OpenAIAdapter(AgentRuntime):
 
         pending_tool_calls: dict[int, RuntimeToolCall] = {}
 
-        async for chunk in stream:
-            if not chunk.choices:
-                continue
+        try:
+            async for chunk in stream:
+                if not chunk.choices:
+                    continue
 
-            choice = chunk.choices[0]
-            delta = choice.delta
+                choice = chunk.choices[0]
+                delta = choice.delta
 
-            text_delta = getattr(delta, "content", None)
-            if text_delta:
-                yield {"type": "text", "delta": text_delta, "raw_event": chunk}
+                text_delta = getattr(delta, "content", None)
+                if text_delta:
+                    yield {"type": "text", "delta": text_delta, "raw_event": chunk}
 
-            for partial_call in getattr(delta, "tool_calls", []) or []:
-                index = getattr(partial_call, "index", 0) or 0
-                call = pending_tool_calls.setdefault(
-                    index,
-                    {
-                        "id": "",
-                        "type": "function",
-                        "function": {
-                            "name": "",
-                            "arguments": "",
+                for partial_call in getattr(delta, "tool_calls", []) or []:
+                    index = getattr(partial_call, "index", 0) or 0
+                    call = pending_tool_calls.setdefault(
+                        index,
+                        {
+                            "id": "",
+                            "type": "function",
+                            "function": {
+                                "name": "",
+                                "arguments": "",
+                            },
                         },
-                    },
-                )
-                call_id = getattr(partial_call, "id", None)
-                if call_id:
-                    call["id"] = call_id
+                    )
+                    call_id = getattr(partial_call, "id", None)
+                    if call_id:
+                        call["id"] = call_id
 
-                function = getattr(partial_call, "function", None)
-                if function:
-                    name = getattr(function, "name", None)
-                    if name:
-                        call["function"]["name"] = name
+                    function = getattr(partial_call, "function", None)
+                    if function:
+                        name = getattr(function, "name", None)
+                        if name:
+                            call["function"]["name"] = name
 
-                    arguments_delta = getattr(function, "arguments", None)
-                    if arguments_delta:
-                        call["function"]["arguments"] += arguments_delta
+                        arguments_delta = getattr(function, "arguments", None)
+                        if arguments_delta:
+                            call["function"]["arguments"] += arguments_delta
+        except Exception as exc:
+            yield {"type": "error", "error": str(exc)}
+            return
 
         for call in pending_tool_calls.values():
             yield {"type": "tool_call", "tool_call": call}

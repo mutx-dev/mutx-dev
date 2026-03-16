@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import AsyncIterator, Awaitable, Callable, Mapping, Sequence
+from collections.abc import AsyncGenerator, Awaitable, Callable, Mapping, Sequence
 from typing import Any, Literal, TypedDict
 
 
@@ -18,8 +18,11 @@ class RuntimeToolCall(TypedDict):
     function: RuntimeToolFunction
 
 
-class RuntimeToolSpec(TypedDict, total=False):
+class _RuntimeToolSpecRequired(TypedDict):
     name: str
+
+
+class RuntimeToolSpec(_RuntimeToolSpecRequired, total=False):
     description: str
     parameters: dict[str, Any]
 
@@ -29,8 +32,11 @@ class RuntimeToolDefinition(TypedDict):
     function: RuntimeToolSpec
 
 
-class RuntimeMessage(TypedDict, total=False):
+class _RuntimeMessageRequired(TypedDict):
     role: Literal["system", "user", "assistant", "tool"]
+
+
+class RuntimeMessage(_RuntimeMessageRequired, total=False):
     content: str | None
     name: str
     tool_call_id: str
@@ -84,8 +90,9 @@ class AgentRuntime(ABC):
         *,
         tools: Sequence[RuntimeToolDefinition] | None = None,
         **kwargs: Any,
-    ) -> AsyncIterator[RuntimeStreamEvent]:
-        """Run a streaming model execution."""
+    ) -> AsyncGenerator[RuntimeStreamEvent, None]:
+        """Run a streaming model execution. Implementations must use ``yield``."""
+        yield  # type: ignore[misc]  # pragma: no cover  # stub — subclasses must override with actual yielding logic
 
     @abstractmethod
     def list_tools(self) -> list[RuntimeToolDefinition]:

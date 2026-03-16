@@ -12,6 +12,8 @@ from .base import (
     RuntimeStreamEvent,
     RuntimeToolCall,
     RuntimeToolDefinition,
+    RuntimeToolFunction,
+    RuntimeToolSpec,
     ToolHandler,
 )
 
@@ -23,5 +25,7 @@ __all__ = [
     "RuntimeStreamEvent",
     "RuntimeToolCall",
     "RuntimeToolDefinition",
+    "RuntimeToolFunction",
+    "RuntimeToolSpec",
     "ToolHandler",
 ]
