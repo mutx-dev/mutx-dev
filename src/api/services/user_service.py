@@ -51,7 +51,7 @@ class UserService:
         email: str,
         name: str,
         password: Optional[str] = None,
-        plan: Plan = PlanTier.FREE,
+        plan: PlanTier = PlanTier.FREE,
     ) -> User:
         password_hash = None
         if password:
@@ -90,7 +90,7 @@ class UserService:
             return None
         return user
 
-    async def update_user_plan(self, user_id: uuid.UUID, plan: Plan) -> User:
+    async def update_user_plan(self, user_id: uuid.UUID, plan: PlanTier) -> User:
         await self.session.execute(
             update(User)
             .where(User.id == user_id)
