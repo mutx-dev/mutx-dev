@@ -50,6 +50,10 @@ def create_test_app() -> FastAPI:
         leads,
         runs,
         usage,
+        analytics,
+        budgets,
+        monitoring,
+        swarms,
     )
     
     app = FastAPI(title="MUTX Test API")
@@ -67,6 +71,10 @@ def create_test_app() -> FastAPI:
     app.include_router(ingest.router, prefix="/v1")
     app.include_router(runs.router, prefix="/v1")
     app.include_router(usage.router, prefix="/v1")
+    app.include_router(analytics.router, prefix="/v1")
+    app.include_router(budgets.router, prefix="/v1")
+    app.include_router(monitoring.router, prefix="/v1")
+    app.include_router(swarms.router, prefix="/v1")
     
     # Health check endpoint
     @app.get("/")
