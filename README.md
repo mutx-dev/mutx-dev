@@ -68,6 +68,23 @@ MUTX is building the infrastructure layer for deploying and operating agents saf
 
 # Local Development
 
+## 🚀 5-Minute Quick Start
+
+```bash
+# 1. Start everything (Docker, DB, API, Frontend)
+make dev
+
+# 2. In a new terminal, setup auth + seed data (one command!)
+make test-auth    # Registers test user, logs in, shows token
+make seed        # Creates test agents + deployments
+
+# 3. Open in browser
+#    Frontend: http://localhost:3000
+#    API:      http://localhost:8000/docs
+```
+
+**That's it!** No manual curl commands needed.
+
 ## Quick Start (Makefile)
 
 ```bash
@@ -135,6 +152,23 @@ Start the local development stack:
 ```
 
 # Local Development
+
+## 🚀 5-Minute Quick Start
+
+```bash
+# 1. Start everything (Docker, DB, API, Frontend)
+make dev
+
+# 2. In a new terminal, setup auth + seed data (one command!)
+make test-auth    # Registers test user, logs in, shows token
+make seed        # Creates test agents + deployments
+
+# 3. Open in browser
+#    Frontend: http://localhost:3000
+#    API:      http://localhost:8000/docs
+```
+
+**That's it!** No manual curl commands needed.
 
 ## Running the Backend
 
