@@ -31,12 +31,12 @@ class AnthropicAgentConfig(AgentConfigBase):
 
 
 class LangChainAgentConfig(AgentConfigBase):
-    chain_id: str
+    chain_id: str = Field(..., min_length=1, max_length=255)
     parameters: dict[str, Any] = Field(default_factory=dict)
 
 
 class CustomAgentConfig(AgentConfigBase):
-    image: str
+    image: str = Field(..., min_length=1, max_length=512)
     command: list[str] = Field(default_factory=list)
     env: dict[str, str] = Field(default_factory=dict)
 
@@ -44,6 +44,32 @@ class CustomAgentConfig(AgentConfigBase):
 AgentConfigSchema = (
     OpenAIAgentConfig | AnthropicAgentConfig | LangChainAgentConfig | CustomAgentConfig
 )
+
+
+class ConfigFieldError(BaseModel):
+    """Represents a single typed field-level validation error."""
+
+    field: str
+    message: str
+
+
+class AgentConfigValidateRequest(BaseModel):
+    """Request model for validating an agent configuration without persisting it."""
+
+    type: AgentType = Field(default=AgentType.OPENAI)
+    config: dict[str, Any] | str = Field(
+        ...,
+        description="Agent configuration payload to validate. Can be a JSON object or JSON string.",
+    )
+
+
+class AgentConfigValidateResponse(BaseModel):
+    """Response model for the typed agent config validation endpoint."""
+
+    valid: bool
+    type: AgentType
+    config: Optional[AgentConfigSchema | dict[str, Any]] = None
+    errors: list[ConfigFieldError] = Field(default_factory=list)
 
 
 class AgentCreate(BaseModel):

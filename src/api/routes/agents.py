@@ -28,12 +28,15 @@ from src.api.models.schemas import (
     AgentConfigBase,
     AgentConfigResponse,
     AgentConfigUpdateRequest,
+    AgentConfigValidateRequest,
+    AgentConfigValidateResponse,
     AgentCreate,
     AgentDetailResponse,
     AgentLogResponse,
     AgentMetricResponse,
     AgentResponse,
     AnthropicAgentConfig,
+    ConfigFieldError,
     CustomAgentConfig,
     LangChainAgentConfig,
     OpenAIAgentConfig,
@@ -216,6 +219,56 @@ def _serialize_agent(agent: Agent, include_deployments: bool = False):
         ]
 
     return payload
+
+
+@router.post("/validate-config", response_model=AgentConfigValidateResponse)
+async def validate_agent_config_endpoint(
+    request: AgentConfigValidateRequest,
+    current_user: User = Depends(get_current_user),
+):
+    """Validate an agent configuration schema without persisting it.
+
+    Returns a typed response indicating whether the configuration is valid,
+    the normalised config on success, or a list of typed field-level errors on failure.
+    """
+    try:
+        config_dict = _parse_agent_config_payload(request.config)
+    except HTTPException as exc:
+        return AgentConfigValidateResponse(
+            valid=False,
+            type=request.type,
+            errors=[ConfigFieldError(field="config", message=exc.detail)],
+        )
+
+    config_model = AGENT_CONFIG_MODEL_MAP.get(request.type)
+    if config_model is None:
+        return AgentConfigValidateResponse(
+            valid=True,
+            type=request.type,
+            config=config_dict,
+        )
+
+    try:
+        validated = config_model.model_validate(config_dict)
+    except ValidationError as exc:
+        errors = [
+            ConfigFieldError(
+                field=".".join(str(loc) for loc in err["loc"]) if err["loc"] else "config",
+                message=err["msg"],
+            )
+            for err in exc.errors()
+        ]
+        return AgentConfigValidateResponse(
+            valid=False,
+            type=request.type,
+            errors=errors,
+        )
+
+    return AgentConfigValidateResponse(
+        valid=True,
+        type=request.type,
+        config=validated.model_dump(exclude_none=True),
+    )
 
 
 @router.post("", response_model=AgentResponse, status_code=201)
