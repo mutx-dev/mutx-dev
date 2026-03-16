@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Bot, Calendar, Clock, Copy, Power, RefreshCcw, Rocket, Trash2, Loader2, Activity, Check } from "lucide-react";
+import { ArrowLeft, Bot, Calendar, Clock, Copy, Power, PowerOff, RefreshCcw, Rocket, Trash2, Loader2, Activity, Check } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { type components } from "@/app/types/api";
 
@@ -50,12 +50,25 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
   };
 
   const handleStop = async () => {
+    if (!confirm("Are you sure you want to stop this agent immediately? Any running tasks will be cancelled.")) return;
     setActionLoading(true);
     try {
       const response = await fetch(`/api/dashboard/agents/${encodeURIComponent(agentId)}?action=stop`, { method: "POST" });
       if (!response.ok) throw new Error("Stop failed");
       setAgent(await response.json());
     } catch (err) { alert(err instanceof Error ? err.message : "Stop failed"); }
+    finally { setActionLoading(false); }
+  };
+
+  const handleGracefulStop = async () => {
+    if (!confirm("Gracefully stop this agent? It will finish current tasks before shutting down.")) return;
+    setActionLoading(true);
+    try {
+      const response = await fetch(`/api/agents/${encodeURIComponent(agentId)}/graceful-stop`, { method: "POST" });
+      if (!response.ok) throw new Error("Graceful stop failed");
+      setAgent(await response.json());
+      alert("Agent is shutting down gracefully. It will stop once current tasks complete.");
+    } catch (err) { alert(err instanceof Error ? err.message : "Graceful stop failed"); }
     finally { setActionLoading(false); }
   };
 
@@ -88,7 +101,13 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
 
   const formatDate = (v?: string|null) => v ? new Date(v).toLocaleString() : "N/A";
   const getStatusColor = (s: string) => {
-    switch(s) { case "running": return "bg-emerald-500/20 text-emerald-400"; case "stopped": return "bg-slate-700 text-slate-400"; case "deployed": return "bg-cyan-500/20 text-cyan-400"; default: return "bg-slate-700 text-slate-400"; }
+    switch(s) { 
+      case "running": return "bg-emerald-500/20 text-emerald-400"; 
+      case "stopped": return "bg-slate-700 text-slate-400"; 
+      case "deployed": return "bg-cyan-500/20 text-cyan-400";
+      case "shutting_down": return "bg-amber-500/20 text-amber-400";
+      default: return "bg-slate-700 text-slate-400"; 
+    }
   };
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-cyan-400" /></div>;
@@ -108,7 +127,12 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
         </div>
       </div>
       <div className="flex gap-3">
-        {agent.status === "running" && <button onClick={handleStop} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 disabled:opacity-50"><Power className="h-4 w-4" />Stop</button>}
+        {agent.status === "running" && (
+          <>
+            <button onClick={handleGracefulStop} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-400 hover:bg-amber-500/20 disabled:opacity-50"><PowerOff className="h-4 w-4" />Graceful Stop</button>
+            <button onClick={handleStop} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 disabled:opacity-50"><Power className="h-4 w-4" />Stop</button>
+          </>
+        )}
         {(agent.status === "stopped" || agent.status === "error" || agent.status === "deployed") && <button onClick={handleDeploy} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-50"><Rocket className="h-4 w-4" />Deploy</button>}
         <button onClick={handleRefresh} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 disabled:opacity-50"><RefreshCcw className="h-4 w-4" />Refresh</button>
         <button onClick={handleDelete} disabled={actionLoading} className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 disabled:opacity-50"><Trash2 className="h-4 w-4" />Delete</button>

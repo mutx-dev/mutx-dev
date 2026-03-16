@@ -131,3 +131,14 @@ export const schemas = {
     id: z.string().uuid('Invalid ID format'),
   }),
 }
+
+  // Password reset schemas
+  passwordResetRequest: z.object({
+    email: z.string().email('Invalid email format'),
+  }),
+  
+  passwordResetConfirm: z.object({
+    token: z.string().min(1, 'Token is required'),
+    new_password: z.string().min(8, 'Password must be at least 8 characters'),
+  }),
+}
