@@ -11,7 +11,6 @@ Phase 3+4: HTTP Instrumentation + Metrics Export
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
 from fastapi import APIRouter, Response, Request
 import time
-from typing import Callable
 
 # Custom metrics for Issue #1029
 agents_running = Gauge("agents_running", "Number of currently running agents")
