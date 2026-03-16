@@ -130,7 +130,6 @@ export const schemas = {
   idParam: z.object({
     id: z.string().uuid('Invalid ID format'),
   }),
-}
 
   // Password reset schemas
   passwordResetRequest: z.object({
