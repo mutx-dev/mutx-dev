@@ -106,7 +106,8 @@ async def get_agent_metrics_summary(
     from fastapi import HTTPException
     agent_result = await db.execute(select(Agent).where(Agent.id == agent_id, Agent.user_id == current_user.id))
     agent = agent_result.scalar_one_or_none()
-    if not agent: raise HTTPException(status_code=404, detail="Agent not found")
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
     
     now = datetime.now(timezone.utc)
     if period_start == "24h":
@@ -172,7 +173,9 @@ async def get_analytics_timeseries(
     if metric == "runs":
         q = select(func.date_trunc(interval, AgentRun.started_at).label("ts"), func.count().label("count")
         ).where(and_(AgentRun.user_id == current_user.id, AgentRun.started_at >= period_start_dt, AgentRun.started_at <= period_end_dt))
-        if agent_id: q = q.where(AgentRun.agent_id == agent_id)
+        if agent_id:
+
+            q = q.where(AgentRun.agent_id == agent_id)
         q = q.group_by("ts").order_by("ts")
         for row in await db.execute(q):
             data.append(AnalyticsTimeSeries(timestamp=row.ts.replace(tzinfo=timezone.utc) if row.ts else now, value=row.count))
@@ -186,7 +189,9 @@ async def get_analytics_timeseries(
     elif metric == "latency":
         q = select(func.date_trunc(interval, Metrics.timestamp).label("ts"), func.avg(Metrics.latency).label("avg")
         ).where(and_(Metrics.timestamp >= period_start_dt, Metrics.timestamp <= period_end_dt))
-        if agent_id: q = q.where(Metrics.agent_id == agent_id)
+        if agent_id:
+
+            q = q.where(Metrics.agent_id == agent_id)
         q = q.group_by("ts").order_by("ts")
         for row in await db.execute(q):
             data.append(AnalyticsTimeSeries(timestamp=row.ts.replace(tzinfo=timezone.utc) if row.ts else now, value=round(row.avg, 2) if row.avg else 0))
@@ -217,7 +222,9 @@ async def get_cost_summary(
     usage_by_event_type, usage_by_agent = {}, {}
     for event in events:
         usage_by_event_type[event.event_type] = usage_by_event_type.get(event.event_type, 0) + 1
-        if event.resource_id: usage_by_agent[event.resource_id] = usage_by_agent.get(event.resource_id, 0) + 1
+        if event.resource_id:
+
+            usage_by_agent[event.resource_id] = usage_by_agent.get(event.resource_id, 0) + 1
     
     from src.api.models.plan_tiers import PlanTier
     plan_credits = {PlanTier.FREE: 100, PlanTier.STARTER: 1000, PlanTier.PRO: 10000, PlanTier.ENTERPRISE: 100000}
