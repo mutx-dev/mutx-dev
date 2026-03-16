@@ -1,5 +1,5 @@
 # =============================================================================
-# Production Docker Compose for MUTX API
+# Production Docker Compose for MUTX
 # Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 # =============================================================================
 version: '3.8'
@@ -101,6 +101,36 @@ services:
     # ports:
     #   - "8000:8000"
 
+  frontend:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.frontend
+      target: production
+    container_name: mutx-frontend-prod
+    restart: unless-stopped
+    env_file:
+      - ../../.env.production
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://api.mutx.dev}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://mutx.dev}
+    depends_on:
+      api:
+        condition: service_started
+    networks:
+      - mutx-network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    # Production: Don't expose frontend directly, use nginx
+    # ports:
+    #   - "3000:3000"
+
   nginx:
     image: nginx:alpine
     container_name: mutx-nginx-prod
@@ -113,6 +143,7 @@ services:
       - ./ssl:/etc/nginx/ssl:ro
     depends_on:
       - api
+      - frontend
     networks:
       - mutx-network
     deploy:
