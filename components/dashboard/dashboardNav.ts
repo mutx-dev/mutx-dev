@@ -96,3 +96,14 @@ export function isDashboardNavItemActive(pathname: string, href: string): boolea
 
   return pathname === href || pathname.startsWith(`${href}/`);
 }
+
+export function filterNavItems(items: DashboardNavItem[], query: string): DashboardNavItem[] {
+  if (!query.trim()) return items;
+
+  const lower = query.toLowerCase().trim();
+  return items.filter(
+    (item) =>
+      item.title.toLowerCase().includes(lower) ||
+      item.description.toLowerCase().includes(lower),
+  );
+}
