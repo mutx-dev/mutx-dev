@@ -6,6 +6,14 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
   output: 'standalone',
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://zooming-youth-production-3eb8.up.railway.app/:path*',
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig
