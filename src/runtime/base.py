@@ -42,13 +42,15 @@ class RuntimeResult(TypedDict, total=False):
     content: str | None
     tool_calls: list[RuntimeToolCall]
     raw_response: Any
+    timed_out: bool
 
 
 class RuntimeStreamEvent(TypedDict, total=False):
-    type: Literal["text", "tool_call", "done", "error"]
+    type: Literal["text", "tool_call", "done", "error", "timeout"]
     delta: str
     tool_call: RuntimeToolCall
     error: str
+    timed_out: bool
     raw_event: Any
 
 
@@ -63,6 +65,43 @@ class RuntimeConfig(ABC):
         """Build keyword arguments for the underlying provider SDK client."""
 
 
+class ExecutionTimeoutError(Exception):
+    """Raised when agent execution exceeds the configured timeout."""
+
+    def __init__(self, timeout: float, message: str | None = None):
+        self.timeout = timeout
+        self.message = message or f"Execution timed out after {timeout} seconds"
+        super().__init__(self.message)
+
+
+class TimeoutMixin(ABC):
+    """Mixin to add timeout enforcement capabilities to runtimes."""
+
+    @property
+    @abstractmethod
+    def default_timeout(self) -> float | None:
+        """Default timeout in seconds, or None for no timeout."""
+
+    @property
+    @abstractmethod
+    def max_timeout(self) -> float | None:
+        """Maximum allowed timeout in seconds, or None for no limit."""
+
+    def validate_timeout(self, timeout: float | None) -> float | None:
+        """Validate and normalize a timeout value."""
+        if timeout is None:
+            return None
+
+        if timeout <= 0:
+            raise ValueError("Timeout must be a positive number")
+
+        max_t = self.max_timeout
+        if max_t is not None and timeout > max_t:
+            raise ValueError(f"Timeout cannot exceed {max_t} seconds")
+
+        return timeout
+
+
 class AgentRuntime(ABC):
     """Abstract interface for runtime execution adapters."""
 
@@ -73,6 +112,7 @@ class AgentRuntime(ABC):
         *,
         tools: Sequence[RuntimeToolDefinition] | None = None,
         tool_handlers: Mapping[str, ToolHandler] | None = None,
+        timeout: float | None = None,
         **kwargs: Any,
     ) -> RuntimeResult:
         """Run a non-streaming model execution."""
@@ -83,6 +123,7 @@ class AgentRuntime(ABC):
         messages: Sequence[RuntimeMessage],
         *,
         tools: Sequence[RuntimeToolDefinition] | None = None,
+        timeout: float | None = None,
         **kwargs: Any,
     ) -> AsyncIterator[RuntimeStreamEvent]:
         """Run a streaming model execution."""
