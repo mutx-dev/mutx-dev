@@ -43,3 +43,4 @@ tenacity==8.2.3
 psutil==5.9.8
 aiosqlite==0.20.0
 langchain-core>=0.1.52,<0.2.0
+bcrypt>=3.2.0,<4.0.0
