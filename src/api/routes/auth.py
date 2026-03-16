@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
@@ -54,6 +54,7 @@ class UserResponse(BaseModel):
     email: str
     name: str
     plan: str
+    tier: str = Field(default=None, description="Alias for plan field")
     api_key: Optional[str]
     created_at: datetime
     is_active: bool
@@ -159,6 +160,7 @@ async def get_me(current_user: User = Depends(get_current_user)):
         email=current_user.email,
         name=current_user.name,
         plan=current_user.plan.value,
+        tier=current_user.plan.value,
         api_key=current_user.api_key,
         created_at=current_user.created_at,
         is_active=current_user.is_active,
