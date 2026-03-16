@@ -1,4 +1,5 @@
 """Simple analytics event tracking service (quick win for issue #264)"""
+
 import json
 import logging
 from datetime import datetime, timezone
@@ -12,18 +13,19 @@ from src.api.models import AnalyticsEvent
 
 logger = logging.getLogger(__name__)
 
+
 # Event type constants
 class AnalyticsEventType:
     # Agent lifecycle events
     AGENT_RUN_STARTED = "agent_run.started"
     AGENT_RUN_COMPLETED = "agent_run.completed"
     AGENT_RUN_FAILED = "agent_run.failed"
-    
+
     # API key events
     API_KEY_CREATED = "api_key.created"
     API_KEY_USED = "api_key.used"
     API_KEY_EXPIRED = "api_key.expired"
-    
+
     # User events
     USER_LOGIN = "user.login"
     USER_LOGOUT = "user.logout"
@@ -37,14 +39,14 @@ async def log_analytics_event(
     properties: Optional[dict] = None,
 ) -> AnalyticsEvent:
     """Log an analytics event to the database.
-    
+
     Args:
         db: Database session
         event_name: Human-readable event name
         event_type: Event type (use AnalyticsEventType constants)
         user_id: Optional user UUID
         properties: Optional dict of event properties (will be JSON serialized)
-    
+
     Returns:
         The created AnalyticsEvent
     """

@@ -15,7 +15,6 @@ from src.api.services.email.email_service import (
 )
 
 
-
 def generate_api_key() -> str:
     return f"mutx_{secrets.token_urlsafe(32)}"
 
