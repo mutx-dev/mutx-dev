@@ -101,3 +101,7 @@ class AgentRuntime(ABC):
     @abstractmethod
     def list_tools(self) -> list[RuntimeToolDefinition]:
         """List tools currently configured for this runtime."""
+
+    @abstractmethod
+    async def shutdown(self) -> None:
+        """Gracefully shutdown the runtime, releasing any resources."""

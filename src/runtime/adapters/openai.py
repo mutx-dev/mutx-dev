@@ -361,3 +361,7 @@ class OpenAIAdapter(AgentRuntime):
             return json.dumps(output)
         except TypeError:
             return str(output)
+
+    async def shutdown(self) -> None:
+        """Gracefully shutdown the runtime, closing the AsyncOpenAI client."""
+        await self._client.close()
