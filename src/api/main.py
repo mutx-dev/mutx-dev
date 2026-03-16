@@ -19,6 +19,7 @@ from src.api.exception_handlers import (
     generic_exception_handler,
 )
 from src.api.routes import (
+    rag,
     agents,
     deployments,
     webhooks,
@@ -158,6 +159,7 @@ app.include_router(leads.router, prefix="/api")
 app.include_router(agent_runtime.router, prefix="/api")
 app.include_router(ingest.router, prefix="/api")
 app.include_router(runs.router, prefix="/api")
+app.include_router(rag.router, prefix="/api")
 
 
 @app.get("/health", response_model=HealthResponse)
