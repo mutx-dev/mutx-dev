@@ -15,12 +15,14 @@ router = APIRouter(prefix="/rag", tags=["rag"])
 
 class EmbedRequest(BaseModel):
     """Request model for embedding generation."""
+
     text: str
     model: str = "text-embedding-3-small"
 
 
 class EmbedResponse(BaseModel):
     """Response model for embedding generation."""
+
     embedding: list[float]
     model: str
     tokens: int
@@ -47,40 +49,37 @@ def get_client() -> AsyncOpenAI:
 async def generate_embedding(request: EmbedRequest) -> EmbedResponse:
     """
     Generate embeddings for text input using OpenAI's embedding models.
-    
+
     Supports text-embedding-3-small, text-embedding-3-large, and text-embedding-ada-002.
     """
     client = get_client()
-    
+
     # Validate model
     if request.model not in EMBEDDING_MODELS:
         raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported model. Supported: {list(EMBEDDING_MODELS.keys())}"
+            status_code=400, detail=f"Unsupported model. Supported: {list(EMBEDDING_MODELS.keys())}"
         )
-    
+
     if client is None:
         # Fallback to placeholder if no API key
         dimension = EMBEDDING_MODELS[request.model]
         embedding = [0.0] * dimension
         logger.warning(f"Using placeholder embedding for model {request.model} (no API key)")
         return EmbedResponse(
-            embedding=embedding,
-            model=request.model,
-            tokens=len(request.text.split())
+            embedding=embedding, model=request.model, tokens=len(request.text.split())
         )
-    
+
     try:
         response = await client.embeddings.create(
             model=request.model,
             input=request.text,
         )
-        
+
         embedding_data = response.data[0]
         return EmbedResponse(
             embedding=embedding_data.embedding,
             model=request.model,
-            tokens=embedding_data.usage.tokens
+            tokens=embedding_data.usage.tokens,
         )
     except Exception as e:
         logger.error(f"Embedding generation failed: {e}")
@@ -89,12 +88,14 @@ async def generate_embedding(request: EmbedRequest) -> EmbedResponse:
 
 class BatchEmbedRequest(BaseModel):
     """Request model for batch embedding generation."""
+
     texts: list[str]
     model: str = "text-embedding-3-small"
 
 
 class BatchEmbedResponse(BaseModel):
     """Response model for batch embedding generation."""
+
     embeddings: list[list[float]]
     model: str
     total_tokens: int
@@ -106,37 +107,32 @@ async def generate_batch_embeddings(request: BatchEmbedRequest) -> BatchEmbedRes
     Generate embeddings for multiple texts in a single request.
     """
     client = get_client()
-    
+
     if request.model not in EMBEDDING_MODELS:
         raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported model. Supported: {list(EMBEDDING_MODELS.keys())}"
+            status_code=400, detail=f"Unsupported model. Supported: {list(EMBEDDING_MODELS.keys())}"
         )
-    
+
     if client is None:
         dimension = EMBEDDING_MODELS[request.model]
         embeddings = [[0.0] * dimension] * len(request.texts)
         total_tokens = sum(len(t.split()) for t in request.texts)
         return BatchEmbedResponse(
-            embeddings=embeddings,
-            model=request.model,
-            total_tokens=total_tokens
+            embeddings=embeddings, model=request.model, total_tokens=total_tokens
         )
-    
+
     try:
         response = await client.embeddings.create(
             model=request.model,
             input=request.texts,
         )
-        
+
         # Sort by index to maintain order
         sorted_data = sorted(response.data, key=lambda x: x.index)
         embeddings = [item.embedding for item in sorted_data]
-        
+
         return BatchEmbedResponse(
-            embeddings=embeddings,
-            model=request.model,
-            total_tokens=response.usage.tokens
+            embeddings=embeddings, model=request.model, total_tokens=response.usage.tokens
         )
     except Exception as e:
         logger.error(f"Batch embedding generation failed: {e}")
@@ -145,6 +141,7 @@ async def generate_batch_embeddings(request: BatchEmbedRequest) -> BatchEmbedRes
 
 class SearchRequest(BaseModel):
     """Request model for similarity search."""
+
     query: str
     top_k: int = 5
     model: str = "text-embedding-3-small"
@@ -152,6 +149,7 @@ class SearchRequest(BaseModel):
 
 class SearchResult(BaseModel):
     """Single search result."""
+
     text: str
     score: float
 
@@ -160,7 +158,7 @@ class SearchResult(BaseModel):
 async def similarity_search(request: SearchRequest) -> list[SearchResult]:
     """
     Simple similarity search endpoint.
-    
+
     Note: Full implementation requires pgvector and a document store.
     This is a placeholder that demonstrates the API contract.
     """
@@ -177,5 +175,5 @@ async def rag_health():
         "status": "available",
         "feature": "embeddings",
         "openai_configured": api_key_present,
-        "supported_models": list(EMBEDDING_MODELS.keys())
+        "supported_models": list(EMBEDDING_MODELS.keys()),
     }
