@@ -134,7 +134,9 @@ async def test_get_lead_internal_user(client: AsyncClient, db_session: AsyncSess
 
 
 @pytest.mark.asyncio
-async def test_get_lead_non_internal_forbidden(other_user_client: AsyncClient, db_session: AsyncSession):
+async def test_get_lead_non_internal_forbidden(
+    other_user_client: AsyncClient, db_session: AsyncSession
+):
     """Test fetching a lead is forbidden for non-internal users."""
     lead = Lead(email="private@example.com", source="homepage")
     db_session.add(lead)

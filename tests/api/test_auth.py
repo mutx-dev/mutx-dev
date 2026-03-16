@@ -1,6 +1,7 @@
 """
 Tests for /auth endpoints.
 """
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,7 +12,7 @@ from src.api.models.models import User
 
 class TestAuthEndpoints:
     """Tests for authentication endpoints."""
-    
+
     @pytest.mark.asyncio
     async def test_register_success(self, client_no_auth: AsyncClient):
         """Test user registration."""
@@ -27,12 +28,12 @@ class TestAuthEndpoints:
         data = response.json()
         assert "access_token" in data
         assert "refresh_token" in data
-    
+
     @pytest.mark.asyncio
     async def test_login_success(self, client_no_auth: AsyncClient, db_session: AsyncSession):
         """Test user login."""
         from src.api.auth.password import hash_password
-        
+
         # Create a user with known password
         user = User(
             id=uuid.uuid4(),
@@ -43,7 +44,7 @@ class TestAuthEndpoints:
         )
         db_session.add(user)
         await db_session.commit()
-        
+
         response = await client_no_auth.post(
             "/v1/auth/login",
             json={
@@ -55,7 +56,7 @@ class TestAuthEndpoints:
         data = response.json()
         assert "access_token" in data
         assert data["token_type"] == "bearer"
-    
+
     @pytest.mark.asyncio
     async def test_me_endpoint(self, client: AsyncClient, test_user):
         """Test the /me endpoint."""
@@ -66,10 +67,12 @@ class TestAuthEndpoints:
         assert data["id"] == str(test_user.id)
 
     @pytest.mark.asyncio
-    async def test_register_duplicate_email(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+    async def test_register_duplicate_email(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
         """Test registering with an existing email fails."""
         from src.api.auth.password import hash_password
-        
+
         # Create existing user
         user = User(
             id=uuid.uuid4(),
@@ -80,7 +83,7 @@ class TestAuthEndpoints:
         )
         db_session.add(user)
         await db_session.commit()
-        
+
         # Try to register with same email
         response = await client_no_auth.post(
             "/v1/auth/register",
@@ -94,10 +97,12 @@ class TestAuthEndpoints:
         assert "Email already registered" in response.json()["detail"]
 
     @pytest.mark.asyncio
-    async def test_login_invalid_password(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+    async def test_login_invalid_password(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
         """Test login with wrong password fails."""
         from src.api.auth.password import hash_password
-        
+
         user = User(
             id=uuid.uuid4(),
             email="wrongpass@example.com",
@@ -107,7 +112,7 @@ class TestAuthEndpoints:
         )
         db_session.add(user)
         await db_session.commit()
-        
+
         response = await client_no_auth.post(
             "/v1/auth/login",
             json={
@@ -122,7 +127,7 @@ class TestAuthEndpoints:
     async def test_login_inactive_user(self, client_no_auth: AsyncClient, db_session: AsyncSession):
         """Test login with inactive user fails."""
         from src.api.auth.password import hash_password
-        
+
         user = User(
             id=uuid.uuid4(),
             email="inactive@example.com",
@@ -132,7 +137,7 @@ class TestAuthEndpoints:
         )
         db_session.add(user)
         await db_session.commit()
-        
+
         response = await client_no_auth.post(
             "/v1/auth/login",
             json={
@@ -183,10 +188,12 @@ class TestAuthEndpoints:
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_forgot_password_existing_user(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+    async def test_forgot_password_existing_user(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
         """Test forgot password for existing user."""
         from src.api.auth.password import hash_password
-        
+
         user = User(
             id=uuid.uuid4(),
             email="forgot@example.com",
@@ -196,7 +203,7 @@ class TestAuthEndpoints:
         )
         db_session.add(user)
         await db_session.commit()
-        
+
         response = await client_no_auth.post(
             "/v1/auth/forgot-password",
             json={"email": "forgot@example.com"},
@@ -216,10 +223,12 @@ class TestAuthEndpoints:
         # Should return success to prevent email enumeration
 
     @pytest.mark.asyncio
-    async def test_resend_verification_existing_unverified(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+    async def test_resend_verification_existing_unverified(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
         """Test resend verification for unverified user."""
         from src.api.auth.password import hash_password
-        
+
         user = User(
             id=uuid.uuid4(),
             email="unverified@example.com",
@@ -230,7 +239,7 @@ class TestAuthEndpoints:
         )
         db_session.add(user)
         await db_session.commit()
-        
+
         response = await client_no_auth.post(
             "/v1/auth/resend-verification",
             json={"email": "unverified@example.com"},
@@ -239,10 +248,12 @@ class TestAuthEndpoints:
         assert "Verification email has been sent" in response.json()["message"]
 
     @pytest.mark.asyncio
-    async def test_resend_verification_already_verified(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+    async def test_resend_verification_already_verified(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
         """Test resend verification for already verified user fails."""
         from src.api.auth.password import hash_password
-        
+
         user = User(
             id=uuid.uuid4(),
             email="verified@example.com",
@@ -253,7 +264,7 @@ class TestAuthEndpoints:
         )
         db_session.add(user)
         await db_session.commit()
-        
+
         response = await client_no_auth.post(
             "/v1/auth/resend-verification",
             json={"email": "verified@example.com"},

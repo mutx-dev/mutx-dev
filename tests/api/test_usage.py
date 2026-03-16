@@ -1,6 +1,7 @@
 """
 Tests for /usage endpoints.
 """
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -85,7 +86,9 @@ class TestListUsageEvents:
         assert len(data["items"]) == 0
 
     @pytest.mark.asyncio
-    async def test_list_usage_events_with_data(self, client: AsyncClient, test_user, db_session: AsyncSession):
+    async def test_list_usage_events_with_data(
+        self, client: AsyncClient, test_user, db_session: AsyncSession
+    ):
         """Test listing usage events for the authenticated user."""
         # Create some usage events for the test user
         event1 = UsageEvent(
@@ -211,7 +214,9 @@ class TestGetUsageEvent:
     """Tests for GET /usage/events/{event_id}."""
 
     @pytest.mark.asyncio
-    async def test_get_usage_event_success(self, client: AsyncClient, test_user, db_session: AsyncSession):
+    async def test_get_usage_event_success(
+        self, client: AsyncClient, test_user, db_session: AsyncSession
+    ):
         """Test getting a specific usage event."""
         event = UsageEvent(
             id=uuid.uuid4(),

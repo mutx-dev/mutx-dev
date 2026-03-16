@@ -33,7 +33,8 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
 
     # 4. Update Webhook
     response = await client.patch(
-        f"/v1/webhooks/{webhook_id}", json={"url": "https://example.com/updated", "is_active": False}
+        f"/v1/webhooks/{webhook_id}",
+        json={"url": "https://example.com/updated", "is_active": False},
     )
     assert response.status_code == 200
     data = response.json()
@@ -71,10 +72,7 @@ async def test_webhook_list_honors_skip_and_limit(client: AsyncClient):
     for idx in range(3):
         response = await client.post(
             "/v1/webhooks/",
-            json={
-                "url": f"https://example.com/webhook-{idx}",
-                "events": ["agent.*"]
-            }
+            json={"url": f"https://example.com/webhook-{idx}", "events": ["agent.*"]},
         )
         assert response.status_code == 201
 
@@ -89,6 +87,7 @@ async def test_webhook_list_honors_skip_and_limit(client: AsyncClient):
     skipped_response = await client.get("/v1/webhooks/?skip=1&limit=10")
     assert skipped_response.status_code == 200
     assert len(skipped_response.json()) == 2
+
 
 @pytest.mark.asyncio
 async def test_webhook_unauthorized(client_no_auth: AsyncClient):

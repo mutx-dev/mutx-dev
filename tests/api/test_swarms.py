@@ -1,6 +1,7 @@
 """
 Tests for /swarms endpoints.
 """
+
 import uuid
 import pytest
 from httpx import AsyncClient
@@ -8,7 +9,7 @@ from httpx import AsyncClient
 
 class TestListSwarms:
     """Tests for GET /swarms endpoint."""
-    
+
     @pytest.mark.asyncio
     async def test_list_swarms_empty(self, client: AsyncClient):
         """Test listing swarms when none exist."""
@@ -18,7 +19,7 @@ class TestListSwarms:
         # Response is wrapped in {"items": [...], "total": N}
         assert data["items"] == []
         assert data["total"] == 0
-    
+
     @pytest.mark.asyncio
     async def test_list_swarms_after_create(self, client: AsyncClient, test_agent):
         """Test listing swarms after creating one."""
@@ -34,7 +35,7 @@ class TestListSwarms:
             },
         )
         assert create_response.status_code == 201
-        
+
         # List swarms - should have at least our swarm
         response = await client.get("/v1/swarms")
         assert response.status_code == 200
@@ -47,7 +48,7 @@ class TestListSwarms:
 
 class TestCreateSwarm:
     """Tests for POST /swarms endpoint."""
-    
+
     @pytest.mark.asyncio
     async def test_create_swarm_success(self, client: AsyncClient, test_agent):
         """Test creating a swarm successfully."""
@@ -70,7 +71,7 @@ class TestCreateSwarm:
         assert data["max_replicas"] == 10
         assert "id" in data
         assert "created_at" in data
-    
+
     @pytest.mark.asyncio
     async def test_create_swarm_minimal(self, client: AsyncClient, test_agent):
         """Test creating a swarm with minimal data."""
@@ -86,7 +87,7 @@ class TestCreateSwarm:
         assert data["name"] == "minimal-swarm"
         assert data["min_replicas"] == 1  # default
         assert data["max_replicas"] == 10  # default
-    
+
     @pytest.mark.asyncio
     async def test_create_swarm_with_nonexistent_agent(self, client: AsyncClient):
         """Test creating a swarm with non-existent agent fails."""
@@ -100,7 +101,7 @@ class TestCreateSwarm:
         )
         assert response.status_code == 400
         assert "not found" in response.json()["detail"].lower()
-    
+
     @pytest.mark.asyncio
     async def test_create_swarm_empty_agent_ids(self, client: AsyncClient):
         """Test creating a swarm with empty agent_ids fails."""
@@ -116,7 +117,7 @@ class TestCreateSwarm:
 
 class TestGetSwarm:
     """Tests for GET /swarms/{swarm_id} endpoint."""
-    
+
     @pytest.mark.asyncio
     async def test_get_swarm_success(self, client: AsyncClient, test_agent):
         """Test getting a specific swarm."""
@@ -130,14 +131,14 @@ class TestGetSwarm:
             },
         )
         swarm_id = create_response.json()["id"]
-        
+
         # Get the swarm
         response = await client.get(f"/v1/swarms/{swarm_id}")
         assert response.status_code == 200
         data = response.json()
         assert data["id"] == swarm_id
         assert data["name"] == "get-test-swarm"
-    
+
     @pytest.mark.asyncio
     async def test_get_swarm_not_found(self, client: AsyncClient):
         """Test getting a non-existent swarm returns 404."""
@@ -148,7 +149,7 @@ class TestGetSwarm:
 
 class TestScaleSwarm:
     """Tests for POST /swarms/{swarm_id}/scale endpoint."""
-    
+
     @pytest.mark.asyncio
     async def test_scale_swarm_success(self, client: AsyncClient, test_agent):
         """Test scaling a swarm."""
@@ -163,7 +164,7 @@ class TestScaleSwarm:
             },
         )
         swarm_id = create_response.json()["id"]
-        
+
         # Scale the swarm
         response = await client.post(
             f"/v1/swarms/{swarm_id}/scale",
@@ -175,7 +176,7 @@ class TestScaleSwarm:
         assert "replicas" not in data  # Swarm doesn't have replicas at top level
         assert data["min_replicas"] == 1
         assert data["max_replicas"] == 10
-    
+
     @pytest.mark.asyncio
     async def test_scale_swarm_not_found(self, client: AsyncClient):
         """Test scaling a non-existent swarm returns 404."""
@@ -185,7 +186,7 @@ class TestScaleSwarm:
             json={"replicas": 3},
         )
         assert response.status_code == 404
-    
+
     @pytest.mark.asyncio
     async def test_scale_swarm_invalid_replicas(self, client: AsyncClient, test_agent):
         """Test scaling with invalid replica count outside range."""
@@ -200,7 +201,7 @@ class TestScaleSwarm:
             },
         )
         swarm_id = create_response.json()["id"]
-        
+
         # Try to scale below min_replicas
         response = await client.post(
             f"/v1/swarms/{swarm_id}/scale",

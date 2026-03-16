@@ -111,7 +111,7 @@ class TestCreateAPIKey:
         test_user.plan = PlanTier.PRO
         db_session.add(test_user)
         await db_session.commit()
-        
+
         quota = get_quota(test_user.plan)
         for index in range(quota.max_api_keys):
             db_session.add(
@@ -138,7 +138,7 @@ class TestCreateAPIKey:
         test_user.plan = PlanTier.PRO
         db_session.add(test_user)
         await db_session.commit()
-        
+
         quota = get_quota(test_user.plan)
         for index in range(quota.max_api_keys):
             db_session.add(

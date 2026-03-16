@@ -141,9 +141,7 @@ class TestAgentAuthorization:
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_get_agent_requires_authentication(
-        self, client_no_auth: AsyncClient, test_agent
-    ):
+    async def test_get_agent_requires_authentication(self, client_no_auth: AsyncClient, test_agent):
         response = await client_no_auth.get(f"/v1/agents/{test_agent.id}")
         assert response.status_code == 401
 

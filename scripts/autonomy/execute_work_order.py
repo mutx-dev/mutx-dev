@@ -12,7 +12,9 @@ DEFAULT_MAX_CHANGED_FILES = 6
 CODEX_REVIEW_COMMENT = "@codex please review"
 
 
-def run(command: list[str], *, cwd: str | None = None, check: bool = True) -> subprocess.CompletedProcess[str]:
+def run(
+    command: list[str], *, cwd: str | None = None, check: bool = True
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(command, cwd=cwd, check=check, text=True, capture_output=True)
 
 
@@ -36,7 +38,10 @@ def resolve_reviewer_login(reviewer_agent: str) -> str | None:
 
 def resolve_open_pr_ref(branch: str) -> str:
     # If branch is already a PR ref, keep it. Otherwise try to map to an open PR by head branch.
-    result = run(["gh", "pr", "list", "--state", "open", "--json", "number,headRefName", "--limit", "100"], check=False)
+    result = run(
+        ["gh", "pr", "list", "--state", "open", "--json", "number,headRefName", "--limit", "100"],
+        check=False,
+    )
     if result.returncode != 0:
         return branch
 
@@ -227,7 +232,9 @@ def maybe_open_pr(work_order: dict, base_branch: str) -> None:
     )
 
     if create_result.returncode != 0:
-        print("Could not create PR (possibly already exists). Ensuring handoff is posted on the active PR.")
+        print(
+            "Could not create PR (possibly already exists). Ensuring handoff is posted on the active PR."
+        )
 
     maybe_comment_codex_review(pr_ref)
 
@@ -261,7 +268,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Prepare and execute a MUTX autonomous work order")
     parser.add_argument("work_order", help="Path to work order JSON")
     parser.add_argument("--base-branch", default=os.environ.get("AUTONOMY_BASE_BRANCH", "main"))
-    parser.add_argument("--brief-dir", default=os.environ.get("AUTONOMY_BRIEF_DIR", ".autonomy/briefs"))
+    parser.add_argument(
+        "--brief-dir", default=os.environ.get("AUTONOMY_BRIEF_DIR", ".autonomy/briefs")
+    )
     args = parser.parse_args()
 
     work_order_path = Path(args.work_order)

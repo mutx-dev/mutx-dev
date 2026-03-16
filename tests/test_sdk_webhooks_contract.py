@@ -89,7 +89,9 @@ def _delivery_payload(**overrides: Any) -> dict[str, Any]:
 
 
 def test_webhook_delivery_parses_optional_contract_fields() -> None:
-    delivery = WebhookDelivery(_delivery_payload(status_code=None, error_message="boom", delivered_at=None))
+    delivery = WebhookDelivery(
+        _delivery_payload(status_code=None, error_message="boom", delivered_at=None)
+    )
 
     assert delivery.status_code is None
     assert delivery.error_message == "boom"
