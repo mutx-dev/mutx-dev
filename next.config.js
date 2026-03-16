@@ -7,7 +7,7 @@ const nextConfig = {
   },
   output: 'standalone',
   async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://zooming-youth-production-3eb8.up.railway.app';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
     return [
       {
         source: '/api/:path*',
