@@ -15,6 +15,7 @@
       * [Leads API](docs/contracts/api/leads.md)
       * [Webhooks and Ingestion API](docs/contracts/api/webhooks.md)
   * [CLI Guide](docs/cli.md)
+  * [Webhook Integration Guide](docs/webhook-guide.md)
   * [Project Status](docs/project-status.md)
   * [Architecture](docs/architecture/README.md)
     * [Agent Runtime](docs/architecture/agent-runtime.md)
