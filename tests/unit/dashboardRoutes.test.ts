@@ -138,7 +138,7 @@ describe('dashboard route proxies', () => {
     const { POST } = await import('../../app/api/dashboard/deployments/route')
 
     const response = await POST({
-      json: async () => ({ agent_id: '00000000-0000-0000-0000-000000000001', replicas: 2 }),
+      json: async () => ({ agent_id: '00000000-0000-0000-0000-000000000001', environment: 'development' }),
     } as NextRequest)
 
     expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/deployments', {
