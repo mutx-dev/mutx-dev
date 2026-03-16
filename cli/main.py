@@ -93,11 +93,52 @@ def whoami():
 def status():
     """Show CLI status"""
     config = CLIConfig()
+    
+    click.echo("=== mutx CLI Status ===")
+    click.echo(f"Config file: {config.config_path}")
     click.echo(f"API URL: {config.api_url}")
+    
+    # Check API connectivity
+    try:
+        client = get_client(config)
+        health_response = client.get("/health", timeout=5.0)
+        if health_response.status_code == 200:
+            click.echo("API: ✓ Reachable")
+        else:
+            click.echo(f"API: ⚠ Status {health_response.status_code}")
+    except Exception as e:
+        click.echo(f"API: ✗ Unreachable ({type(e).__name__})")
+    
+    # Auth status
     if config.is_authenticated():
-        click.echo("Status: Logged in")
+        click.echo("Auth: ✓ Logged in")
+        
+        # Show user info
+        try:
+            client = get_client(config)
+            user_response = client.get("/v1/auth/me", timeout=5.0)
+            if user_response.status_code == 200:
+                user = user_response.json()
+                click.echo(f"User: {user.get('email', 'N/A')}")
+                click.echo(f"Plan: {user.get('plan', 'N/A')}")
+            elif user_response.status_code == 401:
+                click.echo("Auth: ⚠ Token may be expired")
+        except Exception:
+            pass
+        
+        # Show agent count
+        try:
+            client = get_client(config)
+            agents_response = client.get("/v1/agents", params={"limit": 1}, timeout=5.0)
+            if agents_response.status_code == 200:
+                agents = agents_response.json()
+                click.echo(f"Agents: {len(agents)} (use 'mutx agents list' for details)")
+        except Exception:
+            pass
     else:
-        click.echo("Status: Not logged in")
+        click.echo("Auth: ✗ Not logged in")
+    
+    click.echo("========================")
 
 
 cli.add_command(agents_group)
