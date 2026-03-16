@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
+    refresh_token_max_sliding_days: int = 30  # Max days for sliding expiry
     # Email settings
     smtp_host: str = Field(default="smtp.gmail.com")
     smtp_port: int = Field(default=587)
