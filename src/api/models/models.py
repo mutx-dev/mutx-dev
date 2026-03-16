@@ -45,7 +45,6 @@ def ARRAY(type_):
 
 class Plan(str, enum.Enum):
     FREE = "free"
-    STARTER = "starter"
     PRO = "pro"
     ENTERPRISE = "enterprise"
 
@@ -80,7 +79,14 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=True)
+
     plan: Mapped[Plan] = mapped_column(SQLEnum(Plan), default=Plan.FREE)
+
+    @property
+    def tier(self) -> str:
+        """Alias for plan field - returns the plan tier value."""
+        return self.plan.value if self.plan else Plan.FREE.value
+
     api_key: Mapped[str] = mapped_column(String(64), unique=True, nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
