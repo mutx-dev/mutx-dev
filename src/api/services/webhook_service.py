@@ -42,6 +42,10 @@ def verify_signature(payload: bytes, signature: str, secret: str) -> bool:
 
     Accepts signatures with or without the 'sha256=' prefix, as sent in
     the X-Webhook-Signature header by ``deliver_webhook``.
+
+    Returns ``True`` when *secret* is empty, meaning signature verification
+    is opted out for this webhook.  Callers that require a secret should
+    check for its presence before invoking this function.
     """
     if not secret:
         return True

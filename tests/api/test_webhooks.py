@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-import json
 
 import pytest
 from httpx import AsyncClient
@@ -401,7 +400,7 @@ async def test_webhook_verify_valid_signature(client: AsyncClient):
     assert response.status_code == 201
     webhook_id = response.json()["id"]
 
-    payload = json.dumps({"event": "agent.status", "data": {}}).encode("utf-8")
+    payload = b'{"event": "agent.status"}'
     signature = "sha256=" + hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
 
     response = await client.post(
