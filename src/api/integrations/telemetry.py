@@ -33,8 +33,7 @@ def init_otel():
         from opentelemetry.sdk.trace import TracerProvider
         from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
         from opentelemetry.sdk.resources import Resource, SERVICE_NAME
-        from opentelemetry.trace import Status, StatusCode
-        from opentelemetry.trace.propagation import set_span_in_context
+        # Status, StatusCode imported in trace_async
         from opentelemetry.sdk.propagate import set_global_textmap
         from opentelemetry.propagators.b3 import B3MultiFormatPropagator
 
@@ -63,8 +62,6 @@ def init_otel():
             span_exporter = OTLPSpanExporter(endpoint=endpoint)
         elif exporter_type == "jaeger":
             from opentelemetry.exporter.jaeger.thrift import JaegerExporter
-            from opentelemetry.exporter.jaeger.thrift.gen.agent import Agent as JaegerAgent
-            from thriftpy2.transport import TSocket
 
             jaeger_host = os.getenv("MUTX_OTEL_JAEGER_HOST", "localhost")
             jaeger_port = int(os.getenv("MUTX_OTEL_JAEGER_PORT", "6831"))
@@ -114,6 +111,7 @@ def is_otel_enabled():
 
 @asynccontextmanager
 async def trace_async(name, attributes=None, mask_input=False, mask_output=False):
+    from opentelemetry.trace import Status, StatusCode
     tracer = get_tracer()
     if tracer is None:
         yield None
