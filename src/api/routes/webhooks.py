@@ -8,6 +8,7 @@ from typing import Optional
 from src.api.database import get_db
 from src.api.models import User, Webhook, WebhookDeliveryLog
 from src.api.services.webhook_handler import WebhookEventType as WebhookEvent
+from src.api.services.webhook_service import verify_signature
 from src.api.models.schemas import (
     WebhookCreate,
     WebhookUpdate,
@@ -238,8 +239,6 @@ async def verify_webhook_signature(
 
     if not webhook.secret:
         raise HTTPException(status_code=400, detail="Webhook does not have a secret configured")
-
-    from src.api.services.webhook_service import verify_signature
 
     payload = await request.body()
     valid = verify_signature(payload, x_webhook_signature or "", webhook.secret)

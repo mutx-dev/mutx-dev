@@ -1,3 +1,7 @@
+import hashlib
+import hmac
+import json
+
 import pytest
 from httpx import AsyncClient
 import uuid
@@ -389,10 +393,6 @@ async def test_webhook_delivery_history_other_user_forbidden(
 
 @pytest.mark.asyncio
 async def test_webhook_verify_valid_signature(client: AsyncClient):
-    import hashlib
-    import hmac
-    import json
-
     secret = "test-secret-123"
     response = await client.post(
         "/v1/webhooks/",
@@ -492,9 +492,6 @@ async def test_webhook_verify_wrong_user_forbidden(
 @pytest.mark.asyncio
 async def test_webhook_verify_signature_without_prefix(client: AsyncClient):
     """Verify that signatures without 'sha256=' prefix are also accepted."""
-    import hashlib
-    import hmac
-
     secret = "prefix-test-secret"
     response = await client.post(
         "/v1/webhooks/",
