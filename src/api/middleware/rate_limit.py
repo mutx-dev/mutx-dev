@@ -1,5 +1,6 @@
 """Rate limiting middleware for the API."""
 
+import hashlib
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Callable
@@ -19,7 +20,7 @@ settings = get_settings()
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Simple in-memory rate limiting middleware.
 
-    Uses a sliding window approach per IP address.
+    Uses a sliding window approach per API key when available, otherwise per IP.
     For production, consider using Redis-backed storage.
     """
 
@@ -32,6 +33,43 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     def _get_client_ip(self, request: Request) -> str:
         """Extract client IP from the direct connection."""
         return request.client.host if request.client else "unknown"
+
+    @staticmethod
+    def _fingerprint(value: str) -> str:
+        return hashlib.sha256(value.encode()).hexdigest()[:24]
+
+    def _extract_api_key_token(self, request: Request) -> str | None:
+        x_api_key = request.headers.get("X-API-Key")
+        if x_api_key:
+            token = x_api_key.strip()
+            if token:
+                return token
+
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            return None
+
+        parts = authorization.split()
+        if len(parts) != 2 or parts[0].lower() != "bearer":
+            return None
+
+        token = parts[1].strip()
+        if token.startswith("mutx_") or token.startswith("mutx_live_"):
+            return token
+
+        return None
+
+    def _get_client_identifier(self, request: Request) -> str:
+        """Resolve rate-limit bucket key (API key first, IP fallback)."""
+        auth_api_key_identifier = getattr(request.state, "auth_api_key_identifier", None)
+        if auth_api_key_identifier:
+            return f"api_key:{auth_api_key_identifier}"
+
+        key_token = self._extract_api_key_token(request)
+        if key_token:
+            return f"api_key:fingerprint:{self._fingerprint(key_token)}"
+
+        return f"ip:{self._get_client_ip(request)}"
 
     def _clean_old_requests(self) -> None:
         """Remove requests outside the current window and stale client entries."""
@@ -51,7 +89,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         self._clean_old_requests()
-        client_id = self._get_client_ip(request)
+        client_id = self._get_client_identifier(request)
 
         current_count = len(self._requests.get(client_id, []))
 

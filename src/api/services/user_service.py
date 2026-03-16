@@ -163,17 +163,36 @@ class UserService:
 
     async def get_user_for_api_key(self, plain_key: str) -> Optional[User]:
         """Resolve an active user for either legacy user API keys or managed APIKey records."""
+        auth_context = await self.authenticate_api_key(plain_key)
+        return auth_context[0] if auth_context else None
+
+    async def authenticate_api_key(
+        self, plain_key: str
+    ) -> Optional[tuple[User, uuid.UUID | None]]:
+        """Authenticate legacy or managed API keys.
+
+        Returns the active user and a managed API key ID when present.
+        Legacy `users.api_key` matches return `(user, None)`.
+        """
         user = await self.get_user_by_api_key(plain_key)
         if user and user.is_active:
-            return user
+            return user, None
 
-        result = await self.session.execute(select(User).where(User.is_active))
-        users = result.scalars().all()
+        now = datetime.now(timezone.utc)
+        result = await self.session.execute(
+            select(APIKey, User)
+            .join(User, APIKey.user_id == User.id)
+            .where(APIKey.is_active, User.is_active)
+        )
+        managed_keys = result.all()
 
-        for active_user in users:
-            api_key = await self.verify_api_key(plain_key, active_user.id)
-            if api_key:
-                return active_user
+        for api_key, active_user in managed_keys:
+            if api_key.expires_at and api_key.expires_at < now:
+                continue
+
+            if verify_api_key(plain_key, api_key.key_hash):
+                await self.update_api_key_last_used(api_key.id)
+                return active_user, api_key.id
 
         return None
 
