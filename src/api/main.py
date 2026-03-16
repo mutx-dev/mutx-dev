@@ -1,20 +1,22 @@
 import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from typing import Literal
 
 
 import time
 
 import logging
 
+from sqlalchemy import select
 from fastapi import FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 
 from src.api.config import get_settings
-from src.api.database import dispose_engine, init_db
-from src.api.models.schemas import HealthResponse
+from src.api.database import async_session_maker, dispose_engine, init_db
+from src.api.models.schemas import DependencyStatus, HealthResponse
 from src.api.middleware.auth import add_authentication_middleware
 from src.api.middleware.security import add_security_middleware
 from src.api.middleware.rate_limit import add_rate_limiting
@@ -181,20 +183,38 @@ app.include_router(usage.router, prefix="/v1")
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check(request: Request):
-    database_ready = request.app.state.database_ready
-    database_error = request.app.state.database_error
     uptime = (
         time.time() - request.app.state.start_time
         if hasattr(request.app.state, "start_time")
         else 0
     )
 
+    # Perform a live database connectivity check
+    db_status: Literal["healthy", "unhealthy"] = "healthy"
+    db_error: str | None = None
+    try:
+        async with async_session_maker() as session:
+            await session.execute(select(1))
+    except Exception as exc:
+        db_status = "unhealthy"
+        db_error = str(exc)
+        logger.warning("Health check: database connectivity failed: %s", exc)
+
+    dependencies: dict[str, DependencyStatus] = {
+        "database": DependencyStatus(status=db_status, error=db_error),
+    }
+
+    # Overall status is degraded if any dependency is unhealthy
+    all_healthy = all(dep.status == "healthy" for dep in dependencies.values())
+    overall_status = "healthy" if all_healthy else "degraded"
+
     return HealthResponse(
-        status="healthy" if database_ready else "degraded",
+        status=overall_status,
         timestamp=datetime.now(timezone.utc),
-        database="ready" if database_ready else "unavailable" if database_error else "initializing",
-        error=database_error,
+        database=db_status,
+        error=db_error,
         uptime_seconds=uptime,
+        dependencies=dependencies,
     )
 
 

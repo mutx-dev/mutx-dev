@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
 import uuid
@@ -309,6 +309,11 @@ class MetricsReportRequest(BaseModel):
     )
 
 
+class DependencyStatus(BaseModel):
+    status: Literal["healthy", "unhealthy"]
+    error: Optional[str] = None
+
+
 class HealthResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     status: str
@@ -317,6 +322,7 @@ class HealthResponse(BaseModel):
     error: Optional[str] = None
     version: str = "1.0.0"
     uptime_seconds: Optional[float] = None
+    dependencies: dict[str, DependencyStatus] = Field(default_factory=dict)
 
 
 # API Key Schemas
