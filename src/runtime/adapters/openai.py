@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 import inspect
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from openai import AsyncOpenAI
@@ -19,6 +20,45 @@ from ..base import (
     RuntimeToolDefinition,
     ToolHandler,
 )
+
+
+# Circuit breaker states
+class CircuitState:
+    CLOSED = "closed"
+    OPEN = "open"
+    HALF_OPEN = "half_open"
+
+
+@dataclass
+class CircuitBreaker:
+    """Simple circuit breaker for API calls."""
+    failure_threshold: int = 5
+    recovery_timeout: float = 30.0
+    state: str = field(default=CircuitState.CLOSED, init=False)
+    failures: int = field(default=0, init=False)
+    last_failure_time: float = field(default=0.0, init=False)
+
+    def record_success(self) -> None:
+        self.failures = 0
+        self.state = CircuitState.CLOSED
+
+    def record_failure(self) -> None:
+        self.failures += 1
+        self.last_failure_time = asyncio.get_event_loop().time()
+        if self.failures >= self.failure_threshold:
+            self.state = CircuitState.OPEN
+
+    def can_attempt(self) -> bool:
+        if self.state == CircuitState.CLOSED:
+            return True
+        if self.state == CircuitState.OPEN:
+            # Check if we should transition to half-open
+            elapsed = asyncio.get_event_loop().time() - self.last_failure_time
+            if elapsed >= self.recovery_timeout:
+                self.state = CircuitState.HALF_OPEN
+                return True
+            return False
+        return True  # HALF_OPEN allows one attempt
 
 
 @dataclass
@@ -68,6 +108,7 @@ class OpenAIAdapter(AgentRuntime):
         self.config = config
         self._tools = list(tools or [])
         self._client = client or AsyncOpenAI(**config.to_client_kwargs())
+        self._circuit_breaker = CircuitBreaker()
 
     def list_tools(self) -> list[RuntimeToolDefinition]:
         return list(self._tools)
@@ -262,7 +303,23 @@ class OpenAIAdapter(AgentRuntime):
         if stream:
             request["stream"] = True
 
-        return await self._client.chat.completions.create(**request)
+        # Retry with exponential backoff and circuit breaker
+        max_retries = 3
+        base_delay = 1.0
+
+        for attempt in range(max_retries):
+            if not self._circuit_breaker.can_attempt():
+                raise RuntimeError("Circuit breaker is open - too many failures")
+
+            try:
+                return await self._client.chat.completions.create(**request)
+            except Exception as exc:
+                self._circuit_breaker.record_failure()
+                if attempt < max_retries - 1:
+                    delay = base_delay * (2 ** attempt)
+                    await asyncio.sleep(delay)
+                else:
+                    raise
 
     async def _append_tool_results(
         self,
