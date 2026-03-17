@@ -533,7 +533,6 @@ async def get_agent_metrics(
 
 # --- Resource Usage Routes ---
 
-
 @router.post(
     "/{agent_id}/resource-usage",
     response_model=AgentResourceUsageResponse,

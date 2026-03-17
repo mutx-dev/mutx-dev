@@ -6,6 +6,7 @@ from mutx.services import AgentsService
 
 # Re-export CLIConfig for backwards compatibility with tests
 from mutx.services.base import CLIConfig as _CLIConfig
+
 CLIConfig = _CLIConfig
 
 
@@ -35,7 +36,7 @@ def list_agents(limit: int, skip: int, format: str):
     # Pass client for testability (uses get_client for backwards compatibility)
     client = get_client(config)
     service = AgentsService(config, client=client)
-    
+
     try:
         agents = service.list(limit=limit, skip=skip)
     except ValueError as e:
@@ -88,7 +89,7 @@ def create_agent(name: str, description: str, agent_type: str, config: str):
 
     client = get_client(cli_config)
     service = AgentsService(cli_config, client=client)
-    
+
     try:
         agent = service.create(
             name=name,
@@ -117,7 +118,7 @@ def delete_agent(agent_id: str, force: bool):
 
     client = get_client(config_obj)
     service = AgentsService(config_obj, client=client)
-    
+
     try:
         service.delete(agent_id)
         click.echo(f"Deleted agent: {agent_id}")
@@ -136,7 +137,7 @@ def deploy_agent(agent_id: str):
 
     client = get_client(config_obj)
     service = AgentsService(config_obj, client=client)
-    
+
     try:
         result = service.deploy(agent_id)
         click.echo(f"Deploying agent: {agent_id}")
@@ -159,7 +160,7 @@ def get_logs(agent_id: str, limit: int, level: Optional[str]):
 
     client = get_client(config_obj)
     service = AgentsService(config_obj, client=client)
-    
+
     try:
         logs = service.get_logs(agent_id, limit=limit, level=level)
     except ValueError as e:
@@ -188,7 +189,7 @@ def stop_agent(agent_id: str):
 
     client = get_client(config_obj)
     service = AgentsService(config_obj, client=client)
-    
+
     try:
         result = service.stop(agent_id)
         click.echo(f"Stopped agent: {agent_id}")
@@ -208,7 +209,7 @@ def get_status(agent_id: str):
 
     client = get_client(config_obj)
     service = AgentsService(config_obj, client=client)
-    
+
     try:
         agent = service.get(agent_id)
         click.echo(f"Agent ID: {agent['id']}")
