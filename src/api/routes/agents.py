@@ -13,6 +13,7 @@ from src.api.auth.ownership import get_owned_agent
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models import (
+    AgentVersion,
     UsageEvent,
     Agent,
     AgentLog,
@@ -40,6 +41,9 @@ from src.api.models.schemas import (
     CustomAgentConfig,
     LangChainAgentConfig,
     OpenAIAgentConfig,
+    AgentVersionResponse,
+    AgentVersionHistoryResponse,
+    AgentRollbackRequest,
 )
 
 router = APIRouter(prefix="/agents", tags=["agents"])
@@ -524,8 +528,6 @@ async def get_agent_metrics(
 
 # --- Resource Usage Routes ---
 
-from src.api.models import AgentResourceUsage
-from src.api.models.schemas import AgentResourceUsageCreate, AgentResourceUsageResponse
 
 
 @router.post(
@@ -595,3 +597,169 @@ async def list_agent_resource_usage(
     result = await db.execute(query)
     usages = result.scalars().all()
     return usages
+
+
+@router.get("/{agent_id}/versions", response_model=AgentVersionHistoryResponse)
+async def list_agent_versions(
+    agent_id: uuid.UUID,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """List all versions of an agent."""
+    await get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to access this agent's versions",
+    )
+
+    query = (
+        select(AgentVersion)
+        .where(AgentVersion.agent_id == agent_id)
+        .order_by(AgentVersion.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    result = await db.execute(query)
+    versions = result.scalars().all()
+
+    # Get total count
+    count_query = select(AgentVersion).where(AgentVersion.agent_id == agent_id)
+    count_result = await db.execute(count_query)
+    total = len(count_result.scalars().all())
+
+    return {
+        "agent_id": agent_id,
+        "items": versions,
+        "total": total,
+    }
+
+
+@router.get("/{agent_id}/versions/{version_id}", response_model=AgentVersionResponse)
+async def get_agent_version(
+    agent_id: uuid.UUID,
+    version_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get a specific version of an agent."""
+    await get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to access this agent's versions",
+    )
+
+    query = select(AgentVersion).where(
+        AgentVersion.id == version_id,
+        AgentVersion.agent_id == agent_id,
+    )
+    result = await db.execute(query)
+    version = result.scalar_one_or_none()
+
+    if not version:
+        raise HTTPException(status_code=404, detail="Version not found")
+
+    return version
+
+
+@router.post("/{agent_id}/versions", response_model=AgentVersionResponse, status_code=201)
+async def create_agent_version(
+    agent_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Create a new version snapshot of an agent's configuration."""
+    agent = await get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to create versions for this agent",
+    )
+
+    # Get the latest version number
+    query = (
+        select(AgentVersion)
+        .where(AgentVersion.agent_id == agent_id)
+        .order_by(AgentVersion.version.desc())
+    )
+    result = await db.execute(query)
+    latest_version = result.scalar_one_or_none()
+    new_version = (latest_version.version + 1) if latest_version else 1
+
+    # Mark previous versions as not current
+    await db.execute(
+        AgentVersion.__table__.update()
+        .where(AgentVersion.agent_id == agent_id)
+        .values(status="archived")
+    )
+
+    # Create new version
+    agent_version = AgentVersion(
+        agent_id=agent_id,
+        version=new_version,
+        config_snapshot=agent.config,
+        status="current",
+    )
+    db.add(agent_version)
+    await db.commit()
+    await db.refresh(agent_version)
+
+    logger.info(f"Created version {new_version} for agent: {agent_id}")
+    return agent_version
+
+
+@router.post("/{agent_id}/rollback", response_model=AgentVersionResponse)
+async def rollback_agent(
+    agent_id: uuid.UUID,
+    request: AgentRollbackRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Rollback an agent to a specific version."""
+    agent = await get_owned_agent(
+        agent_id,
+        db,
+        current_user,
+        forbidden_detail="Not authorized to rollback this agent",
+    )
+
+    # Find the version to rollback to
+    query = select(AgentVersion).where(
+        AgentVersion.agent_id == agent_id,
+        AgentVersion.version == request.version,
+    )
+    result = await db.execute(query)
+    target_version = result.scalar_one_or_none()
+
+    if not target_version:
+        raise HTTPException(
+            status_code=404, detail=f"Version {request.version} not found for this agent"
+        )
+
+    # Mark current version as rolled back
+    current_query = select(AgentVersion).where(
+        AgentVersion.agent_id == agent_id,
+        AgentVersion.status == "current",
+    )
+    current_result = await db.execute(current_query)
+    current_version = current_result.scalar_one_or_none()
+    if current_version:
+        current_version.status = "archived"
+        current_version.rolled_back_at = datetime.now(timezone.utc)
+
+    # Mark target version as current
+    target_version.status = "current"
+    target_version.rolled_back_at = None
+
+    # Restore the agent config
+    agent.config = target_version.config_snapshot
+    agent.updated_at = datetime.now(timezone.utc)
+
+    await db.commit()
+    await db.refresh(target_version)
+
+    logger.info(f"Rolled back agent {agent_id} to version {request.version}")
+    return target_version

@@ -7,7 +7,6 @@ from sqlalchemy.dialects.postgresql import UUID, ARRAY as PG_ARRAY
 import enum
 
 from src.api.database import Base
-from src.api.models.plan_tiers import PlanTier
 
 
 def ARRAY(type_):
@@ -86,7 +85,8 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True),
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
@@ -132,7 +132,8 @@ class Agent(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True),
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
