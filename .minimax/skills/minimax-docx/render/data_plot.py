@@ -7,6 +7,7 @@ from typing import Sequence
 
 try:
     import matplotlib
+
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 except ImportError:
@@ -40,8 +41,7 @@ class DataPlotter:
         """
         if plt is None:
             raise ImportError(
-                "matplotlib is required for chart rendering. "
-                "Install with: pip install matplotlib"
+                "matplotlib is required for chart rendering. Install with: pip install matplotlib"
             )
         self._style = style
         self._width = width
@@ -105,10 +105,7 @@ class DataPlotter:
 
         for i, (name, values) in enumerate(datasets):
             color = self._style.accent_at(i)
-            positions = [
-                idx + i * bar_width - (n_series - 1) * bar_width / 2
-                for idx in indices
-            ]
+            positions = [idx + i * bar_width - (n_series - 1) * bar_width / 2 for idx in indices]
             bars = ax.bar(positions, values, bar_width, label=name, color=color)
 
             if show_values:
@@ -157,10 +154,7 @@ class DataPlotter:
 
         for i, (name, values) in enumerate(datasets):
             color = self._style.accent_at(i)
-            positions = [
-                idx + i * bar_height - (n_series - 1) * bar_height / 2
-                for idx in indices
-            ]
+            positions = [idx + i * bar_height - (n_series - 1) * bar_height / 2 for idx in indices]
             ax.barh(positions, values, bar_height, label=name, color=color)
 
         ax.set_yticks(indices)
