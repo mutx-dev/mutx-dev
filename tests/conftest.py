@@ -14,7 +14,7 @@ from sqlalchemy.ext.compiler import compiles
 
 # Set environment before any imports
 os.environ.setdefault("DATABASE_REQUIRED_ON_STARTUP", "false")
-os.environ.setdefault("JWT_SECRET", "test-secret-key-that-is-long-enough-32")
+os.environ.setdefault("JWT_SECRET", "test-secret-key-that-is-long-enough-32+")
 
 # Use an isolated SQLite database for tests by default.
 # Do not inherit DATABASE_URL from the shell, or tests can accidentally hit a
