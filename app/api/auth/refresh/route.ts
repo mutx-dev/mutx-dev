@@ -5,8 +5,23 @@ import { validateRequest, schemas } from '@/app/api/_lib/validation'
 import { withErrorHandling } from '@/app/api/_lib/errors'
 
 const API_BASE_URL = getApiBaseUrl()
+const FETCH_TIMEOUT_MS = 5000
 
 export const dynamic = 'force-dynamic'
+
+async function fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Response> {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+  
+  try {
+    return await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    })
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   return withErrorHandling(async (req: Request) => {
@@ -20,7 +35,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const secureCookies = shouldUseSecureCookies(request)
     const cookieDomain = getCookieDomain(request)
 
-    const response = await fetch(`${API_BASE_URL}/v1/auth/refresh`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/v1/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh_token }),
