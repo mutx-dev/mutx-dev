@@ -173,6 +173,11 @@ async def _run_schema_setup() -> None:
         await conn.run_sync(Base.metadata.create_all)
         if conn.dialect.name == "postgresql":
             await conn.execute(text("ALTER TABLE agents ADD COLUMN IF NOT EXISTS description TEXT"))
+            # Migrate plan column from enum to varchar if needed
+            try:
+                await conn.execute(text("ALTER TABLE users ALTER COLUMN plan TYPE VARCHAR(20)"))
+            except Exception:
+                pass  # Column may already be varchar
 
 
 async def init_db() -> None:
