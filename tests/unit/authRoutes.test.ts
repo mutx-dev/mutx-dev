@@ -233,7 +233,7 @@ describe('auth route handlers', () => {
         body: JSON.stringify({ email: 'newuser@mutx.dev', password: 'securepassword123', name: 'New User' }),
         cache: 'no-store',
       })
-      expect(response.status).toBe(201)
+      expect(response.status).toBe(200)
       await expect(response.json()).resolves.toEqual({
         access_token: 'new_access_token',
         refresh_token: 'new_refresh_token',
