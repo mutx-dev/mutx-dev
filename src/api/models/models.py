@@ -86,7 +86,7 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
-    updated_at: Mapped[datetime] = mapped_column(
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True),
         DateTime,
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
@@ -133,7 +133,7 @@ class Agent(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
-    updated_at: Mapped[datetime] = mapped_column(
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True),
         DateTime,
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
