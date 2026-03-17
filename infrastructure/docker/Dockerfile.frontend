@@ -1,89 +1,22 @@
-# =============================================================================
-# Development Dockerfile for MUTX Frontend
-# Multi-stage build with dependency caching
-# =============================================================================
-
-# -----------------------------------------------------------------------------
-# Stage 1: Base - Common base
-# -----------------------------------------------------------------------------
-FROM node:20-alpine AS base
+FROM node:20-alpine
 WORKDIR /app
 
-# Install pnpm
-
-# -----------------------------------------------------------------------------
-# Stage 2: Deps - Install dependencies only
-# -----------------------------------------------------------------------------
-FROM base AS deps
-WORKDIR /app
-
-# Install pnpm
-
+# Copy package files
 COPY package.json package-lock.json ./
-RUN npm install --frozen-lockfile
 
-# -----------------------------------------------------------------------------
-# Stage 3: Builder - Build the application
-# -----------------------------------------------------------------------------
-FROM base AS builder
-WORKDIR /app
+# Install dependencies
+RUN npm ci
 
-# Install pnpm
-
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/package.json ./
-# package-lock.json not used with pnpm
-
-ARG NEXT_PUBLIC_API_URL
-ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY
-
+# Copy source
 COPY . .
+
+# Build the app
 RUN npm run build
 
-# -----------------------------------------------------------------------------
-# Stage 4: Runner - Production runtime
-# -----------------------------------------------------------------------------
-FROM node:20-alpine AS runner
-WORKDIR /app
-
-# Install pnpm
+# Production mode
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-
-RUN mkdir -p /app/.next/cache && chown -R nextjs:nodejs /app
-
-USER nextjs
 EXPOSE 3000
-ENV PORT=3000
 
-CMD ["node", "server.js"]
-
-# -----------------------------------------------------------------------------
-# Stage 5: Development - With hot reload
-# -----------------------------------------------------------------------------
-FROM base AS development
-WORKDIR /app
-
-# Install pnpm
-
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/package.json ./
-# package-lock.json not used with pnpm
-
-COPY . .
-ENV NODE_ENV=development
-ENV NEXT_TELEMETRY_DISABLED=1
-
-EXPOSE 3000
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
