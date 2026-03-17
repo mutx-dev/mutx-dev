@@ -12,10 +12,10 @@ from enum import Enum
 class PlanTier(str, Enum):
     """Available plan tiers in MUTX."""
 
-    FREE = "free"
-    STARTER = "starter"
-    PRO = "pro"
-    ENTERPRISE = "enterprise"
+    FREE = "FREE"
+    STARTER = "STARTER"
+    PRO = "PRO"
+    ENTERPRISE = "ENTERPRISE"
 
     def __str__(self) -> str:
         return self.value

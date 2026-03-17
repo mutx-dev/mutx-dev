@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://minimax.local/schemas/mapping.schema.json",
+  "title": "Minimax DOCX Mapping",
+  "description": "Schema contract for deterministic template fill/patch mapping table.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "rows"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "minimax-docx.map.v1"
+    },
+    "required_requirement_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "requirements": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required": {
+            "type": "boolean",
+            "default": true
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "id",
+          "action",
+          "selector",
+          "requirement_ids",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "replace",
+              "delete",
+              "insert"
+            ]
+          },
+          "selector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "requirement_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "target_value": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "resolved",
+              "todo",
+              "ambiguous",
+              "blocked"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

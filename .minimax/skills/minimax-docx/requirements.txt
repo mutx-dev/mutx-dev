@@ -1,0 +1,7 @@
+# Keep this skill dependency-free by default for multi-environment execution.
+# Optional capabilities are lazily imported and degrade gracefully when absent.
+#
+# Optional dependencies (install as needed):
+#   pip install matplotlib      # For chart rendering (render/data_plot.py)
+#   pip install playwright && playwright install chromium  # For HTML rendering (render/html_canvas.py)
+#   pip install Pillow          # For image analysis (check/detectors.py)
