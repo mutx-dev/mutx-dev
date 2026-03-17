@@ -24,6 +24,7 @@ HEADING_STYLE_RE = re.compile(r"^heading\d+$", re.IGNORECASE)
 
 class Detector(Protocol):
     """Interface contract for all validation detectors."""
+
     name: str
 
     def scan(self, ctx: "ScanContext") -> None:
@@ -64,7 +65,9 @@ class ScanContext:
 
         result = {}
         tree = ET.parse(rels_path)
-        for rel in tree.findall(".//{http://schemas.openxmlformats.org/package/2006/relationships}Relationship"):
+        for rel in tree.findall(
+            ".//{http://schemas.openxmlformats.org/package/2006/relationships}Relationship"
+        ):
             rid = rel.get("Id", "")
             target = rel.get("Target", "")
             if rid and target:
@@ -155,6 +158,7 @@ class GridConsistencyDetector:
     Tables in OOXML define column widths in tblGrid, and each cell can
     specify its own width. Mismatches cause rendering unpredictability.
     """
+
     name = "grid-consistency"
 
     def scan(self, ctx: ScanContext) -> None:
@@ -196,13 +200,13 @@ class GridConsistencyDetector:
                     if tc_w is not None:
                         cell_width = tc_w.get(f"{{{WML}}}w")
                         if cell_width and cell_width.isdigit():
-                            expected = sum(defined_widths[col_cursor:col_cursor + span])
+                            expected = sum(defined_widths[col_cursor : col_cursor + span])
                             actual = int(cell_width)
                             # Use 8% tolerance to allow for rounding in grid calculations
                             if expected > 0 and abs(actual - expected) / expected > 0.08:
                                 ctx.report.warning(
                                     f"table[{idx}]/row[{row_idx}]",
-                                    f"Cell width {actual} deviates from grid sum {expected}"
+                                    f"Cell width {actual} deviates from grid sum {expected}",
                                 )
 
                     col_cursor += span
@@ -214,6 +218,7 @@ class AspectRatioDetector:
     Distorted images indicate cx/cy values were modified without
     maintaining the source aspect ratio.
     """
+
     name = "aspect-ratio"
 
     def scan(self, ctx: ScanContext) -> None:
@@ -222,10 +227,14 @@ class AspectRatioDetector:
         except ImportError:
             return
 
-        drawings = ctx.document_root.findall(".//{http://schemas.openxmlformats.org/drawingml/2006/main}blip")
+        drawings = ctx.document_root.findall(
+            ".//{http://schemas.openxmlformats.org/drawingml/2006/main}blip"
+        )
 
         for blip in drawings:
-            embed = blip.get("{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed")
+            embed = blip.get(
+                "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed"
+            )
             if not embed or embed not in ctx.relationships:
                 continue
 
@@ -266,7 +275,7 @@ class AspectRatioDetector:
             if abs(src_ratio - doc_ratio) / src_ratio > 0.03:
                 ctx.report.warning(
                     f"image/{embed}",
-                    f"Aspect ratio changed from {src_ratio:.2f} to {doc_ratio:.2f}"
+                    f"Aspect ratio changed from {src_ratio:.2f} to {doc_ratio:.2f}",
                 )
 
 
@@ -276,6 +285,7 @@ class AnnotationLinkDetector:
     Comments in OOXML span from commentRangeStart to commentRangeEnd,
     referencing entries in comments.xml. Orphaned references cause errors.
     """
+
     name = "annotation-links"
 
     def scan(self, ctx: ScanContext) -> None:
@@ -290,8 +300,7 @@ class AnnotationLinkDetector:
         if not comments_file.exists():
             for rid in referenced_ids:
                 ctx.report.blocker(
-                    f"comment/{rid}",
-                    "Comment reference exists but comments.xml is missing"
+                    f"comment/{rid}", "Comment reference exists but comments.xml is missing"
                 )
             return
 
@@ -304,10 +313,7 @@ class AnnotationLinkDetector:
 
         orphans = referenced_ids - defined_ids
         for oid in orphans:
-            ctx.report.blocker(
-                f"comment/{oid}",
-                "Reference points to undefined comment entry"
-            )
+            ctx.report.blocker(f"comment/{oid}", "Reference points to undefined comment entry")
 
 
 class BookmarkIntegrityDetector:
@@ -316,6 +322,7 @@ class BookmarkIntegrityDetector:
     Bookmarks require both bookmarkStart and bookmarkEnd with matching IDs.
     Unmatched bookmarks cause cross-reference failures.
     """
+
     name = "bookmark-integrity"
 
     def scan(self, ctx: ScanContext) -> None:
@@ -328,18 +335,12 @@ class BookmarkIntegrityDetector:
         # Check for orphaned starts (no matching end)
         orphan_starts = start_ids - end_ids
         for oid in orphan_starts:
-            ctx.report.warning(
-                f"bookmark/{oid}",
-                "bookmarkStart has no matching bookmarkEnd"
-            )
+            ctx.report.warning(f"bookmark/{oid}", "bookmarkStart has no matching bookmarkEnd")
 
         # Check for orphaned ends (no matching start)
         orphan_ends = end_ids - start_ids
         for oid in orphan_ends:
-            ctx.report.warning(
-                f"bookmark/{oid}",
-                "bookmarkEnd has no matching bookmarkStart"
-            )
+            ctx.report.warning(f"bookmark/{oid}", "bookmarkEnd has no matching bookmarkStart")
 
 
 class DrawingIdUniquenessDetector:
@@ -348,6 +349,7 @@ class DrawingIdUniquenessDetector:
     Duplicate docPr id values cause rendering issues in some viewers
     and may result in images not displaying correctly.
     """
+
     name = "drawing-id-uniqueness"
 
     def scan(self, ctx: ScanContext) -> None:
@@ -367,8 +369,7 @@ class DrawingIdUniquenessDetector:
         for id_val, count in seen_ids.items():
             if count > 1:
                 ctx.report.warning(
-                    f"drawing/docPr[@id={id_val}]",
-                    f"Duplicate drawing ID found {count} times"
+                    f"drawing/docPr[@id={id_val}]", f"Duplicate drawing ID found {count} times"
                 )
 
 
@@ -378,6 +379,7 @@ class HyperlinkValidityDetector:
     Hyperlinks referencing missing relationships will not work
     when clicked in Word.
     """
+
     name = "hyperlink-validity"
 
     def scan(self, ctx: ScanContext) -> None:
@@ -389,8 +391,7 @@ class HyperlinkValidityDetector:
                 anchor = hl.get(f"{{{WML}}}anchor", "")
                 if not anchor:  # Only flag if no internal anchor either
                     ctx.report.warning(
-                        f"hyperlink/{rid}",
-                        "Hyperlink references missing relationship"
+                        f"hyperlink/{rid}", "Hyperlink references missing relationship"
                     )
 
 
@@ -400,6 +401,7 @@ class SectionIsolationDetector:
     Cover pages using excessive spacing (Gaps) without section breaks
     risk content overflow on smaller paper sizes (A5, B5).
     """
+
     name = "section-isolation"
 
     # Threshold: if total spacing before first page break exceeds this, warn
@@ -468,6 +470,7 @@ class OutlineLevelDetector:
     Detects flat TOC structures where all headings use the same outline level,
     which results in incorrect TOC nesting.
     """
+
     name = "outline-level"
 
     def scan(self, ctx: ScanContext) -> None:
@@ -512,6 +515,7 @@ class HeaderFooterDetector:
     Documents with multiple sections or many paragraphs should typically
     have headers and/or footers for navigation.
     """
+
     name = "header-footer"
 
     PARAGRAPH_THRESHOLD = 30  # Suggest headers/footers for documents with 30+ paragraphs

@@ -150,18 +150,22 @@ def locate_dotnet_binary() -> Optional[Path]:
     search_paths = ["dotnet"]
 
     if os_type == "Windows":
-        search_paths.extend([
-            Path.home() / ".dotnet" / "dotnet.exe",
-            Path(os.environ.get("ProgramFiles", "")) / "dotnet" / "dotnet.exe",
-            Path(os.environ.get("ProgramFiles(x86)", "")) / "dotnet" / "dotnet.exe",
-        ])
+        search_paths.extend(
+            [
+                Path.home() / ".dotnet" / "dotnet.exe",
+                Path(os.environ.get("ProgramFiles", "")) / "dotnet" / "dotnet.exe",
+                Path(os.environ.get("ProgramFiles(x86)", "")) / "dotnet" / "dotnet.exe",
+            ]
+        )
     else:
-        search_paths.extend([
-            Path.home() / ".dotnet" / "dotnet",
-            Path("/usr/local/share/dotnet/dotnet"),
-            Path("/usr/share/dotnet/dotnet"),
-            Path("/opt/dotnet/dotnet"),
-        ])
+        search_paths.extend(
+            [
+                Path.home() / ".dotnet" / "dotnet",
+                Path("/usr/local/share/dotnet/dotnet"),
+                Path("/usr/share/dotnet/dotnet"),
+                Path("/opt/dotnet/dotnet"),
+            ]
+        )
 
     for candidate in search_paths:
         if isinstance(candidate, str):
@@ -186,8 +190,7 @@ def assess_runtime_health() -> Tuple[str, Optional[Path], Optional[str]]:
 
     try:
         proc = subprocess.run(
-            [str(binary), "--version"],
-            capture_output=True, text=True, timeout=10
+            [str(binary), "--version"], capture_output=True, text=True, timeout=10
         )
         if proc.returncode == 0:
             ver = proc.stdout.strip()
@@ -230,7 +233,9 @@ def provision_dotnet() -> Optional[Path]:
             """
             subprocess.run(
                 ["powershell", "-Command", powershell_script],
-                capture_output=True, text=True, timeout=300
+                capture_output=True,
+                text=True,
+                timeout=300,
             )
             binary = target_dir / "dotnet.exe"
         else:
@@ -239,13 +244,13 @@ def provision_dotnet() -> Optional[Path]:
 
             installer_path = Path(tempfile.gettempdir()) / "dotnet-bootstrap.sh"
             subprocess.run(
-                ["curl", "-sSL", installer_url, "-o", str(installer_path)],
-                check=True, timeout=60
+                ["curl", "-sSL", installer_url, "-o", str(installer_path)], check=True, timeout=60
             )
             installer_path.chmod(0o755)
             subprocess.run(
                 [str(installer_path), "--channel", channel, "--install-dir", str(target_dir)],
-                check=True, timeout=300
+                check=True,
+                timeout=300,
             )
             binary = target_dir / "dotnet"
 
@@ -305,7 +310,9 @@ def audit_python_dependencies() -> dict:
     pandoc_binary = shutil.which("pandoc")
     if pandoc_binary:
         try:
-            proc = subprocess.run(["pandoc", "--version"], capture_output=True, text=True, timeout=5)
+            proc = subprocess.run(
+                ["pandoc", "--version"], capture_output=True, text=True, timeout=5
+            )
             ver = proc.stdout.split("\n")[0].split()[-1] if proc.returncode == 0 else "?"
             inventory["pandoc"] = ("available", ver)
         except Exception:
@@ -367,8 +374,15 @@ def execute_verification(document_path: Path, runtime: Path) -> bool:
     if validator_dll.exists():
         try:
             proc = subprocess.run(
-                [str(runtime), "--roll-forward", "LatestMajor", str(validator_dll), str(document_path)],
-                capture_output=True, text=True
+                [
+                    str(runtime),
+                    "--roll-forward",
+                    "LatestMajor",
+                    str(validator_dll),
+                    str(document_path),
+                ],
+                capture_output=True,
+                text=True,
             )
             print(proc.stdout, end="")
             if proc.stderr:
@@ -384,7 +398,13 @@ def execute_verification(document_path: Path, runtime: Path) -> bool:
 
 def extract_document_metrics(document_path: Path) -> dict:
     """Collect statistics about the document using pandoc."""
-    metrics = {"characters": 0, "tokens": 0, "media_count": 0, "has_markup": False, "has_annotations": False}
+    metrics = {
+        "characters": 0,
+        "tokens": 0,
+        "media_count": 0,
+        "has_markup": False,
+        "has_annotations": False,
+    }
 
     if not shutil.which("pandoc"):
         return metrics
@@ -392,14 +412,16 @@ def extract_document_metrics(document_path: Path) -> dict:
     try:
         proc = subprocess.run(
             ["pandoc", str(document_path), "-t", "plain"],
-            capture_output=True, text=True, timeout=30
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
         if proc.returncode == 0:
             content = proc.stdout
             metrics["characters"] = len(content)
             metrics["tokens"] = len(content.split())
 
-        with zipfile.ZipFile(document_path, 'r') as archive:
+        with zipfile.ZipFile(document_path, "r") as archive:
             entries = archive.namelist()
             metrics["media_count"] = sum(1 for e in entries if e.startswith("word/media/"))
             metrics["has_annotations"] = "word/comments.xml" in entries
@@ -473,7 +495,9 @@ def extract_text_nodes(xml_text: str) -> List[str]:
     return values
 
 
-def detect_residual_placeholders(document_path: Path, allow_tokens: Optional[List[str]] = None) -> Counter:
+def detect_residual_placeholders(
+    document_path: Path, allow_tokens: Optional[List[str]] = None
+) -> Counter:
     """Find unresolved placeholder/sample fragments in document text."""
     allowed = {token.strip().lower() for token in (allow_tokens or []) if token.strip()}
     findings: Counter = Counter()
@@ -545,7 +569,9 @@ def action_doctor():
 
     if "libreoffice-soffice" in missing_required:
         print("Dependency Gate:")
-        print("  - libreoffice-soffice is required for template-driven .doc -> .docx normalization.")
+        print(
+            "  - libreoffice-soffice is required for template-driven .doc -> .docx normalization."
+        )
         if "textutil" in unsupported:
             print("  - textutil is detected but cannot be used as a fallback.")
         print("  - Install LibreOffice and ensure `soffice` is on PATH.")
@@ -559,7 +585,7 @@ def action_doctor():
         if needs_setup:
             print("=== Provisioning Dependencies ===")
             runtime = guarantee_dotnet()
-            ver_proc = subprocess.run([str(runtime), '--version'], capture_output=True, text=True)
+            ver_proc = subprocess.run([str(runtime), "--version"], capture_output=True, text=True)
             print(f"  + dotnet {ver_proc.stdout.strip()}")
 
             print()
@@ -581,8 +607,12 @@ def action_doctor():
     print("Ready!")
     print(f"  Render: python {Path(__file__).name} render")
     print(f"  Preset: python {Path(__file__).name} render output.docx tech")
-    print(f"  Template: dotnet run --project \"{SCRIPT_LOCATION / 'src' / 'DocForge.csproj'}\" -- from-template template.docx output.docx")
-    print(f"  Mapping template: python {Path(__file__).name} map-template mapping.json --require R1,R2")
+    print(
+        f'  Template: dotnet run --project "{SCRIPT_LOCATION / "src" / "DocForge.csproj"}" -- from-template template.docx output.docx'
+    )
+    print(
+        f"  Mapping template: python {Path(__file__).name} map-template mapping.json --require R1,R2"
+    )
     print(f"  Residual gate: python {Path(__file__).name} residual output.docx")
     print(f"  Mapping gate: python {Path(__file__).name} map-gate mapping.json --require R1,R2")
     print(f"  Mapping schema: {resolve_mapping_schema_path()}")
@@ -616,7 +646,9 @@ def action_render(target_name: Optional[str] = None, preset: str = "tech"):
     proj_file = SCRIPT_LOCATION / "src" / "DocForge.csproj"
     proc = subprocess.run(
         [str(runtime), "build", str(proj_file), "--verbosity", "quiet"],
-        capture_output=True, text=True, cwd=str(SCRIPT_LOCATION)
+        capture_output=True,
+        text=True,
+        cwd=str(SCRIPT_LOCATION),
     )
 
     if proc.returncode != 0:
@@ -685,8 +717,10 @@ def action_render(target_name: Optional[str] = None, preset: str = "tech"):
     metrics = extract_document_metrics(target)
     if metrics["characters"] > 0:
         media_note = "" if metrics["media_count"] > 0 else " - verify image embedding path"
-        print(f"  >> {metrics['characters']} chars, {metrics['tokens']} words, {metrics['media_count']} images{media_note}")
-        print(f"  >> Structural check passed. Content review: pandoc \"{target}\" -t plain")
+        print(
+            f"  >> {metrics['characters']} chars, {metrics['tokens']} words, {metrics['media_count']} images{media_note}"
+        )
+        print(f'  >> Structural check passed. Content review: pandoc "{target}" -t plain')
         if metrics["has_markup"] or metrics["has_annotations"]:
             print("     Track changes detected - use --track-changes=all for review")
 
@@ -725,8 +759,7 @@ def action_preview(document_path: str):
     print(f">> Preview: {path}")
     print("-" * 60)
     proc = subprocess.run(
-        ["pandoc", str(path), "-t", "plain"],
-        capture_output=True, text=True, timeout=30
+        ["pandoc", str(path), "-t", "plain"], capture_output=True, text=True, timeout=30
     )
     if proc.returncode == 0:
         print(proc.stdout)
@@ -958,9 +991,7 @@ def check_mapping_schema_header(mapping_doc: dict[str, Any]) -> Tuple[List[str],
 
     schema_version = mapping_doc.get("schema_version")
     if schema_version is None:
-        warnings.append(
-            f"missing `schema_version` (recommended: {MAPPING_SCHEMA_VERSION})"
-        )
+        warnings.append(f"missing `schema_version` (recommended: {MAPPING_SCHEMA_VERSION})")
     elif not isinstance(schema_version, str) or not schema_version.strip():
         errors.append("`schema_version` must be a non-empty string")
     elif schema_version.strip() != MAPPING_SCHEMA_VERSION:
@@ -974,7 +1005,9 @@ def check_mapping_schema_header(mapping_doc: dict[str, Any]) -> Tuple[List[str],
     return errors, warnings
 
 
-def evaluate_mapping_doc(mapping_doc: dict[str, Any], cli_required: Optional[Set[str]] = None) -> dict[str, Any]:
+def evaluate_mapping_doc(
+    mapping_doc: dict[str, Any], cli_required: Optional[Set[str]] = None
+) -> dict[str, Any]:
     """Evaluate mapping completeness and return normalized execution rows."""
     header_errors, header_warnings = check_mapping_schema_header(mapping_doc)
     if header_errors:
@@ -1104,9 +1137,7 @@ def evaluate_mapping_doc(mapping_doc: dict[str, Any], cli_required: Optional[Set
 
     missing = sorted(req for req in required_ids if req not in covered_requirements)
     if missing:
-        errors.append(
-            "missing required requirements in resolved rows: " + ", ".join(missing)
-        )
+        errors.append("missing required requirements in resolved rows: " + ", ".join(missing))
 
     if not required_ids:
         warnings.append("No required requirement IDs provided; gate only checked row completeness")
@@ -1150,7 +1181,9 @@ def action_map_gate(mapping_path: str, cli_required: Optional[Set[str]] = None):
         print("!! Mapping gate failed:")
         for err in result["errors"]:
             print(f"  - {err}")
-        print("  Fill-mode is blocked. Complete the mapping table or switch to template-apply rebuild mode.")
+        print(
+            "  Fill-mode is blocked. Complete the mapping table or switch to template-apply rebuild mode."
+        )
         sys.exit(1)
 
     print("+ Mapping gate passed")
@@ -1204,7 +1237,9 @@ def replace_paragraph_content(paragraph: ET.Element, text: str) -> None:
     paragraph.append(make_text_run(text))
 
 
-def find_ancestor_paragraph(node: ET.Element, parent_map: dict[ET.Element, ET.Element]) -> Optional[ET.Element]:
+def find_ancestor_paragraph(
+    node: ET.Element, parent_map: dict[ET.Element, ET.Element]
+) -> Optional[ET.Element]:
     """Ascend to nearest paragraph ancestor."""
     cursor: Optional[ET.Element] = node
     while cursor is not None:
@@ -1255,9 +1290,7 @@ def resolve_selector_to_paragraph(root: ET.Element, selector: str) -> ET.Element
             raise ValueError(f"selector `{selector}` has no paragraph ancestor")
         return paragraph
 
-    raise ValueError(
-        f"selector `{selector}` unsupported; use text:, bookmark:, or xpath:"
-    )
+    raise ValueError(f"selector `{selector}` unsupported; use text:, bookmark:, or xpath:")
 
 
 def delete_paragraph(root: ET.Element, paragraph: ET.Element) -> None:
@@ -1306,9 +1339,7 @@ def execute_mapping_rows(root: ET.Element, rows: List[dict[str, Any]]) -> List[s
             )
         elif action == "delete":
             delete_paragraph(root, paragraph)
-            summaries.append(
-                f"{row_id}: delete on `{selector}` removed paragraph `{before[:60]}`"
-            )
+            summaries.append(f"{row_id}: delete on `{selector}` removed paragraph `{before[:60]}`")
         elif action == "insert":
             insert_paragraph_after(root, paragraph, target_value)
             summaries.append(
@@ -1446,7 +1477,9 @@ def parse_map_gate_args(argv: List[str]) -> Tuple[str, Set[str]]:
         flag = argv[index]
         if flag == "--require":
             if index + 1 >= len(argv):
-                print("Usage: python docx_engine.py map-gate <mapping.json> [--require ID[,ID...]]...")
+                print(
+                    "Usage: python docx_engine.py map-gate <mapping.json> [--require ID[,ID...]]..."
+                )
                 print("- Missing value after --require")
                 sys.exit(1)
             for req in split_requirement_ids(argv[index + 1]):
@@ -1620,7 +1653,7 @@ Modification Workflow:
 
 Template-Driven Workflow (when user provides a template):
   1. Keep the template as source of truth (no preset structure injection)
-  2. Run: dotnet run --project "{SCRIPT_LOCATION / 'src' / 'DocForge.csproj'}" -- from-template template.docx output.docx
+  2. Run: dotnet run --project "{SCRIPT_LOCATION / "src" / "DocForge.csproj"}" -- from-template template.docx output.docx
   3. Run: python docx_engine.py audit output.docx
   4. Run: python docx_engine.py residual output.docx
   5. Run: python docx_engine.py map-template mapping.json --require R1,R2
@@ -1673,7 +1706,9 @@ def main():
             overwrite=overwrite,
         )
     elif command == "map-apply":
-        input_docx, mapping_path, output_docx, required_ids, dry_run, allow_tokens = parse_map_apply_args(sys.argv)
+        input_docx, mapping_path, output_docx, required_ids, dry_run, allow_tokens = (
+            parse_map_apply_args(sys.argv)
+        )
         action_map_apply(
             input_docx=input_docx,
             mapping_path=mapping_path,
