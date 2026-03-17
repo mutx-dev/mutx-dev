@@ -14,6 +14,7 @@ class PlotStyle:
         grid_color: Color for chart grid lines.
         font_family: Font family for text elements.
     """
+
     background: str
     foreground: str
     accents: tuple[str, ...]

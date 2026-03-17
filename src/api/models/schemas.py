@@ -243,7 +243,6 @@ class AgentMetricResponse(BaseModel):
     timestamp: datetime
 
 
-
 class AgentResourceUsageResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -273,6 +272,7 @@ class AgentResourceUsageCreate(BaseModel):
     extra_metadata: Optional[dict[str, Any]] = Field(default_factory=dict)
     period_start: datetime
     period_end: Optional[datetime] = None
+
 
 class RunTraceCreate(BaseModel):
     event_type: str = Field(..., min_length=1, max_length=100)
