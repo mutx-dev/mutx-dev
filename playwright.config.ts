@@ -18,7 +18,7 @@ export default defineConfig({
   timeout: 30000,
   use: {
     baseURL,
-    trace: isCI ? 'on-first-retry' : 'on-demand',
+    trace: isCI ? 'on-first-retry' : 'retain-on-failure',
     screenshot: isCI ? 'off' : 'only-on-failure',
     video: isCI ? 'off' : 'retain-on-failure',
     viewport: { width: 1280, height: 720 },
