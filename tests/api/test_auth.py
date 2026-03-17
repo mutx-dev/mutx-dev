@@ -287,13 +287,9 @@ class TestAuthEndpoints:
     ):
         """Test that refresh token uses sliding expiry."""
         from src.api.auth.password import hash_password
-        from datetime import datetime, timedelta, timezone
         from src.api.auth.jwt import (
-            create_refresh_token,
             get_refresh_token_iat,
-            verify_refresh_token,
         )
-        from src.api.services.user_service import UserService
 
         # Create a user
         user = User(
@@ -347,7 +343,6 @@ class TestAuthEndpoints:
             create_refresh_token,
             get_refresh_token_iat,
             verify_refresh_token,
-            REFRESH_TOKEN_MAX_SLIDING_DAYS,
         )
 
         # Create a user

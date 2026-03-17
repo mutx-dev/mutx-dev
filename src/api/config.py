@@ -1,7 +1,6 @@
 from functools import lru_cache
 from json import JSONDecodeError, loads
 import os
-import re
 import secrets
 
 from pydantic import AliasChoices, Field, field_validator, model_validator

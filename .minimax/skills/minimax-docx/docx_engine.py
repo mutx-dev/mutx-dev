@@ -530,9 +530,9 @@ def action_doctor():
         print(f"  Output dir:    {resolve_artifact_dir()}")
     except RuntimeError:
         in_skill_dir = True
-        print(f"  Project home:  (running from skill dir - set PROJECT_HOME or run from workspace)")
-        print(f"  Workspace:     N/A")
-        print(f"  Output dir:    N/A")
+        print("  Project home:  (running from skill dir - set PROJECT_HOME or run from workspace)")
+        print("  Workspace:     N/A")
+        print("  Output dir:    N/A")
     print()
 
     print("Runtime:")
