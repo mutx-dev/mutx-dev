@@ -39,6 +39,7 @@ class RuntimeMessage(TypedDict, total=False):
 
 class RuntimeUsage(TypedDict, total=False):
     """Usage statistics from model execution."""
+
     prompt_tokens: int
     completion_tokens: int
     total_tokens: int

@@ -78,8 +78,7 @@ class ValidationPipeline:
                     detector.scan(ctx)
                 except Exception as e:
                     report.warning(
-                        f"detector/{detector.name}",
-                        f"Detector failed: {type(e).__name__}: {e}"
+                        f"detector/{detector.name}", f"Detector failed: {type(e).__name__}: {e}"
                     )
 
         return report

@@ -94,8 +94,10 @@ async def test_prometheus_metrics_endpoint_returns_prometheus_format():
     assert response.status_code == 200
     content = response.text
     # Prometheus format typically has lines like "metric_name{labels} value"
-    assert "# HELP" in content or "# TYPE" in content or any(
-        line for line in content.split("\n") if line and not line.startswith("#")
+    assert (
+        "# HELP" in content
+        or "# TYPE" in content
+        or any(line for line in content.split("\n") if line and not line.startswith("#"))
     )
 
 

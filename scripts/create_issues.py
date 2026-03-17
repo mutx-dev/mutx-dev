@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 # Issue definition
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Issue:
     title: str
@@ -354,7 +355,6 @@ ISSUES: list[Issue] = [
         ),
         labels=["area:api", "area:test", "size:s", "risk:low"],
     ),
-
     # ── area:web  (18 issues) ──────────────────────────────────────────────
     Issue(
         title="feat(web): add authenticated agent list view to dashboard",
@@ -649,7 +649,6 @@ ISSUES: list[Issue] = [
         ),
         labels=["area:web", "area:auth", "size:s", "risk:low"],
     ),
-
     # ── area:cli-sdk  (12 issues) ──────────────────────────────────────────
     Issue(
         title="fix(cli): fix mutx agents create to use current API contract",
@@ -843,7 +842,6 @@ ISSUES: list[Issue] = [
         ),
         labels=["area:cli-sdk", "size:s", "risk:low"],
     ),
-
     # ── area:test  (15 issues) ─────────────────────────────────────────────
     Issue(
         title="test(api): add route tests for GET /agents",
@@ -1086,7 +1084,6 @@ ISSUES: list[Issue] = [
         ),
         labels=["area:test", "size:s", "risk:low"],
     ),
-
     # ── area:docs  (10 issues) ─────────────────────────────────────────────
     Issue(
         title="docs: add quickstart guide for new contributors",
@@ -1247,7 +1244,6 @@ ISSUES: list[Issue] = [
         ),
         labels=["area:docs", "size:s", "risk:low"],
     ),
-
     # ── area:infra  (10 issues) ────────────────────────────────────────────
     Issue(
         title="feat(infra): add database migration CI check",
@@ -1410,7 +1406,6 @@ ISSUES: list[Issue] = [
         ),
         labels=["area:infra", "size:s", "risk:low"],
     ),
-
     # ── area:auth  (5 issues) ──────────────────────────────────────────────
     Issue(
         title="feat(auth): enforce ownership on all agent endpoints",
@@ -1491,7 +1486,6 @@ ISSUES: list[Issue] = [
         ),
         labels=["area:auth", "area:api", "size:s", "risk:medium"],
     ),
-
     # ── area:runtime  (5 issues) ───────────────────────────────────────────
     Issue(
         title="feat(runtime): add agent execution timeout enforcement",
@@ -1576,7 +1570,6 @@ ISSUES: list[Issue] = [
         ),
         labels=["area:runtime", "area:api", "size:m", "risk:medium"],
     ),
-
     # ── area:ops  (5 issues) ───────────────────────────────────────────────
     Issue(
         title="feat(ops): add Prometheus metrics endpoint",
@@ -1671,11 +1664,12 @@ if len(ISSUES) != 100:
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def dry_run(issues: list[Issue]) -> None:
     """Print all issues that would be created."""
     for idx, issue in enumerate(issues, 1):
         labels = ", ".join(issue.labels) if issue.labels else "(none)"
-        print(f"\n{'='*72}")
+        print(f"\n{'=' * 72}")
         print(f"Issue {idx}/100")
         print(f"  Title:  {issue.title}")
         print(f"  Labels: {labels}")
@@ -1683,7 +1677,7 @@ def dry_run(issues: list[Issue]) -> None:
         if len(issue.body) > 200:
             body_preview += "..."
         print(f"  Body:\n{body_preview}")
-    print(f"\n{'='*72}")
+    print(f"\n{'=' * 72}")
     print(f"Total: {len(issues)} issues ready to create.")
     print("Run with --execute to create them.\n")
 
@@ -1694,10 +1688,15 @@ def create_issues(issues: list[Issue], repo: str) -> None:
     failed = 0
     for idx, issue in enumerate(issues, 1):
         cmd = [
-            "gh", "issue", "create",
-            "--repo", repo,
-            "--title", issue.title,
-            "--body", issue.body,
+            "gh",
+            "issue",
+            "create",
+            "--repo",
+            repo,
+            "--title",
+            issue.title,
+            "--body",
+            issue.body,
         ]
         for label in issue.labels:
             cmd.extend(["--label", label])
@@ -1735,10 +1734,9 @@ def create_issues(issues: list[Issue], repo: str) -> None:
 # Main
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Generate 100 GitHub issues for the MUTX project."
-    )
+    parser = argparse.ArgumentParser(description="Generate 100 GitHub issues for the MUTX project.")
     parser.add_argument(
         "--execute",
         action="store_true",

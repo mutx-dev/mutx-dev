@@ -282,11 +282,17 @@ class TestAuthEndpoints:
         assert response.status_code == 200
 
     @pytest.mark.asyncio
-    async def test_refresh_token_sliding_expiry(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+    async def test_refresh_token_sliding_expiry(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
         """Test that refresh token uses sliding expiry."""
         from src.api.auth.password import hash_password
         from datetime import datetime, timedelta, timezone
-        from src.api.auth.jwt import create_refresh_token, get_refresh_token_iat, verify_refresh_token
+        from src.api.auth.jwt import (
+            create_refresh_token,
+            get_refresh_token_iat,
+            verify_refresh_token,
+        )
         from src.api.services.user_service import UserService
 
         # Create a user
@@ -311,11 +317,11 @@ class TestAuthEndpoints:
         assert response.status_code == 200
         data = response.json()
         refresh_token = data["refresh_token"]
-        
+
         # Get original iat
         original_iat = get_refresh_token_iat(refresh_token)
         assert original_iat is not None
-        
+
         # Use the refresh token
         response = await client_no_auth.post(
             "/v1/auth/refresh",
@@ -323,19 +329,26 @@ class TestAuthEndpoints:
         )
         assert response.status_code == 200
         data = response.json()
-        
+
         new_refresh_token = data["refresh_token"]
         new_iat = get_refresh_token_iat(new_refresh_token)
-        
+
         # The new token should keep the original iat (for sliding window calculation)
         assert new_iat == original_iat
 
     @pytest.mark.asyncio
-    async def test_refresh_token_sliding_expiry_max_days(self, client_no_auth: AsyncClient, db_session: AsyncSession):
+    async def test_refresh_token_sliding_expiry_max_days(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
         """Test that sliding expiry is capped at max days."""
         from src.api.auth.password import hash_password
         from datetime import datetime, timedelta, timezone
-        from src.api.auth.jwt import create_refresh_token, get_refresh_token_iat, verify_refresh_token, REFRESH_TOKEN_MAX_SLIDING_DAYS
+        from src.api.auth.jwt import (
+            create_refresh_token,
+            get_refresh_token_iat,
+            verify_refresh_token,
+            REFRESH_TOKEN_MAX_SLIDING_DAYS,
+        )
 
         # Create a user
         user = User(
@@ -358,11 +371,11 @@ class TestAuthEndpoints:
         )
         assert response.status_code == 200
         data = response.json()
-        
+
         # Simulate a refresh token that was issued 25 days ago (almost at max)
         old_iat = datetime.now(timezone.utc) - timedelta(days=25)
         old_token, _ = create_refresh_token(user.id, original_iat=old_iat)
-        
+
         # Refresh with the old token
         response = await client_no_auth.post(
             "/v1/auth/refresh",
@@ -370,14 +383,14 @@ class TestAuthEndpoints:
         )
         assert response.status_code == 200
         data = response.json()
-        
+
         new_refresh_token = data["refresh_token"]
         new_iat = get_refresh_token_iat(new_refresh_token)
-        
+
         # The iat should still be the original (25 days ago)
         assert new_iat is not None
         age = (datetime.now(timezone.utc) - new_iat).days
         assert age >= 25  # Original iat preserved
-        
+
         # Verify the new token is still valid (not more than 30 days from original iat)
         assert verify_refresh_token(new_refresh_token) is not None
