@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 function normalizeBaseUrl(value?: string | null) {
   if (!value) return null
@@ -65,4 +65,55 @@ export async function refreshAuthToken(
   } catch {
     return null
   }
+}
+
+/**
+ * Authenticated fetch with automatic token refresh on 401.
+ * Returns the response and a NextResponse with updated cookies if token was refreshed.
+ */
+export async function authenticatedFetch(
+  request: NextRequest,
+  url: string,
+  options: RequestInit = {}
+): Promise<{ response: Response; tokenRefreshed: boolean; cookieHeader?: string }> {
+  let token = await getAuthToken(request)
+  let refreshToken = getRefreshToken(request)
+  
+  // Initial fetch with current token
+  let response = await fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    credentials: 'include',
+  })
+
+  // If unauthorized, try to refresh the token
+  if (response.status === 401 && token && refreshToken) {
+    const newTokens = await refreshAuthToken(request, refreshToken)
+    if (newTokens) {
+      // Retry with new token
+      token = newTokens.access_token
+      refreshToken = newTokens.refresh_token || refreshToken
+      response = await fetch(url, {
+        ...options,
+        headers: {
+          ...options.headers,
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: 'include',
+      })
+      
+      // Build cookie header for updated tokens
+      const cookieParts = [`access_token=${newTokens.access_token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${newTokens.expires_in}`]
+      if (newTokens.refresh_token) {
+        cookieParts.push(`refresh_token=${newTokens.refresh_token}; Path=/; HttpOnly; SameSite=Lax`)
+      }
+      
+      return { response, tokenRefreshed: true, cookieHeader: cookieParts.join('; ') }
+    }
+  }
+
+  return { response, tokenRefreshed: false }
 }

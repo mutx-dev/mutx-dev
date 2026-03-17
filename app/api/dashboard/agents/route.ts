@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getApiBaseUrl, getAuthToken } from '@/app/api/_lib/controlPlane'
+import { getApiBaseUrl, getAuthToken, authenticatedFetch } from '@/app/api/_lib/controlPlane'
 import { validateRequest, schemas } from '@/app/api/_lib/validation'
 import { withErrorHandling, unauthorized } from '@/app/api/_lib/errors'
 
@@ -20,14 +20,22 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return unauthorized()
     }
 
-    // Backend enforces ownership from auth token - no user_id needed
-    const response = await fetch(`${API_BASE_URL}/v1/agents?limit=20`, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: 'no-store',
-    })
+    // Use authenticatedFetch to handle token refresh automatically
+    const { response, tokenRefreshed, cookieHeader } = await authenticatedFetch(
+      request,
+      `${API_BASE_URL}/v1/agents?limit=20`,
+      { cache: 'no-store' }
+    )
 
     const payload = await response.json().catch(() => ({ detail: 'Failed to fetch agents' }))
-    return NextResponse.json(payload, { status: response.status })
+    const nextResponse = NextResponse.json(payload, { status: response.status })
+    
+    // If token was refreshed, set the new cookies
+    if (tokenRefreshed && cookieHeader) {
+      nextResponse.headers.set('Set-Cookie', cookieHeader)
+    }
+    
+    return nextResponse
   })(request)
 }
 
@@ -43,17 +51,26 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return validation.response
     }
 
-    const response = await fetch(`${API_BASE_URL}/v1/agents`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(validation.data),
-      cache: 'no-store',
-    })
+    // Use authenticatedFetch to handle token refresh automatically
+    const { response, tokenRefreshed, cookieHeader } = await authenticatedFetch(
+      request,
+      `${API_BASE_URL}/v1/agents`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(validation.data),
+        cache: 'no-store',
+      }
+    )
 
     const payload = await response.json().catch(() => ({ detail: 'Failed to create agent' }))
-    return NextResponse.json(payload, { status: response.status })
+    const nextResponse = NextResponse.json(payload, { status: response.status })
+    
+    // If token was refreshed, set the new cookies
+    if (tokenRefreshed && cookieHeader) {
+      nextResponse.headers.set('Set-Cookie', cookieHeader)
+    }
+    
+    return nextResponse
   })(request)
 }
