@@ -146,7 +146,7 @@ async def test_mutx_agent_client_heartbeat_hits_contract_route():
     client._client = AsyncMock()
     client._client.post = mock_post
 
-    result = await client.heartbeat(status="running", message="all good")
+    await client.heartbeat(status="running", message="all good")
 
     assert captured["path"] == "/v1/agents/heartbeat"
     assert captured["json"]["agent_id"] == agent_id
@@ -180,7 +180,7 @@ async def test_mutx_agent_client_report_metrics_hits_contract_route():
     client._client.post = mock_post
 
     metrics = AgentMetrics(cpu_usage=25.0, memory_usage=512.0, requests_processed=10)
-    result = await client.report_metrics(metrics)
+    await client.report_metrics(metrics)
 
     assert captured["path"] == "/v1/agents/metrics"
     assert captured["json"]["agent_id"] == agent_id
@@ -234,9 +234,7 @@ async def test_mutx_agent_client_acknowledge_command_hits_contract_route():
     client._client = AsyncMock()
     client._client.post = mock_post
 
-    result = await client.acknowledge_command(
-        command_id=command_id, success=True, result={"output": "done"}
-    )
+    await client.acknowledge_command(command_id=command_id, success=True, result={"output": "done"})
 
     assert captured["path"] == "/v1/agents/commands/acknowledge"
     assert captured["json"]["command_id"] == command_id
@@ -262,7 +260,7 @@ async def test_mutx_agent_client_log_hits_contract_route():
     client._client = AsyncMock()
     client._client.post = mock_post
 
-    result = await client.log(level="info", message="Agent started", metadata={"host": "server1"})
+    await client.log(level="info", message="Agent started", metadata={"host": "server1"})
 
     assert captured["path"] == "/v1/agents/logs"
     assert captured["json"]["agent_id"] == agent_id
@@ -311,7 +309,7 @@ def test_mutx_agent_sync_client_heartbeat():
         mock_instance.post = mock_post
 
         client = MutxAgentSyncClient(mutx_url="https://api.test", agent_id=agent_id)
-        result = client.heartbeat(status="idle", message="waiting")
+        client.heartbeat(status="idle", message="waiting")
 
     assert captured["path"] == "/v1/agents/heartbeat"
     assert captured["json"]["agent_id"] == agent_id
@@ -333,7 +331,7 @@ def test_mutx_agent_sync_client_report_metrics():
         mock_instance.post = mock_post
 
         client = MutxAgentSyncClient(mutx_url="https://api.test", agent_id=agent_id)
-        result = client.report_metrics(cpu_usage=75.0, memory_usage=2048.0)
+        client.report_metrics(cpu_usage=75.0, memory_usage=2048.0)
 
     assert captured["path"] == "/v1/agents/metrics"
     assert captured["json"]["cpu_usage"] == 75.0
@@ -355,7 +353,7 @@ def test_mutx_agent_sync_client_log():
         mock_instance.post = mock_post
 
         client = MutxAgentSyncClient(mutx_url="https://api.test", agent_id=agent_id)
-        result = client.log(level="error", message="Something failed", metadata={"code": 500})
+        client.log(level="error", message="Something failed", metadata={"code": 500})
 
     assert captured["path"] == "/v1/agents/logs"
     assert captured["json"]["level"] == "error"
@@ -395,7 +393,7 @@ async def test_create_agent_client_registers_new_agent():
         response.json = lambda: _agent_info_response(agent_id=agent_id, api_key=api_key)
         return response
 
-    with patch("mutx.agent_runtime.httpx.AsyncClient") as mock_client:
+    with patch("mutx.agent_runtime.httpx.AsyncClient"):
         mock_instance = AsyncMock()
         mock_instance.post = mock_post
         mock_instance.__aenter__ = AsyncMock(return_value=mock_instance)
