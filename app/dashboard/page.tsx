@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 
 interface Agent {
   id: string;
@@ -87,11 +88,7 @@ export default function DashboardPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (error) {
