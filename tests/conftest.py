@@ -20,7 +20,7 @@ from sqlalchemy.pool import StaticPool
 
 # Set environment before any imports
 os.environ.setdefault("DATABASE_REQUIRED_ON_STARTUP", "false")
-os.environ.setdefault("JWT_SECRET", "test-secret-key")
+os.environ.setdefault("JWT_SECRET", "test-secret-key-at-least-32-chars")
 
 # Use an isolated SQLite database for tests by default.
 # Do not inherit DATABASE_URL from the shell, or tests can accidentally hit a

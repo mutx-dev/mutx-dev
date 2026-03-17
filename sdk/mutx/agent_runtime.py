@@ -10,6 +10,7 @@ This module provides the MutxAgentClient for agents to:
 
 import asyncio
 import logging
+import os
 import platform
 import threading
 import time
@@ -18,6 +19,10 @@ from datetime import datetime, timezone
 from typing import Any, Callable, Optional
 
 import httpx
+
+# Default base URL - can be overridden via MUTX_API_URL env var
+DEFAULT_BASE_URL = os.getenv("MUTX_API_URL", "https://api.mutx.dev")
+
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +66,7 @@ class MutxAgentClient:
 
     Usage:
         client = MutxAgentClient(
-            mutx_url="https://api.mutx.dev",
+            mutx_url=DEFAULT_BASE_URL,
             api_key="your-agent-api-key"  # Or use agent_id for registration
         )
 
@@ -83,7 +88,7 @@ class MutxAgentClient:
 
     def __init__(
         self,
-        mutx_url: str = "https://api.mutx.dev",
+        mutx_url: str = DEFAULT_BASE_URL,
         api_key: Optional[str] = None,
         agent_id: Optional[str] = None,
         timeout: float = 30.0,
@@ -526,7 +531,7 @@ class MutxAgentSyncClient:
 
     def __init__(
         self,
-        mutx_url: str = "https://api.mutx.dev",
+        mutx_url: str = DEFAULT_BASE_URL,
         api_key: Optional[str] = None,
         agent_id: Optional[str] = None,
         timeout: float = 30.0,
@@ -656,7 +661,7 @@ class MutxAgentSyncClient:
 
 # Convenience function for quick setup
 async def create_agent_client(
-    mutx_url: str = "https://api.mutx.dev",
+    mutx_url: str = DEFAULT_BASE_URL,
     agent_name: str = "default-agent",
     agent_description: str = "",
     api_key: Optional[str] = None,
@@ -667,7 +672,7 @@ async def create_agent_client(
 
     Usage:
         client = await create_agent_client(
-            mutx_url="https://api.mutx.dev",
+            mutx_url=DEFAULT_BASE_URL,
             agent_name="my-agent",
         )
         client.start_heartbeat()
