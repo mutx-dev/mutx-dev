@@ -9,12 +9,18 @@ The CLI is a Click application defined in `cli/` and installed from the repo roo
 
 ## Install
 
+### Via pip
+
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 pip install -e ".[dev]"
 ```
+
+### Via Homebrew
+
+Homebrew installation is coming soon. See [#1140](https://github.com/mutx-dev/mutx-dev/issues/1140) for progress.
 
 ## Configuration
 
@@ -61,6 +67,10 @@ mutx login --email you@example.com
 mutx whoami
 mutx status
 ```
+
+## TUI Usage
+
+The TUI (Textual User Interface) is under development. See [#1138](https://github.com/mutx-dev/mutx-dev/issues/1138) and [#1139](https://github.com/mutx-dev/mutx-dev/issues/1139) for progress.
 
 ## Commands
 
@@ -122,6 +132,41 @@ mutx status
 | `mutx webhooks list` | List all webhooks |
 | `mutx webhooks get <webhook_id>` | Get webhook details |
 | `mutx webhooks deliveries <webhook_id>` | Get webhook delivery history |
+
+## Release Process
+
+### Version Bump
+
+MUTX uses semantic versioning. To release a new version:
+
+1. Update `CHANGELOG.md` with the new version and date
+2. Tag the release:
+
+```bash
+git tag -a v0.2.0 -m "Release v0.2.0"
+git push origin v0.2.0
+```
+
+### Publishing to PyPI
+
+```bash
+python -m build
+python -m twine upload dist/*
+```
+
+### Publishing to Homebrew
+
+After [#1140](https://github.com/mutx-dev/mutx-dev/issues/1140) is resolved, Homebrew taps will be available.
+
+## Troubleshooting
+
+For common issues and debugging tips, see the [Troubleshooting Guide](../troubleshooting/common-issues.md).
+
+Quick fixes:
+
+- **API not reachable**: Check `mutx status` and verify `MUTX_API_URL` env var
+- **Auth failures**: Run `mutx logout` then `mutx login --email <your-email>`
+- **Agent/deploy errors**: Ensure you've created an agent first with `mutx agents create`
 
 ## Example Session
 
