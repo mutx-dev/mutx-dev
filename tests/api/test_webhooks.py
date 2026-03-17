@@ -495,7 +495,9 @@ async def test_webhook_delivery_history_empty(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_webhook_test_delivery_failure_returns_502(client: AsyncClient, test_user, monkeypatch):
+async def test_webhook_test_delivery_failure_returns_502(
+    client: AsyncClient, test_user, monkeypatch
+):
     import src.api.services.webhook_service
 
     async def mock_deliver_failure(*args, **kwargs):

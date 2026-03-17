@@ -14,7 +14,7 @@ from mutx.agents import Agents
 from mutx.api_keys import APIKeys
 from mutx.clawhub import ClawHub
 from mutx.deployments import Deployments
-from mutx.leads import Leads, Contacts
+from mutx.leads import Contacts, Leads
 from mutx.webhooks import Webhooks
 
 

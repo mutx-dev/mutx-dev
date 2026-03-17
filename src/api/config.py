@@ -1,4 +1,3 @@
-
 from functools import lru_cache
 from json import JSONDecodeError, loads
 import os
@@ -149,7 +148,7 @@ class Settings(BaseSettings):
             if is_production:
                 errors.append(
                     "JWT_SECRET environment variable must be set in production. "
-                    "Generate one with: python3 -c \"import secrets; print(secrets.token_urlsafe(32))\""
+                    'Generate one with: python3 -c "import secrets; print(secrets.token_urlsafe(32))"'
                 )
             else:
                 warnings.append(
@@ -199,13 +198,18 @@ class Settings(BaseSettings):
 
         # Raise errors if any
         if errors:
-            error_message = "Environment variable validation failed:\n" + "\n".join(f"  - {e}" for e in errors)
+            error_message = "Environment variable validation failed:\n" + "\n".join(
+                f"  - {e}" for e in errors
+            )
             raise ValueError(error_message)
 
         # Log warnings (these will be captured by the caller)
         if warnings:
-            warning_message = "Environment variable warnings:\n" + "\n".join(f"  - {w}" for w in warnings)
+            warning_message = "Environment variable warnings:\n" + "\n".join(
+                f"  - {w}" for w in warnings
+            )
             import logging
+
             logging.warning(warning_message)
 
         return self

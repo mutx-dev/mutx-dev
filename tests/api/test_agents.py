@@ -170,7 +170,9 @@ class TestCreateAgent:
         assert response.status_code == 422
 
     @pytest.mark.asyncio
-    async def test_create_agent_duplicate_name_allowed(self, client: AsyncClient, db_session: AsyncSession):
+    async def test_create_agent_duplicate_name_allowed(
+        self, client: AsyncClient, db_session: AsyncSession
+    ):
         """Test that creating agents with duplicate names is allowed."""
         # Create first agent
         response = await client.post(

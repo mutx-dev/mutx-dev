@@ -21,6 +21,7 @@ from typing import Iterator
 
 class DiagnosticSeverity(Enum):
     """Compiler diagnostic severity levels from MSBuild."""
+
     ERROR = "error"
     WARNING = "warning"
     INFO = "info"
@@ -38,6 +39,7 @@ class RoslynDiagnostic:
         line: Line number in source file
         column: Column number in source file
     """
+
     id: str
     severity: DiagnosticSeverity
     message: str
@@ -81,12 +83,11 @@ class DiagnosticParser:
     _MSBUILD_PATTERN = re.compile(
         r"^(?P<file>[^(]+)\((?P<line>\d+),(?P<col>\d+)\):\s*"
         r"(?P<sev>error|warning|info)\s+(?P<id>CS\d+):\s*(?P<msg>.+)$",
-        re.MULTILINE
+        re.MULTILINE,
     )
 
     _SIMPLE_PATTERN = re.compile(
-        r"^(?P<sev>error|warning|info)\s+(?P<id>CS\d+):\s*(?P<msg>.+)$",
-        re.MULTILINE
+        r"^(?P<sev>error|warning|info)\s+(?P<id>CS\d+):\s*(?P<msg>.+)$", re.MULTILINE
     )
 
     def parse(self, output: str) -> Iterator[RoslynDiagnostic]:
@@ -126,6 +127,7 @@ class FixSuggestion:
         description: Detailed explanation
         code_action: Optional code snippet demonstrating the fix
     """
+
     diagnostic_id: str
     title: str
     description: str
@@ -223,13 +225,26 @@ class SuggestionEngine:
 
     def _infer_namespace(self, type_name: str) -> str | None:
         """Guess the namespace for common OpenXML types."""
-        if type_name in ("Body", "Paragraph", "Run", "Text", "Table",
-                         "TableRow", "TableCell", "SectionProperties",
-                         "ParagraphProperties", "RunProperties"):
+        if type_name in (
+            "Body",
+            "Paragraph",
+            "Run",
+            "Text",
+            "Table",
+            "TableRow",
+            "TableCell",
+            "SectionProperties",
+            "ParagraphProperties",
+            "RunProperties",
+        ):
             return "DocumentFormat.OpenXml.Wordprocessing"
 
-        if type_name in ("WordprocessingDocument", "MainDocumentPart",
-                         "StyleDefinitionsPart", "NumberingDefinitionsPart"):
+        if type_name in (
+            "WordprocessingDocument",
+            "MainDocumentPart",
+            "StyleDefinitionsPart",
+            "NumberingDefinitionsPart",
+        ):
             return "DocumentFormat.OpenXml.Packaging"
 
         if type_name in ("Drawing", "Inline", "Anchor"):
