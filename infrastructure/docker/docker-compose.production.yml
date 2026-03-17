@@ -106,6 +106,12 @@ services:
         reservations:
           memory: 256M
           cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   nginx:
     image: nginx:alpine
@@ -128,6 +134,11 @@ services:
           memory: 128M
         reservations:
           memory: 64M
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   postgres_data:
