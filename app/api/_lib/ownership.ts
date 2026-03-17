@@ -112,3 +112,85 @@ export async function checkDeploymentOwnership(
   }
   return null
 }
+
+/**
+ * Verify that the authenticated user owns the agent.
+ * This provides defense-in-depth, as the backend also enforces ownership.
+ */
+export async function verifyAgentOwnership(
+  request: NextRequest,
+  agentId: string
+): Promise<boolean> {
+  const token = await getAuthToken(request)
+  if (!token) {
+    // Let the backend handle authentication errors
+    return true
+  }
+
+  try {
+    // Fetch the agent to get its user_id
+    const agentResponse = await fetch(`${API_BASE_URL}/v1/agents/${agentId}`, {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    })
+
+    if (agentResponse.status === 404) {
+      // Let the backend return 404
+      return true
+    }
+
+    if (!agentResponse.ok) {
+      // If we can't verify ownership, let the backend handle it
+      return true
+    }
+
+    const agent = await agentResponse.json().catch(() => null)
+    if (!agent || !agent.user_id) {
+      // Can't determine ownership, let backend handle it
+      return true
+    }
+
+    // Get the current user's ID to compare
+    const userResponse = await fetch(`${API_BASE_URL}/v1/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    })
+
+    if (!userResponse.ok) {
+      // Can't get user info, let backend handle it
+      return true
+    }
+
+    const user = await userResponse.json().catch(() => null)
+    if (!user || !user.id) {
+      // Can't determine user, let backend handle it
+      return true
+    }
+
+    // Check if the agent belongs to the authenticated user
+    if (agent.user_id !== user.id) {
+      return false
+    }
+
+    return true
+  } catch {
+    // On any error, fall through to backend
+    return true
+  }
+}
+
+/**
+ * Helper to check ownership and return error response if not owned
+ */
+export async function checkAgentOwnership(
+  request: NextRequest,
+  agentId: string
+): Promise<NextResponse | null> {
+  const isOwned = await verifyAgentOwnership(request, agentId)
+  if (!isOwned) {
+    return forbidden('You do not own this agent')
+  }
+  return null
+}

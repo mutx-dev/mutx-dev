@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { getApiBaseUrl, getAuthToken } from '@/app/api/_lib/controlPlane'
 import { withErrorHandling, unauthorized, badRequest } from '@/app/api/_lib/errors'
+import { checkAgentOwnership } from '@/app/api/_lib/ownership'
 import { z } from 'zod'
 
 const API_BASE_URL = getApiBaseUrl()
@@ -21,6 +22,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const idValidation = z.string().uuid('Invalid agent ID').safeParse(agentId)
     if (!idValidation.success) {
       return badRequest('Invalid agent ID format')
+    }
+
+    // Check ownership before proceeding
+    const ownershipError = await checkAgentOwnership(request, agentId)
+    if (ownershipError) {
+      return ownershipError
     }
 
     const response = await fetch(`${API_BASE_URL}/v1/agents/${agentId}`, {
@@ -47,6 +54,12 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const idValidation = z.string().uuid('Invalid agent ID').safeParse(agentId)
     if (!idValidation.success) {
       return badRequest('Invalid agent ID format')
+    }
+
+    // Check ownership before proceeding
+    const ownershipError = await checkAgentOwnership(request, agentId)
+    if (ownershipError) {
+      return ownershipError
     }
 
     const response = await fetch(`${API_BASE_URL}/v1/agents/${agentId}`, {
@@ -77,6 +90,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const idValidation = z.string().uuid('Invalid agent ID').safeParse(agentId)
     if (!idValidation.success) {
       return badRequest('Invalid agent ID format')
+    }
+
+    // Check ownership before proceeding
+    const ownershipError = await checkAgentOwnership(request, agentId)
+    if (ownershipError) {
+      return ownershipError
     }
 
     // Determine action from URL search params
