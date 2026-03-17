@@ -54,7 +54,7 @@ class UserService:
         email: str,
         name: str,
         password: Optional[str] = None,
-        plan: Plan = Plan.FREE,
+        plan: str = "FREE",
     ) -> User:
         password_hash = None
         if password:
@@ -219,10 +219,10 @@ class UserService:
             return False
 
         plan_limits = {
-            Plan.FREE: {"agents": 3, "deployments": 5, "api_keys": 2},
-            Plan.STARTER: {"agents": 10, "deployments": 20, "api_keys": 10},
-            Plan.PRO: {"agents": 50, "deployments": 100, "api_keys": 50},
-            Plan.ENTERPRISE: {"agents": -1, "deployments": -1, "api_keys": -1},
+            "FREE": {"agents": 3, "deployments": 5, "api_keys": 2},
+            "STARTER": {"agents": 10, "deployments": 20, "api_keys": 10},
+            "PRO": {"agents": 50, "deployments": 100, "api_keys": 50},
+            "ENTERPRISE": {"agents": -1, "deployments": -1, "api_keys": -1},
         }
 
         limit = plan_limits.get(user.plan, {}).get(resource, 0)
