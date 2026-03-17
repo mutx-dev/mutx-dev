@@ -94,7 +94,7 @@ async def get_budget(
 
     return BudgetResponse(
         user_id=current_user.id,
-        plan=current_user.plan.value,
+        plan=current_user.plan,
         credits_total=credits_total,
         credits_used=credits_used,
         credits_remaining=credits_remaining,

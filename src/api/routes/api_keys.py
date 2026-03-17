@@ -98,7 +98,7 @@ async def create_api_key(
     if max_keys != -1 and active_key_count >= max_keys:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Active API key limit reached for your plan ({current_user.plan.value}): {max_keys} keys",
+            detail=f"Active API key limit reached for your plan ({current_user.plan}): {max_keys} keys",
         )
 
     plain_key = generate_api_key()
