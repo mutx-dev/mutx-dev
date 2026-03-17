@@ -13,10 +13,13 @@
     "frontend": {
       "build": {
         "builder": "DOCKERFILE",
-        "dockerfilePath": "infrastructure/docker/Dockerfile.frontend"
+        "dockerfilePath": "infrastructure/docker/Dockerfile.frontend",
+        "target": "runner"
       },
       "deploy": {
-        "startCommand": "node server.js"
+        "numReplicas": 1,
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
       }
     }
   }
