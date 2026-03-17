@@ -13,7 +13,8 @@ import {
   Zap, 
   Webhook, 
   Key, 
-  Activity 
+  Activity,
+  User 
 } from "lucide-react";
 
 const navItems = [
@@ -28,6 +29,7 @@ const navItems = [
   { href: "/dashboard/webhooks", label: "Webhook Gateway", icon: Webhook },
   { href: "/dashboard/api-keys", label: "Key Management", icon: Key },
   { href: "/dashboard/monitoring", label: "System Health", icon: Activity },
+  { href: "/dashboard/profile", label: "Profile & Settings", icon: User },
 ];
 
 export function Sidebar() {
