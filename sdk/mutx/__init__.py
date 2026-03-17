@@ -1,3 +1,4 @@
+import os
 import warnings
 
 import httpx
@@ -14,15 +15,18 @@ from mutx.agents import Agents
 from mutx.api_keys import APIKeys
 from mutx.clawhub import ClawHub
 from mutx.deployments import Deployments
-from mutx.leads import Leads, Contacts
+from mutx.leads import Contacts, Leads
 from mutx.webhooks import Webhooks
+
+# Default base URL - can be overridden via MUTX_API_URL env var
+DEFAULT_BASE_URL = os.getenv("MUTX_API_URL", "https://api.mutx.dev")
 
 
 class MutxClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.mutx.dev",
+        base_url: str = DEFAULT_BASE_URL,
         timeout: float = 30.0,
     ):
         self.api_key = api_key
@@ -116,7 +120,7 @@ class MutxAsyncClient:
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.mutx.dev",
+        base_url: str = DEFAULT_BASE_URL,
         timeout: float = 30.0,
     ):
         warnings.warn(
