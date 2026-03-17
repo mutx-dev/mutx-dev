@@ -1,7 +1,12 @@
 import click
 from typing import Optional
 
-from cli.config import CLIConfig, get_client
+# Import service classes and config for CLI use
+from mutx.services import DeploymentsService
+
+# Re-export CLIConfig for backwards compatibility with tests
+from mutx.services.base import CLIConfig as _CLIConfig
+CLIConfig = _CLIConfig
 
 
 @click.group(name="deploy")
@@ -22,24 +27,20 @@ def list_deployments(limit: int, skip: int, agent_id: Optional[str], status: Opt
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return
 
-    params = {"limit": limit, "skip": skip}
-    if agent_id:
-        params["agent_id"] = agent_id
-    if status:
-        params["status"] = status
-
     client = get_client(config)
-    response = client.get("/v1/deployments", params=params)
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+    service = DeploymentsService(config, client=client)
+    
+    try:
+        deployments = service.list(
+            limit=limit,
+            skip=skip,
+            agent_id=agent_id,
+            status=status,
+        )
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
         return
 
-    if response.status_code != 200:
-        click.echo(f"Error: {response.text}", err=True)
-        return
-
-    deployments = response.json()
     if not deployments:
         click.echo("No deployments found.")
         return
@@ -66,21 +67,15 @@ def create_deployment(agent_id: str, replicas: int):
         return
 
     client = get_client(config)
-    response = client.post("/v1/deployments", json={"agent_id": agent_id, "replicas": replicas})
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
-        return
-
-    if response.status_code in (200, 201):
-        result = response.json()
+    service = DeploymentsService(config, client=client)
+    
+    try:
+        result = service.create(agent_id=agent_id, replicas=replicas)
         deployment_id = result.get("deployment_id") or result.get("id")
         click.echo(f"Created deployment: {deployment_id}")
         click.echo(f"Status: {result.get('status')}")
-    elif response.status_code == 404:
-        click.echo("Error: Agent not found", err=True)
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
 
 
 @deploy_group.command(name="scale")
@@ -94,24 +89,13 @@ def scale_deployment(deployment_id: str, replicas: int):
         return
 
     client = get_client(config)
-    response = client.post(
-        f"/v1/deployments/{deployment_id}/scale",
-        json={"replicas": replicas},
-    )
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
-        return
-
-    if response.status_code == 200:
-        deployment = response.json()
+    service = DeploymentsService(config, client=client)
+    
+    try:
+        deployment = service.scale(deployment_id, replicas)
         click.echo(f"Scaled deployment {deployment_id} to {deployment.get('replicas')} replicas")
-    elif response.status_code == 400:
-        click.echo(f"Error: {response.json().get('detail', 'Cannot scale deployment')}", err=True)
-    elif response.status_code == 404:
-        click.echo("Error: Deployment not found", err=True)
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
 
 
 @deploy_group.command(name="events")
@@ -133,44 +117,40 @@ def deployment_events(
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return
 
-    params = {"limit": limit, "skip": skip}
-    if event_type:
-        params["event_type"] = event_type
-    if status:
-        params["status"] = status
-
     client = get_client(config)
-    response = client.get(f"/v1/deployments/{deployment_id}/events", params=params)
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+    service = DeploymentsService(config, client=client)
+    
+    try:
+        payload = service.get_events(
+            deployment_id,
+            limit=limit,
+            skip=skip,
+            event_type=event_type,
+            status=status,
+        )
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
         return
 
-    if response.status_code == 200:
-        payload = response.json()
-        items = payload.get("items", [])
-        if not items:
-            click.echo("No deployment events found.")
-            return
+    items = payload.get("items", [])
+    if not items:
+        click.echo("No deployment events found.")
+        return
 
+    click.echo(
+        f"Deployment: {payload.get('deployment_id')} | status: {payload.get('deployment_status')}"
+    )
+    for item in items:
         click.echo(
-            f"Deployment: {payload.get('deployment_id')} | status: {payload.get('deployment_status')}"
-        )
-        for item in items:
-            click.echo(
-                " | ".join(
-                    [
-                        item.get("created_at", ""),
-                        item.get("event_type", "unknown"),
-                        item.get("status", "unknown"),
-                        f"node: {item.get('node_id') or 'n/a'}",
-                    ]
-                )
+            " | ".join(
+                [
+                    item.get("created_at", ""),
+                    item.get("event_type", "unknown"),
+                    item.get("status", "unknown"),
+                    f"node: {item.get('node_id') or 'n/a'}",
+                ]
             )
-    elif response.status_code == 404:
-        click.echo("Error: Deployment not found", err=True)
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+        )
 
 
 @deploy_group.command(name="restart")
@@ -183,22 +163,14 @@ def restart_deployment(deployment_id: str):
         return
 
     client = get_client(config)
-    response = client.post(f"/v1/deployments/{deployment_id}/restart")
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
-        return
-
-    if response.status_code == 200:
-        deployment = response.json()
+    service = DeploymentsService(config, client=client)
+    
+    try:
+        deployment = service.restart(deployment_id)
         click.echo(f"Restarted deployment: {deployment.get('id', deployment_id)}")
         click.echo(f"Status: {deployment.get('status')}")
-    elif response.status_code == 400:
-        click.echo(f"Error: {response.json().get('detail', 'Cannot restart deployment')}", err=True)
-    elif response.status_code == 404:
-        click.echo("Error: Deployment not found", err=True)
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
 
 
 @deploy_group.command(name="logs")
@@ -213,37 +185,29 @@ def deployment_logs(deployment_id: str, limit: int, skip: int, level: Optional[s
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return
 
-    params = {"limit": limit, "skip": skip}
-    if level:
-        params["level"] = level
-
     client = get_client(config)
-    response = client.get(f"/v1/deployments/{deployment_id}/logs", params=params)
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+    service = DeploymentsService(config, client=client)
+    
+    try:
+        logs = service.get_logs(deployment_id, limit=limit, skip=skip, level=level)
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
         return
 
-    if response.status_code == 200:
-        logs = response.json()
-        if not logs:
-            click.echo("No deployment logs found.")
-            return
+    if not logs:
+        click.echo("No deployment logs found.")
+        return
 
-        for log in logs:
-            click.echo(
-                " | ".join(
-                    [
-                        str(log.get("timestamp", "")),
-                        str(log.get("level", "unknown")),
-                        str(log.get("message", "")),
-                    ]
-                )
+    for log in logs:
+        click.echo(
+            " | ".join(
+                [
+                    str(log.get("timestamp", "")),
+                    str(log.get("level", "unknown")),
+                    str(log.get("message", "")),
+                ]
             )
-    elif response.status_code == 404:
-        click.echo("Error: Deployment not found", err=True)
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+        )
 
 
 @deploy_group.command(name="metrics")
@@ -258,35 +222,28 @@ def deployment_metrics(deployment_id: str, limit: int, skip: int):
         return
 
     client = get_client(config)
-    response = client.get(
-        f"/v1/deployments/{deployment_id}/metrics",
-        params={"limit": limit, "skip": skip},
-    )
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+    service = DeploymentsService(config, client=client)
+    
+    try:
+        metrics = service.get_metrics(deployment_id, limit=limit, skip=skip)
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
         return
 
-    if response.status_code == 200:
-        metrics = response.json()
-        if not metrics:
-            click.echo("No deployment metrics found.")
-            return
+    if not metrics:
+        click.echo("No deployment metrics found.")
+        return
 
-        for metric in metrics:
-            click.echo(
-                " | ".join(
-                    [
-                        str(metric.get("timestamp", "")),
-                        f"cpu: {metric.get('cpu_usage', 'n/a')}",
-                        f"memory: {metric.get('memory_usage', 'n/a')}",
-                    ]
-                )
+    for metric in metrics:
+        click.echo(
+            " | ".join(
+                [
+                    str(metric.get("timestamp", "")),
+                    f"cpu: {metric.get('cpu_usage', 'n/a')}",
+                    f"memory: {metric.get('memory_usage', 'n/a')}",
+                ]
             )
-    elif response.status_code == 404:
-        click.echo("Error: Deployment not found", err=True)
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+        )
 
 
 @deploy_group.command(name="delete")
@@ -304,15 +261,14 @@ def delete_deployment(deployment_id: str, force: bool):
             return
 
     client = get_client(config_obj)
-    response = client.delete(f"/v1/deployments/{deployment_id}")
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
-        return
-
-    if response.status_code == 204:
+    service = DeploymentsService(config_obj, client=client)
+    
+    try:
+        service.delete(deployment_id)
         click.echo(f"Deleted deployment: {deployment_id}")
-    elif response.status_code == 404:
-        click.echo("Error: Deployment not found", err=True)
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+
+
+# Backwards compatibility - re-export for tests
+from mutx.services import get_client
