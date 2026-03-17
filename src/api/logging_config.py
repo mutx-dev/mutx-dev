@@ -5,11 +5,9 @@ Provides JSON logging with configurable fields and formats for better
 log aggregation and analysis in production environments.
 """
 
-import json
 import logging
 import sys
 from datetime import datetime, timezone
-from typing import Any
 from uuid import uuid4
 
 from pythonjsonlogger import jsonlogger
