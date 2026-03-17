@@ -24,12 +24,12 @@ def show_config():
 def get_config(key: str):
     """Get a specific config value"""
     config = CLIConfig()
-    
+
     valid_keys = ["api_url", "api_key", "refresh_token", "config_path"]
     if key not in valid_keys:
         click.echo(f"Error: Invalid key '{key}'. Valid keys: {', '.join(valid_keys)}", err=True)
         return
-    
+
     if key == "config_path":
         click.echo(str(config.config_path))
     elif key == "api_key":
@@ -48,20 +48,20 @@ def get_config(key: str):
 def set_config(key: str, value: str, unset: bool):
     """Set a config value"""
     config = CLIConfig()
-    
+
     valid_keys = ["api_url"]
     if key not in valid_keys:
         click.echo(f"Error: Invalid key '{key}'. Editable keys: {', '.join(valid_keys)}", err=True)
         return
-    
+
     if unset:
         click.echo(f"Error: Cannot unset '{key}' via this command.", err=True)
         return
-    
+
     if key == "api_url":
         config.api_url = value
         click.echo(f"API URL set to: {value}")
-    
+
     config.save()
 
 
@@ -71,21 +71,21 @@ def set_config(key: str, value: str, unset: bool):
 def unset_config(key: str, force: bool):
     """Unset a config value"""
     config = CLIConfig()
-    
+
     valid_keys = ["api_key", "refresh_token"]
     if key not in valid_keys:
         click.echo(f"Error: Invalid key '{key}'. Can only unset: {', '.join(valid_keys)}", err=True)
         return
-    
+
     if not force:
         if not click.confirm(f"Are you sure you want to unset {key}?"):
             return
-    
+
     if key == "api_key":
         config.api_key = None
     elif key == "refresh_token":
         config.refresh_token = None
-    
+
     config.save()
     click.echo(f"Unset {key}")
 
@@ -97,12 +97,12 @@ def reset_config(force: bool):
     if not force:
         if not click.confirm("This will clear all local settings. Continue?"):
             return
-    
+
     config = CLIConfig()
     config.api_url = "http://localhost:8000"
     config.api_key = None
     config.refresh_token = None
     config.save()
-    
+
     click.echo("Configuration reset to defaults.")
     click.echo("API URL: http://localhost:8000")

@@ -35,29 +35,33 @@ def create_refresh_token(
 ) -> tuple[str, datetime]:
     """
     Create a refresh token with optional sliding expiry.
-    
+
     If original_iat is provided, the token expiry will be calculated from that
     time instead of now, enabling sliding expiry up to REFRESH_TOKEN_MAX_SLIDING_DAYS.
-    
+
     Args:
         user_id: The user's UUID
         original_iat: Original issue time for calculating sliding expiry
-        
+
     Returns:
         Tuple of (encoded JWT, expiry datetime)
     """
     now = datetime.now(timezone.utc)
-    
+
     if original_iat is not None:
         # Sliding expiry: calculate expiry from original issue time
-        original_iat = original_iat.replace(tzinfo=timezone.utc) if original_iat.tzinfo is None else original_iat
+        original_iat = (
+            original_iat.replace(tzinfo=timezone.utc)
+            if original_iat.tzinfo is None
+            else original_iat
+        )
         max_expire = original_iat + timedelta(days=REFRESH_TOKEN_MAX_SLIDING_DAYS)
         expire = min(now + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS), max_expire)
         iat = original_iat  # Keep original issue time for future sliding
     else:
         expire = now + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
         iat = now
-    
+
     to_encode = {
         "sub": str(user_id),
         "type": "refresh",
@@ -106,18 +110,18 @@ def get_refresh_token_iat(token: str) -> Optional[datetime]:
     payload = verify_token(token)
     if not payload or payload.get("type") != "refresh":
         return None
-    
+
     iat = payload.get("iat")
     if not iat:
         return None
-    
+
     # Handle both string and numeric timestamps
     if isinstance(iat, str):
         # Parse ISO format string
         return datetime.fromisoformat(iat.replace("Z", "+00:00"))
     elif isinstance(iat, (int, float)):
         return datetime.fromtimestamp(iat, tz=timezone.utc)
-    
+
     return None
 
 
@@ -126,7 +130,7 @@ async def refresh_access_token(
 ) -> Optional[tuple[str, datetime, str]]:
     """
     Refresh access token with sliding expiry.
-    
+
     When a refresh token is used, the new refresh token will have its expiry
     calculated from the ORIGINAL issue time of the old token (sliding window),
     capped at REFRESH_TOKEN_MAX_SLIDING_DAYS.
@@ -142,7 +146,7 @@ async def refresh_access_token(
 
     # Get original issue time for sliding expiry
     original_iat = get_refresh_token_iat(refresh_token)
-    
+
     access_token, access_token_expires_at = create_access_token(user_id)
     # Pass original_iat to implement sliding expiry
     new_refresh_token, _ = create_refresh_token(user_id, original_iat=original_iat)
