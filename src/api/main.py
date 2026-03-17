@@ -52,9 +52,7 @@ start_time = time.time()
 
 # Setup logging - use JSON format if configured
 setup_json_logging(
-    log_level=settings.log_level,
-    json_format=settings.json_logging,
-    log_file=settings.log_file
+    log_level=settings.log_level, json_format=settings.json_logging, log_file=settings.log_file
 )
 logger = logging.getLogger(__name__)
 
@@ -95,14 +93,14 @@ async def _start_monitor_when_database_ready(app: FastAPI) -> None:
 
 def _validate_environment() -> None:
     """Validate environment variables on startup.
-    
+
     This function is called during app startup to ensure required
     environment variables are properly configured.
     """
     # Re-access settings to trigger validation
     # The Settings class already validates on instantiation
     logger.info("Environment variable validation completed")
-    
+
     # Log the validation results
     if settings.is_production:
         logger.info("Running in PRODUCTION mode")
@@ -113,7 +111,7 @@ def _validate_environment() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting up API...")
-    
+
     # Validate environment variables on startup
     try:
         _validate_environment()
@@ -123,7 +121,7 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.exception("Unexpected error during environment validation: %s", e)
         raise RuntimeError(f"Environment validation failed: {e}") from e
-    
+
     app.state.start_time = time.time()
     app.state.database_ready = False
     app.state.database_error = None

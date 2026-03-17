@@ -101,9 +101,7 @@ def test_clawhub_install_hits_canonical_route(monkeypatch) -> None:
     )
 
     runner = CliRunner()
-    result = runner.invoke(
-        cli, ["clawhub", "install", "-a", agent_id, "-s", skill_id]
-    )
+    result = runner.invoke(cli, ["clawhub", "install", "-a", agent_id, "-s", skill_id])
 
     assert result.exit_code == 0
     assert captured["path"] == "/v1/clawhub/install"
@@ -111,7 +109,9 @@ def test_clawhub_install_hits_canonical_route(monkeypatch) -> None:
         "agent_id": agent_id,
         "skill_id": skill_id,
     }
-    assert f"Successfully initiated installation of '{skill_id}' for agent {agent_id}" in result.output
+    assert (
+        f"Successfully initiated installation of '{skill_id}' for agent {agent_id}" in result.output
+    )
 
 
 def test_clawhub_install_agent_not_found(monkeypatch) -> None:
@@ -127,9 +127,7 @@ def test_clawhub_install_agent_not_found(monkeypatch) -> None:
     )
 
     runner = CliRunner()
-    result = runner.invoke(
-        cli, ["clawhub", "install", "-a", agent_id, "-s", skill_id]
-    )
+    result = runner.invoke(cli, ["clawhub", "install", "-a", agent_id, "-s", skill_id])
 
     assert result.exit_code == 0
     assert f"Error: Agent {agent_id} not found" in result.output
@@ -151,9 +149,7 @@ def test_clawhub_uninstall_hits_canonical_route(monkeypatch) -> None:
     )
 
     runner = CliRunner()
-    result = runner.invoke(
-        cli, ["clawhub", "uninstall", "-a", agent_id, "-s", skill_id]
-    )
+    result = runner.invoke(cli, ["clawhub", "uninstall", "-a", agent_id, "-s", skill_id])
 
     assert result.exit_code == 0
     assert captured["path"] == "/v1/clawhub/uninstall"
@@ -177,9 +173,7 @@ def test_clawhub_uninstall_agent_not_found(monkeypatch) -> None:
     )
 
     runner = CliRunner()
-    result = runner.invoke(
-        cli, ["clawhub", "uninstall", "-a", agent_id, "-s", skill_id]
-    )
+    result = runner.invoke(cli, ["clawhub", "uninstall", "-a", agent_id, "-s", skill_id])
 
     assert result.exit_code == 0
     assert f"Error: Agent {agent_id} not found" in result.output

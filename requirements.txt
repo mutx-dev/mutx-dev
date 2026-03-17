@@ -46,3 +46,4 @@ langchain-core>=0.1.52,<0.2.0
 bcrypt>=4.0.0
 # Updated Mon Mar 16 10:24:07 CET 2026
 python-json-logger==2.0.7
+python-json-logger
