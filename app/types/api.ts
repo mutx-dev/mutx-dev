@@ -1840,7 +1840,6 @@ export interface operations {
             query?: {
                 skip?: number;
                 limit?: number;
-                user_id?: string | null;
             };
             header?: {
                 authorization?: string | null;
