@@ -403,9 +403,7 @@ async def test_create_agent_client_registers_new_agent():
         mock_instance.headers = {}
 
         with patch("mutx.agent_runtime.MutxAgentClient._get_client", return_value=mock_instance):
-            client = await create_agent_client(
-                mutx_url="https://api.test", agent_name="new-agent"
-            )
+            client = await create_agent_client(mutx_url="https://api.test", agent_name="new-agent")
 
     assert client.agent_id == agent_id
     assert client.api_key == api_key

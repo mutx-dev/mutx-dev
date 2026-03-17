@@ -637,7 +637,6 @@ class TestRollbackDeployment:
         assert response.status_code == 403
 
 
-
 class TestDeploymentVersions:
     """Tests for GET /deployments/{deployment_id}/versions endpoint."""
 

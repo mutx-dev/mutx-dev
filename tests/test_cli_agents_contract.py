@@ -344,6 +344,7 @@ def test_agents_delete_requires_confirmation_without_force(monkeypatch) -> None:
     assert result.exit_code == 0
     assert "Are you sure you want to delete agent" in result.output
 
+
 def test_agents_list_with_table_format(monkeypatch) -> None:
     """Test that table format outputs properly formatted table"""
     captured: dict[str, Any] = {}
@@ -415,4 +416,3 @@ def test_agents_list_with_simple_format(monkeypatch) -> None:
     assert result.exit_code == 0
     assert " | " in result.output
     assert agent_id in result.output
-
