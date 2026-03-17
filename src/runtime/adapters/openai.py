@@ -205,42 +205,42 @@ class OpenAIAdapter(AgentRuntime):
 
     def _extract_usage(self, response: Any) -> RuntimeUsage | None:
         """Extract usage statistics from the API response."""
-        usage = getattr(response, 'usage', None)
+        usage = getattr(response, "usage", None)
         if not usage:
             return None
-        
-        prompt_tokens = getattr(usage, 'prompt_tokens', 0) or 0
-        completion_tokens = getattr(usage, 'completion_tokens', 0) or 0
-        total_tokens = getattr(usage, 'total_tokens', 0) or 0
-        
+
+        prompt_tokens = getattr(usage, "prompt_tokens", 0) or 0
+        completion_tokens = getattr(usage, "completion_tokens", 0) or 0
+        total_tokens = getattr(usage, "total_tokens", 0) or 0
+
         # Calculate approximate cost (can be customized per model)
         cost = self._calculate_cost(prompt_tokens, completion_tokens, self.config.model)
-        
+
         return {
-            'prompt_tokens': prompt_tokens,
-            'completion_tokens': completion_tokens,
-            'total_tokens': total_tokens,
-            'model': self.config.model,
-            'cost_usd': cost,
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+            "model": self.config.model,
+            "cost_usd": cost,
         }
-    
+
     def _calculate_cost(self, prompt_tokens: int, completion_tokens: int, model: str) -> float:
         """Calculate approximate cost in USD based on model pricing."""
         # Pricing per 1M tokens (approximate, as of 2024)
         pricing = {
-            'gpt-4o': {'prompt': 2.50, 'completion': 10.00},
-            'gpt-4-turbo': {'prompt': 10.00, 'completion': 30.00},
-            'gpt-4': {'prompt': 30.00, 'completion': 60.00},
-            'gpt-3.5-turbo': {'prompt': 0.50, 'completion': 1.50},
-            'o1': {'prompt': 15.00, 'completion': 60.00},
-            'o1-preview': {'prompt': 15.00, 'completion': 60.00},
-            'o1-mini': {'prompt': 3.00, 'completion': 12.00},
+            "gpt-4o": {"prompt": 2.50, "completion": 10.00},
+            "gpt-4-turbo": {"prompt": 10.00, "completion": 30.00},
+            "gpt-4": {"prompt": 30.00, "completion": 60.00},
+            "gpt-3.5-turbo": {"prompt": 0.50, "completion": 1.50},
+            "o1": {"prompt": 15.00, "completion": 60.00},
+            "o1-preview": {"prompt": 15.00, "completion": 60.00},
+            "o1-mini": {"prompt": 3.00, "completion": 12.00},
         }
-        
-        model_pricing = pricing.get(model.lower(), {'prompt': 5.0, 'completion': 15.0})
-        prompt_cost = (prompt_tokens / 1_000_000) * model_pricing['prompt']
-        completion_cost = (completion_tokens / 1_000_000) * model_pricing['completion']
-        
+
+        model_pricing = pricing.get(model.lower(), {"prompt": 5.0, "completion": 15.0})
+        prompt_cost = (prompt_tokens / 1_000_000) * model_pricing["prompt"]
+        completion_cost = (completion_tokens / 1_000_000) * model_pricing["completion"]
+
         return round(prompt_cost + completion_cost, 6)
 
     async def _create_completion(

@@ -524,9 +524,6 @@ async def get_agent_metrics(
 
 # --- Resource Usage Routes ---
 
-from src.api.models import AgentResourceUsage
-from src.api.models.schemas import AgentResourceUsageCreate, AgentResourceUsageResponse
-
 
 @router.post(
     "/{agent_id}/resource-usage",

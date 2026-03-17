@@ -23,7 +23,7 @@ def tag_name(clark_notation: str) -> str:
     close_brace = clark_notation.rfind("}")
     if close_brace == -1:
         return clark_notation
-    return clark_notation[close_brace + 1:]
+    return clark_notation[close_brace + 1 :]
 
 
 def make_rank_index(sequence: Sequence[str]) -> dict[str, int]:

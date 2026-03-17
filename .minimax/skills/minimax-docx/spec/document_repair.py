@@ -19,11 +19,9 @@ from .tree_fixer import sort_by_spec, tag_name
 
 
 class SchemaProvider(Protocol):
-    def get_child_order(self, container_name: str) -> Sequence[str] | None:
-        ...
+    def get_child_order(self, container_name: str) -> Sequence[str] | None: ...
 
-    def get_all_containers(self) -> Sequence[str]:
-        ...
+    def get_all_containers(self) -> Sequence[str]: ...
 
 
 @dataclass(frozen=True)
@@ -59,7 +57,9 @@ class DocumentFixer:
             if local == "pPr":
                 moved = self.wrap_border_group(node)
                 if moved:
-                    self._record("wrap-border-group", local, "moved loose border leaves into pBdr", moved)
+                    self._record(
+                        "wrap-border-group", local, "moved loose border leaves into pBdr", moved
+                    )
                     changes += moved
 
             order = self._schema.get_child_order(local)
@@ -191,7 +191,9 @@ class DocumentFixer:
 
         parent.insert(insert_index, node)
 
-    def _iter_non_nested_tables(self, root: Element, parent_map: dict[Element, Element]) -> Iterable[Element]:
+    def _iter_non_nested_tables(
+        self, root: Element, parent_map: dict[Element, Element]
+    ) -> Iterable[Element]:
         for table in root.iter(clark("tbl")):
             parent = parent_map.get(table)
             nested = False
