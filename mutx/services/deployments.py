@@ -11,11 +11,11 @@ from mutx.services.base import BaseService, CLIConfig
 
 class DeploymentsService(BaseService):
     """Service for managing MUTX deployments.
-    
+
     Provides a clean API for deployment operations that can be used
     by both the click CLI and future TUI.
     """
-    
+
     def __init__(
         self,
         config: Optional[CLIConfig] = None,
@@ -23,7 +23,7 @@ class DeploymentsService(BaseService):
     ):
         super().__init__(config, client)
         self.base_path = "/v1/deployments"
-    
+
     def list(
         self,
         limit: int = 50,
@@ -40,13 +40,13 @@ class DeploymentsService(BaseService):
             params["status"] = status
         response = self._get_client().get(self.base_path, params=params)
         return self._check_response(response)
-    
+
     def get(self, deployment_id: str) -> Dict[str, Any]:
         """Get a single deployment by ID."""
         self._check_auth()
         response = self._get_client().get(f"{self.base_path}/{deployment_id}")
         return self._check_response(response)
-    
+
     def create(
         self,
         agent_id: str,
@@ -59,14 +59,14 @@ class DeploymentsService(BaseService):
             json={"agent_id": agent_id, "replicas": replicas},
         )
         return self._check_response(response)
-    
+
     def delete(self, deployment_id: str) -> bool:
         """Delete a deployment. Returns True on success."""
         self._check_auth()
         response = self._get_client().delete(f"{self.base_path}/{deployment_id}")
         self._check_response(response)
         return response.status_code == 204
-    
+
     def scale(self, deployment_id: str, replicas: int) -> Dict[str, Any]:
         """Scale a deployment to the specified number of replicas."""
         self._check_auth()
@@ -75,13 +75,13 @@ class DeploymentsService(BaseService):
             json={"replicas": replicas},
         )
         return self._check_response(response)
-    
+
     def restart(self, deployment_id: str) -> Dict[str, Any]:
         """Restart a deployment."""
         self._check_auth()
         response = self._get_client().post(f"{self.base_path}/{deployment_id}/restart")
         return self._check_response(response)
-    
+
     def get_logs(
         self,
         deployment_id: str,
@@ -99,7 +99,7 @@ class DeploymentsService(BaseService):
             params=params,
         )
         return self._check_response(response)
-    
+
     def get_events(
         self,
         deployment_id: str,
@@ -120,7 +120,7 @@ class DeploymentsService(BaseService):
             params=params,
         )
         return self._check_response(response)
-    
+
     def get_metrics(
         self,
         deployment_id: str,

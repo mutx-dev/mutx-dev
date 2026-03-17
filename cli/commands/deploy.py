@@ -6,6 +6,7 @@ from mutx.services import DeploymentsService
 
 # Re-export CLIConfig for backwards compatibility with tests
 from mutx.services.base import CLIConfig as _CLIConfig
+
 CLIConfig = _CLIConfig
 
 
@@ -29,7 +30,7 @@ def list_deployments(limit: int, skip: int, agent_id: Optional[str], status: Opt
 
     client = get_client(config)
     service = DeploymentsService(config, client=client)
-    
+
     try:
         deployments = service.list(
             limit=limit,
@@ -68,7 +69,7 @@ def create_deployment(agent_id: str, replicas: int):
 
     client = get_client(config)
     service = DeploymentsService(config, client=client)
-    
+
     try:
         result = service.create(agent_id=agent_id, replicas=replicas)
         deployment_id = result.get("deployment_id") or result.get("id")
@@ -90,7 +91,7 @@ def scale_deployment(deployment_id: str, replicas: int):
 
     client = get_client(config)
     service = DeploymentsService(config, client=client)
-    
+
     try:
         deployment = service.scale(deployment_id, replicas)
         click.echo(f"Scaled deployment {deployment_id} to {deployment.get('replicas')} replicas")
@@ -119,7 +120,7 @@ def deployment_events(
 
     client = get_client(config)
     service = DeploymentsService(config, client=client)
-    
+
     try:
         payload = service.get_events(
             deployment_id,
@@ -164,7 +165,7 @@ def restart_deployment(deployment_id: str):
 
     client = get_client(config)
     service = DeploymentsService(config, client=client)
-    
+
     try:
         deployment = service.restart(deployment_id)
         click.echo(f"Restarted deployment: {deployment.get('id', deployment_id)}")
@@ -187,7 +188,7 @@ def deployment_logs(deployment_id: str, limit: int, skip: int, level: Optional[s
 
     client = get_client(config)
     service = DeploymentsService(config, client=client)
-    
+
     try:
         logs = service.get_logs(deployment_id, limit=limit, skip=skip, level=level)
     except ValueError as e:
@@ -223,7 +224,7 @@ def deployment_metrics(deployment_id: str, limit: int, skip: int):
 
     client = get_client(config)
     service = DeploymentsService(config, client=client)
-    
+
     try:
         metrics = service.get_metrics(deployment_id, limit=limit, skip=skip)
     except ValueError as e:
@@ -262,7 +263,7 @@ def delete_deployment(deployment_id: str, force: bool):
 
     client = get_client(config_obj)
     service = DeploymentsService(config_obj, client=client)
-    
+
     try:
         service.delete(deployment_id)
         click.echo(f"Deleted deployment: {deployment_id}")

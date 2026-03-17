@@ -18,6 +18,7 @@ from typing import Iterable, Sequence
 try:
     from enum import StrEnum
 except ImportError:  # pragma: no cover - Python < 3.11
+
     class StrEnum(str, Enum):
         """Compatibility shim for Python versions without enum.StrEnum."""
 
@@ -87,7 +88,19 @@ ORDER_BOOK: dict[str, ContainerOrder] = {
     "rPr": ContainerOrder(
         name="rPr",
         phases=(
-            _phase(RuleLevel.MUST, "must-core", "rStyle", "rFonts", "b", "i", "color", "sz", "szCs", "u", "rtl"),
+            _phase(
+                RuleLevel.MUST,
+                "must-core",
+                "rStyle",
+                "rFonts",
+                "b",
+                "i",
+                "color",
+                "sz",
+                "szCs",
+                "u",
+                "rtl",
+            ),
             _phase(
                 RuleLevel.SHOULD,
                 "should-emphasis",
@@ -102,14 +115,35 @@ ORDER_BOOK: dict[str, ContainerOrder] = {
                 "lang",
                 "oMath",
             ),
-            _phase(RuleLevel.MAY, "may-typography", "spacing", "w", "kern", "position", "fitText", "eastAsianLayout"),
+            _phase(
+                RuleLevel.MAY,
+                "may-typography",
+                "spacing",
+                "w",
+                "kern",
+                "position",
+                "fitText",
+                "eastAsianLayout",
+            ),
             _phase(RuleLevel.VENDOR, "vendor-tail", "specVanish"),
         ),
     ),
     "pPr": ContainerOrder(
         name="pPr",
         phases=(
-            _phase(RuleLevel.MUST, "must-layout", "pStyle", "numPr", "pBdr", "tabs", "spacing", "ind", "jc", "rPr", "sectPr"),
+            _phase(
+                RuleLevel.MUST,
+                "must-layout",
+                "pStyle",
+                "numPr",
+                "pBdr",
+                "tabs",
+                "spacing",
+                "ind",
+                "jc",
+                "rPr",
+                "sectPr",
+            ),
             _phase(
                 RuleLevel.SHOULD,
                 "should-flow-control",
@@ -122,7 +156,15 @@ ORDER_BOOK: dict[str, ContainerOrder] = {
                 "outlineLvl",
                 "pPrChange",
             ),
-            _phase(RuleLevel.MAY, "may-asian-layout", "kinsoku", "wordWrap", "autoSpaceDE", "autoSpaceDN", "snapToGrid"),
+            _phase(
+                RuleLevel.MAY,
+                "may-asian-layout",
+                "kinsoku",
+                "wordWrap",
+                "autoSpaceDE",
+                "autoSpaceDN",
+                "snapToGrid",
+            ),
             _phase(RuleLevel.VENDOR, "vendor-formatting", "divId", "cnfStyle"),
         ),
     ),
@@ -142,23 +184,62 @@ ORDER_BOOK: dict[str, ContainerOrder] = {
                 "bidi",
                 "rtlGutter",
             ),
-            _phase(RuleLevel.MAY, "may-page-extensions", "paperSrc", "pgBorders", "lnNumType", "pgNumType", "printerSettings"),
+            _phase(
+                RuleLevel.MAY,
+                "may-page-extensions",
+                "paperSrc",
+                "pgBorders",
+                "lnNumType",
+                "pgNumType",
+                "printerSettings",
+            ),
             _phase(RuleLevel.VENDOR, "vendor-tail", "sectPrChange"),
         ),
     ),
     "tcPr": ContainerOrder(
         name="tcPr",
         phases=(
-            _phase(RuleLevel.MUST, "must-cell", "tcW", "gridSpan", "hMerge", "vMerge", "tcBorders", "tcMar", "vAlign"),
-            _phase(RuleLevel.SHOULD, "should-cell-layout", "cnfStyle", "shd", "noWrap", "textDirection", "tcFitText", "hideMark"),
-            _phase(RuleLevel.MAY, "may-cell-revision", "headers", "cellIns", "cellDel", "cellMerge"),
+            _phase(
+                RuleLevel.MUST,
+                "must-cell",
+                "tcW",
+                "gridSpan",
+                "hMerge",
+                "vMerge",
+                "tcBorders",
+                "tcMar",
+                "vAlign",
+            ),
+            _phase(
+                RuleLevel.SHOULD,
+                "should-cell-layout",
+                "cnfStyle",
+                "shd",
+                "noWrap",
+                "textDirection",
+                "tcFitText",
+                "hideMark",
+            ),
+            _phase(
+                RuleLevel.MAY, "may-cell-revision", "headers", "cellIns", "cellDel", "cellMerge"
+            ),
             _phase(RuleLevel.VENDOR, "vendor-tail", "tcPrChange"),
         ),
     ),
     "tblPr": ContainerOrder(
         name="tblPr",
         phases=(
-            _phase(RuleLevel.MUST, "must-table", "tblStyle", "tblW", "jc", "tblBorders", "tblLayout", "tblCellMar", "tblLook"),
+            _phase(
+                RuleLevel.MUST,
+                "must-table",
+                "tblStyle",
+                "tblW",
+                "jc",
+                "tblBorders",
+                "tblLayout",
+                "tblCellMar",
+                "tblLook",
+            ),
             _phase(
                 RuleLevel.SHOULD,
                 "should-table-layout",
@@ -169,20 +250,47 @@ ORDER_BOOK: dict[str, ContainerOrder] = {
                 "tblStyleRowBandSize",
                 "tblStyleColBandSize",
             ),
-            _phase(RuleLevel.MAY, "may-table-meta", "tblOverlap", "bidiVisual", "tblCaption", "tblDescription"),
+            _phase(
+                RuleLevel.MAY,
+                "may-table-meta",
+                "tblOverlap",
+                "bidiVisual",
+                "tblCaption",
+                "tblDescription",
+            ),
             _phase(RuleLevel.VENDOR, "vendor-tail", "tblPrChange"),
         ),
     ),
     "tblBorders": ContainerOrder(
         name="tblBorders",
         phases=(
-            _phase(RuleLevel.MUST, "must-outer-and-inner", "top", "left", "bottom", "right", "insideH", "insideV"),
+            _phase(
+                RuleLevel.MUST,
+                "must-outer-and-inner",
+                "top",
+                "left",
+                "bottom",
+                "right",
+                "insideH",
+                "insideV",
+            ),
             _phase(RuleLevel.MAY, "may-bidi-edges", "start", "end"),
         ),
     ),
     "pBdr": ContainerOrder(
         name="pBdr",
-        phases=(_phase(RuleLevel.MUST, "must-border-loop", "top", "left", "bottom", "right", "between", "bar"),),
+        phases=(
+            _phase(
+                RuleLevel.MUST,
+                "must-border-loop",
+                "top",
+                "left",
+                "bottom",
+                "right",
+                "between",
+                "bar",
+            ),
+        ),
     ),
     "tcMar": ContainerOrder(
         name="tcMar",
@@ -201,8 +309,25 @@ ORDER_BOOK: dict[str, ContainerOrder] = {
     "lvl": ContainerOrder(
         name="lvl",
         phases=(
-            _phase(RuleLevel.MUST, "must-numbering", "start", "numFmt", "lvlText", "lvlJc", "pPr", "rPr"),
-            _phase(RuleLevel.SHOULD, "should-numbering-controls", "lvlRestart", "pStyle", "isLgl", "suff", "lvlPicBulletId"),
+            _phase(
+                RuleLevel.MUST,
+                "must-numbering",
+                "start",
+                "numFmt",
+                "lvlText",
+                "lvlJc",
+                "pPr",
+                "rPr",
+            ),
+            _phase(
+                RuleLevel.SHOULD,
+                "should-numbering-controls",
+                "lvlRestart",
+                "pStyle",
+                "isLgl",
+                "suff",
+                "lvlPicBulletId",
+            ),
             _phase(RuleLevel.MAY, "may-legacy", "legacy"),
         ),
     ),
@@ -218,7 +343,14 @@ ORDER_BOOK: dict[str, ContainerOrder] = {
         name="tr",
         phases=(
             _phase(RuleLevel.MUST, "must-row-core", "tblPrEx", "trPr", "tc"),
-            _phase(RuleLevel.SHOULD, "should-row-content", "customXml", "sdt", "bookmarkStart", "bookmarkEnd"),
+            _phase(
+                RuleLevel.SHOULD,
+                "should-row-content",
+                "customXml",
+                "sdt",
+                "bookmarkStart",
+                "bookmarkEnd",
+            ),
             _phase(
                 RuleLevel.MAY,
                 "may-ranges",
@@ -247,17 +379,58 @@ ORDER_BOOK: dict[str, ContainerOrder] = {
         name="style",
         phases=(
             _phase(RuleLevel.MUST, "must-style-identity", "name", "basedOn", "next", "qFormat"),
-            _phase(RuleLevel.SHOULD, "should-style-switches", "aliases", "link", "uiPriority", "semiHidden", "unhideWhenUsed", "locked", "rsid"),
-            _phase(RuleLevel.MUST, "must-style-payload", "pPr", "rPr", "tblPr", "trPr", "tcPr", "tblStylePr"),
-            _phase(RuleLevel.MAY, "may-style-personalization", "autoRedefine", "hidden", "personal", "personalCompose", "personalReply"),
+            _phase(
+                RuleLevel.SHOULD,
+                "should-style-switches",
+                "aliases",
+                "link",
+                "uiPriority",
+                "semiHidden",
+                "unhideWhenUsed",
+                "locked",
+                "rsid",
+            ),
+            _phase(
+                RuleLevel.MUST,
+                "must-style-payload",
+                "pPr",
+                "rPr",
+                "tblPr",
+                "trPr",
+                "tcPr",
+                "tblStylePr",
+            ),
+            _phase(
+                RuleLevel.MAY,
+                "may-style-personalization",
+                "autoRedefine",
+                "hidden",
+                "personal",
+                "personalCompose",
+                "personalReply",
+            ),
         ),
     ),
     "tbl": ContainerOrder(
         name="tbl",
         phases=(
             _phase(RuleLevel.MUST, "must-table-core", "tblPr", "tblGrid", "tr"),
-            _phase(RuleLevel.SHOULD, "should-table-anchors", "bookmarkStart", "bookmarkEnd", "commentRangeStart", "commentRangeEnd"),
-            _phase(RuleLevel.MAY, "may-move-ranges", "moveFromRangeStart", "moveFromRangeEnd", "moveToRangeStart", "moveToRangeEnd"),
+            _phase(
+                RuleLevel.SHOULD,
+                "should-table-anchors",
+                "bookmarkStart",
+                "bookmarkEnd",
+                "commentRangeStart",
+                "commentRangeEnd",
+            ),
+            _phase(
+                RuleLevel.MAY,
+                "may-move-ranges",
+                "moveFromRangeStart",
+                "moveFromRangeEnd",
+                "moveToRangeStart",
+                "moveToRangeEnd",
+            ),
             _phase(
                 RuleLevel.VENDOR,
                 "vendor-custom-ranges",
@@ -277,7 +450,14 @@ ORDER_BOOK: dict[str, ContainerOrder] = {
         phases=(
             _phase(RuleLevel.MUST, "must-main-flow", "p", "tbl"),
             _phase(RuleLevel.SHOULD, "should-embedded-blocks", "customXml", "sdt", "altChunk"),
-            _phase(RuleLevel.MAY, "may-ranges", "bookmarkStart", "bookmarkEnd", "commentRangeStart", "commentRangeEnd"),
+            _phase(
+                RuleLevel.MAY,
+                "may-ranges",
+                "bookmarkStart",
+                "bookmarkEnd",
+                "commentRangeStart",
+                "commentRangeEnd",
+            ),
             _phase(
                 RuleLevel.VENDOR,
                 "vendor-move-ranges",
@@ -341,7 +521,15 @@ ORDER_BOOK: dict[str, ContainerOrder] = {
                 "alwaysMergeEmptyNamespace",
                 "updateFields",
             ),
-            _phase(RuleLevel.VENDOR, "vendor-tail", "docId", "defaultImageDpi", "conflictMode", "decimalSymbol", "listSeparator"),
+            _phase(
+                RuleLevel.VENDOR,
+                "vendor-tail",
+                "docId",
+                "defaultImageDpi",
+                "conflictMode",
+                "decimalSymbol",
+                "listSeparator",
+            ),
         ),
     ),
 }
@@ -384,7 +572,9 @@ def get_child_order(container: str, profile: str = DEFAULT_PROFILE) -> tuple[str
     return spec.build_sequence(profile)
 
 
-def get_phase_plan(container: str, profile: str = DEFAULT_PROFILE) -> tuple[AssemblyPhase, ...] | None:
+def get_phase_plan(
+    container: str, profile: str = DEFAULT_PROFILE
+) -> tuple[AssemblyPhase, ...] | None:
     spec = ORDER_BOOK.get(container)
     return spec.active_phases(profile) if spec else None
 

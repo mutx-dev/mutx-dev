@@ -12,6 +12,7 @@ class Gravity(Enum):
     WARNING: Problems that may cause rendering inconsistencies.
     HINT: Suggestions for best practices compliance.
     """
+
     BLOCKER = "blocker"
     WARNING = "warning"
     HINT = "hint"
@@ -26,6 +27,7 @@ class Issue:
         location: XPath or human-readable path to the problematic element.
         summary: Brief description of what was detected.
     """
+
     gravity: Gravity
     location: str
     summary: str
@@ -38,6 +40,7 @@ class ValidationReport:
     Provides convenience methods for adding issues at different severity
     levels and querying the collection.
     """
+
     issues: list[Issue] = field(default_factory=list)
 
     def blocker(self, location: str, summary: str) -> None:
