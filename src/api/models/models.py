@@ -81,7 +81,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=True)
-    plan: Mapped[PlanTier] = mapped_column(SQLEnum(PlanTier), default=PlanTier.FREE)
+    plan: Mapped[str] = mapped_column(String(20), default="FREE")
     api_key: Mapped[str] = mapped_column(String(64), unique=True, nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
