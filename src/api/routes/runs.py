@@ -273,7 +273,7 @@ async def add_run_traces(
     max_seq_result = await db.execute(
         select(func.max(AgentRunTrace.sequence)).where(AgentRunTrace.run_id == run.id)
     )
-    current_max_seq = max_seq_result.scalar() or -1
+    max_seq = max_seq_result.scalar(); current_max_seq = max_seq if max_seq is not None else -1
     
     # Add new traces
     new_traces = []
