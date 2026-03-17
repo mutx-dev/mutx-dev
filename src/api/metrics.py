@@ -2,7 +2,7 @@
 Prometheus metrics for MUTX API monitoring.
 """
 
-from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import Counter, Histogram, Gauge, generate_latest
 from fastapi import APIRouter, Response, Request
 import time
 

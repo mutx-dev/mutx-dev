@@ -247,7 +247,7 @@ async def test_add_traces_to_existing_run(client, test_agent):
     )
     assert add_traces_response.status_code == 201
     traces_payload = add_traces_response.json()
-    
+
     assert traces_payload["run_id"] == run_id
     assert traces_payload["total"] == 3
     assert len(traces_payload["items"]) == 3
@@ -293,7 +293,7 @@ async def test_add_traces_continues_sequence(client, test_agent):
         ],
     )
     assert add_response.status_code == 201
-    
+
     # Verify sequences are correct
     traces = add_response.json()["items"]
     assert traces[0]["sequence"] == 0  # init
