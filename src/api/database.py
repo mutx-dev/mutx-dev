@@ -174,15 +174,12 @@ async def _run_schema_setup() -> None:
         if conn.dialect.name == "postgresql":
             await conn.execute(text("ALTER TABLE agents ADD COLUMN IF NOT EXISTS description TEXT"))
             # Migrate plan column from enum to varchar if needed
-            try:
-                await conn.execute(text("ALTER TABLE users ALTER COLUMN plan DROP DEFAULT"))
-                await conn.execute(text("ALTER TABLE users ADD COLUMN plan_temp VARCHAR(20)"))
-                await conn.execute(text("UPDATE users SET plan_temp = plan::varchar"))
-                await conn.execute(text("ALTER TABLE users DROP COLUMN plan"))
-                await conn.execute(text("ALTER TABLE users RENAME COLUMN plan_temp TO plan"))
-                await conn.execute(text("ALTER TABLE users ALTER COLUMN plan SET DEFAULT 'FREE'"))
-            except Exception:
-                pass  # Column may already be varchar
+            await conn.execute(text("ALTER TABLE users ALTER COLUMN plan DROP DEFAULT"))
+            await conn.execute(text("ALTER TABLE users ADD COLUMN plan_temp VARCHAR(20)"))
+            await conn.execute(text("UPDATE users SET plan_temp = plan::varchar"))
+            await conn.execute(text("ALTER TABLE users DROP COLUMN plan"))
+            await conn.execute(text("ALTER TABLE users RENAME COLUMN plan_temp TO plan"))
+            await conn.execute(text("ALTER TABLE users ALTER COLUMN plan SET DEFAULT 'FREE'"))
 
 
 async def init_db() -> None:
