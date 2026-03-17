@@ -175,7 +175,12 @@ async def _run_schema_setup() -> None:
             await conn.execute(text("ALTER TABLE agents ADD COLUMN IF NOT EXISTS description TEXT"))
             # Migrate plan column from enum to varchar if needed
             try:
-                await conn.execute(text("ALTER TABLE users ALTER COLUMN plan TYPE VARCHAR(20)"))
+                await conn.execute(text("ALTER TABLE users ALTER COLUMN plan DROP DEFAULT"))
+                await conn.execute(text("ALTER TABLE users ADD COLUMN plan_temp VARCHAR(20)"))
+                await conn.execute(text("UPDATE users SET plan_temp = plan::varchar"))
+                await conn.execute(text("ALTER TABLE users DROP COLUMN plan"))
+                await conn.execute(text("ALTER TABLE users RENAME COLUMN plan_temp TO plan"))
+                await conn.execute(text("ALTER TABLE users ALTER COLUMN plan SET DEFAULT 'FREE'"))
             except Exception:
                 pass  # Column may already be varchar
 
