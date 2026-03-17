@@ -2,9 +2,12 @@
 Tests for /deployments endpoints.
 """
 
+import uuid
 from datetime import datetime, timezone
+
 import pytest
 from httpx import AsyncClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.models.models import (
@@ -15,6 +18,7 @@ from src.api.models.models import (
     Deployment,
     DeploymentEvent,
     DeploymentVersion,
+    UsageEvent,
 )
 
 
@@ -514,6 +518,121 @@ class TestCreateDeployment:
 
         assert response.status_code == 400
         assert response.json() == {"detail": "Cannot deploy an agent that is being deleted"}
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_agent_not_found(self, client: AsyncClient):
+        """Test creating a deployment for a non-existent agent returns 404."""
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": "00000000-0000-0000-0000-999999999999", "replicas": 1},
+        )
+        assert response.status_code == 404
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_invalid_replicas_below_minimum(
+        self, client: AsyncClient, test_agent
+    ):
+        """Test that replicas below the minimum of 1 is rejected with 422."""
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": str(test_agent.id), "replicas": 0},
+        )
+        assert response.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_invalid_replicas_above_maximum(
+        self, client: AsyncClient, test_agent
+    ):
+        """Test that replicas above the maximum of 10 is rejected with 422."""
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": str(test_agent.id), "replicas": 11},
+        )
+        assert response.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_default_replicas(
+        self, client: AsyncClient, test_agent, db_session: AsyncSession
+    ):
+        """Test that omitting replicas uses the default value of 1."""
+        test_agent.status = AgentStatus.STOPPED.value
+        await db_session.commit()
+
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": str(test_agent.id)},
+        )
+
+        assert response.status_code == 201
+        assert response.json()["replicas"] == 1
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_sets_version(
+        self, client: AsyncClient, test_agent, db_session: AsyncSession
+    ):
+        """Test that the created deployment carries the initial version string."""
+        test_agent.status = AgentStatus.STOPPED.value
+        await db_session.commit()
+
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": str(test_agent.id), "replicas": 1},
+        )
+
+        assert response.status_code == 201
+        assert response.json()["version"] == "v1.0.0"
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_creates_version_snapshot(
+        self, client: AsyncClient, test_agent, db_session: AsyncSession
+    ):
+        """Test that creating a deployment writes a DeploymentVersion snapshot to the DB."""
+        test_agent.status = AgentStatus.STOPPED.value
+        await db_session.commit()
+
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": str(test_agent.id), "replicas": 2},
+        )
+
+        assert response.status_code == 201
+        deployment_id = uuid.UUID(response.json()["id"])
+
+        result = await db_session.execute(
+            select(DeploymentVersion).where(
+                DeploymentVersion.deployment_id == deployment_id
+            )
+        )
+        versions = result.scalars().all()
+        assert len(versions) == 1
+        assert versions[0].version == 1
+        assert versions[0].status == "current"
+
+    @pytest.mark.asyncio
+    async def test_create_deployment_tracks_usage_event(
+        self, client: AsyncClient, test_agent, db_session: AsyncSession
+    ):
+        """Test that creating a deployment writes a UsageEvent record to the DB."""
+        test_agent.status = AgentStatus.STOPPED.value
+        await db_session.commit()
+
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": str(test_agent.id), "replicas": 1},
+        )
+
+        assert response.status_code == 201
+        deployment_id = response.json()["id"]
+
+        result = await db_session.execute(
+            select(UsageEvent).where(
+                UsageEvent.resource_id == deployment_id,
+                UsageEvent.event_type == "deployment_create",
+            )
+        )
+        usage_events = result.scalars().all()
+        assert len(usage_events) == 1
+        assert usage_events[0].resource_type == "deployment"
 
 
 class TestRestartDeployment:
