@@ -7,7 +7,6 @@ from sqlalchemy.dialects.postgresql import UUID, ARRAY as PG_ARRAY
 import enum
 
 from src.api.database import Base
-from src.api.models.plan_tiers import PlanTier
 
 
 def ARRAY(type_):

@@ -5,7 +5,6 @@ Tests for structured JSON logging configuration.
 import json
 import logging
 import sys
-from unittest.mock import patch
 
 from src.api.logging_config import (
     StructuredJsonFormatter,
@@ -20,9 +19,7 @@ class TestStructuredJsonFormatter:
 
     def test_formatter_produces_valid_json(self):
         """Test that the formatter outputs valid JSON."""
-        formatter = StructuredJsonFormatter(
-            "%(timestamp)s %(level)s %(name)s %(message)s"
-        )
+        formatter = StructuredJsonFormatter("%(timestamp)s %(level)s %(name)s %(message)s")
 
         # Create a log record
         record = logging.LogRecord(
@@ -46,9 +43,7 @@ class TestStructuredJsonFormatter:
 
     def test_formatter_includes_exception_info(self):
         """Test that exception info is included when present."""
-        formatter = StructuredJsonFormatter(
-            "%(timestamp)s %(level)s %(name)s %(message)s"
-        )
+        formatter = StructuredJsonFormatter("%(timestamp)s %(level)s %(name)s %(message)s")
 
         try:
             raise ValueError("Test error")
@@ -73,9 +68,7 @@ class TestStructuredJsonFormatter:
 
     def test_formatter_adds_required_fields(self):
         """Test that all required fields are added."""
-        formatter = StructuredJsonFormatter(
-            "%(timestamp)s %(level)s %(name)s %(message)s"
-        )
+        formatter = StructuredJsonFormatter("%(timestamp)s %(level)s %(name)s %(message)s")
 
         record = logging.LogRecord(
             name="test_logger",
