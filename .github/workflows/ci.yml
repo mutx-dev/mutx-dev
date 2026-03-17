@@ -135,7 +135,11 @@ jobs:
 
       - name: Verify migration syntax
         run: |
-          for migration in src/api/models/migrations/versions/*.py; do
-            python -m py_compile "$migration" || { echo "Syntax error in $migration"; exit 1; }
-          done
-          echo "✓ All migration files have valid syntax"
+          if [ -d src/api/models/migrations/versions ] && [ $(ls -A src/api/models/migrations/versions/*.py 2>/dev/null | wc -l) -gt 0 ]; then
+            for migration in src/api/models/migrations/versions/*.py; do
+              python -m py_compile "$migration" || { echo "Syntax error in $migration"; exit 1; }
+            done
+            echo "✓ All migration files have valid syntax"
+          else
+            echo "✓ No migration files to check"
+          fi
