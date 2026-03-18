@@ -59,7 +59,7 @@
 |---|-----------|-------------|-------------|--------|-------|
 | 1 | Sidebar Navigation | `dashboard/sidebar.tsx` | `components/ui/sidebar.tsx` | ✅ DONE | Map to MUTX sections |
 | 2 | Stats Card | `dashboard/stats-grid.tsx` | `components/ui/stat-card.tsx` | ✅ DONE | Copy verbatim |
-| 3 | Dashboard Layout | `dashboard/dashboard.tsx` | `components/app/dashboard-layout.tsx` | TODO | Adapt API calls |
+| 3 | Dashboard Layout | `dashboard/dashboard.tsx` | `components/app/dashboard-layout.tsx` | ✅ DONE — Adapted SignalPill + MetricCard + DashboardOverview in components/ui/dashboard-widgets.tsx | Adapt API calls |
 | 4 | Agent Row | `panels/agent-squad-panel.tsx` | `components/app/agent-row.tsx` | ✅ DONE | Map agent model |
 | 5 | Log Viewer Panel | `panels/log-viewer-panel.tsx` | `components/app/log-viewer.tsx` | TODO | Uses `/api/logs` |
 
@@ -109,7 +109,7 @@
 | Date | Phase | Components Done | Notes |
 |------|-------|-----------------|-------|
 | 2026-03-18 | Phase 1 (Discovery) | ✅ Complete | mutx-control = OpenClaw UI |
-| 2026-03-18 | Phase 2 (Components) | 4/10 | sidebar, stat-card, agent-row, widget-grid → pushed to ui-porting |
+| 2026-03-18 | Phase 2 (Components) | 5/10 | sidebar, stat-card, agent-row, widget-grid, dashboard-overview → pushed to ui-porting |
 
 ---
 
@@ -117,10 +117,10 @@
 
 ## Next Actions
 
-1. **IMMEDIATE:** Copy sidebar to `components/ui/sidebar.tsx`
-2. **IMMEDIATE:** Adapt sidebar to MUTX nav items
-3. **NEXT:** Copy stats-grid components
-4. **NEXT:** Wire up dashboard page
+1. **DONE:** sidebar, stat-card, widget-grid, dashboard-overview — pushed to ui-porting
+2. **NEXT:** Log Viewer Panel (`panels/log-viewer-panel.tsx` → `components/app/log-viewer.tsx`)
+3. **NEXT:** Activity Feed (`panels/activity-feed-panel.tsx` → `components/app/activity-feed.tsx`)
+4. **NEXT:** Task Board (`panels/task-board-panel.tsx` → `components/app/task-board.tsx`)
 
 ---
 
