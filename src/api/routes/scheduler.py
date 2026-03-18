@@ -71,5 +71,4 @@ async def trigger_scheduled_task(
         )
 
     result = await trigger_task(request.task_id)
-    status_code = 200 if result.get("ok") else 500
     return result
