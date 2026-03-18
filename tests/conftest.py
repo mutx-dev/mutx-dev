@@ -7,6 +7,7 @@ import os
 from fastapi import FastAPI
 import pytest
 import pytest_asyncio
+from typing import AsyncGenerator
 
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.ext.compiler import compiles
