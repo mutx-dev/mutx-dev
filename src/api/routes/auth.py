@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
@@ -65,48 +65,57 @@ class UserResponse(BaseModel):
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def register(request: RegisterRequest, session: AsyncSession = Depends(get_db)):
-    user_service = UserService(session)
+    try:
+        user_service = UserService(session)
 
-    existing_user = await user_service.get_user_by_email(request.email)
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered",
+        existing_user = await user_service.get_user_by_email(request.email)
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered",
+            )
+
+        is_valid, error_message = validate_password_strength(request.password)
+        if not is_valid:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=error_message,
+            )
+
+        user = await user_service.create_user(
+            email=request.email,
+            name=request.name,
+            password=request.password,
         )
 
-    is_valid, error_message = validate_password_strength(request.password)
-    if not is_valid:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=error_message,
+        # Send verification email
+        token = await user_service.create_email_verification_token(user.id)
+        send_verification_email(user.email, user.name, token)
+
+        access_token, access_token_expires_at = create_access_token(user.id)
+        refresh_token, _ = create_refresh_token(user.id)
+
+        # Track analytics event
+        await log_analytics_event(
+            session,
+            event_name="User logged in",
+            event_type=AnalyticsEventType.USER_LOGIN,
+            user_id=user.id,
         )
 
-    user = await user_service.create_user(
-        email=request.email,
-        name=request.name,
-        password=request.password,
-    )
-
-    # Send verification email
-    token = await user_service.create_email_verification_token(user.id)
-    send_verification_email(user.email, user.name, token)
-
-    access_token, access_token_expires_at = create_access_token(user.id)
-    refresh_token, _ = create_refresh_token(user.id)
-
-    # Track analytics event
-    await log_analytics_event(
-        session,
-        event_name="User logged in",
-        event_type=AnalyticsEventType.USER_LOGIN,
-        user_id=user.id,
-    )
-
-    return TokenResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        expires_in=_get_expires_in_seconds(access_token_expires_at),
-    )
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_in=_get_expires_in_seconds(access_token_expires_at),
+        )
+    except ValidationError as e:
+        # Handle Pydantic validation errors (invalid email format, etc.)
+        errors = e.errors()
+        error_messages = [err.get("msg", "Validation error") for err in errors]
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="; ".join(error_messages) if error_messages else "Invalid request data",
+        )
 
 
 @router.post("/login", response_model=TokenResponse)
