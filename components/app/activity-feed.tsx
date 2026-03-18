@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { EmptyState } from '@/components/dashboard'
 import { cn } from '@/lib/utils'
 
 interface ActivityEvent {
@@ -372,12 +373,14 @@ export function ActivityFeed({
             <div className="text-slate-500 text-sm">Loading activity...</div>
           </div>
         ) : filteredEvents.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-            <svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="mb-2 opacity-50">
-              <path d="M2 4h12M2 8h8M2 12h10" />
-            </svg>
-            <p className="text-sm">No activity yet</p>
-            <p className="text-xs mt-1 opacity-60">Activity will appear as agents and deployments are managed</p>
+          <div className="p-4">
+            <EmptyState
+              title="No activity yet"
+              message={selectedEntity || filterType
+                ? 'Try clearing your filters to see agent and deployment activity.'
+                : 'Activity will appear here as agents and deployments are created, updated, and fail.'}
+              className="border-white/5 bg-white/[0.02]"
+            />
           </div>
         ) : (
           <div className="space-y-2 p-4">

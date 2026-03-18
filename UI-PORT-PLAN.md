@@ -91,7 +91,7 @@
 - [ ] Apply MUTX branding (logo, colors from tailwind.config.js)
 - [ ] Mobile responsiveness (nav rail)
 - [ ] Loading states with framer-motion
-- [ ] Empty states for agents/deployments
+- [x] Empty states for agents/deployments/logs/activity/tasks — 2026-03-18: reused shared `components/dashboard/EmptyState` across the ported panels to give no-data + filtered-empty views a consistent MUTX treatment without adding new primitives
 
 ---
 
