@@ -1,7 +1,7 @@
 # UI Porting Plan — mutx-control → mutx-dev
 
 **Started:** 2026-03-18  
-**Status:** PHASE 2 COMPLETE — All 10 components ported  
+**Status:** PHASE 3 IN PROGRESS — Integration wiring done, e2e testing pending  
 **Push branch:** `mutx-dev:ui-porting` (main is protected — open PR to merge)  
 **Source:** https://github.com/mutx-dev/mutx-control/ (OpenClaw Mission Control)  
 **Target:** https://github.com/mutx-dev/mutx-dev  
@@ -118,7 +118,9 @@
 ## Next Actions
 
 1. **DONE:** sidebar, stat-card, widget-grid, dashboard-overview, log-viewer, activity-feed, task-board, metric-cards, nav-rail — all 10 components ported to ui-porting
-2. **NEXT:** Phase 3 (Integration) — wire components to API routes
+2. **IN PROGRESS:** Phase 3 — /app wired to ported components, API endpoints exist
+3. **NEXT:** Phase 4 (Polish) — MUTX branding, empty states, mobile polish
+4. **PENDING:** Manual e2e testing of all ported components
 
 ---
 
