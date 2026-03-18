@@ -4,14 +4,14 @@
 
 @layer base {
   :root {
-    --background: #000000;
-    --surface: #0a0a0a;
-    --surface-strong: #111111;
-    --foreground: #ffffff;
-    --muted: #888888;
-    --line: rgba(255, 255, 255, 0.1);
-    --primary: #ffffff;
-    --accent: #333333;
+    --background: #02040a;
+    --surface: #050913;
+    --surface-strong: #0b1220;
+    --foreground: #f8fafc;
+    --muted: #8b97b0;
+    --line: rgba(148, 163, 184, 0.24);
+    --primary: #67e8f9;
+    --accent: #1f2a3d;
   }
 
   * {
@@ -25,6 +25,11 @@
   body {
     min-height: 100vh;
     background-color: var(--background);
+    background-image:
+      radial-gradient(circle at 14% -10%, rgba(56, 189, 248, 0.1), transparent 42%),
+      radial-gradient(circle at 88% 8%, rgba(59, 130, 246, 0.1), transparent 36%),
+      linear-gradient(180deg, #02040a 0%, #040813 100%);
+    background-attachment: fixed;
     color: var(--foreground);
     text-rendering: optimizeLegibility;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
@@ -33,7 +38,7 @@
   }
 
   ::selection {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(56, 189, 248, 0.32);
     color: white;
   }
 
@@ -44,11 +49,23 @@
 
 @layer components {
   .glass {
-    @apply border border-white/10 bg-black/40 backdrop-blur-xl;
+    @apply border border-white/10 bg-[#050913]/70 backdrop-blur-xl;
   }
 
   .panel {
-    @apply border border-white/10 bg-[#0a0a0a];
+    @apply border border-white/10 bg-[#050913]/75 backdrop-blur-xl shadow-[0_16px_48px_rgba(2,8,24,0.45)];
+  }
+
+  .control-surface {
+    @apply rounded-2xl border border-white/10 bg-black/40;
+  }
+
+  .control-subpanel {
+    @apply rounded-xl border border-white/10 bg-black/35;
+  }
+
+  .control-chip {
+    @apply inline-flex items-center rounded-full border border-white/15 bg-white/[0.03] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300;
   }
 
   .eyebrow {

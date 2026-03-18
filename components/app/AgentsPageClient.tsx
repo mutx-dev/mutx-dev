@@ -247,7 +247,7 @@ function AgentCard({ agent, onDelete, deletingId }: { agent: Agent; onDelete: (i
   );
 }
 
-function EmptyState() {
+function EmptyState({ onCreateNew }: { onCreateNew: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-3xl border border-white/5 bg-white/[0.01] py-16 text-center">
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-800/50 text-slate-500">
@@ -259,7 +259,7 @@ function EmptyState() {
       </p>
       <div className="mt-6 flex flex-col gap-3">
         <button
-          onClick={() => setCreateDialogOpen(true)}
+          onClick={onCreateNew}
           className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-5 py-2.5 text-sm font-medium text-black hover:bg-cyan-400"
         >
           <Plus className="h-4 w-4" />
@@ -666,7 +666,7 @@ export function AgentsPageClient() {
         </div>
 
         {agents.length === 0 ? (
-          <EmptyState />
+          <EmptyState onCreateNew={() => setIsCreateModalOpen(true)} />
         ) : filteredAgents.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-3xl border border-white/5 bg-white/[0.01] py-16 text-center">
             <Search className="h-8 w-8 text-slate-500" />

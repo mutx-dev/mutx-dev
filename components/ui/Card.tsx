@@ -2,8 +2,14 @@ import { cn } from "@/lib/utils"
 
 export function Card({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("panel relative overflow-hidden rounded-[28px] border border-white/10 p-8 transition-all duration-500 hover:-translate-y-1 hover:border-cyan-300/30 hover:shadow-[0_24px_80px_rgba(8,145,178,0.16)]", className)} {...props}>
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(103,232,249,0.14),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(245,158,11,0.08),transparent_26%)] opacity-80" />
+    <div
+      className={cn(
+        "panel relative overflow-hidden rounded-[22px] border border-white/10 p-6 transition-colors hover:border-cyan-300/20",
+        className,
+      )}
+      {...props}
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.1),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(14,165,233,0.07),transparent_32%)]" />
       <div className="relative">{children}</div>
     </div>
   )
