@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Server, Calendar, Clock, Copy, RefreshCcw, Trash2, Loader2, Activity, Scale } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Server, Clock, RefreshCcw, Trash2, Activity } from "lucide-react";
+
+import {
+  ShellAuthRequiredState,
+  ShellErrorState,
+  ShellLoadingState,
+  ShellNotFoundState,
+} from "@/components/dashboard";
 import { Card } from "@/components/ui/Card";
 import { type components } from "@/app/types/api";
 
@@ -20,22 +27,44 @@ export default function DeploymentDetailPage({ params }: DeploymentDetailPagePro
   const [actionLoading, setActionLoading] = useState(false);
   const [deploymentId, setDeploymentId] = useState<string>("");
 
-  useEffect(() => { params.then((p) => setDeploymentId(p.id)); }, [params]);
+  useEffect(() => {
+    params.then((p) => setDeploymentId(p.id));
+  }, [params]);
+
+  const fetchDeployment = useCallback(async () => {
+    if (!deploymentId) return;
+
+    setError(null);
+    setLoading(true);
+
+    try {
+      const response = await fetch(`/api/dashboard/deployments/${encodeURIComponent(deploymentId)}`, {
+        cache: "no-store",
+      });
+
+      if (response.status === 401) {
+        setDeployment(null);
+        setError("auth_required");
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch deployment");
+      }
+
+      const data = await response.json();
+      setDeployment(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  }, [deploymentId]);
 
   useEffect(() => {
     if (!deploymentId) return;
-    async function fetchDeployment() {
-      try {
-        const response = await fetch(`/api/dashboard/deployments/${encodeURIComponent(deploymentId)}`);
-        if (response.status === 401) { setError("auth_required"); setLoading(false); return; }
-        if (!response.ok) throw new Error("Failed to fetch deployment");
-        const data = await response.json();
-        setDeployment(data);
-      } catch (err) { setError(err instanceof Error ? err.message : "Unknown error"); }
-      finally { setLoading(false); }
-    }
-    fetchDeployment();
-  }, [deploymentId]);
+    void fetchDeployment();
+  }, [deploymentId, fetchDeployment]);
 
   const handleRestart = async () => {
     setActionLoading(true);
@@ -63,9 +92,34 @@ export default function DeploymentDetailPage({ params }: DeploymentDetailPagePro
     switch(s) { case "running": return "bg-emerald-500/20 text-emerald-400"; case "stopped": return "bg-slate-700 text-slate-400"; default: return "bg-slate-700 text-slate-400"; }
   };
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-cyan-400" /></div>;
-  if (error) return <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-red-400">{error}</div>;
-  if (!deployment) return <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-red-400">Deployment not found</div>;
+  if (loading) {
+    return <ShellLoadingState variant="detail" count={2} label="Loading deployment details" />;
+  }
+
+  if (error) {
+    if (error === "auth_required") {
+      return <ShellAuthRequiredState message="Sign in to view this deployment." />;
+    }
+    return <ShellErrorState message={error} onRetry={() => void fetchDeployment()} />;
+  }
+
+  if (!deployment) {
+    return (
+      <ShellNotFoundState
+        title="Deployment not found"
+        message="This deployment may have been removed or you no longer have access."
+        cta={
+          <button
+            type="button"
+            onClick={() => router.push("/dashboard/deployments")}
+            className="inline-flex h-10 items-center rounded-lg border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-slate-200 hover:bg-white/10"
+          >
+            Back to deployments
+          </button>
+        }
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">

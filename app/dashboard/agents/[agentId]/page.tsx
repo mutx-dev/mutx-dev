@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Bot, Calendar, Clock, Copy, Power, RefreshCcw, Rocket, Trash2, Loader2, Activity, Check } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Bot, Check, Clock, Copy, Power, RefreshCcw, Rocket, Trash2, Activity } from "lucide-react";
+
+import {
+  ShellAuthRequiredState,
+  ShellErrorState,
+  ShellLoadingState,
+  ShellNotFoundState,
+} from "@/components/dashboard";
 import { Card } from "@/components/ui/Card";
 import { type components } from "@/app/types/api";
 
@@ -21,22 +28,44 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
   const [agentId, setAgentId] = useState<string>("");
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => { params.then((p) => setAgentId(p.agentId)); }, [params]);
+  useEffect(() => {
+    params.then((p) => setAgentId(p.agentId));
+  }, [params]);
+
+  const fetchAgent = useCallback(async () => {
+    if (!agentId) return;
+
+    setError(null);
+    setLoading(true);
+
+    try {
+      const response = await fetch(`/api/dashboard/agents/${encodeURIComponent(agentId)}`, {
+        cache: "no-store",
+      });
+
+      if (response.status === 401) {
+        setAgent(null);
+        setError("auth_required");
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch agent");
+      }
+
+      const data = await response.json();
+      setAgent(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  }, [agentId]);
 
   useEffect(() => {
     if (!agentId) return;
-    async function fetchAgent() {
-      try {
-        const response = await fetch(`/api/dashboard/agents/${encodeURIComponent(agentId)}`);
-        if (response.status === 401) { setError("auth_required"); setLoading(false); return; }
-        if (!response.ok) throw new Error("Failed to fetch agent");
-        const data = await response.json();
-        setAgent(data);
-      } catch (err) { setError(err instanceof Error ? err.message : "Unknown error"); }
-      finally { setLoading(false); }
-    }
-    fetchAgent();
-  }, [agentId]);
+    void fetchAgent();
+  }, [agentId, fetchAgent]);
 
   const handleDelete = async () => {
     if (!confirm("Are you sure?")) return;
@@ -72,11 +101,10 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
   const handleRefresh = async () => {
     setActionLoading(true);
     try {
-      const response = await fetch(`/api/dashboard/agents/${encodeURIComponent(agentId)}`);
-      if (!response.ok) throw new Error("Refresh failed");
-      setAgent(await response.json());
-    } catch (err) { alert(err instanceof Error ? err.message : "Refresh failed"); }
-    finally { setActionLoading(false); }
+      await fetchAgent();
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const handleCopyId = async () => {
@@ -91,9 +119,34 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
     switch(s) { case "running": return "bg-emerald-500/20 text-emerald-400"; case "stopped": return "bg-slate-700 text-slate-400"; case "deployed": return "bg-cyan-500/20 text-cyan-400"; default: return "bg-slate-700 text-slate-400"; }
   };
 
-  if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-cyan-400" /></div>;
-  if (error) return <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-red-400">{error}</div>;
-  if (!agent) return <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-red-400">Agent not found</div>;
+  if (loading) {
+    return <ShellLoadingState variant="detail" count={2} label="Loading agent details" />;
+  }
+
+  if (error) {
+    if (error === "auth_required") {
+      return <ShellAuthRequiredState message="Sign in to view this agent." />;
+    }
+    return <ShellErrorState message={error} onRetry={() => void fetchAgent()} />;
+  }
+
+  if (!agent) {
+    return (
+      <ShellNotFoundState
+        title="Agent not found"
+        message="This agent may have been deleted or you no longer have access."
+        cta={
+          <button
+            type="button"
+            onClick={() => router.push("/dashboard/agents")}
+            className="inline-flex h-10 items-center rounded-lg border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-slate-200 hover:bg-white/10"
+          >
+            Back to agents
+          </button>
+        }
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">

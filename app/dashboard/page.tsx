@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { Bot, Server } from "lucide-react";
+
+import { EmptyState, ShellAuthRequiredState, ShellErrorState, ShellLoadingState } from "@/components/dashboard";
 import { DashboardOverview } from "@/components/ui/dashboard-widgets";
 
 interface Agent {
@@ -30,75 +33,62 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [agentsRes, deploymentsRes, healthRes] = await Promise.all([
-          fetch("/api/dashboard/agents"),
-          fetch("/api/dashboard/deployments"),
-          fetch("/api/dashboard/health"),
-        ]);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-        if (agentsRes.status === 401 || deploymentsRes.status === 401) {
-          setError("auth_required");
-          setLoading(false);
-          return;
-        }
+    try {
+      const [agentsRes, deploymentsRes, healthRes] = await Promise.all([
+        fetch("/api/dashboard/agents", { cache: "no-store" }),
+        fetch("/api/dashboard/deployments", { cache: "no-store" }),
+        fetch("/api/dashboard/health", { cache: "no-store" }),
+      ]);
 
-        if (!agentsRes.ok || !deploymentsRes.ok) {
-          throw new Error("Failed to fetch data");
-        }
+      if (agentsRes.status === 401 || deploymentsRes.status === 401) {
+        setError("auth_required");
+        return;
+      }
 
-        const agentsData = await agentsRes.json();
-        const deploymentsData = await deploymentsRes.json();
+      if (!agentsRes.ok || !deploymentsRes.ok) {
+        throw new Error("Failed to fetch data");
+      }
 
-        if (healthRes.ok) {
-          try {
-            const healthData = await healthRes.json();
-            setHealth(healthData);
-          } catch {
-            setHealth({ status: "unknown" });
-          }
-        } else {
+      const agentsData = await agentsRes.json();
+      const deploymentsData = await deploymentsRes.json();
+
+      if (healthRes.ok) {
+        try {
+          const healthData = await healthRes.json();
+          setHealth(healthData);
+        } catch {
           setHealth({ status: "unknown" });
         }
-
-        setAgents(agentsData.agents || []);
-        setDeployments(deploymentsData.deployments || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
+      } else {
+        setHealth({ status: "unknown" });
       }
-    }
 
-    fetchData();
+      setAgents(agentsData.agents || []);
+      setDeployments(deploymentsData.deployments || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
+
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
-      </div>
-    );
+    return <ShellLoadingState variant="cards" count={4} />;
   }
 
   if (error) {
     if (error === "auth_required") {
-      return (
-        <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/10 p-4">
-          <p className="text-cyan-400">Please sign in to view your dashboard</p>
-          <a href="/login" className="mt-2 inline-block text-sm font-medium text-cyan-300 hover:text-cyan-200">
-            Sign in →
-          </a>
-        </div>
-      );
+      return <ShellAuthRequiredState message="Please sign in to view your dashboard." />;
     }
-    return (
-      <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-red-400">
-        {error}
-      </div>
-    );
+    return <ShellErrorState message={error} onRetry={fetchData} />;
   }
 
   const agentStats = {
@@ -138,12 +128,14 @@ export default function DashboardPage() {
             </Link>
           </div>
           {agents.length === 0 ? (
-            <div className="mt-4 space-y-3">
-              <p className="text-slate-400">No agents yet</p>
-              <Link href="/dashboard/agents" className="inline-flex items-center gap-2 rounded-lg bg-cyan-500/20 px-4 py-2 text-sm font-medium text-cyan-400 hover:bg-cyan-500/30">
-                Create your first agent →
-              </Link>
-            </div>
+            <EmptyState
+              className="mt-4 border-white/10 bg-black/30 px-4 py-8"
+              title="No agents yet"
+              message="Create your first agent to start running tasks."
+              icon={<Bot className="h-7 w-7" />}
+              ctaLabel="Create agent"
+              ctaHref="/dashboard/agents"
+            />
           ) : (
             <ul className="mt-4 space-y-3">
               {agents.slice(0, 3).map((agent) => (
@@ -179,12 +171,14 @@ export default function DashboardPage() {
             </Link>
           </div>
           {deployments.length === 0 ? (
-            <div className="mt-4 space-y-3">
-              <p className="text-slate-400">No deployments yet</p>
-              <Link href="/dashboard/agents" className="inline-flex items-center gap-2 rounded-lg bg-cyan-500/20 px-4 py-2 text-sm font-medium text-cyan-400 hover:bg-cyan-500/30">
-                Deploy an agent →
-              </Link>
-            </div>
+            <EmptyState
+              className="mt-4 border-white/10 bg-black/30 px-4 py-8"
+              title="No deployments yet"
+              message="Deploy an agent to monitor runtime health and status."
+              icon={<Server className="h-7 w-7" />}
+              ctaLabel="Deploy agent"
+              ctaHref="/dashboard/agents"
+            />
           ) : (
             <ul className="mt-4 space-y-3">
               {deployments.slice(0, 3).map((deployment) => (

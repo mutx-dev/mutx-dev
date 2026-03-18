@@ -5,6 +5,7 @@ export * from "./FilterBar";
 export * from "./KebabMenu";
 export * from "./LoadingState";
 export * from "./Sidebar";
+export * from "./ShellRequestState";
 export * from "./StatusBadge";
 export * from "./TopBar";
 export * from "./tokens";
