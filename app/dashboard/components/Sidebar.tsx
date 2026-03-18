@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
-  LayoutDashboard, 
+  LayoutDashboard,
+  LogOut, 
   Bot, 
   Cloud, 
   Play, 
@@ -76,7 +77,11 @@ export function Sidebar() {
 
         {/* Footer */}
         <div className="border-t border-[rgba(255,255,255,0.06)] p-4">
-          <div className="rounded-lg bg-[rgba(255,255,255,0.03)] p-3">
+          <div className="space-y-2">
+            <a href="/logout" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.05)] hover:text-white transition-colors">
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </a>
             <p className="text-xs text-[rgba(255,255,255,0.4)]">
               Agentic Era v0.1.0
             </p>
