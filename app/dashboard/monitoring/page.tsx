@@ -1,44 +1,75 @@
-import { DashboardSectionPage } from "@/components/dashboard/DashboardSectionPage";
+import Link from "next/link";
+import { Activity, ArrowRight, HeartPulse, Layers, ShieldCheck } from "lucide-react";
+
+import { RouteHeader } from "@/components/dashboard/RouteHeader";
+
+const monitoringChecks = [
+  "Bind health summaries to backend uptime/status contracts once exposed by MUTX runtime APIs.",
+  "Attach deployment-level latency/error views here using the same data source used in Deployments.",
+  "Add alert stream panels only after alerting/event contracts are available in MUTX.",
+];
 
 export default function DashboardMonitoringPage() {
   return (
-    <DashboardSectionPage
-      title="Monitoring"
-      description="Use the ported operator shell as the truthful landing surface for MUTX health, telemetry, and alerting work."
-      badge="telemetry"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Monitoring" },
-      ]}
-      checks={[
-        "Replace hard-coded fleet metrics and fake alerts with real MUTX health, deployment, and runtime telemetry once the backing APIs are defined.",
-        "Keep this route aligned with the new dashboard shell so future monitoring panels can land without inventing OpenClaw-only controls.",
-        "Use this surface for truthful uptime, error-rate, queue, and agent-health views sourced from MUTX infrastructure.",
-      ]}
-      aside={
-        <div className="space-y-4">
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-              Next truthful integration
-            </p>
+    <div className="space-y-6">
+      <RouteHeader
+        title="Monitoring"
+        description="Mission-control shell for truthful health, telemetry, and alerting integrations."
+        icon={Activity}
+        iconTone="text-sky-400 bg-sky-400/10"
+        badge="observability surface"
+        stats={[
+          { label: "Status", value: "Shell ready" },
+          { label: "Policy", value: "No fake data", tone: "success" },
+        ]}
+      />
+
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
+        <div className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+          <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+            <HeartPulse className="h-4 w-4" />
+            Next truthful monitoring integrations
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            {monitoringChecks.map((check, index) => (
+              <article key={check} className="rounded-xl border border-white/10 bg-black/20 p-4">
+                <p className="text-[10px] uppercase tracking-[0.16em] text-slate-500">Integration {String(index + 1).padStart(2, "0")}</p>
+                <p className="mt-2 text-sm text-slate-300">{check}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <aside className="space-y-4">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              <ShieldCheck className="h-4 w-4" />
+              Operator rule
+            </div>
             <p className="mt-3 text-sm leading-6 text-slate-300">
-              Wire this route to real monitoring data — for example health summaries,
-              deployment runtime signals, and alert streams — instead of shipping fabricated
-              operator numbers.
+              Monitoring must reflect real MUTX telemetry only. Keep this surface honest and wire panels as backend contracts arrive.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-              Run note
-            </p>
-            <p className="mt-3 text-sm leading-6 text-slate-300">
-              Route shell landed cleanly. Real observability widgets should be added here only
-              when MUTX exposes trustworthy data for them.
-            </p>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              <Layers className="h-4 w-4" />
+              Adjacent control surfaces
+            </div>
+            <div className="mt-3 space-y-2">
+              <Link href="/dashboard/deployments" className="flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-slate-200 hover:border-cyan-400/30">
+                Deployments
+                <ArrowRight className="h-4 w-4 text-slate-500" />
+              </Link>
+              <Link href="/dashboard" className="flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-slate-200 hover:border-cyan-400/30">
+                Overview
+                <ArrowRight className="h-4 w-4 text-slate-500" />
+              </Link>
+            </div>
           </div>
-        </div>
-      }
-    />
+        </aside>
+      </section>
+    </div>
   );
 }

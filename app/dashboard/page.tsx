@@ -1,7 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Activity,
+  Bot,
+  ChevronRight,
+  KeyRound,
+  Layers,
+  ShieldCheck,
+  Webhook,
+} from "lucide-react";
+
 import { DashboardOverview } from "@/components/ui/dashboard-widgets";
 
 interface Agent {
@@ -13,19 +23,40 @@ interface Agent {
 
 interface Deployment {
   id: string;
-  agent_name: string;
+  agent_name?: string;
+  agent_id?: string;
   status: string;
   created_at: string;
 }
 
+interface ApiKeyRecord {
+  id: string;
+}
+
+interface WebhookRecord {
+  id: string;
+  is_active?: boolean;
+}
+
 interface HealthStatus {
   status: "healthy" | "degraded" | "unhealthy" | "unknown" | string;
-  error?: string;
+}
+
+interface RouteCard {
+  title: string;
+  description: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  countLabel: string;
+  countValue: string;
+  accent: string;
 }
 
 export default function DashboardPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [deployments, setDeployments] = useState<Deployment[]>([]);
+  const [apiKeys, setApiKeys] = useState<ApiKeyRecord[]>([]);
+  const [webhooks, setWebhooks] = useState<WebhookRecord[]>([]);
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,38 +64,44 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [agentsRes, deploymentsRes, healthRes] = await Promise.all([
-          fetch("/api/dashboard/agents"),
-          fetch("/api/dashboard/deployments"),
-          fetch("/api/dashboard/health"),
+        const [agentsRes, deploymentsRes, healthRes, apiKeysRes, webhooksRes] = await Promise.all([
+          fetch("/api/dashboard/agents", { cache: "no-store" }),
+          fetch("/api/dashboard/deployments", { cache: "no-store" }),
+          fetch("/api/dashboard/health", { cache: "no-store" }),
+          fetch("/api/api-keys", { cache: "no-store" }),
+          fetch("/api/webhooks", { cache: "no-store" }),
         ]);
 
-        if (agentsRes.status === 401 || deploymentsRes.status === 401) {
+        if (
+          [agentsRes, deploymentsRes, apiKeysRes, webhooksRes].some((response) => response.status === 401)
+        ) {
           setError("auth_required");
           setLoading(false);
           return;
         }
 
         if (!agentsRes.ok || !deploymentsRes.ok) {
-          throw new Error("Failed to fetch data");
+          throw new Error("Failed to fetch overview data");
         }
 
-        const agentsData = await agentsRes.json();
-        const deploymentsData = await deploymentsRes.json();
+        const [agentsData, deploymentsData, apiKeysData, webhooksData] = await Promise.all([
+          agentsRes.json(),
+          deploymentsRes.json(),
+          apiKeysRes.ok ? apiKeysRes.json() : Promise.resolve([]),
+          webhooksRes.ok ? webhooksRes.json() : Promise.resolve({ webhooks: [] }),
+        ]);
 
         if (healthRes.ok) {
-          try {
-            const healthData = await healthRes.json();
-            setHealth(healthData);
-          } catch {
-            setHealth({ status: "unknown" });
-          }
+          const healthData = await healthRes.json().catch(() => ({ status: "unknown" }));
+          setHealth(healthData);
         } else {
           setHealth({ status: "unknown" });
         }
 
         setAgents(agentsData.agents || []);
         setDeployments(deploymentsData.deployments || []);
+        setApiKeys(Array.isArray(apiKeysData) ? apiKeysData : apiKeysData.items || []);
+        setWebhooks(webhooksData.webhooks || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
@@ -74,6 +111,29 @@ export default function DashboardPage() {
 
     fetchData();
   }, []);
+
+  const agentStats = useMemo(
+    () => ({
+      total: agents.length,
+      running: agents.filter((agent) => agent.status === "running").length,
+      stopped: agents.filter((agent) => agent.status !== "running").length,
+    }),
+    [agents],
+  );
+
+  const deploymentStats = useMemo(
+    () => ({
+      total: deployments.length,
+      running: deployments.filter((deployment) => deployment.status === "running").length,
+      failed: deployments.filter((deployment) => deployment.status === "failed").length,
+    }),
+    [deployments],
+  );
+
+  const activeWebhooks = useMemo(
+    () => webhooks.filter((webhook) => webhook.is_active !== false).length,
+    [webhooks],
+  );
 
   if (loading) {
     return (
@@ -94,134 +154,116 @@ export default function DashboardPage() {
         </div>
       );
     }
-    return (
-      <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-red-400">
-        {error}
-      </div>
-    );
+
+    return <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-red-400">{error}</div>;
   }
-
-  const agentStats = {
-    total: agents.length,
-    running: agents.filter((a) => a.status === "running").length,
-    stopped: agents.filter((a) => a.status !== "running").length,
-  };
-
-  const deploymentStats = {
-    total: deployments.length,
-    running: deployments.filter((d) => d.status === "running").length,
-    failed: deployments.filter((d) => d.status === "failed").length,
-  };
 
   const apiHealth: HealthStatus["status"] = health?.status ?? "unknown";
 
+  const routeCards: RouteCard[] = [
+    {
+      title: "Agents",
+      description: "Manage fleet configuration and lifecycle.",
+      href: "/dashboard/agents",
+      icon: Bot,
+      countLabel: "Running / Total",
+      countValue: `${agentStats.running} / ${agentStats.total}`,
+      accent: "text-cyan-300 border-cyan-400/20 bg-cyan-400/10",
+    },
+    {
+      title: "Deployments",
+      description: "Operate active runtime deployments.",
+      href: "/dashboard/deployments",
+      icon: Layers,
+      countLabel: "Active / Total",
+      countValue: `${deploymentStats.running} / ${deploymentStats.total}`,
+      accent: "text-emerald-300 border-emerald-400/20 bg-emerald-400/10",
+    },
+    {
+      title: "API Keys",
+      description: "Issue and rotate machine credentials.",
+      href: "/dashboard/api-keys",
+      icon: KeyRound,
+      countLabel: "Registered keys",
+      countValue: `${apiKeys.length}`,
+      accent: "text-amber-300 border-amber-400/20 bg-amber-400/10",
+    },
+    {
+      title: "Webhooks",
+      description: "Track event delivery endpoints.",
+      href: "/dashboard/webhooks",
+      icon: Webhook,
+      countLabel: "Active endpoints",
+      countValue: `${activeWebhooks}`,
+      accent: "text-purple-300 border-purple-400/20 bg-purple-400/10",
+    },
+    {
+      title: "Monitoring",
+      description: "Observe health and telemetry wiring.",
+      href: "/dashboard/monitoring",
+      icon: Activity,
+      countLabel: "Control plane",
+      countValue: String(apiHealth),
+      accent: "text-sky-300 border-sky-400/20 bg-sky-400/10",
+    },
+  ];
+
   return (
-    <div className="space-y-8">
-      {/* Ported from mutx-control dashboard.tsx — enriched overview with SignalPills + metric cards */}
+    <div className="space-y-6">
+      <section className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-5 sm:p-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">operator overview</p>
+            <h1 className="mt-2 text-2xl font-semibold text-white">MUTX Mission Control</h1>
+            <p className="mt-1 text-sm text-slate-400">
+              Truthful control surface stitched from live agents, deployments, API keys, webhooks, and health.
+            </p>
+          </div>
+
+          <div className="inline-flex items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300">
+            <ShieldCheck className="h-4 w-4" />
+            No fabricated metrics
+          </div>
+        </div>
+      </section>
+
       <DashboardOverview
         agentStats={agentStats}
         deploymentStats={deploymentStats}
         apiHealth={apiHealth as "healthy" | "degraded" | "unhealthy" | "unknown"}
       />
 
-      {/* Quick Links */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Agents Card */}
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">Agents</h2>
-            <Link
-              href="/dashboard/agents"
-              className="text-sm font-medium text-cyan-400 hover:text-cyan-300"
-            >
-              View all →
-            </Link>
-          </div>
-          {agents.length === 0 ? (
-            <div className="mt-4 space-y-3">
-              <p className="text-slate-400">No agents yet</p>
-              <Link href="/dashboard/agents" className="inline-flex items-center gap-2 rounded-lg bg-cyan-500/20 px-4 py-2 text-sm font-medium text-cyan-400 hover:bg-cyan-500/30">
-                Create your first agent →
-              </Link>
-            </div>
-          ) : (
-            <ul className="mt-4 space-y-3">
-              {agents.slice(0, 3).map((agent) => (
-                <li
-                  key={agent.id}
-                  className="flex items-center justify-between rounded-lg bg-slate-800/50 p-3"
-                >
-                  <span className="text-slate-200">{agent.name}</span>
-                  <span
-                    className={`rounded-full px-2 py-1 text-xs font-medium ${
-                      agent.status === "running"
-                        ? "bg-emerald-500/20 text-emerald-400"
-                        : "bg-slate-700 text-slate-400"
-                    }`}
-                  >
-                    {agent.status}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-white">Core operator surfaces</h2>
+          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">authenticated routes</p>
         </div>
 
-        {/* Deployments Card */}
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">Deployments</h2>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {routeCards.map((card) => (
             <Link
-              href="/dashboard/deployments"
-              className="text-sm font-medium text-cyan-400 hover:text-cyan-300"
+              key={card.href}
+              href={card.href}
+              className="group rounded-xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-cyan-400/30 hover:bg-white/[0.04]"
             >
-              View all →
-            </Link>
-          </div>
-          {deployments.length === 0 ? (
-            <div className="mt-4 space-y-3">
-              <p className="text-slate-400">No deployments yet</p>
-              <Link href="/dashboard/agents" className="inline-flex items-center gap-2 rounded-lg bg-cyan-500/20 px-4 py-2 text-sm font-medium text-cyan-400 hover:bg-cyan-500/30">
-                Deploy an agent →
-              </Link>
-            </div>
-          ) : (
-            <ul className="mt-4 space-y-3">
-              {deployments.slice(0, 3).map((deployment) => (
-                <li
-                  key={deployment.id}
-                  className="flex items-center justify-between rounded-lg bg-slate-800/50 p-3"
-                >
-                  <span className="text-slate-200">{deployment.agent_name}</span>
-                  <span
-                    className={`rounded-full px-2 py-1 text-xs font-medium ${
-                      deployment.status === "running"
-                        ? "bg-emerald-500/20 text-emerald-400"
-                        : "bg-slate-700 text-slate-400"
-                    }`}
-                  >
-                    {deployment.status}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+              <div className="flex items-start justify-between gap-3">
+                <div className={`inline-flex h-10 w-10 items-center justify-center rounded-lg border ${card.accent}`}>
+                  <card.icon className="h-5 w-5" />
+                </div>
+                <ChevronRight className="h-4 w-4 text-slate-500 transition group-hover:text-cyan-300" />
+              </div>
 
-        {/* Webhooks Card */}
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">Webhooks</h2>
-            <Link
-              href="/dashboard/webhooks"
-              className="text-sm font-medium text-cyan-400 hover:text-cyan-300"
-            >
-              Manage →
+              <h3 className="mt-3 text-base font-semibold text-white">{card.title}</h3>
+              <p className="mt-1 text-sm text-slate-400">{card.description}</p>
+
+              <div className="mt-4 rounded-lg border border-white/10 bg-black/20 px-3 py-2">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">{card.countLabel}</p>
+                <p className="mt-1 font-mono text-sm text-slate-100">{card.countValue}</p>
+              </div>
             </Link>
-          </div>
-          <p className="mt-4 text-slate-400">Configure webhook endpoints for real-time events</p>
+          ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 }
