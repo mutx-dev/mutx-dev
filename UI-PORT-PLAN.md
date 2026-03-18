@@ -1,7 +1,7 @@
 # UI Porting Plan — mutx-control → mutx-dev
 
 **Started:** 2026-03-18  
-**Status:** PHASE 2 COMPLETE — All priority components ported  
+**Status:** PHASE 2 COMPLETE — All 10 components ported  
 **Push branch:** `mutx-dev:ui-porting` (main is protected — open PR to merge)  
 **Source:** https://github.com/mutx-dev/mutx-control/ (OpenClaw Mission Control)  
 **Target:** https://github.com/mutx-dev/mutx-dev  
@@ -68,7 +68,7 @@
 | # | Component | Source File | Target File | Status | Notes |
 |---|-----------|-------------|-------------|--------|-------|
 | 6 | Widget Grid | `dashboard/widget-grid.tsx` | `components/ui/widget-grid.tsx` | ✅ DONE | Layout system |
-| 7 | Metric Cards | `dashboard/widgets/metric-cards-widget.tsx` | `components/app/metric-cards.tsx` | TODO | |
+| 7 | Metric Cards | `dashboard/widgets/metric-cards-widget.tsx` | `components/app/metric-cards.tsx` | ✅ DONE — `DashboardMetricCard` in `components/ui/dashboard-widgets.tsx` | |
 | 8 | Activity Feed | `panels/activity-feed-panel.tsx` | `components/app/activity-feed.tsx` | ✅ DONE | Derives events from agents + deployments API |
 | 9 | Task Board | `panels/task-board-panel.tsx` | `components/app/task-board.tsx` | ✅ DONE | Kanban from agents + deployments |
 | 10 | Nav Rail | `components/layout/nav-rail.tsx` | `components/ui/nav-rail.tsx` | TODO | Mobile nav |
@@ -109,7 +109,7 @@
 | Date | Phase | Components Done | Notes |
 |------|-------|-----------------|-------|
 | 2026-03-18 | Phase 1 (Discovery) | ✅ Complete | mutx-control = OpenClaw UI |
-| 2026-03-18 | Phase 2 (Components) | 7/10 | sidebar, stat-card, agent-row, widget-grid, dashboard-overview, log-viewer, activity-feed, task-board → pushed to ui-porting |
+| 2026-03-18 | Phase 2 (Components) | 10/10 | sidebar, stat-card, agent-row, widget-grid, dashboard-overview, log-viewer, activity-feed, task-board → pushed to ui-porting |
 
 ---
 
@@ -117,9 +117,8 @@
 
 ## Next Actions
 
-1. **DONE:** sidebar, stat-card, widget-grid, dashboard-overview, log-viewer, activity-feed, task-board — pushed to ui-porting
-2. **NEXT:** Metric Cards (`dashboard/widgets/metric-cards-widget.tsx` → `components/app/metric-cards.tsx`)
-3. **NEXT:** Nav Rail (`components/layout/nav-rail.tsx` → `components/ui/nav-rail.tsx`)
+1. **DONE:** sidebar, stat-card, widget-grid, dashboard-overview, log-viewer, activity-feed, task-board, metric-cards, nav-rail — all 10 components ported to ui-porting
+2. **NEXT:** Phase 3 (Integration) — wire components to API routes
 
 ---
 
