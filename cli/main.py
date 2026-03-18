@@ -7,6 +7,7 @@ from cli.commands.clawhub import clawhub_group
 from cli.commands.deploy import deploy_group
 from cli.commands.config import config_group
 from cli.commands.webhooks import webhooks_group
+from cli.commands.tui import tui_command
 
 
 @click.group()
@@ -107,6 +108,7 @@ cli.add_command(clawhub_group)
 cli.add_command(deploy_group)
 cli.add_command(config_group)
 cli.add_command(webhooks_group)
+cli.add_command(tui_command)
 
 
 if __name__ == "__main__":

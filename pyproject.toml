@@ -38,6 +38,11 @@ dev = [
     "ruff>=0.1.0",
     "aiosqlite>=0.20.0",
 ]
+tui = [
+    "textual>=0.50.0",
+]
+
+
 
 [project.scripts]
 mutx = "cli.main:cli"
