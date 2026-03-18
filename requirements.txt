@@ -60,3 +60,6 @@ opentelemetry-exporter-zipkin-proto-http
 opentelemetry-exporter-prometheus
 opentelemetry-instrumentation-fastapi
 opentelemetry-instrumentation-httpx
+
+# TUI dependencies
+textual>=0.50.0
