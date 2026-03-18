@@ -599,9 +599,7 @@ class TestCreateDeployment:
         deployment_id = uuid.UUID(response.json()["id"])
 
         result = await db_session.execute(
-            select(DeploymentVersion).where(
-                DeploymentVersion.deployment_id == deployment_id
-            )
+            select(DeploymentVersion).where(DeploymentVersion.deployment_id == deployment_id)
         )
         versions = result.scalars().all()
         assert len(versions) == 1
