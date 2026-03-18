@@ -6,3 +6,8 @@ const sql = process.env.DATABASE_URL
   : null
 
 export default sql
+
+// Additional exports needed by gnap-sync / task-dispatch
+export { default as sql }
+export const db_helpers = { timestamptz: (col: string) => col }
+export function getDatabase() { return sql }
