@@ -1,37 +1,88 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { Check, Copy, Github, Menu, X, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-
-import { AnimatedTerminal } from '@/components/AnimatedTerminal'
-import { WaitlistForm } from '@/components/WaitlistForm'
+import { motion } from 'framer-motion'
+import {
+  ArrowRight,
+  ChevronRight,
+  Github,
+  Lock,
+  Menu,
+  Orbit,
+  Radio,
+  ShieldCheck,
+  Sparkles,
+  TimerReset,
+  X,
+} from 'lucide-react'
 
 const GITHUB_URL = 'https://github.com/fortunexbt/mutx-dev'
 const DOCS_URL = 'https://docs.mutx.dev'
 const X_URL = 'https://x.com/mutxdev'
 
-const DEMO_COMMAND = 'npm run demo:validate'
+const navLinks = [
+  { label: 'Whitepaper', href: '#whitepaper' },
+  { label: 'USPs', href: '#usp' },
+  { label: 'Architecture', href: '#architecture' },
+  { label: 'Docs', href: DOCS_URL, external: true },
+]
 
-const links = [
-  { label: 'docs', href: DOCS_URL },
-  { label: 'github', href: GITHUB_URL },
-  { label: 'contact', href: '/contact' },
+const usps = [
+  {
+    icon: ShieldCheck,
+    title: 'Operator-First Safety',
+    body: 'Scoped identities, audit history, and predictable rollback paths ensure humans stay in command.',
+  },
+  {
+    icon: Orbit,
+    title: 'Mission Graph Runtime',
+    body: 'Model decisioning, tool calls, and handoffs as a visible execution graph instead of opaque chains.',
+  },
+  {
+    icon: TimerReset,
+    title: 'Recovery in Seconds',
+    body: 'Replay sessions from checkpoints and restore degraded agents without hand patching state.',
+  },
+  {
+    icon: Radio,
+    title: 'Live Operational Telemetry',
+    body: 'Track each transition, latency spike, and escalation event with real-time stream-level observability.',
+  },
+]
+
+const paperHighlights = [
+  {
+    title: 'Control Surface Thesis',
+    detail: 'Autonomous systems need explicit override contracts, not best-effort emergency prompts.',
+  },
+  {
+    title: 'Risk-Layered Architecture',
+    detail: 'Risk budgets are attached to task classes and enforced before each state transition.',
+  },
+  {
+    title: 'Human Recovery Loop',
+    detail: 'Escalations include full context snapshots so operators can resolve issues in one pass.',
+  },
+  {
+    title: 'Composable Runtime Contracts',
+    detail: 'Policy, memory, and execution services can evolve independently while preserving protocol guarantees.',
+  },
+]
+
+const orbitNodes = [
+  { id: 'intent', label: 'Intent Intake', x: '10%', y: '18%' },
+  { id: 'policy', label: 'Policy Gate', x: '72%', y: '12%' },
+  { id: 'runtime', label: 'Agent Runtime', x: '78%', y: '72%' },
+  { id: 'review', label: 'Operator Review', x: '22%', y: '78%' },
 ]
 
 export default function LandingPage() {
-  const [demoCommandCopied, setDemoCommandCopied] = useState(false)
-  const [isMac, setIsMac] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const [checkingAuth, setCheckingAuth] = useState(true)
 
-  useEffect(() => {
-    setIsMac(/Mac|iPod|iPhone|iPad/.test(navigator.platform))
-  }, [])
-
-  // Check authentication status on mount
   useEffect(() => {
     async function checkAuth() {
       try {
@@ -46,234 +97,313 @@ export default function LandingPage() {
     checkAuth()
   }, [])
 
-  // Close mobile menu on resize to desktop
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
         setMobileMenuOpen(false)
       }
     }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
-  const copyDemoCommand = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(DEMO_COMMAND)
-    } catch {
-      const fallbackInput = document.createElement('textarea')
-      fallbackInput.value = DEMO_COMMAND
-      fallbackInput.style.position = 'absolute'
-      fallbackInput.style.opacity = '0'
-      document.body.appendChild(fallbackInput)
-      fallbackInput.select()
-      document.execCommand('copy')
-      document.body.removeChild(fallbackInput)
-    }
-
-    setDemoCommandCopied(true)
-    window.setTimeout(() => {
-      setDemoCommandCopied(false)
-    }, 1200)
-  }, [])
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && mobileMenuOpen) {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
         setMobileMenuOpen(false)
-        return
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-        const target = e.target as HTMLElement
-        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
-          e.preventDefault()
-          copyDemoCommand()
-        }
       }
     }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [copyDemoCommand, mobileMenuOpen])
+
+    window.addEventListener('resize', handleResize)
+    window.addEventListener('keydown', handleEsc)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('keydown', handleEsc)
+    }
+  }, [])
+
+  const authButton = useMemo(() => {
+    if (checkingAuth) return null
+
+    if (isAuthenticated) {
+      return (
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-300/10 px-5 py-2.5 text-sm font-semibold text-cyan-200 transition hover:border-cyan-300/70 hover:bg-cyan-300/20"
+        >
+          Dashboard
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      )
+    }
+
+    return (
+      <Link
+        href="/login"
+        className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
+      >
+        Sign In
+        <ChevronRight className="h-4 w-4" />
+      </Link>
+    )
+  }, [checkingAuth, isAuthenticated])
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-white/20">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.06),transparent_32%),linear-gradient(180deg,#050505_0%,#000_55%,#050505_100%)]" />
+    <div className="relative min-h-screen overflow-hidden bg-[#02040a] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_8%,rgba(83,164,255,0.25),transparent_35%),radial-gradient(circle_at_88%_20%,rgba(153,98,255,0.2),transparent_35%),linear-gradient(180deg,#05070d_0%,#02040a_45%,#010206_100%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-[-200px] h-[480px] bg-[conic-gradient(from_80deg_at_50%_50%,rgba(0,198,255,0.09),rgba(151,71,255,0.2),rgba(0,198,255,0.09))] blur-3xl" />
 
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <div className="relative h-8 w-8">
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#03050ccc]/90 backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+          <a href="#" className="flex items-center gap-3">
+            <div className="relative h-9 w-9 overflow-hidden rounded-lg border border-white/10 bg-black/30 p-1">
               <Image src="/logo.png" alt="MUTX" fill className="object-contain" />
             </div>
-            <span className="text-sm font-semibold uppercase tracking-[0.28em] text-white/90">MUTX</span>
-          </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-white/55">MUTX</p>
+              <p className="text-sm font-semibold text-white/90">Control Plane for AI Operators</p>
+            </div>
+          </a>
 
-          <div className="hidden items-center gap-6 text-sm text-white/55 md:flex">
-            {links.map((item) => (
+          <div className="hidden items-center gap-6 md:flex">
+            {navLinks.map((link) => (
               <a
-                key={item.label}
-                href={item.href}
-                target={item.href.startsWith('http') ? '_blank' : undefined}
-                rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
-                className="transition hover:text-white"
+                key={link.label}
+                href={link.href}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noreferrer' : undefined}
+                className="text-sm text-white/70 transition hover:text-white"
               >
-                {item.label}
+                {link.label}
               </a>
             ))}
-            {/* Auth-aware dashboard link */}
-            {!checkingAuth && isAuthenticated && (
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-400 transition hover:border-cyan-500/50 hover:bg-cyan-500/20"
-              >
-                Dashboard
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            )}
-            {!checkingAuth && !isAuthenticated && (
-              <Link
-                href="/login"
-                className="inline-flex items-center rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/[0.08]"
-              >
-                Sign In
-              </Link>
-            )}
+            {authButton}
           </div>
 
-          <div className="flex items-center gap-3">
-            <a href={GITHUB_URL} target="_blank" rel="noreferrer" aria-label="GitHub" className="hidden text-white/60 transition hover:text-white sm:block">
-              <Github className="h-5 w-5" />
-            </a>
-            <a href={X_URL} target="_blank" rel="noreferrer" aria-label="X" className="hidden text-white/60 transition hover:text-white sm:block">
-              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-current">
-                <path d="M18.244 2H21.5l-7.11 8.13L22.75 22h-6.54l-5.12-6.69L5.24 22H2l7.6-8.69L1.25 2h6.71l4.63 6.1L18.244 2Zm-1.147 18h1.803L6.98 3.894H5.045L17.097 20Z" />
-              </svg>
-            </a>
-            <button
-              type="button"
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={mobileMenuOpen}
-              className="block text-white/60 transition hover:text-white md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
+          <button
+            type="button"
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+            className="rounded-lg border border-white/15 bg-white/5 p-2 text-white/80 transition hover:text-white md:hidden"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
 
-        {/* Mobile menu dropdown */}
         {mobileMenuOpen && (
-          <div className="border-t border-white/10 bg-black/95 md:hidden">
-            <div className="flex flex-col gap-1 px-5 py-4">
-              {links.map((item) => (
+          <div className="border-t border-white/10 bg-[#04060f]/95 px-4 py-4 md:hidden">
+            <div className="flex flex-col gap-2">
+              {navLinks.map((link) => (
                 <a
-                  key={item.label}
-                  href={item.href}
-                  target={item.href.startsWith('http') ? '_blank' : undefined}
-                  rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
-                  className="rounded-lg px-3 py-2 text-sm text-white/70 transition hover:bg-white/5 hover:text-white"
+                  key={link.label}
+                  href={link.href}
+                  target={link.external ? '_blank' : undefined}
+                  rel={link.external ? 'noreferrer' : undefined}
+                  className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/75"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  {item.label}
+                  {link.label}
                 </a>
               ))}
-              {/* Mobile auth-aware buttons */}
-              {!checkingAuth && isAuthenticated && (
-                <Link
-                  href="/dashboard"
-                  className="mt-2 flex items-center justify-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-sm font-medium text-cyan-400 transition hover:border-cyan-500/50 hover:bg-cyan-500/20"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Dashboard
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              )}
-              {!checkingAuth && !isAuthenticated && (
-                <Link
-                  href="/login"
-                  className="mt-2 flex items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/[0.08]"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Sign In
-                </Link>
-              )}
-              <div className="mt-2 flex gap-3 border-t border-white/10 pt-4">
-                <a href={GITHUB_URL} target="_blank" rel="noreferrer" aria-label="GitHub" className="text-white/60 transition hover:text-white">
-                  <Github className="h-5 w-5" />
-                </a>
-                <a href={X_URL} target="_blank" rel="noreferrer" aria-label="X" className="text-white/60 transition hover:text-white">
-                  <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 fill-current">
-                    <path d="M18.244 2H21.5l-7.11 8.13L22.75 22h-6.54l-5.12-6.69L5.24 22H2l7.6-8.69L1.25 2h6.71l4.63 6.1L18.244 2Zm-1.147 18h1.803L6.98 3.894H5.045L17.097 20Z" />
-                  </svg>
-                </a>
-              </div>
+              <div className="pt-2">{authButton}</div>
             </div>
           </div>
         )}
       </nav>
 
-      <main className="relative px-5 pb-20 pt-32 sm:px-6 lg:pt-40">
-        <section className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)] lg:items-start">
-          <div className="max-w-2xl">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/65">
-              open-source agent control plane
+      <main className="relative z-10 px-4 pb-24 pt-28 sm:px-6 lg:px-8 lg:pt-32">
+        <section className="mx-auto grid w-full max-w-7xl gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
+          <div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-200/20 bg-cyan-300/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-100">
+              <Sparkles className="h-3.5 w-3.5" />
+              Whitepaper-driven platform design
             </div>
 
-            <h1 className="max-w-3xl text-4xl font-medium tracking-tight text-white sm:text-5xl lg:text-[4.5rem] lg:leading-[0.94]">
-              run ai agents with a control surface operators can trust.
+            <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
+              Autonomous agents.
+              <br />
+              <span className="bg-gradient-to-r from-cyan-300 via-sky-200 to-violet-300 bg-clip-text text-transparent">
+                Human-grade control.
+              </span>
             </h1>
 
-            <p className="mt-6 max-w-xl text-base leading-7 text-white/62 sm:text-lg sm:leading-8">
-              MUTX is the minimal public surface: docs, repo, app, and a waitlist for early access.
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/75 sm:text-lg sm:leading-8">
+              We rebuilt the MUTX landing experience to expose the operational model visually—risk gates, escalation flows, and telemetry loops—all aligned to the core whitepaper thesis.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              {links.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  target={item.href.startsWith('http') ? '_blank' : undefined}
-                  rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
-                  className="inline-flex items-center rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/[0.08]"
-                >
-                  {item.label}
-                </a>
-              ))}
-              {/* CTA button for unauthenticated users */}
-              {!checkingAuth && !isAuthenticated && (
-                <Link
-                  href="/login"
-                  className="inline-flex items-center rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-5 py-3 text-sm font-medium text-cyan-400 transition hover:border-cyan-500/50 hover:bg-cyan-500/20"
-                >
-                  Sign In
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              )}
-            </div>
-
-            <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-200/75">morning demo</p>
-              <p className="mt-1 text-white/80">Run once in the morning for a guaranteed local demo path:</p>
-              <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-white/10 bg-black/35 p-3">
-                <code className="inline-flex flex-1 min-w-0 rounded-lg bg-black/20 px-3 py-2 text-xs leading-5 font-mono break-all text-cyan-100">
-                  {DEMO_COMMAND}
-                </code>
-                <button
-                  type="button"
-                  onClick={copyDemoCommand}
-                  aria-label={demoCommandCopied ? 'Demo command copied' : 'Copy demo command'}
-                  className="inline-flex shrink-0 items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-2 text-xs font-medium text-white transition hover:bg-white/[0.18]"
-                >
-                  {demoCommandCopied ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}
-                  {demoCommandCopied ? 'Copied' : (isMac ? '⌘C' : 'Ctrl+C')}
-                </button>
-              </div>
+              <a
+                href={DOCS_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
+              >
+                Read docs
+                <ArrowRight className="h-4 w-4" />
+              </a>
+              <a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-cyan-300/40 bg-cyan-300/15 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/70 hover:bg-cyan-300/25"
+              >
+                <Github className="h-4 w-4" />
+                Star on GitHub
+              </a>
+              <a
+                href={X_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-white/85 transition hover:bg-white/10"
+              >
+                Follow updates
+              </a>
             </div>
           </div>
 
-          <div className="space-y-6">
-            <AnimatedTerminal />
-            <WaitlistForm source="hero" compact />
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/[0.03] p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_30px_80px_rgba(20,20,80,0.4)] sm:p-6"
+          >
+            <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
+            <div className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-violet-400/20 blur-3xl" />
+
+            <p className="mb-4 text-[11px] uppercase tracking-[0.24em] text-white/55">Live mission diagram</p>
+            <div className="relative h-[340px] rounded-2xl border border-white/10 bg-[#030610] p-3 sm:h-[380px]">
+              {orbitNodes.map((node, idx) => (
+                <motion.div
+                  key={node.id}
+                  className="absolute"
+                  style={{ left: node.x, top: node.y }}
+                  animate={{ scale: [1, 1.04, 1], opacity: [0.85, 1, 0.85] }}
+                  transition={{ duration: 2.8, repeat: Infinity, delay: idx * 0.25 }}
+                >
+                  <div className="-translate-x-1/2 -translate-y-1/2 rounded-xl border border-cyan-200/30 bg-cyan-300/10 px-3 py-2 text-[11px] font-semibold text-cyan-100 shadow-[0_0_0_1px_rgba(34,211,238,0.18)]">
+                    {node.label}
+                  </div>
+                </motion.div>
+              ))}
+
+              <svg className="absolute inset-0 h-full w-full" aria-hidden="true">
+                <defs>
+                  <linearGradient id="orbitLine" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="rgba(125,211,252,0.15)" />
+                    <stop offset="50%" stopColor="rgba(56,189,248,0.7)" />
+                    <stop offset="100%" stopColor="rgba(139,92,246,0.25)" />
+                  </linearGradient>
+                </defs>
+                <motion.path
+                  d="M 70 70 C 240 12, 310 32, 340 70"
+                  stroke="url(#orbitLine)"
+                  strokeWidth="2"
+                  fill="transparent"
+                  strokeDasharray="7 8"
+                  animate={{ strokeDashoffset: [0, -80] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                />
+                <motion.path
+                  d="M 340 70 C 355 180, 345 252, 310 300"
+                  stroke="url(#orbitLine)"
+                  strokeWidth="2"
+                  fill="transparent"
+                  strokeDasharray="7 8"
+                  animate={{ strokeDashoffset: [0, -80] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: 'linear', delay: 0.5 }}
+                />
+                <motion.path
+                  d="M 310 300 C 180 352, 110 330, 90 290"
+                  stroke="url(#orbitLine)"
+                  strokeWidth="2"
+                  fill="transparent"
+                  strokeDasharray="7 8"
+                  animate={{ strokeDashoffset: [0, -80] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: 'linear', delay: 1 }}
+                />
+                <motion.path
+                  d="M 90 290 C 55 220, 40 145, 70 70"
+                  stroke="url(#orbitLine)"
+                  strokeWidth="2"
+                  fill="transparent"
+                  strokeDasharray="7 8"
+                  animate={{ strokeDashoffset: [0, -80] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: 'linear', delay: 1.4 }}
+                />
+              </svg>
+
+              <div className="absolute inset-x-3 bottom-3 rounded-xl border border-white/10 bg-black/40 p-3 text-xs text-white/75">
+                <p className="font-semibold text-cyan-100">Current mission health: 98.4%</p>
+                <p className="mt-1">Escalation SLA under 2m · Drift guardrails active · Policy violations blocked pre-exec.</p>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        <section id="whitepaper" className="mx-auto mt-14 w-full max-w-7xl">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {paperHighlights.map((item, idx) => (
+              <motion.article
+                key={item.title}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.35 }}
+                transition={{ duration: 0.5, delay: idx * 0.08 }}
+                className="rounded-2xl border border-white/10 bg-white/[0.04] p-5"
+              >
+                <p className="text-[11px] uppercase tracking-[0.2em] text-cyan-100/70">Whitepaper section {idx + 1}</p>
+                <h3 className="mt-2 text-lg font-semibold text-white">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/70">{item.detail}</p>
+              </motion.article>
+            ))}
+          </div>
+        </section>
+
+        <section id="usp" className="mx-auto mt-14 w-full max-w-7xl">
+          <div className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Why teams choose MUTX</p>
+              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">USPs built for scale and safety.</h2>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {usps.map((usp, idx) => (
+              <motion.article
+                key={usp.title}
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.35 }}
+                transition={{ duration: 0.45, delay: idx * 0.06 }}
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-6"
+              >
+                <div className="absolute -right-12 -top-12 h-28 w-28 rounded-full bg-cyan-300/10 blur-2xl transition group-hover:bg-cyan-300/20" />
+                <usp.icon className="h-6 w-6 text-cyan-200" />
+                <h3 className="mt-3 text-xl font-semibold text-white">{usp.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/72">{usp.body}</p>
+              </motion.article>
+            ))}
+          </div>
+        </section>
+
+        <section id="architecture" className="mx-auto mt-14 w-full max-w-7xl overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Reference architecture</p>
+              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Control loops you can see, inspect, and enforce.</h2>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">
+                MUTX places policy and observability at every layer: intake, execution, recovery, and operator review. The result is autonomous throughput without autonomous risk.
+              </p>
+            </div>
+            <div className="grid gap-3">
+              {[
+                'Identity & policy checks on each transition',
+                'Runtime checkpoints for replay and rollback',
+                'SLA-aware escalation channels with full context',
+              ].map((line) => (
+                <div key={line} className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/30 p-3 text-sm text-white/75">
+                  <Lock className="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" />
+                  <span>{line}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </main>
