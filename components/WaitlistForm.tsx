@@ -121,7 +121,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
       const payload = await response.json()
 
       if (!response.ok) {
-        throw new Error(payload.error || 'Failed to join waitlist')
+        throw new Error(String(payload.error) || 'Failed to join waitlist')
       }
 
       const alreadyJoined = String(payload.message || '').toLowerCase().includes('already')
