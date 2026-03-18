@@ -1,4 +1,5 @@
 """Gateway client for calling OpenClaw gateway methods."""
+
 import json
 import subprocess
 import logging
@@ -12,16 +13,16 @@ def _parse_gateway_json_output(raw: str) -> Any:
     trimmed = raw.strip()
     if not trimmed:
         return None
-    
+
     # Find JSON start position
     object_start = trimmed.find("{")
     array_start = trimmed.find("[")
     has_object = object_start >= 0
     has_array = array_start >= 0
-    
+
     start = -1
     end = -1
-    
+
     if has_object and has_array:
         if object_start < array_start:
             start = object_start
@@ -35,10 +36,10 @@ def _parse_gateway_json_output(raw: str) -> Any:
     elif has_array:
         start = array_start
         end = trimmed.rfind("]")
-    
+
     if start < 0 or end < start:
         return None
-    
+
     try:
         return json.loads(trimmed[start : end + 1])
     except json.JSONDecodeError:
@@ -69,22 +70,22 @@ async def call_gateway_method(
 ) -> Any:
     """
     Call an OpenClaw gateway method via CLI.
-    
+
     Args:
         method: Gateway method name
         params: Method parameters dict
         timeout_ms: Timeout in milliseconds
-        
+
     Returns:
         Parsed JSON response from gateway
-        
+
     Raises:
         TimeoutError: If command times out
         RuntimeError: If OpenClaw CLI not found or invalid response
     """
     params = params or {}
     timeout = max(1000, int(timeout_ms))
-    
+
     cmd = [
         "gateway",
         "call",
@@ -95,13 +96,13 @@ async def call_gateway_method(
         json.dumps(params),
         "--json",
     ]
-    
+
     result = _run_openclaw(cmd, timeout_ms=timeout_ms + 2000)
-    
+
     payload = _parse_gateway_json_output(result.stdout)
     if payload is None:
         raise RuntimeError(f"Invalid JSON response from gateway method {method}")
-    
+
     return payload
 
 
@@ -113,10 +114,10 @@ def call_gateway_method_sync(
 ) -> Any:
     """Synchronous version of call_gateway_method."""
     import asyncio
-    
+
     async def _call():
         return await call_gateway_method(method, params, timeout_ms)
-    
+
     return asyncio.get_event_loop().run_until_complete(_call())
 
 

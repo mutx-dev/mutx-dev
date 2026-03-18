@@ -1,5 +1,5 @@
 """Gateway URL building utilities for WebSocket connections."""
-import os
+
 from typing import Optional
 from urllib.parse import urlparse, urlunparse, parse_qs
 
@@ -68,18 +68,20 @@ def build_gateway_websocket_url(
         try:
             parsed = urlparse(prefixed)
             # Local hosts always use plain ws:// — no TLS on local gateway.
-            new_protocol = "ws:" if _is_local_host(parsed.hostname) else _normalize_protocol(parsed.scheme)
-            
+            new_protocol = (
+                "ws:" if _is_local_host(parsed.hostname) else _normalize_protocol(parsed.scheme)
+            )
+
             # Keep explicit proxy paths (e.g. /gw), but collapse known dashboard/session routes to root.
             new_path = _normalize_gateway_path(parsed.path)
-            
+
             # Preserve token from query
             query_dict = parse_qs(parsed.query)
             token = query_dict.get("token", [None])[0]
-            
+
             # Build new query
             new_query = f"token={token}" if token else ""
-            
+
             # Reconstruct URL
             netloc = f"{parsed.hostname}:{parsed.port}" if parsed.port else parsed.hostname
             new_url = urlunparse((new_protocol, netloc, new_path, "", new_query, ""))
@@ -89,8 +91,10 @@ def build_gateway_websocket_url(
 
     # Local gateway hosts always use plain ws:// — they don't speak TLS,
     # and browsers allow ws://localhost from HTTPS pages (mixed-content exception).
-    ws_protocol = "ws" if _is_local_host(raw_host) else ("wss" if browser_protocol == "https:" else "ws")
-    
+    ws_protocol = (
+        "ws" if _is_local_host(raw_host) else ("wss" if browser_protocol == "https:" else "ws")
+    )
+
     # Omit default port for wss non-local hosts
     should_omit_port = ws_protocol == "wss" and not _is_local_host(raw_host) and port == 18789
 
