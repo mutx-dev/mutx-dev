@@ -1,7 +1,7 @@
 # UI Porting Plan — mutx-control → mutx-dev
 
 **Started:** 2026-03-18  
-**Status:** PHASE 3 IN PROGRESS — Integration wiring done, e2e testing pending  
+**Status:** PHASE 4 IN PROGRESS — Polish + e2e testing  
 **Push branch:** `mutx-dev:ui-porting` (main is protected — open PR to merge)  
 **Source:** https://github.com/mutx-dev/mutx-control/ (OpenClaw Mission Control)  
 **Target:** https://github.com/mutx-dev/mutx-dev  
@@ -71,7 +71,7 @@
 | 7 | Metric Cards | `dashboard/widgets/metric-cards-widget.tsx` | `components/app/metric-cards.tsx` | ✅ DONE — `DashboardMetricCard` in `components/ui/dashboard-widgets.tsx` | |
 | 8 | Activity Feed | `panels/activity-feed-panel.tsx` | `components/app/activity-feed.tsx` | ✅ DONE | Derives events from agents + deployments API |
 | 9 | Task Board | `panels/task-board-panel.tsx` | `components/app/task-board.tsx` | ✅ DONE | Kanban from agents + deployments |
-| 10 | Nav Rail | `components/layout/nav-rail.tsx` | `components/ui/nav-rail.tsx` | TODO | Mobile nav |
+| 10 | Nav Rail | `components/layout/nav-rail.tsx` | `components/ui/nav-rail.tsx` | ✅ DONE | Mobile nav |
 
 ---
 
@@ -118,8 +118,8 @@
 ## Next Actions
 
 1. **DONE:** sidebar, stat-card, widget-grid, dashboard-overview, log-viewer, activity-feed, task-board, metric-cards, nav-rail — all 10 components ported to ui-porting
-2. **IN PROGRESS:** Phase 3 — /app wired to ported components, API endpoints exist
-3. **NEXT:** Phase 4 (Polish) — MUTX branding, empty states, mobile polish
+2. **DONE:** Phase 3 — /app wired to ported components, API endpoints exist; sidebar routes fixed
+3. **IN PROGRESS:** Phase 4 (Polish) — empty states, mobile polish
 4. **PENDING:** Manual e2e testing of all ported components
 
 ---
