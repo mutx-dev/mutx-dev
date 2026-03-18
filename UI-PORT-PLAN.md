@@ -70,7 +70,7 @@
 | 6 | Widget Grid | `dashboard/widget-grid.tsx` | `components/ui/widget-grid.tsx` | ✅ DONE | Layout system |
 | 7 | Metric Cards | `dashboard/widgets/metric-cards-widget.tsx` | `components/app/metric-cards.tsx` | ✅ DONE | Adapt API calls to `/api/dashboard/*` |
 | 8 | Activity Feed | `panels/activity-feed-panel.tsx` | `components/app/activity-feed.tsx` | ✅ DONE | Adapt API calls to `/api/dashboard/*` |
-| 9 | Task Board | `panels/task-board-panel.tsx` | `components/app/task-board.tsx` | TODO | |
+| 9 | Task Board | `panels/task-board-panel.tsx` | `components/app/task-board.tsx` | ✅ DONE | Derived from `/api/dashboard/agents` + `/api/dashboard/deployments` until `/api/dashboard/tasks` exists |
 | 10 | Nav Rail | `components/layout/nav-rail.tsx` | `components/ui/nav-rail.tsx` | TODO | Mobile nav |
 
 ---
@@ -111,7 +111,7 @@
 | Date | Phase | Components Done | Notes |
 |------|-------|-----------------|-------|
 | 2026-03-18 | Phase 1 (Discovery) | ✅ Complete | mutx-control = OpenClaw UI |
-| 2026-03-18 | Phase 2 (Components) | 8/10 | sidebar, stat-card, agent-row, widget-grid, dashboard-layout, log-viewer, metric-cards, activity-feed → pushed to ui-porting |
+| 2026-03-18 | Phase 2 (Components) | 9/10 | sidebar, stat-card, agent-row, widget-grid, dashboard-layout, log-viewer, metric-cards, activity-feed, task-board → pushed to ui-porting |
 
 ---
 
