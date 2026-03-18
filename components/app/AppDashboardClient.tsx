@@ -177,14 +177,14 @@ export function AppDashboardClient() {
     ? deployments.find(d => d.id === selectedDeploymentId) 
     : deployments[0] ?? null;
 
-  const runningAgents = agents.filter((agent) => agent.status === "running").length;
-  const healthyDeployments = deployments.filter(
+  const runningAgents = (Array.isArray(agents) ? agents : []).filter((agent) => agent.status === "running").length;
+  const healthyDeployments = (Array.isArray(deployments) ? deployments : []).filter(
     (deployment) => deployment.status === "running" || deployment.status === "healthy",
   ).length;
-  const failedDeployments = deployments.filter(
+  const failedDeployments = (Array.isArray(deployments) ? deployments : []).filter(
     (deployment) => deployment.status === "failed" || deployment.status === "error",
   ).length;
-  const activeKeys = apiKeys.filter((apiKey) => apiKey.is_active).length;
+  const activeKeys = (Array.isArray(apiKeys) ? apiKeys : []).filter((apiKey) => apiKey.is_active).length;
   const revokedKeys = apiKeys.length - activeKeys;
   const apiKeyLimit = getApiKeyLimit(user?.plan);
   const apiKeyCapacityRemaining = apiKeyLimit === null ? null : Math.max(apiKeyLimit - activeKeys, 0);

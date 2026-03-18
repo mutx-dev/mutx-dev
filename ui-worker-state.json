@@ -1,0 +1,18 @@
+{
+  "worker": "mutx-ui-porting",
+  "started": "2026-03-18T11:00:00Z",
+  "status": "active",
+  "components_done": ["sidebar.tsx", "stat-card.tsx", "agent-row.tsx", "widget-grid.tsx"],
+  "components_remaining": [
+    "activity-feed.tsx",
+    "task-board.tsx",
+    "log-viewer.tsx",
+    "metric-cards.tsx",
+    "nav-rail.tsx",
+    "dashboard-layout.tsx"
+  ],
+  "source": "/tmp/mutx-control/src/components/",
+  "target": "/Users/fortune/.openclaw/workspace/components/",
+  "last_run": "2026-03-18T12:18:00Z",
+  "errors": []
+}

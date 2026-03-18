@@ -1,0 +1,10 @@
+okay would it make sense for us to separate the front end and the back end they're already
+separated services within the zooming dash youth railway project so they're already separate but
+they're both pointing to the same repo and to the just to the root of the repo should we like because
+i feel because what happens when i tried loading it earlier is it would just take forever and just
+wouldn't load properly so i'm assuming there must be a way um for us to uh yeah like that that lag
+before the site showed an internal error is what makes me think that the site is trying to load
+like in the entire suit and then just crashes or something or you know like we coded way too much
+we pushed we're at like two million lines of code or something by now so we need to properly
+compartmentalize everything
+you

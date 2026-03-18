@@ -1,0 +1,11 @@
+start	end	text
+0	7220	okay would it make sense for us to separate the front end and the back end they're already
+7220	13780	separated services within the zooming dash youth railway project so they're already separate but
+13780	21280	they're both pointing to the same repo and to the just to the root of the repo should we like because
+21280	25500	i feel because what happens when i tried loading it earlier is it would just take forever and just
+25500	36500	wouldn't load properly so i'm assuming there must be a way um for us to uh yeah like that that lag
+36500	41720	before the site showed an internal error is what makes me think that the site is trying to load
+41720	48420	like in the entire suit and then just crashes or something or you know like we coded way too much
+48420	53560	we pushed we're at like two million lines of code or something by now so we need to properly
+53560	55380	compartmentalize everything
+55380	55560	you

@@ -1,0 +1,6 @@
+start	end	text
+0	8660	now back to us can you figure out why the website is still returning an internal server or whatever
+8660	14160	like it's just not online it's completely dead something happened you can check the
+14160	20820	it's not even the the deployment is is fine can you check the network logs or whatever like live
+20820	29240	service logs for the zooming dash youth project because that's where we have both the front end
+29240	32360	the back end and the postgres server for mutx

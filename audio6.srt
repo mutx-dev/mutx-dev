@@ -1,0 +1,20 @@
+1
+00:00:00,000 --> 00:00:05,480
+And FYI, the Mutex-API project, I don't think that's even configured.
+
+2
+00:00:05,480 --> 00:00:09,600
+That was made randomly by you.
+
+3
+00:00:09,820 --> 00:00:11,460
+I don't think it's configured to anything.
+
+4
+00:00:11,620 --> 00:00:12,720
+I don't know if it even works.
+
+5
+00:00:13,820 --> 00:00:19,460
+Just FYI, can we please stick to the zooming-youth railway service?
+

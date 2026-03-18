@@ -1,0 +1,24 @@
+1
+00:00:00,000 --> 00:00:07,560
+yes you have all the credentials for railway CLI so just use the CLI figure
+
+2
+00:00:07,560 --> 00:00:10,920
+out figure this out on your own please like your task is not done until the
+
+3
+00:00:10,920 --> 00:00:15,900
+website is back up it's unbelievable that it's not back up if we have to roll
+
+4
+00:00:15,900 --> 00:00:20,220
+back to an earlier version then do so because we're pushing super hard now with
+
+5
+00:00:20,220 --> 00:00:25,140
+the with the X posts and also I'm emailing a bunch of VCs like this is
+
+6
+00:00:25,140 --> 00:00:29,200
+not the time for the website to be down so fix it
+

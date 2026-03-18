@@ -1,0 +1,1 @@
+{"text": " You check the back-end logs.", "segments": [{"id": 0, "seek": 0, "start": 0.0, "end": 2.24, "text": " You check the back-end logs.", "tokens": [50365, 509, 1520, 264, 646, 12, 521, 20820, 13, 50477], "temperature": 0.0, "avg_logprob": -0.5699068849736993, "compression_ratio": 0.7777777777777778, "no_speech_prob": 7.037753192717933e-12}], "language": "en"}

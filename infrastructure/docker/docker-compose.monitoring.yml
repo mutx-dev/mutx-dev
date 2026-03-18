@@ -40,6 +40,11 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9093/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   grafana:
     image: grafana/grafana:11.2.2
@@ -62,6 +67,11 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   node-exporter:
     image: prom/node-exporter:v1.8.2
@@ -79,6 +89,11 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9100/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   redis-exporter:
     image: oliver006/redis_exporter:v1.62.0
@@ -93,6 +108,11 @@ services:
       - redis
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9121/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:v0.16.0
@@ -106,6 +126,11 @@ services:
       - postgres
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9187/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -118,6 +143,11 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   postgres:
     image: postgres:16-alpine
@@ -133,6 +163,11 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mutx}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
   prometheus_data:
