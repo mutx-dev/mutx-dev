@@ -2,6 +2,7 @@
 
 **Started:** 2026-03-18  
 **Status:** PHASE 1 COMPLETE — Starting Phase 2  
+**Push branch:** `mutx-dev:ui-porting` (main is protected — open PR to merge)  
 **Source:** https://github.com/mutx-dev/mutx-control/ (OpenClaw Mission Control)  
 **Target:** https://github.com/mutx-dev/mutx-dev  
 
@@ -108,9 +109,11 @@
 | Date | Phase | Components Done | Notes |
 |------|-------|-----------------|-------|
 | 2026-03-18 | Phase 1 (Discovery) | ✅ Complete | mutx-control = OpenClaw UI |
-| 2026-03-18 | Phase 2 (Components) | 0/10 | Starting with Sidebar |
+| 2026-03-18 | Phase 2 (Components) | 4/10 | sidebar, stat-card, agent-row, widget-grid → pushed to ui-porting |
 
 ---
+
+**Note:** `main` is protected — all changes pushed to `ui-porting` branch. Open PR to merge into main.
 
 ## Next Actions
 
