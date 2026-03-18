@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Bot, Server } from "lucide-react";
+import { Bot, Server, Zap, RotateCcw } from "lucide-react";
 
 import { EmptyState, ShellAuthRequiredState, ShellErrorState, ShellLoadingState } from "@/components/dashboard";
 import { AgentAvatar } from "@/components/ui/agent-avatar";
 import { DashboardOverview } from "@/components/ui/dashboard-widgets";
+import { cn } from "@/lib/utils";
 
 interface Agent {
   id: string;
@@ -22,6 +23,12 @@ interface Deployment {
   created_at: string;
 }
 
+interface Run {
+  id: string;
+  status: string;
+  created_at: string;
+}
+
 interface HealthStatus {
   status: "healthy" | "degraded" | "unhealthy" | "unknown" | string;
   error?: string;
@@ -30,6 +37,7 @@ interface HealthStatus {
 export default function DashboardPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [deployments, setDeployments] = useState<Deployment[]>([]);
+  const [runs, setRuns] = useState<Run[]>([]);
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,10 +47,11 @@ export default function DashboardPage() {
     setError(null);
 
     try {
-      const [agentsRes, deploymentsRes, healthRes] = await Promise.all([
+      const [agentsRes, deploymentsRes, healthRes, runsRes] = await Promise.all([
         fetch("/api/dashboard/agents", { cache: "no-store" }),
         fetch("/api/dashboard/deployments", { cache: "no-store" }),
         fetch("/api/dashboard/health", { cache: "no-store" }),
+        fetch("/api/dashboard/runs", { cache: "no-store" }),
       ]);
 
       if (agentsRes.status === 401 || deploymentsRes.status === 401) {
@@ -70,6 +79,15 @@ export default function DashboardPage() {
 
       setAgents(agentsData.agents || []);
       setDeployments(deploymentsData.deployments || []);
+
+      if (runsRes.ok) {
+        try {
+          const runsData = await runsRes.json();
+          setRuns(runsData.runs || []);
+        } catch {
+          setRuns([]);
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -104,6 +122,11 @@ export default function DashboardPage() {
     failed: deployments.filter((d) => d.status === "failed").length,
   };
 
+  const runStats = {
+    total: runs.length,
+    running: runs.filter((r) => r.status === "running").length,
+  };
+
   const apiHealth: HealthStatus["status"] = health?.status ?? "unknown";
 
   return (
@@ -112,11 +135,14 @@ export default function DashboardPage() {
       <DashboardOverview
         agentStats={agentStats}
         deploymentStats={deploymentStats}
+        runStats={runStats}
         apiHealth={apiHealth as "healthy" | "degraded" | "unhealthy" | "unknown"}
+        onRefresh={fetchData}
+        isRefreshing={loading}
       />
 
       {/* Quick Links */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-4">
         {/* Agents Card */}
         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
           <div className="flex items-center justify-between">
@@ -206,6 +232,44 @@ export default function DashboardPage() {
           )}
         </div>
 
+        {/* Runs Card */}
+        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-white">Runs</h2>
+            <Link
+              href="/dashboard/runs"
+              className="text-sm font-medium text-cyan-400 hover:text-cyan-300"
+            >
+              View all →
+            </Link>
+          </div>
+          {runs.length === 0 ? (
+            <p className="mt-4 text-sm text-slate-400">No runs recorded yet.</p>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {runs.slice(0, 3).map((run) => (
+                <div
+                  key={run.id}
+                  className="flex items-center justify-between rounded-lg bg-slate-800/50 p-3"
+                >
+                  <span className="truncate font-mono text-xs text-slate-400">
+                    {run.id.slice(0, 12)}...
+                  </span>
+                  <span
+                    className={`rounded-full px-2 py-1 text-xs font-medium ${
+                      run.status === "running"
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : "bg-slate-700 text-slate-400"
+                    }`}
+                  >
+                    {run.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Webhooks Card */}
         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
           <div className="flex items-center justify-between">
@@ -217,7 +281,7 @@ export default function DashboardPage() {
               Manage →
             </Link>
           </div>
-          <p className="mt-4 text-slate-400">Configure webhook endpoints for real-time events</p>
+          <p className="mt-4 text-sm text-slate-400">Configure webhook endpoints for real-time events</p>
         </div>
       </div>
     </div>

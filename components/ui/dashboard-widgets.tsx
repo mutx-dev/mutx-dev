@@ -117,8 +117,14 @@ export interface DashboardOverviewProps {
     running: number
     failed: number
   }
+  runStats?: {
+    total: number
+    running: number
+  }
   apiHealth: 'healthy' | 'degraded' | 'unhealthy' | 'unknown'
   errorCount?: number
+  onRefresh?: () => void
+  isRefreshing?: boolean
   className?: string
 }
 
@@ -133,8 +139,11 @@ export function DashboardOverview({
   isLoading,
   agentStats,
   deploymentStats,
+  runStats,
   apiHealth,
   errorCount = 0,
+  onRefresh,
+  isRefreshing,
   className,
 }: DashboardOverviewProps) {
   const healthTone = getSignalTone(apiHealth)
@@ -151,33 +160,56 @@ export function DashboardOverview({
               Agent fleet status, deployment health, and operational signals.
             </p>
           </div>
-          <div className="grid grid-cols-2 gap-2 min-w-[280px]">
-            <SignalPill
-              label="API"
-              value={apiHealth === 'unknown' ? 'Checking...' : apiHealth}
-              tone={healthTone}
-            />
-            <SignalPill
-              label="Agents"
-              value={`${agentStats.running}/${agentStats.total}`}
-              tone={agentStats.running > 0 ? 'success' : 'info'}
-            />
-            <SignalPill
-              label="Deployments"
-              value={`${deploymentStats.running}/${deploymentStats.total}`}
-              tone={deploymentStats.running > 0 ? 'success' : 'info'}
-            />
-            <SignalPill
-              label="Errors"
-              value={String(errorCount)}
-              tone={errorCount > 0 ? 'warning' : 'success'}
-            />
+          <div className="flex items-center gap-2">
+            {onRefresh && (
+              <button
+                type="button"
+                onClick={onRefresh}
+                disabled={isRefreshing}
+                className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
+              >
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  className={cn('h-3.5 w-3.5', isRefreshing && 'animate-spin')}
+                >
+                  <path d="M14 8A6 6 0 1 1 8 2" />
+                  <path d="M8 2l2-2m-2 2l2 2" />
+                </svg>
+                {isRefreshing ? 'Refreshing...' : 'Refresh'}
+              </button>
+            )}
+            <div className="grid grid-cols-2 gap-2 min-w-[280px]">
+              <SignalPill
+                label="API"
+                value={apiHealth === 'unknown' ? 'Checking...' : apiHealth}
+                tone={healthTone}
+              />
+              <SignalPill
+                label="Agents"
+                value={`${agentStats.running}/${agentStats.total}`}
+                tone={agentStats.running > 0 ? 'success' : 'info'}
+              />
+              <SignalPill
+                label="Deployments"
+                value={`${deploymentStats.running}/${deploymentStats.total}`}
+                tone={deploymentStats.running > 0 ? 'success' : 'info'}
+              />
+              <SignalPill
+                label="Errors"
+                value={String(errorCount)}
+                tone={errorCount > 0 ? 'warning' : 'success'}
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {/* Metric cards grid */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-7">
         <DashboardMetricCard
           label="Total Agents"
           value={agentStats.total}
@@ -215,6 +247,15 @@ export function DashboardOverview({
           icon={<FailedIcon />}
           color={deploymentStats.failed > 0 ? 'red' : 'blue'}
         />
+        {runStats && (
+          <DashboardMetricCard
+            label="Total Runs"
+            value={runStats.total}
+            icon={<RunningIcon />}
+            color="blue"
+            subtitle={runStats.running > 0 ? `${runStats.running} running` : undefined}
+          />
+        )}
       </div>
     </section>
   )
