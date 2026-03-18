@@ -2,31 +2,36 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Activity,
-  Bot,
-  ChevronRight,
-  KeyRound,
-  Layers,
-  ShieldCheck,
-  Webhook,
-} from "lucide-react";
+import { Activity, Bot, Gauge, ServerCog, ShieldCheck, Workflow } from "lucide-react";
 
-import { DashboardOverview } from "@/components/ui/dashboard-widgets";
+import {
+  ControlPlaneOverview,
+  ControlPlaneOverviewSkeleton,
+  type OverviewHealthRow,
+  type OverviewIncident,
+  type OverviewKpi,
+  type OverviewMetricRow,
+  type OverviewRouterEntry,
+  type OverviewSignal,
+} from "@/components/dashboard/OverviewControlPlane";
 
 interface Agent {
   id: string;
   name: string;
   status: string;
-  created_at: string;
+  created_at?: string;
 }
 
 interface Deployment {
   id: string;
-  agent_name?: string;
   agent_id?: string;
+  agent_name?: string;
   status: string;
-  created_at: string;
+  replicas?: number;
+  created_at?: string;
+  started_at?: string | null;
+  ended_at?: string | null;
+  error_message?: string | null;
 }
 
 interface ApiKeyRecord {
@@ -40,16 +45,106 @@ interface WebhookRecord {
 
 interface HealthStatus {
   status: "healthy" | "degraded" | "unhealthy" | "unknown" | string;
+  error?: string | null;
 }
 
-interface RouteCard {
-  title: string;
-  description: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  countLabel: string;
-  countValue: string;
-  accent: string;
+interface DeploymentEventRecord {
+  id?: string;
+  event_type?: string;
+  status?: string;
+  error_message?: string | null;
+  created_at?: string;
+  timestamp?: string;
+}
+
+interface DeploymentIncidentEnvelope {
+  deploymentId: string;
+  agentId?: string;
+  event: DeploymentEventRecord;
+}
+
+function toLower(value?: string | null) {
+  return (value ?? "").toLowerCase();
+}
+
+function isErrorStatus(status?: string | null) {
+  const normalized = toLower(status);
+  return normalized.includes("error") || normalized.includes("fail") || normalized.includes("unhealthy");
+}
+
+function isWarnStatus(status?: string | null) {
+  const normalized = toLower(status);
+  return (
+    normalized.includes("degraded") ||
+    normalized.includes("warn") ||
+    normalized.includes("pending") ||
+    normalized.includes("creating") ||
+    normalized.includes("starting") ||
+    normalized.includes("stopped")
+  );
+}
+
+function isQueuedDeployment(status?: string | null) {
+  const normalized = toLower(status);
+  return (
+    normalized.includes("queued") ||
+    normalized.includes("pending") ||
+    normalized.includes("creating") ||
+    normalized.includes("starting") ||
+    normalized.includes("restarting")
+  );
+}
+
+function shortId(value?: string | null, size = 8) {
+  if (!value) return "unknown";
+  return value.length <= size ? value : value.slice(0, size);
+}
+
+function formatRelativeTime(value?: string | null) {
+  if (!value) return "unknown";
+
+  const timestamp = new Date(value).getTime();
+  if (Number.isNaN(timestamp)) return "unknown";
+
+  const diffMs = timestamp - Date.now();
+  const formatter = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+  const minutes = Math.round(diffMs / 60000);
+
+  if (Math.abs(minutes) < 60) return formatter.format(minutes, "minute");
+
+  const hours = Math.round(minutes / 60);
+  if (Math.abs(hours) < 48) return formatter.format(hours, "hour");
+
+  const days = Math.round(hours / 24);
+  return formatter.format(days, "day");
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== "object") return null;
+  return value as Record<string, unknown>;
+}
+
+function readString(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim().length > 0 ? value : undefined;
+}
+
+function normalizeDeploymentEvents(payload: unknown): DeploymentEventRecord[] {
+  if (Array.isArray(payload)) return payload as DeploymentEventRecord[];
+
+  const record = asRecord(payload);
+  if (!record) return [];
+
+  if (Array.isArray(record.items)) return record.items as DeploymentEventRecord[];
+  if (Array.isArray(record.events)) return record.events as DeploymentEventRecord[];
+
+  return [];
+}
+
+function mapHealthTone(status: string): "good" | "warn" | "bad" | "info" {
+  if (toLower(status) === "healthy") return "good";
+  if (toLower(status) === "degraded") return "warn";
+  if (toLower(status) === "unhealthy") return "bad";
+  return "info";
 }
 
 export default function DashboardPage() {
@@ -58,10 +153,14 @@ export default function DashboardPage() {
   const [apiKeys, setApiKeys] = useState<ApiKeyRecord[]>([]);
   const [webhooks, setWebhooks] = useState<WebhookRecord[]>([]);
   const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [incidents, setIncidents] = useState<OverviewIncident[]>([]);
+  const [incidentsNote, setIncidentsNote] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchData() {
       try {
         const [agentsRes, deploymentsRes, healthRes, apiKeysRes, webhooksRes] = await Promise.all([
@@ -75,8 +174,10 @@ export default function DashboardPage() {
         if (
           [agentsRes, deploymentsRes, apiKeysRes, webhooksRes].some((response) => response.status === 401)
         ) {
-          setError("auth_required");
-          setLoading(false);
+          if (!cancelled) {
+            setError("auth_required");
+            setLoading(false);
+          }
           return;
         }
 
@@ -91,32 +192,156 @@ export default function DashboardPage() {
           webhooksRes.ok ? webhooksRes.json() : Promise.resolve({ webhooks: [] }),
         ]);
 
-        if (healthRes.ok) {
-          const healthData = await healthRes.json().catch(() => ({ status: "unknown" }));
-          setHealth(healthData);
-        } else {
-          setHealth({ status: "unknown" });
+        const nextAgents: Agent[] = Array.isArray(agentsData?.agents) ? agentsData.agents : [];
+        const nextDeployments: Deployment[] = Array.isArray(deploymentsData?.deployments)
+          ? deploymentsData.deployments
+          : [];
+
+        const nextApiKeys: ApiKeyRecord[] = Array.isArray(apiKeysData)
+          ? apiKeysData
+          : Array.isArray(apiKeysData?.items)
+            ? apiKeysData.items
+            : [];
+
+        const nextWebhooks: WebhookRecord[] = Array.isArray(webhooksData?.webhooks) ? webhooksData.webhooks : [];
+
+        if (!cancelled) {
+          setAgents(nextAgents);
+          setDeployments(nextDeployments);
+          setApiKeys(nextApiKeys);
+          setWebhooks(nextWebhooks);
         }
 
-        setAgents(agentsData.agents || []);
-        setDeployments(deploymentsData.deployments || []);
-        setApiKeys(Array.isArray(apiKeysData) ? apiKeysData : apiKeysData.items || []);
-        setWebhooks(webhooksData.webhooks || []);
+        if (!cancelled) {
+          if (healthRes.ok) {
+            const healthPayload = await healthRes.json().catch(() => ({ status: "unknown" }));
+            setHealth(healthPayload);
+          } else {
+            setHealth({ status: "unknown" });
+          }
+        }
+
+        const selectedDeployments = nextDeployments.slice(0, 6);
+        if (selectedDeployments.length === 0) {
+          if (!cancelled) {
+            setIncidents([]);
+            setIncidentsNote("No deployments available yet. Incident stream will populate when deployments start.");
+          }
+          return;
+        }
+
+        const incidentResults = await Promise.allSettled(
+          selectedDeployments.map(async (deployment): Promise<DeploymentIncidentEnvelope[]> => {
+            const response = await fetch(
+              `/api/deployments/${encodeURIComponent(deployment.id)}/events?limit=6`,
+              { cache: "no-store" },
+            );
+
+            if (!response.ok) {
+              throw new Error(`events_${response.status}`);
+            }
+
+            const payload = await response.json().catch(() => ({}));
+            const events = normalizeDeploymentEvents(payload);
+
+            return events.map((event) => ({
+              deploymentId: deployment.id,
+              agentId: deployment.agent_id,
+              event,
+            }));
+          }),
+        );
+
+        const eventFailures = incidentResults.filter((result) => result.status === "rejected").length;
+        const eventEnvelopes = incidentResults
+          .filter((result): result is PromiseFulfilledResult<DeploymentIncidentEnvelope[]> => result.status === "fulfilled")
+          .flatMap((result) => result.value);
+
+        const agentNameById = new Map(nextAgents.map((agent) => [agent.id, agent.name]));
+
+        const mappedIncidents = eventEnvelopes
+          .map((envelope, index): OverviewIncident => {
+            const eventType = readString(envelope.event.event_type)?.replace(/_/g, " ") ?? "lifecycle update";
+            const eventStatus = readString(envelope.event.status);
+            const eventError = readString(envelope.event.error_message);
+            const severity = eventError || isErrorStatus(eventStatus)
+              ? "error"
+              : isWarnStatus(eventStatus)
+                ? "warning"
+                : "info";
+
+            const sourceAgent = envelope.agentId ? agentNameById.get(envelope.agentId) ?? shortId(envelope.agentId) : "unknown";
+            const occurredAt =
+              formatRelativeTime(readString(envelope.event.created_at) ?? readString(envelope.event.timestamp));
+
+            return {
+              id: readString(envelope.event.id) ?? `${envelope.deploymentId}-${index}`,
+              level: severity,
+              title: `deployment:${shortId(envelope.deploymentId)} • ${eventType}`,
+              detail: eventError ?? (eventStatus ? `status ${eventStatus}` : "event recorded"),
+              source: `agent:${sourceAgent}`,
+              occurredAt,
+            };
+          })
+          .slice(0, 16);
+
+        const fallbackDeploymentIncidents: OverviewIncident[] = nextDeployments
+          .filter((deployment) => isErrorStatus(deployment.status))
+          .map((deployment, index) => {
+            const sourceAgent = deployment.agent_id
+              ? agentNameById.get(deployment.agent_id) ?? shortId(deployment.agent_id)
+              : "unknown";
+
+            return {
+              id: `fallback-${deployment.id}-${index}`,
+              level: "error",
+              title: `deployment:${shortId(deployment.id)} • runtime failure`,
+              detail: deployment.error_message ?? `status ${deployment.status}`,
+              source: `agent:${sourceAgent}`,
+              occurredAt: formatRelativeTime(deployment.ended_at ?? deployment.started_at ?? deployment.created_at),
+            };
+          });
+
+        const nextIncidents = [...mappedIncidents, ...fallbackDeploymentIncidents].slice(0, 12);
+
+        if (!cancelled) {
+          setIncidents(nextIncidents);
+
+          if (eventFailures > 0) {
+            setIncidentsNote(
+              `Event stream unavailable for ${eventFailures} deployment${eventFailures === 1 ? "" : "s"}; showing available incident signals.`,
+            );
+          } else if (nextIncidents.length === 0) {
+            setIncidentsNote("No incident events reported in the current deployment scope.");
+          } else {
+            setIncidentsNote(null);
+          }
+        }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Unknown error");
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
-    fetchData();
+    void fetchData();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const apiHealth: HealthStatus["status"] = health?.status ?? "unknown";
 
   const agentStats = useMemo(
     () => ({
       total: agents.length,
-      running: agents.filter((agent) => agent.status === "running").length,
-      stopped: agents.filter((agent) => agent.status !== "running").length,
+      running: agents.filter((agent) => toLower(agent.status) === "running").length,
+      stopped: agents.filter((agent) => toLower(agent.status) !== "running").length,
     }),
     [agents],
   );
@@ -124,9 +349,14 @@ export default function DashboardPage() {
   const deploymentStats = useMemo(
     () => ({
       total: deployments.length,
-      running: deployments.filter((deployment) => deployment.status === "running").length,
-      failed: deployments.filter((deployment) => deployment.status === "failed").length,
+      running: deployments.filter((deployment) => toLower(deployment.status) === "running").length,
+      failed: deployments.filter((deployment) => isErrorStatus(deployment.status)).length,
     }),
+    [deployments],
+  );
+
+  const queuedDeployments = useMemo(
+    () => deployments.filter((deployment) => isQueuedDeployment(deployment.status)).length,
     [deployments],
   );
 
@@ -135,135 +365,196 @@ export default function DashboardPage() {
     [webhooks],
   );
 
+  const agentNameById = useMemo(() => new Map(agents.map((agent) => [agent.id, agent.name])), [agents]);
+
+  const routerEntries = useMemo<OverviewRouterEntry[]>(
+    () =>
+      deployments.slice(0, 10).map((deployment) => {
+        const label = deployment.agent_name ?? (deployment.agent_id ? agentNameById.get(deployment.agent_id) : undefined);
+        const routeStatus = isErrorStatus(deployment.status)
+          ? "bad"
+          : isWarnStatus(deployment.status)
+            ? "warn"
+            : toLower(deployment.status) === "running"
+              ? "good"
+              : "info";
+
+        return {
+          id: deployment.id,
+          primary: `agent:${label ?? shortId(deployment.agent_id)}`,
+          secondary: `deployment:${shortId(deployment.id, 12)}`,
+          statusLabel: deployment.status,
+          statusTone: routeStatus,
+          meta: `${deployment.replicas ?? 1} replica${(deployment.replicas ?? 1) === 1 ? "" : "s"}`,
+          ageLabel: formatRelativeTime(deployment.started_at ?? deployment.created_at ?? deployment.ended_at),
+        };
+      }),
+    [deployments, agentNameById],
+  );
+
+  const incidentErrorCount = useMemo(
+    () => incidents.filter((incident) => incident.level === "error").length,
+    [incidents],
+  );
+
+  const totalErrorSignals = Math.max(incidentErrorCount, deploymentStats.failed);
+  const loadRatio = deploymentStats.total > 0 ? Math.round((deploymentStats.running / deploymentStats.total) * 100) : null;
+
+  const gatewayLabel =
+    apiHealth === "healthy"
+      ? "Online"
+      : apiHealth === "degraded"
+        ? "Degraded"
+        : apiHealth === "unhealthy"
+          ? "Offline"
+          : "Unknown";
+
+  const signals: OverviewSignal[] = [
+    { label: "Mode", value: "Gateway", tone: "info" },
+    { label: "Events", value: `${incidents.length} stream`, tone: incidents.length > 0 ? "good" : "info" },
+    { label: "Queue", value: String(queuedDeployments), tone: queuedDeployments > 0 ? "warn" : "good" },
+    { label: "Errors", value: String(totalErrorSignals), tone: totalErrorSignals > 0 ? "warn" : "good" },
+  ];
+
+  const kpis: OverviewKpi[] = [
+    {
+      title: "Gateway",
+      value: gatewayLabel,
+      subtitle: "transport status",
+      detail: apiHealth === "unknown" && health?.error ? health.error : undefined,
+      tone: "gateway",
+      icon: ShieldCheck,
+    },
+    {
+      title: "Sessions",
+      value: `${deploymentStats.running}/${deploymentStats.total}`,
+      subtitle: "active / total",
+      detail: "deployment-backed proxy",
+      tone: "blue",
+      icon: Workflow,
+    },
+    {
+      title: "Agent Capacity",
+      value: String(agentStats.running),
+      subtitle: `${agentStats.total} total`,
+      tone: "green",
+      icon: Bot,
+    },
+    {
+      title: "Queue",
+      value: String(queuedDeployments),
+      subtitle: "pending deployments",
+      tone: "violet",
+      icon: ServerCog,
+    },
+    {
+      title: "System Load",
+      value: loadRatio == null ? "n/a" : `${loadRatio}%`,
+      subtitle: "running deployment ratio",
+      detail: loadRatio == null ? "awaiting deployment metrics contract" : undefined,
+      tone: "slate",
+      icon: Gauge,
+    },
+  ];
+
+  const healthRows: OverviewHealthRow[] = [
+    { label: "Gateway", value: gatewayLabel, tone: mapHealthTone(apiHealth) },
+    {
+      label: "Traffic (deployments)",
+      value: String(deploymentStats.total),
+      tone: deploymentStats.total > 0 ? "good" : "info",
+    },
+    { label: "Errors (24h proxy)", value: String(totalErrorSignals), tone: totalErrorSignals > 0 ? "warn" : "good" },
+    {
+      label: "Saturation (queue)",
+      value: String(queuedDeployments),
+      tone: queuedDeployments > 4 ? "bad" : queuedDeployments > 0 ? "warn" : "good",
+      bar: deploymentStats.total > 0 ? Math.round((queuedDeployments / deploymentStats.total) * 100) : 0,
+    },
+    {
+      label: "Webhooks (active)",
+      value: String(activeWebhooks),
+      tone: activeWebhooks > 0 ? "good" : "info",
+    },
+    {
+      label: "API Keys",
+      value: String(apiKeys.length),
+      tone: apiKeys.length > 0 ? "info" : "warn",
+    },
+  ];
+
+  const taskRows: OverviewMetricRow[] = [
+    { label: "Inbox", value: "n/a", tone: "info" },
+    { label: "Assigned", value: "n/a", tone: "info" },
+    { label: "In Progress", value: "n/a", tone: "info" },
+    { label: "Review", value: "n/a", tone: "info" },
+    { label: "Done", value: "n/a", tone: "info" },
+    { label: "Backlog", value: "n/a", tone: "info" },
+  ];
+
+  const securityRows: OverviewMetricRow[] = [
+    {
+      label: "API keys (registered)",
+      value: String(apiKeys.length),
+      tone: apiKeys.length > 0 ? "good" : "warn",
+    },
+    {
+      label: "Webhook endpoints (active)",
+      value: String(activeWebhooks),
+      tone: activeWebhooks > 0 ? "good" : "info",
+    },
+    { label: "Login failures (24h)", value: "n/a", tone: "info" },
+    { label: "Unread notifications", value: "n/a", tone: "info" },
+  ];
+
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
-      </div>
-    );
+    return <ControlPlaneOverviewSkeleton />;
   }
 
   if (error) {
     if (error === "auth_required") {
       return (
-        <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/10 p-4">
-          <p className="text-cyan-400">Please sign in to view your dashboard</p>
-          <a href="/login" className="mt-2 inline-block text-sm font-medium text-cyan-300 hover:text-cyan-200">
-            Sign in →
-          </a>
-        </div>
+        <section className="rounded-xl border border-cyan-500/20 bg-cyan-500/10 p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-300/80">Auth Required</p>
+          <h1 className="mt-2 text-lg font-semibold text-cyan-100">Sign in to view gateway overview.</h1>
+          <p className="mt-1 text-sm text-cyan-200/80">
+            Dashboard data is scoped to authenticated control-plane ownership.
+          </p>
+          <Link
+            href="/login"
+            className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-cyan-200 transition hover:text-cyan-100"
+          >
+            Open login
+          </Link>
+        </section>
       );
     }
 
-    return <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-red-400">{error}</div>;
+    return (
+      <section className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-5">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-rose-300/80">Overview Error</p>
+        <h1 className="mt-2 text-lg font-semibold text-rose-100">Failed to load control-plane overview.</h1>
+        <p className="mt-1 text-sm text-rose-200/80">{error}</p>
+      </section>
+    );
   }
 
-  const apiHealth: HealthStatus["status"] = health?.status ?? "unknown";
-
-  const routeCards: RouteCard[] = [
-    {
-      title: "Agents",
-      description: "Manage fleet configuration and lifecycle.",
-      href: "/dashboard/agents",
-      icon: Bot,
-      countLabel: "Running / Total",
-      countValue: `${agentStats.running} / ${agentStats.total}`,
-      accent: "text-cyan-300 border-cyan-400/20 bg-cyan-400/10",
-    },
-    {
-      title: "Deployments",
-      description: "Operate active runtime deployments.",
-      href: "/dashboard/deployments",
-      icon: Layers,
-      countLabel: "Active / Total",
-      countValue: `${deploymentStats.running} / ${deploymentStats.total}`,
-      accent: "text-emerald-300 border-emerald-400/20 bg-emerald-400/10",
-    },
-    {
-      title: "API Keys",
-      description: "Issue and rotate machine credentials.",
-      href: "/dashboard/api-keys",
-      icon: KeyRound,
-      countLabel: "Registered keys",
-      countValue: `${apiKeys.length}`,
-      accent: "text-amber-300 border-amber-400/20 bg-amber-400/10",
-    },
-    {
-      title: "Webhooks",
-      description: "Track event delivery endpoints.",
-      href: "/dashboard/webhooks",
-      icon: Webhook,
-      countLabel: "Active endpoints",
-      countValue: `${activeWebhooks}`,
-      accent: "text-purple-300 border-purple-400/20 bg-purple-400/10",
-    },
-    {
-      title: "Monitoring",
-      description: "Observe health and telemetry wiring.",
-      href: "/dashboard/monitoring",
-      icon: Activity,
-      countLabel: "Control plane",
-      countValue: String(apiHealth),
-      accent: "text-sky-300 border-sky-400/20 bg-sky-400/10",
-    },
-  ];
-
   return (
-    <div className="space-y-6">
-      <section className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-5 sm:p-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">operator overview</p>
-            <h1 className="mt-2 text-2xl font-semibold text-white">MUTX Mission Control</h1>
-            <p className="mt-1 text-sm text-slate-400">
-              Truthful control surface stitched from live agents, deployments, API keys, webhooks, and health.
-            </p>
-          </div>
-
-          <div className="inline-flex items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300">
-            <ShieldCheck className="h-4 w-4" />
-            No fabricated metrics
-          </div>
-        </div>
-      </section>
-
-      <DashboardOverview
-        agentStats={agentStats}
-        deploymentStats={deploymentStats}
-        apiHealth={apiHealth as "healthy" | "degraded" | "unhealthy" | "unknown"}
-      />
-
-      <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Core operator surfaces</h2>
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">authenticated routes</p>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {routeCards.map((card) => (
-            <Link
-              key={card.href}
-              href={card.href}
-              className="group rounded-xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-cyan-400/30 hover:bg-white/[0.04]"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className={`inline-flex h-10 w-10 items-center justify-center rounded-lg border ${card.accent}`}>
-                  <card.icon className="h-5 w-5" />
-                </div>
-                <ChevronRight className="h-4 w-4 text-slate-500 transition group-hover:text-cyan-300" />
-              </div>
-
-              <h3 className="mt-3 text-base font-semibold text-white">{card.title}</h3>
-              <p className="mt-1 text-sm text-slate-400">{card.description}</p>
-
-              <div className="mt-4 rounded-lg border border-white/10 bg-black/20 px-3 py-2">
-                <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">{card.countLabel}</p>
-                <p className="mt-1 font-mono text-sm text-slate-100">{card.countValue}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-    </div>
+    <ControlPlaneOverview
+      title="Gateway Control Plane"
+      subtitle="Gateway-first health, session routing, queue pressure, and incident response signals."
+      signals={signals}
+      kpis={kpis}
+      healthRows={healthRows}
+      routerEntries={routerEntries}
+      incidents={incidents}
+      incidentsNote={incidentsNote}
+      taskRows={taskRows}
+      taskFootnote="Task-state aggregate contract is not wired in this workspace yet."
+      securityRows={securityRows}
+      securityTag="Partial coverage"
+      securityHref="/dashboard/control"
+      securityHrefLabel="View Security Surface"
+    />
   );
 }
