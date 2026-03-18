@@ -71,6 +71,8 @@
 | 7 | Metric Cards | `dashboard/widgets/metric-cards-widget.tsx` | `components/app/metric-cards.tsx` | ✅ DONE — `DashboardMetricCard` in `components/ui/dashboard-widgets.tsx` | |
 | 8 | Activity Feed | `panels/activity-feed-panel.tsx` | `components/app/activity-feed.tsx` | ✅ DONE | Derives events from agents + deployments API |
 | 9 | Task Board | `panels/task-board-panel.tsx` | `components/app/task-board.tsx` | ✅ DONE | Kanban from agents + deployments |
+
+| 11 | Agent Avatar | `ui/agent-avatar.tsx` | `components/ui/agent-avatar.tsx` | ✅ DONE | Color-coded initials avatar |
 | 10 | Nav Rail | `components/layout/nav-rail.tsx` | `components/ui/nav-rail.tsx` | ✅ DONE | Mobile nav |
 
 ---
