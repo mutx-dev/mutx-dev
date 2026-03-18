@@ -13,13 +13,14 @@ interface MenuItem {
   description?: string
 }
 
+// Fixed: corrected routes to match actual dashboard routes
 const menuItems: MenuItem[] = [
   { id: 'overview', label: 'Overview', icon: '📊', href: '/app', description: 'Dashboard overview' },
-  { id: 'agents', label: 'Agents', icon: '🤖', href: '/app/agents', description: 'Manage agents' },
-  { id: 'deployments', label: 'Deployments', icon: '🚀', href: '/app/deployments', description: 'Deployment management' },
-  { id: 'api-keys', label: 'API Keys', icon: '🔑', href: '/app/api-keys', description: 'API key management' },
-  { id: 'webhooks', label: 'Webhooks', icon: '🪝', href: '/app/webhooks', description: 'Webhook endpoints' },
-  { id: 'logs', label: 'Logs', icon: '📝', href: '/app/logs', description: 'Log viewer' },
+  { id: 'agents', label: 'Agents', icon: '🤖', href: '/dashboard/agents', description: 'Manage agents' },
+  { id: 'deployments', label: 'Deployments', icon: '🚀', href: '/dashboard/deployments', description: 'Deployment management' },
+  { id: 'api-keys', label: 'API Keys', icon: '🔑', href: '/dashboard/api-keys', description: 'API key management' },
+  { id: 'webhooks', label: 'Webhooks', icon: '🪝', href: '/dashboard/webhooks', description: 'Webhook endpoints' },
+  { id: 'logs', label: 'Logs', icon: '📝', href: '/dashboard/logs', description: 'Log viewer' },
   { id: 'docs', label: 'Docs', icon: '📚', href: '/docs', description: 'Documentation' },
 ]
 
