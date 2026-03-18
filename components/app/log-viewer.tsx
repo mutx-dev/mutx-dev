@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { EmptyState } from '@/components/dashboard'
 import { cn } from '@/lib/utils'
 
 interface LogEntry {
@@ -368,9 +369,13 @@ export function LogViewer({ className, deploymentId }: LogViewerProps) {
             Loading logs...
           </div>
         ) : filteredLogs.length === 0 ? (
-          <div className="flex items-center justify-center h-32 text-slate-500">
-            No logs match your filters
-          </div>
+          <EmptyState
+            title={deployments.length === 0 ? 'No deployments yet' : 'No logs match your filters'}
+            message={deployments.length === 0
+              ? 'Create a deployment to start streaming logs into this viewer.'
+              : 'Try changing the deployment, level, source, or search filters.'}
+            className="h-40 border-white/5 bg-white/[0.02]"
+          />
         ) : (
           filteredLogs.map(entry => (
             <div

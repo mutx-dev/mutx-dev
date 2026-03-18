@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { EmptyState } from '@/components/dashboard'
 import { cn } from '@/lib/utils'
 
 interface Task {
@@ -270,6 +271,8 @@ export function TaskBoard({ className, initialTasks = [] }: TaskBoardProps) {
     )
   }
 
+  const hasData = agents.length > 0 || deployments.length > 0
+
   return (
     <div className={cn('flex flex-col h-full', className)}>
       <div className="flex items-center justify-between p-4 border-b border-white/10">
@@ -292,60 +295,70 @@ export function TaskBoard({ className, initialTasks = [] }: TaskBoardProps) {
         </div>
       )}
 
-      <div className="flex-1 flex gap-4 p-4 overflow-x-auto">
-        {COLUMNS.map(col => (
-          <div
-            key={col.key}
-            onDragOver={e => handleDragOver(e, col.key)}
-            onDragLeave={handleDragLeave}
-            onDrop={e => handleDrop(e, col.key)}
-            className={cn(
-              'flex-1 min-w-72 rounded-lg border flex flex-col transition-colors',
-              dragOverColumn === col.key
-                ? 'border-cyan-400/40 bg-cyan-500/5'
-                : 'border-white/5 bg-white/[0.02]'
-            )}
-          >
-            <div className={cn('px-4 py-3 rounded-t-lg flex justify-between items-center border-b border-white/5', col.color)}>
-              <h3 className="text-sm font-semibold tracking-wide">{col.label}</h3>
-              <span className="text-xs font-mono bg-white/10 px-2 py-0.5 rounded min-w-[1.75rem] text-center">
-                {tasksByStatus[col.key]?.length || 0}
-              </span>
-            </div>
-
-            <div className="flex-1 p-3 space-y-2.5 min-h-32 overflow-y-auto">
-              {tasksByStatus[col.key]?.map(task => (
-                <div
-                  key={task.id}
-                  draggable
-                  onDragStart={() => setDraggedTask(task)}
-                  onDragEnd={() => { setDraggedTask(null); setDragOverColumn(null) }}
-                  className={cn(
-                    'cursor-grab active:cursor-grabbing',
-                    draggedTask?.id === task.id ? 'opacity-50' : ''
-                  )}
-                >
-                  <TaskCard
-                    task={task}
-                    agent={task.agentId ? getAgentById(task.agentId) : undefined}
-                    onStatusChange={() => {}}
-                  />
-                </div>
-              ))}
-
-              {tasksByStatus[col.key]?.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-8 text-slate-600">
-                  <svg className="w-6 h-6 mb-1.5 opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <path d="M9 12h6M12 9v6" strokeLinecap="round" />
-                  </svg>
-                  <span className="text-xs">Drop tasks here</span>
-                </div>
+      {hasData ? (
+        <div className="flex-1 flex gap-4 p-4 overflow-x-auto">
+          {COLUMNS.map(col => (
+            <div
+              key={col.key}
+              onDragOver={e => handleDragOver(e, col.key)}
+              onDragLeave={handleDragLeave}
+              onDrop={e => handleDrop(e, col.key)}
+              className={cn(
+                'flex-1 min-w-72 rounded-lg border flex flex-col transition-colors',
+                dragOverColumn === col.key
+                  ? 'border-cyan-400/40 bg-cyan-500/5'
+                  : 'border-white/5 bg-white/[0.02]'
               )}
+            >
+              <div className={cn('px-4 py-3 rounded-t-lg flex justify-between items-center border-b border-white/5', col.color)}>
+                <h3 className="text-sm font-semibold tracking-wide">{col.label}</h3>
+                <span className="text-xs font-mono bg-white/10 px-2 py-0.5 rounded min-w-[1.75rem] text-center">
+                  {tasksByStatus[col.key]?.length || 0}
+                </span>
+              </div>
+
+              <div className="flex-1 p-3 space-y-2.5 min-h-32 overflow-y-auto">
+                {tasksByStatus[col.key]?.map(task => (
+                  <div
+                    key={task.id}
+                    draggable
+                    onDragStart={() => setDraggedTask(task)}
+                    onDragEnd={() => { setDraggedTask(null); setDragOverColumn(null) }}
+                    className={cn(
+                      'cursor-grab active:cursor-grabbing',
+                      draggedTask?.id === task.id ? 'opacity-50' : ''
+                    )}
+                  >
+                    <TaskCard
+                      task={task}
+                      agent={task.agentId ? getAgentById(task.agentId) : undefined}
+                      onStatusChange={() => {}}
+                    />
+                  </div>
+                ))}
+
+                {tasksByStatus[col.key]?.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-8 text-slate-600">
+                    <svg className="w-6 h-6 mb-1.5 opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <path d="M9 12h6M12 9v6" strokeLinecap="round" />
+                    </svg>
+                    <span className="text-xs">Drop tasks here</span>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex-1 p-4">
+          <EmptyState
+            title="No work items yet"
+            message="Tasks will appear here once agents or deployments exist in this account."
+            className="h-full border-white/5 bg-white/[0.02]"
+          />
+        </div>
+      )}
 
       <div className="border-t border-white/5 p-3 bg-white/[0.02] text-xs text-slate-500">
         <div className="flex justify-between">

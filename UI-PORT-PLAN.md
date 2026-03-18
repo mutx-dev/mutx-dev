@@ -81,7 +81,7 @@
 - [ ] Add `/api/dashboard/logs` endpoint (currently missing)
 - [ ] Add `/api/dashboard/tasks` endpoint (currently missing)
 - [ ] Add `/api/dashboard/events` endpoint (for activity feed)
-- [ ] Wire sidebar nav to MUTX dashboard routes
+- [x] Wire sidebar nav to MUTX dashboard routes — 2026-03-18: `DashboardShell` now wraps `/dashboard/*` via `app/dashboard/layout.tsx`, with nav trimmed to truthful MUTX sections only
 - [ ] Test end-to-end flows
 
 ---
@@ -89,9 +89,9 @@
 ## Polish (Phase 4)
 
 - [ ] Apply MUTX branding (logo, colors from tailwind.config.js)
-- [ ] Mobile responsiveness (nav rail)
+- [x] Mobile responsiveness (nav rail + shell) — 2026-03-18: responsive drawer + collapsible desktop sidebar now wrap `/dashboard/*` through the ported `DashboardShell`
 - [ ] Loading states with framer-motion
-- [ ] Empty states for agents/deployments
+- [x] Empty states for agents/deployments/logs/activity/tasks — 2026-03-18: reused shared `components/dashboard/EmptyState` across the ported panels to give no-data + filtered-empty views a consistent MUTX treatment without adding new primitives
 
 ---
 

@@ -1,15 +1,13 @@
 import {
   Activity,
-  ArrowRight,
+  BarChart3,
   Bot,
-  Command,
   Key,
   Layers,
-  LogOut,
-  Rocket,
   ShieldCheck,
   Users,
-  BarChart3,
+  Webhook,
+  TerminalSquare,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -23,7 +21,7 @@ export interface DashboardNavItem {
 export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
   {
     title: "Overview",
-    description: "Fleet summary and agents",
+    description: "Fleet summary and health",
     href: "/dashboard",
     icon: ShieldCheck,
   },
@@ -34,58 +32,46 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     icon: Users,
   },
   {
-    title: "Spawn",
-    description: "Create and configure agents",
-    href: "/dashboard/spawn",
-    icon: Bot,
+    title: "Deployments",
+    description: "Operate running deployments",
+    href: "/dashboard/deployments",
+    icon: Layers,
   },
   {
-    title: "Control",
-    description: "Control plane operations",
-    href: "/dashboard/control",
-    icon: Command,
+    title: "Webhooks",
+    description: "Configure event delivery",
+    href: "/dashboard/webhooks",
+    icon: Webhook,
+  },
+  {
+    title: "API Keys",
+    description: "Manage API access",
+    href: "/dashboard/api-keys",
+    icon: Key,
+  },
+  {
+    title: "Logs",
+    description: "Inspect runtime output",
+    href: "/dashboard/logs",
+    icon: TerminalSquare,
   },
   {
     title: "Monitoring",
-    description: "Usage and health telemetry",
+    description: "Health and telemetry",
     href: "/dashboard/monitoring",
     icon: Activity,
   },
   {
     title: "Analytics",
-    description: "Usage telemetry and insights",
+    description: "Usage trends and insights",
     href: "/dashboard/analytics",
     icon: BarChart3,
   },
   {
-    title: "Orchestration",
-    description: "Lane scheduling and flow",
-    href: "/dashboard/orchestration",
-    icon: Rocket,
-  },
-  {
-    title: "Logs",
-    description: "Runtime and system logs",
-    href: "/dashboard/logs",
-    icon: LogOut,
-  },
-  {
-    title: "History",
-    description: "Execution timeline",
-    href: "/dashboard/history",
-    icon: ArrowRight,
-  },
-  {
-    title: "Deployments",
-    description: "Manage agent deployments",
-    href: "/dashboard/deployments",
-    icon: Layers,
-  },
-  {
-    title: "API Keys",
-    description: "Manage API access keys",
-    href: "/dashboard/api-keys",
-    icon: Key,
+    title: "Spawn",
+    description: "Create new agents",
+    href: "/dashboard/spawn",
+    icon: Bot,
   },
 ];
 
