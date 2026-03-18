@@ -147,6 +147,64 @@ const tickerItems = [
   'Audit-grade telemetry',
 ]
 
+const missionRail = [
+  {
+    step: 'INTAKE',
+    text: 'User intent classified as “high-impact external action”.',
+    icon: Binary,
+  },
+  {
+    step: 'POLICY',
+    text: 'Kernel validates identity scope + spend cap + approval policy.',
+    icon: Shield,
+  },
+  {
+    step: 'EXECUTION',
+    text: 'Mission branch executes with continuous telemetry stream.',
+    icon: Rocket,
+  },
+  {
+    step: 'REVIEW',
+    text: 'Operator confirms summary diff before side effects commit.',
+    icon: Zap,
+  },
+]
+
+const terminalFrames = [
+  '[policy-kernel] evaluating mission_id=mx-4912 risk=high-impact',
+  '[relay] escalation path set → on-call: secops-l2 (SLA 90s)',
+  '[fabric] checkpoint written sha=991af3d replay=true signed=true',
+  '[operator] approval received by @jade · branch merge unlocked',
+]
+
+const dashboardStats = [
+  { label: 'Active missions', value: '128', delta: '+18 today' },
+  { label: 'Policy pass rate', value: '99.97%', delta: 'steady' },
+  { label: 'Escalations under SLA', value: '98.8%', delta: '-4s avg' },
+]
+
+const codeSnippets = [
+  {
+    title: 'Policy guard (YAML)',
+    content: [
+      'approval:',
+      '  requires_human: true',
+      '  max_spend_usd: 2500',
+      '  privileged_tools: [wire_transfer, prod_write]',
+    ],
+  },
+  {
+    title: 'Runtime hook (TypeScript)',
+    content: [
+      'await mutx.mission.start({',
+      "  riskClass: 'high-impact',",
+      "  replay: 'deterministic',",
+      "  escalation: 'operator-first'",
+      '})',
+    ],
+  },
+]
+
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
@@ -344,40 +402,107 @@ export default function LandingPage() {
             <div className="absolute -right-14 -top-10 h-44 w-44 rounded-full bg-cyan-400/25 blur-3xl" />
             <div className="absolute -bottom-16 -left-8 h-44 w-44 rounded-full bg-violet-500/25 blur-3xl" />
 
-            <p className="mb-4 text-[11px] uppercase tracking-[0.24em] text-white/55">Live mission rail</p>
-            <div className="relative h-[420px] rounded-2xl border border-white/10 bg-[#030612] p-4">
-              <motion.div
-                className="absolute inset-x-4 top-6 h-px bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent"
-                animate={{ opacity: [0.25, 0.8, 0.25] }}
-                transition={{ duration: 2.8, repeat: Infinity }}
-              />
+            <div className="mb-4 flex items-center justify-between">
+              <p className="text-[11px] uppercase tracking-[0.24em] text-white/55">Live mission rail</p>
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/35 bg-emerald-300/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-100">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+                Streaming
+              </span>
+            </div>
 
-              <div className="space-y-3">
-                {[
-                  { step: 'INTAKE', text: 'User intent classified as “high-impact external action”.', icon: Binary },
-                  { step: 'POLICY', text: 'Kernel validates identity scope + spend cap + approval policy.', icon: Shield },
-                  { step: 'EXECUTION', text: 'Mission branch executes with continuous telemetry stream.', icon: Rocket },
-                  { step: 'REVIEW', text: 'Operator confirms summary diff before side effects commit.', icon: Zap },
-                ].map((line, idx) => (
-                  <motion.div
-                    key={line.step}
-                    className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/35 p-3"
-                    animate={{ borderColor: ['rgba(255,255,255,0.1)', 'rgba(103,232,249,0.45)', 'rgba(255,255,255,0.1)'] }}
-                    transition={{ duration: 3.2, delay: idx * 0.35, repeat: Infinity }}
-                  >
-                    <line.icon className="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" />
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-100/85">{line.step}</p>
-                      <p className="mt-1 text-sm leading-6 text-white/75">{line.text}</p>
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+              <div className="rounded-2xl border border-white/10 bg-[#030612] p-4">
+                <motion.div
+                  className="mb-3 h-px bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent"
+                  animate={{ opacity: [0.25, 0.8, 0.25] }}
+                  transition={{ duration: 2.8, repeat: Infinity }}
+                />
+
+                <div className="space-y-3">
+                  {missionRail.map((line, idx) => (
+                    <motion.div
+                      key={line.step}
+                      className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/35 p-3"
+                      animate={{ borderColor: ['rgba(255,255,255,0.1)', 'rgba(103,232,249,0.45)', 'rgba(255,255,255,0.1)'] }}
+                      transition={{ duration: 3.2, delay: idx * 0.35, repeat: Infinity }}
+                    >
+                      <line.icon className="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" />
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-100/85">{line.step}</p>
+                        <p className="mt-1 text-sm leading-6 text-white/75">{line.text}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="mt-3 rounded-xl border border-cyan-200/20 bg-cyan-300/10 p-3 text-xs text-cyan-50/90">
+                  <p className="font-semibold text-cyan-100">Mission status: nominal · risk envelope maintained</p>
+                  <p className="mt-1 text-white/75">Pre-exec policy enforcement active · SLA-safe escalation channel online · replay snapshots synced.</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-2xl border border-white/10 bg-[#050819] p-4">
+                  <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-white/50">Animated terminal TUI</p>
+                  <div className="rounded-xl border border-white/10 bg-black/45 p-3 font-mono text-[11px] text-cyan-100/90">
+                    {terminalFrames.map((line, idx) => (
+                      <motion.p
+                        key={line}
+                        className="mb-2 last:mb-0"
+                        animate={{ opacity: [0.25, 1, 0.45] }}
+                        transition={{ duration: 2.4, delay: idx * 0.55, repeat: Infinity }}
+                      >
+                        <span className="mr-2 text-cyan-300/80">$</span>
+                        {line}
+                      </motion.p>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/95 to-[#101730] p-4">
+                  <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-white/50">Dashboard snapshot</p>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    {dashboardStats.map((stat) => (
+                      <div key={stat.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
+                        <p className="text-[10px] uppercase tracking-[0.16em] text-white/55">{stat.label}</p>
+                        <p className="mt-2 text-xl font-semibold text-cyan-100">{stat.value}</p>
+                        <p className="text-xs text-emerald-200/80">{stat.delta}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 rounded-xl border border-white/10 bg-[#04070f] p-3">
+                    <div className="mb-2 flex items-center justify-between text-xs text-white/60">
+                      <span>Policy decisions (24h)</span>
+                      <span>12,881 evals</span>
                     </div>
-                  </motion.div>
-                ))}
+                    <div className="flex h-14 items-end gap-1">
+                      {[42, 58, 37, 62, 49, 66, 44, 71, 53, 64, 57, 74].map((bar, idx) => (
+                        <motion.div
+                          key={`${bar}-${idx}`}
+                          className="w-full rounded-sm bg-gradient-to-t from-cyan-500/60 to-violet-400/70"
+                          animate={{ height: [`${Math.max(bar - 12, 20)}%`, `${bar}%`, `${Math.max(bar - 8, 24)}%`] }}
+                          transition={{ duration: 3, delay: idx * 0.06, repeat: Infinity, repeatType: 'mirror' }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
+            </div>
 
-              <div className="absolute inset-x-4 bottom-4 rounded-xl border border-cyan-200/20 bg-cyan-300/10 p-3 text-xs text-cyan-50/90">
-                <p className="font-semibold text-cyan-100">Mission status: nominal · risk envelope maintained</p>
-                <p className="mt-1 text-white/75">Pre-exec policy enforcement active · SLA-safe escalation channel online · replay snapshots synced.</p>
-              </div>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {codeSnippets.map((snippet) => (
+                <div key={snippet.title} className="rounded-xl border border-white/10 bg-black/35 p-3">
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-100/85">{snippet.title}</p>
+                  <pre className="overflow-x-auto text-xs leading-6 text-white/75">
+                    {snippet.content.map((line) => (
+                      <code key={line} className="block whitespace-pre">
+                        {line}
+                      </code>
+                    ))}
+                  </pre>
+                </div>
+              ))}
             </div>
           </motion.div>
         </section>
