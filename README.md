@@ -18,50 +18,34 @@
 
 ---
 
-# What is MUTX
+## What is MUTX
 
-MUTX is an **industrial control plane for AI agents**.
+MUTX is the **production control plane for AI agents** — deploy, operate, and govern agents like the infrastructure they are.
 
-It lets you deploy, operate, observe, and govern autonomous agents as production systems.
-
-Think:
-
-```
-Vercel → for web apps
-Kubernetes → for containers
-MUTX → for AI agents
-```
+Think: Vercel → web apps. Kubernetes → containers. MUTX → agents.
 
 Capabilities include:
-
-• agent lifecycle management
-• orchestration and scheduling
-• observability and debugging
-• policy and governance
-• budget and access control
-• CLI + API + SDK access
-
----
+• Agent lifecycle management
+• Deployment with versioning and rollback  
+• Budget enforcement and cost controls
+• SDK + CLI + API access
+• Observability and run traces
+• Governance and policy controls
 
 ## OpenClaw Integration
 
-MUTX intentionally supports two operator entry paths:
+MUTX supports two operator entry paths:
 
-- **Spin up new OpenClaw-backed agents** — MUTX provisions the OpenClaw runtime and manages the full agent lifecycle from deployment through governance
-- **Link existing OpenClaw workspaces** — attach a running OpenClaw workspace and manage it through MUTX's control plane, gaining deployment governance, budgets, and observability on top
+- **New OpenClaw deployment** — MUTX spins up and manages OpenClaw-backed agent runtimes with full lifecycle control
+- **Link existing workspace** — attach a running OpenClaw workspace and govern it through MUTX's control plane
 
-Both paths use the same API, SDK, and CLI. MUTX does not replace OpenClaw — it extends it with the operational layer that production agent systems need.
+## Why MUTX vs a dashboard?
 
----
+Mission Control, LangSmith, and similar tools observe agent sessions — they answer "what are my agents doing right now?"
 
-## Why MUTX, not a dashboard?
+MUTX controls how agents run: deployment model, access boundaries, budget constraints, and operational contracts. Not a session dashboard — a control plane.
 
-Most agent tools are session or tracing layers — they observe what agents do (LangSmith, Helicone, Mission Control). MUTX controls how agents run: their deployment model, access boundaries, budget constraints, and operational contracts.
-
-Mission Control answers: *What are my agents doing right now?*  
-MUTX answers: *How are my agents deployed, governed, and performing — and what do I do when they're not?*
-
-This is not a cosmetic difference. Session dashboards track chat logs. MUTX manages deployment lifecycles, enforces budgets, and provides the SDK and CLI that production operators need.
+This is the difference between watching your infrastructure and operating it.
 
 ---
 
