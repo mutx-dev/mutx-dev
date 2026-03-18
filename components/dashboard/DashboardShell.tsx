@@ -8,7 +8,7 @@ import { Command, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-import { DASHBOARD_NAV_ITEMS, isDashboardNavItemActive } from "./dashboardNav";
+import { DASHBOARD_NAV_GROUPS, DASHBOARD_NAV_ITEMS, isDashboardNavItemActive } from "./dashboardNav";
 
 interface DashboardShellProps {
   children: ReactNode;
@@ -22,36 +22,46 @@ interface DashboardNavProps {
 
 function DashboardNav({ collapsed = false, onNavigate, pathname }: DashboardNavProps) {
   return (
-    <nav className="space-y-1">
-      {DASHBOARD_NAV_ITEMS.map((item) => {
-        const isActive = isDashboardNavItemActive(pathname, item.href);
+    <nav className="space-y-4">
+      {DASHBOARD_NAV_GROUPS.map((group) => (
+        <div key={group.key} className="space-y-1">
+          {!collapsed ? (
+            <p className="px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+              {group.title}
+            </p>
+          ) : null}
 
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onNavigate}
-            title={collapsed ? item.title : undefined}
-            className={cn(
-              "flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors",
-              isActive
-                ? "border-cyan-400/20 bg-cyan-400/10 text-white"
-                : "border-transparent text-slate-400 hover:bg-white/[0.03] hover:text-slate-200",
-              collapsed && "justify-center px-2",
-            )}
-          >
-            <item.icon className="h-4 w-4 shrink-0" />
-            {!collapsed ? (
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{item.title}</p>
-                <p className="truncate text-[10px] uppercase tracking-[0.16em] text-slate-500">
-                  {item.description}
-                </p>
-              </div>
-            ) : null}
-          </Link>
-        );
-      })}
+          {group.items.map((item) => {
+            const isActive = isDashboardNavItemActive(pathname, item.href);
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onNavigate}
+                title={collapsed ? item.title : undefined}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors",
+                  isActive
+                    ? "border-cyan-400/20 bg-cyan-400/10 text-white"
+                    : "border-transparent text-slate-400 hover:bg-white/[0.03] hover:text-slate-200",
+                  collapsed && "justify-center px-2",
+                )}
+              >
+                <item.icon className="h-4 w-4 shrink-0" />
+                {!collapsed ? (
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{item.title}</p>
+                    <p className="truncate text-[10px] uppercase tracking-[0.16em] text-slate-500">
+                      {item.description}
+                    </p>
+                  </div>
+                ) : null}
+              </Link>
+            );
+          })}
+        </div>
+      ))}
     </nav>
   );
 }
