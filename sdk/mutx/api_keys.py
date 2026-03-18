@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from datetime import datetime
+
+from mutx._datetime import parse_datetime
 from typing import Any, Optional
 from uuid import UUID
 
@@ -15,11 +17,11 @@ class APIKey:
         self.name = data["name"]
         self.is_active = data.get("is_active", True)
         self.last_used = (
-            datetime.fromisoformat(data["last_used"]) if data.get("last_used") else None
+            parse_datetime(data["last_used"]) if data.get("last_used") else None
         )
-        self.created_at = datetime.fromisoformat(data["created_at"])
+        self.created_at = parse_datetime(data["created_at"])
         self.expires_at = (
-            datetime.fromisoformat(data["expires_at"]) if data.get("expires_at") else None
+            parse_datetime(data["expires_at"]) if data.get("expires_at") else None
         )
         self._data = data
 

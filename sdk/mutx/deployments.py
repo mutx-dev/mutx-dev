@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from datetime import datetime
+
+from mutx._datetime import parse_datetime
 from typing import Any, Optional
 from uuid import UUID
 
@@ -8,12 +10,7 @@ import httpx
 
 
 def _parse_datetime(value: str | None) -> datetime | None:
-    if value is None:
-        return None
-    # FastAPI serializers may emit UTC timestamps with a trailing "Z".
-    if value.endswith("Z"):
-        value = f"{value[:-1]}+00:00"
-    return datetime.fromisoformat(value)
+    return parse_datetime(value)
 
 
 class DeploymentEvent:

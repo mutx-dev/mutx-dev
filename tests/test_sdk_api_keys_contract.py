@@ -267,3 +267,17 @@ def test_api_keys_list_works_with_sync_client() -> None:
 
     result = api_keys.list()
     assert result == []
+
+
+def test_api_key_parses_z_suffix_timestamps() -> None:
+    key = APIKey(
+        _api_key_payload(
+            created_at="2026-03-12T09:00:00Z",
+            last_used="2026-03-14T10:00:00Z",
+            expires_at="2026-04-14T10:00:00Z",
+        )
+    )
+
+    assert key.created_at.tzinfo is not None
+    assert key.last_used is not None and key.last_used.tzinfo is not None
+    assert key.expires_at is not None and key.expires_at.tzinfo is not None

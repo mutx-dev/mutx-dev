@@ -140,3 +140,41 @@ def test_agent_logs_maps_backend_extra_data_field_to_sdk_aliases() -> None:
 
     assert logs[0].extra_data == '{"deployment_id":"abc"}'
     assert logs[0].metadata == '{"deployment_id":"abc"}'
+
+
+def test_agent_models_parse_z_suffix_timestamps() -> None:
+    detail = AgentDetail(
+        _agent_payload(
+            created_at="2026-03-12T09:00:00Z",
+            updated_at="2026-03-12T09:05:00Z",
+            deployments=[
+                {
+                    "id": str(uuid.uuid4()),
+                    "agent_id": str(uuid.uuid4()),
+                    "status": "running",
+                    "replicas": 1,
+                    "node_id": "node-1",
+                    "started_at": "2026-03-12T10:00:00Z",
+                    "ended_at": "2026-03-12T10:30:00Z",
+                    "error_message": None,
+                    "events": [
+                        {
+                            "id": str(uuid.uuid4()),
+                            "deployment_id": str(uuid.uuid4()),
+                            "event_type": "deploy",
+                            "status": "running",
+                            "node_id": "node-1",
+                            "error_message": None,
+                            "created_at": "2026-03-12T10:00:01Z",
+                        }
+                    ],
+                }
+            ],
+        )
+    )
+
+    assert detail.created_at.tzinfo is not None
+    assert detail.updated_at.tzinfo is not None
+    assert detail.deployments[0].started_at is not None and detail.deployments[0].started_at.tzinfo is not None
+    assert detail.deployments[0].ended_at is not None and detail.deployments[0].ended_at.tzinfo is not None
+    assert detail.deployments[0].events[0].created_at.tzinfo is not None

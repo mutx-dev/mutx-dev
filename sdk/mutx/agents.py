@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
+
+from mutx._datetime import parse_datetime
 from typing import Any, AsyncGenerator, Callable, Generator, Optional
 from uuid import UUID
 
@@ -16,8 +18,8 @@ class Agent:
         self.status = data["status"]
         self.config_json = data.get("config")
         self.config = self._parse_config(self.config_json)
-        self.created_at = datetime.fromisoformat(data["created_at"])
-        self.updated_at = datetime.fromisoformat(data["updated_at"])
+        self.created_at = parse_datetime(data["created_at"])
+        self.updated_at = parse_datetime(data["updated_at"])
         self.user_id = data.get("user_id")
         self._data = data
 
@@ -43,7 +45,7 @@ class DeploymentEvent:
         self.status = data["status"]
         self.node_id = data.get("node_id")
         self.error_message = data.get("error_message")
-        self.created_at = datetime.fromisoformat(data["created_at"])
+        self.created_at = parse_datetime(data["created_at"])
         self._data = data
 
 
@@ -55,9 +57,9 @@ class Deployment:
         self.replicas = data["replicas"]
         self.node_id = data.get("node_id")
         self.started_at = (
-            datetime.fromisoformat(data["started_at"]) if data.get("started_at") else None
+            parse_datetime(data["started_at"]) if data.get("started_at") else None
         )
-        self.ended_at = datetime.fromisoformat(data["ended_at"]) if data.get("ended_at") else None
+        self.ended_at = parse_datetime(data["ended_at"]) if data.get("ended_at") else None
         self.error_message = data.get("error_message")
         self.events = [DeploymentEvent(item) for item in data.get("events", [])]
         self._data = data
@@ -75,7 +77,7 @@ class AgentLog:
         self.agent_id = UUID(data["agent_id"])
         self.level = data["level"]
         self.message = data["message"]
-        self.timestamp = datetime.fromisoformat(data["timestamp"])
+        self.timestamp = parse_datetime(data["timestamp"])
         self.extra_data = data.get("extra_data")
         self.metadata = data.get("metadata", self.extra_data)
         self._data = data
@@ -87,7 +89,7 @@ class AgentMetric:
         self.agent_id = UUID(data["agent_id"])
         self.cpu_usage = data.get("cpu_usage")
         self.memory_usage = data.get("memory_usage")
-        self.timestamp = datetime.fromisoformat(data["timestamp"])
+        self.timestamp = parse_datetime(data["timestamp"])
         self._data = data
 
 

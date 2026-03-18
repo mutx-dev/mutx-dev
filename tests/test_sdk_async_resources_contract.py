@@ -165,3 +165,35 @@ async def test_webhooks_async_methods_are_awaited_with_async_client() -> None:
     assert captured["path"] == "/v1/webhooks/"
     assert webhook.url == "https://example.com/webhook"
     assert webhook.events == ["agent.started", "agent.stopped"]
+
+
+@pytest.mark.asyncio
+async def test_async_resource_models_parse_z_suffix_timestamps() -> None:
+    async def agent_handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=[_agent_payload(created_at="2026-03-12T09:00:00Z", updated_at="2026-03-12T09:00:01Z")])
+
+    async def deployment_handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=[_deployment_payload(started_at="2026-03-12T09:05:00Z")])
+
+    async def api_key_handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=[_api_key_payload(created_at="2026-03-12T09:00:00Z", last_used="2026-03-12T09:10:00Z", expires_at="2026-04-12T09:00:00Z")])
+
+    async def webhook_handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=[_webhook_payload(created_at="2026-03-12T09:00:00Z")])
+
+    async with httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(agent_handler)) as client:
+        agent = (await Agents(client).alist())[0]
+    async with httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(deployment_handler)) as client:
+        deployment = (await Deployments(client).alist())[0]
+    async with httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(api_key_handler)) as client:
+        key = (await APIKeys(client).alist())[0]
+    async with httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(webhook_handler)) as client:
+        webhook = (await Webhooks(client).alist())[0]
+
+    assert agent.created_at.tzinfo is not None
+    assert agent.updated_at.tzinfo is not None
+    assert deployment.started_at is not None and deployment.started_at.tzinfo is not None
+    assert key.created_at.tzinfo is not None
+    assert key.last_used is not None and key.last_used.tzinfo is not None
+    assert key.expires_at is not None and key.expires_at.tzinfo is not None
+    assert webhook.created_at.tzinfo is not None

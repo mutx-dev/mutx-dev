@@ -1,0 +1,5 @@
+## 2026-03-19 00:58 Europe/Rome
+- Shipped a concrete SDK runtime-correctness fix: normalized FastAPI-style trailing `Z` timestamps across `sdk/mutx/agents.py`, `sdk/mutx/api_keys.py`, `sdk/mutx/webhooks.py`, and `sdk/mutx/leads.py` via shared `sdk/mutx/_datetime.py` parsing instead of raw `datetime.fromisoformat(...)` calls.
+- Why it matters: deployment/agent/API-key/webhook surfaces can legitimately emit UTC timestamps with `Z`; before this change, several SDK models could raise `ValueError` during normal response parsing, which is a real client/runtime footgun for dashboard and automation consumers.
+- Added focused contract coverage for Z-suffixed timestamps in API keys, webhooks, agents, async resource flows, leads, and kept deployment coverage green.
+- Validation: `pytest -q tests/test_sdk_api_keys_contract.py tests/test_sdk_webhooks_contract.py tests/test_sdk_agent_config_contract.py tests/test_sdk_async_resources_contract.py tests/test_sdk_leads_contract.py tests/test_sdk_deployments_contract.py` ✅ (`49 passed`)

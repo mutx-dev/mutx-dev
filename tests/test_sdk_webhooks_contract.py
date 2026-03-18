@@ -123,3 +123,17 @@ def test_webhooks_get_deliveries_uses_live_backend_route_and_filters() -> None:
     }
     assert len(deliveries) == 1
     assert deliveries[0].webhook_id == webhook_id
+
+
+def test_webhook_models_parse_z_suffix_timestamps() -> None:
+    webhook = Webhook(_webhook_payload(created_at="2026-03-12T08:16:00Z"))
+    delivery = WebhookDelivery(
+        _delivery_payload(
+            created_at="2026-03-12T08:18:00Z",
+            delivered_at="2026-03-12T08:18:01Z",
+        )
+    )
+
+    assert webhook.created_at.tzinfo is not None
+    assert delivery.created_at.tzinfo is not None
+    assert delivery.delivered_at is not None and delivery.delivered_at.tzinfo is not None

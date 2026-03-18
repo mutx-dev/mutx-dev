@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from datetime import datetime
+
+from mutx._datetime import parse_datetime
 from typing import Any, Optional
 from uuid import UUID
 
@@ -16,7 +18,7 @@ class Webhook:
         # Contract parity: backend uses `is_active`; keep `.active` as compatibility alias.
         self.is_active = data.get("is_active", data.get("active", True))
         self.active = self.is_active
-        self.created_at = datetime.fromisoformat(data["created_at"])
+        self.created_at = parse_datetime(data["created_at"])
         self._data = data
 
     def __repr__(self) -> str:
@@ -33,9 +35,9 @@ class WebhookDelivery:
         self.success = data["success"]
         self.error_message = data.get("error_message")
         self.attempts = data["attempts"]
-        self.created_at = datetime.fromisoformat(data["created_at"])
+        self.created_at = parse_datetime(data["created_at"])
         delivered_at = data.get("delivered_at")
-        self.delivered_at = datetime.fromisoformat(delivered_at) if delivered_at else None
+        self.delivered_at = parse_datetime(delivered_at) if delivered_at else None
         self._data = data
 
     def __repr__(self) -> str:

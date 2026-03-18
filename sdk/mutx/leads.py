@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from datetime import datetime
+
+from mutx._datetime import parse_datetime
 from typing import Any, Optional
 from uuid import UUID
 
@@ -15,7 +17,7 @@ class Lead:
         self.company = data.get("company")
         self.message = data.get("message")
         self.source = data.get("source")
-        self.created_at = datetime.fromisoformat(data["created_at"])
+        self.created_at = parse_datetime(data["created_at"])
         self._data = data
 
     def __repr__(self) -> str:
