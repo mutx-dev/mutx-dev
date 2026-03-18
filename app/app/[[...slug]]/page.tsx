@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import { ArrowRight, Bot, Command, Github, KeyRound, LogOut, Rocket, ShieldCheck, Activity, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 
 import { ApiKeysPageClient } from '@/components/app/ApiKeysPageClient';
 import { AppDashboardClient } from '@/components/app/AppDashboardClient';
+import { DashboardOverview } from '@/components/ui/dashboard-widgets';
+import { StatsGrid } from '@/components/ui/stat-card';
 import { AgentsPageClient } from '@/components/app/AgentsPageClient';
 import { DeploymentsPageClient } from '@/components/app/DeploymentsPageClient';
 import { ErrorBoundary } from '@/components/app/ErrorBoundary';
@@ -102,9 +104,74 @@ const heroSignals = [
   { label: 'Demo posture', value: 'no placeholders when data is absent' },
 ]
 
+interface Agent {
+  id: string;
+  name: string;
+  status: string;
+  created_at: string;
+}
+
+interface Deployment {
+  id: string;
+  agent_id: string;
+  agent_name?: string;
+  status: string;
+  created_at: string;
+}
+
+interface HealthStatus {
+  status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown' | string;
+  error?: string;
+}
+
 export default function AppPreviewPage() {
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [deployments, setDeployments] = useState<Deployment[]>([]);
+  const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [loading, setLoading] = useState(false);
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Fetch dashboard data for the overview widgets
+  useEffect(() => {
+    if (pathname !== '/app' && pathname !== '/app/') return;
+
+    async function fetchDashboardData() {
+      setLoading(true);
+      try {
+        const [agentsRes, deploymentsRes, healthRes] = await Promise.all([
+          fetch('/api/dashboard/agents'),
+          fetch('/api/dashboard/deployments'),
+          fetch('/api/dashboard/health'),
+        ]);
+
+        if (agentsRes.ok) {
+          const agentsData = await agentsRes.json();
+          setAgents(agentsData.agents || []);
+        }
+        if (deploymentsRes.ok) {
+          const deploymentsData = await deploymentsRes.json();
+          setDeployments(deploymentsData.deployments || []);
+        }
+        if (healthRes.ok) {
+          try {
+            const healthData = await healthRes.json();
+            setHealth(healthData);
+          } catch {
+            setHealth({ status: 'unknown' });
+          }
+        } else {
+          setHealth({ status: 'unknown' });
+        }
+      } catch {
+        setHealth({ status: 'unknown' });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void fetchDashboardData();
+  }, [pathname]);
   
   const currentItem = navItems.find(item => {
     if (item.href === '/app') {
@@ -150,7 +217,33 @@ export default function AppPreviewPage() {
             </div>
           </section>
 
-          <AppDashboardClient />
+          {/* Dashboard overview — ported from mutx-control */}
+          <DashboardOverview
+            isLoading={loading}
+            agentStats={{
+              total: agents.length,
+              running: agents.filter((a) => a.status === 'running').length,
+              stopped: agents.filter((a) => a.status !== 'running').length,
+            }}
+            deploymentStats={{
+              total: deployments.length,
+              running: deployments.filter((d) => d.status === 'running').length,
+              failed: deployments.filter((d) => d.status === 'failed').length,
+            }}
+            apiHealth={(health?.status ?? 'unknown') as 'healthy' | 'degraded' | 'unhealthy' | 'unknown'}
+          />
+
+          {/* Stats grid — ported from mutx-control */}
+          {!loading && (
+            <StatsGrid
+              stats={{
+                totalAgents: agents.length,
+                activeAgents: agents.filter((a) => a.status === 'running').length,
+                totalDeployments: deployments.length,
+                activeDeployments: deployments.filter((d) => d.status === 'running').length,
+              }}
+            />
+          )}
         </>
       );
     }
