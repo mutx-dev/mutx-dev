@@ -5,6 +5,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 
+const APP_DASHBOARD_URL = 'https://app.mutx.dev/dashboard'
+const APP_LOGIN_URL = 'https://app.mutx.dev/login'
+const APP_REGISTER_URL = 'https://app.mutx.dev/register'
+
 export function AuthNav() {
   const pathname = usePathname()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -27,7 +31,7 @@ export function AuthNav() {
 
   const isAuthPage = pathname === '/login' || pathname === '/register'
   const isHomePage = pathname === '/'
-  const isDashboardRoute = pathname.startsWith('/dashboard')
+  const isDashboardRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/app')
 
   if (isDashboardRoute) {
     return null
@@ -60,26 +64,26 @@ export function AuthNav() {
 
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
-            <Link
-              href="/app"
+            <a
+              href={APP_DASHBOARD_URL}
               className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition-opacity hover:opacity-90"
             >
               Dashboard
-            </Link>
+            </a>
           ) : !isAuthPage ? (
             <>
-              <Link
-                href="/login"
+              <a
+                href={APP_LOGIN_URL}
                 className="text-sm text-white/60 transition hover:text-white"
               >
                 Sign in
-              </Link>
-              <Link
-                href="/register"
+              </a>
+              <a
+                href={APP_REGISTER_URL}
                 className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition-opacity hover:opacity-90"
               >
                 Get Started
-              </Link>
+              </a>
             </>
           ) : null}
         </div>

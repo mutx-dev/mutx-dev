@@ -26,6 +26,9 @@ import {
 const GITHUB_URL = 'https://github.com/fortunexbt/mutx-dev'
 const DOCS_URL = 'https://docs.mutx.dev'
 const X_URL = 'https://x.com/mutxdev'
+const APP_URL = 'https://app.mutx.dev'
+const APP_DASHBOARD_URL = `${APP_URL}/dashboard`
+const APP_LOGIN_URL = `${APP_URL}/login`
 
 const navLinks = [
   { label: 'Manifesto', href: '#manifesto' },
@@ -250,24 +253,24 @@ export default function LandingPage() {
 
     if (isAuthenticated) {
       return (
-        <Link
-          href="/dashboard"
+        <a
+          href={APP_DASHBOARD_URL}
           className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-300/10 px-5 py-2.5 text-sm font-semibold text-cyan-200 transition hover:border-cyan-300/70 hover:bg-cyan-300/20"
         >
           Dashboard
           <ArrowRight className="h-4 w-4" />
-        </Link>
+        </a>
       )
     }
 
     return (
-      <Link
-        href="/login"
+      <a
+        href={APP_LOGIN_URL}
         className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
       >
         Sign In
         <ChevronRight className="h-4 w-4" />
-      </Link>
+      </a>
     )
   }, [checkingAuth, isAuthenticated])
 
