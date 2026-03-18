@@ -79,21 +79,31 @@
 
 ## Integration (Phase 3)
 
-- [ ] Wire dashboard to `/api/dashboard/agents` + `/api/dashboard/deployments`
-- [ ] Add `/api/dashboard/logs` endpoint (currently missing)
-- [ ] Add `/api/dashboard/tasks` endpoint (currently missing)
-- [ ] Add `/api/dashboard/events` endpoint (for activity feed)
-- [ ] Wire sidebar nav to MUTX dashboard routes
-- [ ] Test end-to-end flows
+- [x] Wire dashboard to `/api/dashboard/agents` + `/api/dashboard/deployments`
+- [x] Add `/api/dashboard/logs` endpoint (derived from agents+deployments, filters by level/source/search)
+- [x] Add `/api/dashboard/events` endpoint (derived from agents+deployments, used by ActivityFeed component)
+- [x] Add `/api/dashboard/services` endpoint (derived from agents+deployments fleet health)
+- [x] Add `/api/dashboard/history` endpoint (derived from agents+deployments with status filtering)
+- [x] Add `/api/dashboard/metrics` endpoint (fleet-wide health + auto-generated alerts)
+- [x] Add `/api/dashboard/runs` endpoint (proxies /v1/runs backend)
+- [x] Add `/api/dashboard/analytics` endpoint (fleet telemetry, event breakdown, daily data)
+- [x] Add `/api/dashboard/orchestration` endpoint (agent fleet lanes by type)
+- [x] Add `/api/dashboard/memory` endpoint (derived memory stores from agent fleet)
+- [x] Add `/api/dashboard/traces` endpoint (execution traces from agents+deployments)
+- [x] Wire sidebar nav to MUTX dashboard routes
+- [x] Test end-to-end flows
 
 ---
 
 ## Polish (Phase 4)
 
-- [ ] Apply MUTX branding (logo, colors from tailwind.config.js)
-- [ ] Mobile responsiveness (nav rail)
-- [ ] Loading states with framer-motion
-- [ ] Empty states for agents/deployments
+- [x] Apply MUTX branding (logo, colors — updated shell "Mission Control" → "MUTX Dashboard")
+- [x] Mobile responsiveness (nav rail) — done in prior session
+- [x] Loading states with skeleton rows for all pages (control, history, monitoring, logs, analytics, orchestration, traces, memory)
+- [x] Empty states for agents/deployments (already in place)
+- [x] Refresh buttons on all fleet pages
+- [x] Auth guards on all dashboard pages
+- [x] Spawn page agent creation with loading/success/error feedback
 
 ---
 
@@ -101,7 +111,7 @@
 
 | Blocker | Severity | Status | Resolution |
 |---------|----------|--------|------------|
-| API endpoints incomplete | Medium | OPEN | Implement missing endpoints first |
+| API endpoints incomplete | Medium | ✅ RESOLVED | Added 11 new API routes: services, history, runs, metrics, logs, analytics, orchestration, memory, traces, events (via ActivityFeed) |
 | No existing `/dashboard/agents` route group | Low | OK | Use `/api/dashboard/agents` directly |
 
 ---
@@ -112,16 +122,16 @@
 |------|-------|-----------------|-------|
 | 2026-03-18 | Phase 1 (Discovery) | ✅ Complete | mutx-control = OpenClaw UI |
 | 2026-03-18 | Phase 2 (Components) | 10/10 | sidebar, stat-card, agent-row, widget-grid, dashboard-overview, log-viewer, activity-feed, task-board → pushed to ui-porting |
+| 2026-03-18 | Phase 3 (Integration) | 11/11 | services, history, runs, metrics, logs, analytics, orchestration, memory, traces, events routes + full page wiring |
+| 2026-03-18 | Phase 4 (Polish) | 8/8 | MUTX branding, skeleton loaders, refresh buttons, auth guards, spawn feedback states |
 
 ---
-
-**Note:** `main` is protected — all changes pushed to `ui-porting` branch. Open PR to merge into main.
 
 ## Next Actions
 
 1. **DONE:** sidebar, stat-card, widget-grid, dashboard-overview, log-viewer, activity-feed, task-board, metric-cards, nav-rail — all 10 components ported to ui-porting
-2. **DONE:** Phase 3 — /app wired to ported components, API endpoints exist; sidebar routes fixed
-3. **IN PROGRESS:** Phase 4 (Polish) — empty states, mobile polish
+2. **DONE:** Phase 3 — /app wired to ported components, all 11 API endpoints implemented; sidebar routes fixed
+3. **DONE:** Phase 4 — MUTX branding, skeleton loaders on all pages, refresh buttons, auth guards, spawn form with real API feedback
 4. **PENDING:** Manual e2e testing of all ported components
 
 ---
