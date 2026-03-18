@@ -21,9 +21,7 @@ export default function DashboardAgentsPage() {
           ]}
         />
 
-        <ErrorBoundary>
-          <AgentsPageClient />
-        </ErrorBoundary>
+        <AgentsPageClient />
       </div>
     </ErrorBoundary>
   );

@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from typing import Optional
+import asyncio
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, ConfigDict, EmailStr, ValidationError
@@ -90,7 +91,14 @@ async def register(request: RegisterRequest, session: AsyncSession = Depends(get
 
         # Send verification email
         token = await user_service.create_email_verification_token(user.id)
-        send_verification_email(user.email, user.name, token)
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(
+            None,
+            send_verification_email,
+            user.email,
+            user.name,
+            token,
+        )
 
         access_token, access_token_expires_at = create_access_token(user.id)
         refresh_token, _ = create_refresh_token(user.id)
@@ -98,7 +106,7 @@ async def register(request: RegisterRequest, session: AsyncSession = Depends(get
         # Track analytics event
         await log_analytics_event(
             session,
-            event_name="User logged in",
+            event_name="User registered",
             event_type=AnalyticsEventType.USER_LOGIN,
             user_id=user.id,
         )
@@ -191,7 +199,16 @@ async def refresh(request: RefreshRequest, session: AsyncSession = Depends(get_d
 
 @router.post("/logout")
 async def logout(current_user: User = Depends(get_current_user)):
-    return {"message": "Successfully logged out"}
+    """
+    Logout endpoint for stateless JWT authentication.
+
+    This endpoint does not invalidate or blacklist existing JWTs on the server.
+    Clients are responsible for deleting stored access and refresh tokens to
+    complete the logout process.
+    """
+    return {
+        "message": "Successfully logged out. Note: existing tokens remain valid until they expire; please delete stored tokens on the client."
+    }
 
 
 @router.get("/me", response_model=UserResponse)
@@ -303,9 +320,9 @@ async def resend_verification(
         )
 
     if user.is_email_verified:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email is already verified",
+        # Don't reveal if email exists or is already verified
+        return MessageResponse(
+            message="If an account exists and is not verified, a verification email has been sent"
         )
 
     # Create new verification token

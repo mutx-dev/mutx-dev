@@ -379,13 +379,13 @@ class TestDeploymentMetrics:
                     agent_id=test_deployment.agent_id,
                     cpu_usage=0.22,
                     memory_usage=0.40,
-                    timestamp=datetime.fromisoformat("2026-03-12T09:00:00"),
+                    timestamp=datetime.fromisoformat("2026-03-12T09:00:00+00:00"),
                 ),
                 AgentMetric(
                     agent_id=test_deployment.agent_id,
                     cpu_usage=0.85,
                     memory_usage=0.92,
-                    timestamp=datetime.fromisoformat("2026-03-12T09:10:00"),
+                    timestamp=datetime.fromisoformat("2026-03-12T09:10:00+00:00"),
                 ),
             ]
         )
