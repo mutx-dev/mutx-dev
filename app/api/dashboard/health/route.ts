@@ -28,6 +28,14 @@ function isConnectionError(error: unknown): boolean {
   )
 }
 
+function createHealthErrorResponse(message: string, status: number) {
+  const timestamp = new Date().toISOString()
+  return NextResponse.json(
+    { status: 'degraded', timestamp, database: null, error: message },
+    { status }
+  )
+}
+
 export async function GET() {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => {
@@ -45,12 +53,12 @@ export async function GET() {
   } catch (error) {
     console.error('Dashboard health proxy error:', error)
     if (isAbortError(error)) {
-      return NextResponse.json({ status: 'degraded', error: 'Health check timed out' }, { status: 504 })
+      return createHealthErrorResponse('Health check timed out', 504)
     }
     if (isConnectionError(error)) {
-      return NextResponse.json({ status: 'degraded', error: 'Connection failed' }, { status: 503 })
+      return createHealthErrorResponse('Connection failed', 503)
     }
-    return NextResponse.json({ status: 'unknown', error: 'Failed to connect to API' }, { status: 500 })
+    return createHealthErrorResponse('Failed to connect to API', 500)
   } finally {
     clearTimeout(timeoutId)
   }
