@@ -1,7 +1,7 @@
 # UI Porting Plan — mutx-control → mutx-dev
 
 **Started:** 2026-03-18  
-**Status:** PHASE 1 COMPLETE — Starting Phase 2  
+**Status:** PHASE 2 COMPLETE — All priority components ported  
 **Push branch:** `mutx-dev:ui-porting` (main is protected — open PR to merge)  
 **Source:** https://github.com/mutx-dev/mutx-control/ (OpenClaw Mission Control)  
 **Target:** https://github.com/mutx-dev/mutx-dev  
