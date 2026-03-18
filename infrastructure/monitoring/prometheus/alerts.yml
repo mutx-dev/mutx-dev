@@ -6,9 +6,11 @@ groups:
         for: 2m
         labels:
           severity: critical
+          notify: webhook
+          self_heal: "container"
         annotations:
           summary: "MUTX API target is down"
-          description: "Prometheus cannot scrape mutx-api for more than 2 minutes."
+          description: "Prometheus cannot scrape mutx-api for more than 2 minutes. Will trigger self-healing."
 
       - alert: HighApiP95Latency
         expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job="mutx-api"}[5m])) by (le)) > 1
@@ -33,9 +35,11 @@ groups:
         for: 5m
         labels:
           severity: critical
+          notify: webhook
+          self_heal: "container"
         annotations:
           summary: "High error rate detected"
-          description: "Error rate is above 5% for 5 minutes."
+          description: "Error rate is above 5% for 5 minutes. Will trigger self-healing."
 
       - alert: High4xxRate
         expr: sum(rate(http_requests_total{job="mutx-api",status=~"4.."}[5m])) / sum(rate(http_requests_total{job="mutx-api"}[5m])) > 0.20
@@ -51,18 +55,20 @@ groups:
         for: 5m
         labels:
           severity: warning
+          self_heal: "redis"
         annotations:
           summary: "Redis exporter is down"
-          description: "No Redis metrics for 5 minutes."
+          description: "No Redis metrics for 5 minutes. Will trigger Redis recovery."
 
       - alert: PostgresExporterDown
         expr: up{job="postgres-exporter"} == 0
         for: 5m
         labels:
           severity: warning
+          self_heal: "database"
         annotations:
           summary: "Postgres exporter is down"
-          description: "No Postgres metrics for 5 minutes."
+          description: "No Postgres metrics for 5 minutes. Will trigger database recovery."
 
       - alert: NodeExporterDown
         expr: up{job="node-exporter"} == 0
@@ -87,9 +93,10 @@ groups:
         for: 5m
         labels:
           severity: critical
+          self_heal: "container"
         annotations:
           summary: "Host memory usage is critical (95%+)"
-          description: "Node memory pressure has stayed above 95% for 5 minutes."
+          description: "Node memory pressure has stayed above 95% for 5 minutes. Restarting containers."
 
       - alert: HostDiskAlmostFull
         expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay",mountpoint="/"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay",mountpoint="/"}) < 0.15
@@ -123,9 +130,10 @@ groups:
         for: 5m
         labels:
           severity: warning
+          self_heal: "database"
         annotations:
           summary: "PostgreSQL connection pool near exhaustion"
-          description: "Database is using more than 80% of available connections."
+          description: "Database is using more than 80% of available connections. Will trigger DB recovery."
 
       - alert: PostgresSlowQueries
         expr: rate(pg_stat_statements_mean_exec_time[5m]) > 1000
@@ -259,3 +267,24 @@ groups:
         annotations:
           summary: "MUTX API is down"
           description: "Prometheus cannot scrape mutx-api - service unavailable."
+
+      # Queue-specific alerts for self-healing
+      - alert: TaskQueueBacklog
+        expr: sum(rate(mutx_task_queue_size[5m])) > 1000
+        for: 15m
+        labels:
+          severity: warning
+          self_heal: "queue"
+        annotations:
+          summary: "Task queue backlog building"
+          description: "Task queue backlog exceeds 1000 items for 15 minutes. Will trigger queue drain."
+
+      - alert: TaskQueueStalled
+        expr: sum(rate(mutx_tasks_stalled_total[5m])) > 0
+        for: 5m
+        labels:
+          severity: critical
+          self_heal: "queue"
+        annotations:
+          summary: "Tasks stalled in queue"
+          description: "Detected stalled tasks. Will trigger queue recovery."
