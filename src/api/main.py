@@ -251,7 +251,12 @@ async def readiness_check(request: Request, response: Response):
 
 
 @app.get("/")
-async def root():
+async def root(request: Request):
+    """Redirect authenticated users to app.mutx.dev, unauthenticated to landing."""
+    user_id = getattr(request.state, "auth_user_id", None)
+    if user_id:
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="https://app.mutx.dev", status_code=302)
     return {"message": "mutx.dev API", "version": "1.0.0"}
 
 
