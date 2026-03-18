@@ -31,6 +31,7 @@ class CircuitState:
 @dataclass
 class CircuitBreaker:
     """Simple circuit breaker for API calls."""
+
     failure_threshold: int = 5
     recovery_timeout: float = 30.0
     state: str = field(default=CircuitState.CLOSED, init=False)
@@ -130,10 +131,10 @@ class AnthropicAdapter(AgentRuntime):
                 response = await self._client.messages.create(**request_kwargs)
                 self._circuit_breaker.record_success()
                 break
-            except Exception as exc:
+            except Exception:
                 self._circuit_breaker.record_failure()
                 if attempt < max_retries - 1:
-                    delay = base_delay * (2 ** attempt)
+                    delay = base_delay * (2**attempt)
                     await asyncio.sleep(delay)
                 else:
                     raise
