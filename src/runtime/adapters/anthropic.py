@@ -19,7 +19,6 @@ from ..base import (
     RuntimeToolDefinition,
     ToolHandler,
 )
-from ..circuit_breaker import CircuitBreaker
 
 
 # Circuit breaker states

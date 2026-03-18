@@ -9,6 +9,7 @@ from enum import Enum
 
 class CircuitState(str, Enum):
     """Circuit breaker states."""
+
     CLOSED = "closed"
     OPEN = "open"
     HALF_OPEN = "half_open"
@@ -17,7 +18,7 @@ class CircuitState(str, Enum):
 @dataclass
 class CircuitBreaker:
     """Simple circuit breaker for API calls.
-    
+
     Prevents cascading failures by stopping requests when a service
     is experiencing issues. After a threshold of failures, the circuit
     opens and rejects requests for a recovery timeout period.
