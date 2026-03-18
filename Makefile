@@ -125,3 +125,11 @@ seed: test-auth
 seed-only:
 	@./scripts/seed.sh
 
+# Run mutation testing
+.PHONY: mutation-test
+mutation-test:
+	@echo "Running mutation testing..."
+	@python -m mutmut run
+	@echo ""
+	@echo "Mutation testing results:"
+	@python -m mutmut show
