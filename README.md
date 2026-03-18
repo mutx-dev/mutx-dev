@@ -34,11 +34,34 @@ MUTX → for AI agents
 
 Capabilities include:
 
-• agent lifecycle management  
-• orchestration and scheduling  
-• observability and debugging  
-• policy and governance  
-• CLI + API + SDK access  
+• agent lifecycle management
+• orchestration and scheduling
+• observability and debugging
+• policy and governance
+• budget and access control
+• CLI + API + SDK access
+
+---
+
+## OpenClaw Integration
+
+MUTX intentionally supports two operator entry paths:
+
+- **Spin up new OpenClaw-backed agents** — MUTX provisions the OpenClaw runtime and manages the full agent lifecycle from deployment through governance
+- **Link existing OpenClaw workspaces** — attach a running OpenClaw workspace and manage it through MUTX's control plane, gaining deployment governance, budgets, and observability on top
+
+Both paths use the same API, SDK, and CLI. MUTX does not replace OpenClaw — it extends it with the operational layer that production agent systems need.
+
+---
+
+## Why MUTX, not a dashboard?
+
+Most agent tools are session or tracing layers — they observe what agents do (LangSmith, Helicone, Mission Control). MUTX controls how agents run: their deployment model, access boundaries, budget constraints, and operational contracts.
+
+Mission Control answers: *What are my agents doing right now?*  
+MUTX answers: *How are my agents deployed, governed, and performing — and what do I do when they're not?*
+
+This is not a cosmetic difference. Session dashboards track chat logs. MUTX manages deployment lifecycles, enforces budgets, and provides the SDK and CLI that production operators need.
 
 ---
 

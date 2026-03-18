@@ -110,11 +110,11 @@ export default function LandingPage() {
             </div>
 
             <h1 className="max-w-3xl text-4xl font-medium tracking-tight text-white sm:text-5xl lg:text-[4.5rem] lg:leading-[0.94]">
-              run ai agents with a control surface operators can trust.
+              deploy, operate, and govern ai agents like the infrastructure they are.
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-7 text-white/62 sm:text-lg sm:leading-8">
-              MUTX is the minimal public surface: docs, repo, app, and a waitlist for early access.
+              MUTX is the production control plane for AI agents — built for operators who need real deployment semantics, not just chat sessions. Agents get deployments. Operations get budgets and governance. Teams get SDK and CLI.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
