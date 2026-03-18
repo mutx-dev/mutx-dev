@@ -1,0 +1,10 @@
+[railway]
+schemaVersion = 2
+
+[deploy]
+startCommand = "pip install psycopg2-binary alembic -q && alembic upgrade head && uvicorn src.api.main:app --host 0.0.0.0 --port $PORT"
+
+[[build.targets]]
+service = "backend"
+dockerfile = "infrastructure/docker/Dockerfile.backend"
+target = "production"

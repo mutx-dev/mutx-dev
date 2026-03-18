@@ -1,0 +1,1 @@
+{"$schema":"https://railway.app/schema.json","build":{"builder":"NIXPACKS"},"deploy":{"numReplicas":1,"singleInstance":true,"restartPolicyType":"ON_FAILURE","restartPolicyMaxRetries":3,"runCommand":"pip install psycopg2-binary -q && alembic upgrade head && echo DONE"}}
