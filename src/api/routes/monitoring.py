@@ -126,7 +126,7 @@ async def list_alerts(
     unresolved_query = (
         select(func.count())
         .select_from(Alert)
-        .where(and_(Alert.agent_id.in_(agent_subquery), not Alert.resolved))
+        .where(and_(Alert.agent_id.in_(agent_subquery), Alert.resolved.is_(False)))
     )
     unresolved_count = (await db.execute(unresolved_query)).scalar_one() or 0
 
