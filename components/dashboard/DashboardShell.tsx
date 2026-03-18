@@ -100,9 +100,9 @@ export function DashboardShell({ children }: DashboardShellProps) {
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                  app.mutx.dev
+                  MUTX
                 </p>
-                <p className="text-sm font-semibold text-white">Mission Control</p>
+                <p className="text-sm font-semibold text-white">Dashboard</p>
               </div>
             </div>
 
@@ -143,11 +143,11 @@ export function DashboardShell({ children }: DashboardShellProps) {
               {!sidebarCollapsed ? (
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                    app.mutx.dev
+                    MUTX
                   </p>
-                  <p className="text-sm font-semibold text-white">Mission Control</p>
+                  <p className="text-sm font-semibold text-white">Dashboard</p>
                   <p className="mt-1 text-[10px] uppercase tracking-[0.18em] text-cyan-300/70">
-                    dashboard shell
+                    control plane
                   </p>
                 </div>
               ) : null}
@@ -174,7 +174,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
                       {activeItem?.title ?? "Dashboard"}
                     </p>
                     <p className="truncate text-[11px] uppercase tracking-[0.15em] text-slate-400">
-                      {activeItem?.description ?? "Operator control surface"}
+                      {activeItem?.description ?? "MUTX control plane"}
                     </p>
                   </div>
                 </div>
