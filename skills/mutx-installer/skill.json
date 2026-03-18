@@ -1,0 +1,27 @@
+{
+  "name": "mutx-installer",
+  "version": "1.0.0",
+  "description": "Install and configure MUTX — the agent control plane",
+  "author": "MUTX",
+  "license": "MIT",
+  "tools": ["exec", "fs"],
+  "parameters": {
+    "deployment_mode": {
+      "type": "string",
+      "enum": ["docker", "local"],
+      "default": "docker",
+      "description": "How to deploy MUTX"
+    },
+    "port": {
+      "type": "number",
+      "default": 3000,
+      "description": "Port for the MUTX dashboard"
+    },
+    "install_dir": {
+      "type": "string",
+      "default": "",
+      "description": "Installation directory (defaults to ./mutx)"
+    }
+  },
+  "tags": ["mutx", "installer", "docker", "deployment"]
+}
