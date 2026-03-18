@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build --no-lint",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint --dir .",
     "desktop:start": "electron .",
     "desktop:dev": "bash -lc 'npm run dev & NEXT_PID=$!; trap \"kill $NEXT_PID\" EXIT; until curl -fsS http://127.0.0.1:3000 >/dev/null; do sleep 1; done; MUTX_DESKTOP_URL=http://127.0.0.1:3000 electron .'",
     "desktop:build": "npm run build && electron-builder --mac --publish never",
