@@ -59,17 +59,17 @@
 |---|-----------|-------------|-------------|--------|-------|
 | 1 | Sidebar Navigation | `dashboard/sidebar.tsx` | `components/ui/sidebar.tsx` | ✅ DONE | Map to MUTX sections |
 | 2 | Stats Card | `dashboard/stats-grid.tsx` | `components/ui/stat-card.tsx` | ✅ DONE | Copy verbatim |
-| 3 | Dashboard Layout | `dashboard/dashboard.tsx` | `components/app/dashboard-layout.tsx` | TODO | Adapt API calls |
+| 3 | Dashboard Layout | `dashboard/dashboard.tsx` | `components/app/dashboard-layout.tsx` | ✅ DONE | Adapt API calls to `/api/dashboard/*` |
 | 4 | Agent Row | `panels/agent-squad-panel.tsx` | `components/app/agent-row.tsx` | ✅ DONE | Map agent model |
-| 5 | Log Viewer Panel | `panels/log-viewer-panel.tsx` | `components/app/log-viewer.tsx` | TODO | Uses `/api/logs` |
+| 5 | Log Viewer Panel | `panels/log-viewer-panel.tsx` | `components/app/log-viewer.tsx` | ✅ DONE | Uses `/api/dashboard/logs` (endpoint TBD) |
 
 ### Secondary Components
 
 | # | Component | Source File | Target File | Status | Notes |
 |---|-----------|-------------|-------------|--------|-------|
 | 6 | Widget Grid | `dashboard/widget-grid.tsx` | `components/ui/widget-grid.tsx` | ✅ DONE | Layout system |
-| 7 | Metric Cards | `dashboard/widgets/metric-cards-widget.tsx` | `components/app/metric-cards.tsx` | TODO | |
-| 8 | Activity Feed | `panels/activity-feed-panel.tsx` | `components/app/activity-feed.tsx` | TODO | |
+| 7 | Metric Cards | `dashboard/widgets/metric-cards-widget.tsx` | `components/app/metric-cards.tsx` | ✅ DONE | Adapt API calls to `/api/dashboard/*` |
+| 8 | Activity Feed | `panels/activity-feed-panel.tsx` | `components/app/activity-feed.tsx` | ✅ DONE | Adapt API calls to `/api/dashboard/*` |
 | 9 | Task Board | `panels/task-board-panel.tsx` | `components/app/task-board.tsx` | TODO | |
 | 10 | Nav Rail | `components/layout/nav-rail.tsx` | `components/ui/nav-rail.tsx` | TODO | Mobile nav |
 
@@ -100,6 +100,8 @@
 | Blocker | Severity | Status | Resolution |
 |---------|----------|--------|------------|
 | API endpoints incomplete | Medium | OPEN | Implement missing endpoints first |
+
+**Note:** Activity feed requires `/api/dashboard/events` endpoint (Phase 3). Currently shows error gracefully when endpoint is unavailable.
 | No existing `/dashboard/agents` route group | Low | OK | Use `/api/dashboard/agents` directly |
 
 ---
@@ -109,7 +111,7 @@
 | Date | Phase | Components Done | Notes |
 |------|-------|-----------------|-------|
 | 2026-03-18 | Phase 1 (Discovery) | ✅ Complete | mutx-control = OpenClaw UI |
-| 2026-03-18 | Phase 2 (Components) | 4/10 | sidebar, stat-card, agent-row, widget-grid → pushed to ui-porting |
+| 2026-03-18 | Phase 2 (Components) | 8/10 | sidebar, stat-card, agent-row, widget-grid, dashboard-layout, log-viewer, metric-cards, activity-feed → pushed to ui-porting |
 
 ---
 
