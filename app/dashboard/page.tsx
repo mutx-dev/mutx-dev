@@ -136,7 +136,7 @@ export default function DashboardPage() {
         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
           <p className="text-sm font-medium text-slate-400">Active Agents</p>
           <p className="mt-2 text-3xl font-bold text-cyan-400">
-            {agents.filter((a) => a.status === "running").length}
+            {(Array.isArray(agents) ? agents.filter((a: Agent) => a.status === "running").length : 0)}
           </p>
         </div>
         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
@@ -146,7 +146,7 @@ export default function DashboardPage() {
         <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-6">
           <p className="text-sm font-medium text-slate-400">Active Deployments</p>
           <p className="mt-2 text-3xl font-bold text-emerald-400">
-            {deployments.filter((d) => d.status === "running").length}
+            {(Array.isArray(deployments) ? deployments.filter((d: Deployment) => d.status === "running").length : 0)}
           </p>
         </div>
       </div>
