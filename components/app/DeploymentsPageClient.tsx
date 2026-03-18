@@ -727,20 +727,29 @@ export function DeploymentsPageClient() {
       {filteredDeployments.length === 0 ? (
         <div className="rounded-xl border border-white/5 bg-white/[0.02] p-12 text-center">
           <Server className="mx-auto h-12 w-12 text-slate-600" />
-          <p className="mt-4 text-lg font-medium text-white">No deployments found</p>
+          <p className="mt-4 text-lg font-medium text-white">No deployments yet</p>
           <p className="mt-1 text-sm text-slate-500">
             {searchQuery
               ? "Try adjusting your search query"
-              : "Deployments will appear here when agents are deployed"}
+              : "Deployments are running instances of your agents — with versioning, scaling, and live config updates."}
           </p>
           {!searchQuery && (
-            <button
-              onClick={() => setCreateDialogOpen(true)}
-              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600"
-            >
-              <Plus className="h-4 w-4" />
-              Create Deployment
-            </button>
+            <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                onClick={() => setCreateDialogOpen(true)}
+                className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600"
+              >
+                <Plus className="h-4 w-4" />
+                Create Deployment
+              </button>
+              <a
+                href="/app?setup=openclaw"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08]"
+              >
+                <Bot className="h-4 w-4" />
+                Connect OpenClaw workspace
+              </a>
+            </div>
           )}
         </div>
       ) : (

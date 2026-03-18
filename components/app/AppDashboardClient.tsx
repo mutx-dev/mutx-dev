@@ -925,9 +925,25 @@ export function AppDashboardClient() {
                     <tr>
                       <td
                         colSpan={3}
-                        className="px-6 py-12 text-center text-slate-500"
+                        className="px-6 py-12 text-center"
                       >
-                        No agents found for this account yet.
+                        <div className="flex flex-col items-center gap-2">
+                          <p className="text-sm text-slate-400">No agents in your account yet.</p>
+                          <div className="flex items-center gap-3 mt-1">
+                            <button
+                              onClick={() => {/* open agent create */}}
+                              className="rounded-lg bg-cyan-500 px-3 py-1.5 text-xs font-medium text-black hover:bg-cyan-400"
+                            >
+                              Create new agent
+                            </button>
+                            <a
+                              href="/app?setup=openclaw"
+                              className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/[0.05]"
+                            >
+                              Connect OpenClaw workspace
+                            </a>
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   )}

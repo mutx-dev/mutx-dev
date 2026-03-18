@@ -253,10 +253,34 @@ function EmptyState() {
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-800/50 text-slate-500">
         <Bot className="h-8 w-8" />
       </div>
-      <h3 className="mt-6 text-lg font-semibold text-white">No agents found</h3>
+      <h3 className="mt-6 text-lg font-semibold text-white">No agents yet</h3>
       <p className="mt-2 max-w-sm text-sm text-slate-400">
-        Agents you create will appear here. Authenticate and provision your first agent to see it in the fleet inventory.
+        Agents are your deployable unit — each one is a named, versioned agent configuration with its own API key and deployment history.
       </p>
+      <div className="mt-6 flex flex-col gap-3">
+        <button
+          onClick={() => setCreateDialogOpen(true)}
+          className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-5 py-2.5 text-sm font-medium text-black hover:bg-cyan-400"
+        >
+          <Plus className="h-4 w-4" />
+          Create new agent
+        </button>
+        <a
+          href="/app?setup=openclaw"
+          className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/[0.08]"
+        >
+          <Bot className="h-4 w-4" />
+          Connect existing OpenClaw workspace
+        </a>
+        <a
+          href="https://docs.mutx.dev/agents"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-400"
+        >
+          Learn more about agents →
+        </a>
+      </div>
     </div>
   );
 }

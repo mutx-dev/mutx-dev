@@ -170,7 +170,15 @@ export function ApiKeysPageClient() {
         {keys.length === 0 ? (
           <div className="px-6 py-12 text-center">
             <KeyRound className="mx-auto h-12 w-12 text-slate-600" />
-            <p className="mt-4 text-slate-400">No API keys yet</p>
+            <p className="mt-4 text-sm font-medium text-white">No API keys yet</p>
+            <p className="mt-1 text-xs text-slate-500">Keys let you drive MUTX from the CLI, SDK, or any HTTP client — without the browser session.</p>
+            <button
+              onClick={() => setShowCreate(true)}
+              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-black hover:bg-cyan-400"
+            >
+              <KeyRound className="h-4 w-4" />
+              Create API key
+            </button>
           </div>
         ) : (
           <div className="divide-y divide-white/5">
