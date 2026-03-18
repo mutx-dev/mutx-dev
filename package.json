@@ -5,7 +5,7 @@
   "main": "desktop/main.cjs",
   "scripts": {
     "dev": "next dev",
-    "build": "next build --no-lint",
+    "build": "next build",
     "start": "next start",
     "lint": "echo Skipping lint - use pnpm eslint instead",
     "desktop:start": "electron .",
