@@ -177,14 +177,14 @@ export function AppDashboardClient() {
     ? deployments.find(d => d.id === selectedDeploymentId) 
     : deployments[0] ?? null;
 
-  const runningAgents = agents.filter((agent) => agent.status === "running").length;
-  const healthyDeployments = deployments.filter(
+  const runningAgents = (Array.isArray(agents) ? agents : []).filter((agent) => agent.status === "running").length;
+  const healthyDeployments = (Array.isArray(deployments) ? deployments : []).filter(
     (deployment) => deployment.status === "running" || deployment.status === "healthy",
   ).length;
-  const failedDeployments = deployments.filter(
+  const failedDeployments = (Array.isArray(deployments) ? deployments : []).filter(
     (deployment) => deployment.status === "failed" || deployment.status === "error",
   ).length;
-  const activeKeys = apiKeys.filter((apiKey) => apiKey.is_active).length;
+  const activeKeys = (Array.isArray(apiKeys) ? apiKeys : []).filter((apiKey) => apiKey.is_active).length;
   const revokedKeys = apiKeys.length - activeKeys;
   const apiKeyLimit = getApiKeyLimit(user?.plan);
   const apiKeyCapacityRemaining = apiKeyLimit === null ? null : Math.max(apiKeyLimit - activeKeys, 0);
@@ -362,20 +362,31 @@ export function AppDashboardClient() {
     ],
   );
 
+  // Helper to extract array from API response (handles { items: [...] } or direct array)
+  function normalizeArray<T>(data: any): T[] {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (data.items && Array.isArray(data.items)) return data.items;
+    if (data.agents && Array.isArray(data.agents)) return data.agents;
+    if (data.deployments && Array.isArray(data.deployments)) return data.deployments;
+    if (data.data && Array.isArray(data.data)) return data.data;
+    return [];
+  }
+
   async function loadDashboard() {
-    const [nextUser, nextHealth, nextAgents, nextDeployments, nextKeys] =
+    const [nextUser, nextHealth, rawAgents, rawDeployments, nextKeys] =
       await Promise.all([
         readJson<User>("/api/auth/me"),
         readJson<Health>("/api/dashboard/health"),
-        readJson<Agent[]>("/api/dashboard/agents"),
-        readJson<Deployment[]>("/api/dashboard/deployments"),
+        readJson<any>("/api/dashboard/agents"),
+        readJson<any>("/api/dashboard/deployments"),
         readJson<ApiKey[]>("/api/api-keys"),
       ]);
 
     setUser(nextUser);
     setHealth(nextHealth);
-    setAgents(nextAgents);
-    setDeployments(nextDeployments);
+    setAgents(normalizeArray<Agent>(rawAgents));
+    setDeployments(normalizeArray<Deployment>(rawDeployments));
     setApiKeys(nextKeys);
   }
 
