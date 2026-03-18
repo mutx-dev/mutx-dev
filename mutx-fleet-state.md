@@ -18,7 +18,7 @@
 |-----|-------|---------|--------|
 | mutx-pulse-poster | x | 30 min | ⏳ Pending restart |
 | mutx-pulse-engagement | x | 15 min | ⏳ Pending restart |
-| mutx-ui-porting-worker | minimax-m2.7 | 30 min | 🟢 Active (just created) |
+| mutx-ui-porting | opencode + minimax-m2.7 | 30 min | 🟢 Running (just triggered) |
 
 ### New Discipline
 - State files before/after every action
@@ -30,11 +30,15 @@
 
 ## PRIORITY WORK (2026-03-18)
 
-### 1. Port mutx-control UI (TOP PRIORITY)
-- **Source:** https://github.com/mutx-dev/mutx-control/ (approved)
+### 1. Port mutx-control UI + v2.0.1 Features (TOP PRIORITY)
+- **Source:** https://github.com/mutx-dev/mutx-control/ (synced to builderz-labs v2.0.1)
 - **Target:** Our frontend in https://github.com/mutx-dev/mutx-dev
-- **Strategy:** Clone, copy UI, adapt to our API, ship incrementally
-- **Progress:** Not started
+- **Worktree:** ~/mutx-worktrees/factory/ship (on pr-1154 branch)
+- **Progress:** 10 components ported (Phase 2 complete, including nav rail), Phase 3+4 in progress
+- **v2.0.1 pulled:** GNAP sync engine, task-dispatch, i18n messages (10 langs)
+- **sessions/ dropped** — OpenClaw-specific deps not compatible with MUTX stack
+- **Stub modules added:** logger, command, openclaw-gateway, event-bus
+- **Note:** i18n messages present but next-intl not yet set up in MUTX frontend
 
 ### 2. Clear PR Backlog
 - 13 PRs labeled "merge-ready" but ALL blocked by conflicts
@@ -96,8 +100,11 @@
 
 ### Immediate (Today)
 - [x] Port first page of mutx-control UI (sidebar + stat-card done)
-- [x] Create UI porting cron worker (minimax-m2.7, every 30 min)
-- [ ] Monitor UI porting worker progress
+- [x] Pull mutx-control to builderz-labs v2.0.1 (synced origin/main)
+- [x] Copy v2.0.1 GNAP sync, task-dispatch, i18n to ship worktree
+- [x] Draft FACTORY-RESTART-PLAN.md with 3-job disciplined restart payloads
+- [ ] Monitor UI porting worker progress (currently failing - edit errors)
+- [ ] Wire i18n framework (next-intl setup needed for messages to work)
 - [ ] Restart X cron workers (monitor for rate limits)
 - [ ] Create healer worker to fix PR conflicts
 - [ ] Create 1 backend + 1 frontend worker (start with 2, not 6)

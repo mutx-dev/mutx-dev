@@ -71,7 +71,7 @@
 | 7 | Metric Cards | `dashboard/widgets/metric-cards-widget.tsx` | `components/app/metric-cards.tsx` | ✅ DONE | Adapt API calls to `/api/dashboard/*` |
 | 8 | Activity Feed | `panels/activity-feed-panel.tsx` | `components/app/activity-feed.tsx` | ✅ DONE | Adapt API calls to `/api/dashboard/*` |
 | 9 | Task Board | `panels/task-board-panel.tsx` | `components/app/task-board.tsx` | ✅ DONE | Derived from `/api/dashboard/agents` + `/api/dashboard/deployments` until `/api/dashboard/tasks` exists |
-| 10 | Nav Rail | `components/layout/nav-rail.tsx` | `components/ui/nav-rail.tsx` | TODO | Mobile nav |
+| 10 | Nav Rail | `components/layout/nav-rail.tsx` | `components/ui/nav-rail.tsx` | ✅ DONE | Mobile nav |
 
 ---
 
