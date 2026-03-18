@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Bot, Check, Clock, Copy, Power, RefreshCcw, Rocket, Trash2, Activity } from "lucide-react";
+import { ArrowLeft, Check, Clock, Copy, Power, RefreshCcw, Rocket, Trash2, Activity } from "lucide-react";
 
 import {
   ShellAuthRequiredState,
@@ -10,6 +10,7 @@ import {
   ShellLoadingState,
   ShellNotFoundState,
 } from "@/components/dashboard";
+import { AgentAvatar } from "@/components/ui/agent-avatar";
 import { Card } from "@/components/ui/Card";
 import { type components } from "@/app/types/api";
 
@@ -152,7 +153,7 @@ export default function AgentDetailPage({ params }: AgentDetailPageProps) {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <button onClick={() => router.push("/dashboard/agents")} className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-700 bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white"><ArrowLeft className="h-5 w-5" /></button>
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400"><Bot className="h-6 w-6" /></div>
+        <AgentAvatar name={agent.name} size="md" className="h-12 w-12 text-sm" />
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-semibold text-white">{agent.name}</h1>

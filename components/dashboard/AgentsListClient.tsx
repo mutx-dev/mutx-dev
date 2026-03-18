@@ -283,7 +283,7 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
               status={mapStatusToDashboardStatus(agent.status)}
               description={agent.description ?? undefined}
               updatedAt={formatRelativeTime(agent.updated_at)}
-              icon={<Bot className="h-4 w-4" />}
+              avatarName={agent.name}
             />
           ))}
         </div>

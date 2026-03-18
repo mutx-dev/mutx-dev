@@ -2,6 +2,7 @@ import type { HTMLAttributes, ReactNode } from "react";
 import { Bot, Layers3, ListTodo } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { AgentAvatar } from "@/components/ui/agent-avatar";
 
 import { StatusBadge } from "./StatusBadge";
 import { dashboardTokens } from "./tokens";
@@ -15,6 +16,7 @@ export interface AgentCardProps extends HTMLAttributes<HTMLDivElement> {
   description?: string;
   updatedAt?: string;
   icon?: ReactNode;
+  avatarName?: string;
   actions?: ReactNode;
 }
 
@@ -26,6 +28,7 @@ export function AgentCard({
   description,
   updatedAt,
   icon,
+  avatarName,
   actions,
   className,
   style,
@@ -46,16 +49,20 @@ export function AgentCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex items-start gap-3">
-          <div
-            className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border"
-            style={{
-              borderColor: dashboardTokens.borderSubtle,
-              backgroundColor: dashboardTokens.bgSubtle,
-              color: dashboardTokens.textSubtle,
-            }}
-          >
-            {icon ?? <Bot className="h-4 w-4" />}
-          </div>
+          {avatarName ? (
+            <AgentAvatar name={avatarName} size="md" className="mt-0.5 h-9 w-9 text-xs" />
+          ) : (
+            <div
+              className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border"
+              style={{
+                borderColor: dashboardTokens.borderSubtle,
+                backgroundColor: dashboardTokens.bgSubtle,
+                color: dashboardTokens.textSubtle,
+              }}
+            >
+              {icon ?? <Bot className="h-4 w-4" />}
+            </div>
+          )}
           <div className="min-w-0">
             <h3 className="truncate text-sm font-semibold">{name}</h3>
             {description ? (

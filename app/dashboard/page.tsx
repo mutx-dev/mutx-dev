@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Bot, Server } from "lucide-react";
 
 import { EmptyState, ShellAuthRequiredState, ShellErrorState, ShellLoadingState } from "@/components/dashboard";
+import { AgentAvatar } from "@/components/ui/agent-avatar";
 import { DashboardOverview } from "@/components/ui/dashboard-widgets";
 
 interface Agent {
@@ -143,7 +144,10 @@ export default function DashboardPage() {
                   key={agent.id}
                   className="flex items-center justify-between rounded-lg bg-slate-800/50 p-3"
                 >
-                  <span className="text-slate-200">{agent.name}</span>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <AgentAvatar name={agent.name} size="sm" />
+                    <span className="truncate text-slate-200">{agent.name}</span>
+                  </div>
                   <span
                     className={`rounded-full px-2 py-1 text-xs font-medium ${
                       agent.status === "running"
