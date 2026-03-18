@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   Activity,
+  Bot,
   Calendar,
   Clock,
   Loader2,
@@ -232,6 +233,44 @@ function LoadingState() {
       <DeploymentCardSkeleton />
       <DeploymentCardSkeleton />
       <DeploymentCardSkeleton />
+    </div>
+  );
+}
+
+function DeploymentsEmptyState({ onCreateNew }: { onCreateNew: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-3xl border border-white/5 bg-white/[0.01] py-16 text-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-800/50 text-slate-500">
+        <Server className="h-8 w-8" />
+      </div>
+      <h3 className="mt-6 text-lg font-semibold text-white">No deployments yet</h3>
+      <p className="mt-2 max-w-sm text-sm text-slate-400">
+        Deployments are running instances of your agents — with versioning, scaling, and live config updates.
+      </p>
+      <div className="mt-6 flex flex-col gap-3">
+        <button
+          onClick={onCreateNew}
+          className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-600"
+        >
+          <Plus className="h-4 w-4" />
+          Create new deployment
+        </button>
+        <a
+          href="/app?setup=openclaw"
+          className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/[0.08]"
+        >
+          <Bot className="h-4 w-4" />
+          Connect existing OpenClaw workspace
+        </a>
+        <a
+          href="https://docs.mutx.dev/deployments"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-400"
+        >
+          Learn more about deployments →
+        </a>
+      </div>
     </div>
   );
 }
@@ -725,33 +764,7 @@ export function DeploymentsPageClient() {
       </div>
 
       {filteredDeployments.length === 0 ? (
-        <div className="rounded-xl border border-white/5 bg-white/[0.02] p-12 text-center">
-          <Server className="mx-auto h-12 w-12 text-slate-600" />
-          <p className="mt-4 text-lg font-medium text-white">No deployments yet</p>
-          <p className="mt-1 text-sm text-slate-500">
-            {searchQuery
-              ? "Try adjusting your search query"
-              : "Deployments are running instances of your agents — with versioning, scaling, and live config updates."}
-          </p>
-          {!searchQuery && (
-            <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <button
-                onClick={() => setCreateDialogOpen(true)}
-                className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600"
-              >
-                <Plus className="h-4 w-4" />
-                Create Deployment
-              </button>
-              <a
-                href="/app?setup=openclaw"
-                className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08]"
-              >
-                <Bot className="h-4 w-4" />
-                Connect OpenClaw workspace
-              </a>
-            </div>
-          )}
-        </div>
+        <DeploymentsEmptyState onCreateNew={() => setCreateDialogOpen(true)} />
       ) : (
         <div className="space-y-4">
           {filteredDeployments.map((deployment) => (

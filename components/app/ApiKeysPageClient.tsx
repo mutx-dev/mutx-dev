@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { KeyRound, Plus, RefreshCw, Trash2, AlertCircle, Loader2 } from 'lucide-react';
+import { KeyRound, Plus, RefreshCw, Trash2, AlertCircle, Loader2, Bot } from 'lucide-react';
 
 interface ApiKey {
   id: string;
@@ -146,6 +146,7 @@ export function ApiKeysPageClient() {
         <h3 className="text-lg font-medium text-white mb-4">Create New API Key</h3>
         <form onSubmit={createKey} className="flex gap-3">
           <input
+            id="new-key-input"
             type="text"
             value={newKeyName}
             onChange={(e) => setNewKeyName(e.target.value)}
@@ -172,13 +173,30 @@ export function ApiKeysPageClient() {
             <KeyRound className="mx-auto h-12 w-12 text-slate-600" />
             <p className="mt-4 text-sm font-medium text-white">No API keys yet</p>
             <p className="mt-1 text-xs text-slate-500">Keys let you drive MUTX from the CLI, SDK, or any HTTP client — without the browser session.</p>
-            <button
-              onClick={() => setShowCreate(true)}
-              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-black hover:bg-cyan-400"
-            >
-              <KeyRound className="h-4 w-4" />
-              Create API key
-            </button>
+            <div className="mt-4 flex flex-col items-center gap-3">
+              <button
+                onClick={() => document.getElementById('new-key-input')?.focus()}
+                className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 text-sm font-medium text-black hover:bg-cyan-400"
+              >
+                <KeyRound className="h-4 w-4" />
+                Create API key
+              </button>
+              <a
+                href="/app?setup=openclaw"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08]"
+              >
+                <Bot className="h-4 w-4" />
+                Connect existing OpenClaw workspace
+              </a>
+              <a
+                href="https://docs.mutx.dev/api-keys"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-400"
+              >
+                Learn more about API keys →
+              </a>
+            </div>
           </div>
         ) : (
           <div className="divide-y divide-white/5">

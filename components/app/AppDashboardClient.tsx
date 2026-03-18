@@ -1072,8 +1072,19 @@ export function AppDashboardClient() {
                   );
                 })
               ) : (
-                <div className="rounded-xl border border-white/5 border-dashed p-6 text-center text-sm text-slate-500">
-                  No deployments found for this account yet.
+                <div className="flex flex-col items-center justify-center rounded-xl border border-white/5 border-dashed p-6 text-center">
+                  <Server className="h-10 w-10 text-slate-600" />
+                  <p className="mt-3 text-sm font-medium text-white">No deployments in this account yet</p>
+                  <p className="mt-1 text-xs text-slate-500">Deployments are running instances of your agents, surfaced here after auth.</p>
+                  <div className="mt-4 flex flex-col items-center gap-2">
+                    <a
+                      href="/app?setup=openclaw"
+                      className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-medium text-slate-300 hover:bg-white/[0.08]"
+                    >
+                      <Bot className="h-4 w-4" />
+                      Connect OpenClaw workspace
+                    </a>
+                  </div>
                 </div>
               )}
             </div>
@@ -1159,9 +1170,19 @@ export function AppDashboardClient() {
                     )}
                   </>
                 ) : (
-                  <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-                    <Activity className="mb-2 h-8 w-8 opacity-50" />
-                    <p className="text-sm">Select a deployment to view observability data</p>
+                  <div className="flex flex-col items-center justify-center rounded-xl border border-white/5 border-dashed py-12 text-center">
+                    <Activity className="mb-3 h-8 w-8 text-slate-600" />
+                    <p className="text-sm font-medium text-white">No deployment selected</p>
+                    <p className="mt-1 text-xs text-slate-500">Select a deployment above to view logs, metrics, and state transitions.</p>
+                    <div className="mt-4">
+                      <a
+                        href="/app?setup=openclaw"
+                        className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-medium text-slate-300 hover:bg-white/[0.08]"
+                      >
+                        <Bot className="h-4 w-4" />
+                        Connect OpenClaw workspace
+                      </a>
+                    </div>
                   </div>
                 )}
               </div>
