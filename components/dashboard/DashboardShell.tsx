@@ -9,6 +9,7 @@ import { Command, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { DASHBOARD_NAV_ITEMS, isDashboardNavItemActive } from "./dashboardNav";
+import { LiveHealthPill } from "./LiveHealthPill";
 
 interface DashboardShellProps {
   children: ReactNode;
@@ -178,18 +179,22 @@ export function DashboardShell({ children }: DashboardShellProps) {
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setSidebarCollapsed((current) => !current)}
-                  className="hidden rounded-lg border border-white/10 bg-white/5 p-2 text-slate-300 hover:bg-white/10 lg:inline-flex"
-                  aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                >
-                  {sidebarCollapsed ? (
-                    <PanelLeftOpen className="h-4 w-4" />
-                  ) : (
-                    <PanelLeftClose className="h-4 w-4" />
-                  )}
-                </button>
+                <div className="flex items-center gap-2">
+                  <LiveHealthPill />
+
+                  <button
+                    type="button"
+                    onClick={() => setSidebarCollapsed((current) => !current)}
+                    className="hidden rounded-lg border border-white/10 bg-white/5 p-2 text-slate-300 hover:bg-white/10 lg:inline-flex"
+                    aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                  >
+                    {sidebarCollapsed ? (
+                      <PanelLeftOpen className="h-4 w-4" />
+                    ) : (
+                      <PanelLeftClose className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </div>
             </header>
 
