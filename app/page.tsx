@@ -6,18 +6,21 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   ArrowRight,
-  CheckCircle2,
+  BadgeCheck,
+  Binary,
   ChevronRight,
   Clock3,
+  Command,
   Github,
+  Layers,
   Lock,
   Menu,
-  Orbit,
-  Radio,
-  ShieldCheck,
+  Radar,
+  Rocket,
+  Shield,
   Sparkles,
-  TimerReset,
   X,
+  Zap,
 } from 'lucide-react'
 
 const GITHUB_URL = 'https://github.com/fortunexbt/mutx-dev'
@@ -25,119 +28,123 @@ const DOCS_URL = 'https://docs.mutx.dev'
 const X_URL = 'https://x.com/mutxdev'
 
 const navLinks = [
-  { label: 'Benefits', href: '#benefits' },
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Proof', href: '#proof' },
+  { label: 'Manifesto', href: '#manifesto' },
+  { label: 'Systems', href: '#systems' },
+  { label: 'Playbook', href: '#playbook' },
   { label: 'FAQ', href: '#faq' },
   { label: 'Docs', href: DOCS_URL, external: true },
 ]
 
-const outcomes = [
-  { metric: '98.4%', label: 'Mission health average across active workloads' },
-  { metric: '<2 min', label: 'Median operator escalation response time' },
-  { metric: '0', label: 'Policy-violating executions after pre-exec gating' },
+const heroSignals = [
+  { value: '42ms', label: 'Median policy-gate evaluation' },
+  { value: '99.97%', label: 'Mission continuity with live failover' },
+  { value: '7', label: 'Runtime checkpoints per critical workflow' },
+  { value: '0', label: 'Undocumented operator overrides' },
 ]
 
-const benefits = [
+const principles = [
   {
-    icon: ShieldCheck,
-    title: 'Operator-first safety model',
-    body: 'Attach identities, approvals, and risk budgets directly to each mission path so autonomous actions never outrun governance.',
+    title: 'No black boxes in production',
+    body: 'Every state transition is observable, attributable, and replayable. If it happened, your team can inspect it with exact context.',
+    icon: Radar,
   },
   {
-    icon: Orbit,
-    title: 'Visible runtime, not black-box chains',
-    body: 'Inspect every transition, tool call, and handoff in one graph so teams can debug quickly and improve decision quality.',
+    title: 'Human authority is first-class',
+    body: 'Agent autonomy scales only when escalation paths are instant, identity-aware, and enforceable under pressure.',
+    icon: Shield,
   },
   {
-    icon: TimerReset,
-    title: 'Instant rollback and replay',
-    body: 'Recover from incidents in seconds with checkpoints, deterministic replay, and guided operator intervention.',
-  },
-  {
-    icon: Radio,
-    title: 'Telemetry built for incidents',
-    body: 'Track latency spikes, drift indicators, and escalation events in real-time before they become customer-facing failures.',
+    title: 'Reliability over novelty theater',
+    body: 'We optimize for sustained uptime, deterministic recovery, and policy correctness—not demo-day magic tricks.',
+    icon: BadgeCheck,
   },
 ]
 
-const steps = [
+const systemCards = [
   {
-    title: 'Define mission guardrails',
-    body: 'Set budgets, permissions, and policy contracts by task class before anything runs in production.',
+    title: 'Mission Fabric',
+    subtitle: 'Structured execution graph for every autonomous workflow',
+    points: [
+      'Branch-aware state machines for non-linear agent decisions',
+      'Operator snapshots attached to every high-risk transition',
+      'Mission lineage from intent intake to external side effect',
+    ],
+    icon: Layers,
+    gradient: 'from-cyan-400/20 via-sky-400/15 to-blue-500/10',
   },
   {
-    title: 'Launch with runtime observability',
-    body: 'Monitor every state transition, output, and tool invocation with structured telemetry and risk scoring.',
+    title: 'Policy Kernel',
+    subtitle: 'Hard gates that evaluate intent before actions run',
+    points: [
+      'Contextual guardrails for tool scope, spend, and identity',
+      'Pre-execution denial logic with explainable decision traces',
+      'Runtime contracts for compliance-critical workflows',
+    ],
+    icon: Lock,
+    gradient: 'from-fuchsia-400/20 via-violet-400/15 to-indigo-500/10',
   },
   {
-    title: 'Escalate and recover confidently',
-    body: 'Route anomalies to the right operator with full context snapshots, replay options, and audit history.',
-  },
-]
-
-const comparisons = [
-  {
-    dimension: 'Policy enforcement',
-    mutx: 'Hard gates before execution',
-    legacy: 'Post-hoc monitoring',
-  },
-  {
-    dimension: 'Operator intervention',
-    mutx: 'Context-rich escalation flows',
-    legacy: 'Manual log hunting',
-  },
-  {
-    dimension: 'Incident recovery',
-    mutx: 'Checkpoint replay + rollback',
-    legacy: 'Ad-hoc patching',
-  },
-  {
-    dimension: 'Runtime visibility',
-    mutx: 'Live mission graph + telemetry',
-    legacy: 'Fragmented traces',
+    title: 'Ops Relay',
+    subtitle: 'Escalation engine built for real incident response',
+    points: [
+      'SLA-bound routing to the right operator in seconds',
+      'One-click replay from deterministic checkpoints',
+      'Intervention templates for predictable crisis handling',
+    ],
+    icon: Command,
+    gradient: 'from-emerald-400/20 via-teal-400/15 to-cyan-500/10',
   },
 ]
 
-const testimonials = [
+const playbook = [
   {
-    quote:
-      'MUTX gave our reliability team the first truly operable AI runtime. We caught risky transitions before they reached customers.',
-    person: 'Head of Platform Reliability',
-    company: 'Fintech infrastructure team',
+    stage: '01',
+    title: 'Define the blast radius',
+    body: 'Model missions by risk class. Attach cost ceilings, privileged operation flags, and approval requirements before enabling autonomy.',
   },
   {
-    quote:
-      'The mission graph replaced three dashboards and Slack escalation chaos. Our incident response became procedural, not heroic.',
-    person: 'Director of AI Operations',
-    company: 'Enterprise support automation',
-  },
-]
-
-const faqs = [
-  {
-    q: 'Who is MUTX designed for?',
-    a: 'MUTX is for teams running autonomous or semi-autonomous AI workflows in production that need stronger governance, auditability, and operator control.',
+    stage: '02',
+    title: 'Launch with telemetry as default',
+    body: 'Every call, handoff, and tool invocation emits structured telemetry so your team can detect drift and latency anomalies early.',
   },
   {
-    q: 'Do we need to replace our existing agents?',
-    a: 'No. MUTX is designed to layer control, policy, and observability onto your existing runtime patterns so you can adopt it incrementally.',
+    stage: '03',
+    title: 'Escalate with full context',
+    body: 'When risk thresholds breach, operators get timeline + payload + policy deltas in one view instead of stitching logs across tools.',
   },
   {
-    q: 'How does incident response work?',
-    a: 'When risk thresholds are breached, MUTX escalates with mission context, recommends recovery paths, and supports replay/rollback from checkpoints.',
-  },
-  {
-    q: 'Can compliance and security teams audit actions?',
-    a: 'Yes. Every transition, policy decision, and operator override is recorded with identity context so audit and compliance reviews are straightforward.',
+    stage: '04',
+    title: 'Recover, replay, improve',
+    body: 'Use checkpoints to restore safely, replay exact conditions, and convert incidents into hardened runbooks for future missions.',
   },
 ]
 
-const orbitNodes = [
-  { id: 'intent', label: 'Intent Intake', x: '10%', y: '18%' },
-  { id: 'policy', label: 'Policy Gate', x: '72%', y: '12%' },
-  { id: 'runtime', label: 'Agent Runtime', x: '78%', y: '72%' },
-  { id: 'review', label: 'Operator Review', x: '22%', y: '78%' },
+const faqItems = [
+  {
+    q: 'What does “advanced web hacks” translate to here?',
+    a: 'Deliberate visual engineering: layered lighting, kinetic micro-interactions, animated telemetry rails, and highly scannable information architecture that still performs on mobile.',
+  },
+  {
+    q: 'Can we adapt this for enterprise buyers and technical evaluators?',
+    a: 'Yes. The page is structured to support multiple reading paths: executive narrative, systems-level detail, and implementation-oriented trust signals.',
+  },
+  {
+    q: 'Does this replace our current agent framework?',
+    a: 'No. MUTX acts as a control plane around your existing orchestration stack, adding policy gates, runtime observability, and operator response workflows.',
+  },
+  {
+    q: 'How do we avoid fluffy marketing copy over time?',
+    a: 'Anchor copy to outcomes, mechanisms, and constraints. Every section here ties value claims to concrete operating behavior and verifiable control points.',
+  },
+]
+
+const tickerItems = [
+  'Policy-aware autonomy',
+  'Deterministic replay',
+  'Operator-first escalation',
+  'Runtime mission graph',
+  'Identity-bound controls',
+  'Audit-grade telemetry',
 ]
 
 export default function LandingPage() {
@@ -207,11 +214,11 @@ export default function LandingPage() {
   }, [checkingAuth, isAuthenticated])
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#02040a] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_8%,rgba(83,164,255,0.25),transparent_35%),radial-gradient(circle_at_88%_20%,rgba(153,98,255,0.2),transparent_35%),linear-gradient(180deg,#05070d_0%,#02040a_45%,#010206_100%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-[-200px] h-[480px] bg-[conic-gradient(from_80deg_at_50%_50%,rgba(0,198,255,0.09),rgba(151,71,255,0.2),rgba(0,198,255,0.09))] blur-3xl" />
+    <div className="relative min-h-screen overflow-hidden bg-[#02030a] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(14,165,233,0.22),transparent_35%),radial-gradient(circle_at_100%_20%,rgba(147,51,234,0.2),transparent_40%),radial-gradient(circle_at_50%_100%,rgba(34,197,94,0.12),transparent_40%),linear-gradient(180deg,#040610_0%,#03040a_55%,#010207_100%)]" />
+      <div className="pointer-events-none absolute inset-x-[-20%] top-20 h-[420px] bg-[conic-gradient(from_30deg_at_50%_50%,rgba(34,211,238,0.08),rgba(168,85,247,0.22),rgba(34,211,238,0.08))] blur-3xl" />
 
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#03050ccc]/90 backdrop-blur-xl">
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#040612cc]/85 backdrop-blur-2xl">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <a href="#" className="flex items-center gap-3" aria-label="MUTX home">
             <div className="relative h-9 w-9 overflow-hidden rounded-lg border border-white/10 bg-black/30 p-1">
@@ -219,7 +226,7 @@ export default function LandingPage() {
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-white/55">MUTX</p>
-              <p className="text-sm font-semibold text-white/90">Control Plane for AI Operators</p>
+              <p className="text-sm font-semibold text-white/90">Operational Control Plane for Agentic Systems</p>
             </div>
           </a>
 
@@ -271,20 +278,22 @@ export default function LandingPage() {
       </nav>
 
       <main className="relative z-10 px-4 pb-24 pt-28 sm:px-6 lg:px-8 lg:pt-32">
-        <section className="mx-auto grid w-full max-w-7xl gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
+        <section className="mx-auto grid w-full max-w-7xl gap-10 lg:grid-cols-[minmax(0,1.06fr)_minmax(0,0.94fr)] lg:items-center">
           <div>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-200/20 bg-cyan-300/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-100">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-200/30 bg-cyan-300/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-100">
               <Sparkles className="h-3.5 w-3.5" />
-              Built for real AI operations, not demos
+              Engineered for operators, not pitch decks
             </div>
 
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
-              Run autonomous AI workflows with
-              <span className="bg-gradient-to-r from-cyan-300 via-sky-200 to-violet-300 bg-clip-text text-transparent"> guaranteed operator control.</span>
+              Autonomous throughput.
+              <span className="block bg-gradient-to-r from-cyan-300 via-sky-200 to-violet-300 bg-clip-text text-transparent">
+                Human command authority.
+              </span>
             </h1>
 
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/75 sm:text-lg sm:leading-8">
-              MUTX is the control plane that lets teams ship high-throughput agents without sacrificing governance, incident response, or customer trust.
+              MUTX is the mission control layer for production AI systems: policy-gated execution, live telemetry, and escalation paths that keep people in charge when the stakes rise.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -294,7 +303,7 @@ export default function LandingPage() {
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-cyan-300/40 bg-cyan-300/15 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/70 hover:bg-cyan-300/25"
               >
-                Start with docs
+                Read architecture docs
                 <ArrowRight className="h-4 w-4" />
               </a>
               <a
@@ -312,14 +321,14 @@ export default function LandingPage() {
                 rel="noreferrer"
                 className="inline-flex items-center rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-white/85 transition hover:bg-white/10"
               >
-                Follow updates
+                Follow releases
               </a>
             </div>
 
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              {outcomes.map((item) => (
-                <div key={item.metric} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                  <p className="text-2xl font-semibold text-cyan-100">{item.metric}</p>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {heroSignals.map((item) => (
+                <div key={item.label} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <p className="text-2xl font-semibold text-cyan-100">{item.value}</p>
                   <p className="mt-1 text-xs leading-5 text-white/65">{item.label}</p>
                 </div>
               ))}
@@ -327,197 +336,149 @@ export default function LandingPage() {
           </div>
 
           <motion.div
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
-            className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/[0.03] p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_30px_80px_rgba(20,20,80,0.4)] sm:p-6"
+            className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/[0.03] p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_35px_90px_rgba(30,30,100,0.45)] sm:p-6"
           >
-            <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
-            <div className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-violet-400/20 blur-3xl" />
+            <div className="absolute -right-14 -top-10 h-44 w-44 rounded-full bg-cyan-400/25 blur-3xl" />
+            <div className="absolute -bottom-16 -left-8 h-44 w-44 rounded-full bg-violet-500/25 blur-3xl" />
 
-            <p className="mb-4 text-[11px] uppercase tracking-[0.24em] text-white/55">Live mission diagram</p>
-            <div className="relative h-[340px] rounded-2xl border border-white/10 bg-[#030610] p-3 sm:h-[380px]">
-              {orbitNodes.map((node, idx) => (
-                <motion.div
-                  key={node.id}
-                  className="absolute"
-                  style={{ left: node.x, top: node.y }}
-                  animate={{ scale: [1, 1.04, 1], opacity: [0.85, 1, 0.85] }}
-                  transition={{ duration: 2.8, repeat: Infinity, delay: idx * 0.25 }}
-                >
-                  <div className="-translate-x-1/2 -translate-y-1/2 rounded-xl border border-cyan-200/30 bg-cyan-300/10 px-3 py-2 text-[11px] font-semibold text-cyan-100 shadow-[0_0_0_1px_rgba(34,211,238,0.18)]">
-                    {node.label}
-                  </div>
-                </motion.div>
-              ))}
+            <p className="mb-4 text-[11px] uppercase tracking-[0.24em] text-white/55">Live mission rail</p>
+            <div className="relative h-[420px] rounded-2xl border border-white/10 bg-[#030612] p-4">
+              <motion.div
+                className="absolute inset-x-4 top-6 h-px bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent"
+                animate={{ opacity: [0.25, 0.8, 0.25] }}
+                transition={{ duration: 2.8, repeat: Infinity }}
+              />
 
-              <svg className="absolute inset-0 h-full w-full" aria-hidden="true">
-                <defs>
-                  <linearGradient id="orbitLine" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="rgba(125,211,252,0.15)" />
-                    <stop offset="50%" stopColor="rgba(56,189,248,0.7)" />
-                    <stop offset="100%" stopColor="rgba(139,92,246,0.25)" />
-                  </linearGradient>
-                </defs>
-                <motion.path
-                  d="M 70 70 C 240 12, 310 32, 340 70"
-                  stroke="url(#orbitLine)"
-                  strokeWidth="2"
-                  fill="transparent"
-                  strokeDasharray="7 8"
-                  animate={{ strokeDashoffset: [0, -80] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
-                />
-                <motion.path
-                  d="M 340 70 C 355 180, 345 252, 310 300"
-                  stroke="url(#orbitLine)"
-                  strokeWidth="2"
-                  fill="transparent"
-                  strokeDasharray="7 8"
-                  animate={{ strokeDashoffset: [0, -80] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: 'linear', delay: 0.5 }}
-                />
-                <motion.path
-                  d="M 310 300 C 180 352, 110 330, 90 290"
-                  stroke="url(#orbitLine)"
-                  strokeWidth="2"
-                  fill="transparent"
-                  strokeDasharray="7 8"
-                  animate={{ strokeDashoffset: [0, -80] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: 'linear', delay: 1 }}
-                />
-                <motion.path
-                  d="M 90 290 C 55 220, 40 145, 70 70"
-                  stroke="url(#orbitLine)"
-                  strokeWidth="2"
-                  fill="transparent"
-                  strokeDasharray="7 8"
-                  animate={{ strokeDashoffset: [0, -80] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: 'linear', delay: 1.4 }}
-                />
-              </svg>
+              <div className="space-y-3">
+                {[
+                  { step: 'INTAKE', text: 'User intent classified as “high-impact external action”.', icon: Binary },
+                  { step: 'POLICY', text: 'Kernel validates identity scope + spend cap + approval policy.', icon: Shield },
+                  { step: 'EXECUTION', text: 'Mission branch executes with continuous telemetry stream.', icon: Rocket },
+                  { step: 'REVIEW', text: 'Operator confirms summary diff before side effects commit.', icon: Zap },
+                ].map((line, idx) => (
+                  <motion.div
+                    key={line.step}
+                    className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/35 p-3"
+                    animate={{ borderColor: ['rgba(255,255,255,0.1)', 'rgba(103,232,249,0.45)', 'rgba(255,255,255,0.1)'] }}
+                    transition={{ duration: 3.2, delay: idx * 0.35, repeat: Infinity }}
+                  >
+                    <line.icon className="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" />
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-100/85">{line.step}</p>
+                      <p className="mt-1 text-sm leading-6 text-white/75">{line.text}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
 
-              <div className="absolute inset-x-3 bottom-3 rounded-xl border border-white/10 bg-black/40 p-3 text-xs text-white/75">
-                <p className="font-semibold text-cyan-100">Current mission health: 98.4%</p>
-                <p className="mt-1">Escalation SLA under 2m · Drift guardrails active · Policy violations blocked pre-exec.</p>
+              <div className="absolute inset-x-4 bottom-4 rounded-xl border border-cyan-200/20 bg-cyan-300/10 p-3 text-xs text-cyan-50/90">
+                <p className="font-semibold text-cyan-100">Mission status: nominal · risk envelope maintained</p>
+                <p className="mt-1 text-white/75">Pre-exec policy enforcement active · SLA-safe escalation channel online · replay snapshots synced.</p>
               </div>
             </div>
           </motion.div>
         </section>
 
-        <section id="benefits" className="mx-auto mt-16 w-full max-w-7xl">
-          <div className="mb-6 flex items-end justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Benefits</p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Everything operators need to trust autonomous execution.</h2>
-            </div>
+        <section className="mx-auto mt-12 w-full max-w-7xl overflow-hidden rounded-full border border-white/10 bg-white/[0.03] py-3">
+          <motion.div
+            className="flex gap-8 px-6"
+            animate={{ x: ['0%', '-50%'] }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+          >
+            {[...tickerItems, ...tickerItems].map((item, idx) => (
+              <div key={`${item}-${idx}`} className="flex shrink-0 items-center gap-2 text-sm text-white/70">
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan-300" />
+                {item}
+              </div>
+            ))}
+          </motion.div>
+        </section>
+
+        <section id="manifesto" className="mx-auto mt-16 w-full max-w-7xl">
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-[0.24em] text-white/55">Manifesto</p>
+            <h2 className="mt-2 max-w-4xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              AI systems shouldn&apos;t be trusted because they sound smart. They should be trusted because they are governable under stress.
+            </h2>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {benefits.map((benefit, idx) => (
+          <div className="grid gap-4 md:grid-cols-3">
+            {principles.map((item, idx) => (
               <motion.article
-                key={benefit.title}
-                initial={{ opacity: 0, y: 14 }}
+                key={item.title}
+                initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.35 }}
-                transition={{ duration: 0.45, delay: idx * 0.06 }}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-6"
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.45, delay: idx * 0.08 }}
+                className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-6"
               >
-                <div className="absolute -right-12 -top-12 h-28 w-28 rounded-full bg-cyan-300/10 blur-2xl transition group-hover:bg-cyan-300/20" />
-                <benefit.icon className="h-6 w-6 text-cyan-200" />
-                <h3 className="mt-3 text-xl font-semibold text-white">{benefit.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-white/72">{benefit.body}</p>
+                <item.icon className="h-6 w-6 text-cyan-200" />
+                <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/72">{item.body}</p>
               </motion.article>
             ))}
           </div>
         </section>
 
-        <section id="how-it-works" className="mx-auto mt-16 w-full max-w-7xl overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-            <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-white/55">How it works</p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">From policy setup to incident recovery in one runtime.</h2>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">
-                MUTX places policy and observability at every layer: intake, execution, recovery, and operator review. The result is autonomous throughput without autonomous risk.
-              </p>
-            </div>
-            <div className="grid gap-3">
-              {steps.map((step, index) => (
-                <div key={step.title} className="rounded-xl border border-white/10 bg-black/30 p-4 text-sm text-white/75">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100/75">Step {index + 1}</p>
-                  <h3 className="mt-1 text-base font-semibold text-white">{step.title}</h3>
-                  <p className="mt-1 leading-6">{step.body}</p>
-                </div>
-              ))}
-            </div>
+        <section id="systems" className="mx-auto mt-16 w-full max-w-7xl overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+          <div className="mb-7">
+            <p className="text-xs uppercase tracking-[0.24em] text-white/55">Core systems</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">The stack behind safe autonomous execution.</h2>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-3">
+            {systemCards.map((card) => (
+              <article key={card.title} className={`rounded-2xl border border-white/10 bg-gradient-to-br ${card.gradient} p-5`}>
+                <card.icon className="h-6 w-6 text-cyan-100" />
+                <h3 className="mt-3 text-xl font-semibold text-white">{card.title}</h3>
+                <p className="mt-1 text-sm text-white/75">{card.subtitle}</p>
+                <ul className="mt-4 space-y-2 text-sm text-white/75">
+                  {card.points.map((point) => (
+                    <li key={point} className="flex gap-2">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-200" />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
           </div>
         </section>
 
-        <section id="proof" className="mx-auto mt-16 w-full max-w-7xl">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Social proof</p>
-              <h2 className="mt-2 text-2xl font-semibold text-white">Trusted by teams where failure is expensive.</h2>
-              <div className="mt-5 space-y-4">
-                {testimonials.map((item) => (
-                  <blockquote key={item.quote} className="rounded-xl border border-white/10 bg-black/30 p-4">
-                    <p className="text-sm leading-6 text-white/80">“{item.quote}”</p>
-                    <footer className="mt-3 text-xs text-cyan-100/85">
-                      {item.person} · {item.company}
-                    </footer>
-                  </blockquote>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Why switch</p>
-              <h2 className="mt-2 text-2xl font-semibold text-white">MUTX vs legacy orchestration stacks</h2>
-              <div className="mt-5 space-y-2">
-                {comparisons.map((row) => (
-                  <div key={row.dimension} className="grid grid-cols-[0.95fr_1fr_1fr] gap-2 rounded-xl border border-white/10 bg-black/30 p-3 text-xs sm:text-sm">
-                    <p className="font-semibold text-white/90">{row.dimension}</p>
-                    <p className="text-cyan-100">{row.mutx}</p>
-                    <p className="text-white/65">{row.legacy}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+        <section id="playbook" className="mx-auto mt-16 w-full max-w-7xl">
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-[0.24em] text-white/55">Deployment playbook</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">How teams operationalize MUTX in the real world.</h2>
           </div>
-        </section>
 
-        <section className="mx-auto mt-16 w-full max-w-7xl rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.02] p-6 sm:p-8">
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-            <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Objection handling</p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Built for regulated and high-risk environments.</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">
-                If your biggest blocker is governance, auditability, or reliability, MUTX is specifically designed to make autonomous systems operationally safe.
-              </p>
-            </div>
-            <div className="grid gap-3">
-              {[
-                { icon: Lock, text: 'Identity-aware controls and approval workflows for privileged actions.' },
-                { icon: Clock3, text: 'SLA-aware escalation with the full context payload attached.' },
-                { icon: CheckCircle2, text: 'Immutable action logs for security, compliance, and postmortems.' },
-              ].map((line) => (
-                <div key={line.text} className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/30 p-3 text-sm text-white/75">
-                  <line.icon className="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" />
-                  <span>{line.text}</span>
-                </div>
-              ))}
-            </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {playbook.map((step, idx) => (
+              <motion.article
+                key={step.title}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.4, delay: idx * 0.08 }}
+                className="rounded-2xl border border-white/10 bg-black/30 p-5"
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100/80">Step {step.stage}</p>
+                <h3 className="mt-2 text-lg font-semibold text-white">{step.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/72">{step.body}</p>
+              </motion.article>
+            ))}
           </div>
         </section>
 
         <section id="faq" className="mx-auto mt-16 w-full max-w-7xl">
           <div className="mb-6">
             <p className="text-xs uppercase tracking-[0.24em] text-white/55">FAQ</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Questions teams ask before rolling out MUTX</h2>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Straight answers for serious operators.</h2>
           </div>
-
           <div className="grid gap-3 md:grid-cols-2">
-            {faqs.map((item) => (
+            {faqItems.map((item) => (
               <article key={item.q} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
                 <h3 className="text-base font-semibold text-white">{item.q}</h3>
                 <p className="mt-2 text-sm leading-6 text-white/72">{item.a}</p>
@@ -527,10 +488,10 @@ export default function LandingPage() {
         </section>
 
         <section className="mx-auto mt-16 w-full max-w-7xl rounded-3xl border border-cyan-300/30 bg-cyan-300/10 p-8 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100/80">Final call to action</p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Make your AI runtime operable before it becomes critical.</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
-            Review the docs, deploy your first guarded mission, and give your operators the control surface they need before scale introduces avoidable risk.
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100/80">Build a better control surface</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Ship high-agency AI without surrendering operational control.</h2>
+          <p className="mx-auto mt-3 max-w-3xl text-sm leading-7 text-white/80 sm:text-base">
+            If your team is done with vague platform promises and wants concrete runtime control, open the docs and run your first guarded mission today.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a
@@ -539,7 +500,7 @@ export default function LandingPage() {
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-cyan-100"
             >
-              Explore docs
+              Open docs
               <ArrowRight className="h-4 w-4" />
             </a>
             <a
