@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
-// Mock next/server so NextResponse works in the Node test environment
+jest.spyOn(console, "error").mockImplementation(() => {})
+
 jest.mock('next/server', () => {
   const actual = jest.requireActual('next/server')
   return actual

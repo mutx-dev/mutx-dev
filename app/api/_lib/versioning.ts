@@ -88,7 +88,7 @@ export function withVersionedHandler(
       const response = await handler(request)
       return addVersionHeaders(response, version)
     } catch (error) {
-      console.error('Versioned handler error:', error)
+      console.error('Versioned handler error:', error instanceof Error ? error.message : String(error))
       const errorResponse = NextResponse.json(
         { status: 'error', error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' } },
         { status: 500 }
