@@ -116,6 +116,22 @@ async def register(request: RegisterRequest, session: AsyncSession = Depends(get
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="; ".join(error_messages) if error_messages else "Invalid request data",
         )
+    except ValueError as e:
+        # Handle value errors (e.g., invalid email format from EmailStr)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e) or "Invalid email format",
+        )
+    except Exception as e:
+        # Handle any other unexpected errors - return 400 for validation-related issues
+        error_str = str(e).lower()
+        if any(keyword in error_str for keyword in ["email", "validation", "invalid", "format"]):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e) or "Invalid request data",
+            )
+        # Re-raise other exceptions to be handled by global exception handlers
+        raise
 
 
 @router.post("/login", response_model=TokenResponse)
