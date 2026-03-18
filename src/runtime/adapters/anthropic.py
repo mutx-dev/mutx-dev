@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import asyncio
 import json
-from dataclasses import dataclass, field
-from typing import Any, Mapping, Sequence
+import logging
+from dataclasses import dataclass
+from typing import Any, AsyncIterator, Mapping, Sequence
 
-from anthropic import AsyncAnthropic
+from anthropic import APIConnectionError, AsyncAnthropic, RateLimitError
 
 from ..base import (
     AgentRuntime,
@@ -19,45 +20,9 @@ from ..base import (
     RuntimeToolDefinition,
     ToolHandler,
 )
+from ..circuit_breaker import CircuitBreaker
 
-
-# Circuit breaker states
-class CircuitState:
-    CLOSED = "closed"
-    OPEN = "open"
-    HALF_OPEN = "half_open"
-
-
-@dataclass
-class CircuitBreaker:
-    """Simple circuit breaker for API calls."""
-
-    failure_threshold: int = 5
-    recovery_timeout: float = 30.0
-    state: str = field(default=CircuitState.CLOSED, init=False)
-    failures: int = field(default=0, init=False)
-    last_failure_time: float = field(default=0.0, init=False)
-
-    def record_success(self) -> None:
-        self.failures = 0
-        self.state = CircuitState.CLOSED
-
-    def record_failure(self) -> None:
-        self.failures += 1
-        self.last_failure_time = asyncio.get_event_loop().time()
-        if self.failures >= self.failure_threshold:
-            self.state = CircuitState.OPEN
-
-    def can_attempt(self) -> bool:
-        if self.state == CircuitState.CLOSED:
-            return True
-        if self.state == CircuitState.OPEN:
-            elapsed = asyncio.get_event_loop().time() - self.last_failure_time
-            if elapsed >= self.recovery_timeout:
-                self.state = CircuitState.HALF_OPEN
-                return True
-            return False
-        return True
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -86,7 +51,7 @@ class AnthropicAdapter(AgentRuntime):
         self.config = config
         self._client = AsyncAnthropic(**config.to_client_kwargs())
         self._tools: list[RuntimeToolDefinition] = []
-        self._circuit_breaker = CircuitBreaker()
+        self._circuit_breaker = CircuitBreaker(failure_threshold=5, recovery_timeout=30.0)
 
     async def execute(
         self,
@@ -99,10 +64,7 @@ class AnthropicAdapter(AgentRuntime):
         """Run a non-streaming model execution."""
         tool_handlers = tool_handlers or {}
 
-        # Convert messages to Anthropic format
         anthropic_messages = self._convert_messages(messages)
-
-        # Build request
         request_kwargs: dict[str, Any] = {
             "model": self.config.model,
             "messages": anthropic_messages,
@@ -119,38 +81,52 @@ class AnthropicAdapter(AgentRuntime):
             self._tools = list(tools)
             request_kwargs["tools"] = self._convert_tools(tools)
 
-        # Execute with retry and circuit breaker
         max_retries = 3
         base_delay = 1.0
 
         for attempt in range(max_retries):
             if not self._circuit_breaker.can_attempt():
-                raise RuntimeError("Circuit breaker is open - too many failures")
+                logger.warning("Anthropic circuit breaker OPEN - rejecting request")
+                raise RuntimeError("Circuit breaker is open - service unavailable")
 
             try:
                 response = await self._client.messages.create(**request_kwargs)
                 self._circuit_breaker.record_success()
+                logger.debug("Anthropic API call succeeded")
                 break
+            except (RateLimitError, APIConnectionError) as exc:
+                self._circuit_breaker.record_failure()
+                logger.warning(
+                    "Anthropic API transient error on attempt %s/%s: %s: %s",
+                    attempt + 1,
+                    max_retries,
+                    type(exc).__name__,
+                    exc,
+                )
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(base_delay * (2**attempt))
+                else:
+                    raise
             except Exception:
                 self._circuit_breaker.record_failure()
+                logger.exception(
+                    "Anthropic API call failed on attempt %s/%s",
+                    attempt + 1,
+                    max_retries,
+                )
                 if attempt < max_retries - 1:
-                    delay = base_delay * (2**attempt)
-                    await asyncio.sleep(delay)
+                    await asyncio.sleep(base_delay * (2**attempt))
                 else:
                     raise
 
-        # Handle tool calls
         tool_calls = self._convert_tool_calls(response.content)
 
-        # Handle tool execution if needed
-        result_content = None
         while tool_calls and tool_handlers:
             for tc in tool_calls:
                 tool_name = tc["function"]["name"]
                 tool_args = json.loads(tc["function"]["arguments"])
                 if tool_name in tool_handlers:
                     tool_result = await tool_handlers[tool_name](tool_args)
-                    # Add tool result to messages and continue
                     messages = list(messages)
                     messages.append(
                         {
@@ -168,7 +144,6 @@ class AnthropicAdapter(AgentRuntime):
                             "tool_call_id": tc["id"],
                         }
                     )
-                    # Recursively call with tool results
                     anthropic_messages = self._convert_messages(messages)
                     request_kwargs["messages"] = anthropic_messages
                     response = await self._client.messages.create(**request_kwargs)
@@ -221,7 +196,6 @@ class AnthropicAdapter(AgentRuntime):
                             raw_event=event,
                         )
                     elif event.delta.type == "input_json_delta":
-                        # Tool call delta
                         yield RuntimeStreamEvent(
                             type="tool_call",
                             delta=event.delta.partial_json,
@@ -251,7 +225,6 @@ class AnthropicAdapter(AgentRuntime):
                 anthropic_msg["name"] = msg["name"]
 
             if "tool_calls" in msg and msg["tool_calls"]:
-                # Convert tool calls to Anthropic format
                 tool_calls = []
                 for tc in msg["tool_calls"]:
                     tool_calls.append(
