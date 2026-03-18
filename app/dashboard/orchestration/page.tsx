@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { GitBranch, Plus, Settings, Play, Pause, ArrowRight, Trash2, Layers } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Plus, Settings, ArrowRight, Layers, RotateCcw } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Lane {
   id: string;
@@ -11,15 +12,12 @@ interface Lane {
   concurrency: number;
   queueDepth: number;
   nextHandoff?: string;
+  agents: string[];
 }
 
-const mockLanes: Lane[] = [
-  { id: "lane_1", name: "backend-builder", type: "builder", status: "active", concurrency: 2, queueDepth: 5, nextHandoff: "ship-lane" },
-  { id: "lane_2", name: "frontend-builder", type: "builder", status: "active", concurrency: 2, queueDepth: 3, nextHandoff: "ship-lane" },
-  { id: "lane_3", name: "ship-lane", type: "ship", status: "active", concurrency: 1, queueDepth: 8 },
-  { id: "lane_4", name: "qa-gate", type: "qa", status: "paused", concurrency: 1, queueDepth: 0 },
-  { id: "lane_5", name: "control-tower", type: "control", status: "active", concurrency: 1, queueDepth: 2 },
-];
+interface OrchestrationResponse {
+  lanes: Lane[];
+}
 
 const typeColors = {
   builder: "bg-cyan-400/10 text-cyan-400 border-cyan-400/20",
@@ -35,6 +33,44 @@ const statusConfig = {
 };
 
 export default function DashboardOrchestrationPage() {
+  const [lanes, setLanes] = useState<Lane[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [authRequired, setAuthRequired] = useState(false);
+
+  const fetchLanes = useCallback(async () => {
+    setLoading(true);
+    setAuthRequired(false);
+
+    try {
+      const res = await fetch("/api/dashboard/orchestration", {
+        cache: "no-store",
+        credentials: "include",
+      });
+
+      if (res.status === 401) {
+        setAuthRequired(true);
+        setLoading(false);
+        return;
+      }
+
+      if (!res.ok) {
+        setLoading(false);
+        return;
+      }
+
+      const data: OrchestrationResponse = await res.json();
+      setLanes(data.lanes ?? []);
+    } catch {
+      // silently fail
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void fetchLanes();
+  }, [fetchLanes]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -47,68 +83,126 @@ export default function DashboardOrchestrationPage() {
             <p className="mt-1 text-sm text-slate-400">Agent lanes, handoffs, and execution graph</p>
           </div>
         </div>
-        <button className="flex items-center gap-2 rounded-lg bg-cyan-400/10 px-4 py-2.5 text-sm font-medium text-cyan-400 hover:bg-cyan-400/20">
-          <Plus className="h-4 w-4" /> New Lane
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => void fetchLanes()}
+            className={cn(
+              "flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:bg-white/10 hover:text-white",
+              loading && "opacity-50 cursor-not-allowed"
+            )}
+            disabled={loading}
+          >
+            <RotateCcw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
+            Refresh
+          </button>
+          <button className="flex items-center gap-2 rounded-lg bg-cyan-400/10 px-4 py-2.5 text-sm font-medium text-cyan-400 hover:bg-cyan-400/20">
+            <Plus className="h-4 w-4" /> New Lane
+          </button>
+        </div>
       </div>
+
+      {authRequired ? (
+        <div className="rounded-xl border border-cyan-400/20 bg-cyan-400/5 p-6">
+          <p className="text-sm text-white">Sign in to view your orchestration lanes.</p>
+        </div>
+      ) : null}
 
       {/* Lane Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {mockLanes.map((lane) => {
-          const status = statusConfig[lane.status];
-          return (
-            <div key={lane.id} className="rounded-xl border border-white/10 bg-[#0a0a0e] p-5 hover:border-white/20 transition-colors">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-white">{lane.name}</h3>
-                    <span className={`rounded border px-1.5 py-0.5 text-[10px] font-bold uppercase ${typeColors[lane.type]}`}>{lane.type}</span>
-                  </div>
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className={`h-2 w-2 rounded-full ${status.dot}`} />
-                    <span className={`text-sm ${status.color}`}>{lane.status}</span>
-                  </div>
-                </div>
-                <button className="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-white">
-                  <Settings className="h-4 w-4" />
-                </button>
-              </div>
-              <div className="mt-4 flex items-center justify-between text-sm">
-                <div>
-                  <p className="text-slate-400">Concurrency</p>
-                  <p className="font-medium text-white">{lane.concurrency}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-slate-400">Queue</p>
-                  <p className="font-medium text-white">{lane.queueDepth}</p>
+        {loading
+          ? Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="rounded-xl border border-white/10 bg-[#0a0a0e] p-5 animate-pulse">
+                <div className="h-5 w-32 rounded bg-white/5 mb-3" />
+                <div className="h-4 w-16 rounded bg-white/5 mb-4" />
+                <div className="flex gap-4">
+                  <div className="h-4 w-20 rounded bg-white/5" />
+                  <div className="h-4 w-12 rounded bg-white/5" />
                 </div>
               </div>
-              {lane.nextHandoff && (
-                <div className="mt-4 flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2 text-xs">
-                  <ArrowRight className="h-3 w-3 text-slate-400" />
-                  <span className="text-slate-400">Handoff to</span>
-                  <span className="text-cyan-400">{lane.nextHandoff}</span>
+            ))
+          : lanes.map((lane) => {
+              const status = statusConfig[lane.status];
+              return (
+                <div
+                  key={lane.id}
+                  className="rounded-xl border border-white/10 bg-[#0a0a0e] p-5 hover:border-white/20 transition-colors"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-white">{lane.name}</h3>
+                        <span
+                          className={`rounded border px-1.5 py-0.5 text-[10px] font-bold uppercase ${typeColors[lane.type]}`}
+                        >
+                          {lane.type}
+                        </span>
+                      </div>
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className={`h-2 w-2 rounded-full ${status.dot}`} />
+                        <span className={`text-sm ${status.color}`}>{lane.status}</span>
+                      </div>
+                    </div>
+                    <button className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/5 hover:text-white">
+                      <Settings className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between text-sm">
+                    <div>
+                      <p className="text-slate-400">Concurrency</p>
+                      <p className="font-medium text-white">{lane.concurrency}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-slate-400">Queue</p>
+                      <p className="font-medium text-white">{lane.queueDepth}</p>
+                    </div>
+                  </div>
+                  {lane.agents.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {lane.agents.slice(0, 3).map((agent) => (
+                        <span
+                          key={agent}
+                          className="rounded bg-white/5 px-2 py-0.5 text-[10px] text-slate-400"
+                        >
+                          {agent}
+                        </span>
+                      ))}
+                      {lane.agents.length > 3 && (
+                        <span className="rounded bg-white/5 px-2 py-0.5 text-[10px] text-slate-400">
+                          +{lane.agents.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {lane.nextHandoff && (
+                    <div className="mt-4 flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2 text-xs">
+                      <ArrowRight className="h-3 w-3 text-slate-400" />
+                      <span className="text-slate-400">Handoff to</span>
+                      <span className="text-cyan-400">{lane.nextHandoff}</span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          );
-        })}
+              );
+            })}
       </div>
 
       {/* Execution Graph Preview */}
-      <div className="rounded-xl border border-white/10 bg-[#0a0a0e] p-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Execution Flow</h2>
-        <div className="flex items-center justify-between">
-          {["control-tower", "backend-builder", "frontend-builder", "ship-lane", "qa-gate"].map((lane, i) => (
-            <div key={lane} className="flex items-center">
-              <div className="flex h-12 w-32 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-sm text-slate-300">
-                {lane}
+      {lanes.length > 0 && (
+        <div className="rounded-xl border border-white/10 bg-[#0a0a0e] p-6">
+          <h2 className="mb-4 text-lg font-semibold text-white">Execution Flow</h2>
+          <div className="flex flex-wrap items-center justify-start gap-2">
+            {lanes.map((lane, i) => (
+              <div key={lane.id} className="flex items-center">
+                <div className="flex h-12 min-w-32 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-slate-300">
+                  {lane.name}
+                </div>
+                {i < lanes.length - 1 && (
+                  <ArrowRight className="mx-2 h-4 w-4 flex-shrink-0 text-slate-600" />
+                )}
               </div>
-              {i < 4 && <ArrowRight className="mx-2 h-4 w-4 text-slate-600" />}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
