@@ -1,5 +1,3 @@
-"""TUI module for mutx CLI."""
+"""MUTX Textual TUI"""
 
-from cli.tui.app import MutxTUI
-
-__all__ = ["MutxTUI"]
+__version__ = "0.1.0"
