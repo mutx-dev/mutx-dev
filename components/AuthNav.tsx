@@ -27,6 +27,11 @@ export function AuthNav() {
 
   const isAuthPage = pathname === '/login' || pathname === '/register'
   const isHomePage = pathname === '/'
+  const isDashboardRoute = pathname.startsWith('/dashboard')
+
+  if (isDashboardRoute) {
+    return null
+  }
 
   if (loading || isHomePage) {
     return (
