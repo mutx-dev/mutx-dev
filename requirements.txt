@@ -63,3 +63,4 @@ opentelemetry-instrumentation-httpx
 
 # TUI dependencies
 textual>=0.50.0
+python-json-logger
