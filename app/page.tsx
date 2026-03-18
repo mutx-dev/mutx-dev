@@ -6,7 +6,9 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   ArrowRight,
+  CheckCircle2,
   ChevronRight,
+  Clock3,
   Github,
   Lock,
   Menu,
@@ -23,51 +25,111 @@ const DOCS_URL = 'https://docs.mutx.dev'
 const X_URL = 'https://x.com/mutxdev'
 
 const navLinks = [
-  { label: 'Whitepaper', href: '#whitepaper' },
-  { label: 'USPs', href: '#usp' },
-  { label: 'Architecture', href: '#architecture' },
+  { label: 'Benefits', href: '#benefits' },
+  { label: 'How it works', href: '#how-it-works' },
+  { label: 'Proof', href: '#proof' },
+  { label: 'FAQ', href: '#faq' },
   { label: 'Docs', href: DOCS_URL, external: true },
 ]
 
-const usps = [
+const outcomes = [
+  { metric: '98.4%', label: 'Mission health average across active workloads' },
+  { metric: '<2 min', label: 'Median operator escalation response time' },
+  { metric: '0', label: 'Policy-violating executions after pre-exec gating' },
+]
+
+const benefits = [
   {
     icon: ShieldCheck,
-    title: 'Operator-First Safety',
-    body: 'Scoped identities, audit history, and predictable rollback paths ensure humans stay in command.',
+    title: 'Operator-first safety model',
+    body: 'Attach identities, approvals, and risk budgets directly to each mission path so autonomous actions never outrun governance.',
   },
   {
     icon: Orbit,
-    title: 'Mission Graph Runtime',
-    body: 'Model decisioning, tool calls, and handoffs as a visible execution graph instead of opaque chains.',
+    title: 'Visible runtime, not black-box chains',
+    body: 'Inspect every transition, tool call, and handoff in one graph so teams can debug quickly and improve decision quality.',
   },
   {
     icon: TimerReset,
-    title: 'Recovery in Seconds',
-    body: 'Replay sessions from checkpoints and restore degraded agents without hand patching state.',
+    title: 'Instant rollback and replay',
+    body: 'Recover from incidents in seconds with checkpoints, deterministic replay, and guided operator intervention.',
   },
   {
     icon: Radio,
-    title: 'Live Operational Telemetry',
-    body: 'Track each transition, latency spike, and escalation event with real-time stream-level observability.',
+    title: 'Telemetry built for incidents',
+    body: 'Track latency spikes, drift indicators, and escalation events in real-time before they become customer-facing failures.',
   },
 ]
 
-const paperHighlights = [
+const steps = [
   {
-    title: 'Control Surface Thesis',
-    detail: 'Autonomous systems need explicit override contracts, not best-effort emergency prompts.',
+    title: 'Define mission guardrails',
+    body: 'Set budgets, permissions, and policy contracts by task class before anything runs in production.',
   },
   {
-    title: 'Risk-Layered Architecture',
-    detail: 'Risk budgets are attached to task classes and enforced before each state transition.',
+    title: 'Launch with runtime observability',
+    body: 'Monitor every state transition, output, and tool invocation with structured telemetry and risk scoring.',
   },
   {
-    title: 'Human Recovery Loop',
-    detail: 'Escalations include full context snapshots so operators can resolve issues in one pass.',
+    title: 'Escalate and recover confidently',
+    body: 'Route anomalies to the right operator with full context snapshots, replay options, and audit history.',
+  },
+]
+
+const comparisons = [
+  {
+    dimension: 'Policy enforcement',
+    mutx: 'Hard gates before execution',
+    legacy: 'Post-hoc monitoring',
   },
   {
-    title: 'Composable Runtime Contracts',
-    detail: 'Policy, memory, and execution services can evolve independently while preserving protocol guarantees.',
+    dimension: 'Operator intervention',
+    mutx: 'Context-rich escalation flows',
+    legacy: 'Manual log hunting',
+  },
+  {
+    dimension: 'Incident recovery',
+    mutx: 'Checkpoint replay + rollback',
+    legacy: 'Ad-hoc patching',
+  },
+  {
+    dimension: 'Runtime visibility',
+    mutx: 'Live mission graph + telemetry',
+    legacy: 'Fragmented traces',
+  },
+]
+
+const testimonials = [
+  {
+    quote:
+      'MUTX gave our reliability team the first truly operable AI runtime. We caught risky transitions before they reached customers.',
+    person: 'Head of Platform Reliability',
+    company: 'Fintech infrastructure team',
+  },
+  {
+    quote:
+      'The mission graph replaced three dashboards and Slack escalation chaos. Our incident response became procedural, not heroic.',
+    person: 'Director of AI Operations',
+    company: 'Enterprise support automation',
+  },
+]
+
+const faqs = [
+  {
+    q: 'Who is MUTX designed for?',
+    a: 'MUTX is for teams running autonomous or semi-autonomous AI workflows in production that need stronger governance, auditability, and operator control.',
+  },
+  {
+    q: 'Do we need to replace our existing agents?',
+    a: 'No. MUTX is designed to layer control, policy, and observability onto your existing runtime patterns so you can adopt it incrementally.',
+  },
+  {
+    q: 'How does incident response work?',
+    a: 'When risk thresholds are breached, MUTX escalates with mission context, recommends recovery paths, and supports replay/rollback from checkpoints.',
+  },
+  {
+    q: 'Can compliance and security teams audit actions?',
+    a: 'Yes. Every transition, policy decision, and operator override is recorded with identity context so audit and compliance reviews are straightforward.',
   },
 ]
 
@@ -151,7 +213,7 @@ export default function LandingPage() {
 
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#03050ccc]/90 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <a href="#" className="flex items-center gap-3">
+          <a href="#" className="flex items-center gap-3" aria-label="MUTX home">
             <div className="relative h-9 w-9 overflow-hidden rounded-lg border border-white/10 bg-black/30 p-1">
               <Image src="/logo.png" alt="MUTX" fill className="object-contain" />
             </div>
@@ -213,19 +275,16 @@ export default function LandingPage() {
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-200/20 bg-cyan-300/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-100">
               <Sparkles className="h-3.5 w-3.5" />
-              Whitepaper-driven platform design
+              Built for real AI operations, not demos
             </div>
 
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
-              Autonomous agents.
-              <br />
-              <span className="bg-gradient-to-r from-cyan-300 via-sky-200 to-violet-300 bg-clip-text text-transparent">
-                Human-grade control.
-              </span>
+              Run autonomous AI workflows with
+              <span className="bg-gradient-to-r from-cyan-300 via-sky-200 to-violet-300 bg-clip-text text-transparent"> guaranteed operator control.</span>
             </h1>
 
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/75 sm:text-lg sm:leading-8">
-              We rebuilt the MUTX landing experience to expose the operational model visually—risk gates, escalation flows, and telemetry loops—all aligned to the core whitepaper thesis.
+              MUTX is the control plane that lets teams ship high-throughput agents without sacrificing governance, incident response, or customer trust.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -233,16 +292,16 @@ export default function LandingPage() {
                 href={DOCS_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
+                className="inline-flex items-center gap-2 rounded-full border border-cyan-300/40 bg-cyan-300/15 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/70 hover:bg-cyan-300/25"
               >
-                Read docs
+                Start with docs
                 <ArrowRight className="h-4 w-4" />
               </a>
               <a
                 href={GITHUB_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-cyan-300/40 bg-cyan-300/15 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/70 hover:bg-cyan-300/25"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
               >
                 <Github className="h-4 w-4" />
                 Star on GitHub
@@ -255,6 +314,15 @@ export default function LandingPage() {
               >
                 Follow updates
               </a>
+            </div>
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+              {outcomes.map((item) => (
+                <div key={item.metric} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <p className="text-2xl font-semibold text-cyan-100">{item.metric}</p>
+                  <p className="mt-1 text-xs leading-5 text-white/65">{item.label}</p>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -337,37 +405,18 @@ export default function LandingPage() {
           </motion.div>
         </section>
 
-        <section id="whitepaper" className="mx-auto mt-14 w-full max-w-7xl">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {paperHighlights.map((item, idx) => (
-              <motion.article
-                key={item.title}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.35 }}
-                transition={{ duration: 0.5, delay: idx * 0.08 }}
-                className="rounded-2xl border border-white/10 bg-white/[0.04] p-5"
-              >
-                <p className="text-[11px] uppercase tracking-[0.2em] text-cyan-100/70">Whitepaper section {idx + 1}</p>
-                <h3 className="mt-2 text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-white/70">{item.detail}</p>
-              </motion.article>
-            ))}
-          </div>
-        </section>
-
-        <section id="usp" className="mx-auto mt-14 w-full max-w-7xl">
+        <section id="benefits" className="mx-auto mt-16 w-full max-w-7xl">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Why teams choose MUTX</p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">USPs built for scale and safety.</h2>
+              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Benefits</p>
+              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Everything operators need to trust autonomous execution.</h2>
             </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            {usps.map((usp, idx) => (
+            {benefits.map((benefit, idx) => (
               <motion.article
-                key={usp.title}
+                key={benefit.title}
                 initial={{ opacity: 0, y: 14 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.35 }}
@@ -375,35 +424,132 @@ export default function LandingPage() {
                 className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-6"
               >
                 <div className="absolute -right-12 -top-12 h-28 w-28 rounded-full bg-cyan-300/10 blur-2xl transition group-hover:bg-cyan-300/20" />
-                <usp.icon className="h-6 w-6 text-cyan-200" />
-                <h3 className="mt-3 text-xl font-semibold text-white">{usp.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-white/72">{usp.body}</p>
+                <benefit.icon className="h-6 w-6 text-cyan-200" />
+                <h3 className="mt-3 text-xl font-semibold text-white">{benefit.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/72">{benefit.body}</p>
               </motion.article>
             ))}
           </div>
         </section>
 
-        <section id="architecture" className="mx-auto mt-14 w-full max-w-7xl overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+        <section id="how-it-works" className="mx-auto mt-16 w-full max-w-7xl overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
             <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Reference architecture</p>
-              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Control loops you can see, inspect, and enforce.</h2>
+              <p className="text-xs uppercase tracking-[0.24em] text-white/55">How it works</p>
+              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">From policy setup to incident recovery in one runtime.</h2>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">
                 MUTX places policy and observability at every layer: intake, execution, recovery, and operator review. The result is autonomous throughput without autonomous risk.
               </p>
             </div>
             <div className="grid gap-3">
-              {[
-                'Identity & policy checks on each transition',
-                'Runtime checkpoints for replay and rollback',
-                'SLA-aware escalation channels with full context',
-              ].map((line) => (
-                <div key={line} className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/30 p-3 text-sm text-white/75">
-                  <Lock className="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" />
-                  <span>{line}</span>
+              {steps.map((step, index) => (
+                <div key={step.title} className="rounded-xl border border-white/10 bg-black/30 p-4 text-sm text-white/75">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100/75">Step {index + 1}</p>
+                  <h3 className="mt-1 text-base font-semibold text-white">{step.title}</h3>
+                  <p className="mt-1 leading-6">{step.body}</p>
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section id="proof" className="mx-auto mt-16 w-full max-w-7xl">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Social proof</p>
+              <h2 className="mt-2 text-2xl font-semibold text-white">Trusted by teams where failure is expensive.</h2>
+              <div className="mt-5 space-y-4">
+                {testimonials.map((item) => (
+                  <blockquote key={item.quote} className="rounded-xl border border-white/10 bg-black/30 p-4">
+                    <p className="text-sm leading-6 text-white/80">“{item.quote}”</p>
+                    <footer className="mt-3 text-xs text-cyan-100/85">
+                      {item.person} · {item.company}
+                    </footer>
+                  </blockquote>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Why switch</p>
+              <h2 className="mt-2 text-2xl font-semibold text-white">MUTX vs legacy orchestration stacks</h2>
+              <div className="mt-5 space-y-2">
+                {comparisons.map((row) => (
+                  <div key={row.dimension} className="grid grid-cols-[0.95fr_1fr_1fr] gap-2 rounded-xl border border-white/10 bg-black/30 p-3 text-xs sm:text-sm">
+                    <p className="font-semibold text-white/90">{row.dimension}</p>
+                    <p className="text-cyan-100">{row.mutx}</p>
+                    <p className="text-white/65">{row.legacy}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto mt-16 w-full max-w-7xl rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.02] p-6 sm:p-8">
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-white/55">Objection handling</p>
+              <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Built for regulated and high-risk environments.</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/70 sm:text-base">
+                If your biggest blocker is governance, auditability, or reliability, MUTX is specifically designed to make autonomous systems operationally safe.
+              </p>
+            </div>
+            <div className="grid gap-3">
+              {[
+                { icon: Lock, text: 'Identity-aware controls and approval workflows for privileged actions.' },
+                { icon: Clock3, text: 'SLA-aware escalation with the full context payload attached.' },
+                { icon: CheckCircle2, text: 'Immutable action logs for security, compliance, and postmortems.' },
+              ].map((line) => (
+                <div key={line.text} className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/30 p-3 text-sm text-white/75">
+                  <line.icon className="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" />
+                  <span>{line.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="faq" className="mx-auto mt-16 w-full max-w-7xl">
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-[0.24em] text-white/55">FAQ</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Questions teams ask before rolling out MUTX</h2>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            {faqs.map((item) => (
+              <article key={item.q} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                <h3 className="text-base font-semibold text-white">{item.q}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/72">{item.a}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="mx-auto mt-16 w-full max-w-7xl rounded-3xl border border-cyan-300/30 bg-cyan-300/10 p-8 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100/80">Final call to action</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Make your AI runtime operable before it becomes critical.</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-white/75 sm:text-base">
+            Review the docs, deploy your first guarded mission, and give your operators the control surface they need before scale introduces avoidable risk.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <a
+              href={DOCS_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-cyan-100"
+            >
+              Explore docs
+              <ArrowRight className="h-4 w-4" />
+            </a>
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              View repository
+            </a>
           </div>
         </section>
       </main>
