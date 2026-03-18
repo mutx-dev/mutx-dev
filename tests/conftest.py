@@ -5,6 +5,7 @@ Pytest configuration and fixtures for MUTX API tests.
 import os
 
 from fastapi import FastAPI
+import pytest
 
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.ext.compiler import compiles
