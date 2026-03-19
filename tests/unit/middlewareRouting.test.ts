@@ -55,6 +55,29 @@ describe('host-aware UI routing middleware', () => {
     expect(response.headers.get('location')).toBe('https://app.mutx.dev/dashboard/monitoring')
   })
 
+  it('maps stale legacy workflow routes onto canonical dashboard destinations', () => {
+    const activityResponse = middleware(
+      mockRequest('https://app.mutx.dev/app/activity', { host: 'app.mutx.dev' }),
+    )
+
+    expect(activityResponse.status).toBe(307)
+    expect(activityResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/history')
+
+    const cronResponse = middleware(
+      mockRequest('https://app.mutx.dev/app/cron', { host: 'app.mutx.dev' }),
+    )
+
+    expect(cronResponse.status).toBe(307)
+    expect(cronResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/orchestration')
+
+    const settingsResponse = middleware(
+      mockRequest('https://app.mutx.dev/app/settings', { host: 'app.mutx.dev' }),
+    )
+
+    expect(settingsResponse.status).toBe(307)
+    expect(settingsResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/control')
+  })
+
   it('passes through unrelated routes and still applies rate-limit headers', () => {
     const response = middleware(
       mockRequest('https://mutx.dev/contact', { host: 'mutx.dev' }),

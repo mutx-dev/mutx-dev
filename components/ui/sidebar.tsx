@@ -15,7 +15,7 @@ interface MenuItem {
 
 // Fixed: corrected routes to match actual dashboard routes
 const menuItems: MenuItem[] = [
-  { id: 'overview', label: 'Overview', icon: '📊', href: '/app', description: 'Dashboard overview' },
+  { id: 'overview', label: 'Overview', icon: '📊', href: '/dashboard', description: 'Dashboard overview' },
   { id: 'agents', label: 'Agents', icon: '🤖', href: '/dashboard/agents', description: 'Manage agents' },
   { id: 'deployments', label: 'Deployments', icon: '🚀', href: '/dashboard/deployments', description: 'Deployment management' },
   { id: 'api-keys', label: 'API Keys', icon: '🔑', href: '/dashboard/api-keys', description: 'API key management' },
@@ -62,8 +62,8 @@ export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname()
 
   const isActive = (href: string) => {
-    if (href === '/app') {
-      return pathname === '/app' || pathname === '/app/'
+    if (href === '/dashboard') {
+      return pathname === '/dashboard' || pathname === '/dashboard/'
     }
     return pathname.startsWith(href)
   }

@@ -17,9 +17,9 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { href: "/dashboard", label: "Control Center", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/agents", label: "Agent Registry", icon: Bot },
-  { href: "/dashboard/swarm", label: "Swarm Command", icon: Cloud },
+  { href: "/dashboard/deployments", label: "Deployments", icon: Cloud },
   { href: "/dashboard/runs", label: "Run History", icon: Play },
   { href: "/dashboard/traces", label: "Trace Explorer", icon: FileText },
   { href: "/dashboard/memory", label: "Memory Atlas", icon: Database },
@@ -78,7 +78,7 @@ export function Sidebar() {
         <div className="border-t border-[rgba(255,255,255,0.06)] p-4">
           <div className="rounded-lg bg-[rgba(255,255,255,0.03)] p-3">
             <p className="text-xs text-[rgba(255,255,255,0.4)]">
-              Agentic Era v0.1.0
+              MUTX operator surface
             </p>
           </div>
         </div>

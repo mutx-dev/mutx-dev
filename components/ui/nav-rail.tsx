@@ -27,33 +27,33 @@ const navGroups: NavGroup[] = [
   {
     id: 'core',
     items: [
-      { id: 'overview', label: 'Overview', href: '/app', icon: <OverviewIcon />, priority: true },
-      { id: 'agents', label: 'Agents', href: '/app/agents', icon: <AgentsIcon />, priority: true },
-      { id: 'deployments', label: 'Deployments', href: '/app/deployments', icon: <DeployIcon />, priority: true },
-      { id: 'webhooks', label: 'Webhooks', href: '/app/webhooks', icon: <WebhookIcon />, priority: false },
-      { id: 'api-keys', label: 'API Keys', href: '/app/api-keys', icon: <KeyIcon />, priority: false },
+      { id: 'overview', label: 'Overview', href: '/dashboard', icon: <OverviewIcon />, priority: true },
+      { id: 'agents', label: 'Agents', href: '/dashboard/agents', icon: <AgentsIcon />, priority: true },
+      { id: 'deployments', label: 'Deployments', href: '/dashboard/deployments', icon: <DeployIcon />, priority: true },
+      { id: 'webhooks', label: 'Webhooks', href: '/dashboard/webhooks', icon: <WebhookIcon />, priority: false },
+      { id: 'api-keys', label: 'API Keys', href: '/dashboard/api-keys', icon: <KeyIcon />, priority: false },
     ],
   },
   {
     id: 'observe',
     label: 'OBSERVE',
     items: [
-      { id: 'activity', label: 'Activity', href: '/app/activity', icon: <ActivityIcon />, priority: true },
-      { id: 'logs', label: 'Logs', href: '/app/logs', icon: <LogsIcon />, priority: false },
+      { id: 'history', label: 'History', href: '/dashboard/history', icon: <ActivityIcon />, priority: true },
+      { id: 'logs', label: 'Logs', href: '/dashboard/logs', icon: <LogsIcon />, priority: false },
     ],
   },
   {
     id: 'automate',
     label: 'AUTOMATE',
     items: [
-      { id: 'cron', label: 'Cron Jobs', href: '/app/cron', icon: <CronIcon />, priority: false },
+      { id: 'orchestration', label: 'Orchestration', href: '/dashboard/orchestration', icon: <CronIcon />, priority: false },
     ],
   },
   {
     id: 'admin',
     label: 'ADMIN',
     items: [
-      { id: 'settings', label: 'Settings', href: '/app/settings', icon: <SettingsIcon />, priority: false },
+      { id: 'control', label: 'Control', href: '/dashboard/control', icon: <SettingsIcon />, priority: false },
     ],
   },
 ]
@@ -133,7 +133,7 @@ function SidebarDesktop({ expanded, onToggle }: SidebarDesktopProps) {
   const pathname = usePathname()
 
   function isActive(href: string): boolean {
-    if (href === '/app') return pathname === '/app' || pathname === '/app/'
+    if (href === '/dashboard') return pathname === '/dashboard' || pathname === '/dashboard/'
     return pathname.startsWith(href)
   }
 
@@ -236,8 +236,8 @@ function MobileBottomBar({ activeHref }: MobileBottomBarProps) {
   const [sheetOpen, setSheetOpen] = useState(false)
 
   function isActive(item: NavItem): boolean {
-    return item.href === '/app'
-      ? activeHref === '/app' || activeHref === '/app/'
+    return item.href === '/dashboard'
+      ? activeHref === '/dashboard' || activeHref === '/dashboard/'
       : activeHref.startsWith(item.href)
   }
 
@@ -303,8 +303,8 @@ function MobileBottomSheet({
   const [visible, setVisible] = useState(false)
 
   function isActive(item: NavItem): boolean {
-    return item.href === '/app'
-      ? activeHref === '/app' || activeHref === '/app/'
+    return item.href === '/dashboard'
+      ? activeHref === '/dashboard' || activeHref === '/dashboard/'
       : activeHref.startsWith(item.href)
   }
 
