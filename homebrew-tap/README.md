@@ -7,7 +7,7 @@ Mirror of the published third-party tap repository `mutx-dev/homebrew-tap`.
 Fastest macOS path to install and open the TUI:
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/scripts/install-tui.sh)"
+curl -fsSL https://mutx.dev/install.sh | bash
 ```
 
 Manual tap flow:

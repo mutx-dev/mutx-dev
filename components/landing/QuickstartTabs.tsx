@@ -36,8 +36,7 @@ const tabContent: Record<QuickstartTab, QuickstartContent> = {
         id: 'installer',
         label: 'Installer',
         hint: 'The fastest path from zero to the operator shell.',
-        script:
-          '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/scripts/install-tui.sh)"',
+        script: 'curl -fsSL https://mutx.dev/install.sh | bash',
       },
     ],
   },

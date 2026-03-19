@@ -11,7 +11,7 @@ It brings the pieces operators actually need into one repo: a FastAPI control pl
 If you are on macOS and just want the TUI open as fast as possible, copy-paste this:
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/scripts/install-tui.sh)"
+curl -fsSL https://mutx.dev/install.sh | bash
 ```
 
 That bootstrap script will:
@@ -181,7 +181,7 @@ If `mutx` still resolves to a stale wrapper and raises `ModuleNotFoundError: No 
 One-command TUI bootstrap on macOS:
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/scripts/install-tui.sh)"
+curl -fsSL https://mutx.dev/install.sh | bash
 ```
 
 ## Local Quickstart
