@@ -31,18 +31,18 @@ const APP_DASHBOARD_URL = `${APP_URL}/dashboard`
 const APP_LOGIN_URL = `${APP_URL}/login`
 
 const navLinks = [
-  { label: 'Manifesto', href: '#manifesto' },
-  { label: 'Systems', href: '#systems' },
-  { label: 'Playbook', href: '#playbook' },
+  { label: 'Thesis', href: '#manifesto' },
+  { label: 'Control Surface', href: '#systems' },
+  { label: 'Proof', href: '#playbook' },
   { label: 'FAQ', href: '#faq' },
   { label: 'Docs', href: DOCS_URL, external: true },
 ]
 
 const heroSignals = [
-  { value: '42ms', label: 'Median policy-gate evaluation' },
-  { value: '99.97%', label: 'Mission continuity with live failover' },
-  { value: '7', label: 'Runtime checkpoints per critical workflow' },
-  { value: '0', label: 'Undocumented operator overrides' },
+  { value: 'API', label: 'Contract-first control plane' },
+  { value: 'CLI', label: 'Operator automation surface' },
+  { value: 'SDK', label: 'Programmatic runtime access' },
+  { value: 'App', label: 'Canonical dashboard for governed operations' },
 ]
 
 const principles = [
@@ -65,34 +65,34 @@ const principles = [
 
 const systemCards = [
   {
-    title: 'Mission Fabric',
-    subtitle: 'Structured execution graph for every autonomous workflow',
+    title: 'Lifecycle control',
+    subtitle: 'Agents and deployments as first-class resources',
     points: [
-      'Branch-aware state machines for non-linear agent decisions',
-      'Operator snapshots attached to every high-risk transition',
-      'Mission lineage from intent intake to external side effect',
+      'Track agents, deployments, versions, and event history with explicit state',
+      'Operate rollbacks, restarts, and readiness flows from one control layer',
+      'Keep lifecycle semantics consistent across API, CLI, SDK, and app surfaces',
     ],
     icon: Layers,
     gradient: 'from-cyan-400/20 via-sky-400/15 to-blue-500/10',
   },
   {
-    title: 'Policy Kernel',
-    subtitle: 'Hard gates that evaluate intent before actions run',
+    title: 'Governance rails',
+    subtitle: 'Ownership, keys, and policy as product behavior',
     points: [
-      'Contextual guardrails for tool scope, spend, and identity',
-      'Pre-execution denial logic with explainable decision traces',
-      'Runtime contracts for compliance-critical workflows',
+      'Enforce ownership boundaries instead of relying on dashboard convention',
+      'Rotate, revoke, and audit API credentials with durable control-plane semantics',
+      'Treat webhooks and approval paths as governed contracts, not side notes',
     ],
     icon: Lock,
     gradient: 'from-fuchsia-400/20 via-violet-400/15 to-indigo-500/10',
   },
   {
-    title: 'Ops Relay',
-    subtitle: 'Escalation engine built for real incident response',
+    title: 'Operator execution',
+    subtitle: 'One surface for deploy, observe, govern, and recover',
     points: [
-      'SLA-bound routing to the right operator in seconds',
-      'One-click replay from deterministic checkpoints',
-      'Intervention templates for predictable crisis handling',
+      'Use the canonical dashboard without splitting product truth across duplicate shells',
+      'Move from runs and traces into concrete operational action',
+      'Bring OpenClaw runtimes under MUTX governance without collapsing into session-only UX',
     ],
     icon: Command,
     gradient: 'from-emerald-400/20 via-teal-400/15 to-cyan-500/10',
@@ -102,88 +102,88 @@ const systemCards = [
 const playbook = [
   {
     stage: '01',
-    title: 'Define the blast radius',
-    body: 'Model missions by risk class. Attach cost ceilings, privileged operation flags, and approval requirements before enabling autonomy.',
+    title: 'Model the owned resources',
+    body: 'Start with agents, deployments, runs, traces, keys, and webhooks as explicit resources instead of burying operations inside chat transcripts.',
   },
   {
     stage: '02',
-    title: 'Launch with telemetry as default',
-    body: 'Every call, handoff, and tool invocation emits structured telemetry so your team can detect drift and latency anomalies early.',
+    title: 'Choose the runtime path',
+    body: 'Create a new OpenClaw-backed deployment or link an existing workspace under MUTX governance without changing the product category.',
   },
   {
     stage: '03',
-    title: 'Escalate with full context',
-    body: 'When risk thresholds breach, operators get timeline + payload + policy deltas in one view instead of stitching logs across tools.',
+    title: 'Operate through one control plane',
+    body: 'Keep app, CLI, SDK, and API aligned so the operator surface reflects the same lifecycle and governance contracts everywhere.',
   },
   {
     stage: '04',
-    title: 'Recover, replay, improve',
-    body: 'Use checkpoints to restore safely, replay exact conditions, and convert incidents into hardened runbooks for future missions.',
+    title: 'Recover with explicit signals',
+    body: 'Use health, readiness, event history, and rollout controls to fix real runtime problems instead of watching a passive session dashboard.',
   },
 ]
 
 const faqItems = [
   {
-    q: 'What does “advanced web hacks” translate to here?',
-    a: 'Deliberate visual engineering: layered lighting, kinetic micro-interactions, animated telemetry rails, and highly scannable information architecture that still performs on mobile.',
+    q: 'Is MUTX just another agent dashboard?',
+    a: 'No. Dashboards observe what happened. MUTX controls what is deployed, who owns it, how credentials are governed, and how the system recovers.',
   },
   {
-    q: 'Can we adapt this for enterprise buyers and technical evaluators?',
-    a: 'Yes. The page is structured to support multiple reading paths: executive narrative, systems-level detail, and implementation-oriented trust signals.',
+    q: 'Do I need to replace my runtime to use it?',
+    a: 'No. MUTX can create a new OpenClaw-backed deployment or link an existing workspace under the same control-plane semantics.',
   },
   {
-    q: 'Does this replace our current agent framework?',
-    a: 'No. MUTX acts as a control plane around your existing orchestration stack, adding policy gates, runtime observability, and operator response workflows.',
+    q: 'What makes the product surface truthful?',
+    a: 'The app shell, API, CLI, and SDK are meant to track the same resource model: agents, deployments, runs, traces, API keys, and webhooks.',
   },
   {
-    q: 'How do we avoid fluffy marketing copy over time?',
-    a: 'Anchor copy to outcomes, mechanisms, and constraints. Every section here ties value claims to concrete operating behavior and verifiable control points.',
+    q: 'Why keep emphasizing governance?',
+    a: 'Because production trust comes from explicit ownership, key lifecycle, webhook contracts, health signals, and recovery loops—not from prettier logs.',
   },
 ]
 
 const tickerItems = [
-  'Policy-aware autonomy',
-  'Deterministic replay',
-  'Operator-first escalation',
-  'Runtime mission graph',
-  'Identity-bound controls',
-  'Audit-grade telemetry',
+  'Agents get deployments',
+  'Dashboards observe; control planes decide',
+  'Operational trust is the product',
+  'Govern lifecycle, not just sessions',
+  'API + CLI + SDK + app alignment',
+  'OpenClaw compatibility without product drift',
 ]
 
 const missionRail = [
   {
-    step: 'INTAKE',
-    text: 'User intent classified as “high-impact external action”.',
+    step: 'DEPLOY',
+    text: 'Create or link a runtime under MUTX lifecycle semantics.',
     icon: Binary,
   },
   {
-    step: 'POLICY',
-    text: 'Kernel validates identity scope + spend cap + approval policy.',
+    step: 'GOVERN',
+    text: 'Apply ownership, credentials, and policy boundaries before writes land.',
     icon: Shield,
   },
   {
-    step: 'EXECUTION',
-    text: 'Mission branch executes with continuous telemetry stream.',
+    step: 'OBSERVE',
+    text: 'Stream runs, traces, and health signals through the canonical dashboard.',
     icon: Rocket,
   },
   {
-    step: 'REVIEW',
-    text: 'Operator confirms summary diff before side effects commit.',
+    step: 'RECOVER',
+    text: 'Restart, roll back, or intervene with explicit runtime context.',
     icon: Zap,
   },
 ]
 
 const terminalFrames = [
-  '[policy-kernel] evaluating mission_id=mx-4912 risk=high-impact',
-  '[relay] escalation path set → on-call: secops-l2 (SLA 90s)',
-  '[fabric] checkpoint written sha=991af3d replay=true signed=true',
-  '[operator] approval received by @jade · branch merge unlocked',
+  '[mutx.api] GET /deployments → 200 ok · ownership scope applied',
+  '[mutx.health] readiness=green · webhooks=healthy · auth=online',
+  '[mutx.events] deployment restarted · version=2026.03.19 · actor=operator',
+  '[mutx.keys] rotate complete · previous secret revoked · audit trail written',
 ]
 
 const dashboardStats = [
-  { label: 'Active missions', value: '128', delta: '+18 today' },
-  { label: 'Policy pass rate', value: '99.97%', delta: 'steady' },
-  { label: 'Escalations under SLA', value: '98.8%', delta: '-4s avg' },
+  { label: 'Primary resources', value: '6', delta: 'agents → webhooks' },
+  { label: 'Operator surfaces', value: '4', delta: 'API · CLI · SDK · App' },
+  { label: 'Runtime paths', value: '2', delta: 'deploy new or link existing' },
 ]
 
 const codeSnippets = [
@@ -192,17 +192,17 @@ const codeSnippets = [
     content: [
       'approval:',
       '  requires_human: true',
-      '  max_spend_usd: 2500',
-      '  privileged_tools: [wire_transfer, prod_write]',
+      '  ownership_scope: team',
+      '  privileged_actions: [deploy_restart, key_rotate]',
     ],
   },
   {
     title: 'Runtime hook (TypeScript)',
     content: [
-      'await mutx.mission.start({',
-      "  riskClass: 'high-impact',",
-      "  replay: 'deterministic',",
-      "  escalation: 'operator-first'",
+      'await mutx.deployments.restart({',
+      "  deploymentId: 'dep_123',",
+      "  reason: 'recover unhealthy replica',",
+      "  actor: 'operator'",
       '})',
     ],
   },
@@ -343,18 +343,18 @@ export default function LandingPage() {
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-200/30 bg-cyan-300/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-100">
               <Sparkles className="h-3.5 w-3.5" />
-              Engineered for operators, not pitch decks
+              Control plane, not session dashboard
             </div>
 
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
-              Autonomous throughput.
+              Deploy agents like services.
               <span className="block bg-gradient-to-r from-cyan-300 via-sky-200 to-violet-300 bg-clip-text text-transparent">
-                Human command authority.
+                Operate them like systems.
               </span>
             </h1>
 
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/75 sm:text-lg sm:leading-8">
-              MUTX is the mission control layer for production AI systems: policy-gated execution, live telemetry, and escalation paths that keep people in charge when the stakes rise.
+              MUTX is the open-source control plane for AI agents. It gives teams lifecycle, governance, and operator workflows instead of another session-only dashboard.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -406,7 +406,7 @@ export default function LandingPage() {
             <div className="absolute -bottom-16 -left-8 h-44 w-44 rounded-full bg-violet-500/25 blur-3xl" />
 
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/55">Live mission rail</p>
+              <p className="text-[11px] uppercase tracking-[0.24em] text-white/55">Control loop</p>
               <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/35 bg-emerald-300/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-100">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
                 Streaming
@@ -439,14 +439,14 @@ export default function LandingPage() {
                 </div>
 
                 <div className="mt-3 rounded-xl border border-cyan-200/20 bg-cyan-300/10 p-3 text-xs text-cyan-50/90">
-                  <p className="font-semibold text-cyan-100">Mission status: nominal · risk envelope maintained</p>
-                  <p className="mt-1 text-white/75">Pre-exec policy enforcement active · SLA-safe escalation channel online · replay snapshots synced.</p>
+                  <p className="font-semibold text-cyan-100">Control-plane status: healthy · governance rails online</p>
+                  <p className="mt-1 text-white/75">Lifecycle controls active · ownership enforced · health and readiness signals flowing into the dashboard.</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div className="rounded-2xl border border-white/10 bg-[#050819] p-4">
-                  <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-white/50">Animated terminal TUI</p>
+                  <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-white/50">Runtime events</p>
                   <div className="rounded-xl border border-white/10 bg-black/45 p-3 font-mono text-[11px] text-cyan-100/90">
                     {terminalFrames.map((line, idx) => (
                       <motion.p
@@ -463,7 +463,7 @@ export default function LandingPage() {
                 </div>
 
                 <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/95 to-[#101730] p-4">
-                  <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-white/50">Dashboard snapshot</p>
+                  <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-white/50">Product surface snapshot</p>
                   <div className="grid gap-2 sm:grid-cols-3">
                     {dashboardStats.map((stat) => (
                       <div key={stat.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
@@ -475,8 +475,8 @@ export default function LandingPage() {
                   </div>
                   <div className="mt-3 rounded-xl border border-white/10 bg-[#04070f] p-3">
                     <div className="mb-2 flex items-center justify-between text-xs text-white/60">
-                      <span>Policy decisions (24h)</span>
-                      <span>12,881 evals</span>
+                      <span>Canonical scope</span>
+                      <span>deploy · observe · govern</span>
                     </div>
                     <div className="flex h-14 items-end gap-1">
                       {[42, 58, 37, 62, 49, 66, 44, 71, 53, 64, 57, 74].map((bar, idx) => (
@@ -527,9 +527,9 @@ export default function LandingPage() {
 
         <section id="manifesto" className="mx-auto mt-16 w-full max-w-7xl">
           <div className="mb-6">
-            <p className="text-xs uppercase tracking-[0.24em] text-white/55">Manifesto</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-white/55">Category thesis</p>
             <h2 className="mt-2 max-w-4xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              AI systems shouldn&apos;t be trusted because they sound smart. They should be trusted because they are governable under stress.
+              The hard part is not the model. It is everything after the demo: ownership, deployment semantics, recovery paths, and operational trust.
             </h2>
           </div>
 
@@ -553,8 +553,8 @@ export default function LandingPage() {
 
         <section id="systems" className="mx-auto mt-16 w-full max-w-7xl overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
           <div className="mb-7">
-            <p className="text-xs uppercase tracking-[0.24em] text-white/55">Core systems</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">The stack behind safe autonomous execution.</h2>
+            <p className="text-xs uppercase tracking-[0.24em] text-white/55">What MUTX actually controls</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Lifecycle, governance, and operator execution in one control layer.</h2>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-3">
@@ -578,8 +578,8 @@ export default function LandingPage() {
 
         <section id="playbook" className="mx-auto mt-16 w-full max-w-7xl">
           <div className="mb-6">
-            <p className="text-xs uppercase tracking-[0.24em] text-white/55">Deployment playbook</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">How teams operationalize MUTX in the real world.</h2>
+            <p className="text-xs uppercase tracking-[0.24em] text-white/55">Proof</p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Where dashboards stop, MUTX starts.</h2>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -616,10 +616,10 @@ export default function LandingPage() {
         </section>
 
         <section className="mx-auto mt-16 w-full max-w-7xl rounded-3xl border border-cyan-300/30 bg-cyan-300/10 p-8 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100/80">Build a better control surface</p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Ship high-agency AI without surrendering operational control.</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100/80">Operate your agents like production systems</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Move from demo agent to governed deployment.</h2>
           <p className="mx-auto mt-3 max-w-3xl text-sm leading-7 text-white/80 sm:text-base">
-            If your team is done with vague platform promises and wants concrete runtime control, open the docs and run your first guarded mission today.
+            If your agents need to survive beyond a demo, start with MUTX: explicit resources, truthful health signals, and one control plane across app, API, CLI, and SDK.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a
@@ -628,7 +628,7 @@ export default function LandingPage() {
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-cyan-100"
             >
-              Open docs
+              Launch docs
               <ArrowRight className="h-4 w-4" />
             </a>
             <a
@@ -637,7 +637,7 @@ export default function LandingPage() {
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
             >
-              View repository
+              View source
             </a>
           </div>
         </section>
