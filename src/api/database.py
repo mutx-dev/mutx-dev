@@ -18,6 +18,7 @@ from src.api.config import get_settings
 settings = get_settings()
 logger = logging.getLogger(__name__)
 runtime_ssl_mode_override: str | None = None
+last_runtime_schema_repairs: list[str] = []
 
 SSL_REJECTION_ERROR_FRAGMENTS = (
     "rejected ssl upgrade",
@@ -56,8 +57,11 @@ def _build_engine_config(database_url: str, override_ssl_mode: str | None = None
 
     # Allow SQLite for testing
     if base_drivername in {"sqlite"}:
+        async_url = url
+        if url.drivername != "sqlite+aiosqlite":
+            async_url = url.set(drivername="sqlite+aiosqlite")
         return EngineConfig(
-            url=database_url,
+            url=async_url.render_as_string(hide_password=False),
             connect_args={"check_same_thread": False},
             ssl_mode_explicitly_set=False,
         )
@@ -191,10 +195,39 @@ def _has_index(sync_connection: Connection, table_name: str, index_name: str) ->
     return any(index["name"] == index_name for index in inspector.get_indexes(table_name))
 
 
+def get_last_runtime_schema_repairs() -> list[str]:
+    return list(last_runtime_schema_repairs)
+
+
+def _set_last_runtime_schema_repairs(repaired_objects: list[str]) -> None:
+    global last_runtime_schema_repairs
+    last_runtime_schema_repairs = list(repaired_objects)
+
+
+def _timestamp_column_type(sync_connection: Connection) -> str:
+    dialect_name = getattr(getattr(sync_connection, "dialect", None), "name", "")
+    if dialect_name == "postgresql":
+        return "TIMESTAMP WITH TIME ZONE"
+    return "DATETIME"
+
+
 def _repair_known_schema_drift(sync_connection: Connection) -> list[str]:
-    from src.api.models.models import AgentLog, RefreshTokenSession, UsageEvent
+    from src.api.models.models import Agent, AgentLog, RefreshTokenSession, UsageEvent
 
     repaired_objects: list[str] = []
+
+    if _has_table(sync_connection, Agent.__tablename__) and not _has_column(
+        sync_connection,
+        Agent.__tablename__,
+        "last_heartbeat",
+    ):
+        sync_connection.execute(
+            text(
+                f"ALTER TABLE {Agent.__tablename__} "
+                f"ADD COLUMN last_heartbeat {_timestamp_column_type(sync_connection)}"
+            )
+        )
+        repaired_objects.append(f"{Agent.__tablename__}.last_heartbeat")
 
     if not _has_table(sync_connection, AgentLog.__tablename__):
         AgentLog.__table__.create(bind=sync_connection, checkfirst=True)
@@ -251,6 +284,8 @@ async def _repair_runtime_schema() -> None:
     async with engine.begin() as conn:
         repaired_objects = await conn.run_sync(_repair_known_schema_drift)
 
+    _set_last_runtime_schema_repairs(repaired_objects)
+
     if repaired_objects:
         logger.warning(
             "Applied runtime database schema repairs: %s",
@@ -258,7 +293,7 @@ async def _repair_runtime_schema() -> None:
         )
 
 
-async def init_db() -> None:
+async def init_db() -> list[str]:
     try:
         await _run_startup_probe()
         await _repair_runtime_schema()
@@ -270,6 +305,8 @@ async def init_db() -> None:
         await _reconfigure_engine(override_ssl_mode="disable")
         await _run_startup_probe()
         await _repair_runtime_schema()
+
+    return get_last_runtime_schema_repairs()
 
 
 async def dispose_engine() -> None:

@@ -11,7 +11,6 @@ import uuid
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from fastapi import FastAPI
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -20,6 +19,8 @@ from sqlalchemy.pool import StaticPool
 
 # Set environment before any imports
 os.environ.setdefault("DATABASE_REQUIRED_ON_STARTUP", "false")
+os.environ.setdefault("BACKGROUND_MONITOR_ENABLED", "false")
+os.environ.setdefault("ENABLE_RAG_API", "true")
 os.environ.setdefault("JWT_SECRET", "test-secret-key-that-is-long-enough-32")
 
 # Use an isolated SQLite database for tests by default.
@@ -36,67 +37,20 @@ def compile_uuid_sqlite(_type, _compiler, **_kw):
     return "CHAR(36)"
 
 
-def create_test_app() -> FastAPI:
-    """Create a test FastAPI application."""
-    from src.api.routes import (
-        agents,
-        deployments,
-        api_keys,
-        auth,
-        webhooks,
-        clawhub,
-        agent_runtime,
-        newsletter,
-        ingest,
-        leads,
-        runs,
-        usage,
-        analytics,
-        budgets,
-        monitoring,
-        swarms,
+def create_test_app():
+    """Create a test FastAPI application using the production app factory."""
+    from src.api.main import create_app
+
+    app = create_app(
+        enable_lifespan=False,
+        background_monitor_enabled=False,
+        database_required_on_startup=False,
     )
-
-    app = FastAPI(title="MUTX Test API")
-
-    # Include routers
-    app.include_router(agents.router, prefix="/v1")
-    app.include_router(deployments.router, prefix="/v1")
-    app.include_router(api_keys.router, prefix="/v1")
-    app.include_router(auth.router, prefix="/v1")
-    app.include_router(webhooks.router, prefix="/v1")
-    app.include_router(clawhub.router, prefix="/v1")
-    app.include_router(agent_runtime.router, prefix="/v1")
-    app.include_router(newsletter.router, prefix="/v1")
-    app.include_router(leads.router, prefix="/v1")
-    app.include_router(leads.contacts_router, prefix="/v1")
-    app.include_router(ingest.router, prefix="/v1")
-    app.include_router(runs.router, prefix="/v1")
-    app.include_router(usage.router, prefix="/v1")
-    app.include_router(analytics.router, prefix="/v1")
-    app.include_router(budgets.router, prefix="/v1")
-    app.include_router(monitoring.router, prefix="/v1")
-    app.include_router(swarms.router, prefix="/v1")
-
-    # Health check endpoint
-    @app.get("/")
-    async def root():
-        return {"message": "mutx.dev API", "version": "1.0.0"}
-
-    @app.get("/ready")
-    async def ready():
-        # Simple ready check for tests
-        return {
-            "status": "ready",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "database": "ready",
-            "error": None,
-        }
-
-    @app.get("/health")
-    async def health():
-        return {"status": "ok"}
-
+    app.state.start_time = datetime.now(timezone.utc).timestamp()
+    app.state.database_ready = True
+    app.state.database_error = None
+    app.state.database_error_detail = None
+    app.state.schema_repairs_applied = []
     return app
 
 

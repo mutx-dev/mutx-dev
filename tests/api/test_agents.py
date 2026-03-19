@@ -3,12 +3,14 @@ Tests for /agents endpoints.
 """
 
 import json
+import uuid
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.models.models import Agent, AgentStatus
+from src.api.models.models import Agent, AgentStatus, UsageEvent
 
 
 class TestCreateAgent:
@@ -231,6 +233,56 @@ class TestCreateAgent:
         assert data["name"] == "minimal-agent"
         assert data["config"]["name"] == "minimal-agent"
         assert data["config_version"] == 1
+
+    @pytest.mark.asyncio
+    async def test_create_agent_succeeds_when_usage_tracking_fails(
+        self,
+        client: AsyncClient,
+        db_session: AsyncSession,
+        monkeypatch,
+    ):
+        async def raise_usage_failure(*_args, **_kwargs):
+            raise RuntimeError("usage unavailable")
+
+        monkeypatch.setattr("src.api.services.usage.track_usage", raise_usage_failure)
+
+        response = await client.post(
+            "/v1/agents",
+            json={"name": "usage-failure-agent"},
+        )
+
+        assert response.status_code == 201
+        created_id = uuid.UUID(response.json()["id"])
+        persisted = await db_session.get(Agent, created_id)
+        assert persisted is not None
+        assert persisted.name == "usage-failure-agent"
+
+    @pytest.mark.asyncio
+    async def test_create_agent_records_single_usage_event(
+        self,
+        client: AsyncClient,
+        db_session: AsyncSession,
+        test_user,
+    ):
+        response = await client.post(
+            "/v1/agents",
+            json={"name": "single-usage-agent"},
+        )
+
+        assert response.status_code == 201
+        created_id = response.json()["id"]
+        usage_events = (
+            (
+                await db_session.execute(
+                    select(UsageEvent).where(UsageEvent.user_id == test_user.id)
+                )
+            )
+            .scalars()
+            .all()
+        )
+
+        assert [event.event_type for event in usage_events] == ["agent_create"]
+        assert usage_events[0].resource_id == created_id
 
 
 class TestListAgents:

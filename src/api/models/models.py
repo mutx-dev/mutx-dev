@@ -160,7 +160,7 @@ class Agent(Base):
     api_key: Mapped[str] = mapped_column(
         String(128), nullable=True, index=True
     )  # Agent API key for self-auth
-    last_heartbeat: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    last_heartbeat: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )

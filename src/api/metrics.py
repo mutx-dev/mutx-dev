@@ -81,6 +81,18 @@ mutx_api_calls_total = Counter("mutx_api_calls_total", "Total API calls", ["endp
 
 # Error metrics
 mutx_errors_total = Counter("mutx_errors_total", "Total errors by type", ["type", "endpoint"])
+mutx_runtime_schema_repairs_applied = Gauge(
+    "mutx_runtime_schema_repairs_applied",
+    "Whether runtime schema repair ran during startup",
+)
+mutx_runtime_schema_repairs_total = Gauge(
+    "mutx_runtime_schema_repairs_total",
+    "Number of runtime schema repairs applied during startup",
+)
+mutx_background_monitor_consecutive_failures = Gauge(
+    "mutx_background_monitor_consecutive_failures",
+    "Current number of consecutive background monitor failures",
+)
 
 router = APIRouter()
 
@@ -118,3 +130,12 @@ async def track_request(request: Request, call_next):
     http_request_duration_seconds.labels(method=request.method, path=path).observe(duration)
 
     return response
+
+
+def set_runtime_schema_repair_metrics(repaired_objects: list[str]) -> None:
+    mutx_runtime_schema_repairs_applied.set(1 if repaired_objects else 0)
+    mutx_runtime_schema_repairs_total.set(len(repaired_objects))
+
+
+def set_background_monitor_failure_metrics(consecutive_failures: int) -> None:
+    mutx_background_monitor_consecutive_failures.set(consecutive_failures)

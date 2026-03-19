@@ -31,6 +31,12 @@ class _FakeSession:
     async def execute(self, _query):
         return self.result
 
+    async def commit(self):
+        return None
+
+    async def rollback(self):
+        return None
+
 
 class _FakeSessionManager:
     def __init__(self, result: _FakeExecuteResult):
@@ -45,6 +51,36 @@ class _FakeSessionManager:
 
 def _fake_session_maker(result: _FakeExecuteResult):
     return _FakeSessionManager(result)
+
+
+class _TrackedSession(_FakeSession):
+    def __init__(self, result: _FakeExecuteResult):
+        super().__init__(result)
+        self.commit_calls = 0
+        self.rollback_calls = 0
+        self.commit_event: asyncio.Event | None = None
+        self.rollback_event: asyncio.Event | None = None
+
+    async def commit(self):
+        self.commit_calls += 1
+        if self.commit_event is not None:
+            self.commit_event.set()
+
+    async def rollback(self):
+        self.rollback_calls += 1
+        if self.rollback_event is not None:
+            self.rollback_event.set()
+
+
+class _TrackedSessionManager:
+    def __init__(self, session: _TrackedSession):
+        self.session = session
+
+    async def __aenter__(self):
+        return self.session
+
+    async def __aexit__(self, _exc_type, _exc, _tb):
+        return False
 
 
 class _FakeSelfHealing:
@@ -145,6 +181,90 @@ async def test_start_background_monitor_cancellation_survives_stop_failure(monke
 
     assert fake_self_healing.start_calls == 1
     assert fake_self_healing.stop_calls == 1
+
+
+@pytest.mark.asyncio
+async def test_start_background_monitor_commits_successful_iteration(monkeypatch):
+    fake_self_healing = _FakeSelfHealingMissingScheduler()
+    session = _TrackedSession(_FakeExecuteResult())
+    session.commit_event = asyncio.Event()
+    runtime_state = monitor_module.MonitorRuntimeState()
+
+    async def fake_monitor_agent_health(_session):
+        return None
+
+    monkeypatch.setattr(
+        monitor_module,
+        "get_self_healing_service",
+        lambda: fake_self_healing,
+    )
+    monkeypatch.setattr(
+        monitor_module,
+        "monitor_agent_health",
+        fake_monitor_agent_health,
+    )
+    monkeypatch.setattr(
+        monitor_module.database_module,
+        "async_session_maker",
+        lambda: _TrackedSessionManager(session),
+    )
+
+    task = asyncio.create_task(monitor_module.start_background_monitor(runtime_state))
+    await asyncio.wait_for(session.commit_event.wait(), timeout=1)
+    task.cancel()
+
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert session.commit_calls >= 1
+    assert session.rollback_calls == 0
+    assert runtime_state.last_success_at is not None
+    assert runtime_state.consecutive_failures == 0
+
+
+@pytest.mark.asyncio
+async def test_start_background_monitor_rolls_back_failed_iteration(monkeypatch):
+    real_sleep = asyncio.sleep
+    fake_self_healing = _FakeSelfHealingMissingScheduler()
+    session = _TrackedSession(_FakeExecuteResult())
+    session.rollback_event = asyncio.Event()
+    runtime_state = monitor_module.MonitorRuntimeState()
+
+    async def fake_monitor_agent_health(_session):
+        raise RuntimeError("boom")
+
+    async def fake_sleep(_delay):
+        await real_sleep(0)
+
+    monkeypatch.setattr(
+        monitor_module,
+        "get_self_healing_service",
+        lambda: fake_self_healing,
+    )
+    monkeypatch.setattr(
+        monitor_module,
+        "monitor_agent_health",
+        fake_monitor_agent_health,
+    )
+    monkeypatch.setattr(
+        monitor_module.database_module,
+        "async_session_maker",
+        lambda: _TrackedSessionManager(session),
+    )
+    monkeypatch.setattr(monitor_module.asyncio, "sleep", fake_sleep)
+
+    task = asyncio.create_task(monitor_module.start_background_monitor(runtime_state))
+    await asyncio.wait_for(session.rollback_event.wait(), timeout=1)
+    task.cancel()
+
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert session.commit_calls == 0
+    assert session.rollback_calls >= 1
+    assert runtime_state.last_error == "boom"
+    assert runtime_state.last_error_at is not None
+    assert runtime_state.consecutive_failures >= 1
 
 
 @pytest.mark.asyncio

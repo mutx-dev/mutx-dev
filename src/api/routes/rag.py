@@ -5,13 +5,11 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.config import get_settings
-from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models import User
-from src.api.services.usage import track_usage
+from src.api.services.usage import track_usage_best_effort
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +74,6 @@ def validate_text_payload(text: str, *, field_name: str = "text", max_length: in
 @router.post("/embed", response_model=EmbedResponse)
 async def generate_embedding(
     request: EmbedRequest,
-    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> EmbedResponse:
     """
@@ -108,15 +105,13 @@ async def generate_embedding(
         dimension = EMBEDDING_MODELS[request.model]
         embedding = [0.0] * dimension
         logger.warning(f"Using placeholder embedding for model {request.model} (no API key)")
-        await track_usage(
-            db,
-            current_user.id,
+        await track_usage_best_effort(
+            user_id=current_user.id,
             event_type="rag.embed",
             resource_type="rag",
             resource_id=request.model,
             metadata={"text_length": len(request.text), "mode": "placeholder"},
         )
-        await db.commit()
         return EmbedResponse(
             embedding=embedding, model=request.model, tokens=len(request.text.split())
         )
@@ -128,15 +123,13 @@ async def generate_embedding(
         )
 
         embedding_data = response.data[0]
-        await track_usage(
-            db,
-            current_user.id,
+        await track_usage_best_effort(
+            user_id=current_user.id,
             event_type="rag.embed",
             resource_type="rag",
             resource_id=request.model,
             metadata={"text_length": len(request.text), "tokens": embedding_data.usage.tokens},
         )
-        await db.commit()
         return EmbedResponse(
             embedding=embedding_data.embedding,
             model=request.model,
@@ -165,7 +158,6 @@ class BatchEmbedResponse(BaseModel):
 @router.post("/embed/batch", response_model=BatchEmbedResponse)
 async def generate_batch_embeddings(
     request: BatchEmbedRequest,
-    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> BatchEmbedResponse:
     """
@@ -211,9 +203,8 @@ async def generate_batch_embeddings(
         dimension = EMBEDDING_MODELS[request.model]
         embeddings = [[0.0] * dimension] * len(request.texts)
         total_tokens = sum(len(t.split()) for t in request.texts)
-        await track_usage(
-            db,
-            current_user.id,
+        await track_usage_best_effort(
+            user_id=current_user.id,
             event_type="rag.embed.batch",
             resource_type="rag",
             resource_id=request.model,
@@ -223,7 +214,6 @@ async def generate_batch_embeddings(
                 "mode": "placeholder",
             },
         )
-        await db.commit()
         return BatchEmbedResponse(
             embeddings=embeddings, model=request.model, total_tokens=total_tokens
         )
@@ -237,9 +227,8 @@ async def generate_batch_embeddings(
         # Sort by index to maintain order
         sorted_data = sorted(response.data, key=lambda x: x.index)
         embeddings = [item.embedding for item in sorted_data]
-        await track_usage(
-            db,
-            current_user.id,
+        await track_usage_best_effort(
+            user_id=current_user.id,
             event_type="rag.embed.batch",
             resource_type="rag",
             resource_id=request.model,
@@ -249,7 +238,6 @@ async def generate_batch_embeddings(
                 "tokens": response.usage.tokens,
             },
         )
-        await db.commit()
 
         return BatchEmbedResponse(
             embeddings=embeddings, model=request.model, total_tokens=response.usage.tokens
@@ -277,7 +265,6 @@ class SearchResult(BaseModel):
 @router.post("/search", response_model=list[SearchResult])
 async def similarity_search(
     request: SearchRequest,
-    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> list[SearchResult]:
     """
@@ -303,15 +290,13 @@ async def similarity_search(
             "query_length": len(request.query),
         },
     )
-    await track_usage(
-        db,
-        current_user.id,
+    await track_usage_best_effort(
+        user_id=current_user.id,
         event_type="rag.search",
         resource_type="rag",
         resource_id=request.model,
         metadata={"top_k": request.top_k, "query_length": len(request.query)},
     )
-    await db.commit()
     # TODO: Implement with pgvector once extension is added
     # For now, return empty results with a clear message
     return []

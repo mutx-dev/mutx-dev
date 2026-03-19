@@ -174,3 +174,45 @@ def test_runtime_schema_repair_repairs_usage_events_columns_and_indexes(monkeypa
         "usage_events.ix_usage_events_resource_type",
         "usage_events.ix_usage_events_user_id",
     ]
+
+
+def test_runtime_schema_repair_adds_missing_agents_last_heartbeat(monkeypatch):
+    existing_tables = {"agents", "agent_logs", "refresh_token_sessions", "usage_events"}
+    existing_columns = {
+        ("agent_logs", "meta_data"),
+        ("usage_events", "resource_type"),
+        ("usage_events", "resource_id"),
+        ("usage_events", "credits_used"),
+        ("usage_events", "event_metadata"),
+    }
+    existing_indexes = {
+        ("refresh_token_sessions", "ix_refresh_token_sessions_family_id"),
+        ("refresh_token_sessions", "ix_refresh_token_sessions_token_jti"),
+        ("refresh_token_sessions", "ix_refresh_token_sessions_user_id"),
+        ("usage_events", "ix_usage_events_created_at"),
+        ("usage_events", "ix_usage_events_event_type"),
+        ("usage_events", "ix_usage_events_resource_type"),
+        ("usage_events", "ix_usage_events_user_id"),
+    }
+
+    monkeypatch.setattr(
+        database,
+        "_has_table",
+        lambda _connection, table_name: table_name in existing_tables,
+    )
+    monkeypatch.setattr(
+        database,
+        "_has_column",
+        lambda _connection, table_name, column_name: (table_name, column_name) in existing_columns,
+    )
+    monkeypatch.setattr(
+        database,
+        "_has_index",
+        lambda _connection, table_name, index_name: (table_name, index_name) in existing_indexes,
+    )
+
+    connection = _FakeConnection()
+    repaired_objects = database._repair_known_schema_drift(connection)
+
+    assert connection.executed == ["ALTER TABLE agents ADD COLUMN last_heartbeat DATETIME"]
+    assert repaired_objects == ["agents.last_heartbeat"]

@@ -13,7 +13,6 @@ from src.api.auth.ownership import get_owned_agent
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models import (
-    UsageEvent,
     Agent,
     AgentLog,
     AgentMetric,
@@ -24,7 +23,7 @@ from src.api.models import (
     DeploymentEvent as DeploymentEventModel,
     User,
 )
-from src.api.services.usage import track_usage
+from src.api.services.usage import track_usage_best_effort
 from src.api.models.schemas import (
     AgentConfigBase,
     AgentConfigResponse,
@@ -245,32 +244,18 @@ async def create_agent(
     db.add(agent)
     await db.flush()
 
-    # Track usage event
-    await track_usage(
-        db,
+    await db.commit()
+    await db.refresh(agent)
+    logger.info(f"Created agent: {agent.id}")
+
+    await track_usage_best_effort(
+        db=db,
         user_id=current_user.id,
         event_type="agent_create",
         resource_type="agent",
         resource_id=str(agent.id),
         metadata={"agent_type": agent.type.value},
     )
-
-    await db.commit()
-    await db.refresh(agent)
-    logger.info(f"Created agent: {agent.id}")
-
-    # Track usage event
-    usage_event = UsageEvent(
-        event_type="agent_created",
-        user_id=current_user.id,
-        resource_id=str(agent.id),
-        resource_type="agent",
-        credits_used=1.0,
-        event_metadata=None,
-        created_at=datetime.now(timezone.utc),
-    )
-    db.add(usage_event)
-    await db.commit()
 
     return _serialize_agent(agent)
 
@@ -405,18 +390,14 @@ async def deploy_agent(
         await db.refresh(deployment)
         logger.info(f"Deployed agent: {agent_id}, deployment: {deployment.id}")
 
-        # Track usage event
-        usage_event = UsageEvent(
-            event_type="agent_deployed",
+        await track_usage_best_effort(
+            db=db,
             user_id=current_user.id,
-            resource_id=str(agent_id),
+            event_type="agent_deployed",
             resource_type="agent",
-            credits_used=1.0,
-            event_metadata=f'{{"deployment_id": "{deployment.id}"}}',
-            created_at=datetime.now(timezone.utc),
+            resource_id=str(agent_id),
+            metadata={"deployment_id": str(deployment.id)},
         )
-        db.add(usage_event)
-        await db.commit()
 
         return {"deployment_id": deployment.id, "status": "deploying"}
     except HTTPException:
@@ -462,18 +443,13 @@ async def stop_agent(
     agent.status = AgentStatus.STOPPED.value
     await db.commit()
 
-    # Track usage event
-    usage_event = UsageEvent(
-        event_type="agent_stopped",
+    await track_usage_best_effort(
+        db=db,
         user_id=current_user.id,
-        resource_id=str(agent_id),
+        event_type="agent_stopped",
         resource_type="agent",
-        credits_used=1.0,
-        event_metadata=None,
-        created_at=datetime.now(timezone.utc),
+        resource_id=str(agent_id),
     )
-    db.add(usage_event)
-    await db.commit()
 
     logger.info(f"Stopped agent: {agent_id}")
     return {"status": "stopped"}

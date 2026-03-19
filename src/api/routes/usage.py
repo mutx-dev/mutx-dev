@@ -1,9 +1,7 @@
 """Usage event tracking API"""
 
-import json
 import logging
 import uuid
-from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
@@ -15,6 +13,7 @@ from src.api.database import get_db
 from src.api.models import UsageEvent, User
 from src.api.models.schemas import UsageEventCreate, UsageEventResponse
 from src.api.middleware.auth import get_current_user
+from src.api.services.usage import track_usage
 
 router = APIRouter(prefix="/usage", tags=["usage"])
 logger = logging.getLogger(__name__)
@@ -36,14 +35,15 @@ async def create_usage_event(
     current_user: User = Depends(get_current_user),
 ):
     """Record a usage event for tracking API usage and quotas."""
-    usage_event = UsageEvent(
-        event_type=event_data.event_type,
+    usage_event = await track_usage(
+        db,
         user_id=current_user.id,
+        event_type=event_data.event_type,
+        resource_type=event_data.resource_type,
         resource_id=event_data.resource_id,
-        event_metadata=(json.dumps(event_data.metadata) if event_data.metadata else None),
-        created_at=datetime.now(timezone.utc),
+        metadata=event_data.metadata,
+        credits_used=event_data.credits_used,
     )
-    db.add(usage_event)
     await db.commit()
     await db.refresh(usage_event)
     logger.info(f"Created usage event: {usage_event.id} type={usage_event.event_type}")

@@ -13,7 +13,6 @@ from src.api.auth.ownership import get_owned_agent, get_owned_deployment
 from src.api.database import get_db
 from src.api.models import (
     Deployment,
-    UsageEvent,
     Agent,
     AgentStatus,
     User,
@@ -33,7 +32,7 @@ from src.api.models.schemas import (
     DeploymentRollbackRequest,
 )
 from src.api.middleware.auth import get_current_user
-from src.api.services.usage import track_usage
+from src.api.services.usage import track_usage_best_effort
 
 router = APIRouter(prefix="/deployments", tags=["deployments"])
 logger = logging.getLogger(__name__)
@@ -212,18 +211,14 @@ async def scale_deployment(
     )
     logger.info(f"Scaled deployment {deployment_id} to {scale_data.replicas} replicas")
 
-    # Track usage event
-    usage_event = UsageEvent(
-        event_type="deployment_scaled",
+    await track_usage_best_effort(
+        db=db,
         user_id=current_user.id,
-        resource_id=str(deployment_id),
+        event_type="deployment_scaled",
         resource_type="deployment",
-        credits_used=1.0,
-        event_metadata=f'{{"replicas": {scale_data.replicas}}}',
-        created_at=datetime.now(timezone.utc),
+        resource_id=str(deployment_id),
+        metadata={"replicas": scale_data.replicas},
     )
-    db.add(usage_event)
-    await db.commit()
 
     return _serialize_deployment(deployment)
 
@@ -254,18 +249,13 @@ async def kill_deployment(
 
     await db.commit()
 
-    # Track usage event
-    usage_event = UsageEvent(
-        event_type="deployment_killed",
+    await track_usage_best_effort(
+        db=db,
         user_id=current_user.id,
-        resource_id=str(deployment_id),
+        event_type="deployment_killed",
         resource_type="deployment",
-        credits_used=1.0,
-        event_metadata=None,
-        created_at=datetime.now(timezone.utc),
+        resource_id=str(deployment_id),
     )
-    db.add(usage_event)
-    await db.commit()
 
     logger.info(f"Killed deployment: {deployment_id}")
 
@@ -314,16 +304,6 @@ async def create_deployment(
     # Update agent status
     agent.status = AgentStatus.RUNNING.value
 
-    # Track usage event
-    await track_usage(
-        db,
-        user_id=current_user.id,
-        event_type="deployment_create",
-        resource_type="deployment",
-        resource_id=str(deployment.id),
-        metadata={"replicas": deployment.replicas},
-    )
-
     await db.commit()
     # Re-fetch to ensure events are loaded and attributes are fresh
     deployment = await get_owned_deployment(
@@ -333,7 +313,14 @@ async def create_deployment(
         include_events=True,
     )
     logger.info(f"Created deployment {deployment.id} for agent {deployment_data.agent_id}")
-    await db.commit()
+    await track_usage_best_effort(
+        db=db,
+        user_id=current_user.id,
+        event_type="deployment_create",
+        resource_type="deployment",
+        resource_id=str(deployment.id),
+        metadata={"replicas": deployment.replicas},
+    )
 
     return _serialize_deployment(deployment)
 
@@ -384,18 +371,13 @@ async def restart_deployment(
     )
     logger.info(f"Restarted deployment: {deployment_id}")
 
-    # Track usage event
-    usage_event = UsageEvent(
-        event_type="deployment_restarted",
+    await track_usage_best_effort(
+        db=db,
         user_id=current_user.id,
-        resource_id=str(deployment_id),
+        event_type="deployment_restarted",
         resource_type="deployment",
-        credits_used=1.0,
-        event_metadata=None,
-        created_at=datetime.now(timezone.utc),
+        resource_id=str(deployment_id),
     )
-    db.add(usage_event)
-    await db.commit()
 
     return _serialize_deployment(deployment)
 

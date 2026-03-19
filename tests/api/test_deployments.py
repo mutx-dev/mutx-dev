@@ -3,6 +3,7 @@ Tests for /deployments endpoints.
 """
 
 from datetime import datetime, timezone
+import uuid
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -551,6 +552,33 @@ class TestCreateDeployment:
         )
         assert response.status_code == 422
 
+    @pytest.mark.asyncio
+    async def test_create_deployment_succeeds_when_usage_tracking_fails(
+        self,
+        client: AsyncClient,
+        test_agent,
+        db_session: AsyncSession,
+        monkeypatch,
+    ):
+        async def raise_usage_failure(*_args, **_kwargs):
+            raise RuntimeError("usage unavailable")
+
+        monkeypatch.setattr("src.api.services.usage.track_usage", raise_usage_failure)
+
+        test_agent.status = AgentStatus.STOPPED.value
+        await db_session.commit()
+
+        response = await client.post(
+            "/v1/deployments",
+            json={"agent_id": str(test_agent.id), "replicas": 2},
+        )
+
+        assert response.status_code == 201
+        created_id = uuid.UUID(response.json()["id"])
+        persisted = await db_session.get(Deployment, created_id)
+        assert persisted is not None
+        assert persisted.agent_id == test_agent.id
+
 
 class TestRestartDeployment:
     """Tests for POST /deployments/{deployment_id}/restart endpoint."""
@@ -647,4 +675,3 @@ class TestRollbackDeployment:
         data = response.json()
         assert data["version"] == "v1.0.0"
         assert data["replicas"] == 2
-

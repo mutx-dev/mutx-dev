@@ -376,6 +376,8 @@ class HealthResponse(BaseModel):
     error: Optional[str] = None
     version: str = "1.0.0"
     uptime_seconds: Optional[float] = None
+    components: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    schema_repairs_applied: list[str] = Field(default_factory=list)
 
 
 # API Key Schemas
@@ -524,7 +526,13 @@ class UsageEventCreate(BaseModel):
         max_length=100,
         description="Type of usage event (e.g., api_call, agent_run, deployment)",
     )
+    resource_type: Optional[str] = Field(
+        None,
+        max_length=100,
+        description="Type of resource that was used",
+    )
     resource_id: Optional[str] = Field(None, max_length=255, description="Resource that was used")
+    credits_used: float = Field(1.0, ge=0.0, description="Credits consumed by this event")
     metadata: Optional[dict[str, Any]] = Field(
         default_factory=dict, description="Additional event metadata"
     )
@@ -538,7 +546,9 @@ class UsageEventResponse(BaseModel):
     id: uuid.UUID
     event_type: str
     user_id: uuid.UUID
+    resource_type: Optional[str]
     resource_id: Optional[str]
+    credits_used: float
     event_metadata: Optional[str] = None  # JSON string from DB
     created_at: datetime
 

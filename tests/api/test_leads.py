@@ -47,7 +47,7 @@ async def test_capture_lead_minimal(client: AsyncClient):
 async def test_capture_contact_alias_success(client: AsyncClient):
     """Test /contacts alias captures leads."""
     response = await client.post(
-        "/v1/contacts",
+        "/v1/leads/contacts",
         json={
             "email": "contact@example.com",
             "name": "Contact Name",
@@ -70,7 +70,7 @@ async def test_list_leads_internal_user(client: AsyncClient, test_user):
 @pytest.mark.asyncio
 async def test_list_contacts_alias_internal_user(client: AsyncClient):
     """Test /contacts alias for listing."""
-    response = await client.get("/v1/contacts")
+    response = await client.get("/v1/leads/contacts")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
@@ -205,7 +205,7 @@ async def test_update_contact_alias_internal_user(client: AsyncClient, db_sessio
     await db_session.refresh(lead)
 
     response = await client.patch(
-        f"/v1/contacts/{lead.id}",
+        f"/v1/leads/contacts/{lead.id}",
         json={"source": "partner-referral"},
     )
     assert response.status_code == 200
@@ -246,5 +246,5 @@ async def test_delete_contact_alias_non_internal_forbidden(
     await db_session.commit()
     await db_session.refresh(lead)
 
-    response = await other_user_client.delete(f"/v1/contacts/{lead.id}")
+    response = await other_user_client.delete(f"/v1/leads/contacts/{lead.id}")
     assert response.status_code == 403

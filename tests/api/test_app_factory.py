@@ -1,0 +1,97 @@
+import pytest
+from httpx import AsyncClient
+from datetime import datetime, timezone
+
+from src.api.main import create_app
+
+
+def _mounted_route_prefixes(app) -> set[str]:
+    prefixes: set[str] = set()
+
+    for route in app.routes:
+        path = getattr(route, "path", None)
+        if not path:
+            continue
+
+        if path == "/metrics":
+            prefixes.add(path)
+            continue
+
+        if not path.startswith("/v1/"):
+            continue
+
+        parts = path.split("/")
+        if len(parts) > 3 and parts[2] == "leads" and parts[3] == "contacts":
+            prefixes.add("/v1/leads/contacts")
+            continue
+
+        prefixes.add(f"/v1/{parts[2]}")
+
+    return prefixes
+
+
+def test_app_factory_mounts_expected_public_routes():
+    app = create_app(
+        enable_lifespan=False,
+        background_monitor_enabled=False,
+        database_required_on_startup=False,
+    )
+
+    mounted_prefixes = _mounted_route_prefixes(app)
+
+    assert mounted_prefixes == {
+        "/metrics",
+        "/v1/agents",
+        "/v1/api-keys",
+        "/v1/auth",
+        "/v1/budgets",
+        "/v1/clawhub",
+        "/v1/deployments",
+        "/v1/ingest",
+        "/v1/leads",
+        "/v1/leads/contacts",
+        "/v1/monitoring",
+        "/v1/rag",
+        "/v1/runs",
+        "/v1/swarms",
+        "/v1/usage",
+        "/v1/webhooks",
+        "/v1/analytics",
+    }
+    assert "/v1/newsletter" not in mounted_prefixes
+    assert "/v1/scheduler" not in mounted_prefixes
+    assert "/v1/sessions" not in mounted_prefixes
+
+
+@pytest.mark.asyncio
+async def test_health_includes_component_status(client: AsyncClient):
+    response = await client.get("/health")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "healthy"
+    assert payload["database"] == "ready"
+    assert payload["schema_repairs_applied"] == []
+    assert payload["components"]["database"]["status"] == "healthy"
+    assert payload["components"]["background_monitor"]["status"] == "disabled"
+
+
+@pytest.mark.asyncio
+async def test_health_degrades_for_background_monitor_failures_while_ready_stays_db_based(
+    client: AsyncClient,
+):
+    client.app.state.background_monitor_enabled = True
+    client.app.state.background_monitor_state.started_at = datetime.now(timezone.utc)
+    client.app.state.background_monitor_state.last_error = "monitor failed"
+    client.app.state.background_monitor_state.last_error_at = datetime.now(timezone.utc)
+    client.app.state.background_monitor_state.consecutive_failures = 2
+
+    health_response = await client.get("/health")
+    ready_response = await client.get("/ready")
+
+    assert health_response.status_code == 200
+    assert health_response.json()["status"] == "degraded"
+    assert health_response.json()["components"]["background_monitor"]["status"] == "degraded"
+
+    assert ready_response.status_code == 200
+    assert ready_response.json()["status"] == "ready"

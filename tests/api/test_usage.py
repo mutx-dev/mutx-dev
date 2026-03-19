@@ -48,6 +48,28 @@ class TestCreateUsageEvent:
         assert data["metadata"] == {"replicas": 2, "region": "us-east-1"}
 
     @pytest.mark.asyncio
+    async def test_create_usage_event_round_trips_resource_type_and_credits(
+        self,
+        client: AsyncClient,
+    ):
+        response = await client.post(
+            "/v1/usage/events",
+            json={
+                "event_type": "deployment_create",
+                "resource_type": "deployment",
+                "resource_id": str(uuid.uuid4()),
+                "credits_used": 2.5,
+                "metadata": {"replicas": 2},
+            },
+        )
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["resource_type"] == "deployment"
+        assert data["credits_used"] == 2.5
+        assert data["metadata"] == {"replicas": 2}
+
+    @pytest.mark.asyncio
     async def test_create_usage_event_requires_auth(self, client_no_auth: AsyncClient):
         """Test that creating a usage event requires authentication."""
         response = await client_no_auth.post(

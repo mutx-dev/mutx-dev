@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import dataclass
 import logging
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -6,12 +7,44 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import select
 
 from src.api import database as database_module
+from src.api.metrics import set_background_monitor_failure_metrics
 from src.api.models import Agent, AgentLog, AgentStatus
 from src.api.services.monitoring import STALE_THRESHOLD_SECONDS, monitor_agent_health
 from src.api.services.self_healer import RecoveryAction, get_self_healing_service
-from src.api.time_utils import utc_now_naive
+from src.api.time_utils import as_utc, utc_now
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class MonitorRuntimeState:
+    started_at: datetime | None = None
+    last_success_at: datetime | None = None
+    last_error_at: datetime | None = None
+    last_error: str | None = None
+    consecutive_failures: int = 0
+
+    def mark_started(self, started_at: datetime | None = None) -> None:
+        self.started_at = started_at or datetime.now(timezone.utc)
+        self.last_error = None
+        self.consecutive_failures = 0
+
+    def mark_success(self, succeeded_at: datetime | None = None) -> None:
+        self.last_success_at = succeeded_at or datetime.now(timezone.utc)
+        self.last_error = None
+        self.consecutive_failures = 0
+
+    def mark_error(self, error: Exception | str, failed_at: datetime | None = None) -> None:
+        self.last_error_at = failed_at or datetime.now(timezone.utc)
+        self.last_error = str(error)
+        self.consecutive_failures += 1
+
+
+_default_monitor_runtime_state = MonitorRuntimeState()
+
+
+def get_monitor_runtime_state() -> MonitorRuntimeState:
+    return _default_monitor_runtime_state
 
 
 def _agent_heartbeat_check(agent_id: str):
@@ -27,8 +60,7 @@ def _agent_heartbeat_check(agent_id: str):
             if not last_heartbeat:
                 return False
 
-            if last_heartbeat.tzinfo is None:
-                last_heartbeat = last_heartbeat.replace(tzinfo=timezone.utc)
+            last_heartbeat = as_utc(last_heartbeat)
 
             return (datetime.now(timezone.utc) - last_heartbeat) <= timedelta(
                 seconds=STALE_THRESHOLD_SECONDS,
@@ -47,7 +79,7 @@ async def _recover_agent_to_running(agent_id: str, metadata):
 
         previous_status = agent.status
         agent.status = AgentStatus.RUNNING.value
-        agent.last_heartbeat = utc_now_naive()
+        agent.last_heartbeat = utc_now()
         session.add(
             AgentLog(
                 agent_id=agent.id,
@@ -87,7 +119,9 @@ async def _sync_self_healing_agents(session, self_healing):
         self_healing.unregister_agent(agent_id)
 
 
-async def start_background_monitor():
+async def start_background_monitor(
+    runtime_state: MonitorRuntimeState | None = None,
+):
     """Main loop for the background service.
 
     This loop intentionally runs only real runtime monitoring and self-healing.
@@ -96,6 +130,9 @@ async def start_background_monitor():
     """
 
     logger.info("Starting background agent monitor...")
+    monitor_state = runtime_state or get_monitor_runtime_state()
+    monitor_state.mark_started()
+    set_background_monitor_failure_metrics(monitor_state.consecutive_failures)
     self_healing = get_self_healing_service()
 
     await self_healing.start()
@@ -113,18 +150,31 @@ async def start_background_monitor():
         while True:
             try:
                 async with database_module.async_session_maker() as session:
-                    # Run real monitoring and self-healing logic.
-                    await monitor_agent_health(session)
-                    if hasattr(self_healing, "health_check_scheduler"):
-                        await _sync_self_healing_agents(session, self_healing)
-                        for agent_id in self_healing.health_check_scheduler.get_all_health():
-                            await self_healing.check_and_recover(agent_id)
+                    try:
+                        # Run real monitoring and self-healing logic.
+                        await monitor_agent_health(session)
+                        if hasattr(self_healing, "health_check_scheduler"):
+                            await _sync_self_healing_agents(session, self_healing)
+                        await session.commit()
+                    except Exception:
+                        await session.rollback()
+                        raise
+
+                if hasattr(self_healing, "health_check_scheduler"):
+                    for agent_id in self_healing.health_check_scheduler.get_all_health():
+                        await self_healing.check_and_recover(agent_id)
+
+                monitor_state.mark_success()
+                set_background_monitor_failure_metrics(monitor_state.consecutive_failures)
 
             except asyncio.CancelledError:
                 raise
             except Exception as e:
+                monitor_state.mark_error(e)
+                set_background_monitor_failure_metrics(monitor_state.consecutive_failures)
                 logger.error(f"Error in background monitor: {e}")
                 await asyncio.sleep(5)
+                continue
 
             await asyncio.sleep(5)  # Run every 5 seconds
     except asyncio.CancelledError:

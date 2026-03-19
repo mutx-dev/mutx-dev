@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.models import Agent, AgentLog, Deployment, Alert, AlertType
 from src.api.services.webhook_service import trigger_agent_status_event, trigger_deployment_event
-from src.api.time_utils import as_utc_naive
+from src.api.time_utils import as_utc
 
 logger = logging.getLogger(__name__)
 
@@ -111,20 +111,20 @@ async def monitor_agent_health(session: AsyncSession):
     result = await session.execute(select(Agent).where(Agent.status == "creating"))
     new_agents = result.scalars().all()
     for agent in new_agents:
-        # Handle both naive and timezone-aware datetimes
-        created = agent.created_at
-        if created and created.tzinfo is None:
-            created = created.replace(tzinfo=timezone.utc)
+        created = as_utc(agent.created_at) if agent.created_at else None
         if created and now - created > timedelta(seconds=10):
             old_status = agent.status
-            agent.status = "running"
-            agent.last_heartbeat = as_utc_naive(now)
+            with session.no_autoflush:
+                dep_check = await session.execute(
+                    select(Deployment).where(Deployment.agent_id == agent.id)
+                )
+                deployment = dep_check.scalar_one_or_none()
 
-            # Ensure a deployment record exists
-            dep_check = await session.execute(
-                select(Deployment).where(Deployment.agent_id == agent.id)
-            )
-            if not dep_check.scalar_one_or_none():
+            agent.status = "running"
+            agent.last_heartbeat = as_utc(now)
+
+            created_deployment = False
+            if deployment is None:
                 deployment = Deployment(
                     agent_id=agent.id,
                     status="running",
@@ -140,6 +140,10 @@ async def monitor_agent_health(session: AsyncSession):
                     event_type="monitor_started",
                     status="running",
                 )
+                created_deployment = True
+            await session.flush()
+
+            if created_deployment:
                 await _emit_deployment_webhook(
                     session,
                     deployment_id=deployment.id,
@@ -163,14 +167,18 @@ async def monitor_agent_health(session: AsyncSession):
     running_agents = result.scalars().all()
 
     for agent in running_agents:
-        last_hb = agent.last_heartbeat or agent.created_at
-        # Handle both naive and timezone-aware datetimes
-        if last_hb:
-            if last_hb.tzinfo is None:
-                last_hb = last_hb.replace(tzinfo=timezone.utc)
+        last_hb = as_utc(agent.last_heartbeat or agent.created_at) if (agent.last_heartbeat or agent.created_at) else None
         if last_hb and now - last_hb > timedelta(seconds=STALE_THRESHOLD_SECONDS):
             logger.warning(f"Monitor: Agent {agent.name} ({agent.id}) is STALE. Marking as FAILED.")
             old_status = agent.status
+            failure_message = (
+                f"System: Agent marked as FAILED due to heartbeat timeout "
+                f"({STALE_THRESHOLD_SECONDS}s)."
+            )
+
+            with session.no_autoflush:
+                deployment = await _get_latest_deployment(session, agent.id)
+
             agent.status = "failed"
 
             # Create Alert
@@ -181,31 +189,29 @@ async def monitor_agent_health(session: AsyncSession):
             )
             session.add(alert)
 
-            # Log failure (skip on DB column error - fix pending migration)
-            try:
-                log = AgentLog(
+            session.add(
+                AgentLog(
                     agent_id=agent.id,
                     level="error",
-                    message=f"System: Agent marked as FAILED due to heartbeat timeout ({STALE_THRESHOLD_SECONDS}s).",
+                    message=failure_message,
                     timestamp=now,
                 )
-                session.add(log)
-            except Exception as e:
-                import logging
-                logging.getLogger(__name__).warning(f"AgentLog insert skipped: {e}")
+            )
 
-            deployment = await _get_latest_deployment(session, agent.id)
             if deployment is not None:
                 deployment.status = "failed"
                 deployment.ended_at = now
-                deployment.error_message = log.message
+                deployment.error_message = failure_message
                 _record_deployment_event(
                     session,
                     deployment,
                     event_type="monitor_failed",
                     status="failed",
-                    error_message=log.message,
+                    error_message=failure_message,
                 )
+            await session.flush()
+
+            if deployment is not None:
                 await _emit_deployment_webhook(
                     session,
                     deployment_id=deployment.id,
@@ -227,15 +233,14 @@ async def monitor_agent_health(session: AsyncSession):
     failed_agents = result.scalars().all()
 
     for agent in failed_agents:
-        # Handle both naive and timezone-aware datetimes
-        updated = agent.updated_at
-        if updated and updated.tzinfo is None:
-            updated = updated.replace(tzinfo=timezone.utc)
+        updated = as_utc(agent.updated_at) if agent.updated_at else None
         if updated and now - updated > timedelta(seconds=HEAL_THRESHOLD_SECONDS):
             logger.info(f"Auto-Healer: Restarting agent {agent.name} ({agent.id})...")
             old_status = agent.status
+            with session.no_autoflush:
+                deployment = await _get_latest_deployment(session, agent.id)
             agent.status = "running"
-            agent.last_heartbeat = as_utc_naive(now)
+            agent.last_heartbeat = as_utc(now)
 
             # Resolve active AGENT_DOWN alerts
             await session.execute(
@@ -248,20 +253,15 @@ async def monitor_agent_health(session: AsyncSession):
                 .values(resolved=True, resolved_at=now)
             )
 
-            # Log recovery (skip on DB column error)
-            try:
-                heal_log = AgentLog(
+            session.add(
+                AgentLog(
                     agent_id=agent.id,
                     level="info",
                     message="System: Control plane detected failure and initiated automatic recovery. Agent is back to RUNNING.",
                     timestamp=now,
                 )
-                session.add(heal_log)
-            except Exception as e:
-                import logging
-                logging.getLogger(__name__).warning(f"AgentLog recovery insert skipped: {e}")
+            )
 
-            deployment = await _get_latest_deployment(session, agent.id)
             if deployment is not None:
                 deployment.status = "running"
                 deployment.started_at = now
@@ -273,6 +273,9 @@ async def monitor_agent_health(session: AsyncSession):
                     event_type="monitor_restarted",
                     status="running",
                 )
+            await session.flush()
+
+            if deployment is not None:
                 await _emit_deployment_webhook(
                     session,
                     deployment_id=deployment.id,
@@ -288,5 +291,3 @@ async def monitor_agent_health(session: AsyncSession):
                 new_status=agent.status,
                 agent_name=agent.name,
             )
-
-    await session.commit()

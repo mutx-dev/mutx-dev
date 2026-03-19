@@ -10,8 +10,9 @@ from sqlalchemy.orm import selectinload
 
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
-from src.api.models import Agent, AgentRun, AgentRunTrace, User, UsageEvent
+from src.api.models import Agent, AgentRun, AgentRunTrace, User
 from src.api.services.analytics import log_analytics_event, AnalyticsEventType
+from src.api.services.usage import track_usage_best_effort
 from src.api.models.schemas import (
     RunCreate,
     RunDetailResponse,
@@ -139,16 +140,13 @@ async def create_run(
         properties={"agent_id": str(agent.id), "run_id": str(run.id)},
     )
 
-    # Track usage event
-    usage_event = UsageEvent(
-        event_type="agent_run_created",
+    await track_usage_best_effort(
+        db=db,
         user_id=current_user.id,
+        event_type="agent_run_created",
         resource_id=str(run.id),
-        event_metadata=f'{{"agent_id": "{agent.id}"}}',
-        created_at=datetime.now(timezone.utc),
+        metadata={"agent_id": str(agent.id)},
     )
-    db.add(usage_event)
-    await db.commit()
 
     persisted_run = await _get_user_run(run.id, current_user, db)
     traces = sorted(persisted_run.traces, key=lambda item: (item.sequence, item.timestamp))

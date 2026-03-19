@@ -192,7 +192,10 @@ class Settings(BaseSettings):
         # Validate database URL format
         if self.database_url:
             db_url = self.database_url.lower()
-            if not db_url.startswith(("postgresql://", "postgres://")):
+            if db_url.startswith(("sqlite://", "sqlite+")):
+                if is_production:
+                    errors.append("DATABASE_URL must use PostgreSQL in production")
+            elif not db_url.startswith(("postgresql://", "postgres://")):
                 errors.append(
                     f"DATABASE_URL must be a valid PostgreSQL connection string, "
                     f"got: {self.database_url[:50]}..."
