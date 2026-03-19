@@ -62,7 +62,7 @@ export function DashboardSectionPage({
                   className="mt-3 max-w-3xl text-sm leading-6"
                   style={{ color: dashboardTokens.textSubtle }}
                 >
-                  This route now uses the ported mutx-control operator section shell, but the content stays truthful to MUTX. These are the next real integrations for this surface.
+                  This route uses the shared MUTX operator shell and stays truthful about what is live today. These are the next real integrations for this surface.
                 </p>
               </div>
               <div
@@ -130,7 +130,7 @@ export function DashboardSectionPage({
                 Port note
               </p>
               <p className="mt-3 text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
-                The shell is in. Real APIs and actions should land here route by route, instead of inventing OpenClaw-only controls that MUTX does not back.
+                The shell is in. Real APIs and actions should land here route by route instead of inventing product behavior that MUTX does not back yet.
               </p>
               <div
                 className="mt-4 rounded-xl border p-3 text-sm"

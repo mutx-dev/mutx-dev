@@ -84,8 +84,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
       </div>
       <div className="min-w-0">
         <div className="flex items-baseline gap-2">
-          <p className="truncate text-sm font-semibold text-slate-100">Mission Control</p>
-          <p className="shrink-0 text-[10px] font-medium uppercase tracking-[0.16em] text-slate-500">v2.0.0</p>
+          <p className="truncate text-sm font-semibold text-slate-100">MUTX</p>
+          <p className="shrink-0 text-[10px] font-medium uppercase tracking-[0.16em] text-slate-500">operator</p>
         </div>
       </div>
     </div>
@@ -95,19 +95,19 @@ export function DashboardShell({ children }: DashboardShellProps) {
     <div className="mt-auto space-y-2 border-t border-[#172238] p-3">
       <div className="rounded-lg border border-[#1d2d46] bg-[#0a1326] px-3 py-2">
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">mutx cli</p>
-        <p className="mt-1 text-xs text-slate-300">Run local tools for agents.</p>
+        <p className="mt-1 text-xs text-slate-300">CLI + SDK access for governed operators.</p>
       </div>
       <div className="rounded-lg border border-[#1d2d46] bg-[#0a1326] px-3 py-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">builderz</p>
-        <p className="mt-1 text-xs text-slate-300">AI-native dev shop surface.</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">control plane</p>
+        <p className="mt-1 text-xs text-slate-300">Deploy, govern, and recover agent systems.</p>
       </div>
       <div className="flex items-center gap-2 rounded-lg border border-[#1d2d46] bg-[#0a1326] px-3 py-2">
         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-semibold text-cyan-200">
           A
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-slate-100">Admin</p>
-          <p className="truncate text-[10px] uppercase tracking-[0.15em] text-slate-500">openclaw</p>
+          <p className="truncate text-sm font-medium text-slate-100">Operator</p>
+          <p className="truncate text-[10px] uppercase tracking-[0.15em] text-slate-500">mutx</p>
         </div>
       </div>
     </div>
