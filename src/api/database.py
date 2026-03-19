@@ -2,8 +2,8 @@ from dataclasses import dataclass
 import logging
 from typing import Any
 
-from sqlalchemy import text
-from sqlalchemy.engine import make_url
+from sqlalchemy import inspect, text
+from sqlalchemy.engine import Connection, make_url
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -173,9 +173,64 @@ async def _run_startup_probe() -> None:
         await conn.execute(text("SELECT 1"))
 
 
+def _has_table(sync_connection: Connection, table_name: str) -> bool:
+    return inspect(sync_connection).has_table(table_name)
+
+
+def _has_column(sync_connection: Connection, table_name: str, column_name: str) -> bool:
+    inspector = inspect(sync_connection)
+    return any(column["name"] == column_name for column in inspector.get_columns(table_name))
+
+
+def _has_index(sync_connection: Connection, table_name: str, index_name: str) -> bool:
+    inspector = inspect(sync_connection)
+    return any(index["name"] == index_name for index in inspector.get_indexes(table_name))
+
+
+def _repair_known_schema_drift(sync_connection: Connection) -> list[str]:
+    from src.api.models.models import AgentLog, RefreshTokenSession
+
+    repaired_objects: list[str] = []
+
+    if not _has_table(sync_connection, AgentLog.__tablename__):
+        AgentLog.__table__.create(bind=sync_connection, checkfirst=True)
+        repaired_objects.append(AgentLog.__tablename__)
+    elif not _has_column(sync_connection, AgentLog.__tablename__, "meta_data"):
+        sync_connection.execute(text("ALTER TABLE agent_logs ADD COLUMN meta_data TEXT"))
+        repaired_objects.append("agent_logs.meta_data")
+
+    if not _has_table(sync_connection, RefreshTokenSession.__tablename__):
+        RefreshTokenSession.__table__.create(bind=sync_connection, checkfirst=True)
+        repaired_objects.append(RefreshTokenSession.__tablename__)
+        return repaired_objects
+
+    for index in sorted(RefreshTokenSession.__table__.indexes, key=lambda item: item.name or ""):
+        if index.name and not _has_index(
+            sync_connection,
+            RefreshTokenSession.__tablename__,
+            index.name,
+        ):
+            index.create(bind=sync_connection, checkfirst=True)
+            repaired_objects.append(f"{RefreshTokenSession.__tablename__}.{index.name}")
+
+    return repaired_objects
+
+
+async def _repair_runtime_schema() -> None:
+    async with engine.begin() as conn:
+        repaired_objects = await conn.run_sync(_repair_known_schema_drift)
+
+    if repaired_objects:
+        logger.warning(
+            "Applied runtime database schema repairs: %s",
+            ", ".join(repaired_objects),
+        )
+
+
 async def init_db() -> None:
     try:
         await _run_startup_probe()
+        await _repair_runtime_schema()
     except Exception as exc:
         if not _should_retry_without_ssl(exc):
             raise
@@ -183,6 +238,7 @@ async def init_db() -> None:
         logger.warning("Database rejected SSL upgrade; retrying with SSL disabled for asyncpg")
         await _reconfigure_engine(override_ssl_mode="disable")
         await _run_startup_probe()
+        await _repair_runtime_schema()
 
 
 async def dispose_engine() -> None:
