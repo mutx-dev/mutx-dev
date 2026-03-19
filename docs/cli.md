@@ -9,13 +9,13 @@ The MUTX CLI distribution lives at repo root and installs the `mutx` entrypoint 
 
 ## Install
 
-Fastest macOS path to open the TUI immediately:
+Fastest macOS path to install MUTX with a guided setup flow:
 
 ```bash
 curl -fsSL https://mutx.dev/install.sh | bash
 ```
 
-That script installs or upgrades the Homebrew distribution, force-links `mutx` if an older shim is already present, runs `mutx status`, and launches `mutx tui`.
+That script installs or upgrades the Homebrew distribution, force-links `mutx` if an older shim is already present, runs `mutx status`, walks API URL and login setup, and offers to launch `mutx tui`.
 
 Editable local install with the operator TUI:
 

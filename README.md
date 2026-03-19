@@ -8,7 +8,7 @@ It brings the pieces operators actually need into one repo: a FastAPI control pl
 
 ## Fastest Start
 
-If you are on macOS and just want the TUI open as fast as possible, copy-paste this:
+If you are on macOS and just want the fastest guided path into MUTX, copy-paste this:
 
 ```bash
 curl -fsSL https://mutx.dev/install.sh | bash
@@ -20,9 +20,10 @@ That bootstrap script will:
 - install or upgrade `mutx`
 - relink the Homebrew binary if an older `/opt/homebrew/bin/mutx` shim already exists
 - run `mutx status`
-- launch `mutx tui`
+- walk you through API URL and login setup
+- offer to open `mutx tui`
 
-If you have not logged in yet, the TUI still opens in local-only mode and shows the current config/auth state instead of crashing.
+If you skip login, you can still open the TUI later in local-only mode and inspect the current config/auth state without crashing.
 
 ## Why MUTX Exists
 
@@ -178,7 +179,7 @@ mutx tui
 
 If `mutx` still resolves to a stale wrapper and raises `ModuleNotFoundError: No module named 'cli'`, verify that `which mutx` points at the Homebrew-linked path under `/opt/homebrew/bin/mutx` and not an older script.
 
-One-command TUI bootstrap on macOS:
+One-command guided install on macOS:
 
 ```bash
 curl -fsSL https://mutx.dev/install.sh | bash

@@ -26,16 +26,16 @@ const tabs: QuickstartTab[] = ['one-liner', 'homebrew', 'hackable', 'api']
 const tabContent: Record<QuickstartTab, QuickstartContent> = {
   'one-liner': {
     label: 'One-liner',
-    intro: '# One paste. Homebrew handles the install. The TUI opens when it is done.',
+    intro: '# One paste. Homebrew handles the install, then MUTX walks you through config, login, and the optional TUI handoff.',
     environment: 'macOS',
-    mode: 'TUI first',
+    mode: 'Guided setup',
     footer:
-      'macOS-first. Uses the published Homebrew tap, force-links mutx if an older shim already exists, runs mutx status, and launches mutx tui in local-only mode if you have not authenticated yet.',
+      'macOS-first. Uses the published Homebrew tap, force-links mutx if an older shim already exists, runs mutx status, then opens a guided setup flow for API URL, login, and optional mutx tui launch.',
     blocks: [
       {
         id: 'installer',
         label: 'Installer',
-        hint: 'The fastest path from zero to the operator shell.',
+        hint: 'The fastest path from zero to a guided MUTX setup and operator shell.',
         script: 'curl -fsSL https://mutx.dev/install.sh | bash',
       },
     ],

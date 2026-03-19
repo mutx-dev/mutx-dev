@@ -4,7 +4,7 @@ Mirror of the published third-party tap repository `mutx-dev/homebrew-tap`.
 
 ## Install
 
-Fastest macOS path to install and open the TUI:
+Fastest macOS path to install MUTX with a guided setup flow:
 
 ```bash
 curl -fsSL https://mutx.dev/install.sh | bash
