@@ -9,6 +9,16 @@ brew tap mutx-dev/homebrew-tap
 brew install mutx
 ```
 
+If Homebrew reports that `mutx` is already installed but not linked, overwrite the older shim in `/opt/homebrew/bin` with the Homebrew-managed one:
+
+```bash
+brew link --overwrite mutx
+hash -r
+which mutx
+```
+
+Use `brew link --overwrite mutx --dry-run` first if you want to inspect what will be replaced.
+
 ## Smoke check
 
 ```bash
@@ -18,6 +28,8 @@ mutx tui
 ```
 
 `mutx` reads the existing CLI config from `~/.mutx/config.json`, including `api_url`, `api_key`, and `refresh_token`.
+
+If `mutx` throws `ModuleNotFoundError: No module named 'cli'`, your shell is still picking up a stale non-Brew wrapper instead of the linked Homebrew binary.
 
 ## Release process
 

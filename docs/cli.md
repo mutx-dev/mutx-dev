@@ -27,6 +27,22 @@ brew install mutx
 
 The tap formula is expected to smoke-test the package with `mutx status`, not a networked command.
 
+If Homebrew says `mutx` is installed but not linked, there is usually an older `mutx` shim already present in `/opt/homebrew/bin`. Relink the Homebrew binary with:
+
+```bash
+brew link --overwrite mutx
+hash -r
+which mutx
+```
+
+If you want to inspect the conflict before overwriting:
+
+```bash
+brew link --overwrite mutx --dry-run
+```
+
+If `mutx` still fails with `ModuleNotFoundError: No module named 'cli'`, your shell is still resolving the stale wrapper rather than the Homebrew-managed executable.
+
 ## Configuration
 
 The CLI stores configuration in `~/.mutx/config.json` and reuses the existing `CLIConfig` shape from [`cli/config.py`](../cli/config.py):

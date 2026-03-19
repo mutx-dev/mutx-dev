@@ -136,6 +136,20 @@ brew tap mutx-dev/homebrew-tap
 brew install mutx
 ```
 
+If Homebrew reports that `mutx` is installed but not linked, you likely already have an older `mutx` shim in `/opt/homebrew/bin/mutx` from a previous source or manual install. In that case, relink the Homebrew-managed binary:
+
+```bash
+brew link --overwrite mutx
+hash -r
+which mutx
+```
+
+If you want to inspect the overwrite first:
+
+```bash
+brew link --overwrite mutx --dry-run
+```
+
 After install:
 
 ```bash
@@ -143,6 +157,8 @@ mutx --help
 mutx status
 mutx tui
 ```
+
+If `mutx` still resolves to a stale wrapper and raises `ModuleNotFoundError: No module named 'cli'`, verify that `which mutx` points at the Homebrew-linked path under `/opt/homebrew/bin/mutx` and not an older script.
 
 ## Local Quickstart
 
