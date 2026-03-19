@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Command, Menu, Search, Settings2, X } from "lucide-react";
+import { Bell, Bot, Command, Layers, Menu, Settings2, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -189,31 +189,35 @@ export function DashboardShell({ children }: DashboardShellProps) {
                   GW Connected
                 </div>
 
-                <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-[#22314b] bg-[#0a1428] px-3 py-2">
-                  <Search className="h-4 w-4 shrink-0 text-slate-500" />
-                  <input
-                    type="text"
-                    value="Jump to page, task, agent..."
-                    readOnly
-                    aria-label="Jump to page, task, or agent"
-                    className="w-full bg-transparent text-sm text-slate-300 outline-none placeholder:text-slate-500"
-                  />
-                  <span className="hidden rounded border border-[#283a59] bg-[#111d35] px-1.5 py-0.5 text-[10px] text-slate-400 sm:inline-flex">
-                    ⌘K
-                  </span>
+                <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-[#22314b] bg-[#0a1428] px-3 py-2 text-sm text-slate-300">
+                  <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
+                    <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-400/10 text-cyan-200">
+                      <Bot className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-slate-100">Canonical /dashboard surface</p>
+                      <p className="truncate text-xs text-slate-500">Lifecycle, governance, deployments, runs, traces, keys, and health.</p>
+                    </div>
+                  </div>
+                  <div className="hidden items-center gap-2 lg:flex">
+                    <span className="inline-flex items-center gap-1 rounded-md border border-[#283a59] bg-[#111d35] px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-slate-400">
+                      <Layers className="h-3.5 w-3.5" />
+                      Control plane
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-md border border-[#283a59] bg-[#111d35] px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-slate-400">
+                      Surface {activeItem?.title ?? "Overview"}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="hidden items-center gap-4 text-[11px] text-slate-500 xl:flex">
                   <span>
-                    Sessions <span className="font-mono text-slate-300">n/a</span>
+                    Resources <span className="text-slate-300">Agents · Deployments · Runs</span>
                   </span>
                   <span>
-                    Events <span className="text-emerald-300">• Live</span>
+                    Posture <span className="text-cyan-200">Governed</span>
                   </span>
                   <span className="font-mono text-slate-300">{clockLabel}</span>
-                  <span>
-                    Surface <span className="text-slate-300">{activeItem?.title ?? "Overview"}</span>
-                  </span>
                   <button
                     type="button"
                     className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#1d2d46] bg-[#0a1326] text-slate-400 transition hover:text-slate-200"

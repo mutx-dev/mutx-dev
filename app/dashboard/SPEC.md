@@ -1,7 +1,7 @@
 # MUTX Dashboard Redesign Specification
 
 ## Overview
-MUTX Dashboard - "The Vercel for production AI agents" control plane. Premium dark-first, operator-grade interface for managing autonomous agents deployed to dedicated VPCs.
+MUTX Dashboard - premium dark-first, operator-grade control plane for managing AI agents with explicit lifecycle, governance, and deployment semantics.
 
 ---
 
@@ -25,13 +25,11 @@ MUTX Dashboard - "The Vercel for production AI agents" control plane. Premium da
 | `/dashboard/api-keys` | APIKeysPage | Key Management |
 | `/dashboard/monitoring` | MonitoringPage | System Health |
 
-### Concept Translation
-- projects → agents
-- deployments → swarms
-- builds → runs
-- logs → traces
-- cache → memory
-- usage → budgets
+### Product Semantics
+- agents are first-class resources
+- deployments remain deployments, not borrowed platform metaphors
+- runs and traces expose execution history and observability
+- memory, budgets, and orchestration stay truthful to real MUTX product scope
 
 ---
 
