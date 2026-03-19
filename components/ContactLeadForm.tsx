@@ -83,9 +83,9 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
   }
 
   return (
-    <div className={cn('rounded-2xl border border-white/10 bg-[#0d0d0d] p-6 shadow-xl', className)}>
+    <div className={cn('site-panel-strong p-6', className)}>
       <div className="mb-5">
-        <div className="eyebrow mb-3">Institutional contact</div>
+        <div className="site-kicker mb-3">Institutional contact</div>
         <h2 className="text-2xl font-medium text-white">Send a structured inquiry</h2>
         <p className="mt-2 text-sm leading-6 text-white/60">
           Use one slim form for funding, partnerships, contributions, ideas, demos, or general inbound.
@@ -113,12 +113,12 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
           />
 
           <label className="block text-sm text-white/70">
-            <span className="mb-2 block">Inquiry type</span>
+            <span className="site-form-label">Inquiry type</span>
             <select
               required
               value={inquiryType}
               onChange={(event) => setInquiryType(event.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-black px-4 py-2.5 text-sm text-white focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/20"
+              className="site-input"
             >
               {INQUIRY_TYPES.map((item) => (
                 <option key={item.value} value={item.value}>
@@ -130,47 +130,47 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
 
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block text-sm text-white/70">
-              <span className="mb-2 block">Name</span>
+              <span className="site-form-label">Name</span>
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder="Your name"
-                className="w-full rounded-lg border border-white/10 bg-black px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/20"
+                className="site-input"
               />
             </label>
 
             <label className="block text-sm text-white/70">
-              <span className="mb-2 block">Work email</span>
+              <span className="site-form-label">Work email</span>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@company.com"
-                className="w-full rounded-lg border border-white/10 bg-black px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/20"
+                className="site-input"
               />
             </label>
           </div>
 
           <label className="block text-sm text-white/70">
-            <span className="mb-2 block">Organization</span>
+            <span className="site-form-label">Organization</span>
             <input
               value={organization}
               onChange={(event) => setOrganization(event.target.value)}
               placeholder="Firm, company, studio, or fund"
-              className="w-full rounded-lg border border-white/10 bg-black px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/20"
+              className="site-input"
             />
           </label>
 
           <label className="block text-sm text-white/70">
-            <span className="mb-2 block">Message</span>
+            <span className="site-form-label">Message</span>
             <textarea
               required
               value={message}
               onChange={(event) => setMessage(event.target.value)}
               placeholder={MESSAGE_PLACEHOLDERS[inquiryType]}
               rows={6}
-              className="w-full rounded-lg border border-white/10 bg-black px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/20"
+              className="site-input"
             />
           </label>
 
@@ -181,11 +181,7 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
             </div>
           ) : null}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <button type="submit" disabled={loading} className="site-button-primary disabled:cursor-not-allowed disabled:opacity-50">
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             {loading ? 'Sending…' : 'Send inquiry'}
           </button>

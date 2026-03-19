@@ -58,10 +58,10 @@ const directChannels = [
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen bg-black px-6 py-20 text-white">
-      <div className="mx-auto max-w-7xl">
+    <main className="site-page px-6 py-28 text-white">
+      <div className="site-shell">
         <div className="mb-14 max-w-4xl">
-          <div className="eyebrow mb-5">Contact</div>
+          <div className="site-kicker mb-5">Contact</div>
           <h1 className="text-4xl font-medium tracking-tight sm:text-6xl">Contact MUTX.</h1>
           <p className="mt-5 max-w-3xl text-base leading-7 text-white/60 sm:text-lg">
             This page is for institutional inbound: funding, partnerships, contributions, ideas, demos, hosted access,
@@ -71,7 +71,7 @@ export default function ContactPage() {
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {inquiryTracks.map((track) => (
-            <div key={track.title} className="rounded-2xl border border-white/10 bg-[#0d0d0d] p-5">
+            <div key={track.title} className="site-panel p-5">
               <p className="text-sm font-medium text-white">{track.title}</p>
               <p className="mt-3 text-sm leading-6 text-white/60">{track.body}</p>
             </div>
@@ -82,7 +82,7 @@ export default function ContactPage() {
           <ContactLeadForm />
 
           <div className="space-y-6">
-            <div className="rounded-2xl border border-white/10 bg-[#0d0d0d] p-6">
+            <div className="site-panel p-6">
               <h2 className="text-xl font-medium text-white">What to include</h2>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-white/60">
                 <li>• who you are and what organization you represent</li>
@@ -92,7 +92,7 @@ export default function ContactPage() {
               </ul>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-[#0d0d0d] p-6">
+            <div className="site-panel p-6">
               <h2 className="text-xl font-medium text-white">Direct channels</h2>
               <div className="mt-4 space-y-4">
                 {directChannels.map((item) => (
@@ -101,7 +101,7 @@ export default function ContactPage() {
                     href={item.href}
                     target={item.href.startsWith('http') ? '_blank' : undefined}
                     rel={item.href.startsWith('http') ? 'noreferrer' : undefined}
-                    className="block rounded-xl border border-white/10 bg-black/40 p-4 transition-colors hover:border-white/20 hover:bg-black/60"
+                    className="block rounded-xl border border-white/10 bg-black/20 p-4 transition-colors hover:border-white/20 hover:bg-black/40"
                   >
                     <div className="flex items-center gap-3 text-white">
                       <item.icon className="h-4 w-4 text-white/80" />

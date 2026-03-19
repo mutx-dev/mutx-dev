@@ -1,91 +1,53 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import Image from 'next/image'
 
-const APP_DASHBOARD_URL = 'https://app.mutx.dev/dashboard'
 const APP_LOGIN_URL = 'https://app.mutx.dev/login'
 const APP_REGISTER_URL = 'https://app.mutx.dev/register'
+const DOCS_URL = 'https://docs.mutx.dev'
 
 export function AuthNav() {
   const pathname = usePathname()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const isAuthPage = pathname === '/login' || pathname === '/register' || pathname === '/forgot-password' || pathname === '/reset-password'
+  const isHiddenRoute = pathname === '/' || pathname.startsWith('/dashboard') || pathname.startsWith('/app')
 
-  useEffect(() => {
-    async function checkAuth() {
-      try {
-        const response = await fetch('/api/auth/me', { cache: 'no-store' })
-        setIsAuthenticated(response.ok)
-      } catch {
-        setIsAuthenticated(false)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    checkAuth()
-  }, [pathname])
-
-  const isAuthPage = pathname === '/login' || pathname === '/register'
-  const isHomePage = pathname === '/'
-  const isDashboardRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/app')
-
-  if (isDashboardRoute || isHomePage) {
+  if (isHiddenRoute) {
     return null
   }
 
-  if (loading) {
-    return (
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="relative h-8 w-8">
-              <Image src="/logo.png" alt="MUTX" fill className="object-contain" />
-            </div>
-            <span className="text-sm font-semibold uppercase tracking-[0.28em] text-white/90">MUTX</span>
-          </Link>
-        </div>
-      </nav>
-    )
-  }
-
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="relative h-8 w-8">
-            <Image src="/logo.png" alt="MUTX" fill className="object-contain" />
+    <nav className="site-topbar">
+      <div className="site-shell flex items-center justify-between py-4">
+        <Link href="/" className="site-brand">
+          <div className="site-brand-mark">
+            <Image src="/logo.png" alt="MUTX" fill className="object-contain p-1.5" />
           </div>
-          <span className="text-sm font-semibold uppercase tracking-[0.28em] text-white/90">MUTX</span>
+          <div>
+            <p className="site-brand-overline">MUTX</p>
+            <p className="site-brand-title">control plane for agents with a pulse</p>
+          </div>
         </Link>
 
         <div className="flex items-center gap-4">
-          {isAuthenticated ? (
-            <a
-              href={APP_DASHBOARD_URL}
-              className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition-opacity hover:opacity-90"
-            >
-              Dashboard
-            </a>
-          ) : !isAuthPage ? (
+          {!isAuthPage ? (
             <>
-              <a
-                href={APP_LOGIN_URL}
-                className="text-sm text-white/60 transition hover:text-white"
-              >
+              <a href={DOCS_URL} target="_blank" rel="noreferrer" className="site-nav-link hidden sm:block">
+                Docs
+              </a>
+              <a href={APP_LOGIN_URL} className="site-nav-link">
                 Sign in
               </a>
-              <a
-                href={APP_REGISTER_URL}
-                className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition-opacity hover:opacity-90"
-              >
-                Get Started
+              <a href={APP_REGISTER_URL} className="site-button-accent">
+                Get started
               </a>
             </>
-          ) : null}
+          ) : (
+            <a href={DOCS_URL} target="_blank" rel="noreferrer" className="site-nav-link">
+              Docs
+            </a>
+          )}
         </div>
       </div>
     </nav>

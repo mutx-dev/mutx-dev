@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     description: 'Deploy agents like software. Govern them like systems. Open-source infrastructure with a pulse.',
     url: 'https://mutx.dev',
     siteName: 'MUTX',
-    images: [{ url: 'https://mutx.dev/landing/hero-manifesto.png', width: 1536, height: 1024, alt: 'MUTX control plane landing page hero art' }],
+    images: [{ url: 'https://mutx.dev/landing/victory-core.png', width: 1536, height: 1024, alt: 'MUTX robot holding the MUTX mark aloft' }],
     type: 'website',
   },
   twitter: {
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     site: '@mutxdev',
     title: 'MUTX | The Control Plane for AI Agents',
     description: 'Open-source control plane for teams deploying, governing, and recovering AI agents in the wild.',
-    images: ['https://mutx.dev/landing/hero-manifesto.png'],
+    images: ['https://mutx.dev/landing/victory-core.png'],
   },
   icons: {
     icon: '/favicon.ico',
