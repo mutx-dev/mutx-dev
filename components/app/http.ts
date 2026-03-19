@@ -1,3 +1,15 @@
+export class ApiRequestError extends Error {
+  status: number;
+  code?: string;
+
+  constructor(message: string, status: number, code?: string) {
+    super(message);
+    this.name = "ApiRequestError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
 export function extractApiErrorMessage(payload: unknown, fallback = "Request failed") {
   if (typeof payload === "string" && payload.trim().length > 0) {
     return payload;
@@ -39,18 +51,48 @@ export function extractApiErrorMessage(payload: unknown, fallback = "Request fai
   return fallback;
 }
 
+function extractApiErrorCode(payload: unknown) {
+  if (!payload || typeof payload !== "object") return undefined;
+
+  const record = payload as Record<string, unknown>;
+  const error = record.error;
+  if (error && typeof error === "object") {
+    const code = (error as Record<string, unknown>).code;
+    if (typeof code === "string" && code.trim().length > 0) {
+      return code;
+    }
+  }
+
+  const code = record.code;
+  if (typeof code === "string" && code.trim().length > 0) {
+    return code;
+  }
+
+  return undefined;
+}
+
+async function parseJsonResponse(response: Response) {
+  return response.json().catch(() => ({ detail: "Request failed" }));
+}
+
+function assertOk(response: Response, payload: unknown) {
+  if (response.ok) return;
+
+  throw new ApiRequestError(
+    extractApiErrorMessage(payload, "Request failed"),
+    response.status,
+    extractApiErrorCode(payload),
+  );
+}
+
 export async function readJson<T>(
   input: RequestInfo | URL,
   init?: RequestInit,
 ): Promise<T> {
   const response = await fetch(input, { ...init, cache: "no-store" });
-  const payload = await response
-    .json()
-    .catch(() => ({ detail: "Request failed" }));
+  const payload = await parseJsonResponse(response);
 
-  if (!response.ok) {
-    throw new Error(extractApiErrorMessage(payload, "Request failed"));
-  }
+  assertOk(response, payload);
 
   return payload as T;
 }
@@ -60,13 +102,9 @@ export async function writeJson<T>(
   init?: RequestInit,
 ): Promise<T> {
   const response = await fetch(input, { ...init, cache: "no-store" });
-  const payload = await response
-    .json()
-    .catch(() => ({ detail: "Request failed" }));
+  const payload = await parseJsonResponse(response);
 
-  if (!response.ok) {
-    throw new Error(extractApiErrorMessage(payload, "Request failed"));
-  }
+  assertOk(response, payload);
 
   return payload as T;
 }
