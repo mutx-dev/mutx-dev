@@ -443,7 +443,9 @@ def test_agents_metrics_hits_canonical_route_and_renders_metrics(monkeypatch) ->
         "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
 
-    result = CliRunner().invoke(cli, ["agents", "metrics", agent_id, "--limit", "10", "--skip", "2"])
+    result = CliRunner().invoke(
+        cli, ["agents", "metrics", agent_id, "--limit", "10", "--skip", "2"]
+    )
 
     assert result.exit_code == 0
     assert captured == {

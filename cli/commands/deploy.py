@@ -209,14 +209,16 @@ def deployment_versions(deployment_id: str):
             click.echo("No deployment versions found.")
             return
 
-        click.echo(f"Deployment: {payload.get('deployment_id')} | versions: {payload.get('total', len(items))}")
+        click.echo(
+            f"Deployment: {payload.get('deployment_id')} | versions: {payload.get('total', len(items))}"
+        )
         for item in items:
             click.echo(
                 " | ".join(
                     [
                         f"v{item.get('version', 'unknown')}",
-                        str(item.get('status', 'unknown')),
-                        str(item.get('created_at', '')),
+                        str(item.get("status", "unknown")),
+                        str(item.get("created_at", "")),
                     ]
                 )
             )
@@ -228,7 +230,9 @@ def deployment_versions(deployment_id: str):
 
 @deploy_group.command(name="rollback")
 @click.argument("deployment_id")
-@click.option("--version", "version_number", required=True, type=int, help="Version number to restore")
+@click.option(
+    "--version", "version_number", required=True, type=int, help="Version number to restore"
+)
 def rollback_deployment(deployment_id: str, version_number: int):
     """Rollback a deployment to a prior version"""
     config = CLIConfig()
@@ -254,7 +258,9 @@ def rollback_deployment(deployment_id: str, version_number: int):
     elif response.status_code == 404:
         click.echo("Error: Deployment not found", err=True)
     elif response.status_code == 400:
-        click.echo(f"Error: {response.json().get('detail', 'Cannot rollback deployment')}", err=True)
+        click.echo(
+            f"Error: {response.json().get('detail', 'Cannot rollback deployment')}", err=True
+        )
     else:
         click.echo(f"Error: {response.text}", err=True)
 

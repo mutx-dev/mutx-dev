@@ -427,7 +427,9 @@ def test_deployments_rollback_hits_contract_route_and_maps_payload() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
         captured["body"] = request.content.decode()
-        return httpx.Response(200, json=_deployment_payload(id=str(deployment_id), status="running"))
+        return httpx.Response(
+            200, json=_deployment_payload(id=str(deployment_id), status="running")
+        )
 
     with httpx.Client(
         base_url="https://api.test", transport=httpx.MockTransport(handler)
@@ -448,7 +450,9 @@ async def test_deployments_arollback_hits_contract_route_and_maps_payload() -> N
     def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
         captured["body"] = request.content.decode()
-        return httpx.Response(200, json=_deployment_payload(id=str(deployment_id), status="running"))
+        return httpx.Response(
+            200, json=_deployment_payload(id=str(deployment_id), status="running")
+        )
 
     async with httpx.AsyncClient(
         base_url="https://api.test",

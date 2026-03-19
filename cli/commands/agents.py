@@ -146,7 +146,6 @@ def stop_agent(agent_id: str):
         _echo_service_error(exc)
 
 
-
 @agents_group.command(name="metrics")
 @click.argument("agent_id")
 @click.option("--limit", "-l", default=100, help="Number of metric samples to fetch")
@@ -244,6 +243,7 @@ def update_config(agent_id: str, config_json: str):
         click.echo("Error: Agent not found", err=True)
     else:
         click.echo(f"Error: {response.text}", err=True)
+
 
 @agents_group.command(name="status")
 @click.argument("agent_id")

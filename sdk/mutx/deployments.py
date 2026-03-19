@@ -338,7 +338,6 @@ class Deployments:
         response.raise_for_status()
         return response.json()
 
-
     def versions(self, deployment_id: UUID | str) -> DeploymentVersionHistory:
         self._require_sync_client()
         response = self._client.get(f"/v1/deployments/{deployment_id}/versions")
