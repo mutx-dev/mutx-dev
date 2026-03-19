@@ -2,10 +2,9 @@ class Mutx < Formula
   include Language::Python::Virtualenv
 
   desc "Operator CLI and Textual TUI for the MUTX control plane"
-  homepage "https://github.com/mutx-dev/mutx-dev"
-  # Release publishing should swap this commit archive to the matching cli-vX.Y.Z tag archive.
-  url "https://github.com/mutx-dev/mutx-dev/archive/ab917480d1448569fc5288170bb59c95661aa5fa.tar.gz"
-  sha256 "b4e393f3178b86f0da69a8ecd072073aa39598475c9df28d4949354fa223a51e"
+  homepage "https://mutx.dev"
+  url "https://github.com/mutx-dev/mutx-dev/archive/refs/tags/cli-v0.2.0.tar.gz"
+  sha256 "1f864ed99912296e6bd9174a203b15c849bbcbe877fc0701f54202103e074c0a"
   license "MIT"
   version "0.2.0"
 

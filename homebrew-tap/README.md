@@ -1,24 +1,30 @@
 # MUTX Homebrew Tap
 
-This directory is the scaffold for the third-party tap repository `mutx-dev/homebrew-tap`.
+Mirror of the published third-party tap repository `mutx-dev/homebrew-tap`.
 
-## What to update on each CLI release
-
-1. Copy this directory into the tap repository root.
-2. Update `Formula/mutx.rb`:
-   - `url` from the current commit archive to the matching `cli-vX.Y.Z` source archive
-   - `sha256` to the tagged archive checksum
-   - `version` to the CLI distribution version from the root `pyproject.toml`
-3. Commit and push the tap change.
-
-## Validation
-
-The formula test must stay non-networked:
+## Install
 
 ```bash
 brew tap mutx-dev/homebrew-tap
 brew install mutx
-mutx status
 ```
 
-The runtime dependency resources in the formula were generated from a successful local `pip install -e ".[dev,tui]"` resolution against the current repo state.
+## Smoke check
+
+```bash
+mutx --help
+mutx status
+mutx tui
+```
+
+`mutx` reads the existing CLI config from `~/.mutx/config.json`, including `api_url`, `api_key`, and `refresh_token`.
+
+## Release process
+
+1. Bump the CLI version in the monorepo `pyproject.toml`.
+2. Push the monorepo release to `main`.
+3. Create and push the matching `cli-vX.Y.Z` tag.
+4. Update `Formula/mutx.rb` to the new tag tarball and checksum.
+5. Commit and push the tap repo update.
+
+The formula test must remain non-networked. Keep it on `mutx status` or `mutx --help`.
