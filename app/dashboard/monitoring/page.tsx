@@ -14,7 +14,7 @@ export default function DashboardMonitoringPage() {
     <div className="space-y-6">
       <RouteHeader
         title="Monitoring"
-        description="Mission-control shell for truthful health, telemetry, and alerting integrations."
+        description="Truthful health, telemetry, and alerting integrations for the MUTX control plane."
         icon={Activity}
         iconTone="text-sky-400 bg-sky-400/10"
         badge="observability surface"
