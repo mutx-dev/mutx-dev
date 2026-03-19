@@ -41,6 +41,26 @@ class DeploymentEventHistory:
         self._data = data
 
 
+class DeploymentVersion:
+    def __init__(self, data: dict[str, Any]):
+        self.id = UUID(data["id"])
+        self.deployment_id = UUID(data["deployment_id"])
+        self.version = data["version"]
+        self.config_snapshot = data["config_snapshot"]
+        self.status = data["status"]
+        self.created_at = _parse_datetime(data["created_at"])
+        self.rolled_back_at = _parse_datetime(data.get("rolled_back_at"))
+        self._data = data
+
+
+class DeploymentVersionHistory:
+    def __init__(self, data: dict[str, Any]):
+        self.deployment_id = UUID(data["deployment_id"])
+        self.items = [DeploymentVersion(item) for item in data.get("items", [])]
+        self.total = data["total"]
+        self._data = data
+
+
 class Deployment:
     def __init__(self, data: dict[str, Any]):
         self.id = UUID(data["id"])
@@ -317,3 +337,34 @@ class Deployments:
         )
         response.raise_for_status()
         return response.json()
+
+
+    def versions(self, deployment_id: UUID | str) -> DeploymentVersionHistory:
+        self._require_sync_client()
+        response = self._client.get(f"/v1/deployments/{deployment_id}/versions")
+        response.raise_for_status()
+        return DeploymentVersionHistory(response.json())
+
+    async def aversions(self, deployment_id: UUID | str) -> DeploymentVersionHistory:
+        self._require_async_client()
+        response = await self._client.get(f"/v1/deployments/{deployment_id}/versions")
+        response.raise_for_status()
+        return DeploymentVersionHistory(response.json())
+
+    def rollback(self, deployment_id: UUID | str, version: int) -> Deployment:
+        self._require_sync_client()
+        response = self._client.post(
+            f"/v1/deployments/{deployment_id}/rollback",
+            json={"version": version},
+        )
+        response.raise_for_status()
+        return Deployment(response.json())
+
+    async def arollback(self, deployment_id: UUID | str, version: int) -> Deployment:
+        self._require_async_client()
+        response = await self._client.post(
+            f"/v1/deployments/{deployment_id}/rollback",
+            json={"version": version},
+        )
+        response.raise_for_status()
+        return Deployment(response.json())

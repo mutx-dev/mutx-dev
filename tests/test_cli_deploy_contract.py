@@ -269,3 +269,67 @@ def test_deploy_metrics_hits_contract_route_and_renders_points(monkeypatch) -> N
         },
     }
     assert "2026-03-12T15:10:00 | cpu: 0.5 | memory: 0.75" in result.output
+
+
+def test_deploy_versions_hits_contract_route_and_renders_items(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["params"] = params
+        return DummyResponse(
+            200,
+            {
+                "deployment_id": "dep-123",
+                "total": 2,
+                "items": [
+                    {
+                        "version": 2,
+                        "status": "current",
+                        "created_at": "2026-03-12T16:00:00Z",
+                    }
+                ],
+            },
+        )
+
+    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.deploy.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["deploy", "versions", "dep-123"])
+
+    assert result.exit_code == 0
+    assert captured == {
+        "path": "/v1/deployments/dep-123/versions",
+        "params": None,
+    }
+    assert "Deployment: dep-123 | versions: 2" in result.output
+    assert "v2 | current | 2026-03-12T16:00:00Z" in result.output
+
+
+def test_deploy_rollback_hits_contract_route_and_renders_status(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_post(path: str, json: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["json"] = json
+        return DummyResponse(200, {"id": "dep-123", "status": "running", "version": "v1.0.0"})
+
+    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.deploy.get_client", lambda config: SimpleNamespace(post=fake_post)
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["deploy", "rollback", "dep-123", "--version", "2"])
+
+    assert result.exit_code == 0
+    assert captured == {
+        "path": "/v1/deployments/dep-123/rollback",
+        "json": {"version": 2},
+    }
+    assert "Rolled back deployment: dep-123" in result.output
+    assert "Status: running" in result.output
+    assert "Version: v1.0.0" in result.output
