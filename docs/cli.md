@@ -9,7 +9,21 @@ The CLI is a Click application defined in `cli/` and installed from the repo roo
 
 ## Install
 
+### From PyPI (recommended)
+
 ```bash
+pip install mutx
+```
+
+### Homebrew status
+
+Homebrew support is planned but not published yet. Track progress in issue `#1140` rather than expecting `brew install mutx` to work today.
+
+### From Source
+
+```bash
+git clone https://github.com/mutx-dev/mutx-dev
+cd mutx-dev
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -49,7 +63,7 @@ The CLI can log in, but it does not currently register users.
 Create a user first via the API:
 
 ```bash
-curl -X POST http://localhost:8000/auth/register \
+curl -X POST http://localhost:8000/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
 ```
@@ -61,6 +75,31 @@ mutx login --email you@example.com
 mutx whoami
 mutx status
 ```
+
+## TUI Usage Guide
+
+The TUI (Textual User Interface) provides an interactive terminal interface for managing agents and deployments.
+
+> **Note:** TUI support exists, but it is still evolving. See issue `#1139` for the broader status of the interface.
+
+### Installing TUI dependencies
+
+```bash
+pip install 'mutx[tui]'
+```
+
+### Launching the TUI
+
+```bash
+mutx tui
+```
+
+### TUI navigation
+
+- Use arrow keys to navigate menus
+- Press `Enter` to select
+- Press `Esc` to go back
+- Press `Ctrl+C` to exit
 
 ## Commands
 
@@ -150,6 +189,10 @@ mutx deploy restart YOUR_DEPLOYMENT_ID
 # Fetch webhook delivery history
 mutx webhooks deliveries YOUR_WEBHOOK_ID --limit 10
 ```
+
+## Troubleshooting
+
+For common issues and solutions, see the [Troubleshooting Guide](./troubleshooting/faq.md).
 
 ## When in Doubt
 
