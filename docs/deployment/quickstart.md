@@ -31,7 +31,7 @@ npm install
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -e ".[dev]"
+pip install -e ".[dev,tui]"
 cp .env.example .env
 ```
 
@@ -100,7 +100,7 @@ curl http://localhost:8000/ready
 ### Create a local user
 
 ```bash
-curl -X POST http://localhost:8000/auth/register \
+curl -X POST http://localhost:8000/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
 ```
@@ -108,7 +108,7 @@ curl -X POST http://localhost:8000/auth/register \
 Log in and save the access token:
 
 ```bash
-curl -X POST http://localhost:8000/auth/login \
+curl -X POST http://localhost:8000/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","password":"StrongPass1!"}'
 ```
@@ -120,14 +120,14 @@ curl -X POST http://localhost:8000/auth/login \
 Confirm your auth first:
 
 ```bash
-curl http://localhost:8000/auth/me \
+curl http://localhost:8000/v1/auth/me \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 Create the agent:
 
 ```bash
-curl -X POST http://localhost:8000/agents \
+curl -X POST http://localhost:8000/v1/agents \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -137,13 +137,13 @@ curl -X POST http://localhost:8000/agents \
   }'
 ```
 
-Deploy it (either route works; the CLI uses the canonical `/deployments` create flow):
+Deploy it (either route works; the CLI uses the canonical `/v1/deployments` create flow):
 
 ```bash
-curl -X POST http://localhost:8000/agents/YOUR_AGENT_ID/deploy
+curl -X POST http://localhost:8000/v1/agents/YOUR_AGENT_ID/deploy
 
 # or
-curl -X POST http://localhost:8000/deployments \
+curl -X POST http://localhost:8000/v1/deployments \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"agent_id":"YOUR_AGENT_ID","replicas":1}'
@@ -152,8 +152,8 @@ curl -X POST http://localhost:8000/deployments \
 Inspect the result:
 
 ```bash
-curl http://localhost:8000/deployments
-curl http://localhost:8000/agents/YOUR_AGENT_ID
+curl http://localhost:8000/v1/deployments
+curl http://localhost:8000/v1/agents/YOUR_AGENT_ID
 ```
 {% endstep %}
 {% endstepper %}
@@ -164,13 +164,14 @@ curl http://localhost:8000/agents/YOUR_AGENT_ID
 
 ```bash
 source .venv/bin/activate
-pip install -e .
+pip install -e ".[tui]"
 mutx status
 mutx login --email you@example.com
 mutx whoami
+mutx tui
 ```
 
-`mutx deploy create` now targets the current `POST /deployments` route. See `docs/cli.md` for the current support matrix.
+`mutx deploy create` now targets the current `POST /v1/deployments` route. See `docs/cli.md` for the current support matrix.
 
 ### Frontend verification
 

@@ -55,10 +55,10 @@ test.describe('mutx.dev QA', () => {
   });
 
   test('legacy /app redirects into the canonical dashboard surface', async ({ page }) => {
-    await page.goto('/app');
+    await page.goto('/app?next=%2Fdashboard%2Fagents&source=legacy');
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page).toHaveURL(/\/dashboard\?next=%2Fdashboard%2Fagents&source=legacy$/);
     await expect(page.getByRole('heading', { name: /deploy agents like services\. operate them like systems\./i })).toBeVisible();
     await expect(page.getByText(/mutx control plane/i)).toBeVisible();
     await expect(page.getByText(/canonical \/dashboard surface/i)).toBeVisible();

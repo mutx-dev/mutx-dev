@@ -31,7 +31,7 @@ Current cause: older docs and examples may still suggest a client-supplied `user
 Use the CLI or the authenticated API shape instead:
 
 ```bash
-curl -X POST http://localhost:8000/agents \
+curl -X POST http://localhost:8000/v1/agents \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -42,13 +42,13 @@ curl -X POST http://localhost:8000/agents \
 
 ## `mutx deploy create` returns route errors
 
-This should no longer happen on current mainline: `mutx deploy create` now targets `POST /deployments`.
+This should no longer happen on current mainline: `mutx deploy create` now targets `POST /v1/deployments`.
 
 If you still see route errors, reinstall the CLI from the current repo checkout and retry:
 
 ```bash
 source .venv/bin/activate
-pip install -e .
+pip install -e ".[tui]"
 mutx deploy create --agent-id YOUR_AGENT_ID --replicas 1
 ```
 
@@ -62,16 +62,16 @@ Use `./scripts/dev.sh` for the canonical local demo path. Use the Playwright sui
 npx playwright test --list
 ```
 
-## SDK or docs mention `/v1`
+## SDK or docs mention unversioned routes
 
-The current FastAPI app does not mount a `/v1` prefix.
+The current FastAPI app uses the `/v1/*` contract.
 
 Use:
 
-* `http://localhost:8000/auth/...`
-* `http://localhost:8000/agents/...`
-* `http://localhost:8000/deployments/...`
-* `http://localhost:8000/webhooks/...`
+* `http://localhost:8000/v1/auth/...`
+* `http://localhost:8000/v1/agents/...`
+* `http://localhost:8000/v1/deployments/...`
+* `http://localhost:8000/v1/webhooks/...`
 
 ## Waitlist works locally, but email does not send
 

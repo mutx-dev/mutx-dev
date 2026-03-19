@@ -1,3 +1,10 @@
-"""MUTX Textual TUI"""
+"""MUTX Textual TUI."""
 
-__version__ = "0.1.0"
+from cli.tui.app import MutxTUI
+
+
+def run_tui() -> None:
+    MutxTUI().run()
+
+
+__all__ = ["MutxTUI", "run_tui"]

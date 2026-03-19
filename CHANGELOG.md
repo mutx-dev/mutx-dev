@@ -8,10 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial project structure and documentation
+- Textual-based `mutx tui` operator shell for agents and deployments
+- Shared CLI service layer under `cli/services/*` for auth, agents, and deployments
+- Homebrew tap scaffold with `Formula/mutx.rb` and non-network `mutx status` formula test guidance
 
 ### Changed
-- Updated from time to time with new features and fixes
+- Root CLI distribution versioning now tracks the root `pyproject.toml` and `cli-vX.Y.Z` tags
+- CLI docs, quickstart, and debugging notes now reflect the `/v1/*` API contract and the TUI install flow
 
 ## [1.0.0] - 2024-01-01
 
@@ -67,7 +70,8 @@ This project uses [Semantic Versioning](https://semver.org/). Given a version nu
 | Component | Current Version | Location |
 |-----------|-----------------|----------|
 | Frontend/App | 1.0.0 | `package.json` |
-| CLI/SDK (Python) | 0.1.0 | `pyproject.toml` |
+| CLI distribution | 0.2.0 | root `pyproject.toml` |
+| Python SDK | 0.1.0 | `sdk/pyproject.toml` |
 | API | Matches frontend | `package.json` |
 
 ## How We Release

@@ -27,8 +27,9 @@ The canonical changelog lives at [CHANGELOG.md](../CHANGELOG.md) in the reposito
 When preparing a release:
 
 1. **Update version numbers** in:
-   - `package.json` (frontend/app version)
-   - `pyproject.toml` (CLI/SDK version)
+   - `package.json` (frontend/app version, if needed)
+   - root `pyproject.toml` (CLI distribution version)
+   - `sdk/pyproject.toml` (SDK version, only when shipping the SDK)
 
 2. **Update CHANGELOG.md**:
    - Move items from `[Unreleased]` to the new version section
@@ -36,7 +37,7 @@ When preparing a release:
    - Use appropriate version type (Major/Minor/Patch)
 
 3. **Create GitHub Release**:
-   - Tag format: `v1.0.0` (frontend) or `cli-v0.1.0` (Python CLI)
+   - Tag format: `v1.0.0` (frontend/app) or `cli-v0.2.0` (CLI distribution)
    - Include changelog notes for that release
 
 ### Release Validation
@@ -67,9 +68,17 @@ make test-api
 ### Python CLI Release
 
 ```bash
-# Build and publish to PyPI
+# Build the CLI distribution from repo root
+python -m pip install build
 python -m build
-twine upload dist/*
+```
+
+Then update the Homebrew tap formula to the matching `cli-vX.Y.Z` archive and validate its non-network test:
+
+```bash
+brew tap mutx-dev/homebrew-tap
+brew install mutx
+mutx status
 ```
 
 ## Versioning
@@ -79,16 +88,17 @@ This project uses [Semantic Versioning](https://semver.org/):
 | Component | Version Location |
 |-----------|------------------|
 | Frontend/App | `package.json` |
-| CLI/SDK (Python) | `pyproject.toml` |
+| CLI distribution | root `pyproject.toml` |
+| Python SDK | `sdk/pyproject.toml` |
 
 See [CHANGELOG.md](../CHANGELOG.md#versioning) for details on versioning scheme.
 
 ## Contract Notes (Current)
 
-- FastAPI routes are unversioned (`/auth`, `/agents`, `/deployments`, etc.); no global `/v1` prefix.
-- Ingestion routes are mounted at `/ingest/*`.
-- Webhook destination management is mounted at `/webhooks/*`.
-- Deployment event history is available at `GET /deployments/{deployment_id}/events`.
+- FastAPI routes are mounted under `/v1/*` in [`src/api/main.py`](../src/api/main.py).
+- Ingestion routes are mounted at `/v1/ingest/*`.
+- Webhook destination management is mounted at `/v1/webhooks/*`.
+- Deployment event history is available at `GET /v1/deployments/{deployment_id}/events`.
 
 ## Related Planning Docs
 
@@ -96,3 +106,5 @@ See [CHANGELOG.md](../CHANGELOG.md#versioning) for details on versioning scheme.
 - [Roadmap](../ROADMAP.md)
 - [API Reference](./api/reference.md)
 - [Contributing](../CONTRIBUTING.md)
+- [CLI Reference](./cli.md)
+- [CLI Release Runbook](./deployment/cli-release.md)

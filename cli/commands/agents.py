@@ -2,12 +2,21 @@ import click
 from typing import Optional
 
 from cli.config import CLIConfig, get_client
+from cli.services import AgentsService, CLIServiceError
 
 
 @click.group(name="agents")
 def agents_group():
     """Manage agents"""
     pass
+
+
+def _echo_service_error(error: CLIServiceError) -> None:
+    click.echo(f"Error: {error}", err=True)
+
+
+def _agents_service() -> AgentsService:
+    return AgentsService(config=CLIConfig(), client_factory=get_client)
 
 
 @agents_group.command(name="list")
@@ -22,23 +31,11 @@ def agents_group():
 )
 def list_agents(limit: int, skip: int, format: str):
     """List all agents"""
-    config = CLIConfig()
-    if not config.is_authenticated():
-        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+    try:
+        agents = _agents_service().list_agents(limit=limit, skip=skip)
+    except CLIServiceError as exc:
+        _echo_service_error(exc)
         return
-
-    client = get_client(config)
-    response = client.get("/v1/agents", params={"limit": limit, "skip": skip})
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
-        return
-
-    if response.status_code != 200:
-        click.echo(f"Error: {response.text}", err=True)
-        return
-
-    agents = response.json()
     if not agents:
         click.echo("No agents found.")
         return
@@ -51,14 +48,14 @@ def list_agents(limit: int, skip: int, format: str):
 
         # Print each agent row
         for agent in agents:
-            agent_id = agent.get("id", "")[:38]
-            name = agent.get("name", "")[:28]
-            status = agent.get("status", "")[:10]
+            agent_id = agent.id[:38]
+            name = agent.name[:28]
+            status = agent.status[:10]
             click.echo(f"{agent_id:<40} {name:<30} {status:<12}")
     else:
         # Simple format (original)
         for agent in agents:
-            click.echo(f"{agent['id']} | {agent['name']} | {agent['status']}")
+            click.echo(f"{agent.id} | {agent.name} | {agent.status}")
 
 
 @agents_group.command(name="create")
@@ -74,40 +71,16 @@ def list_agents(limit: int, skip: int, format: str):
 @click.option("--config", "-c", default="{}", help="Agent config as JSON object string")
 def create_agent(name: str, description: str, agent_type: str, config: str):
     """Create a new agent"""
-    cli_config = CLIConfig()
-    if not cli_config.is_authenticated():
-        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
-        return
-
-    import json
-
     try:
-        # Validate JSON locally; backend accepts dict or string and normalizes it.
-        config_json = json.loads(config)
-    except json.JSONDecodeError:
-        click.echo("Error: Invalid JSON in config", err=True)
-        return
-
-    client = get_client(cli_config)
-    response = client.post(
-        "/v1/agents",
-        json={
-            "name": name,
-            "description": description,
-            "type": agent_type,
-            "config": config_json,
-        },
-    )
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
-        return
-
-    if response.status_code == 201:
-        agent = response.json()
-        click.echo(f"Created agent: {agent['id']} - {agent['name']}")
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+        agent = _agents_service().create_agent(
+            name=name,
+            description=description,
+            agent_type=agent_type,
+            config=config,
+        )
+        click.echo(f"Created agent: {agent.id} - {agent.name}")
+    except CLIServiceError as exc:
+        _echo_service_error(exc)
 
 
 @agents_group.command(name="delete")
@@ -115,55 +88,28 @@ def create_agent(name: str, description: str, agent_type: str, config: str):
 @click.option("--force", "-f", is_flag=True, help="Force deletion without confirmation")
 def delete_agent(agent_id: str, force: bool):
     """Delete an agent"""
-    config_obj = CLIConfig()
-    if not config_obj.is_authenticated():
-        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
-        return
-
     if not force:
         if not click.confirm(f"Are you sure you want to delete agent {agent_id}?"):
             return
 
-    client = get_client(config_obj)
-    response = client.delete(f"/v1/agents/{agent_id}")
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
-        return
-
-    if response.status_code == 204:
+    try:
+        _agents_service().delete_agent(agent_id)
         click.echo(f"Deleted agent: {agent_id}")
-    elif response.status_code == 404:
-        click.echo("Error: Agent not found", err=True)
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+    except CLIServiceError as exc:
+        _echo_service_error(exc)
 
 
 @agents_group.command(name="deploy")
 @click.argument("agent_id")
 def deploy_agent(agent_id: str):
     """Deploy an agent"""
-    config_obj = CLIConfig()
-    if not config_obj.is_authenticated():
-        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
-        return
-
-    client = get_client(config_obj)
-    response = client.post(f"/v1/agents/{agent_id}/deploy")
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
-        return
-
-    if response.status_code == 200:
-        result = response.json()
+    try:
+        result = _agents_service().deploy_agent(agent_id)
         click.echo(f"Deploying agent: {agent_id}")
-        click.echo(f"Deployment ID: {result.get('deployment_id')}")
-        click.echo(f"Status: {result.get('status')}")
-    elif response.status_code == 404:
-        click.echo("Error: Agent not found", err=True)
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+        click.echo(f"Deployment ID: {result.deployment_id}")
+        click.echo(f"Status: {result.status}")
+    except CLIServiceError as exc:
+        _echo_service_error(exc)
 
 
 @agents_group.command(name="logs")
@@ -172,89 +118,44 @@ def deploy_agent(agent_id: str):
 @click.option("--level", "-L", default=None, help="Filter by log level (INFO, WARNING, ERROR)")
 def get_logs(agent_id: str, limit: int, level: Optional[str]):
     """Get logs for an agent"""
-    config_obj = CLIConfig()
-    if not config_obj.is_authenticated():
-        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+    try:
+        logs = _agents_service().get_logs(agent_id, limit=limit, level=level)
+    except CLIServiceError as exc:
+        _echo_service_error(exc)
         return
 
-    params = {"limit": limit}
-    if level:
-        params["level"] = level
-
-    client = get_client(config_obj)
-    response = client.get(f"/v1/agents/{agent_id}/logs", params=params)
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+    if not logs:
+        click.echo("No logs found.")
         return
 
-    if response.status_code == 200:
-        logs = response.json()
-        if not logs:
-            click.echo("No logs found.")
-            return
-
-        for log in logs:
-            timestamp = log.get("timestamp", "")
-            level_str = log.get("level", "INFO")
-            message = log.get("message", "")
-            click.echo(f"{timestamp} | {level_str} | {message}")
-    elif response.status_code == 404:
-        click.echo("Error: Agent not found", err=True)
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+    for log in logs:
+        click.echo(f"{log.timestamp or ''} | {log.level} | {log.message}")
 
 
 @agents_group.command(name="stop")
 @click.argument("agent_id")
 def stop_agent(agent_id: str):
     """Stop a running agent"""
-    config_obj = CLIConfig()
-    if not config_obj.is_authenticated():
-        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
-        return
-
-    client = get_client(config_obj)
-    response = client.post(f"/v1/agents/{agent_id}/stop")
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
-        return
-
-    if response.status_code == 200:
-        result = response.json()
+    try:
+        status = _agents_service().stop_agent(agent_id)
         click.echo(f"Stopped agent: {agent_id}")
-        click.echo(f"Status: {result.get('status')}")
-    elif response.status_code == 404:
-        click.echo("Error: Agent not found", err=True)
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+        click.echo(f"Status: {status}")
+    except CLIServiceError as exc:
+        _echo_service_error(exc)
 
 
 @agents_group.command(name="status")
 @click.argument("agent_id")
 def get_status(agent_id: str):
     """Get status of an agent"""
-    config_obj = CLIConfig()
-    if not config_obj.is_authenticated():
-        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+    try:
+        agent = _agents_service().get_agent(agent_id)
+    except CLIServiceError as exc:
+        _echo_service_error(exc)
         return
 
-    client = get_client(config_obj)
-    response = client.get(f"/v1/agents/{agent_id}")
-
-    if response.status_code == 401:
-        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
-        return
-
-    if response.status_code == 200:
-        agent = response.json()
-        click.echo(f"Agent ID: {agent['id']}")
-        click.echo(f"Name: {agent['name']}")
-        click.echo(f"Description: {agent.get('description', 'N/A')}")
-        click.echo(f"Status: {agent['status']}")
-        click.echo(f"Created at: {agent.get('created_at', 'N/A')}")
-    elif response.status_code == 404:
-        click.echo("Error: Agent not found", err=True)
-    else:
-        click.echo(f"Error: {response.text}", err=True)
+    click.echo(f"Agent ID: {agent.id}")
+    click.echo(f"Name: {agent.name}")
+    click.echo(f"Description: {agent.description or 'N/A'}")
+    click.echo(f"Status: {agent.status}")
+    click.echo(f"Created at: {agent.created_at or 'N/A'}")

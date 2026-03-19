@@ -61,16 +61,18 @@ test-auth:
 	@echo "======================================"
 	@echo ""
 	@API_URL="$${API_URL:-http://localhost:8000}" && \
+	V1_URL="$${API_URL%/}" && \
+	case "$$V1_URL" in */v1) ;; *) V1_URL="$$V1_URL/v1" ;; esac && \
 	TEST_EMAIL="test@local.dev" && \
 	TEST_PASS="TestPass123!" && \
 	echo "Registering test user..." && \
-	RESPONSE=$$(curl -sf -X POST "$$API_URL/auth/register" \
+	RESPONSE=$$(curl -sf -X POST "$$V1_URL/auth/register" \
 		-H "Content-Type: application/json" \
 		-d "{\"email\":\"$$TEST_EMAIL\",\"name\":\"Test User\",\"password\":\"$$TEST_PASS\"}" 2>/dev/null || echo "{}") && \
 	echo "✓ User registered (or already exists)" && \
 	echo "" && \
 	echo "Logging in..." && \
-	LOGIN_RESP=$$(curl -sf -X POST "$$API_URL/auth/login" \
+	LOGIN_RESP=$$(curl -sf -X POST "$$V1_URL/auth/login" \
 		-H "Content-Type: application/json" \
 		-d "{\"email\":\"$$TEST_EMAIL\",\"password\":\"$$TEST_PASS\"}" 2>/dev/null) && \
 	TOKEN=$$(echo "$$LOGIN_RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('access_token',''))" 2>/dev/null || echo "") && \
@@ -86,11 +88,13 @@ test-auth:
 		echo "📝 Example Authenticated Requests:"; \
 		echo "======================================"; \
 		echo ""; \
-		echo "curl $$API_URL/auth/me -H \"Authorization: Bearer $$TOKEN\""; \
+		echo "curl $$V1_URL/auth/me -H \"Authorization: Bearer $$TOKEN\""; \
 		echo ""; \
-		echo "curl \"$$API_URL/agents?limit=5\" -H \"Authorization: Bearer $$TOKEN\""; \
+		echo "curl \"$$V1_URL/agents?limit=5\" -H \"Authorization: Bearer $$TOKEN\""; \
 		echo ""; \
-		ME_RESP=$$(curl -sf "$$API_URL/auth/me" -H "Authorization: Bearer $$TOKEN" 2>/dev/null); \
+		echo "mutx --api-url $$API_URL login --email $$TEST_EMAIL --password $$TEST_PASS"; \
+		echo ""; \
+		ME_RESP=$$(curl -sf "$$V1_URL/auth/me" -H "Authorization: Bearer $$TOKEN" 2>/dev/null); \
 		if [ -n "$$ME_RESP" ]; then \
 			echo ""; \
 			echo "✅ Test Request (auth/me):"; \
