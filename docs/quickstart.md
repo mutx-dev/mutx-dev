@@ -25,6 +25,7 @@ If you prefer host processes for API and web:
 ```bash
 npm install
 pip install -r requirements.txt
+pip install -e ".[dev,tui]"
 docker compose -f infrastructure/docker/docker-compose.yml up -d postgres redis
 uvicorn src.api.main:app --reload --port 8000
 npm run dev
@@ -57,7 +58,7 @@ These commands remove the need to manually build `curl` auth headers and token p
 If you need direct API calls instead, use:
 
 ```bash
-BASE_URL=http://localhost:8000
+BASE_URL=http://localhost:8000/v1
 curl -X POST "$BASE_URL/auth/register" \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'

@@ -21,6 +21,11 @@
 set -e
 
 API_URL="${API_URL:-http://localhost:8000}"
+V1_URL="${API_URL%/}"
+case "$V1_URL" in
+    */v1) ;;
+    *) V1_URL="$V1_URL/v1" ;;
+esac
 TEST_EMAIL="${TEST_EMAIL:-test@local.dev}"
 TEST_PASSWORD="${TEST_PASSWORD:-TestPass123!}"
 ACCESS_TOKEN="${ACCESS_TOKEN:-}"
@@ -87,7 +92,7 @@ do_register() {
     payload=$(printf '{"email":"%s","name":"%s","password":"%s"}' "$TEST_EMAIL" "Test User" "$TEST_PASSWORD")
 
     local response
-    response=$(curl -sf -X POST "$API_URL/auth/register"         -H "Content-Type: application/json"         -d "$payload" 2>&1) || true
+    response=$(curl -sf -X POST "$V1_URL/auth/register"         -H "Content-Type: application/json"         -d "$payload" 2>&1) || true
     
     if echo "$response" | grep -q "Email already registered"; then
         echo -e "${YELLOW}User already exists, trying login...${NC}"
@@ -110,7 +115,7 @@ do_login() {
     payload=$(printf '{"email":"%s","password":"%s"}' "$TEST_EMAIL" "$TEST_PASSWORD")
 
     local response
-    response=$(curl -sf -X POST "$API_URL/auth/login"         -H "Content-Type: application/json"         -d "$payload" 2>&1) || true
+    response=$(curl -sf -X POST "$V1_URL/auth/login"         -H "Content-Type: application/json"         -d "$payload" 2>&1) || true
     
     if echo "$response" | grep -q "access_token"; then
         ACCESS_TOKEN=$(echo "$response" | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))" 2>/dev/null || echo "")
@@ -131,11 +136,11 @@ do_auth_tests() {
     
     print_header "Authenticated API Tests"
     
-    test_endpoint "Get Current User" "$API_URL/auth/me" "GET" "" "$ACCESS_TOKEN"
-    test_endpoint "List Agents" "$API_URL/agents?limit=5" "GET" "" "$ACCESS_TOKEN"
-    test_endpoint "List Deployments" "$API_URL/deployments?limit=5" "GET" "" "$ACCESS_TOKEN"
-    test_endpoint "List API Keys" "$API_URL/api-keys" "GET" "" "$ACCESS_TOKEN"
-    test_endpoint "List Runs" "$API_URL/runs?limit=5" "GET" "" "$ACCESS_TOKEN"
+    test_endpoint "Get Current User" "$V1_URL/auth/me" "GET" "" "$ACCESS_TOKEN"
+    test_endpoint "List Agents" "$V1_URL/agents?limit=5" "GET" "" "$ACCESS_TOKEN"
+    test_endpoint "List Deployments" "$V1_URL/deployments?limit=5" "GET" "" "$ACCESS_TOKEN"
+    test_endpoint "List API Keys" "$V1_URL/api-keys" "GET" "" "$ACCESS_TOKEN"
+    test_endpoint "List Runs" "$V1_URL/runs?limit=5" "GET" "" "$ACCESS_TOKEN"
 }
 
 do_agents() {
@@ -143,7 +148,7 @@ do_agents() {
         do_login
     fi
     echo -e "${BLUE}Fetching agents...${NC}"
-    curl -sf "$API_URL/agents?limit=10" -H "Authorization: Bearer $ACCESS_TOKEN" | python3 -m json.tool 2>/dev/null || echo "Failed to fetch agents"
+    curl -sf "$V1_URL/agents?limit=10" -H "Authorization: Bearer $ACCESS_TOKEN" | python3 -m json.tool 2>/dev/null || echo "Failed to fetch agents"
 }
 
 do_deployments() {
@@ -151,7 +156,7 @@ do_deployments() {
         do_login
     fi
     echo -e "${BLUE}Fetching deployments...${NC}"
-    curl -sf "$API_URL/deployments?limit=10" -H "Authorization: Bearer $ACCESS_TOKEN" | python3 -m json.tool 2>/dev/null || echo "Failed to fetch deployments"
+    curl -sf "$V1_URL/deployments?limit=10" -H "Authorization: Bearer $ACCESS_TOKEN" | python3 -m json.tool 2>/dev/null || echo "Failed to fetch deployments"
 }
 
 do_api_keys() {
@@ -159,7 +164,7 @@ do_api_keys() {
         do_login
     fi
     echo -e "${BLUE}Fetching API keys...${NC}"
-    curl -sf "$API_URL/api-keys" -H "Authorization: Bearer $ACCESS_TOKEN" | python3 -m json.tool 2>/dev/null || echo "Failed to fetch API keys"
+    curl -sf "$V1_URL/api-keys" -H "Authorization: Bearer $ACCESS_TOKEN" | python3 -m json.tool 2>/dev/null || echo "Failed to fetch API keys"
 }
 
 do_health_checks() {

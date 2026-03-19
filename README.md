@@ -1,4 +1,3 @@
-
 <p align="center">
   <img src="https://github.com/fortunexbt/mutx-dev/blob/main/public/logo.png" width="140" alt="MUTX logo"/>
 </p>
@@ -13,246 +12,213 @@
   Deploy, operate, and govern agents like production systems.
 </p>
 
----
+## What MUTX Is
 
-# MUTX
+MUTX is an open-source control plane for running AI agents as durable systems instead of throwaway scripts.
 
-MUTX is an **open-source control plane for AI agents**.
+The current monorepo includes:
 
-Most agent frameworks focus on prompts, reasoning loops, or local orchestration.  
-MUTX focuses on the **operational layer** required to run agents as production systems.
+- a FastAPI control plane under `src/api/`
+- a Next.js site and app surface under `app/`
+- a Python CLI and first-party terminal UI under `cli/`
+- a Python SDK under `sdk/`
+- local bootstrap, Docker, and infrastructure tooling under `scripts/` and `infrastructure/`
 
-This includes:
+Current control-plane API routes are mounted under `/v1/*`.
 
-- agent deployment
-- lifecycle management
-- orchestration and scheduling
-- observability and debugging
-- governance and policy controls
-- CLI, API, and SDK interfaces
+## What You Can Do Today
 
-The goal is simple: treat agents the same way modern teams treat backend services.
+- create and inspect agents
+- create and operate deployments
+- inspect deployment logs, events, and metrics
+- use the Python CLI from source
+- launch the first-party operator TUI with `mutx tui`
+- install the CLI via a third-party Homebrew tap
 
----
+## Install The CLI
 
-# The Problem
-
-Most AI agents today are deployed like scripts.
-
-That works for demos, but breaks quickly in real systems.
-
-Once agents interact with APIs, credentials, background jobs, or external services, teams need infrastructure that answers questions like:
-
-- What agents are running?
-- Where are they deployed?
-- What permissions do they have?
-- What changed between runs?
-- Why did something fail?
-- How do we monitor and debug it?
-
-MUTX exists to provide that layer.
-
----
-
-# The Idea
-
-Modern software has clear operational primitives.
-
-Web applications   → Vercel  
-Containers         → Kubernetes  
-AI agents          → MUTX  
-
-MUTX is building the infrastructure layer for deploying and operating agents safely at scale.
-
----
-
-# Local Development
-
-## 🚀 5-Minute Quick Start
+### From source
 
 ```bash
-# 1. Start everything (Docker, DB, API, Frontend)
-make dev
-
-# 2. In a new terminal, setup auth + seed data (one command!)
-make test-auth    # Registers test user, logs in, shows token
-make seed        # Creates test agents + deployments
-
-# 3. Open in browser
-#    Frontend: http://localhost:3000
-#    API:      http://localhost:8000/docs
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e ".[dev,tui]"
 ```
 
-**That's it!** No manual curl commands needed.
-
-## Quick Start (Makefile)
+Smoke commands:
 
 ```bash
-make help              # Show all available commands
-make dev               # Start local dev stack (Docker Compose)
-make test-auth         # Register test user, login, get token (one-command)
-make test-api          # Run API health tests
-make lint              # Run linters
+mutx --help
+mutx status
+mutx tui
 ```
 
-After `make test-auth`, you will have:
-- A registered test user
-- A valid access token
-- Ready-to-copy curl examples
+The CLI stores local config in `~/.mutx/config.json`:
 
-Frontend: http://localhost:3000 | Backend: http://localhost:8000 | API Docs: http://localhost:8000/docs
-
-## macOS Desktop Shell (Electron)
-
-Issue `#375` adds a first-pass native desktop wrapper around the existing web app.
-
-```bash
-# Launch desktop app pointed to your local Next.js dev server
-npm run desktop:dev
-
-# Launch desktop app shell (defaults to https://mutx.dev)
-npm run desktop:start
-
-# Build unsigned macOS artifacts (.dmg + .zip) into dist/desktop
-npm run desktop:build
+```json
+{
+  "api_url": "http://localhost:8000",
+  "api_key": null,
+  "refresh_token": null
+}
 ```
 
-Override the loaded app URL if needed:
+### From Homebrew
+
+The intended install path is the third-party tap:
 
 ```bash
-MUTX_DESKTOP_URL=http://127.0.0.1:3000 npm run desktop:start
+brew tap mutx-dev/homebrew-tap
+brew install mutx
 ```
 
-# Project Structure
+The formula is expected to use a non-network smoke test such as `mutx status`.
 
-mutx-dev/
-├── control-plane/       # FastAPI backend services  
-├── cli/                 # MUTX operator CLI  
-├── sdk/                 # Python SDK  
-├── agents/              # agent templates and roles  
-├── infrastructure/      # Docker, Terraform, deployment configs  
-├── docs/                # documentation source  
-└── scripts/             # bootstrap and developer tooling  
+## Operator TUI
 
----
-
-# Quickstart
-
-Clone the repository:
+Launch the first-party terminal UI with:
 
 ```bash
-git clone https://github.com/fortunexbt/mutx-dev
+mutx tui
+```
+
+The current operator-focused scope is intentionally small:
+
+- auth/session state
+- agents list, detail, deploy, logs
+- deployments list, detail, events, logs, metrics
+- safe actions with confirmation: restart, scale, delete
+
+The TUI reuses the existing CLI config and auth/session flow. It does not maintain a separate session store.
+
+## Local Quick Start
+
+### Fastest repo-native path
+
+```bash
+git clone https://github.com/mutx-dev/mutx-dev.git
 cd mutx-dev
-```
 
-Start the local development stack:
+npm install
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e ".[dev,tui]"
 
-```bash
-./scripts/dev.sh
-```
-
-# Local Development
-
-## 🚀 5-Minute Quick Start
-
-```bash
-# 1. Start everything (Docker, DB, API, Frontend)
 make dev
-
-# 2. In a new terminal, setup auth + seed data (one command!)
-make test-auth    # Registers test user, logs in, shows token
-make seed        # Creates test agents + deployments
-
-# 3. Open in browser
-#    Frontend: http://localhost:3000
-#    API:      http://localhost:8000/docs
+make test-auth
+mutx login --email test@local.dev --password TestPass123!
+make seed
+mutx tui
 ```
 
-**That's it!** No manual curl commands needed.
+Local URLs:
 
-## Running the Backend
+- site/app: `http://localhost:3000`
+- API: `http://localhost:8000`
+- API docs: `http://localhost:8000/docs`
 
-Start the local development stack:
+### If you prefer direct API checks
+
+Register a user:
 
 ```bash
-./scripts/dev.sh
+curl -X POST http://localhost:8000/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
 ```
 
-This starts the FastAPI backend on http://localhost:8000.
-
-## Testing the API
-
-Use the built-in test script to test API endpoints without writing manual curl commands:
+Log in:
 
 ```bash
-# Health checks only
-./scripts/test-api.sh
-
-# Full test suite with authentication
-./scripts/test-api.sh --with-auth
-
-# Register a test user
-./scripts/test-api.sh --register
-
-# Login and get token
-./scripts/test-api.sh --login
-
-# Test specific endpoints
-./scripts/test-api.sh --agents
-./scripts/test-api.sh --deployments
-./scripts/test-api.sh --api-keys
+curl -X POST http://localhost:8000/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","password":"StrongPass1!"}'
 ```
 
-The test script handles:
-- User registration and login
-- Token management
-- Authenticated API requests
-- Response validation
+Then use the returned token with:
 
-## Running Tests
+- `GET /v1/auth/me`
+- `GET /v1/agents`
+- `GET /v1/deployments`
 
-Run the full test suite:
+## Common Commands
+
+### Local development
+
+```bash
+make help
+make dev
+make dev-stop
+make test-auth
+make seed
+make test-api
+make test-api-auth
+```
+
+### CLI and TUI
+
+```bash
+mutx --help
+mutx status
+mutx whoami
+mutx agents list --limit 10
+mutx deploy list --limit 10
+mutx tui
+```
+
+### Validation
 
 ```bash
 ./scripts/test.sh
 ```
 
-Skip Playwright browser tests:
+Smaller CLI-focused validation:
 
 ```bash
-MUTX_SKIP_PLAYWRIGHT=1 ./scripts/test.sh
+pytest tests/test_cli_auth_and_tui.py tests/test_cli_agents_contract.py tests/test_cli_deploy_contract.py
+python3 -m compileall src/api cli sdk/mutx
 ```
 
+## Repository Layout
 
----
+```text
+mutx-dev/
+├── app/                  # Next.js site and app routes
+├── cli/                  # Python CLI and Textual TUI
+├── docs/                 # Documentation source
+├── infrastructure/       # Docker, Terraform, Ansible, monitoring
+├── scripts/              # Local bootstrap and validation helpers
+├── sdk/                  # Python SDK
+├── src/api/              # FastAPI control plane
+└── tests/                # Python, frontend, and contract tests
+```
 
-# Documentation
+## Release Truth
 
-Full documentation:
+- the CLI distribution version lives in the root `pyproject.toml`
+- the recommended CLI tag format is `cli-vX.Y.Z`
+- the Python SDK version lives separately in `sdk/pyproject.toml`
+- the Homebrew tap should track the CLI release archive, not frontend/site tags
 
-https://docs.mutx.dev
+For the detailed CLI/tap release flow, see [docs/deployment/cli-release.md](docs/deployment/cli-release.md).
 
-Key entry points:
+## Docs
 
-- Quickstart: https://docs.mutx.dev/docs/deployment/quickstart
-- Architecture: https://docs.mutx.dev/docs/architecture/overview
-- API Reference: https://docs.mutx.dev/docs/contracts/api
-- CLI Guide: https://docs.mutx.dev/docs/cli
+- CLI guide: [docs/cli.md](docs/cli.md)
+- quickstart: [docs/deployment/quickstart.md](docs/deployment/quickstart.md)
+- local bootstrap: [docs/deployment/local-developer-bootstrap.md](docs/deployment/local-developer-bootstrap.md)
+- release notes and tagging: [docs/changelog-status.md](docs/changelog-status.md)
+- architecture overview: [docs/architecture/overview.md](docs/architecture/overview.md)
+- API contract docs: [docs/contracts/api/index.md](docs/contracts/api/index.md)
 
----
+Hosted docs are available at [docs.mutx.dev](https://docs.mutx.dev).
 
-# Contributing
+## Contributing
 
-Contributions are welcome.
+Start with [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Start here:
+## License
 
-https://docs.mutx.dev/contributing
-
----
-
-# License
-
-MIT License
-
-https://github.com/fortunexbt/mutx-dev/blob/main/LICENSE
+[MIT](LICENSE)

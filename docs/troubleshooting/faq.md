@@ -15,7 +15,7 @@ Yes. Waitlist signups are stored in Postgres through `lib/waitlist.ts` and `lib/
 
 ## Is there a `/v1` API prefix?
 
-No. The current FastAPI app mounts plain routes such as `/auth`, `/agents`, `/deployments`, and `/webhooks`.
+Yes. The current FastAPI app mounts versioned routes such as `/v1/auth`, `/v1/agents`, `/v1/deployments`, and `/v1/webhooks`.
 
 ## Can I use the CLI for everything?
 
@@ -23,7 +23,8 @@ Not yet. Core auth and deployment flows work well, but some commands still lag t
 
 Current examples:
 
-- `mutx deploy create` now targets the canonical `POST /deployments` route
+- `mutx deploy create` now targets the canonical `POST /v1/deployments` route
+- `mutx tui` provides the current operator-focused agents and deployments shell
 - `mutx agents create` now relies on authenticated ownership instead of a client-supplied `user_id`
 
 ## Is the SDK fully aligned with the API?

@@ -29,11 +29,11 @@ Use `/ready` when you want to know whether the database is actually available.
 ## Inspect Agents and Deployments
 
 ```bash
-curl http://localhost:8000/agents
-curl http://localhost:8000/deployments
-curl http://localhost:8000/agents/YOUR_AGENT_ID
-curl http://localhost:8000/agents/YOUR_AGENT_ID/logs?limit=50
-curl http://localhost:8000/agents/YOUR_AGENT_ID/metrics?limit=50
+curl http://localhost:8000/v1/agents
+curl http://localhost:8000/v1/deployments
+curl http://localhost:8000/v1/agents/YOUR_AGENT_ID
+curl http://localhost:8000/v1/agents/YOUR_AGENT_ID/logs?limit=50
+curl http://localhost:8000/v1/agents/YOUR_AGENT_ID/metrics?limit=50
 ```
 
 ## Auth Debugging
@@ -41,11 +41,11 @@ curl http://localhost:8000/agents/YOUR_AGENT_ID/metrics?limit=50
 Register and log in again if you want to validate the auth flow end to end:
 
 ```bash
-curl -X POST http://localhost:8000/auth/register \
+curl -X POST http://localhost:8000/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
 
-curl -X POST http://localhost:8000/auth/login \
+curl -X POST http://localhost:8000/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","password":"StrongPass1!"}'
 ```
@@ -66,6 +66,7 @@ mutx status
 mutx whoami
 mutx agents list --limit 5
 mutx deploy list --limit 5
+mutx tui
 ```
 
 If a CLI command fails unexpectedly, compare it against the route implementations in:

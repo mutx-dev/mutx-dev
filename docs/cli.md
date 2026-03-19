@@ -1,26 +1,35 @@
 ---
-description: Install, configure, authenticate, and use the CLI against live routes.
+description: Install, configure, authenticate, operate, and release the MUTX CLI + TUI.
 icon: terminal
 ---
 
 # CLI Command Reference
 
-The CLI is a Click application defined in `cli/` and installed from the repo root.
+The MUTX CLI distribution lives at repo root and installs the `mutx` entrypoint from `pyproject.toml`.
 
 ## Install
+
+Editable local install with the operator TUI:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -e ".[dev]"
+pip install -e ".[dev,tui]"
 ```
+
+Homebrew install from the third-party tap:
+
+```bash
+brew tap mutx-dev/homebrew-tap
+brew install mutx
+```
+
+The tap formula is expected to smoke-test the package with `mutx status`, not a networked command.
 
 ## Configuration
 
-The CLI stores configuration in `~/.mutx/config.json`.
-
-Default local config values come from `cli/config.py`:
+The CLI stores configuration in `~/.mutx/config.json` and reuses the existing `CLIConfig` shape from [`cli/config.py`](../cli/config.py):
 
 ```json
 {
@@ -44,12 +53,10 @@ export MUTX_API_URL=http://localhost:8000
 
 ## First-Time Local Auth Flow
 
-The CLI can log in, but it does not currently register users.
-
-Create a user first via the API:
+Register through the current `/v1/*` API contract:
 
 ```bash
-curl -X POST http://localhost:8000/auth/register \
+curl -X POST http://localhost:8000/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
 ```
@@ -62,16 +69,41 @@ mutx whoami
 mutx status
 ```
 
+## Operator TUI
+
+Launch the first-party Textual shell with:
+
+```bash
+mutx tui
+```
+
+The first release is intentionally operator-focused and small:
+
+* Agents: list, detail, deploy, logs
+* Deployments: list, detail, events, logs, metrics, restart, scale, delete
+
+Key bindings:
+
+* `r` refresh the active pane
+* `d` deploy the selected agent
+* `x` restart the selected deployment
+* `s` scale the selected deployment
+* `backspace` delete the selected deployment
+* `q` quit
+
+If no local auth is stored, the TUI still launches and shows the local CLI state instead of crashing.
+
 ## Commands
 
 ### Authentication
 
 | Command | Description |
 | ------- |-------------|
-| `mutx status` | Show API URL and auth state |
-| `mutx login --email <email>` | Login to mutx.dev (prompts for password) |
+| `mutx status` | Show API URL and auth state without a network call |
+| `mutx login --email <email>` | Login to MUTX (prompts for password) |
 | `mutx logout` | Clear local tokens |
 | `mutx whoami` | Show current user info |
+| `mutx tui` | Launch the operator TUI |
 
 ### Agents
 
@@ -79,7 +111,7 @@ mutx status
 | ------- |-------------|
 | `mutx agents list` | List all agents |
 | `mutx agents create --name <name>` | Create a new agent |
-| `mutx agents status <agent_id>` | Get agent status |
+| `mutx agents status <agent_id>` | Get agent detail |
 | `mutx agents logs <agent_id>` | Get agent logs |
 | `mutx agents deploy <agent_id>` | Deploy an agent |
 | `mutx agents stop <agent_id>` | Stop a running agent |
@@ -98,64 +130,41 @@ mutx status
 | `mutx deploy restart <deployment_id>` | Restart a deployment |
 | `mutx deploy delete <deployment_id>` | Delete a deployment |
 
-### API Keys
+### Other Groups
 
-| Command | Description |
-| ------- |-------------|
-| `mutx api-keys list` | List all API keys |
-| `mutx api-keys create --name <name>` | Create a new API key |
-| `mutx api-keys revoke <key_id>` | Revoke an API key |
-| `mutx api-keys rotate <key_id>` | Rotate an API key |
+Additional command groups remain available for API keys, ClawHub, config, and webhooks. Their implementations still live under `cli/commands/`.
 
-### ClawHub
+## Smoke Validation
 
-| Command | Description |
-| ------- |-------------|
-| `mutx clawhub list` | List trending skills |
-| `mutx clawhub install --agent-id <id> --skill-id <id>` | Install a skill to an agent |
-| `mutx clawhub uninstall --agent-id <id> --skill-id <id>` | Uninstall a skill from an agent |
-
-### Webhooks
-
-| Command | Description |
-| ------- |-------------|
-| `mutx webhooks list` | List all webhooks |
-| `mutx webhooks get <webhook_id>` | Get webhook details |
-| `mutx webhooks deliveries <webhook_id>` | Get webhook delivery history |
-
-## Example Session
+Local editable install and command smoke:
 
 ```bash
-# Check local setup
+pip install -e ".[dev,tui]"
 mutx status
-
-# Log in after registering via API
-mutx login --email you@example.com
-
-# Confirm identity
-mutx whoami
-
-# List current agents
-mutx agents list --limit 10
-
-# List current deployments
-mutx deploy list --limit 10
-
-# Create a deployment for an owned agent
-mutx deploy create --agent-id YOUR_AGENT_ID --replicas 1
-
-# Restart a failed deployment
-mutx deploy restart YOUR_DEPLOYMENT_ID
-
-# Fetch webhook delivery history
-mutx webhooks deliveries YOUR_WEBHOOK_ID --limit 10
+mutx --help
 ```
 
-## When in Doubt
+Local stack validation:
 
-If CLI behavior and docs diverge, inspect:
+```bash
+make dev
+make test-auth
+mutx login --email test@local.dev --password TestPass123!
+make seed
+mutx agents list --limit 10
+mutx deploy list --limit 10
+mutx tui
+```
 
-* `cli/main.py`
-* `cli/commands/agents.py`
-* `cli/commands/deploy.py`
-* `cli/config.py`
+Targeted contract coverage:
+
+```bash
+pytest tests/test_cli_auth_and_tui.py tests/test_cli_agents_contract.py tests/test_cli_deploy_contract.py
+```
+
+## Release Truth
+
+* The CLI distribution version is the root [`pyproject.toml`](../pyproject.toml) version.
+* The recommended CLI git tag format is `cli-vX.Y.Z`.
+* The Homebrew tap formula should point at the matching `cli-vX.Y.Z` source archive and use `mutx status` as its non-network test.
+* The SDK has its own package metadata under [`sdk/pyproject.toml`](../sdk/pyproject.toml); do not treat SDK and CLI release tags as the same thing.

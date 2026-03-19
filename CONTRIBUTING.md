@@ -52,6 +52,12 @@ Good contribution shapes:
 - Update the closest docs when behavior changes.
 - Do not bundle unrelated cleanup with the main change.
 
+Recommended split for CLI/TUI distribution work:
+
+- PR 1: release/docs truth plus shared CLI service extraction
+- PR 2: `mutx tui` shell and operator flows
+- PR 3: Homebrew tap/formula and install docs
+
 ### Updating the Changelog
 
 When your change affects users, update [CHANGELOG.md](CHANGELOG.md):
@@ -89,6 +95,17 @@ black --check src/api cli sdk
 python3 -m compileall src/api cli sdk/mutx
 ```
 
+### CLI/TUI
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev,tui]"
+mutx --help
+mutx status
+python -m pytest tests/test_cli_auth_and_tui.py tests/test_cli_agents_contract.py tests/test_cli_deploy_contract.py
+```
+
 ### Playwright
 
 ```bash
@@ -103,7 +120,8 @@ For maintainers releasing new versions:
 
 1. **Update versions** in:
    - `package.json` (frontend/app)
-   - `pyproject.toml` (CLI/SDK)
+   - root `pyproject.toml` (CLI distribution)
+   - `sdk/pyproject.toml` (SDK, when needed)
 
 2. **Update CHANGELOG.md**:
    - Move `[Unreleased]` items to a new version section
@@ -117,7 +135,12 @@ For maintainers releasing new versions:
 
 4. **Tag and publish**:
    - Frontend: `git tag v1.0.0 && git push origin v1.0.0`
-   - CLI: `git tag cli-v0.1.0 && git push origin cli-v0.1.0`
+   - CLI: `git tag cli-v0.2.0 && git push origin cli-v0.2.0`
+
+5. **Update the third-party tap**:
+   - Sync `mutx-dev/homebrew-tap`
+   - Update `Formula/mutx.rb` to the matching `cli-vX.Y.Z` archive and checksum
+   - Validate with `brew tap mutx-dev/homebrew-tap && brew install mutx && mutx status`
 
 See [docs/changelog-status.md](docs/changelog-status.md) for full release documentation.
 

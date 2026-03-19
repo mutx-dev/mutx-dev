@@ -54,7 +54,7 @@ pnpm install
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -e ".[dev]"
+pip install -e ".[dev,tui]"
 ```
 
 ## 3. Environment Configuration
@@ -145,6 +145,12 @@ make test-api-auth
 ```
 
 `make test-auth` registers/logs in a test user and prints a ready-to-use token.
+
+If you want to drive the Python CLI or `mutx tui` with that local user, store the session with:
+
+```bash
+mutx login --email test@local.dev --password TestPass123!
+```
 
 `make test-api-auth` runs authenticated endpoint checks through `scripts/test-api.sh --with-auth`.
 

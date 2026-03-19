@@ -7,6 +7,8 @@ icon: rocket
 
 Target release date: **Monday, March 16, 2026**.
 
+This file is the historical platform release checklist. For the current CLI distribution, TUI, and Homebrew flow, use [`cli-release.md`](./cli-release.md).
+
 ## 1. Sync and install once
 
 ```bash
@@ -18,7 +20,7 @@ npm ci
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install -e ".[dev]"
+pip install -e ".[dev,tui]"
 ```
 
 ## 2. Run the release gate
