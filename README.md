@@ -6,6 +6,24 @@ It brings the pieces operators actually need into one repo: a FastAPI control pl
 
 ![MUTX architecture at a glance](docs/assets/readme-architecture.svg)
 
+## Fastest Start
+
+If you are on macOS and just want the TUI open as fast as possible, copy-paste this:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/scripts/install-tui.sh)"
+```
+
+That bootstrap script will:
+
+- tap `mutx-dev/homebrew-tap`
+- install or upgrade `mutx`
+- relink the Homebrew binary if an older `/opt/homebrew/bin/mutx` shim already exists
+- run `mutx status`
+- launch `mutx tui`
+
+If you have not logged in yet, the TUI still opens in local-only mode and shows the current config/auth state instead of crashing.
+
 ## Why MUTX Exists
 
 Most agent projects are still optimized for demos:
@@ -159,6 +177,12 @@ mutx tui
 ```
 
 If `mutx` still resolves to a stale wrapper and raises `ModuleNotFoundError: No module named 'cli'`, verify that `which mutx` points at the Homebrew-linked path under `/opt/homebrew/bin/mutx` and not an older script.
+
+One-command TUI bootstrap on macOS:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/scripts/install-tui.sh)"
+```
 
 ## Local Quickstart
 
