@@ -29,6 +29,26 @@ def _deployment_payload(**overrides: Any) -> dict[str, Any]:
     return payload
 
 
+def _version_history_payload(deployment_id: uuid.UUID, **overrides: Any) -> dict[str, Any]:
+    payload = {
+        "deployment_id": str(deployment_id),
+        "items": [
+            {
+                "id": str(uuid.uuid4()),
+                "deployment_id": str(deployment_id),
+                "version": 2,
+                "config_snapshot": '{"replicas": 3, "version": "v1.1.0"}',
+                "status": "current",
+                "created_at": "2026-03-12T11:00:00Z",
+                "rolled_back_at": None,
+            }
+        ],
+        "total": 1,
+    }
+    payload.update(overrides)
+    return payload
+
+
 def _event_history_payload(deployment_id: uuid.UUID, **overrides: Any) -> dict[str, Any]:
     payload = {
         "deployment_id": str(deployment_id),
@@ -357,3 +377,90 @@ async def test_deployments_ametrics_hits_contract_route_and_query_params() -> No
     assert captured["path"] == f"/v1/deployments/{deployment_id}/metrics"
     assert captured["query"] == {"skip": "6", "limit": "12"}
     assert payload[0]["cpu_usage"] == 0.61
+
+
+def test_deployments_versions_hits_contract_route_and_maps_payload() -> None:
+    deployment_id = uuid.uuid4()
+    captured: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        return httpx.Response(200, json=_version_history_payload(deployment_id))
+
+    with httpx.Client(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
+        history = Deployments(client).versions(deployment_id)
+
+    assert captured["path"] == f"/v1/deployments/{deployment_id}/versions"
+    assert history.deployment_id == deployment_id
+    assert history.total == 1
+    assert history.items[0].version == 2
+    assert history.items[0].created_at is not None
+    assert history.items[0].created_at.tzinfo is not None
+
+
+@pytest.mark.asyncio
+async def test_deployments_aversions_hits_contract_route_and_maps_payload() -> None:
+    deployment_id = uuid.uuid4()
+    captured: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        return httpx.Response(200, json=_version_history_payload(deployment_id))
+
+    async with httpx.AsyncClient(
+        base_url="https://api.test",
+        transport=httpx.MockTransport(handler),
+    ) as client:
+        history = await Deployments(client).aversions(deployment_id)
+
+    assert captured["path"] == f"/v1/deployments/{deployment_id}/versions"
+    assert history.deployment_id == deployment_id
+    assert history.items[0].status == "current"
+
+
+def test_deployments_rollback_hits_contract_route_and_maps_payload() -> None:
+    deployment_id = uuid.uuid4()
+    captured: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        captured["body"] = request.content.decode()
+        return httpx.Response(
+            200, json=_deployment_payload(id=str(deployment_id), status="running")
+        )
+
+    with httpx.Client(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
+        deployment = Deployments(client).rollback(deployment_id, version=2)
+
+    assert captured["path"] == f"/v1/deployments/{deployment_id}/rollback"
+    assert json.loads(captured["body"]) == {"version": 2}
+    assert deployment.id == deployment_id
+    assert deployment.status == "running"
+
+
+@pytest.mark.asyncio
+async def test_deployments_arollback_hits_contract_route_and_maps_payload() -> None:
+    deployment_id = uuid.uuid4()
+    captured: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        captured["body"] = request.content.decode()
+        return httpx.Response(
+            200, json=_deployment_payload(id=str(deployment_id), status="running")
+        )
+
+    async with httpx.AsyncClient(
+        base_url="https://api.test",
+        transport=httpx.MockTransport(handler),
+    ) as client:
+        deployment = await Deployments(client).arollback(deployment_id, version=3)
+
+    assert captured["path"] == f"/v1/deployments/{deployment_id}/rollback"
+    assert json.loads(captured["body"]) == {"version": 3}
+    assert deployment.id == deployment_id
+    assert deployment.status == "running"

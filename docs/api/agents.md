@@ -1,374 +1,230 @@
-# Agents
+# Agents API
 
-Agents are autonomous entities that can perform tasks, report metrics, and receive commands.
+The canonical agent surface lives under `/v1/agents` and returns raw resources/lists rather than `{ data, total }` envelopes.
 
-## Endpoints
+## Authentication
 
-### Register Agent
-
-Register a new agent with the platform.
+All routes require a valid bearer token.
 
 ```http
-POST /agents/register
-```
-
-**Headers:**
-
-```
 Authorization: Bearer <access_token>
 ```
 
-**Request Body:**
+## List agents
+
+```http
+GET /v1/agents?limit=50&skip=0
+```
+
+Response:
 
 ```json
-{
-  "agent_type": "operator",
-  "name": "data-processor-01",
-  "metadata": {
-    "region": "us-east-1",
-    "version": "1.2.0"
+[
+  {
+    "id": "9d9f8c70-2fd0-4d1a-80d8-4f2b4a6e3c18",
+    "name": "support-agent",
+    "description": "Handles customer support",
+    "type": "openai",
+    "status": "running",
+    "config": {
+      "name": "support-agent",
+      "model": "gpt-4o",
+      "temperature": 0.7,
+      "version": 1
+    },
+    "config_version": 1,
+    "created_at": "2026-03-19T01:00:00",
+    "updated_at": "2026-03-19T01:00:00",
+    "user_id": "1a20f130-cda8-4eb0-b538-2989273b29f7"
   }
-}
+]
 ```
 
-**Response:**
-
-```json
-{
-  "agent_id": "agnt_abc123",
-  "agent_type": "operator",
-  "name": "data-processor-01",
-  "status": "registered",
-  "created_at": "2024-01-15T10:30:00Z"
-}
-```
-
----
-
-### List Agents
-
-Retrieve all registered agents.
+## Create agent
 
 ```http
-GET /agents
+POST /v1/agents
 ```
 
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `status` | string | Filter by status (registered, online, offline, error) |
-| `agent_type` | string | Filter by agent type |
-| `limit` | int | Maximum results (default: 50) |
-| `offset` | int | Pagination offset |
-
-**Response:**
+Request body:
 
 ```json
 {
-  "data": [
-    {
-      "agent_id": "agnt_abc123",
-      "agent_type": "operator",
-      "name": "data-processor-01",
-      "status": "online",
-      "last_heartbeat": "2024-01-20T15:45:00Z"
-    }
-  ],
-  "total": 42
-}
-```
-
----
-
-### Get Agent Details
-
-Retrieve detailed information about an agent.
-
-```http
-GET /agents/{agent_id}
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Response:**
-
-```json
-{
-  "agent_id": "agnt_abc123",
-  "agent_type": "operator",
-  "name": "data-processor-01",
-  "status": "online",
-  "metadata": {
-    "region": "us-east-1",
-    "version": "1.2.0"
-  },
-  "created_at": "2024-01-15T10:30:00Z",
-  "last_heartbeat": "2024-01-20T15:45:00Z"
-}
-```
-
----
-
-### Get Agent Status
-
-Get current operational status of an agent.
-
-```http
-GET /agents/{agent_id}/status
-```
-
-**Response:**
-
-```json
-{
-  "agent_id": "agnt_abc123",
-  "status": "online",
-  "state": "idle",
-  "current_task": null,
-  "uptime_seconds": 3600
-}
-```
-
----
-
-### Update Agent Status
-
-Update agent status from the agent itself.
-
-```http
-POST /agents/heartbeat
-```
-
-**Request Body:**
-
-```json
-{
-  "agent_id": "agnt_abc123",
-  "status": "online",
-  "state": "processing",
-  "current_task": "task_xyz789",
-  "metrics": {
-    "cpu_percent": 45.2,
-    "memory_percent": 62.1
-  }
-}
-```
-
----
-
-### Deploy Agent
-
-Trigger deployment for an agent.
-
-```http
-POST /agents/{agent_id}/deploy
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Request Body:**
-
-```json
-{
-  "version": "1.3.0",
+  "name": "support-agent",
+  "description": "Handles customer support",
+  "type": "openai",
   "config": {
-    "replicas": 2,
-    "environment": {
-      "LOG_LEVEL": "debug"
-    }
+    "model": "gpt-4o",
+    "temperature": 0.3,
+    "max_tokens": 512
   }
 }
 ```
 
-**Response:**
+Notes:
+- `config` may be either a JSON object or a JSON string.
+- The backend validates and normalizes the config for the selected agent `type`.
+
+## Get agent details
+
+```http
+GET /v1/agents/{agent_id}
+```
+
+Response includes embedded deployments and their lifecycle events.
+
+## Get runtime config
+
+```http
+GET /v1/agents/{agent_id}/config
+```
+
+Response:
 
 ```json
 {
-  "deployment_id": "dply_abc123",
-  "agent_id": "agnt_abc123",
-  "version": "1.3.0",
+  "agent_id": "9d9f8c70-2fd0-4d1a-80d8-4f2b4a6e3c18",
+  "type": "openai",
+  "config": {
+    "name": "support-agent",
+    "model": "gpt-4o",
+    "temperature": 0.3,
+    "max_tokens": 512,
+    "version": 1
+  },
+  "config_version": 1,
+  "updated_at": "2026-03-19T01:00:00"
+}
+```
+
+## Update runtime config
+
+```http
+PATCH /v1/agents/{agent_id}/config
+```
+
+Request body:
+
+```json
+{
+  "config": {
+    "model": "gpt-4o-mini",
+    "temperature": 0.2,
+    "max_tokens": 256
+  }
+}
+```
+
+Notes:
+- `config` may be a JSON object or a JSON string.
+- The backend increments config versioning automatically.
+- Invalid configs return `400` with `Configuration validation failed ...` in `detail`.
+
+## Deploy agent
+
+```http
+POST /v1/agents/{agent_id}/deploy
+```
+
+Response:
+
+```json
+{
+  "deployment_id": "8c4880f3-5c43-4427-b74f-8068a1471110",
   "status": "deploying"
 }
 ```
 
----
-
-### Stop Agent
-
-Stop a running agent.
+## Stop agent
 
 ```http
-POST /agents/{agent_id}/stop
+POST /v1/agents/{agent_id}/stop
 ```
 
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Response:**
+Response:
 
 ```json
 {
-  "message": "Agent stopped successfully"
+  "status": "stopped"
 }
 ```
 
----
-
-### Get Agent Logs
-
-Retrieve logs for an agent.
+## Get agent logs
 
 ```http
-GET /agents/{agent_id}/logs
+GET /v1/agents/{agent_id}/logs?limit=100&skip=0&level=ERROR
 ```
 
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `level` | string | Filter by log level (debug, info, warn, error) |
-| `since` | string | ISO timestamp - only logs after this time |
-| `limit` | int | Maximum number of log entries |
-
-**Response:**
+Response:
 
 ```json
-{
-  "logs": [
-    {
-      "timestamp": "2024-01-20T15:45:00Z",
-      "level": "info",
-      "message": "Agent started successfully"
-    }
-  ]
-}
-```
-
----
-
-### Get Agent Metrics
-
-Retrieve metrics for an agent.
-
-```http
-GET /agents/{agent_id}/metrics
-```
-
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `metric_type` | string | Type of metric (cpu, memory, network, custom) |
-| `since` | string | ISO timestamp |
-| `until` | string | ISO timestamp |
-| `interval` | string | Aggregation interval (1m, 5m, 1h, 1d) |
-
-**Response:**
-
-```json
-{
-  "agent_id": "agnt_abc123",
-  "metrics": [
-    {
-      "timestamp": "2024-01-20T15:00:00Z",
-      "cpu_percent": 45.2,
-      "memory_percent": 62.1,
-      "requests_total": 1234
-    }
-  ]
-}
-```
-
----
-
-### Send Agent Command
-
-Send a command to an agent.
-
-```http
-POST /agents/commands
-```
-
-**Request Body:**
-
-```json
-{
-  "agent_id": "agnt_abc123",
-  "command": "execute_task",
-  "payload": {
-    "task_id": "task_xyz789",
-    "priority": "high"
+[
+  {
+    "id": "7ff456a1-0e91-4898-93c2-c617f37694c0",
+    "agent_id": "9d9f8c70-2fd0-4d1a-80d8-4f2b4a6e3c18",
+    "level": "ERROR",
+    "message": "Inference request failed",
+    "extra_data": null,
+    "timestamp": "2026-03-19T01:10:00"
   }
-}
+]
 ```
 
-**Response:**
-
-```json
-{
-  "command_id": "cmd_abc123",
-  "status": "acknowledged"
-}
-```
-
----
-
-### Acknowledge Command
-
-Acknowledge receipt of a command.
+## Get agent metrics
 
 ```http
-POST /agents/commands/acknowledge
+GET /v1/agents/{agent_id}/metrics?limit=100&skip=0
 ```
 
-**Request Body:**
+Response:
 
 ```json
-{
-  "command_id": "cmd_abc123",
-  "status": "accepted"
-}
+[
+  {
+    "id": "7ff456a1-0e91-4898-93c2-c617f37694c0",
+    "agent_id": "9d9f8c70-2fd0-4d1a-80d8-4f2b4a6e3c18",
+    "cpu_usage": 0.52,
+    "memory_usage": 256.0,
+    "timestamp": "2026-03-19T01:10:00"
+  }
+]
 ```
 
----
-
-### Get Agent Commands
-
-List pending commands for an agent.
+## Create resource-usage record
 
 ```http
-GET /agents/commands
+POST /v1/agents/{agent_id}/resource-usage
 ```
 
-**Response:**
+Request body:
 
 ```json
 {
-  "commands": [
-    {
-      "command_id": "cmd_abc123",
-      "command": "execute_task",
-      "payload": {...},
-      "created_at": "2024-01-20T15:45:00Z"
-    }
-  ]
+  "prompt_tokens": 120,
+  "completion_tokens": 40,
+  "total_tokens": 160,
+  "api_calls": 1,
+  "cost_usd": 0.0042,
+  "model": "gpt-4o-mini",
+  "extra_metadata": {
+    "request_id": "req_123"
+  },
+  "period_start": "2026-03-19T01:00:00Z",
+  "period_end": "2026-03-19T01:05:00Z"
 }
 ```
+
+## List resource-usage records
+
+```http
+GET /v1/agents/{agent_id}/resource-usage?limit=50&skip=0
+```
+
+Returns a raw list of usage records ordered by `period_start` descending.
+
+## Common error semantics
+
+- `401` — missing or expired authentication
+- `403` — resource exists but is not owned by the caller
+- `404` — agent not found
+- `400` — invalid config or malformed request payload
