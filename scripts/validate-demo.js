@@ -123,7 +123,7 @@ async function main() {
     }
 
     await validateRoute('/');
-    await validateRoute('/app');
+    await validateRoute('/dashboard');
     await validateRoute('/contact');
     await validateRoute('/privacy-policy');
 
@@ -132,7 +132,7 @@ async function main() {
     console.log('=====================\n');
     console.log(`Demo available at: ${frontendBase}`);
     console.log('  - Homepage: /');
-    console.log('  - App shell: /app');
+    console.log('  - Canonical dashboard: /dashboard');
     return 0;
   } catch (err) {
     console.error('\n=====================');
