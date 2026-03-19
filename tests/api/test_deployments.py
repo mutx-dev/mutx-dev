@@ -648,3 +648,68 @@ class TestRollbackDeployment:
         assert data["version"] == "v1.0.0"
         assert data["replicas"] == 2
 
+    @pytest.mark.asyncio
+    async def test_rollback_deployment_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_deployment, db_session: AsyncSession
+    ):
+        """Test other users cannot rollback deployments they do not own."""
+        test_deployment.status = "stopped"
+        await db_session.commit()
+
+        db_session.add(
+            DeploymentVersion(
+                deployment_id=test_deployment.id,
+                version=1,
+                config_snapshot='{"replicas": 1, "version": "v1.0.0"}',
+                status="current",
+            )
+        )
+        await db_session.commit()
+
+        response = await other_user_client.post(
+            f"/v1/deployments/{test_deployment.id}/rollback",
+            json={"version": 1},
+        )
+        assert response.status_code == 403
+
+
+class TestDeploymentVersions:
+    """Tests for GET /deployments/{deployment_id}/versions endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_versions_success(
+        self, client: AsyncClient, test_deployment, db_session: AsyncSession
+    ):
+        """Test getting version history for a deployment."""
+        db_session.add_all(
+            [
+                DeploymentVersion(
+                    deployment_id=test_deployment.id,
+                    version=1,
+                    config_snapshot='{"replicas": 1, "version": "v1.0.0"}',
+                    status="superseded",
+                ),
+                DeploymentVersion(
+                    deployment_id=test_deployment.id,
+                    version=2,
+                    config_snapshot='{"replicas": 2, "version": "v2.0.0"}',
+                    status="current",
+                ),
+            ]
+        )
+        await db_session.commit()
+
+        response = await client.get(f"/v1/deployments/{test_deployment.id}/versions")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["deployment_id"] == str(test_deployment.id)
+        assert data["total"] == 2
+        assert len(data["items"]) == 2
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_versions_other_user_forbidden(
+        self, other_user_client: AsyncClient, test_deployment, db_session: AsyncSession
+    ):
+        """Test other users cannot view versions for deployments they do not own."""
+        response = await other_user_client.get(f"/v1/deployments/{test_deployment.id}/versions")
+        assert response.status_code == 403

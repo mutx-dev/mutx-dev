@@ -48,7 +48,7 @@ mutx = "cli.main:cli"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["cli*"]
+include = ["cli*", "mutx*"]
 
 [tool.ruff]
 line-length = 100
