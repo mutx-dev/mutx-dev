@@ -1,41 +1,114 @@
-<p align="center">
-  <img src="https://github.com/fortunexbt/mutx-dev/blob/main/public/logo.png" width="140" alt="MUTX logo"/>
-</p>
+# MUTX
 
-<h1 align="center">MUTX</h1>
+**MUTX is an open-source control plane for running AI agents like durable systems instead of disposable demos.**
 
-<p align="center">
-  <strong>The control plane for AI agents.</strong>
-</p>
+It brings the pieces operators actually need into one repo: a FastAPI control plane, a Next.js web surface, a Python CLI, a first-party terminal UI, a Python SDK, and the infrastructure lane behind deployment and runtime operations.
 
-<p align="center">
-  Deploy, operate, and govern agents like production systems.
-</p>
+![MUTX architecture at a glance](docs/assets/readme-architecture.svg)
 
-## What MUTX Is
+## Why MUTX Exists
 
-MUTX is an open-source control plane for running AI agents as durable systems instead of throwaway scripts.
+Most agent projects are still optimized for demos:
 
-The current monorepo includes:
+- weak ownership and auth boundaries
+- fragile deploy flows
+- poor observability once something is live
+- too much manual glue between app code, runtime state, and infrastructure
+- no honest operator surface when the dashboard is still incomplete
 
-- a FastAPI control plane under `src/api/`
-- a Next.js site and app surface under `app/`
-- a Python CLI and first-party terminal UI under `cli/`
-- a Python SDK under `sdk/`
-- local bootstrap, Docker, and infrastructure tooling under `scripts/` and `infrastructure/`
+The repo's own status and architecture docs point at the same pressure: agent systems need clearer control-plane boundaries, better deployment lifecycle handling, and faster operator feedback loops than a chat box or one-off script can provide.
 
-Current control-plane API routes are mounted under `/v1/*`.
+MUTX is the answer to that problem set:
 
-## What You Can Do Today
+- a control plane for auth, agents, deployments, webhooks, health, and ingest
+- an operator workflow through `mutx` and `mutx tui`
+- a path toward single-tenant runtime isolation, zero-trust networking, self-healing services, and dedicated infrastructure per customer
 
-- create and inspect agents
-- create and operate deployments
-- inspect deployment logs, events, and metrics
-- use the Python CLI from source
-- launch the first-party operator TUI with `mutx tui`
-- install the CLI via a third-party Homebrew tap
+## What Ships Today
 
-## Install The CLI
+The repo already contains real, working surfaces. It also has some deliberately marked aspirational areas. That distinction matters.
+
+| Surface | Truth today | Status |
+| --- | --- | --- |
+| `mutx.dev` | Public product narrative and entry point | Supported |
+| `docs.mutx.dev` | Canonical docs and API reference | Supported |
+| FastAPI control plane | Auth, agents, deployments, API keys, webhooks, ingest, health | Supported in repo |
+| Python CLI | Auth, status, agents, deployments, webhooks, API keys, config | Supported in repo |
+| `mutx tui` | Operator-focused terminal UI for agents and deployments | Supported in repo |
+| `app.mutx.dev` | Operator-facing app shell with real reads, but still incomplete as a full dashboard | Aspirational |
+
+Current API truth is versioned under **`/v1/*`**.
+
+## What MUTX Is Building Toward
+
+The current repo is already useful locally, but the architecture docs are clear about the larger target system:
+
+- dedicated customer environments instead of shared agent sprawl
+- zero-trust networking and stronger runtime isolation
+- self-healing supervision for connected agents
+- observability that includes logs, lifecycle events, metrics, and health
+- BYOK-style operation and no token markup as a product principle
+- infrastructure that is provisioned, not hand-assembled
+
+That is the important distinction in this repo:
+
+- **today**: the control plane, local stack, CLI, and TUI are real and usable
+- **next**: the full hosted operator experience and deeper runtime guarantees keep getting pushed toward the architecture target
+
+## The Operator Surface
+
+The first-party operator interface now exists in two forms:
+
+- the Python CLI: `mutx`
+- the terminal UI: `mutx tui`
+
+The TUI is intentionally dense, keyboard-first, and small in scope. It is built with Textual inside the existing CLI package and reuses the same config and auth state as the click commands.
+
+### `mutx tui` currently supports
+
+- auth and session state visibility
+- agent list and detail views
+- agent deploy and agent log inspection
+- deployment list and detail views
+- deployment events, logs, and metrics
+- safe actions with confirmation: restart, scale, delete
+- refreshable panes and operator-first navigation
+
+### Shared config and auth
+
+The CLI and TUI both use `~/.mutx/config.json`:
+
+```json
+{
+  "api_url": "http://localhost:8000",
+  "api_key": null,
+  "refresh_token": null
+}
+```
+
+That means `mutx status`, `mutx whoami`, `mutx agents ...`, and `mutx tui` all operate on the same stored session.
+
+## Architecture And Infra
+
+MUTX is not just a CLI wrapper around a few endpoints. The repo spans the full lane from surface to infrastructure:
+
+- **Web**: Next.js marketing site and app shell under `app/`
+- **Control plane**: FastAPI services under `src/api/`
+- **Operator tooling**: Python CLI and Textual TUI under `cli/`
+- **SDK**: Python SDK under `sdk/`
+- **Infra**: Docker, Terraform, Ansible, monitoring, and deployment assets under `infrastructure/`
+- **Docs and contracts**: architecture, API, troubleshooting, and release docs under `docs/`
+
+The current high-level platform model is:
+
+- Next.js surfaces in front
+- a FastAPI control plane in the middle
+- PostgreSQL and Redis in the data layer
+- Terraform and Ansible for provisioning and host setup
+
+For the bigger system design, see [docs/architecture/overview.md](docs/architecture/overview.md).
+
+## Install
 
 ### From source
 
@@ -46,7 +119,7 @@ pip install -r requirements.txt
 pip install -e ".[dev,tui]"
 ```
 
-Smoke commands:
+Smoke check:
 
 ```bash
 mutx --help
@@ -54,47 +127,26 @@ mutx status
 mutx tui
 ```
 
-The CLI stores local config in `~/.mutx/config.json`:
-
-```json
-{
-  "api_url": "http://localhost:8000",
-  "api_key": null,
-  "refresh_token": null
-}
-```
-
 ### From Homebrew
 
-The intended install path is the third-party tap:
+The CLI is distributed through the third-party tap:
 
 ```bash
 brew tap mutx-dev/homebrew-tap
 brew install mutx
 ```
 
-The formula is expected to use a non-network smoke test such as `mutx status`.
-
-## Operator TUI
-
-Launch the first-party terminal UI with:
+After install:
 
 ```bash
+mutx --help
+mutx status
 mutx tui
 ```
 
-The current operator-focused scope is intentionally small:
+## Local Quickstart
 
-- auth/session state
-- agents list, detail, deploy, logs
-- deployments list, detail, events, logs, metrics
-- safe actions with confirmation: restart, scale, delete
-
-The TUI reuses the existing CLI config and auth/session flow. It does not maintain a separate session store.
-
-## Local Quick Start
-
-### Fastest repo-native path
+If you want the fastest truthful local path:
 
 ```bash
 git clone https://github.com/mutx-dev/mutx-dev.git
@@ -119,33 +171,11 @@ Local URLs:
 - API: `http://localhost:8000`
 - API docs: `http://localhost:8000/docs`
 
-### If you prefer direct API checks
-
-Register a user:
-
-```bash
-curl -X POST http://localhost:8000/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
-```
-
-Log in:
-
-```bash
-curl -X POST http://localhost:8000/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"you@example.com","password":"StrongPass1!"}'
-```
-
-Then use the returned token with:
-
-- `GET /v1/auth/me`
-- `GET /v1/agents`
-- `GET /v1/deployments`
+If you want a lower-level API-first path, start with [docs/deployment/quickstart.md](docs/deployment/quickstart.md).
 
 ## Common Commands
 
-### Local development
+### Local stack
 
 ```bash
 make help
@@ -160,7 +190,6 @@ make test-api-auth
 ### CLI and TUI
 
 ```bash
-mutx --help
 mutx status
 mutx whoami
 mutx agents list --limit 10
@@ -168,26 +197,24 @@ mutx deploy list --limit 10
 mutx tui
 ```
 
-### Validation
+### TUI keys
 
-```bash
-./scripts/test.sh
-```
+- `r` refresh the active pane
+- `d` deploy the selected agent
+- `x` restart the selected deployment
+- `s` scale the selected deployment
+- `backspace` delete the selected deployment
+- `q` quit
 
-Smaller CLI-focused validation:
+Full CLI reference lives in [docs/cli.md](docs/cli.md).
 
-```bash
-pytest tests/test_cli_auth_and_tui.py tests/test_cli_agents_contract.py tests/test_cli_deploy_contract.py
-python3 -m compileall src/api cli sdk/mutx
-```
-
-## Repository Layout
+## Repo Map
 
 ```text
 mutx-dev/
-├── app/                  # Next.js site and app routes
-├── cli/                  # Python CLI and Textual TUI
-├── docs/                 # Documentation source
+├── app/                  # Next.js marketing site and app shell
+├── cli/                  # Python CLI and Textual operator TUI
+├── docs/                 # Docs, architecture, contracts, troubleshooting
 ├── infrastructure/       # Docker, Terraform, Ansible, monitoring
 ├── scripts/              # Local bootstrap and validation helpers
 ├── sdk/                  # Python SDK
@@ -195,29 +222,77 @@ mutx-dev/
 └── tests/                # Python, frontend, and contract tests
 ```
 
-## Release Truth
+## Changelog And Release Truth
 
+The repo now tracks multiple release lanes, and the README should be explicit about that:
+
+- frontend and hosted app releases use the main app version flow
 - the CLI distribution version lives in the root `pyproject.toml`
-- the recommended CLI tag format is `cli-vX.Y.Z`
-- the Python SDK version lives separately in `sdk/pyproject.toml`
-- the Homebrew tap should track the CLI release archive, not frontend/site tags
+- CLI release tags use **`cli-vX.Y.Z`**
+- the Homebrew formula should point at the matching CLI tag archive
 
-For the detailed CLI/tap release flow, see [docs/deployment/cli-release.md](docs/deployment/cli-release.md).
+Current user-visible CLI highlights are tracked in [CHANGELOG.md](CHANGELOG.md). Recent additions include:
 
-## Docs
+- the first-party `mutx tui` operator shell
+- a shared CLI service layer under `cli/services/*`
+- third-party Homebrew installation through `mutx-dev/homebrew-tap`
+- docs aligned to the live `/v1/*` control-plane contract
 
-- CLI guide: [docs/cli.md](docs/cli.md)
-- quickstart: [docs/deployment/quickstart.md](docs/deployment/quickstart.md)
-- local bootstrap: [docs/deployment/local-developer-bootstrap.md](docs/deployment/local-developer-bootstrap.md)
-- release notes and tagging: [docs/changelog-status.md](docs/changelog-status.md)
-- architecture overview: [docs/architecture/overview.md](docs/architecture/overview.md)
-- API contract docs: [docs/contracts/api/index.md](docs/contracts/api/index.md)
+For the release runbook, see [docs/deployment/cli-release.md](docs/deployment/cli-release.md) and [docs/changelog-status.md](docs/changelog-status.md).
 
-Hosted docs are available at [docs.mutx.dev](https://docs.mutx.dev).
+## Validation
 
-## Contributing
+Repo-wide validation:
 
-Start with [CONTRIBUTING.md](CONTRIBUTING.md).
+```bash
+./scripts/test.sh
+```
+
+CLI and TUI focused validation:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev,tui]"
+
+mutx --help
+mutx status
+python -m pytest tests/test_cli_auth_and_tui.py tests/test_cli_agents_contract.py tests/test_cli_deploy_contract.py
+```
+
+## Contributions Requested
+
+MUTX is already broad enough that contribution quality matters more than contribution size.
+
+High-leverage areas from the repo's own status docs:
+
+- route auth and ownership enforcement in the API
+- stronger dashboard reads and write flows in the app surface
+- CLI and SDK alignment with the live FastAPI contract
+- backend route coverage and more truthful CI
+- infrastructure validation and operational confidence loops
+- docs drift control and better examples
+
+Good first reading:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [docs/project-status.md](docs/project-status.md)
+- [ROADMAP.md](ROADMAP.md)
+- [docs/surfaces.md](docs/surfaces.md)
+
+The repo also includes an explicit autonomous shipping model in [docs/autonomy/operating_model.md](docs/autonomy/operating_model.md) for small, reviewed, testable changes without giving unattended agents direct production power.
+
+## Documentation
+
+- [docs/README.md](docs/README.md)
+- [docs/cli.md](docs/cli.md)
+- [docs/deployment/quickstart.md](docs/deployment/quickstart.md)
+- [docs/deployment/local-developer-bootstrap.md](docs/deployment/local-developer-bootstrap.md)
+- [docs/architecture/overview.md](docs/architecture/overview.md)
+- [docs/contracts/api/index.md](docs/contracts/api/index.md)
+- [docs/troubleshooting/faq.md](docs/troubleshooting/faq.md)
+
+Hosted docs: [docs.mutx.dev](https://docs.mutx.dev)
 
 ## License
 
