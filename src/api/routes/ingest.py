@@ -26,6 +26,7 @@ from src.api.services.webhook_service import (
     trigger_deployment_event,
     trigger_webhook_event,
 )
+from src.api.time_utils import utc_now_naive
 
 router = APIRouter(prefix="/ingest", tags=["ingest"])
 logger = logging.getLogger(__name__)
@@ -72,7 +73,7 @@ async def agent_status_update(
 
     old_status = agent.status
     agent.status = status_data.status.value
-    agent.last_heartbeat = datetime.now(timezone.utc)
+    agent.last_heartbeat = utc_now_naive()
     agent.updated_at = datetime.now(timezone.utc)
 
     log = AgentLog(
@@ -184,13 +185,13 @@ async def receive_metrics(
             status_code=403, detail="Not authorized to submit metrics for this agent"
         )
 
-    agent.last_heartbeat = datetime.now(timezone.utc)
+    agent.last_heartbeat = utc_now_naive()
     metric = AgentMetric(
         agent_id=metrics_data.agent_id,
         cpu_usage=metrics_data.cpu_usage,
         memory_usage=metrics_data.memory_usage,
     )
-    agent.last_heartbeat = datetime.now(timezone.utc)
+    agent.last_heartbeat = utc_now_naive()
     db.add(metric)
     await db.commit()
 

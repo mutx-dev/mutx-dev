@@ -28,6 +28,7 @@ from src.api.models import Agent, AgentLog, AgentMetric, AgentStatus, AgentVersi
 from src.api.models.schemas import AgentResponse
 from src.api.services.user_service import hash_api_key
 from src.api.services.webhook_service import trigger_webhook_event
+from src.api.time_utils import as_utc_naive
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +188,7 @@ async def heartbeat(
     heartbeat_timestamp = now.isoformat()
     new_status = request.status.value
     agent.status = new_status
-    agent.last_heartbeat = now
+    agent.last_heartbeat = as_utc_naive(now)
 
     await db.commit()
 

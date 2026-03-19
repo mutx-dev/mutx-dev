@@ -9,6 +9,7 @@ from src.api import database as database_module
 from src.api.models import Agent, AgentLog, AgentStatus
 from src.api.services.monitoring import STALE_THRESHOLD_SECONDS, monitor_agent_health
 from src.api.services.self_healer import RecoveryAction, get_self_healing_service
+from src.api.time_utils import utc_now_naive
 
 logger = logging.getLogger(__name__)
 
@@ -46,13 +47,13 @@ async def _recover_agent_to_running(agent_id: str, metadata):
 
         previous_status = agent.status
         agent.status = AgentStatus.RUNNING.value
-        agent.last_heartbeat = datetime.now(timezone.utc).replace(tzinfo=None)
+        agent.last_heartbeat = utc_now_naive()
         session.add(
             AgentLog(
                 agent_id=agent.id,
                 level="warning",
                 message="Self-healing recovery handler restored agent status to RUNNING",
-                timestamp=datetime.now(timezone.utc).replace(tzinfo=None),
+                timestamp=datetime.now(timezone.utc),
             )
         )
         await session.commit()

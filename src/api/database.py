@@ -179,16 +179,20 @@ def _has_table(sync_connection: Connection, table_name: str) -> bool:
 
 def _has_column(sync_connection: Connection, table_name: str, column_name: str) -> bool:
     inspector = inspect(sync_connection)
+    if not inspector.has_table(table_name):
+        return False
     return any(column["name"] == column_name for column in inspector.get_columns(table_name))
 
 
 def _has_index(sync_connection: Connection, table_name: str, index_name: str) -> bool:
     inspector = inspect(sync_connection)
+    if not inspector.has_table(table_name):
+        return False
     return any(index["name"] == index_name for index in inspector.get_indexes(table_name))
 
 
 def _repair_known_schema_drift(sync_connection: Connection) -> list[str]:
-    from src.api.models.models import AgentLog, RefreshTokenSession
+    from src.api.models.models import AgentLog, RefreshTokenSession, UsageEvent
 
     repaired_objects: list[str] = []
 
@@ -202,16 +206,43 @@ def _repair_known_schema_drift(sync_connection: Connection) -> list[str]:
     if not _has_table(sync_connection, RefreshTokenSession.__tablename__):
         RefreshTokenSession.__table__.create(bind=sync_connection, checkfirst=True)
         repaired_objects.append(RefreshTokenSession.__tablename__)
-        return repaired_objects
+    else:
+        for index in sorted(RefreshTokenSession.__table__.indexes, key=lambda item: item.name or ""):
+            if index.name and not _has_index(
+                sync_connection,
+                RefreshTokenSession.__tablename__,
+                index.name,
+            ):
+                index.create(bind=sync_connection, checkfirst=True)
+                repaired_objects.append(f"{RefreshTokenSession.__tablename__}.{index.name}")
 
-    for index in sorted(RefreshTokenSession.__table__.indexes, key=lambda item: item.name or ""):
-        if index.name and not _has_index(
-            sync_connection,
-            RefreshTokenSession.__tablename__,
-            index.name,
-        ):
-            index.create(bind=sync_connection, checkfirst=True)
-            repaired_objects.append(f"{RefreshTokenSession.__tablename__}.{index.name}")
+    if not _has_table(sync_connection, UsageEvent.__tablename__):
+        UsageEvent.__table__.create(bind=sync_connection, checkfirst=True)
+        repaired_objects.append(UsageEvent.__tablename__)
+    else:
+        usage_event_column_repairs = {
+            "resource_type": "ALTER TABLE usage_events ADD COLUMN resource_type VARCHAR(100)",
+            "resource_id": "ALTER TABLE usage_events ADD COLUMN resource_id VARCHAR(255)",
+            "credits_used": (
+                "ALTER TABLE usage_events "
+                "ADD COLUMN credits_used DOUBLE PRECISION NOT NULL DEFAULT 1.0"
+            ),
+            "event_metadata": "ALTER TABLE usage_events ADD COLUMN event_metadata TEXT",
+        }
+
+        for column_name, statement in usage_event_column_repairs.items():
+            if not _has_column(sync_connection, UsageEvent.__tablename__, column_name):
+                sync_connection.execute(text(statement))
+                repaired_objects.append(f"{UsageEvent.__tablename__}.{column_name}")
+
+        for index in sorted(UsageEvent.__table__.indexes, key=lambda item: item.name or ""):
+            if index.name and not _has_index(
+                sync_connection,
+                UsageEvent.__tablename__,
+                index.name,
+            ):
+                index.create(bind=sync_connection, checkfirst=True)
+                repaired_objects.append(f"{UsageEvent.__tablename__}.{index.name}")
 
     return repaired_objects
 

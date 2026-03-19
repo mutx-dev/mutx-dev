@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.models import Agent, AgentLog, Deployment, Alert, AlertType
 from src.api.services.webhook_service import trigger_agent_status_event, trigger_deployment_event
+from src.api.time_utils import as_utc_naive
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +118,7 @@ async def monitor_agent_health(session: AsyncSession):
         if created and now - created > timedelta(seconds=10):
             old_status = agent.status
             agent.status = "running"
-            agent.last_heartbeat = now
+            agent.last_heartbeat = as_utc_naive(now)
 
             # Ensure a deployment record exists
             dep_check = await session.execute(
@@ -234,7 +235,7 @@ async def monitor_agent_health(session: AsyncSession):
             logger.info(f"Auto-Healer: Restarting agent {agent.name} ({agent.id})...")
             old_status = agent.status
             agent.status = "running"
-            agent.last_heartbeat = now
+            agent.last_heartbeat = as_utc_naive(now)
 
             # Resolve active AGENT_DOWN alerts
             await session.execute(
