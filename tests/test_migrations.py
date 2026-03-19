@@ -9,7 +9,7 @@ def test_alembic_has_single_head():
     config = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
     script = ScriptDirectory.from_config(config)
 
-    assert script.get_heads() == ["5c2f4a7d9e10"]
+    assert script.get_heads() == ["8b3a6f1d2c4e"]
 
 
 def _load_migration_module(module_name: str, file_name: str):
@@ -97,6 +97,75 @@ def test_live_mode_schema_hardening_upgrade_is_idempotent_for_existing_live_sche
     module.upgrade()
 
     assert calls == [
+        ("create_table", "refresh_token_sessions"),
+        (
+            "create_index",
+            "ix_refresh_token_sessions_user_id",
+            "refresh_token_sessions",
+            ("user_id",),
+            False,
+        ),
+        (
+            "create_index",
+            "ix_refresh_token_sessions_token_jti",
+            "refresh_token_sessions",
+            ("token_jti",),
+            True,
+        ),
+        (
+            "create_index",
+            "ix_refresh_token_sessions_family_id",
+            "refresh_token_sessions",
+            ("family_id",),
+            False,
+        ),
+    ]
+
+
+def test_repair_live_auth_schema_drift_repairs_missing_objects(monkeypatch):
+    module = _load_migration_module(
+        "repair_live_auth_schema_drift",
+        "8b3a6f1d2c4e_repair_live_auth_schema_drift.py",
+    )
+
+    existing_tables = {"agent_logs", "users"}
+    existing_columns = set()
+    existing_indexes = set()
+    calls: list[tuple] = []
+
+    monkeypatch.setattr(module, "_has_table", lambda table_name: table_name in existing_tables)
+    monkeypatch.setattr(
+        module,
+        "_has_column",
+        lambda table_name, column_name: (table_name, column_name) in existing_columns,
+    )
+    monkeypatch.setattr(
+        module,
+        "_has_index",
+        lambda _table_name, index_name: index_name in existing_indexes,
+    )
+    monkeypatch.setattr(module.op, "f", lambda name: name)
+
+    def add_column(table_name, column):
+        calls.append(("add_column", table_name, column.name))
+        existing_columns.add((table_name, column.name))
+
+    def create_table(table_name, *args, **kwargs):
+        calls.append(("create_table", table_name))
+        existing_tables.add(table_name)
+
+    def create_index(index_name, table_name, columns, unique=False):
+        calls.append(("create_index", index_name, table_name, tuple(columns), unique))
+        existing_indexes.add(index_name)
+
+    monkeypatch.setattr(module.op, "add_column", add_column)
+    monkeypatch.setattr(module.op, "create_table", create_table)
+    monkeypatch.setattr(module.op, "create_index", create_index)
+
+    module.upgrade()
+
+    assert calls == [
+        ("add_column", "agent_logs", "meta_data"),
         ("create_table", "refresh_token_sessions"),
         (
             "create_index",
