@@ -28,21 +28,23 @@ curl -X POST https://api.mutx.dev/auth/login \
 
 ## Response Format
 
-All responses follow this structure:
+The API is not fully envelope-based today. Most routes return raw JSON resources or arrays directly, while errors generally follow FastAPI's `detail` shape.
+
+Example success responses:
 
 ```json
-{
-  "data": { ... },
-  "message": "Success"
-}
+[{"id": "...", "status": "running"}]
 ```
 
-Error responses:
+```json
+{"id": "...", "status": "pending"}
+```
+
+Example error response:
 
 ```json
 {
-  "detail": "Error message",
-  "status_code": 400
+  "detail": "Error message"
 }
 ```
 

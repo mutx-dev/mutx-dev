@@ -1,288 +1,176 @@
 # Deployments
 
-Deployments manage the lifecycle of agent services in production.
+Deployments manage the runtime lifecycle of agents in production.
+
+## Base Path
+
+All routes below are mounted under `/v1`.
+
+## Response Shape
+
+Deployment routes return raw JSON resources, not `{"data": ...}` envelopes.
 
 ## Endpoints
 
-### List Deployments
-
-Retrieve all deployments.
+### List deployments
 
 ```http
-GET /deployments
+GET /v1/deployments?skip=0&limit=50&agent_id=<uuid>&status=running
 ```
 
-**Headers:**
+Returns a JSON array of deployment objects ordered newest-first.
 
-```
-Authorization: Bearer <access_token>
-```
-
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `status` | string | Filter by status (pending, running, stopped, failed) |
-| `agent_id` | string | Filter by agent |
-| `limit` | int | Maximum results |
-| `offset` | int | Pagination offset |
-
-**Response:**
+Example item:
 
 ```json
 {
-  "data": [
-    {
-      "deployment_id": "dply_abc123",
-      "agent_id": "agnt_abc123",
-      "agent_name": "data-processor-01",
-      "version": "1.2.0",
-      "status": "running",
-      "replicas": 2,
-      "created_at": "2024-01-15T10:30:00Z"
-    }
-  ],
-  "total": 15
-}
-```
-
----
-
-### Create Deployment
-
-Create a new deployment.
-
-```http
-POST /deployments
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Request Body:**
-
-```json
-{
-  "agent_id": "agnt_abc123",
-  "version": "1.3.0",
-  "config": {
-    "replicas": 3,
-    "environment": {
-      "LOG_LEVEL": "info",
-      "DATABASE_URL": "postgresql://..."
-    },
-    "resources": {
-      "cpu": "500m",
-      "memory": "512Mi"
-    }
-  }
-}
-```
-
-**Response:**
-
-```json
-{
-  "deployment_id": "dply_xyz789",
-  "agent_id": "agnt_abc123",
-  "version": "1.3.0",
-  "status": "pending",
-  "replicas": 3,
-  "created_at": "2024-01-20T10:30:00Z"
-}
-```
-
----
-
-### Get Deployment Details
-
-Retrieve detailed information about a deployment.
-
-```http
-GET /deployments/{deployment_id}
-```
-
-**Response:**
-
-```json
-{
-  "deployment_id": "dply_abc123",
-  "agent_id": "agnt_abc123",
-  "agent_name": "data-processor-01",
-  "version": "1.3.0",
+  "id": "3dd9b2df-58b6-4cc0-a595-5c30f17c1a4a",
+  "agent_id": "f145d31b-c0b2-4559-bca7-4e0d4c546f8c",
   "status": "running",
+  "version": "v1.0.0",
   "replicas": 2,
-  "config": {
-    "environment": {...},
-    "resources": {...}
-  },
-  "created_at": "2024-01-15T10:30:00Z",
-  "updated_at": "2024-01-20T15:45:00Z"
+  "node_id": "node-1",
+  "started_at": "2026-03-12T09:05:00Z",
+  "ended_at": null,
+  "error_message": null,
+  "events": []
 }
 ```
 
----
-
-### Restart Deployment
-
-Restart a running deployment.
+### Create deployment
 
 ```http
-POST /deployments/{deployment_id}/restart
-```
+POST /v1/deployments
+Content-Type: application/json
 
-**Response:**
-
-```json
 {
-  "deployment_id": "dply_abc123",
-  "status": "restarting",
-  "message": "Deployment restart initiated"
+  "agent_id": "f145d31b-c0b2-4559-bca7-4e0d4c546f8c",
+  "replicas": 3
 }
 ```
 
----
+Creates a new pending deployment and returns the full deployment resource.
 
-### Scale Deployment
-
-Scale deployment replicas up or down.
+### Get deployment
 
 ```http
-POST /deployments/{deployment_id}/scale
+GET /v1/deployments/{deployment_id}
 ```
 
-**Request Body:**
+Returns the deployment resource with nested lifecycle events.
 
-```json
+### Scale deployment
+
+```http
+POST /v1/deployments/{deployment_id}/scale
+Content-Type: application/json
+
 {
   "replicas": 5
 }
 ```
 
-**Response:**
+Allowed when the deployment status is `running` or `ready`.
 
-```json
-{
-  "deployment_id": "dply_abc123",
-  "replicas": 5,
-  "previous_replicas": 2,
-  "status": "scaling"
-}
-```
-
----
-
-### Get Deployment Logs
-
-Retrieve logs for a deployment.
+### Restart deployment
 
 ```http
-GET /deployments/{deployment_id}/logs
+POST /v1/deployments/{deployment_id}/restart
 ```
 
-**Query Parameters:**
+Allowed when the deployment status is `stopped`, `failed`, or `killed`.
+Returns the updated deployment resource.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `container` | string | Container name (main, sidecar) |
-| `since` | string | ISO timestamp |
-| `limit` | int | Maximum log lines |
-| `follow` | bool | Stream logs (Server-Sent Events) |
-
-**Response:**
-
-```json
-{
-  "logs": [
-    {
-      "timestamp": "2024-01-20T15:45:00Z",
-      "container": "main",
-      "message": "Application started",
-      "level": "info"
-    }
-  ]
-}
-```
-
----
-
-### Get Deployment Events
-
-Retrieve lifecycle events for a deployment.
+### Delete deployment
 
 ```http
-GET /deployments/{deployment_id}/events
+DELETE /v1/deployments/{deployment_id}
 ```
 
-**Response:**
+Marks the deployment as killed and returns `204 No Content`.
 
-```json
-{
-  "events": [
-    {
-      "event_id": "evt_abc123",
-      "type": "scaling",
-      "message": "Scaled to 5 replicas",
-      "timestamp": "2024-01-20T15:45:00Z",
-      "metadata": {
-        "previous_replicas": 2,
-        "new_replicas": 5
-      }
-    }
-  ]
-}
-```
-
----
-
-### Get Deployment Metrics
-
-Retrieve metrics for a deployment.
+### Deployment events
 
 ```http
-GET /deployments/{deployment_id}/metrics
+GET /v1/deployments/{deployment_id}/events?skip=0&limit=100&event_type=restart&status=failed
 ```
 
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `metric_type` | string | Type (cpu, memory, requests, custom) |
-| `since` | string | Start timestamp |
-| `until` | string | End timestamp |
-| `interval` | string | Aggregation (1m, 5m, 1h, 1d) |
-
-**Response:**
+Returns paginated lifecycle history:
 
 ```json
 {
-  "deployment_id": "dply_abc123",
-  "metrics": [
+  "deployment_id": "3dd9b2df-58b6-4cc0-a595-5c30f17c1a4a",
+  "deployment_status": "failed",
+  "items": [
     {
-      "timestamp": "2024-01-20T15:00:00Z",
-      "cpu_percent": 45.2,
-      "memory_percent": 62.1,
-      "requests_per_second": 125.5,
-      "error_rate": 0.01
+      "id": "119db9f1-5c83-450e-b563-f770c5074f6d",
+      "deployment_id": "3dd9b2df-58b6-4cc0-a595-5c30f17c1a4a",
+      "event_type": "restart",
+      "status": "failed",
+      "node_id": "node-1",
+      "error_message": null,
+      "created_at": "2026-03-12T10:00:00Z"
     }
-  ]
+  ],
+  "total": 1,
+  "skip": 0,
+  "limit": 100,
+  "event_type": "restart",
+  "status": "failed"
 }
 ```
 
-## Deployment States
+### Deployment logs
 
-| State | Description |
-|-------|-------------|
-| `pending` | Deployment created, starting |
-| `running` | Successfully deployed and serving |
-| `stopped` | Deployment stopped |
-| `failed` | Deployment failed |
-| `restarting` | Restart in progress |
-| `scaling` | Scaling in progress |
+```http
+GET /v1/deployments/{deployment_id}/logs?skip=0&limit=100&level=ERROR
+```
 
-## Webhooks for Deployments
+Returns a JSON array of deployment log rows for the deployment's agent.
 
-Configure webhooks to receive deployment notifications. See [webhooks.md](./webhooks.md).
+### Deployment metrics
+
+```http
+GET /v1/deployments/{deployment_id}/metrics?skip=0&limit=100
+```
+
+Returns a JSON array of metric points for the deployment's agent.
+
+### Deployment versions
+
+```http
+GET /v1/deployments/{deployment_id}/versions
+```
+
+Returns version history:
+
+```json
+{
+  "deployment_id": "3dd9b2df-58b6-4cc0-a595-5c30f17c1a4a",
+  "items": [
+    {
+      "id": "1d9f2e38-78c9-4c95-b9fc-20e9897d0b76",
+      "deployment_id": "3dd9b2df-58b6-4cc0-a595-5c30f17c1a4a",
+      "version": 2,
+      "config_snapshot": "{\"replicas\": 3, \"version\": \"v1.1.0\"}",
+      "status": "current",
+      "created_at": "2026-03-12T11:00:00Z",
+      "rolled_back_at": null
+    }
+  ],
+  "total": 1
+}
+```
+
+### Roll back deployment
+
+```http
+POST /v1/deployments/{deployment_id}/rollback
+Content-Type: application/json
+
+{
+  "version": 2
+}
+```
+
+Restores the selected deployment version snapshot and returns the updated deployment resource.
