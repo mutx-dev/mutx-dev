@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
+import { readJson } from "@/components/app/http";
 import { type components } from "@/app/types/api";
 import { getApiKeyLimit, getLatestActiveApiKey, getLatestRevokedApiKey } from "@/components/app/apiKeyHelpers";
 import { LogsViewer, MetricsDashboard, StateTransitions } from "@/components/app/Observability";
@@ -32,22 +33,6 @@ type Deployment = components["schemas"]["DeploymentResponse"];
 type ApiKey = components["schemas"]["APIKeyResponse"];
 type Health = components["schemas"]["HealthResponse"];
 type CreateKeyResponse = components["schemas"]["APIKeyCreateResponse"];
-
-async function readJson<T>(
-  input: RequestInfo | URL,
-  init?: RequestInit,
-): Promise<T> {
-  const response = await fetch(input, { ...init, cache: "no-store" });
-  const payload = await response
-    .json()
-    .catch(() => ({ detail: "Request failed" }));
-
-  if (!response.ok) {
-    throw new Error(payload.detail || payload.error || "Request failed");
-  }
-
-  return payload as T;
-}
 
 function formatDate(value?: string | null) {
   if (!value) return "N/A";

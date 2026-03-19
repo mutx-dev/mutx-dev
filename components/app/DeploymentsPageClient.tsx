@@ -21,43 +21,12 @@ import {
 import { DeploymentSortSelect } from "./DeploymentSortSelect";
 
 import { Card } from "@/components/ui/Card";
+import { readJson, writeJson } from "@/components/app/http";
 import { DeploymentHistory } from "./DeploymentHistory";
 import { type components } from "@/app/types/api";
 
 type Deployment = components["schemas"]["DeploymentResponse"];
 type Agent = components["schemas"]["AgentResponse"];
-
-async function readJson<T>(
-  input: RequestInfo | URL,
-  init?: RequestInit,
-): Promise<T> {
-  const response = await fetch(input, { ...init, cache: "no-store" });
-  const payload = await response
-    .json()
-    .catch(() => ({ detail: "Request failed" }));
-
-  if (!response.ok) {
-    throw new Error(payload.detail || payload.error || "Request failed");
-  }
-
-  return payload as T;
-}
-
-async function writeJson<T>(
-  input: RequestInfo | URL,
-  init?: RequestInit,
-): Promise<T> {
-  const response = await fetch(input, { ...init, cache: "no-store" });
-  const payload = await response
-    .json()
-    .catch(() => ({ detail: "Request failed" }));
-
-  if (!response.ok) {
-    throw new Error(payload.detail || payload.error || "Request failed");
-  }
-
-  return payload as T;
-}
 
 function formatRelativeDate(value?: string | null) {
   if (!value) return "Not recorded";
