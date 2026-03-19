@@ -20,6 +20,7 @@ import {
   Check,
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
+import { readJson, writeJson } from "@/components/app/http";
 
 type WebhookDelivery = {
   id: string;
@@ -40,6 +41,62 @@ type Webhook = {
   is_active: boolean;
   created_at: string;
 };
+
+function normalizeStringList(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
+}
+
+function normalizeWebhooks(payload: unknown): Webhook[] {
+  const container = payload && typeof payload === "object" ? (payload as Record<string, unknown>) : null;
+  const rawWebhooks = Array.isArray(payload) ? payload : container?.webhooks ?? container?.items ?? container?.data ?? [];
+
+  if (!Array.isArray(rawWebhooks)) return [];
+
+  return rawWebhooks
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") return null;
+      const record = entry as Record<string, unknown>;
+      const id = typeof record.id === "string" ? record.id : "";
+      const url = typeof record.url === "string" ? record.url : "";
+      if (!id || !url) return null;
+      return {
+        id,
+        url,
+        events: normalizeStringList(record.events),
+        is_active: Boolean(record.is_active),
+        created_at: typeof record.created_at === "string" ? record.created_at : "",
+      } satisfies Webhook;
+    })
+    .filter((webhook): webhook is Webhook => Boolean(webhook));
+}
+
+function normalizeDeliveries(payload: unknown): WebhookDelivery[] {
+  const container = payload && typeof payload === "object" ? (payload as Record<string, unknown>) : null;
+  const rawDeliveries = Array.isArray(payload) ? payload : container?.deliveries ?? container?.items ?? container?.data ?? [];
+
+  if (!Array.isArray(rawDeliveries)) return [];
+
+  return rawDeliveries
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") return null;
+      const record = entry as Record<string, unknown>;
+      const id = typeof record.id === "string" ? record.id : "";
+      if (!id) return null;
+      return {
+        id,
+        event: typeof record.event === "string" ? record.event : "unknown",
+        payload: typeof record.payload === "string" ? record.payload : JSON.stringify(record.payload ?? {}, null, 2),
+        status_code: typeof record.status_code === "number" ? record.status_code : null,
+        success: Boolean(record.success),
+        error_message: typeof record.error_message === "string" ? record.error_message : null,
+        attempts: typeof record.attempts === "number" ? record.attempts : 0,
+        created_at: typeof record.created_at === "string" ? record.created_at : new Date(0).toISOString(),
+        delivered_at: typeof record.delivered_at === "string" ? record.delivered_at : null,
+      } satisfies WebhookDelivery;
+    })
+    .filter((delivery): delivery is WebhookDelivery => Boolean(delivery));
+}
 
 export default function WebhooksPageClient() {
   const [webhooks, setWebhooks] = useState<Webhook[]>([]);
@@ -96,14 +153,16 @@ export default function WebhooksPageClient() {
       )
     : webhooks;
 
+  const hasAuthError = Boolean(error && /unauthorized|forbidden|auth|token|sign in|login/i.test(error));
+
   async function fetchWebhooks() {
     try {
       setLoading(true);
-      const res = await fetch("/api/webhooks");
-      if (!res.ok) throw new Error("Failed to fetch webhooks");
-      const data = await res.json();
-      setWebhooks(data.webhooks || []);
+      setError(null);
+      const data = await readJson<unknown>("/api/webhooks");
+      setWebhooks(normalizeWebhooks(data));
     } catch (err) {
+      setWebhooks([]);
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
@@ -113,11 +172,11 @@ export default function WebhooksPageClient() {
   async function fetchDeliveries(webhookId: string) {
     try {
       setLoadingDeliveries(true);
-      const res = await fetch(`/api/webhooks/${webhookId}/deliveries`);
-      if (!res.ok) throw new Error("Failed to fetch deliveries");
-      const data = await res.json();
-      setDeliveries(data.deliveries || []);
+      setError(null);
+      const data = await readJson<unknown>(`/api/webhooks/${webhookId}/deliveries`);
+      setDeliveries(normalizeDeliveries(data));
     } catch (err) {
+      setDeliveries([]);
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoadingDeliveries(false);
@@ -127,13 +186,14 @@ export default function WebhooksPageClient() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
+    setError(null);
     try {
       const method = editingWebhook ? "PATCH" : "POST";
       const url = editingWebhook
         ? `/api/webhooks/${editingWebhook.id}`
         : "/api/webhooks";
 
-      const res = await fetch(url, {
+      await writeJson<unknown>(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -143,12 +203,10 @@ export default function WebhooksPageClient() {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to save webhook");
-
       setShowForm(false);
       setEditingWebhook(null);
       setFormData({ url: "", events: "", is_active: true });
-      fetchWebhooks();
+      await fetchWebhooks();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -160,9 +218,9 @@ export default function WebhooksPageClient() {
     if (!confirm("Are you sure you want to delete this webhook?")) return;
 
     try {
-      const res = await fetch(`/api/webhooks/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete webhook");
-      fetchWebhooks();
+      setError(null);
+      await writeJson<unknown>(`/api/webhooks/${id}`, { method: "DELETE" });
+      await fetchWebhooks();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     }
@@ -170,9 +228,9 @@ export default function WebhooksPageClient() {
 
   async function handleTest(id: string) {
     setTestingId(id);
+    setError(null);
     try {
-      const res = await fetch(`/api/webhooks/${id}/test`, { method: "POST" });
-      if (!res.ok) throw new Error("Failed to test webhook");
+      await writeJson<unknown>(`/api/webhooks/${id}/test`, { method: "POST" });
       alert("Test event sent!");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -430,9 +488,11 @@ export default function WebhooksPageClient() {
       {filteredWebhooks.length === 0 && !showForm && !viewingDeliveries ? (
         <Card className="p-12 text-center">
           <Webhook className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold mb-2">No webhooks configured</h3>
+          <h3 className="text-lg font-semibold mb-2">{hasAuthError ? "Sign in to manage webhooks" : "No webhooks configured"}</h3>
           <p className="text-muted-foreground mb-4">
-            Add a webhook to receive real-time notifications
+            {hasAuthError
+              ? "Authentication is required before the dashboard can load webhook routes or delivery history."
+              : "Add a webhook to receive real-time notifications"}
           </p>
           <button
             onClick={() => setShowForm(true)}

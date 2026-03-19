@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { getApiBaseUrl, getAuthToken } from '@/app/api/_lib/controlPlane'
 import { withErrorHandling, unauthorized } from '@/app/api/_lib/errors'
+import { checkAgentOwnership } from '@/app/api/_lib/ownership'
 
 const API_BASE_URL = getApiBaseUrl()
 
@@ -18,11 +19,18 @@ export async function GET(
     }
 
     const { id } = await params
+
+    // Check ownership before proceeding
+    const ownershipError = await checkAgentOwnership(request, id)
+    if (ownershipError) {
+      return ownershipError
+    }
+
     const { searchParams } = new URL(request.url)
     const paramsStr = searchParams.toString()
-    
+
     const response = await fetch(`${API_BASE_URL}/v1/agents/${id}/logs?${paramsStr}`, {
-      headers: { 
+      headers: {
         Authorization: `Bearer ${token}`,
       },
       cache: 'no-store',

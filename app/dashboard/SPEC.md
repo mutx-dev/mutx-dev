@@ -1,7 +1,7 @@
 # MUTX Dashboard Redesign Specification
 
 ## Overview
-MUTX Dashboard - "The Vercel for production AI agents" control plane. Premium dark-first, operator-grade interface for managing autonomous agents deployed to dedicated VPCs.
+MUTX Dashboard - premium dark-first, operator-grade control plane for managing AI agents with explicit lifecycle, governance, and deployment semantics.
 
 ---
 
@@ -9,11 +9,9 @@ MUTX Dashboard - "The Vercel for production AI agents" control plane. Premium da
 
 | Path | Component | Agent-Native Label |
 |------|-----------|-------------------|
-| `/dashboard` | OverviewPage | Control Center |
+| `/dashboard` | OverviewPage | Overview |
 | `/dashboard/agents` | AgentsListPage | Agent Registry |
 | `/dashboard/agents/[id]` | AgentDetailPage | Agent Inspector |
-| `/dashboard/swarm` | SwarmsListPage | Swarm Command |
-| `/dashboard/swarm/[id]` | SwarmDetailPage | Swarm Control |
 | `/dashboard/runs` | RunsListPage | Run History |
 | `/dashboard/runs/[id]` | RunDetailPage | Run Inspector |
 | `/dashboard/traces` | TracesListPage | Trace Explorer |
@@ -25,13 +23,11 @@ MUTX Dashboard - "The Vercel for production AI agents" control plane. Premium da
 | `/dashboard/api-keys` | APIKeysPage | Key Management |
 | `/dashboard/monitoring` | MonitoringPage | System Health |
 
-### Concept Translation
-- projects → agents
-- deployments → swarms
-- builds → runs
-- logs → traces
-- cache → memory
-- usage → budgets
+### Product Semantics
+- agents are first-class resources
+- deployments remain deployments, not borrowed platform metaphors
+- runs and traces expose execution history and observability
+- memory, budgets, and orchestration stay truthful to real MUTX product scope
 
 ---
 
@@ -145,13 +141,10 @@ MUTX Dashboard - "The Vercel for production AI agents" control plane. Premium da
 ### Navigation Structure
 ```
 MUTX
-├── Control Center (/)
+├── Overview (/)
 ├── Agents (/agents)
 │   ├── Agent Registry
 │   └── Agent Detail
-├── Swarms (/swarm)
-│   ├── Swarm Command
-│   └── Swarm Detail
 ├── Runs (/runs)
 │   ├── Run History
 │   └── Run Detail
@@ -213,7 +206,7 @@ MUTX
 
 1. **Phase 1**: Design tokens + globals.css
 2. **Phase 2**: App shell with sidebar navigation
-3. **Phase 3**: Overview page (Control Center)
+3. **Phase 3**: Overview page (Overview)
 4. **Phase 4**: Agents list + detail
 5. **Phase 5**: Supporting pages (runs, traces, memory, budgets)
 

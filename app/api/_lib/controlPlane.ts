@@ -43,6 +43,10 @@ export function getRefreshToken(request: NextRequest): string | null {
   return request.cookies.get('refresh_token')?.value ?? null
 }
 
+export function hasAuthSession(request: NextRequest): boolean {
+  return Boolean(request.cookies.get('access_token')?.value || request.cookies.get('refresh_token')?.value)
+}
+
 export async function refreshAuthToken(
   request: NextRequest,
   refreshToken: string
@@ -89,8 +93,10 @@ export async function authenticatedFetch(
     credentials: 'include',
   })
 
-  // If unauthorized, try to refresh the token
-  if (response.status === 401 && token && refreshToken) {
+  // If unauthorized, try to refresh the token.
+  // This also recovers the common edge case where the access token cookie expired
+  // but a valid refresh token cookie is still present.
+  if (response.status === 401 && refreshToken) {
     const newTokens = await refreshAuthToken(request, refreshToken)
     if (newTokens) {
       // Retry with new token

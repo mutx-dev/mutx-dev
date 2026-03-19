@@ -376,48 +376,57 @@ async def deploy_agent(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    agent = await get_owned_agent(
-        agent_id,
-        db,
-        current_user,
-        forbidden_detail="Not authorized to deploy this agent",
-    )
+    try:
+        agent = await get_owned_agent(
+            agent_id,
+            db,
+            current_user,
+            forbidden_detail="Not authorized to deploy this agent",
+        )
 
-    deployment = Deployment(
-        agent_id=agent_id,
-        status="deploying",
-        replicas=1,
-        started_at=datetime.now(timezone.utc),
-    )
-    db.add(deployment)
-    await db.flush()
+        deployment = Deployment(
+            agent_id=agent_id,
+            status="deploying",
+            replicas=1,
+            started_at=datetime.now(timezone.utc),
+        )
+        db.add(deployment)
+        await db.flush()
 
-    deploy_event = DeploymentEventModel(
-        deployment_id=deployment.id,
-        event_type="deploy",
-        status="deploying",
-    )
-    db.add(deploy_event)
+        deploy_event = DeploymentEventModel(
+            deployment_id=deployment.id,
+            event_type="deploy",
+            status="deploying",
+        )
+        db.add(deploy_event)
 
-    agent.status = AgentStatus.RUNNING.value
-    await db.commit()
-    await db.refresh(deployment)
-    logger.info(f"Deployed agent: {agent_id}, deployment: {deployment.id}")
+        agent.status = AgentStatus.RUNNING.value
+        await db.commit()
+        await db.refresh(deployment)
+        logger.info(f"Deployed agent: {agent_id}, deployment: {deployment.id}")
 
-    # Track usage event
-    usage_event = UsageEvent(
-        event_type="agent_deployed",
-        user_id=current_user.id,
-        resource_id=str(agent_id),
-        resource_type="agent",
-        credits_used=1.0,
-        event_metadata=f'{{"deployment_id": "{deployment.id}"}}',
-        created_at=datetime.now(timezone.utc),
-    )
-    db.add(usage_event)
-    await db.commit()
+        # Track usage event
+        usage_event = UsageEvent(
+            event_type="agent_deployed",
+            user_id=current_user.id,
+            resource_id=str(agent_id),
+            resource_type="agent",
+            credits_used=1.0,
+            event_metadata=f'{{"deployment_id": "{deployment.id}"}}',
+            created_at=datetime.now(timezone.utc),
+        )
+        db.add(usage_event)
+        await db.commit()
 
-    return {"deployment_id": deployment.id, "status": "deploying"}
+        return {"deployment_id": deployment.id, "status": "deploying"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception(f"Failed to deploy agent: {agent_id}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to deploy agent: {str(e)}",
+        ) from e
 
 
 @router.post("/{agent_id}/stop", response_model=dict)

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getApiBaseUrl, getAuthToken, authenticatedFetch } from '@/app/api/_lib/controlPlane'
+import { getApiBaseUrl, hasAuthSession, authenticatedFetch } from '@/app/api/_lib/controlPlane'
 import { validateRequest, schemas } from '@/app/api/_lib/validation'
 import { withErrorHandling, unauthorized } from '@/app/api/_lib/errors'
 
@@ -15,8 +15,7 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
   return withErrorHandling(async (req: Request) => {
-    const token = await getAuthToken(request)
-    if (!token) {
+    if (!hasAuthSession(request)) {
       return unauthorized()
     }
 
@@ -41,8 +40,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   return withErrorHandling(async (req: Request) => {
-    const token = await getAuthToken(request)
-    if (!token) {
+    if (!hasAuthSession(request)) {
       return unauthorized()
     }
 

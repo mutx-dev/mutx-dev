@@ -40,9 +40,8 @@ dev = [
     "black>=23.0.0",
     "ruff>=0.1.0",
     "aiosqlite>=0.20.0",
+    "mutmut>=3.0.0",
 ]
-
-
 
 [project.scripts]
 mutx = "cli.main:cli"
@@ -62,3 +61,30 @@ target-version = ["py310"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
+
+[tool.mutmut]
+paths = ["tests", "cli"]
+exclude = ["tests/website.spec.ts", "tests/conftest.py"]
+
+[tool.coverage.run]
+source = ["src", "cli", "sdk"]
+omit = ["*/tests/*", "*/test_*.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+precision = 2
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "coverage_html"
+
+[tool.coverage.fail_under]
+min_cov_line = 70

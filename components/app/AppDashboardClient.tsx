@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
+import { readJson } from "@/components/app/http";
 import { type components } from "@/app/types/api";
 import { getApiKeyLimit, getLatestActiveApiKey, getLatestRevokedApiKey } from "@/components/app/apiKeyHelpers";
 import { LogsViewer, MetricsDashboard, StateTransitions } from "@/components/app/Observability";
@@ -32,22 +33,6 @@ type Deployment = components["schemas"]["DeploymentResponse"];
 type ApiKey = components["schemas"]["APIKeyResponse"];
 type Health = components["schemas"]["HealthResponse"];
 type CreateKeyResponse = components["schemas"]["APIKeyCreateResponse"];
-
-async function readJson<T>(
-  input: RequestInfo | URL,
-  init?: RequestInit,
-): Promise<T> {
-  const response = await fetch(input, { ...init, cache: "no-store" });
-  const payload = await response
-    .json()
-    .catch(() => ({ detail: "Request failed" }));
-
-  if (!response.ok) {
-    throw new Error(payload.detail || payload.error || "Request failed");
-  }
-
-  return payload as T;
-}
 
 function formatDate(value?: string | null) {
   if (!value) return "N/A";
@@ -167,7 +152,7 @@ export function AppDashboardClient() {
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [health, setHealth] = useState<Health | null>(null);
-  const [apiKeyName, setApiKeyName] = useState("App dashboard key");
+  const [apiKeyName, setApiKeyName] = useState("MUTX operator key");
   const [createdKey, setCreatedKey] = useState<CreateKeyResponse | null>(null);
   const [lastKeyAction, setLastKeyAction] = useState<"created" | "rotated">("created");
   const [selectedDeploymentId, setSelectedDeploymentId] = useState<string | null>(null);
@@ -177,14 +162,14 @@ export function AppDashboardClient() {
     ? deployments.find(d => d.id === selectedDeploymentId) 
     : deployments[0] ?? null;
 
-  const runningAgents = agents.filter((agent) => agent.status === "running").length;
-  const healthyDeployments = deployments.filter(
+  const runningAgents = (Array.isArray(agents) ? agents : []).filter((agent) => agent.status === "running").length;
+  const healthyDeployments = (Array.isArray(deployments) ? deployments : []).filter(
     (deployment) => deployment.status === "running" || deployment.status === "healthy",
   ).length;
-  const failedDeployments = deployments.filter(
+  const failedDeployments = (Array.isArray(deployments) ? deployments : []).filter(
     (deployment) => deployment.status === "failed" || deployment.status === "error",
   ).length;
-  const activeKeys = apiKeys.filter((apiKey) => apiKey.is_active).length;
+  const activeKeys = (Array.isArray(apiKeys) ? apiKeys : []).filter((apiKey) => apiKey.is_active).length;
   const revokedKeys = apiKeys.length - activeKeys;
   const apiKeyLimit = getApiKeyLimit(user?.plan);
   const apiKeyCapacityRemaining = apiKeyLimit === null ? null : Math.max(apiKeyLimit - activeKeys, 0);
@@ -362,21 +347,36 @@ export function AppDashboardClient() {
     ],
   );
 
+  // Helper to extract array from API response (handles { items: [...] } or direct array)
+  function normalizeArray<T>(data: any): T[] {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (data.items && Array.isArray(data.items)) return data.items;
+    if (data.agents && Array.isArray(data.agents)) return data.agents;
+    if (data.deployments && Array.isArray(data.deployments)) return data.deployments;
+    if (data.data && Array.isArray(data.data)) return data.data;
+    return [];
+  }
+
+  function normalizeApiKeys(data: unknown): ApiKey[] {
+    return normalizeArray<ApiKey>(data).filter((entry) => Boolean(entry && typeof entry === "object" && "id" in entry));
+  }
+
   async function loadDashboard() {
-    const [nextUser, nextHealth, nextAgents, nextDeployments, nextKeys] =
+    const [nextUser, nextHealth, rawAgents, rawDeployments, nextKeys] =
       await Promise.all([
         readJson<User>("/api/auth/me"),
         readJson<Health>("/api/dashboard/health"),
-        readJson<Agent[]>("/api/dashboard/agents"),
-        readJson<Deployment[]>("/api/dashboard/deployments"),
-        readJson<ApiKey[]>("/api/api-keys"),
+        readJson<any>("/api/dashboard/agents"),
+        readJson<any>("/api/dashboard/deployments"),
+        readJson<unknown>("/api/api-keys"),
       ]);
 
     setUser(nextUser);
     setHealth(nextHealth);
-    setAgents(nextAgents);
-    setDeployments(nextDeployments);
-    setApiKeys(nextKeys);
+    setAgents(normalizeArray<Agent>(rawAgents));
+    setDeployments(normalizeArray<Deployment>(rawDeployments));
+    setApiKeys(normalizeApiKeys(nextKeys));
   }
 
   useEffect(() => {

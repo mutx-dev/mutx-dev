@@ -1,15 +1,18 @@
 import {
   Activity,
-  ArrowRight,
+  BellRing,
   Bot,
-  Command,
-  Key,
-  Layers,
-  LogOut,
-  Rocket,
-  ShieldCheck,
-  Users,
+  BrainCircuit,
   BarChart3,
+  History,
+  KeyRound,
+  Layers,
+  MessageCircle,
+  MessagesSquare,
+  ShieldCheck,
+  Sparkles,
+  Wallet,
+  Webhook,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -18,74 +21,144 @@ export interface DashboardNavItem {
   description: string;
   href: string;
   icon: LucideIcon;
+  group: "core" | "observe" | "automate";
+}
+
+export interface DashboardNavGroup {
+  key: DashboardNavItem["group"];
+  title?: string;
+  items: DashboardNavItem[];
 }
 
 export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
   {
     title: "Overview",
-    description: "Fleet summary and agents",
+    description: "Control-plane posture",
     href: "/dashboard",
     icon: ShieldCheck,
+    group: "core",
   },
   {
     title: "Agents",
-    description: "Manage your agent fleet",
+    description: "Manage active fleet",
     href: "/dashboard/agents",
-    icon: Users,
-  },
-  {
-    title: "Spawn",
-    description: "Create and configure agents",
-    href: "/dashboard/spawn",
     icon: Bot,
-  },
-  {
-    title: "Control",
-    description: "Control plane operations",
-    href: "/dashboard/control",
-    icon: Command,
-  },
-  {
-    title: "Monitoring",
-    description: "Usage and health telemetry",
-    href: "/dashboard/monitoring",
-    icon: Activity,
-  },
-  {
-    title: "Analytics",
-    description: "Usage telemetry and insights",
-    href: "/dashboard/analytics",
-    icon: BarChart3,
-  },
-  {
-    title: "Orchestration",
-    description: "Lane scheduling and flow",
-    href: "/dashboard/orchestration",
-    icon: Rocket,
-  },
-  {
-    title: "Logs",
-    description: "Runtime and system logs",
-    href: "/dashboard/logs",
-    icon: LogOut,
-  },
-  {
-    title: "History",
-    description: "Execution timeline",
-    href: "/dashboard/history",
-    icon: ArrowRight,
+    group: "core",
   },
   {
     title: "Deployments",
-    description: "Manage agent deployments",
+    description: "Deployment inventory and topology",
     href: "/dashboard/deployments",
     icon: Layers,
+    group: "core",
+  },
+  {
+    title: "Runs",
+    description: "Execution history and outcomes",
+    href: "/dashboard/runs",
+    icon: History,
+    group: "core",
+  },
+  {
+    title: "Traces",
+    description: "Trace and runtime detail",
+    href: "/dashboard/traces",
+    icon: MessagesSquare,
+    group: "core",
+  },
+  {
+    title: "Control",
+    description: "Policies and control settings",
+    href: "/dashboard/control",
+    icon: MessageCircle,
+    group: "core",
+  },
+  {
+    title: "Provisioning",
+    description: "Create and prepare new operator workflows",
+    href: "/dashboard/spawn",
+    icon: Sparkles,
+    group: "core",
+  },
+  {
+    title: "Memory",
+    description: "Operator memory surface",
+    href: "/dashboard/memory",
+    icon: BrainCircuit,
+    group: "observe",
+  },
+  {
+    title: "History",
+    description: "Recent operator activity",
+    href: "/dashboard/history",
+    icon: Activity,
+    group: "observe",
+  },
+  {
+    title: "Logs",
+    description: "Runtime log stream",
+    href: "/dashboard/logs",
+    icon: MessageCircle,
+    group: "observe",
+  },
+  {
+    title: "Budgets",
+    description: "Usage and budget posture",
+    href: "/dashboard/budgets",
+    icon: Wallet,
+    group: "observe",
   },
   {
     title: "API Keys",
-    description: "Manage API access keys",
+    description: "Access governance",
     href: "/dashboard/api-keys",
-    icon: Key,
+    icon: KeyRound,
+    group: "observe",
+  },
+  {
+    title: "Analytics",
+    description: "Operational analytics",
+    href: "/dashboard/analytics",
+    icon: BarChart3,
+    group: "observe",
+  },
+  {
+    title: "Orchestration",
+    description: "Automation lanes",
+    href: "/dashboard/orchestration",
+    icon: Sparkles,
+    group: "automate",
+  },
+  {
+    title: "Webhooks",
+    description: "Event delivery routes",
+    href: "/dashboard/webhooks",
+    icon: Webhook,
+    group: "automate",
+  },
+  {
+    title: "Monitoring",
+    description: "Health and readiness posture",
+    href: "/dashboard/monitoring",
+    icon: BellRing,
+    group: "automate",
+  },
+];
+
+export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
+  {
+    key: "core",
+    items: DASHBOARD_NAV_ITEMS.filter((item) => item.group === "core"),
+  },
+  {
+    key: "observe",
+    title: "Observe",
+    items: DASHBOARD_NAV_ITEMS.filter((item) => item.group === "observe"),
+  },
+  {
+    key: "automate",
+    title: "Automate",
+    items: DASHBOARD_NAV_ITEMS.filter((item) => item.group === "automate"),
   },
 ];
 

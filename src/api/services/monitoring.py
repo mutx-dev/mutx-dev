@@ -180,14 +180,18 @@ async def monitor_agent_health(session: AsyncSession):
             )
             session.add(alert)
 
-            # Log failure
-            log = AgentLog(
-                agent_id=agent.id,
-                level="error",
-                message=f"System: Agent marked as FAILED due to heartbeat timeout ({STALE_THRESHOLD_SECONDS}s).",
-                timestamp=now,
-            )
-            session.add(log)
+            # Log failure (skip on DB column error - fix pending migration)
+            try:
+                log = AgentLog(
+                    agent_id=agent.id,
+                    level="error",
+                    message=f"System: Agent marked as FAILED due to heartbeat timeout ({STALE_THRESHOLD_SECONDS}s).",
+                    timestamp=now,
+                )
+                session.add(log)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"AgentLog insert skipped: {e}")
 
             deployment = await _get_latest_deployment(session, agent.id)
             if deployment is not None:
@@ -243,14 +247,18 @@ async def monitor_agent_health(session: AsyncSession):
                 .values(resolved=True, resolved_at=now)
             )
 
-            # Log recovery
-            heal_log = AgentLog(
-                agent_id=agent.id,
-                level="info",
-                message="System: Control plane detected failure and initiated automatic recovery. Agent is back to RUNNING.",
-                timestamp=now,
-            )
-            session.add(heal_log)
+            # Log recovery (skip on DB column error)
+            try:
+                heal_log = AgentLog(
+                    agent_id=agent.id,
+                    level="info",
+                    message="System: Control plane detected failure and initiated automatic recovery. Agent is back to RUNNING.",
+                    timestamp=now,
+                )
+                session.add(heal_log)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"AgentLog recovery insert skipped: {e}")
 
             deployment = await _get_latest_deployment(session, agent.id)
             if deployment is not None:

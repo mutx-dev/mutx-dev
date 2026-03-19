@@ -21,43 +21,12 @@ import {
 import { DeploymentSortSelect } from "./DeploymentSortSelect";
 
 import { Card } from "@/components/ui/Card";
+import { ApiRequestError, readJson, writeJson } from "@/components/app/http";
 import { DeploymentHistory } from "./DeploymentHistory";
 import { type components } from "@/app/types/api";
 
 type Deployment = components["schemas"]["DeploymentResponse"];
 type Agent = components["schemas"]["AgentResponse"];
-
-async function readJson<T>(
-  input: RequestInfo | URL,
-  init?: RequestInit,
-): Promise<T> {
-  const response = await fetch(input, { ...init, cache: "no-store" });
-  const payload = await response
-    .json()
-    .catch(() => ({ detail: "Request failed" }));
-
-  if (!response.ok) {
-    throw new Error(payload.detail || payload.error || "Request failed");
-  }
-
-  return payload as T;
-}
-
-async function writeJson<T>(
-  input: RequestInfo | URL,
-  init?: RequestInit,
-): Promise<T> {
-  const response = await fetch(input, { ...init, cache: "no-store" });
-  const payload = await response
-    .json()
-    .catch(() => ({ detail: "Request failed" }));
-
-  if (!response.ok) {
-    throw new Error(payload.detail || payload.error || "Request failed");
-  }
-
-  return payload as T;
-}
 
 function formatRelativeDate(value?: string | null) {
   if (!value) return "Not recorded";
@@ -260,6 +229,7 @@ function CreateDeploymentDialog({ open, onOpenChange, agents, onSubmit }: Create
   const [replicas, setReplicas] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [authRequired, setAuthRequired] = useState(false);
 
   const availableAgents = agents.filter(a => a.status !== "deployed");
 
@@ -383,6 +353,7 @@ export function DeploymentsPageClient() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const [authRequired, setAuthRequired] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [sortBy, setSortBy] = useState<"date"|"status"|"agent">("date");
@@ -433,8 +404,18 @@ export function DeploymentsPageClient() {
       }
       
       setDeployments(deploymentsData);
+      setAuthRequired(false);
       setError("");
     } catch (err) {
+      if (err instanceof ApiRequestError && err.status === 401) {
+        setDeployments([]);
+        setAgents([]);
+        setAuthRequired(true);
+        setError("Sign in to view and operate deployments.");
+        return;
+      }
+
+      setAuthRequired(false);
       setError(
         err instanceof Error ? err.message : "Failed to load deployments",
       );
@@ -456,6 +437,11 @@ export function DeploymentsPageClient() {
       
       setAgents(agentsData);
     } catch (err) {
+      if (err instanceof ApiRequestError && err.status === 401) {
+        setAgents([]);
+        return;
+      }
+
       console.error("Failed to load agents:", err);
     }
   }
@@ -762,7 +748,16 @@ export function DeploymentsPageClient() {
         <DeploymentSortSelect value={sortBy} onChange={setSortBy} />
       </div>
 
-      {filteredDeployments.length === 0 ? (
+      {authRequired ? (
+        <div className="rounded-xl border border-amber-400/20 bg-amber-400/10 p-8 text-center">
+          <Server className="mx-auto h-12 w-12 text-amber-300" />
+          <p className="mt-4 text-lg font-medium text-white">Operator session required</p>
+          <p className="mt-2 text-sm text-slate-300">
+            Sign in again to load your real deployment inventory and control actions.
+            If your session just expired, a refresh should recover automatically on your next request.
+          </p>
+        </div>
+      ) : filteredDeployments.length === 0 ? (
         <div className="rounded-xl border border-white/5 bg-white/[0.02] p-12 text-center">
           <Server className="mx-auto h-12 w-12 text-slate-600" />
           <p className="mt-4 text-lg font-medium text-white">No deployments found</p>

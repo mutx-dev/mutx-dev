@@ -5,14 +5,38 @@ route:
   repeat_interval: 1h
   receiver: 'null'
   routes:
+    # Self-healing routes for critical alerts
+    - matchers:
+        - severity="critical"
+      receiver: 'self-heal'
+      continue: true
+
+    # Webhook notifications
     - matchers:
         - notify="webhook"
       receiver: 'web.hook'
+
+# Receiver definitions
 receivers:
   - name: 'null'
+
   - name: 'web.hook'
     webhook_configs:
       - url: 'http://127.0.0.1:5001/'
+        send_resolved: true
+
+  # Self-healing receiver - calls healing scripts
+  - name: 'self-heal'
+    webhook_configs:
+      # AlertManager will POST to this endpoint which should run self-heal.sh
+      # In production, this would be a webhook receiver that parses the alert
+      # and calls the appropriate healing script
+      - url: 'http://host.docker.internal:3000/api/heal'
+        send_resolved: true
+        http_config:
+          timeout: 30s
+
+# Inhibition rules
 inhibit_rules:
   - source_match:
       severity: 'critical'

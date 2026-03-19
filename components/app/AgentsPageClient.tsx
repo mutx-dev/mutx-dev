@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
+import { extractApiErrorMessage, readJson } from "@/components/app/http";
 import { type components } from "@/app/types/api";
 
 type Agent = components["schemas"]["AgentResponse"];
@@ -28,22 +29,6 @@ type AgentCreateRequest = {
   type?: string;
   config?: Record<string, unknown>;
 };
-
-async function readJson<T>(
-  input: RequestInfo | URL,
-  init?: RequestInit,
-): Promise<T> {
-  const response = await fetch(input, { ...init, cache: "no-store" });
-  const payload = await response
-    .json()
-    .catch(() => ({ detail: "Request failed" }));
-
-  if (!response.ok) {
-    throw new Error(payload.detail || payload.error || "Request failed");
-  }
-
-  return payload as T;
-}
 
 async function createAgent(data: AgentCreateRequest): Promise<Agent> {
   return readJson<Agent>("/api/dashboard/agents", {
@@ -61,7 +46,7 @@ async function deleteAgent(agentId: string): Promise<void> {
   
   if (!response.ok) {
     const payload = await response.json().catch(() => ({ detail: "Delete failed" }));
-    throw new Error(payload.detail || "Delete failed");
+    throw new Error(extractApiErrorMessage(payload, "Delete failed"));
   }
 }
 
