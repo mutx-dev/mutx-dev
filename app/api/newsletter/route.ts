@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import sql from '@/lib/db'
-import { validateRequest, schemas } from '@/app/api/_lib/validation'
+import { validateData, schemas } from '@/app/api/_lib/validation'
 import { withErrorHandling, badRequest } from '@/app/api/_lib/errors'
 
 export const dynamic = 'force-dynamic'
@@ -133,7 +133,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     // 2. Validate email with schema
-    const validation = await validateRequest(schemas.newsletter, req)
+    const validation = await validateData(schemas.newsletter, body)
     if (!validation.success) {
       return validation.response
     }

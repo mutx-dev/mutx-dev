@@ -2,9 +2,10 @@ import pytest
 from httpx import AsyncClient
 import uuid
 from datetime import datetime, timedelta
+from sqlalchemy import select
 
 from src.api.auth.jwt import create_access_token
-from src.api.models.models import WebhookDeliveryLog
+from src.api.models.models import Webhook, WebhookDeliveryLog
 
 
 @pytest.mark.asyncio
@@ -19,6 +20,8 @@ async def test_webhook_lifecycle(client: AsyncClient, test_user):
     webhook_id = webhook["id"]
     assert webhook["url"] == "https://example.com/webhook"
     assert "agent.*" in webhook["events"]
+    assert webhook["secret"] is None
+    assert webhook["has_secret"] is True
 
     # 2. List Webhooks
     response = await client.get("/v1/webhooks/")
@@ -65,6 +68,23 @@ async def test_webhook_create_accepts_runtime_status_event_names(
 
     assert response.status_code == 201
     assert response.json()["events"] == [event_name]
+
+
+@pytest.mark.asyncio
+async def test_webhook_secret_is_encrypted_at_rest(client: AsyncClient, db_session):
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["*"], "secret": "test-secret"},
+    )
+    assert response.status_code == 201
+
+    webhook_id = uuid.UUID(response.json()["id"])
+    result = await db_session.execute(select(Webhook).where(Webhook.id == webhook_id))
+    webhook = result.scalar_one()
+
+    assert webhook.secret != "test-secret"
+    assert response.json()["secret"] is None
+    assert response.json()["has_secret"] is True
 
 
 @pytest.mark.asyncio
@@ -260,7 +280,7 @@ async def test_webhook_delivery_history_rejects_invalid_pagination_bounds(client
 
 
 @pytest.mark.asyncio
-async def test_webhook_delivery_history_supports_legacy_user_api_key_auth(
+async def test_webhook_delivery_history_rejects_legacy_user_api_key_auth(
     client: AsyncClient, client_no_auth: AsyncClient, db_session, test_user
 ):
     create_response = await client.post(
@@ -288,10 +308,7 @@ async def test_webhook_delivery_history_supports_legacy_user_api_key_auth(
         headers={"X-API-Key": "legacy-webhook-key"},
     )
 
-    assert response.status_code == 200
-    data = response.json()
-    assert len(data) == 1
-    assert data[0]["event"] == "agent.heartbeat"
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio

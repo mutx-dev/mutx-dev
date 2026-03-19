@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getApiBaseUrl, getAuthToken } from '@/app/api/_lib/controlPlane'
+import {
+  applyAuthCookies,
+  authenticatedFetch,
+  getApiBaseUrl,
+  hasAuthSession,
+} from '@/app/api/_lib/controlPlane'
 
 const API_BASE_URL = getApiBaseUrl()
 
@@ -8,25 +13,26 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
-    const token = await getAuthToken(request)
-    if (!token) {
+    if (!hasAuthSession(request)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const response = await fetch(`${API_BASE_URL}/v1/api-keys`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-      cache: 'no-store',
-    })
+    const { response, tokenRefreshed, refreshedTokens } = await authenticatedFetch(
+      request,
+      `${API_BASE_URL}/v1/api-keys`,
+      {
+        cache: 'no-store',
+      }
+    )
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: 'Failed to fetch API keys' }))
-      return NextResponse.json(error, { status: response.status })
+    const payload = await response.json().catch(() => ({ detail: 'Failed to fetch API keys' }))
+    const nextResponse = NextResponse.json(payload, { status: response.status })
+
+    if (tokenRefreshed && refreshedTokens) {
+      applyAuthCookies(nextResponse, request, refreshedTokens)
     }
 
-    const data = await response.json()
-    return NextResponse.json(data)
+    return nextResponse
   } catch (error) {
     console.error('API keys fetch error:', error)
     return NextResponse.json({ error: 'Failed to connect to API' }, { status: 500 })
@@ -35,33 +41,35 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const token = await getAuthToken(request)
-    if (!token) {
+    if (!hasAuthSession(request)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
 
-    const response = await fetch(`${API_BASE_URL}/v1/api-keys`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-      cache: 'no-store',
-    })
+    const { response, tokenRefreshed, refreshedTokens } = await authenticatedFetch(
+      request,
+      `${API_BASE_URL}/v1/api-keys`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+        cache: 'no-store',
+      }
+    )
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: 'Failed to create API key' }))
-      return NextResponse.json(error, { status: response.status })
+    const payload = await response.json().catch(() => ({ detail: 'Failed to create API key' }))
+    const nextResponse = NextResponse.json(payload, { status: response.status })
+
+    if (tokenRefreshed && refreshedTokens) {
+      applyAuthCookies(nextResponse, request, refreshedTokens)
     }
 
-    const data = await response.json()
-    return NextResponse.json(data, { status: 201 })
+    return nextResponse
   } catch (error) {
     console.error('API key create error:', error)
     return NextResponse.json({ error: 'Failed to connect to API' }, { status: 500 })
   }
 }
-

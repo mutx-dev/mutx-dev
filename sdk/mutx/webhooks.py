@@ -13,6 +13,7 @@ class Webhook:
         self.url = data["url"]
         self.events = data.get("events", [])
         self.secret = data.get("secret")
+        self.has_secret = data.get("has_secret", bool(self.secret))
         # Contract parity: backend uses `is_active`; keep `.active` as compatibility alias.
         self.is_active = data.get("is_active", data.get("active", True))
         self.active = self.is_active

@@ -168,30 +168,21 @@ async def get_db() -> AsyncSession:
             await session.close()
 
 
-async def _run_schema_setup() -> None:
+async def _run_startup_probe() -> None:
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-        if conn.dialect.name == "postgresql":
-            await conn.execute(text("ALTER TABLE agents ADD COLUMN IF NOT EXISTS description TEXT"))
-            # Migrate plan column from enum to varchar if needed
-            await conn.execute(text("ALTER TABLE users ALTER COLUMN plan DROP DEFAULT"))
-            await conn.execute(text("ALTER TABLE users ADD COLUMN plan_temp VARCHAR(20)"))
-            await conn.execute(text("UPDATE users SET plan_temp = plan::varchar"))
-            await conn.execute(text("ALTER TABLE users DROP COLUMN plan"))
-            await conn.execute(text("ALTER TABLE users RENAME COLUMN plan_temp TO plan"))
-            await conn.execute(text("ALTER TABLE users ALTER COLUMN plan SET DEFAULT 'FREE'"))
+        await conn.execute(text("SELECT 1"))
 
 
 async def init_db() -> None:
     try:
-        await _run_schema_setup()
+        await _run_startup_probe()
     except Exception as exc:
         if not _should_retry_without_ssl(exc):
             raise
 
         logger.warning("Database rejected SSL upgrade; retrying with SSL disabled for asyncpg")
         await _reconfigure_engine(override_ssl_mode="disable")
-        await _run_schema_setup()
+        await _run_startup_probe()
 
 
 async def dispose_engine() -> None:

@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getApiBaseUrl, getAuthToken } from "@/app/api/_lib/controlPlane";
+import {
+  applyAuthCookies,
+  authenticatedFetch,
+  getApiBaseUrl,
+  hasAuthSession,
+} from "@/app/api/_lib/controlPlane";
+import { unauthorized, withErrorHandling } from "@/app/api/_lib/errors";
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -10,13 +16,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const token = await getAuthToken(request);
+  return withErrorHandling(async () => {
+    if (!hasAuthSession(request)) {
+      return unauthorized();
+    }
 
-  if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
     const event = searchParams.get("event");
@@ -28,32 +32,27 @@ export async function GET(
     if (success) queryParams.set("success", success);
     queryParams.set("limit", limit);
 
-    const response = await fetch(
+    const { response, tokenRefreshed, refreshedTokens } = await authenticatedFetch(
+      request,
       `${API_BASE_URL}/v1/webhooks/${id}/deliveries?${queryParams.toString()}`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         cache: "no-store",
       }
     );
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      return NextResponse.json(
-        { error: error.detail || "Failed to fetch deliveries" },
-        { status: response.status }
-      );
+    const payload = await response.json().catch(() => ({}));
+    const nextResponse = response.ok
+      ? NextResponse.json({ deliveries: payload }, { status: response.status })
+      : NextResponse.json(
+          { error: payload.detail || "Failed to fetch webhook deliveries" },
+          { status: response.status }
+        );
+
+    if (tokenRefreshed && refreshedTokens) {
+      applyAuthCookies(nextResponse, request, refreshedTokens);
     }
 
-    const data = await response.json();
-    return NextResponse.json({ deliveries: data });
-  } catch (error) {
-    console.error("Webhooks deliveries GET error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
+    return nextResponse;
+  })(request);
 }

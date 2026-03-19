@@ -50,7 +50,7 @@ function ResetPasswordForm() {
       const payload = await response.json()
 
       if (!response.ok) {
-        throw new Error(payload.detail || "Failed to reset password")
+        throw new Error(payload.detail || payload.error?.message || payload.error || "Failed to reset password")
       }
 
       setSuccess(true)

@@ -45,6 +45,10 @@ class Settings(BaseSettings):
         description="Optional file path for log output",
     )
     jwt_secret: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
+    secret_encryption_key: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("SECRET_ENCRYPTION_KEY"),
+    )
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
     refresh_token_max_sliding_days: int = 30  # Max days for sliding expiry
@@ -99,6 +103,20 @@ class Settings(BaseSettings):
             "ADMIN_EMAIL_DOMAINS",
         ),
         description="Email domains allowed to access internal-only endpoints.",
+    )
+    background_monitor_enabled: bool = Field(
+        default=True,
+        validation_alias=AliasChoices(
+            "BACKGROUND_MONITOR_ENABLED",
+            "ENABLE_BACKGROUND_MONITOR",
+        ),
+    )
+    enable_rag_api: bool = Field(
+        default=False,
+        validation_alias=AliasChoices(
+            "ENABLE_RAG_API",
+            "RAG_API_ENABLED",
+        ),
     )
 
     # Store whether JWT_SECRET was user-provided or auto-generated

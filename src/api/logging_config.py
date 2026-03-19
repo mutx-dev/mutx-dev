@@ -6,11 +6,34 @@ log aggregation and analysis in production environments.
 """
 
 import logging
+import json
 import sys
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from pythonjsonlogger import jsonlogger
+try:
+    from pythonjsonlogger import jsonlogger
+except ModuleNotFoundError:  # pragma: no cover - exercised in dependency-light environments
+
+    class _FallbackJsonFormatter(logging.Formatter):
+        def __init__(self, *args, rename_fields: dict[str, str] | None = None, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.rename_fields = rename_fields or {}
+
+        def add_fields(
+            self, log_record: dict, record: logging.LogRecord, message_dict: dict
+        ) -> None:
+            del record, message_dict
+
+        def format(self, record: logging.LogRecord) -> str:
+            log_record: dict = {}
+            self.add_fields(log_record, record, {})
+            return json.dumps(log_record)
+
+    class _JsonLoggerModule:
+        JsonFormatter = _FallbackJsonFormatter
+
+    jsonlogger = _JsonLoggerModule()
 
 
 class StructuredJsonFormatter(jsonlogger.JsonFormatter):

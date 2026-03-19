@@ -1,4 +1,5 @@
 import bcrypt
+import hashlib
 import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -8,7 +9,8 @@ from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.password import hash_password, verify_password
-from src.api.models.models import User, APIKey, Plan, Agent, Deployment
+from src.api.models.models import User, APIKey, Plan, Agent, Deployment, RefreshTokenSession
+from src.api.security import hash_token_value
 from src.api.services.email.email_service import (
     generate_token,
     PASSWORD_RESET_TOKEN_EXPIRE_HOURS,
@@ -30,14 +32,14 @@ def hash_api_key(key: str) -> str:
 
 
 def verify_api_key(plain_key: str, hashed_key: str) -> bool:
-    import hashlib
-
     # Legacy SHA256 check (for old keys created before bcrypt migration)
     # SHA256 hashes are 64 hex chars = 64 bytes
     if len(hashed_key) == 64:
         sha256_hash = hashlib.sha256(plain_key.encode()).hexdigest()
         if secrets.compare_digest(sha256_hash, hashed_key):
             return True
+    if not hashed_key.startswith("$2"):
+        return secrets.compare_digest(plain_key, hashed_key)
     # bcrypt verification - truncate to 72 bytes (bcrypt limitation)
     try:
         return bcrypt.checkpw(plain_key[:72].encode(), hashed_key.encode())
@@ -66,7 +68,6 @@ class UserService:
             name=name,
             password_hash=password_hash,
             plan=plan,
-            api_key=generate_user_api_key(),
         )
         self.session.add(user)
         await self.session.commit()
@@ -159,20 +160,15 @@ class UserService:
         return None
 
     async def get_user_for_api_key(self, plain_key: str) -> Optional[User]:
-        """Resolve an active user for either legacy user API keys or managed APIKey records."""
+        """Resolve an active user for a managed API key."""
         auth_context = await self.authenticate_api_key(plain_key)
         return auth_context[0] if auth_context else None
 
     async def authenticate_api_key(self, plain_key: str) -> Optional[tuple[User, uuid.UUID | None]]:
-        """Authenticate legacy or managed API keys.
+        """Authenticate managed API keys.
 
         Returns the active user and a managed API key ID when present.
-        Legacy `users.api_key` matches return `(user, None)`.
         """
-        user = await self.get_user_by_api_key(plain_key)
-        if user and user.is_active:
-            return user, None
-
         now = datetime.now(timezone.utc)
         result = await self.session.execute(
             select(APIKey, User)
@@ -266,7 +262,9 @@ class UserService:
         """Create and store an email verification token."""
         token = generate_token()
         await self.session.execute(
-            update(User).where(User.id == user_id).values(email_verification_token=token)
+            update(User)
+            .where(User.id == user_id)
+            .values(email_verification_token=hash_token_value(token))
         )
         await self.session.commit()
         return token
@@ -274,7 +272,7 @@ class UserService:
     async def verify_email(self, token: str) -> Optional[User]:
         """Verify email with token. Returns user if successful."""
         result = await self.session.execute(
-            select(User).where(User.email_verification_token == token)
+            select(User).where(User.email_verification_token == hash_token_value(token))
         )
         user = result.scalar_one_or_none()
         if not user:
@@ -299,7 +297,7 @@ class UserService:
     async def get_user_by_verification_token(self, token: str) -> Optional[User]:
         """Get user by verification token (without verifying)."""
         result = await self.session.execute(
-            select(User).where(User.email_verification_token == token)
+            select(User).where(User.email_verification_token == hash_token_value(token))
         )
         return result.scalar_one_or_none()
 
@@ -312,7 +310,7 @@ class UserService:
             update(User)
             .where(User.id == user_id)
             .values(
-                password_reset_token=token,
+                password_reset_token=hash_token_value(token),
                 password_reset_expires_at=expires_at,
             )
         )
@@ -321,7 +319,9 @@ class UserService:
 
     async def reset_password(self, token: str, new_password: str) -> Optional[User]:
         """Reset password with token. Returns user if successful."""
-        result = await self.session.execute(select(User).where(User.password_reset_token == token))
+        result = await self.session.execute(
+            select(User).where(User.password_reset_token == hash_token_value(token))
+        )
         user = result.scalar_one_or_none()
 
         if not user:
@@ -352,7 +352,9 @@ class UserService:
 
     async def get_user_by_password_reset_token(self, token: str) -> Optional[User]:
         """Get user by password reset token (without resetting)."""
-        result = await self.session.execute(select(User).where(User.password_reset_token == token))
+        result = await self.session.execute(
+            select(User).where(User.password_reset_token == hash_token_value(token))
+        )
         return result.scalar_one_or_none()
 
     async def clear_password_reset_token(self, user_id: uuid.UUID) -> None:
@@ -364,5 +366,17 @@ class UserService:
                 password_reset_token=None,
                 password_reset_expires_at=None,
             )
+        )
+        await self.session.commit()
+
+    async def revoke_all_refresh_tokens(self, user_id: uuid.UUID) -> None:
+        now = datetime.now(timezone.utc)
+        await self.session.execute(
+            update(RefreshTokenSession)
+            .where(
+                RefreshTokenSession.user_id == user_id,
+                RefreshTokenSession.revoked_at.is_(None),
+            )
+            .values(revoked_at=now)
         )
         await self.session.commit()

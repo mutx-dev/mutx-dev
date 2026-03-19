@@ -2,17 +2,17 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, ConfigDict, EmailStr, ValidationError
+from pydantic import BaseModel, ConfigDict, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
 from src.api.models.models import User
 from src.api.services.user_service import UserService
 from src.api.services.analytics import log_analytics_event, AnalyticsEventType
-from src.api.middleware.auth import get_current_user
+from src.api.middleware.auth import get_current_user, get_current_user_optional
 from src.api.auth.jwt import (
-    create_access_token,
-    create_refresh_token,
+    issue_token_pair,
+    revoke_refresh_token,
     refresh_access_token,
 )
 from src.api.auth.password import validate_password_strength
@@ -43,6 +43,10 @@ class RefreshRequest(BaseModel):
     refresh_token: str
 
 
+class LogoutRequest(BaseModel):
+    refresh_token: Optional[str] = None
+
+
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
@@ -55,7 +59,6 @@ class UserResponse(BaseModel):
     email: str
     name: str
     plan: str
-    api_key: Optional[str]
     created_at: datetime
     is_active: bool
     is_email_verified: bool = False
@@ -65,73 +68,47 @@ class UserResponse(BaseModel):
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def register(request: RegisterRequest, session: AsyncSession = Depends(get_db)):
-    try:
-        user_service = UserService(session)
+    user_service = UserService(session)
 
-        existing_user = await user_service.get_user_by_email(request.email)
-        if existing_user:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already registered",
-            )
-
-        is_valid, error_message = validate_password_strength(request.password)
-        if not is_valid:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=error_message,
-            )
-
-        user = await user_service.create_user(
-            email=request.email,
-            name=request.name,
-            password=request.password,
-        )
-
-        # Send verification email
-        token = await user_service.create_email_verification_token(user.id)
-        send_verification_email(user.email, user.name, token)
-
-        access_token, access_token_expires_at = create_access_token(user.id)
-        refresh_token, _ = create_refresh_token(user.id)
-
-        # Track analytics event
-        await log_analytics_event(
-            session,
-            event_name="User logged in",
-            event_type=AnalyticsEventType.USER_LOGIN,
-            user_id=user.id,
-        )
-
-        return TokenResponse(
-            access_token=access_token,
-            refresh_token=refresh_token,
-            expires_in=_get_expires_in_seconds(access_token_expires_at),
-        )
-    except ValidationError as e:
-        # Handle Pydantic validation errors (invalid email format, etc.)
-        errors = e.errors()
-        error_messages = [err.get("msg", "Validation error") for err in errors]
+    existing_user = await user_service.get_user_by_email(request.email)
+    if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="; ".join(error_messages) if error_messages else "Invalid request data",
+            detail="Email already registered",
         )
-    except ValueError as e:
-        # Handle value errors (e.g., invalid email format from EmailStr)
+
+    is_valid, error_message = validate_password_strength(request.password)
+    if not is_valid:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e) or "Invalid email format",
+            detail=error_message,
         )
-    except Exception as e:
-        # Handle any other unexpected errors - return 400 for validation-related issues
-        error_str = str(e).lower()
-        if any(keyword in error_str for keyword in ["email", "validation", "invalid", "format"]):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=str(e) or "Invalid request data",
-            )
-        # Re-raise other exceptions to be handled by global exception handlers
-        raise
+
+    user = await user_service.create_user(
+        email=request.email,
+        name=request.name,
+        password=request.password,
+    )
+
+    # Send verification email
+    token = await user_service.create_email_verification_token(user.id)
+    send_verification_email(user.email, user.name, token)
+
+    access_token, access_token_expires_at, refresh_token = await issue_token_pair(session, user.id)
+
+    # Track analytics event
+    await log_analytics_event(
+        session,
+        event_name="User logged in",
+        event_type=AnalyticsEventType.USER_LOGIN,
+        user_id=user.id,
+    )
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        expires_in=_get_expires_in_seconds(access_token_expires_at),
+    )
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -154,8 +131,7 @@ async def login(request: LoginRequest, session: AsyncSession = Depends(get_db)):
     # Check if email is verified (optional - can be enabled by setting REQUIRE_EMAIL_VERIFICATION)
     # For now, we'll allow login but warn if not verified
 
-    access_token, access_token_expires_at = create_access_token(user.id)
-    refresh_token, _ = create_refresh_token(user.id)
+    access_token, access_token_expires_at, refresh_token = await issue_token_pair(session, user.id)
 
     # Track analytics event
     await log_analytics_event(
@@ -190,7 +166,38 @@ async def refresh(request: RefreshRequest, session: AsyncSession = Depends(get_d
 
 
 @router.post("/logout")
-async def logout(current_user: User = Depends(get_current_user)):
+async def logout(
+    request: Optional[LogoutRequest] = None,
+    session: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
+    refresh_token = request.refresh_token if request is not None else None
+
+    if not current_user and not refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+        )
+
+    if refresh_token:
+        revoked = await revoke_refresh_token(
+            session,
+            refresh_token,
+            user_id=current_user.id if current_user else None,
+        )
+        if not revoked and current_user:
+            await UserService(session).revoke_all_refresh_tokens(current_user.id)
+    elif current_user:
+        await UserService(session).revoke_all_refresh_tokens(current_user.id)
+
+    if current_user:
+        await log_analytics_event(
+            session,
+            event_name="User logged out",
+            event_type=AnalyticsEventType.USER_LOGOUT,
+            user_id=current_user.id,
+        )
+
     return {"message": "Successfully logged out"}
 
 
@@ -201,7 +208,6 @@ async def get_me(current_user: User = Depends(get_current_user)):
         email=current_user.email,
         name=current_user.name,
         plan=current_user.plan,
-        api_key=current_user.api_key,
         created_at=current_user.created_at,
         is_active=current_user.is_active,
         is_email_verified=current_user.is_email_verified,
@@ -269,6 +275,7 @@ async def reset_password(request: ResetPasswordRequest, session: AsyncSession = 
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired reset token",
         )
+    await user_service.revoke_all_refresh_tokens(user.id)
 
     return MessageResponse(message="Password has been reset successfully")
 

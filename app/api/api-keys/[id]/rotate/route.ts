@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getApiBaseUrl, getAuthToken } from '@/app/api/_lib/controlPlane'
+import {
+  applyAuthCookies,
+  authenticatedFetch,
+  getApiBaseUrl,
+  hasAuthSession,
+} from '@/app/api/_lib/controlPlane'
 
 const API_BASE_URL = getApiBaseUrl()
 
@@ -11,28 +16,29 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const token = await getAuthToken(request)
-    if (!token) {
+    if (!hasAuthSession(request)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { id } = await params
 
-    const response = await fetch(`${API_BASE_URL}/v1/api-keys/${id}/rotate`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      cache: 'no-store',
-    })
+    const { response, tokenRefreshed, refreshedTokens } = await authenticatedFetch(
+      request,
+      `${API_BASE_URL}/v1/api-keys/${id}/rotate`,
+      {
+        method: 'POST',
+        cache: 'no-store',
+      }
+    )
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: 'Failed to rotate API key' }))
-      return NextResponse.json(error, { status: response.status })
+    const payload = await response.json().catch(() => ({ detail: 'Failed to rotate API key' }))
+    const nextResponse = NextResponse.json(payload, { status: response.status })
+
+    if (tokenRefreshed && refreshedTokens) {
+      applyAuthCookies(nextResponse, request, refreshedTokens)
     }
 
-    const data = await response.json()
-    return NextResponse.json(data)
+    return nextResponse
   } catch (error) {
     console.error('API key rotate error:', error)
     return NextResponse.json({ error: 'Failed to connect to API' }, { status: 500 })

@@ -1,18 +1,47 @@
 import type { NextRequest } from 'next/server'
 
+const applyAuthCookies = jest.fn((response, _request, payload) => {
+  response.cookies.set('access_token', payload.access_token, {
+    path: '/',
+    maxAge: payload.expires_in || 1800,
+  })
+
+  if (payload.refresh_token) {
+    response.cookies.set('refresh_token', payload.refresh_token, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    })
+  }
+})
+const authenticatedFetch = jest.fn()
+const clearAuthCookies = jest.fn((response) => {
+  response.cookies.set('access_token', '', { path: '/', maxAge: 0 })
+  response.cookies.set('refresh_token', '', { path: '/', maxAge: 0 })
+})
 const getAuthToken = jest.fn()
 const getCookieDomain = jest.fn()
+const getRefreshToken = jest.fn()
+const hasAuthSession = jest.fn()
 const shouldUseSecureCookies = jest.fn()
 
 jest.mock('../../app/api/_lib/controlPlane', () => ({
+  applyAuthCookies,
+  authenticatedFetch,
+  clearAuthCookies,
   getApiBaseUrl: () => 'http://localhost:8000',
   getAuthToken,
   getCookieDomain,
+  getRefreshToken,
+  hasAuthSession,
   shouldUseSecureCookies,
 }))
 
-function mockRequest() {
-  return {} as NextRequest
+function mockRequest(cookies: Record<string, string> = {}) {
+  return {
+    cookies: {
+      get: (name: string) => (cookies[name] ? { value: cookies[name] } : undefined),
+    },
+  } as NextRequest
 }
 
 function mockJsonRequest(body: unknown) {
@@ -25,8 +54,13 @@ describe('auth route handlers', () => {
   let fetchSpy: jest.SpyInstance
 
   beforeEach(() => {
+    applyAuthCookies.mockClear()
+    authenticatedFetch.mockReset()
+    clearAuthCookies.mockClear()
     getAuthToken.mockReset()
     getCookieDomain.mockReturnValue(undefined)
+    getRefreshToken.mockReset()
+    hasAuthSession.mockReset()
     shouldUseSecureCookies.mockReturnValue(false)
     fetchSpy = jest.spyOn(global as typeof globalThis, 'fetch').mockImplementation(jest.fn())
   })
@@ -248,6 +282,7 @@ describe('auth route handlers', () => {
   describe('POST /api/auth/logout', () => {
     it('returns 200 with success payload', async () => {
       const { POST } = await import('../../app/api/auth/logout/route')
+      getRefreshToken.mockReturnValue(null)
 
       const response = await POST(mockRequest())
 
@@ -257,6 +292,7 @@ describe('auth route handlers', () => {
 
     it('clears auth cookies by setting maxAge to 0', async () => {
       const { POST } = await import('../../app/api/auth/logout/route')
+      getRefreshToken.mockReturnValue(null)
 
       const response = await POST(mockRequest())
 
@@ -266,18 +302,46 @@ describe('auth route handlers', () => {
       expect(setCookieHeader).toContain('Max-Age=0')
     })
 
-    it('does not call the backend API', async () => {
+    it('does not call the backend API when no auth cookies exist', async () => {
       const { POST } = await import('../../app/api/auth/logout/route')
+      getRefreshToken.mockReturnValue(null)
 
       await POST(mockRequest())
 
       expect(global.fetch).not.toHaveBeenCalled()
     })
+
+    it('best-effort revokes the backend refresh session when tokens exist', async () => {
+      getRefreshToken.mockReturnValue('refresh-token')
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ message: 'Successfully logged out' }),
+      })
+      const { POST } = await import('../../app/api/auth/logout/route')
+
+      await POST(
+        mockRequest({
+          access_token: 'access-token',
+          refresh_token: 'refresh-token',
+        })
+      )
+
+      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer access-token',
+        },
+        body: JSON.stringify({ refresh_token: 'refresh-token' }),
+        cache: 'no-store',
+      })
+    })
   })
 
   describe('GET /api/auth/me', () => {
     it('returns 401 when no auth token exists', async () => {
-      getAuthToken.mockResolvedValue(null)
+      hasAuthSession.mockReturnValue(false)
       const { GET } = await import('../../app/api/auth/me/route')
 
       const response = await GET(mockRequest())
@@ -288,18 +352,20 @@ describe('auth route handlers', () => {
     })
 
     it('preserves upstream unauthorized responses', async () => {
-      getAuthToken.mockResolvedValue('token')
-      ;(global.fetch as jest.Mock).mockResolvedValue({
-        ok: false,
+      hasAuthSession.mockReturnValue(true)
+      const request = mockRequest()
+      authenticatedFetch.mockResolvedValue({
+        response: {
         status: 401,
         json: async () => ({ detail: 'Session expired' }),
+        },
+        tokenRefreshed: false,
       })
       const { GET } = await import('../../app/api/auth/me/route')
 
-      const response = await GET(mockRequest())
+      const response = await GET(request)
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/me', {
-        headers: { Authorization: 'Bearer token' },
+      expect(authenticatedFetch).toHaveBeenCalledWith(request, 'http://localhost:8000/v1/auth/me', {
         cache: 'no-store',
       })
       expect(response.status).toBe(401)
@@ -307,22 +373,24 @@ describe('auth route handlers', () => {
     })
 
     it('preserves successful user payloads', async () => {
-      getAuthToken.mockResolvedValue('token')
-      ;(global.fetch as jest.Mock).mockResolvedValue({
-        ok: true,
+      hasAuthSession.mockReturnValue(true)
+      const request = mockRequest()
+      authenticatedFetch.mockResolvedValue({
+        response: {
         status: 200,
         json: async () => ({
           id: 'user_123',
           email: 'operator@mutx.dev',
           name: 'Operator',
         }),
+        },
+        tokenRefreshed: false,
       })
       const { GET } = await import('../../app/api/auth/me/route')
 
-      const response = await GET(mockRequest())
+      const response = await GET(request)
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/me', {
-        headers: { Authorization: 'Bearer token' },
+      expect(authenticatedFetch).toHaveBeenCalledWith(request, 'http://localhost:8000/v1/auth/me', {
         cache: 'no-store',
       })
       expect(response.status).toBe(200)
@@ -331,6 +399,98 @@ describe('auth route handlers', () => {
         email: 'operator@mutx.dev',
         name: 'Operator',
       })
+    })
+
+    it('applies refreshed auth cookies after session renewal', async () => {
+      hasAuthSession.mockReturnValue(true)
+      authenticatedFetch.mockResolvedValue({
+        response: {
+          status: 200,
+          json: async () => ({ id: 'user_123' }),
+        },
+        tokenRefreshed: true,
+        refreshedTokens: {
+          access_token: 'new_access_token',
+          refresh_token: 'new_refresh_token',
+          expires_in: 1800,
+        },
+      })
+      const { GET } = await import('../../app/api/auth/me/route')
+
+      const request = mockRequest()
+      const response = await GET(request)
+
+      expect(response.status).toBe(200)
+      expect(applyAuthCookies).toHaveBeenCalledWith(
+        expect.anything(),
+        request,
+        expect.objectContaining({
+          access_token: 'new_access_token',
+          refresh_token: 'new_refresh_token',
+        })
+      )
+    })
+  })
+
+  describe('POST /api/auth/forgot-password', () => {
+    it('validates the request body before proxying', async () => {
+      const { POST } = await import('../../app/api/auth/forgot-password/route')
+
+      const response = await POST(mockJsonRequest({}))
+
+      expect(response.status).toBe(400)
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('proxies forgot-password requests to the backend', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ message: 'If an account exists with this email, a password reset link has been sent' }),
+      })
+      const { POST } = await import('../../app/api/auth/forgot-password/route')
+
+      const response = await POST(mockJsonRequest({ email: 'operator@mutx.dev' }))
+
+      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'operator@mutx.dev' }),
+        cache: 'no-store',
+      })
+      expect(response.status).toBe(200)
+    })
+  })
+
+  describe('POST /api/auth/reset-password', () => {
+    it('validates the reset payload before proxying', async () => {
+      const { POST } = await import('../../app/api/auth/reset-password/route')
+
+      const response = await POST(mockJsonRequest({ token: '', new_password: 'short' }))
+
+      expect(response.status).toBe(400)
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('proxies reset-password requests to the backend', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ message: 'Password has been reset successfully' }),
+      })
+      const { POST } = await import('../../app/api/auth/reset-password/route')
+
+      const response = await POST(
+        mockJsonRequest({ token: 'reset-token', new_password: 'StrongPassword123!' })
+      )
+
+      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: 'reset-token', new_password: 'StrongPassword123!' }),
+        cache: 'no-store',
+      })
+      expect(response.status).toBe(200)
     })
   })
 })

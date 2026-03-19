@@ -96,13 +96,16 @@ jobs:
 
       - name: Set up Docker Compose
         run: |
-          curl -sL https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-          chmod +x /usr/local/bin/docker-compose
+          docker compose version
 
-      - name: Validate docker-compose files
+      - name: Validate canonical docker-compose files
+        env:
+          POSTGRES_PASSWORD: testpass
+          JWT_SECRET: test-secret-key-that-is-long-enough-32
+          DATABASE_URL: postgresql://mutx:testpass@postgres:5432/mutx
+          DATABASE_SSL_MODE: disable
         run: |
-          docker-compose -f infrastructure/docker/docker-compose.yml config --quiet
-          docker-compose -f infrastructure/docker/docker-compose.prod.yml config --quiet
-          docker-compose -f infrastructure/docker/docker-compose.production.yml config --quiet
-          docker-compose -f infrastructure/docker/docker-compose.monitoring.yml config --quiet
-          docker-compose -f infrastructure/docker/otel-compose.yml config --quiet
+          docker compose -f infrastructure/docker/docker-compose.yml config --quiet
+          docker compose -f infrastructure/docker/docker-compose.prod.yml config --quiet
+          docker compose -f infrastructure/docker/docker-compose.monitoring.yml config --quiet
+          docker compose -f infrastructure/docker/otel-compose.yml config --quiet

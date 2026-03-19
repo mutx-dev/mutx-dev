@@ -3,7 +3,7 @@
 from alembic import op
 
 revision = "alter_plan_to_varchar"
-down_revision = "e8f636a73690_initial_migration_create_all_tables"
+down_revision = "e8f636a73690"
 branch_labels = None
 depends_on = None
 

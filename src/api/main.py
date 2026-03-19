@@ -62,7 +62,7 @@ async def _initialize_database(app: FastAPI) -> None:
     app.state.database_ready = True
     app.state.database_error = None
     app.state.database_error_detail = None
-    logger.info("Database initialized")
+    logger.info("Database connectivity verified")
 
 
 async def _initialize_database_with_retries(app: FastAPI) -> None:
@@ -135,10 +135,13 @@ async def lifespan(app: FastAPI):
         logger.info("Database initialization running in background")
         database_init_task = asyncio.create_task(_initialize_database_with_retries(app))
 
-    if settings.database_required_on_startup:
-        monitor_task = asyncio.create_task(start_background_monitor())
+    if settings.background_monitor_enabled:
+        if settings.database_required_on_startup:
+            monitor_task = asyncio.create_task(start_background_monitor())
+        else:
+            monitor_task = asyncio.create_task(_start_monitor_when_database_ready(app))
     else:
-        monitor_task = asyncio.create_task(_start_monitor_when_database_ready(app))
+        logger.info("Background monitor disabled for this process")
 
     try:
         yield
@@ -251,12 +254,7 @@ async def readiness_check(request: Request, response: Response):
 
 
 @app.get("/")
-async def root(request: Request):
-    """Redirect authenticated users to app.mutx.dev, unauthenticated to landing."""
-    user_id = getattr(request.state, "auth_user_id", None)
-    if user_id:
-        from fastapi.responses import RedirectResponse
-        return RedirectResponse(url="https://app.mutx.dev", status_code=302)
+async def root():
     return {"message": "mutx.dev API", "version": "1.0.0"}
 
 

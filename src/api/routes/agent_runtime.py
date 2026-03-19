@@ -26,6 +26,7 @@ from src.api.database import get_db
 from src.api.middleware.auth import get_current_agent, get_current_user
 from src.api.models import Agent, AgentLog, AgentMetric, AgentStatus, AgentVersion, Command, User
 from src.api.models.schemas import AgentResponse
+from src.api.services.user_service import hash_api_key
 from src.api.services.webhook_service import trigger_webhook_event
 
 logger = logging.getLogger(__name__)
@@ -140,20 +141,18 @@ async def register_agent(
 
     Returns agent_id and api_key that the agent should use for subsequent requests.
     """
-    # Generate unique API key for this agent
-    agent_api_key = f"mutx_agent_{uuid.uuid4().hex}_{uuid.uuid4().hex[:8]}"
-
     agent = Agent(
         name=request.name,
         description=request.description or "",
         status=AgentStatus.RUNNING.value,
         config=json.dumps(request.metadata) if request.metadata else None,
-        api_key=agent_api_key,
         user_id=current_user.id,
     )
 
     db.add(agent)
     await db.flush()  # Get agent.id before creating version
+    agent_api_key = f"mutx_agent_{agent.id.hex}_{uuid.uuid4().hex[:24]}"
+    agent.api_key = hash_api_key(agent_api_key)
 
     # Create initial version
     _create_agent_version(agent, db)

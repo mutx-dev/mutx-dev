@@ -1,3 +1,4 @@
+import uuid
 from functools import wraps
 from typing import Callable, Optional
 
@@ -8,7 +9,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from src.api.auth.jwt import verify_access_token
 from src.api.database import async_session_maker, get_db
 from src.api.models.models import User
-from src.api.services.user_service import UserService
+from src.api.services.user_service import UserService, verify_api_key
 
 
 async def _resolve_user_from_bearer_token(
@@ -73,10 +74,7 @@ async def _populate_api_key_context(request: Request, token: str) -> None:
     request.state.auth_user_id = user.id
     request.state.auth_method = "api_key"
     request.state.auth_api_key_id = managed_api_key_id
-    if managed_api_key_id:
-        request.state.auth_api_key_identifier = f"managed:{managed_api_key_id}"
-    else:
-        request.state.auth_api_key_identifier = f"legacy:{user.id}"
+    request.state.auth_api_key_identifier = f"managed:{managed_api_key_id}"
 
 
 class AuthenticationMiddleware(BaseHTTPMiddleware):
@@ -257,11 +255,33 @@ async def get_current_agent(
         )
 
     token = parts[1]
+    agent = None
 
-    # In a real app, we'd hash the token or use a faster lookup
-    # For now, we match the logic used in the existing verify_agent_api_key
-    result = await session.execute(select(Agent).where(Agent.api_key == token))
-    agent = result.scalar_one_or_none()
+    if token.startswith("mutx_agent_"):
+        candidate_agent_id = None
+        token_parts = token.split("_", 3)
+        if len(token_parts) >= 4:
+            try:
+                candidate_agent_id = uuid.UUID(hex=token_parts[2])
+            except ValueError:
+                candidate_agent_id = None
+
+        if candidate_agent_id is not None:
+            result = await session.execute(select(Agent).where(Agent.id == candidate_agent_id))
+            candidate_agent = result.scalar_one_or_none()
+            if (
+                candidate_agent
+                and candidate_agent.api_key
+                and verify_api_key(token, candidate_agent.api_key)
+            ):
+                agent = candidate_agent
+
+    if agent is None:
+        result = await session.execute(select(Agent).where(Agent.api_key.is_not(None)))
+        for candidate_agent in result.scalars().all():
+            if candidate_agent.api_key and verify_api_key(token, candidate_agent.api_key):
+                agent = candidate_agent
+                break
 
     if not agent:
         raise HTTPException(

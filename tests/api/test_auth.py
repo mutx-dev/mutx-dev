@@ -340,8 +340,8 @@ class TestAuthEndpoints:
         from src.api.auth.password import hash_password
         from datetime import datetime, timedelta, timezone
         from src.api.auth.jwt import (
-            create_refresh_token,
             get_refresh_token_iat,
+            issue_refresh_token,
             verify_refresh_token,
         )
 
@@ -365,11 +365,11 @@ class TestAuthEndpoints:
             },
         )
         assert response.status_code == 200
-        data = response.json()
 
         # Simulate a refresh token that was issued 25 days ago (almost at max)
         old_iat = datetime.now(timezone.utc) - timedelta(days=25)
-        old_token, _ = create_refresh_token(user.id, original_iat=old_iat)
+        old_token, _, _ = await issue_refresh_token(db_session, user.id, original_iat=old_iat)
+        await db_session.commit()
 
         # Refresh with the old token
         response = await client_no_auth.post(

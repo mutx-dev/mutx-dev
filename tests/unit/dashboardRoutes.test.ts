@@ -1,26 +1,39 @@
 import type { NextRequest } from 'next/server'
 
+const applyAuthCookies = jest.fn()
+const authenticatedFetch = jest.fn()
 const getAuthToken = jest.fn()
-const authenticatedFetch = jest.fn(() => Promise.resolve({ response: new Response(JSON.stringify({})), tokenRefreshed: false }))
+const hasAuthSession = jest.fn()
+const proxyJson = jest.fn()
 
 jest.mock('../../app/api/_lib/controlPlane', () => ({
   getApiBaseUrl: () => 'http://localhost:8000',
-  getAuthToken,
+  applyAuthCookies,
   authenticatedFetch,
+  getAuthToken,
+  hasAuthSession,
+}))
+
+jest.mock('../../app/api/_lib/proxy', () => ({
+  proxyJson,
 }))
 
 function mockRequest() {
   return {} as NextRequest
 }
 
-describe.skip('dashboard route proxies', () => {
+describe('dashboard route proxies', () => {
   beforeEach(() => {
+    applyAuthCookies.mockReset()
+    authenticatedFetch.mockReset()
     getAuthToken.mockReset()
+    hasAuthSession.mockReset()
+    proxyJson.mockReset()
     global.fetch = jest.fn()
   })
 
   it('returns 401 from dashboard agents proxy when no auth token exists', async () => {
-    getAuthToken.mockResolvedValue(null)
+    hasAuthSession.mockReturnValue(false)
     const { GET } = await import('../../app/api/dashboard/agents/route')
 
     const response = await GET(mockRequest())
@@ -31,36 +44,38 @@ describe.skip('dashboard route proxies', () => {
   })
 
   it('returns 401 from dashboard agents proxy when auth fails', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      status: 401,
-      json: async () => ({ detail: 'Session expired' }),
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 401,
+        json: async () => ({ detail: 'Session expired' }),
+      },
+      tokenRefreshed: false,
     })
     const { GET } = await import('../../app/api/dashboard/agents/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/agents?limit=20', {
-      headers: { Authorization: 'Bearer token' },
+    expect(authenticatedFetch).toHaveBeenCalledWith(mockRequest(), 'http://localhost:8000/v1/agents?limit=20', {
       cache: 'no-store',
     })
     expect(response.status).toBe(401)
   })
 
   it('preserves upstream forbidden responses for dashboard agents proxy', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      status: 403,
-      json: async () => ({ detail: 'Forbidden' }),
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 403,
+        json: async () => ({ detail: 'Forbidden' }),
+      },
+      tokenRefreshed: false,
     })
     const { GET } = await import('../../app/api/dashboard/agents/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/agents?limit=20', {
-      headers: { Authorization: 'Bearer token' },
+    expect(authenticatedFetch).toHaveBeenCalledWith(mockRequest(), 'http://localhost:8000/v1/agents?limit=20', {
       cache: 'no-store',
     })
     expect(response.status).toBe(403)
@@ -68,24 +83,25 @@ describe.skip('dashboard route proxies', () => {
   })
 
   it('preserves successful list responses for dashboard agents proxy', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => [
-        {
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 200,
+        json: async () => [
+          {
           id: 'agent_123',
           name: 'runtime-agent',
           status: 'running',
         },
       ],
+      },
+      tokenRefreshed: false,
     })
     const { GET } = await import('../../app/api/dashboard/agents/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/agents?limit=20', {
-      headers: { Authorization: 'Bearer token' },
+    expect(authenticatedFetch).toHaveBeenCalledWith(mockRequest(), 'http://localhost:8000/v1/agents?limit=20', {
       cache: 'no-store',
     })
     expect(response.status).toBe(200)
@@ -99,7 +115,7 @@ describe.skip('dashboard route proxies', () => {
   })
 
   it('returns 401 from dashboard deployments proxy when no auth token exists', async () => {
-    getAuthToken.mockResolvedValue(null)
+    hasAuthSession.mockReturnValue(false)
     const { GET } = await import('../../app/api/dashboard/deployments/route')
 
     const response = await GET(mockRequest())
@@ -110,36 +126,38 @@ describe.skip('dashboard route proxies', () => {
   })
 
   it('returns 401 from dashboard deployments proxy when auth fails', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      status: 401,
-      json: async () => ({ detail: 'Session expired' }),
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 401,
+        json: async () => ({ detail: 'Session expired' }),
+      },
+      tokenRefreshed: false,
     })
     const { GET } = await import('../../app/api/dashboard/deployments/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments?limit=20', {
-      headers: { Authorization: 'Bearer token' },
+    expect(authenticatedFetch).toHaveBeenCalledWith(mockRequest(), 'http://localhost:8000/v1/deployments?limit=20', {
       cache: 'no-store',
     })
     expect(response.status).toBe(401)
   })
 
   it('preserves upstream forbidden responses for dashboard deployments proxy', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      status: 403,
-      json: async () => ({ detail: 'Forbidden' }),
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 403,
+        json: async () => ({ detail: 'Forbidden' }),
+      },
+      tokenRefreshed: false,
     })
     const { GET } = await import('../../app/api/dashboard/deployments/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments?limit=20', {
-      headers: { Authorization: 'Bearer token' },
+    expect(authenticatedFetch).toHaveBeenCalledWith(mockRequest(), 'http://localhost:8000/v1/deployments?limit=20', {
       cache: 'no-store',
     })
     expect(response.status).toBe(403)
@@ -147,24 +165,25 @@ describe.skip('dashboard route proxies', () => {
   })
 
   it('preserves successful list responses for dashboard deployments proxy', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => [
-        {
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 200,
+        json: async () => [
+          {
           id: 'dep_123',
           agent_id: 'agent_123',
           status: 'running',
         },
       ],
+      },
+      tokenRefreshed: false,
     })
     const { GET } = await import('../../app/api/dashboard/deployments/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments?limit=20', {
-      headers: { Authorization: 'Bearer token' },
+    expect(authenticatedFetch).toHaveBeenCalledWith(mockRequest(), 'http://localhost:8000/v1/deployments?limit=20', {
       cache: 'no-store',
     })
     expect(response.status).toBe(200)
@@ -178,11 +197,13 @@ describe.skip('dashboard route proxies', () => {
   })
 
   it('proxies deployment creation requests', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      status: 201,
-      json: async () => ({ id: 'dep_123', status: 'pending' }),
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 201,
+        json: async () => ({ id: 'dep_123', status: 'pending' }),
+      },
+      tokenRefreshed: false,
     })
     const { POST } = await import('../../app/api/dashboard/deployments/route')
 
@@ -190,10 +211,9 @@ describe.skip('dashboard route proxies', () => {
       json: async () => ({ agent_id: '123e4567-e89b-12d3-a456-426614174000' }),
     } as NextRequest)
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments', {
+    expect(authenticatedFetch).toHaveBeenCalledWith(expect.anything(), 'http://localhost:8000/v1/deployments', {
       method: 'POST',
       headers: {
-        Authorization: 'Bearer token',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ agent_id: '123e4567-e89b-12d3-a456-426614174000' }),
@@ -203,65 +223,91 @@ describe.skip('dashboard route proxies', () => {
     await expect(response.json()).resolves.toEqual({ id: 'dep_123', status: 'pending' })
   })
 
-  it('proxies deployment restart actions', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ id: 'dep_123', status: 'pending' }),
+  it('applies refreshed auth cookies when dashboard agents refreshes the session', async () => {
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 200,
+        json: async () => [],
+      },
+      tokenRefreshed: true,
+      refreshedTokens: {
+        access_token: 'new_access_token',
+        refresh_token: 'new_refresh_token',
+        expires_in: 1800,
+      },
     })
+    const { GET } = await import('../../app/api/dashboard/agents/route')
+
+    const request = mockRequest()
+    const response = await GET(request)
+
+    expect(response.status).toBe(200)
+    expect(applyAuthCookies).toHaveBeenCalledWith(
+      expect.anything(),
+      request,
+      expect.objectContaining({
+        access_token: 'new_access_token',
+        refresh_token: 'new_refresh_token',
+      })
+    )
+  })
+
+  it('proxies deployment restart actions', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ id: 'dep_123', status: 'pending' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    )
     const { POST } = await import('../../app/api/dashboard/deployments/[id]/route')
 
+    const request = { url: 'http://localhost:3000/api/dashboard/v1/deployments/dep_123?action=restart' } as NextRequest
     const response = await POST(
-      { url: 'http://localhost:3000/api/dashboard/v1/deployments/dep_123?action=restart' } as NextRequest,
+      request,
       { params: Promise.resolve({ id: 'dep_123' }) }
     )
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments/dep_123/restart', {
+    expect(proxyJson).toHaveBeenCalledWith(request, 'http://localhost:8000/v1/deployments/dep_123/restart', {
       method: 'POST',
-      headers: { Authorization: 'Bearer token' },
-      cache: 'no-store',
+      fallbackMessage: 'Failed to restart deployment',
     })
     expect(response.status).toBe(200)
     await expect(response.json()).resolves.toEqual({ id: 'dep_123', status: 'pending' })
   })
 
   it('proxies deployment delete actions', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      status: 204,
-      json: async () => ({}),
-    })
+    proxyJson.mockResolvedValue(new Response(null, { status: 204 }))
     const { DELETE } = await import('../../app/api/dashboard/deployments/[id]/route')
 
+    const request = mockRequest()
     const response = await DELETE(
-      mockRequest(),
+      request,
       { params: Promise.resolve({ id: 'dep_123' }) }
     )
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/deployments/dep_123', {
+    expect(proxyJson).toHaveBeenCalledWith(request, 'http://localhost:8000/v1/deployments/dep_123', {
       method: 'DELETE',
-      headers: { Authorization: 'Bearer token' },
-      cache: 'no-store',
+      fallbackMessage: 'Failed to delete deployment',
     })
     expect(response.status).toBe(204)
   })
 
 
   it('preserves upstream unauthorized responses for auth me proxy', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      status: 401,
-      json: async () => ({ detail: 'Session expired' }),
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 401,
+        json: async () => ({ detail: 'Session expired' }),
+      },
+      tokenRefreshed: false,
     })
     const { GET } = await import('../../app/api/auth/me/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/me', {
-      headers: { Authorization: 'Bearer token' },
+    expect(authenticatedFetch).toHaveBeenCalledWith(mockRequest(), 'http://localhost:8000/v1/auth/me', {
       cache: 'no-store',
     })
     expect(response.status).toBe(401)
@@ -269,7 +315,7 @@ describe.skip('dashboard route proxies', () => {
   })
 
   it('returns 401 from auth me proxy when no auth token exists', async () => {
-    getAuthToken.mockResolvedValue(null)
+    hasAuthSession.mockReturnValue(false)
     const { GET } = await import('../../app/api/auth/me/route')
 
     const response = await GET(mockRequest())
@@ -280,22 +326,23 @@ describe.skip('dashboard route proxies', () => {
   })
 
   it('preserves successful auth me payloads', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({
-        id: 'user_123',
-        email: 'operator@mutx.dev',
-        name: 'Operator',
-      }),
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 200,
+        json: async () => ({
+          id: 'user_123',
+          email: 'operator@mutx.dev',
+          name: 'Operator',
+        }),
+      },
+      tokenRefreshed: false,
     })
     const { GET } = await import('../../app/api/auth/me/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/me', {
-      headers: { Authorization: 'Bearer token' },
+    expect(authenticatedFetch).toHaveBeenCalledWith(mockRequest(), 'http://localhost:8000/v1/auth/me', {
       cache: 'no-store',
     })
     expect(response.status).toBe(200)
@@ -349,18 +396,19 @@ describe.skip('dashboard route proxies', () => {
   })
 
   it('preserves upstream unauthorized responses for api keys proxy', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      status: 401,
-      json: async () => ({ detail: 'Session expired' }),
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 401,
+        json: async () => ({ detail: 'Session expired' }),
+      },
+      tokenRefreshed: false,
     })
     const { GET } = await import('../../app/api/api-keys/route')
 
     const response = await GET(mockRequest())
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys', {
-      headers: { Authorization: 'Bearer token' },
+    expect(authenticatedFetch).toHaveBeenCalledWith(mockRequest(), 'http://localhost:8000/v1/api-keys', {
       cache: 'no-store',
     })
     expect(response.status).toBe(401)
@@ -368,22 +416,24 @@ describe.skip('dashboard route proxies', () => {
   })
 
   it('preserves upstream conflict responses for api key creation', async () => {
-    getAuthToken.mockResolvedValue('token')
-    ;(global.fetch as jest.Mock).mockResolvedValue({
-      ok: false,
-      status: 409,
-      json: async () => ({ detail: 'Active API key limit reached' }),
+    hasAuthSession.mockReturnValue(true)
+    authenticatedFetch.mockResolvedValue({
+      response: {
+        status: 409,
+        json: async () => ({ detail: 'Active API key limit reached' }),
+      },
+      tokenRefreshed: false,
     })
     const { POST } = await import('../../app/api/api-keys/route')
 
-    const response = await POST({
+    const request = {
       json: async () => ({ name: 'Demo key' }),
-    } as NextRequest)
+    } as NextRequest
+    const response = await POST(request)
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/api-keys', {
+    expect(authenticatedFetch).toHaveBeenCalledWith(request, 'http://localhost:8000/v1/api-keys', {
       method: 'POST',
       headers: {
-        Authorization: 'Bearer token',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ name: 'Demo key' }),

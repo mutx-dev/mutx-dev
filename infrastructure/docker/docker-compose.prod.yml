@@ -1,8 +1,13 @@
-# =============================================================================
-# Production Docker Compose for MUTX
-# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-# =============================================================================
-version: '3.8'
+x-api-env: &api-env
+  ENVIRONMENT: production
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  DATABASE_URL: ${DATABASE_URL}
+  DATABASE_SSL_MODE: ${DATABASE_SSL_MODE:-require}
+  DATABASE_REQUIRED_ON_STARTUP: "true"
+  JWT_SECRET: ${JWT_SECRET}
+  SECRET_ENCRYPTION_KEY: ${SECRET_ENCRYPTION_KEY:-${JWT_SECRET}}
+  CORS_ORIGINS: ${CORS_ORIGINS:-https://mutx.dev,https://app.mutx.dev}
+  ENABLE_RAG_API: ${ENABLE_RAG_API:-false}
 
 services:
   postgres:
@@ -23,14 +28,6 @@ services:
       start_period: 30s
     networks:
       - mutx-network
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 256M
-    # Security: Don't expose postgres externally
-    # ports:  # Commented out - only accessible within network
 
   redis:
     image: redis:7-alpine
@@ -53,14 +50,22 @@ services:
       start_period: 10s
     networks:
       - mutx-network
-    deploy:
-      resources:
-        limits:
-          memory: 384M
-        reservations:
-          memory: 128M
-    # Security: Don't expose redis externally
-    # ports:  # Commented out - only accessible within network
+
+  migrate:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.api.production
+    container_name: mutx-migrate-prod
+    restart: "no"
+    environment:
+      <<: *api-env
+      BACKGROUND_MONITOR_ENABLED: "false"
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - mutx-network
 
   api:
     build:
@@ -68,68 +73,79 @@ services:
       dockerfile: infrastructure/docker/Dockerfile.api.production
     container_name: mutx-api-prod
     restart: unless-stopped
-    env_file:
-      - ../../.env.production
     environment:
-      - ENVIRONMENT=production
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      - WEB_CONCURRENCY=${WEB_CONCURRENCY:-4}
-      - DATABASE_URL=${DATABASE_URL}
-      - DATABASE_SSL_MODE=${DATABASE_SSL_MODE:-require}
-      - DATABASE_REQUIRED_ON_STARTUP=${DATABASE_REQUIRED_ON_STARTUP:-false}
-      - JWT_SECRET=${JWT_SECRET}
-      - RESEND_API_KEY=${RESEND_API_KEY:-}
-      - CORS_ORIGINS=${CORS_ORIGINS:-https://mutx.dev,https://app.mutx.dev}
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      <<: *api-env
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
+      BACKGROUND_MONITOR_ENABLED: "false"
     depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - mutx-network
+
+  monitor:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.api.production
+    container_name: mutx-monitor-prod
+    restart: unless-stopped
+    environment:
+      <<: *api-env
+      BACKGROUND_MONITOR_ENABLED: "true"
+    command: ["python", "-m", "src.api.monitor_worker"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     networks:
       - mutx-network
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-          cpus: '1.0'
-        reservations:
-          memory: 512M
-          cpus: '0.5'
-    # Health check is built into the Dockerfile
-    # Production: Don't expose API directly, use nginx
-    # ports:
-    #   - "8000:8000"
 
   frontend:
     build:
       context: ../..
       dockerfile: infrastructure/docker/Dockerfile.frontend
       target: production
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.mutx.dev}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://app.mutx.dev}
     container_name: mutx-frontend-prod
     restart: unless-stopped
-    env_file:
-      - ../../.env.production
     environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://api.mutx.dev}
-      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-https://mutx.dev}
+      NODE_ENV: production
+      INTERNAL_API_URL: http://api:8000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.mutx.dev}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://app.mutx.dev}
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
     depends_on:
       api:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3000', (res) => process.exit(res.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     networks:
       - mutx-network
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-          cpus: '0.5'
-        reservations:
-          memory: 256M
-          cpus: '0.25'
-    # Production: Don't expose frontend directly, use nginx
-    # ports:
-    #   - "3000:3000"
 
   nginx:
     image: nginx:alpine
@@ -142,22 +158,22 @@ services:
       - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
       - ./ssl:/etc/nginx/ssl:ro
     depends_on:
-      - api
-      - frontend
+      api:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     networks:
       - mutx-network
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-        reservations:
-          memory: 64M
 
 volumes:
   postgres_data:
-    driver: local
   redis_data:
-    driver: local
 
 networks:
   mutx-network:

@@ -4,6 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 MUTX_SKIP_PLAYWRIGHT="${MUTX_SKIP_PLAYWRIGHT:-0}"
+MUTX_SKIP_COMPOSE_SMOKE="${MUTX_SKIP_COMPOSE_SMOKE:-1}"
 
 PYTHON_BIN=""
 for candidate in ".venv/bin/python" "python3.11" "python3.10" "python3"; do
@@ -51,8 +52,18 @@ echo "Running Python compile check..."
 "$PYTHON_BIN" -m compileall src/api cli sdk/mutx
 
 echo ""
-echo "Running Python API test suite..."
-"$PYTHON_BIN" -m pytest tests/api --maxfail=1 -q
+echo "Running expanded Python validation suite..."
+"$PYTHON_BIN" -m pytest \
+  tests/api \
+  tests/unit/python \
+  tests/test_cli_*.py \
+  tests/test_sdk_*.py \
+  tests/test_hosted_llm_executor.py \
+  --maxfail=1 -q
+
+echo ""
+echo "Generating OpenAPI spec..."
+"$PYTHON_BIN" scripts/generate_openapi.py
 
 echo ""
 echo "Generating frontend API types..."
@@ -63,8 +74,8 @@ echo "Running app-level frontend unit tests..."
 npm run test:app
 
 echo ""
-echo "Checking generated frontend API types are committed..."
-git diff --exit-code -- app/types/api.ts
+echo "Checking generated OpenAPI artifacts are committed..."
+git diff --exit-code -- docs/api/openapi.json app/types/api.ts
 
 echo ""
 echo "Running frontend lint..."
@@ -80,6 +91,14 @@ if [ "$MUTX_SKIP_PLAYWRIGHT" = "1" ]; then
 else
   echo "Running frontend smoke tests..."
   npx playwright test --project=chromium
+fi
+
+echo ""
+if [ "$MUTX_SKIP_COMPOSE_SMOKE" = "1" ]; then
+  echo "Skipping production compose smoke test (MUTX_SKIP_COMPOSE_SMOKE=1)."
+else
+  echo "Running production compose smoke test..."
+  bash scripts/smoke-compose-prod.sh
 fi
 
 echo ""

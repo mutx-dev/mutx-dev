@@ -15,9 +15,39 @@ from src.api.models.schemas import (
     WebhookDelivery,
 )
 from src.api.middleware.auth import get_current_user_or_api_key
+from src.api.security import encrypt_secret_value
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 logger = logging.getLogger(__name__)
+
+
+def _serialize_webhook(webhook: Webhook) -> WebhookResponse:
+    return WebhookResponse(
+        id=webhook.id,
+        user_id=webhook.user_id,
+        url=webhook.url,
+        events=webhook.events or [],
+        secret=None,
+        has_secret=bool(webhook.secret),
+        is_active=webhook.is_active,
+        created_at=webhook.created_at,
+    )
+
+
+def _validate_webhook_events(events: list[str]) -> None:
+    allowed_events = [e.value for e in WebhookEvent]
+    for event in events:
+        if event == "*":
+            continue
+
+        if event not in allowed_events:
+            if not any(
+                event.startswith(p.split(".")[0] + ".*") for p in allowed_events if "." in p
+            ):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid event: {event}. Supported events: {allowed_events} and '*'",
+                )
 
 
 async def _get_owned_webhook(
@@ -74,27 +104,13 @@ async def create_webhook(
     if not webhook_data.url.startswith(("http://", "https://")):
         raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
 
-    # Validate events
-    allowed_events = [e.value for e in WebhookEvent]
-    for event in webhook_data.events:
-        if event == "*":
-            continue
-
-        if event not in allowed_events:
-            # Check for prefix.* wildcards
-            if not any(
-                event.startswith(p.split(".")[0] + ".*") for p in allowed_events if "." in p
-            ):
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Invalid event: {event}. Supported events: {allowed_events} and '*'",
-                )
+    _validate_webhook_events(webhook_data.events)
 
     webhook = Webhook(
         user_id=current_user.id,
         url=webhook_data.url,
         events=webhook_data.events,
-        secret=webhook_data.secret,
+        secret=encrypt_secret_value(webhook_data.secret),
         is_active=webhook_data.is_active,
     )
     db.add(webhook)
@@ -102,7 +118,7 @@ async def create_webhook(
     await db.refresh(webhook)
 
     logger.info(f"Webhook created: {webhook.id} for user {current_user.id}")
-    return webhook
+    return _serialize_webhook(webhook)
 
 
 @router.get("/", response_model=list[WebhookResponse])
@@ -117,7 +133,7 @@ async def list_webhooks(
         select(Webhook).where(Webhook.user_id == current_user.id).offset(skip).limit(limit)
     )
     webhooks = result.scalars().all()
-    return webhooks
+    return [_serialize_webhook(webhook) for webhook in webhooks]
 
 
 @router.get("/{webhook_id}", response_model=WebhookResponse)
@@ -128,7 +144,7 @@ async def get_webhook(
 ):
     """Get a specific webhook by ID."""
     webhook = await _get_owned_webhook(webhook_id, db, current_user)
-    return webhook
+    return _serialize_webhook(webhook)
 
 
 @router.patch("/{webhook_id}", response_model=WebhookResponse)
@@ -148,20 +164,7 @@ async def update_webhook(
         webhook.url = webhook_data.url
 
     if webhook_data.events is not None:
-        allowed_events = [e.value for e in WebhookEvent]
-        for event in webhook_data.events:
-            if event == "*":
-                continue
-
-            if event not in allowed_events:
-                # Check for prefix.* wildcards
-                if not any(
-                    event.startswith(p.split(".")[0] + ".*") for p in allowed_events if "." in p
-                ):
-                    raise HTTPException(
-                        status_code=400,
-                        detail=f"Invalid event: {event}. Supported events: {allowed_events} and '*'",
-                    )
+        _validate_webhook_events(webhook_data.events)
         webhook.events = webhook_data.events
 
     if webhook_data.is_active is not None:
@@ -171,7 +174,7 @@ async def update_webhook(
     await db.refresh(webhook)
 
     logger.info(f"Webhook updated: {webhook.id}")
-    return webhook
+    return _serialize_webhook(webhook)
 
 
 @router.delete("/{webhook_id}", status_code=204)

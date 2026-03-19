@@ -28,7 +28,7 @@ export default function LoginPage() {
       const payload = await response.json()
 
       if (!response.ok) {
-        throw new Error(payload.detail || 'Login failed')
+        throw new Error(payload.detail || payload.error?.message || payload.error || 'Login failed')
       }
 
       router.push('/dashboard')

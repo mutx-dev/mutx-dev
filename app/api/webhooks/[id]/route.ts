@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getApiBaseUrl, getAuthToken } from "@/app/api/_lib/controlPlane";
+import { getApiBaseUrl } from "@/app/api/_lib/controlPlane";
+import { proxyJson } from "@/app/api/_lib/proxy";
+import { validateRequest, schemas } from "@/app/api/_lib/validation";
+import { withErrorHandling } from "@/app/api/_lib/errors";
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -10,74 +13,33 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const token = await getAuthToken(request);
-
-  if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
+  return withErrorHandling(async (req: Request) => {
     const { id } = await params;
-    const body = await request.json();
-    const { url, name, events } = body;
-
-    if (!url) {
-      return NextResponse.json({ error: "URL is required" }, { status: 400 });
+    const validation = await validateRequest(schemas.webhookUpdate, req);
+    if (!validation.success) {
+      return validation.response;
     }
 
-    const response = await fetch(`${API_BASE_URL}/v1/webhooks/${id}`, {
+    return proxyJson(request, `${API_BASE_URL}/v1/webhooks/${id}`, {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ url, name, events: events || [] }),
-      cache: "no-store"
+      body: JSON.stringify(validation.data),
+      fallbackMessage: "Failed to update webhook",
     });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      return NextResponse.json({ error: error.detail || "Failed to update webhook" }, { status: response.status });
-    }
-
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error("Webhooks PATCH error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
+  })(request);
 }
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const token = await getAuthToken(request);
-
-  if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
+  return withErrorHandling(async () => {
     const { id } = await params;
-
-    const response = await fetch(`${API_BASE_URL}/v1/webhooks/${id}`, {
+    return proxyJson(request, `${API_BASE_URL}/v1/webhooks/${id}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      cache: "no-store"
+      fallbackMessage: "Failed to delete webhook",
     });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      return NextResponse.json({ error: error.detail || "Failed to delete webhook" }, { status: response.status });
-    }
-
-    return new NextResponse(null, { status: 204 });
-  } catch (error) {
-    console.error("Webhooks DELETE error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
+  })(request);
 }

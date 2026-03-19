@@ -105,6 +105,9 @@ class User(Base):
     api_keys: Mapped[list["APIKey"]] = relationship(
         "APIKey", back_populates="user", cascade="all, delete-orphan"
     )
+    refresh_token_sessions: Mapped[list["RefreshTokenSession"]] = relationship(
+        "RefreshTokenSession", back_populates="user", cascade="all, delete-orphan"
+    )
     webhooks: Mapped[list["Webhook"]] = relationship(
         "Webhook", back_populates="user", cascade="all, delete-orphan"
     )
@@ -261,6 +264,26 @@ class APIKey(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     user: Mapped["User"] = relationship("User", back_populates="api_keys")
+
+
+class RefreshTokenSession(Base):
+    __tablename__ = "refresh_token_sessions"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
+    token_jti: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
+    family_id: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    last_used_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    revoked_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    replaced_by_token_jti: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+
+    user: Mapped["User"] = relationship("User", back_populates="refresh_token_sessions")
 
 
 class Webhook(Base):

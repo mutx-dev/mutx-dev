@@ -2,15 +2,21 @@
 Pytest configuration and fixtures for MUTX API tests.
 """
 
+import asyncio
+from datetime import datetime, timezone
+from collections.abc import AsyncGenerator
 import os
+import uuid
 
-from fastapi import FastAPI
 import pytest
 import pytest_asyncio
-from typing import AsyncGenerator
-
+from httpx import ASGITransport, AsyncClient
+from fastapi import FastAPI
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 # Set environment before any imports
 os.environ.setdefault("DATABASE_REQUIRED_ON_STARTUP", "false")
@@ -142,7 +148,11 @@ async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
 async def client(db_session: AsyncSession, test_user):
     """Create test client with database and auth overrides."""
     from src.api.database import get_db
-    from src.api.middleware.auth import get_current_user, get_current_user_or_api_key
+    from src.api.middleware.auth import (
+        get_current_user,
+        get_current_user_optional,
+        get_current_user_or_api_key,
+    )
     from src.api.routes.webhooks import get_webhook_auth
     from src.api.routes.ingest import get_ingest_auth
 
@@ -160,6 +170,9 @@ async def client(db_session: AsyncSession, test_user):
     async def override_get_current_user_or_api_key():
         return test_user
 
+    async def override_get_current_user_optional():
+        return test_user
+
     async def override_get_webhook_auth():
         return test_user
 
@@ -169,6 +182,7 @@ async def client(db_session: AsyncSession, test_user):
     # Override dependencies
     test_app.dependency_overrides[get_db] = override_get_db
     test_app.dependency_overrides[get_current_user] = override_get_current_user
+    test_app.dependency_overrides[get_current_user_optional] = override_get_current_user_optional
     test_app.dependency_overrides[get_current_user_or_api_key] = (
         override_get_current_user_or_api_key
     )
@@ -205,7 +219,11 @@ async def client_no_auth(db_session: AsyncSession):
 async def other_user_client(db_session: AsyncSession, other_user):
     """Create test client authenticated as other_user."""
     from src.api.database import get_db
-    from src.api.middleware.auth import get_current_user, get_current_user_or_api_key
+    from src.api.middleware.auth import (
+        get_current_user,
+        get_current_user_optional,
+        get_current_user_or_api_key,
+    )
     from src.api.routes.webhooks import get_webhook_auth
     from src.api.routes.ingest import get_ingest_auth
 
@@ -220,6 +238,9 @@ async def other_user_client(db_session: AsyncSession, other_user):
     async def override_get_current_user_or_api_key():
         return other_user
 
+    async def override_get_current_user_optional():
+        return other_user
+
     async def override_get_webhook_auth():
         return other_user
 
@@ -228,6 +249,7 @@ async def other_user_client(db_session: AsyncSession, other_user):
 
     test_app.dependency_overrides[get_db] = override_get_db
     test_app.dependency_overrides[get_current_user] = override_get_current_user
+    test_app.dependency_overrides[get_current_user_optional] = override_get_current_user_optional
     test_app.dependency_overrides[get_current_user_or_api_key] = (
         override_get_current_user_or_api_key
     )

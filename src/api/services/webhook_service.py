@@ -18,9 +18,10 @@ from typing import Optional
 
 import aiohttp
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.api.models import Webhook, WebhookDeliveryLog
+from src.api.security import decrypt_secret_value
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ async def deliver_webhook(
         tuple of (success, status_code, error_message)
     """
     url = webhook.url
-    secret = webhook.secret
+    secret = decrypt_secret_value(webhook.secret)
 
     # Prepare payload
     payload_json = json.dumps(
@@ -121,52 +122,58 @@ async def deliver_webhook_with_retry(
 
     Retries up to MAX_RETRIES times with increasing delays.
     """
-    if not webhook.is_active:
-        logger.info(f"Webhook {webhook.id} is inactive, skipping delivery")
-        return False
+    if db.bind is None:
+        raise RuntimeError("Database session is not bound")
 
-    delivery_id = uuid.uuid4()
-
-    # Log initial attempt
-    delivery_log = WebhookDeliveryLog(
-        id=delivery_id,
-        webhook_id=webhook.id,
-        event=event,
-        payload=json.dumps(payload, default=str),
+    isolated_session_factory = async_sessionmaker(
+        db.bind,
+        class_=AsyncSession,
+        expire_on_commit=False,
     )
-    db.add(delivery_log)
-    await db.commit()
+    async with isolated_session_factory() as isolated_db:
+        refreshed_webhook = await isolated_db.get(Webhook, webhook.id)
+        if not refreshed_webhook or not refreshed_webhook.is_active:
+            logger.info(f"Webhook {webhook.id} is inactive, skipping delivery")
+            return False
 
-    for attempt in range(MAX_RETRIES):
-        success, status_code, error_message = await deliver_webhook(
-            session, webhook, event, payload, delivery_id
+        delivery_id = uuid.uuid4()
+        delivery_log = WebhookDeliveryLog(
+            id=delivery_id,
+            webhook_id=refreshed_webhook.id,
+            event=event,
+            payload=json.dumps(payload, default=str),
         )
+        isolated_db.add(delivery_log)
+        await isolated_db.commit()
 
-        if success:
-            # Update delivery log
-            delivery_log.success = True
-            delivery_log.status_code = status_code
-            delivery_log.delivered_at = datetime.now(timezone.utc)
-            await db.commit()
-            return True
-
-        # Update attempt count and error
-        delivery_log.attempts = attempt + 1
-        delivery_log.status_code = status_code
-        delivery_log.error_message = error_message
-        await db.commit()
-
-        # Wait before retry (if not last attempt)
-        if attempt < MAX_RETRIES - 1:
-            delay = RETRY_DELAYS[attempt]
-            logger.info(
-                f"Retrying webhook delivery in {delay}s (attempt {attempt + 2}/{MAX_RETRIES})"
+        for attempt in range(MAX_RETRIES):
+            success, status_code, error_message = await deliver_webhook(
+                session, refreshed_webhook, event, payload, delivery_id
             )
-            await asyncio.sleep(delay)
 
-    # All retries failed
-    logger.error(f"Webhook delivery failed after {MAX_RETRIES} attempts: {event} to {webhook.url}")
-    return False
+            if success:
+                delivery_log.success = True
+                delivery_log.status_code = status_code
+                delivery_log.delivered_at = datetime.now(timezone.utc)
+                await isolated_db.commit()
+                return True
+
+            delivery_log.attempts = attempt + 1
+            delivery_log.status_code = status_code
+            delivery_log.error_message = error_message
+            await isolated_db.commit()
+
+            if attempt < MAX_RETRIES - 1:
+                delay = RETRY_DELAYS[attempt]
+                logger.info(
+                    f"Retrying webhook delivery in {delay}s (attempt {attempt + 2}/{MAX_RETRIES})"
+                )
+                await asyncio.sleep(delay)
+
+        logger.error(
+            f"Webhook delivery failed after {MAX_RETRIES} attempts: {event} to {refreshed_webhook.url}"
+        )
+        return False
 
 
 async def trigger_webhook_event(

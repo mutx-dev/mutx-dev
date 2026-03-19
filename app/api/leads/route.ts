@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { getApiBaseUrl } from '@/app/api/_lib/controlPlane'
-import { validateRequest, schemas } from '@/app/api/_lib/validation'
+import { validateData, schemas } from '@/app/api/_lib/validation'
 import { withErrorHandling } from '@/app/api/_lib/errors'
 
 const API_BASE_URL = getApiBaseUrl()
@@ -16,7 +16,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
     }
 
-    const validation = await validateRequest(schemas.lead, req)
+    const validation = await validateData(schemas.lead, rawBody)
     if (!validation.success) {
       return validation.response
     }

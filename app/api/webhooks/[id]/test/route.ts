@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getApiBaseUrl, getAuthToken } from "@/app/api/_lib/controlPlane";
+import { getApiBaseUrl } from "@/app/api/_lib/controlPlane";
+import { proxyJson } from "@/app/api/_lib/proxy";
+import { withErrorHandling } from "@/app/api/_lib/errors";
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -10,33 +12,11 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const token = await getAuthToken(request);
-
-  if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
+  return withErrorHandling(async () => {
     const { id } = await params;
-
-    const response = await fetch(`${API_BASE_URL}/v1/webhooks/${id}/test`, {
+    return proxyJson(request, `${API_BASE_URL}/v1/webhooks/${id}/test`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      cache: "no-store"
+      fallbackMessage: "Failed to test webhook",
     });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      return NextResponse.json({ error: error.detail || "Failed to test webhook" }, { status: response.status });
-    }
-
-    const data = await response.json().catch(() => ({}));
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error("Webhooks test POST error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
+  })(request);
 }

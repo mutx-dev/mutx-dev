@@ -417,7 +417,7 @@ class WebhookCreate(BaseModel):
         description="List of events to subscribe to (e.g., 'agent.status', 'deployment.*', '*' for all)",
     )
     secret: Optional[str] = Field(
-        None, max_length=512, description="Optional secret for signature verification"
+        None, max_length=64, description="Optional secret for signature verification"
     )
     is_active: bool = Field(True, description="Whether the webhook should be active immediately")
 
@@ -435,7 +435,11 @@ class WebhookResponse(BaseModel):
     user_id: uuid.UUID
     url: str
     events: list[str]
-    secret: Optional[str]
+    secret: Optional[str] = Field(
+        default=None,
+        description="Always null. Webhook secrets are write-only and never returned after creation.",
+    )
+    has_secret: bool = False
     is_active: bool
     created_at: datetime
 

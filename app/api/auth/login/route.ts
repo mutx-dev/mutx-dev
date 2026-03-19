@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getApiBaseUrl, getCookieDomain, shouldUseSecureCookies } from '@/app/api/_lib/controlPlane'
+import { applyAuthCookies, getApiBaseUrl } from '@/app/api/_lib/controlPlane'
 import { validateRequest, schemas } from '@/app/api/_lib/validation'
 import { withErrorHandling } from '@/app/api/_lib/errors'
 
@@ -18,9 +18,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { email, password } = validation.data
     const body = { email, password }
     
-    const secureCookies = shouldUseSecureCookies(request)
-    const cookieDomain = getCookieDomain(request)
-
     const response = await fetch(`${API_BASE_URL}/v1/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -35,22 +32,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const nextResponse = NextResponse.json(payload)
-    nextResponse.cookies.set('access_token', payload.access_token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: secureCookies,
-      domain: cookieDomain,
-      path: '/',
-      maxAge: payload.expires_in || 1800,
-    })
-    nextResponse.cookies.set('refresh_token', payload.refresh_token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: secureCookies,
-      domain: cookieDomain,
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-    })
+    applyAuthCookies(nextResponse, request, payload)
 
     return nextResponse
   })(request)

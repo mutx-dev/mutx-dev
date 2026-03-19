@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export type AuthTokens = {
+  access_token: string
+  refresh_token?: string
+  expires_in: number
+}
+
 function normalizeBaseUrl(value?: string | null) {
   if (!value) return null
   if (value.startsWith('http://') || value.startsWith('https://')) return value
@@ -44,13 +50,64 @@ export function getRefreshToken(request: NextRequest): string | null {
 }
 
 export function hasAuthSession(request: NextRequest): boolean {
-  return Boolean(request.cookies.get('access_token')?.value || request.cookies.get('refresh_token')?.value)
+  return Boolean(request.cookies.get('access_token')?.value || getRefreshToken(request) || request.headers.get('authorization'))
+}
+
+export function applyAuthCookies(
+  response: NextResponse,
+  request: NextRequest,
+  tokens: AuthTokens
+) {
+  const secureCookies = shouldUseSecureCookies(request)
+  const cookieDomain = getCookieDomain(request)
+
+  response.cookies.set('access_token', tokens.access_token, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: secureCookies,
+    domain: cookieDomain,
+    path: '/',
+    maxAge: tokens.expires_in || 1800,
+  })
+
+  if (tokens.refresh_token) {
+    response.cookies.set('refresh_token', tokens.refresh_token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: secureCookies,
+      domain: cookieDomain,
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    })
+  }
+}
+
+export function clearAuthCookies(response: NextResponse, request: NextRequest) {
+  const secureCookies = shouldUseSecureCookies(request)
+  const cookieDomain = getCookieDomain(request)
+
+  response.cookies.set('access_token', '', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: secureCookies,
+    domain: cookieDomain,
+    path: '/',
+    maxAge: 0,
+  })
+  response.cookies.set('refresh_token', '', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: secureCookies,
+    domain: cookieDomain,
+    path: '/',
+    maxAge: 0,
+  })
 }
 
 export async function refreshAuthToken(
   request: NextRequest,
   refreshToken: string
-): Promise<{ access_token: string; refresh_token?: string; expires_in: number } | null> {
+): Promise<AuthTokens | null> {
   const apiBaseUrl = getApiBaseUrl()
   
   try {
@@ -79,45 +136,36 @@ export async function authenticatedFetch(
   request: NextRequest,
   url: string,
   options: RequestInit = {}
-): Promise<{ response: Response; tokenRefreshed: boolean; cookieHeader?: string }> {
+): Promise<{ response: Response; tokenRefreshed: boolean; refreshedTokens?: AuthTokens }> {
   let token = await getAuthToken(request)
-  let refreshToken = getRefreshToken(request)
+  const refreshToken = getRefreshToken(request)
   
   // Initial fetch with current token
   let response = await fetch(url, {
     ...options,
     headers: {
-      ...options.headers,
+      ...(options.headers ?? {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     credentials: 'include',
   })
 
-  // If unauthorized, try to refresh the token.
-  // This also recovers the common edge case where the access token cookie expired
-  // but a valid refresh token cookie is still present.
+  // If unauthorized, try to refresh the token
   if (response.status === 401 && refreshToken) {
     const newTokens = await refreshAuthToken(request, refreshToken)
     if (newTokens) {
       // Retry with new token
       token = newTokens.access_token
-      refreshToken = newTokens.refresh_token || refreshToken
       response = await fetch(url, {
         ...options,
         headers: {
-          ...options.headers,
+          ...(options.headers ?? {}),
           Authorization: `Bearer ${token}`,
         },
         credentials: 'include',
       })
-      
-      // Build cookie header for updated tokens
-      const cookieParts = [`access_token=${newTokens.access_token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${newTokens.expires_in}`]
-      if (newTokens.refresh_token) {
-        cookieParts.push(`refresh_token=${newTokens.refresh_token}; Path=/; HttpOnly; SameSite=Lax`)
-      }
-      
-      return { response, tokenRefreshed: true, cookieHeader: cookieParts.join('; ') }
+
+      return { response, tokenRefreshed: true, refreshedTokens: newTokens }
     }
   }
 
