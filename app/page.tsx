@@ -123,8 +123,8 @@ export default function LandingPage() {
             <div className="mb-6 max-w-4xl">
               <p className="site-kicker">Quickstart</p>
               <h2 className="site-title mt-3">
-                Fastest truthful local path.
-                <span className="block text-white/74">Clone it. Boot it. Authenticate. Open the operator loop.</span>
+                Fastest path into the operator loop.
+                <span className="block text-white/74">Install it. Configure it. Authenticate. Open the TUI when you are ready.</span>
               </h2>
             </div>
 
@@ -133,13 +133,13 @@ export default function LandingPage() {
 
               <div className="grid gap-4">
                 <div className="site-panel-strong p-5 sm:p-6">
-                  <p className="site-kicker">What you get immediately</p>
+                  <p className="site-kicker">What the setup touches</p>
                   <div className="mt-4 grid gap-3">
                     {[
-                      ['localhost:3000', 'marketing site and app shell'],
-                      ['localhost:8000', 'FastAPI control plane'],
-                      ['localhost:8000/docs', 'API reference and route truth'],
-                      ['~/.mutx/config.json', 'shared auth state for CLI and TUI'],
+                      ['/opt/homebrew/bin/mutx', 'the Homebrew-linked MUTX CLI entrypoint'],
+                      ['~/.mutx/config.json', 'shared auth and API state for the CLI and TUI'],
+                      ['mutx status', 'the local smoke check the installer runs after install'],
+                      ['mutx tui', 'the operator shell the wizard offers to open at the end'],
                     ].map(([title, body]) => (
                       <div key={title} className="site-step-card">
                         <div className="text-sm font-semibold text-white">{title}</div>
