@@ -11,7 +11,7 @@ const API_BASE_URL = getApiBaseUrl()
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ agentId: string }> }): Promise<NextResponse> {
-  return withErrorHandling(async (req: Request) => {
+  return withErrorHandling(async () => {
     const { agentId } = await params
 
     const idValidation = z.string().uuid('Invalid agent ID').safeParse(agentId)
@@ -24,15 +24,29 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return ownershipError
     }
 
-    return proxyJson(request, `${API_BASE_URL}/v1/agents/${agentId}`, {
+    const { searchParams } = new URL(request.url)
+    const path = searchParams.get('path') || ''
+    const targetUrl =
+      path === 'logs'
+        ? `${API_BASE_URL}/v1/agents/${agentId}/logs`
+        : path === 'metrics'
+          ? `${API_BASE_URL}/v1/agents/${agentId}/metrics`
+          : `${API_BASE_URL}/v1/agents/${agentId}`
+
+    return proxyJson(request, targetUrl, {
       method: 'GET',
-      fallbackMessage: 'Failed to fetch agent',
+      fallbackMessage:
+        path === 'logs'
+          ? 'Failed to fetch agent logs'
+          : path === 'metrics'
+            ? 'Failed to fetch agent metrics'
+            : 'Failed to fetch agent',
     })
   })(request)
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ agentId: string }> }): Promise<NextResponse> {
-  return withErrorHandling(async (req: Request) => {
+  return withErrorHandling(async () => {
     const { agentId } = await params
 
     const idValidation = z.string().uuid('Invalid agent ID').safeParse(agentId)
@@ -53,7 +67,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 }
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ agentId: string }> }): Promise<NextResponse> {
-  return withErrorHandling(async (req: Request) => {
+  return withErrorHandling(async () => {
     const { agentId } = await params
 
     const idValidation = z.string().uuid('Invalid agent ID').safeParse(agentId)

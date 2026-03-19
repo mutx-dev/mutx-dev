@@ -15,17 +15,25 @@ export async function GET(
   return withErrorHandling(async () => {
     const { id } = await params;
     const { searchParams } = new URL(request.url);
-    const path = searchParams.get("path");
+    const path = searchParams.get("path") || "";
     const targetUrl =
       path === "versions"
         ? `${API_BASE_URL}/v1/deployments/${id}/versions`
-        : `${API_BASE_URL}/v1/deployments/${id}`;
+        : path === "logs"
+          ? `${API_BASE_URL}/v1/deployments/${id}/logs`
+          : path === "metrics"
+            ? `${API_BASE_URL}/v1/deployments/${id}/metrics`
+            : `${API_BASE_URL}/v1/deployments/${id}`;
 
     return proxyJson(request, targetUrl, {
       fallbackMessage:
         path === "versions"
           ? "Failed to fetch deployment versions"
-          : "Failed to fetch deployment",
+          : path === "logs"
+            ? "Failed to fetch deployment logs"
+            : path === "metrics"
+              ? "Failed to fetch deployment metrics"
+              : "Failed to fetch deployment",
     });
   })(request);
 }

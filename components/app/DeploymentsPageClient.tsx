@@ -21,7 +21,7 @@ import {
 import { DeploymentSortSelect } from "./DeploymentSortSelect";
 
 import { Card } from "@/components/ui/Card";
-import { ApiRequestError, readJson, writeJson } from "@/components/app/http";
+import { ApiRequestError, normalizeCollection, readJson, writeJson } from "@/components/app/http";
 import { DeploymentHistory } from "./DeploymentHistory";
 import { type components } from "@/app/types/api";
 
@@ -392,17 +392,11 @@ export function DeploymentsPageClient() {
 
   async function loadDeployments() {
     try {
-      const data = await readJson<{ deployments?: Deployment[] } | Deployment[]>("/api/dashboard/deployments");
-      
-      let deploymentsData: Deployment[];
-      if (Array.isArray(data)) {
-        deploymentsData = data;
-      } else if (data.deployments) {
-        deploymentsData = data.deployments;
-      } else {
-        deploymentsData = [];
-      }
-      
+      const data = await readJson<unknown>("/api/dashboard/deployments");
+      const deploymentsData = normalizeCollection<Deployment>(data, ["deployments", "items", "data"]).filter(
+        (entry): entry is Deployment => Boolean(entry && typeof entry === "object" && "id" in entry),
+      );
+
       setDeployments(deploymentsData);
       setAuthRequired(false);
       setError("");
@@ -424,17 +418,11 @@ export function DeploymentsPageClient() {
 
   async function loadAgents() {
     try {
-      const data = await readJson<{ agents?: Agent[] } | Agent[]>("/api/dashboard/agents");
-      
-      let agentsData: Agent[];
-      if (Array.isArray(data)) {
-        agentsData = data;
-      } else if (data.agents) {
-        agentsData = data.agents;
-      } else {
-        agentsData = [];
-      }
-      
+      const data = await readJson<unknown>("/api/dashboard/agents");
+      const agentsData = normalizeCollection<Agent>(data, ["agents", "items", "data"]).filter(
+        (entry): entry is Agent => Boolean(entry && typeof entry === "object" && "id" in entry),
+      );
+
       setAgents(agentsData);
     } catch (err) {
       if (err instanceof ApiRequestError && err.status === 401) {

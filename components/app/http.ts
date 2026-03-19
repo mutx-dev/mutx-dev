@@ -10,16 +10,35 @@ export class ApiRequestError extends Error {
   }
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+export function normalizeCollection<T>(
+  payload: unknown,
+  keys: string[] = ["items", "agents", "deployments", "keys", "api_keys", "deliveries", "events", "data", "logs", "metrics"],
+): T[] {
+  if (Array.isArray(payload)) return payload as T[];
+  if (!isRecord(payload)) return [];
+
+  for (const key of keys) {
+    const value = payload[key];
+    if (Array.isArray(value)) return value as T[];
+  }
+
+  return [];
+}
+
 export function extractApiErrorMessage(payload: unknown, fallback = "Request failed") {
   if (typeof payload === "string" && payload.trim().length > 0) {
     return payload;
   }
 
-  if (!payload || typeof payload !== "object") {
+  if (!isRecord(payload)) {
     return fallback;
   }
 
-  const record = payload as Record<string, unknown>;
+  const record = payload;
 
   const detail = record.detail;
   if (typeof detail === "string" && detail.trim().length > 0) {
@@ -52,9 +71,9 @@ export function extractApiErrorMessage(payload: unknown, fallback = "Request fai
 }
 
 function extractApiErrorCode(payload: unknown) {
-  if (!payload || typeof payload !== "object") return undefined;
+  if (!isRecord(payload)) return undefined;
 
-  const record = payload as Record<string, unknown>;
+  const record = payload;
   const error = record.error;
   if (error && typeof error === "object") {
     const code = (error as Record<string, unknown>).code;

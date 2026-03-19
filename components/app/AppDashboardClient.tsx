@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
-import { readJson } from "@/components/app/http";
+import { ApiRequestError, normalizeCollection, readJson } from "@/components/app/http";
 import { type components } from "@/app/types/api";
 import { getApiKeyLimit, getLatestActiveApiKey, getLatestRevokedApiKey } from "@/components/app/apiKeyHelpers";
 import { LogsViewer, MetricsDashboard, StateTransitions } from "@/components/app/Observability";
@@ -175,7 +175,7 @@ export function AppDashboardClient() {
   const apiKeyCapacityRemaining = apiKeyLimit === null ? null : Math.max(apiKeyLimit - activeKeys, 0);
   const apiKeyLimitReached = apiKeyLimit !== null && activeKeys >= apiKeyLimit;
   const latestDeploymentEvent = deployments
-    .flatMap((deployment) => deployment.events ?? [])
+    .flatMap((deployment) => normalizeCollection<{ created_at?: string | null; event_type?: string | null }>(deployment?.events, ["items", "events", "data"]))
     .sort(
       (left, right) =>
         new Date(right.created_at ?? 0).getTime() - new Date(left.created_at ?? 0).getTime(),
@@ -347,19 +347,14 @@ export function AppDashboardClient() {
     ],
   );
 
-  // Helper to extract array from API response (handles { items: [...] } or direct array)
-  function normalizeArray<T>(data: any): T[] {
-    if (!data) return [];
-    if (Array.isArray(data)) return data;
-    if (data.items && Array.isArray(data.items)) return data.items;
-    if (data.agents && Array.isArray(data.agents)) return data.agents;
-    if (data.deployments && Array.isArray(data.deployments)) return data.deployments;
-    if (data.data && Array.isArray(data.data)) return data.data;
-    return [];
+  function normalizeDashboardCollection<T extends { id?: string }>(data: unknown, keys?: string[]): T[] {
+    return normalizeCollection<T>(data, keys).filter(
+      (entry): entry is T => Boolean(entry && typeof entry === "object" && ("id" in entry || Object.keys(entry).length > 0)),
+    );
   }
 
   function normalizeApiKeys(data: unknown): ApiKey[] {
-    return normalizeArray<ApiKey>(data).filter((entry) => Boolean(entry && typeof entry === "object" && "id" in entry));
+    return normalizeDashboardCollection<ApiKey>(data, ["keys", "api_keys", "items", "data"]);
   }
 
   async function loadDashboard() {
@@ -374,8 +369,8 @@ export function AppDashboardClient() {
 
     setUser(nextUser);
     setHealth(nextHealth);
-    setAgents(normalizeArray<Agent>(rawAgents));
-    setDeployments(normalizeArray<Deployment>(rawDeployments));
+    setAgents(normalizeDashboardCollection<Agent>(rawAgents, ["agents", "items", "data"]));
+    setDeployments(normalizeDashboardCollection<Deployment>(rawDeployments, ["deployments", "items", "data"]));
     setApiKeys(normalizeApiKeys(nextKeys));
   }
 
@@ -385,9 +380,19 @@ export function AppDashboardClient() {
     async function bootstrap() {
       try {
         await loadDashboard();
-      } catch {
+      } catch (nextError) {
         if (!cancelled) {
-          setUser(null);
+          if (nextError instanceof ApiRequestError && nextError.status === 401) {
+            setUser(null);
+            setAgents([]);
+            setDeployments([]);
+            setApiKeys([]);
+            setHealth(null);
+            setError("");
+          } else {
+            setUser(null);
+            setError(nextError instanceof Error ? nextError.message : "Failed to load dashboard");
+          }
         }
       } finally {
         if (!cancelled) {

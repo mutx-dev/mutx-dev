@@ -14,6 +14,7 @@ import {
 
 import { Card } from "@/components/ui/Card";
 import { type components } from "@/app/types/api";
+import { extractApiErrorMessage, normalizeCollection } from "@/components/app/http";
 
 type AgentMetricResponse = components["schemas"]["AgentMetricResponse"];
 type DeploymentMetricsResponse = components["schemas"]["DeploymentMetricsResponse"];
@@ -92,10 +93,11 @@ function getTrendIcon(
 
 async function fetchMetrics<T>(url: string): Promise<T[]> {
   const response = await fetch(url, { cache: "no-store" });
+  const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(`Failed to fetch metrics: ${response.statusText}`);
+    throw new Error(extractApiErrorMessage(payload, `Failed to fetch metrics: ${response.statusText}`));
   }
-  return response.json();
+  return normalizeCollection<T>(payload, ["metrics", "items", "data"]);
 }
 
 export function MetricsDashboard({
@@ -116,9 +118,9 @@ export function MetricsDashboard({
     try {
       let url = "";
       if (agentId) {
-        url = `/agents/${agentId}/metrics`;
+        url = `/api/dashboard/agents/${agentId}?path=metrics`;
       } else if (deploymentId) {
-        url = `/deployments/${deploymentId}/metrics`;
+        url = `/api/dashboard/deployments/${deploymentId}?path=metrics`;
       }
 
       const data = await fetchMetrics<MetricEntry>(url);

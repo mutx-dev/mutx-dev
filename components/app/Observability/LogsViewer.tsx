@@ -15,6 +15,7 @@ import {
 
 import { Card } from "@/components/ui/Card";
 import { type components } from "@/app/types/api";
+import { extractApiErrorMessage, normalizeCollection } from "@/components/app/http";
 
 type AgentLogResponse = components["schemas"]["AgentLogResponse"];
 type DeploymentLogsResponse = components["schemas"]["DeploymentLogsResponse"];
@@ -66,10 +67,11 @@ function formatMetadata(metadata: string): string {
 
 async function fetchLogs<T>(url: string): Promise<T[]> {
   const response = await fetch(url, { cache: "no-store" });
+  const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(`Failed to fetch logs: ${response.statusText}`);
+    throw new Error(extractApiErrorMessage(payload, `Failed to fetch logs: ${response.statusText}`));
   }
-  return response.json();
+  return normalizeCollection<T>(payload, ["logs", "items", "data"]);
 }
 
 export function LogsViewer({
@@ -94,9 +96,9 @@ export function LogsViewer({
     try {
       let url = "";
       if (agentId) {
-        url = `/agents/${agentId}/logs`;
+        url = `/api/dashboard/agents/${agentId}?path=logs`;
       } else if (deploymentId) {
-        url = `/deployments/${deploymentId}/logs`;
+        url = `/api/dashboard/deployments/${deploymentId}?path=logs`;
       }
 
       const data = await fetchLogs<LogEntry>(url);

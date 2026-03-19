@@ -3,6 +3,7 @@
 import { History, RotateCcw, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/Card";
+import { extractApiErrorMessage, normalizeCollection } from "@/components/app/http";
 
 interface DeploymentVersion {
   id: string;
@@ -25,7 +26,9 @@ function formatDate(value?: string | null) {
   return new Date(value).toLocaleString();
 }
 
-function parseConfigSnapshot(snapshot: string): Record<string, unknown> {
+function parseConfigSnapshot(snapshot: string | Record<string, unknown> | null | undefined): Record<string, unknown> {
+  if (snapshot && typeof snapshot === "object") return snapshot;
+  if (typeof snapshot !== "string") return {};
   try {
     return JSON.parse(snapshot);
   } catch {
@@ -79,9 +82,15 @@ export function DeploymentHistory({ deploymentId }: { deploymentId: string }) {
       fetch(`/api/dashboard/deployments/${deploymentId}?path=versions`, {
         cache: "no-store",
       })
-        .then((res) => res.json())
-        .then((data: VersionHistoryResponse) => {
-          setVersions(data.items || []);
+        .then(async (res) => {
+          const payload = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            throw new Error(extractApiErrorMessage(payload, "Failed to load version history"));
+          }
+          return payload;
+        })
+        .then((data: VersionHistoryResponse | unknown) => {
+          setVersions(normalizeCollection<DeploymentVersion>(data, ["items", "versions", "data"]));
           setError("");
         })
         .catch((err) => {
@@ -107,8 +116,8 @@ export function DeploymentHistory({ deploymentId }: { deploymentId: string }) {
       );
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || "Rollback failed");
+        const data = await response.json().catch(() => ({}));
+        throw new Error(extractApiErrorMessage(data, "Rollback failed"));
       }
 
       setVersions([]);

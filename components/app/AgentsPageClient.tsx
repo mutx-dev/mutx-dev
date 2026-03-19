@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
-import { extractApiErrorMessage, readJson } from "@/components/app/http";
+import { ApiRequestError, extractApiErrorMessage, normalizeCollection, readJson } from "@/components/app/http";
 import { type components } from "@/app/types/api";
 
 type Agent = components["schemas"]["AgentResponse"];
@@ -458,6 +458,7 @@ export function AgentsPageClient() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const [authRequired, setAuthRequired] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -479,20 +480,23 @@ export function AgentsPageClient() {
 
   async function loadAgents() {
     try {
-      const data = await readJson<{ agents?: Agent[] } | Agent[]>("/api/dashboard/agents");
-      
-      let agentsData: Agent[];
-      if (Array.isArray(data)) {
-        agentsData = data;
-      } else if (data.agents) {
-        agentsData = data.agents;
-      } else {
-        agentsData = [];
-      }
-      
+      const data = await readJson<unknown>("/api/dashboard/agents");
+      const agentsData = normalizeCollection<Agent>(data, ["agents", "items", "data"]).filter(
+        (entry): entry is Agent => Boolean(entry && typeof entry === "object" && "id" in entry),
+      );
+
       setAgents(agentsData);
+      setAuthRequired(false);
       setError("");
     } catch (err) {
+      if (err instanceof ApiRequestError && err.status === 401) {
+        setAgents([]);
+        setAuthRequired(true);
+        setError("Sign in to view and operate agents.");
+        return;
+      }
+
+      setAuthRequired(false);
       setError(err instanceof Error ? err.message : "Failed to load agents");
     }
   }
