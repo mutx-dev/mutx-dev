@@ -43,6 +43,35 @@ def ARRAY(type_):
     return ArrayType()
 
 
+def JSONText():
+    """
+    Store JSON-compatible Python values in a text column.
+    """
+    from sqlalchemy.types import TypeDecorator, TEXT
+    import json
+
+    class JSONTextType(TypeDecorator):
+        impl = TEXT
+        cache_ok = True
+
+        def process_bind_param(self, value, dialect):
+            if value is None:
+                return None
+            if isinstance(value, str):
+                return value
+            return json.dumps(value)
+
+        def process_result_value(self, value, dialect):
+            if value is None or isinstance(value, (dict, list)):
+                return value
+            try:
+                return json.loads(value)
+            except (TypeError, json.JSONDecodeError):
+                return None
+
+    return JSONTextType()
+
+
 class Plan(str, enum.Enum):
     FREE = "free"
     STARTER = "starter"
@@ -350,7 +379,7 @@ class AgentLog(Base):
     level: Mapped[str] = mapped_column(String(20), default="info")
     message: Mapped[str] = mapped_column(Text, nullable=False)
     extra_data: Mapped[str] = mapped_column(Text, nullable=True)
-    meta_data: Mapped[Optional[dict]] = mapped_column(Text, nullable=True)  # Renamed to meta_data
+    meta_data: Mapped[Optional[dict]] = mapped_column(JSONText(), nullable=True)
     timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True
     )
@@ -366,9 +395,9 @@ class Command(Base):
         UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True
     )
     action: Mapped[str] = mapped_column(String(100), nullable=False)
-    parameters: Mapped[Optional[dict]] = mapped_column(Text, nullable=True)
+    parameters: Mapped[Optional[dict]] = mapped_column(JSONText(), nullable=True)
     status: Mapped[str] = mapped_column(String(50), default="pending")
-    result: Mapped[Optional[dict]] = mapped_column(Text, nullable=True)
+    result: Mapped[Optional[dict]] = mapped_column(JSONText(), nullable=True)
     error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)

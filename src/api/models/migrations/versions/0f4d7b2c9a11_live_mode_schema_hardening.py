@@ -17,12 +17,32 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _has_table(table_name: str) -> bool:
+    return sa.inspect(op.get_bind()).has_table(table_name)
+
+
+def _has_column(table_name: str, column_name: str) -> bool:
+    inspector = sa.inspect(op.get_bind())
+    if not inspector.has_table(table_name):
+        return False
+    columns = inspector.get_columns(table_name)
+    return any(column["name"] == column_name for column in columns)
+
+
+def _has_index(table_name: str, index_name: str) -> bool:
+    if not _has_table(table_name):
+        return False
+    indexes = sa.inspect(op.get_bind()).get_indexes(table_name)
+    return any(index["name"] == index_name for index in indexes)
+
+
 def upgrade() -> None:
     op.add_column("agents", sa.Column("api_key", sa.String(length=128), nullable=True))
     op.add_column("agents", sa.Column("last_heartbeat", sa.DateTime(), nullable=True))
     op.create_index(op.f("ix_agents_api_key"), "agents", ["api_key"], unique=False)
 
-    op.add_column("agent_logs", sa.Column("meta_data", sa.Text(), nullable=True))
+    if not _has_column("agent_logs", "meta_data"):
+        op.add_column("agent_logs", sa.Column("meta_data", sa.Text(), nullable=True))
 
     op.create_table(
         "commands",
@@ -118,35 +138,28 @@ def upgrade() -> None:
     op.create_index(op.f("ix_leads_email"), "leads", ["email"], unique=False)
     op.create_index(op.f("ix_leads_created_at"), "leads", ["created_at"], unique=False)
 
-    op.create_table(
-        "usage_events",
-        sa.Column("id", sa.UUID(), nullable=False),
-        sa.Column("event_type", sa.String(length=100), nullable=False),
-        sa.Column("user_id", sa.UUID(), nullable=False),
-        sa.Column("resource_type", sa.String(length=100), nullable=True),
-        sa.Column("resource_id", sa.String(length=255), nullable=True),
-        sa.Column("credits_used", sa.Float(), nullable=False),
-        sa.Column("event_metadata", sa.Text(), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
-        sa.ForeignKeyConstraint(["user_id"], ["users.id"]),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_index(
-        op.f("ix_usage_events_event_type"), "usage_events", ["event_type"], unique=False
-    )
-    op.create_index(op.f("ix_usage_events_user_id"), "usage_events", ["user_id"], unique=False)
-    op.create_index(
-        op.f("ix_usage_events_resource_type"),
-        "usage_events",
-        ["resource_type"],
-        unique=False,
-    )
-    op.create_index(
-        op.f("ix_usage_events_created_at"),
-        "usage_events",
-        ["created_at"],
-        unique=False,
-    )
+    if not _has_table("usage_events"):
+        op.create_table(
+            "usage_events",
+            sa.Column("id", sa.UUID(), nullable=False),
+            sa.Column("event_type", sa.String(length=100), nullable=False),
+            sa.Column("user_id", sa.UUID(), nullable=False),
+            sa.Column("resource_type", sa.String(length=100), nullable=True),
+            sa.Column("resource_id", sa.String(length=255), nullable=True),
+            sa.Column("credits_used", sa.Float(), nullable=False),
+            sa.Column("event_metadata", sa.Text(), nullable=True),
+            sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
+            sa.ForeignKeyConstraint(["user_id"], ["users.id"]),
+            sa.PrimaryKeyConstraint("id"),
+        )
+    for index_name, column_name in (
+        (op.f("ix_usage_events_event_type"), "event_type"),
+        (op.f("ix_usage_events_user_id"), "user_id"),
+        (op.f("ix_usage_events_resource_type"), "resource_type"),
+        (op.f("ix_usage_events_created_at"), "created_at"),
+    ):
+        if not _has_index("usage_events", index_name):
+            op.create_index(index_name, "usage_events", [column_name], unique=False)
 
     op.create_table(
         "agent_resource_usage",

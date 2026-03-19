@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 import uuid
 
 import pytest
+from sqlalchemy import select
 
 
 @pytest.mark.asyncio
@@ -125,3 +126,38 @@ async def test_runtime_registered_agent_api_key_authenticates_status_and_heartbe
 
     assert heartbeat_response.status_code == 200
     assert heartbeat_response.json()["agent_id"] == agent_id
+
+
+@pytest.mark.asyncio
+async def test_agent_log_submission_persists_metadata_as_json(
+    client, db_session, test_agent
+):
+    from src.api.models.models import AgentLog
+
+    api_key = f"mutx_agent_{test_agent.id.hex}_{uuid.uuid4().hex[:24]}"
+    test_agent.api_key = api_key
+    await db_session.commit()
+
+    metadata = {
+        "provider": "openclaw",
+        "attempt": 3,
+        "flags": {"self_heal": True},
+    }
+
+    response = await client.post(
+        "/v1/agents/logs",
+        headers={"Authorization": f"Bearer {api_key}"},
+        json={
+            "agent_id": str(test_agent.id),
+            "level": "info",
+            "message": "runtime log",
+            "metadata": metadata,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        },
+    )
+
+    assert response.status_code == 200
+
+    result = await db_session.execute(select(AgentLog).where(AgentLog.agent_id == test_agent.id))
+    log_entry = result.scalar_one()
+    assert log_entry.meta_data == metadata

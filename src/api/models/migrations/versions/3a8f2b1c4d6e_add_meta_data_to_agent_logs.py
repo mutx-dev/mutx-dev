@@ -15,9 +15,20 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _has_column(table_name: str, column_name: str) -> bool:
+    inspector = sa.inspect(op.get_bind())
+    if not inspector.has_table(table_name):
+        return False
+    columns = inspector.get_columns(table_name)
+    return any(column["name"] == column_name for column in columns)
+
+
 def upgrade() -> None:
-    op.add_column('agent_logs', sa.Column('meta_data', sa.Text(), nullable=True))
+    if not _has_column("agent_logs", "meta_data"):
+        op.add_column("agent_logs", sa.Column("meta_data", sa.Text(), nullable=True))
 
 
 def downgrade() -> None:
-    op.drop_column('agent_logs', 'meta_data')
+    # This orphan branch is merged back into the main chain by a later revision.
+    # Leave teardown to the canonical migration path to avoid dropping shared columns.
+    pass

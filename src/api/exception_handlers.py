@@ -64,7 +64,8 @@ async def validation_exception_handler(
     )
 
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=response.model_dump()
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=response.model_dump(mode="json"),
     )
 
 
@@ -101,7 +102,8 @@ async def pydantic_validation_exception_handler(
     )
 
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, content=response.model_dump()
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=response.model_dump(mode="json"),
     )
 
 
@@ -131,5 +133,6 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
     )
 
     return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content=response.model_dump()
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content=response.model_dump(mode="json"),
     )
