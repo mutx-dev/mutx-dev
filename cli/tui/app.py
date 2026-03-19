@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 
 from textual import on, work
 from textual.app import App, ComposeResult
@@ -11,7 +12,6 @@ from textual.widgets import (
     Button,
     DataTable,
     Footer,
-    Header,
     Input,
     Label,
     Static,
@@ -30,6 +30,40 @@ from cli.services import (
     LogEntry,
     MetricPoint,
 )
+
+
+MUTX_ASCII_LOGO = """\
+                     ≠≠
+                    ≠≠≠≠
+                   ≠====≠
+                 ≠≠======≠≠
+                ≠≠=========≠  ==≠≠≠≈≈≈
+               =======÷======  ÷÷=====≠=
+             =======÷÷÷÷=======  ÷======≠
+            =======÷÷   ÷=======  ÷÷=====≠
+           ==÷====×   ÷  ÷÷====÷  ≠======≠
+         ==÷÷÷÷÷÷÷  ÷==÷  ÷÷==÷  =======÷
+        ==÷÷÷÷÷÷÷  ÷======  ÷÷ =======÷÷
+       =÷÷÷÷÷÷÷÷ =÷÷=======   =======÷÷
+     ==÷÷÷÷÷÷÷   ÷÷===÷÷÷÷÷  ==÷÷÷÷÷÷
+    ==÷÷÷÷÷÷÷  ÷  ÷÷÷÷==÷  ==÷÷÷÷÷÷÷ ==
+   =÷÷÷÷÷÷÷÷  ÷=÷  ÷÷÷÷÷  ÷=÷÷÷÷÷÷÷ ==÷=
+  =÷÷÷÷÷÷÷   ÷÷===  ÷÷÷  ÷=÷÷÷÷÷×÷÷=÷÷÷÷=≠
+ ÷÷÷÷÷÷÷÷   ×÷==÷÷==    ===÷÷÷÷÷  ÷÷÷÷÷÷÷=≠
+ ÷÷÷÷÷÷÷     ×÷÷÷÷÷== =====÷÷÷÷    ≠÷÷÷÷÷÷=
+ ÷÷÷÷÷        ÷÷÷÷÷÷===÷÷==÷÷÷       ÷÷÷÷÷=
+ ÷÷÷÷           ÷÷÷÷÷÷÷÷÷÷÷÷          ÷÷÷÷=
+ ÷÷÷             ÷÷÷÷÷÷÷÷÷÷            ÷÷÷=
+ ÷÷               ÷÷÷÷÷÷÷÷              ÷÷=
+                   ÷÷÷÷÷÷                 =
+"""
+
+MUTX_OPERATOR_COPY = "control plane for agent infrastructure"
+KEY_HINTS = "r refresh  d deploy  x restart  s scale  backspace delete  tab switch"
+MUTX_ACCENT_FRAMES = ("#3B82F6", "#2563EB", "#06B6D4", "#22D3EE")
+MUTX_IDLE_FRAMES = ("◢", "◣", "◤", "◥")
+MUTX_BUSY_FRAMES = ("◐", "◓", "◑", "◒")
+MUTX_SIGNAL_PATTERN = "▁▂▃▄▅▆▇█▇▆▅▄▃▂"
 
 
 def _shorten(value: str | None, limit: int = 32) -> str:
@@ -156,8 +190,8 @@ class ConfirmActionScreen(ModalScreen[bool]):
     #confirm-dialog {
         width: 60;
         height: auto;
-        border: round #6f8d9a;
-        background: #12222b;
+        border: round #2563eb;
+        background: #050816;
         padding: 1 2;
     }
 
@@ -197,8 +231,8 @@ class ScaleDeploymentScreen(ModalScreen[int | None]):
     #scale-dialog {
         width: 60;
         height: auto;
-        border: round #6f8d9a;
-        background: #12222b;
+        border: round #2563eb;
+        background: #050816;
         padding: 1 2;
     }
 
@@ -248,25 +282,73 @@ class MutxTUI(App[None]):
     TITLE = "mutx tui"
     CSS = """
     Screen {
-        background: #0b1318;
-        color: #e5eef2;
-    }
-
-    Header {
-        background: #133042;
-        color: #f5fbff;
+        background: #030307;
+        color: #e2e8f0;
     }
 
     Footer {
-        background: #08141c;
-        color: #98aeb9;
+        background: #050816;
+        color: #94a3b8;
+    }
+
+    #brand-rail {
+        height: auto;
+        padding: 1 2 1 1;
+        background: #050816;
+        border-bottom: solid #162032;
+    }
+
+    #brand-art {
+        width: 46;
+        min-width: 46;
+        color: #3b82f6;
+        padding: 0 1 0 0;
+    }
+
+    #brand-meta {
+        width: 1fr;
+        height: auto;
+        padding: 1 0 0 1;
+    }
+
+    #brand-title {
+        color: #ffffff;
+        text-style: bold;
+    }
+
+    #brand-copy {
+        color: #cbd5e1;
+        margin-top: 1;
+    }
+
+    #brand-signal {
+        height: auto;
+        margin-top: 1;
+        padding: 0 1;
+        background: #091224;
+        color: #22d3ee;
+        border: round #1d4ed8;
+    }
+
+    #brand-context {
+        color: #64748b;
+        margin-top: 1;
     }
 
     #status-banner {
         height: 2;
         padding: 0 1;
-        background: #10212b;
-        color: #d4e0e7;
+        background: #0a1428;
+        color: #dbeafe;
+        border-bottom: solid #1e2c45;
+    }
+
+    #context-footer {
+        height: auto;
+        padding: 0 1;
+        background: #04060f;
+        color: #94a3b8;
+        border-top: solid #162032;
     }
 
     TabbedContent {
@@ -277,13 +359,29 @@ class MutxTUI(App[None]):
         padding: 0;
     }
 
+    ContentTabs {
+        background: #050816;
+        border-bottom: solid #162032;
+    }
+
+    ContentTabs Tab {
+        color: #94a3b8;
+        background: transparent;
+    }
+
+    ContentTabs Tab.-active {
+        color: #ffffff;
+        text-style: bold;
+        border-bottom: heavy #22d3ee;
+    }
+
     .workspace-split {
         height: 1fr;
     }
 
     .panel {
-        border: round #4a6978;
-        background: #101c24;
+        border: round #1e2c45;
+        background: #0a0a0e;
     }
 
     .entity-table {
@@ -298,6 +396,8 @@ class MutxTUI(App[None]):
     .action-bar {
         height: auto;
         padding: 1 1 0 1;
+        background: #050816;
+        border-bottom: solid #162032;
     }
 
     .action-bar Button {
@@ -311,6 +411,38 @@ class MutxTUI(App[None]):
 
     .detail-body {
         width: 1fr;
+        color: #dbe5f0;
+    }
+
+    Button {
+        background: #0b172b;
+        color: #dbeafe;
+        border: round #22314b;
+    }
+
+    Button.-primary {
+        background: #2563eb;
+        color: #ffffff;
+        border: round #3b82f6;
+    }
+
+    Button.-error {
+        background: #3b0d1e;
+        color: #fecdd3;
+        border: round #fb7185;
+    }
+
+    Button:focus {
+        border: round #22d3ee;
+    }
+
+    DataTable {
+        background: #050816;
+        color: #e2e8f0;
+    }
+
+    DataTable:focus {
+        border: round #22d3ee;
     }
     """
     BINDINGS = [
@@ -332,9 +464,22 @@ class MutxTUI(App[None]):
         self.selected_agent_id: str | None = None
         self.selected_deployment_id: str | None = None
         self._deployment_cache: dict[str, DeploymentRecord] = {}
+        self._agent_count = 0
+        self._deployment_count = 0
+        self._activity_label = "idle"
+        self._activity_started_at: float | None = None
+        self._notice_text: str | None = None
+        self._notice_deadline = 0.0
+        self._animation_tick = 0
 
     def compose(self) -> ComposeResult:
-        yield Header(show_clock=True)
+        with Horizontal(id="brand-rail"):
+            yield Static(MUTX_ASCII_LOGO, id="brand-art")
+            with Vertical(id="brand-meta"):
+                yield Static("MUTX operator terminal", id="brand-title")
+                yield Static(MUTX_OPERATOR_COPY, id="brand-copy")
+                yield Static(id="brand-signal")
+                yield Static("auth · records · routes · deployments · health", id="brand-context")
         yield Static(id="status-banner")
         with TabbedContent(id="workspace"):
             with TabPane("Agents", id="agents-pane"):
@@ -377,14 +522,18 @@ class MutxTUI(App[None]):
                                     yield Static(
                                         id="deployment-metrics-body", classes="detail-body"
                                     )
+        yield Static(id="context-footer")
         yield Footer()
 
     def on_mount(self) -> None:
         self._configure_tables()
-        self._refresh_status_banner()
+        self.set_interval(0.2, self._advance_animation)
+        self._refresh_chrome()
 
         if self.auth_service.status().authenticated:
+            self._set_activity("loading agents")
             self.load_agents()
+            self._set_activity("loading deployments")
             self.load_deployments()
         else:
             self._render_logged_out_state()
@@ -400,17 +549,71 @@ class MutxTUI(App[None]):
         deployments_table.zebra_stripes = True
         deployments_table.add_columns("Deployment", "Status", "Replicas", "Agent")
 
-    def _refresh_status_banner(self, message: str | None = None) -> None:
+    def _set_activity(self, label: str) -> None:
+        self._activity_label = label
+        self._activity_started_at = time.monotonic()
+        self._refresh_chrome()
+
+    def _clear_activity(self) -> None:
+        self._activity_label = "idle"
+        self._activity_started_at = None
+        self._refresh_chrome()
+
+    def _set_notice(self, message: str, *, ttl: float = 5.0) -> None:
+        self._notice_text = message
+        self._notice_deadline = time.monotonic() + ttl
+        self._refresh_chrome()
+
+    def _active_workspace(self) -> str:
+        return self.query_one("#workspace", TabbedContent).active
+
+    def _status_glyph(self, busy: bool) -> str:
+        frames = MUTX_BUSY_FRAMES if busy else MUTX_IDLE_FRAMES
+        return frames[self._animation_tick % len(frames)]
+
+    def _signal_wave(self, width: int = 14) -> str:
+        offset = self._animation_tick % len(MUTX_SIGNAL_PATTERN)
+        return "".join(
+            MUTX_SIGNAL_PATTERN[(offset + index) % len(MUTX_SIGNAL_PATTERN)] for index in range(width)
+        )
+
+    def _brand_signal_text(self, authenticated: bool) -> str:
+        mode = "session live" if authenticated else "login required"
+        return f"{self._status_glyph(self._activity_label != 'idle')}  fabric {self._signal_wave()}  /v1  {mode}"
+
+    def _refresh_chrome(self) -> None:
         status = self.auth_service.status()
         auth_state = "logged in" if status.authenticated else "local only"
-        banner = f"API: {status.api_url} | Auth: {auth_state} | Config: {status.config_path}"
-        if message:
-            banner = f"{banner} | {message}"
+        busy = self._activity_label != "idle"
+        elapsed = ""
+        if self._activity_started_at is not None:
+            elapsed = f" {time.monotonic() - self._activity_started_at:0.1f}s"
+        notice = ""
+        if self._notice_text and time.monotonic() < self._notice_deadline:
+            notice = f" | {self._notice_text}"
+        elif self._notice_text:
+            self._notice_text = None
 
+        banner = (
+            f"{self._status_glyph(busy)} mutx tui | API: {status.api_url} | Auth: {auth_state}"
+            f" | {self._activity_label}{elapsed}{notice}"
+        )
         self.sub_title = status.api_url
         self.query_one("#status-banner", Static).update(banner)
+        self.query_one("#brand-signal", Static).update(self._brand_signal_text(status.authenticated))
+        self.query_one("#brand-context", Static).update(
+            f"agents {self._agent_count} · deployments {self._deployment_count} · config {status.config_path}"
+        )
+        self.query_one("#context-footer", Static).update(
+            f"{KEY_HINTS} | workspace {self._active_workspace()} | selected agent {_shorten(self.selected_agent_id, 12)} | selected deployment {_shorten(self.selected_deployment_id, 12)}"
+        )
+        accent = MUTX_ACCENT_FRAMES[self._animation_tick % len(MUTX_ACCENT_FRAMES)]
+        self.query_one("#brand-art", Static).styles.color = accent
+        self.query_one("#brand-signal", Static).styles.color = accent
 
     def _render_logged_out_state(self) -> None:
+        self._agent_count = 0
+        self._deployment_count = 0
         message = (
             "No stored CLI auth. Run `mutx login --email you@example.com` and relaunch `mutx tui`."
         )
@@ -430,18 +633,24 @@ class MutxTUI(App[None]):
         self.query_one("#deployment-metrics-body", Static).update(
             "Deployment metrics require an authenticated session."
         )
+        self._clear_activity()
 
     def _handle_service_error(self, error: CLIServiceError) -> None:
         self.notify(str(error), severity="error")
-        self._refresh_status_banner(str(error))
+        self._set_notice(str(error), ttl=8.0)
+        self._clear_activity()
 
     def _render_agents(self, agents: list[AgentRecord]) -> None:
         table = self.query_one("#agents-table", DataTable)
         table.clear(columns=False)
+        self._agent_count = len(agents)
         if not agents:
             self.selected_agent_id = None
             self.query_one("#agent-detail-body", Static).update("No agents found.")
             self.query_one("#agent-logs-body", Static).update("No logs found.")
+            self.query_one("#agents-summary", Static).update("Agents: 0")
+            self._set_notice("Agents refreshed")
+            self._clear_activity()
             return
 
         for agent in agents:
@@ -455,11 +664,12 @@ class MutxTUI(App[None]):
 
         self.selected_agent_id = agents[0].id
         table.cursor_coordinate = (0, 0)
+        self._set_activity(f"loading {_shorten(agents[0].name, 18)}")
         self.load_agent_detail(agents[0].id)
         self.query_one("#agents-summary", Static).update(
             f"Agents: {len(agents)} | Selected: {agents[0].name}"
         )
-        self._refresh_status_banner("Agents refreshed")
+        self._set_notice("Agents refreshed")
 
     def _render_agent_payload(self, agent: AgentRecord, logs: list[LogEntry]) -> None:
         self.query_one("#agent-detail-body", Static).update(_render_agent_detail(agent))
@@ -469,11 +679,13 @@ class MutxTUI(App[None]):
         self.query_one("#agents-summary", Static).update(
             f"Agent: {agent.name} | Status: {agent.status} | Deployments: {len(agent.deployments)}"
         )
+        self._clear_activity()
 
     def _render_deployments(self, deployments: list[DeploymentRecord]) -> None:
         table = self.query_one("#deployments-table", DataTable)
         table.clear(columns=False)
         self._deployment_cache = {deployment.id: deployment for deployment in deployments}
+        self._deployment_count = len(deployments)
         if not deployments:
             self.selected_deployment_id = None
             self.query_one("#deployment-detail-body", Static).update("No deployments found.")
@@ -482,6 +694,9 @@ class MutxTUI(App[None]):
             self.query_one("#deployment-metrics-body", Static).update(
                 "No deployment metrics found."
             )
+            self.query_one("#deployments-summary", Static).update("Deployments: 0")
+            self._set_notice("Deployments refreshed")
+            self._clear_activity()
             return
 
         for deployment in deployments:
@@ -495,11 +710,12 @@ class MutxTUI(App[None]):
 
         self.selected_deployment_id = deployments[0].id
         table.cursor_coordinate = (0, 0)
+        self._set_activity(f"loading {_shorten(deployments[0].id, 12)}")
         self.load_deployment_detail(deployments[0].id)
         self.query_one("#deployments-summary", Static).update(
             f"Deployments: {len(deployments)} | Selected: {_shorten(deployments[0].id, 12)}"
         )
-        self._refresh_status_banner("Deployments refreshed")
+        self._set_notice("Deployments refreshed")
 
     def _render_deployment_payload(
         self,
@@ -520,6 +736,11 @@ class MutxTUI(App[None]):
         self.query_one("#deployments-summary", Static).update(
             f"Deployment: {_shorten(deployment.id, 12)} | Status: {deployment.status} | Replicas: {deployment.replicas}"
         )
+        self._clear_activity()
+
+    def _advance_animation(self) -> None:
+        self._animation_tick += 1
+        self._refresh_chrome()
 
     @work(thread=True, exclusive=True, group="agents-list")
     def load_agents(self) -> None:
@@ -623,21 +844,26 @@ class MutxTUI(App[None]):
 
     def _after_action(self, message: str, refresh_agents: bool) -> None:
         self.notify(message, severity="information")
-        self._refresh_status_banner(message)
+        self._set_notice(message)
+        self._clear_activity()
         if refresh_agents:
+            self._set_activity("loading agents")
             self.load_agents()
+        self._set_activity("loading deployments")
         self.load_deployments()
 
     @on(DataTable.RowSelected, "#agents-table")
     def on_agent_row_selected(self, event: DataTable.RowSelected) -> None:
         agent_id = str(event.row_key.value)
         self.selected_agent_id = agent_id
+        self._set_activity(f"loading {_shorten(agent_id, 12)}")
         self.load_agent_detail(agent_id)
 
     @on(DataTable.RowSelected, "#deployments-table")
     def on_deployment_row_selected(self, event: DataTable.RowSelected) -> None:
         deployment_id = str(event.row_key.value)
         self.selected_deployment_id = deployment_id
+        self._set_activity(f"loading {_shorten(deployment_id, 12)}")
         self.load_deployment_detail(deployment_id)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -658,14 +884,17 @@ class MutxTUI(App[None]):
     def action_refresh_current(self) -> None:
         active = self.query_one("#workspace", TabbedContent).active
         if active == "agents-pane":
+            self._set_activity("loading agents")
             self.load_agents()
         else:
+            self._set_activity("loading deployments")
             self.load_deployments()
 
     def action_deploy_selected_agent(self) -> None:
         if not self.selected_agent_id:
             self.notify("Select an agent first.", severity="warning")
             return
+        self._set_activity(f"deploying {_shorten(self.selected_agent_id, 12)}")
         self.deploy_selected_agent_worker(self.selected_agent_id)
 
     def action_restart_selected_deployment(self) -> None:
@@ -677,6 +906,7 @@ class MutxTUI(App[None]):
 
         def _handle(confirm: bool) -> None:
             if confirm:
+                self._set_activity(f"restarting {_shorten(deployment_id, 12)}")
                 self.restart_selected_deployment_worker(deployment_id)
 
         self.push_screen(
@@ -698,6 +928,7 @@ class MutxTUI(App[None]):
 
         def _handle(replicas: int | None) -> None:
             if replicas is not None:
+                self._set_activity(f"scaling {_shorten(deployment_id, 12)}")
                 self.scale_selected_deployment_worker(deployment_id, replicas)
 
         self.push_screen(ScaleDeploymentScreen(current_replicas), _handle)
@@ -711,6 +942,7 @@ class MutxTUI(App[None]):
 
         def _handle(confirm: bool) -> None:
             if confirm:
+                self._set_activity(f"deleting {_shorten(deployment_id, 12)}")
                 self.delete_selected_deployment_worker(deployment_id)
 
         self.push_screen(

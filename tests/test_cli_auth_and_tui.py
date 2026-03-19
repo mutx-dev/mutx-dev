@@ -100,18 +100,25 @@ def test_tui_renders_logged_out_state() -> None:
     textual = pytest.importorskip("textual")
     assert textual is not None
 
-    from cli.tui.app import MutxTUI
+    from cli.tui.app import MUTX_ASCII_LOGO, MutxTUI
 
-    async def run() -> tuple[str, str]:
+    async def run() -> tuple[str, str, str, str]:
         app = MutxTUI()
         async with app.run_test() as pilot:
             await pilot.pause()
             banner = app.query_one("#status-banner").renderable
             detail = app.query_one("#agent-detail-body").renderable
-            return str(banner), str(detail)
+            logo = app.query_one("#brand-art").renderable
+            signal = app.query_one("#brand-signal").renderable
+            return str(banner), str(detail), str(logo), str(signal)
 
     import asyncio
 
-    banner, detail = asyncio.run(run())
+    banner, detail, logo, signal = asyncio.run(run())
     assert "Auth: local only" in banner
     assert "No stored CLI auth." in detail
+    assert logo == MUTX_ASCII_LOGO
+    assert "≠≠≠≠" in logo
+    assert len(logo.splitlines()) >= 20
+    assert "/v1" in signal
+    assert "login required" in signal
