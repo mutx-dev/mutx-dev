@@ -54,16 +54,14 @@ test.describe('mutx.dev QA', () => {
     await expect(page.locator('input[type="email"]')).toHaveCount(1);
   });
 
-  test('operator app exposes dashboard walkthrough and readiness surfaces', async ({ page }) => {
+  test('legacy /app redirects into the canonical dashboard surface', async ({ page }) => {
     await page.goto('/app');
     await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.getByRole('heading', { name: /real authenticated operations/i })).toBeVisible();
-    await expect(page.getByText(/mission control/i)).toBeVisible();
-    await expect(page.getByText(/demo walkthrough/i)).toBeVisible();
-    await expect(page.getByText(/step 1/i)).toBeVisible();
-    await expect(page.getByText(/step 4/i)).toBeVisible();
-    await expect(page.getByText(/auth required/i)).toBeVisible();
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.getByRole('heading', { name: /deploy agents like services\. operate them like systems\./i })).toBeVisible();
+    await expect(page.getByText(/mutx control plane/i)).toBeVisible();
+    await expect(page.getByText(/canonical \/dashboard surface/i)).toBeVisible();
     await expect(page.getByText(/checking for an existing operator session/i)).toBeVisible();
   });
 
