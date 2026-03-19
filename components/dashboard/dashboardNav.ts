@@ -3,9 +3,7 @@ import {
   BellRing,
   Bot,
   BrainCircuit,
-  Building2,
-  Clock3,
-  Github,
+  BarChart3,
   History,
   KeyRound,
   Layers,
@@ -23,7 +21,7 @@ export interface DashboardNavItem {
   description: string;
   href: string;
   icon: LucideIcon;
-  group: "core" | "observe" | "automate" | "admin";
+  group: "core" | "observe" | "automate";
 }
 
 export interface DashboardNavGroup {
@@ -48,17 +46,17 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     group: "core",
   },
   {
+    title: "Deployments",
+    description: "Deployment inventory and topology",
+    href: "/dashboard/deployments",
+    icon: Layers,
+    group: "core",
+  },
+  {
     title: "Runs",
     description: "Execution history and outcomes",
     href: "/dashboard/runs",
     icon: History,
-    group: "core",
-  },
-  {
-    title: "Control",
-    description: "Policies and control settings",
-    href: "/dashboard/control",
-    icon: MessageCircle,
     group: "core",
   },
   {
@@ -69,8 +67,15 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     group: "core",
   },
   {
+    title: "Control",
+    description: "Policies and control settings",
+    href: "/dashboard/control",
+    icon: MessageCircle,
+    group: "core",
+  },
+  {
     title: "Provisioning",
-    description: "Spawn new operator workflows",
+    description: "Create and prepare new operator workflows",
     href: "/dashboard/spawn",
     icon: Sparkles,
     group: "core",
@@ -80,7 +85,7 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     description: "Operator memory surface",
     href: "/dashboard/memory",
     icon: BrainCircuit,
-    group: "core",
+    group: "observe",
   },
   {
     title: "History",
@@ -104,13 +109,6 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     group: "observe",
   },
   {
-    title: "Deployments",
-    description: "Deployment inventory and topology",
-    href: "/dashboard/deployments",
-    icon: Layers,
-    group: "observe",
-  },
-  {
     title: "API Keys",
     description: "Access governance",
     href: "/dashboard/api-keys",
@@ -121,14 +119,14 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     title: "Analytics",
     description: "Operational analytics",
     href: "/dashboard/analytics",
-    icon: Building2,
+    icon: BarChart3,
     group: "observe",
   },
   {
     title: "Orchestration",
     description: "Automation lanes",
     href: "/dashboard/orchestration",
-    icon: Clock3,
+    icon: Sparkles,
     group: "automate",
   },
   {
@@ -144,20 +142,6 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     href: "/dashboard/monitoring",
     icon: BellRing,
     group: "automate",
-  },
-  {
-    title: "Swarm",
-    description: "GitHub-linked swarm operations",
-    href: "/dashboard/swarm",
-    icon: Github,
-    group: "automate",
-  },
-  {
-    title: "Security",
-    description: "Security and hardening",
-    href: "/dashboard/control",
-    icon: ShieldCheck,
-    group: "admin",
   },
 ];
 
@@ -175,11 +159,6 @@ export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
     key: "automate",
     title: "Automate",
     items: DASHBOARD_NAV_ITEMS.filter((item) => item.group === "automate"),
-  },
-  {
-    key: "admin",
-    title: "Admin",
-    items: DASHBOARD_NAV_ITEMS.filter((item) => item.group === "admin"),
   },
 ];
 

@@ -9,11 +9,9 @@ MUTX Dashboard - premium dark-first, operator-grade control plane for managing A
 
 | Path | Component | Agent-Native Label |
 |------|-----------|-------------------|
-| `/dashboard` | OverviewPage | Control Center |
+| `/dashboard` | OverviewPage | Overview |
 | `/dashboard/agents` | AgentsListPage | Agent Registry |
 | `/dashboard/agents/[id]` | AgentDetailPage | Agent Inspector |
-| `/dashboard/swarm` | SwarmsListPage | Swarm Command |
-| `/dashboard/swarm/[id]` | SwarmDetailPage | Swarm Control |
 | `/dashboard/runs` | RunsListPage | Run History |
 | `/dashboard/runs/[id]` | RunDetailPage | Run Inspector |
 | `/dashboard/traces` | TracesListPage | Trace Explorer |
@@ -143,13 +141,10 @@ MUTX Dashboard - premium dark-first, operator-grade control plane for managing A
 ### Navigation Structure
 ```
 MUTX
-├── Control Center (/)
+├── Overview (/)
 ├── Agents (/agents)
 │   ├── Agent Registry
 │   └── Agent Detail
-├── Swarms (/swarm)
-│   ├── Swarm Command
-│   └── Swarm Detail
 ├── Runs (/runs)
 │   ├── Run History
 │   └── Run Detail
@@ -211,7 +206,7 @@ MUTX
 
 1. **Phase 1**: Design tokens + globals.css
 2. **Phase 2**: App shell with sidebar navigation
-3. **Phase 3**: Overview page (Control Center)
+3. **Phase 3**: Overview page (Overview)
 4. **Phase 4**: Agents list + detail
 5. **Phase 5**: Supporting pages (runs, traces, memory, budgets)
 

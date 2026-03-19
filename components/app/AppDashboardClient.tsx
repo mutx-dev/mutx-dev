@@ -152,7 +152,7 @@ export function AppDashboardClient() {
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [health, setHealth] = useState<Health | null>(null);
-  const [apiKeyName, setApiKeyName] = useState("App dashboard key");
+  const [apiKeyName, setApiKeyName] = useState("MUTX operator key");
   const [createdKey, setCreatedKey] = useState<CreateKeyResponse | null>(null);
   const [lastKeyAction, setLastKeyAction] = useState<"created" | "rotated">("created");
   const [selectedDeploymentId, setSelectedDeploymentId] = useState<string | null>(null);

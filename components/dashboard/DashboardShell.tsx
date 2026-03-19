@@ -186,7 +186,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/50" />
                     <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
                   </span>
-                  GW Connected
+                  Control plane online
                 </div>
 
                 <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-[#22314b] bg-[#0a1428] px-3 py-2 text-sm text-slate-300">

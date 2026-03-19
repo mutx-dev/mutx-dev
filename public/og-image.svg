@@ -18,7 +18,7 @@
     <rect x="-200" y="40" width="400" height="6" fill="url(#accent)" rx="3"/>
   </g>
   <text x="600" y="380" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="400" fill="#94a3b8" text-anchor="middle">
-    The Vercel for production AI agents
+    Deploy agents like services. Operate them like systems.
   </text>
   <g transform="translate(100, 560)">
     <circle cx="15" cy="15" r="15" fill="url(#accent)"/>
