@@ -78,13 +78,24 @@ describe('host-aware UI routing middleware', () => {
     expect(settingsResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/control')
   })
 
-  it('passes through unrelated routes and still applies rate-limit headers', () => {
+  it('passes through unrelated routes without injecting auth-form rate-limit headers', () => {
     const response = middleware(
       mockRequest('https://mutx.dev/contact', { host: 'mutx.dev' }),
     )
 
     expect(response.status).toBe(200)
-    expect(response.headers.get('X-RateLimit-Limit')).toBe('100')
-    expect(response.headers.get('X-RateLimit-Remaining')).toBe('100')
+    expect(response.headers.get('X-RateLimit-Limit')).toBeNull()
+    expect(response.headers.get('X-RateLimit-Remaining')).toBeNull()
+  })
+
+  it('still applies rate-limit headers on protected auth endpoints', () => {
+    const response = middleware(
+      mockRequest('https://app.mutx.dev/api/auth/login', { host: 'app.mutx.dev' }),
+    )
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('X-RateLimit-Limit')).toBe('8')
+    expect(response.headers.get('X-RateLimit-Remaining')).toBe('7')
+    expect(response.headers.get('X-RateLimit-Reset')).not.toBeNull()
   })
 })
