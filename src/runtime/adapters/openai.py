@@ -5,11 +5,12 @@ from __future__ import annotations
 import asyncio
 import inspect
 import json
+import logging
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
-from openai import AsyncOpenAI
+from openai import APIConnectionError, AsyncOpenAI, RateLimitError
 
 from ..base import (
     AgentRuntime,
@@ -21,46 +22,9 @@ from ..base import (
     RuntimeToolDefinition,
     ToolHandler,
 )
+from ..circuit_breaker import CircuitBreaker
 
-
-# Circuit breaker states
-class CircuitState:
-    CLOSED = "closed"
-    OPEN = "open"
-    HALF_OPEN = "half_open"
-
-
-@dataclass
-class CircuitBreaker:
-    """Simple circuit breaker for API calls."""
-
-    failure_threshold: int = 5
-    recovery_timeout: float = 30.0
-    state: str = field(default=CircuitState.CLOSED, init=False)
-    failures: int = field(default=0, init=False)
-    last_failure_time: float = field(default=0.0, init=False)
-
-    def record_success(self) -> None:
-        self.failures = 0
-        self.state = CircuitState.CLOSED
-
-    def record_failure(self) -> None:
-        self.failures += 1
-        self.last_failure_time = asyncio.get_event_loop().time()
-        if self.failures >= self.failure_threshold:
-            self.state = CircuitState.OPEN
-
-    def can_attempt(self) -> bool:
-        if self.state == CircuitState.CLOSED:
-            return True
-        if self.state == CircuitState.OPEN:
-            # Check if we should transition to half-open
-            elapsed = asyncio.get_event_loop().time() - self.last_failure_time
-            if elapsed >= self.recovery_timeout:
-                self.state = CircuitState.HALF_OPEN
-                return True
-            return False
-        return True  # HALF_OPEN allows one attempt
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -110,7 +74,7 @@ class OpenAIAdapter(AgentRuntime):
         self.config = config
         self._tools = list(tools or [])
         self._client = client or AsyncOpenAI(**config.to_client_kwargs())
-        self._circuit_breaker = CircuitBreaker()
+        self._circuit_breaker = CircuitBreaker(failure_threshold=5, recovery_timeout=30.0)
 
     @property
     def default_timeout(self) -> float | None:
@@ -304,7 +268,6 @@ class OpenAIAdapter(AgentRuntime):
         completion_tokens = getattr(usage, "completion_tokens", 0) or 0
         total_tokens = getattr(usage, "total_tokens", 0) or 0
 
-        # Calculate approximate cost (can be customized per model)
         cost = self._calculate_cost(prompt_tokens, completion_tokens, self.config.model)
 
         return {
@@ -317,7 +280,6 @@ class OpenAIAdapter(AgentRuntime):
 
     def _calculate_cost(self, prompt_tokens: int, completion_tokens: int, model: str) -> float:
         """Calculate approximate cost in USD based on model pricing."""
-        # Pricing per 1M tokens (approximate, as of 2024)
         pricing = {
             "gpt-4o": {"prompt": 2.50, "completion": 10.00},
             "gpt-4-turbo": {"prompt": 10.00, "completion": 30.00},
@@ -353,21 +315,41 @@ class OpenAIAdapter(AgentRuntime):
         if stream:
             request["stream"] = True
 
-        # Retry with exponential backoff and circuit breaker
         max_retries = 3
         base_delay = 1.0
 
         for attempt in range(max_retries):
             if not self._circuit_breaker.can_attempt():
-                raise RuntimeError("Circuit breaker is open - too many failures")
+                logger.warning("OpenAI circuit breaker OPEN - rejecting request")
+                raise RuntimeError("Circuit breaker is open - service unavailable")
 
             try:
-                return await self._client.chat.completions.create(**request)
+                response = await self._client.chat.completions.create(**request)
+                self._circuit_breaker.record_success()
+                logger.debug("OpenAI API call succeeded")
+                return response
+            except (RateLimitError, APIConnectionError) as exc:
+                self._circuit_breaker.record_failure()
+                logger.warning(
+                    "OpenAI API transient error on attempt %s/%s: %s: %s",
+                    attempt + 1,
+                    max_retries,
+                    type(exc).__name__,
+                    exc,
+                )
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(base_delay * (2**attempt))
+                else:
+                    raise
             except Exception:
                 self._circuit_breaker.record_failure()
+                logger.exception(
+                    "OpenAI API call failed on attempt %s/%s",
+                    attempt + 1,
+                    max_retries,
+                )
                 if attempt < max_retries - 1:
-                    delay = base_delay * (2**attempt)
-                    await asyncio.sleep(delay)
+                    await asyncio.sleep(base_delay * (2**attempt))
                 else:
                     raise
 

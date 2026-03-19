@@ -9,7 +9,24 @@ The CLI is a Click application defined in `cli/` and installed from the repo roo
 
 ## Install
 
+### From PyPI (recommended)
+
 ```bash
+pip install mutx
+```
+
+### From Homebrew (coming soon)
+
+```bash
+# Not yet available - see issue #1140
+brew install mutx
+```
+
+### From Source
+
+```bash
+git clone https://github.com/mutx-dev/mutx-dev
+cd mutx-dev
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -49,7 +66,7 @@ The CLI can log in, but it does not currently register users.
 Create a user first via the API:
 
 ```bash
-curl -X POST http://localhost:8000/auth/register \
+curl -X POST http://localhost:8000/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
 ```
@@ -61,6 +78,37 @@ mutx login --email you@example.com
 mutx whoami
 mutx status
 ```
+
+## TUI Usage Guide
+
+The TUI (Textual User Interface) provides an interactive terminal interface for managing agents and deployments.
+
+> **Note:** TUI is under active development. See issue #1139 for current status.
+
+### Installing TUI Dependencies
+
+```bash
+pip install mutx[textual]
+```
+
+### Launching the TUI
+
+```bash
+mutx tui
+```
+
+### TUI Navigation
+
+- Use arrow keys to navigate menus
+- Press `Enter` to select
+- Press `Esc` to go back
+- Press `Ctrl+C` to exit
+
+### TUI Screens
+
+- **Agents Screen** - List, create, and manage agents
+- **Deployments Screen** - Monitor and manage deployments
+- **Logs Screen** - View real-time agent and deployment logs
 
 ## Commands
 
@@ -150,6 +198,14 @@ mutx deploy restart YOUR_DEPLOYMENT_ID
 # Fetch webhook delivery history
 mutx webhooks deliveries YOUR_WEBHOOK_ID --limit 10
 ```
+
+## Release Process
+
+For information on releasing new versions of the CLI, see [RELEASE.md](./RELEASE.md).
+
+## Troubleshooting
+
+For common issues and solutions, see the [Troubleshooting Guide](./troubleshooting/faq.md).
 
 ## When in Doubt
 
