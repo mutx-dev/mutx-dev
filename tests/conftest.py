@@ -2,15 +2,21 @@
 Pytest configuration and fixtures for MUTX API tests.
 """
 
+import asyncio
+from datetime import datetime, timezone
 import os
+from typing import AsyncGenerator
+import uuid
 
 from fastapi import FastAPI
+from httpx import ASGITransport, AsyncClient
 import pytest
 import pytest_asyncio
-from typing import AsyncGenerator
-
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 # Set environment before any imports
 os.environ.setdefault("DATABASE_REQUIRED_ON_STARTUP", "false")
