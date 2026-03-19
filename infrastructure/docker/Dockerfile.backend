@@ -51,6 +51,7 @@ COPY --from=deps /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.
 COPY --from=deps /usr/local/bin /usr/local/bin
 
 # Copy source code
+COPY alembic.ini /app/alembic.ini
 COPY src /app/src
 
 ENV PYTHONPATH=/app
@@ -73,6 +74,7 @@ COPY --from=deps /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.
 COPY --from=deps /usr/local/bin /usr/local/bin
 
 # Copy source code
+COPY alembic.ini /app/alembic.ini
 COPY src /app/src
 
 ENV PYTHONPATH=/app
