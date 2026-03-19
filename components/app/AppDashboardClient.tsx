@@ -358,6 +358,10 @@ export function AppDashboardClient() {
     return [];
   }
 
+  function normalizeApiKeys(data: unknown): ApiKey[] {
+    return normalizeArray<ApiKey>(data).filter((entry) => Boolean(entry && typeof entry === "object" && "id" in entry));
+  }
+
   async function loadDashboard() {
     const [nextUser, nextHealth, rawAgents, rawDeployments, nextKeys] =
       await Promise.all([
@@ -365,14 +369,14 @@ export function AppDashboardClient() {
         readJson<Health>("/api/dashboard/health"),
         readJson<any>("/api/dashboard/agents"),
         readJson<any>("/api/dashboard/deployments"),
-        readJson<ApiKey[]>("/api/api-keys"),
+        readJson<unknown>("/api/api-keys"),
       ]);
 
     setUser(nextUser);
     setHealth(nextHealth);
     setAgents(normalizeArray<Agent>(rawAgents));
     setDeployments(normalizeArray<Deployment>(rawDeployments));
-    setApiKeys(nextKeys);
+    setApiKeys(normalizeApiKeys(nextKeys));
   }
 
   useEffect(() => {

@@ -3,12 +3,45 @@
 import { useState, useEffect, useRef } from 'react';
 import { KeyRound, Search, Plus, RefreshCw, Trash2, AlertCircle, Loader2, Copy, Check } from 'lucide-react';
 
+import { readJson, writeJson } from '@/components/app/http';
+
 interface ApiKey {
   id: string;
   name: string;
   created_at: string;
   last_used: string | null;
   expires_at: string | null;
+}
+
+function normalizeApiKeys(payload: unknown): ApiKey[] {
+  const container = payload && typeof payload === 'object' ? (payload as Record<string, unknown>) : null;
+  const rawKeys = Array.isArray(payload) ? payload : container?.items ?? container?.keys ?? container?.api_keys ?? container?.data ?? [];
+
+  if (!Array.isArray(rawKeys)) return [];
+
+  return rawKeys
+    .map((entry) => {
+      if (!entry || typeof entry !== 'object') return null;
+      const record = entry as Record<string, unknown>;
+      const id = typeof record.id === 'string' ? record.id : '';
+      if (!id) return null;
+
+      return {
+        id,
+        name: typeof record.name === 'string' && record.name.trim().length > 0 ? record.name : 'Unnamed key',
+        created_at: typeof record.created_at === 'string' ? record.created_at : '',
+        last_used: typeof record.last_used === 'string' ? record.last_used : null,
+        expires_at: typeof record.expires_at === 'string' ? record.expires_at : null,
+      } satisfies ApiKey;
+    })
+    .filter((key): key is ApiKey => Boolean(key));
+}
+
+function extractCreatedKey(payload: unknown): string | null {
+  if (!payload || typeof payload !== 'object') return null;
+  const record = payload as Record<string, unknown>;
+  const direct = [record.key, record.api_key, record.token].find((value) => typeof value === 'string' && value.trim().length > 0);
+  return typeof direct === 'string' ? direct : null;
 }
 
 export function ApiKeysPageClient() {
@@ -30,14 +63,10 @@ export function ApiKeysPageClient() {
   const fetchKeys = async () => {
     try {
       setError(null);
-      const res = await fetch('/api/api-keys');
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({ detail: 'Failed to fetch' }));
-        throw new Error(data.detail || 'Failed to fetch API keys');
-      }
-      const data = await res.json();
-      setKeys(Array.isArray(data) ? data : (data.items || []));
+      const data = await readJson<unknown>('/api/api-keys');
+      setKeys(normalizeApiKeys(data));
     } catch (err) {
+      setKeys([]);
       setError(err instanceof Error ? err.message : 'Failed to load API keys');
     } finally {
       setLoading(false);
@@ -53,6 +82,8 @@ export function ApiKeysPageClient() {
     key.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     key.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const hasAuthError = Boolean(error && /unauthorized|forbidden|auth|token|sign in|login/i.test(error));
 
   // Keyboard shortcut: Cmd/Ctrl + K to focus search, Escape to clear
   useEffect(() => {
@@ -77,21 +108,19 @@ export function ApiKeysPageClient() {
     if (!newKeyName.trim()) return;
     setCreating(true);
     setCreatedKey(null);
+    setError(null);
     try {
-      const res = await fetch('/api/api-keys', {
+      const data = await writeJson<unknown>('/api/api-keys', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newKeyName.trim(), expires_in_days: newKeyExpires }),
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({ detail: 'Failed to create' }));
-        throw new Error(data.detail || 'Failed to create API key');
-      }
-      const data = await res.json();
-      setCreatedKey(data.key);
+      const nextKey = extractCreatedKey(data);
+      setCreatedKey(nextKey);
       setNewKeyName('');
       setNewKeyExpires(null);
-      fetchKeys();
+      await fetchKeys();
+      if (!nextKey) setError('API key was created, but the secret value was missing from the response.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create API key');
     } finally {
@@ -101,15 +130,13 @@ export function ApiKeysPageClient() {
 
   const rotateKey = async (id: string) => {
     setRotatingId(id);
+    setError(null);
     try {
-      const res = await fetch(`/api/api-keys/${id}/rotate`, { method: 'POST' });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({ detail: 'Failed to rotate' }));
-        throw new Error(data.detail || 'Failed to rotate API key');
-      }
-      const data = await res.json();
-      setCreatedKey(data.key);
-      fetchKeys();
+      const data = await writeJson<unknown>(`/api/api-keys/${id}/rotate`, { method: 'POST' });
+      const nextKey = extractCreatedKey(data);
+      setCreatedKey(nextKey);
+      await fetchKeys();
+      if (!nextKey) setError('API key rotated, but the new secret value was missing from the response.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to rotate API key');
     } finally {
@@ -120,13 +147,10 @@ export function ApiKeysPageClient() {
   const deleteKey = async (id: string) => {
     if (!confirm('Are you sure you want to revoke this API key?')) return;
     setDeletingId(id);
+    setError(null);
     try {
-      const res = await fetch(`/api/api-keys/${id}`, { method: 'DELETE' });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({ detail: 'Failed to delete' }));
-        throw new Error(data.detail || 'Failed to revoke API key');
-      }
-      fetchKeys();
+      await writeJson<unknown>(`/api/api-keys/${id}`, { method: 'DELETE' });
+      await fetchKeys();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to revoke API key');
     } finally {
@@ -244,7 +268,8 @@ export function ApiKeysPageClient() {
         {keys.length === 0 ? (
           <div className="px-6 py-12 text-center">
             <KeyRound className="mx-auto h-12 w-12 text-slate-600" />
-            <p className="mt-4 text-slate-400">No API keys yet</p>
+            <p className="mt-4 text-slate-400">{hasAuthError ? 'Sign in to view and manage API keys' : 'No API keys yet'}</p>
+            <p className="mt-2 text-sm text-slate-500">{hasAuthError ? 'Authentication is required before the dashboard can load live key state.' : 'Create a key to unlock CLI, SDK, and automation access.'}</p>
           </div>
         ) : filteredKeys.length === 0 && searchQuery ? (
           <div className="px-6 py-12 text-center">
