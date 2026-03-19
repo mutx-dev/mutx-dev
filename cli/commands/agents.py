@@ -1,5 +1,7 @@
-import click
+import json
 from typing import Optional
+
+import click
 
 from cli.config import CLIConfig, get_client
 from cli.services import AgentsService, CLIServiceError
@@ -143,6 +145,105 @@ def stop_agent(agent_id: str):
     except CLIServiceError as exc:
         _echo_service_error(exc)
 
+
+
+@agents_group.command(name="metrics")
+@click.argument("agent_id")
+@click.option("--limit", "-l", default=100, help="Number of metric samples to fetch")
+@click.option("--skip", "-s", default=0, help="Number of metric samples to skip")
+def get_metrics(agent_id: str, limit: int, skip: int):
+    """Get metrics for an agent"""
+    config_obj = CLIConfig()
+    if not config_obj.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        return
+
+    client = get_client(config_obj)
+    response = client.get(f"/v1/agents/{agent_id}/metrics", params={"limit": limit, "skip": skip})
+
+    if response.status_code == 401:
+        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+        return
+
+    if response.status_code == 200:
+        metrics = response.json()
+        if not metrics:
+            click.echo("No metrics found.")
+            return
+
+        for metric in metrics:
+            click.echo(
+                f"{metric.get('timestamp', '')} | cpu={metric.get('cpu_usage', 'n/a')} | memory={metric.get('memory_usage', 'n/a')}"
+            )
+    elif response.status_code == 404:
+        click.echo("Error: Agent not found", err=True)
+    else:
+        click.echo(f"Error: {response.text}", err=True)
+
+
+@agents_group.command(name="config")
+@click.argument("agent_id")
+def get_config(agent_id: str):
+    """Get runtime config for an agent"""
+    config_obj = CLIConfig()
+    if not config_obj.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        return
+
+    client = get_client(config_obj)
+    response = client.get(f"/v1/agents/{agent_id}/config")
+
+    if response.status_code == 401:
+        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+        return
+
+    if response.status_code == 200:
+        payload = response.json()
+        click.echo(f"Agent ID: {payload['agent_id']}")
+        click.echo(f"Type: {payload['type']}")
+        click.echo(f"Config version: {payload['config_version']}")
+        click.echo(f"Updated at: {payload.get('updated_at', 'N/A')}")
+        click.echo("Config:")
+        click.echo(json.dumps(payload.get("config", {}), indent=2, sort_keys=True))
+    elif response.status_code == 404:
+        click.echo("Error: Agent not found", err=True)
+    else:
+        click.echo(f"Error: {response.text}", err=True)
+
+
+@agents_group.command(name="update-config")
+@click.argument("agent_id")
+@click.option("--config", "config_json", required=True, help="Agent config as JSON object string")
+def update_config(agent_id: str, config_json: str):
+    """Update runtime config for an agent"""
+    config_obj = CLIConfig()
+    if not config_obj.is_authenticated():
+        click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+        return
+
+    try:
+        parsed_config = json.loads(config_json)
+    except json.JSONDecodeError:
+        click.echo("Error: Invalid JSON in config", err=True)
+        return
+
+    client = get_client(config_obj)
+    response = client.patch(f"/v1/agents/{agent_id}/config", json={"config": parsed_config})
+
+    if response.status_code == 401:
+        click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+        return
+
+    if response.status_code == 200:
+        payload = response.json()
+        click.echo(f"Updated config for agent: {payload['agent_id']}")
+        click.echo(f"Config version: {payload['config_version']}")
+        click.echo("Config:")
+        click.echo(json.dumps(payload.get("config", {}), indent=2, sort_keys=True))
+    elif response.status_code == 404:
+        click.echo("Error: Agent not found", err=True)
+    else:
+        click.echo(f"Error: {response.text}", err=True)
 
 @agents_group.command(name="status")
 @click.argument("agent_id")

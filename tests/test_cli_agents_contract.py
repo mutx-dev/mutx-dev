@@ -416,3 +416,127 @@ def test_agents_list_with_simple_format(monkeypatch) -> None:
     assert result.exit_code == 0
     assert " | " in result.output
     assert agent_id in result.output
+
+
+def test_agents_metrics_hits_canonical_route_and_renders_metrics(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+    agent_id = str(uuid.uuid4())
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["params"] = params
+        return DummyResponse(
+            200,
+            [
+                {
+                    "id": str(uuid.uuid4()),
+                    "agent_id": agent_id,
+                    "cpu_usage": 0.52,
+                    "memory_usage": 256.0,
+                    "timestamp": "2026-03-19T01:00:00",
+                }
+            ],
+        )
+
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
+
+    result = CliRunner().invoke(cli, ["agents", "metrics", agent_id, "--limit", "10", "--skip", "2"])
+
+    assert result.exit_code == 0
+    assert captured == {
+        "path": f"/v1/agents/{agent_id}/metrics",
+        "params": {"limit": 10, "skip": 2},
+    }
+    assert "cpu=0.52" in result.output
+    assert "memory=256.0" in result.output
+
+
+def test_agents_config_hits_canonical_route_and_renders_config(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+    agent_id = str(uuid.uuid4())
+
+    def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["params"] = params
+        return DummyResponse(
+            200,
+            {
+                "agent_id": agent_id,
+                "type": "openai",
+                "config": {"model": "gpt-4o", "temperature": 0.2, "version": 3},
+                "config_version": 3,
+                "updated_at": "2026-03-19T01:05:00",
+            },
+        )
+
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
+    )
+
+    result = CliRunner().invoke(cli, ["agents", "config", agent_id])
+
+    assert result.exit_code == 0
+    assert captured == {"path": f"/v1/agents/{agent_id}/config", "params": None}
+    assert f"Agent ID: {agent_id}" in result.output
+    assert "Config version: 3" in result.output
+    assert '"model": "gpt-4o"' in result.output
+
+
+def test_agents_update_config_hits_canonical_route_and_renders_updated_config(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+    agent_id = str(uuid.uuid4())
+
+    def fake_patch(path: str, json: dict[str, Any] | None = None) -> DummyResponse:
+        captured["path"] = path
+        captured["json"] = json
+        return DummyResponse(
+            200,
+            {
+                "agent_id": agent_id,
+                "type": "openai",
+                "config": {"model": "gpt-4o-mini", "temperature": 0.1, "version": 4},
+                "config_version": 4,
+                "updated_at": "2026-03-19T01:06:00",
+            },
+        )
+
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr(
+        "cli.commands.agents.get_client",
+        lambda config: SimpleNamespace(patch=fake_patch),
+    )
+
+    result = CliRunner().invoke(
+        cli,
+        [
+            "agents",
+            "update-config",
+            agent_id,
+            "--config",
+            '{"model":"gpt-4o-mini","temperature":0.1}',
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured == {
+        "path": f"/v1/agents/{agent_id}/config",
+        "json": {"config": {"model": "gpt-4o-mini", "temperature": 0.1}},
+    }
+    assert f"Updated config for agent: {agent_id}" in result.output
+    assert "Config version: 4" in result.output
+
+
+def test_agents_update_config_rejects_invalid_json(monkeypatch) -> None:
+    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+
+    result = CliRunner().invoke(
+        cli,
+        ["agents", "update-config", "agent-id", "--config", "not-json"],
+    )
+
+    assert result.exit_code == 0
+    assert "Error: Invalid JSON in config" in result.output

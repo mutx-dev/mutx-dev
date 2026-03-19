@@ -15,3 +15,10 @@
 - Unblocked the monitoring/runtime truth lane by repairing `tests/conftest.py`, whose shared async test fixture had lost the core imports (`create_async_engine`, `AsyncSession`, `sessionmaker`, `StaticPool`, `AsyncClient`, `ASGITransport`, `asyncio`, `uuid`, and ready-check datetime helpers).
 - Impact: `tests/api/test_monitoring.py` now executes real assertions again instead of dying in fixture setup with `NameError: create_async_engine is not defined`, so the monitoring auto-fail/auto-heal/webhook regression slice is trustworthy again for backend + UI coordination.
 - Validation: `pytest -q tests/api/test_monitoring.py tests/test_sdk_deployments_contract.py tests/test_cli_webhooks_contract.py tests/test_sdk_webhooks_contract.py` → 33 passed; `python -m compileall tests/conftest.py` passed.
+
+## 2026-03-19 03:05 CET
+- Closed the agent operator parity gap that was still leaving monitoring/runtime config routes truthful in the API but missing in the CLI.
+- Added `mutx agents metrics`, `mutx agents config`, and `mutx agents update-config` in `cli/commands/agents.py`, so operators can inspect live agent metrics and read/update validated runtime config without dropping to raw HTTP.
+- Rewrote `docs/api/agents.md` to match the live `/v1/agents` contract, including raw list responses, config endpoints, deploy/stop semantics, metrics/logs, and resource-usage routes instead of the old pre-v1 envelope/register docs.
+- Validation: `pytest -q tests/test_cli_agents_contract.py tests/api/test_agents.py -k "config or metrics"` → 16 passed, 45 deselected; `python -m compileall cli/commands/agents.py` passed.
+- Coordination note: this checkout still does not contain `mutx-fleet-state.md` or `reports/company/ROSTER.md`, so execution continued from repo-local state plus prior backend-executor notes.
