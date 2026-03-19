@@ -22,9 +22,7 @@ export default function DashboardDeploymentsPage() {
           ]}
         />
 
-        <ErrorBoundary>
-          <DeploymentsPageClient />
-        </ErrorBoundary>
+        <DeploymentsPageClient />
       </div>
     </ErrorBoundary>
   );
