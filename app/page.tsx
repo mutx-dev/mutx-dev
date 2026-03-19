@@ -6,206 +6,147 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   ArrowRight,
-  BadgeCheck,
   Binary,
+  BookOpen,
+  Bot,
   ChevronRight,
-  Clock3,
   Command,
   Github,
-  Layers,
-  Lock,
+  KeyRound,
   Menu,
   Radar,
   Rocket,
-  Shield,
+  ShieldCheck,
   Sparkles,
+  Webhook,
+  Workflow,
+  Wrench,
   X,
   Zap,
 } from 'lucide-react'
 
 const GITHUB_URL = 'https://github.com/fortunexbt/mutx-dev'
 const DOCS_URL = 'https://docs.mutx.dev'
-const X_URL = 'https://x.com/mutxdev'
 const APP_URL = 'https://app.mutx.dev'
 const APP_DASHBOARD_URL = `${APP_URL}/dashboard`
 const APP_LOGIN_URL = `${APP_URL}/login`
 
 const navLinks = [
-  { label: 'Thesis', href: '#manifesto' },
-  { label: 'Control Surface', href: '#systems' },
-  { label: 'Proof', href: '#playbook' },
+  { label: 'Manifesto', href: '#manifesto' },
+  { label: 'Control Plane', href: '#control-plane' },
+  { label: 'Docs', href: '#docs' },
   { label: 'FAQ', href: '#faq' },
-  { label: 'Docs', href: DOCS_URL, external: true },
 ]
 
-const heroSignals = [
-  { value: 'API', label: 'Contract-first control plane' },
-  { value: 'CLI', label: 'Operator automation surface' },
-  { value: 'SDK', label: 'Programmatic runtime access' },
-  { value: 'App', label: 'Canonical dashboard for governed operations' },
+const heroPills = ['deployments', 'runs', 'traces', 'webhooks', 'keys', 'budgets', 'health', 'routes']
+
+const consoleLines = [
+  'mutx deploy create --agent checkout-bot --env prod',
+  'mutx traces tail --run run_4021 --follow',
+  'mutx webhooks replay --event order.failed --delivery whd_91',
+  'mutx keys rotate --scope operator --reason "night shift hygiene"',
 ]
 
-const principles = [
+const manifestoCards = [
   {
-    title: 'No black boxes in production',
-    body: 'Every state transition is observable, attributable, and replayable. If it happened, your team can inspect it with exact context.',
+    title: 'Pretty demos are the easy part',
+    body: 'The real work starts when an agent owns credentials, talks to live systems, and needs a 2:13 AM recovery path.',
+    icon: Sparkles,
+  },
+  {
+    title: 'Logs are not a control plane',
+    body: 'You need deploys, routes, approvals, traces, budgets, health, and explicit buttons that change reality on purpose.',
     icon: Radar,
   },
   {
-    title: 'Human authority is first-class',
-    body: 'Agent autonomy scales only when escalation paths are instant, identity-aware, and enforceable under pressure.',
-    icon: Shield,
-  },
-  {
-    title: 'Reliability over novelty theater',
-    body: 'We optimize for sustained uptime, deterministic recovery, and policy correctness—not demo-day magic tricks.',
-    icon: BadgeCheck,
+    title: 'Humans still need sharp tools',
+    body: 'Override power, audit trails, key lifecycle, and ownership rails should feel native instead of bolted on as afterthoughts.',
+    icon: ShieldCheck,
   },
 ]
 
-const systemCards = [
+const controlCards = [
   {
-    title: 'Lifecycle control',
-    subtitle: 'Agents and deployments as first-class resources',
-    points: [
-      'Track agents, deployments, versions, and event history with explicit state',
-      'Operate rollbacks, restarts, and readiness flows from one control layer',
-      'Keep lifecycle semantics consistent across API, CLI, SDK, and app surfaces',
-    ],
-    icon: Layers,
-    gradient: 'from-cyan-400/20 via-sky-400/15 to-blue-500/10',
+    title: 'Deploy with receipts',
+    body: 'Treat agents like software that ships versions, restarts, rolls back, and leaves evidence.',
+    icon: Rocket,
+    accent: 'from-cyan-400/30 via-sky-400/10 to-transparent',
   },
   {
-    title: 'Governance rails',
-    subtitle: 'Ownership, keys, and policy as product behavior',
-    points: [
-      'Enforce ownership boundaries instead of relying on dashboard convention',
-      'Rotate, revoke, and audit API credentials with durable control-plane semantics',
-      'Treat webhooks and approval paths as governed contracts, not side notes',
-    ],
-    icon: Lock,
-    gradient: 'from-fuchsia-400/20 via-violet-400/15 to-indigo-500/10',
+    title: 'Govern without ceremony',
+    body: 'Keys, approvals, auth, and routes stay in the product surface instead of rotting inside runbooks.',
+    icon: KeyRound,
+    accent: 'from-blue-400/25 via-cyan-400/10 to-transparent',
   },
   {
-    title: 'Operator execution',
-    subtitle: 'One surface for deploy, observe, govern, and recover',
-    points: [
-      'Use the canonical dashboard without splitting product truth across duplicate shells',
-      'Move from runs and traces into concrete operational action',
-      'Bring OpenClaw runtimes under MUTX governance without collapsing into session-only UX',
-    ],
-    icon: Command,
-    gradient: 'from-emerald-400/20 via-teal-400/15 to-cyan-500/10',
+    title: 'Recover faster than panic',
+    body: 'Runs, traces, health, and webhook replay sit close enough to intervention that operators can actually do something.',
+    icon: Zap,
+    accent: 'from-amber-300/20 via-orange-300/10 to-transparent',
   },
 ]
 
-const playbook = [
+const storySections = [
   {
-    stage: '01',
-    title: 'Model the owned resources',
-    body: 'Start with agents, deployments, runs, traces, keys, and webhooks as explicit resources instead of burying operations inside chat transcripts.',
+    id: 'build',
+    eyebrow: 'Runtime pit crew',
+    title: 'A control plane that actually gets its hands dirty.',
+    body: 'Deployments, routes, keys, health, and runtime actions belong in one fast loop. MUTX is built for the moment the agent stops being adorable and starts needing maintenance.',
+    bullets: [
+      'Launch new deployments or attach existing runtimes without changing the product story.',
+      'Move from run to trace to fix without switching mental models.',
+      'Keep the operator in one lane instead of scattering product truth across tools.',
+    ],
+    image: '/landing/wiring-bay.png',
   },
   {
-    stage: '02',
-    title: 'Choose the runtime path',
-    body: 'Create a new OpenClaw-backed deployment or link an existing workspace under MUTX governance without changing the product category.',
+    id: 'learn',
+    eyebrow: 'Docs with posture',
+    title: 'The docs are part of the product, not the punishment.',
+    body: 'The fastest way to make serious software feel unserious is shipping a gorgeous app with a sad docs lane. MUTX treats docs like an on-ramp, not an afterthought.',
+    bullets: [
+      'Architecture, deployment, and SDK paths should feel as deliberate as the app itself.',
+      'Docs link directly into operational concepts instead of floating as marketing wallpaper.',
+      'The reading lane is calm on purpose. It is where teams get un-lost fast.',
+    ],
+    image: '/landing/reading-bench.png',
   },
-  {
-    stage: '03',
-    title: 'Operate through one control plane',
-    body: 'Keep app, CLI, SDK, and API aligned so the operator surface reflects the same lifecycle and governance contracts everywhere.',
-  },
-  {
-    stage: '04',
-    title: 'Recover with explicit signals',
-    body: 'Use health, readiness, event history, and rollout controls to fix real runtime problems instead of watching a passive session dashboard.',
-  },
+]
+
+const arcadeFacts = [
+  { value: '01', label: 'canonical control plane', detail: 'app + api + cli + sdk tell the same story' },
+  { value: '06', label: 'operator primitives', detail: 'agents, deployments, runs, traces, keys, webhooks' },
+  { value: '0', label: 'patience for toy UX', detail: 'buttons should do something real or get out of the way' },
 ]
 
 const faqItems = [
   {
-    q: 'Is MUTX just another agent dashboard?',
-    a: 'No. Dashboards observe what happened. MUTX controls what is deployed, who owns it, how credentials are governed, and how the system recovers.',
+    q: 'Is this a dashboard?',
+    a: 'Only in the same way a cockpit is a dashboard. MUTX is for deploy, govern, observe, and recover. Watching is not enough.',
   },
   {
-    q: 'Do I need to replace my runtime to use it?',
-    a: 'No. MUTX can create a new OpenClaw-backed deployment or link an existing workspace under the same control-plane semantics.',
+    q: 'Do I have to rebuild everything around it?',
+    a: 'No. MUTX is designed to wrap real runtimes, link existing systems, and give them a stronger operational surface.',
   },
   {
-    q: 'What makes the product surface truthful?',
-    a: 'The app shell, API, CLI, and SDK are meant to track the same resource model: agents, deployments, runs, traces, API keys, and webhooks.',
+    q: 'Why so much emphasis on docs and operator UX?',
+    a: 'Because the fastest way to lose trust is making production feel mysterious. Good docs and sharp controls are part of reliability.',
   },
   {
-    q: 'Why keep emphasizing governance?',
-    a: 'Because production trust comes from explicit ownership, key lifecycle, webhook contracts, health signals, and recovery loops—not from prettier logs.',
+    q: 'What is the vibe here, exactly?',
+    a: 'Open-source infrastructure with a pulse. Serious product underneath, zero desire to cosplay as enterprise wallpaper.',
   },
 ]
 
 const tickerItems = [
-  'Agents get deployments',
-  'Dashboards observe; control planes decide',
-  'Operational trust is the product',
-  'Govern lifecycle, not just sessions',
-  'API + CLI + SDK + app alignment',
-  'OpenClaw compatibility without product drift',
-]
-
-const missionRail = [
-  {
-    step: 'DEPLOY',
-    text: 'Create or link a runtime under MUTX lifecycle semantics.',
-    icon: Binary,
-  },
-  {
-    step: 'GOVERN',
-    text: 'Apply ownership, credentials, and policy boundaries before writes land.',
-    icon: Shield,
-  },
-  {
-    step: 'OBSERVE',
-    text: 'Stream runs, traces, and health signals through the canonical dashboard.',
-    icon: Rocket,
-  },
-  {
-    step: 'RECOVER',
-    text: 'Restart, roll back, or intervene with explicit runtime context.',
-    icon: Zap,
-  },
-]
-
-const terminalFrames = [
-  '[mutx.api] GET /deployments → 200 ok · ownership scope applied',
-  '[mutx.health] readiness=green · webhooks=healthy · auth=online',
-  '[mutx.events] deployment restarted · version=2026.03.19 · actor=operator',
-  '[mutx.keys] rotate complete · previous secret revoked · audit trail written',
-]
-
-const dashboardStats = [
-  { label: 'Primary resources', value: '6', delta: 'agents → webhooks' },
-  { label: 'Operator surfaces', value: '4', delta: 'API · CLI · SDK · App' },
-  { label: 'Runtime paths', value: '2', delta: 'deploy new or link existing' },
-]
-
-const codeSnippets = [
-  {
-    title: 'Policy guard (YAML)',
-    content: [
-      'approval:',
-      '  requires_human: true',
-      '  ownership_scope: team',
-      '  privileged_actions: [deploy_restart, key_rotate]',
-    ],
-  },
-  {
-    title: 'Runtime hook (TypeScript)',
-    content: [
-      'await mutx.deployments.restart({',
-      "  deploymentId: 'dep_123',",
-      "  reason: 'recover unhealthy replica',",
-      "  actor: 'operator'",
-      '})',
-    ],
-  },
+  'agents need grown-up infrastructure',
+  'deploy like software',
+  'route like systems',
+  'recover with context',
+  'trace with intent',
+  'docs that pull their weight',
+  'webhooks with receipts',
+  'keys with lifecycle',
 ]
 
 export default function LandingPage() {
@@ -224,6 +165,7 @@ export default function LandingPage() {
         setCheckingAuth(false)
       }
     }
+
     checkAuth()
   }, [])
 
@@ -248,61 +190,53 @@ export default function LandingPage() {
     }
   }, [])
 
+  const appHref = isAuthenticated ? APP_DASHBOARD_URL : APP_LOGIN_URL
+  const appLabel = checkingAuth ? 'Open app' : isAuthenticated ? 'Open dashboard' : 'Enter the control plane'
+
   const authButton = useMemo(() => {
-    if (checkingAuth) return null
-
-    if (isAuthenticated) {
-      return (
-        <a
-          href={APP_DASHBOARD_URL}
-          className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-300/10 px-5 py-2.5 text-sm font-semibold text-cyan-200 transition hover:border-cyan-300/70 hover:bg-cyan-300/20"
-        >
-          Dashboard
-          <ArrowRight className="h-4 w-4" />
-        </a>
-      )
-    }
-
     return (
       <a
-        href={APP_LOGIN_URL}
-        className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
+        href={appHref}
+        className="inline-flex items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-300/15 px-5 py-2.5 text-sm font-semibold text-cyan-50 transition hover:border-cyan-200/70 hover:bg-cyan-300/25"
       >
-        Sign In
+        {appLabel}
         <ChevronRight className="h-4 w-4" />
       </a>
     )
-  }, [checkingAuth, isAuthenticated])
+  }, [appHref, appLabel])
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#02030a] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(14,165,233,0.22),transparent_35%),radial-gradient(circle_at_100%_20%,rgba(147,51,234,0.2),transparent_40%),radial-gradient(circle_at_50%_100%,rgba(34,197,94,0.12),transparent_40%),linear-gradient(180deg,#040610_0%,#03040a_55%,#010207_100%)]" />
-      <div className="pointer-events-none absolute inset-x-[-20%] top-20 h-[420px] bg-[conic-gradient(from_30deg_at_50%_50%,rgba(34,211,238,0.08),rgba(168,85,247,0.22),rgba(34,211,238,0.08))] blur-3xl" />
+    <div className="relative min-h-screen overflow-hidden bg-[#02050b] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgba(56,189,248,0.18),transparent_28%),radial-gradient(circle_at_90%_10%,rgba(96,165,250,0.22),transparent_30%),radial-gradient(circle_at_50%_100%,rgba(251,191,36,0.12),transparent_38%),linear-gradient(180deg,#02050b_0%,#04101b_48%,#02050b_100%)]" />
+      <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:80px_80px]" />
+      <div className="pointer-events-none absolute left-1/2 top-32 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-cyan-400/12 blur-[140px]" />
 
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#040612cc]/85 backdrop-blur-2xl">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#03101acc]/80 backdrop-blur-2xl">
+        <div className="mx-auto flex w-full max-w-[88rem] items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <a href="#" className="flex items-center gap-3" aria-label="MUTX home">
-            <div className="relative h-9 w-9 overflow-hidden rounded-lg border border-white/10 bg-black/30 p-1">
+            <div className="relative h-10 w-10 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-1.5 shadow-[0_0_30px_rgba(56,189,248,0.15)]">
               <Image src="/logo.png" alt="MUTX" fill className="object-contain" />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-white/55">MUTX</p>
-              <p className="text-sm font-semibold text-white/90">Operational Control Plane for Agentic Systems</p>
+              <p className="text-[10px] uppercase tracking-[0.34em] text-white/45">MUTX</p>
+              <p className="text-sm font-semibold text-white/90">control plane for agents with a pulse</p>
             </div>
           </a>
 
           <div className="hidden items-center gap-6 md:flex">
             {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.external ? '_blank' : undefined}
-                rel={link.external ? 'noreferrer' : undefined}
-                className="text-sm text-white/70 transition hover:text-white"
-              >
+              <a key={link.label} href={link.href} className="text-sm text-white/70 transition hover:text-white">
                 {link.label}
               </a>
             ))}
+            <a
+              href={DOCS_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm text-white/70 transition hover:text-white"
+            >
+              docs.mutx.dev
+            </a>
             {authButton}
           </div>
 
@@ -310,7 +244,7 @@ export default function LandingPage() {
             type="button"
             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileMenuOpen}
-            className="rounded-lg border border-white/15 bg-white/5 p-2 text-white/80 transition hover:text-white md:hidden"
+            className="rounded-2xl border border-white/15 bg-white/5 p-2 text-white/80 transition hover:text-white md:hidden"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -318,327 +252,512 @@ export default function LandingPage() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="border-t border-white/10 bg-[#04060f]/95 px-4 py-4 md:hidden">
+          <div className="border-t border-white/10 bg-[#04131d]/95 px-4 py-4 md:hidden">
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
-                  target={link.external ? '_blank' : undefined}
-                  rel={link.external ? 'noreferrer' : undefined}
-                  className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/75"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.label}
                 </a>
               ))}
-              <div className="pt-2">{authButton}</div>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      <main className="relative z-10 px-4 pb-24 pt-28 sm:px-6 lg:px-8 lg:pt-32">
-        <section className="mx-auto grid w-full max-w-7xl gap-10 lg:grid-cols-[minmax(0,1.06fr)_minmax(0,0.94fr)] lg:items-center">
-          <div>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-200/30 bg-cyan-300/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-100">
-              <Sparkles className="h-3.5 w-3.5" />
-              Control plane, not session dashboard
-            </div>
-
-            <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
-              Deploy agents like services.
-              <span className="block bg-gradient-to-r from-cyan-300 via-sky-200 to-violet-300 bg-clip-text text-transparent">
-                Operate them like systems.
-              </span>
-            </h1>
-
-            <p className="mt-6 max-w-2xl text-base leading-7 text-white/75 sm:text-lg sm:leading-8">
-              MUTX is the open-source control plane for AI agents. It gives teams lifecycle, governance, and operator workflows instead of another session-only dashboard.
-            </p>
-
-            <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href={DOCS_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-cyan-300/40 bg-cyan-300/15 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200/70 hover:bg-cyan-300/25"
+                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80"
               >
-                Read architecture docs
-                <ArrowRight className="h-4 w-4" />
+                docs.mutx.dev
               </a>
-              <a
-                href={GITHUB_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
-              >
-                <Github className="h-4 w-4" />
-                Star on GitHub
-              </a>
-              <a
-                href={X_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-white/85 transition hover:bg-white/10"
-              >
-                Follow releases
-              </a>
+              <div className="pt-2">{authButton}</div>
             </div>
+          </div>
+        )}
+      </header>
 
-            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {heroSignals.map((item) => (
-                <div key={item.label} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                  <p className="text-2xl font-semibold text-cyan-100">{item.value}</p>
-                  <p className="mt-1 text-xs leading-5 text-white/65">{item.label}</p>
-                </div>
-              ))}
-            </div>
+      <main className="relative z-10 px-4 pb-24 pt-28 sm:px-6 lg:px-8 lg:pt-32">
+        <section className="mx-auto grid w-full max-w-[88rem] gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:items-center">
+          <div className="relative">
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+              className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(7,16,26,0.96),rgba(5,10,18,0.92))] p-6 shadow-[0_25px_80px_rgba(2,8,20,0.55)] sm:p-8"
+            >
+              <div className="absolute -left-10 top-16 h-28 w-28 rounded-full bg-cyan-300/20 blur-3xl" />
+              <div className="absolute -right-8 bottom-8 h-28 w-28 rounded-full bg-amber-300/10 blur-3xl" />
+
+              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-200/25 bg-cyan-300/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-100">
+                <Sparkles className="h-3.5 w-3.5" />
+                no ai slop. no dead-end demo theater.
+              </div>
+
+              <h1 className="mt-6 max-w-3xl text-4xl font-semibold leading-[0.96] tracking-[-0.04em] text-white sm:text-6xl xl:text-7xl">
+                Agents are fun.
+                <span className="mt-2 block text-white/72">Production is the boss fight.</span>
+                <span className="mt-3 block bg-gradient-to-r from-cyan-300 via-sky-200 to-blue-100 bg-clip-text text-transparent">
+                  MUTX gives them a control plane.
+                </span>
+              </h1>
+
+              <p className="mt-6 max-w-2xl text-base leading-8 text-white/72 sm:text-lg">
+                MUTX is the open-source control plane for the moment your agent stops being a cute demo and starts touching real systems.
+                Deploy it. Route it. Govern it. Trace it. Recover it. Keep the fun part. Lose the chaos.
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a
+                  href={appHref}
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-100"
+                >
+                  {appLabel}
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+                <a
+                  href={DOCS_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-cyan-300/40 bg-cyan-300/10 px-6 py-3 text-sm font-semibold text-cyan-50 transition hover:border-cyan-200/70 hover:bg-cyan-300/20"
+                >
+                  Read the docs
+                  <BookOpen className="h-4 w-4" />
+                </a>
+                <a
+                  href={GITHUB_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                >
+                  <Github className="h-4 w-4" />
+                  Star the repo
+                </a>
+              </div>
+
+              <div className="mt-8 flex flex-wrap gap-2">
+                {heroPills.map((pill) => (
+                  <span
+                    key={pill}
+                    className="rounded-full border border-white/10 bg-white/[0.045] px-3 py-1.5 text-xs uppercase tracking-[0.2em] text-white/68"
+                  >
+                    {pill}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                {arcadeFacts.map((fact) => (
+                  <div key={fact.label} className="rounded-[1.4rem] border border-white/10 bg-black/25 p-4">
+                    <p className="text-3xl font-semibold tracking-[-0.04em] text-cyan-100">{fact.value}</p>
+                    <p className="mt-2 text-[11px] uppercase tracking-[0.24em] text-white/45">{fact.label}</p>
+                    <p className="mt-2 text-sm leading-6 text-white/68">{fact.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </div>
 
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-            className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/[0.03] p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_35px_90px_rgba(30,30,100,0.45)] sm:p-6"
+            transition={{ duration: 0.7, delay: 0.1, ease: 'easeOut' }}
+            className="relative"
           >
-            <div className="absolute -right-14 -top-10 h-44 w-44 rounded-full bg-cyan-400/25 blur-3xl" />
-            <div className="absolute -bottom-16 -left-8 h-44 w-44 rounded-full bg-violet-500/25 blur-3xl" />
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#040d16] shadow-[0_30px_100px_rgba(0,0,0,0.45)]">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#03070c] via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_30%,rgba(96,165,250,0.35),transparent_28%)]" />
+              <Image
+                src="/landing/hero-manifesto.png"
+                alt="MUTX robot hero art"
+                width={1536}
+                height={1024}
+                priority
+                className="h-auto w-full object-cover"
+                sizes="(max-width: 1024px) 100vw, 55vw"
+              />
 
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-[11px] uppercase tracking-[0.24em] text-white/55">Control loop</p>
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/35 bg-emerald-300/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-100">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
-                Streaming
-              </span>
-            </div>
-
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-              <div className="rounded-2xl border border-white/10 bg-[#030612] p-4">
-                <motion.div
-                  className="mb-3 h-px bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent"
-                  animate={{ opacity: [0.25, 0.8, 0.25] }}
-                  transition={{ duration: 2.8, repeat: Infinity }}
-                />
-
-                <div className="space-y-3">
-                  {missionRail.map((line, idx) => (
-                    <motion.div
-                      key={line.step}
-                      className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/35 p-3"
-                      animate={{ borderColor: ['rgba(255,255,255,0.1)', 'rgba(103,232,249,0.45)', 'rgba(255,255,255,0.1)'] }}
-                      transition={{ duration: 3.2, delay: idx * 0.35, repeat: Infinity }}
-                    >
-                      <line.icon className="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" />
-                      <div>
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-100/85">{line.step}</p>
-                        <p className="mt-1 text-sm leading-6 text-white/75">{line.text}</p>
-                      </div>
-                    </motion.div>
-                  ))}
+              <div className="absolute left-4 right-4 top-4 flex items-start justify-between gap-3 sm:left-6 sm:right-6 sm:top-6">
+                <div className="rounded-full border border-white/15 bg-black/35 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-50/90 backdrop-blur-md">
+                  manifesto for agent infrastructure
                 </div>
-
-                <div className="mt-3 rounded-xl border border-cyan-200/20 bg-cyan-300/10 p-3 text-xs text-cyan-50/90">
-                  <p className="font-semibold text-cyan-100">Control-plane status: healthy · governance rails online</p>
-                  <p className="mt-1 text-white/75">Lifecycle controls active · ownership enforced · health and readiness signals flowing into the dashboard.</p>
+                <div className="hidden rounded-full border border-emerald-300/30 bg-emerald-300/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-100 backdrop-blur-md sm:block">
+                  app · api · cli · sdk
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="rounded-2xl border border-white/10 bg-[#050819] p-4">
-                  <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-white/50">Runtime events</p>
-                  <div className="rounded-xl border border-white/10 bg-black/45 p-3 font-mono text-[11px] text-cyan-100/90">
-                    {terminalFrames.map((line, idx) => (
+              <div className="absolute bottom-4 left-4 right-4 grid gap-3 sm:bottom-6 sm:left-6 sm:right-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
+                <div className="rounded-[1.4rem] border border-white/12 bg-[#02060c]/75 p-4 backdrop-blur-xl">
+                  <p className="text-[11px] uppercase tracking-[0.26em] text-white/48">operator console</p>
+                  <div className="mt-3 space-y-2 font-[family:var(--font-mono)] text-[11px] text-cyan-100/88 sm:text-xs">
+                    {consoleLines.map((line, index) => (
                       <motion.p
                         key={line}
-                        className="mb-2 last:mb-0"
-                        animate={{ opacity: [0.25, 1, 0.45] }}
-                        transition={{ duration: 2.4, delay: idx * 0.55, repeat: Infinity }}
+                        animate={{ opacity: [0.35, 1, 0.55] }}
+                        transition={{ duration: 3.1, delay: index * 0.35, repeat: Infinity }}
+                        className="rounded-xl border border-white/8 bg-white/[0.03] px-3 py-2"
                       >
-                        <span className="mr-2 text-cyan-300/80">$</span>
+                        <span className="mr-2 text-cyan-300">$</span>
                         {line}
                       </motion.p>
                     ))}
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/95 to-[#101730] p-4">
-                  <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-white/50">Product surface snapshot</p>
-                  <div className="grid gap-2 sm:grid-cols-3">
-                    {dashboardStats.map((stat) => (
-                      <div key={stat.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-white/55">{stat.label}</p>
-                        <p className="mt-2 text-xl font-semibold text-cyan-100">{stat.value}</p>
-                        <p className="text-xs text-emerald-200/80">{stat.delta}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-3 rounded-xl border border-white/10 bg-[#04070f] p-3">
-                    <div className="mb-2 flex items-center justify-between text-xs text-white/60">
-                      <span>Canonical scope</span>
-                      <span>deploy · observe · govern</span>
+                <div className="rounded-[1.4rem] border border-white/12 bg-[#02060c]/75 p-4 backdrop-blur-xl">
+                  <p className="text-[11px] uppercase tracking-[0.26em] text-white/48">why this hits</p>
+                  <div className="mt-3 space-y-3 text-sm text-white/74">
+                    <div className="flex items-start gap-3">
+                      <Workflow className="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" />
+                      <p>Resource-first model for agents, deployments, runs, traces, keys, and webhooks.</p>
                     </div>
-                    <div className="flex h-14 items-end gap-1">
-                      {[42, 58, 37, 62, 49, 66, 44, 71, 53, 64, 57, 74].map((bar, idx) => (
-                        <motion.div
-                          key={`${bar}-${idx}`}
-                          className="w-full rounded-sm bg-gradient-to-t from-cyan-500/60 to-violet-400/70"
-                          animate={{ height: [`${Math.max(bar - 12, 20)}%`, `${bar}%`, `${Math.max(bar - 8, 24)}%`] }}
-                          transition={{ duration: 3, delay: idx * 0.06, repeat: Infinity, repeatType: 'mirror' }}
-                        />
-                      ))}
+                    <div className="flex items-start gap-3">
+                      <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" />
+                      <p>Governance lives in the product surface instead of a haunted Notion page.</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Command className="mt-0.5 h-4 w-4 shrink-0 text-cyan-200" />
+                      <p>Operators get actions, not just sympathy and another graph.</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              {codeSnippets.map((snippet) => (
-                <div key={snippet.title} className="rounded-xl border border-white/10 bg-black/35 p-3">
-                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-100/85">{snippet.title}</p>
-                  <pre className="overflow-x-auto text-xs leading-6 text-white/75">
-                    {snippet.content.map((line) => (
-                      <code key={line} className="block whitespace-pre">
-                        {line}
-                      </code>
-                    ))}
-                  </pre>
-                </div>
-              ))}
-            </div>
           </motion.div>
         </section>
 
-        <section className="mx-auto mt-12 w-full max-w-7xl overflow-hidden rounded-full border border-white/10 bg-white/[0.03] py-3">
+        <section className="mx-auto mt-10 w-full max-w-[88rem] overflow-hidden rounded-full border border-white/10 bg-white/[0.04] py-3">
           <motion.div
             className="flex gap-8 px-6"
             animate={{ x: ['0%', '-50%'] }}
-            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
           >
-            {[...tickerItems, ...tickerItems].map((item, idx) => (
-              <div key={`${item}-${idx}`} className="flex shrink-0 items-center gap-2 text-sm text-white/70">
-                <span className="h-1.5 w-1.5 rounded-full bg-cyan-300" />
+            {[...tickerItems, ...tickerItems].map((item, index) => (
+              <div key={`${item}-${index}`} className="flex shrink-0 items-center gap-3 text-sm uppercase tracking-[0.26em] text-white/62">
+                <span className="h-2 w-2 rounded-full bg-cyan-300/75" />
                 {item}
               </div>
             ))}
           </motion.div>
         </section>
 
-        <section id="manifesto" className="mx-auto mt-16 w-full max-w-7xl">
-          <div className="mb-6">
-            <p className="text-xs uppercase tracking-[0.24em] text-white/55">Category thesis</p>
-            <h2 className="mt-2 max-w-4xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              The hard part is not the model. It is everything after the demo: ownership, deployment semantics, recovery paths, and operational trust.
+        <section id="manifesto" className="mx-auto mt-16 w-full max-w-[88rem]">
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)]">
+            <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#06111d]">
+              <div className="relative">
+                <Image
+                  src="/landing/running-agent.png"
+                  alt="MUTX robot running"
+                  width={1024}
+                  height={1024}
+                  className="h-auto w-full object-cover"
+                  sizes="(max-width: 1280px) 100vw, 38vw"
+                />
+                <div className="absolute inset-x-4 bottom-4 rounded-[1.4rem] border border-white/12 bg-[#02060d]/78 p-4 backdrop-blur-xl sm:inset-x-6 sm:bottom-6 sm:p-5">
+                  <p className="text-[11px] uppercase tracking-[0.24em] text-cyan-100/80">the mutx thesis in one sentence</p>
+                  <p className="mt-2 text-xl font-semibold tracking-tight text-white sm:text-2xl">
+                    Agents should move fast. Their infrastructure should not move like improv theater.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/70">Manifesto</p>
+              <h2 className="mt-3 max-w-4xl text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+                If your agent can spend money, call APIs, ship code, or wake someone up, it deserves grown-up infrastructure.
+              </h2>
+              <p className="mt-5 max-w-3xl text-base leading-8 text-white/72 sm:text-lg">
+                MUTX is built for teams who want the weird, powerful, creative upside of agents without accepting a mushy product surface.
+                The app should feel alive. The controls should feel sharp. The system should feel accountable.
+              </p>
+
+              <div className="mt-8 grid gap-4 md:grid-cols-3">
+                {manifestoCards.map((card, index) => (
+                  <motion.article
+                    key={card.title}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.25 }}
+                    transition={{ duration: 0.4, delay: index * 0.08 }}
+                    className="rounded-[1.5rem] border border-white/10 bg-white/[0.035] p-5"
+                  >
+                    <card.icon className="h-5 w-5 text-cyan-200" />
+                    <h3 className="mt-4 text-xl font-semibold text-white">{card.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-white/68">{card.body}</p>
+                  </motion.article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="control-plane" className="mx-auto mt-16 w-full max-w-[88rem]">
+          <div className="mb-6 max-w-4xl">
+            <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/70">Control plane</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+              This is where the operator gets their hands back on the wheel.
             </h2>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            {principles.map((item, idx) => (
-              <motion.article
-                key={item.title}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.45, delay: idx * 0.08 }}
-                className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-6"
-              >
-                <item.icon className="h-6 w-6 text-cyan-200" />
-                <h3 className="mt-4 text-xl font-semibold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-white/72">{item.body}</p>
-              </motion.article>
-            ))}
-          </div>
-        </section>
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)]">
+            <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#07111b]">
+              <Image
+                src="/landing/wiring-bay.png"
+                alt="MUTX robot wiring control systems"
+                width={1024}
+                height={1536}
+                className="h-full w-full object-cover"
+                sizes="(max-width: 1280px) 100vw, 30vw"
+              />
+            </div>
 
-        <section id="systems" className="mx-auto mt-16 w-full max-w-7xl overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-          <div className="mb-7">
-            <p className="text-xs uppercase tracking-[0.24em] text-white/55">What MUTX actually controls</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Lifecycle, governance, and operator execution in one control layer.</h2>
-          </div>
+            <div className="grid gap-4 lg:grid-cols-3">
+              {controlCards.map((card) => (
+                <article
+                  key={card.title}
+                  className={`overflow-hidden rounded-[1.7rem] border border-white/10 bg-gradient-to-br ${card.accent} p-5`}
+                >
+                  <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
+                    <card.icon className="h-5 w-5 text-cyan-100" />
+                  </div>
+                  <h3 className="mt-5 text-2xl font-semibold tracking-tight text-white">{card.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-white/70">{card.body}</p>
+                </article>
+              ))}
 
-          <div className="grid gap-4 lg:grid-cols-3">
-            {systemCards.map((card) => (
-              <article key={card.title} className={`rounded-2xl border border-white/10 bg-gradient-to-br ${card.gradient} p-5`}>
-                <card.icon className="h-6 w-6 text-cyan-100" />
-                <h3 className="mt-3 text-xl font-semibold text-white">{card.title}</h3>
-                <p className="mt-1 text-sm text-white/75">{card.subtitle}</p>
-                <ul className="mt-4 space-y-2 text-sm text-white/75">
-                  {card.points.map((point) => (
-                    <li key={point} className="flex gap-2">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-200" />
-                      <span>{point}</span>
-                    </li>
+              <article className="rounded-[1.7rem] border border-white/10 bg-[#07111c] p-5 lg:col-span-2">
+                <p className="text-[11px] uppercase tracking-[0.28em] text-white/42">Operator loop</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {[
+                    { label: 'auth and ownership', icon: ShieldCheck },
+                    { label: 'deployments and health', icon: Rocket },
+                    { label: 'runs and traces', icon: Binary },
+                    { label: 'webhooks and replay', icon: Webhook },
+                  ].map((item) => (
+                    <div key={item.label} className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-4">
+                      <item.icon className="h-5 w-5 text-cyan-200" />
+                      <p className="mt-3 text-lg font-semibold capitalize text-white">{item.label}</p>
+                      <p className="mt-2 text-sm leading-6 text-white/66">
+                        Real operator surfaces should connect observation to action without dumping you into another disconnected tool.
+                      </p>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </article>
-            ))}
+
+              <article className="rounded-[1.7rem] border border-white/10 bg-[#07111c] p-5">
+                <p className="text-[11px] uppercase tracking-[0.28em] text-white/42">MUTX energy</p>
+                <p className="mt-4 text-2xl font-semibold tracking-tight text-white">
+                  Serious infrastructure.
+                  <span className="block text-cyan-200">Way more fun than it has any right to be.</span>
+                </p>
+                <p className="mt-3 text-sm leading-7 text-white/68">
+                  The best operator tools make pressure feel manageable. Fast UI, clear posture, honest state, zero corporate wallpaper.
+                </p>
+              </article>
+            </div>
           </div>
         </section>
 
-        <section id="playbook" className="mx-auto mt-16 w-full max-w-7xl">
-          <div className="mb-6">
-            <p className="text-xs uppercase tracking-[0.24em] text-white/55">Proof</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Where dashboards stop, MUTX starts.</h2>
+        <section id="docs" className="mx-auto mt-16 w-full max-w-[88rem]">
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.16fr)_minmax(0,0.84fr)]">
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#06111d]">
+              <Image
+                src="/landing/docs-surface.png"
+                alt="MUTX docs surface"
+                width={1536}
+                height={1024}
+                className="h-auto w-full object-cover"
+                sizes="(max-width: 1280px) 100vw, 60vw"
+              />
+              <div className="absolute inset-x-4 bottom-4 max-w-xl rounded-[1.6rem] border border-white/12 bg-[#02060d]/78 p-5 backdrop-blur-xl sm:inset-x-6 sm:bottom-6 sm:p-6">
+                <p className="text-[11px] uppercase tracking-[0.28em] text-cyan-100/80">docs lane</p>
+                <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">docs.mutx.dev should feel like a runway, not a side quest.</h3>
+                <p className="mt-3 text-sm leading-7 text-white/72">
+                  Architecture, API shape, operational semantics, and setup paths should land with the same confidence as the app.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <a
+                    href={DOCS_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-100"
+                  >
+                    Open docs
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                  >
+                    Talk to the team
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-6">
+              {storySections.map((section, index) => (
+                <motion.article
+                  key={section.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.45, delay: index * 0.08 }}
+                  className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#07111c]"
+                >
+                  <Image
+                    src={section.image}
+                    alt={section.title}
+                    width={1024}
+                    height={1536}
+                    className="h-72 w-full object-cover object-top"
+                    sizes="(max-width: 1280px) 100vw, 36vw"
+                  />
+                  <div className="p-6">
+                    <p className="text-[11px] uppercase tracking-[0.28em] text-cyan-100/75">{section.eyebrow}</p>
+                    <h3 className="mt-3 text-2xl font-semibold tracking-tight text-white">{section.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-white/70">{section.body}</p>
+                    <ul className="mt-5 space-y-3 text-sm text-white/68">
+                      {section.bullets.map((bullet) => (
+                        <li key={bullet} className="flex gap-3">
+                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300" />
+                          <span>{bullet}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto mt-16 w-full max-w-[88rem]">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+            <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#07111c]">
+              <Image
+                src="/landing/victory-core.png"
+                alt="MUTX robot lifting the mark"
+                width={1536}
+                height={1024}
+                className="h-full w-full object-cover"
+                sizes="(max-width: 1024px) 100vw, 40vw"
+              />
+            </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(7,17,28,0.98),rgba(4,10,18,0.92))] p-6 sm:p-8">
+              <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/70">Why teams stick around</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+                Make your agents boring in the best possible way.
+              </h2>
+              <p className="mt-5 max-w-3xl text-base leading-8 text-white/72 sm:text-lg">
+                Reliable systems are fun because they keep the creative part alive. MUTX is for teams that want serious control without flattening the energy out of the product.
+              </p>
+
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                {[
+                  {
+                    title: 'Open-source bones',
+                    body: 'Inspect it, run it, extend it, and stop guessing what the control surface is really doing.',
+                    icon: Bot,
+                  },
+                  {
+                    title: 'Operator-first flow',
+                    body: 'The app, docs, API, CLI, and SDK all point toward one product model instead of five competing metaphors.',
+                    icon: Command,
+                  },
+                  {
+                    title: 'Recovery > theater',
+                    body: 'Health, traces, webhooks, deploys, and keys are arranged around action, not applause.',
+                    icon: Wrench,
+                  },
+                  {
+                    title: 'Built for real pressure',
+                    body: 'When something breaks, the surface should feel like backup, not another problem to manage.',
+                    icon: ShieldCheck,
+                  },
+                ].map((item) => (
+                  <div key={item.title} className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4">
+                    <item.icon className="h-5 w-5 text-cyan-200" />
+                    <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-white/68">{item.body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="faq" className="mx-auto mt-16 w-full max-w-[88rem]">
+          <div className="mb-6 max-w-3xl">
+            <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/70">FAQ</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+              Straight answers, zero enterprise fog.
+            </h2>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            {playbook.map((step, idx) => (
-              <motion.article
-                key={step.title}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.4, delay: idx * 0.08 }}
-                className="rounded-2xl border border-white/10 bg-black/30 p-5"
-              >
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100/80">Step {step.stage}</p>
-                <h3 className="mt-2 text-lg font-semibold text-white">{step.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-white/72">{step.body}</p>
-              </motion.article>
-            ))}
-          </div>
-        </section>
-
-        <section id="faq" className="mx-auto mt-16 w-full max-w-7xl">
-          <div className="mb-6">
-            <p className="text-xs uppercase tracking-[0.24em] text-white/55">FAQ</p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Straight answers for serious operators.</h2>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
             {faqItems.map((item) => (
-              <article key={item.q} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-                <h3 className="text-base font-semibold text-white">{item.q}</h3>
-                <p className="mt-2 text-sm leading-6 text-white/72">{item.a}</p>
+              <article key={item.q} className="rounded-[1.6rem] border border-white/10 bg-white/[0.035] p-5">
+                <h3 className="text-xl font-semibold text-white">{item.q}</h3>
+                <p className="mt-3 text-sm leading-7 text-white/70">{item.a}</p>
               </article>
             ))}
           </div>
         </section>
 
-        <section className="mx-auto mt-16 w-full max-w-7xl rounded-3xl border border-cyan-300/30 bg-cyan-300/10 p-8 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100/80">Operate your agents like production systems</p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Move from demo agent to governed deployment.</h2>
-          <p className="mx-auto mt-3 max-w-3xl text-sm leading-7 text-white/80 sm:text-base">
-            If your agents need to survive beyond a demo, start with MUTX: explicit resources, truthful health signals, and one control plane across app, API, CLI, and SDK.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href={DOCS_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-cyan-100"
-            >
-              Launch docs
-              <ArrowRight className="h-4 w-4" />
-            </a>
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-            >
-              View source
-            </a>
+        <section className="mx-auto mt-16 w-full max-w-[88rem]">
+          <div className="grid overflow-hidden rounded-[2rem] border border-cyan-300/25 bg-[linear-gradient(180deg,rgba(10,30,46,0.95),rgba(5,12,20,0.92))] lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)]">
+            <div className="p-6 sm:p-8 lg:p-10">
+              <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/78">final call</p>
+              <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+                Build the weird agent thing.
+                <span className="mt-2 block text-cyan-200">Just give it a control plane before it bites you.</span>
+              </h2>
+              <p className="mt-5 max-w-2xl text-base leading-8 text-white/74 sm:text-lg">
+                Open the app, read the docs, inspect the code, and start operating agents like the systems they are becoming.
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a
+                  href={appHref}
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-100"
+                >
+                  {appLabel}
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+                <a
+                  href={DOCS_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                >
+                  Open docs
+                </a>
+                <a
+                  href={GITHUB_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                >
+                  View source
+                </a>
+              </div>
+            </div>
+
+            <div className="relative min-h-[24rem] border-t border-white/10 lg:border-l lg:border-t-0">
+              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-[#030810]/60" />
+              <Image
+                src="/landing/thumbs-up-portrait.png"
+                alt="MUTX robot giving a thumbs up"
+                fill
+                className="object-cover object-center"
+                sizes="(max-width: 1024px) 100vw, 40vw"
+              />
+            </div>
           </div>
         </section>
       </main>

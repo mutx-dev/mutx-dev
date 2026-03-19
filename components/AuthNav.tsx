@@ -33,11 +33,11 @@ export function AuthNav() {
   const isHomePage = pathname === '/'
   const isDashboardRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/app')
 
-  if (isDashboardRoute) {
+  if (isDashboardRoute || isHomePage) {
     return null
   }
 
-  if (loading || isHomePage) {
+  if (loading) {
     return (
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 sm:px-6">
