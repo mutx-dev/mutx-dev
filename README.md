@@ -1,16 +1,86 @@
 # MUTX
 
-**MUTX is an open-source control plane for deploying and operating AI agents like systems, not demos.**
+> Open-source MIT control plane for deploying and operating AI agents like systems, not demos.
 
-It brings the core surfaces into one repo: a FastAPI control plane, a browser operator shell, a Python CLI, a first-party Textual TUI, a Python SDK, and the infrastructure lane behind deployment and runtime operations.
+![MUTX dashboard demo](demo.gif)
 
-![MUTX architecture at a glance](docs/assets/readme-architecture.svg)
+MUTX brings the operator surfaces into one repository:
+
+- a FastAPI control plane mounted under `/v1/*`
+- a public browser demo at [`/app`](app/app/[[...slug]]/page.tsx)
+- a Next.js site and app host
+- a Python CLI and first-party Textual TUI
+- a Python SDK
+- local-first install and bootstrap flows for real operator setup
+
+Most teams can already prototype an agent. Very few can run one with durable identity, deployment semantics, sessions, health, access control, and honest operator contracts. MUTX is the layer around the agent system that makes those concerns explicit.
+
+## What MUTX Is
+
+MUTX is an assistant-first control plane for AI operations.
+
+Today the project already models and exposes the operational shell around agents:
+
+- starter templates, including `personal_assistant`
+- assistant overview, sessions, skills, channels, wakeups, and gateway health
+- agents, deployments, runs, usage, webhooks, API keys, and auth routes
+- a public dashboard demo that shows the intended operator surface
+- a CLI and TUI aligned around `mutx setup`, `mutx doctor`, and assistant workflows
+- shared local config and local operator bootstrap for contributor workflows
+
+The core thesis is simple:
+
+1. Deploy the assistant or agent as a real resource.
+2. Operate it through durable control-plane records.
+3. Keep the web surface, CLI, TUI, SDK, docs, and API contract speaking the same language.
+
+## Current Surfaces
+
+| Surface                   | Path / URL                                                | Current role                                              |
+| ------------------------- | --------------------------------------------------------- | --------------------------------------------------------- |
+| Public site               | `mutx.dev` / [`app/`](app)                                | Product narrative, quickstart, install path, metadata     |
+| Public control-plane demo | [`/app`](app/app/[[...slug]]/page.tsx)                    | Browser demo of the MUTX operator shell                   |
+| Docs                      | `docs.mutx.dev` / [`docs/`](docs)                         | Canonical setup, architecture, and contract documentation |
+| Control plane API         | [`src/api/`](src/api)                                     | FastAPI backend and mounted `/v1/*` routes                |
+| CLI + TUI                 | [`cli/`](cli) and root [`pyproject.toml`](pyproject.toml) | Terminal operator workflows                               |
+| SDK                       | [`sdk/mutx/`](sdk/mutx)                                   | Python client access to the control plane                 |
+
+## What Ships Today
+
+### Control plane
+
+- mounted public routes under `/v1/*`
+- route groups for `auth`, `assistant`, `agents`, `deployments`, `templates`, `sessions`, `runs`, `usage`, `api-keys`, `webhooks`, `monitoring`, `budgets`, `rag`, `clawhub`, and more
+- local and hosted operator setup paths
+- database initialization, schema-repair, and background monitor wiring
+
+### Assistant-first workflow
+
+- `personal_assistant` starter template
+- one-shot deploy flow through `mutx setup hosted` and `mutx setup local`
+- assistant overview, session discovery, channel inspection, skill management, and gateway health
+- workspace skill discovery and assistant config shaping in the control plane
+
+### Operator surfaces
+
+- public dashboard demo route under `/app`
+- browser site and app shell in Next.js
+- `mutx` CLI
+- `mutx tui` Textual operator shell
+
+### Delivery and operations
+
+- installer at `https://mutx.dev/install.sh`
+- local dev stack with `make dev-up`
+- infrastructure references in Docker, Terraform, Ansible, and monitoring assets
 
 ## Quickstart
 
-Canonical quickstart: [docs/deployment/quickstart.md](docs/deployment/quickstart.md)
+Canonical guide: [docs/deployment/quickstart.md](docs/deployment/quickstart.md)
 
-Fastest hosted operator path on macOS:
+### Hosted operator
+
+Use this when you already have access to a MUTX control plane.
 
 ```bash
 curl -fsSL https://mutx.dev/install.sh | bash
@@ -19,7 +89,9 @@ mutx doctor
 mutx assistant overview
 ```
 
-Canonical local contributor path:
+### Local contributor
+
+Use this when you are working inside the MUTX repository.
 
 ```bash
 git clone https://github.com/mutx-dev/mutx-dev.git
@@ -34,36 +106,44 @@ pip install -e ".[dev,tui]"
 make dev-up
 mutx setup local --open-tui
 mutx doctor
+mutx assistant overview
 ```
 
-The first supported deployment is always `Personal Assistant`.
+Expected result in either lane:
 
-## What Is Live Today
+1. authenticated operator state is stored in `~/.mutx/config.json`
+2. `Personal Assistant` is deployed
+3. runtime state is visible from the CLI, TUI, and browser surfaces
 
-* FastAPI control plane mounted under `/v1/*`
-* starter template catalog with `personal_assistant`
-* assistant overview, sessions, health, channels, and skills routes
-* Python CLI with `setup`, `doctor`, `auth`, `agent`, `deployment`, `assistant`, `api-key`, and `webhook` surfaces
-* `mutx tui`, built with Textual inside the CLI package
-* shared auth and config in `~/.mutx/config.json`
-* browser control-plane shell under `app/dashboard`
-* docs at [docs.mutx.dev](https://docs.mutx.dev)
+## Operator Contract
 
-## Assistant-First Operator Loop
+### Key routes
 
-MUTX now assumes the first thing an operator wants is a deployed assistant, not an empty dashboard.
+These are the core route families worth knowing first:
 
-The default flow is:
+- `/v1/templates`
+- `/v1/assistant`
+- `/v1/sessions`
+- `/v1/deployments`
+- `/v1/agents`
+- `/v1/auth`
+- `/v1/webhooks`
+- `/v1/api-keys`
 
-1. install or start MUTX
-2. authenticate
-3. deploy `Personal Assistant`
-4. connect channels and skills
-5. operate it from the web control plane, CLI, or TUI
+### Core commands
 
-## CLI And Config
+```bash
+mutx setup hosted
+mutx setup local
+mutx doctor
+mutx assistant overview
+mutx assistant sessions
+mutx tui
+```
 
-`mutx` and `mutx tui` share the same local config:
+### Shared local config
+
+`mutx` and `mutx tui` reuse the same config shape in `~/.mutx/config.json`:
 
 ```json
 {
@@ -78,94 +158,93 @@ The default flow is:
 }
 ```
 
-Core commands:
+## Recent Progress
 
-```bash
-mutx setup hosted
-mutx setup local
-mutx doctor
-mutx assistant overview
-mutx tui
+Recent work in the repository has materially changed what MUTX can show and prove:
+
+- public control-plane demo shipped under `/app`
+- installer handoff simplified and aligned with the assistant-first setup lane
+- local operator auth bootstrap added for contributor workflows
+- CLI and TUI centered around one-command setup and assistant inspection
+- dashboard, landing, and docs moved closer to the same operational story
+
+![MUTX architecture at a glance](docs/assets/readme-architecture.svg)
+
+## Repository Map
+
+```text
+mutx-dev/
+├── app/             # Next.js site, app host, and route handlers
+├── cli/             # Python CLI and Textual TUI
+├── docs/            # Setup, architecture, contracts, and troubleshooting
+├── infrastructure/  # Docker, Terraform, Ansible, and monitoring assets
+├── sdk/             # Python SDK
+├── src/api/         # FastAPI control plane
+└── tests/           # API, CLI, and frontend coverage
 ```
 
-The older flat commands such as `mutx login`, `mutx whoami`, and `mutx status` still exist for compatibility, but the canonical onboarding path is now `mutx setup`.
+## Development
 
-## Local Development
-
-Truthful local bootstrap:
+### Local stack
 
 ```bash
-git clone https://github.com/mutx-dev/mutx-dev.git
-cd mutx-dev
-
-npm install
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install -e ".[dev,tui]"
-
 make dev-up
-mutx setup local --open-tui
 make dev-logs
 make dev-stop
 ```
 
-Local URLs:
+Useful local URLs:
 
-* site and app shell: `http://localhost:3000`
-* API: `http://localhost:8000`
-* API docs: `http://localhost:8000/docs`
+- site and app host: `http://localhost:3000`
+- public dashboard demo: `http://localhost:3000/app`
+- API: `http://localhost:8000`
+- API docs: `http://localhost:8000/docs`
 
-## Repo Map
+### Validation
 
-```text
-mutx-dev/
-├── app/             # Next.js site and app shell
-├── cli/             # Python CLI and Textual TUI
-├── docs/            # Docs, architecture, contracts, troubleshooting
-├── infrastructure/  # Docker, Terraform, Ansible, monitoring
-├── sdk/             # Python SDK
-├── src/api/         # FastAPI control plane
-└── tests/           # CLI, contract, and frontend coverage
+```bash
+./scripts/test.sh
+npm run build
+pytest tests/test_cli_auth_and_tui.py tests/test_cli_setup_and_doctor.py
 ```
 
-## Release And Changelog
+## TODO
 
-* CLI versioning lives in the root `pyproject.toml`
-* CLI release tags use `cli-vX.Y.Z`
-* Homebrew points at the matching CLI release tarball
-* user-visible changes are tracked in [CHANGELOG.md](CHANGELOG.md)
+Near-term contributor priorities are intentionally short and concrete:
 
-Release docs:
+- make the authenticated browser dashboard use live control-plane data end to end
+- keep API, CLI, SDK, docs, and public site aligned with the mounted `/v1/*` contract
+- finish durable deployment lifecycle history, events, and rollback posture
+- turn webhook and API-key flows into complete product surfaces with clear operator UX
+- expand local-first route, UI, and integration coverage in CI
 
-* [docs/deployment/cli-release.md](docs/deployment/cli-release.md)
-* [docs/changelog-status.md](docs/changelog-status.md)
+## Documentation
+
+- [docs/README.md](docs/README.md)
+- [docs/deployment/quickstart.md](docs/deployment/quickstart.md)
+- [docs/cli.md](docs/cli.md)
+- [docs/architecture/overview.md](docs/architecture/overview.md)
+- [docs/contracts/api/index.md](docs/contracts/api/index.md)
+- [whitepaper.md](whitepaper.md)
+- [ROADMAP.md](ROADMAP.md)
+
+Hosted documentation: [docs.mutx.dev](https://docs.mutx.dev)
 
 ## Contributing
 
-High-leverage areas:
+Start with:
 
-* assistant-first onboarding and templates
-* OpenClaw runtime integration
-* browser control-plane panels
-* CLI and TUI alignment with live `/v1/*` routes
-* docs drift control
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [docs/project-status.md](docs/project-status.md)
+- [ROADMAP.md](ROADMAP.md)
 
-Start here:
+When docs and code disagree, trust the code first:
 
-* [CONTRIBUTING.md](CONTRIBUTING.md)
-* [docs/project-status.md](docs/project-status.md)
-* [ROADMAP.md](ROADMAP.md)
-
-## Docs
-
-* [docs/cli.md](docs/cli.md)
-* [docs/deployment/quickstart.md](docs/deployment/quickstart.md)
-* [docs/architecture/overview.md](docs/architecture/overview.md)
-* [docs/contracts/api/index.md](docs/contracts/api/index.md)
-
-Hosted docs: [docs.mutx.dev](https://docs.mutx.dev)
+- [`src/api/routes/`](src/api/routes)
+- [`app/api/`](app/api)
+- [`cli/`](cli)
+- [`sdk/mutx/`](sdk/mutx)
 
 ## License
 
-[MIT](LICENSE)
+MUTX is licensed under the [MIT License](LICENSE).
