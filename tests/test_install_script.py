@@ -139,12 +139,18 @@ def build_install_env(tmp_path: Path, *, source_ref: str | None = None) -> tuple
     return env, brew_prefix
 
 
-def run_install_script(tmp_path: Path, *, mutx_script: str, source_ref: str | None = None) -> tuple[subprocess.CompletedProcess[str], Path]:
+def run_install_script(
+    tmp_path: Path,
+    *,
+    mutx_script: str,
+    source_ref: str | None = None,
+    args: list[str] | None = None,
+) -> tuple[subprocess.CompletedProcess[str], Path]:
     env, brew_prefix = build_install_env(tmp_path, source_ref=source_ref)
     write_executable(brew_prefix / "bin" / "mutx", mutx_script)
 
     result = subprocess.run(
-        ["bash", str(INSTALL_SCRIPT)],
+        ["bash", str(INSTALL_SCRIPT), *(args or [])],
         cwd=ROOT,
         env=env,
         capture_output=True,
@@ -303,10 +309,34 @@ def test_install_script_allows_assistant_first_cli_surface_without_recovery(tmp_
 
     assert result.returncode == 0
     assert "Recovering current CLI surface" not in result.stdout
+    assert "Install plan" in result.stdout
+    assert "[1/3] Preparing environment" in result.stdout
     assert "Checking onboarding surface" in result.stdout
     assert "Install complete" in result.stdout
     assert "mutx-dev/homebrew-tap" not in result.stdout
     assert result.stderr == ""
+
+
+def test_install_script_help_shows_usage_without_running_install(tmp_path: Path) -> None:
+    result, _ = run_install_script(tmp_path, mutx_script=CURRENT_MUTX_SCRIPT, args=["--help"])
+
+    assert result.returncode == 0
+    assert "Usage: curl -fsSL https://mutx.dev/install.sh | bash -s -- [options]" in result.stdout
+    assert "--no-onboard" in result.stdout
+    assert "--no-prompt" in result.stdout
+    assert "Syncing package lane" not in result.stdout
+
+
+def test_install_script_no_onboard_skips_wizard_and_prints_next_steps(tmp_path: Path) -> None:
+    result, _ = run_install_script(tmp_path, mutx_script=CURRENT_MUTX_SCRIPT, args=["--no-onboard"])
+
+    assert result.returncode == 0
+    assert "Onboarding:" in result.stdout
+    assert "skipped" in result.stdout
+    assert "Setup Wizard" not in result.stdout
+    assert "Install complete" in result.stdout
+    assert "mutx setup hosted" in result.stdout
+    assert "mutx setup local" in result.stdout
 
 
 def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recovery(tmp_path: Path) -> None:

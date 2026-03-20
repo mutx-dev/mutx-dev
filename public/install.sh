@@ -7,6 +7,9 @@ OPEN_TUI="${MUTX_OPEN_TUI:-1}"
 MUTX_HOME_DIR="${MUTX_HOME_DIR:-$HOME/.mutx}"
 MUTX_CLI_SOURCE_REF="${MUTX_CLI_SOURCE_REF:-https://github.com/mutx-dev/mutx-dev/archive/refs/heads/main.tar.gz}"
 MUTX_NO_ANIMATION="${MUTX_NO_ANIMATION:-0}"
+NO_ONBOARD="${MUTX_NO_ONBOARD:-0}"
+NO_PROMPT="${MUTX_NO_PROMPT:-0}"
+HELP=0
 export HOMEBREW_NO_AUTO_UPDATE="${HOMEBREW_NO_AUTO_UPDATE:-1}"
 export HOMEBREW_NO_INSTALL_FROM_API="${HOMEBREW_NO_INSTALL_FROM_API:-1}"
 
@@ -20,32 +23,11 @@ MUTX_BIN=""
 SOURCE_OVERLAY_USED=0
 WIZARD_SELECTION=""
 BANNER_HAS_ANIMATED=0
-
-MUTX_ASCII_LOGO="$(cat <<'EOF'
-                    ++
-                   ++++
-                  ++++++
-                 ++++++++
-               ++++++++++++  +++++++
-              ++++++++++++++  +++++++++
-            +++++++++ +++++++  ++++++++
-           ++++++++    ++++++++  +++++++
-          ++++++++  ++  ++++++  +++++++
-        +++++++++  +++++  +++  ++++++++
-       ++++++++   +++++++  + +++++++++
-      ++++++++  ++++++++++  ++++++++
-    +++++++++    ++++++++  ++++++++
-   +++++++++  ++  ++++++  ++++++++ +++
-  ++++++++  +++++  +++  +++++++++++++++
- ++++++++  +++++++     ++++++++ +++++++++
- +++++++    ++++++++  ++++++++   ++++++++
- +++++       ++++++++++++++++      ++++++
- ++++         +++++++++++++         +++++
- +++            ++++++++++           ++++
- +               ++++++++             +++
-                  ++++++                +
-EOF
-)"
+OS_NAME="unknown"
+INSTALL_STAGE_TOTAL=3
+INSTALL_STAGE_CURRENT=0
+ASCII_FRAME_COUNT=5
+ASCII_FRAME_INDEX=0
 
 if [[ -t 1 ]]; then
   C_RESET=$'\033[0m'
@@ -159,6 +141,326 @@ clear_tty_screen() {
   fi
 }
 
+print_usage() {
+  cat <<EOF
+Usage: curl -fsSL https://mutx.dev/install.sh | bash -s -- [options]
+
+Options:
+  --help           Show this help text
+  --no-onboard     Install MUTX but skip the setup wizard handoff
+  --onboard        Force the setup wizard handoff
+  --no-prompt      Disable interactive prompts even when a TTY is present
+  --prompt         Re-enable interactive prompts
+
+Environment:
+  MUTX_OPEN_TUI=0          Keep setup in the CLI instead of opening the TUI
+  MUTX_NO_ANIMATION=1      Disable animated installer output
+  MUTX_NO_ONBOARD=1        Skip the setup wizard handoff
+  MUTX_NO_PROMPT=1         Disable prompts and finish with next-step commands
+  MUTX_CLI_SOURCE_REF=...  Override the fallback source runtime reference
+EOF
+}
+
+parse_args() {
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --help|-h)
+        HELP=1
+        ;;
+      --no-onboard)
+        NO_ONBOARD=1
+        ;;
+      --onboard)
+        NO_ONBOARD=0
+        ;;
+      --no-prompt)
+        NO_PROMPT=1
+        ;;
+      --prompt)
+        NO_PROMPT=0
+        ;;
+      *)
+        die "Unknown installer option: $1"
+        ;;
+    esac
+    shift
+  done
+}
+
+detect_os_or_die() {
+  case "$(uname -s)" in
+    Darwin)
+      OS_NAME="macos"
+      ;;
+    *)
+      die "This installer currently targets macOS with Homebrew. Use the source install path from the repo on other platforms."
+      ;;
+  esac
+}
+
+is_promptable() {
+  if [[ "${NO_PROMPT}" == "1" ]]; then
+    return 1
+  fi
+  if [[ "${HAS_TTY}" == "1" ]]; then
+    return 0
+  fi
+  return 1
+}
+
+ui_section() {
+  tty_print "\n${C_MUTX}${C_BOLD}$1${C_RESET}\n"
+}
+
+ui_stage() {
+  local title="$1"
+  INSTALL_STAGE_CURRENT=$((INSTALL_STAGE_CURRENT + 1))
+  ui_section "[${INSTALL_STAGE_CURRENT}/${INSTALL_STAGE_TOTAL}] ${title}"
+}
+
+ui_kv() {
+  local key="$1"
+  local value="$2"
+  printf '%b%-18s%b %s\n' "${C_DIM}" "${key}:" "${C_RESET}" "${value}" | {
+    if [[ "${HAS_TTY}" == "1" ]]; then
+      cat > /dev/tty
+    else
+      cat
+    fi
+  }
+}
+
+show_install_plan() {
+  local onboarding_mode="interactive wizard"
+  local prompt_mode="interactive"
+  local tui_mode="open after setup"
+
+  if [[ "${NO_ONBOARD}" == "1" ]]; then
+    onboarding_mode="skipped"
+  fi
+  if ! is_promptable; then
+    prompt_mode="disabled"
+  fi
+  if [[ "${OPEN_TUI}" == "0" ]]; then
+    tui_mode="stay in CLI"
+  fi
+
+  ui_section "Install plan"
+  ui_kv "OS" "${OS_NAME}"
+  ui_kv "Package lane" "homebrew"
+  ui_kv "Runtime fallback" "source overlay if packaged CLI is stale"
+  ui_kv "Onboarding" "${onboarding_mode}"
+  ui_kv "Prompt mode" "${prompt_mode}"
+  ui_kv "TUI" "${tui_mode}"
+  ui_kv "Config dir" "${MUTX_HOME_DIR}"
+}
+
+show_finish_message() {
+  local -a install_messages=(
+    "Runtime locked in. Pick a lane."
+    "Package synced. Operator loop is next."
+    "Bootstrap complete. Hand it to the CLI."
+    "Fresh install. Clean runway."
+    "MUTX is in. Time to wire the control plane."
+  )
+  local -a deferred_messages=(
+    "Install complete. Setup can wait."
+    "Runtime is ready. Onboarding is one command away."
+    "Clean exit. Launch the wizard when you want it."
+    "MUTX is staged. Finish setup when you're ready."
+    "Everything is installed. Handoff deferred."
+  )
+  local index=0
+
+  index=$((RANDOM % ${#install_messages[@]}))
+  if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
+    index=$((RANDOM % ${#deferred_messages[@]}))
+    tty_print "\n${C_GOOD}${C_BOLD}${deferred_messages[${index}]}${C_RESET}\n"
+    return
+  fi
+
+  tty_print "\n${C_GOOD}${C_BOLD}${install_messages[${index}]}${C_RESET}\n"
+}
+
+ascii_frame_content() {
+  case "$1" in
+    0)
+      cat <<'EOF'
+                    ++
+                   ++++
+                  ++++++
+                 ++++++++
+               ++++++++++++  +++++++
+              ++++++++++++++  +++++++++
+            +++++++++ +++++++  ++++++++
+           ++++++++    ++++++++  +++++++
+          ++++++++  ++  ++++++  +++++++
+        +++++++++  +++++  +++  ++++++++
+       ++++++++   +++++++  + +++++++++
+      ++++++++  ++++++++++  ++++++++
+    +++++++++    ++++++++  ++++++++
+   +++++++++  ++  ++++++  ++++++++ +++
+  ++++++++  +++++  +++  +++++++++++++++
+ ++++++++  +++++++     ++++++++ +++++++++
+ +++++++    ++++++++  ++++++++   ++++++++
+ +++++       ++++++++++++++++      ++++++
+ ++++         +++++++++++++         +++++
+ +++            ++++++++++           ++++
+ +               ++++++++             +++
+                  ++++++                +
+EOF
+      ;;
+    1)
+      cat <<'EOF'
+                    ##
+                   ####
+                  ######
+                 ########
+               ############  #######
+              ##############  #########
+            ######### #######  ########
+           ########    ########  #######
+          ########  ##  ######  #######
+        #########  #####  ###  ########
+       ########   #######  # #########
+      ########  ##########  ########
+    #########    ########  ########
+   #########  ##  ######  ######## ###
+  ########  #####  ###  ###############
+ ########  #######     ######## #########
+ #######    ########  ########   ########
+ #####       ################      ######
+ ####         #############         #####
+ ###            ##########           ####
+ #               ########             ###
+                  ######                #
+EOF
+      ;;
+    2)
+      cat <<'EOF'
+                    ↑↑
+                   ↑↑↑↑
+                  ↑↑↑↑↑↑
+                 ↑↑↑↑↑↑↑↑
+               ↑↑↑↑↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑
+              ↑↑↑↑↑↑↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑↑
+            ↑↑↑↑↑↑↑↑↑ ↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑
+           ↑↑↑↑↑↑↑↑    ↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑
+          ↑↑↑↑↑↑↑↑  ↑↑  ↑↑↑↑↑↑  ↑↑↑↑↑↑↑
+        ↑↑↑↑↑↑↑↑↑  ↑↑↑↑↑  ↑↑↑  ↑↑↑↑↑↑↑↑
+       ↑↑↑↑↑↑↑↑   ↑↑↑↑↑↑↑  ↑ ↑↑↑↑↑↑↑↑↑
+      ↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑
+    ↑↑↑↑↑↑↑↑↑    ↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑
+   ↑↑↑↑↑↑↑↑↑  ↑↑  ↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑ ↑↑↑
+  ↑↑↑↑↑↑↑↑  ↑↑↑↑↑  ↑↑↑  ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+ ↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑     ↑↑↑↑↑↑↑↑ ↑↑↑↑↑↑↑↑↑
+ ↑↑↑↑↑↑↑    ↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑   ↑↑↑↑↑↑↑↑
+ ↑↑↑↑↑       ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑      ↑↑↑↑↑↑
+ ↑↑↑↑         ↑↑↑↑↑↑↑↑↑↑↑↑↑         ↑↑↑↑↑
+ ↑↑↑            ↑↑↑↑↑↑↑↑↑↑           ↑↑↑↑
+ ↑               ↑↑↑↑↑↑↑↑             ↑↑↑
+                  ↑↑↑↑↑↑                ↑
+EOF
+      ;;
+    3)
+      cat <<'EOF'
+                    AA
+                   AAAA
+                  AAAAAA
+                 AAAAAAAA
+               AAAAAAAAAAAA  AAAAAAA
+              AAAAAAAAAAAAAA  AAAAAAAAA
+            AAAAAAAAA AAAAAAA  AAAAAAAA
+           AAAAAAAA    AAAAAAAA  AAAAAAA
+          AAAAAAAA  AA  AAAAAA  AAAAAAA
+        AAAAAAAAA  AAAAA  AAA  AAAAAAAA
+       AAAAAAAA   AAAAAAA  A AAAAAAAAA
+      AAAAAAAA  AAAAAAAAAA  AAAAAAAA
+    AAAAAAAAA    AAAAAAAA  AAAAAAAA
+   AAAAAAAAA  AA  AAAAAA  AAAAAAAA AAA
+  AAAAAAAA  AAAAA  AAA  AAAAAAAAAAAAAAA
+ AAAAAAAA  AAAAAAA     AAAAAAAA AAAAAAAAA
+ AAAAAAA    AAAAAAAA  AAAAAAAA   AAAAAAAA
+ AAAAA       AAAAAAAAAAAAAAAA      AAAAAA
+ AAAA         AAAAAAAAAAAAA         AAAAA
+ AAA            AAAAAAAAAA           AAAA
+ A               AAAAAAAA             AAA
+                  AAAAAA                A
+EOF
+      ;;
+    *)
+      cat <<'EOF'
+                    ÆÆ
+                   ÆÆÆÆ
+                  ÆÆÆÆÆÆ
+                 ÆÆÆÆÆÆÆÆ
+               ÆÆÆÆÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆ
+              ÆÆÆÆÆÆÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆÆ
+            ÆÆÆÆÆÆÆÆÆ ÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆ
+           ÆÆÆÆÆÆÆÆ    ÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆ
+          ÆÆÆÆÆÆÆÆ  ÆÆ  ÆÆÆÆÆÆ  ÆÆÆÆÆÆÆ
+        ÆÆÆÆÆÆÆÆÆ  ÆÆÆÆÆ  ÆÆÆ  ÆÆÆÆÆÆÆÆ
+       ÆÆÆÆÆÆÆÆ   ÆÆÆÆÆÆÆ  Æ ÆÆÆÆÆÆÆÆÆ
+      ÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆ
+    ÆÆÆÆÆÆÆÆÆ    ÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆ
+   ÆÆÆÆÆÆÆÆÆ  ÆÆ  ÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆ ÆÆÆ
+  ÆÆÆÆÆÆÆÆ  ÆÆÆÆÆ  ÆÆÆ  ÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆ
+ ÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆ     ÆÆÆÆÆÆÆÆ ÆÆÆÆÆÆÆÆÆ
+ ÆÆÆÆÆÆÆ    ÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆ   ÆÆÆÆÆÆÆÆ
+ ÆÆÆÆÆ       ÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆ      ÆÆÆÆÆÆ
+ ÆÆÆÆ         ÆÆÆÆÆÆÆÆÆÆÆÆÆ         ÆÆÆÆÆ
+ ÆÆÆ            ÆÆÆÆÆÆÆÆÆÆ           ÆÆÆÆ
+ Æ               ÆÆÆÆÆÆÆÆ             ÆÆÆ
+                  ÆÆÆÆÆÆ                Æ
+EOF
+      ;;
+  esac
+}
+
+ascii_frame_color() {
+  case "$1" in
+    0) printf '%s' "${C_DIM}" ;;
+    1) printf '%s' "${C_FLARE_SOFT}" ;;
+    2) printf '%s' "${C_PANEL}" ;;
+    3) printf '%s' "${C_MUTX_ALT}" ;;
+    *) printf '%s' "${C_FLARE}" ;;
+  esac
+}
+
+ascii_frame_phase() {
+  case "$1" in
+    0) printf '%s' "spark lattice" ;;
+    1) printf '%s' "forge lattice" ;;
+    2) printf '%s' "raise signal" ;;
+    3) printf '%s' "align operator" ;;
+    *) printf '%s' "merge control" ;;
+  esac
+}
+
+ascii_stage_sigil() {
+  case "$1" in
+    0) printf '%s' "++" ;;
+    1) printf '%s' "##" ;;
+    2) printf '%s' "↑↑" ;;
+    3) printf '%s' "AA" ;;
+    *) printf '%s' "ÆÆ" ;;
+  esac
+}
+
+render_ascii_frame() {
+  local frame_idx="$1"
+  local per_line_delay="${2:-0}"
+  local frame_color=""
+  frame_color="$(ascii_frame_color "${frame_idx}")"
+
+  while IFS= read -r line; do
+    tty_print "${frame_color}${line}${C_RESET}\n"
+    if [[ "${MOTION_OK}" == "1" ]]; then
+      sleep "${per_line_delay}"
+    fi
+  done <<< "$(ascii_frame_content "${frame_idx}")"
+}
+
 die() {
   KEEP_LOG=1
   printf '%berror:%b %s\n' "${C_WARN}" "${C_RESET}" "$*" >&2
@@ -183,7 +485,9 @@ spinner_loop() {
   local i=0
 
   while kill -0 "${pid}" 2>/dev/null; do
-    printf '\r%b%s%b %s  %b%s%b' "${C_MUTX_ALT}" "${frames[${i}]}" "${C_RESET}" "${label}" "${C_PANEL}" "${beams[${i}]}" "${C_RESET}" > /dev/tty
+    local sigil
+    sigil="$(ascii_stage_sigil $((i % ASCII_FRAME_COUNT)))"
+    printf '\r%b%s%b %s  %b%s%b %b%s%b' "${C_MUTX_ALT}" "${frames[${i}]}" "${C_RESET}" "${label}" "${C_PANEL}" "${beams[${i}]}" "${C_RESET}" "${C_FLARE_SOFT}" "${sigil}" "${C_RESET}" > /dev/tty
     i=$(( (i + 1) % ${#frames[@]} ))
     sleep 0.08
   done
@@ -235,31 +539,41 @@ render_banner() {
   local title="${C_BOLD}${C_MUTX}MUTX setup wizard${C_RESET}"
   local subtitle="${C_SOFT}Install the CLI, verify the onboarding surface, and land in the right lane.${C_RESET}"
   local signal="${C_DIM}neon bootstrap ▸ current runtime ▸ clean operator handoff${C_RESET}"
-  local -a palette=("${C_DIM}" "${C_FLARE_SOFT}" "${C_FLARE}" "${C_MUTX_ALT}" "${C_PANEL}")
+  local frame_idx="${ASCII_FRAME_INDEX}"
+  local phase=""
 
   clear_tty_screen
   tty_print '\n'
 
   if [[ "${MOTION_OK}" == "1" && "${BANNER_HAS_ANIMATED}" != "1" ]]; then
     local idx=0
-    while IFS= read -r line; do
-      printf '%b%s%b\n' "${palette[$((idx % ${#palette[@]}))]}" "${line}" "${C_RESET}" > /dev/tty
+    while [[ "${idx}" -lt "${ASCII_FRAME_COUNT}" ]]; do
+      clear_tty_screen
+      tty_print "\n"
+      render_ascii_frame "${idx}" 0.018
+      phase="$(ascii_frame_phase "${idx}")"
+      tty_print "\n${C_FLARE_SOFT}   ${phase}${C_RESET}\n"
+      motion_sleep 0.18
       idx=$((idx + 1))
-      sleep 0.028
-    done <<< "${MUTX_ASCII_LOGO}"
+    done
+    frame_idx=$((ASCII_FRAME_COUNT - 1))
+    clear_tty_screen
+    tty_print "\n"
+    render_ascii_frame "${frame_idx}" 0.010
     tty_print "\n"
     type_tty "${title}\n" 0.006
     type_tty "${subtitle}\n" 0.0035
     type_tty "${signal}\n\n" 0.0025
     motion_sleep 0.08
   else
-    tty_print "${C_FLARE_SOFT}${MUTX_ASCII_LOGO}${C_RESET}\n"
+    render_ascii_frame "${frame_idx}" 0
     tty_print "\n${title}\n"
     tty_print "${subtitle}\n"
     tty_print "${signal}\n\n"
   fi
 
   BANNER_HAS_ANIMATED=1
+  ASCII_FRAME_INDEX=$(( (ASCII_FRAME_INDEX + 1) % ASCII_FRAME_COUNT ))
 }
 
 tty_prompt() {
@@ -416,7 +730,7 @@ run_setup_handoff() {
     handoff_note="The lane will stay in the CLI when setup completes."
   fi
 
-  if [[ "${HAS_TTY}" != "1" ]]; then
+  if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
     say "Install complete"
     note "Next steps:"
     note "  mutx setup hosted"
@@ -484,18 +798,25 @@ run_setup_handoff() {
   note "  mutx doctor"
 }
 
-render_banner
+parse_args "$@"
 
-if [[ "$(uname -s)" != "Darwin" ]]; then
-  die "This installer currently targets macOS with Homebrew. Use the source install path from the repo on other platforms."
+if [[ "${HELP}" == "1" ]]; then
+  print_usage
+  exit 0
 fi
+
+detect_os_or_die
+render_banner
+show_install_plan
 
 if ! command -v brew >/dev/null 2>&1; then
   die "Homebrew is required. Install it from https://brew.sh and rerun: curl -fsSL https://mutx.dev/install.sh | bash"
 fi
 
+ui_stage "Preparing environment"
 run_stage "Syncing package lane" brew tap "${TAP}"
 
+ui_stage "Installing MUTX runtime"
 if brew list --versions "${FORMULA}" >/dev/null 2>&1; then
   run_stage "Refreshing MUTX runtime" upgrade_or_keep_formula
 else
@@ -505,5 +826,8 @@ fi
 run_stage "Linking mutx into PATH" brew link --overwrite "${FORMULA}"
 resolve_mutx_bin
 run_stage "Warming CLI" "${MUTX_BIN}" --help
+
+ui_stage "Finalizing setup"
 ensure_assistant_first_surface
+show_finish_message
 run_setup_handoff
