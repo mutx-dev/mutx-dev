@@ -28,21 +28,21 @@ const tabs: QuickstartTab[] = ['hosted', 'local', 'api']
 const tabContent: Record<QuickstartTab, QuickstartContent> = {
   hosted: {
     label: 'Hosted operator',
-    intro: 'Install the CLI, authenticate, and land on a live assistant surface.',
+    intro: 'Install the CLI, authenticate, and land on a live assistant.',
     environment: 'hosted control plane',
     mode: 'assistant first',
-    footer: 'Hosted lane. Minimal local setup once the public auth path is ready.',
+    footer: 'Hosted lane. Minimal local setup once public auth is open.',
     blocks: [
       {
-        id: 'installer',
+        id: 'install',
         label: 'Install',
-        hint: 'Pull down the CLI.',
+        hint: 'Install the CLI.',
         script: 'curl -fsSL https://mutx.dev/install.sh | bash',
       },
       {
-        id: 'setup',
+        id: 'deploy',
         label: 'Deploy Personal Assistant',
-        hint: 'Authenticate, validate, deploy.',
+        hint: 'Auth. Validate. Deploy.',
         script: `mutx setup hosted
 mutx doctor
 mutx assistant overview`,
@@ -51,22 +51,22 @@ mutx assistant overview`,
   },
   local: {
     label: 'Local contributor',
-    intro: 'Boot the stack, deploy locally, and inspect the same operator surface on localhost.',
+    intro: 'Boot the stack, deploy locally, and inspect the operator surface on localhost.',
     environment: 'repo + localhost',
     mode: 'local operator loop',
-    footer: 'Fastest truthful lane today. Same runtime, fully local.',
+    footer: 'Local lane. Full stack control on the same product surface.',
     blocks: [
       {
         id: 'stack',
         label: 'Start local stack',
-        hint: 'Bring up the services.',
+        hint: 'Boot services.',
         script: `make dev-up
 make dev-logs`,
       },
       {
-        id: 'setup',
-        label: 'Register + deploy',
-        hint: 'Create the operator and launch the assistant.',
+        id: 'deploy',
+        label: 'Deploy Personal Assistant',
+        hint: 'Setup. Validate. Open TUI.',
         script: `mutx setup local
 mutx doctor
 mutx tui`,
@@ -75,15 +75,15 @@ mutx tui`,
   },
   api: {
     label: 'API contract',
-    intro: 'Hit the mounted routes directly when you want raw contract truth.',
-    environment: '/v1',
-    mode: 'versioned control-plane API',
-    footer: 'Same runtime shape, no UI layer required.',
+    intro: 'Work the mounted routes directly when you want raw control-plane truth.',
+    environment: '/v1 contract',
+    mode: 'no browser required',
+    footer: 'API lane. Mounted routes, operator state, no UI layer.',
     blocks: [
       {
         id: 'auth',
         label: 'Authenticate',
-        hint: 'Create an operator and capture a token.',
+        hint: 'Register and capture a token.',
         script: `BASE_URL=http://localhost:8000/v1
 
 curl -X POST "$BASE_URL/auth/register" \\
@@ -91,9 +91,9 @@ curl -X POST "$BASE_URL/auth/register" \\
   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'`,
       },
       {
-        id: 'starter',
+        id: 'deploy',
         label: 'Starter deployment',
-        hint: 'Create the assistant and first deployment.',
+        hint: 'Create the first assistant.',
         script: `curl -X POST "$BASE_URL/templates/personal_assistant/deploy" \\
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\
   -H "Content-Type: application/json" \\
@@ -101,8 +101,8 @@ curl -X POST "$BASE_URL/auth/register" \\
       },
       {
         id: 'inspect',
-        label: 'Inspect operator surfaces',
-        hint: 'Read overview and session state.',
+        label: 'Inspect state',
+        hint: 'Read overview and sessions.',
         script: `curl "$BASE_URL/assistant/overview" \\
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
@@ -117,52 +117,53 @@ type QuickstartSnippetProps = {
   block: QuickstartBlock
   copied: boolean
   onCopy: (block: QuickstartBlock) => void
+  wide?: boolean
 }
 
-function QuickstartSnippet({ block, copied, onCopy }: QuickstartSnippetProps) {
+function QuickstartSnippet({
+  block,
+  copied,
+  onCopy,
+  wide = false,
+}: QuickstartSnippetProps) {
   return (
-    <div className="rounded-[1.7rem] border border-white/10 bg-[#091322]/85 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-      <div className="flex items-start justify-between gap-3">
+    <article className={cn('site-quickstart-card', wide && 'lg:col-span-2')}>
+      <div className="site-quickstart-card-head">
         <div>
-          <p className="font-[family:var(--font-landing-mono)] text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
+          <p className="font-[family:var(--font-landing-mono)] text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-slate-500">
             {block.label}
           </p>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">
-            {block.hint}
-          </p>
+          <p className="site-quickstart-hint">{block.hint}</p>
         </div>
         <button
           type="button"
           onClick={() => onCopy(block)}
           className={cn(
-            'inline-flex h-10 w-10 items-center justify-center rounded-xl border transition',
-            copied
-              ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200'
-              : 'border-white/10 bg-white/[0.04] text-slate-300 hover:border-cyan-400/25 hover:bg-cyan-400/10 hover:text-cyan-100',
+            'site-quickstart-copy',
+            copied &&
+              'border-emerald-400/20 bg-emerald-400/10 text-emerald-200 hover:border-emerald-400/20 hover:bg-emerald-400/10 hover:text-emerald-200',
           )}
           aria-label={copied ? `${block.label} copied` : `Copy ${block.label} commands`}
         >
-          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          {copied ? <Check className="h-4.5 w-4.5" /> : <Copy className="h-4.5 w-4.5" />}
         </button>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-[1.4rem] border border-white/10 bg-[#040914]">
-        <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3 text-[11px] uppercase tracking-[0.2em] text-slate-500">
-          <span className="h-2.5 w-2.5 rounded-full bg-rose-400" />
-          <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
-          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-          <span className="ml-2 font-mono normal-case tracking-normal text-slate-400">
+      <div className="mt-5 overflow-hidden rounded-[1.35rem] border border-white/10 bg-[#030913] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+        <div className="flex items-center gap-2 border-b border-white/10 px-5 py-3 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+          <span className="site-quickstart-dot site-quickstart-dot-red" />
+          <span className="site-quickstart-dot site-quickstart-dot-amber" />
+          <span className="site-quickstart-dot site-quickstart-dot-green" />
+          <span className="ml-3 font-[family:var(--font-landing-mono)] text-[0.7rem] normal-case tracking-[0.08em] text-slate-400">
             bash {block.id}
           </span>
         </div>
-        <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 px-4 py-4">
-          <span className="pt-0.5 font-mono text-sm text-cyan-300">$</span>
-          <pre className="overflow-x-auto whitespace-pre-wrap break-words font-mono text-[13px] leading-7 text-slate-100">
-            {block.script}
-          </pre>
+        <div className="site-quickstart-snippet">
+          <span className="site-quickstart-prompt">$</span>
+          <pre>{block.script}</pre>
         </div>
       </div>
-    </div>
+    </article>
   )
 }
 
@@ -187,10 +188,20 @@ export function QuickstartTabs() {
   }
 
   return (
-    <div className="landing-panel-strong overflow-hidden text-white">
-      <div className="border-b border-white/10 px-4 py-4 sm:px-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-1 flex-wrap items-center gap-2" role="tablist" aria-label="MUTX quickstart modes">
+    <div className="site-quickstart-shell text-white">
+      <div className="site-quickstart-toolbar">
+        <div className="site-quickstart-toolbar-main">
+          <div className="site-quickstart-dots" aria-hidden="true">
+            <span className="site-quickstart-dot site-quickstart-dot-red" />
+            <span className="site-quickstart-dot site-quickstart-dot-amber" />
+            <span className="site-quickstart-dot site-quickstart-dot-green" />
+          </div>
+
+          <div
+            className="site-quickstart-tabrail"
+            role="tablist"
+            aria-label="MUTX quickstart modes"
+          >
             {tabs.map((tab) => (
               <button
                 key={tab}
@@ -198,43 +209,42 @@ export function QuickstartTabs() {
                 role="tab"
                 aria-selected={activeTab === tab}
                 onClick={() => setActiveTab(tab)}
-                className={cn(
-                  'rounded-full border px-4 py-2 text-sm font-semibold transition',
-                  activeTab === tab
-                    ? 'border-cyan-400/20 bg-cyan-400 text-slate-950 shadow-[0_14px_34px_rgba(34,211,238,0.28)]'
-                    : 'border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/15 hover:text-slate-100',
-                )}
+                className="site-quickstart-tab"
+                data-active={activeTab === tab}
               >
                 {tabContent[tab].label}
               </button>
             ))}
           </div>
+        </div>
 
-          <div className="flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-            <span className="landing-chip">{active.environment}</span>
-            <span className="landing-chip">{active.mode}</span>
-          </div>
+        <div className="site-quickstart-context">
+          <span className="site-quickstart-context-pill">
+            {active.environment}
+          </span>
+          <span className="site-quickstart-context-pill site-quickstart-context-pill-active">
+            {active.mode}
+          </span>
         </div>
       </div>
 
-      <div className="px-4 py-5 sm:px-5 sm:py-6">
-        <p className="max-w-3xl text-base leading-7 text-slate-300">{active.intro}</p>
+      <div className="site-quickstart-body">
+        <p className="site-quickstart-lead">{active.intro}</p>
 
-        <div className="mt-5 grid gap-4 xl:grid-cols-2">
-          {active.blocks.map((block) => (
+        <div className="site-quickstart-grid">
+          {active.blocks.map((block, index) => (
             <QuickstartSnippet
               key={block.id}
               block={block}
               copied={copiedKey === `${activeTab}:${block.id}`}
               onCopy={handleCopy}
+              wide={active.blocks.length === 3 && index === active.blocks.length - 1}
             />
           ))}
         </div>
       </div>
 
-      <div className="border-t border-white/10 bg-[#07101d]/85 px-4 py-4 text-sm leading-6 text-slate-400 sm:px-5">
-        {active.footer}
-      </div>
+      <div className="site-quickstart-footer">{active.footer}</div>
     </div>
   )
 }

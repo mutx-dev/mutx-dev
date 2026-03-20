@@ -46,19 +46,20 @@ test.describe('mutx.dev QA', () => {
   test('landing page exposes proof rail and operator flow sections', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByText(/^Real surface$/).first()).toBeVisible();
-    await expect(page.getByText(/^Mounted contract$/).first()).toBeVisible();
-    await expect(page.getByText(/^Verify fast$/).first()).toBeVisible();
+    await expect(page.getByText(/^Deployments$/).first()).toBeVisible();
+    await expect(page.getByText(/^Sessions$/).first()).toBeVisible();
+    await expect(page.getByText(/^Access$/).first()).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /one operator model for deploy, observe, and govern\./i })
+      page.getByRole('heading', { name: /one control plane\. four operator surfaces\./i })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /pick the lane that lands on the real runtime\./i })
+      page.getByRole('heading', { name: /bring mutx up fast\./i })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /operate in one loop, not three disconnected tools\./i })
+      page.getByRole('heading', { name: /see it\. change it\. recover it\./i })
     ).toBeVisible();
     await expect(page.getByRole('tab', { name: /hosted operator/i })).toBeVisible();
+    await expect(page.getByText(/curl -fsSL https:\/\/mutx\.dev\/install\.sh \| bash/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /observe/i })).toBeVisible();
   });
 

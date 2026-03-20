@@ -13,9 +13,9 @@ type ControlLoopTab = {
   label: string
   kicker: string
   title: string
-  body: string
-  points: string[]
-  outcome: string
+  signals: string[]
+  surfaces: string[]
+  outcomes: string[]
   icon: ComponentType<{ className?: string }>
 }
 
@@ -23,43 +23,31 @@ const tabs: ControlLoopTab[] = [
   {
     id: 'observe',
     label: 'Observe',
-    kicker: 'sessions + logs + health',
-    title: 'See the live surface.',
-    body: 'Sessions, deployments, health, and runtime posture read as one operator view.',
-    points: [
-      'Live session and deployment state',
-      'Health stays tied to the runtime',
-      'Same surface language as the browser demo',
-    ],
-    outcome: 'Know what is live, what shifted, and where to intervene.',
+    kicker: 'live state',
+    title: 'Read the runtime.',
+    signals: ['Sessions', 'Deployments', 'Health'],
+    surfaces: ['Browser', 'CLI', 'TUI'],
+    outcomes: ['Find drift', 'Read incidents', 'Recover fast'],
     icon: Radar,
   },
   {
     id: 'orchestrate',
     label: 'Orchestrate',
-    kicker: 'setup + deployment + channels',
-    title: 'Move the runtime forward.',
-    body: 'Deploy the starter assistant, add channels, and keep the operator path legible.',
-    points: [
-      'One-shot starter deployment',
-      'Defaults already wired for real runtime work',
-      'Durable deployment controls',
-    ],
-    outcome: 'Go from install to a live assistant without inventing a second story.',
+    kicker: 'runtime moves',
+    title: 'Move it forward.',
+    signals: ['Setup', 'Deploy', 'Channels'],
+    surfaces: ['Template', 'Assistant', 'Rollout'],
+    outcomes: ['Start clean', 'Ship changes', 'Keep posture'],
     icon: LifeBuoy,
   },
   {
     id: 'automate',
     label: 'Automate',
-    kicker: 'skills + wakeups + follow-on flows',
-    title: 'Extend without breaking the loop.',
-    body: 'Install skills, surface wakeups, and keep fallback paths alive in CLI and TUI.',
-    points: [
-      'Workspace-backed skills',
-      'Wakeups as operator data',
-      'Recoverable fallback paths',
-    ],
-    outcome: 'Grow the control loop while keeping the runtime readable.',
+    kicker: 'follow-on flows',
+    title: 'Extend the loop.',
+    signals: ['Skills', 'Wakeups', 'Fallbacks'],
+    surfaces: ['Workspace', 'Signals', 'Recovery'],
+    outcomes: ['Scale workflows', 'Keep traceability', 'Stay recoverable'],
     icon: Sparkles,
   },
 ]
@@ -91,23 +79,40 @@ export function ControlLoopTabs() {
         </div>
       </div>
 
-      <div className="grid gap-6 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.08fr)_minmax(19rem,0.92fr)]">
+      <div className="grid gap-6 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(19rem,0.95fr)]">
         <div>
           <div className="landing-kicker">{active.kicker}</div>
           <h3 className="mt-4 text-2xl font-semibold tracking-[-0.05em] text-slate-50 sm:text-3xl">
             {active.title}
           </h3>
-          <p className="mt-4 text-base leading-7 text-slate-300">{active.body}</p>
 
-          <div className="mt-6 grid gap-3">
-            {active.points.map((point) => (
-              <div
-                key={point}
-                className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-medium text-slate-200"
-              >
-                {point}
-              </div>
-            ))}
+          <div className="mt-6 rounded-[1.8rem] border border-white/10 bg-black/20 p-4">
+            <p className="font-[family:var(--font-landing-mono)] text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
+              Signals
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {active.signals.map((signal) => (
+                <div
+                  key={signal}
+                  className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] px-4 py-4 text-center text-sm font-medium text-slate-100"
+                >
+                  {signal}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-[1.8rem] border border-white/10 bg-black/20 p-4">
+            <p className="font-[family:var(--font-landing-mono)] text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
+              Surfaces
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {active.surfaces.map((surface) => (
+                <span key={surface} className="landing-chip">
+                  {surface}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -115,27 +120,20 @@ export function ControlLoopTabs() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="font-[family:var(--font-landing-mono)] text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
-                Operational outcome
+                Outcomes
               </p>
               <h4 className="mt-3 text-xl font-semibold tracking-[-0.04em] text-slate-50">
-                What this buys you
+                Stay in control
               </h4>
             </div>
             <Command className="h-5 w-5 text-cyan-300" />
           </div>
 
-          <p className="mt-4 text-sm leading-6 text-slate-300">{active.outcome}</p>
-
           <div className="mt-6 grid gap-3">
-            {[
-              'Honest surface boundaries',
-              'Assistant-first onboarding',
-              'Durable deployment records',
-              'Recoverable operator paths',
-            ].map((item) => (
+            {active.outcomes.map((item) => (
               <div
                 key={item}
-                className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-medium text-slate-200"
+                className="rounded-[1.3rem] border border-white/10 bg-white/[0.03] px-4 py-4 text-sm font-medium text-slate-200"
               >
                 {item}
               </div>
