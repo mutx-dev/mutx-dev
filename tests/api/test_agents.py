@@ -130,6 +130,34 @@ class TestCreateAgent:
         assert data["type"] == "custom"
 
     @pytest.mark.asyncio
+    async def test_create_agent_openclaw_type(self, client: AsyncClient):
+        response = await client.post(
+            "/v1/agents",
+            json={
+                "name": "Personal Assistant",
+                "type": "openclaw",
+                "config": {
+                    "assistant_id": "personal-assistant",
+                    "workspace": "personal-assistant",
+                    "channels": {
+                        "webchat": {
+                            "label": "WebChat",
+                            "enabled": True,
+                            "mode": "pairing",
+                            "allow_from": [],
+                        }
+                    },
+                    "skills": ["web_search"],
+                },
+            },
+        )
+        assert response.status_code == 201
+        data = response.json()
+        assert data["type"] == "openclaw"
+        assert data["config"]["template"] == "personal_assistant"
+        assert data["config"]["assistant_id"] == "personal-assistant"
+
+    @pytest.mark.asyncio
     async def test_create_agent_with_config_as_json_string(self, client: AsyncClient):
         """Test creating an agent with config as JSON string."""
         response = await client.post(

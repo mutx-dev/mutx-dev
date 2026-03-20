@@ -22,6 +22,7 @@ from textual.widgets import (
 from cli.services import (
     AgentRecord,
     AgentsService,
+    AssistantService,
     AuthService,
     CLIServiceError,
     DeploymentEventHistory,
@@ -29,6 +30,7 @@ from cli.services import (
     DeploymentsService,
     LogEntry,
     MetricPoint,
+    TemplatesService,
 )
 
 
@@ -179,6 +181,49 @@ def _render_deployment_detail(deployment: DeploymentRecord) -> str:
         *event_lines,
     ]
     return "\n".join(lines)
+
+
+def _render_setup_body(authenticated: bool, api_url: str, assistant_name: str | None) -> str:
+    if not authenticated:
+        return (
+            f"API URL: {api_url}\n\n"
+            "No stored access token was found.\n"
+            "Run `mutx setup hosted` or `mutx setup local` to authenticate and deploy the Personal Assistant."
+        )
+    if assistant_name:
+        return (
+            f"API URL: {api_url}\n\n"
+            f"Personal Assistant detected: {assistant_name}\n"
+            "Use the Assistant and Control Plane workspaces to inspect channels, sessions, and gateway health."
+        )
+    return (
+        f"API URL: {api_url}\n\n"
+        "Authenticated, but no Personal Assistant is deployed yet.\n"
+        "Use the deploy action in this workspace to create the starter assistant."
+    )
+
+
+def _render_control_plane_body(overview, sessions: list[dict]) -> tuple[str, str]:
+    if overview is None:
+        return (
+            "No Personal Assistant found.",
+            "Gateway health will appear after the starter assistant is deployed.",
+        )
+
+    session_lines = [
+        f"{item.get('agent')} | {item.get('channel')} | {item.get('age')} | {item.get('tokens')}"
+        for item in sessions[:50]
+    ] or ["No sessions found."]
+
+    health_lines = [
+        f"Assistant: {overview.name}",
+        f"Gateway: {overview.gateway.status}",
+        f"Sessions: {overview.session_count}",
+        f"Workspace: {overview.workspace}",
+        "",
+        overview.gateway.doctor_summary,
+    ]
+    return ("\n".join(session_lines), "\n".join(health_lines))
 
 
 class ConfirmActionScreen(ModalScreen[bool]):
@@ -460,12 +505,17 @@ class MutxTUI(App[None]):
         super().__init__()
         self.auth_service = AuthService()
         self.agents_service = AgentsService()
+        self.assistant_service = AssistantService()
         self.deployments_service = DeploymentsService()
+        self.templates_service = TemplatesService()
         self.selected_agent_id: str | None = None
         self.selected_deployment_id: str | None = None
+        self.selected_session_id: str | None = None
         self._deployment_cache: dict[str, DeploymentRecord] = {}
+        self._session_cache: list[dict] = []
         self._agent_count = 0
         self._deployment_count = 0
+        self._assistant_name: str | None = None
         self._activity_label = "idle"
         self._activity_started_at: float | None = None
         self._notice_text: str | None = None
@@ -479,14 +529,22 @@ class MutxTUI(App[None]):
                 yield Static("MUTX operator terminal", id="brand-title")
                 yield Static(MUTX_OPERATOR_COPY, id="brand-copy")
                 yield Static(id="brand-signal")
-                yield Static("auth · records · routes · deployments · health", id="brand-context")
+                yield Static("setup · assistant · deployments · control plane", id="brand-context")
         yield Static(id="status-banner")
         with TabbedContent(id="workspace"):
-            with TabPane("Agents", id="agents-pane"):
+            with TabPane("Setup", id="setup-pane"):
+                with Vertical(classes="panel detail-panel"):
+                    yield Static("Setup workspace", id="setup-summary")
+                    with Horizontal(classes="action-bar"):
+                        yield Button("Refresh", id="setup-refresh", variant="primary")
+                        yield Button("Deploy Personal Assistant", id="setup-deploy")
+                    with VerticalScroll(classes="detail-scroll"):
+                        yield Static(id="setup-body", classes="detail-body")
+            with TabPane("Assistant", id="agents-pane"):
                 with Horizontal(classes="workspace-split"):
                     yield DataTable(id="agents-table", classes="panel entity-table")
                     with Vertical(classes="panel detail-panel"):
-                        yield Static("Agent detail", id="agents-summary")
+                        yield Static("Assistant detail", id="agents-summary")
                         with Horizontal(classes="action-bar"):
                             yield Button("Refresh", id="agents-refresh", variant="primary")
                             yield Button("Deploy", id="agents-deploy")
@@ -522,6 +580,20 @@ class MutxTUI(App[None]):
                                     yield Static(
                                         id="deployment-metrics-body", classes="detail-body"
                                     )
+            with TabPane("Control Plane", id="control-pane"):
+                with Horizontal(classes="workspace-split"):
+                    yield DataTable(id="sessions-table", classes="panel entity-table")
+                    with Vertical(classes="panel detail-panel"):
+                        yield Static("Control plane", id="control-summary")
+                        with Horizontal(classes="action-bar"):
+                            yield Button("Refresh", id="control-refresh", variant="primary")
+                        with TabbedContent(id="control-detail-tabs"):
+                            with TabPane("Sessions"):
+                                with VerticalScroll(classes="detail-scroll"):
+                                    yield Static(id="control-sessions-body", classes="detail-body")
+                            with TabPane("Gateway"):
+                                with VerticalScroll(classes="detail-scroll"):
+                                    yield Static(id="control-health-body", classes="detail-body")
         yield Static(id="context-footer")
         yield Footer()
 
@@ -531,10 +603,14 @@ class MutxTUI(App[None]):
         self._refresh_chrome()
 
         if self.auth_service.status().authenticated:
+            self._set_activity("loading setup")
+            self.load_setup()
             self._set_activity("loading agents")
             self.load_agents()
             self._set_activity("loading deployments")
             self.load_deployments()
+            self._set_activity("loading control plane")
+            self.load_control_plane()
         else:
             self._render_logged_out_state()
 
@@ -548,6 +624,11 @@ class MutxTUI(App[None]):
         deployments_table.cursor_type = "row"
         deployments_table.zebra_stripes = True
         deployments_table.add_columns("Deployment", "Status", "Replicas", "Agent")
+
+        sessions_table = self.query_one("#sessions-table", DataTable)
+        sessions_table.cursor_type = "row"
+        sessions_table.zebra_stripes = True
+        sessions_table.add_columns("Agent", "Channel", "Age", "Tokens")
 
     def _set_activity(self, label: str) -> None:
         self._activity_label = label
@@ -565,7 +646,14 @@ class MutxTUI(App[None]):
         self._refresh_chrome()
 
     def _active_workspace(self) -> str:
-        return self.query_one("#workspace", TabbedContent).active
+        active = self.query_one("#workspace", TabbedContent).active
+        mapping = {
+            "setup-pane": "setup",
+            "agents-pane": "assistant",
+            "deployments-pane": "deployments",
+            "control-pane": "control-plane",
+        }
+        return mapping.get(active, active)
 
     def _status_glyph(self, busy: bool) -> str:
         frames = MUTX_BUSY_FRAMES if busy else MUTX_IDLE_FRAMES
@@ -602,7 +690,7 @@ class MutxTUI(App[None]):
         self.query_one("#status-banner", Static).update(banner)
         self.query_one("#brand-signal", Static).update(self._brand_signal_text(status.authenticated))
         self.query_one("#brand-context", Static).update(
-            f"agents {self._agent_count} · deployments {self._deployment_count} · config {status.config_path}"
+            f"assistant {self._assistant_name or 'not deployed'} · deployments {self._deployment_count} · config {status.config_path}"
         )
         self.query_one("#context-footer", Static).update(
             f"{KEY_HINTS} | workspace {self._active_workspace()} | selected agent {_shorten(self.selected_agent_id, 12)} | selected deployment {_shorten(self.selected_deployment_id, 12)}"
@@ -614,11 +702,15 @@ class MutxTUI(App[None]):
     def _render_logged_out_state(self) -> None:
         self._agent_count = 0
         self._deployment_count = 0
+        self._assistant_name = None
         message = (
-            "No stored CLI auth. Run `mutx login --email you@example.com` and relaunch `mutx tui`."
+            "No stored CLI auth. Run `mutx setup hosted` or `mutx setup local`, then relaunch `mutx tui`."
         )
+        self.query_one("#setup-summary", Static).update("Setup required")
+        self.query_one("#setup-body", Static).update(message)
         self.query_one("#agents-summary", Static).update("Agents unavailable")
         self.query_one("#deployments-summary", Static).update("Deployments unavailable")
+        self.query_one("#control-summary", Static).update("Control plane unavailable")
         self.query_one("#agent-detail-body", Static).update(message)
         self.query_one("#agent-logs-body", Static).update(
             "Agent logs require an authenticated session."
@@ -633,11 +725,28 @@ class MutxTUI(App[None]):
         self.query_one("#deployment-metrics-body", Static).update(
             "Deployment metrics require an authenticated session."
         )
+        self.query_one("#control-sessions-body", Static).update(
+            "Session data requires an authenticated session."
+        )
+        self.query_one("#control-health-body", Static).update(
+            "Gateway health requires an authenticated session."
+        )
         self._clear_activity()
 
     def _handle_service_error(self, error: CLIServiceError) -> None:
         self.notify(str(error), severity="error")
         self._set_notice(str(error), ttl=8.0)
+        self._clear_activity()
+
+    def _render_setup_payload(self, assistant_name: str | None) -> None:
+        status = self.auth_service.status()
+        self._assistant_name = assistant_name
+        self.query_one("#setup-summary", Static).update(
+            "Setup complete" if assistant_name else "Setup pending"
+        )
+        self.query_one("#setup-body", Static).update(
+            _render_setup_body(status.authenticated, status.api_url, assistant_name)
+        )
         self._clear_activity()
 
     def _render_agents(self, agents: list[AgentRecord]) -> None:
@@ -738,6 +847,28 @@ class MutxTUI(App[None]):
         )
         self._clear_activity()
 
+    def _render_control_plane(self, overview, sessions: list[dict]) -> None:
+        table = self.query_one("#sessions-table", DataTable)
+        table.clear(columns=False)
+        self._session_cache = sessions
+
+        for session in sessions[:100]:
+            table.add_row(
+                str(session.get("agent") or ""),
+                str(session.get("channel") or ""),
+                str(session.get("age") or ""),
+                str(session.get("tokens") or ""),
+                key=str(session.get("id") or ""),
+            )
+
+        sessions_body, health_body = _render_control_plane_body(overview, sessions)
+        self.query_one("#control-summary", Static).update(
+            f"Control plane | sessions: {len(sessions)} | gateway: {overview.gateway.status if overview else 'n/a'}"
+        )
+        self.query_one("#control-sessions-body", Static).update(sessions_body)
+        self.query_one("#control-health-body", Static).update(health_body)
+        self._clear_activity()
+
     def _advance_animation(self) -> None:
         self._animation_tick += 1
         self._refresh_chrome()
@@ -763,6 +894,17 @@ class MutxTUI(App[None]):
 
         self.call_from_thread(self._render_agent_payload, agent, logs)
 
+    @work(thread=True, exclusive=True, group="setup")
+    def load_setup(self) -> None:
+        try:
+            overview = self.assistant_service.overview()
+        except CLIServiceError as exc:
+            self.call_from_thread(self._handle_service_error, exc)
+            return
+
+        assistant_name = overview.name if overview else None
+        self.call_from_thread(self._render_setup_payload, assistant_name)
+
     @work(thread=True, exclusive=True, group="deployments-list")
     def load_deployments(self) -> None:
         try:
@@ -785,6 +927,19 @@ class MutxTUI(App[None]):
             return
 
         self.call_from_thread(self._render_deployment_payload, deployment, events, logs, metrics)
+
+    @work(thread=True, exclusive=True, group="control-plane")
+    def load_control_plane(self) -> None:
+        try:
+            overview = self.assistant_service.overview()
+            sessions = self.assistant_service.list_sessions(
+                agent_id=overview.agent_id if overview else None
+            )
+        except CLIServiceError as exc:
+            self.call_from_thread(self._handle_service_error, exc)
+            return
+
+        self.call_from_thread(self._render_control_plane, overview, sessions)
 
     @work(thread=True, exclusive=True, group="agent-action")
     def deploy_selected_agent_worker(self, agent_id: str) -> None:
@@ -842,15 +997,36 @@ class MutxTUI(App[None]):
             False,
         )
 
+    @work(thread=True, exclusive=True, group="setup-action")
+    def deploy_default_assistant_worker(self) -> None:
+        try:
+            result = self.templates_service.deploy_template(
+                "personal_assistant",
+                name="Personal Assistant",
+            )
+        except CLIServiceError as exc:
+            self.call_from_thread(self._handle_service_error, exc)
+            return
+
+        self.call_from_thread(
+            self._after_action,
+            f"Deployed Personal Assistant {_shorten(result['agent']['id'], 12)}",
+            True,
+        )
+
     def _after_action(self, message: str, refresh_agents: bool) -> None:
         self.notify(message, severity="information")
         self._set_notice(message)
         self._clear_activity()
+        self._set_activity("loading setup")
+        self.load_setup()
         if refresh_agents:
             self._set_activity("loading agents")
             self.load_agents()
         self._set_activity("loading deployments")
         self.load_deployments()
+        self._set_activity("loading control plane")
+        self.load_control_plane()
 
     @on(DataTable.RowSelected, "#agents-table")
     def on_agent_row_selected(self, event: DataTable.RowSelected) -> None:
@@ -868,7 +1044,11 @@ class MutxTUI(App[None]):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
-        if button_id == "agents-refresh":
+        if button_id == "setup-refresh":
+            self.load_setup()
+        elif button_id == "setup-deploy":
+            self.action_deploy_selected_agent()
+        elif button_id == "agents-refresh":
             self.load_agents()
         elif button_id == "agents-deploy":
             self.action_deploy_selected_agent()
@@ -880,17 +1060,30 @@ class MutxTUI(App[None]):
             self.action_scale_selected_deployment()
         elif button_id == "deployments-delete":
             self.action_delete_selected_deployment()
+        elif button_id == "control-refresh":
+            self.load_control_plane()
 
     def action_refresh_current(self) -> None:
         active = self.query_one("#workspace", TabbedContent).active
-        if active == "agents-pane":
+        if active == "setup-pane":
+            self._set_activity("loading setup")
+            self.load_setup()
+        elif active == "agents-pane":
             self._set_activity("loading agents")
             self.load_agents()
+        elif active == "control-pane":
+            self._set_activity("loading control plane")
+            self.load_control_plane()
         else:
             self._set_activity("loading deployments")
             self.load_deployments()
 
     def action_deploy_selected_agent(self) -> None:
+        active = self.query_one("#workspace", TabbedContent).active
+        if active == "setup-pane":
+            self._set_activity("deploying personal assistant")
+            self.deploy_default_assistant_worker()
+            return
         if not self.selected_agent_id:
             self.notify("Select an agent first.", severity="warning")
             return

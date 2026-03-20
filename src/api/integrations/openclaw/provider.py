@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Any
 from datetime import datetime, timezone
 
-from src.api.models import Agent, AgentStatus, AgentLog
+from src.api.models import Agent, AgentLog, AgentStatus, AgentType
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
@@ -64,7 +64,9 @@ async def handle_openclaw_lifecycle(session: AsyncSession, agent: Agent):
     """
     Hook for the background monitor to handle OpenClaw-specific lifecycle events.
     """
-    if agent.type == "custom" and "openclaw" in (agent.description or "").lower():
+    if agent.type == AgentType.OPENCLAW or (
+        agent.type == "custom" and "openclaw" in (agent.description or "").lower()
+    ):
         provider = OpenClawProvider(agent)
         if agent.status == AgentStatus.CREATING.value:
             await provider.deploy(session)

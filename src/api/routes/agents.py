@@ -38,6 +38,7 @@ from src.api.models.schemas import (
     AnthropicAgentConfig,
     CustomAgentConfig,
     LangChainAgentConfig,
+    OpenClawAgentConfig,
     OpenAIAgentConfig,
 )
 
@@ -50,6 +51,7 @@ AGENT_CONFIG_MODEL_MAP: dict[AgentType, type[AgentConfigBase]] = {
     AgentType.ANTHROPIC: AnthropicAgentConfig,
     AgentType.LANGCHAIN: LangChainAgentConfig,
     AgentType.CUSTOM: CustomAgentConfig,
+    AgentType.OPENCLAW: OpenClawAgentConfig,
 }
 
 

@@ -42,6 +42,7 @@ def test_app_factory_mounts_expected_public_routes():
     assert mounted_prefixes == {
         "/metrics",
         "/v1/agents",
+        "/v1/assistant",
         "/v1/api-keys",
         "/v1/auth",
         "/v1/budgets",
@@ -53,14 +54,15 @@ def test_app_factory_mounts_expected_public_routes():
         "/v1/monitoring",
         "/v1/rag",
         "/v1/runs",
+        "/v1/sessions",
         "/v1/swarms",
+        "/v1/templates",
         "/v1/usage",
         "/v1/webhooks",
         "/v1/analytics",
     }
     assert "/v1/newsletter" not in mounted_prefixes
     assert "/v1/scheduler" not in mounted_prefixes
-    assert "/v1/sessions" not in mounted_prefixes
 
 
 @pytest.mark.asyncio

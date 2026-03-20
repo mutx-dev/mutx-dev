@@ -13,22 +13,26 @@ type Step =
   | { type: 'clear' }
 
 const steps: Step[] = [
-  { type: 'command', content: 'mutx login' },
-  { type: 'output', content: 'session ready', tone: 'success' },
+  { type: 'command', content: 'mutx setup hosted' },
+  { type: 'output', content: 'operator authenticated', tone: 'success' },
+  { type: 'output', content: 'Personal Assistant deployed', tone: 'success' },
   { type: 'wait', delay: 350 },
   { type: 'divider' },
-  { type: 'command', content: 'mutx deployments list' },
-  { type: 'output', content: 'api-gateway        healthy', tone: 'success' },
-  { type: 'output', content: 'webhook-router     healthy', tone: 'success' },
-  { type: 'output', content: 'agent-runtime      degraded', tone: 'accent' },
+  { type: 'command', content: 'mutx assistant overview' },
+  { type: 'output', content: 'gateway            healthy', tone: 'success' },
+  { type: 'output', content: 'onboarding         completed', tone: 'success' },
+  { type: 'output', content: 'sessions           2 active', tone: 'accent' },
   { type: 'wait', delay: 500 },
   { type: 'divider' },
-  { type: 'command', content: 'mutx deployments restart agent-runtime' },
+  { type: 'command', content: 'mutx assistant skills install --agent-id pa_01 --skill-id browser_control' },
+  { type: 'output', content: 'skill installed', tone: 'muted' },
+  { type: 'wait', delay: 300 },
+  { type: 'command', content: 'mutx deployment restart dep_pa_01' },
   { type: 'output', content: 'restart queued', tone: 'muted' },
   { type: 'wait', delay: 400 },
-  { type: 'command', content: 'mutx health' },
-  { type: 'output', content: 'status: healthy', tone: 'success' },
-  { type: 'output', content: 'ready: true', tone: 'success' },
+  { type: 'command', content: 'mutx doctor' },
+  { type: 'output', content: 'api_health: healthy', tone: 'success' },
+  { type: 'output', content: 'assistant: Personal Assistant', tone: 'success' },
   { type: 'wait', delay: 1200 },
   { type: 'clear' },
 ]
@@ -124,10 +128,12 @@ export function AnimatedTerminal() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.12),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.06),transparent_30%)]" />
       <div className="relative flex h-full flex-col overflow-hidden">
         <div className="mb-3 flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.24em] text-white/45 sm:mb-4 sm:text-[11px]">
-          <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1">auth</span>
+          <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1">setup</span>
+          <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1">assistant</span>
+          <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1">skills</span>
           <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1">deployments</span>
           <span className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1">health</span>
-          <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-cyan-200/90">recovery</span>
+          <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-cyan-200/90">control plane</span>
         </div>
 
         <div className="flex-1 overflow-hidden rounded-2xl border border-white/10 bg-black/65 p-3 sm:p-4 lg:p-5">

@@ -1,7 +1,7 @@
 import click
 from typing import Optional
 
-from cli.config import CLIConfig, get_client
+from cli.config import current_config, get_client
 from cli.services import AgentsService, CLIServiceError
 
 
@@ -16,7 +16,7 @@ def _echo_service_error(error: CLIServiceError) -> None:
 
 
 def _agents_service() -> AgentsService:
-    return AgentsService(config=CLIConfig(), client_factory=get_client)
+    return AgentsService(config=current_config(), client_factory=get_client)
 
 
 @agents_group.command(name="list")

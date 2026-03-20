@@ -22,6 +22,7 @@ os.environ.setdefault("DATABASE_REQUIRED_ON_STARTUP", "false")
 os.environ.setdefault("BACKGROUND_MONITOR_ENABLED", "false")
 os.environ.setdefault("ENABLE_RAG_API", "true")
 os.environ.setdefault("JWT_SECRET", "test-secret-key-that-is-long-enough-32")
+os.environ["OPENCLAW_HOME"] = "/tmp/mutx-test-openclaw-home"
 
 # Use an isolated SQLite database for tests by default.
 # Do not inherit DATABASE_URL from the shell, or tests can accidentally hit a

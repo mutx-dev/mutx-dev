@@ -3,7 +3,12 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from src.api.models.schemas import AgentConfigUpdateRequest, AnthropicAgentConfig, OpenAIAgentConfig
+from src.api.models.schemas import (
+    AgentConfigUpdateRequest,
+    AnthropicAgentConfig,
+    OpenAIAgentConfig,
+    OpenClawAgentConfig,
+)
 
 
 def test_openai_agent_config_validates_typed_fields() -> None:
@@ -46,3 +51,25 @@ def test_agent_config_update_request_accepts_dict_or_json_string() -> None:
 
     assert from_dict.config["model"] == "gpt-4o"
     assert isinstance(from_json.config, str)
+
+
+def test_openclaw_agent_config_validates_default_template_fields() -> None:
+    config = OpenClawAgentConfig(
+        name="Personal Assistant",
+        assistant_id="personal-assistant",
+        workspace="personal-assistant",
+        channels={
+            "telegram": {
+                "label": "Telegram",
+                "enabled": False,
+                "mode": "pairing",
+                "allow_from": [],
+            }
+        },
+        skills=["web_search"],
+    )
+
+    assert config.template == "personal_assistant"
+    assert config.runtime == "personal_assistant"
+    assert config.channels["telegram"].label == "Telegram"
+    assert config.skills == ["web_search"]

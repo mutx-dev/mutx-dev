@@ -4,11 +4,14 @@ import {
   Bot,
   BrainCircuit,
   BarChart3,
+  Cable,
   History,
   KeyRound,
   Layers,
   MessageCircle,
   MessagesSquare,
+  Radio,
+  Rocket,
   ShieldCheck,
   Sparkles,
   Wallet,
@@ -21,7 +24,7 @@ export interface DashboardNavItem {
   description: string;
   href: string;
   icon: LucideIcon;
-  group: "core" | "observe" | "automate";
+  group: "orchestrate" | "observe" | "automate";
 }
 
 export interface DashboardNavGroup {
@@ -33,52 +36,52 @@ export interface DashboardNavGroup {
 export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
   {
     title: "Overview",
-    description: "Control-plane posture",
+    description: "Assistant control-plane posture",
     href: "/dashboard",
     icon: ShieldCheck,
-    group: "core",
+    group: "orchestrate",
   },
   {
     title: "Agents",
-    description: "Manage active fleet",
+    description: "Manage assistant-backed agents",
     href: "/dashboard/agents",
     icon: Bot,
-    group: "core",
+    group: "orchestrate",
   },
   {
     title: "Deployments",
-    description: "Deployment inventory and topology",
+    description: "Assistant deployment inventory and topology",
     href: "/dashboard/deployments",
     icon: Layers,
-    group: "core",
+    group: "orchestrate",
   },
   {
-    title: "Runs",
-    description: "Execution history and outcomes",
-    href: "/dashboard/runs",
-    icon: History,
-    group: "core",
-  },
-  {
-    title: "Traces",
-    description: "Trace and runtime detail",
-    href: "/dashboard/traces",
-    icon: MessagesSquare,
-    group: "core",
-  },
-  {
-    title: "Control",
-    description: "Policies and control settings",
+    title: "Setup",
+    description: "Starter deployment and operator setup lane",
     href: "/dashboard/control",
-    icon: MessageCircle,
-    group: "core",
+    icon: Sparkles,
+    group: "orchestrate",
   },
   {
-    title: "Provisioning",
-    description: "Create and prepare new operator workflows",
-    href: "/dashboard/spawn",
-    icon: Sparkles,
-    group: "core",
+    title: "Sessions",
+    description: "Active assistant session state",
+    href: "/dashboard/sessions",
+    icon: Radio,
+    group: "orchestrate",
+  },
+  {
+    title: "Skills",
+    description: "Assistant workspace and installed skills",
+    href: "/dashboard/skills",
+    icon: Rocket,
+    group: "orchestrate",
+  },
+  {
+    title: "Channels",
+    description: "Assistant channel bindings and policy",
+    href: "/dashboard/channels",
+    icon: Cable,
+    group: "orchestrate",
   },
   {
     title: "Memory",
@@ -89,16 +92,30 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
   },
   {
     title: "History",
-    description: "Recent operator activity",
+    description: "Recent assistant and operator activity",
     href: "/dashboard/history",
     icon: Activity,
     group: "observe",
   },
   {
     title: "Logs",
-    description: "Runtime log stream",
+    description: "Assistant runtime log stream",
     href: "/dashboard/logs",
     icon: MessageCircle,
+    group: "observe",
+  },
+  {
+    title: "Runs",
+    description: "Execution history and outcomes",
+    href: "/dashboard/runs",
+    icon: History,
+    group: "observe",
+  },
+  {
+    title: "Traces",
+    description: "Trace and runtime detail",
+    href: "/dashboard/traces",
+    icon: MessagesSquare,
     group: "observe",
   },
   {
@@ -124,7 +141,7 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
   },
   {
     title: "Orchestration",
-    description: "Automation lanes",
+    description: "Automation lanes after starter deployment",
     href: "/dashboard/orchestration",
     icon: Sparkles,
     group: "automate",
@@ -137,8 +154,8 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     group: "automate",
   },
   {
-    title: "Monitoring",
-    description: "Health and readiness posture",
+    title: "Health",
+    description: "Gateway and readiness posture",
     href: "/dashboard/monitoring",
     icon: BellRing,
     group: "automate",
@@ -147,8 +164,9 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
 
 export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
   {
-    key: "core",
-    items: DASHBOARD_NAV_ITEMS.filter((item) => item.group === "core"),
+    key: "orchestrate",
+    title: "Orchestrate",
+    items: DASHBOARD_NAV_ITEMS.filter((item) => item.group === "orchestrate"),
   },
   {
     key: "observe",

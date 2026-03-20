@@ -1,11 +1,17 @@
 import click
 
 from cli.config import CLIConfig, get_client
+from cli.commands.agent import agent_group
+from cli.commands.assistant import assistant_group
+from cli.commands.auth import auth_group
 from cli.commands.agents import agents_group
 from cli.commands.api_keys import api_keys_group
 from cli.commands.clawhub import clawhub_group
 from cli.commands.config import config_group
+from cli.commands.deployment import deployment_group
 from cli.commands.deploy import deploy_group
+from cli.commands.doctor import doctor_command
+from cli.commands.setup import setup_group
 from cli.commands.tui import tui_command
 from cli.commands.webhooks import webhooks_group
 from cli.services import AuthService, CLIServiceError
@@ -19,7 +25,7 @@ def cli(ctx, api_url):
     ctx.ensure_object(dict)
     config = CLIConfig()
     if api_url:
-        config.api_url = api_url
+        config.set_runtime_api_url(api_url)
     ctx.obj["config"] = config
 
 
@@ -28,7 +34,7 @@ def _echo_service_error(error: CLIServiceError) -> None:
 
 
 def _auth_service() -> AuthService:
-    return AuthService(config=CLIConfig(), client_factory=get_client)
+    return AuthService(config=click.get_current_context().obj["config"], client_factory=get_client)
 
 
 @cli.command(name="login")
@@ -83,10 +89,16 @@ def status():
 
 
 cli.add_command(agents_group)
+cli.add_command(agent_group)
+cli.add_command(assistant_group)
+cli.add_command(auth_group)
 cli.add_command(api_keys_group)
 cli.add_command(clawhub_group)
 cli.add_command(deploy_group)
+cli.add_command(deployment_group)
+cli.add_command(doctor_command)
 cli.add_command(config_group)
+cli.add_command(setup_group)
 cli.add_command(webhooks_group)
 cli.add_command(tui_command)
 

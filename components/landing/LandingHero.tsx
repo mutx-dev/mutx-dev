@@ -10,21 +10,22 @@ type LandingHeroProps = {
 
 const proofPoints = [
   'Open source',
-  'FastAPI control plane',
-  'CLI + TUI ship today',
-  'Current API truth: /v1/*',
+  'install.sh for macOS',
+  'CLI + TUI live today',
+  '/v1/* route contract',
 ]
 
 const capabilityRows = [
-  { label: 'Control plane', value: 'Auth, agents, deployments, webhooks, health' },
-  { label: 'Operator tooling', value: 'mutx CLI and mutx tui share the same auth state' },
-  { label: 'Docs', value: 'Canonical docs and API reference live today' },
+  { label: 'Install', value: 'curl -fsSL https://mutx.dev/install.sh | bash' },
+  { label: 'Starter path', value: '/v1/auth, /v1/templates, /v1/assistant, /v1/sessions' },
+  { label: 'Operator tools', value: 'mutx setup, mutx doctor, mutx assistant, mutx tui, and docs.mutx.dev share the same flow' },
 ]
 
 const commandPreview = [
-  'mutx status',
-  'mutx login --email test@local.dev --password TestPass123!',
-  'mutx tui',
+  'make dev-up',
+  'mutx setup local',
+  'mutx doctor',
+  'mutx assistant overview',
 ]
 
 export function LandingHero({
@@ -50,14 +51,14 @@ export function LandingHero({
 
           <div className="mt-7 max-w-3xl">
             <h1 className="text-[3rem] font-semibold leading-[0.92] tracking-[-0.07em] text-white sm:text-[4.2rem] xl:text-[5.2rem]">
-              <span className="block">Run AI agents like</span>
-              <span className="block text-cyan-200">durable systems.</span>
-              <span className="mt-2 block text-white/76">Not disposable demos.</span>
+              <span className="block">Agents need</span>
+              <span className="block text-cyan-200">a control plane.</span>
+              <span className="mt-2 block text-white/76">MUTX gives you one.</span>
             </h1>
           </div>
 
           <p className="mt-6 max-w-2xl text-lg leading-8 text-white/72 sm:text-[1.1rem] sm:leading-9">
-            MUTX is the open-source control plane for teams shipping agents into real environments. FastAPI control plane, Python CLI, first-party TUI, docs, SDK, and the web app shell in one system.
+            Run the FastAPI control plane locally or point at a hosted one, authenticate through the CLI, deploy the Personal Assistant first, and work against the same versioned API the docs describe.
           </p>
 
           <div className="mt-7 flex flex-wrap gap-3">
@@ -99,10 +100,10 @@ export function LandingHero({
             <div className="absolute bottom-4 left-4 right-4 rounded-[1.4rem] border border-white/12 bg-[#07121ccc]/90 p-4 backdrop-blur-xl sm:bottom-5 sm:left-5 sm:right-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.22em] text-white/46">What ships today</div>
-                  <div className="mt-1 text-sm font-semibold text-white">Real operator surfaces in repo, not just product fiction.</div>
+                  <div className="text-[10px] uppercase tracking-[0.22em] text-white/46">Product today</div>
+                  <div className="mt-1 text-sm font-semibold text-white">Local stack, versioned API, CLI, TUI, and docs.</div>
                 </div>
-                <span className="site-status-soon">dashboard catching up</span>
+                <span className="site-status-soon">dashboard later</span>
               </div>
 
               <div className="mt-4 space-y-2">
@@ -118,7 +119,7 @@ export function LandingHero({
 
           <div className="grid gap-4 border-t border-white/8 bg-[#06111bcc] p-4 md:grid-cols-[minmax(0,1.08fr)_minmax(16rem,0.92fr)]">
             <div>
-              <div className="text-[10px] uppercase tracking-[0.22em] text-white/46">Operator commands</div>
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/46">Try first</div>
               <div className="mt-3 space-y-2 font-[family:var(--font-mono)] text-xs text-cyan-100">
                 {commandPreview.map((line) => (
                   <div key={line} className="rounded-[1rem] border border-white/10 bg-black/25 px-3 py-2.5">
@@ -130,9 +131,9 @@ export function LandingHero({
             </div>
 
             <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.03] p-4">
-              <div className="text-[10px] uppercase tracking-[0.22em] text-white/46">Why this matters</div>
+              <div className="text-[10px] uppercase tracking-[0.22em] text-white/46">Use this page for</div>
               <p className="mt-3 text-sm leading-6 text-white/68">
-                The serious path today is local stack + CLI + TUI + docs. The hosted dashboard will arrive, but it should not be the only way to understand the product.
+                install, assistant-first onboarding, API truth, and the first control-plane pass. The default success state is a deployed Personal Assistant, not a blank fleet shell.
               </p>
             </div>
           </div>

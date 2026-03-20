@@ -7,20 +7,20 @@ import { AppDashboardClient } from "@/components/app/AppDashboardClient";
 
 const pillars = [
   {
-    title: "Lifecycle first",
-    description: "Agents get deployments, version history, and recovery paths instead of disappearing into session-only UI.",
+    title: "Assistant first",
+    description: "The first thing an operator deploys is Personal Assistant, with lifecycle and recovery state attached from day one.",
     href: "/dashboard/deployments",
     icon: Rocket,
   },
   {
-    title: "Governance built in",
-    description: "Ownership boundaries, key rotation, and webhook contracts belong in the product surface, not in side notes.",
+    title: "Control plane truth",
+    description: "Sessions, skills, channels, health, and deployments belong in the same product surface, not in side notes.",
     href: "/dashboard/api-keys",
     icon: KeyRound,
   },
   {
     title: "Operator execution",
-    description: "The dashboard is one control surface across agents, runs, traces, health, and intervention loops.",
+    description: "The dashboard is one control surface across setup, assistants, deployments, health, and intervention loops.",
     href: "/dashboard/agents",
     icon: Bot,
   },
@@ -38,12 +38,12 @@ export default function DashboardPage() {
             </div>
 
             <h1 className="mt-5 max-w-4xl text-3xl font-semibold tracking-tight text-slate-50 sm:text-5xl">
-              Deploy agents like services. Operate them like systems.
+              Deploy the first assistant like a service. Operate it like a system.
             </h1>
 
             <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300 sm:text-lg">
-              MUTX is the production control plane for AI agents: lifecycle, governance, and operator workflows in one surface.
-              Dashboards observe what happened. MUTX owns what is deployed, who controls it, and how it recovers.
+              MUTX is the production control plane for AI assistants: starter deployment, lifecycle, governance, and operator workflows in one surface.
+              The browser shell should not invent a separate story from the CLI and TUI, so the default path starts with a real assistant instead of an empty dashboard.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -67,13 +67,13 @@ export default function DashboardPage() {
             <div className="rounded-2xl border border-[#1e2c45] bg-[#091224] p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Category truth</p>
               <p className="mt-3 text-sm leading-6 text-slate-200">
-                Not another session dashboard. MUTX centers agents, deployments, runs, traces, keys, and webhooks as first-class resources.
+                Not another chat skin. MUTX centers assistants, deployments, sessions, skills, keys, and health as first-class resources.
               </p>
             </div>
             <div className="rounded-2xl border border-[#1e2c45] bg-[#091224] p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Operator proof</p>
               <p className="mt-3 text-sm leading-6 text-slate-200">
-                Agents get deployments, not just sessions. Operational trust is the product.
+                Assistants get deployments, not just sessions. Operational trust is the product.
               </p>
             </div>
           </div>

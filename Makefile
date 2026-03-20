@@ -3,7 +3,9 @@
 #
 # Usage:
 #   make help         Show this help
-#   make dev          Start local dev stack (Docker Compose)
+#   make dev          Start local dev stack and follow logs
+#   make dev-up       Start local dev stack in detached mode
+#   make dev-logs     Follow local dev logs
 #   make dev-stop     Stop dev stack
 #   make test-api     Run API health tests
 #   make test-api-auth Run API tests with auth bootstrap
@@ -17,7 +19,9 @@ help:
 	@echo "MUTX Local Development"
 	@echo "======================="
 	@echo ""
-	@echo "  make dev         Start local dev stack (Docker Compose)"
+	@echo "  make dev         Start local dev stack and follow logs"
+	@echo "  make dev-up      Start local dev stack in detached mode"
+	@echo "  make dev-logs    Follow local dev logs"
 	@echo "  make dev-stop    Stop dev stack"
 	@echo "  make test-api   Run API health/ready tests"
 	@echo "  make test-api-auth Run API checks with auth bootstrap"
@@ -36,12 +40,22 @@ help:
 # Start local dev stack
 .PHONY: dev
 dev:
-	@./scripts/dev.sh
+	@./scripts/dev.sh start
+
+# Start local dev stack in detached mode
+.PHONY: dev-up
+dev-up:
+	@./scripts/dev.sh up
+
+# Follow local dev logs
+.PHONY: dev-logs
+dev-logs:
+	@./scripts/dev.sh logs
 
 # Stop dev stack
 .PHONY: dev-stop
 dev-stop:
-	@cd infrastructure/docker && docker compose down || true
+	@./scripts/dev.sh stop
 
 # Run API tests
 .PHONY: test-api

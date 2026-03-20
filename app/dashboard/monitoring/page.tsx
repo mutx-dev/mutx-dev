@@ -13,11 +13,11 @@ export default function DashboardMonitoringPage() {
   return (
     <div className="space-y-6">
       <RouteHeader
-        title="Monitoring"
-        description="Truthful health, telemetry, and alerting integrations for the MUTX control plane."
+        title="Health"
+        description="Truthful gateway, readiness, and assistant health integrations for the MUTX control plane."
         icon={Activity}
         iconTone="text-sky-400 bg-sky-400/10"
-        badge="observability surface"
+        badge="health surface"
         stats={[
           { label: "Status", value: "Shell ready" },
           { label: "Policy", value: "No fake data", tone: "success" },

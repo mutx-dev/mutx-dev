@@ -146,81 +146,43 @@ confirm_tty() {
   done
 }
 
-current_api_url() {
-  mutx config get api_url 2>/dev/null | tr -d '\r'
-}
+run_setup_handoff() {
+  local -a hosted_cmd=(mutx setup hosted)
+  local -a local_cmd=(mutx setup local)
 
-is_logged_in() {
-  mutx status 2>/dev/null | grep -q "Status: Logged in"
-}
-
-run_login_wizard() {
-  local email=""
-
-  if [[ "${HAS_TTY}" != "1" ]]; then
-    return
+  if [[ "${OPEN_TUI}" != "0" ]]; then
+    hosted_cmd+=(--open-tui)
+    local_cmd+=(--open-tui)
   fi
-
-  tty_prompt "Email address:"
-  read_tty_line email
-
-  if [[ -z "${email}" ]]; then
-    tty_note "Skipping login because no email was entered."
-    return
-  fi
-
-  tty_note "Password prompt is handled by mutx itself."
-  mutx login --email "${email}" < /dev/tty > /dev/tty 2>&1
-}
-
-run_setup_wizard() {
-  local api_url=""
 
   if [[ "${HAS_TTY}" != "1" ]]; then
     say "Install complete"
-    note "Run 'mutx status' to inspect local state."
-    note "Run 'mutx tui' when you want to open the operator shell."
+    note "Next steps:"
+    note "  mutx setup hosted"
+    note "  mutx setup local"
+    note "  mutx doctor"
+    note "  mutx tui"
     return
   fi
 
-  tty_say "Guided setup"
-  tty_note "Current API URL: $(current_api_url)"
+  tty_say "CLI onboarding handoff"
+  tty_note "The installer now stops at package installation and lets the CLI own setup."
 
-  if confirm_tty "Use a different API URL?" "n"; then
-    tty_prompt "API URL:"
-    read_tty_line api_url
-
-    if [[ -n "${api_url}" ]]; then
-      mutx config set api_url "${api_url}" > /dev/tty 2>&1
-      tty_note "Saved API URL to ~/.mutx/config.json"
-    else
-      tty_note "Keeping the existing API URL."
-    fi
+  if confirm_tty "Start hosted setup now?" "y"; then
+    tty_say "Launching: ${hosted_cmd[*]}"
+    exec "${hosted_cmd[@]}" < /dev/tty > /dev/tty 2>&1
   fi
 
-  if is_logged_in; then
-    tty_note "You already have a local MUTX session."
-  elif confirm_tty "Log in now?" "y"; then
-    run_login_wizard
-  else
-    tty_note "Skipping login. The TUI can still open in local-only mode."
+  if confirm_tty "Start local setup now?" "n"; then
+    tty_say "Launching: ${local_cmd[*]}"
+    exec "${local_cmd[@]}" < /dev/tty > /dev/tty 2>&1
   fi
 
-  if [[ "${OPEN_TUI}" == "0" ]]; then
-    tty_note "Skipping TUI launch because MUTX_OPEN_TUI=0"
-    return
-  fi
-
-  if confirm_tty "Open mutx tui now?" "y"; then
-    tty_say "Launching mutx tui"
-    exec mutx tui < /dev/tty > /dev/tty 2>&1
-  fi
-
-  tty_say "Setup complete"
-  tty_note "Next steps:"
-  tty_note "  mutx status"
-  tty_note "  mutx whoami"
-  tty_note "  mutx tui"
+  tty_say "Install complete"
+  tty_note "Run one of:"
+  tty_note "  mutx setup hosted"
+  tty_note "  mutx setup local"
+  tty_note "  mutx doctor"
 }
 
 banner
@@ -260,6 +222,5 @@ fi
 say "Using $(command -v mutx)"
 say "Running CLI smoke check"
 mutx --help >/dev/null
-mutx status
 
-run_setup_wizard
+run_setup_handoff

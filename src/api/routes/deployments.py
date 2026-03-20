@@ -1,4 +1,3 @@
-import json
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
@@ -19,7 +18,6 @@ from src.api.models import (
     AgentLog,
     AgentMetric,
     DeploymentEvent as DeploymentEventModel,
-    DeploymentVersion,
 )
 from src.api.models.schemas import (
     DeploymentResponse,
@@ -32,6 +30,7 @@ from src.api.models.schemas import (
     DeploymentRollbackRequest,
 )
 from src.api.middleware.auth import get_current_user
+from src.api.services.deployment_lifecycle import create_deployment_record
 from src.api.services.usage import track_usage_best_effort
 
 router = APIRouter(prefix="/deployments", tags=["deployments"])
@@ -62,21 +61,6 @@ def _serialize_deployment(deployment: Deployment):
             for event in getattr(deployment, "events", [])
         ],
     }
-
-
-def _create_deployment_version(deployment: Deployment, db: AsyncSession) -> DeploymentVersion:
-    config_snapshot = {
-        "replicas": deployment.replicas,
-        "version": deployment.version,
-    }
-    version = DeploymentVersion(
-        deployment_id=deployment.id,
-        version=1,
-        config_snapshot=json.dumps(config_snapshot),
-        status="current",
-    )
-    db.add(version)
-    return version
 
 
 @router.get("", response_model=list[DeploymentResponse])
@@ -279,30 +263,11 @@ async def create_deployment(
     if agent.status == AgentStatus.DELETING.value:
         raise HTTPException(status_code=400, detail="Cannot deploy an agent that is being deleted")
 
-    # Create the deployment
-    deployment = Deployment(
-        agent_id=deployment_data.agent_id,
-        status="pending",
-        version="v1.0.0",
+    deployment = await create_deployment_record(
+        agent=agent,
+        db=db,
         replicas=deployment_data.replicas,
-        started_at=datetime.now(timezone.utc),
     )
-    db.add(deployment)
-    await db.flush()  # Get deployment.id
-
-    # Create initial version
-    _create_deployment_version(deployment, db)
-
-    # Record create event
-    create_event = DeploymentEventModel(
-        deployment_id=deployment.id,
-        event_type="create",
-        status="pending",
-    )
-    db.add(create_event)
-
-    # Update agent status
-    agent.status = AgentStatus.RUNNING.value
 
     await db.commit()
     # Re-fetch to ensure events are loaded and attributes are fresh

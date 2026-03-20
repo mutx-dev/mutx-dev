@@ -41,8 +41,52 @@ class CustomAgentConfig(AgentConfigBase):
     env: dict[str, str] = Field(default_factory=dict)
 
 
+class OpenClawChannelConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    label: str = Field(..., min_length=1, max_length=120)
+    enabled: bool = False
+    mode: str = Field(default="pairing", min_length=1, max_length=64)
+    allow_from: list[str] = Field(default_factory=list)
+
+
+class OpenClawWakeupConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = False
+    schedule: Optional[str] = Field(default=None, max_length=255)
+    timezone: Optional[str] = Field(default=None, max_length=120)
+    label: Optional[str] = Field(default=None, max_length=120)
+
+
+class OpenClawGatewayConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    port: int = Field(default=18789, ge=1, le=65535)
+    auth_mode: str = Field(default="token", min_length=1, max_length=64)
+    dashboard_allowed_origins: list[str] = Field(default_factory=list)
+
+
+class OpenClawAgentConfig(AgentConfigBase):
+    runtime: str = Field(default="personal_assistant", min_length=1, max_length=120)
+    template: str = Field(default="personal_assistant", min_length=1, max_length=120)
+    assistant_id: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    workspace: str = Field(default="default", min_length=1, max_length=255)
+    model: str = Field(default="openai/gpt-5", min_length=1, max_length=255)
+    safety_mode: str = Field(default="pairing", min_length=1, max_length=64)
+    channels: dict[str, OpenClawChannelConfig] = Field(default_factory=dict)
+    skills: list[str] = Field(default_factory=list)
+    wakeups: list[OpenClawWakeupConfig] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    gateway: OpenClawGatewayConfig = Field(default_factory=OpenClawGatewayConfig)
+
+
 AgentConfigSchema = (
-    OpenAIAgentConfig | AnthropicAgentConfig | LangChainAgentConfig | CustomAgentConfig
+    OpenAIAgentConfig
+    | AnthropicAgentConfig
+    | LangChainAgentConfig
+    | CustomAgentConfig
+    | OpenClawAgentConfig
 )
 
 
@@ -378,6 +422,115 @@ class HealthResponse(BaseModel):
     uptime_seconds: Optional[float] = None
     components: dict[str, dict[str, Any]] = Field(default_factory=dict)
     schema_repairs_applied: list[str] = Field(default_factory=list)
+
+
+class AssistantTemplateResponse(BaseModel):
+    id: str
+    name: str
+    summary: str
+    description: str
+    agent_type: AgentType
+    starter_prompt: str
+    default_config: OpenClawAgentConfig | dict[str, Any]
+
+
+class StarterDeploymentCreate(BaseModel):
+    name: str = Field(default="Personal Assistant", min_length=1, max_length=255)
+    description: Optional[str] = Field(default=None, max_length=1000)
+    replicas: int = Field(default=1, ge=1, le=10)
+    model: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    workspace: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    skills: list[str] = Field(default_factory=list)
+    channels: dict[str, OpenClawChannelConfig] = Field(default_factory=dict)
+
+
+class StarterDeploymentResponse(BaseModel):
+    template_id: str
+    agent: AgentResponse
+    deployment: DeploymentResponse
+
+
+class AssistantSkillResponse(BaseModel):
+    id: str
+    name: str
+    description: str
+    author: str
+    category: str
+    source: str
+    is_official: bool = False
+    installed: bool = False
+    tags: list[str] = Field(default_factory=list)
+    path: Optional[str] = None
+
+
+class AssistantChannelResponse(BaseModel):
+    id: str
+    label: str
+    enabled: bool
+    mode: str
+    allow_from: list[str] = Field(default_factory=list)
+
+
+class AssistantWakeupResponse(BaseModel):
+    enabled: bool
+    schedule: Optional[str] = None
+    timezone: Optional[str] = None
+    label: Optional[str] = None
+
+
+class AssistantHealthResponse(BaseModel):
+    status: str
+    cli_available: bool
+    gateway_configured: bool
+    gateway_reachable: bool
+    gateway_port: Optional[int] = None
+    gateway_url: Optional[str] = None
+    credential_detected: bool = False
+    config_path: Optional[str] = None
+    state_dir: Optional[str] = None
+    doctor_summary: str
+
+
+class AssistantSessionResponse(BaseModel):
+    id: str
+    key: str
+    agent: str
+    kind: str
+    age: str
+    model: str
+    tokens: str
+    channel: str
+    flags: list[str] = Field(default_factory=list)
+    active: bool
+    start_time: int
+    last_activity: int
+    source: str
+
+
+class AssistantOverviewResponse(BaseModel):
+    agent_id: uuid.UUID
+    name: str
+    description: Optional[str] = None
+    runtime: str
+    template_id: str
+    status: str
+    onboarding_status: str
+    assistant_id: str
+    workspace: str
+    last_activity: Optional[datetime] = None
+    session_count: int = 0
+    installed_skills: list[AssistantSkillResponse] = Field(default_factory=list)
+    channels: list[AssistantChannelResponse] = Field(default_factory=list)
+    wakeups: list[AssistantWakeupResponse] = Field(default_factory=list)
+    gateway: AssistantHealthResponse
+    deployments: list[DeploymentResponse] = Field(default_factory=list)
+    config: OpenClawAgentConfig | dict[str, Any]
+
+
+class AssistantOverviewEnvelope(BaseModel):
+    has_assistant: bool
+    recommended_template_id: str = "personal_assistant"
+    assistant: Optional[AssistantOverviewResponse] = None
 
 
 # API Key Schemas

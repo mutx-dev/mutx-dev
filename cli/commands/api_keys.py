@@ -1,7 +1,7 @@
 import click
 from typing import Optional
 
-from cli.config import CLIConfig, get_client
+from cli.config import current_config, get_client
 
 
 @click.group(name="api-keys")
@@ -13,7 +13,7 @@ def api_keys_group():
 @api_keys_group.command(name="list")
 def list_api_keys():
     """List all API keys"""
-    config = CLIConfig()
+    config = current_config()
     if not config.is_authenticated():
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return
@@ -45,7 +45,7 @@ def list_api_keys():
 @click.option("--expires-in-days", "-e", default=None, type=int, help="Expiration in days (1-365)")
 def create_api_key(name: str, expires_in_days: Optional[int]):
     """Create a new API key"""
-    config = CLIConfig()
+    config = current_config()
     if not config.is_authenticated():
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return
@@ -77,7 +77,7 @@ def create_api_key(name: str, expires_in_days: Optional[int]):
 @click.option("--force", "-f", is_flag=True, help="Skip confirmation prompt")
 def revoke_api_key(key_id: str, force: bool):
     """Revoke (delete) an API key"""
-    config = CLIConfig()
+    config = current_config()
     if not config.is_authenticated():
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return
@@ -106,7 +106,7 @@ def revoke_api_key(key_id: str, force: bool):
 @click.option("--force", "-f", is_flag=True, help="Skip confirmation prompt")
 def rotate_api_key(key_id: str, force: bool):
     """Rotate an API key (revoke old, create new)"""
-    config = CLIConfig()
+    config = current_config()
     if not config.is_authenticated():
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return

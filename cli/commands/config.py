@@ -1,6 +1,6 @@
 import click
 
-from cli.config import CLIConfig
+from cli.config import CLIConfig, current_config
 
 
 @click.group(name="config")
@@ -12,9 +12,10 @@ def config_group():
 @config_group.command(name="show")
 def show_config():
     """Show current local configuration"""
-    config = CLIConfig()
+    config = current_config()
     click.echo(f"API URL:        {config.api_url}")
-    click.echo(f"API Key:        {'(set)' if config.api_key else '(not set)'}")
+    click.echo(f"API URL Source: {config.api_url_source}")
+    click.echo(f"Access Token:   {'(set)' if config.access_token else '(not set)'}")
     click.echo(f"Refresh Token:  {'(set)' if config.refresh_token else '(not set)'}")
     click.echo(f"Config Path:    {config.config_path}")
 
@@ -23,17 +24,19 @@ def show_config():
 @click.argument("key")
 def get_config(key: str):
     """Get a specific config value"""
-    config = CLIConfig()
+    config = current_config()
+    if key == "api_key":
+        key = "access_token"
 
-    valid_keys = ["api_url", "api_key", "refresh_token", "config_path"]
+    valid_keys = ["api_url", "access_token", "refresh_token", "config_path"]
     if key not in valid_keys:
         click.echo(f"Error: Invalid key '{key}'. Valid keys: {', '.join(valid_keys)}", err=True)
         return
 
     if key == "config_path":
         click.echo(str(config.config_path))
-    elif key == "api_key":
-        click.echo("***" if config.api_key else "(not set)")
+    elif key == "access_token":
+        click.echo("***" if config.access_token else "(not set)")
     elif key == "refresh_token":
         click.echo("***" if config.refresh_token else "(not set)")
     else:
@@ -47,7 +50,7 @@ def get_config(key: str):
 @click.option("--unset", is_flag=True, help="Unset a config value")
 def set_config(key: str, value: str, unset: bool):
     """Set a config value"""
-    config = CLIConfig()
+    config = current_config()
 
     valid_keys = ["api_url"]
     if key not in valid_keys:
@@ -70,9 +73,11 @@ def set_config(key: str, value: str, unset: bool):
 @click.option("--force", "-f", is_flag=True, help="Skip confirmation prompt")
 def unset_config(key: str, force: bool):
     """Unset a config value"""
-    config = CLIConfig()
+    config = current_config()
+    if key == "api_key":
+        key = "access_token"
 
-    valid_keys = ["api_key", "refresh_token"]
+    valid_keys = ["access_token", "refresh_token"]
     if key not in valid_keys:
         click.echo(f"Error: Invalid key '{key}'. Can only unset: {', '.join(valid_keys)}", err=True)
         return
@@ -81,8 +86,8 @@ def unset_config(key: str, force: bool):
         if not click.confirm(f"Are you sure you want to unset {key}?"):
             return
 
-    if key == "api_key":
-        config.api_key = None
+    if key == "access_token":
+        config.access_token = None
     elif key == "refresh_token":
         config.refresh_token = None
 
@@ -98,9 +103,9 @@ def reset_config(force: bool):
         if not click.confirm("This will clear all local settings. Continue?"):
             return
 
-    config = CLIConfig()
+    config = current_config()
     config.api_url = "http://localhost:8000"
-    config.api_key = None
+    config.access_token = None
     config.refresh_token = None
     config.save()
 

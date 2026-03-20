@@ -28,7 +28,7 @@ function DashboardNav({ onNavigate, pathname }: DashboardNavProps) {
             <p className="px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">
               {group.title}
             </p>
-          ) : group.key === "core" ? (
+          ) : group.key === "orchestrate" ? (
             <div className="h-1" />
           ) : null}
 
@@ -99,7 +99,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
       </div>
       <div className="rounded-lg border border-[#1d2d46] bg-[#0a1326] px-3 py-2">
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">control plane</p>
-        <p className="mt-1 text-xs text-slate-300">Deploy, govern, and recover agent systems.</p>
+        <p className="mt-1 text-xs text-slate-300">Deploy, govern, and recover assistant systems.</p>
       </div>
       <div className="flex items-center gap-2 rounded-lg border border-[#1d2d46] bg-[#0a1326] px-3 py-2">
         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-semibold text-cyan-200">
@@ -186,7 +186,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/50" />
                     <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
                   </span>
-                  Control plane online
+                  Assistant online
                 </div>
 
                 <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-[#22314b] bg-[#0a1428] px-3 py-2 text-sm text-slate-300">
@@ -196,7 +196,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
                     </div>
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-slate-100">Canonical /dashboard surface</p>
-                      <p className="truncate text-xs text-slate-500">Lifecycle, governance, deployments, runs, traces, keys, and health.</p>
+                      <p className="truncate text-xs text-slate-500">Setup, assistant state, deployments, sessions, skills, channels, logs, and health.</p>
                     </div>
                   </div>
                   <div className="hidden items-center gap-2 lg:flex">
@@ -212,7 +212,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
 
                 <div className="hidden items-center gap-4 text-[11px] text-slate-500 xl:flex">
                   <span>
-                    Resources <span className="text-slate-300">Agents · Deployments · Runs</span>
+                    Resources <span className="text-slate-300">Assistants · Deployments · Sessions</span>
                   </span>
                   <span>
                     Posture <span className="text-cyan-200">Governed</span>

@@ -1,30 +1,75 @@
 ---
-description: Fastest local path from clone to first running MUTX workflow.
+description: Canonical assistant-first onboarding for hosted operators and local contributors.
 icon: bolt
 ---
 
 # Quickstart
 
-This guide follows the current repo layout and route contracts.
+This is the canonical operator quickstart for MUTX.
 
-For a full clone-to-validation onboarding flow (including `pnpm`, `.env` details, and local test targets), see [Local Developer Bootstrap](./local-developer-bootstrap.md).
+Every supported lane ends in the same success state:
 
-{% stepper %}
-{% step %}
-### Check prerequisites
+1. You have a stored authenticated session in `~/.mutx/config.json`.
+2. You have deployed the `Personal Assistant` starter template.
+3. You can inspect that assistant from the CLI, TUI, or browser control plane.
 
-You need:
+For full repo setup details, see [Local Developer Bootstrap](./local-developer-bootstrap.md).
 
-* Node.js 18+
-* Python 3.10+
-* Docker and Docker Compose
-{% endstep %}
+## Hosted operator
 
-{% step %}
-### Install dependencies
+Use this when you already have access to a MUTX control plane.
+
+### 1. Install the CLI
+
+Fastest macOS path:
 
 ```bash
-git clone https://github.com/fortunexbt/mutx-dev.git
+curl -fsSL https://mutx.dev/install.sh | bash
+```
+
+Source install:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e ".[dev,tui]"
+```
+
+### 2. Run guided setup
+
+```bash
+mutx setup hosted --open-tui
+```
+
+The CLI will:
+
+* prompt for your API URL if needed
+* authenticate your operator account
+* deploy `Personal Assistant`
+* optionally open `mutx tui`
+
+### 3. Verify the deployment
+
+```bash
+mutx doctor
+mutx assistant overview
+```
+
+Expected result:
+
+* `Authenticated: yes`
+* assistant overview returns a deployed `Personal Assistant`
+* gateway/session state begins to appear once the runtime is active
+
+## Local contributor
+
+Use this when you are working on the MUTX repo itself.
+
+### 1. Install local dependencies
+
+```bash
+git clone https://github.com/mutx-dev/mutx-dev.git
 cd mutx-dev
 
 npm install
@@ -32,166 +77,111 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 pip install -e ".[dev,tui]"
-cp .env.example .env
 ```
 
-Set a local database URL in `.env`:
+If `.env` does not exist, `scripts/dev.sh` will create it from `.env.example` and generate a local `JWT_SECRET`.
+
+### 2. Start the local stack
+
+Detached local stack:
 
 ```bash
-DATABASE_URL=postgresql://mutx:mutx_password@localhost:5432/mutx
-```
-{% endstep %}
-
-{% step %}
-### Optional one-command demo validation
-
-Use this when you want a smoke check that boots the stack and validates routes in one run:
-
-```bash
-npm run demo:validate
+make dev-up
 ```
 
-This validates API health and the demo-facing routes in one go.
-{% endstep %}
-
-{% step %}
-### Start the local demo stack
-
-Use the canonical local bootstrap entrypoint from repo root:
+Follow logs in another terminal when you need them:
 
 ```bash
-./scripts/dev.sh
+make dev-logs
 ```
 
-If you prefer to run services manually, start the local dependencies first:
+Stop the stack:
 
 ```bash
-docker compose -f infrastructure/docker/docker-compose.yml up -d postgres redis
-uvicorn src.api.main:app --reload --port 8000
-```
-{% endstep %}
-
-{% step %}
-### Start the web app
-
-In another terminal for manual mode (skip this if you launched `./scripts/dev.sh`, because frontend is already running in Compose):
-
-```bash
-npm run dev
+make dev-stop
 ```
 
-Visit:
-
-* `http://localhost:3000` for the marketing site
-* `http://localhost:3000/app` for the app-facing surface
-{% endstep %}
-
-{% step %}
-### Verify health
+The legacy one-command foreground mode still exists:
 
 ```bash
-curl http://localhost:8000/
-curl http://localhost:8000/health
-curl http://localhost:8000/ready
+make dev
 ```
-{% endstep %}
 
-{% step %}
-### Create a local user
+### 3. Register and deploy the starter assistant
 
 ```bash
-curl -X POST http://localhost:8000/v1/auth/register \
+mutx setup local --open-tui
+```
+
+If you want a fully non-interactive local smoke path:
+
+```bash
+mutx setup local \
+  --email test@local.dev \
+  --password TestPass123! \
+  --name "Local Operator" \
+  --assistant-name "Personal Assistant" \
+  --no-input
+```
+
+### 4. Verify the local control plane
+
+```bash
+mutx doctor
+mutx assistant overview
+mutx tui
+```
+
+Useful URLs:
+
+* site and app shell: `http://localhost:3000`
+* API: `http://localhost:8000`
+* API docs: `http://localhost:8000/docs`
+
+## API contract
+
+The public contract remains mounted under `/v1/*`.
+
+### Register or log in
+
+```bash
+BASE_URL=http://localhost:8000/v1
+
+curl -X POST "$BASE_URL/auth/register" \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
 ```
 
-Log in and save the access token:
+### Deploy the starter assistant in one action
 
 ```bash
-curl -X POST http://localhost:8000/v1/auth/login \
+curl -X POST "$BASE_URL/templates/personal_assistant/deploy" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"email":"you@example.com","password":"StrongPass1!"}'
+  -d '{"name":"Personal Assistant","replicas":1}'
 ```
-{% endstep %}
 
-{% step %}
-### Create and deploy an agent record
-
-Confirm your auth first:
+### Inspect assistant state
 
 ```bash
-curl http://localhost:8000/v1/auth/me \
+curl "$BASE_URL/assistant/overview" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl "$BASE_URL/sessions" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-Create the agent:
+## Validation
 
-```bash
-curl -X POST http://localhost:8000/v1/agents \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name":"My First Agent",
-    "description":"Local test agent",
-    "config":"{\"model\":\"gpt-4\"}"
-  }'
-```
-
-Deploy it (either route works; the CLI uses the canonical `/v1/deployments` create flow):
-
-```bash
-curl -X POST http://localhost:8000/v1/agents/YOUR_AGENT_ID/deploy
-
-# or
-curl -X POST http://localhost:8000/v1/deployments \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"agent_id":"YOUR_AGENT_ID","replicas":1}'
-```
-
-Inspect the result:
-
-```bash
-curl http://localhost:8000/v1/deployments
-curl http://localhost:8000/v1/agents/YOUR_AGENT_ID
-```
-{% endstep %}
-{% endstepper %}
-
-## Optional extras
-
-### CLI setup
-
-```bash
-source .venv/bin/activate
-pip install -e ".[tui]"
-mutx status
-mutx login --email you@example.com
-mutx whoami
-mutx tui
-```
-
-`mutx deploy create` now targets the current `POST /v1/deployments` route. See `docs/cli.md` for the current support matrix.
-
-### Frontend verification
-
-```bash
-npm run lint
-npm run build
-```
-
-## Optional: validation commands
-
-Quick discovery for the hosted smoke suite:
-
-```bash
-npx playwright test --list
-```
-
-Full repo validation:
+Targeted local validation:
 
 ```bash
 ./scripts/test.sh
 ```
 
-Important: the checked-in Playwright smoke suite is part of the repo validation path and currently exercises the hosted surface, not a localhost browser flow.
+Frontend verification:
+
+```bash
+npm run lint
+npm run build
+```

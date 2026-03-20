@@ -15,9 +15,14 @@ def _as_optional_str(value: Any) -> str | None:
 class CLIStatus:
     api_url: str
     config_path: Path
+    api_url_source: str
     authenticated: bool
-    has_api_key: bool
+    has_access_token: bool
     has_refresh_token: bool
+
+    @property
+    def has_api_key(self) -> bool:
+        return self.has_access_token
 
 
 @dataclass(slots=True)
@@ -210,4 +215,129 @@ class AgentDeploymentResult:
         return cls(
             deployment_id=_as_optional_str(payload.get("deployment_id")),
             status=_as_optional_str(payload.get("status")),
+        )
+
+
+@dataclass(slots=True)
+class TemplateRecord:
+    id: str
+    name: str
+    summary: str
+    description: str
+    agent_type: str
+    starter_prompt: str
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "TemplateRecord":
+        return cls(
+            id=str(payload.get("id", "")),
+            name=str(payload.get("name", "")),
+            summary=str(payload.get("summary", "")),
+            description=str(payload.get("description", "")),
+            agent_type=str(payload.get("agent_type", "")),
+            starter_prompt=str(payload.get("starter_prompt", "")),
+        )
+
+
+@dataclass(slots=True)
+class AssistantSkillRecord:
+    id: str
+    name: str
+    description: str
+    author: str
+    category: str
+    source: str
+    installed: bool
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "AssistantSkillRecord":
+        return cls(
+            id=str(payload.get("id", "")),
+            name=str(payload.get("name", "")),
+            description=str(payload.get("description", "")),
+            author=str(payload.get("author", "")),
+            category=str(payload.get("category", "")),
+            source=str(payload.get("source", "")),
+            installed=bool(payload.get("installed", False)),
+        )
+
+
+@dataclass(slots=True)
+class AssistantChannelRecord:
+    id: str
+    label: str
+    enabled: bool
+    mode: str
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "AssistantChannelRecord":
+        return cls(
+            id=str(payload.get("id", "")),
+            label=str(payload.get("label", "")),
+            enabled=bool(payload.get("enabled", False)),
+            mode=str(payload.get("mode", "")),
+        )
+
+
+@dataclass(slots=True)
+class AssistantHealthRecord:
+    status: str
+    cli_available: bool
+    gateway_configured: bool
+    gateway_reachable: bool
+    gateway_url: str | None
+    doctor_summary: str
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "AssistantHealthRecord":
+        return cls(
+            status=str(payload.get("status", "unknown")),
+            cli_available=bool(payload.get("cli_available", False)),
+            gateway_configured=bool(payload.get("gateway_configured", False)),
+            gateway_reachable=bool(payload.get("gateway_reachable", False)),
+            gateway_url=_as_optional_str(payload.get("gateway_url")),
+            doctor_summary=str(payload.get("doctor_summary", "")),
+        )
+
+
+@dataclass(slots=True)
+class AssistantOverviewRecord:
+    agent_id: str
+    name: str
+    status: str
+    onboarding_status: str
+    assistant_id: str
+    workspace: str
+    session_count: int
+    gateway: AssistantHealthRecord
+    deployments: list[DeploymentRecord]
+    installed_skills: list[AssistantSkillRecord]
+    channels: list[AssistantChannelRecord]
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "AssistantOverviewRecord":
+        return cls(
+            agent_id=str(payload.get("agent_id", "")),
+            name=str(payload.get("name", "")),
+            status=str(payload.get("status", "unknown")),
+            onboarding_status=str(payload.get("onboarding_status", "unknown")),
+            assistant_id=str(payload.get("assistant_id", "")),
+            workspace=str(payload.get("workspace", "")),
+            session_count=int(payload.get("session_count", 0)),
+            gateway=AssistantHealthRecord.from_payload(payload.get("gateway") or {}),
+            deployments=[
+                DeploymentRecord.from_payload(item)
+                for item in (payload.get("deployments") or [])
+                if isinstance(item, dict)
+            ],
+            installed_skills=[
+                AssistantSkillRecord.from_payload(item)
+                for item in (payload.get("installed_skills") or [])
+                if isinstance(item, dict)
+            ],
+            channels=[
+                AssistantChannelRecord.from_payload(item)
+                for item in (payload.get("channels") or [])
+                if isinstance(item, dict)
+            ],
         )

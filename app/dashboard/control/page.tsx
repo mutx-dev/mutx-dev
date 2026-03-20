@@ -5,15 +5,15 @@ export default function DashboardControlPage() {
     <DashboardSectionPage
       breadcrumbs={[
         { label: "Dashboard", href: "/dashboard" },
-        { label: "Control" },
+        { label: "Setup" },
       ]}
-      title="Control"
-      description="Operator control-plane settings shell for service and policy management."
-      badge="operator control"
+      title="Setup"
+      description="Assistant-first onboarding shell for starter deployment, operator auth, and initial control-plane readiness."
+      badge="starter setup"
       checks={[
-        "Surface only real service status and management actions once control APIs expose supported operations.",
-        "Map security, auth, and preference controls directly to MUTX backend settings to avoid UI-only toggles.",
-        "Preserve this shell for future authenticated system controls without fabricating service telemetry.",
+        "Drive the first-run flow from the same `personal_assistant` template and starter deployment route used by the CLI.",
+        "Expose only real setup and readiness checks that map to mounted backend routes.",
+        "Keep setup focused on authentication, starter deployment, and truthful follow-on actions.",
       ]}
     />
   );

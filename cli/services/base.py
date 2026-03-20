@@ -4,7 +4,7 @@ import json
 from collections.abc import Iterable
 from typing import Any
 
-from cli.config import CLIConfig, get_client
+from cli.config import CLIConfig, current_config, get_client
 
 
 class CLIServiceError(Exception):
@@ -43,7 +43,7 @@ class APIService:
     """Shared service base for Click commands and the Textual UI."""
 
     def __init__(self, config: CLIConfig | None = None, client_factory=None):
-        self.config = config or CLIConfig()
+        self.config = config or current_config()
         self._client_factory = client_factory or get_client
 
     def require_authentication(self) -> None:

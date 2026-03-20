@@ -84,6 +84,7 @@ class AgentType(str, enum.Enum):
     ANTHROPIC = "anthropic"
     LANGCHAIN = "langchain"
     CUSTOM = "custom"
+    OPENCLAW = "openclaw"
 
 
 class AlertType(str, enum.Enum):

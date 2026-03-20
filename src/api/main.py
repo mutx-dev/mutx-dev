@@ -31,6 +31,7 @@ from src.api.routes import (
     agent_runtime,
     agents,
     analytics,
+    assistant,
     api_keys,
     auth,
     budgets,
@@ -41,7 +42,9 @@ from src.api.routes import (
     monitoring,
     rag,
     runs,
+    sessions,
     swarms,
+    templates,
     usage,
     webhooks,
 )
@@ -67,7 +70,9 @@ class RouterRegistration:
 
 PUBLIC_ROUTE_REGISTRATIONS: tuple[RouterRegistration, ...] = (
     RouterRegistration("agents", agents.router),
+    RouterRegistration("assistant", assistant.router),
     RouterRegistration("deployments", deployments.router),
+    RouterRegistration("templates", templates.router),
     RouterRegistration("webhooks", webhooks.router),
     RouterRegistration("auth", auth.router),
     RouterRegistration("clawhub", clawhub.router),
@@ -81,13 +86,14 @@ PUBLIC_ROUTE_REGISTRATIONS: tuple[RouterRegistration, ...] = (
     RouterRegistration("usage", usage.router),
     RouterRegistration("analytics", analytics.router),
     RouterRegistration("monitoring", monitoring.router),
+    RouterRegistration("sessions", sessions.router),
     RouterRegistration("swarms", swarms.router),
     RouterRegistration("budgets", budgets.router),
 )
 PUBLIC_ROUTER_ALLOWLIST: tuple[str, ...] = tuple(
     registration.name for registration in PUBLIC_ROUTE_REGISTRATIONS
 )
-UNMOUNTED_ROUTER_NAMES: tuple[str, ...] = ("newsletter", "scheduler", "sessions")
+UNMOUNTED_ROUTER_NAMES: tuple[str, ...] = ("newsletter", "scheduler")
 
 
 def _initialize_app_state(

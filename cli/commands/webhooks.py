@@ -1,7 +1,7 @@
 import click
 from typing import Any, Optional
 
-from cli.config import CLIConfig, get_client
+from cli.config import current_config, get_client
 
 
 @click.group(name="webhooks")
@@ -15,7 +15,7 @@ def webhooks_group():
 @click.option("--skip", "-s", default=0, help="Number of webhooks to skip")
 def list_webhooks(limit: int, skip: int):
     """List all configured webhooks"""
-    config = CLIConfig()
+    config = current_config()
     if not config.is_authenticated():
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return
@@ -56,7 +56,7 @@ def webhook_deliveries(
     webhook_id: str, skip: int, limit: int, event: Optional[str], success: Optional[str]
 ):
     """Fetch delivery history for a webhook"""
-    config = CLIConfig()
+    config = current_config()
     if not config.is_authenticated():
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return
@@ -93,7 +93,7 @@ def webhook_deliveries(
 @click.argument("webhook_id")
 def get_webhook(webhook_id: str):
     """Fetch one webhook by id"""
-    config = CLIConfig()
+    config = current_config()
     if not config.is_authenticated():
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return

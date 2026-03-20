@@ -97,14 +97,16 @@ Note: `./scripts/dev.sh` auto-creates `.env` from `.env.example` and generates a
 Preferred one-command flow:
 
 ```bash
-./scripts/dev.sh
+make dev
 ```
 
 Equivalent Make target:
 
 ```bash
-make dev
+make dev-up
 ```
+
+Use `make dev-up` when you want the stack detached, `make dev-logs` to follow logs, and `make dev-stop` to stop it.
 
 This starts PostgreSQL, Redis, FastAPI, and Next.js via Docker Compose.
 
@@ -146,10 +148,10 @@ make test-api-auth
 
 `make test-auth` registers/logs in a test user and prints a ready-to-use token.
 
-If you want to drive the Python CLI or `mutx tui` with that local user, store the session with:
+If you want to drive the Python CLI or `mutx tui` with the canonical assistant-first flow, use:
 
 ```bash
-mutx login --email test@local.dev --password TestPass123!
+mutx setup local --email test@local.dev --password TestPass123! --no-input
 ```
 
 `make test-api-auth` runs authenticated endpoint checks through `scripts/test-api.sh --with-auth`.

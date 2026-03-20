@@ -1,6 +1,6 @@
 import click
 
-from cli.config import CLIConfig, get_client
+from cli.config import current_config, get_client
 
 
 @click.group(name="clawhub")
@@ -12,7 +12,7 @@ def clawhub_group():
 @clawhub_group.command(name="list")
 def list_skills():
     """List trending skills from ClawHub"""
-    config = CLIConfig()
+    config = current_config()
     if not config.is_authenticated():
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return
@@ -46,7 +46,7 @@ def list_skills():
 @click.option("--skill-id", "-s", required=True, help="Skill ID to install")
 def install_skill(agent_id: str, skill_id: str):
     """Install a skill to an agent"""
-    cli_config = CLIConfig()
+    cli_config = current_config()
     if not cli_config.is_authenticated():
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return
@@ -77,7 +77,7 @@ def install_skill(agent_id: str, skill_id: str):
 @click.option("--skill-id", "-s", required=True, help="Skill ID to uninstall")
 def uninstall_skill(agent_id: str, skill_id: str):
     """Uninstall a skill from an agent"""
-    cli_config = CLIConfig()
+    cli_config = current_config()
     if not cli_config.is_authenticated():
         click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
         return

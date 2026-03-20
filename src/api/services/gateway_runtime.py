@@ -5,8 +5,48 @@ import os
 import logging
 from typing import Optional, Dict, Any
 from dataclasses import dataclass
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
+
+
+def get_detected_openclaw_state_dir() -> Optional[Path]:
+    env_dir = os.environ.get("OPENCLAW_HOME")
+    if env_dir:
+        return Path(env_dir).expanduser()
+
+    default = Path.home() / ".openclaw"
+    if default.exists():
+        return default
+
+    return None
+
+
+def _candidate_openclaw_config_paths() -> list[Path]:
+    env_path = os.environ.get("OPENCLAW_CONFIG_PATH")
+    candidates: list[Path] = []
+    if env_path:
+        candidates.append(Path(env_path).expanduser())
+
+    state_dir = get_detected_openclaw_state_dir()
+    if state_dir is not None:
+        candidates.append(state_dir / "openclaw.json")
+
+    candidates.extend(
+        [
+            Path("/etc/openclaw/openclaw.json"),
+            Path("./openclaw.json"),
+            Path("/app/openclaw.json"),
+        ]
+    )
+    return candidates
+
+
+def get_detected_openclaw_config_path() -> Optional[Path]:
+    for candidate in _candidate_openclaw_config_paths():
+        if candidate.exists():
+            return candidate
+    return None
 
 
 @dataclass
@@ -27,14 +67,8 @@ class GatewayConfig:
 def _read_openclaw_config(config_path: Optional[str] = None) -> Optional[Dict[str, Any]]:
     """Read OpenClaw config from file."""
     if config_path is None:
-        # Try default paths
-        config_path = os.environ.get("OPENCLAW_CONFIG_PATH")
-        if not config_path:
-            # Common default locations
-            for path in ["/etc/openclaw/openclaw.json", "./openclaw.json", "/app/openclaw.json"]:
-                if os.path.exists(path):
-                    config_path = path
-                    break
+        detected = get_detected_openclaw_config_path()
+        config_path = str(detected) if detected else None
 
     if not config_path or not os.path.exists(config_path):
         return None
@@ -72,12 +106,8 @@ def register_mc_as_dashboard(mc_url: str, config_path: Optional[str] = None) -> 
         dict with 'registered' and 'already_set' booleans
     """
     if config_path is None:
-        config_path = os.environ.get("OPENCLAW_CONFIG_PATH")
-        if not config_path:
-            for path in ["/etc/openclaw/openclaw.json", "./openclaw.json", "/app/openclaw.json"]:
-                if os.path.exists(path):
-                    config_path = path
-                    break
+        detected = get_detected_openclaw_config_path()
+        config_path = str(detected) if detected else None
 
     if not config_path or not os.path.exists(config_path):
         return {"registered": False, "already_set": False}
@@ -212,4 +242,6 @@ __all__ = [
     "register_mc_as_dashboard",
     "get_detected_gateway_token",
     "get_detected_gateway_port",
+    "get_detected_openclaw_config_path",
+    "get_detected_openclaw_state_dir",
 ]

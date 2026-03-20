@@ -1,5 +1,5 @@
 ---
-description: Install, configure, authenticate, operate, and release the MUTX CLI + TUI.
+description: Install, configure, and operate MUTX through the assistant-first CLI and TUI.
 icon: terminal
 ---
 
@@ -9,13 +9,13 @@ The MUTX CLI distribution lives at repo root and installs the `mutx` entrypoint 
 
 ## Install
 
-Fastest macOS path to install MUTX with a guided setup flow:
+Fastest macOS path:
 
 ```bash
 curl -fsSL https://mutx.dev/install.sh | bash
 ```
 
-That script installs or upgrades the Homebrew distribution, force-links `mutx` if an older shim is already present, runs `mutx status`, walks API URL and login setup, and offers to launch `mutx tui`.
+That script installs or upgrades the Homebrew distribution, force-links `mutx` if an older shim is already present, and then hands onboarding off to the CLI itself.
 
 Editable local install with the operator TUI:
 
@@ -33,7 +33,7 @@ brew tap mutx-dev/homebrew-tap
 brew install mutx
 ```
 
-The tap formula is expected to smoke-test the package with `mutx status`, not a networked command.
+The tap formula is expected to smoke-test the package with `mutx --help`, not a networked command.
 
 If Homebrew says `mutx` is installed but not linked, there is usually an older `mutx` shim already present in `/opt/homebrew/bin`. Relink the Homebrew binary with:
 
@@ -58,15 +58,27 @@ The CLI stores configuration in `~/.mutx/config.json` and reuses the existing `C
 ```json
 {
   "api_url": "http://localhost:8000",
-  "api_key": null,
-  "refresh_token": null
+  "access_token": null,
+  "refresh_token": null,
+  "assistant_defaults": {
+    "template": "personal_assistant",
+    "runtime": "openclaw",
+    "model": "openai/gpt-5"
+  }
 }
 ```
+
+Config precedence is:
+
+1. CLI flag
+2. `MUTX_API_URL`
+3. config file
+4. default
 
 You can override the API URL per command:
 
 ```bash
-mutx --api-url http://localhost:8000 status
+mutx --api-url http://localhost:8000 doctor
 ```
 
 Or with an environment variable:
@@ -75,23 +87,73 @@ Or with an environment variable:
 export MUTX_API_URL=http://localhost:8000
 ```
 
-## First-Time Local Auth Flow
+## Canonical Setup Flow
 
-Register through the current `/v1/*` API contract:
-
-```bash
-curl -X POST http://localhost:8000/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
-```
-
-Then log in with the CLI:
+Hosted operator:
 
 ```bash
-mutx login --email you@example.com
-mutx whoami
-mutx status
+mutx setup hosted --open-tui
 ```
+
+Local contributor:
+
+```bash
+mutx setup local --open-tui
+```
+
+Both flows authenticate, deploy `Personal Assistant`, and optionally open the TUI.
+
+## Core Commands
+
+### Setup + health
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx setup hosted` | Authenticate against a hosted control plane and deploy `Personal Assistant` |
+| `mutx setup local` | Register or log in to a local control plane and deploy `Personal Assistant` |
+| `mutx doctor` | Show config source, auth state, API reachability, and assistant summary |
+
+### Auth
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx auth login` | Login to MUTX |
+| `mutx auth register` | Create a user account |
+| `mutx auth logout` | Clear local tokens |
+| `mutx auth whoami` | Show current user info |
+| `mutx auth status` | Show local auth state |
+
+### Assistants
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx assistant overview` | Show the current Personal Assistant summary |
+| `mutx assistant sessions` | List known assistant sessions |
+| `mutx assistant channels --agent-id <id>` | Show assistant channel bindings |
+| `mutx assistant health --agent-id <id>` | Show assistant gateway health |
+| `mutx assistant skills list --agent-id <id>` | List available and installed skills |
+| `mutx assistant skills install --agent-id <id> --skill-id <skill>` | Install a skill |
+| `mutx assistant skills remove --agent-id <id> --skill-id <skill>` | Remove a skill |
+
+### Agents + deployments
+
+| Command | Description |
+| ------- | ----------- |
+| `mutx agent list` | List agents |
+| `mutx agent create --template personal_assistant` | Create the starter assistant without the one-shot setup flow |
+| `mutx agent deploy <agent_id>` | Deploy an agent |
+| `mutx deployment list` | List deployments |
+| `mutx deployment create --agent-id <id>` | Create a deployment |
+
+### Compatibility commands
+
+The older flat commands remain available for compatibility:
+
+* `mutx login`
+* `mutx logout`
+* `mutx whoami`
+* `mutx status`
+* legacy `agents` and `deploy` groups
 
 ## Operator TUI
 
@@ -101,15 +163,17 @@ Launch the first-party Textual shell with:
 mutx tui
 ```
 
-The first release is intentionally operator-focused and small:
+The TUI now centers the assistant-first operator path:
 
-* Agents: list, detail, deploy, logs
-* Deployments: list, detail, events, logs, metrics, restart, scale, delete
+* `Setup`: auth state, API state, and starter deployment entrypoint
+* `Assistant`: assistant overview, status, and deployment context
+* `Deployments`: deployment inventory and controls
+* `Control Plane`: sessions and gateway detail
 
 Key bindings:
 
 * `r` refresh the active pane
-* `d` deploy the selected agent
+* `d` deploy the default assistant from setup
 * `x` restart the selected deployment
 * `s` scale the selected deployment
 * `backspace` delete the selected deployment
@@ -117,78 +181,35 @@ Key bindings:
 
 If no local auth is stored, the TUI still launches and shows the local CLI state instead of crashing.
 
-## Commands
-
-### Authentication
-
-| Command | Description |
-| ------- |-------------|
-| `mutx status` | Show API URL and auth state without a network call |
-| `mutx login --email <email>` | Login to MUTX (prompts for password) |
-| `mutx logout` | Clear local tokens |
-| `mutx whoami` | Show current user info |
-| `mutx tui` | Launch the operator TUI |
-
-### Agents
-
-| Command | Description |
-| ------- |-------------|
-| `mutx agents list` | List all agents |
-| `mutx agents create --name <name>` | Create a new agent |
-| `mutx agents status <agent_id>` | Get agent detail |
-| `mutx agents logs <agent_id>` | Get agent logs |
-| `mutx agents deploy <agent_id>` | Deploy an agent |
-| `mutx agents stop <agent_id>` | Stop a running agent |
-| `mutx agents delete <agent_id>` | Delete an agent |
-
-### Deployments
-
-| Command | Description |
-| ------- |-------------|
-| `mutx deploy list` | List all deployments |
-| `mutx deploy create --agent-id <id>` | Create a deployment |
-| `mutx deploy events <deployment_id>` | Get deployment events |
-| `mutx deploy logs <deployment_id>` | Get deployment logs |
-| `mutx deploy metrics <deployment_id>` | Get deployment metrics |
-| `mutx deploy scale <deployment_id>` | Scale deployment replicas |
-| `mutx deploy restart <deployment_id>` | Restart a deployment |
-| `mutx deploy delete <deployment_id>` | Delete a deployment |
-
-### Other Groups
-
-Additional command groups remain available for API keys, ClawHub, config, and webhooks. Their implementations still live under `cli/commands/`.
-
 ## Smoke Validation
 
 Local editable install and command smoke:
 
 ```bash
 pip install -e ".[dev,tui]"
-mutx status
+mutx doctor --output json
 mutx --help
 ```
 
 Local stack validation:
 
 ```bash
-make dev
-make test-auth
-mutx login --email test@local.dev --password TestPass123!
-make seed
-mutx agents list --limit 10
-mutx deploy list --limit 10
+make dev-up
+mutx setup local --email test@local.dev --password TestPass123! --no-input
+mutx doctor
+mutx assistant overview
 mutx tui
 ```
 
 Targeted contract coverage:
 
 ```bash
-pytest tests/test_cli_auth_and_tui.py tests/test_cli_agents_contract.py tests/test_cli_deploy_contract.py
+pytest tests/test_cli_auth_and_tui.py tests/test_cli_setup_and_doctor.py
 ```
 
 ## Release Truth
 
 * The CLI distribution version is the root [`pyproject.toml`](../pyproject.toml) version.
 * The recommended CLI git tag format is `cli-vX.Y.Z`.
-* The Homebrew tap formula should point at the matching `cli-vX.Y.Z` source archive and use `mutx status` as its non-network test.
+* The Homebrew tap formula should point at the matching `cli-vX.Y.Z` source archive and use `mutx --help` as its non-network test.
 * The SDK has its own package metadata under [`sdk/pyproject.toml`](../sdk/pyproject.toml); do not treat SDK and CLI release tags as the same thing.

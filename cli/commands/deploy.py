@@ -1,7 +1,7 @@
 import click
 from typing import Optional
 
-from cli.config import CLIConfig, get_client
+from cli.config import current_config, get_client
 from cli.services import CLIServiceError, DeploymentsService
 
 
@@ -16,7 +16,7 @@ def _echo_service_error(error: CLIServiceError) -> None:
 
 
 def _deployments_service() -> DeploymentsService:
-    return DeploymentsService(config=CLIConfig(), client_factory=get_client)
+    return DeploymentsService(config=current_config(), client_factory=get_client)
 
 
 @deploy_group.command(name="list")
