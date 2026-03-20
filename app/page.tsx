@@ -310,10 +310,11 @@ export default function LandingPage() {
                   </p>
 
                   <div className="mt-8 flex flex-wrap items-center gap-3">
-                    <Link
-                      href="/app"
-                      className="landing-button-primary px-7 py-4 text-base"
-                    >
+                  <Link
+                    href="/app"
+                    prefetch={false}
+                    className="landing-button-primary px-7 py-4 text-base"
+                  >
                       Open live demo
                       <ArrowRight className="h-4 w-4" />
                     </Link>
@@ -587,6 +588,7 @@ mutx tui`}
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Link
                         href="/app"
+                        prefetch={false}
                         className="landing-button-primary justify-between px-5 py-4 text-base"
                       >
                         Open live demo
