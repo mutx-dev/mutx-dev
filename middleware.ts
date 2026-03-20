@@ -14,6 +14,7 @@ type RateLimitState = {
 const APP_HOST = 'app.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
+const UI_CACHE_CONTROL = 'private, no-cache, no-store, max-age=0, must-revalidate'
 const APP_PUBLIC_PATHS = new Set([
   '/',
   '/overview',
@@ -190,6 +191,22 @@ function rewriteWithinHost(request: NextRequest, pathname: string) {
   return NextResponse.rewrite(url)
 }
 
+function shouldDisableUiCaching(host: string, pathname: string): boolean {
+  if (pathname.startsWith('/api')) {
+    return false
+  }
+
+  return MARKETING_HOSTS.has(host) || APP_HOSTS.has(host)
+}
+
+function applyUiCacheHeaders(response: NextResponse, host: string, pathname: string) {
+  if (shouldDisableUiCaching(host, pathname)) {
+    response.headers.set('Cache-Control', UI_CACHE_CONTROL)
+  }
+
+  return response
+}
+
 function getPolicy(pathname: string): RateLimitPolicy | null {
   for (const [prefix, policy] of POLICY_BY_PATH) {
     if (pathname.startsWith(prefix)) {
@@ -238,11 +255,19 @@ export function middleware(request: NextRequest) {
 
   if (MARKETING_HOSTS.has(host)) {
     if (normalizedPath === '/login' || normalizedPath === '/register') {
-      return redirectToHost(request, APP_HOST, normalizedPath)
+      return applyUiCacheHeaders(
+        redirectToHost(request, APP_HOST, normalizedPath),
+        host,
+        normalizedPath,
+      )
     }
 
     if (normalizedPath !== '/' && APP_PUBLIC_PATHS.has(normalizedPath)) {
-      return redirectToHost(request, APP_HOST, normalizedPath === '/overview' ? '/' : normalizedPath)
+      return applyUiCacheHeaders(
+        redirectToHost(request, APP_HOST, normalizedPath === '/overview' ? '/' : normalizedPath),
+        host,
+        normalizedPath,
+      )
     }
 
     if (
@@ -251,28 +276,44 @@ export function middleware(request: NextRequest) {
       normalizedPath === '/app' ||
       normalizedPath.startsWith('/app/')
     ) {
-      return redirectToHost(request, APP_HOST, dashboardPathToAppPath(normalizedPath))
+      return applyUiCacheHeaders(
+        redirectToHost(request, APP_HOST, dashboardPathToAppPath(normalizedPath)),
+        host,
+        normalizedPath,
+      )
     }
   }
 
   if (APP_HOSTS.has(host)) {
     if (normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/')) {
-      return redirectWithinHost(request, dashboardPathToAppPath(normalizedPath))
+      return applyUiCacheHeaders(
+        redirectWithinHost(request, dashboardPathToAppPath(normalizedPath)),
+        host,
+        normalizedPath,
+      )
     }
 
     if (normalizedPath === '/app' || normalizedPath.startsWith('/app/')) {
-      return redirectWithinHost(request, dashboardPathToAppPath(normalizedPath))
+      return applyUiCacheHeaders(
+        redirectWithinHost(request, dashboardPathToAppPath(normalizedPath)),
+        host,
+        normalizedPath,
+      )
     }
 
     const internalPath = appHostPathToInternalDemoPath(normalizedPath)
     if (internalPath !== normalizedPath) {
-      return rewriteWithinHost(request, internalPath)
+      return applyUiCacheHeaders(
+        rewriteWithinHost(request, internalPath),
+        host,
+        normalizedPath,
+      )
     }
   }
 
   const policy = getPolicy(pathname)
   if (!policy) {
-    return NextResponse.next()
+    return applyUiCacheHeaders(NextResponse.next(), host, normalizedPath)
   }
 
   const { allowed, remaining, resetTime } = checkRateLimit(request, policy)
