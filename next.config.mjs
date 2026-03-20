@@ -12,6 +12,16 @@ const nextConfig = {
   middleware: {
     runtime: 'nodejs',
   },
+  webpack(config, { webpack, dev }) {
+    if (dev) {
+      config.plugins.push(
+        new webpack.DefinePlugin({
+          'process.env.__NEXT_DEVTOOL_SEGMENT_EXPLORER': JSON.stringify(''),
+        }),
+      );
+    }
+    return config;
+  },
   async rewrites() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.mutx.dev';
     return {

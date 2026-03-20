@@ -1,39 +1,32 @@
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
-function toSearchString(searchParams: Record<string, string | string[] | undefined> | undefined) {
-  if (!searchParams) {
-    return "";
-  }
+import { MutxDemoApp } from "@/components/dashboard/demo/MutxDemoApp";
+import { isDemoSection } from "@/components/dashboard/demo/demoSections";
 
-  const query = new URLSearchParams();
-
-  for (const [key, value] of Object.entries(searchParams)) {
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        query.append(key, item);
-      }
-      continue;
-    }
-
-    if (typeof value === "string") {
-      query.set(key, value);
-    }
-  }
-
-  const serialized = query.toString();
-  return serialized ? `?${serialized}` : "";
-}
-
-export default async function LegacyAppPage({
+export default async function AppDemoPage({
   params,
-  searchParams,
 }: {
-  params: Promise<{ slug?: string[] }>
-  searchParams?: Promise<Record<string, string | string[] | undefined>>
+  params: Promise<{ slug?: string[] }>;
 }) {
-  const [{ slug }, resolvedSearchParams] = await Promise.all([params, searchParams]);
-  const suffix = slug && slug.length > 0 ? `/${slug.join("/")}` : "";
-  const search = toSearchString(resolvedSearchParams);
+  const { slug } = await params;
 
-  redirect(`/dashboard${suffix}${search}`);
+  if (!slug || slug.length === 0) {
+    return <MutxDemoApp section="overview" />;
+  }
+
+  if (slug.length !== 1) {
+    notFound();
+  }
+
+  const [section] = slug;
+
+  if (section === "overview") {
+    return <MutxDemoApp section="overview" />;
+  }
+
+  if (!isDemoSection(section)) {
+    notFound();
+  }
+
+  return <MutxDemoApp section={section} />;
 }

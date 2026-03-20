@@ -12,7 +12,21 @@ type RateLimitState = {
 }
 
 const APP_HOST = 'app.mutx.dev'
+const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
+const APP_PUBLIC_PATHS = new Set([
+  '/',
+  '/overview',
+  '/agents',
+  '/deployments',
+  '/runs',
+  '/environments',
+  '/access',
+  '/connectors',
+  '/audit',
+  '/usage',
+  '/settings',
+])
 
 const DEFAULT_POLICY: RateLimitPolicy = {
   limit: 10,
@@ -91,15 +105,63 @@ function mapLegacyAppPathToDashboard(pathname: string): string {
   return normalized
 }
 
-function canonicalizeAppPath(pathname: string): string {
+function dashboardPathToAppPath(pathname: string): string {
   const normalized = normalizePathname(pathname)
 
-  if (normalized === '/dashboard' || normalized.startsWith('/dashboard/')) {
-    return normalized
+  if (normalized === '/dashboard' || normalized === '/app' || normalized === '/overview') {
+    return '/'
   }
 
-  if (normalized === '/app' || normalized.startsWith('/app/')) {
-    return mapLegacyAppPathToDashboard(normalized)
+  const directMap: Record<string, string> = {
+    '/dashboard/agents': '/agents',
+    '/dashboard/deployments': '/deployments',
+    '/dashboard/runs': '/runs',
+    '/dashboard/monitoring': '/environments',
+    '/dashboard/api-keys': '/access',
+    '/dashboard/webhooks': '/connectors',
+    '/dashboard/history': '/audit',
+    '/dashboard/budgets': '/usage',
+    '/dashboard/control': '/settings',
+    '/dashboard/logs': '/logs',
+    '/dashboard/traces': '/traces',
+    '/dashboard/memory': '/memory',
+    '/dashboard/orchestration': '/orchestration',
+  }
+
+  if (directMap[normalized]) {
+    return directMap[normalized]
+  }
+
+  if (normalized.startsWith('/app/')) {
+    return dashboardPathToAppPath(mapLegacyAppPathToDashboard(normalized))
+  }
+
+  if (normalized.startsWith('/dashboard/')) {
+    return normalized.slice('/dashboard'.length) || '/'
+  }
+
+  return normalized
+}
+
+function appHostPathToInternalDemoPath(pathname: string): string {
+  const normalized = normalizePathname(pathname)
+
+  const directMap: Record<string, string> = {
+    '/': '/app',
+    '/overview': '/app',
+    '/agents': '/app/agents',
+    '/deployments': '/app/deployments',
+    '/runs': '/app/runs',
+    '/environments': '/app/environments',
+    '/access': '/app/access',
+    '/connectors': '/app/connectors',
+    '/audit': '/app/audit',
+    '/usage': '/app/usage',
+    '/settings': '/app/settings',
+  }
+
+  if (directMap[normalized]) {
+    return directMap[normalized]
   }
 
   return normalized
@@ -119,6 +181,13 @@ function redirectWithinHost(request: NextRequest, pathname: string) {
   url.pathname = pathname
   url.search = request.nextUrl.search
   return NextResponse.redirect(url)
+}
+
+function rewriteWithinHost(request: NextRequest, pathname: string) {
+  const url = new URL(request.url)
+  url.pathname = pathname
+  url.search = request.nextUrl.search
+  return NextResponse.rewrite(url)
 }
 
 function getPolicy(pathname: string): RateLimitPolicy | null {
@@ -172,23 +241,32 @@ export function middleware(request: NextRequest) {
       return redirectToHost(request, APP_HOST, normalizedPath)
     }
 
+    if (normalizedPath !== '/' && APP_PUBLIC_PATHS.has(normalizedPath)) {
+      return redirectToHost(request, APP_HOST, normalizedPath === '/overview' ? '/' : normalizedPath)
+    }
+
     if (
       normalizedPath === '/dashboard' ||
       normalizedPath.startsWith('/dashboard/') ||
       normalizedPath === '/app' ||
       normalizedPath.startsWith('/app/')
     ) {
-      return redirectToHost(request, APP_HOST, canonicalizeAppPath(normalizedPath))
+      return redirectToHost(request, APP_HOST, dashboardPathToAppPath(normalizedPath))
     }
   }
 
-  if (host === APP_HOST) {
-    if (normalizedPath === '/') {
-      return redirectWithinHost(request, '/dashboard')
+  if (APP_HOSTS.has(host)) {
+    if (normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/')) {
+      return redirectWithinHost(request, dashboardPathToAppPath(normalizedPath))
     }
 
     if (normalizedPath === '/app' || normalizedPath.startsWith('/app/')) {
-      return redirectWithinHost(request, canonicalizeAppPath(normalizedPath))
+      return redirectWithinHost(request, dashboardPathToAppPath(normalizedPath))
+    }
+
+    const internalPath = appHostPathToInternalDemoPath(normalizedPath)
+    if (internalPath !== normalizedPath) {
+      return rewriteWithinHost(request, internalPath)
     }
   }
 

@@ -43,12 +43,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <head>
         <link rel="preconnect" href="https://challenges.cloudflare.com" />
         <meta name="theme-color" content="#050816" />
       </head>
-      <body className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} min-h-screen font-[family:var(--font-display)] antialiased`}>
+      <body className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} h-full min-h-screen font-[family:var(--font-display)] antialiased`}>
         <AuthNav />
         {children}
       </body>

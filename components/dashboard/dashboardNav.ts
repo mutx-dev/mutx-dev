@@ -1,19 +1,12 @@
 import {
-  Activity,
-  BellRing,
   Bot,
-  BrainCircuit,
+  BellRing,
   BarChart3,
-  Cable,
   History,
   KeyRound,
   Layers,
-  MessageCircle,
-  MessagesSquare,
-  Radio,
-  Rocket,
+  Settings2,
   ShieldCheck,
-  Sparkles,
   Wallet,
   Webhook,
 } from "lucide-react";
@@ -23,8 +16,9 @@ export interface DashboardNavItem {
   title: string;
   description: string;
   href: string;
+  publicHref: string;
   icon: LucideIcon;
-  group: "orchestrate" | "observe" | "automate";
+  group: "control" | "system";
 }
 
 export interface DashboardNavGroup {
@@ -36,154 +30,124 @@ export interface DashboardNavGroup {
 export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
   {
     title: "Overview",
-    description: "Assistant control-plane posture",
+    description: "Command center for MUTX operator surfaces",
     href: "/dashboard",
+    publicHref: "/",
     icon: ShieldCheck,
-    group: "orchestrate",
+    group: "control",
   },
   {
     title: "Agents",
-    description: "Manage assistant-backed agents",
+    description: "Manage agent inventory",
     href: "/dashboard/agents",
+    publicHref: "/agents",
     icon: Bot,
-    group: "orchestrate",
+    group: "control",
   },
   {
     title: "Deployments",
-    description: "Assistant deployment inventory and topology",
+    description: "Track deployed versions and fleet posture",
     href: "/dashboard/deployments",
+    publicHref: "/deployments",
     icon: Layers,
-    group: "orchestrate",
-  },
-  {
-    title: "Setup",
-    description: "Starter deployment and operator setup lane",
-    href: "/dashboard/control",
-    icon: Sparkles,
-    group: "orchestrate",
-  },
-  {
-    title: "Sessions",
-    description: "Active assistant session state",
-    href: "/dashboard/sessions",
-    icon: Radio,
-    group: "orchestrate",
-  },
-  {
-    title: "Skills",
-    description: "Assistant workspace and installed skills",
-    href: "/dashboard/skills",
-    icon: Rocket,
-    group: "orchestrate",
-  },
-  {
-    title: "Channels",
-    description: "Assistant channel bindings and policy",
-    href: "/dashboard/channels",
-    icon: Cable,
-    group: "orchestrate",
-  },
-  {
-    title: "Memory",
-    description: "Operator memory surface",
-    href: "/dashboard/memory",
-    icon: BrainCircuit,
-    group: "observe",
-  },
-  {
-    title: "History",
-    description: "Recent assistant and operator activity",
-    href: "/dashboard/history",
-    icon: Activity,
-    group: "observe",
-  },
-  {
-    title: "Logs",
-    description: "Assistant runtime log stream",
-    href: "/dashboard/logs",
-    icon: MessageCircle,
-    group: "observe",
+    group: "control",
   },
   {
     title: "Runs",
-    description: "Execution history and outcomes",
+    description: "Inspect recent execution activity",
     href: "/dashboard/runs",
+    publicHref: "/runs",
     icon: History,
-    group: "observe",
+    group: "control",
   },
   {
-    title: "Traces",
-    description: "Trace and runtime detail",
-    href: "/dashboard/traces",
-    icon: MessagesSquare,
-    group: "observe",
-  },
-  {
-    title: "Budgets",
-    description: "Usage and budget posture",
-    href: "/dashboard/budgets",
-    icon: Wallet,
-    group: "observe",
-  },
-  {
-    title: "API Keys",
-    description: "Access governance",
-    href: "/dashboard/api-keys",
-    icon: KeyRound,
-    group: "observe",
-  },
-  {
-    title: "Analytics",
-    description: "Operational analytics",
-    href: "/dashboard/analytics",
-    icon: BarChart3,
-    group: "observe",
-  },
-  {
-    title: "Orchestration",
-    description: "Automation lanes after starter deployment",
-    href: "/dashboard/orchestration",
-    icon: Sparkles,
-    group: "automate",
-  },
-  {
-    title: "Webhooks",
-    description: "Event delivery routes",
-    href: "/dashboard/webhooks",
-    icon: Webhook,
-    group: "automate",
-  },
-  {
-    title: "Health",
-    description: "Gateway and readiness posture",
+    title: "Environments",
+    description: "View environment posture and readiness",
     href: "/dashboard/monitoring",
+    publicHref: "/environments",
     icon: BellRing,
-    group: "automate",
+    group: "control",
+  },
+  {
+    title: "Access",
+    description: "Manage auth, API keys, and BYOK access",
+    href: "/dashboard/api-keys",
+    publicHref: "/access",
+    icon: KeyRound,
+    group: "control",
+  },
+  {
+    title: "Connectors",
+    description: "Monitor webhooks and external integrations",
+    href: "/dashboard/webhooks",
+    publicHref: "/connectors",
+    icon: Webhook,
+    group: "control",
+  },
+  {
+    title: "Audit",
+    description: "Review operator actions and fleet changes",
+    href: "/dashboard/history",
+    publicHref: "/audit",
+    icon: History,
+    group: "control",
+  },
+  {
+    title: "Usage",
+    description: "Split infra and model cost posture",
+    href: "/dashboard/budgets",
+    publicHref: "/usage",
+    icon: Wallet,
+    group: "control",
+  },
+  {
+    title: "Settings",
+    description: "Configure control-plane policy and preferences",
+    href: "/dashboard/control",
+    publicHref: "/settings",
+    icon: Settings2,
+    group: "system",
   },
 ];
 
 export const DASHBOARD_NAV_GROUPS: DashboardNavGroup[] = [
   {
-    key: "orchestrate",
-    title: "Orchestrate",
-    items: DASHBOARD_NAV_ITEMS.filter((item) => item.group === "orchestrate"),
+    key: "control",
+    items: DASHBOARD_NAV_ITEMS.filter((item) => item.group === "control"),
   },
   {
-    key: "observe",
-    title: "Observe",
-    items: DASHBOARD_NAV_ITEMS.filter((item) => item.group === "observe"),
-  },
-  {
-    key: "automate",
-    title: "Automate",
-    items: DASHBOARD_NAV_ITEMS.filter((item) => item.group === "automate"),
+    key: "system",
+    title: "System",
+    items: DASHBOARD_NAV_ITEMS.filter((item) => item.group === "system"),
   },
 ];
 
-export function isDashboardNavItemActive(pathname: string, href: string): boolean {
-  if (href === "/dashboard") {
-    return pathname === "/dashboard";
+function normalizePathname(pathname: string): string {
+  if (pathname !== "/" && pathname.endsWith("/")) {
+    return pathname.slice(0, -1);
   }
 
-  return pathname === href || pathname.startsWith(`${href}/`);
+  return pathname;
+}
+
+export function getDashboardNavHref(pathname: string, item: DashboardNavItem): string {
+  const normalizedPath = normalizePathname(pathname);
+  const usesInternalDashboardPath =
+    normalizedPath === "/dashboard" ||
+    normalizedPath.startsWith("/dashboard/") ||
+    normalizedPath === "/app" ||
+    normalizedPath.startsWith("/app/");
+
+  return usesInternalDashboardPath ? item.href : item.publicHref;
+}
+
+export function isDashboardNavItemActive(pathname: string, item: DashboardNavItem): boolean {
+  const normalizedPath = normalizePathname(pathname);
+  const activeRoots = [item.href, item.publicHref].map(normalizePathname);
+
+  if (activeRoots.includes("/dashboard") || activeRoots.includes("/")) {
+    return normalizedPath === "/" || normalizedPath === "/dashboard" || normalizedPath === "/overview";
+  }
+
+  return activeRoots.some((root) => normalizedPath === root || normalizedPath.startsWith(`${root}/`));
 }

@@ -35,10 +35,12 @@
   }
 
   html {
+    min-height: 100%;
     scroll-behavior: smooth;
   }
 
   body {
+    min-height: 100%;
     min-height: 100vh;
     background-color: var(--site-bg);
     color: var(--foreground);
@@ -55,6 +57,25 @@
 
   a {
     color: inherit;
+  }
+
+  html.mutx-demo-shell,
+  body.mutx-demo-shell {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  html.mutx-demo-shell {
+    scroll-behavior: auto;
+  }
+
+  body.mutx-demo-shell {
+    overscroll-behavior: none;
+  }
+
+  body.mutx-demo-shell [data-mutx-demo-root] {
+    height: 100%;
+    overflow: hidden;
   }
 }
 
