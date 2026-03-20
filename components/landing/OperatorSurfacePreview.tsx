@@ -42,22 +42,22 @@ const navItems: NavItem[] = [
 const eventFeed: EventItem[] = [
   {
     title: 'starter.deployed',
-    detail: 'Personal Assistant rollout completed',
+    detail: 'Personal Assistant live',
     tone: 'cyan',
   },
   {
     title: 'assistant.session.started',
-    detail: 'telegram channel opened a new runtime session',
+    detail: 'telegram session opened',
     tone: 'amber',
   },
   {
     title: 'assistant.skill.installed',
-    detail: 'browser_control synced into the assistant workspace',
+    detail: 'browser_control installed',
     tone: 'emerald',
   },
   {
     title: 'gateway.health.updated',
-    detail: 'doctor summary reports healthy runtime and valid channel policy',
+    detail: 'runtime healthy',
     tone: 'violet',
   },
 ] as const
@@ -89,7 +89,7 @@ export function OperatorSurfacePreview() {
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-slate-100">MUTX control plane</p>
-              <p className="truncate text-xs text-slate-500">Setup, assistant state, sessions, channels, skills, and health.</p>
+              <p className="truncate text-xs text-slate-500">Setup, sessions, skills, channels, health.</p>
             </div>
           </div>
 
@@ -126,16 +126,13 @@ export function OperatorSurfacePreview() {
 
           <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Operator rule</p>
-            <p className="mt-2 text-xs leading-6 text-slate-300">
-              The browser shell stays honest: it reflects the same assistant, session, skills, and deployment routes the CLI and TUI use.
-            </p>
+            <p className="mt-2 text-xs leading-6 text-slate-300">Same assistant. Same routes. Every surface.</p>
           </div>
         </aside>
 
         <div className="min-w-0 border-b border-white/10 p-4 sm:p-5 lg:border-b-0">
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-slate-300">
-            <span className="font-semibold text-slate-100">Control loop status:</span> starter deployment, assistant sessions,
-            channel policy, workspace skills, and gateway health available from one surface.
+            <span className="font-semibold text-slate-100">Status:</span> starter live, sessions up, channels mounted, health visible.
           </div>
 
           <div className="mt-4 grid gap-3 md:grid-cols-4">
@@ -169,18 +166,18 @@ export function OperatorSurfacePreview() {
                   <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
                     Assistant overview
                   </p>
-                  <h3 className="mt-2 text-xl font-semibold text-slate-100">Deployment with durable state</h3>
+                  <h3 className="mt-2 text-xl font-semibold text-slate-100">Runtime state</h3>
                 </div>
                 <CloudCog className="h-5 w-5 text-cyan-300" />
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {[
-                  'Starter deployment creates the assistant and deployment record in one truthful action.',
-                  'Sessions expose channel activity instead of hiding it behind a dashboard-only state model.',
-                  'Skills and workspace state stay attached to the assistant runtime, not a demo-only settings drawer.',
-                  'Health, wakeups, and channels are visible as operator data instead of browser-only hints.',
+                  'One-shot starter deployment',
+                  'Real session state',
+                  'Workspace skills',
+                  'Health + wakeups',
                 ].map((item) => (
-                  <div key={item} className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm leading-7 text-slate-300">
+                  <div key={item} className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm font-medium text-slate-200">
                     {item}
                   </div>
                 ))}
@@ -207,9 +204,7 @@ export function OperatorSurfacePreview() {
                   </span>
                 ))}
               </div>
-              <p className="mt-4 text-sm leading-7 text-slate-400">
-                The browser shell, CLI, TUI, and installer all orbit the same assistant-first contract.
-              </p>
+              <p className="mt-4 text-sm leading-6 text-slate-400">One contract. Web, CLI, TUI.</p>
             </div>
           </div>
         </div>
@@ -239,10 +234,7 @@ export function OperatorSurfacePreview() {
 
           <div className="mt-4 rounded-2xl border border-white/10 bg-gradient-to-br from-cyan-400/10 via-transparent to-violet-400/10 p-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">What this proves</p>
-            <p className="mt-3 text-sm leading-7 text-slate-200">
-              MUTX is not only a monitoring skin. It keeps starter deployment, assistant state, sessions, skills, channels,
-              and recovery in the same operator model.
-            </p>
+            <p className="mt-3 text-sm leading-6 text-slate-200">Operator model, not dashboard skin.</p>
           </div>
         </aside>
       </div>

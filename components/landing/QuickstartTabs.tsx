@@ -28,23 +28,21 @@ const tabs: QuickstartTab[] = ['hosted', 'local', 'api']
 const tabContent: Record<QuickstartTab, QuickstartContent> = {
   hosted: {
     label: 'Hosted operator',
-    intro:
-      'Fastest path to a real MUTX deployment. Install the CLI, authenticate against your hosted control plane, then deploy the Personal Assistant as your first agent.',
+    intro: 'Install. Auth. Deploy `Personal Assistant`.',
     environment: 'hosted control plane',
     mode: 'assistant first',
-    footer:
-      'This is the primary operator path. The starter flow now ends with a deployed Personal Assistant, not an empty control plane.',
+    footer: 'Primary path. Real assistant. No empty shell.',
     blocks: [
       {
         id: 'installer',
         label: 'Install',
-        hint: 'Install the Homebrew distribution, then hand off onboarding to the CLI.',
+        hint: 'Install the CLI.',
         script: 'curl -fsSL https://mutx.dev/install.sh | bash',
       },
       {
         id: 'setup',
         label: 'Deploy Personal Assistant',
-        hint: 'Point the CLI at your hosted API, authenticate, and create the starter assistant in one flow.',
+        hint: 'Set API, auth, deploy.',
         script: `mutx setup hosted
 mutx doctor
 mutx assistant overview`,
@@ -53,24 +51,22 @@ mutx assistant overview`,
   },
   local: {
     label: 'Local contributor',
-    intro:
-      'Bring up the local stack, register a local operator account, and deploy the same Personal Assistant template against localhost.',
+    intro: 'Run the stack. Launch the same assistant on localhost.',
     environment: 'repo + localhost',
     mode: 'local control plane',
-    footer:
-      'Use this when you are building MUTX itself. The local and hosted lanes converge on the same assistant-first operator loop.',
+    footer: 'Build MUTX locally. Land on the same operator loop.',
     blocks: [
       {
         id: 'stack',
         label: 'Start local stack',
-        hint: 'Boot the repo-backed services first. Use detached mode so setup and logs can live in separate terminals.',
+        hint: 'Boot services.',
         script: `make dev-up
 make dev-logs`,
       },
       {
         id: 'setup',
         label: 'Register + deploy',
-        hint: 'Create a local account, deploy the Personal Assistant, and move into the operator surfaces.',
+        hint: 'Create operator, launch assistant.',
         script: `mutx setup local
 mutx doctor
 mutx tui`,
@@ -79,17 +75,15 @@ mutx tui`,
   },
   api: {
     label: 'API contract',
-    intro:
-      'The public contract stays under `/v1/*`. Use the starter-template and assistant routes to automate first-run deployment flows without stitching records together by hand.',
+    intro: 'One mounted contract: `/v1/*`.',
     environment: '/v1',
     mode: 'control plane contract',
-    footer:
-      'Docs, CLI, TUI, and web quickstart now share the same assistant-first contract surface.',
+    footer: 'Docs, web, CLI, and TUI stay on the same rails.',
     blocks: [
       {
         id: 'auth',
         label: 'Authenticate',
-        hint: 'Register or log in through the mounted auth routes.',
+        hint: 'Get an access token.',
         script: `BASE_URL=http://localhost:8000/v1
 
 curl -X POST "$BASE_URL/auth/register" \\
@@ -99,7 +93,7 @@ curl -X POST "$BASE_URL/auth/register" \\
       {
         id: 'starter',
         label: 'Starter deployment',
-        hint: 'Create the Personal Assistant and deployment in one truthful server-side action.',
+        hint: 'Create assistant + deployment.',
         script: `curl -X POST "$BASE_URL/templates/personal_assistant/deploy" \\
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\
   -H "Content-Type: application/json" \\
@@ -108,7 +102,7 @@ curl -X POST "$BASE_URL/auth/register" \\
       {
         id: 'inspect',
         label: 'Inspect assistant surfaces',
-        hint: 'Read back assistant health, sessions, and deployments after creation.',
+        hint: 'Check overview + sessions.',
         script: `curl "$BASE_URL/assistant/overview" \\
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
@@ -131,7 +125,7 @@ function QuickstartSnippet({ block, copied, onCopy }: QuickstartSnippetProps) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">{block.label}</p>
-          <p className="mt-2 max-w-xl text-sm leading-7 text-slate-400">{block.hint}</p>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400">{block.hint}</p>
         </div>
         <button
           type="button"
@@ -218,7 +212,7 @@ export function QuickstartTabs() {
       </div>
 
       <div className="px-4 py-5 sm:px-5 sm:py-6">
-        <p className="max-w-3xl text-base leading-8 text-slate-300">{active.intro}</p>
+        <p className="max-w-3xl text-base leading-7 text-slate-300">{active.intro}</p>
 
         <div className="mt-5 grid gap-4 xl:grid-cols-2">
           {active.blocks.map((block) => (
@@ -232,7 +226,7 @@ export function QuickstartTabs() {
         </div>
       </div>
 
-      <div className="border-t border-white/10 bg-[#08101d] px-4 py-4 text-sm leading-7 text-slate-400 sm:px-5">
+      <div className="border-t border-white/10 bg-[#08101d] px-4 py-4 text-sm leading-6 text-slate-400 sm:px-5">
         {active.footer}
       </div>
     </div>

@@ -24,45 +24,42 @@ const tabs: ControlLoopTab[] = [
     id: 'observe',
     label: 'Observe',
     kicker: 'sessions + logs + health',
-    title: 'See assistant state, gateway health, and live sessions from one control plane.',
-    body: 'MUTX turns the first assistant into something operators can inspect truthfully instead of hiding runtime state behind a chat-only UI.',
+    title: 'See the assistant.',
+    body: 'Sessions, logs, health, deployment.',
     points: [
-      'Assistant overview combines starter template metadata, deployment state, and gateway posture',
-      'Session listings come from the mounted runtime state rather than synthetic browser samples',
-      'Logs and health stay attached to the same assistant and deployment records operators manage',
-      'Browser, CLI, and TUI surfaces all point at the same assistant-first `/v1/*` routes',
+      'Live session list',
+      'Health tied to deployment',
+      'Same `/v1/*` routes everywhere',
     ],
-    outcome: 'Operators can answer whether the assistant is live, where it is connected, and what changed recently without leaving the control plane.',
+    outcome: 'Know what is live, where, and why.',
     icon: Radar,
   },
   {
     id: 'orchestrate',
     label: 'Orchestrate',
     kicker: 'setup + deployment + channels',
-    title: 'Make the first deployment a real assistant, not a generic placeholder.',
-    body: 'MUTX starts with `Personal Assistant`, then layers channels, skills, and deployment control onto that same runtime instead of forcing users through an empty fleet setup.',
+    title: 'Deploy the assistant.',
+    body: 'Start with `Personal Assistant`. Add channels and skills.',
     points: [
-      'Starter deployment route creates the assistant record and deployment in one action',
-      'OpenClaw-backed runtime defaults provide workspace, model, skills, and safe channel policy',
-      'Deployments stay durable and operable with restart, scale, delete, and event history',
-      'The web control plane adopts Mission Control-style navigation without inventing fake capabilities',
+      'One-shot starter deployment',
+      'Runtime defaults already wired',
+      'Durable deployment controls',
     ],
-    outcome: 'Operators move from install to a working assistant quickly, while the system still preserves truthful deployment state.',
+    outcome: 'From install to live assistant, fast.',
     icon: LifeBuoy,
   },
   {
     id: 'automate',
     label: 'Automate',
     kicker: 'skills + wakeups + follow-on flows',
-    title: 'Extend the assistant with skills and scheduled wakeups once the starter deployment is alive.',
-    body: 'Automation belongs after the assistant exists. MUTX keeps those extensions in the same control plane instead of scattering them across side tools.',
+    title: 'Extend the loop.',
+    body: 'Install skills. Surface wakeups. Keep fallback paths live.',
     points: [
-      'Skill installation and removal are backed by the assistant workspace and registry model',
-      'Wakeups and cron state can be surfaced as assistant resources instead of internal runtime trivia',
-      'The CLI and TUI provide a recovery path even while richer browser panels continue to land',
-      'Docs, installer, and quickstart stay aligned so automation starts from a truthful deployed baseline',
+      'Workspace-backed skills',
+      'Wakeups as operator data',
+      'CLI and TUI always recoverable',
     ],
-    outcome: 'Teams can expand from one assistant to a fuller control loop without changing the product story halfway through onboarding.',
+    outcome: 'Grow the control loop without changing the story.',
     icon: Sparkles,
   },
 ]
@@ -100,13 +97,13 @@ export function ControlLoopTabs() {
           <h3 className="mt-4 text-2xl font-semibold tracking-[-0.05em] text-slate-50 sm:text-3xl">
             {active.title}
           </h3>
-          <p className="mt-4 text-base leading-8 text-slate-300">{active.body}</p>
+          <p className="mt-4 text-base leading-7 text-slate-300">{active.body}</p>
 
           <div className="mt-6 grid gap-3">
             {active.points.map((point) => (
               <div
                 key={point}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm leading-7 text-slate-300"
+                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-medium text-slate-200"
               >
                 {point}
               </div>
@@ -125,7 +122,7 @@ export function ControlLoopTabs() {
             <Command className="h-5 w-5 text-cyan-300" />
           </div>
 
-          <p className="mt-4 text-sm leading-7 text-slate-300">{active.outcome}</p>
+          <p className="mt-4 text-sm leading-6 text-slate-300">{active.outcome}</p>
 
           <div className="mt-6 grid gap-3">
             {[
