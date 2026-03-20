@@ -11,7 +11,6 @@ type ControlLoopTabId = 'observe' | 'orchestrate' | 'automate'
 type ControlLoopTab = {
   id: ControlLoopTabId
   label: string
-  kicker: string
   title: string
   signals: string[]
   surfaces: string[]
@@ -23,7 +22,6 @@ const tabs: ControlLoopTab[] = [
   {
     id: 'observe',
     label: 'Observe',
-    kicker: 'live state',
     title: 'Read the runtime.',
     signals: ['Sessions', 'Deployments', 'Health'],
     surfaces: ['Browser', 'CLI', 'TUI'],
@@ -33,7 +31,6 @@ const tabs: ControlLoopTab[] = [
   {
     id: 'orchestrate',
     label: 'Orchestrate',
-    kicker: 'runtime moves',
     title: 'Move it forward.',
     signals: ['Setup', 'Deploy', 'Channels'],
     surfaces: ['Template', 'Assistant', 'Rollout'],
@@ -43,7 +40,6 @@ const tabs: ControlLoopTab[] = [
   {
     id: 'automate',
     label: 'Automate',
-    kicker: 'follow-on flows',
     title: 'Extend the loop.',
     signals: ['Skills', 'Wakeups', 'Fallbacks'],
     surfaces: ['Workspace', 'Signals', 'Recovery'],
@@ -81,8 +77,7 @@ export function ControlLoopTabs() {
 
       <div className="grid gap-6 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(19rem,0.95fr)]">
         <div>
-          <div className="landing-kicker">{active.kicker}</div>
-          <h3 className="mt-4 text-2xl font-semibold tracking-[-0.05em] text-slate-50 sm:text-3xl">
+          <h3 className="text-2xl font-semibold tracking-[-0.05em] text-slate-50 sm:text-3xl">
             {active.title}
           </h3>
 
@@ -118,14 +113,9 @@ export function ControlLoopTabs() {
 
         <aside className="rounded-[1.8rem] border border-white/10 bg-[#050b16]/90 p-5">
           <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="font-[family:var(--font-landing-mono)] text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
-                Outcomes
-              </p>
-              <h4 className="mt-3 text-xl font-semibold tracking-[-0.04em] text-slate-50">
-                Stay in control
-              </h4>
-            </div>
+            <p className="font-[family:var(--font-landing-mono)] text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slate-500">
+              Outcomes
+            </p>
             <Command className="h-5 w-5 text-cyan-300" />
           </div>
 

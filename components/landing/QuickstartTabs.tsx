@@ -10,16 +10,13 @@ type QuickstartTab = 'hosted' | 'local' | 'api'
 type QuickstartBlock = {
   id: string
   label: string
-  hint: string
   script: string
 }
 
 type QuickstartContent = {
   label: string
-  intro: string
   environment: string
   mode: string
-  footer: string
   blocks: QuickstartBlock[]
 }
 
@@ -28,21 +25,17 @@ const tabs: QuickstartTab[] = ['hosted', 'local', 'api']
 const tabContent: Record<QuickstartTab, QuickstartContent> = {
   hosted: {
     label: 'Hosted operator',
-    intro: 'Install the CLI, authenticate, and land on a live assistant.',
     environment: 'hosted control plane',
     mode: 'assistant first',
-    footer: 'Hosted lane. Minimal local setup once public auth is open.',
     blocks: [
       {
         id: 'install',
         label: 'Install',
-        hint: 'Install the CLI.',
         script: 'curl -fsSL https://mutx.dev/install.sh | bash',
       },
       {
         id: 'deploy',
         label: 'Deploy Personal Assistant',
-        hint: 'Auth. Validate. Deploy.',
         script: `mutx setup hosted
 mutx doctor
 mutx assistant overview`,
@@ -51,22 +44,18 @@ mutx assistant overview`,
   },
   local: {
     label: 'Local contributor',
-    intro: 'Boot the stack, deploy locally, and inspect the operator surface on localhost.',
     environment: 'repo + localhost',
     mode: 'local operator loop',
-    footer: 'Local lane. Full stack control on the same product surface.',
     blocks: [
       {
         id: 'stack',
         label: 'Start local stack',
-        hint: 'Boot services.',
         script: `make dev-up
 make dev-logs`,
       },
       {
         id: 'deploy',
         label: 'Deploy Personal Assistant',
-        hint: 'Setup. Validate. Open TUI.',
         script: `mutx setup local
 mutx doctor
 mutx tui`,
@@ -75,15 +64,12 @@ mutx tui`,
   },
   api: {
     label: 'API contract',
-    intro: 'Work the mounted routes directly when you want raw control-plane truth.',
     environment: '/v1 contract',
     mode: 'no browser required',
-    footer: 'API lane. Mounted routes, operator state, no UI layer.',
     blocks: [
       {
         id: 'auth',
         label: 'Authenticate',
-        hint: 'Register and capture a token.',
         script: `BASE_URL=http://localhost:8000/v1
 
 curl -X POST "$BASE_URL/auth/register" \\
@@ -93,7 +79,6 @@ curl -X POST "$BASE_URL/auth/register" \\
       {
         id: 'deploy',
         label: 'Starter deployment',
-        hint: 'Create the first assistant.',
         script: `curl -X POST "$BASE_URL/templates/personal_assistant/deploy" \\
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\
   -H "Content-Type: application/json" \\
@@ -102,7 +87,6 @@ curl -X POST "$BASE_URL/auth/register" \\
       {
         id: 'inspect',
         label: 'Inspect state',
-        hint: 'Read overview and sessions.',
         script: `curl "$BASE_URL/assistant/overview" \\
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
@@ -133,7 +117,6 @@ function QuickstartSnippet({
           <p className="font-[family:var(--font-landing-mono)] text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-slate-500">
             {block.label}
           </p>
-          <p className="site-quickstart-hint">{block.hint}</p>
         </div>
         <button
           type="button"
@@ -229,8 +212,6 @@ export function QuickstartTabs() {
       </div>
 
       <div className="site-quickstart-body">
-        <p className="site-quickstart-lead">{active.intro}</p>
-
         <div className="site-quickstart-grid">
           {active.blocks.map((block, index) => (
             <QuickstartSnippet
@@ -243,8 +224,6 @@ export function QuickstartTabs() {
           ))}
         </div>
       </div>
-
-      <div className="site-quickstart-footer">{active.footer}</div>
     </div>
   )
 }

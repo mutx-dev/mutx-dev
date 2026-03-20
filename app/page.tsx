@@ -90,13 +90,6 @@ const runtimeState = [
   "Usage",
 ] as const;
 
-const launchMeta = [
-  "Open source",
-  "MIT license",
-  "Public live demo",
-  "Operator docs",
-] as const;
-
 type SectionHeadingProps = {
   label: string;
   title: string;
@@ -330,7 +323,6 @@ export default function LandingPage() {
               <SectionHeading
                 label="Why MUTX"
                 title="One control plane. Four operator surfaces."
-                body="Web, CLI, TUI, and `/v1` stay on the same runtime."
               />
             </MotionIn>
 
@@ -424,7 +416,6 @@ export default function LandingPage() {
               <SectionHeading
                 label="Control Loop"
                 title="See it. Change it. Recover it."
-                body="One operator loop across browser, terminal, and route contract."
               />
             </MotionIn>
 
@@ -444,7 +435,6 @@ export default function LandingPage() {
                 />
                 <div className="relative grid gap-8 lg:grid-cols-[minmax(0,0.88fr)_minmax(19rem,1.12fr)] lg:items-start">
                   <div>
-                    <p className="landing-kicker">Start here</p>
                     <h2 className="mt-5 font-[family:var(--font-landing-display)] text-4xl font-semibold tracking-[-0.08em] text-white sm:text-5xl">
                       Local lane.
                     </h2>
@@ -495,14 +485,6 @@ mutx tui`}
                     </div>
                   </div>
                 </div>
-
-                <footer className="relative mt-8 flex flex-wrap gap-2 border-t border-white/10 pt-6 text-sm text-slate-500">
-                  {launchMeta.map((item) => (
-                    <span key={item} className="landing-chip">
-                      {item}
-                    </span>
-                  ))}
-                </footer>
               </div>
             </MotionIn>
           </div>

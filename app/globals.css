@@ -513,17 +513,9 @@
       rgba(8, 16, 29, 0.98);
   }
 
-  .site-quickstart-lead {
-    max-width: 44rem;
-    font-size: clamp(1.05rem, 1.65vw, 1.45rem);
-    line-height: 1.65;
-    color: rgba(226, 232, 240, 0.9);
-  }
-
   .site-quickstart-grid {
     display: grid;
     gap: 1rem;
-    margin-top: 1.4rem;
   }
 
   @media (min-width: 1024px) {
@@ -546,14 +538,6 @@
     align-items: start;
     justify-content: space-between;
     gap: 0.75rem;
-  }
-
-  .site-quickstart-hint {
-    margin-top: 0.7rem;
-    max-width: 24rem;
-    font-size: 1rem;
-    line-height: 1.6;
-    color: rgba(226, 232, 240, 0.78);
   }
 
   .site-quickstart-copy {
@@ -608,15 +592,6 @@
     line-height: 1.95;
     color: rgba(240, 249, 255, 0.96);
   }
-
-  .site-quickstart-footer {
-    border-top: 1px solid rgba(148, 163, 184, 0.12);
-    padding: 1rem 1.35rem 1.2rem;
-    font-size: 0.98rem;
-    line-height: 1.7;
-    color: rgba(148, 163, 184, 0.82);
-  }
-
   .site-code-header {
     display: flex;
     align-items: center;
@@ -905,8 +880,7 @@
 
   @media (max-width: 767px) {
     .site-quickstart-toolbar,
-    .site-quickstart-body,
-    .site-quickstart-footer {
+    .site-quickstart-body {
       padding-inline: 1rem;
     }
 
