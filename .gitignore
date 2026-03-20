@@ -2,6 +2,7 @@
 node_modules/
 *.log
 .next/
+public/_next/
 .env
 .env.local
 .DS_Store
@@ -58,4 +59,3 @@ test-results/
 # Capacitor build outputs
 out/
 android/app/src/main/assets/
-

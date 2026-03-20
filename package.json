@@ -4,6 +4,7 @@
   "private": true,
   "main": "desktop/main.cjs",
   "scripts": {
+    "prebuild": "node -e \"require('fs').rmSync('public/_next', { recursive: true, force: true })\"",
     "dev": "next dev",
     "build": "next build",
     "start": "node .next/standalone/server.js",

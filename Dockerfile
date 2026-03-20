@@ -17,6 +17,7 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN rm -rf public/_next
 
 # Build the Next.js app
 RUN pnpm run build
