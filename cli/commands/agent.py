@@ -4,8 +4,8 @@ from dataclasses import asdict
 import click
 
 from cli.config import current_config, get_client
+from cli.personal_assistant import build_personal_assistant_config
 from cli.services import AgentsService, CLIServiceError
-from src.api.services.assistant_control_plane import build_personal_assistant_config
 
 
 @click.group(name="agent")

@@ -66,13 +66,15 @@ From the tap repo:
 cd ../homebrew-tap
 ```
 
-Update `Formula/mutx.rb` to the matching `cli-vX.Y.Z` archive URL and `sha256`, then validate:
+Update `Formula/mutx.rb` to the matching `cli-vX.Y.Z` archive URL and `sha256`, then validate the assistant-first surface without hitting the network:
 
 ```bash
 brew uninstall mutx || true
 brew tap mutx-dev/homebrew-tap
 brew install mutx
-mutx status
+mutx --help
+mutx setup --help
+mutx doctor --help
 ```
 
 The formula test must stay non-networked.
@@ -80,8 +82,9 @@ The formula test must stay non-networked.
 ## 5. Post-release checks
 
 ```bash
-mutx status
 mutx --help
+mutx setup --help
+mutx doctor --help
 mutx tui
 ```
 

@@ -15,7 +15,7 @@ Fastest macOS path:
 curl -fsSL https://mutx.dev/install.sh | bash
 ```
 
-That script installs or upgrades the Homebrew distribution, force-links `mutx` if an older shim is already present, and then hands onboarding off to the CLI itself.
+That script keeps the package-lane chatter quiet, force-links `mutx` if an older shim is already present, verifies the assistant-first command surface, and then hands onboarding off to the CLI itself. If the packaged CLI is behind the installer, it overlays a fresh runtime into `~/.mutx` before continuing.
 
 Editable local install with the operator TUI:
 
@@ -33,7 +33,7 @@ brew tap mutx-dev/homebrew-tap
 brew install mutx
 ```
 
-The tap formula is expected to smoke-test the package with `mutx --help`, not a networked command.
+The tap formula is expected to smoke-test the package with non-networked command help such as `mutx --help`, `mutx setup --help`, and `mutx doctor --help`.
 
 If Homebrew says `mutx` is installed but not linked, there is usually an older `mutx` shim already present in `/opt/homebrew/bin`. Relink the Homebrew binary with:
 

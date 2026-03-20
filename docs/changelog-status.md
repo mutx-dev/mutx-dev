@@ -73,12 +73,14 @@ python -m pip install build
 python -m build
 ```
 
-Then update the Homebrew tap formula to the matching `cli-vX.Y.Z` archive and validate its non-network test:
+Then update the Homebrew tap formula to the matching `cli-vX.Y.Z` archive and validate the assistant-first CLI surface without touching the network:
 
 ```bash
 brew tap mutx-dev/homebrew-tap
 brew install mutx
-mutx status
+mutx --help
+mutx setup --help
+mutx doctor --help
 ```
 
 ## Versioning
