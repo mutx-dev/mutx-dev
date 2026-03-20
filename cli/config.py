@@ -6,6 +6,9 @@ from typing import Any, Optional
 import click
 import httpx
 
+LOCAL_API_URL = "http://localhost:8000"
+HOSTED_API_URL = "https://api.mutx.dev"
+
 
 def _normalize_api_url(value: str | None) -> str | None:
     if value is None:
@@ -26,7 +29,7 @@ class CLIConfig:
 
     def _default_config(self) -> dict[str, Any]:
         return {
-            "api_url": "http://localhost:8000",
+            "api_url": LOCAL_API_URL,
             "access_token": None,
             "refresh_token": None,
             "assistant_defaults": {
@@ -57,7 +60,7 @@ class CLIConfig:
             payload.pop("api_key", None)
             migrated = True
 
-        payload["api_url"] = _normalize_api_url(payload.get("api_url")) or "http://localhost:8000"
+        payload["api_url"] = _normalize_api_url(payload.get("api_url")) or LOCAL_API_URL
         payload.setdefault("assistant_defaults", self._default_config()["assistant_defaults"])
 
         if migrated:
@@ -77,7 +80,7 @@ class CLIConfig:
     def api_url(self) -> str:
         if self._runtime_api_url_override:
             return self._runtime_api_url_override
-        return _normalize_api_url(self._config.get("api_url")) or "http://localhost:8000"
+        return _normalize_api_url(self._config.get("api_url")) or LOCAL_API_URL
 
     @property
     def api_url_source(self) -> str:
@@ -87,7 +90,7 @@ class CLIConfig:
 
     @api_url.setter
     def api_url(self, value: str):
-        self._config["api_url"] = _normalize_api_url(value) or "http://localhost:8000"
+        self._config["api_url"] = _normalize_api_url(value) or LOCAL_API_URL
         self.save()
 
     def set_runtime_api_url(self, value: str):
@@ -142,6 +145,17 @@ def current_config() -> CLIConfig:
         if isinstance(config, CLIConfig):
             return config
     return CLIConfig()
+
+
+def resolve_hosted_api_url(config: CLIConfig, override: str | None = None) -> str:
+    if override:
+        return _normalize_api_url(override) or HOSTED_API_URL
+
+    current = _normalize_api_url(config.api_url)
+    if current and current != LOCAL_API_URL:
+        return current
+
+    return HOSTED_API_URL
 
 
 def get_client(config: Optional[CLIConfig] = None) -> httpx.Client:

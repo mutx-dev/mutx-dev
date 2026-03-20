@@ -6,7 +6,7 @@ from typing import Any
 
 import httpx
 
-from cli.config import CLIConfig, current_config, get_client
+from cli.config import CLIConfig, HOSTED_API_URL, LOCAL_API_URL, current_config, get_client
 
 
 class CLIServiceError(Exception):
@@ -52,6 +52,17 @@ class APIService:
         if not self.config.is_authenticated():
             raise AuthenticationRequiredError("Not authenticated. Run 'mutx login' first.")
 
+    def _unreachable_api_message(self) -> str:
+        api_url = self.config.api_url
+        if api_url == LOCAL_API_URL:
+            return (
+                f"Could not reach the local control plane at {LOCAL_API_URL}. "
+                "Start it first, then rerun `mutx setup local`, or use `mutx setup hosted` "
+                f"for the hosted lane at {HOSTED_API_URL}."
+            )
+
+        return f"Could not reach API at {api_url}. Check that the control plane is running and reachable."
+
     def _request(
         self,
         method: str,
@@ -68,9 +79,7 @@ class APIService:
             try:
                 response = getattr(client, method.lower())(path, **kwargs)
             except httpx.HTTPError as exc:
-                raise APIRequestError(
-                    f"Could not reach API at {self.config.api_url}. Check that the control plane is running and reachable."
-                ) from exc
+                raise APIRequestError(self._unreachable_api_message()) from exc
         finally:
             close = getattr(client, "close", None)
             if callable(close):

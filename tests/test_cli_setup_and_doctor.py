@@ -10,6 +10,7 @@ from click.testing import CliRunner
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cli.config import CLIConfig
+from cli.config import HOSTED_API_URL
 from cli.main import cli
 
 
@@ -77,7 +78,7 @@ def test_setup_hosted_deploys_personal_assistant(monkeypatch, tmp_path: Path) ->
     assert captured["login"] == {
         "email": "operator@example.com",
         "password": "StrongPass1!",
-        "api_url": None,
+        "api_url": "https://control.example.com",
     }
     assert captured["template_id"] == "personal_assistant"
     assert captured["template_kwargs"] == {
@@ -90,6 +91,52 @@ def test_setup_hosted_deploys_personal_assistant(monkeypatch, tmp_path: Path) ->
     assert "Assistant deployed: agent-pa-01" in result.output
     assert "Deployment: dep-pa-01" in result.output
     assert launched["value"] is True
+
+
+def test_setup_hosted_defaults_to_hosted_api(monkeypatch, tmp_path: Path) -> None:
+    captured: dict[str, object] = {}
+    config = CLIConfig(config_path=tmp_path / "config.json")
+
+    class DummyAuth:
+        def login(self, email: str, password: str, api_url: str | None = None) -> None:
+            captured["login"] = {
+                "email": email,
+                "password": password,
+                "api_url": api_url,
+            }
+
+    class DummyTemplates:
+        def deploy_template(self, template_id: str, **kwargs: object) -> dict[str, object]:
+            return {
+                "agent": {"id": "agent-pa-01"},
+                "deployment": {"id": "dep-pa-01"},
+            }
+
+    monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
+    monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
+    monkeypatch.setattr("cli.commands.setup._templates_service", lambda: DummyTemplates())
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "setup",
+            "hosted",
+            "--email",
+            "operator@example.com",
+            "--password",
+            "StrongPass1!",
+            "--no-input",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert config.api_url == HOSTED_API_URL
+    assert captured["login"] == {
+        "email": "operator@example.com",
+        "password": "StrongPass1!",
+        "api_url": HOSTED_API_URL,
+    }
 
 
 def test_setup_local_bootstraps_local_operator_without_credentials(

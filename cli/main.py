@@ -1,6 +1,6 @@
 import click
 
-from cli.config import CLIConfig, get_client
+from cli.config import CLIConfig, get_client, resolve_hosted_api_url
 from cli.commands.agent import agent_group
 from cli.commands.assistant import assistant_group
 from cli.commands.auth import auth_group
@@ -38,13 +38,19 @@ def _auth_service() -> AuthService:
 
 
 @cli.command(name="login")
-@click.option("--email", "-e", required=True, help="Email address")
+@click.option("--email", "-e", prompt=True, help="Email address")
 @click.option("--password", "-p", prompt=True, hide_input=True, help="Password")
 @click.option("--api-url", "-u", default=None, help="API URL")
-def login(email: str, password: str, api_url: str):
+@click.pass_context
+def login(ctx, email: str, password: str, api_url: str | None):
     """Login to mutx.dev"""
     try:
-        _auth_service().login(email=email, password=password, api_url=api_url)
+        config = ctx.obj["config"]
+        _auth_service().login(
+            email=email,
+            password=password,
+            api_url=resolve_hosted_api_url(config, api_url),
+        )
         click.echo("Logged in successfully!")
     except CLIServiceError as exc:
         _echo_service_error(exc)

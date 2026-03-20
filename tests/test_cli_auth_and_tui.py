@@ -77,6 +77,7 @@ def test_login_hits_v1_auth_route_and_saves_tokens(monkeypatch) -> None:
             "password": "StrongPass1!",
         },
     }
+    assert config.api_url == "https://api.mutx.dev"
     assert config.api_key == "access-token"
     assert config.refresh_token == "refresh-token"
     assert "Logged in successfully!" in result.output
@@ -106,7 +107,7 @@ def test_login_reports_unreachable_api_without_traceback(monkeypatch) -> None:
     )
 
     assert result.exit_code == 0
-    assert "Could not reach API at http://localhost:8000" in result.output
+    assert "https://api.mutx.dev" in result.output
     assert "Traceback" not in result.output
 
 

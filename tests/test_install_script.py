@@ -124,6 +124,22 @@ def build_install_env(tmp_path: Path, *, source_ref: str | None = None) -> tuple
         """,
     )
 
+    write_executable(
+        brew_bin / "curl",
+        """#!/usr/bin/env bash
+        set -euo pipefail
+
+        target="${@: -1}"
+        case "${target}" in
+          http://localhost:8000/health|http://localhost:8000/ready)
+            exit 0
+            ;;
+        esac
+
+        exit 22
+        """,
+    )
+
     env = os.environ.copy()
     env["FAKE_BREW_PREFIX"] = str(brew_prefix)
     env["HOME"] = str(tmp_path / "home")
@@ -353,12 +369,11 @@ def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recover
     assert exit_code == 0
     assert "\x1b[?1049h" in transcript
     assert "Recovering current CLI surface" in transcript
-    assert "Setup Wizard" in transcript
     assert "Select a lane [1/2/3]" in transcript
     assert "Hosted lane" in transcript
     assert "Local lane" in transcript
     assert "Launching:" in transcript
-    assert "LOCAL SETUP --open-tui" in transcript
+    assert "LOCAL SETUP --no-input --open-tui" in transcript
     assert "MUTX setup wizard\\nInstall the CLI" not in transcript
     assert "No such command 'setup'" not in transcript
 
@@ -369,3 +384,18 @@ def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recover
         check=False,
     )
     assert setup_help.returncode == 0
+
+
+def test_install_script_tty_hosted_lane_targets_hosted_api(tmp_path: Path) -> None:
+    exit_code, transcript, _ = run_install_script_in_tty(
+        tmp_path,
+        mutx_script=CURRENT_MUTX_SCRIPT,
+        source_ref=str(build_fake_cli_package(tmp_path / "source-cli")),
+        replies=[
+            ("Select a lane [1/2/3]", "1\n"),
+        ],
+    )
+
+    assert exit_code == 0
+    assert "Launching:" in transcript
+    assert "setup hosted --api-url https://api.mutx.dev --open-tui" in transcript

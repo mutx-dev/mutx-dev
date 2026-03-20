@@ -1,6 +1,6 @@
 import click
 
-from cli.config import current_config, get_client
+from cli.config import current_config, get_client, resolve_hosted_api_url
 from cli.services import AuthService, CLIServiceError
 
 
@@ -19,11 +19,17 @@ def _echo_service_error(error: CLIServiceError) -> None:
 
 
 @auth_group.command(name="login")
-@click.option("--email", "-e", required=True, help="Email address")
+@click.option("--email", "-e", prompt=True, help="Email address")
 @click.option("--password", "-p", prompt=True, hide_input=True, help="Password")
-def login_command(email: str, password: str):
+@click.option("--api-url", "-u", default=None, help="API URL")
+def login_command(email: str, password: str, api_url: str | None):
     try:
-        _service().login(email=email, password=password)
+        config = current_config()
+        _service().login(
+            email=email,
+            password=password,
+            api_url=resolve_hosted_api_url(config, api_url),
+        )
         click.echo("Logged in successfully.")
     except CLIServiceError as exc:
         _echo_service_error(exc)

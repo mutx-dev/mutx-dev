@@ -1,7 +1,7 @@
 import click
 
 from cli.commands.tui import launch_tui
-from cli.config import current_config, get_client
+from cli.config import LOCAL_API_URL, current_config, get_client, resolve_hosted_api_url
 from cli.services import AuthService, CLIServiceError
 from cli.services.assistant import TemplatesService
 
@@ -52,7 +52,7 @@ def _finish_setup(
 
 
 @setup_group.command(name="hosted")
-@click.option("--api-url", default=None, help="Hosted API base URL")
+@click.option("--api-url", default=None, help="Hosted API base URL (defaults to the configured remote or https://api.mutx.dev)")
 @click.option("--email", default=None, help="Account email")
 @click.option("--password", default=None, help="Account password")
 @click.option("--assistant-name", default="Personal Assistant", help="Assistant display name")
@@ -75,13 +75,14 @@ def setup_hosted(
     no_input: bool,
 ):
     config = current_config()
-    if api_url:
-        config.api_url = api_url
+    target_api_url = resolve_hosted_api_url(config, api_url)
+    config.api_url = target_api_url
 
     try:
         _auth_service().login(
             email=_require_value("Email", email, no_input),
             password=_require_value("Password", password, no_input, secret=True),
+            api_url=target_api_url,
         )
         _finish_setup(
             assistant_name=assistant_name,
@@ -124,7 +125,7 @@ def setup_local(
     open_tui: bool,
     no_input: bool,
 ):
-    current_config().api_url = "http://localhost:8000"
+    current_config().api_url = LOCAL_API_URL
 
     try:
         if email or password:

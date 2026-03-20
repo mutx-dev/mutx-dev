@@ -6,6 +6,8 @@ FORMULA="${MUTX_FORMULA:-mutx}"
 OPEN_TUI="${MUTX_OPEN_TUI:-1}"
 MUTX_HOME_DIR="${MUTX_HOME_DIR:-$HOME/.mutx}"
 MUTX_CLI_SOURCE_REF="${MUTX_CLI_SOURCE_REF:-https://github.com/mutx-dev/mutx-dev/archive/refs/heads/main.tar.gz}"
+HOSTED_API_URL="${MUTX_HOSTED_API_URL:-https://api.mutx.dev}"
+LOCAL_API_URL="${MUTX_LOCAL_API_URL:-http://localhost:8000}"
 MUTX_NO_ANIMATION="${MUTX_NO_ANIMATION:-0}"
 NO_ONBOARD="${MUTX_NO_ONBOARD:-0}"
 NO_PROMPT="${MUTX_NO_PROMPT:-0}"
@@ -26,14 +28,14 @@ BANNER_HAS_ANIMATED=0
 OS_NAME="unknown"
 INSTALL_STAGE_TOTAL=3
 INSTALL_STAGE_CURRENT=0
-ASCII_FRAME_COUNT=5
+ASCII_FRAME_COUNT=1
 ASCII_FRAME_INDEX=0
 ALT_SCREEN_ACTIVE=0
 DASHBOARD_ACTIVE=0
 TERM_COLS=100
 TERM_ROWS=30
-ART_PANEL_WIDTH=56
-PANEL_GAP=4
+ART_PANEL_WIDTH=44
+PANEL_GAP=3
 CURRENT_STAGE_INDEX=-1
 CURRENT_STEP_LABEL=""
 CURRENT_STEP_DETAIL=""
@@ -359,26 +361,8 @@ show_install_plan() {
 }
 
 show_finish_message() {
-  local -a install_messages=(
-    "Runtime locked in. Pick a lane."
-    "Package synced. Operator loop is next."
-    "Bootstrap complete. Hand it to the CLI."
-    "Fresh install. Clean runway."
-    "MUTX is in. Time to wire the control plane."
-  )
-  local -a deferred_messages=(
-    "Install complete. Setup can wait."
-    "Runtime is ready. Onboarding is one command away."
-    "Clean exit. Launch the wizard when you want it."
-    "MUTX is staged. Finish setup when you're ready."
-    "Everything is installed. Handoff deferred."
-  )
-  local index=0
-
-  index=$((RANDOM % ${#install_messages[@]}))
   if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
-    index=$((RANDOM % ${#deferred_messages[@]}))
-    FINISH_MESSAGE="${deferred_messages[${index}]}"
+    FINISH_MESSAGE="Install complete. Run setup when you are ready."
     if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
       dashboard_render
       return
@@ -387,7 +371,7 @@ show_finish_message() {
     return
   fi
 
-  FINISH_MESSAGE="${install_messages[${index}]}"
+  FINISH_MESSAGE="Install complete. Choose a setup lane."
   if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
     dashboard_render
     return
@@ -396,168 +380,43 @@ show_finish_message() {
 }
 
 ascii_frame_content() {
-  case "$1" in
-    0)
-      cat <<'EOF'
-                    ++
-                   ++++
-                  ++++++
-                 ++++++++
-               ++++++++++++  +++++++
-              ++++++++++++++  +++++++++
-            +++++++++ +++++++  ++++++++
-           ++++++++    ++++++++  +++++++
-          ++++++++  ++  ++++++  +++++++
-        +++++++++  +++++  +++  ++++++++
-       ++++++++   +++++++  + +++++++++
-      ++++++++  ++++++++++  ++++++++
-    +++++++++    ++++++++  ++++++++
-   +++++++++  ++  ++++++  ++++++++ +++
-  ++++++++  +++++  +++  +++++++++++++++
- ++++++++  +++++++     ++++++++ +++++++++
- +++++++    ++++++++  ++++++++   ++++++++
- +++++       ++++++++++++++++      ++++++
- ++++         +++++++++++++         +++++
- +++            ++++++++++           ++++
- +               ++++++++             +++
-                  ++++++                +
+  cat <<'EOF'
+                     ≠≠
+                    ≠≠≠≠
+                   ≠====≠
+                 ≠≠======≠≠
+                ≠≠=========≠  ==≠≠≠≈≈≈
+               =======÷======  ÷÷=====≠=
+             =======÷÷÷÷=======  ÷======≠
+            =======÷÷   ÷=======  ÷÷=====≠
+           ==÷====×   ÷  ÷÷====÷  ≠======≠
+         ==÷÷÷÷÷÷÷  ÷==÷  ÷÷==÷  =======÷
+        ==÷÷÷÷÷÷÷  ÷======  ÷÷ =======÷÷
+       =÷÷÷÷÷÷÷÷ =÷÷=======   =======÷÷
+     ==÷÷÷÷÷÷÷   ÷÷===÷÷÷÷÷  ==÷÷÷÷÷÷
+    ==÷÷÷÷÷÷÷  ÷  ÷÷÷÷==÷  ==÷÷÷÷÷÷÷ ==
+   =÷÷÷÷÷÷÷÷  ÷=÷  ÷÷÷÷÷  ÷=÷÷÷÷÷÷÷ ==÷=
+  =÷÷÷÷÷÷÷   ÷÷===  ÷÷÷  ÷=÷÷÷÷÷×÷÷=÷÷÷÷=≠
+ ÷÷÷÷÷÷÷÷   ×÷==÷÷==    ===÷÷÷÷÷  ÷÷÷÷÷÷÷=≠
+ ÷÷÷÷÷÷÷     ×÷÷÷÷÷== =====÷÷÷÷    ≠÷÷÷÷÷÷=
+ ÷÷÷÷÷        ÷÷÷÷÷÷===÷÷==÷÷÷       ÷÷÷÷÷=
+ ÷÷÷÷           ÷÷÷÷÷÷÷÷÷÷÷÷          ÷÷÷÷=
+ ÷÷÷             ÷÷÷÷÷÷÷÷÷÷            ÷÷÷=
+ ÷÷               ÷÷÷÷÷÷÷÷              ÷÷=
+                   ÷÷÷÷÷÷                 =
 EOF
-      ;;
-    1)
-      cat <<'EOF'
-                    ##
-                   ####
-                  ######
-                 ########
-               ############  #######
-              ##############  #########
-            ######### #######  ########
-           ########    ########  #######
-          ########  ##  ######  #######
-        #########  #####  ###  ########
-       ########   #######  # #########
-      ########  ##########  ########
-    #########    ########  ########
-   #########  ##  ######  ######## ###
-  ########  #####  ###  ###############
- ########  #######     ######## #########
- #######    ########  ########   ########
- #####       ################      ######
- ####         #############         #####
- ###            ##########           ####
- #               ########             ###
-                  ######                #
-EOF
-      ;;
-    2)
-      cat <<'EOF'
-                    ↑↑
-                   ↑↑↑↑
-                  ↑↑↑↑↑↑
-                 ↑↑↑↑↑↑↑↑
-               ↑↑↑↑↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑
-              ↑↑↑↑↑↑↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑↑
-            ↑↑↑↑↑↑↑↑↑ ↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑
-           ↑↑↑↑↑↑↑↑    ↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑
-          ↑↑↑↑↑↑↑↑  ↑↑  ↑↑↑↑↑↑  ↑↑↑↑↑↑↑
-        ↑↑↑↑↑↑↑↑↑  ↑↑↑↑↑  ↑↑↑  ↑↑↑↑↑↑↑↑
-       ↑↑↑↑↑↑↑↑   ↑↑↑↑↑↑↑  ↑ ↑↑↑↑↑↑↑↑↑
-      ↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑
-    ↑↑↑↑↑↑↑↑↑    ↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑
-   ↑↑↑↑↑↑↑↑↑  ↑↑  ↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑ ↑↑↑
-  ↑↑↑↑↑↑↑↑  ↑↑↑↑↑  ↑↑↑  ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
- ↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑     ↑↑↑↑↑↑↑↑ ↑↑↑↑↑↑↑↑↑
- ↑↑↑↑↑↑↑    ↑↑↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑   ↑↑↑↑↑↑↑↑
- ↑↑↑↑↑       ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑      ↑↑↑↑↑↑
- ↑↑↑↑         ↑↑↑↑↑↑↑↑↑↑↑↑↑         ↑↑↑↑↑
- ↑↑↑            ↑↑↑↑↑↑↑↑↑↑           ↑↑↑↑
- ↑               ↑↑↑↑↑↑↑↑             ↑↑↑
-                  ↑↑↑↑↑↑                ↑
-EOF
-      ;;
-    3)
-      cat <<'EOF'
-                    AA
-                   AAAA
-                  AAAAAA
-                 AAAAAAAA
-               AAAAAAAAAAAA  AAAAAAA
-              AAAAAAAAAAAAAA  AAAAAAAAA
-            AAAAAAAAA AAAAAAA  AAAAAAAA
-           AAAAAAAA    AAAAAAAA  AAAAAAA
-          AAAAAAAA  AA  AAAAAA  AAAAAAA
-        AAAAAAAAA  AAAAA  AAA  AAAAAAAA
-       AAAAAAAA   AAAAAAA  A AAAAAAAAA
-      AAAAAAAA  AAAAAAAAAA  AAAAAAAA
-    AAAAAAAAA    AAAAAAAA  AAAAAAAA
-   AAAAAAAAA  AA  AAAAAA  AAAAAAAA AAA
-  AAAAAAAA  AAAAA  AAA  AAAAAAAAAAAAAAA
- AAAAAAAA  AAAAAAA     AAAAAAAA AAAAAAAAA
- AAAAAAA    AAAAAAAA  AAAAAAAA   AAAAAAAA
- AAAAA       AAAAAAAAAAAAAAAA      AAAAAA
- AAAA         AAAAAAAAAAAAA         AAAAA
- AAA            AAAAAAAAAA           AAAA
- A               AAAAAAAA             AAA
-                  AAAAAA                A
-EOF
-      ;;
-    *)
-      cat <<'EOF'
-                    ÆÆ
-                   ÆÆÆÆ
-                  ÆÆÆÆÆÆ
-                 ÆÆÆÆÆÆÆÆ
-               ÆÆÆÆÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆ
-              ÆÆÆÆÆÆÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆÆ
-            ÆÆÆÆÆÆÆÆÆ ÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆ
-           ÆÆÆÆÆÆÆÆ    ÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆ
-          ÆÆÆÆÆÆÆÆ  ÆÆ  ÆÆÆÆÆÆ  ÆÆÆÆÆÆÆ
-        ÆÆÆÆÆÆÆÆÆ  ÆÆÆÆÆ  ÆÆÆ  ÆÆÆÆÆÆÆÆ
-       ÆÆÆÆÆÆÆÆ   ÆÆÆÆÆÆÆ  Æ ÆÆÆÆÆÆÆÆÆ
-      ÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆ
-    ÆÆÆÆÆÆÆÆÆ    ÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆ
-   ÆÆÆÆÆÆÆÆÆ  ÆÆ  ÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆ ÆÆÆ
-  ÆÆÆÆÆÆÆÆ  ÆÆÆÆÆ  ÆÆÆ  ÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆ
- ÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆ     ÆÆÆÆÆÆÆÆ ÆÆÆÆÆÆÆÆÆ
- ÆÆÆÆÆÆÆ    ÆÆÆÆÆÆÆÆ  ÆÆÆÆÆÆÆÆ   ÆÆÆÆÆÆÆÆ
- ÆÆÆÆÆ       ÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆ      ÆÆÆÆÆÆ
- ÆÆÆÆ         ÆÆÆÆÆÆÆÆÆÆÆÆÆ         ÆÆÆÆÆ
- ÆÆÆ            ÆÆÆÆÆÆÆÆÆÆ           ÆÆÆÆ
- Æ               ÆÆÆÆÆÆÆÆ             ÆÆÆ
-                  ÆÆÆÆÆÆ                Æ
-EOF
-      ;;
-  esac
 }
 
 ascii_frame_color() {
-  case "$1" in
-    0) printf '%s' "${C_DIM}" ;;
-    1) printf '%s' "${C_FLARE_SOFT}" ;;
-    2) printf '%s' "${C_PANEL}" ;;
-    3) printf '%s' "${C_MUTX_ALT}" ;;
-    *) printf '%s' "${C_FLARE}" ;;
-  esac
+  printf '%s' "${C_MUTX}"
 }
 
 ascii_frame_phase() {
-  case "$1" in
-    0) printf '%s' "spark lattice" ;;
-    1) printf '%s' "forge lattice" ;;
-    2) printf '%s' "raise signal" ;;
-    3) printf '%s' "align operator" ;;
-    *) printf '%s' "merge control" ;;
-  esac
+  printf '%s' "current runtime"
 }
 
 ascii_stage_sigil() {
-  case "$1" in
-    0) printf '%s' "++" ;;
-    1) printf '%s' "##" ;;
-    2) printf '%s' "↑↑" ;;
-    3) printf '%s' "AA" ;;
-    *) printf '%s' "ÆÆ" ;;
-  esac
+  printf '%s' "•"
 }
 
 render_ascii_frame() {
@@ -722,15 +581,11 @@ dashboard_render_splash() {
 }
 
 dashboard_render() {
-  local frame_idx=4
   local frame_color=""
   local max_lines=0
   local idx=0
   local art_line=""
   local info_line=""
-  local onboarding_mode="interactive wizard"
-  local prompt_mode="interactive"
-  local tui_mode="open after setup"
   local -a art_lines=()
   local -a info_lines=()
 
@@ -740,58 +595,32 @@ dashboard_render() {
 
   PROMPT_CURSOR_ROW=0
   PROMPT_CURSOR_COL=0
+  frame_color="$(ascii_frame_color 0)"
 
-  if [[ "${NO_ONBOARD}" == "1" ]]; then
-    onboarding_mode="skipped"
-  fi
-  if ! is_promptable; then
-    prompt_mode="disabled"
-  fi
-  if [[ "${OPEN_TUI}" == "0" ]]; then
-    tui_mode="stay in CLI"
-  fi
-
-  if [[ "${WIZARD_VISIBLE}" == "1" ]]; then
-    if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
-      frame_idx=4
-    else
-      frame_idx=1
-    fi
-  elif [[ "${CURRENT_STEP_STATE}" == "running" ]]; then
-    frame_idx=$((SPINNER_FRAME_INDEX % ASCII_FRAME_COUNT))
-  elif [[ "${CURRENT_STAGE_INDEX}" -ge 0 ]]; then
-    frame_idx=$((CURRENT_STAGE_INDEX % ASCII_FRAME_COUNT))
-  fi
-
-  frame_color="$(ascii_frame_color "${frame_idx}")"
   while IFS= read -r art_line; do
     art_lines+=("${art_line}")
-  done <<< "$(ascii_frame_content "${frame_idx}")"
+  done <<< "$(ascii_frame_content 0)"
 
-  info_lines+=("${C_BOLD}${C_MUTX}MUTX setup wizard${C_RESET}")
-  info_lines+=("${C_SOFT}Single-screen bootstrap for the current MUTX runtime.${C_RESET}")
+  info_lines+=("${C_BOLD}${C_MUTX}MUTX install${C_RESET}")
+  info_lines+=("${C_SOFT}Quiet install, current CLI surface, clean setup handoff.${C_RESET}")
   info_lines+=("")
-  info_lines+=("${C_MUTX_ALT}Install plan${C_RESET}")
-  info_lines+=("${C_DIM}${OS_NAME} • homebrew • ${tui_mode}${C_RESET}")
-  info_lines+=("${C_DIM}fallback: source overlay if packaged CLI is stale${C_RESET}")
-  info_lines+=("${C_DIM}onboarding: ${onboarding_mode} • prompts: ${prompt_mode}${C_RESET}")
-  info_lines+=("")
-  info_lines+=("${C_MUTX_ALT}Progress${C_RESET}")
+  info_lines+=("${C_MUTX_ALT}Stages${C_RESET}")
   info_lines+=("$(dashboard_stage_line 0)")
   info_lines+=("$(dashboard_stage_line 1)")
   info_lines+=("$(dashboard_stage_line 2)")
   info_lines+=("")
 
   if [[ "${WIZARD_VISIBLE}" == "1" ]]; then
-    info_lines+=("${C_MUTX_ALT}Setup Wizard${C_RESET}")
+    info_lines+=("${C_MUTX_ALT}Setup${C_RESET}")
     if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
-      info_lines+=("${C_GOOD}fresh overlay active${C_RESET} so setup uses the current CLI surface")
+      info_lines+=("${C_GOOD}fresh runtime active${C_RESET}")
     else
-      info_lines+=("${C_GOOD}package surface current${C_RESET} and ready for handoff")
+      info_lines+=("${C_GOOD}package runtime current${C_RESET}")
     fi
-    info_lines+=("${C_DIM}1 Hosted lane  authenticate against your control plane${C_RESET}")
-    info_lines+=("${C_DIM}2 Local lane   use http://localhost:8000${C_RESET}")
-    info_lines+=("${C_DIM}3 Later        finish install and exit cleanly${C_RESET}")
+    info_lines+=("${C_DIM}1 Hosted lane  ${HOSTED_API_URL}${C_RESET}")
+    info_lines+=("${C_DIM}2 Local lane   ${LOCAL_API_URL}${C_RESET}")
+    info_lines+=("${C_DIM}3 Later        exit cleanly${C_RESET}")
+    info_lines+=("")
     PROMPT_CURSOR_ROW=$((${#info_lines[@]} + 1))
     PROMPT_CURSOR_COL=$((ART_PANEL_WIDTH + PANEL_GAP + 24))
     info_lines+=("${C_PANEL}Select a lane [1/2/3]: ${C_RESET}")
@@ -801,41 +630,28 @@ dashboard_render() {
       info_lines+=("${C_SOFT}${WIZARD_HINT}${C_RESET}")
     elif [[ -n "${FINISH_MESSAGE}" ]]; then
       info_lines+=("${C_GOOD}${FINISH_MESSAGE}${C_RESET}")
-    else
-      info_lines+=("${C_SOFT}The lane will ${tui_mode} when setup completes.${C_RESET}")
     fi
   else
-    info_lines+=("${C_MUTX_ALT}Now${C_RESET}")
-    if [[ "${CURRENT_STEP_STATE}" == "running" ]]; then
-      info_lines+=("${C_MUTX_ALT}$(dashboard_spinner_glyph)${C_RESET} ${CURRENT_STEP_LABEL}")
-    elif [[ "${CURRENT_STEP_STATE}" == "done" ]]; then
-      info_lines+=("${C_GOOD}✓${C_RESET} ${CURRENT_STEP_LABEL}")
-    else
-      info_lines+=("${C_SOFT}stand by${C_RESET}")
-    fi
+    info_lines+=("${C_MUTX_ALT}Current${C_RESET}")
+    case "${CURRENT_STEP_STATE}" in
+      running)
+        info_lines+=("${C_MUTX_ALT}$(dashboard_spinner_glyph)${C_RESET} ${CURRENT_STEP_LABEL}")
+        ;;
+      done)
+        info_lines+=("${C_GOOD}✓${C_RESET} ${CURRENT_STEP_LABEL}")
+        ;;
+      warn)
+        info_lines+=("${C_WARN}!${C_RESET} ${CURRENT_STEP_LABEL}")
+        ;;
+      *)
+        info_lines+=("${C_SOFT}stand by${C_RESET}")
+        ;;
+    esac
     if [[ -n "${CURRENT_STEP_DETAIL}" ]]; then
       info_lines+=("${C_SOFT}${CURRENT_STEP_DETAIL}${C_RESET}")
-    else
-      info_lines+=("${C_SOFT}Syncing the install lane and current command surface.${C_RESET}")
-    fi
-    info_lines+=("")
-    info_lines+=("${C_MUTX_ALT}Signal${C_RESET}")
-    if [[ "${#FEED_LINES[@]}" == "0" ]]; then
-      info_lines+=("${C_SOFT}No events yet.${C_RESET}")
-      info_lines+=("")
-      info_lines+=("")
-      info_lines+=("")
-    else
-      idx=0
-      while [[ "${idx}" -lt "${#FEED_LINES[@]}" ]]; do
-        info_lines+=("$(dashboard_feed_line "${FEED_LINES[${idx}]}")")
-        idx=$((idx + 1))
-      done
-      while [[ "${#info_lines[@]}" -lt 22 ]]; do
-        info_lines+=("")
-      done
     fi
     if [[ -n "${FINISH_MESSAGE}" ]]; then
+      info_lines+=("")
       info_lines+=("${C_GOOD}${FINISH_MESSAGE}${C_RESET}")
     fi
   fi
@@ -962,31 +778,17 @@ run_stage() {
 }
 
 render_banner() {
-  local title="${C_BOLD}${C_MUTX}MUTX setup wizard${C_RESET}"
-  local subtitle="${C_SOFT}Install the CLI, verify the onboarding surface, and land in the right lane.${C_RESET}"
-  local signal="${C_DIM}neon bootstrap ▸ current runtime ▸ clean operator handoff${C_RESET}"
-  local frame_idx="${ASCII_FRAME_INDEX}"
-  local phase=""
+  local title="${C_BOLD}${C_MUTX}MUTX install${C_RESET}"
+  local subtitle="${C_SOFT}Install the CLI, verify the command surface, and hand off to setup.${C_RESET}"
 
   if [[ "${HAS_TTY}" == "1" ]]; then
     enter_alt_screen
   fi
 
   if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-    if [[ "${MOTION_OK}" == "1" && "${BANNER_HAS_ANIMATED}" != "1" ]]; then
-      local idx=0
-      while [[ "${idx}" -lt "${ASCII_FRAME_COUNT}" ]]; do
-        phase="$(ascii_frame_phase "${idx}")"
-        dashboard_render_splash "${idx}" "${phase}"
-        motion_sleep 0.16
-        idx=$((idx + 1))
-      done
-    fi
-
     BANNER_HAS_ANIMATED=1
-    ASCII_FRAME_INDEX=$((ASCII_FRAME_COUNT - 1))
     CURRENT_STEP_LABEL="Install plan"
-    CURRENT_STEP_DETAIL="Calibrating the package lane and operator handoff."
+    CURRENT_STEP_DETAIL="Preparing the package lane and command surface."
     CURRENT_STEP_STATE="idle"
     dashboard_render
     return
@@ -994,39 +796,11 @@ render_banner() {
 
   clear_tty_screen
   tty_print '\n'
-
-  if [[ "${MOTION_OK}" == "1" && "${BANNER_HAS_ANIMATED}" != "1" ]]; then
-    local idx=0
-    while [[ "${idx}" -lt "${ASCII_FRAME_COUNT}" ]]; do
-      clear_tty_screen
-      tty_print "\n"
-      render_ascii_frame "${idx}" 0.018
-      phase="$(ascii_frame_phase "${idx}")"
-      tty_print "\n${C_FLARE_SOFT}   ${phase}${C_RESET}\n"
-      motion_sleep 0.18
-      idx=$((idx + 1))
-    done
-    frame_idx=$((ASCII_FRAME_COUNT - 1))
-    clear_tty_screen
-    tty_print "\n"
-    render_ascii_frame "${frame_idx}" 0.010
-    tty_print "\n"
-    type_tty "${title}" 0.006
-    tty_print "\n"
-    type_tty "${subtitle}" 0.0035
-    tty_print "\n"
-    type_tty "${signal}" 0.0025
-    tty_print "\n\n"
-    motion_sleep 0.08
-  else
-    render_ascii_frame "${frame_idx}" 0
-    tty_print "\n${title}\n"
-    tty_print "${subtitle}\n"
-    tty_print "${signal}\n\n"
-  fi
+  render_ascii_frame 0 0
+  tty_print "\n${title}\n"
+  tty_print "${subtitle}\n\n"
 
   BANNER_HAS_ANIMATED=1
-  ASCII_FRAME_INDEX=$(( (ASCII_FRAME_INDEX + 1) % ASCII_FRAME_COUNT ))
 }
 
 tty_prompt() {
@@ -1172,9 +946,19 @@ ensure_assistant_first_surface() {
   die "The installed CLI is still missing required commands: ${CLI_MISSING_COMMANDS}"
 }
 
+local_control_plane_ready() {
+  if ! command -v curl >/dev/null 2>&1; then
+    return 1
+  fi
+
+  curl -fsS --max-time 2 "${LOCAL_API_URL}/health" >/dev/null 2>&1 && return 0
+  curl -fsS --max-time 2 "${LOCAL_API_URL}/ready" >/dev/null 2>&1 && return 0
+  return 1
+}
+
 run_setup_handoff() {
-  local -a hosted_cmd=("${MUTX_BIN}" setup hosted)
-  local -a local_cmd=("${MUTX_BIN}" setup local)
+  local -a hosted_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}")
+  local -a local_cmd=("${MUTX_BIN}" setup local --no-input)
   local handoff_note=""
 
   if [[ "${OPEN_TUI}" != "0" ]]; then
@@ -1210,19 +994,19 @@ run_setup_handoff() {
       render_banner
       tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}package lane synced${C_RESET}\n"
       tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}command surface verified${C_RESET}\n"
-      tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}ready for operator handoff${C_RESET}\n"
+      tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}ready for setup handoff${C_RESET}\n"
       tty_print "\n"
       tty_print "${C_PANEL}╭─ ${C_BOLD}Setup Wizard${C_RESET}${C_PANEL} ─────────────────────────────────────────────╮${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}Choose where MUTX should land next.${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}Choose the next lane.${C_RESET}\n"
       if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
-        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} fresh CLI overlay active so setup uses the current surface\n"
+        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} fresh CLI overlay active\n"
       else
-        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} packaged CLI is current and ready\n"
+        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} packaged CLI is current\n"
       fi
       tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}${handoff_note}${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}authenticate against your control plane${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local lane    ${C_DIM}use http://localhost:8000${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}${HOSTED_API_URL}${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local lane    ${C_DIM}${LOCAL_API_URL}${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}3${C_RESET}  Later         ${C_DIM}finish install and exit cleanly${C_RESET}\n"
       tty_print "${C_PANEL}╰───────────────────────────────────────────────────────────────╯${C_RESET}\n"
       tty_prompt "Select a lane [1/2/3]"
@@ -1237,6 +1021,18 @@ run_setup_handoff() {
         break
         ;;
       2|l|L|local|Local)
+        if ! local_control_plane_ready; then
+          WIZARD_ERROR="Local lane needs a running control plane at ${LOCAL_API_URL}."
+          WIZARD_HINT="Start it with make dev-up, then retry."
+          if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+            dashboard_render
+          else
+            note "${WIZARD_ERROR}"
+            note "${WIZARD_HINT}"
+          fi
+          sleep 1
+          continue
+        fi
         break
         ;;
       3|later|Later|q|Q|quit|exit)
