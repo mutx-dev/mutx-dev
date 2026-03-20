@@ -19,31 +19,31 @@ CLI_MISSING_COMMANDS=""
 MUTX_BIN=""
 SOURCE_OVERLAY_USED=0
 WIZARD_SELECTION=""
+BANNER_HAS_ANIMATED=0
 
 MUTX_ASCII_LOGO="$(cat <<'EOF'
-                     ≠≠
-                    ≠≠≠≠
-                   ≠====≠
-                 ≠≠======≠≠
-                ≠≠=========≠  ==≠≠≠≈≈≈
-               =======÷======  ÷÷=====≠=
-             =======÷÷÷÷=======  ÷======≠
-            =======÷÷   ÷=======  ÷÷=====≠
-           ==÷====×   ÷  ÷÷====÷  ≠======≠
-         ==÷÷÷÷÷÷÷  ÷==÷  ÷÷==÷  =======÷
-        ==÷÷÷÷÷÷÷  ÷======  ÷÷ =======÷÷
-       =÷÷÷÷÷÷÷÷ =÷÷=======   =======÷÷
-     ==÷÷÷÷÷÷÷   ÷÷===÷÷÷÷÷  ==÷÷÷÷÷÷
-    ==÷÷÷÷÷÷÷  ÷  ÷÷÷÷==÷  ==÷÷÷÷÷÷÷ ==
-   =÷÷÷÷÷÷÷÷  ÷=÷  ÷÷÷÷÷  ÷=÷÷÷÷÷÷÷ ==÷=
-  =÷÷÷÷÷÷÷   ÷÷===  ÷÷÷  ÷=÷÷÷÷÷×÷÷=÷÷÷÷=≠
- ÷÷÷÷÷÷÷÷   ×÷==÷÷==    ===÷÷÷÷÷  ÷÷÷÷÷÷÷=≠
- ÷÷÷÷÷÷÷     ×÷÷÷÷÷== =====÷÷÷÷    ≠÷÷÷÷÷÷=
- ÷÷÷÷÷        ÷÷÷÷÷÷===÷÷==÷÷÷       ÷÷÷÷÷=
- ÷÷÷÷           ÷÷÷÷÷÷÷÷÷÷÷÷          ÷÷÷÷=
- ÷÷÷             ÷÷÷÷÷÷÷÷÷÷            ÷÷÷=
- ÷÷               ÷÷÷÷÷÷÷÷              ÷÷=
-                   ÷÷÷÷÷÷                 =
+                    ++
+                   ++++
+                  ++++++
+                 ++++++++
+               ++++++++++++  +++++++
+              ++++++++++++++  +++++++++
+            +++++++++ +++++++  ++++++++
+           ++++++++    ++++++++  +++++++
+          ++++++++  ++  ++++++  +++++++
+        +++++++++  +++++  +++  ++++++++
+       ++++++++   +++++++  + +++++++++
+      ++++++++  ++++++++++  ++++++++
+    +++++++++    ++++++++  ++++++++
+   +++++++++  ++  ++++++  ++++++++ +++
+  ++++++++  +++++  +++  +++++++++++++++
+ ++++++++  +++++++     ++++++++ +++++++++
+ +++++++    ++++++++  ++++++++   ++++++++
+ +++++       ++++++++++++++++      ++++++
+ ++++         +++++++++++++         +++++
+ +++            ++++++++++           ++++
+ +               ++++++++             +++
+                  ++++++                +
 EOF
 )"
 
@@ -57,6 +57,8 @@ if [[ -t 1 ]]; then
   C_WARN=$'\033[38;5;221m'
   C_GOOD=$'\033[38;5;85m'
   C_PANEL=$'\033[38;5;159m'
+  C_FLARE=$'\033[38;5;229m'
+  C_FLARE_SOFT=$'\033[38;5;223m'
 else
   C_RESET=''
   C_BOLD=''
@@ -67,6 +69,8 @@ else
   C_WARN=''
   C_GOOD=''
   C_PANEL=''
+  C_FLARE=''
+  C_FLARE_SOFT=''
 fi
 
 if [[ -r /dev/tty && -w /dev/tty ]] && [[ -t 0 || -t 1 || -t 2 ]]; then
@@ -93,6 +97,30 @@ tty_print() {
   else
     printf '%b' "$1"
   fi
+}
+
+motion_sleep() {
+  local duration="${1:-0}"
+  if [[ "${MOTION_OK}" == "1" ]]; then
+    sleep "${duration}"
+  fi
+}
+
+type_tty() {
+  local text="$1"
+  local delay="${2:-0.008}"
+  local idx=0
+
+  if [[ "${MOTION_OK}" != "1" ]]; then
+    tty_print "${text}"
+    return
+  fi
+
+  while [[ "${idx}" -lt "${#text}" ]]; do
+    tty_print "${text:${idx}:1}"
+    idx=$((idx + 1))
+    sleep "${delay}"
+  done
 }
 
 say() {
@@ -151,10 +179,11 @@ spinner_loop() {
   local pid="$1"
   local label="$2"
   local -a frames=( "⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏" )
+  local -a beams=( "▰▱▱▱▱" "▰▰▱▱▱" "▰▰▰▱▱" "▰▰▰▰▱" "▰▰▰▰▰" "▱▰▰▰▰" "▱▱▰▰▰" "▱▱▱▰▰" "▱▱▱▱▰" "▱▱▱▱▱" )
   local i=0
 
   while kill -0 "${pid}" 2>/dev/null; do
-    printf '\r%b%s%b %s' "${C_MUTX_ALT}" "${frames[${i}]}" "${C_RESET}" "${label}" > /dev/tty
+    printf '\r%b%s%b %s  %b%s%b' "${C_MUTX_ALT}" "${frames[${i}]}" "${C_RESET}" "${label}" "${C_PANEL}" "${beams[${i}]}" "${C_RESET}" > /dev/tty
     i=$(( (i + 1) % ${#frames[@]} ))
     sleep 0.08
   done
@@ -205,25 +234,32 @@ run_stage() {
 render_banner() {
   local title="${C_BOLD}${C_MUTX}MUTX setup wizard${C_RESET}"
   local subtitle="${C_SOFT}Install the CLI, verify the onboarding surface, and land in the right lane.${C_RESET}"
+  local signal="${C_DIM}neon bootstrap ▸ current runtime ▸ clean operator handoff${C_RESET}"
+  local -a palette=("${C_DIM}" "${C_FLARE_SOFT}" "${C_FLARE}" "${C_MUTX_ALT}" "${C_PANEL}")
 
   clear_tty_screen
   tty_print '\n'
 
-  if [[ "${MOTION_OK}" == "1" ]]; then
-    local -a palette=("${C_MUTX}" "${C_MUTX_ALT}" "${C_PANEL}" "${C_MUTX_ALT}")
+  if [[ "${MOTION_OK}" == "1" && "${BANNER_HAS_ANIMATED}" != "1" ]]; then
     local idx=0
     while IFS= read -r line; do
       printf '%b%s%b\n' "${palette[$((idx % ${#palette[@]}))]}" "${line}" "${C_RESET}" > /dev/tty
       idx=$((idx + 1))
-      sleep 0.012
+      sleep 0.028
     done <<< "${MUTX_ASCII_LOGO}"
+    tty_print "\n"
+    type_tty "${title}\n" 0.006
+    type_tty "${subtitle}\n" 0.0035
+    type_tty "${signal}\n\n" 0.0025
+    motion_sleep 0.08
   else
-    tty_print "${C_MUTX}${MUTX_ASCII_LOGO}${C_RESET}\n"
+    tty_print "${C_FLARE_SOFT}${MUTX_ASCII_LOGO}${C_RESET}\n"
+    tty_print "\n${title}\n"
+    tty_print "${subtitle}\n"
+    tty_print "${signal}\n\n"
   fi
 
-  tty_print "${title}\n"
-  tty_print "${subtitle}\n"
-  tty_print "${C_DIM}package lane ▸ command surface ▸ operator handoff${C_RESET}\n\n"
+  BANNER_HAS_ANIMATED=1
 }
 
 tty_prompt() {
