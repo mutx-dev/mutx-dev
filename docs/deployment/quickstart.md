@@ -107,7 +107,7 @@ The legacy one-command foreground mode still exists:
 make dev
 ```
 
-### 3. Register and deploy the starter assistant
+### 3. Bootstrap and deploy the starter assistant
 
 ```bash
 mutx setup local --open-tui
@@ -117,8 +117,6 @@ If you want a fully non-interactive local smoke path:
 
 ```bash
 mutx setup local \
-  --email test@local.dev \
-  --password TestPass123! \
   --name "Local Operator" \
   --assistant-name "Personal Assistant" \
   --no-input
@@ -142,14 +140,14 @@ Useful URLs:
 
 The public contract remains mounted under `/v1/*`.
 
-### Register or log in
+### Bootstrap a local operator token pair
 
 ```bash
 BASE_URL=http://localhost:8000/v1
 
-curl -X POST "$BASE_URL/auth/register" \
+curl -X POST "$BASE_URL/auth/local-bootstrap" \
   -H "Content-Type: application/json" \
-  -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
+  -d '{"name":"Local Operator"}'
 ```
 
 ### Deploy the starter assistant in one action

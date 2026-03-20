@@ -4,6 +4,8 @@ import json
 from collections.abc import Iterable
 from typing import Any
 
+import httpx
+
 from cli.config import CLIConfig, current_config, get_client
 
 
@@ -63,7 +65,12 @@ class APIService:
 
         client = self._client_factory(self.config)
         try:
-            response = getattr(client, method.lower())(path, **kwargs)
+            try:
+                response = getattr(client, method.lower())(path, **kwargs)
+            except httpx.HTTPError as exc:
+                raise APIRequestError(
+                    f"Could not reach API at {self.config.api_url}. Check that the control plane is running and reachable."
+                ) from exc
         finally:
             close = getattr(client, "close", None)
             if callable(close):

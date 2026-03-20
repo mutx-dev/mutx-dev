@@ -92,6 +92,70 @@ def test_setup_hosted_deploys_personal_assistant(monkeypatch, tmp_path: Path) ->
     assert launched["value"] is True
 
 
+def test_setup_local_bootstraps_local_operator_without_credentials(
+    monkeypatch, tmp_path: Path
+) -> None:
+    captured: dict[str, object] = {}
+    launched = {"value": False}
+    config = CLIConfig(config_path=tmp_path / "config.json")
+
+    class DummyAuth:
+        def local_bootstrap(self, name: str, api_url: str | None = None) -> None:
+            captured["local_bootstrap"] = {
+                "name": name,
+                "api_url": api_url,
+            }
+
+    class DummyTemplates:
+        def deploy_template(self, template_id: str, **kwargs: object) -> dict[str, object]:
+            captured["template_id"] = template_id
+            captured["template_kwargs"] = kwargs
+            return {
+                "agent": {"id": "agent-pa-01"},
+                "deployment": {"id": "dep-pa-01"},
+            }
+
+    monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
+    monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
+    monkeypatch.setattr("cli.commands.setup._templates_service", lambda: DummyTemplates())
+    monkeypatch.setattr(
+        "cli.commands.setup.launch_tui",
+        lambda: launched.__setitem__("value", True),
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "setup",
+            "local",
+            "--name",
+            "Studio Operator",
+            "--assistant-name",
+            "Personal Assistant",
+            "--open-tui",
+            "--no-input",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert config.api_url == "http://localhost:8000"
+    assert captured["local_bootstrap"] == {
+        "name": "Studio Operator",
+        "api_url": None,
+    }
+    assert captured["template_id"] == "personal_assistant"
+    assert captured["template_kwargs"] == {
+        "name": "Personal Assistant",
+        "description": None,
+        "replicas": 1,
+        "model": None,
+        "workspace": None,
+    }
+    assert "Assistant deployed: agent-pa-01" in result.output
+    assert launched["value"] is True
+
+
 def test_doctor_json_reports_assistant_state(monkeypatch, tmp_path: Path) -> None:
     config = CLIConfig(config_path=tmp_path / "config.json")
     config.api_url = "https://control.example.com"

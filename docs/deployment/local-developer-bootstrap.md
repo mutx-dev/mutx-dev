@@ -151,7 +151,7 @@ make test-api-auth
 If you want to drive the Python CLI or `mutx tui` with the canonical assistant-first flow, use:
 
 ```bash
-mutx setup local --email test@local.dev --password TestPass123! --no-input
+mutx setup local --name "Local Operator" --no-input
 ```
 
 `make test-api-auth` runs authenticated endpoint checks through `scripts/test-api.sh --with-auth`.

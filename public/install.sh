@@ -28,6 +28,34 @@ INSTALL_STAGE_TOTAL=3
 INSTALL_STAGE_CURRENT=0
 ASCII_FRAME_COUNT=5
 ASCII_FRAME_INDEX=0
+ALT_SCREEN_ACTIVE=0
+DASHBOARD_ACTIVE=0
+TERM_COLS=100
+TERM_ROWS=30
+ART_PANEL_WIDTH=56
+PANEL_GAP=4
+CURRENT_STAGE_INDEX=-1
+CURRENT_STEP_LABEL=""
+CURRENT_STEP_DETAIL=""
+CURRENT_STEP_STATE="idle"
+FINISH_MESSAGE=""
+WIZARD_VISIBLE=0
+WIZARD_ERROR=""
+WIZARD_HINT=""
+SPINNER_FRAME_INDEX=0
+PROMPT_CURSOR_ROW=0
+PROMPT_CURSOR_COL=0
+STAGE_TITLES=(
+  "Preparing environment"
+  "Installing MUTX runtime"
+  "Finalizing setup"
+)
+STAGE_STATUSES=(
+  "pending"
+  "pending"
+  "pending"
+)
+FEED_LINES=()
 
 if [[ -t 1 ]]; then
   C_RESET=$'\033[0m'
@@ -64,6 +92,7 @@ if [[ "${HAS_TTY}" == "1" && "${MUTX_NO_ANIMATION}" != "1" ]]; then
 fi
 
 cleanup() {
+  leave_alt_screen
   show_cursor
 
   if [[ "${KEEP_LOG}" != "1" && -f "${INSTALL_LOG}" ]]; then
@@ -106,18 +135,34 @@ type_tty() {
 }
 
 say() {
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    dashboard_record "info" "$*"
+    return
+  fi
   tty_print "${C_MUTX}==>${C_RESET} $*\n"
 }
 
 note() {
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    dashboard_record "note" "$*"
+    return
+  fi
   tty_print "${C_SOFT}   $*${C_RESET}\n"
 }
 
 warn() {
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    dashboard_record "warn" "$*"
+    return
+  fi
   tty_print "${C_WARN} ! ${C_RESET}$*\n"
 }
 
 success() {
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    dashboard_record "success" "$*"
+    return
+  fi
   tty_print "${C_GOOD} ✓ ${C_RESET}$*\n"
 }
 
@@ -139,6 +184,50 @@ clear_tty_screen() {
   if [[ "${HAS_TTY}" == "1" ]]; then
     printf '\033[2J\033[H' > /dev/tty
   fi
+}
+
+refresh_terminal_size() {
+  local tty_size=""
+
+  if [[ "${HAS_TTY}" != "1" ]]; then
+    return
+  fi
+
+  tty_size="$(stty size < /dev/tty 2>/dev/null || true)"
+  if [[ -n "${tty_size}" ]]; then
+    TERM_ROWS="${tty_size%% *}"
+    TERM_COLS="${tty_size##* }"
+  fi
+
+  if [[ "${TERM_ROWS}" -lt 24 ]]; then
+    TERM_ROWS=24
+  fi
+  if [[ "${TERM_COLS}" -lt 96 ]]; then
+    TERM_COLS=96
+  fi
+}
+
+enter_alt_screen() {
+  if [[ "${HAS_TTY}" != "1" || "${ALT_SCREEN_ACTIVE}" == "1" ]]; then
+    return
+  fi
+
+  refresh_terminal_size
+  printf '\033[?1049h\033[2J\033[H' > /dev/tty
+  hide_cursor
+  ALT_SCREEN_ACTIVE=1
+  DASHBOARD_ACTIVE=1
+}
+
+leave_alt_screen() {
+  if [[ "${ALT_SCREEN_ACTIVE}" != "1" ]]; then
+    return
+  fi
+
+  show_cursor
+  printf '\033[?1049l' > /dev/tty
+  ALT_SCREEN_ACTIVE=0
+  DASHBOARD_ACTIVE=0
 }
 
 print_usage() {
@@ -209,12 +298,21 @@ is_promptable() {
 }
 
 ui_section() {
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    dashboard_record "section" "$1"
+    return
+  fi
   tty_print "\n${C_MUTX}${C_BOLD}$1${C_RESET}\n"
 }
 
 ui_stage() {
   local title="$1"
+
   INSTALL_STAGE_CURRENT=$((INSTALL_STAGE_CURRENT + 1))
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    dashboard_begin_stage "${INSTALL_STAGE_CURRENT}" "${title}"
+    return
+  fi
   ui_section "[${INSTALL_STAGE_CURRENT}/${INSTALL_STAGE_TOTAL}] ${title}"
 }
 
@@ -243,6 +341,11 @@ show_install_plan() {
   fi
   if [[ "${OPEN_TUI}" == "0" ]]; then
     tui_mode="stay in CLI"
+  fi
+
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    dashboard_render
+    return
   fi
 
   ui_section "Install plan"
@@ -275,11 +378,21 @@ show_finish_message() {
   index=$((RANDOM % ${#install_messages[@]}))
   if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
     index=$((RANDOM % ${#deferred_messages[@]}))
-    tty_print "\n${C_GOOD}${C_BOLD}${deferred_messages[${index}]}${C_RESET}\n"
+    FINISH_MESSAGE="${deferred_messages[${index}]}"
+    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+      dashboard_render
+      return
+    fi
+    tty_print "\n${C_GOOD}${C_BOLD}${FINISH_MESSAGE}${C_RESET}\n"
     return
   fi
 
-  tty_print "\n${C_GOOD}${C_BOLD}${install_messages[${index}]}${C_RESET}\n"
+  FINISH_MESSAGE="${install_messages[${index}]}"
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    dashboard_render
+    return
+  fi
+  tty_print "\n${C_GOOD}${C_BOLD}${FINISH_MESSAGE}${C_RESET}\n"
 }
 
 ascii_frame_content() {
@@ -461,8 +574,295 @@ render_ascii_frame() {
   done <<< "$(ascii_frame_content "${frame_idx}")"
 }
 
+dashboard_spinner_glyph() {
+  local -a frames=( "⠁" "⠃" "⠇" "⠧" "⠷" "⠿" "⠷" "⠧" )
+  printf '%s' "${frames[$((SPINNER_FRAME_INDEX % ${#frames[@]}))]}"
+}
+
+dashboard_feed_line() {
+  local entry="$1"
+  local level="${entry%%|*}"
+  local message="${entry#*|}"
+  local glyph="•"
+  local color="${C_SOFT}"
+
+  case "${level}" in
+    success)
+      glyph="✓"
+      color="${C_GOOD}"
+      ;;
+    warn)
+      glyph="!"
+      color="${C_WARN}"
+      ;;
+    info)
+      glyph="›"
+      color="${C_MUTX_ALT}"
+      ;;
+  esac
+
+  printf '%b%s%b %s' "${color}" "${glyph}" "${C_RESET}" "${message}"
+}
+
+dashboard_record() {
+  local level="$1"
+  shift
+  local message="$*"
+
+  CURRENT_STEP_DETAIL="${message}"
+
+  if [[ "${level}" == "warn" && "${CURRENT_STAGE_INDEX}" -ge 0 ]]; then
+    STAGE_STATUSES[${CURRENT_STAGE_INDEX}]="warn"
+  fi
+
+  if [[ "${level}" != "section" ]]; then
+    FEED_LINES+=("${level}|${message}")
+    while [[ "${#FEED_LINES[@]}" -gt 4 ]]; do
+      FEED_LINES=("${FEED_LINES[@]:1}")
+    done
+  fi
+
+  dashboard_render
+}
+
+dashboard_begin_stage() {
+  local stage_number="$1"
+  local title="$2"
+  local stage_idx=$((stage_number - 1))
+
+  if [[ "${CURRENT_STAGE_INDEX}" -ge 0 && "${CURRENT_STAGE_INDEX}" -lt "${#STAGE_STATUSES[@]}" ]]; then
+    if [[ "${STAGE_STATUSES[${CURRENT_STAGE_INDEX}]}" == "running" ]]; then
+      STAGE_STATUSES[${CURRENT_STAGE_INDEX}]="done"
+    fi
+  fi
+
+  CURRENT_STAGE_INDEX="${stage_idx}"
+  STAGE_STATUSES[${stage_idx}]="running"
+  CURRENT_STEP_LABEL="${title}"
+  CURRENT_STEP_DETAIL="Stage armed."
+  CURRENT_STEP_STATE="running"
+  dashboard_render
+}
+
+dashboard_mark_stage_done() {
+  local stage_idx="${1:-${CURRENT_STAGE_INDEX}}"
+
+  if [[ "${stage_idx}" -ge 0 && "${stage_idx}" -lt "${#STAGE_STATUSES[@]}" ]]; then
+    STAGE_STATUSES[${stage_idx}]="done"
+  fi
+  CURRENT_STEP_STATE="done"
+  dashboard_render
+}
+
+dashboard_stage_line() {
+  local stage_idx="$1"
+  local stage_number=$((stage_idx + 1))
+  local title="${STAGE_TITLES[${stage_idx}]}"
+  local status="${STAGE_STATUSES[${stage_idx}]}"
+  local glyph="·"
+  local color="${C_DIM}"
+  local label="pending"
+
+  case "${status}" in
+    running)
+      glyph="$(dashboard_spinner_glyph)"
+      color="${C_MUTX_ALT}"
+      label="live"
+      ;;
+    done)
+      glyph="✓"
+      color="${C_GOOD}"
+      label="locked"
+      ;;
+    warn)
+      glyph="!"
+      color="${C_WARN}"
+      label="attention"
+      ;;
+  esac
+
+  printf '%b%s%b [%d/%d] %s %b%s%b' \
+    "${color}" \
+    "${glyph}" \
+    "${C_RESET}" \
+    "${stage_number}" \
+    "${INSTALL_STAGE_TOTAL}" \
+    "${title}" \
+    "${C_DIM}" \
+    "${label}" \
+    "${C_RESET}"
+}
+
+dashboard_render_splash() {
+  local frame_idx="$1"
+  local phase="$2"
+  local frame_color=""
+
+  frame_color="$(ascii_frame_color "${frame_idx}")"
+  refresh_terminal_size
+  printf '\033[H\033[2J' > /dev/tty
+
+  while IFS= read -r line; do
+    printf '%b%-*s%b' "${frame_color}" "${ART_PANEL_WIDTH}" "${line}" "${C_RESET}" > /dev/tty
+    printf '%*s' "${PANEL_GAP}" "" > /dev/tty
+    case "${line}" in
+      "")
+        printf '\n' > /dev/tty
+        ;;
+      *)
+        printf '\n' > /dev/tty
+        ;;
+    esac
+  done <<< "$(ascii_frame_content "${frame_idx}")"
+
+  printf '\033[%d;%dH%bMUTX setup wizard%b' 3 $((ART_PANEL_WIDTH + PANEL_GAP + 1)) "${C_BOLD}${C_MUTX}" "${C_RESET}" > /dev/tty
+  printf '\033[%d;%dH%bSingle-screen bootstrap for the current MUTX runtime.%b' 5 $((ART_PANEL_WIDTH + PANEL_GAP + 1)) "${C_SOFT}" "${C_RESET}" > /dev/tty
+  printf '\033[%d;%dH%b%s%b' 8 $((ART_PANEL_WIDTH + PANEL_GAP + 1)) "${C_FLARE_SOFT}" "${phase}" "${C_RESET}" > /dev/tty
+  printf '\033[%d;%dH%bneon bootstrap • current runtime • clean handoff%b' 10 $((ART_PANEL_WIDTH + PANEL_GAP + 1)) "${C_DIM}" "${C_RESET}" > /dev/tty
+}
+
+dashboard_render() {
+  local frame_idx=4
+  local frame_color=""
+  local max_lines=0
+  local idx=0
+  local art_line=""
+  local info_line=""
+  local onboarding_mode="interactive wizard"
+  local prompt_mode="interactive"
+  local tui_mode="open after setup"
+  local -a art_lines=()
+  local -a info_lines=()
+
+  if [[ "${DASHBOARD_ACTIVE}" != "1" ]]; then
+    return
+  fi
+
+  PROMPT_CURSOR_ROW=0
+  PROMPT_CURSOR_COL=0
+
+  if [[ "${NO_ONBOARD}" == "1" ]]; then
+    onboarding_mode="skipped"
+  fi
+  if ! is_promptable; then
+    prompt_mode="disabled"
+  fi
+  if [[ "${OPEN_TUI}" == "0" ]]; then
+    tui_mode="stay in CLI"
+  fi
+
+  if [[ "${WIZARD_VISIBLE}" == "1" ]]; then
+    if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
+      frame_idx=4
+    else
+      frame_idx=1
+    fi
+  elif [[ "${CURRENT_STEP_STATE}" == "running" ]]; then
+    frame_idx=$((SPINNER_FRAME_INDEX % ASCII_FRAME_COUNT))
+  elif [[ "${CURRENT_STAGE_INDEX}" -ge 0 ]]; then
+    frame_idx=$((CURRENT_STAGE_INDEX % ASCII_FRAME_COUNT))
+  fi
+
+  frame_color="$(ascii_frame_color "${frame_idx}")"
+  while IFS= read -r art_line; do
+    art_lines+=("${art_line}")
+  done <<< "$(ascii_frame_content "${frame_idx}")"
+
+  info_lines+=("${C_BOLD}${C_MUTX}MUTX setup wizard${C_RESET}")
+  info_lines+=("${C_SOFT}Single-screen bootstrap for the current MUTX runtime.${C_RESET}")
+  info_lines+=("")
+  info_lines+=("${C_MUTX_ALT}Install plan${C_RESET}")
+  info_lines+=("${C_DIM}${OS_NAME} • homebrew • ${tui_mode}${C_RESET}")
+  info_lines+=("${C_DIM}fallback: source overlay if packaged CLI is stale${C_RESET}")
+  info_lines+=("${C_DIM}onboarding: ${onboarding_mode} • prompts: ${prompt_mode}${C_RESET}")
+  info_lines+=("")
+  info_lines+=("${C_MUTX_ALT}Progress${C_RESET}")
+  info_lines+=("$(dashboard_stage_line 0)")
+  info_lines+=("$(dashboard_stage_line 1)")
+  info_lines+=("$(dashboard_stage_line 2)")
+  info_lines+=("")
+
+  if [[ "${WIZARD_VISIBLE}" == "1" ]]; then
+    info_lines+=("${C_MUTX_ALT}Setup Wizard${C_RESET}")
+    if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
+      info_lines+=("${C_GOOD}fresh overlay active${C_RESET} so setup uses the current CLI surface")
+    else
+      info_lines+=("${C_GOOD}package surface current${C_RESET} and ready for handoff")
+    fi
+    info_lines+=("${C_DIM}1 Hosted lane  authenticate against your control plane${C_RESET}")
+    info_lines+=("${C_DIM}2 Local lane   use http://localhost:8000${C_RESET}")
+    info_lines+=("${C_DIM}3 Later        finish install and exit cleanly${C_RESET}")
+    PROMPT_CURSOR_ROW=$((${#info_lines[@]} + 1))
+    PROMPT_CURSOR_COL=$((ART_PANEL_WIDTH + PANEL_GAP + 24))
+    info_lines+=("${C_PANEL}Select a lane [1/2/3]: ${C_RESET}")
+    if [[ -n "${WIZARD_ERROR}" ]]; then
+      info_lines+=("${C_WARN}${WIZARD_ERROR}${C_RESET}")
+    elif [[ -n "${WIZARD_HINT}" ]]; then
+      info_lines+=("${C_SOFT}${WIZARD_HINT}${C_RESET}")
+    elif [[ -n "${FINISH_MESSAGE}" ]]; then
+      info_lines+=("${C_GOOD}${FINISH_MESSAGE}${C_RESET}")
+    else
+      info_lines+=("${C_SOFT}The lane will ${tui_mode} when setup completes.${C_RESET}")
+    fi
+  else
+    info_lines+=("${C_MUTX_ALT}Now${C_RESET}")
+    if [[ "${CURRENT_STEP_STATE}" == "running" ]]; then
+      info_lines+=("${C_MUTX_ALT}$(dashboard_spinner_glyph)${C_RESET} ${CURRENT_STEP_LABEL}")
+    elif [[ "${CURRENT_STEP_STATE}" == "done" ]]; then
+      info_lines+=("${C_GOOD}✓${C_RESET} ${CURRENT_STEP_LABEL}")
+    else
+      info_lines+=("${C_SOFT}stand by${C_RESET}")
+    fi
+    if [[ -n "${CURRENT_STEP_DETAIL}" ]]; then
+      info_lines+=("${C_SOFT}${CURRENT_STEP_DETAIL}${C_RESET}")
+    else
+      info_lines+=("${C_SOFT}Syncing the install lane and current command surface.${C_RESET}")
+    fi
+    info_lines+=("")
+    info_lines+=("${C_MUTX_ALT}Signal${C_RESET}")
+    if [[ "${#FEED_LINES[@]}" == "0" ]]; then
+      info_lines+=("${C_SOFT}No events yet.${C_RESET}")
+      info_lines+=("")
+      info_lines+=("")
+      info_lines+=("")
+    else
+      idx=0
+      while [[ "${idx}" -lt "${#FEED_LINES[@]}" ]]; do
+        info_lines+=("$(dashboard_feed_line "${FEED_LINES[${idx}]}")")
+        idx=$((idx + 1))
+      done
+      while [[ "${#info_lines[@]}" -lt 22 ]]; do
+        info_lines+=("")
+      done
+    fi
+    if [[ -n "${FINISH_MESSAGE}" ]]; then
+      info_lines+=("${C_GOOD}${FINISH_MESSAGE}${C_RESET}")
+    fi
+  fi
+
+  max_lines="${#art_lines[@]}"
+  if [[ "${#info_lines[@]}" -gt "${max_lines}" ]]; then
+    max_lines="${#info_lines[@]}"
+  fi
+  if [[ "${max_lines}" -gt $((TERM_ROWS - 1)) ]]; then
+    max_lines=$((TERM_ROWS - 1))
+  fi
+
+  printf '\033[H\033[2J' > /dev/tty
+  idx=0
+  while [[ "${idx}" -lt "${max_lines}" ]]; do
+    art_line="${art_lines[${idx}]:-}"
+    info_line="${info_lines[${idx}]:-}"
+    printf '%b%-*s%b' "${frame_color}" "${ART_PANEL_WIDTH}" "${art_line}" "${C_RESET}" > /dev/tty
+    printf '%*s' "${PANEL_GAP}" "" > /dev/tty
+    printf '%b\n' "${info_line}" > /dev/tty
+    idx=$((idx + 1))
+  done
+}
+
 die() {
   KEEP_LOG=1
+  leave_alt_screen
   printf '%berror:%b %s\n' "${C_WARN}" "${C_RESET}" "$*" >&2
   if [[ -f "${INSTALL_LOG}" ]]; then
     printf '%b   log:%b %s\n' "${C_DIM}" "${C_RESET}" "${INSTALL_LOG}" >&2
@@ -480,9 +880,22 @@ log_command() {
 spinner_loop() {
   local pid="$1"
   local label="$2"
+  local i=0
+
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    while kill -0 "${pid}" 2>/dev/null; do
+      SPINNER_FRAME_INDEX="${i}"
+      CURRENT_STEP_LABEL="${label}"
+      CURRENT_STEP_STATE="running"
+      dashboard_render
+      i=$((i + 1))
+      sleep 0.08
+    done
+    return
+  fi
+
   local -a frames=( "⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏" )
   local -a beams=( "▰▱▱▱▱" "▰▰▱▱▱" "▰▰▰▱▱" "▰▰▰▰▱" "▰▰▰▰▰" "▱▰▰▰▰" "▱▱▰▰▰" "▱▱▱▰▰" "▱▱▱▱▰" "▱▱▱▱▱" )
-  local i=0
 
   while kill -0 "${pid}" 2>/dev/null; do
     local sigil
@@ -497,7 +910,13 @@ run_stage() {
   local label="$1"
   shift
 
-  if [[ "${HAS_TTY}" == "1" && "${MOTION_OK}" == "1" ]]; then
+  CURRENT_STEP_LABEL="${label}"
+  CURRENT_STEP_STATE="running"
+  CURRENT_STEP_DETAIL="Running…"
+
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    dashboard_render
+  elif [[ "${HAS_TTY}" == "1" && "${MOTION_OK}" == "1" ]]; then
     hide_cursor
   else
     say "${label}"
@@ -507,23 +926,30 @@ run_stage() {
   local pid=$!
   local exit_code=0
 
-  if [[ "${HAS_TTY}" == "1" && "${MOTION_OK}" == "1" ]]; then
+  if [[ "${DASHBOARD_ACTIVE}" == "1" && "${MOTION_OK}" == "1" ]]; then
+    spinner_loop "${pid}" "${label}"
+  elif [[ "${HAS_TTY}" == "1" && "${MOTION_OK}" == "1" ]]; then
     spinner_loop "${pid}" "${label}"
   fi
 
   wait "${pid}" || exit_code=$?
 
-  if [[ "${HAS_TTY}" == "1" && "${MOTION_OK}" == "1" ]]; then
+  if [[ "${HAS_TTY}" == "1" && "${MOTION_OK}" == "1" && "${DASHBOARD_ACTIVE}" != "1" ]]; then
     printf '\r\033[K' > /dev/tty
   fi
 
-  show_cursor
+  if [[ "${DASHBOARD_ACTIVE}" != "1" ]]; then
+    show_cursor
+  fi
 
   if [[ "${exit_code}" == "0" ]]; then
+    CURRENT_STEP_STATE="done"
+    CURRENT_STEP_DETAIL="Complete."
     success "${label}"
     return 0
   fi
 
+  CURRENT_STEP_STATE="warn"
   KEEP_LOG=1
   warn "${label}"
   if [[ -f "${INSTALL_LOG}" ]]; then
@@ -541,6 +967,30 @@ render_banner() {
   local signal="${C_DIM}neon bootstrap ▸ current runtime ▸ clean operator handoff${C_RESET}"
   local frame_idx="${ASCII_FRAME_INDEX}"
   local phase=""
+
+  if [[ "${HAS_TTY}" == "1" ]]; then
+    enter_alt_screen
+  fi
+
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    if [[ "${MOTION_OK}" == "1" && "${BANNER_HAS_ANIMATED}" != "1" ]]; then
+      local idx=0
+      while [[ "${idx}" -lt "${ASCII_FRAME_COUNT}" ]]; do
+        phase="$(ascii_frame_phase "${idx}")"
+        dashboard_render_splash "${idx}" "${phase}"
+        motion_sleep 0.16
+        idx=$((idx + 1))
+      done
+    fi
+
+    BANNER_HAS_ANIMATED=1
+    ASCII_FRAME_INDEX=$((ASCII_FRAME_COUNT - 1))
+    CURRENT_STEP_LABEL="Install plan"
+    CURRENT_STEP_DETAIL="Calibrating the package lane and operator handoff."
+    CURRENT_STEP_STATE="idle"
+    dashboard_render
+    return
+  fi
 
   clear_tty_screen
   tty_print '\n'
@@ -561,9 +1011,12 @@ render_banner() {
     tty_print "\n"
     render_ascii_frame "${frame_idx}" 0.010
     tty_print "\n"
-    type_tty "${title}\n" 0.006
-    type_tty "${subtitle}\n" 0.0035
-    type_tty "${signal}\n\n" 0.0025
+    type_tty "${title}" 0.006
+    tty_print "\n"
+    type_tty "${subtitle}" 0.0035
+    tty_print "\n"
+    type_tty "${signal}" 0.0025
+    tty_print "\n\n"
     motion_sleep 0.08
   else
     render_ascii_frame "${frame_idx}" 0
@@ -701,6 +1154,7 @@ install_source_overlay() {
 
 ensure_assistant_first_surface() {
   if show_surface_status "Checking onboarding surface"; then
+    dashboard_mark_stage_done "${CURRENT_STAGE_INDEX}"
     return 0
   fi
 
@@ -711,6 +1165,7 @@ ensure_assistant_first_surface() {
 
   if show_surface_status "Rechecking onboarding surface"; then
     note "mutx now resolves to ${MUTX_BIN}"
+    dashboard_mark_stage_done "${CURRENT_STAGE_INDEX}"
     return 0
   fi
 
@@ -731,6 +1186,7 @@ run_setup_handoff() {
   fi
 
   if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
+    leave_alt_screen
     say "Install complete"
     note "Next steps:"
     note "  mutx setup hosted"
@@ -740,28 +1196,41 @@ run_setup_handoff() {
     return
   fi
 
+  WIZARD_VISIBLE=1
+  WIZARD_HINT="${handoff_note}"
+  WIZARD_ERROR=""
+
   while true; do
-    render_banner
-    tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}package lane synced${C_RESET}\n"
-    tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}command surface verified${C_RESET}\n"
-    tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}ready for operator handoff${C_RESET}\n"
-    tty_print "\n"
-    tty_print "${C_PANEL}╭─ ${C_BOLD}Setup Wizard${C_RESET}${C_PANEL} ─────────────────────────────────────────────╮${C_RESET}\n"
-    tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}Choose where MUTX should land next.${C_RESET}\n"
-    if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
-      tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} fresh CLI overlay active so setup uses the current surface\n"
+    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+      dashboard_render
+      if [[ "${PROMPT_CURSOR_ROW}" -gt 0 && "${PROMPT_CURSOR_COL}" -gt 0 ]]; then
+        printf '\033[%d;%dH' "${PROMPT_CURSOR_ROW}" "${PROMPT_CURSOR_COL}" > /dev/tty
+      fi
     else
-      tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} packaged CLI is current and ready\n"
+      render_banner
+      tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}package lane synced${C_RESET}\n"
+      tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}command surface verified${C_RESET}\n"
+      tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}ready for operator handoff${C_RESET}\n"
+      tty_print "\n"
+      tty_print "${C_PANEL}╭─ ${C_BOLD}Setup Wizard${C_RESET}${C_PANEL} ─────────────────────────────────────────────╮${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}Choose where MUTX should land next.${C_RESET}\n"
+      if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
+        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} fresh CLI overlay active so setup uses the current surface\n"
+      else
+        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} packaged CLI is current and ready\n"
+      fi
+      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}${handoff_note}${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}authenticate against your control plane${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local lane    ${C_DIM}use http://localhost:8000${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}3${C_RESET}  Later         ${C_DIM}finish install and exit cleanly${C_RESET}\n"
+      tty_print "${C_PANEL}╰───────────────────────────────────────────────────────────────╯${C_RESET}\n"
+      tty_prompt "Select a lane [1/2/3]"
     fi
-    tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}${handoff_note}${C_RESET}\n"
-    tty_print "${C_PANEL}│${C_RESET}\n"
-    tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}authenticate against your control plane${C_RESET}\n"
-    tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local lane    ${C_DIM}use http://localhost:8000${C_RESET}\n"
-    tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}3${C_RESET}  Later         ${C_DIM}finish install and exit cleanly${C_RESET}\n"
-    tty_print "${C_PANEL}╰───────────────────────────────────────────────────────────────╯${C_RESET}\n"
-    tty_prompt "Select a lane [1/2/3]"
+
     read_tty_line WIZARD_SELECTION
     WIZARD_SELECTION="${WIZARD_SELECTION:-1}"
+    WIZARD_ERROR=""
 
     case "${WIZARD_SELECTION}" in
       1|h|H|hosted|Hosted)
@@ -775,22 +1244,30 @@ run_setup_handoff() {
         break
         ;;
       *)
-        note "Choose 1, 2, or 3."
+        WIZARD_ERROR="Choose 1, 2, or 3."
+        if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+          dashboard_render
+        else
+          note "${WIZARD_ERROR}"
+        fi
         sleep 1
         ;;
     esac
   done
 
   if [[ "${WIZARD_SELECTION}" == "1" || "${WIZARD_SELECTION}" == "h" || "${WIZARD_SELECTION}" == "H" || "${WIZARD_SELECTION}" == "hosted" || "${WIZARD_SELECTION}" == "Hosted" ]]; then
+    leave_alt_screen
     say "Launching: ${hosted_cmd[*]}"
     exec "${hosted_cmd[@]}" < /dev/tty > /dev/tty 2>&1
   fi
 
   if [[ "${WIZARD_SELECTION}" == "2" || "${WIZARD_SELECTION}" == "l" || "${WIZARD_SELECTION}" == "L" || "${WIZARD_SELECTION}" == "local" || "${WIZARD_SELECTION}" == "Local" ]]; then
+    leave_alt_screen
     say "Launching: ${local_cmd[*]}"
     exec "${local_cmd[@]}" < /dev/tty > /dev/tty 2>&1
   fi
 
+  leave_alt_screen
   say "Install complete"
   note "Run one of:"
   note "  mutx setup hosted"

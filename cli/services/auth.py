@@ -50,6 +50,34 @@ class AuthService(APIService):
             status_code=response.status_code,
         )
 
+    def local_bootstrap(
+        self,
+        *,
+        name: str = "Local Operator",
+        api_url: str | None = None,
+    ) -> CLIStatus:
+        if api_url:
+            self.config.api_url = api_url
+        elif not self.config.api_url:
+            self.config.api_url = "http://localhost:8000"
+
+        response = self._request(
+            "post",
+            "/v1/auth/local-bootstrap",
+            require_auth=False,
+            json={"name": name},
+        )
+
+        if response.status_code == 200:
+            tokens = response.json()
+            self._store_tokens(tokens.get("access_token"), tokens.get("refresh_token"))
+            return self.status()
+
+        raise APIRequestError(
+            self._extract_error_message(response, "Local bootstrap failed."),
+            status_code=response.status_code,
+        )
+
     def register(self, name: str, email: str, password: str, api_url: str | None = None) -> CLIStatus:
         if api_url:
             self.config.set_runtime_api_url(api_url)

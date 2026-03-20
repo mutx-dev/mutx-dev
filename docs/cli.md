@@ -101,7 +101,7 @@ Local contributor:
 mutx setup local --open-tui
 ```
 
-Both flows authenticate, deploy `Personal Assistant`, and optionally open the TUI.
+Hosted setup authenticates against the configured control plane. Local setup bootstraps a trusted local operator session on `http://localhost:8000`, deploys `Personal Assistant`, and can open the TUI without asking for email or password.
 
 ## Core Commands
 
@@ -110,7 +110,7 @@ Both flows authenticate, deploy `Personal Assistant`, and optionally open the TU
 | Command | Description |
 | ------- | ----------- |
 | `mutx setup hosted` | Authenticate against a hosted control plane and deploy `Personal Assistant` |
-| `mutx setup local` | Register or log in to a local control plane and deploy `Personal Assistant` |
+| `mutx setup local` | Bootstrap a local operator session and deploy `Personal Assistant` |
 | `mutx doctor` | Show config source, auth state, API reachability, and assistant summary |
 
 ### Auth
@@ -195,7 +195,7 @@ Local stack validation:
 
 ```bash
 make dev-up
-mutx setup local --email test@local.dev --password TestPass123! --no-input
+mutx setup local --name "Local Operator" --no-input
 mutx doctor
 mutx assistant overview
 mutx tui

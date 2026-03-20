@@ -134,7 +134,7 @@ def build_install_env(tmp_path: Path, *, source_ref: str | None = None) -> tuple
     env["HOMEBREW_NO_INSTALL_FROM_API"] = "1"
     env["PATH"] = f"{brew_bin}:{env['PATH']}"
     if source_ref is not None:
-      env["MUTX_CLI_SOURCE_REF"] = source_ref
+        env["MUTX_CLI_SOURCE_REF"] = source_ref
 
     return env, brew_prefix
 
@@ -351,6 +351,7 @@ def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recover
     )
 
     assert exit_code == 0
+    assert "\x1b[?1049h" in transcript
     assert "Recovering current CLI surface" in transcript
     assert "Setup Wizard" in transcript
     assert "Select a lane [1/2/3]" in transcript
@@ -358,6 +359,7 @@ def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recover
     assert "Local lane" in transcript
     assert "Launching:" in transcript
     assert "LOCAL SETUP --open-tui" in transcript
+    assert "MUTX setup wizard\\nInstall the CLI" not in transcript
     assert "No such command 'setup'" not in transcript
 
     setup_help = subprocess.run(

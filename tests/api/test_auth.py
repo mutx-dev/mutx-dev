@@ -3,11 +3,14 @@ Tests for /auth endpoints.
 """
 
 import pytest
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 import uuid
 
 from src.api.models.models import User
+from src.api.database import get_db
+from src.api.main import create_app
 
 
 class TestAuthEndpoints:
@@ -56,6 +59,85 @@ class TestAuthEndpoints:
         data = response.json()
         assert "access_token" in data
         assert data["token_type"] == "bearer"
+
+    @pytest.mark.asyncio
+    async def test_local_bootstrap_creates_verified_operator(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
+        response = await client_no_auth.post(
+            "/v1/auth/local-bootstrap",
+            json={"name": "Studio Operator"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "access_token" in data
+        assert "refresh_token" in data
+
+        result = await db_session.execute(
+            select(User).where(User.email == "local-operator@mutx.local")
+        )
+        user = result.scalar_one()
+        assert user.name == "Studio Operator"
+        assert user.password_hash is None
+        assert user.is_active is True
+        assert user.is_email_verified is True
+
+    @pytest.mark.asyncio
+    async def test_local_bootstrap_reuses_existing_operator(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
+        user = User(
+            id=uuid.uuid4(),
+            email="local-operator@mutx.local",
+            password_hash=None,
+            name="Old Operator",
+            is_active=False,
+            is_email_verified=False,
+        )
+        db_session.add(user)
+        await db_session.commit()
+
+        response = await client_no_auth.post(
+            "/v1/auth/local-bootstrap",
+            json={"name": "Fresh Operator"},
+        )
+        assert response.status_code == 200
+
+        result = await db_session.execute(
+            select(User).where(User.email == "local-operator@mutx.local")
+        )
+        updated_user = result.scalar_one()
+        assert updated_user.id == user.id
+        assert updated_user.name == "Fresh Operator"
+        assert updated_user.is_active is True
+        assert updated_user.is_email_verified is True
+
+    @pytest.mark.asyncio
+    async def test_local_bootstrap_rejects_non_loopback_clients(
+        self, db_session: AsyncSession
+    ):
+        app = create_app(
+            enable_lifespan=False,
+            background_monitor_enabled=False,
+            database_required_on_startup=False,
+        )
+
+        async def override_get_db():
+            yield db_session
+
+        app.dependency_overrides[get_db] = override_get_db
+
+        async with AsyncClient(
+            transport=ASGITransport(app=app, client=("203.0.113.10", 4242)),
+            base_url="http://test",
+        ) as client:
+            response = await client.post(
+                "/v1/auth/local-bootstrap",
+                json={"name": "Remote Operator"},
+            )
+
+        assert response.status_code == 403
+        assert "localhost" in response.json()["detail"].lower()
 
     @pytest.mark.asyncio
     async def test_me_endpoint(self, client: AsyncClient, test_user):

@@ -1,10 +1,12 @@
+from ipaddress import ip_address
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, ConfigDict, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.config import get_settings
 from src.api.database import get_db
 from src.api.models.models import User
 from src.api.services.user_service import UserService
@@ -22,6 +24,8 @@ from src.api.services.email.email_service import (
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+settings = get_settings()
+LOCAL_BOOTSTRAP_EMAIL = "local-operator@mutx.local"
 
 
 def _get_expires_in_seconds(expires_at: datetime) -> int:
@@ -47,6 +51,10 @@ class LogoutRequest(BaseModel):
     refresh_token: Optional[str] = None
 
 
+class LocalBootstrapRequest(BaseModel):
+    name: str = "Local Operator"
+
+
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
@@ -64,6 +72,35 @@ class UserResponse(BaseModel):
     is_email_verified: bool = False
 
     model_config = ConfigDict(from_attributes=True)
+
+
+def _is_loopback_host(host: str | None) -> bool:
+    if not host:
+        return False
+
+    normalized = host.strip().lower()
+    if normalized in {"localhost", "testclient"}:
+        return True
+
+    try:
+        return ip_address(normalized).is_loopback
+    except ValueError:
+        return False
+
+
+def _assert_local_bootstrap_allowed(request: Request) -> None:
+    if settings.is_production:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Local bootstrap is disabled in production.",
+        )
+
+    client_host = request.client.host if request.client else None
+    if not _is_loopback_host(client_host):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Local bootstrap is only available from localhost.",
+        )
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
@@ -139,6 +176,37 @@ async def login(request: LoginRequest, session: AsyncSession = Depends(get_db)):
         event_name="User logged in",
         event_type=AnalyticsEventType.USER_LOGIN,
         user_id=user.id,
+    )
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        expires_in=_get_expires_in_seconds(access_token_expires_at),
+    )
+
+
+@router.post("/local-bootstrap", response_model=TokenResponse)
+async def local_bootstrap(
+    request: LocalBootstrapRequest,
+    http_request: Request,
+    session: AsyncSession = Depends(get_db),
+):
+    _assert_local_bootstrap_allowed(http_request)
+
+    user_service = UserService(session)
+    user = await user_service.get_or_create_local_bootstrap_user(
+        email=LOCAL_BOOTSTRAP_EMAIL,
+        name=request.name,
+    )
+
+    access_token, access_token_expires_at, refresh_token = await issue_token_pair(session, user.id)
+
+    await log_analytics_event(
+        session,
+        event_name="Local operator bootstrapped",
+        event_type=AnalyticsEventType.USER_LOGIN,
+        user_id=user.id,
+        properties={"mode": "local_bootstrap"},
     )
 
     return TokenResponse(

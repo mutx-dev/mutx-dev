@@ -96,10 +96,14 @@ def setup_hosted(
 
 
 @setup_group.command(name="local")
-@click.option("--email", default=None, help="Account email")
-@click.option("--password", default=None, help="Account password")
-@click.option("--name", "display_name", default="Local Operator", help="Display name")
-@click.option("--register/--login-existing", default=True, help="Register a local account first")
+@click.option("--email", default=None, help="Existing local account email (advanced)")
+@click.option("--password", default=None, help="Existing local account password (advanced)")
+@click.option("--name", "display_name", default="Local Operator", help="Local operator display name")
+@click.option(
+    "--register/--login-existing",
+    default=True,
+    help="Legacy credential flow when email and password are supplied",
+)
 @click.option("--assistant-name", default="Personal Assistant", help="Assistant display name")
 @click.option("--description", default=None, help="Assistant description")
 @click.option("--replicas", default=1, type=int, help="Replica count")
@@ -121,18 +125,21 @@ def setup_local(
     no_input: bool,
 ):
     current_config().api_url = "http://localhost:8000"
-    email_value = _require_value("Email", email, no_input)
-    password_value = _require_value("Password", password, no_input, secret=True)
 
     try:
-        if register:
-            _auth_service().register(
-                name=display_name,
-                email=email_value,
-                password=password_value,
-            )
+        if email or password:
+            email_value = _require_value("Email", email, no_input)
+            password_value = _require_value("Password", password, no_input, secret=True)
+            if register:
+                _auth_service().register(
+                    name=display_name,
+                    email=email_value,
+                    password=password_value,
+                )
+            else:
+                _auth_service().login(email=email_value, password=password_value)
         else:
-            _auth_service().login(email=email_value, password=password_value)
+            _auth_service().local_bootstrap(name=display_name)
         _finish_setup(
             assistant_name=assistant_name,
             description=description,

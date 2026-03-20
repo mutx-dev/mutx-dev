@@ -74,6 +74,51 @@ class UserService:
         await self.session.refresh(user)
         return user
 
+    async def get_or_create_local_bootstrap_user(
+        self,
+        *,
+        email: str,
+        name: str,
+    ) -> User:
+        user = await self.get_user_by_email(email)
+        now = datetime.now(timezone.utc)
+
+        if user is None:
+            user = User(
+                id=uuid.uuid4(),
+                email=email,
+                name=name,
+                password_hash=None,
+                plan="FREE",
+                is_active=True,
+                is_email_verified=True,
+                email_verified_at=now,
+            )
+            self.session.add(user)
+            await self.session.commit()
+            await self.session.refresh(user)
+            return user
+
+        changed = False
+
+        if user.name != name:
+            user.name = name
+            changed = True
+        if not user.is_active:
+            user.is_active = True
+            changed = True
+        if not user.is_email_verified:
+            user.is_email_verified = True
+            user.email_verified_at = now
+            changed = True
+
+        if changed:
+            user.updated_at = now
+            await self.session.commit()
+            await self.session.refresh(user)
+
+        return user
+
     async def get_user_by_email(self, email: str) -> Optional[User]:
         result = await self.session.execute(select(User).where(User.email == email))
         return result.scalar_one_or_none()

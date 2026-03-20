@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
+import httpx
 import pytest
 from click.testing import CliRunner
 
@@ -79,6 +80,34 @@ def test_login_hits_v1_auth_route_and_saves_tokens(monkeypatch) -> None:
     assert config.api_key == "access-token"
     assert config.refresh_token == "refresh-token"
     assert "Logged in successfully!" in result.output
+
+
+def test_login_reports_unreachable_api_without_traceback(monkeypatch) -> None:
+    def fake_post(path: str, json: dict[str, Any] | None = None) -> DummyResponse:
+        raise httpx.ConnectError("Connection refused")
+
+    config = LoginConfig()
+    monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
+    monkeypatch.setattr(
+        "cli.main.get_client",
+        lambda _: SimpleNamespace(post=fake_post, close=lambda: None),
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "login",
+            "--email",
+            "operator@example.com",
+            "--password",
+            "StrongPass1!",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "Could not reach API at http://localhost:8000" in result.output
+    assert "Traceback" not in result.output
 
 
 def test_tui_command_dispatches_to_launcher(monkeypatch) -> None:
