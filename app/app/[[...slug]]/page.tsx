@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { MutxDemoApp } from "@/components/dashboard/demo/MutxDemoApp";
 import { isDemoSection } from "@/components/dashboard/demo/demoSections";
 
+export const dynamic = "force-dynamic";
+
 export default async function AppDemoPage({
   params,
 }: {

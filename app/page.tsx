@@ -19,6 +19,8 @@ import { LoginDisabledButton } from "@/components/landing/LoginDisabledButton";
 import { MotionIn } from "@/components/landing/MotionPrimitives";
 import { QuickstartTabs } from "@/components/landing/QuickstartTabs";
 
+export const dynamic = "force-dynamic";
+
 const displayFont = Syne({
   subsets: ["latin"],
   weight: ["500", "600", "700", "800"],
