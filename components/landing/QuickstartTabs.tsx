@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 
-type QuickstartTab = 'one-liner' | 'homebrew' | 'hackable' | 'api'
+import { cn } from '@/lib/utils'
+
+type QuickstartTab = 'hosted' | 'local' | 'api'
 
 type QuickstartBlock = {
   id: string
@@ -21,111 +23,97 @@ type QuickstartContent = {
   blocks: QuickstartBlock[]
 }
 
-const tabs: QuickstartTab[] = ['one-liner', 'homebrew', 'hackable', 'api']
+const tabs: QuickstartTab[] = ['hosted', 'local', 'api']
 
 const tabContent: Record<QuickstartTab, QuickstartContent> = {
-  'one-liner': {
-    label: 'One-liner',
-    intro: '# One paste. Homebrew handles the install, then MUTX walks you through config, login, and the optional TUI handoff.',
-    environment: 'macOS',
-    mode: 'Guided setup',
+  hosted: {
+    label: 'Hosted operator',
+    intro:
+      'Fastest path to a real MUTX deployment. Install the CLI, authenticate against your hosted control plane, then deploy the Personal Assistant as your first agent.',
+    environment: 'hosted control plane',
+    mode: 'assistant first',
     footer:
-      'macOS-first. Uses the published Homebrew tap, force-links mutx if an older shim already exists, runs mutx status, then opens a guided setup flow for API URL, login, and optional mutx tui launch.',
+      'This is the primary operator path. The starter flow now ends with a deployed Personal Assistant, not an empty control plane.',
     blocks: [
       {
         id: 'installer',
-        label: 'Installer',
-        hint: 'The fastest path from zero to a guided MUTX setup and operator shell.',
+        label: 'Install',
+        hint: 'Install the Homebrew distribution, then hand off onboarding to the CLI.',
         script: 'curl -fsSL https://mutx.dev/install.sh | bash',
       },
-    ],
-  },
-  homebrew: {
-    label: 'Homebrew',
-    intro: '# Manual, explicit, and still quick. Good if you want to see every install step.',
-    environment: 'Tap',
-    mode: 'Manual',
-    footer:
-      'Best for connecting the CLI and TUI to an existing MUTX control plane. Shared state stays in ~/.mutx/config.json and mutx status remains the non-network smoke check.',
-    blocks: [
       {
-        id: 'install',
-        label: 'Install',
-        hint: 'Tap, install, relink, and make sure your shell points at the Brew binary.',
-        script: `brew tap mutx-dev/homebrew-tap
-brew install mutx
-brew link --overwrite mutx
-hash -r`,
-      },
-      {
-        id: 'launch',
-        label: 'Launch',
-        hint: 'Verify the CLI, authenticate against your control plane, and open the TUI.',
-        script: `mutx --help
-mutx status
-mutx login --email you@example.com
-mutx tui`,
+        id: 'setup',
+        label: 'Deploy Personal Assistant',
+        hint: 'Point the CLI at your hosted API, authenticate, and create the starter assistant in one flow.',
+        script: `mutx setup hosted
+mutx doctor
+mutx assistant overview`,
       },
     ],
   },
-  hackable: {
-    label: 'Hackable',
-    intro: '# For people who want the repo, the local stack, and the operator loop under one roof.',
-    environment: 'Repo',
-    mode: 'Local stack',
+  local: {
+    label: 'Local contributor',
+    intro:
+      'Bring up the local stack, register a local operator account, and deploy the same Personal Assistant template against localhost.',
+    environment: 'repo + localhost',
+    mode: 'local control plane',
     footer:
-      'Best for contributors. Site and app shell run on localhost:3000, the FastAPI control plane runs on localhost:8000, and the CLI plus TUI share auth via ~/.mutx/config.json.',
+      'Use this when you are building MUTX itself. The local and hosted lanes converge on the same assistant-first operator loop.',
     blocks: [
       {
-        id: 'clone-install',
-        label: 'Clone + install',
-        hint: 'Set up the repo, Node dependencies, Python environment, and CLI extras.',
-        script: `git clone https://github.com/mutx-dev/mutx-dev.git
-cd mutx-dev
-npm install
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install -e ".[dev,tui]"`,
+        id: 'stack',
+        label: 'Start local stack',
+        hint: 'Boot the repo-backed services first. Use detached mode so setup and logs can live in separate terminals.',
+        script: `make dev-up
+make dev-logs`,
       },
       {
-        id: 'boot-open',
-        label: 'Boot + open',
-        hint: 'Start the stack, create the local auth session, seed the system, then open the operator terminal.',
-        script: `make dev
-make test-auth
-mutx login --email test@local.dev --password TestPass123!
-make seed
+        id: 'setup',
+        label: 'Register + deploy',
+        hint: 'Create a local account, deploy the Personal Assistant, and move into the operator surfaces.',
+        script: `mutx setup local
+mutx doctor
 mutx tui`,
       },
     ],
   },
   api: {
-    label: 'API-first',
-    intro: '# Start with the contract. The current control-plane route truth lives under /v1/*.',
+    label: 'API contract',
+    intro:
+      'The public contract stays under `/v1/*`. Use the starter-template and assistant routes to automate first-run deployment flows without stitching records together by hand.',
     environment: '/v1',
-    mode: 'Control plane',
+    mode: 'control plane contract',
     footer:
-      'Use docs.mutx.dev or localhost:8000/docs as the route reference. After login, mutx and mutx tui reuse the same stored session instead of inventing a second auth model.',
+      'Docs, CLI, TUI, and web quickstart now share the same assistant-first contract surface.',
     blocks: [
       {
-        id: 'health-register',
-        label: 'Health + register',
-        hint: 'Prove the API is up, then create the first operator account over /v1/auth/register.',
-        script: `curl http://localhost:8000/health
-curl -X POST http://localhost:8000/v1/auth/register \\
+        id: 'auth',
+        label: 'Authenticate',
+        hint: 'Register or log in through the mounted auth routes.',
+        script: `BASE_URL=http://localhost:8000/v1
+
+curl -X POST "$BASE_URL/auth/register" \\
   -H "Content-Type: application/json" \\
   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'`,
       },
       {
-        id: 'login-operate',
-        label: 'Login + operate',
-        hint: 'Store the CLI session and switch into the TUI using the same local config.',
-        script: `curl -X POST http://localhost:8000/v1/auth/login \\
+        id: 'starter',
+        label: 'Starter deployment',
+        hint: 'Create the Personal Assistant and deployment in one truthful server-side action.',
+        script: `curl -X POST "$BASE_URL/templates/personal_assistant/deploy" \\
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\
   -H "Content-Type: application/json" \\
-  -d '{"email":"you@example.com","password":"StrongPass1!"}'
-mutx login --email you@example.com
-mutx tui`,
+  -d '{"name":"Personal Assistant","replicas":1}'`,
+      },
+      {
+        id: 'inspect',
+        label: 'Inspect assistant surfaces',
+        hint: 'Read back assistant health, sessions, and deployments after creation.',
+        script: `curl "$BASE_URL/assistant/overview" \\
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl "$BASE_URL/sessions" \\
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"`,
       },
     ],
   },
@@ -139,32 +127,47 @@ type QuickstartSnippetProps = {
 
 function QuickstartSnippet({ block, copied, onCopy }: QuickstartSnippetProps) {
   return (
-    <div className="site-quickstart-card">
-      <div className="site-quickstart-card-head">
+    <div className="rounded-[24px] border border-white/10 bg-[#0a1424] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="site-step-index">{block.label}</div>
-          <p className="site-quickstart-hint">{block.hint}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">{block.label}</p>
+          <p className="mt-2 max-w-xl text-sm leading-7 text-slate-400">{block.hint}</p>
         </div>
         <button
           type="button"
           onClick={() => onCopy(block)}
-          className="site-quickstart-copy"
+          className={cn(
+            'inline-flex h-10 w-10 items-center justify-center rounded-xl border transition',
+            copied
+              ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200'
+              : 'border-white/10 bg-white/[0.04] text-slate-300 hover:border-cyan-400/25 hover:bg-cyan-400/10 hover:text-cyan-100',
+          )}
           aria-label={copied ? `${block.label} copied` : `Copy ${block.label} commands`}
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
         </button>
       </div>
 
-      <div className="site-quickstart-snippet">
-        <span className="site-quickstart-prompt">$</span>
-        <pre>{block.script}</pre>
+      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-[#050b16]">
+        <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3 text-[11px] uppercase tracking-[0.2em] text-slate-500">
+          <span className="h-2.5 w-2.5 rounded-full bg-rose-400" />
+          <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
+          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+          <span className="ml-2 font-mono normal-case tracking-normal text-slate-400">bash {block.id}</span>
+        </div>
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 px-4 py-4">
+          <span className="pt-0.5 font-mono text-sm text-cyan-300">$</span>
+          <pre className="overflow-x-auto whitespace-pre-wrap break-words font-mono text-[13px] leading-7 text-slate-100">
+            {block.script}
+          </pre>
+        </div>
       </div>
     </div>
   )
 }
 
 export function QuickstartTabs() {
-  const [activeTab, setActiveTab] = useState<QuickstartTab>('one-liner')
+  const [activeTab, setActiveTab] = useState<QuickstartTab>('hosted')
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
   const active = tabContent[activeTab]
@@ -184,44 +187,40 @@ export function QuickstartTabs() {
   }
 
   return (
-    <div className="site-quickstart-shell">
-      <div className="site-quickstart-toolbar">
-        <div className="site-quickstart-toolbar-main">
-          <div className="site-quickstart-dots" aria-hidden="true">
-            <span className="site-quickstart-dot site-quickstart-dot-red" />
-            <span className="site-quickstart-dot site-quickstart-dot-amber" />
-            <span className="site-quickstart-dot site-quickstart-dot-green" />
-          </div>
-
-          <div className="site-quickstart-tabrail" role="tablist" aria-label="MUTX quickstart modes">
+    <div className="overflow-hidden rounded-[30px] border border-[#1b2740] bg-[linear-gradient(180deg,#0a1322_0%,#070d18_100%)] text-white shadow-[0_30px_90px_rgba(2,6,23,0.4)]">
+      <div className="border-b border-white/10 px-4 py-4 sm:px-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-1 flex-wrap items-center gap-2" role="tablist" aria-label="MUTX quickstart modes">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 type="button"
                 role="tab"
                 aria-selected={activeTab === tab}
-                data-active={activeTab === tab}
                 onClick={() => setActiveTab(tab)}
-                className="site-quickstart-tab"
+                className={cn(
+                  'rounded-full border px-4 py-2 text-sm font-semibold transition',
+                  activeTab === tab
+                    ? 'border-cyan-400/20 bg-cyan-400 text-slate-950 shadow-[0_14px_34px_rgba(34,211,238,0.28)]'
+                    : 'border-white/10 bg-white/[0.03] text-slate-400 hover:border-white/15 hover:text-slate-100',
+                )}
               >
                 {tabContent[tab].label}
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="site-quickstart-context" aria-label="Quickstart context">
-          <span className="site-quickstart-context-pill site-quickstart-context-pill-active">
-            {active.environment}
-          </span>
-          <span className="site-quickstart-context-pill">{active.mode}</span>
+          <div className="flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{active.environment}</span>
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{active.mode}</span>
+          </div>
         </div>
       </div>
 
-      <div className="site-quickstart-body">
-        <p className="site-quickstart-comment">{active.intro}</p>
+      <div className="px-4 py-5 sm:px-5 sm:py-6">
+        <p className="max-w-3xl text-base leading-8 text-slate-300">{active.intro}</p>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="mt-5 grid gap-4 xl:grid-cols-2">
           {active.blocks.map((block) => (
             <QuickstartSnippet
               key={block.id}
@@ -233,7 +232,9 @@ export function QuickstartTabs() {
         </div>
       </div>
 
-      <p className="site-quickstart-footer">{active.footer}</p>
+      <div className="border-t border-white/10 bg-[#08101d] px-4 py-4 text-sm leading-7 text-slate-400 sm:px-5">
+        {active.footer}
+      </div>
     </div>
   )
 }
