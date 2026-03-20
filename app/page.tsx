@@ -49,24 +49,24 @@ const navLinks = [
 ] as const;
 
 const heroProof = [
-  "Open source",
-  "Mounted `/v1/*` contract",
-  "CLI + TUI included",
-  "Live dashboard demo",
+  "Deployments",
+  "Sessions",
+  "Access",
+  "Audit",
 ] as const;
 
 const heroRail = [
   {
-    label: "Real surface",
-    body: "`demo.gif` is cut from the live dashboard route, not a generated placeholder.",
+    label: "Deployments",
+    body: "Track rollout posture, version history, and health in one operator view.",
   },
   {
-    label: "Mounted contract",
-    body: "The public demo, CLI, and TUI all ride the same control-plane routes.",
+    label: "Sessions",
+    body: "Read live assistant activity, incidents, and usage without switching surfaces.",
   },
   {
-    label: "Verify fast",
-    body: "Run the quickstart, inspect the demo, then keep operating from the terminal.",
+    label: "Access",
+    body: "Keep auth, connectors, keys, and audit inside the same control plane.",
   },
 ] as const;
 
@@ -310,11 +310,11 @@ export default function LandingPage() {
                   </p>
 
                   <div className="mt-8 flex flex-wrap items-center gap-3">
-                  <Link
-                    href="/app"
-                    prefetch={false}
-                    className="landing-button-primary px-7 py-4 text-base"
-                  >
+                    <Link
+                      href="/app"
+                      prefetch={false}
+                      className="landing-button-primary px-7 py-4 text-base"
+                    >
                       Open live demo
                       <ArrowRight className="h-4 w-4" />
                     </Link>

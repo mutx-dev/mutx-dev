@@ -38,7 +38,6 @@ export function HeroMonitorShowcase({ className }: HeroMonitorShowcaseProps) {
   const floatY = useTransform(scrollYProgress, [0, 0.5, 1], [30, 0, -24]);
   const chromeShiftX = useTransform(springRotateY, [-10, 10], [-14, 14]);
   const chromeShiftY = useTransform(springRotateX, [-10, 10], [10, -10]);
-  const statusCardY = useTransform(scrollYProgress, [0, 0.5, 1], [22, 0, -14]);
 
   useEffect(() => {
     if (prefersReducedMotion) {
@@ -130,22 +129,12 @@ export function HeroMonitorShowcase({ className }: HeroMonitorShowcaseProps) {
               <div className="absolute left-1/2 top-3 h-2 w-2 -translate-x-1/2 rounded-full bg-black/80 shadow-[0_0_0_2px_rgba(255,255,255,0.06)]" />
 
               <div className="mb-3 flex flex-wrap items-center justify-between gap-3 px-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400 sm:px-2">
-                <div className="flex items-center gap-2">
-                  <span className="rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1.5 text-cyan-100">
-                    Live operator demo
-                  </span>
-                  <span className="hidden rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-slate-400 sm:inline-flex">
-                    real dashboard capture
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
-                    1280 × 801
-                  </span>
-                  <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
-                    operator surface
-                  </span>
-                </div>
+                <span className="rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1.5 text-cyan-100">
+                  MUTX
+                </span>
+                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
+                  Control plane
+                </span>
               </div>
 
               <div className="relative overflow-hidden rounded-[1.7rem] border border-white/10 bg-[#04101a] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
@@ -191,7 +180,7 @@ export function HeroMonitorShowcase({ className }: HeroMonitorShowcaseProps) {
                       MUTX control plane
                     </p>
                     <p className="truncate text-sm font-semibold text-slate-800">
-                      Actual dashboard demo.gif
+                      Live operator view
                     </p>
                   </div>
                 </div>
@@ -221,34 +210,6 @@ export function HeroMonitorShowcase({ className }: HeroMonitorShowcaseProps) {
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-[16%] bottom-0 h-16 rounded-full bg-black/70 blur-3xl"
         />
-      </motion.div>
-
-      <motion.div
-        style={prefersReducedMotion ? undefined : { y: statusCardY }}
-        className="landing-panel pointer-events-none absolute -right-3 top-8 hidden max-w-[16rem] rounded-[1.7rem] p-4 xl:block"
-      >
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="font-[family:var(--font-landing-mono)] text-[0.64rem] uppercase tracking-[0.28em] text-cyan-200/80">
-              In the frame
-            </p>
-            <p className="mt-2 text-sm font-semibold text-white">
-              Real demo. Real control surface.
-            </p>
-          </div>
-          <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(74,222,128,0.7)]" />
-        </div>
-
-        <div className="mt-4 grid gap-2">
-          {["Dashboard capture from this repo", "Same surface language as CLI and TUI", "Parallax motion falls back cleanly"].map((item) => (
-            <div
-              key={item}
-              className="rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-slate-300"
-            >
-              {item}
-            </div>
-          ))}
-        </div>
       </motion.div>
     </div>
   );
