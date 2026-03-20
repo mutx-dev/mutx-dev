@@ -17,6 +17,7 @@
         "target": "runner"
       },
       "deploy": {
+        "startCommand": "node .next/standalone/server.js",
         "numReplicas": 1,
         "restartPolicyType": "ON_FAILURE",
         "restartPolicyMaxRetries": 10

@@ -21,4 +21,9 @@ COPY --from=builder /app /app
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD ["node", ".next/standalone/server.js"]
+
+# Railway targets a `runner` stage for the frontend service.
+# Keep an explicit alias here so the deployed image cannot drift to a
+# different Dockerfile target or stale cached stage.
+FROM production AS runner
