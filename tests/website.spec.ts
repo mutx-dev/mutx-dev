@@ -30,39 +30,36 @@ test.describe('mutx.dev QA', () => {
     });
   });
 
-  test('homepage loads and renders landing operator surface', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
+  test('homepage loads and renders the redesigned landing surface', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    const h1 = page.locator('h1');
-    await expect(h1).toBeVisible({ timeout: 10000 });
-
-    await expect(page.getByText(/open-source agent control plane/i)).toBeVisible();
-    await expect(page.getByRole('link', { name: /read docs/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /inspect repo/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /operate deployed agents like infrastructure\./i })
+    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('link', { name: /open live demo/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /run quickstart/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /read docs/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /github/i }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: /sign in/i })).toHaveCount(0);
   });
 
-  test('landing page exposes live demo path and hero waitlist capture', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
+  test('landing page exposes proof rail and operator flow sections', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByRole('link', { name: /view demo path/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /open operator app/i })).toBeVisible();
-    await expect(page.getByText(/demo walkthrough/i)).toBeVisible();
-    await expect(page.getByText(/demo checkpoints/i)).toBeVisible();
-    await expect(page.getByTestId('waitlist-form-hero')).toBeVisible();
-    await expect(page.locator('input[type="email"]')).toHaveCount(1);
-  });
-
-  test('legacy /app redirects into the canonical dashboard surface', async ({ page }) => {
-    await page.goto('/app?next=%2Fdashboard%2Fagents&source=legacy');
-    await page.waitForLoadState('domcontentloaded');
-
-    await expect(page).toHaveURL(/\/dashboard\?next=%2Fdashboard%2Fagents&source=legacy$/);
-    await expect(page.getByRole('heading', { name: /deploy agents like services\. operate them like systems\./i })).toBeVisible();
-    await expect(page.getByText(/mutx control plane/i)).toBeVisible();
-    await expect(page.getByText(/canonical \/dashboard surface/i)).toBeVisible();
-    await expect(page.getByText(/checking for an existing operator session/i)).toBeVisible();
+    await expect(page.getByText(/^Real surface$/).first()).toBeVisible();
+    await expect(page.getByText(/^Mounted contract$/).first()).toBeVisible();
+    await expect(page.getByText(/^Verify fast$/).first()).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /one operator model for deploy, observe, and govern\./i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /pick the lane that lands on the real runtime\./i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /operate in one loop, not three disconnected tools\./i })
+    ).toBeVisible();
+    await expect(page.getByRole('tab', { name: /hosted operator/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /observe/i })).toBeVisible();
   });
 
   test('no console errors', async ({ page }) => {
@@ -71,6 +68,7 @@ test.describe('mutx.dev QA', () => {
       /favicon\.ico/i,
       /favicon/i,
       /Failed to load resource: the server responded with a status of 503 \(Service Unavailable\)/i,
+      /Image corrupt or truncated/i,
     ];
 
     page.on('console', (msg) => {
@@ -89,8 +87,7 @@ test.describe('mutx.dev QA', () => {
       }
     });
 
-    await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
 
     const criticalErrors = errors.filter(

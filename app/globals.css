@@ -783,6 +783,100 @@
     color: rgba(255, 255, 255, 0.62);
   }
 
+  .landing-page {
+    --landing-line: rgba(148, 163, 184, 0.16);
+    --landing-line-strong: rgba(103, 232, 249, 0.22);
+    --landing-accent: #67e8f9;
+    --landing-accent-strong: #22d3ee;
+    --landing-shadow: 0 36px 120px rgba(2, 6, 23, 0.48);
+    --landing-shadow-soft: 0 28px 80px rgba(2, 6, 23, 0.28);
+    --landing-panel-bg:
+      radial-gradient(circle at top left, rgba(103, 232, 249, 0.08), transparent 24%),
+      linear-gradient(180deg, rgba(9, 18, 28, 0.94) 0%, rgba(5, 10, 16, 0.98) 100%);
+    --landing-panel-strong-bg:
+      radial-gradient(circle at top left, rgba(103, 232, 249, 0.08), transparent 24%),
+      linear-gradient(180deg, rgba(10, 20, 31, 0.96) 0%, rgba(4, 9, 16, 0.99) 100%);
+  }
+
+  .landing-panel {
+    border: 1px solid var(--landing-line);
+    border-radius: 2rem;
+    background: var(--landing-panel-bg);
+    box-shadow: var(--landing-shadow-soft);
+  }
+
+  .landing-panel-strong {
+    border: 1px solid var(--landing-line);
+    border-radius: 2.5rem;
+    background: var(--landing-panel-strong-bg);
+    box-shadow: var(--landing-shadow);
+  }
+
+  .landing-kicker {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(103, 232, 249, 0.22);
+    background: rgba(103, 232, 249, 0.08);
+    padding: 0.65rem 1rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: rgba(207, 250, 254, 0.88);
+  }
+
+  .landing-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.45rem 0.8rem;
+    font-family: var(--font-landing-mono), var(--font-mono), monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(203, 213, 225, 0.88);
+  }
+
+  .landing-button-primary,
+  .landing-button-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    font-weight: 700;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      color 160ms ease;
+  }
+
+  .landing-button-primary {
+    border: 1px solid rgba(34, 211, 238, 0.18);
+    background: var(--landing-accent-strong);
+    color: #06111b;
+    box-shadow: 0 20px 48px rgba(34, 211, 238, 0.22);
+  }
+
+  .landing-button-primary:hover {
+    background: #4ee3f3;
+  }
+
+  .landing-button-secondary {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(248, 250, 252, 0.96);
+  }
+
+  .landing-button-secondary:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
   @media (max-width: 767px) {
     .site-quickstart-toolbar,
     .site-quickstart-body,

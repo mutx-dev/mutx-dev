@@ -15,7 +15,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 import { ControlLoopTabs } from "@/components/landing/ControlLoopTabs";
-import { LoginDisabledButton } from "@/components/landing/LoginDisabledButton";
+import { HeroMonitorShowcase } from "@/components/landing/HeroMonitorShowcase";
 import { MotionIn } from "@/components/landing/MotionPrimitives";
 import { QuickstartTabs } from "@/components/landing/QuickstartTabs";
 
@@ -52,57 +52,67 @@ const heroProof = [
   "Open source",
   "Mounted `/v1/*` contract",
   "CLI + TUI included",
-  "Public `/app` dashboard demo",
+  "Live dashboard demo",
 ] as const;
 
-const heroNotes = [
+const heroRail = [
   {
-    title: "What you are seeing",
-    body: "The centerpiece is your actual repo `demo.gif`, not a generated placeholder.",
+    label: "Real surface",
+    body: "`demo.gif` is cut from the live dashboard route, not a generated placeholder.",
   },
   {
-    title: "Why it matters",
-    body: "MUTX is about real operator state: deployments, sessions, access, connectors, audit, and usage.",
+    label: "Mounted contract",
+    body: "The public demo, CLI, and TUI all ride the same control-plane routes.",
   },
   {
-    title: "How to verify",
-    body: "Run the quickstart, open `/app`, and operate the same system contract from the terminal.",
+    label: "Verify fast",
+    body: "Run the quickstart, inspect the demo, then keep operating from the terminal.",
   },
 ] as const;
 
 const capabilityPanels = [
   {
     eyebrow: "Deploy",
-    title: "Turn agents into durable resources.",
-    body: "Templates, deployments, rollout posture, and runtime health belong in the same system of record.",
-    points: [
-      "Starter template and one-shot deploy path",
-      "Local and hosted lanes converge on the same control plane",
-      "Sessions and health stay tied to the deployment story",
-    ],
+    title: "Treat assistants like durable runtime resources.",
+    body: "Starter deployments, rollout posture, and runtime health sit in one system of record.",
     icon: ShieldCheck,
   },
   {
     eyebrow: "Observe",
     title: "Read the fleet like infrastructure.",
-    body: "MUTX is built around runtime visibility instead of a fake chat-first shell.",
-    points: [
-      "Live session and operator signal model",
-      "Usage, incidents, and audit in one operator language",
-      "Public browser demo backed by the same product narrative",
-    ],
+    body: "Sessions, logs, health, and usage show up as operator state instead of chat veneer.",
     icon: Radar,
   },
   {
     eyebrow: "Govern",
-    title: "Keep integrations and access inside the frame.",
-    body: "Channels, connectors, keys, and webhooks need explicit ownership and operator boundaries.",
-    points: [
-      "Connector and webhook posture made legible",
-      "Auth and sign-in lanes separated from the public demo",
-      "CLI and TUI remain recoverable when the web surface is not enough",
-    ],
+    title: "Keep boundaries explicit.",
+    body: "Access, connectors, keys, and webhooks stay visible inside the same frame as the runtime.",
     icon: Workflow,
+  },
+] as const;
+
+const visibleBoundaryItems = [
+  "Deployment posture",
+  "Session state",
+  "Connector ownership",
+  "Audit and usage",
+] as const;
+
+const operatorChecklist = [
+  {
+    step: "01",
+    title: "Bring up a control plane",
+    body: "Hosted, local, or raw API contract. Pick the fastest truthful lane.",
+  },
+  {
+    step: "02",
+    title: "Deploy Personal Assistant",
+    body: "Land on a live assistant instead of an empty shell.",
+  },
+  {
+    step: "03",
+    title: "Inspect the operator surface",
+    body: "Use the browser demo, CLI, or TUI against the same runtime story.",
   },
 ] as const;
 
@@ -115,51 +125,69 @@ const contractPills = [
   "/v1/webhooks",
 ] as const;
 
+const surfacePills = [
+  "Browser demo",
+  "CLI",
+  "TUI",
+  "`/v1/*` contract",
+] as const;
+
+const launchMeta = [
+  "Open source",
+  "MIT license",
+  "Public live demo",
+  "Operator docs",
+] as const;
+
 type SectionHeadingProps = {
   label: string;
   title: string;
   body: string;
+  align?: "left" | "center";
 };
 
-function SectionHeading({ label, title, body }: SectionHeadingProps) {
+function SectionHeading({
+  label,
+  title,
+  body,
+  align = "left",
+}: SectionHeadingProps) {
+  const centered = align === "center";
+
   return (
-    <div className="max-w-3xl">
-      <div className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-cyan-200">
-        {label}
-      </div>
+    <div className={centered ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
+      <div className="landing-kicker">{label}</div>
       <h2 className="mt-5 font-[family:var(--font-landing-display)] text-4xl font-semibold tracking-[-0.08em] text-white sm:text-5xl">
         {title}
       </h2>
-      <p className="mt-4 max-w-2xl text-base leading-8 text-slate-400">
+      <p className="mt-4 max-w-2xl text-base leading-8 text-slate-300/80">
         {body}
       </p>
     </div>
   );
 }
 
-type CapabilityPanelProps = {
+type CapabilityTileProps = {
   eyebrow: string;
   title: string;
   body: string;
-  points: readonly string[];
   icon: LucideIcon;
 };
 
-function CapabilityPanel({
+function CapabilityTile({
   eyebrow,
   title,
   body,
-  points,
   icon: Icon,
-}: CapabilityPanelProps) {
+}: CapabilityTileProps) {
   return (
-    <article className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(255,255,255,0.02)_100%)] p-6 shadow-[0_24px_80px_rgba(2,6,23,0.2)]">
-      <div className="flex items-start justify-between gap-4">
+    <div className="rounded-[1.7rem] border border-white/10 bg-black/20 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="font-[family:var(--font-landing-mono)] text-[0.68rem] uppercase tracking-[0.28em] text-slate-500">
+          <p className="font-[family:var(--font-landing-mono)] text-[0.66rem] uppercase tracking-[0.28em] text-slate-500">
             {eyebrow}
           </p>
-          <h3 className="mt-4 font-[family:var(--font-landing-display)] text-3xl font-semibold tracking-[-0.06em] text-white">
+          <h3 className="mt-3 text-xl font-semibold tracking-[-0.05em] text-white">
             {title}
           </h3>
         </div>
@@ -167,116 +195,32 @@ function CapabilityPanel({
           <Icon className="h-5 w-5" />
         </div>
       </div>
-
-      <p className="mt-4 text-sm leading-7 text-slate-300">{body}</p>
-
-      <div className="mt-6 grid gap-3">
-        {points.map((point) => (
-          <div
-            key={point}
-            className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-slate-300"
-          >
-            {point}
-          </div>
-        ))}
-      </div>
-    </article>
-  );
-}
-
-function DeviceShowcase() {
-  return (
-    <div className="relative mt-12">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-[8%] top-[8%] h-40 rounded-full bg-cyan-400/16 blur-[110px] sm:h-56"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-[18%] bottom-10 h-16 rounded-full bg-black/70 blur-3xl"
-      />
-
-      <div className="relative mx-auto max-w-6xl">
-        <div className="mx-auto w-full max-w-5xl transform-gpu md:[transform:perspective(2200px)_rotateX(4deg)]">
-          <div className="rounded-[2.4rem] border border-white/20 bg-[linear-gradient(180deg,rgba(219,228,237,0.98)_0%,rgba(157,169,181,0.98)_42%,rgba(116,128,141,0.98)_100%)] p-[10px] shadow-[0_40px_120px_rgba(2,6,23,0.45)]">
-            <div className="relative overflow-hidden rounded-[2rem] border border-black/35 bg-[linear-gradient(180deg,#151b22_0%,#090d12_100%)] px-3 pb-4 pt-6 sm:px-4 sm:pb-5 sm:pt-7">
-              <div className="absolute left-1/2 top-3 h-2 w-2 -translate-x-1/2 rounded-full bg-black/80 shadow-[0_0_0_2px_rgba(255,255,255,0.05)]" />
-
-              <div className="relative overflow-hidden rounded-[1.4rem] border border-white/10 bg-[#050b12] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
-                <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-16 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0))]" />
-                <img
-                  src="/demo.gif"
-                  alt="Animated MUTX dashboard demo"
-                  width={1280}
-                  height={801}
-                  className="relative z-0 block h-auto w-full"
-                />
-                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0.04)_18%,transparent_34%,transparent_100%)] opacity-60 mix-blend-screen" />
-              </div>
-
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-4 px-2 sm:px-4">
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className="relative h-10 w-10 overflow-hidden rounded-2xl border border-black/10 bg-white/70 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
-                    <Image
-                      src="/logo.png"
-                      alt="MUTX logo"
-                      fill
-                      sizes="2.5rem"
-                      className="object-contain p-0.5"
-                    />
-                  </div>
-                  <div className="min-w-0 text-left">
-                    <p className="truncate font-[family:var(--font-landing-mono)] text-[0.66rem] uppercase tracking-[0.28em] text-slate-500">
-                      MUTX control plane
-                    </p>
-                    <p className="truncate text-sm font-medium text-slate-800">
-                      Actual dashboard demo.gif
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <span className="rounded-full border border-black/10 bg-white/55 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700">
-                    1280 × 801
-                  </span>
-                  <span className="rounded-full border border-black/10 bg-white/55 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700">
-                    Operator surface
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative z-10 mx-auto hidden w-full max-w-4xl flex-col items-center sm:flex">
-          <div className="h-20 w-24 bg-[linear-gradient(180deg,rgba(159,171,184,0.98)_0%,rgba(102,113,126,0.98)_100%)] shadow-[0_24px_48px_rgba(2,6,23,0.35)] [clip-path:polygon(24%_0%,76%_0%,100%_100%,0_100%)]" />
-          <div className="-mt-3 h-5 w-64 rounded-full bg-[linear-gradient(180deg,rgba(167,179,191,0.95)_0%,rgba(105,116,127,0.95)_100%)] shadow-[0_16px_40px_rgba(2,6,23,0.3)]" />
-        </div>
-      </div>
+      <p className="mt-4 text-sm leading-7 text-slate-300/80">{body}</p>
     </div>
   );
 }
 
 function LandingNav() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#07101a]/86 backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-[color:var(--landing-line)] bg-[#06101a]/80 backdrop-blur-xl">
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="relative h-11 w-11 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-1.5 shadow-[0_14px_30px_rgba(2,6,23,0.25)]">
+        <Link href="/" className="group flex items-center gap-3">
+          <div className="relative h-12 w-12 overflow-hidden rounded-[1.15rem] border border-cyan-300/15 bg-[linear-gradient(180deg,rgba(230,238,246,0.24)_0%,rgba(95,114,131,0.18)_100%)] p-1.5 shadow-[0_16px_38px_rgba(34,211,238,0.18)] ring-1 ring-inset ring-white/8 transition group-hover:border-cyan-300/30">
+            <div className="absolute inset-[1px] rounded-[1rem] bg-[radial-gradient(circle_at_50%_20%,rgba(103,232,249,0.16),transparent_56%),linear-gradient(180deg,rgba(15,23,42,0.94)_0%,rgba(4,10,18,0.96)_100%)]" />
             <Image
               src="/logo.png"
               alt="MUTX logo"
               fill
-              sizes="2.75rem"
-              className="object-contain p-0.5"
+              sizes="3rem"
+              className="relative z-10 object-contain p-1 brightness-[1.12] contrast-[1.06]"
             />
           </div>
           <div>
-            <p className="font-[family:var(--font-landing-mono)] text-[0.7rem] uppercase tracking-[0.34em] text-slate-300">
+            <p className="font-[family:var(--font-landing-mono)] text-[0.7rem] uppercase tracking-[0.34em] text-slate-200">
               MUTX
             </p>
-            <p className="text-sm font-medium text-slate-500">
-              Control plane for agent ops
+            <p className="text-sm font-medium text-slate-300/85">
+              Operator control plane
             </p>
           </div>
         </Link>
@@ -294,7 +238,6 @@ function LandingNav() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <LoginDisabledButton className="hidden sm:block" />
           <a
             href={DOCS_URL}
             target="_blank"
@@ -313,7 +256,7 @@ function LandingNav() {
           </a>
           <a
             href="#quickstart"
-            className="inline-flex rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-[0_18px_40px_rgba(34,211,238,0.22)] transition hover:bg-cyan-300"
+            className="landing-button-primary px-5 py-3 text-sm"
           >
             Quickstart
           </a>
@@ -326,13 +269,14 @@ function LandingNav() {
 export default function LandingPage() {
   return (
     <div
-      className={`${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} min-h-screen bg-[#03070d] text-white [font-family:var(--font-landing-body)]`}
+      className={`landing-page ${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} min-h-screen bg-[#03070d] text-white [font-family:var(--font-landing-body)]`}
     >
       <div aria-hidden="true" className="pointer-events-none fixed inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(36,144,171,0.26),transparent_24%),radial-gradient(circle_at_100%_8%,rgba(18,97,123,0.2),transparent_22%),linear-gradient(180deg,#06111a_0%,#03070d_56%,#020509_100%)]" />
-        <div className="absolute inset-0 opacity-[0.13] [background-image:linear-gradient(rgba(118,148,167,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(118,148,167,0.16)_1px,transparent_1px)] [background-size:72px_72px]" />
-        <div className="absolute left-[-12%] top-[12%] h-[32rem] w-[32rem] rounded-full bg-cyan-500/10 blur-[130px]" />
-        <div className="absolute right-[-10%] top-[18%] h-[26rem] w-[26rem] rounded-full bg-sky-400/8 blur-[130px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_8%_0%,rgba(44,133,160,0.3),transparent_22%),radial-gradient(circle_at_100%_8%,rgba(26,97,120,0.22),transparent_24%),linear-gradient(180deg,#07121d_0%,#02070f_54%,#02050a_100%)]" />
+        <div className="absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(124,150,171,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(124,150,171,0.16)_1px,transparent_1px)] [background-size:72px_72px]" />
+        <div className="absolute left-[-12%] top-[12%] h-[32rem] w-[32rem] rounded-full bg-cyan-500/10 blur-[140px]" />
+        <div className="absolute right-[-10%] top-[16%] h-[26rem] w-[26rem] rounded-full bg-sky-400/8 blur-[130px]" />
+        <div className="absolute inset-x-0 top-0 h-40 bg-[linear-gradient(180deg,rgba(4,10,18,0.4),transparent)]" />
       </div>
 
       <LandingNav />
@@ -340,78 +284,81 @@ export default function LandingPage() {
       <main className="relative z-10">
         <section className="px-4 pb-20 pt-32 sm:px-6 sm:pt-36 lg:px-8 lg:pb-24 lg:pt-40">
           <div className="mx-auto max-w-7xl">
-            <div className="overflow-hidden rounded-[44px] border border-white/10 bg-[linear-gradient(180deg,rgba(8,18,28,0.96)_0%,rgba(5,11,17,0.98)_100%)] px-5 py-6 shadow-[0_44px_140px_rgba(2,6,23,0.5)] sm:px-8 sm:py-8 lg:px-10 lg:py-10">
-              <div className="mx-auto max-w-5xl text-center">
-                <div className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.28em] text-cyan-200">
-                  Assistant-first operator control plane
-                </div>
+            <div className="landing-panel-strong relative overflow-hidden px-5 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-10">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(103,232,249,0.09),transparent_26%),radial-gradient(circle_at_100%_22%,rgba(56,189,248,0.08),transparent_24%)]"
+              />
 
-                <h1 className="mx-auto mt-6 max-w-4xl font-[family:var(--font-landing-display)] text-5xl font-semibold leading-[0.92] tracking-[-0.09em] text-white sm:text-6xl xl:text-[5.4rem]">
-                  Control deployed agents
-                  <span className="block text-cyan-300">
-                    like production systems.
-                  </span>
-                </h1>
+              <div className="relative grid gap-10 xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] xl:items-center">
+                <div className="max-w-2xl">
+                  <div className="landing-kicker">
+                    Assistant-first operator control plane
+                  </div>
 
-                <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-slate-300 sm:text-xl sm:leading-9">
-                  MUTX gives you one operator layer for deployments, runs,
-                  sessions, access, connectors, audit, and usage. Same control
-                  plane. Same contract. Web, CLI, TUI.
-                </p>
-
-                <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                  <Link
-                    href="/app"
-                    className="inline-flex items-center gap-2 rounded-full bg-cyan-400 px-7 py-4 text-base font-semibold text-slate-950 shadow-[0_22px_48px_rgba(34,211,238,0.24)] transition hover:bg-cyan-300"
-                  >
-                    Open live demo
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                  <a
-                    href="#quickstart"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-7 py-4 text-base font-semibold text-white transition hover:border-white/15 hover:bg-white/[0.05]"
-                  >
-                    Run quickstart
-                    <TerminalSquare className="h-4 w-4" />
-                  </a>
-                  <a
-                    href={DOCS_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-7 py-4 text-base font-semibold text-white transition hover:border-white/15 hover:bg-white/[0.05]"
-                  >
-                    Read docs
-                    <BookOpen className="h-4 w-4" />
-                  </a>
-                </div>
-
-                <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
-                  {heroProof.map((item) => (
-                    <span
-                      key={item}
-                      className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 font-[family:var(--font-landing-mono)] text-[11px] uppercase tracking-[0.18em] text-slate-400"
-                    >
-                      {item}
+                  <h1 className="mt-6 font-[family:var(--font-landing-display)] text-5xl font-semibold leading-[0.92] tracking-[-0.09em] text-white sm:text-6xl xl:text-[5.15rem]">
+                    Operate deployed agents
+                    <span className="block text-cyan-300">
+                      like infrastructure.
                     </span>
-                  ))}
+                  </h1>
+
+                  <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300 sm:text-[1.18rem] sm:leading-9">
+                    MUTX gives you one operator surface for deployments,
+                    sessions, access, connectors, audit, and usage across web,
+                    CLI, and TUI.
+                  </p>
+
+                  <div className="mt-8 flex flex-wrap items-center gap-3">
+                    <Link
+                      href="/app"
+                      className="landing-button-primary px-7 py-4 text-base"
+                    >
+                      Open live demo
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                    <a
+                      href="#quickstart"
+                      className="landing-button-secondary px-7 py-4 text-base"
+                    >
+                      Run quickstart
+                      <TerminalSquare className="h-4 w-4" />
+                    </a>
+                    <a
+                      href={DOCS_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="landing-button-secondary px-7 py-4 text-base"
+                    >
+                      Read docs
+                      <BookOpen className="h-4 w-4" />
+                    </a>
+                  </div>
+
+                  <div className="mt-8 flex flex-wrap items-center gap-2">
+                    {heroProof.map((item) => (
+                      <span key={item} className="landing-chip">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
                 </div>
+
+                <HeroMonitorShowcase className="xl:-mr-8" />
               </div>
 
-              <DeviceShowcase />
-
-              <div className="mt-6 grid gap-4 lg:grid-cols-3">
-                {heroNotes.map((note) => (
-                  <div
-                    key={note.title}
-                    className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5"
-                  >
-                    <p className="font-[family:var(--font-landing-mono)] text-[0.66rem] uppercase tracking-[0.28em] text-slate-500">
-                      {note.title}
-                    </p>
-                    <p className="mt-3 text-sm leading-7 text-slate-300">
-                      {note.body}
-                    </p>
-                  </div>
+              <div className="relative mt-8 grid gap-4 lg:grid-cols-3">
+                {heroRail.map((item, index) => (
+                  <MotionIn key={item.label} delay={0.05 * index}>
+                    <div className="rounded-[1.7rem] border border-white/10 bg-white/[0.03] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+                      <p className="font-[family:var(--font-landing-mono)] text-[0.66rem] uppercase tracking-[0.28em] text-slate-500">
+                        {item.label}
+                      </p>
+                      <p className="mt-3 text-sm leading-7 text-slate-300/85">
+                        {item.body}
+                      </p>
+                    </div>
+                  </MotionIn>
                 ))}
               </div>
             </div>
@@ -423,63 +370,133 @@ export default function LandingPage() {
             <MotionIn>
               <SectionHeading
                 label="Why MUTX"
-                title="The operator layer around your agent stack."
-                body="This is not another wrapper for model calls. MUTX is the control-plane surface that makes deploys, observability, and governance read as one coherent product."
+                title="One operator model for deploy, observe, and govern."
+                body="MUTX is for teams that want deployed assistants to read like systems with visible state, boundaries, and recovery paths."
               />
             </MotionIn>
 
-            <div className="mt-12 grid gap-5 lg:grid-cols-3">
-              {capabilityPanels.map((panel, index) => (
-                <MotionIn key={panel.title} delay={0.04 * index}>
-                  <CapabilityPanel {...panel} />
+            <div className="mt-12 grid gap-5 xl:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]">
+              <MotionIn>
+                <article className="landing-panel-strong relative overflow-hidden p-6 lg:p-8">
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(103,232,249,0.1),transparent_28%)]"
+                  />
+                  <div className="relative">
+                    <p className="landing-kicker">Operator model</p>
+                    <h3 className="mt-4 font-[family:var(--font-landing-display)] text-3xl font-semibold tracking-[-0.07em] text-white sm:text-[2.35rem]">
+                      The runtime should read like a system, not a chat shell.
+                    </h3>
+                    <p className="mt-4 max-w-3xl text-base leading-8 text-slate-300/80">
+                      MUTX keeps starter deployments, runtime health, session
+                      state, access boundaries, and audit in one operator
+                      surface so the story stays coherent from setup to recovery.
+                    </p>
+
+                    <div className="mt-8 grid gap-4 md:grid-cols-3">
+                      {capabilityPanels.map((panel) => (
+                        <CapabilityTile key={panel.eyebrow} {...panel} />
+                      ))}
+                    </div>
+                  </div>
+                </article>
+              </MotionIn>
+
+              <div className="grid gap-5">
+                <MotionIn delay={0.05}>
+                  <article className="landing-panel p-6">
+                    <p className="landing-kicker">Surface continuity</p>
+                    <h3 className="mt-4 text-2xl font-semibold tracking-[-0.05em] text-white">
+                      Same runtime, more than one surface.
+                    </h3>
+                    <p className="mt-4 text-sm leading-7 text-slate-300/80">
+                      Open the live demo, inspect the routes, or operate through
+                      CLI and TUI without changing how the runtime is described.
+                    </p>
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {["Public demo", "CLI operations", "TUI recovery"].map(
+                        (item) => (
+                          <span key={item} className="landing-chip">
+                            {item}
+                          </span>
+                        ),
+                      )}
+                    </div>
+                  </article>
                 </MotionIn>
-              ))}
+
+                <MotionIn delay={0.1}>
+                  <article className="landing-panel p-6">
+                    <p className="landing-kicker">Visible boundaries</p>
+                    <h3 className="mt-4 text-2xl font-semibold tracking-[-0.05em] text-white">
+                      What stops being hand-wavy.
+                    </h3>
+                    <div className="mt-5 grid gap-3">
+                      {visibleBoundaryItems.map((item) => (
+                        <div
+                          key={item}
+                          className="rounded-[1.2rem] border border-white/10 bg-black/20 px-4 py-3 text-sm font-medium text-slate-200"
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  </article>
+                </MotionIn>
+              </div>
             </div>
           </div>
         </section>
 
         <section id="quickstart" className="px-4 py-24 sm:px-6 lg:px-8">
-          <div className="mx-auto grid max-w-7xl gap-10 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] xl:items-start">
+          <div className="mx-auto grid max-w-7xl gap-10 xl:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] xl:items-start">
             <MotionIn>
-              <div className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(255,255,255,0.02)_100%)] p-6 shadow-[0_30px_90px_rgba(2,6,23,0.24)] lg:p-8">
+              <div className="landing-panel p-6 lg:p-8">
                 <SectionHeading
                   label="Quickstart"
-                  title="Pick a lane. Land on the same runtime."
-                  body="Hosted operator, local contributor, or direct API contract. The point is not the path. The point is arriving at a live assistant with a visible control surface."
+                  title="Pick the lane that lands on the real runtime."
+                  body="Use the fastest truthful path, then inspect the same assistant surface from the browser, CLI, or TUI."
                 />
 
-                <div className="mt-8 rounded-[26px] border border-white/10 bg-black/20 p-5">
-                  <p className="font-[family:var(--font-landing-mono)] text-[0.68rem] uppercase tracking-[0.28em] text-slate-500">
-                    Mounted contract
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {contractPills.map((route) => (
-                      <span
-                        key={route}
-                        className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 font-[family:var(--font-landing-mono)] text-[11px] text-slate-300"
-                      >
-                        {route}
-                      </span>
-                    ))}
+                <div className="mt-8 space-y-4">
+                  <div className="rounded-[1.9rem] border border-white/10 bg-black/20 p-5">
+                    <p className="landing-kicker">Operator checklist</p>
+                    <div className="mt-5 grid gap-3">
+                      {operatorChecklist.map((item) => (
+                        <div
+                          key={item.step}
+                          className="grid gap-3 rounded-[1.35rem] border border-white/10 bg-white/[0.03] px-4 py-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-start"
+                        >
+                          <div className="font-[family:var(--font-landing-mono)] text-sm font-semibold uppercase tracking-[0.22em] text-cyan-200">
+                            {item.step}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-white">
+                              {item.title}
+                            </p>
+                            <p className="mt-2 text-sm leading-6 text-slate-400">
+                              {item.body}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
-                      <p className="text-sm font-semibold text-white">
-                        Local-first today
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-slate-400">
-                        Quickest truthful path is still local setup, CLI, TUI,
-                        and the public app demo.
+
+                  <div className="rounded-[1.9rem] border border-white/10 bg-black/20 p-5">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <p className="landing-kicker">Mounted contract</p>
+                      <p className="max-w-xs text-sm leading-6 text-slate-400">
+                        Hosted auth is still hardening. Local and API lanes
+                        already land on the real runtime.
                       </p>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
-                      <p className="text-sm font-semibold text-white">
-                        Hosted auth later
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-slate-400">
-                        Public sign-in stays disabled until the hosted operator
-                        lane is worth exposing.
-                      </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {contractPills.map((route) => (
+                        <span key={route} className="landing-chip">
+                          {route}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -494,13 +511,25 @@ export default function LandingPage() {
 
         <section id="control-loop" className="px-4 py-24 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
-            <MotionIn>
-              <SectionHeading
-                label="Control Loop"
-                title="Observe. Direct. Recover."
-                body="MUTX should read the same way across the browser, the terminal, and the route contract. The operational loop is the product."
-              />
-            </MotionIn>
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <MotionIn>
+                <SectionHeading
+                  label="Control Loop"
+                  title="Operate in one loop, not three disconnected tools."
+                  body="Deploy, observe, and recover without changing the story between browser, terminal, and route contract."
+                />
+              </MotionIn>
+
+              <MotionIn delay={0.04}>
+                <div className="flex max-w-xl flex-wrap gap-2 lg:justify-end">
+                  {surfacePills.map((item) => (
+                    <span key={item} className="landing-chip">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </MotionIn>
+            </div>
 
             <MotionIn className="mt-12" delay={0.06}>
               <ControlLoopTabs />
@@ -511,38 +540,42 @@ export default function LandingPage() {
         <section className="px-4 pb-24 pt-8 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <MotionIn>
-              <div className="overflow-hidden rounded-[40px] border border-white/10 bg-[linear-gradient(135deg,rgba(12,33,46,0.94)_0%,rgba(4,11,18,0.96)_52%,rgba(8,21,31,0.94)_100%)] p-6 shadow-[0_34px_110px_rgba(2,6,23,0.32)] lg:p-8">
-                <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.92fr)] lg:items-end">
+              <div className="landing-panel relative overflow-hidden p-6 lg:p-8">
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(103,232,249,0.12),transparent_22%),linear-gradient(135deg,rgba(8,21,33,0.22),transparent_40%)]"
+                />
+                <div className="relative grid gap-8 lg:grid-cols-[minmax(0,0.88fr)_minmax(19rem,1.12fr)] lg:items-start">
                   <div>
                     <div className="flex items-center gap-4">
-                      <div className="relative h-16 w-16 overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] shadow-[0_18px_40px_rgba(2,6,23,0.28)]">
+                      <div className="relative h-16 w-16 overflow-hidden rounded-[1.5rem] border border-cyan-300/15 bg-[linear-gradient(180deg,rgba(230,238,246,0.22)_0%,rgba(96,113,130,0.16)_100%)] p-2 shadow-[0_18px_40px_rgba(34,211,238,0.14)] ring-1 ring-inset ring-white/8">
+                        <div className="absolute inset-[1px] rounded-[1.4rem] bg-[radial-gradient(circle_at_50%_20%,rgba(103,232,249,0.14),transparent_56%),linear-gradient(180deg,rgba(15,23,42,0.94)_0%,rgba(4,10,18,0.96)_100%)]" />
                         <Image
                           src="/logo.png"
                           alt="MUTX logo"
                           fill
                           sizes="4rem"
-                          className="object-contain p-1"
+                          className="relative z-10 object-contain p-1 brightness-[1.12] contrast-[1.06]"
                         />
                       </div>
                       <div>
-                        <p className="font-[family:var(--font-landing-mono)] text-[0.72rem] uppercase tracking-[0.34em] text-slate-300">
-                          MUTX
-                        </p>
-                        <p className="text-sm text-slate-500">
-                          Run the real thing
+                        <p className="landing-kicker">Launch rail</p>
+                        <p className="text-sm text-slate-300/80">
+                          Start where the runtime is already live.
                         </p>
                       </div>
                     </div>
 
                     <h2 className="mt-6 font-[family:var(--font-landing-display)] text-4xl font-semibold tracking-[-0.08em] text-white sm:text-5xl">
-                      Start with the control plane.
+                      Bring the stack up. Validate the surface. Keep operating.
                     </h2>
-                    <p className="mt-4 max-w-2xl text-base leading-8 text-slate-300">
-                      Bring the stack up, launch the assistant, inspect the
-                      public demo, then work the same runtime from web, CLI, or
-                      TUI.
+                    <p className="mt-4 max-w-2xl text-base leading-8 text-slate-300/80">
+                      Use the local quickstart to stand the runtime up, inspect
+                      the live demo, then keep the same control-plane story in
+                      the terminal.
                     </p>
-                    <pre className="mt-6 overflow-x-auto whitespace-pre-wrap break-words rounded-[28px] border border-white/10 bg-[#04101a] px-5 py-5 font-[family:var(--font-landing-mono)] text-[13px] leading-7 text-slate-100">
+
+                    <pre className="mt-6 overflow-x-auto whitespace-pre-wrap break-words rounded-[1.9rem] border border-white/10 bg-[#04101a] px-5 py-5 font-[family:var(--font-landing-mono)] text-[13px] leading-7 text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
                       {`make dev-up
 mutx setup local
 mutx doctor
@@ -550,50 +583,69 @@ mutx tui`}
                     </pre>
                   </div>
 
-                  <div className="space-y-3">
-                    <Link
-                      href="/app"
-                      className="flex items-center justify-between rounded-[22px] border border-cyan-400/20 bg-cyan-400 px-5 py-4 text-base font-semibold text-slate-950 transition hover:bg-cyan-300"
-                    >
-                      Open live demo
-                      <ArrowRight className="h-5 w-5" />
-                    </Link>
-                    <a
-                      href="#quickstart"
-                      className="flex items-center justify-between rounded-[22px] border border-white/10 bg-white/[0.03] px-5 py-4 text-base font-semibold text-white transition hover:border-white/15 hover:bg-white/[0.05]"
-                    >
-                      Run quickstart
-                      <TerminalSquare className="h-5 w-5 text-slate-500" />
-                    </a>
-                    <a
-                      href={DOCS_URL}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center justify-between rounded-[22px] border border-white/10 bg-white/[0.03] px-5 py-4 text-base font-semibold text-white transition hover:border-white/15 hover:bg-white/[0.05]"
-                    >
-                      Read docs
-                      <BookOpen className="h-5 w-5 text-slate-500" />
-                    </a>
-                    <a
-                      href={GITHUB_URL}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center justify-between rounded-[22px] border border-white/10 bg-white/[0.03] px-5 py-4 text-base font-semibold text-white transition hover:border-white/15 hover:bg-white/[0.05]"
-                    >
-                      Star on GitHub
-                      <Github className="h-5 w-5 text-slate-500" />
-                    </a>
-                    <LoginDisabledButton className="w-full [&>button]:flex [&>button]:w-full [&>button]:justify-between [&>button]:rounded-[22px] [&>button]:px-5 [&>button]:py-4 [&>button]:text-base" />
+                  <div className="grid gap-4">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <Link
+                        href="/app"
+                        className="landing-button-primary justify-between px-5 py-4 text-base"
+                      >
+                        Open live demo
+                        <ArrowRight className="h-5 w-5" />
+                      </Link>
+                      <a
+                        href="#quickstart"
+                        className="landing-button-secondary justify-between px-5 py-4 text-base"
+                      >
+                        Run quickstart
+                        <TerminalSquare className="h-5 w-5 text-slate-400" />
+                      </a>
+                      <a
+                        href={DOCS_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="landing-button-secondary justify-between px-5 py-4 text-base"
+                      >
+                        Read docs
+                        <BookOpen className="h-5 w-5 text-slate-400" />
+                      </a>
+                      <a
+                        href={GITHUB_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="landing-button-secondary justify-between px-5 py-4 text-base"
+                      >
+                        View GitHub
+                        <Github className="h-5 w-5 text-slate-400" />
+                      </a>
+                    </div>
+
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] px-4 py-4">
+                        <p className="landing-kicker">What you get</p>
+                        <p className="mt-3 text-sm leading-6 text-slate-300/80">
+                          A real operator surface in the browser plus the same
+                          runtime story in CLI and TUI.
+                        </p>
+                      </div>
+                      <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] px-4 py-4">
+                        <p className="landing-kicker">What stays honest</p>
+                        <p className="mt-3 text-sm leading-6 text-slate-300/80">
+                          Deployments, sessions, access, connectors, audit, and
+                          usage stay inside one visible frame.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <footer className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-8 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+                <footer className="relative mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="font-[family:var(--font-landing-mono)] uppercase tracking-[0.28em] text-slate-300">
                       MUTX
                     </span>
-                    <span>Open Source</span>
-                    <span>MIT License</span>
+                    {launchMeta.map((item) => (
+                      <span key={item}>{item}</span>
+                    ))}
                   </div>
                   <div className="flex flex-wrap items-center gap-5">
                     <a

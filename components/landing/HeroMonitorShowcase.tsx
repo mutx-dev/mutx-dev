@@ -1,0 +1,255 @@
+"use client";
+
+import Image from "next/image";
+import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
+
+import { cn } from "@/lib/utils";
+
+type HeroMonitorShowcaseProps = {
+  className?: string;
+};
+
+export function HeroMonitorShowcase({ className }: HeroMonitorShowcaseProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const [allowPointerTilt, setAllowPointerTilt] = useState(false);
+
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+
+  const springRotateX = useSpring(rotateX, {
+    stiffness: 160,
+    damping: 22,
+    mass: 0.75,
+  });
+  const springRotateY = useSpring(rotateY, {
+    stiffness: 160,
+    damping: 22,
+    mass: 0.75,
+  });
+
+  const { scrollYProgress } = useScroll({
+    target: rootRef,
+    offset: ["start end", "end start"],
+  });
+
+  const floatY = useTransform(scrollYProgress, [0, 0.5, 1], [30, 0, -24]);
+  const chromeShiftX = useTransform(springRotateY, [-10, 10], [-14, 14]);
+  const chromeShiftY = useTransform(springRotateX, [-10, 10], [10, -10]);
+  const statusCardY = useTransform(scrollYProgress, [0, 0.5, 1], [22, 0, -14]);
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setAllowPointerTilt(false);
+      return;
+    }
+
+    const media = window.matchMedia("(pointer: fine)");
+    const update = () => setAllowPointerTilt(media.matches);
+
+    update();
+
+    const addListener = media.addEventListener?.bind(media);
+    const removeListener = media.removeEventListener?.bind(media);
+
+    if (addListener && removeListener) {
+      addListener("change", update);
+      return () => removeListener("change", update);
+    }
+
+    media.addListener(update);
+    return () => media.removeListener(update);
+  }, [prefersReducedMotion]);
+
+  function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!allowPointerTilt || !rootRef.current) {
+      return;
+    }
+
+    const rect = rootRef.current.getBoundingClientRect();
+    const relativeX = (event.clientX - rect.left) / rect.width - 0.5;
+    const relativeY = (event.clientY - rect.top) / rect.height - 0.5;
+
+    rotateY.set(relativeX * 12);
+    rotateX.set(relativeY * -10);
+  }
+
+  function resetTilt() {
+    rotateX.set(0);
+    rotateY.set(0);
+  }
+
+  return (
+    <div
+      ref={rootRef}
+      data-hero-monitor-root
+      className={cn("relative mx-auto w-full max-w-[58rem]", className)}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={resetTilt}
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-[12%] top-[7%] h-36 rounded-full bg-cyan-400/18 blur-[120px] sm:h-48"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-[6%] top-[18%] h-40 w-40 rounded-full bg-sky-300/10 blur-[90px]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-[8%] top-[20%] h-52 w-52 rounded-full bg-cyan-400/8 blur-[110px]"
+      />
+
+      <motion.div
+        style={prefersReducedMotion ? undefined : { y: floatY }}
+        className="relative"
+      >
+        <motion.div
+          data-hero-monitor-shell
+          style={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  transformPerspective: 2200,
+                  rotateX: springRotateX,
+                  rotateY: springRotateY,
+                }
+          }
+          className="relative mx-auto w-full will-change-transform md:[transform-style:preserve-3d]"
+        >
+          <motion.div
+            aria-hidden="true"
+            style={prefersReducedMotion ? undefined : { x: chromeShiftX, y: chromeShiftY }}
+            className="pointer-events-none absolute inset-[6%] rounded-[2.6rem] bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.2),transparent_42%),linear-gradient(120deg,rgba(255,255,255,0.1),transparent_38%)] opacity-60 mix-blend-screen"
+          />
+
+          <div className="relative rounded-[2.8rem] border border-white/20 bg-[linear-gradient(180deg,rgba(225,232,240,0.98)_0%,rgba(160,173,186,0.98)_38%,rgba(102,116,132,0.98)_100%)] p-[10px] shadow-[0_48px_120px_rgba(2,6,23,0.52)] sm:p-3">
+            <div className="relative overflow-hidden rounded-[2.25rem] border border-black/35 bg-[linear-gradient(180deg,#131a23_0%,#050a11_100%)] px-3 pb-4 pt-6 sm:px-4 sm:pb-5 sm:pt-7">
+              <div className="absolute left-1/2 top-3 h-2 w-2 -translate-x-1/2 rounded-full bg-black/80 shadow-[0_0_0_2px_rgba(255,255,255,0.06)]" />
+
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-3 px-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400 sm:px-2">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1.5 text-cyan-100">
+                    Live operator demo
+                  </span>
+                  <span className="hidden rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-slate-400 sm:inline-flex">
+                    real dashboard capture
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
+                    1280 × 801
+                  </span>
+                  <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
+                    operator surface
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative overflow-hidden rounded-[1.7rem] border border-white/10 bg-[#04101a] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
+                <Image
+                  src="/demo-poster.png"
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 52vw"
+                  className="object-cover opacity-70"
+                />
+                <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-20 bg-[linear-gradient(180deg,rgba(255,255,255,0.1),rgba(255,255,255,0))]" />
+                <div className="pointer-events-none absolute inset-0 z-20 opacity-[0.16] [background-image:linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:100%_5px]" />
+                <img
+                  src="/demo.gif"
+                  alt="Animated MUTX dashboard demo inside a control-plane monitor"
+                  width={1280}
+                  height={801}
+                  className="relative z-10 block h-auto w-full"
+                />
+                <motion.div
+                  aria-hidden="true"
+                  style={prefersReducedMotion ? undefined : { x: chromeShiftX, y: chromeShiftY }}
+                  className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(120deg,rgba(255,255,255,0.24)_0%,rgba(255,255,255,0.08)_16%,transparent_34%,transparent_100%)] opacity-65 mix-blend-screen"
+                />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-[linear-gradient(180deg,transparent,rgba(2,6,23,0.3))]" />
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-4 px-1 sm:px-2">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="relative h-11 w-11 overflow-hidden rounded-[1.1rem] border border-black/10 bg-[linear-gradient(180deg,rgba(248,250,252,0.98)_0%,rgba(197,210,224,0.94)_100%)] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+                    <Image
+                      src="/logo.png"
+                      alt="MUTX logo"
+                      fill
+                      sizes="2.75rem"
+                      className="object-contain p-1 brightness-[1.08] contrast-[1.04]"
+                    />
+                  </div>
+                  <div className="min-w-0 text-left">
+                    <p className="truncate font-[family:var(--font-landing-mono)] text-[0.66rem] uppercase tracking-[0.28em] text-slate-500">
+                      MUTX control plane
+                    </p>
+                    <p className="truncate text-sm font-semibold text-slate-800">
+                      Actual dashboard demo.gif
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full border border-black/10 bg-white/60 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700">
+                    deployments
+                  </span>
+                  <span className="rounded-full border border-black/10 bg-white/60 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700">
+                    sessions
+                  </span>
+                  <span className="rounded-full border border-black/10 bg-white/60 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700">
+                    audit
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="relative z-10 mx-auto hidden w-full max-w-4xl flex-col items-center sm:flex">
+          <div className="h-24 w-28 bg-[linear-gradient(180deg,rgba(164,177,192,0.98)_0%,rgba(99,112,126,0.98)_100%)] shadow-[0_28px_54px_rgba(2,6,23,0.4)] [clip-path:polygon(22%_0%,78%_0%,100%_100%,0_100%)]" />
+          <div className="-mt-3 h-5 w-72 rounded-full bg-[linear-gradient(180deg,rgba(180,191,203,0.98)_0%,rgba(106,117,128,0.98)_100%)] shadow-[0_18px_40px_rgba(2,6,23,0.35)]" />
+        </div>
+
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-[16%] bottom-0 h-16 rounded-full bg-black/70 blur-3xl"
+        />
+      </motion.div>
+
+      <motion.div
+        style={prefersReducedMotion ? undefined : { y: statusCardY }}
+        className="landing-panel pointer-events-none absolute -right-3 top-8 hidden max-w-[16rem] rounded-[1.7rem] p-4 xl:block"
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="font-[family:var(--font-landing-mono)] text-[0.64rem] uppercase tracking-[0.28em] text-cyan-200/80">
+              In the frame
+            </p>
+            <p className="mt-2 text-sm font-semibold text-white">
+              Real demo. Real control surface.
+            </p>
+          </div>
+          <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(74,222,128,0.7)]" />
+        </div>
+
+        <div className="mt-4 grid gap-2">
+          {["Dashboard capture from this repo", "Same surface language as CLI and TUI", "Parallax motion falls back cleanly"].map((item) => (
+            <div
+              key={item}
+              className="rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-slate-300"
+            >
+              {item}
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
