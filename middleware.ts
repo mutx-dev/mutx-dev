@@ -144,21 +144,35 @@ function dashboardPathToAppPath(pathname: string): string {
   return normalized
 }
 
+function internalDemoPathToPublicPath(pathname: string): string {
+  const normalized = normalizePathname(pathname)
+
+  if (normalized === '/control') {
+    return '/'
+  }
+
+  if (normalized.startsWith('/control/')) {
+    return normalized.slice('/control'.length) || '/'
+  }
+
+  return normalized
+}
+
 function appHostPathToInternalDemoPath(pathname: string): string {
   const normalized = normalizePathname(pathname)
 
   const directMap: Record<string, string> = {
-    '/': '/app',
-    '/overview': '/app',
-    '/agents': '/app/agents',
-    '/deployments': '/app/deployments',
-    '/runs': '/app/runs',
-    '/environments': '/app/environments',
-    '/access': '/app/access',
-    '/connectors': '/app/connectors',
-    '/audit': '/app/audit',
-    '/usage': '/app/usage',
-    '/settings': '/app/settings',
+    '/': '/control',
+    '/overview': '/control',
+    '/agents': '/control/agents',
+    '/deployments': '/control/deployments',
+    '/runs': '/control/runs',
+    '/environments': '/control/environments',
+    '/access': '/control/access',
+    '/connectors': '/control/connectors',
+    '/audit': '/control/audit',
+    '/usage': '/control/usage',
+    '/settings': '/control/settings',
   }
 
   if (directMap[normalized]) {
@@ -254,6 +268,15 @@ export function middleware(request: NextRequest) {
   const host = getRequestHost(request)
 
   if (MARKETING_HOSTS.has(host)) {
+    const publicDemoPath = internalDemoPathToPublicPath(normalizedPath)
+    if (publicDemoPath !== normalizedPath) {
+      return applyUiCacheHeaders(
+        redirectToHost(request, APP_HOST, publicDemoPath),
+        host,
+        normalizedPath,
+      )
+    }
+
     if (normalizedPath === '/login' || normalizedPath === '/register') {
       return applyUiCacheHeaders(
         redirectToHost(request, APP_HOST, normalizedPath),
@@ -285,6 +308,15 @@ export function middleware(request: NextRequest) {
   }
 
   if (APP_HOSTS.has(host)) {
+    const publicDemoPath = internalDemoPathToPublicPath(normalizedPath)
+    if (publicDemoPath !== normalizedPath) {
+      return applyUiCacheHeaders(
+        redirectWithinHost(request, publicDemoPath),
+        host,
+        normalizedPath,
+      )
+    }
+
     if (normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/')) {
       return applyUiCacheHeaders(
         redirectWithinHost(request, dashboardPathToAppPath(normalizedPath)),
