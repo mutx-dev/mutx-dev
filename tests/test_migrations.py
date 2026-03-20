@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSIONS_DIR = ROOT / "src/api/models/migrations/versions"
-CURRENT_HEAD = "d91f0a7b6c5e"
+CURRENT_HEAD = "6c5b4a3921de"
 
 
 def test_alembic_has_single_head():
@@ -391,6 +391,62 @@ def test_convergence_migration_repairs_missing_runtime_drift(monkeypatch):
         ),
         ("add_column", "agents", "last_heartbeat"),
     ]
+
+
+def test_openclaw_repair_migration_repairs_postgresql_enum_and_alert_timestamps(monkeypatch):
+    module = _load_migration_module(
+        "repair_openclaw_agenttype_and_alert_timestamps",
+        "6c5b4a3921de_repair_openclaw_agenttype_and_alert_timestamps.py",
+    )
+
+    executed: list[str] = []
+
+    monkeypatch.setattr(module, "_is_postgresql", lambda: True)
+    monkeypatch.setattr(module, "_has_postgresql_enum_value", lambda *_args: False)
+    monkeypatch.setattr(module, "_has_table", lambda table_name: table_name == "alerts")
+    monkeypatch.setattr(module, "_has_column", lambda table_name, column_name: (table_name, column_name) == ("alerts", "resolved_at"))
+    monkeypatch.setattr(
+        module,
+        "_get_column",
+        lambda table_name, column_name: {
+            "name": column_name,
+            "type": sa.DateTime(timezone=False),
+        }
+        if (table_name, column_name) == ("alerts", "resolved_at")
+        else None,
+    )
+    monkeypatch.setattr(module.op, "execute", lambda statement: executed.append(str(statement)))
+
+    module.upgrade()
+
+    assert executed == [
+        "ALTER TYPE agenttype ADD VALUE IF NOT EXISTS 'OPENCLAW'",
+        "ALTER TABLE alerts ALTER COLUMN resolved_at TYPE TIMESTAMP WITH TIME ZONE USING resolved_at AT TIME ZONE 'UTC'",
+    ]
+
+
+def test_openclaw_repair_migration_is_noop_when_schema_is_already_current(monkeypatch):
+    module = _load_migration_module(
+        "repair_openclaw_agenttype_and_alert_timestamps_noop",
+        "6c5b4a3921de_repair_openclaw_agenttype_and_alert_timestamps.py",
+    )
+
+    executed: list[str] = []
+
+    monkeypatch.setattr(module, "_is_postgresql", lambda: True)
+    monkeypatch.setattr(module, "_has_postgresql_enum_value", lambda *_args: True)
+    monkeypatch.setattr(module, "_has_table", lambda *_args: True)
+    monkeypatch.setattr(module, "_has_column", lambda *_args: True)
+    monkeypatch.setattr(
+        module,
+        "_get_column",
+        lambda *_args: {"name": "resolved_at", "type": sa.DateTime(timezone=True)},
+    )
+    monkeypatch.setattr(module.op, "execute", lambda statement: executed.append(str(statement)))
+
+    module.upgrade()
+
+    assert executed == []
 
 
 def test_alembic_upgrade_head_succeeds_on_empty_sqlite_database(tmp_path):

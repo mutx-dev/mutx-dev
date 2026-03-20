@@ -365,7 +365,7 @@ class Alert(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
-    resolved_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    resolved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
 
     agent: Mapped["Agent"] = relationship("Agent", back_populates="alerts")
 

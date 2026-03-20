@@ -10,6 +10,13 @@ class _FakeConnection:
         self.executed.append(str(statement))
 
 
+class _FakePostgreSQLConnection(_FakeConnection):
+    class _Dialect:
+        name = "postgresql"
+
+    dialect = _Dialect()
+
+
 def test_runtime_schema_repair_repairs_missing_auth_objects(monkeypatch):
     existing_tables = {"agent_logs", "usage_events"}
     existing_columns = {
@@ -216,3 +223,61 @@ def test_runtime_schema_repair_adds_missing_agents_last_heartbeat(monkeypatch):
 
     assert connection.executed == ["ALTER TABLE agents ADD COLUMN last_heartbeat DATETIME"]
     assert repaired_objects == ["agents.last_heartbeat"]
+
+
+def test_runtime_schema_repair_repairs_openclaw_enum_and_alert_timestamp_drift(monkeypatch):
+    existing_tables = {"agents", "alerts", "agent_logs", "refresh_token_sessions", "usage_events"}
+    existing_columns = {
+        ("agents", "last_heartbeat"),
+        ("agent_logs", "meta_data"),
+        ("alerts", "resolved_at"),
+        ("usage_events", "resource_type"),
+        ("usage_events", "resource_id"),
+        ("usage_events", "credits_used"),
+        ("usage_events", "event_metadata"),
+    }
+    existing_indexes = {
+        ("refresh_token_sessions", "ix_refresh_token_sessions_family_id"),
+        ("refresh_token_sessions", "ix_refresh_token_sessions_token_jti"),
+        ("refresh_token_sessions", "ix_refresh_token_sessions_user_id"),
+        ("usage_events", "ix_usage_events_created_at"),
+        ("usage_events", "ix_usage_events_event_type"),
+        ("usage_events", "ix_usage_events_resource_type"),
+        ("usage_events", "ix_usage_events_user_id"),
+    }
+
+    monkeypatch.setattr(
+        database,
+        "_has_table",
+        lambda _connection, table_name: table_name in existing_tables,
+    )
+    monkeypatch.setattr(
+        database,
+        "_has_column",
+        lambda _connection, table_name, column_name: (table_name, column_name) in existing_columns,
+    )
+    monkeypatch.setattr(
+        database,
+        "_has_index",
+        lambda _connection, table_name, index_name: (table_name, index_name) in existing_indexes,
+    )
+    monkeypatch.setattr(database, "_has_postgresql_enum_value", lambda *_args: False)
+    monkeypatch.setattr(
+        database,
+        "_get_column",
+        lambda _connection, table_name, column_name: {
+            "name": column_name,
+            "type": database.DateTime(timezone=False),
+        }
+        if (table_name, column_name) == ("alerts", "resolved_at")
+        else None,
+    )
+
+    connection = _FakePostgreSQLConnection()
+    repaired_objects = database._repair_known_schema_drift(connection)
+
+    assert connection.executed == [
+        "ALTER TYPE agenttype ADD VALUE IF NOT EXISTS 'OPENCLAW'",
+        "ALTER TABLE alerts ALTER COLUMN resolved_at TYPE TIMESTAMP WITH TIME ZONE USING resolved_at AT TIME ZONE 'UTC'",
+    ]
+    assert repaired_objects == ["agenttype.OPENCLAW", "alerts.resolved_at"]

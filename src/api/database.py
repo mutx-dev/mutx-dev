@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import logging
 from typing import Any
 
-from sqlalchemy import inspect, text
+from sqlalchemy import DateTime, inspect, text
 from sqlalchemy.engine import Connection, make_url
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -195,6 +195,44 @@ def _has_index(sync_connection: Connection, table_name: str, index_name: str) ->
     return any(index["name"] == index_name for index in inspector.get_indexes(table_name))
 
 
+def _get_column(sync_connection: Connection, table_name: str, column_name: str) -> dict[str, Any] | None:
+    inspector = inspect(sync_connection)
+    if not inspector.has_table(table_name):
+        return None
+    for column in inspector.get_columns(table_name):
+        if column["name"] == column_name:
+            return column
+    return None
+
+
+def _is_postgresql(sync_connection: Connection) -> bool:
+    return getattr(getattr(sync_connection, "dialect", None), "name", "") == "postgresql"
+
+
+def _is_timezone_aware_datetime(column: dict[str, Any] | None) -> bool:
+    if column is None:
+        return False
+
+    column_type = column.get("type")
+    if isinstance(column_type, DateTime):
+        return bool(getattr(column_type, "timezone", False))
+
+    return "with time zone" in str(column_type).lower()
+
+
+def _has_postgresql_enum_value(sync_connection: Connection, enum_name: str, enum_value: str) -> bool:
+    result = sync_connection.execute(
+        text(
+            "SELECT 1 "
+            "FROM pg_type enum_type "
+            "JOIN pg_enum enum_value_row ON enum_value_row.enumtypid = enum_type.oid "
+            "WHERE enum_type.typname = :enum_name AND enum_value_row.enumlabel = :enum_value"
+        ),
+        {"enum_name": enum_name, "enum_value": enum_value},
+    )
+    return result.scalar() is not None
+
+
 def get_last_runtime_schema_repairs() -> list[str]:
     return list(last_runtime_schema_repairs)
 
@@ -212,9 +250,17 @@ def _timestamp_column_type(sync_connection: Connection) -> str:
 
 
 def _repair_known_schema_drift(sync_connection: Connection) -> list[str]:
-    from src.api.models.models import Agent, AgentLog, RefreshTokenSession, UsageEvent
+    from src.api.models.models import Agent, AgentLog, Alert, RefreshTokenSession, UsageEvent
 
     repaired_objects: list[str] = []
+
+    if (
+        _is_postgresql(sync_connection)
+        and _has_table(sync_connection, Agent.__tablename__)
+        and not _has_postgresql_enum_value(sync_connection, "agenttype", "OPENCLAW")
+    ):
+        sync_connection.execute(text("ALTER TYPE agenttype ADD VALUE IF NOT EXISTS 'OPENCLAW'"))
+        repaired_objects.append("agenttype.OPENCLAW")
 
     if _has_table(sync_connection, Agent.__tablename__) and not _has_column(
         sync_connection,
@@ -228,6 +274,24 @@ def _repair_known_schema_drift(sync_connection: Connection) -> list[str]:
             )
         )
         repaired_objects.append(f"{Agent.__tablename__}.last_heartbeat")
+
+    if (
+        _is_postgresql(sync_connection)
+        and _has_table(sync_connection, Alert.__tablename__)
+        and _has_column(sync_connection, Alert.__tablename__, "resolved_at")
+        and not _is_timezone_aware_datetime(
+            _get_column(sync_connection, Alert.__tablename__, "resolved_at")
+        )
+    ):
+        sync_connection.execute(
+            text(
+                "ALTER TABLE alerts "
+                "ALTER COLUMN resolved_at "
+                "TYPE TIMESTAMP WITH TIME ZONE "
+                "USING resolved_at AT TIME ZONE 'UTC'"
+            )
+        )
+        repaired_objects.append("alerts.resolved_at")
 
     if not _has_table(sync_connection, AgentLog.__tablename__):
         AgentLog.__table__.create(bind=sync_connection, checkfirst=True)
