@@ -125,17 +125,8 @@ export function HeroMonitorShowcase({ className }: HeroMonitorShowcaseProps) {
           />
 
           <div className="relative rounded-[2.8rem] border border-white/20 bg-[linear-gradient(180deg,rgba(225,232,240,0.98)_0%,rgba(160,173,186,0.98)_38%,rgba(102,116,132,0.98)_100%)] p-[10px] shadow-[0_48px_120px_rgba(2,6,23,0.52)] sm:p-3">
-            <div className="relative overflow-hidden rounded-[2.25rem] border border-black/35 bg-[linear-gradient(180deg,#131a23_0%,#050a11_100%)] px-3 pb-4 pt-6 sm:px-4 sm:pb-5 sm:pt-7">
+            <div className="relative overflow-hidden rounded-[2.25rem] border border-black/35 bg-[linear-gradient(180deg,#131a23_0%,#050a11_100%)] px-3 pb-3 pt-6 sm:px-4 sm:pb-4 sm:pt-7">
               <div className="absolute left-1/2 top-3 h-2 w-2 -translate-x-1/2 rounded-full bg-black/80 shadow-[0_0_0_2px_rgba(255,255,255,0.06)]" />
-
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-3 px-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-400 sm:px-2">
-                <span className="rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1.5 text-cyan-100">
-                  MUTX
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">
-                  Control plane
-                </span>
-              </div>
 
               <div className="relative overflow-hidden rounded-[1.7rem] border border-white/10 bg-[#04101a] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]">
                 <Image
@@ -151,7 +142,7 @@ export function HeroMonitorShowcase({ className }: HeroMonitorShowcaseProps) {
                 <div className="pointer-events-none absolute inset-0 z-20 opacity-[0.16] [background-image:linear-gradient(rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:100%_5px]" />
                 <img
                   src="/demo.gif"
-                  alt="Animated MUTX dashboard demo inside a control-plane monitor"
+                  alt="MUTX dashboard demo"
                   width={1280}
                   height={801}
                   className="relative z-10 block h-auto w-full"
@@ -162,40 +153,6 @@ export function HeroMonitorShowcase({ className }: HeroMonitorShowcaseProps) {
                   className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(120deg,rgba(255,255,255,0.24)_0%,rgba(255,255,255,0.08)_16%,transparent_34%,transparent_100%)] opacity-65 mix-blend-screen"
                 />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-[linear-gradient(180deg,transparent,rgba(2,6,23,0.3))]" />
-              </div>
-
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-4 px-1 sm:px-2">
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className="relative h-11 w-11 overflow-hidden rounded-[1.1rem] border border-black/10 bg-[linear-gradient(180deg,rgba(248,250,252,0.98)_0%,rgba(197,210,224,0.94)_100%)] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
-                    <Image
-                      src="/logo.png"
-                      alt="MUTX logo"
-                      fill
-                      sizes="2.75rem"
-                      className="object-contain p-1 brightness-[1.08] contrast-[1.04]"
-                    />
-                  </div>
-                  <div className="min-w-0 text-left">
-                    <p className="truncate font-[family:var(--font-landing-mono)] text-[0.66rem] uppercase tracking-[0.28em] text-slate-500">
-                      MUTX control plane
-                    </p>
-                    <p className="truncate text-sm font-semibold text-slate-800">
-                      Live operator view
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <span className="rounded-full border border-black/10 bg-white/60 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700">
-                    deployments
-                  </span>
-                  <span className="rounded-full border border-black/10 bg-white/60 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700">
-                    sessions
-                  </span>
-                  <span className="rounded-full border border-black/10 bg-white/60 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700">
-                    audit
-                  </span>
-                </div>
               </div>
             </div>
           </div>
