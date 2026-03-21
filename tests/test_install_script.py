@@ -73,10 +73,13 @@ def build_fake_cli_package(package_dir: Path) -> Path:
                     print("")
                     print("Options:")
                     print("  --api-url TEXT")
+                    print("  --email TEXT")
+                    print("  --password TEXT")
                     print("  --provider [openclaw]")
                     print("  --install-openclaw")
                     print("  --import-openclaw")
                     print("  --open-tui")
+                    print("  --no-input")
                     return
 
                 if args == ["setup", "local", "--help"]:
@@ -87,6 +90,7 @@ def build_fake_cli_package(package_dir: Path) -> Path:
                     print("  --install-openclaw")
                     print("  --import-openclaw")
                     print("  --open-tui")
+                    print("  --no-input")
                     return
 
                 if args == ["runtime", "--help"]:
@@ -376,10 +380,13 @@ Usage: mutx setup hosted [OPTIONS]
 
 Options:
   --api-url TEXT
+  --email TEXT
+  --password TEXT
   --provider [openclaw]
   --install-openclaw
   --import-openclaw
   --open-tui
+  --no-input
 EOF
     exit 0
     ;;
@@ -392,6 +399,7 @@ Options:
   --install-openclaw
   --import-openclaw
   --open-tui
+  --no-input
 EOF
     exit 0
     ;;
@@ -554,6 +562,25 @@ def test_install_script_refreshes_existing_source_overlay_even_when_surface_look
     assert "Install complete" in result.stdout
 
 
+def test_install_script_collects_hosted_credentials_inside_the_wizard(tmp_path: Path) -> None:
+    exit_code, transcript, _ = run_install_script_in_tty(
+        tmp_path,
+        mutx_script=CURRENT_MUTX_SCRIPT,
+        source_ref=str(build_fake_cli_package(tmp_path / "source-cli")),
+        replies=[
+            ("Select a lane [1/2/3]", "1\n"),
+            ("Email", "operator@example.com\n"),
+            ("Password", "StrongPass1!\n"),
+        ],
+    )
+
+    assert exit_code == 0
+    assert "Email" in transcript
+    assert "Password" in transcript
+    assert "Launching MUTX hosted setup against https://api.mutx.dev" in transcript
+    assert "Error: No such option" not in transcript
+
+
 def test_install_script_reports_detected_openclaw_and_local_key_policy(tmp_path: Path) -> None:
     extra_bin = tmp_path / "extra-bin"
     extra_bin.mkdir(parents=True, exist_ok=True)
@@ -615,7 +642,7 @@ def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recover
     assert "Select a lane [1/2/3]" in transcript
     assert "https://api.mutx.dev" in transcript
     assert "http://localhost:8000" in transcript
-    assert "Launching:" in transcript
+    assert "Launching MUTX local setup against http://localhost:8000" in transcript
     assert "LOCAL SETUP --provider openclaw --install-openclaw --open-tui" in transcript
     assert "MUTX setup wizard\\nInstall the CLI" not in transcript
     assert "No such command 'setup'" not in transcript
@@ -644,8 +671,7 @@ def test_install_script_tty_local_lane_does_not_require_ready_localhost(tmp_path
     assert "http://localhost:8000" in transcript
     assert "Local dev lane needs a running control plane" not in transcript
     assert "This lane is for contributor checkouts" not in transcript
-    assert "Launching:" in transcript
-    assert "setup local --provider openclaw --install-openclaw --open-tui" in transcript
+    assert "Launching MUTX local setup against http://localhost:8000" in transcript
 
 
 def test_install_script_tty_hosted_lane_targets_hosted_api(tmp_path: Path) -> None:
@@ -655,9 +681,12 @@ def test_install_script_tty_hosted_lane_targets_hosted_api(tmp_path: Path) -> No
         source_ref=str(build_fake_cli_package(tmp_path / "source-cli")),
         replies=[
             ("Select a lane [1/2/3]", "1\n"),
+            ("Email", "operator@example.com\n"),
+            ("Password", "StrongPass1!\n"),
         ],
     )
 
     assert exit_code == 0
-    assert "Launching:" in transcript
-    assert "setup hosted --api-url https://api.mutx.dev --provider openclaw --install-openclaw --open-tui" in transcript
+    assert "https://api.mutx.dev" in transcript
+    assert "Launching MUTX hosted setup against https://api.mutx.dev" in transcript
+    assert "Error: No such option" not in transcript

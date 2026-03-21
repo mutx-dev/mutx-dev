@@ -642,7 +642,7 @@ def inspect_importable_openclaw_runtime(
     if not config_path:
         raise ValidationError(
             "OpenClaw is installed, but no config file was detected. "
-            "Use `Configure OpenClaw 🦞` or run `openclaw configure`, then rerun the import."
+            "Open `openclaw tui` to finish the upstream setup, then rerun the import."
         )
 
     try:
@@ -650,7 +650,7 @@ def inspect_importable_openclaw_runtime(
     except CLIServiceError as exc:
         raise ValidationError(
             "OpenClaw was detected, but the config is invalid. "
-            "Use `Configure OpenClaw 🦞` or run `openclaw configure`, then rerun the import.\n"
+            "Open `openclaw tui` to repair the upstream config, then rerun the import.\n"
             f"{exc}"
         ) from exc
 
@@ -658,12 +658,12 @@ def inspect_importable_openclaw_runtime(
     if not health.onboarded:
         raise ValidationError(
             "OpenClaw config validated, but onboarding is incomplete. "
-            "Use `Configure OpenClaw 🦞` or run `openclaw onboard --install-daemon`, then rerun the import."
+            "Open `openclaw tui` or run `openclaw onboard --install-daemon`, then rerun the import."
         )
     if not health.gateway_reachable:
         raise ValidationError(
             "OpenClaw config validated, but the local gateway is not reachable yet. "
-            "Use `Configure OpenClaw 🦞`, run `openclaw onboard --install-daemon`, or open `openclaw tui`, then rerun the import."
+            "Open `openclaw tui` or run `openclaw onboard --install-daemon`, then rerun the import."
         )
     return install_resolution, health
 

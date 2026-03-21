@@ -171,7 +171,7 @@ def run_openclaw_setup_wizard(
         _sync_onboarding(runtime_service, action="reset")
 
     action_type = (requested_action or ("import" if find_openclaw_bin() else "install")).strip().lower()
-    if action_type not in {"import", "install", "configure"}:
+    if action_type not in {"import", "install", "tui", "configure"}:
         raise CLIServiceError(f"Unsupported OpenClaw setup action '{action_type}'.")
 
     try:
@@ -205,10 +205,10 @@ def run_openclaw_setup_wizard(
             install_resolution, health = inspect_importable_openclaw_runtime(
                 install_method=openclaw_install_method,
             )
-        elif action_type == "configure":
-            _progress(progress, step="install", state="running", message="🦞 Opening OpenClaw configure")
+        elif action_type in {"tui", "configure"}:
+            _progress(progress, step="install", state="running", message="🦞 Opening OpenClaw TUI")
             open_openclaw_surface(
-                surface="configure",
+                surface="tui" if action_type == "tui" else "configure",
                 command_runner=configure_command_runner,
             )
             install_resolution, health = inspect_importable_openclaw_runtime(
@@ -243,8 +243,8 @@ def run_openclaw_setup_wizard(
         _sync_onboarding(runtime_service, action="complete_step", step="install")
         if action_type == "import":
             install_message = f"🦞 Found OpenClaw at {install_resolution.binary_path}; importing it into MUTX tracking"
-        elif action_type == "configure":
-            install_message = f"🦞 OpenClaw configured at {install_resolution.binary_path}; importing it into MUTX tracking"
+        elif action_type in {"tui", "configure"}:
+            install_message = f"🦞 OpenClaw reviewed at {install_resolution.binary_path}; importing it into MUTX tracking"
         else:
             install_message = (
                 f"🦞 Found OpenClaw at {install_resolution.binary_path}; importing it into MUTX tracking"

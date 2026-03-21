@@ -47,6 +47,7 @@ WIZARD_HINT=""
 SPINNER_FRAME_INDEX=0
 PROMPT_CURSOR_ROW=0
 PROMPT_CURSOR_COL=0
+WIZARD_PROMPT_LABEL="Select a lane [1/2/3]"
 OPENCLAW_DETECTED=0
 OPENCLAW_BIN=""
 OPENCLAW_HOME=""
@@ -764,7 +765,7 @@ dashboard_render_compact_status() {
 dashboard_render_wizard() {
   local row=2
   local wrap_width=$((TERM_COLS - 6))
-  local prompt_label="Select a lane [1/2/3]: "
+  local prompt_label="${WIZARD_PROMPT_LABEL}: "
   local runtime_label=""
   local path_label=""
   local home_label=""
@@ -1080,6 +1081,24 @@ read_tty_line() {
   printf -v "${__resultvar}" '%s' "${line}"
 }
 
+read_tty_secret() {
+  local __resultvar="$1"
+  local line=""
+  local stty_state=""
+
+  if [[ "${HAS_TTY}" != "1" ]]; then
+    printf -v "${__resultvar}" '%s' ""
+    return 1
+  fi
+
+  stty_state="$(stty -g < /dev/tty)"
+  stty -echo < /dev/tty
+  IFS= read -r line < /dev/tty || true
+  stty "${stty_state}" < /dev/tty
+  tty_print '\n'
+  printf -v "${__resultvar}" '%s' "${line}"
+}
+
 mutx_help_output() {
   local spec="$1"
   local -a cmd=("${MUTX_BIN}")
@@ -1162,6 +1181,12 @@ check_assistant_first_surface() {
 
   if ! mutx_supports_option "setup hosted" "--provider"; then
     missing+=("mutx setup hosted --provider")
+  fi
+  if ! mutx_supports_option "setup hosted" "--email"; then
+    missing+=("mutx setup hosted --email")
+  fi
+  if ! mutx_supports_option "setup hosted" "--password"; then
+    missing+=("mutx setup hosted --password")
   fi
   if ! mutx_supports_option "setup hosted" "--install-openclaw"; then
     missing+=("mutx setup hosted --install-openclaw")
@@ -1352,6 +1377,8 @@ run_setup_handoff() {
   local -a hosted_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}")
   local -a local_cmd=("${MUTX_BIN}" setup local)
   local handoff_note=""
+  local hosted_email=""
+  local hosted_password=""
 
   append_if_supported hosted_cmd "setup hosted" "--provider" "openclaw"
   append_if_supported hosted_cmd "setup hosted" "--install-openclaw"
@@ -1417,7 +1444,7 @@ run_setup_handoff() {
       fi
       tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}privacy${C_RESET} OpenClaw stays local and MUTX does not upload keys\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}${handoff_note}${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}local${C_RESET} MUTX can bootstrap a private localhost control plane when you choose Local\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}local${C_RESET} MUTX can bootstrap a private localhost control plane and help start Docker Desktop on macOS\n"
       tty_print "${C_PANEL}│${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}${HOSTED_API_URL}${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local lane    ${C_DIM}${LOCAL_API_URL}${C_RESET}\n"
@@ -1454,14 +1481,50 @@ run_setup_handoff() {
   done
 
   if [[ "${WIZARD_SELECTION}" == "1" || "${WIZARD_SELECTION}" == "h" || "${WIZARD_SELECTION}" == "H" || "${WIZARD_SELECTION}" == "hosted" || "${WIZARD_SELECTION}" == "Hosted" ]]; then
+    WIZARD_HINT="Hosted keeps the control plane managed. Sign in here, then MUTX continues into the OpenClaw wizard."
+    WIZARD_PROMPT_LABEL="Email"
+    while [[ -z "${hosted_email}" ]]; do
+      if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+        dashboard_render
+      else
+        tty_print "\n${C_SOFT}${WIZARD_HINT}${C_RESET}\n"
+      fi
+      tty_prompt "${WIZARD_PROMPT_LABEL}"
+      read_tty_line hosted_email
+      hosted_email="${hosted_email#"${hosted_email%%[![:space:]]*}"}"
+      hosted_email="${hosted_email%"${hosted_email##*[![:space:]]}"}"
+      if [[ -z "${hosted_email}" ]]; then
+        WIZARD_ERROR="Email is required for the Hosted lane."
+      else
+        WIZARD_ERROR=""
+      fi
+    done
+
+    WIZARD_PROMPT_LABEL="Password"
+    while [[ -z "${hosted_password}" ]]; do
+      if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+        dashboard_render
+      fi
+      tty_prompt "${WIZARD_PROMPT_LABEL}"
+      read_tty_secret hosted_password
+      if [[ -z "${hosted_password}" ]]; then
+        WIZARD_ERROR="Password is required for the Hosted lane."
+      else
+        WIZARD_ERROR=""
+      fi
+    done
+
+    append_if_supported hosted_cmd "setup hosted" "--email" "${hosted_email}"
+    append_if_supported hosted_cmd "setup hosted" "--password" "${hosted_password}"
+    append_if_supported hosted_cmd "setup hosted" "--no-input"
     leave_alt_screen
-    say "Launching: ${hosted_cmd[*]}"
+    say "Launching MUTX hosted setup against ${HOSTED_API_URL}"
     exec "${hosted_cmd[@]}" < /dev/tty > /dev/tty 2>&1
   fi
 
   if [[ "${WIZARD_SELECTION}" == "2" || "${WIZARD_SELECTION}" == "l" || "${WIZARD_SELECTION}" == "L" || "${WIZARD_SELECTION}" == "local" || "${WIZARD_SELECTION}" == "Local" ]]; then
     leave_alt_screen
-    say "Launching: ${local_cmd[*]}"
+    say "Launching MUTX local setup against ${LOCAL_API_URL}"
     exec "${local_cmd[@]}" < /dev/tty > /dev/tty 2>&1
   fi
 

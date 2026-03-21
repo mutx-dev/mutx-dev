@@ -435,7 +435,7 @@ def test_setup_hosted_uses_import_action_when_openclaw_exists(monkeypatch, tmp_p
     assert "Adoption: existing OpenClaw runtime added to MUTX tracking" in result.output
 
 
-def test_setup_hosted_interactive_can_choose_configure(monkeypatch, tmp_path: Path) -> None:
+def test_setup_hosted_interactive_can_choose_openclaw_tui(monkeypatch, tmp_path: Path) -> None:
     captured: dict[str, object] = {}
     config = CLIConfig(config_path=tmp_path / "config.json")
 
@@ -468,7 +468,8 @@ def test_setup_hosted_interactive_can_choose_configure(monkeypatch, tmp_path: Pa
 
     assert result.exit_code == 0
     assert "Import Existing OpenClaw 🦞" in result.output
-    assert captured["wizard_kwargs"]["requested_action"] == "configure"
+    assert "Open OpenClaw TUI 🦞" in result.output
+    assert captured["wizard_kwargs"]["requested_action"] == "tui"
 
 
 def test_setup_hosted_interactive_can_choose_repair(monkeypatch, tmp_path: Path) -> None:

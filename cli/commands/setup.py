@@ -2,7 +2,7 @@ import click
 
 from cli.commands.tui import launch_tui
 from cli.config import LOCAL_API_URL, current_config, get_client, resolve_hosted_api_url
-from cli.local_control_plane import ensure_local_control_plane
+from cli.local_control_plane import ensure_local_container_runtime, ensure_local_control_plane
 from cli.openclaw_runtime import find_openclaw_bin
 from cli.services import AssistantService, AuthService, CLIServiceError, RuntimeStateService
 from cli.services.assistant import TemplatesService
@@ -57,13 +57,13 @@ def _choose_openclaw_action(*, no_input: bool, import_openclaw: bool, install_op
     click.echo("OpenClaw detected locally. Choose how MUTX should proceed:")
     click.echo(f"  1. Import Existing OpenClaw 🦞  [{existing_binary}]")
     click.echo("  2. Install / Repair OpenClaw")
-    click.echo("  3. Configure OpenClaw 🦞")
+    click.echo("  3. Open OpenClaw TUI 🦞")
     click.echo("  4. Cancel")
     selection = click.prompt("Select an action", type=click.IntRange(1, 4), default=1)
     mapping = {
         1: "import",
         2: "install",
-        3: "configure",
+        3: "tui",
         4: "cancel",
     }
     return mapping[selection]
@@ -139,7 +139,7 @@ def _finish_setup(
     click.echo(f"Workspace: {result.binding.workspace}")
     click.echo(f"Gateway: {result.health.gateway_url or 'n/a'} ({result.health.status})")
     click.echo("Tracking: imported into ~/.mutx/providers/openclaw")
-    if result.action_type in {"import", "configure"}:
+    if result.action_type in {"import", "tui", "configure"}:
         click.echo("Adoption: existing OpenClaw runtime added to MUTX tracking without moving the upstream home.")
     click.echo(
         f"Privacy: {result.runtime_snapshot.get('privacy_summary') or 'Local-only runtime tracking.'}"
@@ -281,6 +281,14 @@ def setup_local(
         local_state = ensure_local_control_plane(
             api_url=LOCAL_API_URL,
             progress=lambda message: click.echo(f"… {message}"),
+            container_runtime_ensurer=lambda progress: ensure_local_container_runtime(
+                progress=progress,
+                prompt_install=(
+                    None
+                    if no_input
+                    else lambda prompt: click.confirm(prompt, default=True)
+                ),
+            ),
         )
         if local_state.bootstrapped_now:
             click.echo(f"✓ Local control plane ready at {LOCAL_API_URL}")

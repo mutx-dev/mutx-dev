@@ -44,29 +44,11 @@ from cli.setup_wizard import mark_auth_completed, prepare_runtime_state_sync, ru
 
 
 MUTX_ASCII_LOGO = """\
-                     ≠≠
-                    ≠≠≠≠
-                   ≠====≠
-                 ≠≠======≠≠
-                ≠≠=========≠  ==≠≠≠≈≈≈
-               =======÷======  ÷÷=====≠=
-             =======÷÷÷÷=======  ÷======≠
-            =======÷÷   ÷=======  ÷÷=====≠
-           ==÷====×   ÷  ÷÷====÷  ≠======≠
-         ==÷÷÷÷÷÷÷  ÷==÷  ÷÷==÷  =======÷
-        ==÷÷÷÷÷÷÷  ÷======  ÷÷ =======÷÷
-       =÷÷÷÷÷÷÷÷ =÷÷=======   =======÷÷
-     ==÷÷÷÷÷÷÷   ÷÷===÷÷÷÷÷  ==÷÷÷÷÷÷
-    ==÷÷÷÷÷÷÷  ÷  ÷÷÷÷==÷  ==÷÷÷÷÷÷÷ ==
-   =÷÷÷÷÷÷÷÷  ÷=÷  ÷÷÷÷÷  ÷=÷÷÷÷÷÷÷ ==÷=
-  =÷÷÷÷÷÷÷   ÷÷===  ÷÷÷  ÷=÷÷÷÷÷×÷÷=÷÷÷÷=≠
- ÷÷÷÷÷÷÷÷   ×÷==÷÷==    ===÷÷÷÷÷  ÷÷÷÷÷÷÷=≠
- ÷÷÷÷÷÷÷     ×÷÷÷÷÷== =====÷÷÷÷    ≠÷÷÷÷÷÷=
- ÷÷÷÷÷        ÷÷÷÷÷÷===÷÷==÷÷÷       ÷÷÷÷÷=
- ÷÷÷÷           ÷÷÷÷÷÷÷÷÷÷÷÷          ÷÷÷÷=
- ÷÷÷             ÷÷÷÷÷÷÷÷÷÷            ÷÷÷=
- ÷÷               ÷÷÷÷÷÷÷÷              ÷÷=
-                   ÷÷÷÷÷÷                 =
+ __  __ _   _ _____ __   __
+|  \\/  | | | |_   _|\\ \\ / /
+| |\\/| | | | | | |   \\ V /
+| |  | | |_| | | |    | |
+|_|  |_|\\___/  |_|    |_|
 """
 
 MUTX_OPERATOR_COPY = "control plane for agent infrastructure"
@@ -245,74 +227,71 @@ def _render_setup_body(
     if not isinstance(gateway, dict):
         gateway = {}
     bindings = runtime_snapshot.get("bindings") if isinstance(runtime_snapshot, dict) else []
-    binding_line = "No binding tracked yet."
-    if isinstance(bindings, list) and bindings:
-        binding = bindings[0] if isinstance(bindings[0], dict) else {}
-        binding_line = (
-            f"assistant_id={binding.get('assistant_id') or 'n/a'} | "
-            f"workspace={binding.get('workspace') or 'n/a'}"
-        )
+    binding = bindings[0] if isinstance(bindings, list) and bindings and isinstance(bindings[0], dict) else {}
 
     last_error = str(onboarding.get("last_error") or "").strip()
     status = str(onboarding.get("status") or "pending")
     current_step = str(onboarding.get("current_step") or "auth")
     gateway_status = str(runtime_snapshot.get("status") or gateway.get("status") or "unknown")
     gateway_url = str(runtime_snapshot.get("gateway_url") or gateway.get("gateway_url") or "n/a")
-    install_method = str(runtime_snapshot.get("install_method") or "npm")
-    last_seen = str(runtime_snapshot.get("last_seen_at") or "n/a")
     binary_path = str(runtime_snapshot.get("binary_path") or "n/a")
-    tracking_mode = str(runtime_snapshot.get("tracking_mode") or "track_external_runtime")
     privacy_summary = str(runtime_snapshot.get("privacy_summary") or "Local-only runtime tracking.")
+    tracked_root = str(runtime_snapshot.get("provider_root") or "~/.mutx/providers/openclaw")
+    assistant_id = str(binding.get("assistant_id") or runtime_snapshot.get("assistant_id") or "n/a")
+    workspace = str(binding.get("workspace") or runtime_snapshot.get("workspace") or "n/a")
 
     lines = [
-        f"API URL: {api_url}",
-        f"Auth: {'ready' if authenticated else 'required'}",
-        f"Assistant: {assistant_name or 'not deployed'}",
+        "MUTX uses this page as a short setup rail. The full runtime view lives in Control Plane.",
         "",
-        f"Wizard status: {status} | current: {current_step}",
-        *_render_provider_lines(onboarding),
-        "",
-        *_render_step_lines(onboarding),
+        f"Session: {'ready' if authenticated else 'login required'} on {api_url}",
+        f"Provider: OpenClaw 🦞",
+        f"Wizard: {status} · step {current_step}",
         "",
         "Runtime:",
-        f"  provider=openclaw | install={install_method} | gateway={gateway_status}",
-        f"  binary={binary_path}",
-        f"  url={gateway_url}",
-        f"  home={runtime_snapshot.get('home_path') or 'n/a'}",
-        f"  config={runtime_snapshot.get('config_path') or 'n/a'}",
-        f"  tracking={tracking_mode}",
-        f"  last_seen={last_seen}",
+        f"  gateway  {gateway_status} · {gateway_url}",
+        f"  binary   {binary_path}",
+        f"  home     {runtime_snapshot.get('home_path') or 'n/a'}",
+        f"  config   {runtime_snapshot.get('config_path') or 'n/a'}",
+        f"  tracking {tracked_root}",
         "",
-        "Binding:",
-        f"  {binding_line}",
+        "Assistant:",
+        f"  name {assistant_name or 'not deployed'}",
+        f"  id   {assistant_id}",
+        f"  ws   {workspace}",
         "",
         "Privacy:",
         f"  {privacy_summary}",
     ]
     if last_error:
-        lines.extend(["", f"Last error: {last_error}"])
+        lines.extend(["", f"Needs attention: {last_error}"])
     if not authenticated:
         lines.extend(
             [
                 "",
-                "Run `mutx setup hosted` or `mutx setup local` first, then return here to continue the provider wizard.",
+                "Next: run `mutx setup hosted` for the managed path or `mutx setup local` for a private localhost control plane.",
             ]
         )
-    elif not assistant_name:
-        if runtime_snapshot.get("binary_path"):
-            lines.extend(
-                [
-                    "",
-                    "Actions:",
-                    "  Import Existing OpenClaw 🦞 adopts the current runtime into ~/.mutx/providers/openclaw.",
-                    "  Configure OpenClaw 🦞 opens the upstream configurator in this shell and returns to MUTX.",
-                    "  Open OpenClaw TUI 🦞 suspends MUTX, opens the upstream TUI, then resumes and refreshes state.",
-                ]
-            )
-        else:
-            lines.extend(["", "Use Deploy Personal Assistant to run the OpenClaw provider wizard."])
+    elif assistant_name:
+        lines.extend(
+            [
+                "",
+                "Next: open OpenClaw TUI 🦞 for the upstream runtime experience, or switch to Control Plane for sessions and gateway health.",
+            ]
+        )
+    elif runtime_snapshot.get("binary_path"):
+        lines.extend(
+            [
+                "",
+                "Next: Import Existing OpenClaw 🦞 to adopt the current runtime and deploy the Personal Assistant in one pass.",
+            ]
+        )
     else:
-        lines.extend(["", "OpenClaw is tracked under ~/.mutx/providers/openclaw and overlaid into Control Plane."])
+        lines.extend(
+            [
+                "",
+                "Next: Deploy Personal Assistant. MUTX will install OpenClaw, onboard it, track it, and bind a dedicated assistant.",
+            ]
+        )
     return "\n".join(lines)
 
 
@@ -457,8 +436,8 @@ class MutxTUI(App[None]):
     }
 
     #brand-art {
-        width: 46;
-        min-width: 46;
+        width: 33;
+        min-width: 33;
         color: #3b82f6;
         padding: 0 1 0 0;
     }
@@ -640,6 +619,7 @@ class MutxTUI(App[None]):
         self._notice_text: str | None = None
         self._notice_deadline = 0.0
         self._animation_tick = 0
+        self._initial_workspace_selected = False
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="brand-rail"):
@@ -657,7 +637,7 @@ class MutxTUI(App[None]):
                     with Horizontal(classes="action-bar"):
                         yield Button("Refresh", id="setup-refresh", variant="primary")
                         yield Button("Import Existing OpenClaw 🦞", id="setup-import")
-                        yield Button("Configure OpenClaw 🦞", id="setup-configure-openclaw")
+                        yield Button("Repair in OpenClaw 🦞", id="setup-configure-openclaw")
                         yield Button("Open OpenClaw TUI 🦞", id="setup-openclaw-tui")
                         yield Button("Deploy Personal Assistant", id="setup-deploy")
                     with VerticalScroll(classes="detail-scroll"):
@@ -825,6 +805,7 @@ class MutxTUI(App[None]):
         self._agent_count = 0
         self._deployment_count = 0
         self._assistant_name = None
+        self._initial_workspace_selected = False
         self._wizard_state_cache = load_wizard_state("openclaw")
         self._runtime_snapshot_cache = collect_openclaw_runtime_snapshot().to_payload()
         message = _render_setup_body(
@@ -883,6 +864,9 @@ class MutxTUI(App[None]):
         self.query_one("#setup-body", Static).update(
             _render_setup_body(status.authenticated, status.api_url, assistant_name, onboarding, runtime_snapshot)
         )
+        if assistant_name and not self._initial_workspace_selected:
+            self.query_one("#workspace", TabbedContent).active = "control-pane"
+            self._initial_workspace_selected = True
         self._refresh_setup_actions()
         self._clear_activity()
 
@@ -1037,10 +1021,31 @@ class MutxTUI(App[None]):
             self._runtime_snapshot_cache if isinstance(self._runtime_snapshot_cache, dict) else {}
         )
         has_openclaw = bool(runtime_snapshot.get("binary_path"))
-        for button_id in ("setup-import", "setup-configure-openclaw", "setup-openclaw-tui"):
-            button = self.query_one(f"#{button_id}", Button)
-            button.display = has_openclaw
-            button.disabled = not has_openclaw
+        assistant_exists = bool(self._assistant_name)
+        gateway = runtime_snapshot.get("gateway")
+        if not isinstance(gateway, dict):
+            gateway = {}
+        gateway_status = str(runtime_snapshot.get("status") or gateway.get("status") or "unknown")
+        needs_repair = has_openclaw and gateway_status != "healthy"
+
+        import_button = self.query_one("#setup-import", Button)
+        import_button.display = has_openclaw and not assistant_exists
+        import_button.disabled = not (has_openclaw and not assistant_exists)
+        import_button.variant = "primary"
+
+        repair_button = self.query_one("#setup-configure-openclaw", Button)
+        repair_button.display = needs_repair
+        repair_button.disabled = not needs_repair
+
+        open_tui_button = self.query_one("#setup-openclaw-tui", Button)
+        open_tui_button.display = has_openclaw and assistant_exists and not needs_repair
+        open_tui_button.disabled = not (has_openclaw and assistant_exists and not needs_repair)
+        open_tui_button.variant = "primary" if assistant_exists else "default"
+
+        deploy_button = self.query_one("#setup-deploy", Button)
+        deploy_button.display = not has_openclaw and not assistant_exists
+        deploy_button.disabled = has_openclaw or assistant_exists
+        deploy_button.variant = "primary"
 
     def _run_external_command(self, command: str | list[str], *, label: str) -> None:
         self._set_notice(label, ttl=12.0)
@@ -1099,7 +1104,7 @@ class MutxTUI(App[None]):
                 ),
                 configure_command_runner=lambda command: self._run_external_command(
                     command,
-                    label="🦞 Opening OpenClaw configure",
+                    label="🦞 Opening OpenClaw TUI",
                 ),
             )
         except CLIServiceError as exc:
@@ -1342,7 +1347,7 @@ class MutxTUI(App[None]):
         elif button_id == "setup-import":
             self._run_setup_wizard(requested_action="import")
         elif button_id == "setup-configure-openclaw":
-            self._open_openclaw_surface("configure")
+            self._open_openclaw_surface("tui")
         elif button_id == "setup-openclaw-tui":
             self._open_openclaw_surface("tui")
         elif button_id == "setup-deploy":

@@ -148,7 +148,7 @@ def test_tui_renders_logged_out_state() -> None:
     assert "Auth: local only" in banner
     assert "No stored CLI auth." in detail
     assert logo == MUTX_ASCII_LOGO
-    assert "≠≠≠≠" in logo
-    assert len(logo.splitlines()) >= 20
+    assert "__  __" in logo
+    assert len(logo.splitlines()) == 5
     assert "/v1" in signal
     assert "login required" in signal

@@ -4,6 +4,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tarfile
 import tempfile
 import time
@@ -35,6 +36,95 @@ class LocalControlPlaneState:
     managed_root: Path
     source_kind: str
     bootstrapped_now: bool
+
+
+def _run_system_command(command: list[str]) -> int:
+    result = subprocess.run(command, check=False)
+    return int(result.returncode)
+
+
+def _docker_daemon_ready() -> bool:
+    docker_bin = shutil.which("docker")
+    if not docker_bin:
+        return False
+    try:
+        result = subprocess.run(
+            [docker_bin, "info"],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0
+
+
+def ensure_local_container_runtime(
+    *,
+    progress: Callable[[str], None] | None = None,
+    prompt_install: Callable[[str], bool] | None = None,
+    system_command_runner: Callable[[list[str]], int] | None = None,
+    docker_ready_checker: Callable[[], bool] | None = None,
+    wait_timeout: int = 120,
+) -> None:
+    ready = docker_ready_checker or _docker_daemon_ready
+    run_command = system_command_runner or _run_system_command
+    docker_bin = shutil.which("docker")
+
+    if ready():
+        return
+
+    if sys.platform == "darwin":
+        if docker_bin is None:
+            prompt = (
+                "Docker Desktop is required for the Local lane. "
+                "Install it with Homebrew now?"
+            )
+            if prompt_install is None or not prompt_install(prompt):
+                raise LocalControlPlaneError(
+                    "Docker Desktop is required for the Local lane. "
+                    "Install it, then rerun `mutx setup local`, or use `mutx setup hosted` "
+                    "for the zero-Docker path."
+                )
+            if progress is not None:
+                progress("Installing Docker Desktop for the Local lane")
+            if run_command(["brew", "install", "--cask", "docker"]) != 0:
+                raise LocalControlPlaneError(
+                    "MUTX could not install Docker Desktop automatically. "
+                    "Run `brew install --cask docker`, open Docker Desktop, then rerun "
+                    "`mutx setup local`."
+                )
+
+        if progress is not None:
+            progress("Starting Docker Desktop")
+        run_command(["open", "-a", "Docker"])
+
+        deadline = time.monotonic() + max(wait_timeout, 10)
+        while time.monotonic() < deadline:
+            if ready():
+                if progress is not None:
+                    progress("Docker Desktop is ready")
+                return
+            time.sleep(1)
+
+        raise LocalControlPlaneError(
+            "Docker Desktop was launched, but the daemon never became ready. "
+            "Finish Docker's first-run prompts, then rerun `mutx setup local`, or use "
+            "`mutx setup hosted` if you do not want local container dependencies."
+        )
+
+    if docker_bin is None:
+        raise LocalControlPlaneError(
+            "Docker is required for the Local lane and is not installed. "
+            "Install Docker, then rerun `mutx setup local`, or use `mutx setup hosted` "
+            "for the managed path."
+        )
+
+    raise LocalControlPlaneError(
+        "Docker is installed but the daemon is not running. "
+        "Start Docker and rerun `mutx setup local`, or use `mutx setup hosted` "
+        "for the managed path."
+    )
 
 
 def mutx_home_dir() -> Path:
@@ -86,6 +176,7 @@ def ensure_local_control_plane(
     home_dir: Path | None = None,
     cwd: Path | None = None,
     command_runner: Callable[[list[str], Path], int] | None = None,
+    container_runtime_ensurer: Callable[[Callable[[str], None] | None], None] | None = None,
     ready_checker: Callable[[str], bool] | None = None,
     wait_timeout: int = 120,
 ) -> LocalControlPlaneState:
@@ -110,6 +201,9 @@ def ensure_local_control_plane(
             source_kind=source_kind,
             bootstrapped_now=False,
         )
+
+    if container_runtime_ensurer is not None:
+        container_runtime_ensurer(progress)
 
     if checkout_root is None:
         checkout_root = ensure_managed_local_control_checkout(
