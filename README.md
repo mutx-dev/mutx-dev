@@ -26,7 +26,7 @@ Today the project already models and exposes the operational shell around agents
 - agents, deployments, runs, usage, webhooks, API keys, and auth routes
 - a public dashboard demo that shows the intended operator surface
 - a CLI and TUI aligned around `mutx setup`, `mutx doctor`, and assistant workflows
-- shared local config and local operator bootstrap for contributor workflows
+- shared local config and local operator bootstrap for localhost workflows
 
 The core thesis is simple:
 
@@ -101,27 +101,20 @@ For an existing runtime, you can skip reinstall and adopt it directly:
 mutx setup hosted --provider openclaw --import-openclaw
 ```
 
-### Local contributor
+### Local operator
 
-Use this when you are working inside the MUTX repository.
+Use this when you want a private localhost control plane on your machine.
 
 ```bash
-git clone https://github.com/mutx-dev/mutx-dev.git
-cd mutx-dev
-
-npm install
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install -e ".[dev,tui]"
-
-make dev-up
+curl -fsSL https://mutx.dev/install.sh | bash
 mutx setup local --provider openclaw --install-openclaw --open-tui
 mutx doctor
 mutx assistant overview
 mutx runtime inspect openclaw
 mutx runtime open openclaw --surface configure
 ```
+
+`mutx setup local` can now provision a managed localhost stack under `~/.mutx/runtime/local-control`, start `http://localhost:8000` for you, bootstrap a local operator session, and then continue into the OpenClaw wizard. Docker is the only required local runtime dependency for this lane.
 
 Expected result in either lane:
 
@@ -184,7 +177,7 @@ Recent work in the repository has materially changed what MUTX can show and prov
 - public control-plane demo shipped under `/app`
 - installer handoff simplified and aligned with the assistant-first setup lane
 - OpenClaw provider wizard added across install, CLI, TUI, API sync, and dashboard setup
-- local operator auth bootstrap added for contributor workflows
+- local operator auth bootstrap added for localhost and contributor workflows
 - CLI and TUI centered around one-command setup and assistant inspection
 - dashboard, landing, and docs moved closer to the same operational story
 

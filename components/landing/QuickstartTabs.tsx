@@ -46,21 +46,22 @@ mutx assistant overview`,
     ],
   },
   local: {
-    label: 'Local contributor',
-    environment: 'repo + localhost',
-    mode: 'local operator loop',
+    label: 'Local operator',
+    environment: 'private localhost',
+    mode: 'managed local stack',
     blocks: [
       {
-        id: 'stack',
-        label: 'Start local stack',
-        script: `make dev-up
-make dev-logs`,
+        id: 'install',
+        label: 'Install',
+        script: `curl -fsSL https://mutx.dev/install.sh | bash
+# choose Local in the wizard`,
       },
       {
         id: 'deploy',
         label: 'Deploy Personal Assistant',
         script: `mutx setup local --provider openclaw --install-openclaw
 mutx setup local --provider openclaw --import-openclaw
+# boots ~/.mutx/runtime/local-control when needed
 mutx doctor
 mutx runtime inspect openclaw
 mutx runtime open openclaw --surface configure

@@ -98,7 +98,7 @@ Hosted operator:
 mutx setup hosted --provider openclaw --install-openclaw --open-tui
 ```
 
-Local contributor:
+Local operator:
 
 ```bash
 mutx setup local --provider openclaw --install-openclaw --open-tui
@@ -111,7 +111,7 @@ mutx setup hosted --provider openclaw --import-openclaw
 mutx setup local --provider openclaw --import-openclaw
 ```
 
-Hosted setup authenticates against the configured control plane. Local setup bootstraps a trusted local operator session on `http://localhost:8000`, deploys `Personal Assistant`, and can open the TUI without asking for email or password.
+Hosted setup authenticates against the configured control plane. Local setup can provision a managed localhost stack under `~/.mutx/runtime/local-control`, start `http://localhost:8000`, bootstrap a trusted local operator session, deploy `Personal Assistant`, and open the TUI without asking for email or password.
 
 Both lanes now:
 

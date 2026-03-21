@@ -185,6 +185,13 @@ def test_setup_local_bootstraps_local_operator_without_credentials(
 
     monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
     monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: None)
+    monkeypatch.setattr(
+        "cli.commands.setup.ensure_local_control_plane",
+        lambda **kwargs: SimpleNamespace(
+            bootstrapped_now=False,
+            source_kind="managed_checkout",
+        ),
+    )
     monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
     monkeypatch.setattr(
         "cli.commands.setup.mark_auth_completed",

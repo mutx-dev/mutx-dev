@@ -136,6 +136,7 @@ def build_install_env(
     *,
     source_ref: str | None = None,
     extra_path: str | None = None,
+    local_ready: bool = True,
 ) -> tuple[dict[str, str], Path]:
     brew_prefix = tmp_path / "brew-prefix"
     brew_bin = brew_prefix / "bin"
@@ -181,7 +182,10 @@ def build_install_env(
         target="${@: -1}"
         case "${target}" in
           http://localhost:8000/health|http://localhost:8000/ready)
-            exit 0
+            if [[ "${FAKE_LOCAL_READY:-1}" == "1" ]]; then
+              exit 0
+            fi
+            exit 22
             ;;
         esac
 
@@ -197,6 +201,7 @@ def build_install_env(
     env["MUTX_OPEN_TUI"] = "0"
     env["HOMEBREW_NO_AUTO_UPDATE"] = "1"
     env["HOMEBREW_NO_INSTALL_FROM_API"] = "1"
+    env["FAKE_LOCAL_READY"] = "1" if local_ready else "0"
     env["PATH"] = f"{brew_bin}:{env['PATH']}"
     if extra_path:
         env["PATH"] = f"{extra_path}:{env['PATH']}"
@@ -213,8 +218,14 @@ def run_install_script(
     source_ref: str | None = None,
     args: list[str] | None = None,
     extra_path: str | None = None,
+    local_ready: bool = True,
 ) -> tuple[subprocess.CompletedProcess[str], Path]:
-    env, brew_prefix = build_install_env(tmp_path, source_ref=source_ref, extra_path=extra_path)
+    env, brew_prefix = build_install_env(
+        tmp_path,
+        source_ref=source_ref,
+        extra_path=extra_path,
+        local_ready=local_ready,
+    )
     write_executable(brew_prefix / "bin" / "mutx", mutx_script)
 
     result = subprocess.run(
@@ -236,8 +247,14 @@ def run_install_script_in_tty(
     replies: list[tuple[str, str]],
     timeout_seconds: float = 45.0,
     extra_path: str | None = None,
+    local_ready: bool = True,
 ) -> tuple[int, str, Path]:
-    env, brew_prefix = build_install_env(tmp_path, source_ref=source_ref, extra_path=extra_path)
+    env, brew_prefix = build_install_env(
+        tmp_path,
+        source_ref=source_ref,
+        extra_path=extra_path,
+        local_ready=local_ready,
+    )
     env["MUTX_OPEN_TUI"] = "1"
     env["TERM"] = "xterm-256color"
     write_executable(brew_prefix / "bin" / "mutx", mutx_script)
@@ -610,6 +627,25 @@ def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recover
         check=False,
     )
     assert setup_help.returncode == 0
+
+
+def test_install_script_tty_local_lane_does_not_require_ready_localhost(tmp_path: Path) -> None:
+    exit_code, transcript, _ = run_install_script_in_tty(
+        tmp_path,
+        mutx_script=CURRENT_MUTX_SCRIPT,
+        source_ref=str(build_fake_cli_package(tmp_path / "source-cli")),
+        replies=[
+            ("Select a lane [1/2/3]", "2\n"),
+        ],
+        local_ready=False,
+    )
+
+    assert exit_code == 0
+    assert "http://localhost:8000" in transcript
+    assert "Local dev lane needs a running control plane" not in transcript
+    assert "This lane is for contributor checkouts" not in transcript
+    assert "Launching:" in transcript
+    assert "setup local --provider openclaw --install-openclaw --open-tui" in transcript
 
 
 def test_install_script_tty_hosted_lane_targets_hosted_api(tmp_path: Path) -> None:

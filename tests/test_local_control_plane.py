@@ -1,0 +1,70 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from cli.local_control_plane import (
+    ensure_local_control_plane,
+    ensure_managed_local_control_checkout,
+    managed_local_control_manifest_path,
+)
+
+
+def _build_fake_control_plane_repo(root: Path) -> Path:
+    (root / "scripts").mkdir(parents=True, exist_ok=True)
+    (root / "infrastructure" / "docker").mkdir(parents=True, exist_ok=True)
+    (root / ".env.example").write_text("JWT_SECRET=replace-with-a-stable-secret\n", encoding="utf-8")
+    (root / "scripts" / "dev.sh").write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
+    (root / "infrastructure" / "docker" / "docker-compose.yml").write_text(
+        "services: {}\n",
+        encoding="utf-8",
+    )
+    return root
+
+
+def test_ensure_managed_local_control_checkout_materializes_source_and_manifest(tmp_path: Path) -> None:
+    source_repo = _build_fake_control_plane_repo(tmp_path / "source-repo")
+    home_dir = tmp_path / "home"
+
+    checkout = ensure_managed_local_control_checkout(
+        source_ref=str(source_repo),
+        home_dir=home_dir,
+    )
+
+    assert (checkout / "scripts" / "dev.sh").exists()
+    manifest = json.loads(
+        managed_local_control_manifest_path(home_dir=home_dir).read_text(encoding="utf-8")
+    )
+    assert manifest["checkout_root"] == str(checkout)
+    assert manifest["source_ref"] == str(source_repo)
+
+
+def test_ensure_local_control_plane_bootstraps_managed_checkout_and_waits_for_ready(tmp_path: Path) -> None:
+    source_repo = _build_fake_control_plane_repo(tmp_path / "source-repo")
+    home_dir = tmp_path / "home"
+    progress: list[str] = []
+    ready_state = {"value": False}
+    started: dict[str, object] = {}
+
+    def command_runner(command: list[str], cwd: Path) -> int:
+        started["command"] = command
+        started["cwd"] = cwd
+        ready_state["value"] = True
+        return 0
+
+    state = ensure_local_control_plane(
+        home_dir=home_dir,
+        cwd=tmp_path / "outside",
+        source_ref=str(source_repo),
+        progress=progress.append,
+        command_runner=command_runner,
+        ready_checker=lambda api_url: ready_state["value"],
+        wait_timeout=2,
+    )
+
+    assert state.bootstrapped_now is True
+    assert state.source_kind == "managed_checkout"
+    assert started["cwd"] == state.checkout_root
+    assert started["command"] == ["/bin/bash", str(state.checkout_root / "scripts" / "dev.sh"), "up"]
+    assert any("Provisioning a managed localhost stack" in message for message in progress)
+    assert any("Starting the local control plane" in message for message in progress)

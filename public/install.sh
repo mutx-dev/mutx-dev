@@ -322,6 +322,7 @@ Environment:
   MUTX_NO_ONBOARD=1        Skip the setup wizard handoff
   MUTX_NO_PROMPT=1         Disable prompts and finish with next-step commands
   MUTX_CLI_SOURCE_REF=...  Override the fallback source runtime reference
+  MUTX_CONTROL_SOURCE_REF=...  Override the managed localhost control-plane source
 EOF
 }
 
@@ -1373,6 +1374,7 @@ run_setup_handoff() {
     note "  mutx setup local --install-openclaw"
     note "  mutx setup hosted --import-openclaw"
     note "  mutx setup local --import-openclaw"
+    note "Local setup can provision a private localhost control plane under ~/.mutx/runtime/local-control."
     note "  mutx doctor"
     note "  mutx runtime inspect openclaw"
     if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
@@ -1415,9 +1417,10 @@ run_setup_handoff() {
       fi
       tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}privacy${C_RESET} OpenClaw stays local and MUTX does not upload keys\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}${handoff_note}${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}local${C_RESET} MUTX can bootstrap a private localhost control plane when you choose Local\n"
       tty_print "${C_PANEL}│${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}${HOSTED_API_URL}${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local dev lane ${C_DIM}${LOCAL_API_URL}${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local lane    ${C_DIM}${LOCAL_API_URL}${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}3${C_RESET}  Later         ${C_DIM}finish install and exit cleanly${C_RESET}\n"
       tty_print "${C_PANEL}╰───────────────────────────────────────────────────────────────╯${C_RESET}\n"
       tty_prompt "Select a lane [1/2/3]"
@@ -1432,26 +1435,6 @@ run_setup_handoff() {
         break
         ;;
       2|l|L|local|Local)
-        if ! local_control_plane_ready; then
-          if maybe_start_local_control_plane; then
-            WIZARD_HINT="Local control plane started automatically."
-            break
-          fi
-          WIZARD_ERROR="Local dev lane needs a running control plane at ${LOCAL_API_URL}."
-          if [[ -n "$(detect_local_repo_root 2>/dev/null || true)" ]]; then
-            WIZARD_HINT="A repo checkout is nearby, but MUTX could not start it automatically. Run `make dev-up` there, then retry."
-          else
-            WIZARD_HINT="This lane is for contributor checkouts. Use Hosted for normal install, or clone the repo and run `make dev-up`."
-          fi
-          if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-            dashboard_render
-          else
-            note "${WIZARD_ERROR}"
-            note "${WIZARD_HINT}"
-          fi
-          sleep 1
-          continue
-        fi
         break
         ;;
       3|later|Later|q|Q|quit|exit)
@@ -1489,6 +1472,7 @@ run_setup_handoff() {
   note "  mutx setup local --install-openclaw"
   note "  mutx setup hosted --import-openclaw"
   note "  mutx setup local --import-openclaw"
+  note "  local setup can provision a private localhost stack under ~/.mutx/runtime/local-control"
   note "  mutx doctor"
   note "  mutx runtime inspect openclaw"
   if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then

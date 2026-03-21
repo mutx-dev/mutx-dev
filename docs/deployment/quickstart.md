@@ -79,56 +79,23 @@ Expected result:
 * `mutx runtime inspect openclaw` shows the tracked provider manifest, binding, and last-seen sync state
 * gateway/session state begins to appear once the runtime is active
 
-## Local contributor
+## Local operator
 
-Use this when you are working on the MUTX repo itself.
+Use this when you want a private localhost MUTX control plane on your own machine.
 
-### 1. Install local dependencies
-
-```bash
-git clone https://github.com/mutx-dev/mutx-dev.git
-cd mutx-dev
-
-npm install
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install -e ".[dev,tui]"
-```
-
-If `.env` does not exist, `scripts/dev.sh` will create it from `.env.example` and generate a local `JWT_SECRET`.
-
-### 2. Start the local stack
-
-Detached local stack:
+### 1. Install the CLI
 
 ```bash
-make dev-up
+curl -fsSL https://mutx.dev/install.sh | bash
 ```
 
-Follow logs in another terminal when you need them:
-
-```bash
-make dev-logs
-```
-
-Stop the stack:
-
-```bash
-make dev-stop
-```
-
-The legacy one-command foreground mode still exists:
-
-```bash
-make dev
-```
-
-### 3. Bootstrap and deploy the starter assistant
+### 2. Bootstrap and deploy the starter assistant
 
 ```bash
 mutx setup local --provider openclaw --install-openclaw --open-tui
 ```
+
+On first run, MUTX can provision a managed localhost stack under `~/.mutx/runtime/local-control`, generate the local `.env`, start the API at `http://localhost:8000`, and then continue into the OpenClaw wizard. Docker is required for this lane.
 
 Import an existing local OpenClaw runtime instead of reinstalling it:
 
@@ -162,6 +129,15 @@ Useful URLs:
 * site and app shell: `http://localhost:3000`
 * API: `http://localhost:8000`
 * API docs: `http://localhost:8000/docs`
+
+### Contributor note
+
+If you are working on the MUTX repo itself, the old repo-backed flow still exists:
+
+```bash
+make dev-up
+mutx setup local --provider openclaw --install-openclaw --open-tui
+```
 
 ## API contract
 

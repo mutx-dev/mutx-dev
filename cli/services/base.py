@@ -34,7 +34,7 @@ class APIService:
         if api_url == LOCAL_API_URL:
             return (
                 f"Could not reach the local control plane at {LOCAL_API_URL}. "
-                "Start it first, then rerun `mutx setup local`, or use `mutx setup hosted` "
+                "Run `mutx setup local` to bootstrap it, or use `mutx setup hosted` "
                 f"for the hosted lane at {HOSTED_API_URL}."
             )
 

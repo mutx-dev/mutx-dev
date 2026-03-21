@@ -2,6 +2,7 @@ import click
 
 from cli.commands.tui import launch_tui
 from cli.config import LOCAL_API_URL, current_config, get_client, resolve_hosted_api_url
+from cli.local_control_plane import ensure_local_control_plane
 from cli.openclaw_runtime import find_openclaw_bin
 from cli.services import AssistantService, AuthService, CLIServiceError, RuntimeStateService
 from cli.services.assistant import TemplatesService
@@ -277,6 +278,14 @@ def setup_local(
     current_config().api_url = LOCAL_API_URL
 
     try:
+        local_state = ensure_local_control_plane(
+            api_url=LOCAL_API_URL,
+            progress=lambda message: click.echo(f"… {message}"),
+        )
+        if local_state.bootstrapped_now:
+            click.echo(f"✓ Local control plane ready at {LOCAL_API_URL}")
+            if local_state.source_kind == "managed_checkout":
+                click.echo("Tracking: managed localhost stack lives under ~/.mutx/runtime/local-control")
         if email or password:
             email_value = _require_value("Email", email, no_input)
             password_value = _require_value("Password", password, no_input, secret=True)
