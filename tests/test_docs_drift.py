@@ -13,15 +13,21 @@ def read_text(relative_path: str) -> str:
 def test_canonical_quickstart_surfaces_share_assistant_first_commands() -> None:
     readme = read_text("README.md")
     quickstart = read_text("docs/deployment/quickstart.md")
-    landing = read_text("components/landing/QuickstartTabs.tsx")
+    landing = read_text("app/page.tsx")
     install_script = read_text("public/install.sh")
 
     for content in (readme, quickstart, landing):
+        assert "curl -fsSL https://mutx.dev/install.sh | bash" in content
+        assert "OpenClaw" in content
+
+    for content in (readme, quickstart):
         assert "mutx setup hosted" in content
         assert "mutx setup local" in content
         assert "mutx doctor" in content
         assert "personal_assistant" in content or "Personal Assistant" in content
 
+    assert "mutx setup hosted --import-openclaw" in landing
+    assert "Hosted" in landing
     assert "mutx setup hosted" in install_script
     assert "mutx setup local" in install_script
     assert "mutx doctor" in install_script

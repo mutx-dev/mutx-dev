@@ -643,7 +643,7 @@ def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recover
     assert "https://api.mutx.dev" in transcript
     assert "http://localhost:8000" in transcript
     assert "Launching MUTX local setup against http://localhost:8000" in transcript
-    assert "LOCAL SETUP --provider openclaw --install-openclaw --open-tui" in transcript
+    assert "LOCAL SETUP --install-openclaw --open-tui" in transcript
     assert "MUTX setup wizard\\nInstall the CLI" not in transcript
     assert "No such command 'setup'" not in transcript
 

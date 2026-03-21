@@ -17,7 +17,7 @@ curl -fsSL https://mutx.dev/install.sh | bash
 
 That script keeps the package-lane chatter quiet, force-links `mutx` if an older shim is already present, verifies the assistant-first command surface, and then hands onboarding off to the CLI itself. If the packaged CLI is behind the installer, it overlays a fresh runtime into `~/.mutx` before continuing.
 
-🦞 The setup handoff now enters a MUTX-owned provider wizard. OpenClaw is the first enabled runtime provider, and MUTX tracks the real upstream OpenClaw home rather than relocating it.
+🦞 The setup handoff now enters a MUTX-owned wizard. Hosted is the recommended lane, OpenClaw is the default personal assistant runtime, and MUTX tracks the real upstream OpenClaw home rather than relocating it.
 
 Editable local install with the operator TUI:
 
@@ -92,23 +92,23 @@ export MUTX_API_URL=http://localhost:8000
 
 ## Canonical Setup Flow
 
-Hosted operator:
+Recommended direct setup:
 
 ```bash
-mutx setup hosted --provider openclaw --install-openclaw --open-tui
+mutx setup hosted --install-openclaw --open-tui
 ```
 
-Local operator:
+Advanced local operator:
 
 ```bash
-mutx setup local --provider openclaw --install-openclaw --open-tui
+mutx setup local --install-openclaw --open-tui
 ```
 
 If OpenClaw already exists on the machine and you just want MUTX to adopt it for tracking:
 
 ```bash
-mutx setup hosted --provider openclaw --import-openclaw
-mutx setup local --provider openclaw --import-openclaw
+mutx setup hosted --import-openclaw
+mutx setup local --import-openclaw
 ```
 
 Hosted setup authenticates against the configured control plane. Local setup can provision a managed localhost stack under `~/.mutx/runtime/local-control`, start `http://localhost:8000`, bootstrap a trusted local operator session, deploy `Personal Assistant`, and open the TUI without asking for email or password.
@@ -190,7 +190,7 @@ mutx tui
 The TUI now centers the assistant-first operator path:
 
 * `Setup`: auth state, provider cards, wizard steps, runtime pointers, and starter deployment entrypoint
-  Existing OpenClaw installs expose `Import Existing OpenClaw 🦞`, `Configure OpenClaw 🦞`, and `Open OpenClaw TUI 🦞`.
+  Existing OpenClaw installs expose `Import Existing OpenClaw 🦞`, a repair path, and `Open OpenClaw TUI 🦞`.
 * `Assistant`: assistant overview, status, and deployment context
 * `Deployments`: deployment inventory and controls
 * `Control Plane`: sessions and gateway detail
@@ -220,7 +220,7 @@ Local stack validation:
 
 ```bash
 make dev-up
-mutx setup local --name "Local Operator" --provider openclaw --install-openclaw --no-input
+mutx setup local --name "Local Operator" --install-openclaw --no-input
 mutx doctor
 mutx assistant overview
 mutx runtime inspect openclaw

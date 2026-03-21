@@ -55,27 +55,16 @@ const surfaceCards = [
 
 const installCards = [
   {
-    label: "Local bootstrap",
-    caption: "managed local stack",
-    command: `curl -fsSL https://mutx.dev/install.sh | bash
-mutx setup local --provider openclaw --install-openclaw
-mutx doctor`,
+    label: "Recommended quickstart",
+    caption: "one command · hosted lane",
+    command: `curl -fsSL https://mutx.dev/install.sh | bash`,
+    note: "The MUTX installer stays in the same terminal, recommends Hosted, installs or imports OpenClaw, and opens the operator TUI for you.",
   },
   {
-    label: "Hosted lane",
-    caption: "same operator grammar",
-    command: `mutx setup hosted --provider openclaw --install-openclaw
-mutx runtime inspect openclaw
-mutx assistant overview`,
-  },
-  {
-    label: "API contract",
-    caption: "no browser required",
-    command: `curl -H "Authorization: Bearer $TOKEN" \
-  "$BASE_URL/v1/deployments"
-
-curl -H "Authorization: Bearer $TOKEN" \
-  "$BASE_URL/v1/runs/$RUN_ID/traces"`,
+    label: "Already running OpenClaw?",
+    caption: "advanced reuse path",
+    command: `mutx setup hosted --import-openclaw`,
+    note: "Use this after install if OpenClaw is already on the machine and you want MUTX to adopt it without reinstalling anything.",
   },
 ] as const;
 
@@ -146,9 +135,10 @@ type InstallCardProps = {
   label: string;
   caption: string;
   command: string;
+  note: string;
 };
 
-function InstallCard({ label, caption, command }: InstallCardProps) {
+function InstallCard({ label, caption, command, note }: InstallCardProps) {
   return (
     <article className="site-command-card">
       <div className="site-command-card-head">
@@ -161,6 +151,9 @@ function InstallCard({ label, caption, command }: InstallCardProps) {
         </div>
       </div>
       <pre>{command}</pre>
+      <p className="mt-4 text-sm leading-7 text-[color:var(--site-text-soft)]">
+        {note}
+      </p>
     </article>
   );
 }
@@ -318,15 +311,17 @@ export default function LandingPage() {
                     </div>
                     <div className="site-command-card-actions">
                       <CommandCopyButton
-                        value={`curl -fsSL https://mutx.dev/install.sh | bash
-mutx setup local --provider openclaw --install-openclaw
-mutx assistant overview`}
+                        value={`curl -fsSL https://mutx.dev/install.sh | bash`}
                       />
                     </div>
                   </div>
-                  <pre>{`curl -fsSL https://mutx.dev/install.sh | bash
-mutx setup local --provider openclaw --install-openclaw
-mutx assistant overview`}</pre>
+                  <pre>{`curl -fsSL https://mutx.dev/install.sh | bash`}</pre>
+                  <p className="mt-4 text-sm leading-7 text-[color:var(--site-text-soft)]">
+                    The installer opens the MUTX wizard in the same terminal.
+                    Choose <span className="font-semibold text-white">Hosted</span>{" "}
+                    unless you explicitly want a private Docker-backed localhost
+                    control plane.
+                  </p>
                 </div>
 
                 <div className="site-signal-grid">
@@ -424,7 +419,7 @@ mutx assistant overview`}</pre>
                 </div>
 
                 <code className="site-openclaw-command">
-                  mutx setup local --provider openclaw --import-openclaw
+                  mutx setup hosted --import-openclaw
                 </code>
               </article>
             </SiteReveal>
@@ -436,8 +431,8 @@ mutx assistant overview`}</pre>
             <SiteReveal>
               <SectionIntro
                 eyebrow="Proof Path"
-                title="Start with the lane that matches your mess."
-                body="Use the install path when you need something running, the docs when you need the contract first, and contact when you want a guided hosted walkthrough."
+                title="Start with one command, then let MUTX guide the rest."
+                body="New to MUTX? Run the installer and choose Hosted. Keep the Docker-backed localhost lane for self-hosting and contributor work."
               />
             </SiteReveal>
 

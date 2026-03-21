@@ -16,19 +16,28 @@ Every supported lane ends in the same success state:
 
 For full repo setup details, see [Local Developer Bootstrap](./local-developer-bootstrap.md).
 
-## Hosted operator
+## Recommended path
 
-Use this when you already have access to a MUTX control plane.
-
-### 1. Install the CLI
-
-Fastest macOS path:
+For most users, the whole quickstart is:
 
 ```bash
 curl -fsSL https://mutx.dev/install.sh | bash
 ```
 
-🦞 The installer now hands off to a MUTX provider wizard. OpenClaw is the first enabled provider, and the wizard can install it, resume upstream onboarding, and return you to MUTX with the runtime already tracked.
+The installer keeps you inside a MUTX wizard in the same terminal.
+
+* Choose `Hosted` unless you explicitly want a private Docker-backed localhost control plane.
+* If OpenClaw is already on the machine, MUTX will detect it and offer to import it.
+* If OpenClaw is missing, MUTX can install it, resume onboarding, track it under `~/.mutx/providers/openclaw`, and open the TUI.
+
+After setup:
+
+```bash
+mutx doctor
+mutx assistant overview
+mutx runtime inspect openclaw
+mutx runtime open openclaw --surface tui
+```
 
 Source install:
 
@@ -39,16 +48,18 @@ pip install -r requirements.txt
 pip install -e ".[dev,tui]"
 ```
 
-### 2. Run guided setup
+## Advanced direct commands
+
+### Hosted operator
 
 ```bash
-mutx setup hosted --provider openclaw --install-openclaw --open-tui
+mutx setup hosted --install-openclaw --open-tui
 ```
 
 If OpenClaw is already installed locally and you only want MUTX to adopt it:
 
 ```bash
-mutx setup hosted --provider openclaw --import-openclaw
+mutx setup hosted --import-openclaw
 ```
 
 The CLI will:
@@ -63,7 +74,7 @@ The CLI will:
 * deploy `Personal Assistant`
 * optionally open `mutx tui`
 
-### 3. Verify the deployment
+### Verify the deployment
 
 ```bash
 mutx doctor
@@ -81,18 +92,10 @@ Expected result:
 
 ## Local operator
 
-Use this when you want a private localhost MUTX control plane on your own machine.
-
-### 1. Install the CLI
+Use this only when you want a private localhost MUTX control plane on your own machine.
 
 ```bash
-curl -fsSL https://mutx.dev/install.sh | bash
-```
-
-### 2. Bootstrap and deploy the starter assistant
-
-```bash
-mutx setup local --provider openclaw --install-openclaw --open-tui
+mutx setup local --install-openclaw --open-tui
 ```
 
 On first run, MUTX can provision a managed localhost stack under `~/.mutx/runtime/local-control`, generate the local `.env`, start the API at `http://localhost:8000`, and then continue into the OpenClaw wizard. Docker is required for this lane.
@@ -100,7 +103,7 @@ On first run, MUTX can provision a managed localhost stack under `~/.mutx/runtim
 Import an existing local OpenClaw runtime instead of reinstalling it:
 
 ```bash
-mutx setup local --provider openclaw --import-openclaw
+mutx setup local --import-openclaw
 ```
 
 If you want a fully non-interactive local smoke path:
@@ -108,19 +111,18 @@ If you want a fully non-interactive local smoke path:
 ```bash
 mutx setup local \
   --name "Local Operator" \
-  --provider openclaw \
   --install-openclaw \
   --assistant-name "Personal Assistant" \
   --no-input
 ```
 
-### 4. Verify the local control plane
+### Verify the local control plane
 
 ```bash
 mutx doctor
 mutx assistant overview
 mutx runtime inspect openclaw
-mutx runtime open openclaw --surface configure
+mutx runtime open openclaw --surface tui
 mutx tui
 ```
 
@@ -136,7 +138,7 @@ If you are working on the MUTX repo itself, the old repo-backed flow still exist
 
 ```bash
 make dev-up
-mutx setup local --provider openclaw --install-openclaw --open-tui
+mutx setup local --install-openclaw --open-tui
 ```
 
 ## API contract

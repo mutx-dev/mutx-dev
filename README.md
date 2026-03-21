@@ -57,7 +57,7 @@ The core thesis is simple:
 ### Assistant-first workflow
 
 - `personal_assistant` starter template
-- one-shot deploy flow through `mutx setup hosted --provider openclaw` and `mutx setup local --provider openclaw`
+- one-shot deploy flow through `mutx setup hosted` and `mutx setup local`
 - assistant overview, session discovery, channel inspection, skill management, and gateway health
 - workspace skill discovery, tracked OpenClaw bindings, and assistant config shaping in the control plane
 
@@ -80,41 +80,34 @@ Canonical guide: [docs/deployment/quickstart.md](docs/deployment/quickstart.md)
 
 ### Hosted operator
 
-Use this when you already have access to a MUTX control plane.
+Recommended for almost everyone.
 
 ```bash
 curl -fsSL https://mutx.dev/install.sh | bash
-mutx setup hosted --provider openclaw --install-openclaw --open-tui
+```
+
+The installer opens a MUTX-owned setup wizard in the same terminal. Choose `Hosted` unless you explicitly want a private Docker-backed localhost control plane. MUTX can install OpenClaw, import an existing OpenClaw runtime, resume onboarding, track it under `~/.mutx/providers/openclaw`, and return you to the CLI or TUI without leaving the MUTX shell story.
+
+If OpenClaw is already installed, MUTX detects the upstream binary and home path, imports that runtime into the MUTX registry for tracking, and leaves the OpenClaw home plus gateway keys in place on the local machine.
+
+After setup:
+
+```bash
 mutx doctor
 mutx assistant overview
 mutx runtime inspect openclaw
 mutx runtime open openclaw --surface tui
 ```
 
-🦞 `mutx setup` now runs a MUTX-owned provider wizard that can install OpenClaw, hand off to upstream `openclaw onboard`, bind a dedicated assistant runtime, track it under `~/.mutx/providers/openclaw`, and return you to the CLI or TUI without leaving the MUTX shell story.
-
-If OpenClaw is already installed, MUTX detects the upstream binary and home path, imports that runtime into the MUTX registry for tracking, and leaves the OpenClaw home plus gateway keys in place on the local machine.
-
-For an existing runtime, you can skip reinstall and adopt it directly:
-
-```bash
-mutx setup hosted --provider openclaw --import-openclaw
-```
-
 ### Local operator
 
-Use this when you want a private localhost control plane on your machine.
+Advanced lane for self-hosting and contributor work.
 
 ```bash
-curl -fsSL https://mutx.dev/install.sh | bash
-mutx setup local --provider openclaw --install-openclaw --open-tui
-mutx doctor
-mutx assistant overview
-mutx runtime inspect openclaw
-mutx runtime open openclaw --surface configure
+mutx setup local --install-openclaw --open-tui
 ```
 
-`mutx setup local` can now provision a managed localhost stack under `~/.mutx/runtime/local-control`, start `http://localhost:8000` for you, bootstrap a local operator session, and then continue into the OpenClaw wizard. Docker is the only required local runtime dependency for this lane.
+`mutx setup local` can provision a managed localhost stack under `~/.mutx/runtime/local-control`, start `http://localhost:8000` for you, bootstrap a local operator session, and then continue into the OpenClaw wizard. Docker is the required local runtime dependency for this lane.
 
 Expected result in either lane:
 

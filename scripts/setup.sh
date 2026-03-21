@@ -6,7 +6,21 @@ echo "Setting up mutx.dev..."
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$ROOT_DIR/infrastructure/docker/docker-compose.yml"
+PYTHON_BIN=""
 cd "$ROOT_DIR"
+
+for candidate in python3 python; do
+    if command -v "$candidate" >/dev/null 2>&1; then
+        PYTHON_BIN="$candidate"
+        break
+    fi
+done
+
+if [ -z "$PYTHON_BIN" ]; then
+    echo "Python 3 is required for local setup."
+    echo "Install python3 and retry."
+    exit 1
+fi
 
 if ! command -v docker >/dev/null 2>&1; then
     echo "Docker is required for local setup."
@@ -47,11 +61,23 @@ if [ ! -f "$ROOT_DIR/.env" ]; then
 fi
 
 echo "Installing Python dependencies..."
-pip install -r requirements.txt
-pip install -e ".[dev]" 2>/dev/null || true
+if ! "$PYTHON_BIN" -m pip --version >/dev/null 2>&1; then
+    echo "Bootstrapping pip for $PYTHON_BIN..."
+    "$PYTHON_BIN" -m ensurepip --upgrade >/dev/null 2>&1 || {
+        echo "pip is unavailable for $PYTHON_BIN."
+        echo "Install pip or rerun with a Python distribution that includes ensurepip."
+        exit 1
+    }
+fi
+"$PYTHON_BIN" -m pip install -r requirements.txt
+"$PYTHON_BIN" -m pip install -e ".[dev]" 2>/dev/null || true
 
 echo "Installing Node.js dependencies..."
-npm install
+if [ -f package-lock.json ]; then
+    npm ci
+else
+    npm install
+fi
 
 echo "Building Docker services..."
 "${COMPOSE_CMD[@]}" -f "$COMPOSE_FILE" build

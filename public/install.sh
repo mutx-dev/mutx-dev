@@ -788,7 +788,7 @@ dashboard_render_wizard() {
   printf '\033[H\033[2J' > /dev/tty
   dashboard_put_line "${row}" 3 "${C_BOLD}${C_MUTX}MUTX setup${C_RESET}"
   row=$((row + 1))
-  dashboard_put_line "${row}" 3 "${C_SOFT}OpenClaw provider wizard. Same terminal. Clean handoff.${C_RESET}"
+  dashboard_put_line "${row}" 3 "${C_SOFT}One install path. One MUTX wizard. OpenClaw comes along for the ride.${C_RESET}"
   row=$((row + 2))
 
   dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Stages${C_RESET}"
@@ -818,9 +818,9 @@ dashboard_render_wizard() {
 
   dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Lanes${C_RESET}"
   row=$((row + 1))
-  dashboard_put_line "${row}" 3 "${C_PANEL}1${C_RESET} Hosted   ${C_DIM}${HOSTED_API_URL}${C_RESET}"
+  dashboard_put_line "${row}" 3 "${C_PANEL}1${C_RESET} Hosted   ${C_DIM}${HOSTED_API_URL}${C_RESET} ${C_GOOD}(recommended)${C_RESET}"
   row=$((row + 1))
-  dashboard_put_line "${row}" 3 "${C_PANEL}2${C_RESET} Local    ${C_DIM}${LOCAL_API_URL}${C_RESET}"
+  dashboard_put_line "${row}" 3 "${C_PANEL}2${C_RESET} Local    ${C_DIM}${LOCAL_API_URL}${C_RESET} ${C_WARN}(advanced · Docker-backed)${C_RESET}"
   row=$((row + 1))
   dashboard_put_line "${row}" 3 "${C_PANEL}3${C_RESET} Later    ${C_DIM}finish install and exit cleanly${C_RESET}"
   row=$((row + 2))
@@ -1179,9 +1179,6 @@ check_assistant_first_surface() {
     fi
   done
 
-  if ! mutx_supports_option "setup hosted" "--provider"; then
-    missing+=("mutx setup hosted --provider")
-  fi
   if ! mutx_supports_option "setup hosted" "--email"; then
     missing+=("mutx setup hosted --email")
   fi
@@ -1193,9 +1190,6 @@ check_assistant_first_surface() {
   fi
   if ! mutx_supports_option "setup hosted" "--import-openclaw"; then
     missing+=("mutx setup hosted --import-openclaw")
-  fi
-  if ! mutx_supports_option "setup local" "--provider"; then
-    missing+=("mutx setup local --provider")
   fi
   if ! mutx_supports_option "setup local" "--install-openclaw"; then
     missing+=("mutx setup local --install-openclaw")
@@ -1380,17 +1374,15 @@ run_setup_handoff() {
   local hosted_email=""
   local hosted_password=""
 
-  append_if_supported hosted_cmd "setup hosted" "--provider" "openclaw"
   append_if_supported hosted_cmd "setup hosted" "--install-openclaw"
-  append_if_supported local_cmd "setup local" "--provider" "openclaw"
   append_if_supported local_cmd "setup local" "--install-openclaw"
 
   if [[ "${OPEN_TUI}" != "0" ]]; then
     append_if_supported hosted_cmd "setup hosted" "--open-tui"
     append_if_supported local_cmd "setup local" "--open-tui"
-    handoff_note="MUTX validates OpenClaw, resumes upstream onboarding if needed, then opens the TUI."
+    handoff_note="Hosted is the easiest path for new users. MUTX handles OpenClaw setup, then opens the TUI."
   else
-    handoff_note="MUTX validates OpenClaw, resumes upstream onboarding if needed, then stays in the CLI."
+    handoff_note="Hosted is the easiest path for new users. MUTX handles OpenClaw setup and keeps you in the CLI."
   fi
 
   if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
@@ -1429,13 +1421,13 @@ run_setup_handoff() {
       tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}ready for setup handoff${C_RESET}\n"
       tty_print "\n"
       tty_print "${C_PANEL}╭─ ${C_BOLD}Setup Wizard${C_RESET}${C_PANEL} ─────────────────────────────────────────────╮${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}Choose the next lane and provider wizard.${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}Choose the next lane. Hosted is the simplest path.${C_RESET}\n"
       if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
         tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} fresh CLI overlay active\n"
       else
         tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} packaged CLI is current\n"
       fi
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}providers${C_RESET} OpenClaw active · LangChain soon · n8n soon\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}runtime${C_RESET} OpenClaw is the default personal assistant runtime\n"
       if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
         tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}openclaw${C_RESET} detected at ${C_DIM}$(display_path "${OPENCLAW_BIN}" 34)${C_RESET}\n"
         tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}import${C_RESET} tracking ${C_DIM}$(display_path "${OPENCLAW_HOME}" 22)${C_RESET} in ~/.mutx/providers/openclaw\n"
@@ -1446,8 +1438,8 @@ run_setup_handoff() {
       tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}${handoff_note}${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}local${C_RESET} MUTX can bootstrap a private localhost control plane and help start Docker Desktop on macOS\n"
       tty_print "${C_PANEL}│${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}${HOSTED_API_URL}${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local lane    ${C_DIM}${LOCAL_API_URL}${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}${HOSTED_API_URL}${C_RESET} ${C_GOOD}(recommended)${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local lane    ${C_DIM}${LOCAL_API_URL}${C_RESET} ${C_WARN}(advanced · Docker-backed)${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}3${C_RESET}  Later         ${C_DIM}finish install and exit cleanly${C_RESET}\n"
       tty_print "${C_PANEL}╰───────────────────────────────────────────────────────────────╯${C_RESET}\n"
       tty_prompt "Select a lane [1/2/3]"

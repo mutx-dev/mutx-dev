@@ -12,8 +12,10 @@ WORKDIR /app
 
 # Install system dependencies (common for all stages)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     gcc \
     libpq-dev \
+    linux-libc-dev \
     curl \
     && rm -rf /var/lib/apt/lists/*
 

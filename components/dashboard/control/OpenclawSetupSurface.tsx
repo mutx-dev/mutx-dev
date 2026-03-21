@@ -115,11 +115,10 @@ export function OpenclawSetupSurface() {
 
   const commands = useMemo(
     () => [
-      "mutx setup hosted --provider openclaw --import-openclaw",
-      "mutx setup local --provider openclaw --import-openclaw",
-      "mutx setup hosted --provider openclaw --install-openclaw",
-      "mutx setup local --provider openclaw --install-openclaw",
-      "mutx runtime open openclaw --surface configure",
+      "mutx setup hosted --import-openclaw",
+      "mutx setup local --import-openclaw",
+      "mutx setup hosted --install-openclaw",
+      "mutx setup local --install-openclaw",
       "mutx runtime open openclaw --surface tui",
       "mutx runtime inspect openclaw",
       "mutx runtime resync openclaw",
