@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BookOpen, Github, Mail, Monitor, PhoneCall } from "lucide-react";
+import { ArrowRight, BookOpen, Github, Mail, PhoneCall, TerminalSquare } from "lucide-react";
 
 import { ContactLeadForm } from "@/components/ContactLeadForm";
 import { CalendlyPopupButton } from "@/components/site/CalendlyPopupButton";
@@ -52,11 +52,11 @@ const directChannels = [
     icon: BookOpen,
   },
   {
-    title: "Dashboard",
-    body: "Look at the operator surface directly if you want to ground the conversation in the actual UI.",
-    href: "/dashboard",
-    label: "/dashboard",
-    icon: Monitor,
+    title: "Quickstart",
+    body: "Take the shortest local proof path before the conversation turns into architecture review.",
+    href: "/#install",
+    label: "install flow",
+    icon: TerminalSquare,
   },
   {
     title: "GitHub",

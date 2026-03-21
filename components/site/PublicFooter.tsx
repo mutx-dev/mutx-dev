@@ -13,7 +13,7 @@ type PublicFooterProps = {
 const footerLinks = [
   { label: "Docs", href: DOCS_URL, external: true },
   { label: "GitHub", href: GITHUB_URL, external: true },
-  { label: "Dashboard", href: "/dashboard", external: false },
+  { label: "Install", href: "/#install", external: false },
   { label: "Contact", href: "/contact", external: false },
   { label: "Privacy", href: "/privacy-policy", external: false },
 ] as const;
@@ -36,7 +36,7 @@ export function PublicFooter({ className }: PublicFooterProps) {
             <div>
               <p className="site-brand-overline">MUTX</p>
               <p className="site-footer-note">
-                Web, CLI, docs, and dashboard share one operator contract.
+                Web, docs, CLI, and local proof lanes share one operator contract.
               </p>
             </div>
           </div>

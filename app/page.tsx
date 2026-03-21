@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import {
-  Activity,
   ArrowRight,
   Binary,
+  BookOpen,
   Boxes,
   GitBranch,
   PhoneCall,
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { CalendlyPopupButton } from "@/components/site/CalendlyPopupButton";
+import { ComingSoonButton } from "@/components/site/ComingSoonButton";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { SiteReveal } from "@/components/site/SiteReveal";
 
@@ -80,11 +81,11 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 const launchCards = [
   {
-    icon: Activity,
-    title: "Open the dashboard",
-    body: "Inspect the operator surface directly instead of waiting for a sales engineer to narrate screenshots.",
-    href: "/dashboard",
-    external: false,
+    icon: BookOpen,
+    title: "Read the docs",
+    body: "Start with the route contract, install path, and operational references before you touch anything hosted.",
+    href: DOCS_URL,
+    external: true,
   },
   {
     icon: Boxes,
@@ -101,7 +102,6 @@ const routePills = [
   "/v1/deployments",
   "/v1/runs/{id}/traces",
   "/v1/webhooks",
-  "/dashboard",
 ] as const;
 
 type SectionIntroProps = {
@@ -247,12 +247,9 @@ export default function LandingPage() {
                     Book a call
                     <PhoneCall className="h-4 w-4" />
                   </CalendlyPopupButton>
-                  <Link
-                    href="/dashboard"
-                    className="site-button-secondary w-full sm:w-auto"
-                  >
-                    Open dashboard
-                  </Link>
+                  <ComingSoonButton className="w-full sm:w-auto">
+                    Dashboard soon
+                  </ComingSoonButton>
                 </div>
 
                 <p className="text-sm text-[color:var(--site-text-muted)]">
@@ -370,14 +367,14 @@ mutx assistant overview`}</pre>
                     ))}
                   </div>
 
-                  <div className="site-figure-frame mt-6">
+                  <div className="site-figure-frame site-figure-frame-cover mt-6">
                     <Image
-                      src="/landing/webp/hero-manifesto.webp"
-                      alt="MUTX robot presenting the control plane manifesto"
-                      width={1400}
-                      height={934}
+                      src="/landing/webp/wiring-bay.webp"
+                      alt="MUTX robot wiring a runtime directly into the control plane"
+                      fill
                       sizes="(max-width: 1280px) 100vw, 44rem"
-                      className="site-hero-art"
+                      className="site-hero-art-cover"
+                      style={{ objectPosition: "center 38%" }}
                     />
                   </div>
                 </article>
@@ -432,7 +429,7 @@ mutx assistant overview`}</pre>
               <SectionIntro
                 eyebrow="Proof Path"
                 title="Start with the lane that matches your mess."
-                body="Use the install path when you need something running, the docs when you need the contract first, and the dashboard when you want the operator surface without the sales narration."
+                body="Use the install path when you need something running, the docs when you need the contract first, and contact when you want a guided hosted walkthrough."
               />
             </SiteReveal>
 
@@ -453,18 +450,18 @@ mutx assistant overview`}</pre>
                       One product, four honest surfaces.
                     </h3>
                     <p className="mt-4 text-sm leading-7 text-[color:var(--site-text-soft)]">
-                      MUTX works best when the site, dashboard, CLI, and API say
-                      the same thing about the same system.
+                      MUTX works best when the site, docs, CLI, and API say the
+                      same thing about the same system.
                     </p>
 
-                    <div className="site-figure-frame mt-6">
+                    <div className="site-figure-frame site-figure-frame-cover mt-6">
                       <Image
-                        src="/landing/webp/docs-surface.webp"
-                        alt="MUTX robot working through docs and control surfaces"
-                        width={1120}
-                        height={747}
+                        src="/landing/webp/reading-bench.webp"
+                        alt="MUTX robot reviewing the proof path before rollout"
+                        fill
                         sizes="(max-width: 1280px) 100vw, 34rem"
-                        className="site-hero-art"
+                        className="site-hero-art-cover"
+                        style={{ objectPosition: "center 24%" }}
                       />
                     </div>
                   </article>
@@ -502,17 +499,15 @@ mutx assistant overview`}</pre>
                       Contact MUTX
                       <ArrowRight className="h-4 w-4" />
                     </Link>
-                    <Link href="/dashboard" className="site-button-secondary">
-                      See the dashboard
-                    </Link>
                     <a
                       href={DOCS_URL}
                       target="_blank"
                       rel="noreferrer"
-                      className="site-button-muted"
+                      className="site-button-secondary"
                     >
                       Re-read the docs
                     </a>
+                    <ComingSoonButton>Dashboard soon</ComingSoonButton>
                   </div>
                 </div>
 

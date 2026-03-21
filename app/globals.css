@@ -345,6 +345,17 @@
     color: var(--site-text-muted);
   }
 
+  .site-button-disabled {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-semibold;
+    border-color: rgba(173, 187, 206, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(170, 185, 203, 0.62);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    cursor: default;
+    pointer-events: none;
+    user-select: none;
+  }
+
   .site-button-secondary:hover {
     border-color: rgba(173, 187, 206, 0.24);
     background: rgba(255, 255, 255, 0.08);
@@ -610,6 +621,14 @@
     display: block;
     width: 100%;
     height: auto;
+    object-fit: cover;
+  }
+
+  .site-figure-frame-cover {
+    aspect-ratio: 16 / 10;
+  }
+
+  .site-hero-art-cover {
     object-fit: cover;
   }
 
@@ -1039,7 +1058,8 @@
     .site-button-primary,
     .site-button-secondary,
     .site-button-accent,
-    .site-button-muted {
+    .site-button-muted,
+    .site-button-disabled {
       padding: 0.78rem 1rem;
       font-size: 0.82rem;
     }

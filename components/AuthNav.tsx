@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { ComingSoonButton } from "@/components/site/ComingSoonButton";
+
 const DOCS_URL = "https://docs.mutx.dev";
 
 export function AuthNav() {
@@ -83,12 +85,12 @@ export function AuthNav() {
         <div className="flex items-center gap-2 sm:gap-3">
           {!isAuthPage ? (
             <>
-              <Link href="/login" className="site-nav-link hidden md:block">
-                Sign in
-              </Link>
-              <Link href="/dashboard" className="site-button-secondary hidden sm:inline-flex">
-                Open dashboard
-              </Link>
+              <ComingSoonButton className="hidden md:inline-flex">
+                Sign in soon
+              </ComingSoonButton>
+              <ComingSoonButton className="hidden sm:inline-flex">
+                Dashboard soon
+              </ComingSoonButton>
               <Link href="/#install" className="site-button-accent">
                 Quickstart
               </Link>
@@ -106,9 +108,7 @@ export function AuthNav() {
               >
                 Docs
               </a>
-              <Link href="/dashboard" className="site-button-accent">
-                Dashboard
-              </Link>
+              <ComingSoonButton>Dashboard soon</ComingSoonButton>
             </>
           )}
         </div>
