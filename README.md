@@ -57,9 +57,9 @@ The core thesis is simple:
 ### Assistant-first workflow
 
 - `personal_assistant` starter template
-- one-shot deploy flow through `mutx setup hosted` and `mutx setup local`
+- one-shot deploy flow through `mutx setup hosted --provider openclaw` and `mutx setup local --provider openclaw`
 - assistant overview, session discovery, channel inspection, skill management, and gateway health
-- workspace skill discovery and assistant config shaping in the control plane
+- workspace skill discovery, tracked OpenClaw bindings, and assistant config shaping in the control plane
 
 ### Operator surfaces
 
@@ -84,10 +84,13 @@ Use this when you already have access to a MUTX control plane.
 
 ```bash
 curl -fsSL https://mutx.dev/install.sh | bash
-mutx setup hosted --open-tui
+mutx setup hosted --provider openclaw --install-openclaw --open-tui
 mutx doctor
 mutx assistant overview
+mutx runtime inspect openclaw
 ```
+
+🦞 `mutx setup` now runs a MUTX-owned provider wizard that can install OpenClaw, hand off to upstream `openclaw onboard`, bind a dedicated assistant runtime, track it under `~/.mutx/providers/openclaw`, and return you to the CLI or TUI without leaving the MUTX shell story.
 
 ### Local contributor
 
@@ -104,16 +107,18 @@ pip install -r requirements.txt
 pip install -e ".[dev,tui]"
 
 make dev-up
-mutx setup local --open-tui
+mutx setup local --provider openclaw --install-openclaw --open-tui
 mutx doctor
 mutx assistant overview
+mutx runtime inspect openclaw
 ```
 
 Expected result in either lane:
 
 1. authenticated operator state is stored in `~/.mutx/config.json`
-2. `Personal Assistant` is deployed
-3. runtime state is visible from the CLI, TUI, and browser surfaces
+2. `Personal Assistant` is deployed against a dedicated OpenClaw assistant binding, never `main`
+3. OpenClaw runtime state is tracked in `~/.mutx/providers/openclaw`
+4. runtime truth is visible from the CLI, TUI, and browser surfaces as live local state or honest last-seen state
 
 ## Operator Contract
 
@@ -138,6 +143,8 @@ mutx setup local
 mutx doctor
 mutx assistant overview
 mutx assistant sessions
+mutx runtime list
+mutx runtime inspect openclaw
 mutx tui
 ```
 
@@ -151,6 +158,7 @@ mutx tui
   "access_token": null,
   "refresh_token": null,
   "assistant_defaults": {
+    "provider": "openclaw",
     "template": "personal_assistant",
     "runtime": "openclaw",
     "model": "openai/gpt-5"
@@ -164,6 +172,7 @@ Recent work in the repository has materially changed what MUTX can show and prov
 
 - public control-plane demo shipped under `/app`
 - installer handoff simplified and aligned with the assistant-first setup lane
+- OpenClaw provider wizard added across install, CLI, TUI, API sync, and dashboard setup
 - local operator auth bootstrap added for contributor workflows
 - CLI and TUI centered around one-command setup and assistant inspection
 - dashboard, landing, and docs moved closer to the same operational story

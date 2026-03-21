@@ -24,9 +24,12 @@ from cli.services.models import (
     DeploymentRecord,
     LogEntry,
     MetricPoint,
+    OnboardingStateRecord,
+    RuntimeProviderRecord,
     TemplateRecord,
     UserProfile,
 )
+from cli.services.runtime import RuntimeStateService
 
 __all__ = [
     "APIRequestError",
@@ -50,7 +53,10 @@ __all__ = [
     "InvalidCredentialsError",
     "LogEntry",
     "MetricPoint",
+    "OnboardingStateRecord",
     "ResourceNotFoundError",
+    "RuntimeProviderRecord",
+    "RuntimeStateService",
     "TemplatesService",
     "TemplateRecord",
     "UserProfile",

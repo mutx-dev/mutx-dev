@@ -4,7 +4,9 @@ import click
 import httpx
 
 from cli.config import current_config
-from cli.services import AssistantService, AuthService, CLIServiceError
+from cli.openclaw_runtime import collect_openclaw_runtime_snapshot, get_gateway_health
+from cli.services import AssistantService, AuthService, CLIServiceError, RuntimeStateService
+from cli.setup_wizard import prepare_runtime_state_sync
 
 
 @click.command(name="doctor")
@@ -13,6 +15,7 @@ def doctor_command(output: str):
     config = current_config()
     auth = AuthService(config=config)
     assistant_service = AssistantService(config=config)
+    runtime_service = RuntimeStateService(config=config)
 
     payload: dict[str, object] = {
         "api_url": config.api_url,
@@ -20,6 +23,8 @@ def doctor_command(output: str):
         "config_path": str(config.config_path),
         "authenticated": auth.status().authenticated,
         "api_health": "unreachable",
+        "openclaw": get_gateway_health().to_payload(),
+        "runtime_snapshot": collect_openclaw_runtime_snapshot().to_payload(),
         "user": None,
         "assistant": None,
     }
@@ -31,6 +36,10 @@ def doctor_command(output: str):
         payload["api_health"] = "unreachable"
 
     try:
+        prepare_runtime_state_sync(
+            runtime_service if auth.status().authenticated else None,
+            install_method="npm",
+        )
         if auth.status().authenticated:
             user = auth.whoami()
             payload["user"] = {"email": user.email, "name": user.name, "plan": user.plan}
@@ -40,6 +49,8 @@ def doctor_command(output: str):
                     "name": overview.name,
                     "status": overview.status,
                     "onboarding_status": overview.onboarding_status,
+                    "assistant_id": overview.assistant_id,
+                    "workspace": overview.workspace,
                     "session_count": overview.session_count,
                     "gateway_status": overview.gateway.status,
                 }
@@ -54,6 +65,18 @@ def doctor_command(output: str):
     click.echo(f"Config Path: {payload['config_path']}")
     click.echo(f"Authenticated: {'yes' if payload['authenticated'] else 'no'}")
     click.echo(f"API Health: {payload['api_health']}")
+    click.echo(
+        "OpenClaw: "
+        f"{payload['openclaw']['status']} | "
+        f"gateway={payload['openclaw']['gateway_url'] or 'n/a'} | "
+        f"onboarded={'yes' if payload['openclaw']['onboarded'] else 'no'}"
+    )
+    click.echo(
+        "Registry: "
+        f"bindings={payload['runtime_snapshot']['binding_count']} | "
+        f"home={payload['runtime_snapshot']['home_path'] or 'n/a'} | "
+        f"last_seen={payload['runtime_snapshot']['last_seen_at'] or 'n/a'}"
+    )
     if payload["user"]:
         click.echo(
             f"User: {payload['user']['email']} | {payload['user']['name']} | {payload['user']['plan']}"
@@ -63,5 +86,6 @@ def doctor_command(output: str):
             "Assistant: "
             f"{payload['assistant']['name']} | {payload['assistant']['status']} | "
             f"{payload['assistant']['onboarding_status']} | sessions={payload['assistant']['session_count']} | "
-            f"gateway={payload['assistant']['gateway_status']}"
+            f"gateway={payload['assistant']['gateway_status']} | "
+            f"assistant_id={payload['assistant']['assistant_id']}"
         )

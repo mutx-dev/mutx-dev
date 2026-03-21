@@ -18,6 +18,12 @@ class TestAssistantTemplates:
             "/v1/templates/personal_assistant/deploy",
             json={
                 "name": "Personal Assistant",
+                "assistant_id": "personal-assistant",
+                "workspace": "/tmp/openclaw/workspace-personal-assistant",
+                "runtime_metadata": {
+                    "managed_by_mutx": True,
+                    "install_method": "npm",
+                },
                 "skills": ["web_search", "workspace_memory"],
                 "channels": {
                     "webchat": {
@@ -34,6 +40,9 @@ class TestAssistantTemplates:
         payload = response.json()
         assert payload["template_id"] == "personal_assistant"
         assert payload["agent"]["type"] == "openclaw"
+        assert payload["agent"]["config"]["assistant_id"] == "personal-assistant"
+        assert payload["agent"]["config"]["workspace"] == "/tmp/openclaw/workspace-personal-assistant"
+        assert payload["agent"]["config"]["metadata"]["runtime"]["managed_by_mutx"] is True
         assert payload["deployment"]["status"] == "pending"
 
 
@@ -62,7 +71,8 @@ class TestAssistantOverview:
         assert payload["has_assistant"] is True
         assert payload["assistant"]["name"] == "Ops Assistant"
         assert payload["assistant"]["template_id"] == "personal_assistant"
-        assert payload["assistant"]["gateway"]["status"] in {"healthy", "degraded", "missing"}
+        assert payload["assistant"]["gateway"]["status"] == "client_required"
+        assert "operator host" in payload["assistant"]["gateway"]["doctor_summary"]
 
     @pytest.mark.asyncio
     async def test_assistant_skill_install_round_trip(self, client: AsyncClient):

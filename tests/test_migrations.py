@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSIONS_DIR = ROOT / "src/api/models/migrations/versions"
-CURRENT_HEAD = "6c5b4a3921de"
+CURRENT_HEAD = "7f3e2c1b4a6d"
 
 
 def test_alembic_has_single_head():

@@ -1,5 +1,6 @@
 from src.api.models.models import (
     User,
+    UserSetting,
     Agent,
     AgentVersion,
     Deployment,
@@ -36,6 +37,7 @@ from src.api.models.plan_tiers import (
 
 __all__ = [
     "User",
+    "UserSetting",
     "Agent",
     "AgentVersion",
     "Deployment",

@@ -1,7 +1,17 @@
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
-from sqlalchemy import Boolean, DateTime, Enum as SQLEnum, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    Enum as SQLEnum,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID, ARRAY as PG_ARRAY
 import enum
@@ -138,12 +148,37 @@ class User(Base):
     refresh_token_sessions: Mapped[list["RefreshTokenSession"]] = relationship(
         "RefreshTokenSession", back_populates="user", cascade="all, delete-orphan"
     )
+    settings: Mapped[list["UserSetting"]] = relationship(
+        "UserSetting", back_populates="user", cascade="all, delete-orphan"
+    )
     webhooks: Mapped[list["Webhook"]] = relationship(
         "Webhook", back_populates="user", cascade="all, delete-orphan"
     )
     runs: Mapped[list["AgentRun"]] = relationship(
         "AgentRun", back_populates="user", cascade="all, delete-orphan"
     )
+
+
+class UserSetting(Base):
+    __tablename__ = "user_settings"
+    __table_args__ = (UniqueConstraint("user_id", "key", name="uq_user_settings_user_key"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
+    key: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    value: Mapped[dict | list | str | int | float | bool | None] = mapped_column(JSONText(), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+    user: Mapped["User"] = relationship("User", back_populates="settings")
 
 
 class Agent(Base):

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import time
 
 from textual import on, work
@@ -19,6 +20,8 @@ from textual.widgets import (
     TabPane,
 )
 
+from cli.openclaw_runtime import collect_openclaw_runtime_snapshot, persist_openclaw_runtime_snapshot
+from cli.runtime_registry import load_wizard_state
 from cli.services import (
     AgentRecord,
     AgentsService,
@@ -30,8 +33,10 @@ from cli.services import (
     DeploymentsService,
     LogEntry,
     MetricPoint,
+    RuntimeStateService,
     TemplatesService,
 )
+from cli.setup_wizard import mark_auth_completed, run_openclaw_setup_wizard
 
 
 MUTX_ASCII_LOGO = """\
@@ -183,24 +188,109 @@ def _render_deployment_detail(deployment: DeploymentRecord) -> str:
     return "\n".join(lines)
 
 
-def _render_setup_body(authenticated: bool, api_url: str, assistant_name: str | None) -> str:
+def _render_provider_lines(onboarding: dict[str, object]) -> list[str]:
+    lines = ["Providers:"]
+    current_provider = str(onboarding.get("provider") or "openclaw")
+    providers = onboarding.get("providers") or []
+    if not isinstance(providers, list):
+        providers = []
+    for item in providers:
+        if not isinstance(item, dict):
+            continue
+        cue = str(item.get("cue") or "•")
+        label = str(item.get("label") or item.get("id") or "provider")
+        enabled = bool(item.get("enabled", False))
+        selected = str(item.get("id") or "") == current_provider
+        status = "active" if selected and enabled else ("available" if enabled else "coming soon")
+        lines.append(f"  {cue} {label:<10} {status}")
+    return lines
+
+
+def _render_step_lines(onboarding: dict[str, object]) -> list[str]:
+    lines = ["Wizard:"]
+    steps = onboarding.get("steps") or []
+    current_step = str(onboarding.get("current_step") or "")
+    failed_step = str(onboarding.get("failed_step") or "")
+    if not isinstance(steps, list):
+        steps = []
+    for item in steps:
+        if not isinstance(item, dict):
+            continue
+        step_id = str(item.get("id") or "")
+        completed = bool(item.get("completed", False))
+        if failed_step and step_id == failed_step:
+            marker = "x"
+        elif completed:
+            marker = "✓"
+        elif step_id == current_step:
+            marker = "→"
+        else:
+            marker = "·"
+        lines.append(f"  {marker} {item.get('title')}")
+    return lines
+
+
+def _render_setup_body(
+    authenticated: bool,
+    api_url: str,
+    assistant_name: str | None,
+    onboarding: dict[str, object],
+    runtime_snapshot: dict[str, object],
+) -> str:
+    gateway = runtime_snapshot.get("gateway") if isinstance(runtime_snapshot, dict) else {}
+    if not isinstance(gateway, dict):
+        gateway = {}
+    bindings = runtime_snapshot.get("bindings") if isinstance(runtime_snapshot, dict) else []
+    binding_line = "No binding tracked yet."
+    if isinstance(bindings, list) and bindings:
+        binding = bindings[0] if isinstance(bindings[0], dict) else {}
+        binding_line = (
+            f"assistant_id={binding.get('assistant_id') or 'n/a'} | "
+            f"workspace={binding.get('workspace') or 'n/a'}"
+        )
+
+    last_error = str(onboarding.get("last_error") or "").strip()
+    status = str(onboarding.get("status") or "pending")
+    current_step = str(onboarding.get("current_step") or "auth")
+    gateway_status = str(runtime_snapshot.get("status") or gateway.get("status") or "unknown")
+    gateway_url = str(runtime_snapshot.get("gateway_url") or gateway.get("gateway_url") or "n/a")
+    install_method = str(runtime_snapshot.get("install_method") or "npm")
+    last_seen = str(runtime_snapshot.get("last_seen_at") or "n/a")
+
+    lines = [
+        f"API URL: {api_url}",
+        f"Auth: {'ready' if authenticated else 'required'}",
+        f"Assistant: {assistant_name or 'not deployed'}",
+        "",
+        f"Wizard status: {status} | current: {current_step}",
+        *_render_provider_lines(onboarding),
+        "",
+        *_render_step_lines(onboarding),
+        "",
+        "Runtime:",
+        f"  provider=openclaw | install={install_method} | gateway={gateway_status}",
+        f"  url={gateway_url}",
+        f"  home={runtime_snapshot.get('home_path') or 'n/a'}",
+        f"  config={runtime_snapshot.get('config_path') or 'n/a'}",
+        f"  last_seen={last_seen}",
+        "",
+        "Binding:",
+        f"  {binding_line}",
+    ]
+    if last_error:
+        lines.extend(["", f"Last error: {last_error}"])
     if not authenticated:
-        return (
-            f"API URL: {api_url}\n\n"
-            "No stored access token was found.\n"
-            "Run `mutx setup hosted` or `mutx setup local` to authenticate and deploy the Personal Assistant."
+        lines.extend(
+            [
+                "",
+                "Run `mutx setup hosted` or `mutx setup local` first, then return here to continue the provider wizard.",
+            ]
         )
-    if assistant_name:
-        return (
-            f"API URL: {api_url}\n\n"
-            f"Personal Assistant detected: {assistant_name}\n"
-            "Use the Assistant and Control Plane workspaces to inspect channels, sessions, and gateway health."
-        )
-    return (
-        f"API URL: {api_url}\n\n"
-        "Authenticated, but no Personal Assistant is deployed yet.\n"
-        "Use the deploy action in this workspace to create the starter assistant."
-    )
+    elif not assistant_name:
+        lines.extend(["", "Use Deploy Personal Assistant to run the OpenClaw provider wizard."])
+    else:
+        lines.extend(["", "OpenClaw is tracked under ~/.mutx/providers/openclaw and overlaid into Control Plane."])
+    return "\n".join(lines)
 
 
 def _render_control_plane_body(overview, sessions: list[dict]) -> tuple[str, str]:
@@ -508,11 +598,17 @@ class MutxTUI(App[None]):
         self.assistant_service = AssistantService()
         self.deployments_service = DeploymentsService()
         self.templates_service = TemplatesService()
+        self.runtime_service = RuntimeStateService()
         self.selected_agent_id: str | None = None
         self.selected_deployment_id: str | None = None
         self.selected_session_id: str | None = None
+        self._agent_cache: dict[str, AgentRecord] = {}
         self._deployment_cache: dict[str, DeploymentRecord] = {}
         self._session_cache: list[dict] = []
+        self._wizard_state_cache: dict[str, object] = load_wizard_state("openclaw")
+        self._runtime_snapshot_cache: dict[str, object] = persist_openclaw_runtime_snapshot(
+            install_method="npm"
+        ).to_payload()
         self._agent_count = 0
         self._deployment_count = 0
         self._assistant_name: str | None = None
@@ -703,8 +799,14 @@ class MutxTUI(App[None]):
         self._agent_count = 0
         self._deployment_count = 0
         self._assistant_name = None
-        message = (
-            "No stored CLI auth. Run `mutx setup hosted` or `mutx setup local`, then relaunch `mutx tui`."
+        self._wizard_state_cache = load_wizard_state("openclaw")
+        self._runtime_snapshot_cache = collect_openclaw_runtime_snapshot().to_payload()
+        message = _render_setup_body(
+            False,
+            self.auth_service.status().api_url,
+            None,
+            self._wizard_state_cache,
+            self._runtime_snapshot_cache,
         )
         self.query_one("#setup-summary", Static).update("Setup required")
         self.query_one("#setup-body", Static).update(message)
@@ -738,20 +840,28 @@ class MutxTUI(App[None]):
         self._set_notice(str(error), ttl=8.0)
         self._clear_activity()
 
-    def _render_setup_payload(self, assistant_name: str | None) -> None:
+    def _render_setup_payload(
+        self,
+        assistant_name: str | None,
+        onboarding: dict[str, object],
+        runtime_snapshot: dict[str, object],
+    ) -> None:
         status = self.auth_service.status()
         self._assistant_name = assistant_name
+        self._wizard_state_cache = onboarding
+        self._runtime_snapshot_cache = runtime_snapshot
         self.query_one("#setup-summary", Static).update(
-            "Setup complete" if assistant_name else "Setup pending"
+            "Setup complete" if assistant_name else f"Setup {str(onboarding.get('status') or 'pending')}"
         )
         self.query_one("#setup-body", Static).update(
-            _render_setup_body(status.authenticated, status.api_url, assistant_name)
+            _render_setup_body(status.authenticated, status.api_url, assistant_name, onboarding, runtime_snapshot)
         )
         self._clear_activity()
 
     def _render_agents(self, agents: list[AgentRecord]) -> None:
         table = self.query_one("#agents-table", DataTable)
         table.clear(columns=False)
+        self._agent_cache = {agent.id: agent for agent in agents}
         self._agent_count = len(agents)
         if not agents:
             self.selected_agent_id = None
@@ -873,6 +983,123 @@ class MutxTUI(App[None]):
         self._animation_tick += 1
         self._refresh_chrome()
 
+    def _render_setup_progress(self, event: dict[str, object]) -> None:
+        step = str(event.get("step") or "setup")
+        state = str(event.get("state") or "running")
+        message = str(event.get("message") or step)
+        self._wizard_state_cache = load_wizard_state("openclaw")
+        self._runtime_snapshot_cache = collect_openclaw_runtime_snapshot().to_payload()
+        self.query_one("#setup-summary", Static).update(
+            f"OpenClaw wizard | {step} | {state}"
+        )
+        self.query_one("#setup-body", Static).update(
+            _render_setup_body(
+                self.auth_service.status().authenticated,
+                self.auth_service.status().api_url,
+                self._assistant_name,
+                self._wizard_state_cache,
+                self._runtime_snapshot_cache,
+            )
+        )
+        self._set_notice(message)
+
+    def _run_external_command(self, command: str | list[str], *, label: str) -> None:
+        self._set_notice(label, ttl=12.0)
+        self._refresh_chrome()
+        with self.suspend():
+            if isinstance(command, str):
+                result = subprocess.run(
+                    ["/bin/bash", "-lc", command],
+                    check=False,
+                )
+            else:
+                result = subprocess.run(command, check=False)
+        if result.returncode != 0:
+            raise CLIServiceError(f"{label} failed with exit code {result.returncode}.")
+
+    def _run_setup_wizard(self) -> None:
+        status = self.auth_service.status()
+        if not status.authenticated:
+            self.notify("Authenticate with `mutx setup hosted` or `mutx setup local` first.", severity="warning")
+            return
+
+        mode = "local" if status.api_url.startswith("http://localhost") else "hosted"
+        self._set_activity("running openclaw wizard")
+        mark_auth_completed(
+            mode=mode,
+            provider="openclaw",
+            assistant_name="Personal Assistant",
+            runtime_service=self.runtime_service,
+            reset=True,
+            progress=self._render_setup_progress,
+        )
+
+        try:
+            result = run_openclaw_setup_wizard(
+                mode=mode,
+                assistant_name="Personal Assistant",
+                description=None,
+                replicas=1,
+                model=None,
+                workspace=None,
+                install_openclaw=True,
+                openclaw_install_method="npm",
+                no_input=False,
+                templates_service=self.templates_service,
+                assistant_service=self.assistant_service,
+                runtime_service=self.runtime_service,
+                progress=self._render_setup_progress,
+                install_command_runner=lambda command: self._run_external_command(
+                    command,
+                    label="🦞 Installing OpenClaw",
+                ),
+                onboard_command_runner=lambda command: self._run_external_command(
+                    command,
+                    label="🦞 Onboarding OpenClaw gateway",
+                ),
+            )
+        except CLIServiceError as exc:
+            self._handle_service_error(exc)
+            self.load_setup()
+            return
+
+        message = (
+            f"Reused assistant {result.assistant_id}"
+            if result.reused_existing_assistant
+            else f"Deployed assistant {result.assistant_id}"
+        )
+        self._after_action(message, True)
+        self.query_one("#workspace", TabbedContent).active = "control-pane"
+
+    def _deploy_openclaw_agent(self, agent_id: str) -> None:
+        self._set_activity(f"deploying {_shorten(agent_id, 12)}")
+        try:
+            agent = self.agents_service.get_agent(agent_id)
+            agent = self.agents_service.ensure_openclaw_binding(
+                agent,
+                install_if_missing=True,
+                install_method="npm",
+                no_input=False,
+                prompt_install=lambda: True,
+                install_command_runner=lambda command: self._run_external_command(
+                    command,
+                    label="🦞 Installing OpenClaw",
+                ),
+                onboard_command_runner=lambda command: self._run_external_command(
+                    command,
+                    label="🦞 Onboarding OpenClaw gateway",
+                ),
+            )
+            result = self.agents_service.deploy_agent(agent_id)
+        except CLIServiceError as exc:
+            self._handle_service_error(exc)
+            return
+
+        self._after_action(
+            f"Deploy started for {_shorten(agent_id, 12)} ({result.status or 'pending'})",
+            True,
+        )
+
     @work(thread=True, exclusive=True, group="agents-list")
     def load_agents(self) -> None:
         try:
@@ -898,12 +1125,14 @@ class MutxTUI(App[None]):
     def load_setup(self) -> None:
         try:
             overview = self.assistant_service.overview()
+            onboarding = load_wizard_state("openclaw")
+            runtime_snapshot = collect_openclaw_runtime_snapshot().to_payload()
         except CLIServiceError as exc:
             self.call_from_thread(self._handle_service_error, exc)
             return
 
         assistant_name = overview.name if overview else None
-        self.call_from_thread(self._render_setup_payload, assistant_name)
+        self.call_from_thread(self._render_setup_payload, assistant_name, onboarding, runtime_snapshot)
 
     @work(thread=True, exclusive=True, group="deployments-list")
     def load_deployments(self) -> None:
@@ -944,6 +1173,13 @@ class MutxTUI(App[None]):
     @work(thread=True, exclusive=True, group="agent-action")
     def deploy_selected_agent_worker(self, agent_id: str) -> None:
         try:
+            agent = self.agents_service.get_agent(agent_id)
+            agent = self.agents_service.ensure_openclaw_binding(
+                agent,
+                install_if_missing=False,
+                install_method="npm",
+                no_input=True,
+            )
             result = self.agents_service.deploy_agent(agent_id)
         except CLIServiceError as exc:
             self.call_from_thread(self._handle_service_error, exc)
@@ -995,23 +1231,6 @@ class MutxTUI(App[None]):
             self._after_action,
             f"Deleted {_shorten(deployment_id, 12)}",
             False,
-        )
-
-    @work(thread=True, exclusive=True, group="setup-action")
-    def deploy_default_assistant_worker(self) -> None:
-        try:
-            result = self.templates_service.deploy_template(
-                "personal_assistant",
-                name="Personal Assistant",
-            )
-        except CLIServiceError as exc:
-            self.call_from_thread(self._handle_service_error, exc)
-            return
-
-        self.call_from_thread(
-            self._after_action,
-            f"Deployed Personal Assistant {_shorten(result['agent']['id'], 12)}",
-            True,
         )
 
     def _after_action(self, message: str, refresh_agents: bool) -> None:
@@ -1081,11 +1300,14 @@ class MutxTUI(App[None]):
     def action_deploy_selected_agent(self) -> None:
         active = self.query_one("#workspace", TabbedContent).active
         if active == "setup-pane":
-            self._set_activity("deploying personal assistant")
-            self.deploy_default_assistant_worker()
+            self._run_setup_wizard()
             return
         if not self.selected_agent_id:
             self.notify("Select an agent first.", severity="warning")
+            return
+        agent = self._agent_cache.get(self.selected_agent_id)
+        if agent is not None and agent.type == "openclaw":
+            self._deploy_openclaw_agent(self.selected_agent_id)
             return
         self._set_activity(f"deploying {_shorten(self.selected_agent_id, 12)}")
         self.deploy_selected_agent_worker(self.selected_agent_id)

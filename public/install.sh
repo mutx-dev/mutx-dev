@@ -957,16 +957,16 @@ local_control_plane_ready() {
 }
 
 run_setup_handoff() {
-  local -a hosted_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}")
-  local -a local_cmd=("${MUTX_BIN}" setup local --no-input)
+  local -a hosted_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}" --provider openclaw)
+  local -a local_cmd=("${MUTX_BIN}" setup local --no-input --provider openclaw)
   local handoff_note=""
 
   if [[ "${OPEN_TUI}" != "0" ]]; then
     hosted_cmd+=(--open-tui)
     local_cmd+=(--open-tui)
-    handoff_note="The lane will open the TUI when setup completes."
+    handoff_note="The lane enters the MUTX provider wizard, validates OpenClaw, hands off to upstream onboarding if needed, then opens the TUI."
   else
-    handoff_note="The lane will stay in the CLI when setup completes."
+    handoff_note="The lane enters the MUTX provider wizard, validates OpenClaw, hands off to upstream onboarding if needed, then stays in the CLI."
   fi
 
   if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
@@ -976,6 +976,7 @@ run_setup_handoff() {
     note "  mutx setup hosted"
     note "  mutx setup local"
     note "  mutx doctor"
+    note "  mutx runtime inspect openclaw"
     note "  mutx tui"
     return
   fi
@@ -997,12 +998,13 @@ run_setup_handoff() {
       tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}ready for setup handoff${C_RESET}\n"
       tty_print "\n"
       tty_print "${C_PANEL}╭─ ${C_BOLD}Setup Wizard${C_RESET}${C_PANEL} ─────────────────────────────────────────────╮${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}Choose the next lane.${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}Choose the next lane and provider wizard.${C_RESET}\n"
       if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
         tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} fresh CLI overlay active\n"
       else
         tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} packaged CLI is current\n"
       fi
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}providers${C_RESET} OpenClaw active · LangChain soon · n8n soon\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}${handoff_note}${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}${HOSTED_API_URL}${C_RESET}\n"
@@ -1069,6 +1071,7 @@ run_setup_handoff() {
   note "  mutx setup hosted"
   note "  mutx setup local"
   note "  mutx doctor"
+  note "  mutx runtime inspect openclaw"
 }
 
 parse_args "$@"

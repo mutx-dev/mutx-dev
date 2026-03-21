@@ -10,8 +10,9 @@ This is the canonical operator quickstart for MUTX.
 Every supported lane ends in the same success state:
 
 1. You have a stored authenticated session in `~/.mutx/config.json`.
-2. You have deployed the `Personal Assistant` starter template.
-3. You can inspect that assistant from the CLI, TUI, or browser control plane.
+2. You have deployed the `Personal Assistant` starter template against a dedicated OpenClaw assistant binding.
+3. MUTX is tracking that provider runtime under `~/.mutx/providers/openclaw`.
+4. You can inspect that assistant from the CLI, TUI, or browser control plane.
 
 For full repo setup details, see [Local Developer Bootstrap](./local-developer-bootstrap.md).
 
@@ -27,6 +28,8 @@ Fastest macOS path:
 curl -fsSL https://mutx.dev/install.sh | bash
 ```
 
+🦞 The installer now hands off to a MUTX provider wizard. OpenClaw is the first enabled provider, and the wizard can install it, resume upstream onboarding, and return you to MUTX with the runtime already tracked.
+
 Source install:
 
 ```bash
@@ -39,13 +42,16 @@ pip install -e ".[dev,tui]"
 ### 2. Run guided setup
 
 ```bash
-mutx setup hosted --open-tui
+mutx setup hosted --provider openclaw --install-openclaw --open-tui
 ```
 
 The CLI will:
 
 * prompt for your API URL if needed
 * authenticate your operator account
+* install OpenClaw if it is missing
+* hand off to upstream `openclaw onboard --install-daemon` when needed
+* write the provider manifest and bindings under `~/.mutx/providers/openclaw`
 * deploy `Personal Assistant`
 * optionally open `mutx tui`
 
@@ -54,12 +60,14 @@ The CLI will:
 ```bash
 mutx doctor
 mutx assistant overview
+mutx runtime inspect openclaw
 ```
 
 Expected result:
 
 * `Authenticated: yes`
 * assistant overview returns a deployed `Personal Assistant`
+* `mutx runtime inspect openclaw` shows the tracked provider manifest, binding, and last-seen sync state
 * gateway/session state begins to appear once the runtime is active
 
 ## Local contributor
@@ -110,7 +118,7 @@ make dev
 ### 3. Bootstrap and deploy the starter assistant
 
 ```bash
-mutx setup local --open-tui
+mutx setup local --provider openclaw --install-openclaw --open-tui
 ```
 
 If you want a fully non-interactive local smoke path:
@@ -118,6 +126,8 @@ If you want a fully non-interactive local smoke path:
 ```bash
 mutx setup local \
   --name "Local Operator" \
+  --provider openclaw \
+  --install-openclaw \
   --assistant-name "Personal Assistant" \
   --no-input
 ```
@@ -127,6 +137,7 @@ mutx setup local \
 ```bash
 mutx doctor
 mutx assistant overview
+mutx runtime inspect openclaw
 mutx tui
 ```
 

@@ -17,6 +17,8 @@ curl -fsSL https://mutx.dev/install.sh | bash
 
 That script keeps the package-lane chatter quiet, force-links `mutx` if an older shim is already present, verifies the assistant-first command surface, and then hands onboarding off to the CLI itself. If the packaged CLI is behind the installer, it overlays a fresh runtime into `~/.mutx` before continuing.
 
+🦞 The setup handoff now enters a MUTX-owned provider wizard. OpenClaw is the first enabled runtime provider, and MUTX tracks the real upstream OpenClaw home rather than relocating it.
+
 Editable local install with the operator TUI:
 
 ```bash
@@ -61,6 +63,7 @@ The CLI stores configuration in `~/.mutx/config.json` and reuses the existing `C
   "access_token": null,
   "refresh_token": null,
   "assistant_defaults": {
+    "provider": "openclaw",
     "template": "personal_assistant",
     "runtime": "openclaw",
     "model": "openai/gpt-5"
@@ -92,16 +95,24 @@ export MUTX_API_URL=http://localhost:8000
 Hosted operator:
 
 ```bash
-mutx setup hosted --open-tui
+mutx setup hosted --provider openclaw --install-openclaw --open-tui
 ```
 
 Local contributor:
 
 ```bash
-mutx setup local --open-tui
+mutx setup local --provider openclaw --install-openclaw --open-tui
 ```
 
 Hosted setup authenticates against the configured control plane. Local setup bootstraps a trusted local operator session on `http://localhost:8000`, deploys `Personal Assistant`, and can open the TUI without asking for email or password.
+
+Both lanes now:
+
+* keep MUTX in charge of the flow
+* install OpenClaw on demand
+* resume upstream `openclaw onboard --install-daemon` when needed
+* track the runtime in `~/.mutx/providers/openclaw`
+* sync a last-seen provider snapshot back to the control plane for the web dashboard
 
 ## Core Commands
 
@@ -111,7 +122,10 @@ Hosted setup authenticates against the configured control plane. Local setup boo
 | ------- | ----------- |
 | `mutx setup hosted` | Authenticate against a hosted control plane and deploy `Personal Assistant` |
 | `mutx setup local` | Bootstrap a local operator session and deploy `Personal Assistant` |
-| `mutx doctor` | Show config source, auth state, API reachability, and assistant summary |
+| `mutx doctor` | Show config source, auth state, API reachability, provider runtime health, and assistant summary |
+| `mutx runtime list` | List local provider runtimes tracked under `~/.mutx/providers` |
+| `mutx runtime inspect <provider>` | Inspect the local manifest plus the last synced remote snapshot |
+| `mutx runtime resync <provider>` | Push the local provider snapshot back to the API/dashboard |
 
 ### Auth
 
@@ -165,7 +179,7 @@ mutx tui
 
 The TUI now centers the assistant-first operator path:
 
-* `Setup`: auth state, API state, and starter deployment entrypoint
+* `Setup`: auth state, provider cards, wizard steps, runtime pointers, and starter deployment entrypoint
 * `Assistant`: assistant overview, status, and deployment context
 * `Deployments`: deployment inventory and controls
 * `Control Plane`: sessions and gateway detail
@@ -195,9 +209,10 @@ Local stack validation:
 
 ```bash
 make dev-up
-mutx setup local --name "Local Operator" --no-input
+mutx setup local --name "Local Operator" --provider openclaw --install-openclaw --no-input
 mutx doctor
 mutx assistant overview
+mutx runtime inspect openclaw
 mutx tui
 ```
 

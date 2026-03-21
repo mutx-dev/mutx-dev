@@ -2,25 +2,15 @@ from __future__ import annotations
 
 import json
 import re
-import shutil
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import httpx
-
 from src.api.models import Agent, AgentType
-from src.api.services.gateway_runtime import (
-    get_detected_gateway_port,
-    get_detected_gateway_token,
-    get_detected_openclaw_config_path,
-    get_detected_openclaw_state_dir,
-)
 
 DEFAULT_TEMPLATE_ID = "personal_assistant"
 DEFAULT_ASSISTANT_MODEL = "openai/gpt-5"
-LOCAL_SESSION_ACTIVE_WINDOW_MS = 90 * 60 * 1000
 
 
 @dataclass(frozen=True, slots=True)
@@ -138,10 +128,12 @@ def build_personal_assistant_config(
     description: str | None = None,
     model: str | None = None,
     workspace: str | None = None,
+    assistant_id: str | None = None,
     skills: list[str] | None = None,
     channels: dict[str, dict[str, Any]] | None = None,
+    runtime_metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    assistant_id = slugify_assistant_id(name)
+    resolved_assistant_id = assistant_id or slugify_assistant_id(name)
     normalized_channels = default_channel_map()
     for channel_id, payload in (channels or {}).items():
         existing = normalized_channels.get(
@@ -166,8 +158,8 @@ def build_personal_assistant_config(
         "version": 1,
         "runtime": DEFAULT_TEMPLATE_ID,
         "template": DEFAULT_TEMPLATE_ID,
-        "assistant_id": assistant_id,
-        "workspace": workspace or assistant_id,
+        "assistant_id": resolved_assistant_id,
+        "workspace": workspace or resolved_assistant_id,
         "model": model or DEFAULT_ASSISTANT_MODEL,
         "safety_mode": "pairing",
         "skills": list(dict.fromkeys(skills or ["web_search", "workspace_memory"])),
@@ -177,9 +169,10 @@ def build_personal_assistant_config(
             "starter": True,
             "description": description,
             "starter_template": DEFAULT_TEMPLATE_ID,
+            "runtime": dict(runtime_metadata or {}),
         },
         "gateway": {
-            "port": get_detected_gateway_port() or 18789,
+            "port": 18789,
             "auth_mode": "token",
             "dashboard_allowed_origins": [],
         },
@@ -251,21 +244,7 @@ def _extract_skill_metadata(skill_file: Path) -> SkillCatalogItem | None:
 
 
 def discover_workspace_skills() -> list[SkillCatalogItem]:
-    state_dir = get_detected_openclaw_state_dir()
-    if not state_dir:
-        return []
-
-    discovered: dict[str, SkillCatalogItem] = {}
-    patterns = (
-        "workspace*/skills/*/SKILL.md",
-        "workspace*/**/skills/*/SKILL.md",
-    )
-    for pattern in patterns:
-        for skill_file in state_dir.glob(pattern):
-            metadata = _extract_skill_metadata(skill_file)
-            if metadata is not None and metadata.id not in discovered:
-                discovered[metadata.id] = metadata
-    return sorted(discovered.values(), key=lambda item: item.name.lower())
+    return []
 
 
 def list_skill_catalog() -> list[SkillCatalogItem]:
@@ -364,133 +343,27 @@ def list_assistant_wakeups(agent: Agent) -> list[dict[str, Any]]:
     return items
 
 
-def _session_store_files() -> list[Path]:
-    state_dir = get_detected_openclaw_state_dir()
-    if not state_dir:
-        return []
-
-    agents_dir = state_dir / "agents"
-    if not agents_dir.exists():
-        return []
-
-    files: list[Path] = []
-    for agent_dir in agents_dir.iterdir():
-        sessions_file = agent_dir / "sessions" / "sessions.json"
-        if sessions_file.exists() and sessions_file.is_file():
-            files.append(sessions_file)
-    return files
-
-
-def _format_tokens(n: int) -> str:
-    if n >= 1_000_000:
-        return f"{n / 1_000_000:.1f}m"
-    if n >= 1000:
-        return f"{round(n / 1000)}k"
-    return str(n)
-
-
-def _format_age(timestamp: int) -> str:
-    if not timestamp:
-        return "-"
-    diff = datetime.now(timezone.utc).timestamp() * 1000 - timestamp
-    if diff <= 0:
-        return "now"
-    mins = int(diff / 60000)
-    hours = int(mins / 60)
-    days = int(hours / 24)
-    if days > 0:
-        return f"{days}d"
-    if hours > 0:
-        return f"{hours}h"
-    return f"{mins}m"
-
-
 def list_gateway_sessions(*, assistant_id: str | None = None) -> list[dict[str, Any]]:
-    now = int(datetime.now(timezone.utc).timestamp() * 1000)
-    sessions: list[dict[str, Any]] = []
-    for sessions_file in _session_store_files():
-        agent_name = sessions_file.parent.parent.name
-        if assistant_id and agent_name != assistant_id:
-            continue
-        try:
-            payload = json.loads(_read_text(sessions_file))
-        except json.JSONDecodeError:
-            continue
-        if not isinstance(payload, dict):
-            continue
-
-        for key, entry in payload.items():
-            if not isinstance(entry, dict):
-                continue
-            updated_at = int(entry.get("updatedAt") or 0)
-            total = int(entry.get("totalTokens") or 0)
-            context = int(entry.get("contextTokens") or 0)
-            pct = round((total / context) * 100) if context > 0 else 0
-            sessions.append(
-                {
-                    "id": entry.get("sessionId") or f"{agent_name}:{key}",
-                    "key": str(key),
-                    "agent": agent_name,
-                    "kind": str(entry.get("chatType") or "unknown"),
-                    "age": _format_age(updated_at),
-                    "model": str(entry.get("model") or ""),
-                    "tokens": f"{_format_tokens(total)}/{_format_tokens(context)} ({pct}%)",
-                    "channel": str(
-                        (entry.get("deliveryContext") or {}).get("channel")
-                        or entry.get("lastChannel")
-                        or entry.get("channel")
-                        or ""
-                    ),
-                    "flags": [],
-                    "active": (now - updated_at) < LOCAL_SESSION_ACTIVE_WINDOW_MS if updated_at else False,
-                    "start_time": updated_at,
-                    "last_activity": updated_at,
-                    "source": "gateway",
-                }
-            )
-    return sorted(sessions, key=lambda item: item["last_activity"], reverse=True)
+    return []
 
 
 def collect_gateway_health() -> dict[str, Any]:
-    config_path = get_detected_openclaw_config_path()
-    state_dir = get_detected_openclaw_state_dir()
-    gateway_port = get_detected_gateway_port()
-    gateway_url = f"http://127.0.0.1:{gateway_port}" if gateway_port else None
-    cli_available = shutil.which("openclaw") is not None
-    credential_detected = bool(get_detected_gateway_token())
-    gateway_configured = config_path is not None or (state_dir is not None and state_dir.exists())
-
-    gateway_reachable = False
-    if gateway_url:
-        try:
-            response = httpx.get(f"{gateway_url}/health", timeout=0.75)
-            gateway_reachable = response.status_code < 500
-        except httpx.HTTPError:
-            gateway_reachable = False
-
-    if gateway_reachable:
-        status = "healthy"
-        doctor_summary = "Gateway is reachable and ready for assistant operations."
-    elif gateway_configured and cli_available:
-        status = "degraded"
-        doctor_summary = "OpenClaw is configured locally, but the gateway is not reachable yet."
-    elif gateway_configured:
-        status = "degraded"
-        doctor_summary = "OpenClaw state is present, but the CLI runtime is not available on this host."
-    else:
-        status = "missing"
-        doctor_summary = "No local OpenClaw runtime was detected. Run onboarding or connect a hosted runtime."
+    status = "client_required"
+    doctor_summary = (
+        "Local OpenClaw runtime state is resolved from the operator host. "
+        "Use the MUTX CLI or TUI on that machine to inspect live health and sessions."
+    )
 
     return {
         "status": status,
-        "cli_available": cli_available,
-        "gateway_configured": gateway_configured,
-        "gateway_reachable": gateway_reachable,
-        "gateway_port": gateway_port,
-        "gateway_url": gateway_url,
-        "credential_detected": credential_detected,
-        "config_path": str(config_path) if config_path else None,
-        "state_dir": str(state_dir) if state_dir else None,
+        "cli_available": False,
+        "gateway_configured": False,
+        "gateway_reachable": False,
+        "gateway_port": None,
+        "gateway_url": None,
+        "credential_detected": False,
+        "config_path": None,
+        "state_dir": None,
         "doctor_summary": doctor_summary,
     }
 
@@ -498,19 +371,7 @@ def collect_gateway_health() -> dict[str, Any]:
 def collect_assistant_overview(agent: Agent, deployments: list[Any]) -> dict[str, Any]:
     config = deserialize_config(agent.config)
     assistant_id = str(config.get("assistant_id") or slugify_assistant_id(agent.name))
-    sessions = list_gateway_sessions(assistant_id=assistant_id)
-    last_activity = None
-    if sessions and sessions[0]["last_activity"]:
-        last_activity = datetime.fromtimestamp(
-            sessions[0]["last_activity"] / 1000,
-            tz=timezone.utc,
-        )
-
-    onboarding_status = "ready"
-    if not deployments:
-        onboarding_status = "needs_deployment"
-    elif not sessions:
-        onboarding_status = "deployed"
+    onboarding_status = "needs_deployment" if not deployments else "deployed"
 
     return {
         "agent_id": agent.id,
@@ -522,8 +383,8 @@ def collect_assistant_overview(agent: Agent, deployments: list[Any]) -> dict[str
         "onboarding_status": onboarding_status,
         "assistant_id": assistant_id,
         "workspace": str(config.get("workspace") or assistant_id),
-        "last_activity": last_activity,
-        "session_count": len(sessions),
+        "last_activity": None,
+        "session_count": 0,
         "installed_skills": [item for item in list_assistant_skills(agent) if item["installed"]],
         "channels": list_assistant_channels(agent),
         "wakeups": list_assistant_wakeups(agent),

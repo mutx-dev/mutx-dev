@@ -36,8 +36,9 @@ const tabContent: Record<QuickstartTab, QuickstartContent> = {
       {
         id: 'deploy',
         label: 'Deploy Personal Assistant',
-        script: `mutx setup hosted
+        script: `mutx setup hosted --provider openclaw --install-openclaw
 mutx doctor
+mutx runtime inspect openclaw
 mutx assistant overview`,
       },
     ],
@@ -56,8 +57,9 @@ make dev-logs`,
       {
         id: 'deploy',
         label: 'Deploy Personal Assistant',
-        script: `mutx setup local
+        script: `mutx setup local --provider openclaw --install-openclaw
 mutx doctor
+mutx runtime inspect openclaw
 mutx tui`,
       },
     ],

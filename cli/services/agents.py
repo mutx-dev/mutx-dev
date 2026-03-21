@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import Any, Callable
 
+from cli.openclaw_runtime import reconcile_openclaw_agent_config
 from cli.services.base import APIService, ValidationError
 from cli.services.models import AgentDeploymentResult, AgentRecord, LogEntry
 
@@ -48,6 +49,44 @@ class AgentsService(APIService):
         )
         self._expect_status(response, {201}, invalid_message="Invalid agent configuration")
         return AgentRecord.from_payload(response.json())
+
+    def update_config(self, agent_id: str, config: dict[str, Any]) -> AgentRecord:
+        response = self._request(
+            "patch",
+            f"/v1/agents/{agent_id}/config",
+            json={"config": config},
+        )
+        self._expect_status(response, {200}, not_found_message="Agent not found")
+        detail = self.get_agent(agent_id)
+        return detail
+
+    def ensure_openclaw_binding(
+        self,
+        agent: AgentRecord,
+        *,
+        install_if_missing: bool,
+        install_method: str,
+        no_input: bool,
+        prompt_install: Callable[[], bool] | None = None,
+        install_command_runner: Callable[[str], None] | None = None,
+        onboard_command_runner: Callable[[list[str]], None] | None = None,
+    ) -> AgentRecord:
+        if agent.type != "openclaw":
+            return agent
+
+        updated_config, _binding, _health = reconcile_openclaw_agent_config(
+            agent_name=agent.name,
+            config=agent.config,
+            install_if_missing=install_if_missing,
+            install_method=install_method,
+            no_input=no_input,
+            prompt_install=prompt_install,
+            install_command_runner=install_command_runner,
+            onboard_command_runner=onboard_command_runner,
+        )
+        if agent.config == updated_config:
+            return agent
+        return self.update_config(agent.id, updated_config)
 
     def deploy_agent(self, agent_id: str) -> AgentDeploymentResult:
         response = self._request("post", f"/v1/agents/{agent_id}/deploy")

@@ -10,6 +10,8 @@ Fastest macOS path to install MUTX with a guided setup flow:
 curl -fsSL https://mutx.dev/install.sh | bash
 ```
 
+That handoff now opens the MUTX provider wizard. 🦞 OpenClaw is the first enabled provider, and MUTX can install it, resume upstream onboarding, and track the runtime in `~/.mutx/providers/openclaw`.
+
 Manual tap flow:
 
 ```bash
@@ -32,6 +34,7 @@ Use `brew link --overwrite mutx --dry-run` first if you want to inspect what wil
 ```bash
 mutx --help
 mutx status
+mutx runtime list
 mutx tui
 ```
 

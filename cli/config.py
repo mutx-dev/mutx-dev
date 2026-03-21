@@ -33,6 +33,7 @@ class CLIConfig:
             "access_token": None,
             "refresh_token": None,
             "assistant_defaults": {
+                "provider": "openclaw",
                 "template": "personal_assistant",
                 "runtime": "openclaw",
                 "model": "openai/gpt-5",

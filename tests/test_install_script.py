@@ -373,7 +373,7 @@ def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recover
     assert "Hosted lane" in transcript
     assert "Local lane" in transcript
     assert "Launching:" in transcript
-    assert "LOCAL SETUP --no-input --open-tui" in transcript
+    assert "LOCAL SETUP --no-input --provider openclaw --open-tui" in transcript
     assert "MUTX setup wizard\\nInstall the CLI" not in transcript
     assert "No such command 'setup'" not in transcript
 
@@ -398,4 +398,4 @@ def test_install_script_tty_hosted_lane_targets_hosted_api(tmp_path: Path) -> No
 
     assert exit_code == 0
     assert "Launching:" in transcript
-    assert "setup hosted --api-url https://api.mutx.dev --open-tui" in transcript
+    assert "setup hosted --api-url https://api.mutx.dev --provider openclaw --open-tui" in transcript

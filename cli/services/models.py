@@ -285,8 +285,14 @@ class AssistantHealthRecord:
     cli_available: bool
     gateway_configured: bool
     gateway_reachable: bool
-    gateway_url: str | None
-    doctor_summary: str
+    installed: bool = False
+    onboarded: bool = False
+    gateway_port: int | None = None
+    gateway_url: str | None = None
+    credential_detected: bool = False
+    config_path: str | None = None
+    state_dir: str | None = None
+    doctor_summary: str = ""
 
     @classmethod
     def from_payload(cls, payload: dict[str, Any]) -> "AssistantHealthRecord":
@@ -295,7 +301,13 @@ class AssistantHealthRecord:
             cli_available=bool(payload.get("cli_available", False)),
             gateway_configured=bool(payload.get("gateway_configured", False)),
             gateway_reachable=bool(payload.get("gateway_reachable", False)),
+            installed=bool(payload.get("installed", payload.get("cli_available", False))),
+            onboarded=bool(payload.get("onboarded", payload.get("gateway_configured", False))),
+            gateway_port=int(payload["gateway_port"]) if payload.get("gateway_port") else None,
             gateway_url=_as_optional_str(payload.get("gateway_url")),
+            credential_detected=bool(payload.get("credential_detected", False)),
+            config_path=_as_optional_str(payload.get("config_path")),
+            state_dir=_as_optional_str(payload.get("state_dir")),
             doctor_summary=str(payload.get("doctor_summary", "")),
         )
 
@@ -313,6 +325,7 @@ class AssistantOverviewRecord:
     deployments: list[DeploymentRecord]
     installed_skills: list[AssistantSkillRecord]
     channels: list[AssistantChannelRecord]
+    config: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def from_payload(cls, payload: dict[str, Any]) -> "AssistantOverviewRecord":
@@ -340,4 +353,69 @@ class AssistantOverviewRecord:
                 for item in (payload.get("channels") or [])
                 if isinstance(item, dict)
             ],
+            config=payload.get("config") if isinstance(payload.get("config"), dict) else {},
+        )
+
+
+@dataclass(slots=True)
+class RuntimeProviderRecord:
+    provider: str
+    label: str
+    status: str
+    last_seen_at: str | None
+    stale: bool
+    install_method: str | None
+    gateway_url: str | None
+    binding_count: int
+    payload: dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "RuntimeProviderRecord":
+        return cls(
+            provider=str(payload.get("provider", "")),
+            label=str(payload.get("label", "")),
+            status=str(payload.get("status", "unknown")),
+            last_seen_at=_as_optional_str(payload.get("last_seen_at")),
+            stale=bool(payload.get("stale", False)),
+            install_method=_as_optional_str(payload.get("install_method")),
+            gateway_url=_as_optional_str(payload.get("gateway_url")),
+            binding_count=int(payload.get("binding_count", 0)),
+            payload=payload,
+        )
+
+
+@dataclass(slots=True)
+class OnboardingStateRecord:
+    provider: str
+    status: str
+    current_step: str
+    completed_steps: list[str]
+    failed_step: str | None
+    last_error: str | None
+    checklist_dismissed: bool
+    steps: list[dict[str, Any]] = field(default_factory=list)
+    providers: list[dict[str, Any]] = field(default_factory=list)
+    payload: dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_payload(cls, payload: dict[str, Any]) -> "OnboardingStateRecord":
+        return cls(
+            provider=str(payload.get("provider", "openclaw")),
+            status=str(payload.get("status", "unknown")),
+            current_step=str(payload.get("current_step", "")),
+            completed_steps=[str(item) for item in (payload.get("completed_steps") or [])],
+            failed_step=_as_optional_str(payload.get("failed_step")),
+            last_error=_as_optional_str(payload.get("last_error")),
+            checklist_dismissed=bool(payload.get("checklist_dismissed", False)),
+            steps=[
+                dict(item)
+                for item in (payload.get("steps") or [])
+                if isinstance(item, dict)
+            ],
+            providers=[
+                dict(item)
+                for item in (payload.get("providers") or [])
+                if isinstance(item, dict)
+            ],
+            payload=payload,
         )

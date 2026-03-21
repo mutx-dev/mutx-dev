@@ -2,8 +2,9 @@ import click
 
 from cli.commands.tui import launch_tui
 from cli.config import LOCAL_API_URL, current_config, get_client, resolve_hosted_api_url
-from cli.services import AuthService, CLIServiceError
+from cli.services import AssistantService, AuthService, CLIServiceError, RuntimeStateService
 from cli.services.assistant import TemplatesService
+from cli.setup_wizard import mark_auth_completed, run_openclaw_setup_wizard
 
 
 @click.group(name="setup")
@@ -20,6 +21,14 @@ def _templates_service() -> TemplatesService:
     return TemplatesService(config=current_config(), client_factory=get_client)
 
 
+def _assistant_service() -> AssistantService:
+    return AssistantService(config=current_config(), client_factory=get_client)
+
+
+def _runtime_service() -> RuntimeStateService:
+    return RuntimeStateService(config=current_config(), client_factory=get_client)
+
+
 def _require_value(label: str, value: str | None, no_input: bool, *, secret: bool = False) -> str:
     if value:
         return value
@@ -30,23 +39,56 @@ def _require_value(label: str, value: str | None, no_input: bool, *, secret: boo
 
 def _finish_setup(
     *,
+    mode: str,
+    provider: str,
     assistant_name: str,
     description: str | None,
     replicas: int,
     model: str | None,
     workspace: str | None,
+    install_openclaw: bool,
+    openclaw_install_method: str,
+    no_input: bool,
     open_tui: bool,
 ) -> None:
-    result = _templates_service().deploy_template(
-        "personal_assistant",
-        name=assistant_name,
+    if provider != "openclaw":
+        raise click.ClickException(f"Unsupported provider '{provider}'. Only openclaw is enabled in this sprint.")
+
+    default_model = str(current_config().assistant_defaults.get("model") or model or "")
+
+    def _report(event: dict[str, object]) -> None:
+        state = str(event.get("state") or "running")
+        message = str(event.get("message") or "").strip()
+        prefix = {"running": "…", "completed": "✓", "failed": "x"}.get(state, "•")
+        click.echo(f"{prefix} {message}")
+
+    result = run_openclaw_setup_wizard(
+        mode=mode,
+        assistant_name=assistant_name,
         description=description,
         replicas=replicas,
-        model=model,
+        model=model or default_model,
         workspace=workspace,
+        install_openclaw=install_openclaw,
+        openclaw_install_method=openclaw_install_method,
+        no_input=no_input,
+        templates_service=_templates_service(),
+        assistant_service=_assistant_service(),
+        runtime_service=_runtime_service(),
+        prompt_install=lambda: click.confirm(
+            "OpenClaw is required for the Personal Assistant and is not installed. Install it now?",
+            default=True,
+        ),
+        progress=_report,
     )
-    click.echo(f"Assistant deployed: {result['agent']['id']}")
-    click.echo(f"Deployment: {result['deployment']['id']}")
+    if result.deployment is not None:
+        click.echo(f"Assistant deployed: {result.deployment['agent']['id']}")
+        click.echo(f"Deployment: {result.deployment['deployment']['id']}")
+    else:
+        click.echo(f"Assistant already present: {result.assistant_id}")
+    click.echo(f"OpenClaw assistant_id: {result.binding.agent_id}")
+    click.echo(f"Workspace: {result.binding.workspace}")
+    click.echo(f"Gateway: {result.health.gateway_url or 'n/a'} ({result.health.status})")
     if open_tui:
         launch_tui()
 
@@ -60,6 +102,21 @@ def _finish_setup(
 @click.option("--replicas", default=1, type=int, help="Replica count")
 @click.option("--model", default=None, help="Assistant model override")
 @click.option("--workspace", default=None, help="Assistant workspace override")
+@click.option(
+    "--provider",
+    type=click.Choice(["openclaw"]),
+    default="openclaw",
+    show_default=True,
+    help="Runtime provider for the starter assistant",
+)
+@click.option("--install-openclaw", is_flag=True, help="Install OpenClaw automatically if it is missing")
+@click.option(
+    "--openclaw-install-method",
+    type=click.Choice(["npm", "git"]),
+    default="npm",
+    show_default=True,
+    help="OpenClaw install method when installation is required",
+)
 @click.option("--open-tui", is_flag=True, help="Launch the TUI after setup")
 @click.option("--no-input", is_flag=True, help="Disable prompts")
 def setup_hosted(
@@ -71,6 +128,9 @@ def setup_hosted(
     replicas: int,
     model: str | None,
     workspace: str | None,
+    provider: str,
+    install_openclaw: bool,
+    openclaw_install_method: str,
     open_tui: bool,
     no_input: bool,
 ):
@@ -84,12 +144,24 @@ def setup_hosted(
             password=_require_value("Password", password, no_input, secret=True),
             api_url=target_api_url,
         )
+        mark_auth_completed(
+            mode="hosted",
+            provider=provider,
+            assistant_name=assistant_name,
+            runtime_service=_runtime_service(),
+            reset=True,
+        )
         _finish_setup(
+            mode="hosted",
+            provider=provider,
             assistant_name=assistant_name,
             description=description,
             replicas=replicas,
             model=model,
             workspace=workspace,
+            install_openclaw=install_openclaw,
+            openclaw_install_method=openclaw_install_method,
+            no_input=no_input,
             open_tui=open_tui,
         )
     except CLIServiceError as exc:
@@ -110,6 +182,21 @@ def setup_hosted(
 @click.option("--replicas", default=1, type=int, help="Replica count")
 @click.option("--model", default=None, help="Assistant model override")
 @click.option("--workspace", default=None, help="Assistant workspace override")
+@click.option(
+    "--provider",
+    type=click.Choice(["openclaw"]),
+    default="openclaw",
+    show_default=True,
+    help="Runtime provider for the starter assistant",
+)
+@click.option("--install-openclaw", is_flag=True, help="Install OpenClaw automatically if it is missing")
+@click.option(
+    "--openclaw-install-method",
+    type=click.Choice(["npm", "git"]),
+    default="npm",
+    show_default=True,
+    help="OpenClaw install method when installation is required",
+)
 @click.option("--open-tui", is_flag=True, help="Launch the TUI after setup")
 @click.option("--no-input", is_flag=True, help="Disable prompts")
 def setup_local(
@@ -122,6 +209,9 @@ def setup_local(
     replicas: int,
     model: str | None,
     workspace: str | None,
+    provider: str,
+    install_openclaw: bool,
+    openclaw_install_method: str,
     open_tui: bool,
     no_input: bool,
 ):
@@ -141,12 +231,24 @@ def setup_local(
                 _auth_service().login(email=email_value, password=password_value)
         else:
             _auth_service().local_bootstrap(name=display_name)
+        mark_auth_completed(
+            mode="local",
+            provider=provider,
+            assistant_name=assistant_name,
+            runtime_service=_runtime_service(),
+            reset=True,
+        )
         _finish_setup(
+            mode="local",
+            provider=provider,
             assistant_name=assistant_name,
             description=description,
             replicas=replicas,
             model=model,
             workspace=workspace,
+            install_openclaw=install_openclaw,
+            openclaw_install_method=openclaw_install_method,
+            no_input=no_input,
             open_tui=open_tui,
         )
     except CLIServiceError as exc:

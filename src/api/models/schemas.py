@@ -439,9 +439,11 @@ class StarterDeploymentCreate(BaseModel):
     description: Optional[str] = Field(default=None, max_length=1000)
     replicas: int = Field(default=1, ge=1, le=10)
     model: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    assistant_id: Optional[str] = Field(default=None, min_length=1, max_length=255)
     workspace: Optional[str] = Field(default=None, min_length=1, max_length=255)
     skills: list[str] = Field(default_factory=list)
     channels: dict[str, OpenClawChannelConfig] = Field(default_factory=dict)
+    runtime_metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class StarterDeploymentResponse(BaseModel):
@@ -531,6 +533,74 @@ class AssistantOverviewEnvelope(BaseModel):
     has_assistant: bool
     recommended_template_id: str = "personal_assistant"
     assistant: Optional[AssistantOverviewResponse] = None
+
+
+class ProviderOptionResponse(BaseModel):
+    id: str
+    label: str
+    summary: str
+    enabled: bool = False
+    cue: str | None = None
+
+
+class OnboardingStepResponse(BaseModel):
+    id: str
+    title: str
+    completed: bool = False
+
+
+class OnboardingStateResponse(BaseModel):
+    provider: str = "openclaw"
+    status: str
+    current_step: str
+    completed_steps: list[str] = Field(default_factory=list)
+    failed_step: str | None = None
+    last_error: str | None = None
+    checklist_dismissed: bool = False
+    assistant_name: str | None = None
+    assistant_id: str | None = None
+    workspace: str | None = None
+    gateway_url: str | None = None
+    updated_at: datetime | None = None
+    steps: list[OnboardingStepResponse] = Field(default_factory=list)
+    providers: list[ProviderOptionResponse] = Field(default_factory=list)
+
+
+class OnboardingUpdateRequest(BaseModel):
+    action: str = Field(..., min_length=1, max_length=64)
+    provider: str = Field(default="openclaw", min_length=1, max_length=64)
+    step: str | None = Field(default=None, max_length=64)
+    payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class RuntimeProviderSnapshotUpsert(BaseModel):
+    provider: str = Field(default="openclaw", min_length=1, max_length=64)
+    runtime_key: str = Field(default="openclaw", min_length=1, max_length=64)
+    label: str = Field(default="OpenClaw", min_length=1, max_length=120)
+    cue: str | None = Field(default=None, max_length=8)
+    provider_root: str | None = None
+    wizard_state_path: str | None = None
+    binary_path: str | None = None
+    home_path: str | None = None
+    config_path: str | None = None
+    state_dir: str | None = None
+    install_method: str | None = Field(default=None, max_length=32)
+    version: str | None = Field(default=None, max_length=255)
+    status: str = Field(default="unknown", max_length=64)
+    gateway: dict[str, Any] = Field(default_factory=dict)
+    gateway_url: str | None = None
+    gateway_port: int | None = None
+    last_seen_at: datetime | None = None
+    last_synced_at: datetime | None = None
+    binding_count: int = Field(default=0, ge=0)
+    current_binding: dict[str, Any] | None = None
+    bindings: list[dict[str, Any]] = Field(default_factory=list)
+    observed_source: str = Field(default="local", max_length=64)
+
+
+class RuntimeProviderSnapshotResponse(RuntimeProviderSnapshotUpsert):
+    stale: bool = False
+    stale_after_seconds: int = 900
 
 
 # API Key Schemas

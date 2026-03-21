@@ -51,10 +51,12 @@ def build_personal_assistant_config(
     description: str | None = None,
     model: str | None = None,
     workspace: str | None = None,
+    assistant_id: str | None = None,
     skills: list[str] | None = None,
     channels: dict[str, dict[str, Any]] | None = None,
+    runtime_metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    assistant_id = slugify_assistant_id(name)
+    resolved_assistant_id = assistant_id or slugify_assistant_id(name)
     normalized_channels = default_channel_map()
     for channel_id, payload in (channels or {}).items():
         existing = normalized_channels.get(
@@ -79,8 +81,8 @@ def build_personal_assistant_config(
         "version": 1,
         "runtime": DEFAULT_TEMPLATE_ID,
         "template": DEFAULT_TEMPLATE_ID,
-        "assistant_id": assistant_id,
-        "workspace": workspace or assistant_id,
+        "assistant_id": resolved_assistant_id,
+        "workspace": workspace or resolved_assistant_id,
         "model": model or DEFAULT_ASSISTANT_MODEL,
         "safety_mode": "pairing",
         "skills": list(dict.fromkeys(skills or ["web_search", "workspace_memory"])),
@@ -90,6 +92,7 @@ def build_personal_assistant_config(
             "starter": True,
             "description": description,
             "starter_template": DEFAULT_TEMPLATE_ID,
+            "runtime": dict(runtime_metadata or {}),
         },
         "gateway": {
             "port": detect_gateway_port(),
