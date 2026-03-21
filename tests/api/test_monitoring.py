@@ -18,6 +18,8 @@ async def test_monitor_marks_latest_deployment_failed_on_stale_heartbeat(
     await db_session.commit()
 
     await monitor_agent_health(db_session)
+    assert test_deployment.ended_at is not None
+    assert test_deployment.ended_at.tzinfo is None
     await db_session.refresh(test_agent)
     await db_session.refresh(test_deployment)
 
@@ -51,6 +53,8 @@ async def test_monitor_auto_heal_restores_latest_deployment(
     await db_session.commit()
 
     await monitor_agent_health(db_session)
+    assert test_deployment.started_at is not None
+    assert test_deployment.started_at.tzinfo is None
     await db_session.refresh(test_agent)
     await db_session.refresh(test_deployment)
 

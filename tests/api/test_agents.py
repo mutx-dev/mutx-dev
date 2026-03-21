@@ -10,7 +10,7 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.models.models import Agent, AgentStatus, UsageEvent
+from src.api.models.models import Agent, AgentStatus, Deployment, UsageEvent
 
 
 class TestCreateAgent:
@@ -529,6 +529,11 @@ class TestDeployAgent:
         data = response.json()
         assert "deployment_id" in data
         assert data["status"] == "deploying"
+
+        deployment = await db_session.get(Deployment, uuid.UUID(data["deployment_id"]))
+        assert deployment is not None
+        assert deployment.started_at is not None
+        assert deployment.started_at.tzinfo is None
 
         # Verify agent status changed
         await db_session.refresh(test_agent)

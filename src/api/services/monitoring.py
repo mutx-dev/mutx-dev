@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.models import Agent, AgentLog, Deployment, Alert, AlertType
 from src.api.services.webhook_service import trigger_agent_status_event, trigger_deployment_event
-from src.api.time_utils import as_utc
+from src.api.time_utils import as_utc, as_utc_naive
 
 logger = logging.getLogger(__name__)
 
@@ -105,6 +105,7 @@ async def monitor_agent_health(session: AsyncSession):
     3. Auto-heal 'failed' agents back to 'running'
     """
     now = datetime.now(timezone.utc)
+    deployment_now = as_utc_naive(now)
 
     # 1. Promote CREATING -> RUNNING
     # This simulates the completion of provisioning
@@ -129,7 +130,7 @@ async def monitor_agent_health(session: AsyncSession):
                     agent_id=agent.id,
                     status="running",
                     replicas=1,
-                    started_at=now,
+                    started_at=deployment_now,
                     node_id=f"node-{uuid.uuid4().hex[:6]}",
                 )
                 session.add(deployment)
@@ -200,7 +201,7 @@ async def monitor_agent_health(session: AsyncSession):
 
             if deployment is not None:
                 deployment.status = "failed"
-                deployment.ended_at = now
+                deployment.ended_at = deployment_now
                 deployment.error_message = failure_message
                 _record_deployment_event(
                     session,
@@ -264,7 +265,7 @@ async def monitor_agent_health(session: AsyncSession):
 
             if deployment is not None:
                 deployment.status = "running"
-                deployment.started_at = now
+                deployment.started_at = deployment_now
                 deployment.ended_at = None
                 deployment.error_message = None
                 _record_deployment_event(

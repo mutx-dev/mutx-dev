@@ -1,7 +1,6 @@
 import json
 import logging
 import uuid
-from datetime import datetime, timezone
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -41,6 +40,7 @@ from src.api.models.schemas import (
     OpenClawAgentConfig,
     OpenAIAgentConfig,
 )
+from src.api.time_utils import utc_now_naive
 
 router = APIRouter(prefix="/agents", tags=["agents"])
 logger = logging.getLogger(__name__)
@@ -375,7 +375,7 @@ async def deploy_agent(
             agent_id=agent_id,
             status="deploying",
             replicas=1,
-            started_at=datetime.now(timezone.utc),
+            started_at=utc_now_naive(),
         )
         db.add(deployment)
         await db.flush()
@@ -433,7 +433,7 @@ async def stop_agent(
     deployments = result.scalars().all()
     for deployment in deployments:
         deployment.status = "stopped"
-        deployment.ended_at = datetime.now(timezone.utc)
+        deployment.ended_at = utc_now_naive()
 
         stop_event = DeploymentEventModel(
             deployment_id=deployment.id,

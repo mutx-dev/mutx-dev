@@ -26,7 +26,7 @@ from src.api.services.webhook_service import (
     trigger_deployment_event,
     trigger_webhook_event,
 )
-from src.api.time_utils import utc_now
+from src.api.time_utils import utc_now, utc_now_naive
 
 router = APIRouter(prefix="/ingest", tags=["ingest"])
 logger = logging.getLogger(__name__)
@@ -150,14 +150,14 @@ async def deployment_event(
         db.add(error_log)
 
     if event_data.event == "stopped" or event_data.status == "stopped":
-        deployment.ended_at = datetime.now(timezone.utc)
+        deployment.ended_at = utc_now_naive()
         if agent:
             agent.status = AgentStatus.STOPPED.value
 
     if event_data.event == "healthy" or event_data.status == "running":
         deployment.status = "running"
         if deployment.started_at is None:
-            deployment.started_at = datetime.now(timezone.utc)
+            deployment.started_at = utc_now_naive()
 
     await db.commit()
 

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.models import Agent, AgentStatus, Deployment, DeploymentEvent, DeploymentVersion
+from src.api.time_utils import utc_now_naive
 
 
 def _create_deployment_version(deployment: Deployment, db: AsyncSession) -> DeploymentVersion:
@@ -36,7 +36,7 @@ async def create_deployment_record(
         status="pending",
         version=version,
         replicas=replicas,
-        started_at=datetime.now(timezone.utc),
+        started_at=utc_now_naive(),
     )
     db.add(deployment)
     await db.flush()

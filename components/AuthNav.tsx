@@ -34,6 +34,7 @@ export function AuthNav() {
   ]);
   const isHiddenRoute =
     demoAppRoutes.has(pathname) ||
+    pathname.startsWith("/control") ||
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/app");
 

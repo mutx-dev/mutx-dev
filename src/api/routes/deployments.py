@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+import json
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
@@ -18,6 +18,7 @@ from src.api.models import (
     AgentLog,
     AgentMetric,
     DeploymentEvent as DeploymentEventModel,
+    DeploymentVersion,
 )
 from src.api.models.schemas import (
     DeploymentResponse,
@@ -32,6 +33,7 @@ from src.api.models.schemas import (
 from src.api.middleware.auth import get_current_user
 from src.api.services.deployment_lifecycle import create_deployment_record
 from src.api.services.usage import track_usage_best_effort
+from src.api.time_utils import utc_now_naive
 
 router = APIRouter(prefix="/deployments", tags=["deployments"])
 logger = logging.getLogger(__name__)
@@ -216,7 +218,7 @@ async def kill_deployment(
     deployment = await get_owned_deployment(deployment_id, db, current_user)
 
     deployment.status = "killed"
-    deployment.ended_at = datetime.now(timezone.utc)
+    deployment.ended_at = utc_now_naive()
 
     # Record kill event
     kill_event = DeploymentEventModel(
@@ -308,7 +310,7 @@ async def restart_deployment(
 
     # Reset deployment status
     deployment.status = "pending"
-    deployment.started_at = datetime.now(timezone.utc)
+    deployment.started_at = utc_now_naive()
     deployment.ended_at = None
     deployment.error_message = None
 
@@ -463,7 +465,7 @@ async def rollback_deployment(
     old_versions = old_result.scalars().all()
     for old_v in old_versions:
         old_v.status = "superseded"
-        old_v.rolled_back_at = datetime.now(timezone.utc)
+        old_v.rolled_back_at = utc_now_naive()
 
     target_version.status = "current"
     target_version.rolled_back_at = None

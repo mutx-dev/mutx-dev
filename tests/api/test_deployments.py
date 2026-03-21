@@ -497,6 +497,11 @@ class TestCreateDeployment:
         assert data["events"][0]["event_type"] == "create"
         assert data["events"][0]["status"] == "pending"
 
+        created_deployment = await db_session.get(Deployment, uuid.UUID(data["id"]))
+        assert created_deployment is not None
+        assert created_deployment.started_at is not None
+        assert created_deployment.started_at.tzinfo is None
+
         await db_session.refresh(test_agent)
         assert test_agent.status == AgentStatus.RUNNING.value
 
@@ -602,6 +607,8 @@ class TestRestartDeployment:
         assert data["status"] == "pending"
         assert data["ended_at"] is None
         assert data["error_message"] is None
+        assert test_deployment.started_at is not None
+        assert test_deployment.started_at.tzinfo is None
 
         events_response = await client.get(
             f"/v1/deployments/{test_deployment.id}/events?event_type=restart"
