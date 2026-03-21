@@ -1267,6 +1267,62 @@ local_control_plane_ready() {
   return 1
 }
 
+detect_local_repo_root() {
+  local current="${PWD}"
+
+  while [[ -n "${current}" && "${current}" != "/" ]]; do
+    if [[ -f "${current}/Makefile" && -f "${current}/scripts/dev.sh" ]]; then
+      printf '%s\n' "${current}"
+      return 0
+    fi
+    current="$(dirname "${current}")"
+  done
+
+  return 1
+}
+
+maybe_start_local_control_plane() {
+  if local_control_plane_ready; then
+    return 0
+  fi
+
+  local repo_root=""
+  repo_root="$(detect_local_repo_root 2>/dev/null || true)"
+  if [[ -z "${repo_root}" ]] || ! command -v make >/dev/null 2>&1; then
+    return 1
+  fi
+
+  local restore_alt="${ALT_SCREEN_ACTIVE}"
+  if [[ "${restore_alt}" == "1" ]]; then
+    leave_alt_screen
+  fi
+
+  say "Detected a MUTX repo at ${repo_root}. Starting the local control plane with make dev-up"
+  if ! (cd "${repo_root}" && make dev-up) < /dev/tty > /dev/tty 2>&1; then
+    if [[ "${restore_alt}" == "1" ]]; then
+      enter_alt_screen
+    fi
+    return 1
+  fi
+
+  local attempts=0
+  while [[ "${attempts}" -lt 30 ]]; do
+    if local_control_plane_ready; then
+      if [[ "${restore_alt}" == "1" ]]; then
+        enter_alt_screen
+      fi
+      return 0
+    fi
+    sleep 1
+    attempts=$((attempts + 1))
+  done
+
+  if [[ "${restore_alt}" == "1" ]]; then
+    enter_alt_screen
+  fi
+  return 1
+}
+
 run_setup_handoff() {
   detect_openclaw_runtime
   local -a hosted_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}")
@@ -1338,7 +1394,7 @@ run_setup_handoff() {
       tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}${handoff_note}${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}${HOSTED_API_URL}${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local lane    ${C_DIM}${LOCAL_API_URL}${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local dev lane ${C_DIM}${LOCAL_API_URL}${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}3${C_RESET}  Later         ${C_DIM}finish install and exit cleanly${C_RESET}\n"
       tty_print "${C_PANEL}╰───────────────────────────────────────────────────────────────╯${C_RESET}\n"
       tty_prompt "Select a lane [1/2/3]"
@@ -1354,8 +1410,16 @@ run_setup_handoff() {
         ;;
       2|l|L|local|Local)
         if ! local_control_plane_ready; then
-          WIZARD_ERROR="Local lane needs a running control plane at ${LOCAL_API_URL}."
-          WIZARD_HINT="Start it with make dev-up, then retry."
+          if maybe_start_local_control_plane; then
+            WIZARD_HINT="Local control plane started automatically."
+            break
+          fi
+          WIZARD_ERROR="Local dev lane needs a running control plane at ${LOCAL_API_URL}."
+          if [[ -n "$(detect_local_repo_root 2>/dev/null || true)" ]]; then
+            WIZARD_HINT="A repo checkout is nearby, but MUTX could not start it automatically. Run `make dev-up` there, then retry."
+          else
+            WIZARD_HINT="This lane is for contributor checkouts. Use Hosted for normal install, or clone the repo and run `make dev-up`."
+          fi
           if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
             dashboard_render
           else

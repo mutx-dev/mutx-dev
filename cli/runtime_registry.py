@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -106,6 +107,14 @@ def _relative_target(target: Path, base: Path) -> str:
         return str(target)
 
 
+def _remove_pointer_path(path: Path) -> None:
+    if path.is_symlink() or path.is_file():
+        path.unlink(missing_ok=True)
+        return
+    if path.exists() and path.is_dir():
+        shutil.rmtree(path)
+
+
 def write_pointer(provider: str, name: str, target: str | Path | None) -> None:
     if not target:
         return
@@ -114,13 +123,15 @@ def write_pointer(provider: str, name: str, target: str | Path | None) -> None:
     link_path.parent.mkdir(parents=True, exist_ok=True)
 
     if link_path.exists() or link_path.is_symlink():
-        if link_path.is_dir() and not link_path.is_symlink():
-            return
-        link_path.unlink()
+        _remove_pointer_path(link_path)
 
     try:
         os.symlink(_relative_target(target_path, link_path), link_path)
+    except FileExistsError:
+        _remove_pointer_path(link_path)
+        os.symlink(_relative_target(target_path, link_path), link_path)
     except OSError:
+        _remove_pointer_path(link_path)
         link_path.write_text(str(target_path), encoding="utf-8")
 
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from cli.personal_assistant import DEFAULT_TEMPLATE_ID, build_personal_assistant_config
 from cli.openclaw_runtime import get_gateway_health, list_local_sessions
 from cli.services.base import APIService
 from cli.services.models import (
@@ -16,6 +17,60 @@ from cli.setup_wizard import prepare_runtime_state_sync
 
 
 class TemplatesService(APIService):
+    def _fallback_personal_assistant_deploy(
+        self,
+        *,
+        template_id: str,
+        name: str,
+        description: str | None,
+        replicas: int,
+        model: str | None,
+        assistant_id: str | None,
+        workspace: str | None,
+        skills: list[str] | None,
+        runtime_metadata: dict[str, Any] | None,
+    ) -> dict[str, Any]:
+        config = build_personal_assistant_config(
+            name=name,
+            description=description,
+            model=model,
+            workspace=workspace,
+            assistant_id=assistant_id,
+            skills=skills,
+            runtime_metadata=runtime_metadata,
+        )
+        agent_response = self._request(
+            "post",
+            "/v1/agents",
+            json={
+                "name": name,
+                "description": description or "",
+                "type": "openclaw",
+                "config": config,
+            },
+        )
+        self._expect_status(agent_response, {201}, invalid_message="Unable to create starter agent")
+        agent_payload = agent_response.json()
+        deployment_response = self._request(
+            "post",
+            "/v1/deployments",
+            json={
+                "agent_id": agent_payload["id"],
+                "replicas": replicas,
+            },
+        )
+        self._expect_status(
+            deployment_response,
+            {200, 201},
+            invalid_message="Unable to deploy starter template",
+        )
+        return {
+            "template_id": template_id,
+            "agent": agent_payload,
+            "deployment": deployment_response.json(),
+            "delivery": "client_fallback",
+        }
+
     def list_templates(self) -> list[TemplateRecord]:
         response = self._request("get", "/v1/templates")
         self._expect_status(response, {200})
@@ -51,6 +106,18 @@ class TemplatesService(APIService):
             payload["runtime_metadata"] = runtime_metadata
 
         response = self._request("post", f"/v1/templates/{template_id}/deploy", json=payload)
+        if response.status_code in {404, 500, 502, 503, 504} and template_id == DEFAULT_TEMPLATE_ID:
+            return self._fallback_personal_assistant_deploy(
+                template_id=template_id,
+                name=name,
+                description=description,
+                replicas=replicas,
+                model=model,
+                assistant_id=assistant_id,
+                workspace=workspace,
+                skills=skills,
+                runtime_metadata=runtime_metadata,
+            )
         self._expect_status(response, {201}, invalid_message="Unable to deploy starter template")
         return response.json()
 

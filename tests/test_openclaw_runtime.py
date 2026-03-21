@@ -15,7 +15,14 @@ from cli.openclaw_runtime import (
     persist_openclaw_runtime_snapshot,
 )
 from cli.errors import ValidationError
-from cli.runtime_registry import load_binding, load_manifest, load_wizard_state, reset_wizard_state
+from cli.runtime_registry import (
+    load_binding,
+    load_manifest,
+    load_wizard_state,
+    provider_pointers_dir,
+    reset_wizard_state,
+    write_pointer,
+)
 
 
 def test_get_gateway_health_reports_needs_onboard_when_cli_exists_without_config(
@@ -283,3 +290,19 @@ def test_build_openclaw_surface_command_includes_gateway_url(monkeypatch) -> Non
         "--url",
         "http://127.0.0.1:18789",
     ]
+
+
+def test_write_pointer_replaces_stale_directory(monkeypatch, tmp_path: Path) -> None:
+    mutx_home = tmp_path / ".mutx"
+    target = tmp_path / ".openclaw"
+    target.mkdir()
+    monkeypatch.setenv("MUTX_HOME", str(mutx_home))
+
+    stale_pointer = provider_pointers_dir("openclaw") / "home"
+    stale_pointer.mkdir(parents=True)
+    (stale_pointer / "old.txt").write_text("stale", encoding="utf-8")
+
+    write_pointer("openclaw", "home", target)
+
+    assert stale_pointer.exists()
+    assert stale_pointer.is_symlink() or stale_pointer.read_text(encoding="utf-8") == str(target)
