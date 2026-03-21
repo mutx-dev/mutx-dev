@@ -68,6 +68,10 @@ def runtime_inspect_command(provider: str, output: str) -> None:
     click.echo(f"Status: {local_manifest.get('status')}")
     click.echo(f"Gateway: {local_manifest.get('gateway_url') or 'n/a'}")
     click.echo(f"Bindings: {local_manifest.get('binding_count', 0)}")
+    click.echo(f"Binary: {local_manifest.get('binary_path') or 'n/a'}")
+    click.echo(f"Home: {local_manifest.get('home_path') or 'n/a'}")
+    click.echo(f"Tracking: {local_manifest.get('tracking_mode') or 'track_external_runtime'}")
+    click.echo(f"Privacy: {local_manifest.get('privacy_summary') or 'Local-only runtime tracking.'}")
     if remote_payload:
         click.echo(f"Remote last_seen: {remote_payload.get('last_seen_at') or 'n/a'}")
 
@@ -91,4 +95,3 @@ def runtime_resync_command(provider: str) -> None:
         f"last_seen={payload.get('last_seen_at') or 'n/a'} | "
         f"remote_synced={payload.get('last_synced_at') or 'n/a'}"
     )
-

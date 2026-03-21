@@ -109,10 +109,12 @@ Hosted setup authenticates against the configured control plane. Local setup boo
 Both lanes now:
 
 * keep MUTX in charge of the flow
+* detect an existing OpenClaw install and import its binary/home paths into MUTX tracking
 * install OpenClaw on demand
 * resume upstream `openclaw onboard --install-daemon` when needed
 * track the runtime in `~/.mutx/providers/openclaw`
 * sync a last-seen provider snapshot back to the control plane for the web dashboard
+* keep local OpenClaw gateway keys on the operator machine instead of uploading them
 
 ## Core Commands
 

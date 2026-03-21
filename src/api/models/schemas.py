@@ -581,10 +581,18 @@ class RuntimeProviderSnapshotUpsert(BaseModel):
     provider_root: str | None = None
     wizard_state_path: str | None = None
     binary_path: str | None = None
+    binary_confirmed: bool = False
     home_path: str | None = None
+    home_source: str | None = Field(default=None, max_length=64)
     config_path: str | None = None
     state_dir: str | None = None
     install_method: str | None = Field(default=None, max_length=32)
+    installation_disposition: str | None = Field(default=None, max_length=64)
+    tracking_mode: str | None = Field(default=None, max_length=64)
+    imported_into_mutx: bool = False
+    keys_remain_local: bool = False
+    credential_sync_policy: str | None = Field(default=None, max_length=64)
+    privacy_summary: str | None = Field(default=None, max_length=1000)
     version: str | None = Field(default=None, max_length=255)
     status: str = Field(default="unknown", max_length=64)
     gateway: dict[str, Any] = Field(default_factory=dict)

@@ -49,9 +49,11 @@ The CLI will:
 
 * prompt for your API URL if needed
 * authenticate your operator account
+* detect an existing OpenClaw runtime and import its binary/home paths into MUTX tracking
 * install OpenClaw if it is missing
 * hand off to upstream `openclaw onboard --install-daemon` when needed
 * write the provider manifest and bindings under `~/.mutx/providers/openclaw`
+* leave local OpenClaw gateway keys in place on the operator machine
 * deploy `Personal Assistant`
 * optionally open `mutx tui`
 

@@ -173,6 +173,10 @@ def test_persist_openclaw_runtime_snapshot_tracks_manifest_bindings_and_pointers
     assert snapshot["binding_count"] == 1
     assert manifest["provider"] == "openclaw"
     assert manifest["gateway_url"] == "http://127.0.0.1:18789"
+    assert manifest["binary_path"] == "/usr/local/bin/openclaw"
+    assert manifest["tracking_mode"] == "import_existing_runtime"
+    assert manifest["keys_remain_local"] is True
+    assert "does not upload local gateway keys" in manifest["privacy_summary"]
     assert tracked_binding["assistant_id"] == "personal-assistant"
     assert tracked_binding["workspace"] == str(workspace)
     assert (mutx_home / "providers" / "openclaw" / "pointers" / "home").exists()

@@ -87,7 +87,12 @@ def build_fake_cli_package(package_dir: Path) -> Path:
     return package_dir
 
 
-def build_install_env(tmp_path: Path, *, source_ref: str | None = None) -> tuple[dict[str, str], Path]:
+def build_install_env(
+    tmp_path: Path,
+    *,
+    source_ref: str | None = None,
+    extra_path: str | None = None,
+) -> tuple[dict[str, str], Path]:
     brew_prefix = tmp_path / "brew-prefix"
     brew_bin = brew_prefix / "bin"
     brew_bin.mkdir(parents=True, exist_ok=True)
@@ -149,6 +154,8 @@ def build_install_env(tmp_path: Path, *, source_ref: str | None = None) -> tuple
     env["HOMEBREW_NO_AUTO_UPDATE"] = "1"
     env["HOMEBREW_NO_INSTALL_FROM_API"] = "1"
     env["PATH"] = f"{brew_bin}:{env['PATH']}"
+    if extra_path:
+        env["PATH"] = f"{extra_path}:{env['PATH']}"
     if source_ref is not None:
         env["MUTX_CLI_SOURCE_REF"] = source_ref
 
@@ -161,8 +168,9 @@ def run_install_script(
     mutx_script: str,
     source_ref: str | None = None,
     args: list[str] | None = None,
+    extra_path: str | None = None,
 ) -> tuple[subprocess.CompletedProcess[str], Path]:
-    env, brew_prefix = build_install_env(tmp_path, source_ref=source_ref)
+    env, brew_prefix = build_install_env(tmp_path, source_ref=source_ref, extra_path=extra_path)
     write_executable(brew_prefix / "bin" / "mutx", mutx_script)
 
     result = subprocess.run(
@@ -183,8 +191,9 @@ def run_install_script_in_tty(
     source_ref: str,
     replies: list[tuple[str, str]],
     timeout_seconds: float = 45.0,
+    extra_path: str | None = None,
 ) -> tuple[int, str, Path]:
-    env, brew_prefix = build_install_env(tmp_path, source_ref=source_ref)
+    env, brew_prefix = build_install_env(tmp_path, source_ref=source_ref, extra_path=extra_path)
     env["MUTX_OPEN_TUI"] = "1"
     env["TERM"] = "xterm-256color"
     write_executable(brew_prefix / "bin" / "mutx", mutx_script)
@@ -331,6 +340,28 @@ def test_install_script_allows_assistant_first_cli_surface_without_recovery(tmp_
     assert "Install complete" in result.stdout
     assert "mutx-dev/homebrew-tap" not in result.stdout
     assert result.stderr == ""
+
+
+def test_install_script_reports_detected_openclaw_and_local_key_policy(tmp_path: Path) -> None:
+    extra_bin = tmp_path / "extra-bin"
+    extra_bin.mkdir(parents=True, exist_ok=True)
+    write_executable(
+        extra_bin / "openclaw",
+        """#!/usr/bin/env bash
+        exit 0
+        """,
+    )
+
+    result, _ = run_install_script(
+        tmp_path,
+        mutx_script=CURRENT_MUTX_SCRIPT,
+        extra_path=str(extra_bin),
+    )
+
+    assert result.returncode == 0
+    assert "detected at" in result.stdout
+    assert "Tracking:" in result.stdout
+    assert "keys stay local and are not uploaded by MUTX" in result.stdout
 
 
 def test_install_script_help_shows_usage_without_running_install(tmp_path: Path) -> None:

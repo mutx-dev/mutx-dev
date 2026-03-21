@@ -87,8 +87,14 @@ def _finish_setup(
     else:
         click.echo(f"Assistant already present: {result.assistant_id}")
     click.echo(f"OpenClaw assistant_id: {result.binding.agent_id}")
+    click.echo(f"OpenClaw binary: {result.runtime_snapshot.get('binary_path') or 'n/a'}")
+    click.echo(f"OpenClaw home: {result.runtime_snapshot.get('home_path') or 'n/a'}")
     click.echo(f"Workspace: {result.binding.workspace}")
     click.echo(f"Gateway: {result.health.gateway_url or 'n/a'} ({result.health.status})")
+    click.echo("Tracking: imported into ~/.mutx/providers/openclaw")
+    click.echo(
+        f"Privacy: {result.runtime_snapshot.get('privacy_summary') or 'Local-only runtime tracking.'}"
+    )
     if open_tui:
         launch_tui()
 

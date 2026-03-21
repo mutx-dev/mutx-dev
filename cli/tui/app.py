@@ -256,6 +256,9 @@ def _render_setup_body(
     gateway_url = str(runtime_snapshot.get("gateway_url") or gateway.get("gateway_url") or "n/a")
     install_method = str(runtime_snapshot.get("install_method") or "npm")
     last_seen = str(runtime_snapshot.get("last_seen_at") or "n/a")
+    binary_path = str(runtime_snapshot.get("binary_path") or "n/a")
+    tracking_mode = str(runtime_snapshot.get("tracking_mode") or "track_external_runtime")
+    privacy_summary = str(runtime_snapshot.get("privacy_summary") or "Local-only runtime tracking.")
 
     lines = [
         f"API URL: {api_url}",
@@ -269,13 +272,18 @@ def _render_setup_body(
         "",
         "Runtime:",
         f"  provider=openclaw | install={install_method} | gateway={gateway_status}",
+        f"  binary={binary_path}",
         f"  url={gateway_url}",
         f"  home={runtime_snapshot.get('home_path') or 'n/a'}",
         f"  config={runtime_snapshot.get('config_path') or 'n/a'}",
+        f"  tracking={tracking_mode}",
         f"  last_seen={last_seen}",
         "",
         "Binding:",
         f"  {binding_line}",
+        "",
+        "Privacy:",
+        f"  {privacy_summary}",
     ]
     if last_error:
         lines.extend(["", f"Last error: {last_error}"])

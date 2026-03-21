@@ -47,6 +47,9 @@ WIZARD_HINT=""
 SPINNER_FRAME_INDEX=0
 PROMPT_CURSOR_ROW=0
 PROMPT_CURSOR_COL=0
+OPENCLAW_DETECTED=0
+OPENCLAW_BIN=""
+OPENCLAW_HOME=""
 STAGE_TITLES=(
   "Preparing environment"
   "Installing MUTX runtime"
@@ -330,6 +333,22 @@ ui_kv() {
   }
 }
 
+detect_openclaw_runtime() {
+  OPENCLAW_BIN="$(command -v openclaw 2>/dev/null || true)"
+  OPENCLAW_DETECTED=0
+  if [[ -n "${OPENCLAW_BIN}" ]]; then
+    OPENCLAW_DETECTED=1
+  fi
+
+  if [[ -n "${OPENCLAW_HOME:-}" ]]; then
+    OPENCLAW_HOME="${OPENCLAW_HOME}"
+  elif [[ -n "${OPENCLAW_STATE_DIR:-}" ]]; then
+    OPENCLAW_HOME="${OPENCLAW_STATE_DIR}"
+  else
+    OPENCLAW_HOME="${HOME}/.openclaw"
+  fi
+}
+
 show_install_plan() {
   local onboarding_mode="interactive wizard"
   local prompt_mode="interactive"
@@ -358,6 +377,14 @@ show_install_plan() {
   ui_kv "Prompt mode" "${prompt_mode}"
   ui_kv "TUI" "${tui_mode}"
   ui_kv "Config dir" "${MUTX_HOME_DIR}"
+  if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
+    ui_kv "OpenClaw" "detected at ${OPENCLAW_BIN}"
+    ui_kv "OpenClaw home" "${OPENCLAW_HOME}"
+  else
+    ui_kv "OpenClaw" "not detected yet (wizard can install it)"
+  fi
+  ui_kv "Tracking" "~/.mutx/providers/openclaw"
+  ui_kv "Secrets" "OpenClaw keys stay local and are not uploaded by MUTX"
 }
 
 show_finish_message() {
@@ -957,6 +984,7 @@ local_control_plane_ready() {
 }
 
 run_setup_handoff() {
+  detect_openclaw_runtime
   local -a hosted_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}" --provider openclaw)
   local -a local_cmd=("${MUTX_BIN}" setup local --no-input --provider openclaw)
   local handoff_note=""
@@ -977,6 +1005,10 @@ run_setup_handoff() {
     note "  mutx setup local"
     note "  mutx doctor"
     note "  mutx runtime inspect openclaw"
+    if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
+      note "OpenClaw detected at ${OPENCLAW_BIN} and will be tracked under ~/.mutx/providers/openclaw when setup runs."
+    fi
+    note "MUTX leaves your upstream OpenClaw home in place and does not upload local gateway keys."
     note "  mutx tui"
     return
   fi
@@ -1005,6 +1037,13 @@ run_setup_handoff() {
         tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} packaged CLI is current\n"
       fi
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}providers${C_RESET} OpenClaw active · LangChain soon · n8n soon\n"
+      if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
+        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}openclaw${C_RESET} detected at ${C_DIM}${OPENCLAW_BIN}${C_RESET}\n"
+        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}import${C_RESET} tracking ${C_DIM}${OPENCLAW_HOME}${C_RESET} under ~/.mutx/providers/openclaw\n"
+      else
+        tty_print "${C_PANEL}│${C_RESET} ${C_WARN}openclaw${C_RESET} not detected yet · the wizard can install and track it for you\n"
+      fi
+      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}privacy${C_RESET} OpenClaw stays local and MUTX does not upload your gateway keys\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}${handoff_note}${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}${HOSTED_API_URL}${C_RESET}\n"
@@ -1072,6 +1111,10 @@ run_setup_handoff() {
   note "  mutx setup local"
   note "  mutx doctor"
   note "  mutx runtime inspect openclaw"
+  if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
+    note "OpenClaw detected at ${OPENCLAW_BIN}; setup will import it into ~/.mutx/providers/openclaw."
+  fi
+  note "Local OpenClaw secrets remain on this machine."
 }
 
 parse_args "$@"
@@ -1082,6 +1125,7 @@ if [[ "${HELP}" == "1" ]]; then
 fi
 
 detect_os_or_die
+detect_openclaw_runtime
 render_banner
 show_install_plan
 

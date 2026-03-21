@@ -74,8 +74,13 @@ def doctor_command(output: str):
     click.echo(
         "Registry: "
         f"bindings={payload['runtime_snapshot']['binding_count']} | "
+        f"binary={payload['runtime_snapshot']['binary_path'] or 'n/a'} | "
         f"home={payload['runtime_snapshot']['home_path'] or 'n/a'} | "
         f"last_seen={payload['runtime_snapshot']['last_seen_at'] or 'n/a'}"
+    )
+    click.echo(
+        "Privacy: "
+        f"{payload['runtime_snapshot']['privacy_summary'] or 'Local-only runtime tracking.'}"
     )
     if payload["user"]:
         click.echo(

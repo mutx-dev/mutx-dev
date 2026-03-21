@@ -92,6 +92,8 @@ mutx runtime inspect openclaw
 
 🦞 `mutx setup` now runs a MUTX-owned provider wizard that can install OpenClaw, hand off to upstream `openclaw onboard`, bind a dedicated assistant runtime, track it under `~/.mutx/providers/openclaw`, and return you to the CLI or TUI without leaving the MUTX shell story.
 
+If OpenClaw is already installed, MUTX detects the upstream binary and home path, imports that runtime into the MUTX registry for tracking, and leaves the OpenClaw home plus gateway keys in place on the local machine.
+
 ### Local contributor
 
 Use this when you are working inside the MUTX repository.

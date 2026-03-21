@@ -49,9 +49,13 @@ interface RuntimeSnapshot {
   label: string;
   status: string;
   install_method?: string | null;
+  binary_path?: string | null;
   gateway_url?: string | null;
   version?: string | null;
   home_path?: string | null;
+  tracking_mode?: string | null;
+  privacy_summary?: string | null;
+  keys_remain_local?: boolean;
   config_path?: string | null;
   state_dir?: string | null;
   last_seen_at?: string | null;
@@ -268,6 +272,44 @@ export function OpenclawSetupSurface() {
           <section
             className="rounded-2xl border p-5"
             style={{
+              borderColor: "rgba(255, 122, 61, 0.22)",
+              background:
+                "linear-gradient(180deg, rgba(255,90,45,0.10) 0%, rgba(15,23,42,0.72) 100%)",
+            }}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-orange-200/75">
+                  🦞 Local Import
+                </p>
+                <h2 className="mt-2 text-xl font-semibold text-slate-100">
+                  {runtime?.binary_path ? "Existing OpenClaw detected" : "OpenClaw will be tracked locally"}
+                </h2>
+                <p className="mt-1 text-sm text-slate-300">
+                  {runtime?.privacy_summary ??
+                    "MUTX tracks OpenClaw under ~/.mutx/providers/openclaw without relocating the upstream home or uploading local keys."}
+                </p>
+              </div>
+              <div className={`rounded-full border px-3 py-1 text-xs font-medium ${toneStyles(runtime?.keys_remain_local ? "good" : "info")}`}>
+                {runtime?.keys_remain_local ? "keys stay local" : "local snapshot"}
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <div className="rounded-xl border px-4 py-3" style={{ borderColor: dashboardTokens.borderSubtle, backgroundColor: dashboardTokens.bgCanvas }}>
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Binary</p>
+                <p className="mt-2 font-mono text-xs text-slate-200">{runtime?.binary_path ?? "Will be resolved during setup"}</p>
+              </div>
+              <div className="rounded-xl border px-4 py-3" style={{ borderColor: dashboardTokens.borderSubtle, backgroundColor: dashboardTokens.bgCanvas }}>
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Tracking Mode</p>
+                <p className="mt-2 font-mono text-xs text-slate-200">{runtime?.tracking_mode ?? "import_existing_runtime"}</p>
+              </div>
+            </div>
+          </section>
+
+          <section
+            className="rounded-2xl border p-5"
+            style={{
               borderColor: dashboardTokens.borderSubtle,
               backgroundColor: dashboardTokens.bgSurface,
             }}
@@ -396,4 +438,3 @@ export function OpenclawSetupSurface() {
     </section>
   );
 }
-

@@ -93,6 +93,17 @@ class OpenClawRuntimeSnapshot:
         return dict(self.payload)
 
 
+@dataclass(slots=True)
+class OpenClawInstallResolution:
+    binary_path: str
+    install_method: str
+    disposition: str
+
+    @property
+    def imported_existing(self) -> bool:
+        return self.disposition == "detected_existing"
+
+
 def normalize_install_method(value: str | None) -> str:
     method = (value or DEFAULT_OPENCLAW_INSTALL_METHOD).strip().lower()
     if method not in SUPPORTED_OPENCLAW_INSTALL_METHODS:
@@ -145,6 +156,28 @@ def detect_openclaw_config_path() -> Path | None:
         if candidate.exists():
             return candidate
     return None
+
+
+def detect_openclaw_home_source() -> str:
+    for env_name in ("OPENCLAW_HOME", "OPENCLAW_STATE_DIR"):
+        if os.environ.get(env_name):
+            return env_name
+    return "default"
+
+
+def _tracking_mode_for_disposition(disposition: str | None) -> str:
+    if disposition == "detected_existing":
+        return "import_existing_runtime"
+    if disposition == "installed_by_mutx":
+        return "track_mutx_bootstrapped_runtime"
+    return "track_external_runtime"
+
+
+def _privacy_summary() -> str:
+    return (
+        "MUTX tracks your local OpenClaw runtime under ~/.mutx/providers/openclaw without moving "
+        "the upstream home directory, and it does not upload local gateway keys or secrets."
+    )
 
 
 def _read_json_file(path: Path | None) -> dict[str, Any]:
@@ -421,10 +454,14 @@ def ensure_openclaw_installed(
     no_input: bool,
     prompt_install: Callable[[], bool] | None = None,
     command_runner: Callable[[str], None] | None = None,
-) -> str:
+) -> OpenClawInstallResolution:
     resolved = find_openclaw_bin()
     if resolved:
-        return resolved
+        return OpenClawInstallResolution(
+            binary_path=resolved,
+            install_method=normalize_install_method(install_method),
+            disposition="detected_existing",
+        )
 
     if not install_if_missing:
         if no_input:
@@ -452,13 +489,21 @@ def ensure_openclaw_installed(
         command_runner(command)
         resolved = find_openclaw_bin()
         if resolved:
-            return resolved
+            return OpenClawInstallResolution(
+                binary_path=resolved,
+                install_method=method,
+                disposition="installed_by_mutx",
+            )
         raise CLIServiceError(
             "OpenClaw installer finished, but `openclaw` is still not available on PATH. "
             "Open a new terminal or fix PATH, then rerun `mutx setup`."
         )
 
-    return install_openclaw(install_method=method, non_interactive=no_input)
+    return OpenClawInstallResolution(
+        binary_path=install_openclaw(install_method=method, non_interactive=no_input),
+        install_method=method,
+        disposition="installed_by_mutx",
+    )
 
 
 def ensure_openclaw_onboarded(
@@ -589,6 +634,7 @@ def collect_openclaw_runtime_snapshot(
     binding: OpenClawAgentBinding | None = None,
     assistant_name: str | None = None,
     install_method: str | None = None,
+    installation_disposition: str | None = None,
 ) -> OpenClawRuntimeSnapshot:
     observed_at = datetime.now(timezone.utc).isoformat()
     health = get_gateway_health()
@@ -601,7 +647,17 @@ def collect_openclaw_runtime_snapshot(
     binary_path = find_openclaw_bin()
     config_path = detect_openclaw_config_path()
     state_dir = detect_openclaw_state_dir() or resolve_openclaw_home()
+    home_source = detect_openclaw_home_source()
     version = detect_openclaw_version()
+    resolved_disposition = str(
+        installation_disposition
+        or manifest.get("installation_disposition")
+        or ("detected_existing" if binary_path else "unknown")
+    )
+    tracking_mode = str(
+        manifest.get("tracking_mode") or _tracking_mode_for_disposition(resolved_disposition)
+    )
+    privacy_summary = str(manifest.get("privacy_summary") or _privacy_summary())
 
     bindings = list_bindings(OPENCLAW_PROVIDER_ID)
     if binding is not None:
@@ -621,10 +677,18 @@ def collect_openclaw_runtime_snapshot(
         "provider_root": str(provider_root(OPENCLAW_PROVIDER_ID)),
         "wizard_state_path": str(provider_wizard_state_path(OPENCLAW_PROVIDER_ID)),
         "binary_path": binary_path,
+        "binary_confirmed": bool(binary_path),
         "home_path": str(state_dir),
+        "home_source": home_source,
         "config_path": str(config_path) if config_path else None,
         "state_dir": str(state_dir),
         "install_method": resolved_install_method,
+        "installation_disposition": resolved_disposition,
+        "tracking_mode": tracking_mode,
+        "imported_into_mutx": True,
+        "keys_remain_local": True,
+        "credential_sync_policy": "local_only",
+        "privacy_summary": privacy_summary,
         "version": version,
         "status": health.status,
         "gateway": health.to_payload(),
@@ -647,12 +711,14 @@ def persist_openclaw_runtime_snapshot(
     binding: OpenClawAgentBinding | None = None,
     assistant_name: str | None = None,
     install_method: str | None = None,
+    installation_disposition: str | None = None,
     synced_at: str | None = None,
 ) -> OpenClawRuntimeSnapshot:
     snapshot = collect_openclaw_runtime_snapshot(
         binding=binding,
         assistant_name=assistant_name,
         install_method=install_method,
+        installation_disposition=installation_disposition,
     )
     payload = snapshot.to_payload()
     manifest = {
@@ -663,10 +729,18 @@ def persist_openclaw_runtime_snapshot(
         "provider_root": payload["provider_root"],
         "wizard_state_path": payload["wizard_state_path"],
         "binary_path": payload["binary_path"],
+        "binary_confirmed": payload["binary_confirmed"],
         "home_path": payload["home_path"],
+        "home_source": payload["home_source"],
         "config_path": payload["config_path"],
         "state_dir": payload["state_dir"],
         "install_method": payload["install_method"],
+        "installation_disposition": payload["installation_disposition"],
+        "tracking_mode": payload["tracking_mode"],
+        "imported_into_mutx": payload["imported_into_mutx"],
+        "keys_remain_local": payload["keys_remain_local"],
+        "credential_sync_policy": payload["credential_sync_policy"],
+        "privacy_summary": payload["privacy_summary"],
         "version": payload["version"],
         "status": payload["status"],
         "gateway": payload["gateway"],
@@ -705,14 +779,17 @@ def prepare_personal_assistant_runtime(
     install_command_runner: Callable[[str], None] | None = None,
     onboard_command_runner: Callable[[list[str]], None] | None = None,
 ) -> tuple[OpenClawAgentBinding, OpenClawGatewayHealth]:
-    ensure_openclaw_installed(
+    install_resolution = ensure_openclaw_installed(
         install_if_missing=install_if_missing,
         install_method=install_method,
         no_input=no_input,
         prompt_install=prompt_install,
         command_runner=install_command_runner,
     )
-    persist_openclaw_runtime_snapshot(install_method=install_method)
+    persist_openclaw_runtime_snapshot(
+        install_method=install_resolution.install_method,
+        installation_disposition=install_resolution.disposition,
+    )
     health = ensure_openclaw_onboarded(
         no_input=no_input,
         command_runner=onboard_command_runner,
@@ -727,7 +804,8 @@ def prepare_personal_assistant_runtime(
     persist_openclaw_runtime_snapshot(
         binding=binding,
         assistant_name=assistant_name,
-        install_method=install_method,
+        install_method=install_resolution.install_method,
+        installation_disposition=install_resolution.disposition,
     )
     return binding, health
 

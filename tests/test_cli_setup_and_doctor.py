@@ -40,6 +40,11 @@ def wizard_result_payload(*, reused_existing_assistant: bool = False) -> SimpleN
         },
         assistant_id="agent-pa-01",
         reused_existing_assistant=reused_existing_assistant,
+        runtime_snapshot={
+            "binary_path": "/opt/homebrew/bin/openclaw",
+            "home_path": "/tmp/.openclaw",
+            "privacy_summary": "MUTX tracks your local OpenClaw runtime without uploading local gateway keys or secrets.",
+        },
     )
 
 
@@ -108,6 +113,8 @@ def test_setup_hosted_deploys_personal_assistant(monkeypatch, tmp_path: Path) ->
     assert "Assistant deployed: agent-pa-01" in result.output
     assert "Deployment: dep-pa-01" in result.output
     assert "OpenClaw assistant_id: personal-assistant" in result.output
+    assert "OpenClaw binary: /opt/homebrew/bin/openclaw" in result.output
+    assert "Tracking: imported into ~/.mutx/providers/openclaw" in result.output
     assert launched["value"] is True
 
 

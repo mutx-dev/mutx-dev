@@ -85,11 +85,13 @@ def prepare_runtime_state_sync(
     binding: OpenClawAgentBinding | None = None,
     assistant_name: str | None = None,
     install_method: str,
+    installation_disposition: str | None = None,
 ) -> dict[str, Any]:
     snapshot = persist_openclaw_runtime_snapshot(
         binding=binding,
         assistant_name=assistant_name,
         install_method=install_method,
+        installation_disposition=installation_disposition,
     ).to_payload()
     synced = _sync_snapshot(runtime_service, snapshot=snapshot)
     if synced.get("last_synced_at"):
@@ -97,6 +99,7 @@ def prepare_runtime_state_sync(
             binding=binding,
             assistant_name=assistant_name,
             install_method=install_method,
+            installation_disposition=installation_disposition,
             synced_at=str(synced["last_synced_at"]),
         )
     return synced
@@ -178,7 +181,7 @@ def run_openclaw_setup_wizard(
 
         update_wizard_progress(provider, step_id="install", status="in_progress", mode=mode)
         _progress(progress, step="install", state="running", message="🦞 Checking OpenClaw install")
-        ensure_openclaw_installed(
+        install_resolution = ensure_openclaw_installed(
             install_if_missing=install_openclaw,
             install_method=openclaw_install_method,
             no_input=no_input,
@@ -188,11 +191,17 @@ def run_openclaw_setup_wizard(
         install_snapshot = prepare_runtime_state_sync(
             runtime_service,
             assistant_name=assistant_name,
-            install_method=openclaw_install_method,
+            install_method=install_resolution.install_method,
+            installation_disposition=install_resolution.disposition,
         )
         install_state = complete_wizard_step(provider, "install", mode=mode)
         _sync_onboarding(runtime_service, action="complete_step", step="install")
-        _progress(progress, step="install", state="completed", message="🦞 OpenClaw available", payload=install_snapshot)
+        install_message = (
+            f"🦞 Found OpenClaw at {install_resolution.binary_path}; importing it into MUTX tracking"
+            if install_resolution.imported_existing
+            else f"🦞 OpenClaw installed at {install_resolution.binary_path}; importing it into MUTX tracking"
+        )
+        _progress(progress, step="install", state="completed", message=install_message, payload=install_snapshot)
 
         update_wizard_progress(provider, step_id="onboard", status="in_progress", mode=mode)
         _progress(progress, step="onboard", state="running", message="🦞 Verifying gateway onboarding")
@@ -203,7 +212,8 @@ def run_openclaw_setup_wizard(
         onboard_snapshot = prepare_runtime_state_sync(
             runtime_service,
             assistant_name=assistant_name,
-            install_method=openclaw_install_method,
+            install_method=install_resolution.install_method,
+            installation_disposition=install_resolution.disposition,
         )
         onboard_state = complete_wizard_step(
             provider,
@@ -219,7 +229,8 @@ def run_openclaw_setup_wizard(
         track_snapshot = prepare_runtime_state_sync(
             runtime_service,
             assistant_name=assistant_name,
-            install_method=openclaw_install_method,
+            install_method=install_resolution.install_method,
+            installation_disposition=install_resolution.disposition,
         )
         track_state = complete_wizard_step(provider, "track", mode=mode)
         _sync_onboarding(runtime_service, action="complete_step", step="track")
@@ -237,7 +248,8 @@ def run_openclaw_setup_wizard(
             runtime_service,
             binding=binding,
             assistant_name=assistant_name,
-            install_method=openclaw_install_method,
+            install_method=install_resolution.install_method,
+            installation_disposition=install_resolution.disposition,
         )
         bind_state = complete_wizard_step(
             provider,
@@ -293,7 +305,8 @@ def run_openclaw_setup_wizard(
             runtime_service,
             binding=binding,
             assistant_name=assistant_name,
-            install_method=openclaw_install_method,
+            install_method=install_resolution.install_method,
+            installation_disposition=install_resolution.disposition,
         )
         complete_wizard(
             provider,
