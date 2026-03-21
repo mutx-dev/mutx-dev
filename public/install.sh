@@ -207,9 +207,79 @@ refresh_terminal_size() {
   if [[ "${TERM_ROWS}" -lt 24 ]]; then
     TERM_ROWS=24
   fi
-  if [[ "${TERM_COLS}" -lt 96 ]]; then
-    TERM_COLS=96
+  if [[ "${TERM_COLS}" -lt 72 ]]; then
+    TERM_COLS=72
   fi
+}
+
+repeat_char() {
+  local char="$1"
+  local count="$2"
+  local out=""
+
+  while [[ "${#out}" -lt "${count}" ]]; do
+    out="${out}${char}"
+  done
+
+  printf '%s' "${out:0:${count}}"
+}
+
+display_path() {
+  local path="$1"
+  local max_len="${2:-36}"
+  local rendered="${path}"
+
+  if [[ -z "${rendered}" ]]; then
+    printf '%s' "n/a"
+    return
+  fi
+
+  rendered="${rendered/#${HOME}/\~}"
+  if [[ "${#rendered}" -le "${max_len}" ]]; then
+    printf '%s' "${rendered}"
+    return
+  fi
+
+  printf '…%s' "${rendered: -$((max_len - 1))}"
+}
+
+wrap_text() {
+  local text="$1"
+  local width="$2"
+  local remaining="${text}"
+  local candidate=""
+
+  if [[ -z "${remaining}" ]]; then
+    return
+  fi
+
+  if [[ "${width}" -lt 24 ]]; then
+    width=24
+  fi
+
+  while [[ "${#remaining}" -gt "${width}" ]]; do
+    candidate="${remaining:0:${width}}"
+    if [[ "${remaining:${width}:1}" != " " && "${candidate}" == *" "* ]]; then
+      candidate="${candidate% *}"
+    fi
+    if [[ -z "${candidate}" ]]; then
+      candidate="${remaining:0:${width}}"
+    fi
+    printf '%s\n' "${candidate}"
+    remaining="${remaining:${#candidate}}"
+    while [[ "${remaining}" == " "* ]]; do
+      remaining="${remaining# }"
+    done
+  done
+
+  if [[ -n "${remaining}" ]]; then
+    printf '%s\n' "${remaining}"
+  fi
+}
+
+dashboard_compact_layout() {
+  refresh_terminal_size
+  [[ "${TERM_COLS}" -lt 118 ]]
 }
 
 enter_alt_screen() {
@@ -584,6 +654,16 @@ dashboard_render_splash() {
   local phase="$2"
   local frame_color=""
 
+  if dashboard_compact_layout; then
+    refresh_terminal_size
+    printf '\033[H\033[2J' > /dev/tty
+    printf '\033[2;3H%bMUTX setup wizard%b' "${C_BOLD}${C_MUTX}" "${C_RESET}" > /dev/tty
+    printf '\033[4;3H%bSingle-screen bootstrap for the current MUTX runtime.%b' "${C_SOFT}" "${C_RESET}" > /dev/tty
+    printf '\033[6;3H%b%s%b' "${C_FLARE_SOFT}" "${phase}" "${C_RESET}" > /dev/tty
+    printf '\033[8;3H%bcurrent runtime • clean handoff • assistant-first%b' "${C_DIM}" "${C_RESET}" > /dev/tty
+    return
+  fi
+
   frame_color="$(ascii_frame_color "${frame_idx}")"
   refresh_terminal_size
   printf '\033[H\033[2J' > /dev/tty
@@ -607,6 +687,165 @@ dashboard_render_splash() {
   printf '\033[%d;%dH%bneon bootstrap • current runtime • clean handoff%b' 10 $((ART_PANEL_WIDTH + PANEL_GAP + 1)) "${C_DIM}" "${C_RESET}" > /dev/tty
 }
 
+dashboard_put_line() {
+  local row="$1"
+  local col="$2"
+  local text="$3"
+
+  printf '\033[%d;%dH%b' "${row}" "${col}" "${text}" > /dev/tty
+}
+
+dashboard_render_compact_status() {
+  local row=2
+  local wrap_width=$((TERM_COLS - 6))
+  local feed_entry=""
+  local detail_line=""
+
+  PROMPT_CURSOR_ROW=0
+  PROMPT_CURSOR_COL=0
+
+  printf '\033[H\033[2J' > /dev/tty
+  dashboard_put_line "${row}" 3 "${C_BOLD}${C_MUTX}MUTX install${C_RESET}"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "${C_SOFT}Quiet install, current CLI surface, clean setup handoff.${C_RESET}"
+  row=$((row + 2))
+
+  dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Stages${C_RESET}"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "$(dashboard_stage_line 0)"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "$(dashboard_stage_line 1)"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "$(dashboard_stage_line 2)"
+  row=$((row + 2))
+
+  dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Current${C_RESET}"
+  row=$((row + 1))
+  case "${CURRENT_STEP_STATE}" in
+    running)
+      dashboard_put_line "${row}" 3 "${C_MUTX_ALT}$(dashboard_spinner_glyph)${C_RESET} ${CURRENT_STEP_LABEL}"
+      ;;
+    done)
+      dashboard_put_line "${row}" 3 "${C_GOOD}✓${C_RESET} ${CURRENT_STEP_LABEL}"
+      ;;
+    warn)
+      dashboard_put_line "${row}" 3 "${C_WARN}!${C_RESET} ${CURRENT_STEP_LABEL}"
+      ;;
+    *)
+      dashboard_put_line "${row}" 3 "${C_SOFT}stand by${C_RESET}"
+      ;;
+  esac
+  row=$((row + 1))
+
+  if [[ -n "${CURRENT_STEP_DETAIL}" ]]; then
+    while IFS= read -r detail_line; do
+      dashboard_put_line "${row}" 3 "${C_SOFT}${detail_line}${C_RESET}"
+      row=$((row + 1))
+    done < <(wrap_text "${CURRENT_STEP_DETAIL}" "${wrap_width}")
+  fi
+
+  if [[ "${#FEED_LINES[@]}" -gt 0 ]]; then
+    row=$((row + 1))
+    dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Recent${C_RESET}"
+    row=$((row + 1))
+    for feed_entry in "${FEED_LINES[@]}"; do
+      dashboard_put_line "${row}" 3 "$(dashboard_feed_line "${feed_entry}")"
+      row=$((row + 1))
+    done
+  fi
+
+  if [[ -n "${FINISH_MESSAGE}" ]]; then
+    row=$((row + 1))
+    dashboard_put_line "${row}" 3 "${C_GOOD}${FINISH_MESSAGE}${C_RESET}"
+  fi
+}
+
+dashboard_render_wizard() {
+  local row=2
+  local wrap_width=$((TERM_COLS - 6))
+  local prompt_label="Select a lane [1/2/3]: "
+  local runtime_label=""
+  local path_label=""
+  local home_label=""
+  local note_text=""
+  local message_line=""
+
+  PROMPT_CURSOR_ROW=0
+  PROMPT_CURSOR_COL=0
+
+  runtime_label="package runtime current"
+  if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
+    runtime_label="fresh runtime active"
+  fi
+
+  if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
+    path_label="$(display_path "${OPENCLAW_BIN}" 52)"
+    home_label="$(display_path "${OPENCLAW_HOME}" 52)"
+  fi
+
+  printf '\033[H\033[2J' > /dev/tty
+  dashboard_put_line "${row}" 3 "${C_BOLD}${C_MUTX}MUTX setup${C_RESET}"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "${C_SOFT}OpenClaw provider wizard. Same terminal. Clean handoff.${C_RESET}"
+  row=$((row + 2))
+
+  dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Stages${C_RESET}"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "$(dashboard_stage_line 0)"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "$(dashboard_stage_line 1)"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "$(dashboard_stage_line 2)"
+  row=$((row + 2))
+
+  dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Runtime${C_RESET}"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "${C_GOOD}${runtime_label}${C_RESET}"
+  row=$((row + 1))
+  if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
+    dashboard_put_line "${row}" 3 "${C_GOOD}OpenClaw detected${C_RESET} ${C_DIM}${path_label}${C_RESET}"
+    row=$((row + 1))
+    dashboard_put_line "${row}" 3 "${C_GOOD}Importing for tracking${C_RESET} ${C_DIM}${home_label} -> ~/.mutx/providers/openclaw${C_RESET}"
+    row=$((row + 1))
+  else
+    dashboard_put_line "${row}" 3 "${C_WARN}OpenClaw not detected yet${C_RESET} ${C_DIM}the wizard can install it${C_RESET}"
+    row=$((row + 1))
+  fi
+  dashboard_put_line "${row}" 3 "${C_SOFT}Local OpenClaw keys stay on this machine.${C_RESET}"
+  row=$((row + 2))
+
+  dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Lanes${C_RESET}"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "${C_PANEL}1${C_RESET} Hosted   ${C_DIM}${HOSTED_API_URL}${C_RESET}"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "${C_PANEL}2${C_RESET} Local    ${C_DIM}${LOCAL_API_URL}${C_RESET}"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "${C_PANEL}3${C_RESET} Later    ${C_DIM}finish install and exit cleanly${C_RESET}"
+  row=$((row + 2))
+
+  note_text="${WIZARD_HINT}"
+  if [[ -n "${WIZARD_ERROR}" ]]; then
+    while IFS= read -r message_line; do
+      dashboard_put_line "${row}" 3 "${C_WARN}${message_line}${C_RESET}"
+      row=$((row + 1))
+    done < <(wrap_text "${WIZARD_ERROR}" "${wrap_width}")
+  elif [[ -n "${note_text}" ]]; then
+    while IFS= read -r message_line; do
+      dashboard_put_line "${row}" 3 "${C_SOFT}${message_line}${C_RESET}"
+      row=$((row + 1))
+    done < <(wrap_text "${note_text}" "${wrap_width}")
+  elif [[ -n "${FINISH_MESSAGE}" ]]; then
+    while IFS= read -r message_line; do
+      dashboard_put_line "${row}" 3 "${C_GOOD}${message_line}${C_RESET}"
+      row=$((row + 1))
+    done < <(wrap_text "${FINISH_MESSAGE}" "${wrap_width}")
+  fi
+
+  PROMPT_CURSOR_ROW="${row}"
+  PROMPT_CURSOR_COL=$((3 + ${#prompt_label}))
+  dashboard_put_line "${row}" 3 "${C_PANEL}${prompt_label}${C_RESET}"
+}
+
 dashboard_render() {
   local frame_color=""
   local max_lines=0
@@ -617,6 +856,18 @@ dashboard_render() {
   local -a info_lines=()
 
   if [[ "${DASHBOARD_ACTIVE}" != "1" ]]; then
+    return
+  fi
+
+  refresh_terminal_size
+
+  if [[ "${WIZARD_VISIBLE}" == "1" ]]; then
+    dashboard_render_wizard
+    return
+  fi
+
+  if dashboard_compact_layout; then
+    dashboard_render_compact_status
     return
   fi
 
@@ -637,50 +888,27 @@ dashboard_render() {
   info_lines+=("$(dashboard_stage_line 2)")
   info_lines+=("")
 
-  if [[ "${WIZARD_VISIBLE}" == "1" ]]; then
-    info_lines+=("${C_MUTX_ALT}Setup${C_RESET}")
-    if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
-      info_lines+=("${C_GOOD}fresh runtime active${C_RESET}")
-    else
-      info_lines+=("${C_GOOD}package runtime current${C_RESET}")
-    fi
-    info_lines+=("${C_DIM}1 Hosted lane  ${HOSTED_API_URL}${C_RESET}")
-    info_lines+=("${C_DIM}2 Local lane   ${LOCAL_API_URL}${C_RESET}")
-    info_lines+=("${C_DIM}3 Later        exit cleanly${C_RESET}")
+  info_lines+=("${C_MUTX_ALT}Current${C_RESET}")
+  case "${CURRENT_STEP_STATE}" in
+    running)
+      info_lines+=("${C_MUTX_ALT}$(dashboard_spinner_glyph)${C_RESET} ${CURRENT_STEP_LABEL}")
+      ;;
+    done)
+      info_lines+=("${C_GOOD}✓${C_RESET} ${CURRENT_STEP_LABEL}")
+      ;;
+    warn)
+      info_lines+=("${C_WARN}!${C_RESET} ${CURRENT_STEP_LABEL}")
+      ;;
+    *)
+      info_lines+=("${C_SOFT}stand by${C_RESET}")
+      ;;
+  esac
+  if [[ -n "${CURRENT_STEP_DETAIL}" ]]; then
+    info_lines+=("${C_SOFT}${CURRENT_STEP_DETAIL}${C_RESET}")
+  fi
+  if [[ -n "${FINISH_MESSAGE}" ]]; then
     info_lines+=("")
-    PROMPT_CURSOR_ROW=$((${#info_lines[@]} + 1))
-    PROMPT_CURSOR_COL=$((ART_PANEL_WIDTH + PANEL_GAP + 24))
-    info_lines+=("${C_PANEL}Select a lane [1/2/3]: ${C_RESET}")
-    if [[ -n "${WIZARD_ERROR}" ]]; then
-      info_lines+=("${C_WARN}${WIZARD_ERROR}${C_RESET}")
-    elif [[ -n "${WIZARD_HINT}" ]]; then
-      info_lines+=("${C_SOFT}${WIZARD_HINT}${C_RESET}")
-    elif [[ -n "${FINISH_MESSAGE}" ]]; then
-      info_lines+=("${C_GOOD}${FINISH_MESSAGE}${C_RESET}")
-    fi
-  else
-    info_lines+=("${C_MUTX_ALT}Current${C_RESET}")
-    case "${CURRENT_STEP_STATE}" in
-      running)
-        info_lines+=("${C_MUTX_ALT}$(dashboard_spinner_glyph)${C_RESET} ${CURRENT_STEP_LABEL}")
-        ;;
-      done)
-        info_lines+=("${C_GOOD}✓${C_RESET} ${CURRENT_STEP_LABEL}")
-        ;;
-      warn)
-        info_lines+=("${C_WARN}!${C_RESET} ${CURRENT_STEP_LABEL}")
-        ;;
-      *)
-        info_lines+=("${C_SOFT}stand by${C_RESET}")
-        ;;
-    esac
-    if [[ -n "${CURRENT_STEP_DETAIL}" ]]; then
-      info_lines+=("${C_SOFT}${CURRENT_STEP_DETAIL}${C_RESET}")
-    fi
-    if [[ -n "${FINISH_MESSAGE}" ]]; then
-      info_lines+=("")
-      info_lines+=("${C_GOOD}${FINISH_MESSAGE}${C_RESET}")
-    fi
+    info_lines+=("${C_GOOD}${FINISH_MESSAGE}${C_RESET}")
   fi
 
   max_lines="${#art_lines[@]}"
@@ -992,9 +1220,9 @@ run_setup_handoff() {
   if [[ "${OPEN_TUI}" != "0" ]]; then
     hosted_cmd+=(--open-tui)
     local_cmd+=(--open-tui)
-    handoff_note="The lane enters the MUTX provider wizard, validates OpenClaw, hands off to upstream onboarding if needed, then opens the TUI."
+    handoff_note="MUTX validates OpenClaw, resumes upstream onboarding if needed, then opens the TUI."
   else
-    handoff_note="The lane enters the MUTX provider wizard, validates OpenClaw, hands off to upstream onboarding if needed, then stays in the CLI."
+    handoff_note="MUTX validates OpenClaw, resumes upstream onboarding if needed, then stays in the CLI."
   fi
 
   if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
@@ -1038,12 +1266,12 @@ run_setup_handoff() {
       fi
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}providers${C_RESET} OpenClaw active · LangChain soon · n8n soon\n"
       if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
-        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}openclaw${C_RESET} detected at ${C_DIM}${OPENCLAW_BIN}${C_RESET}\n"
-        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}import${C_RESET} tracking ${C_DIM}${OPENCLAW_HOME}${C_RESET} under ~/.mutx/providers/openclaw\n"
+        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}openclaw${C_RESET} detected at ${C_DIM}$(display_path "${OPENCLAW_BIN}" 34)${C_RESET}\n"
+        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}import${C_RESET} tracking ${C_DIM}$(display_path "${OPENCLAW_HOME}" 22)${C_RESET} in ~/.mutx/providers/openclaw\n"
       else
         tty_print "${C_PANEL}│${C_RESET} ${C_WARN}openclaw${C_RESET} not detected yet · the wizard can install and track it for you\n"
       fi
-      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}privacy${C_RESET} OpenClaw stays local and MUTX does not upload your gateway keys\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}privacy${C_RESET} OpenClaw stays local and MUTX does not upload keys\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}${handoff_note}${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET}\n"
       tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}${HOSTED_API_URL}${C_RESET}\n"

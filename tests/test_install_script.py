@@ -401,8 +401,8 @@ def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recover
     assert "\x1b[?1049h" in transcript
     assert "Recovering current CLI surface" in transcript
     assert "Select a lane [1/2/3]" in transcript
-    assert "Hosted lane" in transcript
-    assert "Local lane" in transcript
+    assert "https://api.mutx.dev" in transcript
+    assert "http://localhost:8000" in transcript
     assert "Launching:" in transcript
     assert "LOCAL SETUP --no-input --provider openclaw --open-tui" in transcript
     assert "MUTX setup wizard\\nInstall the CLI" not in transcript
