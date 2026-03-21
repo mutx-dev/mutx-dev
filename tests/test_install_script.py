@@ -54,15 +54,52 @@ def build_fake_cli_package(package_dir: Path) -> Path:
                     print("")
                     print("Commands:")
                     print("  doctor")
+                    print("  runtime")
                     print("  setup")
                     print("  status")
                     print("  tui")
                     return
 
+                if args == ["setup", "--help"]:
+                    print("Usage: mutx setup [OPTIONS] COMMAND [ARGS]...")
+                    print("")
+                    print("Commands:")
+                    print("  hosted")
+                    print("  local")
+                    return
+
+                if args == ["setup", "hosted", "--help"]:
+                    print("Usage: mutx setup hosted [OPTIONS]")
+                    print("")
+                    print("Options:")
+                    print("  --api-url TEXT")
+                    print("  --provider [openclaw]")
+                    print("  --install-openclaw")
+                    print("  --open-tui")
+                    return
+
+                if args == ["setup", "local", "--help"]:
+                    print("Usage: mutx setup local [OPTIONS]")
+                    print("")
+                    print("Options:")
+                    print("  --provider [openclaw]")
+                    print("  --install-openclaw")
+                    print("  --open-tui")
+                    return
+
+                if args == ["runtime", "--help"]:
+                    print("Usage: mutx runtime [OPTIONS] COMMAND [ARGS]...")
+                    print("")
+                    print("Commands:")
+                    print("  inspect")
+                    print("  list")
+                    return
+
+                if args == ["runtime", "inspect", "--help"]:
+                    print("Usage: mutx runtime inspect [OPTIONS] PROVIDER")
+                    return
+
                 if args in (
-                    ["setup", "--help"],
-                    ["setup", "hosted", "--help"],
-                    ["setup", "local", "--help"],
                     ["doctor", "--help"],
                     ["tui", "--help"],
                 ):
@@ -74,6 +111,10 @@ def build_fake_cli_package(package_dir: Path) -> Path:
 
                 if args[:2] == ["setup", "local"]:
                     print("LOCAL SETUP", " ".join(args[2:]).strip())
+                    return
+
+                if args[:2] == ["runtime", "inspect"]:
+                    print("RUNTIME INSPECT", " ".join(args[2:]).strip())
                     return
 
                 if args and args[0] == "doctor":
@@ -292,13 +333,122 @@ Usage: mutx [OPTIONS] COMMAND [ARGS]...
 
 Commands:
   doctor
+  runtime
   setup
   status
   tui
 EOF
     exit 0
     ;;
-  "setup --help"|"setup hosted --help"|"setup local --help"|"doctor --help")
+  "setup --help")
+    cat <<'EOF'
+Usage: mutx setup [OPTIONS] COMMAND [ARGS]...
+
+Commands:
+  hosted
+  local
+EOF
+    exit 0
+    ;;
+  "setup hosted --help")
+    cat <<'EOF'
+Usage: mutx setup hosted [OPTIONS]
+
+Options:
+  --api-url TEXT
+  --provider [openclaw]
+  --install-openclaw
+  --open-tui
+EOF
+    exit 0
+    ;;
+  "setup local --help")
+    cat <<'EOF'
+Usage: mutx setup local [OPTIONS]
+
+Options:
+  --provider [openclaw]
+  --install-openclaw
+  --open-tui
+EOF
+    exit 0
+    ;;
+  "runtime --help")
+    cat <<'EOF'
+Usage: mutx runtime [OPTIONS] COMMAND [ARGS]...
+
+Commands:
+  inspect
+  list
+EOF
+    exit 0
+    ;;
+  "runtime inspect --help"|"doctor --help")
+    exit 0
+    ;;
+esac
+
+exit 0
+"""
+
+
+PROVIDER_STALE_MUTX_SCRIPT = """#!/usr/bin/env bash
+set -euo pipefail
+
+case "${*:-}" in
+  "--help")
+    cat <<'EOF'
+Usage: mutx [OPTIONS] COMMAND [ARGS]...
+
+Commands:
+  doctor
+  runtime
+  setup
+  status
+  tui
+EOF
+    exit 0
+    ;;
+  "setup --help")
+    cat <<'EOF'
+Usage: mutx setup [OPTIONS] COMMAND [ARGS]...
+
+Commands:
+  hosted
+  local
+EOF
+    exit 0
+    ;;
+  "setup hosted --help")
+    cat <<'EOF'
+Usage: mutx setup hosted [OPTIONS]
+
+Options:
+  --api-url TEXT
+  --open-tui
+EOF
+    exit 0
+    ;;
+  "setup local --help")
+    cat <<'EOF'
+Usage: mutx setup local [OPTIONS]
+
+Options:
+  --open-tui
+EOF
+    exit 0
+    ;;
+  "runtime --help")
+    cat <<'EOF'
+Usage: mutx runtime [OPTIONS] COMMAND [ARGS]...
+
+Commands:
+  inspect
+  list
+EOF
+    exit 0
+    ;;
+  "runtime inspect --help"|"doctor --help")
     exit 0
     ;;
 esac
@@ -342,6 +492,19 @@ def test_install_script_allows_assistant_first_cli_surface_without_recovery(tmp_
     assert result.stderr == ""
 
 
+def test_install_script_recovers_when_packaged_cli_lacks_openclaw_flags(tmp_path: Path) -> None:
+    source_ref = str(build_fake_cli_package(tmp_path / "source-cli"))
+    result, _ = run_install_script(
+        tmp_path,
+        mutx_script=PROVIDER_STALE_MUTX_SCRIPT,
+        source_ref=source_ref,
+    )
+
+    assert result.returncode == 0
+    assert "Recovering current CLI surface" in result.stdout
+    assert "mutx setup hosted --install-openclaw" in result.stdout
+
+
 def test_install_script_reports_detected_openclaw_and_local_key_policy(tmp_path: Path) -> None:
     extra_bin = tmp_path / "extra-bin"
     extra_bin.mkdir(parents=True, exist_ok=True)
@@ -382,8 +545,8 @@ def test_install_script_no_onboard_skips_wizard_and_prints_next_steps(tmp_path: 
     assert "skipped" in result.stdout
     assert "Setup Wizard" not in result.stdout
     assert "Install complete" in result.stdout
-    assert "mutx setup hosted" in result.stdout
-    assert "mutx setup local" in result.stdout
+    assert "mutx setup hosted --install-openclaw" in result.stdout
+    assert "mutx setup local --install-openclaw" in result.stdout
 
 
 def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recovery(tmp_path: Path) -> None:
@@ -404,7 +567,7 @@ def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recover
     assert "https://api.mutx.dev" in transcript
     assert "http://localhost:8000" in transcript
     assert "Launching:" in transcript
-    assert "LOCAL SETUP --no-input --provider openclaw --open-tui" in transcript
+    assert "LOCAL SETUP --provider openclaw --install-openclaw --open-tui" in transcript
     assert "MUTX setup wizard\\nInstall the CLI" not in transcript
     assert "No such command 'setup'" not in transcript
 
@@ -429,4 +592,4 @@ def test_install_script_tty_hosted_lane_targets_hosted_api(tmp_path: Path) -> No
 
     assert exit_code == 0
     assert "Launching:" in transcript
-    assert "setup hosted --api-url https://api.mutx.dev --provider openclaw --open-tui" in transcript
+    assert "setup hosted --api-url https://api.mutx.dev --provider openclaw --install-openclaw --open-tui" in transcript

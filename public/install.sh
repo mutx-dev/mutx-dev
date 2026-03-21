@@ -1079,6 +1079,40 @@ read_tty_line() {
   printf -v "${__resultvar}" '%s' "${line}"
 }
 
+mutx_help_output() {
+  local spec="$1"
+  local -a cmd=("${MUTX_BIN}")
+  local -a parts=()
+  read -r -a parts <<< "${spec}"
+  cmd+=("${parts[@]}")
+  "${cmd[@]}" --help 2>&1 || true
+}
+
+mutx_supports_option() {
+  local spec="$1"
+  local option="$2"
+  local help_text=""
+
+  help_text="$(mutx_help_output "${spec}")"
+  [[ "${help_text}" == *"${option}"* ]]
+}
+
+append_if_supported() {
+  local target_name="$1"
+  local spec="$2"
+  local option="$3"
+  shift 3
+
+  if mutx_supports_option "${spec}" "${option}"; then
+    eval "${target_name}+=(\"\${option}\")"
+    while [[ "$#" -gt 0 ]]; do
+      local value="$1"
+      shift
+      eval "${target_name}+=(\"\${value}\")"
+    done
+  fi
+}
+
 resolve_mutx_bin() {
   hash -r 2>/dev/null || true
   MUTX_BIN="$(command -v mutx || true)"
@@ -1091,6 +1125,8 @@ check_assistant_first_surface() {
     "setup hosted"
     "setup local"
     "doctor"
+    "runtime"
+    "runtime inspect"
   )
   local -a missing=()
   local spec=""
@@ -1105,6 +1141,19 @@ check_assistant_first_surface() {
       missing+=("mutx ${spec}")
     fi
   done
+
+  if ! mutx_supports_option "setup hosted" "--provider"; then
+    missing+=("mutx setup hosted --provider")
+  fi
+  if ! mutx_supports_option "setup hosted" "--install-openclaw"; then
+    missing+=("mutx setup hosted --install-openclaw")
+  fi
+  if ! mutx_supports_option "setup local" "--provider"; then
+    missing+=("mutx setup local --provider")
+  fi
+  if ! mutx_supports_option "setup local" "--install-openclaw"; then
+    missing+=("mutx setup local --install-openclaw")
+  fi
 
   if [[ "${#missing[@]}" == "0" ]]; then
     CLI_MISSING_COMMANDS=""
@@ -1213,13 +1262,18 @@ local_control_plane_ready() {
 
 run_setup_handoff() {
   detect_openclaw_runtime
-  local -a hosted_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}" --provider openclaw)
-  local -a local_cmd=("${MUTX_BIN}" setup local --no-input --provider openclaw)
+  local -a hosted_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}")
+  local -a local_cmd=("${MUTX_BIN}" setup local)
   local handoff_note=""
 
+  append_if_supported hosted_cmd "setup hosted" "--provider" "openclaw"
+  append_if_supported hosted_cmd "setup hosted" "--install-openclaw"
+  append_if_supported local_cmd "setup local" "--provider" "openclaw"
+  append_if_supported local_cmd "setup local" "--install-openclaw"
+
   if [[ "${OPEN_TUI}" != "0" ]]; then
-    hosted_cmd+=(--open-tui)
-    local_cmd+=(--open-tui)
+    append_if_supported hosted_cmd "setup hosted" "--open-tui"
+    append_if_supported local_cmd "setup local" "--open-tui"
     handoff_note="MUTX validates OpenClaw, resumes upstream onboarding if needed, then opens the TUI."
   else
     handoff_note="MUTX validates OpenClaw, resumes upstream onboarding if needed, then stays in the CLI."
@@ -1229,8 +1283,8 @@ run_setup_handoff() {
     leave_alt_screen
     say "Install complete"
     note "Next steps:"
-    note "  mutx setup hosted"
-    note "  mutx setup local"
+    note "  mutx setup hosted --install-openclaw"
+    note "  mutx setup local --install-openclaw"
     note "  mutx doctor"
     note "  mutx runtime inspect openclaw"
     if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
@@ -1335,8 +1389,8 @@ run_setup_handoff() {
   leave_alt_screen
   say "Install complete"
   note "Run one of:"
-  note "  mutx setup hosted"
-  note "  mutx setup local"
+  note "  mutx setup hosted --install-openclaw"
+  note "  mutx setup local --install-openclaw"
   note "  mutx doctor"
   note "  mutx runtime inspect openclaw"
   if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
