@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+import { PublicFooter } from '@/components/site/PublicFooter'
+import { SiteReveal } from '@/components/site/SiteReveal'
+
 export const metadata: Metadata = {
   title: 'Privacy Policy | MUTX',
   description: 'Privacy Policy for MUTX, including what data we collect, how we use it, and how to contact us about privacy matters.',
@@ -75,45 +78,57 @@ const sections = [
       'We may update this Privacy Policy from time to time as MUTX evolves. When we do, we will update the effective date on this page.',
     ],
   },
-]
+] as const
 
 export default function PrivacyPolicyPage() {
   return (
-    <main className="min-h-screen bg-black px-6 py-20 text-white">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-10">
-          <div className="eyebrow mb-5">Legal</div>
-          <h1 className="text-4xl font-medium tracking-tight sm:text-5xl">Privacy Policy</h1>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-white/60 sm:text-base">
-            Effective date: March 13, 2026. This page explains how MUTX handles information across the website,
-            docs, waitlist flows, and related product surfaces.
-          </p>
-        </div>
+    <div className="site-page">
+      <main className="site-main">
+        <section className="site-section pt-20 sm:pt-24 lg:pt-28">
+          <div className="site-shell space-y-8">
+            <SiteReveal>
+              <div className="site-section-intro">
+                <div className="site-kicker">Legal</div>
+                <h1 className="site-title mt-4">Privacy policy</h1>
+                <p className="site-copy mt-4 max-w-3xl">
+                  Effective date: March 13, 2026. This page explains how MUTX handles information across the website,
+                  docs, waitlist flows, and related product surfaces.
+                </p>
+              </div>
+            </SiteReveal>
 
-        <div className="panel rounded-2xl p-6 sm:p-8">
-          <div className="space-y-10">
-            {sections.map((section) => (
-              <section key={section.title}>
-                <h2 className="text-xl font-medium text-white sm:text-2xl">{section.title}</h2>
-                <div className="mt-4 space-y-4 text-sm leading-7 text-white/70 sm:text-base">
-                  {section.body.map((paragraph) => (
-                    <p key={paragraph}>{paragraph}</p>
+            <SiteReveal delay={0.06}>
+              <div className="site-panel-strong p-6 sm:p-8">
+                <div className="space-y-10">
+                  {sections.map((section) => (
+                    <section key={section.title}>
+                      <h2 className="text-2xl font-semibold tracking-[-0.05em] text-white">
+                        {section.title}
+                      </h2>
+                      <div className="mt-4 space-y-4 text-sm leading-7 text-[color:var(--site-text-soft)] sm:text-base">
+                        {section.body.map((paragraph) => (
+                          <p key={paragraph}>{paragraph}</p>
+                        ))}
+                      </div>
+                    </section>
                   ))}
                 </div>
-              </section>
-            ))}
-          </div>
-        </div>
+              </div>
+            </SiteReveal>
 
-        <div className="mt-8 flex flex-wrap gap-4 text-sm text-white/60">
-          <Link href="/" className="transition-colors hover:text-white">
-            Back to mutx.dev
-          </Link>
-          <a href="https://docs.mutx.dev" target="_blank" rel="noreferrer" className="transition-colors hover:text-white">
-            docs.mutx.dev
-          </a>
-        </div>
-      </div>
-    </main>
+            <div className="flex flex-wrap gap-4 text-sm text-[color:var(--site-text-muted)]">
+              <Link href="/" className="site-nav-link">
+                Back to mutx.dev
+              </Link>
+              <a href="https://docs.mutx.dev" target="_blank" rel="noreferrer" className="site-nav-link">
+                docs.mutx.dev
+              </a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <PublicFooter />
+    </div>
   )
 }

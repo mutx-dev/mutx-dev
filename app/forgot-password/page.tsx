@@ -2,11 +2,31 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { AlertCircle, ArrowLeft, ArrowRight, Loader2, Mail } from 'lucide-react'
 
+import { AuthSurface } from '@/components/site/AuthSurface'
+
+const authSurfaceProps = {
+  eyebrow: 'Password recovery',
+  title: 'Recover operator access without leaving the control surface.',
+  description:
+    'Use the email attached to your MUTX account and we will send a reset link. If hosted auth is not the lane you need today, the dashboard, docs, and install flow are still available.',
+  asideEyebrow: 'Recovery notes',
+  asideTitle: 'Keep the auth lane practical.',
+  asideBody:
+    'Reset flows should be simple, honest, and easy to verify. If the account does not exist or the hosted lane is unavailable, the rest of the public surface still tells the truth.',
+  mediaSrc: '/landing/webp/reading-bench.webp',
+  mediaAlt: 'MUTX robot reading and reviewing system state on a bench',
+  mediaWidth: 1024,
+  mediaHeight: 1536,
+  highlights: [
+    'Use the work email tied to the hosted operator account.',
+    'Reset links expire, so handle the email quickly once it lands.',
+    'Docs and dashboard stay available if you only need product truth right now.',
+  ],
+} as const
+
 export default function ForgotPasswordPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -38,103 +58,91 @@ export default function ForgotPasswordPage() {
     }
   }
 
-  if (success) {
-    return (
-      <div className="site-page selection:bg-white/20">
-        <main className="relative flex min-h-screen items-center justify-center px-5 py-24 sm:px-6">
-          <div className="site-form-shell">
-            <div className="site-form-card p-8">
-              <div className="relative flex flex-col items-center text-center">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
-                  <Mail className="h-8 w-8 text-green-400" />
-                </div>
-                <h1 className="text-2xl font-medium tracking-tight text-white">Check your email</h1>
-                <p className="mt-3 text-white/62">
-                  We&apos;ve sent password reset instructions to <span className="text-white">{email}</span>
-                </p>
-                <p className="mt-4 text-sm text-white/40">
-                  Didn&apos;t receive the email? Check your spam folder, or{' '}
-                  <button
-                    onClick={() => setSuccess(false)}
-                    className="site-inline-link"
-                  >
-                    try again
-                  </button>
-                </p>
-                <Link
-                  href="/login"
-                  className="mt-8 inline-flex items-center gap-2 text-sm text-white/60 hover:text-white"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  Back to sign in
-                </Link>
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
-    )
-  }
-
   return (
-    <div className="site-page selection:bg-white/20">
-      <main className="relative flex min-h-screen items-center justify-center px-5 py-24 sm:px-6">
-        <div className="site-form-shell">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-medium tracking-tight text-white">Forgot password?</h1>
-            <p className="mt-2 text-white/62">No worries, we&apos;ll send you reset instructions</p>
+    <AuthSurface {...authSurfaceProps}>
+      {success ? (
+        <div className="flex flex-col items-start gap-6">
+          <div className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10">
+            <Mail className="h-7 w-7 text-emerald-300" />
           </div>
 
-          <div className="site-form-card p-8">
-            <div className="relative">
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label htmlFor="email" className="site-form-label">
-                    Email address
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@company.com"
-                    required
-                    className="site-input"
-                  />
-                </div>
+          <div>
+            <h2 className="text-2xl font-semibold tracking-[-0.05em] text-white">
+              Check your email
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-soft)]">
+              We&apos;ve sent password reset instructions to <span className="text-white">{email}</span>.
+            </p>
+            <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-muted)]">
+              If the email does not show up, check spam or request another link.
+            </p>
+          </div>
 
-                {error && (
-                  <div className="site-status-error">
-                    <AlertCircle className="h-4 w-4" />
-                    {error}
-                  </div>
-                )}
-
-                <button type="submit" disabled={loading} className="site-button-primary w-full justify-center disabled:cursor-not-allowed disabled:opacity-60">
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      Send reset link
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
-              </form>
-
-              <p className="mt-6 text-center text-sm text-white/60">
-                <Link href="/login" className="inline-flex items-center gap-1 site-inline-link">
-                  <ArrowLeft className="h-4 w-4" />
-                  Back to sign in
-                </Link>
-              </p>
-            </div>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/login" className="site-button-primary">
+              Back to sign in
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <button type="button" onClick={() => setSuccess(false)} className="site-button-secondary">
+              Try again
+            </button>
           </div>
         </div>
-      </main>
-    </div>
+      ) : (
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-[-0.05em] text-white">
+              Send reset instructions
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-soft)]">
+              No drama. Just the email and a fresh link.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label htmlFor="email" className="site-form-label">
+                Email address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                required
+                className="site-input"
+              />
+            </div>
+
+            {error && (
+              <div className="site-status-error">
+                <AlertCircle className="h-4 w-4" />
+                {error}
+              </div>
+            )}
+
+            <button type="submit" disabled={loading} className="site-button-primary w-full disabled:cursor-not-allowed disabled:opacity-60">
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  Send reset link
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </button>
+          </form>
+
+          <Link href="/login" className="inline-flex items-center gap-2 text-sm text-[color:var(--site-text-muted)] transition hover:text-white">
+            <ArrowLeft className="h-4 w-4" />
+            Back to sign in
+          </Link>
+        </div>
+      )}
+    </AuthSurface>
   )
 }

@@ -75,16 +75,18 @@ type CalendlyPopupButtonProps = {
   children: ReactNode;
   className?: string;
   fallbackClassName?: string;
+  ariaLabel?: string;
 };
 
 export function CalendlyPopupButton({
   children,
   className,
   fallbackClassName,
+  ariaLabel = "Book a call with MUTX",
 }: CalendlyPopupButtonProps) {
   useEffect(() => {
     void ensureCalendlyLoaded().catch(() => {
-      // Fall back to a normal link open on click if the script does not load.
+      // Fall back to a normal tab open if the widget script fails.
     });
   }, []);
 
@@ -101,6 +103,7 @@ export function CalendlyPopupButton({
     <button
       type="button"
       onClick={handleClick}
+      aria-label={ariaLabel}
       className={cn(fallbackClassName, className)}
     >
       {children}

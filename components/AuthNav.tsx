@@ -4,8 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { LoginDisabledButton } from "@/components/landing/LoginDisabledButton";
-
 const DOCS_URL = "https://docs.mutx.dev";
 
 export function AuthNav() {
@@ -16,7 +14,6 @@ export function AuthNav() {
     pathname === "/forgot-password" ||
     pathname === "/reset-password";
   const demoAppRoutes = new Set([
-    "/",
     "/overview",
     "/agents",
     "/deployments",
@@ -44,7 +41,7 @@ export function AuthNav() {
 
   return (
     <nav className="site-topbar">
-      <div className="site-shell flex items-center justify-between py-4">
+      <div className="site-shell site-topbar-inner">
         <Link href="/" className="site-brand">
           <div className="site-brand-mark">
             <Image
@@ -57,15 +54,50 @@ export function AuthNav() {
           </div>
           <div>
             <p className="site-brand-overline">MUTX</p>
-            <p className="site-brand-title">
-              control plane for agents with a pulse
+            <p className="site-brand-title hidden sm:block">
+              control plane for deployed agents
             </p>
           </div>
         </Link>
 
-        <div className="flex items-center gap-4">
+        <div className="hidden items-center gap-6 lg:flex">
+          <Link href="/#surface" className="site-nav-link">
+            Surface
+          </Link>
+          <Link href="/#install" className="site-nav-link">
+            Install
+          </Link>
+          <Link href="/contact" className="site-nav-link">
+            Contact
+          </Link>
+          <a
+            href={DOCS_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="site-nav-link"
+          >
+            Docs
+          </a>
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-3">
           {!isAuthPage ? (
             <>
+              <Link href="/login" className="site-nav-link hidden md:block">
+                Sign in
+              </Link>
+              <Link href="/dashboard" className="site-button-secondary hidden sm:inline-flex">
+                Open dashboard
+              </Link>
+              <Link href="/#install" className="site-button-accent">
+                Quickstart
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/" className="site-nav-link hidden sm:block">
+                Home
+              </Link>
               <a
                 href={DOCS_URL}
                 target="_blank"
@@ -74,20 +106,10 @@ export function AuthNav() {
               >
                 Docs
               </a>
-              <LoginDisabledButton className="[&>button]:px-0 [&>button]:py-0 [&>button]:font-medium [&>button]:text-[0.95rem] [&>button]:text-white/66 [&>button]:border-transparent [&>button]:bg-transparent [&>button:hover]:bg-transparent [&>button:hover]:text-white" />
-              <Link href="/#quickstart" className="site-button-accent">
-                Get started
+              <Link href="/dashboard" className="site-button-accent">
+                Dashboard
               </Link>
             </>
-          ) : (
-            <a
-              href={DOCS_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="site-nav-link"
-            >
-              Docs
-            </a>
           )}
         </div>
       </div>

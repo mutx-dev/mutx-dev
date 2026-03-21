@@ -11,20 +11,20 @@ type ContactLeadFormProps = {
 }
 
 const INQUIRY_TYPES = [
-  { value: 'funding', label: 'Funding' },
-  { value: 'partnerships', label: 'Partnerships' },
+  { value: 'demo-hosted-access', label: 'Hosted evaluation' },
+  { value: 'ideas', label: 'Design partner / workflow' },
+  { value: 'partnerships', label: 'Partnership / infrastructure' },
   { value: 'contributions', label: 'Contributions' },
-  { value: 'ideas', label: 'Ideas' },
-  { value: 'demo-hosted-access', label: 'Demo / hosted access' },
+  { value: 'funding', label: 'Strategic / funding' },
   { value: 'general', label: 'General' },
 ] as const
 
 const MESSAGE_PLACEHOLDERS: Record<string, string> = {
   funding: 'What kind of financing conversation is relevant, what stage are you evaluating, and what part of the MUTX roadmap matters most?',
-  partnerships: 'Describe the partnership, distribution, infrastructure, enterprise, or integration angle you want to explore.',
+  partnerships: 'Describe the partnership, infrastructure, integration, or distribution angle you want to explore.',
   contributions: 'Tell us what you want to contribute: code, docs, design, infrastructure, GTM support, or ecosystem work.',
-  ideas: 'Share the product idea, operator workflow, feature gap, or design-partner use case you think MUTX should support.',
-  'demo-hosted-access': 'Tell us what you need to see in a live demo or hosted evaluation, and what environment or workflow you are trying to validate.',
+  ideas: 'Share the operator workflow, feature gap, or design-partner use case you think MUTX should support.',
+  'demo-hosted-access': 'Tell us what you need to validate in a hosted evaluation and which deployment, auth, or runtime workflow matters most.',
   general: 'Summarize the context, what you need, and how MUTX can help.',
 }
 
@@ -85,10 +85,10 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
   return (
     <div className={cn('site-panel-strong p-6', className)}>
       <div className="mb-5">
-        <div className="site-kicker mb-3">Institutional contact</div>
+        <div className="site-kicker mb-3">Bring the real workflow</div>
         <h2 className="text-2xl font-medium text-white">Send a structured inquiry</h2>
         <p className="mt-2 text-sm leading-6 text-white/60">
-          Use one slim form for funding, partnerships, contributions, ideas, demos, or general inbound.
+          Use one slim form for hosted evaluations, design-partner workflows, infrastructure conversations, contributions, or other serious MUTX work.
         </p>
       </div>
 

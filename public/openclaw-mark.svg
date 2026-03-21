@@ -1,0 +1,30 @@
+<svg width="640" height="640" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="body" x1="110" y1="80" x2="520" y2="540" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF4E4E"/>
+      <stop offset="1" stop-color="#C92D2D"/>
+    </linearGradient>
+    <linearGradient id="arm" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#FF5959"/>
+      <stop offset="1" stop-color="#B92525"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="640" height="640" rx="160" fill="transparent"/>
+
+  <path d="M200 86C184 72 161 73 147 88C133 102 132 124 145 138L187 180C201 194 224 194 238 181C252 167 252 145 239 131L200 86Z" fill="#FF5656"/>
+  <path d="M440 86C456 72 479 73 493 88C507 102 508 124 495 138L453 180C439 194 416 194 402 181C388 167 388 145 401 131L440 86Z" fill="#FF5656"/>
+
+  <ellipse cx="320" cy="330" rx="244" ry="232" fill="url(#body)"/>
+
+  <path d="M59 256C25 253 -2 282 0 318C2 353 31 381 66 379C99 377 126 348 127 315C128 284 92 259 59 256Z" fill="url(#arm)"/>
+  <path d="M581 256C615 253 642 282 640 318C638 353 609 381 574 379C541 377 514 348 513 315C512 284 548 259 581 256Z" fill="url(#arm)"/>
+
+  <circle cx="242" cy="240" r="38" fill="#06121F"/>
+  <circle cx="398" cy="240" r="38" fill="#06121F"/>
+  <circle cx="242" cy="240" r="16" fill="#19E0DA"/>
+  <circle cx="398" cy="240" r="16" fill="#19E0DA"/>
+
+  <path d="M260 547H296V640H260V547Z" fill="#D43131"/>
+  <path d="M344 547H380V640H344V547Z" fill="#D43131"/>
+</svg>

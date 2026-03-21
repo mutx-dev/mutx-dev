@@ -1,501 +1,538 @@
 import Image from "next/image";
 import Link from "next/link";
-import { IBM_Plex_Mono, IBM_Plex_Sans, Syne } from "next/font/google";
-import { ArrowRight, BookOpen, TerminalSquare } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  Activity,
+  ArrowRight,
+  Binary,
+  Boxes,
+  GitBranch,
+  PhoneCall,
+  ShieldCheck,
+  TerminalSquare,
+} from "lucide-react";
 
-import { CalendlyPopupButton } from "@/components/landing/CalendlyPopupButton";
-import { HeroMonitorShowcase } from "@/components/landing/HeroMonitorShowcase";
-import { MotionIn } from "@/components/landing/MotionPrimitives";
-import { QuickstartTabs } from "@/components/landing/QuickstartTabs";
+import { CalendlyPopupButton } from "@/components/site/CalendlyPopupButton";
+import { PublicFooter } from "@/components/site/PublicFooter";
+import { SiteReveal } from "@/components/site/SiteReveal";
 
-export const dynamic = "force-dynamic";
-
-const displayFont = Syne({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-  variable: "--font-landing-display",
-});
-
-const bodyFont = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-landing-body",
-});
-
-const monoFont = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-landing-mono",
-});
-
-const GITHUB_URL = "https://github.com/mutx-dev/mutx-dev";
 const DOCS_URL = "https://docs.mutx.dev";
-
-const navLinks = [
-  { label: "Why now", href: "#why-mutx" },
-  { label: "Quickstart", href: "#quickstart" },
-] as const;
+const GITHUB_URL = "https://github.com/mutx-dev/mutx-dev";
 
 const heroSignals = [
-  { label: "Broken deploys", value: "Kill momentum" },
-  { label: "Security stalls", value: "Delay approval" },
-  { label: "Cost drift", value: "Blows budget" },
-  { label: "Fire drills", value: "Kill scale" },
-] as const;
-
-const fearCards = [
   {
-    title: "Broken client deployments",
-    body: "The demo worked. Production did not.",
+    label: "Auth boundary",
+    value: "keys, sessions, and ownership stay attached to real routes.",
   },
   {
-    title: "Blocked security review",
-    body: "No one can explain isolation, access, and audit fast enough.",
+    label: "Deployment posture",
+    value: "inspect health, restarts, logs, and version drift before it spills.",
   },
   {
-    title: "Opaque model spend",
-    body: "Budget disappears when costs stop being legible.",
-  },
-  {
-    title: "Bespoke operator work",
-    body: "If every rollout is custom, there is no repeatable motion.",
+    label: "Trace diagnosis",
+    value: "follow a run from operator action to receipt instead of guessing.",
   },
 ] as const;
 
-const buyerOutcomes = ["Control", "Speed", "Predictability"] as const;
-
-const enemyList = [
-  "Fragile demo-to-production transitions",
-  "Shared-tenant wrappers",
-  "Opaque model spend",
-  "Teams stuck firefighting bespoke deployments",
+const surfaceCards = [
+  {
+    icon: ShieldCheck,
+    title: "Auth with receipts",
+    body: "Session auth, API keys, and ownership-aware access stop being a side quest you only notice after the demo closes.",
+  },
+  {
+    icon: GitBranch,
+    title: "Deployments with memory",
+    body: "Track what shipped, what warmed, what rolled back, and who touched the runtime when the handoff gets tense.",
+  },
+  {
+    icon: Binary,
+    title: "Trace the weird part",
+    body: "Run history, traces, and webhook receipts make the failure legible instead of forcing another round of screenshot archaeology.",
+  },
 ] as const;
 
-const startingWedge = [
-  "AI agencies shipping client work",
-  "Small product teams shipping automations",
-  "Internal AI platform teams next",
+const installCards = [
+  {
+    label: "Local bootstrap",
+    caption: "managed local stack",
+    command: `curl -fsSL https://mutx.dev/install.sh | bash
+mutx setup local --provider openclaw --install-openclaw
+mutx doctor`,
+  },
+  {
+    label: "Hosted lane",
+    caption: "same operator grammar",
+    command: `mutx setup hosted --provider openclaw --install-openclaw
+mutx runtime inspect openclaw
+mutx assistant overview`,
+  },
+  {
+    label: "API contract",
+    caption: "no browser required",
+    command: `curl -H "Authorization: Bearer $TOKEN" \
+  "$BASE_URL/v1/deployments"
+
+curl -H "Authorization: Bearer $TOKEN" \
+  "$BASE_URL/v1/runs/$RUN_ID/traces"`,
+  },
 ] as const;
 
-const footerProblems = [
-  "Broken deployments",
-  "Blocked security review",
-  "Cost visibility",
+const launchCards = [
+  {
+    icon: Activity,
+    title: "Open the dashboard",
+    body: "Inspect the operator surface directly instead of waiting for a sales engineer to narrate screenshots.",
+    href: "/dashboard",
+    external: false,
+  },
+  {
+    icon: Boxes,
+    title: "Read the repo",
+    body: "Web, API, CLI, SDK, and infra live together so the product truth is inspectable when things get weird.",
+    href: GITHUB_URL,
+    external: true,
+  },
 ] as const;
 
-const footerCallShape = [
-  "1 shared use case",
-  "1 owner",
-  "1 success metric",
-  "4 to 6 week pilot",
-  "Clean unwind if it does not work",
+const routePills = [
+  "/v1/auth",
+  "/v1/agents",
+  "/v1/deployments",
+  "/v1/runs/{id}/traces",
+  "/v1/webhooks",
+  "/dashboard",
 ] as const;
 
-const footerLinks = [
-  { label: "Docs", href: DOCS_URL },
-  { label: "GitHub", href: GITHUB_URL },
-] as const;
-
-type SectionHeadingProps = {
-  label: string;
+type SectionIntroProps = {
+  eyebrow: string;
   title: string;
-  body?: string;
+  body: string;
 };
 
-function SectionHeading({ label, title, body }: SectionHeadingProps) {
+function SectionIntro({ eyebrow, title, body }: SectionIntroProps) {
   return (
-    <div className="max-w-4xl">
-      <div className="landing-kicker">{label}</div>
-      <h2 className="mt-5 font-[family:var(--font-landing-display)] text-4xl font-semibold tracking-[-0.08em] text-white sm:text-5xl">
-        {title}
-      </h2>
-      {body ? (
-        <p className="mt-4 max-w-2xl text-base leading-8 text-slate-300/80">
-          {body}
-        </p>
-      ) : null}
+    <div className="site-section-intro">
+      <div className="site-kicker">{eyebrow}</div>
+      <h2 className="site-section-heading">{title}</h2>
+      <p className="site-copy mt-4 max-w-3xl">{body}</p>
     </div>
   );
 }
 
-function LandingNav() {
+type FeatureCardProps = {
+  icon: LucideIcon;
+  title: string;
+  body: string;
+};
+
+function FeatureCard({ icon: Icon, title, body }: FeatureCardProps) {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-[color:var(--landing-line)] bg-[#06101a]/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="group flex items-center gap-3">
-          <div className="relative h-12 w-12 overflow-hidden rounded-[1.15rem] border border-cyan-300/15 bg-[linear-gradient(180deg,rgba(230,238,246,0.24)_0%,rgba(95,114,131,0.18)_100%)] p-1.5 shadow-[0_16px_38px_rgba(34,211,238,0.18)] ring-1 ring-inset ring-white/8 transition group-hover:border-cyan-300/30">
-            <div className="absolute inset-[1px] rounded-[1rem] bg-[radial-gradient(circle_at_50%_20%,rgba(103,232,249,0.16),transparent_56%),linear-gradient(180deg,rgba(15,23,42,0.94)_0%,rgba(4,10,18,0.96)_100%)]" />
-            <Image
-              src="/logo.png"
-              alt="MUTX logo"
-              fill
-              sizes="3rem"
-              className="relative z-10 object-contain p-1 brightness-[1.12] contrast-[1.06]"
-            />
-          </div>
-          <div>
-            <p className="font-[family:var(--font-landing-mono)] text-[0.7rem] uppercase tracking-[0.34em] text-slate-200">
-              MUTX
-            </p>
-            <p className="text-sm font-medium text-slate-300/85">
-              Operator control plane
-            </p>
-          </div>
-        </Link>
-
-        <nav className="hidden items-center gap-8 lg:flex" aria-label="Landing">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-sm font-medium text-slate-400 transition hover:text-white"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-2">
-          <a
-            href={DOCS_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="hidden rounded-full border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-slate-100 transition hover:border-white/15 hover:bg-white/[0.05] md:inline-flex"
-          >
-            Docs
-          </a>
-          <a
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="hidden rounded-full border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-slate-100 transition hover:border-white/15 hover:bg-white/[0.05] xl:inline-flex"
-          >
-            GitHub
-          </a>
-          <a
-            href="#quickstart"
-            className="hidden rounded-full border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-slate-100 transition hover:border-white/15 hover:bg-white/[0.05] lg:inline-flex"
-          >
-            Quickstart
-          </a>
-          <CalendlyPopupButton className="landing-button-primary px-5 py-3 text-sm">
-            Book a demo
-          </CalendlyPopupButton>
-        </div>
+    <article className="site-panel p-5 sm:p-6">
+      <div className="inline-flex rounded-full border border-white/10 bg-white/[0.04] p-3">
+        <Icon className="h-4 w-4 text-[color:var(--site-accent)]" />
       </div>
-    </header>
+      <h3 className="mt-4 text-xl font-semibold tracking-[-0.04em] text-white">
+        {title}
+      </h3>
+      <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-soft)]">
+        {body}
+      </p>
+    </article>
+  );
+}
+
+type InstallCardProps = {
+  label: string;
+  caption: string;
+  command: string;
+};
+
+function InstallCard({ label, caption, command }: InstallCardProps) {
+  return (
+    <article className="site-command-card">
+      <div className="site-command-card-head">
+        <div>
+          <p>{label}</p>
+          <p>{caption}</p>
+        </div>
+        <TerminalSquare className="h-4 w-4 text-[color:var(--site-accent)]" />
+      </div>
+      <pre>{command}</pre>
+    </article>
+  );
+}
+
+type LaunchCardProps = {
+  icon: LucideIcon;
+  title: string;
+  body: string;
+  href: string;
+  external: boolean;
+};
+
+function LaunchCard({
+  icon: Icon,
+  title,
+  body,
+  href,
+  external,
+}: LaunchCardProps) {
+  const content = (
+    <>
+      <div className="inline-flex rounded-full border border-white/10 bg-white/[0.04] p-3">
+        <Icon className="h-4 w-4 text-[color:var(--site-accent)]" />
+      </div>
+      <div>
+        <h3 className="site-link-card-title">{title}</h3>
+        <p className="site-link-card-body mt-2">{body}</p>
+      </div>
+      <span className="inline-flex items-center gap-2 text-sm font-semibold text-white">
+        Open
+        <ArrowRight className="h-4 w-4" />
+      </span>
+    </>
+  );
+
+  return external ? (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="site-link-card"
+    >
+      {content}
+    </a>
+  ) : (
+    <Link href={href} className="site-link-card">
+      {content}
+    </Link>
   );
 }
 
 export default function LandingPage() {
   return (
-    <div
-      className={`landing-page ${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} min-h-screen bg-[#03070d] text-white [font-family:var(--font-landing-body)]`}
-    >
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_8%_0%,rgba(44,133,160,0.3),transparent_22%),radial-gradient(circle_at_100%_8%,rgba(26,97,120,0.22),transparent_24%),linear-gradient(180deg,#07121d_0%,#02070f_54%,#02050a_100%)]" />
-        <div className="absolute inset-0 opacity-[0.12] [background-image:linear-gradient(rgba(124,150,171,0.16)_1px,transparent_1px),linear-gradient(90deg,rgba(124,150,171,0.16)_1px,transparent_1px)] [background-size:72px_72px]" />
-        <div className="absolute left-[-12%] top-[12%] h-[32rem] w-[32rem] rounded-full bg-cyan-500/10 blur-[140px]" />
-        <div className="absolute right-[-10%] top-[16%] h-[26rem] w-[26rem] rounded-full bg-sky-400/8 blur-[130px]" />
-        <div className="absolute inset-x-0 top-0 h-40 bg-[linear-gradient(180deg,rgba(4,10,18,0.4),transparent)]" />
-      </div>
-
-      <LandingNav />
-
-      <main className="relative z-10">
-        <section className="px-4 pb-20 pt-32 sm:px-6 sm:pt-36 lg:px-8 lg:pb-24 lg:pt-40">
-          <div className="mx-auto max-w-7xl">
-            <div className="landing-panel-strong relative overflow-hidden px-5 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-10">
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(103,232,249,0.09),transparent_26%),radial-gradient(circle_at_100%_22%,rgba(56,189,248,0.08),transparent_24%)]"
-              />
-
-              <div className="relative grid gap-10 xl:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] xl:items-center">
-                <div className="max-w-2xl">
-                  <div className="landing-kicker">
-                    Assistant-first operator control plane
+    <div className="site-page">
+      <main className="site-main">
+        <section className="site-section pb-10 pt-20 sm:pt-24 lg:pt-28">
+          <div className="site-shell">
+            <div className="site-hero-grid">
+              <div className="site-hero-copy">
+                <div className="max-w-[36rem]">
+                  <div className="site-kicker">
+                    Deploy agents without hiding the ugly parts
                   </div>
-
-                  <h1 className="mt-6 font-[family:var(--font-landing-display)] text-5xl font-semibold leading-[0.92] tracking-[-0.09em] text-white sm:text-6xl xl:text-[5.15rem]">
-                    Operate deployed agents
-                    <span className="block text-cyan-300">
-                      like infrastructure.
-                    </span>
+                  <h1 className="site-title mt-5">
+                    The control plane for agents that have to survive
+                    production.
                   </h1>
-
-                  <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300 sm:text-[1.18rem] sm:leading-9">
-                    If the demo works but rollout, review, or cost control breaks
-                    in production, the deal stalls. MUTX gives operators control
-                    before that happens.
+                  <p className="site-copy mt-5 max-w-2xl">
+                    MUTX makes auth, deployments, traces, webhooks, runtime
+                    posture, and operator workflows legible before the rollout
+                    becomes a fire drill.
                   </p>
-
-                  <div className="mt-8 flex flex-wrap items-center gap-3">
-                    <Link
-                      href="/app"
-                      prefetch={false}
-                      className="landing-button-primary px-7 py-4 text-base"
-                    >
-                      Open live demo
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                    <a
-                      href="#quickstart"
-                      className="landing-button-secondary px-7 py-4 text-base"
-                    >
-                      Run quickstart
-                      <TerminalSquare className="h-4 w-4" />
-                    </a>
-                    <a
-                      href={DOCS_URL}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="landing-button-secondary px-7 py-4 text-base"
-                    >
-                      Read docs
-                      <BookOpen className="h-4 w-4" />
-                    </a>
-                  </div>
                 </div>
 
-                <HeroMonitorShowcase className="xl:-mr-8" />
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                  <a
+                    href={DOCS_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="site-button-primary w-full sm:w-auto"
+                  >
+                    Read docs
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                  <CalendlyPopupButton className="site-button-accent w-full sm:w-auto">
+                    Book a call
+                    <PhoneCall className="h-4 w-4" />
+                  </CalendlyPopupButton>
+                  <Link
+                    href="/dashboard"
+                    className="site-button-secondary w-full sm:w-auto"
+                  >
+                    Open dashboard
+                  </Link>
+                </div>
+
+                <p className="text-sm text-[color:var(--site-text-muted)]">
+                  Need a guided rollout or a hosted evaluation?{" "}
+                  <Link href="/contact" className="site-inline-link">
+                    Contact MUTX
+                  </Link>
+                  .
+                </p>
               </div>
 
-              <div className="relative mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                {heroSignals.map((item, index) => (
-                  <MotionIn key={item.label} delay={0.05 * index}>
-                    <div className="rounded-[1.7rem] border border-white/10 bg-white/[0.03] px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-slate-300">
-                        {item.value}
-                      </p>
-                      <p className="mt-2 font-[family:var(--font-landing-mono)] text-[0.66rem] uppercase tracking-[0.28em] text-slate-500">
-                        {item.label}
-                      </p>
+              <SiteReveal className="site-hero-visual">
+                <div className="site-demo-frame">
+                  <div className="site-demo-shell">
+                    <div className="site-demo-header">
+                      <div className="site-demo-title">
+                        <div className="site-demo-dots" aria-hidden="true">
+                          <span />
+                          <span />
+                          <span />
+                        </div>
+                        <div>
+                          <p className="site-demo-label">Live control surface</p>
+                          <p className="text-sm text-[color:var(--site-text-soft)]">
+                            dashboard, deployments, traces, receipts
+                          </p>
+                        </div>
+                      </div>
+                      <span className="site-demo-status">live walkthrough</span>
                     </div>
-                  </MotionIn>
+
+                    <div className="site-demo-screen">
+                      <img
+                        src="/demo.gif"
+                        alt="MUTX operator dashboard demo"
+                        width={1280}
+                        height={801}
+                        loading="eager"
+                        decoding="async"
+                        fetchPriority="high"
+                        className="site-demo-image"
+                      />
+                    </div>
+
+                    <div className="site-demo-footer">
+                      <p className="site-demo-footer-title">MUTX control surface</p>
+                      <div className="site-demo-footer-meta">
+                        <span>deployments</span>
+                        <span>traces</span>
+                        <span>webhooks</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="site-demo-stand" aria-hidden="true" />
+                </div>
+              </SiteReveal>
+
+              <div className="site-hero-support">
+                <div className="site-command-card">
+                  <div className="site-command-card-head">
+                    <div>
+                      <p>Start here</p>
+                      <p>smallest credible proof path</p>
+                    </div>
+                    <TerminalSquare className="h-4 w-4 text-[color:var(--site-accent)]" />
+                  </div>
+                  <pre>{`curl -fsSL https://mutx.dev/install.sh | bash
+mutx setup local --provider openclaw --install-openclaw
+mutx assistant overview`}</pre>
+                </div>
+
+                <div className="site-signal-grid">
+                  {heroSignals.map((item) => (
+                    <div key={item.label} className="site-signal-card">
+                      <p className="site-signal-label">{item.label}</p>
+                      <p className="site-signal-value">{item.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="surface" className="site-section site-defer pt-6">
+          <div className="site-shell space-y-8">
+            <SiteReveal>
+              <SectionIntro
+                eyebrow="Why MUTX"
+                title="Demos do not page you at 3:14 AM. Deployments do."
+                body="The problem is rarely the model in isolation. The real pain shows up in auth boundaries, rollback fear, silent webhook failures, vague ownership, and the moment a promising assistant has to behave like infrastructure."
+              />
+            </SiteReveal>
+
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+              <SiteReveal delay={0.04}>
+                <article className="site-panel-strong overflow-hidden p-5 sm:p-6">
+                  <div className="max-w-2xl">
+                    <div className="site-kicker">What MUTX keeps legible</div>
+                    <h3 className="mt-4 text-3xl font-semibold tracking-[-0.06em] text-white sm:text-4xl">
+                      Operator truth, not AI pageantry.
+                    </h3>
+                    <p className="mt-4 text-sm leading-7 text-[color:var(--site-text-soft)] sm:text-base">
+                      If a route is live, the public site should point at it. If
+                      a workflow is rough, the surface should admit it. That is
+                      how you get a control plane people can trust.
+                    </p>
+                  </div>
+
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {routePills.map((route) => (
+                      <span key={route} className="site-route-pill">
+                        {route}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="site-figure-frame mt-6">
+                    <Image
+                      src="/landing/webp/hero-manifesto.webp"
+                      alt="MUTX robot presenting the control plane manifesto"
+                      width={1400}
+                      height={934}
+                      sizes="(max-width: 1280px) 100vw, 44rem"
+                      className="site-hero-art"
+                    />
+                  </div>
+                </article>
+              </SiteReveal>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                {surfaceCards.map((card, index) => (
+                  <SiteReveal key={card.title} delay={0.06 + index * 0.04}>
+                    <FeatureCard {...card} />
+                  </SiteReveal>
                 ))}
               </div>
             </div>
           </div>
         </section>
 
-        <section id="why-mutx" className="px-4 py-24 sm:px-6 lg:px-8 lg:py-28">
-          <div className="mx-auto max-w-7xl">
-            <MotionIn>
-              <SectionHeading
-                label="Why now"
-                title="The sale dies at production handoff."
-                body="Buyers do not wake up wanting agent infrastructure. They wake up wanting deployments that stop breaking, reviews that stop blocking, and costs that stop surprising them."
-              />
-            </MotionIn>
-
-            <div className="mt-12 grid gap-5 xl:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
-              <MotionIn>
-                <article className="landing-panel-strong relative overflow-hidden p-6 lg:p-8">
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(248,113,113,0.16),transparent_22%),radial-gradient(circle_at_100%_0%,rgba(103,232,249,0.1),transparent_28%)]"
+        <section className="site-section py-0">
+          <div className="site-shell">
+            <SiteReveal delay={0.08}>
+              <article className="site-openclaw-band">
+                <div className="site-openclaw-mark">
+                  <Image
+                    src="/openclaw-mark.svg"
+                    alt="OpenClaw"
+                    width={72}
+                    height={72}
+                    sizes="4.5rem"
+                    className="h-auto w-full"
                   />
-                  <div className="relative">
-                    <p className="landing-kicker border-red-300/20 bg-red-400/10 text-red-100">
-                      What kills the deal
-                    </p>
-                    <h3 className="mt-4 font-[family:var(--font-landing-display)] text-3xl font-semibold tracking-[-0.07em] text-white sm:text-[2.35rem]">
-                      The risk is not the model. It is everything around it.
-                    </h3>
-                    <div className="mt-8 grid gap-4 md:grid-cols-2">
-                      {fearCards.map((item) => (
-                        <div
-                          key={item.title}
-                          className="rounded-[1.7rem] border border-white/10 bg-black/20 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
-                        >
-                          <h4 className="text-lg font-semibold tracking-[-0.04em] text-white">
-                            {item.title}
-                          </h4>
-                          <p className="mt-3 text-sm leading-7 text-slate-300/80">
-                            {item.body}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </article>
-              </MotionIn>
+                </div>
 
-              <div className="grid gap-5">
-                <MotionIn delay={0.05}>
-                  <article className="landing-panel p-6">
-                    <p className="landing-kicker">What buyers purchase</p>
-                    <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                      {buyerOutcomes.map((item) => (
-                        <div
-                          key={item}
-                          className="rounded-[1.4rem] border border-cyan-300/16 bg-cyan-300/[0.08] px-4 py-5 text-center"
-                        >
-                          <p className="font-[family:var(--font-landing-mono)] text-[0.72rem] uppercase tracking-[0.24em] text-cyan-100">
-                            {item}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="mt-5 text-sm leading-7 text-slate-300/80">
-                      Lead with the business outcome, not the architecture.
-                    </p>
-                  </article>
-                </MotionIn>
+                <div className="site-openclaw-copy">
+                  <p className="site-openclaw-label">Already running OpenClaw?</p>
+                  <p className="site-openclaw-body">
+                    MUTX can adopt the local runtime you already trust and put
+                    it behind the same operator surface, receipts, and rollout
+                    controls as the rest of the stack.
+                  </p>
+                </div>
 
-                <MotionIn delay={0.1}>
-                  <article className="landing-panel p-6">
-                    <p className="landing-kicker">Start here</p>
-                    <h3 className="mt-4 text-2xl font-semibold tracking-[-0.05em] text-white">
-                      Deployment-sensitive teams.
+                <code className="site-openclaw-command">
+                  mutx setup local --provider openclaw --import-openclaw
+                </code>
+              </article>
+            </SiteReveal>
+          </div>
+        </section>
+
+        <section id="install" className="site-section site-defer">
+          <div className="site-shell space-y-8">
+            <SiteReveal>
+              <SectionIntro
+                eyebrow="Proof Path"
+                title="Start with the lane that matches your mess."
+                body="Use the install path when you need something running, the docs when you need the contract first, and the dashboard when you want the operator surface without the sales narration."
+              />
+            </SiteReveal>
+
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.95fr)]">
+              <div className="grid gap-4">
+                {installCards.map((card, index) => (
+                  <SiteReveal key={card.label} delay={0.04 + index * 0.04}>
+                    <InstallCard {...card} />
+                  </SiteReveal>
+                ))}
+              </div>
+
+              <div className="grid gap-4">
+                <SiteReveal delay={0.08}>
+                  <article className="site-panel-strong overflow-hidden p-5 sm:p-6">
+                    <div className="site-kicker">Docs + routes + operator UI</div>
+                    <h3 className="mt-4 text-3xl font-semibold tracking-[-0.06em] text-white">
+                      One product, four honest surfaces.
                     </h3>
-                    <div className="mt-5 grid gap-3">
-                      {startingWedge.map((item) => (
-                        <div
-                          key={item}
-                          className="rounded-[1.2rem] border border-white/10 bg-black/20 px-4 py-3 text-sm font-medium text-slate-200"
-                        >
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-5 flex flex-wrap gap-2">
-                      {enemyList.map((item) => (
-                        <span key={item} className="landing-chip">
-                          {item}
-                        </span>
-                      ))}
+                    <p className="mt-4 text-sm leading-7 text-[color:var(--site-text-soft)]">
+                      MUTX works best when the site, dashboard, CLI, and API say
+                      the same thing about the same system.
+                    </p>
+
+                    <div className="site-figure-frame mt-6">
+                      <Image
+                        src="/landing/webp/docs-surface.webp"
+                        alt="MUTX robot working through docs and control surfaces"
+                        width={1120}
+                        height={747}
+                        sizes="(max-width: 1280px) 100vw, 34rem"
+                        className="site-hero-art"
+                      />
                     </div>
                   </article>
-                </MotionIn>
+                </SiteReveal>
+
+                <div className="grid gap-4">
+                  {launchCards.map((card, index) => (
+                    <SiteReveal key={card.title} delay={0.1 + index * 0.04}>
+                      <LaunchCard {...card} />
+                    </SiteReveal>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="quickstart" className="px-4 py-24 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <MotionIn>
-              <SectionHeading
-                label="Proof path"
-                title="Run the proof path."
-                body="Use the smallest lane that gets you to a real runtime."
-              />
-            </MotionIn>
+        <section className="site-section site-defer pt-6">
+          <div className="site-shell">
+            <SiteReveal>
+              <article className="site-panel-strong grid gap-6 overflow-hidden p-5 sm:p-6 xl:grid-cols-[minmax(0,1.04fr)_minmax(19rem,0.96fr)] xl:items-center">
+                <div>
+                  <div className="site-kicker">Close the loop</div>
+                  <h2 className="site-section-heading mt-4">
+                    Bring the rollout that already escaped the demo.
+                  </h2>
+                  <p className="site-copy mt-4 max-w-2xl">
+                    MUTX is for the moment when the prototype is done, the
+                    runtime is behaving like infrastructure, and someone has to
+                    make the operator story coherent enough to ship.
+                  </p>
 
-            <MotionIn className="mt-10" delay={0.06}>
-              <QuickstartTabs />
-            </MotionIn>
-          </div>
-        </section>
-
-        <section className="px-4 pb-24 pt-8 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <MotionIn>
-              <div className="landing-panel-strong relative overflow-hidden p-6 lg:p-8">
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_0%,rgba(103,232,249,0.14),transparent_22%),radial-gradient(circle_at_100%_0%,rgba(248,113,113,0.12),transparent_18%)]"
-                />
-
-                <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(19rem,0.98fr)] lg:items-start">
-                  <div>
-                    <div className="landing-kicker">Book a demo</div>
-                    <h2 className="mt-5 font-[family:var(--font-landing-display)] text-4xl font-semibold tracking-[-0.08em] text-white sm:text-5xl">
-                      Bring the workflow that keeps breaking.
-                    </h2>
-                    <p className="mt-4 max-w-2xl text-base leading-8 text-slate-300/82">
-                      If deployments stall, security blocks, or cost visibility
-                      disappears, we will work from the exact path that is
-                      already slowing the deal down.
-                    </p>
-
-                    <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                      {footerProblems.map((item) => (
-                        <div
-                          key={item}
-                          className="rounded-[1.4rem] border border-white/10 bg-black/20 px-4 py-4 text-sm font-medium text-slate-100"
-                        >
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="rounded-[2rem] border border-white/10 bg-[#06111d]/90 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                    <div>
-                      <p className="font-[family:var(--font-landing-mono)] text-[0.68rem] uppercase tracking-[0.22em] text-slate-500">
-                        Discovery call
-                      </p>
-                      <h3 className="mt-3 text-2xl font-semibold tracking-[-0.05em] text-white">
-                        20-minute working session
-                      </h3>
-                      <p className="mt-3 text-sm leading-7 text-slate-300/78">
-                        Bring the rollout, review, or cost problem that is already
-                        dragging the sale down.
-                      </p>
-                    </div>
-
-                    <div className="mt-6 grid gap-3">
-                      {footerCallShape.map((item) => (
-                        <div
-                          key={item}
-                          className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] px-4 py-4 text-sm font-medium text-slate-200"
-                        >
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-
-                    <CalendlyPopupButton className="landing-button-primary mt-6 w-full justify-between px-5 py-4 text-base">
-                      Book a demo
-                      <ArrowRight className="h-5 w-5" />
-                    </CalendlyPopupButton>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <Link href="/contact" className="site-button-primary">
+                      Contact MUTX
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                    <Link href="/dashboard" className="site-button-secondary">
+                      See the dashboard
+                    </Link>
+                    <a
+                      href={DOCS_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="site-button-muted"
+                    >
+                      Re-read the docs
+                    </a>
                   </div>
                 </div>
 
-                <footer className="relative mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="relative h-10 w-10 overflow-hidden rounded-[1rem] border border-cyan-300/15 bg-[linear-gradient(180deg,rgba(230,238,246,0.24)_0%,rgba(95,114,131,0.18)_100%)] p-1 shadow-[0_12px_28px_rgba(34,211,238,0.12)] ring-1 ring-inset ring-white/8">
-                      <div className="absolute inset-[1px] rounded-[0.9rem] bg-[radial-gradient(circle_at_50%_20%,rgba(103,232,249,0.14),transparent_56%),linear-gradient(180deg,rgba(15,23,42,0.94)_0%,rgba(4,10,18,0.96)_100%)]" />
-                      <Image
-                        src="/logo.png"
-                        alt="MUTX logo"
-                        fill
-                        sizes="2.5rem"
-                        className="relative z-10 object-contain p-1 brightness-[1.08] contrast-[1.04]"
-                      />
-                    </div>
-                    <div>
-                      <p className="font-[family:var(--font-landing-mono)] text-[0.68rem] uppercase tracking-[0.28em] text-slate-300">
-                        MUTX
-                      </p>
-                      <p className="text-sm text-slate-400">
-                        Control, speed, predictable economics.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
-                    {footerLinks.map((item) => (
-                      <a
-                        key={item.label}
-                        href={item.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="transition hover:text-white"
-                      >
-                        {item.label}
-                      </a>
-                    ))}
-                  </div>
-                </footer>
-              </div>
-            </MotionIn>
+                <div className="site-figure-frame">
+                  <Image
+                    src="/landing/webp/victory-core.webp"
+                    alt="MUTX robot raising the MUTX mark in victory"
+                    width={1536}
+                    height={1024}
+                    sizes="(max-width: 1280px) 100vw, 36rem"
+                    className="site-hero-art"
+                  />
+                </div>
+              </article>
+            </SiteReveal>
           </div>
         </section>
       </main>
+
+      <PublicFooter />
     </div>
   );
 }
