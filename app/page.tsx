@@ -15,6 +15,7 @@ import type { LucideIcon } from "lucide-react";
 import { ControlLoopTabs } from "@/components/landing/ControlLoopTabs";
 import { HeroMonitorShowcase } from "@/components/landing/HeroMonitorShowcase";
 import { MotionIn } from "@/components/landing/MotionPrimitives";
+import { OpenClawFlowShowcase } from "@/components/landing/OpenClawFlowShowcase";
 import { QuickstartTabs } from "@/components/landing/QuickstartTabs";
 
 export const dynamic = "force-dynamic";
@@ -43,6 +44,7 @@ const DOCS_URL = "https://docs.mutx.dev";
 const navLinks = [
   { label: "Why MUTX", href: "#why-mutx" },
   { label: "Quickstart", href: "#quickstart" },
+  { label: "OpenClaw Flow", href: "#openclaw-flow" },
   { label: "Control Loop", href: "#control-loop" },
 ] as const;
 
@@ -264,7 +266,8 @@ export default function LandingPage() {
 
                   <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300 sm:text-[1.18rem] sm:leading-9">
                     One control plane for deployed assistants across web, CLI,
-                    and TUI.
+                    and TUI, starting with a graceful OpenClaw lane that stays
+                    local and surfaces cleanly everywhere else.
                   </p>
 
                   <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -399,13 +402,37 @@ export default function LandingPage() {
               <div className="max-w-4xl">
                 <div className="landing-kicker">Quickstart</div>
                 <h2 className="mt-5 font-[family:var(--font-landing-display)] text-4xl font-semibold tracking-[-0.08em] text-white sm:text-5xl">
-                  Bring MUTX up fast.
+                  Bring MUTX and OpenClaw up fast.
                 </h2>
+                <p className="mt-4 max-w-2xl text-base leading-8 text-slate-300/80">
+                  Install MUTX once, then let the provider wizard detect or install
+                  OpenClaw, bind a dedicated assistant, and track the runtime under
+                  <span className="px-2 font-[family:var(--font-landing-mono)] text-[0.9em] text-cyan-200">
+                    ~/.mutx/providers/openclaw
+                  </span>
+                  without moving the upstream home.
+                </p>
               </div>
             </MotionIn>
 
             <MotionIn className="mt-10" delay={0.06}>
               <QuickstartTabs />
+            </MotionIn>
+          </div>
+        </section>
+
+        <section id="openclaw-flow" className="px-4 py-24 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <MotionIn>
+              <SectionHeading
+                label="OpenClaw Flow"
+                title="Use upstream OpenClaw. Keep the MUTX shell."
+                body="The runtime stays local and upstream. MUTX adds the operator wrapper: detection, resumable setup, tracked bindings, honest dashboard sync, and the same control language across CLI, TUI, and web."
+              />
+            </MotionIn>
+
+            <MotionIn className="mt-12" delay={0.06}>
+              <OpenClawFlowShowcase />
             </MotionIn>
           </div>
         </section>
