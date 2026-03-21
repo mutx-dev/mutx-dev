@@ -511,6 +511,32 @@ def test_install_script_recovers_when_packaged_cli_lacks_openclaw_flags(tmp_path
     assert "mutx setup hosted --install-openclaw" in result.stdout
 
 
+def test_install_script_refreshes_existing_source_overlay_even_when_surface_looks_current(tmp_path: Path) -> None:
+    source_ref = str(build_fake_cli_package(tmp_path / "source-cli"))
+    env, brew_prefix = build_install_env(tmp_path, source_ref=source_ref)
+    overlay_bin = Path(env["MUTX_HOME_DIR"]) / "runtime" / "source-cli" / "venv" / "bin"
+    overlay_bin.mkdir(parents=True, exist_ok=True)
+    write_executable(overlay_bin / "mutx", CURRENT_MUTX_SCRIPT)
+
+    target = brew_prefix / "bin" / "mutx"
+    if target.exists() or target.is_symlink():
+        target.unlink()
+    target.symlink_to(overlay_bin / "mutx")
+
+    result = subprocess.run(
+        ["bash", str(INSTALL_SCRIPT)],
+        cwd=ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0
+    assert "Refreshing local CLI overlay" in result.stdout
+    assert "Install complete" in result.stdout
+
+
 def test_install_script_reports_detected_openclaw_and_local_key_policy(tmp_path: Path) -> None:
     extra_bin = tmp_path / "extra-bin"
     extra_bin.mkdir(parents=True, exist_ok=True)

@@ -1119,6 +1119,22 @@ resolve_mutx_bin() {
   [[ -n "${MUTX_BIN}" ]] || die "mutx was not found on PATH after install."
 }
 
+mutx_points_to_source_overlay() {
+  local candidate="${MUTX_BIN}"
+  if [[ -L "${MUTX_BIN}" ]]; then
+    local linked=""
+    linked="$(readlink "${MUTX_BIN}" 2>/dev/null || true)"
+    if [[ -n "${linked}" ]]; then
+      if [[ "${linked}" != /* ]]; then
+        linked="$(cd "$(dirname "${MUTX_BIN}")" && pwd)/${linked}"
+      fi
+      candidate="${linked}"
+    fi
+  fi
+
+  [[ "${candidate}" == "${MUTX_HOME_DIR}/runtime/source-cli/"* ]]
+}
+
 check_assistant_first_surface() {
   local -a required_specs=(
     "setup"
@@ -1238,6 +1254,13 @@ install_source_overlay() {
 }
 
 ensure_assistant_first_surface() {
+  if mutx_points_to_source_overlay; then
+    note "Refreshing the MUTX source overlay to the latest main build."
+    run_stage "Refreshing local CLI overlay" install_source_overlay
+    SOURCE_OVERLAY_USED=1
+    resolve_mutx_bin
+  fi
+
   if show_surface_status "Checking onboarding surface"; then
     dashboard_mark_stage_done "${CURRENT_STAGE_INDEX}"
     return 0
