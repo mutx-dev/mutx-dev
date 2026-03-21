@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { readJson, writeJson } from "@/components/app/http";
+import { LiveAuthRequired } from "@/components/dashboard/livePrimitives";
 
 type WebhookDelivery = {
   id: string;
@@ -485,14 +486,17 @@ export default function WebhooksPageClient() {
         </Card>
       )}
 
-      {filteredWebhooks.length === 0 && !showForm && !viewingDeliveries ? (
+      {hasAuthError && !showForm && !viewingDeliveries ? (
+        <LiveAuthRequired
+          title="Operator session required"
+          message="Sign in to load webhook routes, test deliveries, and replay history from the live event surface."
+        />
+      ) : filteredWebhooks.length === 0 && !showForm && !viewingDeliveries ? (
         <Card className="p-12 text-center">
           <Webhook className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold mb-2">{hasAuthError ? "Sign in to manage webhooks" : "No webhooks configured"}</h3>
+          <h3 className="text-lg font-semibold mb-2">No webhooks configured</h3>
           <p className="text-muted-foreground mb-4">
-            {hasAuthError
-              ? "Authentication is required before the dashboard can load webhook routes or delivery history."
-              : "Add a webhook to receive real-time notifications"}
+            Add a webhook to receive real-time notifications
           </p>
           <button
             onClick={() => setShowForm(true)}

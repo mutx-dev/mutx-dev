@@ -19,13 +19,13 @@ function mockRequest(url: string, headers: Record<string, string> = {}) {
 }
 
 describe('host-aware UI routing middleware', () => {
-  it('redirects marketing-host legacy /app traffic to app.mutx.dev dashboard paths', () => {
+  it('redirects marketing-host legacy /app traffic to canonical dashboard paths on app.mutx.dev', () => {
     const response = middleware(
       mockRequest('https://mutx.dev/app/agents?tab=live', { host: 'mutx.dev' }),
     )
 
     expect(response.status).toBe(307)
-    expect(response.headers.get('location')).toBe('https://app.mutx.dev/agents?tab=live')
+    expect(response.headers.get('location')).toBe('https://app.mutx.dev/dashboard/agents?tab=live')
     expect(response.headers.get('cache-control')).toBe(
       'private, no-cache, no-store, max-age=0, must-revalidate',
     )
@@ -40,25 +40,35 @@ describe('host-aware UI routing middleware', () => {
     expect(response.headers.get('location')).toBe('https://app.mutx.dev/login?next=%2Fdashboard')
   })
 
-  it('rewrites app host root into the internal demo shell without caching the HTML', () => {
+  it('rewrites app host root into the canonical dashboard shell without caching the HTML', () => {
     const response = middleware(
       mockRequest('https://app.mutx.dev/', { host: 'app.mutx.dev' }),
     )
 
     expect(response.status).toBe(200)
-    expect(response.headers.get('x-middleware-rewrite')).toBe('https://app.mutx.dev/app')
+    expect(response.headers.get('x-middleware-rewrite')).toBe('https://app.mutx.dev/dashboard')
     expect(response.headers.get('cache-control')).toBe(
       'private, no-cache, no-store, max-age=0, must-revalidate',
     )
   })
 
-  it('redirects app host legacy /app pages to dashboard routes', () => {
+  it('allows direct /control routes on the app host to pass through unchanged', () => {
+    const response = middleware(
+      mockRequest('https://app.mutx.dev/control/agents', { host: 'app.mutx.dev' }),
+    )
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull()
+    expect(response.headers.get('location')).toBeNull()
+  })
+
+  it('redirects app host legacy /app pages to canonical dashboard routes', () => {
     const response = middleware(
       mockRequest('https://app.mutx.dev/app/health', { host: 'app.mutx.dev' }),
     )
 
     expect(response.status).toBe(307)
-    expect(response.headers.get('location')).toBe('https://app.mutx.dev/environments')
+    expect(response.headers.get('location')).toBe('https://app.mutx.dev/dashboard/monitoring')
   })
 
   it('maps stale legacy workflow routes onto canonical dashboard destinations', () => {
@@ -67,21 +77,41 @@ describe('host-aware UI routing middleware', () => {
     )
 
     expect(activityResponse.status).toBe(307)
-    expect(activityResponse.headers.get('location')).toBe('https://app.mutx.dev/audit')
+    expect(activityResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/monitoring')
+
+    const apiKeysResponse = middleware(
+      mockRequest('https://app.mutx.dev/app/api-keys', { host: 'app.mutx.dev' }),
+    )
+
+    expect(apiKeysResponse.status).toBe(307)
+    expect(apiKeysResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/security')
 
     const cronResponse = middleware(
       mockRequest('https://app.mutx.dev/app/cron', { host: 'app.mutx.dev' }),
     )
 
     expect(cronResponse.status).toBe(307)
-    expect(cronResponse.headers.get('location')).toBe('https://app.mutx.dev/orchestration')
+    expect(cronResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/orchestration')
 
     const settingsResponse = middleware(
       mockRequest('https://app.mutx.dev/app/settings', { host: 'app.mutx.dev' }),
     )
 
     expect(settingsResponse.status).toBe(307)
-    expect(settingsResponse.headers.get('location')).toBe('https://app.mutx.dev/settings')
+    expect(settingsResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/control')
+  })
+
+  it('allows canonical app-host dashboard routes to pass through unchanged', () => {
+    const response = middleware(
+      mockRequest('https://app.mutx.dev/dashboard/agents', { host: 'app.mutx.dev' }),
+    )
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull()
+    expect(response.headers.get('location')).toBeNull()
+    expect(response.headers.get('cache-control')).toBe(
+      'private, no-cache, no-store, max-age=0, must-revalidate',
+    )
   })
 
   it('passes through unrelated marketing routes without injecting auth-form rate-limit headers', () => {

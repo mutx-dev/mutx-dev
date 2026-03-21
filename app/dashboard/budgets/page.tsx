@@ -1,20 +1,24 @@
-import { DashboardSectionPage } from "@/components/dashboard/DashboardSectionPage";
+import { Wallet } from "lucide-react";
+
+import { BudgetsPageClient } from "@/components/dashboard/BudgetsPageClient";
+import { RouteHeader } from "@/components/dashboard/RouteHeader";
 
 export default function DashboardBudgetsPage() {
   return (
-    <DashboardSectionPage
-      breadcrumbs={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Budgets" },
-      ]}
-      title="Budgets"
-      description="Cost and quota posture shell for operators managing spend across agents and deployments."
-      badge="operator economics"
-      checks={[
-        "Render spend totals only from trustworthy billing/usage APIs; avoid static utilization percentages.",
-        "Wire budget categories to real quota boundaries (compute, API, storage) once MUTX exposes them.",
-        "Add trend and burn-rate panels only when historical usage data is available server-side.",
-      ]}
-    />
+    <div className="space-y-4">
+      <RouteHeader
+        title="Budgets"
+        description="Credit posture, spend separation, and usage breakdown anchored to the live budget and analytics contracts."
+        icon={Wallet}
+        iconTone="text-emerald-300 bg-emerald-400/10"
+        badge="cost surface"
+        stats={[
+          { label: "Scope", value: "Credits + usage" },
+          { label: "Data", value: "Live API", tone: "success" },
+        ]}
+      />
+
+      <BudgetsPageClient />
+    </div>
   );
 }

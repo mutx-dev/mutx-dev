@@ -43,12 +43,12 @@ export function RouteHeader({
   return (
     <section
       className={cn(
-        "rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.03] to-white/[0.01] p-5 sm:p-6",
+        "rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.03] to-white/[0.01] p-4 sm:p-5",
         className,
       )}
     >
-      <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-        <div className="min-w-0 space-y-3">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0 space-y-2.5">
           {badge ? (
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
               {badge}
@@ -56,12 +56,14 @@ export function RouteHeader({
           ) : null}
 
           <div className="flex items-start gap-3">
-            <div className={cn("mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl", iconTone)}>
-              <Icon className="h-5 w-5" />
+            <div className={cn("mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", iconTone)}>
+              <Icon className="h-4.5 w-4.5" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl font-semibold text-white">{title}</h1>
-              <p className="mt-1 text-sm text-slate-400">{description}</p>
+              <h1 className="text-[1.7rem] font-semibold leading-none tracking-[-0.04em] text-white sm:text-[1.9rem]">
+                {title}
+              </h1>
+              <p className="mt-1.5 max-w-3xl text-sm leading-6 text-slate-400">{description}</p>
             </div>
           </div>
         </div>
@@ -71,7 +73,7 @@ export function RouteHeader({
             {stats.map((stat) => (
               <div
                 key={`${stat.label}-${stat.value}`}
-                className={cn("rounded-xl border px-3 py-2.5", getStatToneClass(stat.tone))}
+                className={cn("rounded-xl border px-3 py-2", getStatToneClass(stat.tone))}
               >
                 <p className="text-[10px] uppercase tracking-[0.18em] opacity-75">{stat.label}</p>
                 <p className="mt-1 font-mono text-sm font-semibold">{stat.value}</p>

@@ -19,6 +19,7 @@ import {
 
 import { Card } from "@/components/ui/Card";
 import { ApiRequestError, extractApiErrorMessage, normalizeCollection, readJson } from "@/components/app/http";
+import { LiveAuthRequired } from "@/components/dashboard/livePrimitives";
 import { type components } from "@/app/types/api";
 
 type Agent = components["schemas"]["AgentResponse"];
@@ -664,7 +665,7 @@ export function AgentsPageClient() {
           </Card>
         </div>
 
-        {error && (
+        {error && !authRequired && (
           <div className="flex items-center justify-between rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
             <div className="flex items-center gap-2">
               <span className="font-medium">Error:</span> {error}
@@ -690,7 +691,12 @@ export function AgentsPageClient() {
           />
         </div>
 
-        {agents.length === 0 ? (
+        {authRequired ? (
+          <LiveAuthRequired
+            title="Operator session required"
+            message="Sign in to load fleet inventory, lifecycle actions, and per-agent configuration from the live API."
+          />
+        ) : agents.length === 0 ? (
           <EmptyState />
         ) : filteredAgents.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-3xl border border-white/5 bg-white/[0.01] py-16 text-center">

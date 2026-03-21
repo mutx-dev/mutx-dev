@@ -18,8 +18,11 @@ jest.mock('../../app/api/_lib/proxy', () => ({
   proxyJson,
 }))
 
-function mockRequest() {
-  return {} as NextRequest
+function mockRequest(url = 'http://localhost:3000/api/test') {
+  return {
+    url,
+    nextUrl: new URL(url),
+  } as NextRequest
 }
 
 describe('dashboard route proxies', () => {
@@ -389,10 +392,12 @@ describe('dashboard route proxies', () => {
       })
     )
     expect(response.status).toBe(504)
-    await expect(response.json()).resolves.toEqual({
-      status: 'degraded',
-      error: 'Health check timed out',
-    })
+    await expect(response.json()).resolves.toEqual(
+      expect.objectContaining({
+        status: 'degraded',
+        error: 'Health check timed out',
+      })
+    )
   })
 
   it('preserves upstream unauthorized responses for api keys proxy', async () => {
@@ -450,9 +455,159 @@ describe('dashboard route proxies', () => {
     const response = await GET()
 
     expect(response.status).toBe(503)
-    await expect(response.json()).resolves.toEqual({
-      status: 'degraded',
-      error: 'Connection failed',
+    await expect(response.json()).resolves.toEqual(
+      expect.objectContaining({
+        status: 'degraded',
+        error: 'Connection failed',
+      })
+    )
+  })
+
+  it('proxies dashboard runs with default limit and forwarded filters', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ items: [], total: 0 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { GET } = await import('../../app/api/dashboard/runs/route')
+
+    const request = mockRequest('http://localhost:3000/api/dashboard/runs?status=failed')
+    const response = await GET(request)
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/runs?status=failed&limit=24',
+      {
+        method: 'GET',
+        fallbackMessage: 'Failed to fetch runs',
+      },
+    )
+    expect(response.status).toBe(200)
+  })
+
+  it('proxies dashboard run traces for the selected run', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ items: [] }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { GET } = await import('../../app/api/dashboard/runs/[runId]/traces/route')
+
+    const request = mockRequest('http://localhost:3000/api/dashboard/runs/run_123/traces?limit=64')
+    const response = await GET(request, {
+      params: Promise.resolve({ runId: 'run_123' }),
     })
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/runs/run_123/traces?limit=64',
+      {
+        method: 'GET',
+        fallbackMessage: 'Failed to fetch run traces',
+      },
+    )
+    expect(response.status).toBe(200)
+  })
+
+  it('proxies dashboard monitoring alerts with a default page size', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ items: [], total: 0, unresolved_count: 0 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { GET } = await import('../../app/api/dashboard/monitoring/alerts/route')
+
+    const request = mockRequest('http://localhost:3000/api/dashboard/monitoring/alerts')
+    const response = await GET(request)
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/monitoring/alerts?limit=12',
+      {
+        method: 'GET',
+        fallbackMessage: 'Failed to fetch alerts',
+      },
+    )
+    expect(response.status).toBe(200)
+  })
+
+  it('proxies dashboard budget usage with forwarded query params', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ usage_by_agent: [] }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { GET } = await import('../../app/api/dashboard/budgets/usage/route')
+
+    const request = mockRequest('http://localhost:3000/api/dashboard/budgets/usage?period_start=30d')
+    const response = await GET(request)
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/budgets/usage?period_start=30d',
+      {
+        method: 'GET',
+        fallbackMessage: 'Failed to fetch usage breakdown',
+      },
+    )
+    expect(response.status).toBe(200)
+  })
+
+  it('proxies dashboard analytics summary', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ total_runs: 0 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { GET } = await import('../../app/api/dashboard/analytics/summary/route')
+
+    const request = mockRequest('http://localhost:3000/api/dashboard/analytics/summary?period_start=30d')
+    const response = await GET(request)
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/analytics/summary?period_start=30d',
+      {
+        method: 'GET',
+        fallbackMessage: 'Failed to fetch analytics summary',
+      },
+    )
+    expect(response.status).toBe(200)
+  })
+
+  it('proxies dashboard swarms scale actions', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ id: 'swarm_123' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    )
+    const { POST } = await import('../../app/api/dashboard/swarms/[swarmId]/scale/route')
+
+    const request = {
+      json: async () => ({ replicas: 3 }),
+    } as NextRequest
+    const response = await POST(request, {
+      params: Promise.resolve({ swarmId: 'swarm_123' }),
+    })
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/swarms/swarm_123/scale',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ replicas: 3 }),
+        fallbackMessage: 'Failed to scale swarm',
+      },
+    )
+    expect(response.status).toBe(200)
   })
 })

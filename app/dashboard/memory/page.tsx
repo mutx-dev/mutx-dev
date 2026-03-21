@@ -1,19 +1,15 @@
-import { DashboardSectionPage } from "@/components/dashboard/DashboardSectionPage";
+import { DemoRoutePage } from "@/components/dashboard/DemoRoutePage";
 
 export default function DashboardMemoryPage() {
   return (
-    <DashboardSectionPage
-      breadcrumbs={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Memory" },
-      ]}
+    <DemoRoutePage
       title="Memory"
-      description="Reserved operator surface for future MUTX memory and context-management features."
-      badge="ported operator section"
-      checks={[
-        "Keep the route visually aligned with the new operator shell while memory product scope is still being defined for MUTX.",
-        "Avoid shipping fabricated vector-store controls until MUTX has real memory APIs and product semantics.",
-        "Use this shell as the landing zone for future context, retention, or knowledge-surface work once the backend exists.",
+      description="Memory and context-management need real retention and retrieval contracts before they deserve operator controls."
+      badge="demo memory"
+      notes={[
+        "Do not ship pretend vector-store or retention controls before the product semantics exist.",
+        "This surface should become the place operators inspect memory pressure, retention windows, and context ownership.",
+        "Until then, keep the route compact, honest, and visually aligned with the rest of the control plane.",
       ]}
     />
   );

@@ -7,7 +7,7 @@ import WebhooksPageClient from "@/components/webhooks/WebhooksPageClient";
 
 export default function DashboardWebhooksPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <RouteHeader
         title="Webhooks"
         description="Manage outbound event endpoints and verify delivery behavior with truthful delivery history."

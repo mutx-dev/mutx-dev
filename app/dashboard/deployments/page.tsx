@@ -9,7 +9,7 @@ import { RouteHeader } from "@/components/dashboard/RouteHeader";
 export default function DashboardDeploymentsPage() {
   return (
     <ErrorBoundary>
-      <div className="space-y-6">
+      <div className="space-y-4">
         <RouteHeader
           title="Deployments"
           description="Operate active MUTX deployments, rollout actions, and runtime-level fleet posture."

@@ -9,7 +9,7 @@ import { RouteHeader } from "@/components/dashboard/RouteHeader";
 export default function DashboardAgentsPage() {
   return (
     <ErrorBoundary>
-      <div className="space-y-6">
+      <div className="space-y-4">
         <RouteHeader
           title="Agents"
           description="Manage your MUTX agent registry, lifecycle operations, and per-agent configuration."

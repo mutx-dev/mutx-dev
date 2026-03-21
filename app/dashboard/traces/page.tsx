@@ -1,20 +1,24 @@
-import { DashboardSectionPage } from "@/components/dashboard/DashboardSectionPage";
+import { Workflow } from "lucide-react";
+
+import { RouteHeader } from "@/components/dashboard/RouteHeader";
+import { TracesPageClient } from "@/components/dashboard/TracesPageClient";
 
 export default function DashboardTracesPage() {
   return (
-    <DashboardSectionPage
-      breadcrumbs={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Traces" },
-      ]}
-      title="Traces"
-      description="Execution trace explorer shell for correlated request, tool, and runtime events."
-      badge="operator observability"
-      checks={[
-        "Hook to real trace/span data once MUTX exposes a stable endpoint for event timelines and correlation IDs.",
-        "Keep event metadata schema-aligned with backend fields so trace cards remain truthful and auditable.",
-        "Enable log/run/deployment cross-links only when backed by real identifiers from API responses.",
-      ]}
-    />
+    <div className="space-y-4">
+      <RouteHeader
+        title="Traces"
+        description="Correlated event streams anchored to real runs instead of a standalone synthetic log wall."
+        icon={Workflow}
+        iconTone="text-sky-300 bg-sky-400/10"
+        badge="trace explorer"
+        stats={[
+          { label: "Scope", value: "Run drilldown" },
+          { label: "Data", value: "Live API", tone: "success" },
+        ]}
+      />
+
+      <TracesPageClient />
+    </div>
   );
 }

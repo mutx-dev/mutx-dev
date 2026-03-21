@@ -1,19 +1,15 @@
-import { DashboardSectionPage } from "@/components/dashboard/DashboardSectionPage";
+import { DemoRoutePage } from "@/components/dashboard/DemoRoutePage";
 
 export default function DashboardOrchestrationPage() {
   return (
-    <DashboardSectionPage
-      breadcrumbs={[
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Orchestration" },
-      ]}
+    <DemoRoutePage
       title="Orchestration"
-      description="Automation shell for workflows, wakeups, and follow-on control-plane routines after the starter assistant is live."
-      badge="automation lanes"
-      checks={[
-        "Connect lane cards and dependency graph to real automation entities once MUTX publishes workflow and wakeup APIs.",
-        "Expose pause/resume and concurrency controls only when actions map to backend mutations with auditability.",
-        "Keep this route focused on truthful automation state instead of simulated queues or synthetic handoff graphs.",
+      description="Workflow and handoff control will land here once the backend owns orchestration entities end to end."
+      badge="demo orchestration"
+      notes={[
+        "Show truthful workflow topology once orchestration endpoints ship instead of inventing queue theater.",
+        "Keep pause, resume, and concurrency controls hidden until they map to auditable backend actions.",
+        "Use the same shell and density rules as the live routes so this page is ready for backend wiring, not another redesign.",
       ]}
     />
   );

@@ -5,9 +5,10 @@
   "main": "desktop/main.cjs",
   "scripts": {
     "prebuild": "node -e \"require('fs').rmSync('public/_next', { recursive: true, force: true })\"",
+    "prepare:standalone": "node scripts/prepare-standalone.mjs",
     "dev": "next dev",
     "build": "next build",
-    "start": "node .next/standalone/server.js",
+    "start": "npm run prepare:standalone && node .next/standalone/server.js",
     "lint": "echo Skipping lint - use pnpm eslint instead",
     "desktop:start": "electron .",
     "desktop:dev": "bash -lc 'npm run dev & NEXT_PID=$!; trap \"kill $NEXT_PID\" EXIT; until curl -fsS http://127.0.0.1:3000 >/dev/null; do sleep 1; done; MUTX_DESKTOP_URL=http://127.0.0.1:3000 electron .'",

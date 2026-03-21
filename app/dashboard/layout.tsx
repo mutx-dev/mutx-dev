@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL("https://app.mutx.dev"),
   title: "Dashboard - MUTX",
-  description: "Demo overview for the MUTX control plane.",
+  description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
   keywords: [
     "agent control plane",
     "agent deployments",
@@ -22,12 +22,12 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Dashboard - MUTX",
-    description: "Demo overview for the MUTX control plane.",
+    description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
     url: "https://app.mutx.dev",
   },
   twitter: {
     title: "Dashboard - MUTX",
-    description: "Demo overview for the MUTX control plane.",
+    description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
     images: ["https://mutx.dev/landing/victory-core.png"],
   },
 };

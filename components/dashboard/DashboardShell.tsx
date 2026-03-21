@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -87,16 +87,21 @@ function DashboardNav({ onNavigate, pathname }: DashboardNavProps) {
 export function DashboardShell({ children }: DashboardShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [clockLabel, setClockLabel] = useState("--:--");
 
-  const clockLabel = useMemo(
-    () =>
-      new Intl.DateTimeFormat(undefined, {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      }).format(new Date()),
-    [],
-  );
+  useEffect(() => {
+    const formatter = new Intl.DateTimeFormat(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+    const syncClock = () => setClockLabel(formatter.format(new Date()));
+    syncClock();
+    const timer = window.setInterval(syncClock, 60_000);
+
+    return () => window.clearInterval(timer);
+  }, []);
 
   const sidebarBrand = (
     <div className="flex items-center gap-3">

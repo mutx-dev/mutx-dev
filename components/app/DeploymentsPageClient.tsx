@@ -22,6 +22,7 @@ import { DeploymentSortSelect } from "./DeploymentSortSelect";
 
 import { Card } from "@/components/ui/Card";
 import { ApiRequestError, normalizeCollection, readJson, writeJson } from "@/components/app/http";
+import { LiveAuthRequired } from "@/components/dashboard/livePrimitives";
 import { DeploymentHistory } from "./DeploymentHistory";
 import { type components } from "@/app/types/api";
 
@@ -737,14 +738,10 @@ export function DeploymentsPageClient() {
       </div>
 
       {authRequired ? (
-        <div className="rounded-xl border border-amber-400/20 bg-amber-400/10 p-8 text-center">
-          <Server className="mx-auto h-12 w-12 text-amber-300" />
-          <p className="mt-4 text-lg font-medium text-white">Operator session required</p>
-          <p className="mt-2 text-sm text-slate-300">
-            Sign in again to load your real deployment inventory and control actions.
-            If your session just expired, a refresh should recover automatically on your next request.
-          </p>
-        </div>
+        <LiveAuthRequired
+          title="Operator session required"
+          message="Sign in again to load the real deployment inventory, rollout actions, and runtime posture for this tenant."
+        />
       ) : filteredDeployments.length === 0 ? (
         <div className="rounded-xl border border-white/5 bg-white/[0.02] p-12 text-center">
           <Server className="mx-auto h-12 w-12 text-slate-600" />

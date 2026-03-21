@@ -25,7 +25,7 @@ export default defineConfig({
     actionTimeout: 10000,
   },
   webServer: {
-    command: "sh -c 'cp -R .next/static .next/standalone/.next/static && cp -R public .next/standalone/public && PORT=" + port + " HOSTNAME=127.0.0.1 node .next/standalone/server.js'",
+    command: "sh -c 'npm run prepare:standalone && PORT=" + port + " HOSTNAME=127.0.0.1 node .next/standalone/server.js'",
     url: baseURL,
     reuseExistingServer: !isCI,
     timeout: 120000,

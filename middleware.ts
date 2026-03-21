@@ -57,9 +57,9 @@ function getClientIp(request: NextRequest): string {
 }
 
 function getRequestHost(request: NextRequest): string {
-  const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim()
   const host = request.headers.get('host')?.split(',')[0]?.trim()
-  return (forwardedHost || host || request.nextUrl.hostname).split(':')[0]
+  const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim()
+  return (host || forwardedHost || request.nextUrl.hostname).split(':')[0].toLowerCase()
 }
 
 function normalizePathname(pathname: string): string {
@@ -77,11 +77,11 @@ function mapLegacyAppPathToDashboard(pathname: string): string {
     '/app': '/dashboard',
     '/app/agents': '/dashboard/agents',
     '/app/deployments': '/dashboard/deployments',
-    '/app/api-keys': '/dashboard/api-keys',
+    '/app/api-keys': '/dashboard/security',
     '/app/webhooks': '/dashboard/webhooks',
-    '/app/logs': '/dashboard/logs',
-    '/app/history': '/dashboard/history',
-    '/app/activity': '/dashboard/history',
+    '/app/logs': '/dashboard/monitoring',
+    '/app/history': '/dashboard/monitoring',
+    '/app/activity': '/dashboard/monitoring',
     '/app/budgets': '/dashboard/budgets',
     '/app/traces': '/dashboard/traces',
     '/app/runs': '/dashboard/runs',
@@ -106,44 +106,6 @@ function mapLegacyAppPathToDashboard(pathname: string): string {
   return normalized
 }
 
-function dashboardPathToAppPath(pathname: string): string {
-  const normalized = normalizePathname(pathname)
-
-  if (normalized === '/dashboard' || normalized === '/app' || normalized === '/overview') {
-    return '/'
-  }
-
-  const directMap: Record<string, string> = {
-    '/dashboard/agents': '/agents',
-    '/dashboard/deployments': '/deployments',
-    '/dashboard/runs': '/runs',
-    '/dashboard/monitoring': '/environments',
-    '/dashboard/api-keys': '/access',
-    '/dashboard/webhooks': '/connectors',
-    '/dashboard/history': '/audit',
-    '/dashboard/budgets': '/usage',
-    '/dashboard/control': '/settings',
-    '/dashboard/logs': '/logs',
-    '/dashboard/traces': '/traces',
-    '/dashboard/memory': '/memory',
-    '/dashboard/orchestration': '/orchestration',
-  }
-
-  if (directMap[normalized]) {
-    return directMap[normalized]
-  }
-
-  if (normalized.startsWith('/app/')) {
-    return dashboardPathToAppPath(mapLegacyAppPathToDashboard(normalized))
-  }
-
-  if (normalized.startsWith('/dashboard/')) {
-    return normalized.slice('/dashboard'.length) || '/'
-  }
-
-  return normalized
-}
-
 function internalDemoPathToPublicPath(pathname: string): string {
   const normalized = normalizePathname(pathname)
 
@@ -162,8 +124,8 @@ function appHostPathToInternalDemoPath(pathname: string): string {
   const normalized = normalizePathname(pathname)
 
   const directMap: Record<string, string> = {
-    '/': '/control',
-    '/overview': '/control',
+    '/': '/dashboard',
+    '/overview': '/dashboard',
     '/agents': '/control/agents',
     '/deployments': '/control/deployments',
     '/runs': '/control/runs',
@@ -299,8 +261,11 @@ export function middleware(request: NextRequest) {
       normalizedPath === '/app' ||
       normalizedPath.startsWith('/app/')
     ) {
+      const canonicalDashboardPath = normalizedPath.startsWith('/app')
+        ? mapLegacyAppPathToDashboard(normalizedPath)
+        : normalizedPath
       return applyUiCacheHeaders(
-        redirectToHost(request, APP_HOST, dashboardPathToAppPath(normalizedPath)),
+        redirectToHost(request, APP_HOST, canonicalDashboardPath),
         host,
         normalizedPath,
       )
@@ -308,26 +273,17 @@ export function middleware(request: NextRequest) {
   }
 
   if (APP_HOSTS.has(host)) {
-    const publicDemoPath = internalDemoPathToPublicPath(normalizedPath)
-    if (publicDemoPath !== normalizedPath) {
-      return applyUiCacheHeaders(
-        redirectWithinHost(request, publicDemoPath),
-        host,
-        normalizedPath,
-      )
+    if (normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/')) {
+      return applyUiCacheHeaders(NextResponse.next(), host, normalizedPath)
     }
 
-    if (normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/')) {
-      return applyUiCacheHeaders(
-        redirectWithinHost(request, dashboardPathToAppPath(normalizedPath)),
-        host,
-        normalizedPath,
-      )
+    if (normalizedPath === '/control' || normalizedPath.startsWith('/control/')) {
+      return applyUiCacheHeaders(NextResponse.next(), host, normalizedPath)
     }
 
     if (normalizedPath === '/app' || normalizedPath.startsWith('/app/')) {
       return applyUiCacheHeaders(
-        redirectWithinHost(request, dashboardPathToAppPath(normalizedPath)),
+        redirectWithinHost(request, mapLegacyAppPathToDashboard(normalizedPath)),
         host,
         normalizedPath,
       )
