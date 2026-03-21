@@ -168,7 +168,7 @@ def detect_openclaw_home_source() -> str:
 def _tracking_mode_for_disposition(disposition: str | None) -> str:
     if disposition == "detected_existing":
         return "import_existing_runtime"
-    if disposition == "installed_by_mutx":
+    if disposition in {"installed_by_mutx", "reinstalled_by_mutx"}:
         return "track_mutx_bootstrapped_runtime"
     return "track_external_runtime"
 
@@ -298,6 +298,46 @@ def _run_command(
 
 def _run_bash(command: str) -> None:
     _run_command(["/bin/bash", "-lc", command], capture_output=False)
+
+
+def _last_nonempty_line(raw: str) -> str | None:
+    for line in reversed(raw.splitlines()):
+        value = line.strip()
+        if value:
+            return value
+    return None
+
+
+def run_openclaw_text(args: list[str]) -> str:
+    claw_bin = find_openclaw_bin()
+    if claw_bin is None:
+        raise ValidationError("OpenClaw is not installed.")
+
+    result = _run_command([claw_bin, *args])
+    output = (result.stdout or "").strip()
+    if output:
+        return output
+    return (result.stderr or "").strip()
+
+
+def resolve_openclaw_config_file() -> str | None:
+    detected = detect_openclaw_config_path()
+    if detected is not None:
+        return str(detected)
+
+    try:
+        raw = run_openclaw_text(["config", "file"])
+    except CLIServiceError:
+        return None
+
+    candidate = _last_nonempty_line(raw)
+    if not candidate:
+        return None
+    return str(Path(candidate).expanduser())
+
+
+def validate_openclaw_config() -> str:
+    return run_openclaw_text(["config", "validate"])
 
 
 def detect_openclaw_version() -> str | None:
@@ -454,9 +494,10 @@ def ensure_openclaw_installed(
     no_input: bool,
     prompt_install: Callable[[], bool] | None = None,
     command_runner: Callable[[str], None] | None = None,
+    force_install: bool = False,
 ) -> OpenClawInstallResolution:
     resolved = find_openclaw_bin()
-    if resolved:
+    if resolved and not force_install:
         return OpenClawInstallResolution(
             binary_path=resolved,
             install_method=normalize_install_method(install_method),
@@ -492,7 +533,7 @@ def ensure_openclaw_installed(
             return OpenClawInstallResolution(
                 binary_path=resolved,
                 install_method=method,
-                disposition="installed_by_mutx",
+                disposition="reinstalled_by_mutx" if force_install else "installed_by_mutx",
             )
         raise CLIServiceError(
             "OpenClaw installer finished, but `openclaw` is still not available on PATH. "
@@ -502,7 +543,7 @@ def ensure_openclaw_installed(
     return OpenClawInstallResolution(
         binary_path=install_openclaw(install_method=method, non_interactive=no_input),
         install_method=method,
-        disposition="installed_by_mutx",
+        disposition="reinstalled_by_mutx" if force_install else "installed_by_mutx",
     )
 
 
@@ -533,6 +574,45 @@ def ensure_openclaw_onboarded(
     return get_gateway_health()
 
 
+def inspect_importable_openclaw_runtime(
+    *,
+    install_method: str,
+) -> tuple[OpenClawInstallResolution, OpenClawGatewayHealth]:
+    install_resolution = ensure_openclaw_installed(
+        install_if_missing=False,
+        install_method=install_method,
+        no_input=True,
+    )
+    config_path = resolve_openclaw_config_file()
+    if not config_path:
+        raise ValidationError(
+            "OpenClaw is installed, but no config file was detected. "
+            "Use `Configure OpenClaw 🦞` or run `openclaw configure`, then rerun the import."
+        )
+
+    try:
+        validate_openclaw_config()
+    except CLIServiceError as exc:
+        raise ValidationError(
+            "OpenClaw was detected, but the config is invalid. "
+            "Use `Configure OpenClaw 🦞` or run `openclaw configure`, then rerun the import.\n"
+            f"{exc}"
+        ) from exc
+
+    health = get_gateway_health()
+    if not health.onboarded:
+        raise ValidationError(
+            "OpenClaw config validated, but onboarding is incomplete. "
+            "Use `Configure OpenClaw 🦞` or run `openclaw onboard --install-daemon`, then rerun the import."
+        )
+    if not health.gateway_reachable:
+        raise ValidationError(
+            "OpenClaw config validated, but the local gateway is not reachable yet. "
+            "Use `Configure OpenClaw 🦞`, run `openclaw onboard --install-daemon`, or open `openclaw tui`, then rerun the import."
+        )
+    return install_resolution, health
+
+
 def run_openclaw_json(args: list[str]) -> Any:
     claw_bin = find_openclaw_bin()
     if claw_bin is None:
@@ -543,6 +623,47 @@ def run_openclaw_json(args: list[str]) -> Any:
     if payload is None:
         raise CLIServiceError(f"OpenClaw returned invalid JSON for: {' '.join(args)}")
     return payload
+
+
+def build_openclaw_surface_command(
+    *,
+    surface: str,
+    gateway_url: str | None = None,
+    session_key: str | None = None,
+) -> list[str]:
+    claw_bin = find_openclaw_bin()
+    if claw_bin is None:
+        raise ValidationError("OpenClaw is not installed.")
+
+    normalized = surface.strip().lower()
+    if normalized not in {"tui", "configure"}:
+        raise ValidationError("Unsupported OpenClaw surface. Use `tui` or `configure`.")
+
+    command = [claw_bin, normalized]
+    if normalized == "tui":
+        if gateway_url:
+            command.extend(["--url", gateway_url])
+        if session_key:
+            command.extend(["--session", session_key])
+    return command
+
+
+def open_openclaw_surface(
+    *,
+    surface: str,
+    gateway_url: str | None = None,
+    session_key: str | None = None,
+    command_runner: Callable[[list[str]], None] | None = None,
+) -> None:
+    command = build_openclaw_surface_command(
+        surface=surface,
+        gateway_url=gateway_url,
+        session_key=session_key,
+    )
+    if command_runner is not None:
+        command_runner(command)
+        return
+    _run_command(command, capture_output=False)
 
 
 def list_openclaw_agents() -> list[dict[str, Any]]:
@@ -635,6 +756,7 @@ def collect_openclaw_runtime_snapshot(
     assistant_name: str | None = None,
     install_method: str | None = None,
     installation_disposition: str | None = None,
+    action_type: str | None = None,
 ) -> OpenClawRuntimeSnapshot:
     observed_at = datetime.now(timezone.utc).isoformat()
     health = get_gateway_health()
@@ -658,6 +780,24 @@ def collect_openclaw_runtime_snapshot(
         manifest.get("tracking_mode") or _tracking_mode_for_disposition(resolved_disposition)
     )
     privacy_summary = str(manifest.get("privacy_summary") or _privacy_summary())
+    adopted_existing_runtime = bool(
+        manifest.get("adopted_existing_runtime")
+        if "adopted_existing_runtime" in manifest
+        else resolved_disposition == "detected_existing"
+    )
+    resolved_action_type = str(
+        action_type or manifest.get("last_action_type") or ("import" if adopted_existing_runtime else "install")
+    )
+    import_source = manifest.get("import_source")
+    if not isinstance(import_source, dict):
+        import_source = {}
+    import_source = {
+        **import_source,
+        "binary_path": binary_path,
+        "config_path": str(config_path) if config_path else resolve_openclaw_config_file(),
+        "home_path": str(state_dir),
+        "home_source": home_source,
+    }
 
     bindings = list_bindings(OPENCLAW_PROVIDER_ID)
     if binding is not None:
@@ -686,9 +826,12 @@ def collect_openclaw_runtime_snapshot(
         "installation_disposition": resolved_disposition,
         "tracking_mode": tracking_mode,
         "imported_into_mutx": True,
+        "adopted_existing_runtime": adopted_existing_runtime,
         "keys_remain_local": True,
         "credential_sync_policy": "local_only",
         "privacy_summary": privacy_summary,
+        "last_action_type": resolved_action_type,
+        "import_source": import_source,
         "version": version,
         "status": health.status,
         "gateway": health.to_payload(),
@@ -713,12 +856,14 @@ def persist_openclaw_runtime_snapshot(
     install_method: str | None = None,
     installation_disposition: str | None = None,
     synced_at: str | None = None,
+    action_type: str | None = None,
 ) -> OpenClawRuntimeSnapshot:
     snapshot = collect_openclaw_runtime_snapshot(
         binding=binding,
         assistant_name=assistant_name,
         install_method=install_method,
         installation_disposition=installation_disposition,
+        action_type=action_type,
     )
     payload = snapshot.to_payload()
     manifest = {
@@ -738,9 +883,12 @@ def persist_openclaw_runtime_snapshot(
         "installation_disposition": payload["installation_disposition"],
         "tracking_mode": payload["tracking_mode"],
         "imported_into_mutx": payload["imported_into_mutx"],
+        "adopted_existing_runtime": payload["adopted_existing_runtime"],
         "keys_remain_local": payload["keys_remain_local"],
         "credential_sync_policy": payload["credential_sync_policy"],
         "privacy_summary": payload["privacy_summary"],
+        "last_action_type": payload["last_action_type"],
+        "import_source": payload["import_source"],
         "version": payload["version"],
         "status": payload["status"],
         "gateway": payload["gateway"],
@@ -763,7 +911,10 @@ def persist_openclaw_runtime_snapshot(
             binding.agent_id,
             _binding_payload(binding, assistant_name=assistant_name),
         )
-    return OpenClawRuntimeSnapshot(provider=OPENCLAW_PROVIDER_ID, payload={**payload, "last_synced_at": synced_at or payload.get("last_synced_at")})
+    return OpenClawRuntimeSnapshot(
+        provider=OPENCLAW_PROVIDER_ID,
+        payload={**payload, "last_synced_at": synced_at or payload.get("last_synced_at")},
+    )
 
 
 def prepare_personal_assistant_runtime(

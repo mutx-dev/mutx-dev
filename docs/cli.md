@@ -104,6 +104,13 @@ Local contributor:
 mutx setup local --provider openclaw --install-openclaw --open-tui
 ```
 
+If OpenClaw already exists on the machine and you just want MUTX to adopt it for tracking:
+
+```bash
+mutx setup hosted --provider openclaw --import-openclaw
+mutx setup local --provider openclaw --import-openclaw
+```
+
 Hosted setup authenticates against the configured control plane. Local setup bootstraps a trusted local operator session on `http://localhost:8000`, deploys `Personal Assistant`, and can open the TUI without asking for email or password.
 
 Both lanes now:
@@ -128,6 +135,7 @@ Both lanes now:
 | `mutx runtime list` | List local provider runtimes tracked under `~/.mutx/providers` |
 | `mutx runtime inspect <provider>` | Inspect the local manifest plus the last synced remote snapshot |
 | `mutx runtime resync <provider>` | Push the local provider snapshot back to the API/dashboard |
+| `mutx runtime open <provider> --surface tui|configure` | Suspend back into the upstream OpenClaw TUI or configurator, then return to MUTX |
 
 ### Auth
 
@@ -182,6 +190,7 @@ mutx tui
 The TUI now centers the assistant-first operator path:
 
 * `Setup`: auth state, provider cards, wizard steps, runtime pointers, and starter deployment entrypoint
+  Existing OpenClaw installs expose `Import Existing OpenClaw 🦞`, `Configure OpenClaw 🦞`, and `Open OpenClaw TUI 🦞`.
 * `Assistant`: assistant overview, status, and deployment context
 * `Deployments`: deployment inventory and controls
 * `Control Plane`: sessions and gateway detail
@@ -215,6 +224,7 @@ mutx setup local --name "Local Operator" --provider openclaw --install-openclaw 
 mutx doctor
 mutx assistant overview
 mutx runtime inspect openclaw
+mutx runtime open openclaw --surface tui
 mutx tui
 ```
 

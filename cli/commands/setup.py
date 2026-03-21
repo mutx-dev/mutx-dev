@@ -2,6 +2,7 @@ import click
 
 from cli.commands.tui import launch_tui
 from cli.config import LOCAL_API_URL, current_config, get_client, resolve_hosted_api_url
+from cli.openclaw_runtime import find_openclaw_bin
 from cli.services import AssistantService, AuthService, CLIServiceError, RuntimeStateService
 from cli.services.assistant import TemplatesService
 from cli.setup_wizard import mark_auth_completed, run_openclaw_setup_wizard
@@ -37,6 +38,36 @@ def _require_value(label: str, value: str | None, no_input: bool, *, secret: boo
     return click.prompt(label, hide_input=secret)
 
 
+def _choose_openclaw_action(*, no_input: bool, import_openclaw: bool, install_openclaw: bool) -> str:
+    existing_binary = find_openclaw_bin()
+    if import_openclaw:
+        if not existing_binary:
+            raise click.ClickException(
+                "OpenClaw is not installed, so it cannot be imported yet. "
+                "Install it first or rerun without `--import-openclaw`."
+            )
+        return "import"
+    if not existing_binary:
+        return "install"
+    if no_input:
+        return "import"
+
+    click.echo("")
+    click.echo("OpenClaw detected locally. Choose how MUTX should proceed:")
+    click.echo(f"  1. Import Existing OpenClaw 🦞  [{existing_binary}]")
+    click.echo("  2. Install / Repair OpenClaw")
+    click.echo("  3. Configure OpenClaw 🦞")
+    click.echo("  4. Cancel")
+    selection = click.prompt("Select an action", type=click.IntRange(1, 4), default=1)
+    mapping = {
+        1: "import",
+        2: "install",
+        3: "configure",
+        4: "cancel",
+    }
+    return mapping[selection]
+
+
 def _finish_setup(
     *,
     mode: str,
@@ -47,6 +78,7 @@ def _finish_setup(
     model: str | None,
     workspace: str | None,
     install_openclaw: bool,
+    import_openclaw: bool,
     openclaw_install_method: str,
     no_input: bool,
     open_tui: bool,
@@ -54,7 +86,19 @@ def _finish_setup(
     if provider != "openclaw":
         raise click.ClickException(f"Unsupported provider '{provider}'. Only openclaw is enabled in this sprint.")
 
+    action_type = _choose_openclaw_action(
+        no_input=no_input,
+        import_openclaw=import_openclaw,
+        install_openclaw=install_openclaw,
+    )
+    if action_type == "cancel":
+        click.echo("Setup cancelled before OpenClaw import/install.")
+        return
+
     default_model = str(current_config().assistant_defaults.get("model") or model or "")
+    effective_install_openclaw = install_openclaw or (
+        action_type == "install" and find_openclaw_bin() is not None
+    )
 
     def _report(event: dict[str, object]) -> None:
         state = str(event.get("state") or "running")
@@ -69,9 +113,10 @@ def _finish_setup(
         replicas=replicas,
         model=model or default_model,
         workspace=workspace,
-        install_openclaw=install_openclaw,
+        install_openclaw=effective_install_openclaw,
         openclaw_install_method=openclaw_install_method,
         no_input=no_input,
+        requested_action=action_type,
         templates_service=_templates_service(),
         assistant_service=_assistant_service(),
         runtime_service=_runtime_service(),
@@ -89,9 +134,12 @@ def _finish_setup(
     click.echo(f"OpenClaw assistant_id: {result.binding.agent_id}")
     click.echo(f"OpenClaw binary: {result.runtime_snapshot.get('binary_path') or 'n/a'}")
     click.echo(f"OpenClaw home: {result.runtime_snapshot.get('home_path') or 'n/a'}")
+    click.echo(f"OpenClaw config: {result.runtime_snapshot.get('config_path') or 'n/a'}")
     click.echo(f"Workspace: {result.binding.workspace}")
     click.echo(f"Gateway: {result.health.gateway_url or 'n/a'} ({result.health.status})")
     click.echo("Tracking: imported into ~/.mutx/providers/openclaw")
+    if result.action_type in {"import", "configure"}:
+        click.echo("Adoption: existing OpenClaw runtime added to MUTX tracking without moving the upstream home.")
     click.echo(
         f"Privacy: {result.runtime_snapshot.get('privacy_summary') or 'Local-only runtime tracking.'}"
     )
@@ -116,6 +164,7 @@ def _finish_setup(
     help="Runtime provider for the starter assistant",
 )
 @click.option("--install-openclaw", is_flag=True, help="Install OpenClaw automatically if it is missing")
+@click.option("--import-openclaw", is_flag=True, help="Import and track an existing OpenClaw runtime without reinstalling it")
 @click.option(
     "--openclaw-install-method",
     type=click.Choice(["npm", "git"]),
@@ -136,6 +185,7 @@ def setup_hosted(
     workspace: str | None,
     provider: str,
     install_openclaw: bool,
+    import_openclaw: bool,
     openclaw_install_method: str,
     open_tui: bool,
     no_input: bool,
@@ -166,6 +216,7 @@ def setup_hosted(
             model=model,
             workspace=workspace,
             install_openclaw=install_openclaw,
+            import_openclaw=import_openclaw,
             openclaw_install_method=openclaw_install_method,
             no_input=no_input,
             open_tui=open_tui,
@@ -196,6 +247,7 @@ def setup_hosted(
     help="Runtime provider for the starter assistant",
 )
 @click.option("--install-openclaw", is_flag=True, help="Install OpenClaw automatically if it is missing")
+@click.option("--import-openclaw", is_flag=True, help="Import and track an existing OpenClaw runtime without reinstalling it")
 @click.option(
     "--openclaw-install-method",
     type=click.Choice(["npm", "git"]),
@@ -217,6 +269,7 @@ def setup_local(
     workspace: str | None,
     provider: str,
     install_openclaw: bool,
+    import_openclaw: bool,
     openclaw_install_method: str,
     open_tui: bool,
     no_input: bool,
@@ -253,6 +306,7 @@ def setup_local(
             model=model,
             workspace=workspace,
             install_openclaw=install_openclaw,
+            import_openclaw=import_openclaw,
             openclaw_install_method=openclaw_install_method,
             no_input=no_input,
             open_tui=open_tui,

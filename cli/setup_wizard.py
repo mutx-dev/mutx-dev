@@ -10,7 +10,10 @@ from cli.openclaw_runtime import (
     ensure_openclaw_installed,
     ensure_openclaw_onboarded,
     ensure_personal_assistant_binding,
+    find_openclaw_bin,
     get_gateway_health,
+    inspect_importable_openclaw_runtime,
+    open_openclaw_surface,
     persist_openclaw_runtime_snapshot,
 )
 from cli.runtime_registry import (
@@ -37,6 +40,7 @@ class SetupWizardResult:
     assistant_id: str | None
     runtime_snapshot: dict[str, Any]
     reused_existing_assistant: bool
+    action_type: str
 
 
 def _progress(callback: ProgressCallback | None, *, step: str, state: str, message: str, payload: dict[str, Any] | None = None) -> None:
@@ -86,12 +90,14 @@ def prepare_runtime_state_sync(
     assistant_name: str | None = None,
     install_method: str,
     installation_disposition: str | None = None,
+    action_type: str | None = None,
 ) -> dict[str, Any]:
     snapshot = persist_openclaw_runtime_snapshot(
         binding=binding,
         assistant_name=assistant_name,
         install_method=install_method,
         installation_disposition=installation_disposition,
+        action_type=action_type,
     ).to_payload()
     synced = _sync_snapshot(runtime_service, snapshot=snapshot)
     if synced.get("last_synced_at"):
@@ -101,6 +107,7 @@ def prepare_runtime_state_sync(
             install_method=install_method,
             installation_disposition=installation_disposition,
             synced_at=str(synced["last_synced_at"]),
+            action_type=action_type,
         )
     return synced
 
@@ -153,6 +160,8 @@ def run_openclaw_setup_wizard(
     prompt_install: Callable[[], bool] | None = None,
     install_command_runner: Callable[[str], None] | None = None,
     onboard_command_runner: Callable[[list[str]], None] | None = None,
+    configure_command_runner: Callable[[list[str]], None] | None = None,
+    requested_action: str | None = None,
     progress: ProgressCallback | None = None,
 ) -> SetupWizardResult:
     provider = "openclaw"
@@ -161,6 +170,10 @@ def run_openclaw_setup_wizard(
         reset_wizard_state(provider, mode=mode)
         _sync_onboarding(runtime_service, action="reset")
 
+    action_type = (requested_action or ("import" if find_openclaw_bin() else "install")).strip().lower()
+    if action_type not in {"import", "install", "configure"}:
+        raise CLIServiceError(f"Unsupported OpenClaw setup action '{action_type}'.")
+
     try:
         update_wizard_progress(
             provider,
@@ -168,61 +181,101 @@ def run_openclaw_setup_wizard(
             status="in_progress",
             mode=mode,
             assistant_name=assistant_name,
+            extra={"action_type": action_type},
         )
         _progress(progress, step="provider", state="running", message="Selecting runtime provider")
         provider_state = complete_wizard_step(
             provider,
             "provider",
             mode=mode,
-            extra={"assistant_name": assistant_name, "selected_provider": provider},
+            extra={
+                "assistant_name": assistant_name,
+                "selected_provider": provider,
+                "action_type": action_type,
+            },
         )
         _sync_onboarding(runtime_service, action="complete_step", step="provider")
         _progress(progress, step="provider", state="completed", message="OpenClaw selected", payload=provider_state)
 
         update_wizard_progress(provider, step_id="install", status="in_progress", mode=mode)
-        _progress(progress, step="install", state="running", message="🦞 Checking OpenClaw install")
-        install_resolution = ensure_openclaw_installed(
-            install_if_missing=install_openclaw,
-            install_method=openclaw_install_method,
-            no_input=no_input,
-            prompt_install=prompt_install,
-            command_runner=install_command_runner,
-        )
+        install_resolution = None
+        health: OpenClawGatewayHealth | None = None
+        if action_type == "import":
+            _progress(progress, step="install", state="running", message="🦞 Import Existing OpenClaw")
+            install_resolution, health = inspect_importable_openclaw_runtime(
+                install_method=openclaw_install_method,
+            )
+        elif action_type == "configure":
+            _progress(progress, step="install", state="running", message="🦞 Opening OpenClaw configure")
+            open_openclaw_surface(
+                surface="configure",
+                command_runner=configure_command_runner,
+            )
+            install_resolution, health = inspect_importable_openclaw_runtime(
+                install_method=openclaw_install_method,
+            )
+        else:
+            _progress(progress, step="install", state="running", message="🦞 Checking OpenClaw install")
+            install_resolution = ensure_openclaw_installed(
+                install_if_missing=install_openclaw,
+                install_method=openclaw_install_method,
+                no_input=no_input,
+                prompt_install=prompt_install,
+                command_runner=install_command_runner,
+                force_install=requested_action == "install" and find_openclaw_bin() is not None,
+            )
         install_snapshot = prepare_runtime_state_sync(
             runtime_service,
             assistant_name=assistant_name,
             install_method=install_resolution.install_method,
             installation_disposition=install_resolution.disposition,
+            action_type=action_type,
         )
-        install_state = complete_wizard_step(provider, "install", mode=mode)
+        install_state = complete_wizard_step(
+            provider,
+            "install",
+            mode=mode,
+            extra={
+                "action_type": action_type,
+                "import_source": dict(install_snapshot.get("import_source") or {}),
+            },
+        )
         _sync_onboarding(runtime_service, action="complete_step", step="install")
-        install_message = (
-            f"🦞 Found OpenClaw at {install_resolution.binary_path}; importing it into MUTX tracking"
-            if install_resolution.imported_existing
-            else f"🦞 OpenClaw installed at {install_resolution.binary_path}; importing it into MUTX tracking"
-        )
+        if action_type == "import":
+            install_message = f"🦞 Found OpenClaw at {install_resolution.binary_path}; importing it into MUTX tracking"
+        elif action_type == "configure":
+            install_message = f"🦞 OpenClaw configured at {install_resolution.binary_path}; importing it into MUTX tracking"
+        else:
+            install_message = (
+                f"🦞 Found OpenClaw at {install_resolution.binary_path}; importing it into MUTX tracking"
+                if install_resolution.imported_existing
+                else f"🦞 OpenClaw installed at {install_resolution.binary_path}; importing it into MUTX tracking"
+            )
         _progress(progress, step="install", state="completed", message=install_message, payload=install_snapshot)
 
         update_wizard_progress(provider, step_id="onboard", status="in_progress", mode=mode)
         _progress(progress, step="onboard", state="running", message="🦞 Verifying gateway onboarding")
-        health = ensure_openclaw_onboarded(
-            no_input=no_input,
-            command_runner=onboard_command_runner,
-        )
+        if health is None:
+            health = ensure_openclaw_onboarded(
+                no_input=no_input,
+                command_runner=onboard_command_runner,
+            )
         onboard_snapshot = prepare_runtime_state_sync(
             runtime_service,
             assistant_name=assistant_name,
             install_method=install_resolution.install_method,
             installation_disposition=install_resolution.disposition,
+            action_type=action_type,
         )
         onboard_state = complete_wizard_step(
             provider,
             "onboard",
             mode=mode,
-            extra={"gateway_url": health.gateway_url},
+            extra={"gateway_url": health.gateway_url, "action_type": action_type},
         )
         _sync_onboarding(runtime_service, action="complete_step", step="onboard")
-        _progress(progress, step="onboard", state="completed", message="🦞 Gateway onboarded", payload=onboard_snapshot)
+        onboard_message = "🦞 Imported gateway ready" if action_type in {"import", "configure"} else "🦞 Gateway onboarded"
+        _progress(progress, step="onboard", state="completed", message=onboard_message, payload=onboard_snapshot)
 
         update_wizard_progress(provider, step_id="track", status="in_progress", mode=mode)
         _progress(progress, step="track", state="running", message="Tracking provider under ~/.mutx")
@@ -231,8 +284,17 @@ def run_openclaw_setup_wizard(
             assistant_name=assistant_name,
             install_method=install_resolution.install_method,
             installation_disposition=install_resolution.disposition,
+            action_type=action_type,
         )
-        track_state = complete_wizard_step(provider, "track", mode=mode)
+        track_state = complete_wizard_step(
+            provider,
+            "track",
+            mode=mode,
+            extra={
+                "action_type": action_type,
+                "import_source": dict(track_snapshot.get("import_source") or {}),
+            },
+        )
         _sync_onboarding(runtime_service, action="complete_step", step="track")
         _progress(progress, step="track", state="completed", message="Provider registry updated", payload=track_snapshot)
 
@@ -250,6 +312,7 @@ def run_openclaw_setup_wizard(
             assistant_name=assistant_name,
             install_method=install_resolution.install_method,
             installation_disposition=install_resolution.disposition,
+            action_type=action_type,
         )
         bind_state = complete_wizard_step(
             provider,
@@ -259,6 +322,7 @@ def run_openclaw_setup_wizard(
                 "assistant_id": binding.agent_id,
                 "workspace": binding.workspace,
                 "gateway_url": health.gateway_url,
+                "action_type": action_type,
             },
         )
         _sync_onboarding(runtime_service, action="complete_step", step="bind")
@@ -307,6 +371,7 @@ def run_openclaw_setup_wizard(
             assistant_name=assistant_name,
             install_method=install_resolution.install_method,
             installation_disposition=install_resolution.disposition,
+            action_type=action_type,
         )
         complete_wizard(
             provider,
@@ -315,6 +380,8 @@ def run_openclaw_setup_wizard(
                 "assistant_id": binding.agent_id,
                 "workspace": binding.workspace,
                 "gateway_url": health.gateway_url,
+                "action_type": action_type,
+                "import_source": dict(verify_snapshot.get("import_source") or {}),
             },
         )
         _sync_onboarding(runtime_service, action="complete_step", step="verify")
@@ -329,6 +396,7 @@ def run_openclaw_setup_wizard(
             else getattr(existing_overview, "agent_id", None),
             runtime_snapshot=verify_snapshot,
             reused_existing_assistant=reused_existing_assistant,
+            action_type=action_type,
         )
     except CLIServiceError as exc:
         current_state = load_wizard_state(provider)

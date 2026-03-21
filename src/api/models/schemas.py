@@ -552,6 +552,8 @@ class OnboardingStepResponse(BaseModel):
 class OnboardingStateResponse(BaseModel):
     provider: str = "openclaw"
     status: str
+    action_type: str | None = None
+    import_source: dict[str, Any] = Field(default_factory=dict)
     current_step: str
     completed_steps: list[str] = Field(default_factory=list)
     failed_step: str | None = None
@@ -590,9 +592,12 @@ class RuntimeProviderSnapshotUpsert(BaseModel):
     installation_disposition: str | None = Field(default=None, max_length=64)
     tracking_mode: str | None = Field(default=None, max_length=64)
     imported_into_mutx: bool = False
+    adopted_existing_runtime: bool = False
     keys_remain_local: bool = False
     credential_sync_policy: str | None = Field(default=None, max_length=64)
     privacy_summary: str | None = Field(default=None, max_length=1000)
+    last_action_type: str | None = Field(default=None, max_length=64)
+    import_source: dict[str, Any] = Field(default_factory=dict)
     version: str | None = Field(default=None, max_length=255)
     status: str = Field(default="unknown", max_length=64)
     gateway: dict[str, Any] = Field(default_factory=dict)

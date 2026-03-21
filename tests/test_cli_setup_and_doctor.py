@@ -40,8 +40,10 @@ def wizard_result_payload(*, reused_existing_assistant: bool = False) -> SimpleN
         },
         assistant_id="agent-pa-01",
         reused_existing_assistant=reused_existing_assistant,
+        action_type="import",
         runtime_snapshot={
             "binary_path": "/opt/homebrew/bin/openclaw",
+            "config_path": "/tmp/.openclaw/openclaw.json",
             "home_path": "/tmp/.openclaw",
             "privacy_summary": "MUTX tracks your local OpenClaw runtime without uploading local gateway keys or secrets.",
         },
@@ -62,6 +64,7 @@ def test_setup_hosted_deploys_personal_assistant(monkeypatch, tmp_path: Path) ->
             }
 
     monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
+    monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: None)
     monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
     monkeypatch.setattr(
         "cli.commands.setup.mark_auth_completed",
@@ -109,6 +112,7 @@ def test_setup_hosted_deploys_personal_assistant(monkeypatch, tmp_path: Path) ->
     assert captured["wizard_kwargs"]["mode"] == "hosted"
     assert captured["wizard_kwargs"]["assistant_name"] == "Personal Assistant"
     assert captured["wizard_kwargs"]["install_openclaw"] is False
+    assert captured["wizard_kwargs"]["requested_action"] == "install"
     assert captured["wizard_kwargs"]["openclaw_install_method"] == "npm"
     assert "Assistant deployed: agent-pa-01" in result.output
     assert "Deployment: dep-pa-01" in result.output
@@ -131,6 +135,7 @@ def test_setup_hosted_defaults_to_hosted_api(monkeypatch, tmp_path: Path) -> Non
             }
 
     monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
+    monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: None)
     monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
     monkeypatch.setattr(
         "cli.commands.setup.mark_auth_completed",
@@ -179,6 +184,7 @@ def test_setup_local_bootstraps_local_operator_without_credentials(
             }
 
     monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
+    monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: None)
     monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
     monkeypatch.setattr(
         "cli.commands.setup.mark_auth_completed",
@@ -355,6 +361,7 @@ def test_setup_hosted_no_input_requires_explicit_openclaw_install(monkeypatch, t
             return None
 
     monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
+    monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: None)
     monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
     monkeypatch.setattr(
         "cli.commands.setup.mark_auth_completed",
@@ -383,6 +390,114 @@ def test_setup_hosted_no_input_requires_explicit_openclaw_install(monkeypatch, t
 
     assert result.exit_code != 0
     assert "OpenClaw is required for the Personal Assistant." in result.output
+
+
+def test_setup_hosted_uses_import_action_when_openclaw_exists(monkeypatch, tmp_path: Path) -> None:
+    captured: dict[str, object] = {}
+    config = CLIConfig(config_path=tmp_path / "config.json")
+
+    class DummyAuth:
+        def login(self, email: str, password: str, api_url: str | None = None) -> None:
+            return None
+
+    monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
+    monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw")
+    monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
+    monkeypatch.setattr("cli.commands.setup.mark_auth_completed", lambda **kwargs: None)
+    monkeypatch.setattr(
+        "cli.commands.setup.run_openclaw_setup_wizard",
+        lambda **kwargs: captured.__setitem__("wizard_kwargs", kwargs) or wizard_result_payload(),
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "setup",
+            "hosted",
+            "--email",
+            "operator@example.com",
+            "--password",
+            "StrongPass1!",
+            "--no-input",
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert captured["wizard_kwargs"]["requested_action"] == "import"
+    assert "Adoption: existing OpenClaw runtime added to MUTX tracking" in result.output
+
+
+def test_setup_hosted_interactive_can_choose_configure(monkeypatch, tmp_path: Path) -> None:
+    captured: dict[str, object] = {}
+    config = CLIConfig(config_path=tmp_path / "config.json")
+
+    class DummyAuth:
+        def login(self, email: str, password: str, api_url: str | None = None) -> None:
+            return None
+
+    monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
+    monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw")
+    monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
+    monkeypatch.setattr("cli.commands.setup.mark_auth_completed", lambda **kwargs: None)
+    monkeypatch.setattr(
+        "cli.commands.setup.run_openclaw_setup_wizard",
+        lambda **kwargs: captured.__setitem__("wizard_kwargs", kwargs) or wizard_result_payload(),
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "setup",
+            "hosted",
+            "--email",
+            "operator@example.com",
+            "--password",
+            "StrongPass1!",
+        ],
+        input="3\n",
+    )
+
+    assert result.exit_code == 0
+    assert "Import Existing OpenClaw 🦞" in result.output
+    assert captured["wizard_kwargs"]["requested_action"] == "configure"
+
+
+def test_setup_hosted_interactive_can_choose_repair(monkeypatch, tmp_path: Path) -> None:
+    captured: dict[str, object] = {}
+    config = CLIConfig(config_path=tmp_path / "config.json")
+
+    class DummyAuth:
+        def login(self, email: str, password: str, api_url: str | None = None) -> None:
+            return None
+
+    monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
+    monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw")
+    monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
+    monkeypatch.setattr("cli.commands.setup.mark_auth_completed", lambda **kwargs: None)
+    monkeypatch.setattr(
+        "cli.commands.setup.run_openclaw_setup_wizard",
+        lambda **kwargs: captured.__setitem__("wizard_kwargs", kwargs) or wizard_result_payload(),
+    )
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "setup",
+            "hosted",
+            "--email",
+            "operator@example.com",
+            "--password",
+            "StrongPass1!",
+        ],
+        input="2\n",
+    )
+
+    assert result.exit_code == 0
+    assert captured["wizard_kwargs"]["requested_action"] == "install"
+    assert captured["wizard_kwargs"]["install_openclaw"] is True
 
 
 def test_cli_config_migrates_legacy_api_key(tmp_path: Path) -> None:

@@ -23,6 +23,8 @@ interface WizardStep {
 interface OnboardingState {
   provider: string;
   status: string;
+  action_type?: string | null;
+  import_source?: Record<string, string | null | undefined>;
   current_step: string;
   completed_steps: string[];
   failed_step?: string | null;
@@ -54,8 +56,11 @@ interface RuntimeSnapshot {
   version?: string | null;
   home_path?: string | null;
   tracking_mode?: string | null;
+  adopted_existing_runtime?: boolean;
   privacy_summary?: string | null;
   keys_remain_local?: boolean;
+  last_action_type?: string | null;
+  import_source?: Record<string, string | null | undefined>;
   config_path?: string | null;
   state_dir?: string | null;
   last_seen_at?: string | null;
@@ -110,8 +115,12 @@ export function OpenclawSetupSurface() {
 
   const commands = useMemo(
     () => [
+      "mutx setup hosted --provider openclaw --import-openclaw",
+      "mutx setup local --provider openclaw --import-openclaw",
       "mutx setup hosted --provider openclaw --install-openclaw",
       "mutx setup local --provider openclaw --install-openclaw",
+      "mutx runtime open openclaw --surface configure",
+      "mutx runtime open openclaw --surface tui",
       "mutx runtime inspect openclaw",
       "mutx runtime resync openclaw",
     ],
@@ -232,6 +241,11 @@ export function OpenclawSetupSurface() {
                     ? onboarding.last_error
                     : "Checklist progress is synced from the operator host. Web stays read-only in this sprint."}
                 </p>
+                {onboarding?.action_type ? (
+                  <p className="mt-2 text-xs uppercase tracking-[0.2em] text-orange-200/80">
+                    action: {onboarding.action_type}
+                  </p>
+                ) : null}
               </div>
               {onboarding ? (
                 <div className={`rounded-full border px-3 py-1 text-xs font-medium ${toneStyles(statusTone(onboarding.status))}`}>
@@ -302,7 +316,10 @@ export function OpenclawSetupSurface() {
               </div>
               <div className="rounded-xl border px-4 py-3" style={{ borderColor: dashboardTokens.borderSubtle, backgroundColor: dashboardTokens.bgCanvas }}>
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Tracking Mode</p>
-                <p className="mt-2 font-mono text-xs text-slate-200">{runtime?.tracking_mode ?? "import_existing_runtime"}</p>
+                <p className="mt-2 font-mono text-xs text-slate-200">
+                  {runtime?.tracking_mode ?? "import_existing_runtime"}
+                  {runtime?.adopted_existing_runtime ? " · adopted" : ""}
+                </p>
               </div>
             </div>
           </section>
@@ -331,7 +348,10 @@ export function OpenclawSetupSurface() {
               <div className="rounded-xl border p-4" style={{ borderColor: dashboardTokens.borderSubtle, backgroundColor: dashboardTokens.bgCanvas }}>
                 <p className="text-xs text-slate-500">Install</p>
                 <p className="mt-2 text-lg font-semibold text-slate-100">{runtime?.install_method ?? "n/a"}</p>
-                <p className="mt-1 text-sm text-slate-400">{runtime?.version ?? "Version not synced yet."}</p>
+                <p className="mt-1 text-sm text-slate-400">
+                  {runtime?.version ?? "Version not synced yet."}
+                  {runtime?.last_action_type ? ` · ${runtime.last_action_type}` : ""}
+                </p>
               </div>
               <div className="rounded-xl border p-4" style={{ borderColor: dashboardTokens.borderSubtle, backgroundColor: dashboardTokens.bgCanvas }}>
                 <p className="text-xs text-slate-500">Binding</p>
@@ -396,6 +416,12 @@ export function OpenclawSetupSurface() {
               <div>
                 <p className="text-xs text-slate-500">Config</p>
                 <p className="mt-1 break-all text-slate-200">{runtime?.config_path ?? "n/a"}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Import source</p>
+                <p className="mt-1 break-all text-slate-200">
+                  {runtime?.import_source?.binary_path ?? onboarding?.import_source?.binary_path ?? "n/a"}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-slate-500">Registry</p>

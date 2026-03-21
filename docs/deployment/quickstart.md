@@ -45,6 +45,12 @@ pip install -e ".[dev,tui]"
 mutx setup hosted --provider openclaw --install-openclaw --open-tui
 ```
 
+If OpenClaw is already installed locally and you only want MUTX to adopt it:
+
+```bash
+mutx setup hosted --provider openclaw --import-openclaw
+```
+
 The CLI will:
 
 * prompt for your API URL if needed
@@ -63,6 +69,7 @@ The CLI will:
 mutx doctor
 mutx assistant overview
 mutx runtime inspect openclaw
+mutx runtime open openclaw --surface tui
 ```
 
 Expected result:
@@ -123,6 +130,12 @@ make dev
 mutx setup local --provider openclaw --install-openclaw --open-tui
 ```
 
+Import an existing local OpenClaw runtime instead of reinstalling it:
+
+```bash
+mutx setup local --provider openclaw --import-openclaw
+```
+
 If you want a fully non-interactive local smoke path:
 
 ```bash
@@ -140,6 +153,7 @@ mutx setup local \
 mutx doctor
 mutx assistant overview
 mutx runtime inspect openclaw
+mutx runtime open openclaw --surface configure
 mutx tui
 ```
 

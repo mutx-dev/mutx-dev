@@ -88,11 +88,18 @@ mutx setup hosted --provider openclaw --install-openclaw --open-tui
 mutx doctor
 mutx assistant overview
 mutx runtime inspect openclaw
+mutx runtime open openclaw --surface tui
 ```
 
 🦞 `mutx setup` now runs a MUTX-owned provider wizard that can install OpenClaw, hand off to upstream `openclaw onboard`, bind a dedicated assistant runtime, track it under `~/.mutx/providers/openclaw`, and return you to the CLI or TUI without leaving the MUTX shell story.
 
 If OpenClaw is already installed, MUTX detects the upstream binary and home path, imports that runtime into the MUTX registry for tracking, and leaves the OpenClaw home plus gateway keys in place on the local machine.
+
+For an existing runtime, you can skip reinstall and adopt it directly:
+
+```bash
+mutx setup hosted --provider openclaw --import-openclaw
+```
 
 ### Local contributor
 
@@ -113,6 +120,7 @@ mutx setup local --provider openclaw --install-openclaw --open-tui
 mutx doctor
 mutx assistant overview
 mutx runtime inspect openclaw
+mutx runtime open openclaw --surface configure
 ```
 
 Expected result in either lane:
@@ -147,6 +155,7 @@ mutx assistant overview
 mutx assistant sessions
 mutx runtime list
 mutx runtime inspect openclaw
+mutx runtime open openclaw --surface tui
 mutx tui
 ```
 

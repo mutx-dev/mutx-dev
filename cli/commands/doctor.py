@@ -78,6 +78,8 @@ def doctor_command(output: str):
         f"home={payload['runtime_snapshot']['home_path'] or 'n/a'} | "
         f"last_seen={payload['runtime_snapshot']['last_seen_at'] or 'n/a'}"
     )
+    if payload["runtime_snapshot"].get("adopted_existing_runtime"):
+        click.echo("Registry Adoption: existing OpenClaw runtime imported into MUTX tracking")
     click.echo(
         "Privacy: "
         f"{payload['runtime_snapshot']['privacy_summary'] or 'Local-only runtime tracking.'}"

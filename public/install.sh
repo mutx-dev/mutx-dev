@@ -1127,6 +1127,7 @@ check_assistant_first_surface() {
     "doctor"
     "runtime"
     "runtime inspect"
+    "runtime open"
   )
   local -a missing=()
   local spec=""
@@ -1148,11 +1149,17 @@ check_assistant_first_surface() {
   if ! mutx_supports_option "setup hosted" "--install-openclaw"; then
     missing+=("mutx setup hosted --install-openclaw")
   fi
+  if ! mutx_supports_option "setup hosted" "--import-openclaw"; then
+    missing+=("mutx setup hosted --import-openclaw")
+  fi
   if ! mutx_supports_option "setup local" "--provider"; then
     missing+=("mutx setup local --provider")
   fi
   if ! mutx_supports_option "setup local" "--install-openclaw"; then
     missing+=("mutx setup local --install-openclaw")
+  fi
+  if ! mutx_supports_option "setup local" "--import-openclaw"; then
+    missing+=("mutx setup local --import-openclaw")
   fi
 
   if [[ "${#missing[@]}" == "0" ]]; then
@@ -1285,10 +1292,12 @@ run_setup_handoff() {
     note "Next steps:"
     note "  mutx setup hosted --install-openclaw"
     note "  mutx setup local --install-openclaw"
+    note "  mutx setup hosted --import-openclaw"
+    note "  mutx setup local --import-openclaw"
     note "  mutx doctor"
     note "  mutx runtime inspect openclaw"
     if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
-      note "OpenClaw detected at ${OPENCLAW_BIN} and will be tracked under ~/.mutx/providers/openclaw when setup runs."
+      note "OpenClaw detected at ${OPENCLAW_BIN}; setup will offer Import Existing OpenClaw 🦞 and track it under ~/.mutx/providers/openclaw."
     fi
     note "MUTX leaves your upstream OpenClaw home in place and does not upload local gateway keys."
     note "  mutx tui"
@@ -1391,10 +1400,12 @@ run_setup_handoff() {
   note "Run one of:"
   note "  mutx setup hosted --install-openclaw"
   note "  mutx setup local --install-openclaw"
+  note "  mutx setup hosted --import-openclaw"
+  note "  mutx setup local --import-openclaw"
   note "  mutx doctor"
   note "  mutx runtime inspect openclaw"
   if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
-    note "OpenClaw detected at ${OPENCLAW_BIN}; setup will import it into ~/.mutx/providers/openclaw."
+    note "OpenClaw detected at ${OPENCLAW_BIN}; setup will offer Import Existing OpenClaw 🦞 and track it under ~/.mutx/providers/openclaw."
   fi
   note "Local OpenClaw secrets remain on this machine."
 }

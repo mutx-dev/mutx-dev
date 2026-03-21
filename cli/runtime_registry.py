@@ -133,6 +133,8 @@ def default_wizard_state(*, provider: str = "openclaw") -> dict[str, Any]:
         "provider": provider,
         "status": "pending",
         "mode": None,
+        "action_type": None,
+        "import_source": {},
         "current_step": WIZARD_STEPS[0]["id"],
         "completed_steps": [],
         "failed_step": None,
@@ -355,4 +357,3 @@ def list_registered_providers() -> list[dict[str, Any]]:
             continue
         items.append(manifest)
     return items
-

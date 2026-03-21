@@ -6,12 +6,15 @@ from pathlib import Path
 from cli.openclaw_runtime import (
     OpenClawAgentBinding,
     OpenClawGatewayHealth,
+    build_openclaw_surface_command,
     ensure_personal_assistant_binding,
     get_gateway_health,
+    inspect_importable_openclaw_runtime,
     list_local_sessions,
     merge_runtime_binding,
     persist_openclaw_runtime_snapshot,
 )
+from cli.errors import ValidationError
 from cli.runtime_registry import load_binding, load_manifest, load_wizard_state, reset_wizard_state
 
 
@@ -175,6 +178,9 @@ def test_persist_openclaw_runtime_snapshot_tracks_manifest_bindings_and_pointers
     assert manifest["gateway_url"] == "http://127.0.0.1:18789"
     assert manifest["binary_path"] == "/usr/local/bin/openclaw"
     assert manifest["tracking_mode"] == "import_existing_runtime"
+    assert manifest["adopted_existing_runtime"] is True
+    assert manifest["last_action_type"] == "import"
+    assert manifest["import_source"]["binary_path"] == "/usr/local/bin/openclaw"
     assert manifest["keys_remain_local"] is True
     assert "does not upload local gateway keys" in manifest["privacy_summary"]
     assert tracked_binding["assistant_id"] == "personal-assistant"
@@ -192,3 +198,88 @@ def test_wizard_state_defaults_and_reset(monkeypatch, tmp_path: Path) -> None:
     assert state["current_step"] == "auth"
     assert state["completed_steps"] == []
     assert load_wizard_state("openclaw")["providers"][0]["id"] == "openclaw"
+
+
+def test_inspect_importable_openclaw_runtime_succeeds_for_valid_existing_install(monkeypatch) -> None:
+    health = OpenClawGatewayHealth(
+        status="healthy",
+        cli_available=True,
+        installed=True,
+        onboarded=True,
+        gateway_configured=True,
+        gateway_reachable=True,
+        gateway_port=18789,
+        gateway_url="http://127.0.0.1:18789",
+        credential_detected=True,
+        config_path="/tmp/.openclaw/openclaw.json",
+        state_dir="/tmp/.openclaw",
+        doctor_summary="Gateway is reachable and ready for assistant operations.",
+    )
+    monkeypatch.setattr(
+        "cli.openclaw_runtime.ensure_openclaw_installed",
+        lambda **_: __import__("cli.openclaw_runtime", fromlist=["OpenClawInstallResolution"]).OpenClawInstallResolution(
+            binary_path="/opt/homebrew/bin/openclaw",
+            install_method="npm",
+            disposition="detected_existing",
+        ),
+    )
+    monkeypatch.setattr("cli.openclaw_runtime.resolve_openclaw_config_file", lambda: "/tmp/.openclaw/openclaw.json")
+    monkeypatch.setattr("cli.openclaw_runtime.validate_openclaw_config", lambda: "Config valid")
+    monkeypatch.setattr("cli.openclaw_runtime.get_gateway_health", lambda: health)
+
+    resolution, imported_health = inspect_importable_openclaw_runtime(install_method="npm")
+
+    assert resolution.binary_path == "/opt/homebrew/bin/openclaw"
+    assert resolution.imported_existing is True
+    assert imported_health.gateway_url == "http://127.0.0.1:18789"
+
+
+def test_inspect_importable_openclaw_runtime_requires_reachable_gateway(monkeypatch) -> None:
+    health = OpenClawGatewayHealth(
+        status="degraded",
+        cli_available=True,
+        installed=True,
+        onboarded=True,
+        gateway_configured=True,
+        gateway_reachable=False,
+        gateway_port=18789,
+        gateway_url="http://127.0.0.1:18789",
+        credential_detected=True,
+        config_path="/tmp/.openclaw/openclaw.json",
+        state_dir="/tmp/.openclaw",
+        doctor_summary="Gateway not reachable.",
+    )
+    monkeypatch.setattr(
+        "cli.openclaw_runtime.ensure_openclaw_installed",
+        lambda **_: __import__("cli.openclaw_runtime", fromlist=["OpenClawInstallResolution"]).OpenClawInstallResolution(
+            binary_path="/opt/homebrew/bin/openclaw",
+            install_method="npm",
+            disposition="detected_existing",
+        ),
+    )
+    monkeypatch.setattr("cli.openclaw_runtime.resolve_openclaw_config_file", lambda: "/tmp/.openclaw/openclaw.json")
+    monkeypatch.setattr("cli.openclaw_runtime.validate_openclaw_config", lambda: "Config valid")
+    monkeypatch.setattr("cli.openclaw_runtime.get_gateway_health", lambda: health)
+
+    try:
+        inspect_importable_openclaw_runtime(install_method="npm")
+    except ValidationError as exc:
+        assert "gateway is not reachable" in str(exc)
+    else:
+        raise AssertionError("Expected import inspection to reject an unreachable gateway.")
+
+
+def test_build_openclaw_surface_command_includes_gateway_url(monkeypatch) -> None:
+    monkeypatch.setattr("cli.openclaw_runtime.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw")
+
+    command = build_openclaw_surface_command(
+        surface="tui",
+        gateway_url="http://127.0.0.1:18789",
+    )
+
+    assert command == [
+        "/opt/homebrew/bin/openclaw",
+        "tui",
+        "--url",
+        "http://127.0.0.1:18789",
+    ]

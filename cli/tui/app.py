@@ -20,7 +20,11 @@ from textual.widgets import (
     TabPane,
 )
 
-from cli.openclaw_runtime import collect_openclaw_runtime_snapshot, persist_openclaw_runtime_snapshot
+from cli.openclaw_runtime import (
+    collect_openclaw_runtime_snapshot,
+    open_openclaw_surface,
+    persist_openclaw_runtime_snapshot,
+)
 from cli.runtime_registry import load_wizard_state
 from cli.services import (
     AgentRecord,
@@ -36,7 +40,7 @@ from cli.services import (
     RuntimeStateService,
     TemplatesService,
 )
-from cli.setup_wizard import mark_auth_completed, run_openclaw_setup_wizard
+from cli.setup_wizard import mark_auth_completed, prepare_runtime_state_sync, run_openclaw_setup_wizard
 
 
 MUTX_ASCII_LOGO = """\
@@ -295,7 +299,18 @@ def _render_setup_body(
             ]
         )
     elif not assistant_name:
-        lines.extend(["", "Use Deploy Personal Assistant to run the OpenClaw provider wizard."])
+        if runtime_snapshot.get("binary_path"):
+            lines.extend(
+                [
+                    "",
+                    "Actions:",
+                    "  Import Existing OpenClaw 🦞 adopts the current runtime into ~/.mutx/providers/openclaw.",
+                    "  Configure OpenClaw 🦞 opens the upstream configurator in this shell and returns to MUTX.",
+                    "  Open OpenClaw TUI 🦞 suspends MUTX, opens the upstream TUI, then resumes and refreshes state.",
+                ]
+            )
+        else:
+            lines.extend(["", "Use Deploy Personal Assistant to run the OpenClaw provider wizard."])
     else:
         lines.extend(["", "OpenClaw is tracked under ~/.mutx/providers/openclaw and overlaid into Control Plane."])
     return "\n".join(lines)
@@ -641,6 +656,9 @@ class MutxTUI(App[None]):
                     yield Static("Setup workspace", id="setup-summary")
                     with Horizontal(classes="action-bar"):
                         yield Button("Refresh", id="setup-refresh", variant="primary")
+                        yield Button("Import Existing OpenClaw 🦞", id="setup-import")
+                        yield Button("Configure OpenClaw 🦞", id="setup-configure-openclaw")
+                        yield Button("Open OpenClaw TUI 🦞", id="setup-openclaw-tui")
                         yield Button("Deploy Personal Assistant", id="setup-deploy")
                     with VerticalScroll(classes="detail-scroll"):
                         yield Static(id="setup-body", classes="detail-body")
@@ -841,6 +859,7 @@ class MutxTUI(App[None]):
         self.query_one("#control-health-body", Static).update(
             "Gateway health requires an authenticated session."
         )
+        self._refresh_setup_actions()
         self._clear_activity()
 
     def _handle_service_error(self, error: CLIServiceError) -> None:
@@ -864,6 +883,7 @@ class MutxTUI(App[None]):
         self.query_one("#setup-body", Static).update(
             _render_setup_body(status.authenticated, status.api_url, assistant_name, onboarding, runtime_snapshot)
         )
+        self._refresh_setup_actions()
         self._clear_activity()
 
     def _render_agents(self, agents: list[AgentRecord]) -> None:
@@ -1009,7 +1029,18 @@ class MutxTUI(App[None]):
                 self._runtime_snapshot_cache,
             )
         )
+        self._refresh_setup_actions()
         self._set_notice(message)
+
+    def _refresh_setup_actions(self) -> None:
+        runtime_snapshot = (
+            self._runtime_snapshot_cache if isinstance(self._runtime_snapshot_cache, dict) else {}
+        )
+        has_openclaw = bool(runtime_snapshot.get("binary_path"))
+        for button_id in ("setup-import", "setup-configure-openclaw", "setup-openclaw-tui"):
+            button = self.query_one(f"#{button_id}", Button)
+            button.display = has_openclaw
+            button.disabled = not has_openclaw
 
     def _run_external_command(self, command: str | list[str], *, label: str) -> None:
         self._set_notice(label, ttl=12.0)
@@ -1025,7 +1056,7 @@ class MutxTUI(App[None]):
         if result.returncode != 0:
             raise CLIServiceError(f"{label} failed with exit code {result.returncode}.")
 
-    def _run_setup_wizard(self) -> None:
+    def _run_setup_wizard(self, *, requested_action: str | None = None) -> None:
         status = self.auth_service.status()
         if not status.authenticated:
             self.notify("Authenticate with `mutx setup hosted` or `mutx setup local` first.", severity="warning")
@@ -1056,6 +1087,7 @@ class MutxTUI(App[None]):
                 templates_service=self.templates_service,
                 assistant_service=self.assistant_service,
                 runtime_service=self.runtime_service,
+                requested_action=requested_action,
                 progress=self._render_setup_progress,
                 install_command_runner=lambda command: self._run_external_command(
                     command,
@@ -1064,6 +1096,10 @@ class MutxTUI(App[None]):
                 onboard_command_runner=lambda command: self._run_external_command(
                     command,
                     label="🦞 Onboarding OpenClaw gateway",
+                ),
+                configure_command_runner=lambda command: self._run_external_command(
+                    command,
+                    label="🦞 Opening OpenClaw configure",
                 ),
             )
         except CLIServiceError as exc:
@@ -1078,6 +1114,36 @@ class MutxTUI(App[None]):
         )
         self._after_action(message, True)
         self.query_one("#workspace", TabbedContent).active = "control-pane"
+
+    def _open_openclaw_surface(self, surface: str) -> None:
+        runtime_snapshot = (
+            self._runtime_snapshot_cache if isinstance(self._runtime_snapshot_cache, dict) else {}
+        )
+        gateway_url = str(runtime_snapshot.get("gateway_url") or "") or None
+        install_method = str(runtime_snapshot.get("install_method") or "npm")
+        label = "🦞 Opening OpenClaw TUI" if surface == "tui" else "🦞 Opening OpenClaw configure"
+        self._set_activity(label.lower())
+        try:
+            open_openclaw_surface(
+                surface=surface,
+                gateway_url=gateway_url,
+                command_runner=lambda command: self._run_external_command(command, label=label),
+            )
+            prepare_runtime_state_sync(
+                self.runtime_service,
+                assistant_name=self._assistant_name,
+                install_method=install_method,
+                action_type=surface,
+            )
+        except CLIServiceError as exc:
+            self._handle_service_error(exc)
+            self.load_setup()
+            return
+
+        self._after_action(
+            "Returned from OpenClaw TUI" if surface == "tui" else "Returned from OpenClaw configure",
+            False,
+        )
 
     def _deploy_openclaw_agent(self, agent_id: str) -> None:
         self._set_activity(f"deploying {_shorten(agent_id, 12)}")
@@ -1273,6 +1339,12 @@ class MutxTUI(App[None]):
         button_id = event.button.id
         if button_id == "setup-refresh":
             self.load_setup()
+        elif button_id == "setup-import":
+            self._run_setup_wizard(requested_action="import")
+        elif button_id == "setup-configure-openclaw":
+            self._open_openclaw_surface("configure")
+        elif button_id == "setup-openclaw-tui":
+            self._open_openclaw_surface("tui")
         elif button_id == "setup-deploy":
             self.action_deploy_selected_agent()
         elif button_id == "agents-refresh":
@@ -1308,7 +1380,7 @@ class MutxTUI(App[None]):
     def action_deploy_selected_agent(self) -> None:
         active = self.query_one("#workspace", TabbedContent).active
         if active == "setup-pane":
-            self._run_setup_wizard()
+            self._run_setup_wizard(requested_action=None)
             return
         if not self.selected_agent_id:
             self.notify("Select an agent first.", severity="warning")

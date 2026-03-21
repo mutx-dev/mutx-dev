@@ -75,6 +75,7 @@ def build_fake_cli_package(package_dir: Path) -> Path:
                     print("  --api-url TEXT")
                     print("  --provider [openclaw]")
                     print("  --install-openclaw")
+                    print("  --import-openclaw")
                     print("  --open-tui")
                     return
 
@@ -84,6 +85,7 @@ def build_fake_cli_package(package_dir: Path) -> Path:
                     print("Options:")
                     print("  --provider [openclaw]")
                     print("  --install-openclaw")
+                    print("  --import-openclaw")
                     print("  --open-tui")
                     return
 
@@ -93,9 +95,10 @@ def build_fake_cli_package(package_dir: Path) -> Path:
                     print("Commands:")
                     print("  inspect")
                     print("  list")
+                    print("  open")
                     return
 
-                if args == ["runtime", "inspect", "--help"]:
+                if args in (["runtime", "inspect", "--help"], ["runtime", "open", "--help"]):
                     print("Usage: mutx runtime inspect [OPTIONS] PROVIDER")
                     return
 
@@ -358,6 +361,7 @@ Options:
   --api-url TEXT
   --provider [openclaw]
   --install-openclaw
+  --import-openclaw
   --open-tui
 EOF
     exit 0
@@ -369,6 +373,7 @@ Usage: mutx setup local [OPTIONS]
 Options:
   --provider [openclaw]
   --install-openclaw
+  --import-openclaw
   --open-tui
 EOF
     exit 0
@@ -380,10 +385,11 @@ Usage: mutx runtime [OPTIONS] COMMAND [ARGS]...
 Commands:
   inspect
   list
+  open
 EOF
     exit 0
     ;;
-  "runtime inspect --help"|"doctor --help")
+  "runtime inspect --help"|"runtime open --help"|"doctor --help")
     exit 0
     ;;
 esac
