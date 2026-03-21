@@ -28,6 +28,22 @@ test.describe('mutx.dev QA', () => {
 
       await route.fallback();
     });
+
+    await page.route('https://calendly.com/assets/external/widget.css', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/css',
+        body: '',
+      });
+    });
+
+    await page.route('https://calendly.com/assets/external/widget.js', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/javascript',
+        body: 'window.Calendly={initPopupWidget:()=>{},closePopupWidget:()=>{}};',
+      });
+    });
   });
 
   test('homepage loads and renders the redesigned landing surface', async ({ page }) => {
@@ -40,27 +56,31 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('link', { name: /run quickstart/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /read docs/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /github/i }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: /book a demo/i }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: /sign in/i })).toHaveCount(0);
   });
 
   test('landing page exposes proof rail and operator flow sections', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByText(/^Deployments$/).first()).toBeVisible();
-    await expect(page.getByText(/^Sessions$/).first()).toBeVisible();
-    await expect(page.getByText(/^Access$/).first()).toBeVisible();
+    await expect(page.getByText(/^Broken deploys$/).first()).toBeVisible();
+    await expect(page.getByText(/^Security stalls$/).first()).toBeVisible();
+    await expect(page.getByText(/^Cost drift$/).first()).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /one control plane\. four operator surfaces\./i })
+      page.getByRole('heading', { name: /the sale dies at production handoff\./i })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /bring mutx up fast\./i })
+      page.getByRole('heading', { name: /run the proof path\./i })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /see it\. change it\. recover it\./i })
+      page.getByRole('heading', { name: /20-minute working session/i })
     ).toBeVisible();
     await expect(page.getByRole('tab', { name: /hosted operator/i })).toBeVisible();
     await expect(page.getByText(/curl -fsSL https:\/\/mutx\.dev\/install\.sh \| bash/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: /observe/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /book a demo/i })).toHaveCount(2);
+    await expect(
+      page.getByRole('heading', { name: /see it\. change it\. recover it\./i })
+    ).toHaveCount(0);
   });
 
   test('no console errors', async ({ page }) => {

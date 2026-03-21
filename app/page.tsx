@@ -1,21 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Syne } from "next/font/google";
-import {
-  ArrowRight,
-  BookOpen,
-  Github,
-  Radar,
-  ShieldCheck,
-  TerminalSquare,
-  Workflow,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { ArrowRight, BookOpen, TerminalSquare } from "lucide-react";
 
-import { ControlLoopTabs } from "@/components/landing/ControlLoopTabs";
+import { CalendlyPopupButton } from "@/components/landing/CalendlyPopupButton";
 import { HeroMonitorShowcase } from "@/components/landing/HeroMonitorShowcase";
 import { MotionIn } from "@/components/landing/MotionPrimitives";
-import { OpenClawFlowShowcase } from "@/components/landing/OpenClawFlowShowcase";
 import { QuickstartTabs } from "@/components/landing/QuickstartTabs";
 
 export const dynamic = "force-dynamic";
@@ -42,73 +32,79 @@ const GITHUB_URL = "https://github.com/mutx-dev/mutx-dev";
 const DOCS_URL = "https://docs.mutx.dev";
 
 const navLinks = [
-  { label: "Why MUTX", href: "#why-mutx" },
+  { label: "Why now", href: "#why-mutx" },
   { label: "Quickstart", href: "#quickstart" },
-  { label: "OpenClaw Flow", href: "#openclaw-flow" },
-  { label: "Control Loop", href: "#control-loop" },
 ] as const;
 
 const heroSignals = [
-  { label: "Deployments", value: "Live" },
-  { label: "Sessions", value: "Tracked" },
-  { label: "Access", value: "Scoped" },
-  { label: "Audit", value: "Visible" },
+  { label: "Broken deploys", value: "Kill momentum" },
+  { label: "Security stalls", value: "Delay approval" },
+  { label: "Cost drift", value: "Blows budget" },
+  { label: "Fire drills", value: "Kill scale" },
 ] as const;
 
-const capabilityPanels = [
+const fearCards = [
   {
-    eyebrow: "Deploy",
-    title: "Runtime moves",
-    items: ["Templates", "Rollouts", "Health"],
-    icon: ShieldCheck,
+    title: "Broken client deployments",
+    body: "The demo worked. Production did not.",
   },
   {
-    eyebrow: "Observe",
-    title: "Live signals",
-    items: ["Sessions", "Usage", "Incidents"],
-    icon: Radar,
+    title: "Blocked security review",
+    body: "No one can explain isolation, access, and audit fast enough.",
   },
   {
-    eyebrow: "Govern",
-    title: "Visible boundaries",
-    items: ["Access", "Connectors", "Audit"],
-    icon: Workflow,
+    title: "Opaque model spend",
+    body: "Budget disappears when costs stop being legible.",
+  },
+  {
+    title: "Bespoke operator work",
+    body: "If every rollout is custom, there is no repeatable motion.",
   },
 ] as const;
 
-const controlSurfaces = [
-  "Web demo",
-  "CLI",
-  "TUI",
-  "/v1 API",
+const buyerOutcomes = ["Control", "Speed", "Predictability"] as const;
+
+const enemyList = [
+  "Fragile demo-to-production transitions",
+  "Shared-tenant wrappers",
+  "Opaque model spend",
+  "Teams stuck firefighting bespoke deployments",
 ] as const;
 
-const runtimeState = [
-  "Deployments",
-  "Sessions",
-  "Access",
-  "Connectors",
-  "Audit",
-  "Usage",
+const startingWedge = [
+  "AI agencies shipping client work",
+  "Small product teams shipping automations",
+  "Internal AI platform teams next",
+] as const;
+
+const footerProblems = [
+  "Broken deployments",
+  "Blocked security review",
+  "Cost visibility",
+] as const;
+
+const footerCallShape = [
+  "1 shared use case",
+  "1 owner",
+  "1 success metric",
+  "4 to 6 week pilot",
+  "Clean unwind if it does not work",
+] as const;
+
+const footerLinks = [
+  { label: "Docs", href: DOCS_URL },
+  { label: "GitHub", href: GITHUB_URL },
 ] as const;
 
 type SectionHeadingProps = {
   label: string;
   title: string;
   body?: string;
-  align?: "left" | "center";
 };
 
-function SectionHeading({
-  label,
-  title,
-  body,
-  align = "left",
-}: SectionHeadingProps) {
-  const centered = align === "center";
-
+function SectionHeading({ label, title, body }: SectionHeadingProps) {
   return (
-    <div className={centered ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
+    <div className="max-w-4xl">
       <div className="landing-kicker">{label}</div>
       <h2 className="mt-5 font-[family:var(--font-landing-display)] text-4xl font-semibold tracking-[-0.08em] text-white sm:text-5xl">
         {title}
@@ -118,45 +114,6 @@ function SectionHeading({
           {body}
         </p>
       ) : null}
-    </div>
-  );
-}
-
-type CapabilityTileProps = {
-  eyebrow: string;
-  title: string;
-  items: readonly string[];
-  icon: LucideIcon;
-};
-
-function CapabilityTile({
-  eyebrow,
-  title,
-  items,
-  icon: Icon,
-}: CapabilityTileProps) {
-  return (
-    <div className="rounded-[1.7rem] border border-white/10 bg-black/20 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="font-[family:var(--font-landing-mono)] text-[0.66rem] uppercase tracking-[0.28em] text-slate-500">
-            {eyebrow}
-          </p>
-          <h3 className="mt-3 text-xl font-semibold tracking-[-0.05em] text-white">
-            {title}
-          </h3>
-        </div>
-        <div className="rounded-2xl border border-cyan-400/15 bg-cyan-400/10 p-3 text-cyan-200">
-          <Icon className="h-5 w-5" />
-        </div>
-      </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {items.map((item) => (
-          <span key={item} className="landing-chip">
-            {item}
-          </span>
-        ))}
-      </div>
     </div>
   );
 }
@@ -211,16 +168,19 @@ function LandingNav() {
             href={GITHUB_URL}
             target="_blank"
             rel="noreferrer"
-            className="hidden rounded-full border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-slate-100 transition hover:border-white/15 hover:bg-white/[0.05] lg:inline-flex"
+            className="hidden rounded-full border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-slate-100 transition hover:border-white/15 hover:bg-white/[0.05] xl:inline-flex"
           >
             GitHub
           </a>
           <a
             href="#quickstart"
-            className="landing-button-primary px-5 py-3 text-sm"
+            className="hidden rounded-full border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-slate-100 transition hover:border-white/15 hover:bg-white/[0.05] lg:inline-flex"
           >
             Quickstart
           </a>
+          <CalendlyPopupButton className="landing-button-primary px-5 py-3 text-sm">
+            Book a demo
+          </CalendlyPopupButton>
         </div>
       </div>
     </header>
@@ -265,9 +225,9 @@ export default function LandingPage() {
                   </h1>
 
                   <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300 sm:text-[1.18rem] sm:leading-9">
-                    One control plane for deployed assistants across web, CLI,
-                    and TUI, starting with a graceful OpenClaw lane that stays
-                    local and surfaces cleanly everywhere else.
+                    If the demo works but rollout, review, or cost control breaks
+                    in production, the deal stalls. MUTX gives operators control
+                    before that happens.
                   </p>
 
                   <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -296,7 +256,6 @@ export default function LandingPage() {
                       <BookOpen className="h-4 w-4" />
                     </a>
                   </div>
-
                 </div>
 
                 <HeroMonitorShowcase className="xl:-mr-8" />
@@ -324,74 +283,93 @@ export default function LandingPage() {
           <div className="mx-auto max-w-7xl">
             <MotionIn>
               <SectionHeading
-                label="Why MUTX"
-                title="One control plane. Four operator surfaces."
+                label="Why now"
+                title="The sale dies at production handoff."
+                body="Buyers do not wake up wanting agent infrastructure. They wake up wanting deployments that stop breaking, reviews that stop blocking, and costs that stop surprising them."
               />
             </MotionIn>
 
-            <div className="mt-12 grid gap-5 xl:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]">
+            <div className="mt-12 grid gap-5 xl:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
               <MotionIn>
                 <article className="landing-panel-strong relative overflow-hidden p-6 lg:p-8">
                   <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(103,232,249,0.1),transparent_28%)]"
+                    className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,rgba(248,113,113,0.16),transparent_22%),radial-gradient(circle_at_100%_0%,rgba(103,232,249,0.1),transparent_28%)]"
                   />
                   <div className="relative">
-                    <p className="landing-kicker">Operator map</p>
+                    <p className="landing-kicker border-red-300/20 bg-red-400/10 text-red-100">
+                      What kills the deal
+                    </p>
                     <h3 className="mt-4 font-[family:var(--font-landing-display)] text-3xl font-semibold tracking-[-0.07em] text-white sm:text-[2.35rem]">
-                      One runtime. Multiple entry points.
+                      The risk is not the model. It is everything around it.
                     </h3>
-                    <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
-                      <div className="rounded-[1.9rem] border border-white/10 bg-black/20 p-5">
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          {controlSurfaces.map((item) => (
-                            <div
-                              key={item}
-                              className="rounded-[1.2rem] border border-white/10 bg-white/[0.03] px-4 py-4 text-center font-[family:var(--font-landing-mono)] text-[0.72rem] uppercase tracking-[0.24em] text-slate-200"
-                            >
-                              {item}
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className="flex justify-center py-4">
-                          <div className="h-10 w-px bg-gradient-to-b from-cyan-300/0 via-cyan-300/40 to-cyan-300/0" />
-                        </div>
-
-                        <div className="rounded-[1.6rem] border border-cyan-300/18 bg-cyan-300/[0.08] px-5 py-5 text-center shadow-[0_18px_60px_rgba(34,211,238,0.08)]">
-                          <p className="font-[family:var(--font-landing-mono)] text-[0.66rem] uppercase tracking-[0.3em] text-cyan-200/80">
-                            MUTX control plane
-                          </p>
-                          <p className="mt-2 text-xl font-semibold tracking-[-0.04em] text-white">
-                            Shared operator state
+                    <div className="mt-8 grid gap-4 md:grid-cols-2">
+                      {fearCards.map((item) => (
+                        <div
+                          key={item.title}
+                          className="rounded-[1.7rem] border border-white/10 bg-black/20 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]"
+                        >
+                          <h4 className="text-lg font-semibold tracking-[-0.04em] text-white">
+                            {item.title}
+                          </h4>
+                          <p className="mt-3 text-sm leading-7 text-slate-300/80">
+                            {item.body}
                           </p>
                         </div>
-
-                        <div className="flex justify-center py-4">
-                          <div className="h-10 w-px bg-gradient-to-b from-cyan-300/0 via-cyan-300/40 to-cyan-300/0" />
-                        </div>
-
-                        <div className="grid gap-3 sm:grid-cols-3">
-                          {runtimeState.map((item) => (
-                            <div
-                              key={item}
-                              className="rounded-[1.15rem] border border-white/10 bg-black/20 px-4 py-3 text-center text-sm font-medium text-slate-200"
-                            >
-                              {item}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="grid gap-4">
-                        {capabilityPanels.map((panel) => (
-                          <CapabilityTile key={panel.eyebrow} {...panel} />
-                        ))}
-                      </div>
+                      ))}
                     </div>
                   </div>
                 </article>
               </MotionIn>
+
+              <div className="grid gap-5">
+                <MotionIn delay={0.05}>
+                  <article className="landing-panel p-6">
+                    <p className="landing-kicker">What buyers purchase</p>
+                    <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                      {buyerOutcomes.map((item) => (
+                        <div
+                          key={item}
+                          className="rounded-[1.4rem] border border-cyan-300/16 bg-cyan-300/[0.08] px-4 py-5 text-center"
+                        >
+                          <p className="font-[family:var(--font-landing-mono)] text-[0.72rem] uppercase tracking-[0.24em] text-cyan-100">
+                            {item}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="mt-5 text-sm leading-7 text-slate-300/80">
+                      Lead with the business outcome, not the architecture.
+                    </p>
+                  </article>
+                </MotionIn>
+
+                <MotionIn delay={0.1}>
+                  <article className="landing-panel p-6">
+                    <p className="landing-kicker">Start here</p>
+                    <h3 className="mt-4 text-2xl font-semibold tracking-[-0.05em] text-white">
+                      Deployment-sensitive teams.
+                    </h3>
+                    <div className="mt-5 grid gap-3">
+                      {startingWedge.map((item) => (
+                        <div
+                          key={item}
+                          className="rounded-[1.2rem] border border-white/10 bg-black/20 px-4 py-3 text-sm font-medium text-slate-200"
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {enemyList.map((item) => (
+                        <span key={item} className="landing-chip">
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </article>
+                </MotionIn>
+              </div>
             </div>
           </div>
         </section>
@@ -399,20 +377,11 @@ export default function LandingPage() {
         <section id="quickstart" className="px-4 py-24 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <MotionIn>
-              <div className="max-w-4xl">
-                <div className="landing-kicker">Quickstart</div>
-                <h2 className="mt-5 font-[family:var(--font-landing-display)] text-4xl font-semibold tracking-[-0.08em] text-white sm:text-5xl">
-                  Bring MUTX and OpenClaw up fast.
-                </h2>
-                <p className="mt-4 max-w-2xl text-base leading-8 text-slate-300/80">
-                  Install MUTX once, then let the provider wizard detect or install
-                  OpenClaw, bind a dedicated assistant, and track the runtime under
-                  <span className="px-2 font-[family:var(--font-landing-mono)] text-[0.9em] text-cyan-200">
-                    ~/.mutx/providers/openclaw
-                  </span>
-                  without moving the upstream home.
-                </p>
-              </div>
+              <SectionHeading
+                label="Proof path"
+                title="Run the proof path."
+                body="Use the smallest lane that gets you to a real runtime."
+              />
             </MotionIn>
 
             <MotionIn className="mt-10" delay={0.06}>
@@ -421,97 +390,107 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="openclaw-flow" className="px-4 py-24 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <MotionIn>
-              <SectionHeading
-                label="OpenClaw Flow"
-                title="Use upstream OpenClaw. Keep the MUTX shell."
-                body="The runtime stays local and upstream. MUTX adds the operator wrapper: detection, resumable setup, tracked bindings, honest dashboard sync, and the same control language across CLI, TUI, and web."
-              />
-            </MotionIn>
-
-            <MotionIn className="mt-12" delay={0.06}>
-              <OpenClawFlowShowcase />
-            </MotionIn>
-          </div>
-        </section>
-
-        <section id="control-loop" className="px-4 py-24 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <MotionIn>
-              <SectionHeading
-                label="Control Loop"
-                title="See it. Change it. Recover it."
-              />
-            </MotionIn>
-
-            <MotionIn className="mt-12" delay={0.06}>
-              <ControlLoopTabs />
-            </MotionIn>
-          </div>
-        </section>
-
         <section className="px-4 pb-24 pt-8 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <MotionIn>
-              <div className="landing-panel relative overflow-hidden p-6 lg:p-8">
+              <div className="landing-panel-strong relative overflow-hidden p-6 lg:p-8">
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(103,232,249,0.12),transparent_22%),linear-gradient(135deg,rgba(8,21,33,0.22),transparent_40%)]"
+                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_0%,rgba(103,232,249,0.14),transparent_22%),radial-gradient(circle_at_100%_0%,rgba(248,113,113,0.12),transparent_18%)]"
                 />
-                <div className="relative grid gap-8 lg:grid-cols-[minmax(0,0.88fr)_minmax(19rem,1.12fr)] lg:items-start">
+
+                <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(19rem,0.98fr)] lg:items-start">
                   <div>
+                    <div className="landing-kicker">Book a demo</div>
                     <h2 className="mt-5 font-[family:var(--font-landing-display)] text-4xl font-semibold tracking-[-0.08em] text-white sm:text-5xl">
-                      Local lane.
+                      Bring the workflow that keeps breaking.
                     </h2>
+                    <p className="mt-4 max-w-2xl text-base leading-8 text-slate-300/82">
+                      If deployments stall, security blocks, or cost visibility
+                      disappears, we will work from the exact path that is
+                      already slowing the deal down.
+                    </p>
 
-                    <pre className="mt-6 overflow-x-auto whitespace-pre-wrap break-words rounded-[1.9rem] border border-white/10 bg-[#04101a] px-5 py-5 font-[family:var(--font-landing-mono)] text-[13px] leading-7 text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
-                      {`make dev-up
-mutx setup local
-mutx doctor
-mutx tui`}
-                    </pre>
-                  </div>
-
-                  <div className="grid gap-4">
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <Link
-                        href="/app"
-                        prefetch={false}
-                        className="landing-button-primary justify-between px-5 py-4 text-base"
-                      >
-                        Open live demo
-                        <ArrowRight className="h-5 w-5" />
-                      </Link>
-                      <a
-                        href="#quickstart"
-                        className="landing-button-secondary justify-between px-5 py-4 text-base"
-                      >
-                        Run quickstart
-                        <TerminalSquare className="h-5 w-5 text-slate-400" />
-                      </a>
-                      <a
-                        href={DOCS_URL}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="landing-button-secondary justify-between px-5 py-4 text-base"
-                      >
-                        Read docs
-                        <BookOpen className="h-5 w-5 text-slate-400" />
-                      </a>
-                      <a
-                        href={GITHUB_URL}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="landing-button-secondary justify-between px-5 py-4 text-base"
-                      >
-                        View GitHub
-                        <Github className="h-5 w-5 text-slate-400" />
-                      </a>
+                    <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                      {footerProblems.map((item) => (
+                        <div
+                          key={item}
+                          className="rounded-[1.4rem] border border-white/10 bg-black/20 px-4 py-4 text-sm font-medium text-slate-100"
+                        >
+                          {item}
+                        </div>
+                      ))}
                     </div>
                   </div>
+
+                  <div className="rounded-[2rem] border border-white/10 bg-[#06111d]/90 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                    <div>
+                      <p className="font-[family:var(--font-landing-mono)] text-[0.68rem] uppercase tracking-[0.22em] text-slate-500">
+                        Discovery call
+                      </p>
+                      <h3 className="mt-3 text-2xl font-semibold tracking-[-0.05em] text-white">
+                        20-minute working session
+                      </h3>
+                      <p className="mt-3 text-sm leading-7 text-slate-300/78">
+                        Bring the rollout, review, or cost problem that is already
+                        dragging the sale down.
+                      </p>
+                    </div>
+
+                    <div className="mt-6 grid gap-3">
+                      {footerCallShape.map((item) => (
+                        <div
+                          key={item}
+                          className="rounded-[1.25rem] border border-white/10 bg-white/[0.03] px-4 py-4 text-sm font-medium text-slate-200"
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+
+                    <CalendlyPopupButton className="landing-button-primary mt-6 w-full justify-between px-5 py-4 text-base">
+                      Book a demo
+                      <ArrowRight className="h-5 w-5" />
+                    </CalendlyPopupButton>
+                  </div>
                 </div>
+
+                <footer className="relative mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-10 w-10 overflow-hidden rounded-[1rem] border border-cyan-300/15 bg-[linear-gradient(180deg,rgba(230,238,246,0.24)_0%,rgba(95,114,131,0.18)_100%)] p-1 shadow-[0_12px_28px_rgba(34,211,238,0.12)] ring-1 ring-inset ring-white/8">
+                      <div className="absolute inset-[1px] rounded-[0.9rem] bg-[radial-gradient(circle_at_50%_20%,rgba(103,232,249,0.14),transparent_56%),linear-gradient(180deg,rgba(15,23,42,0.94)_0%,rgba(4,10,18,0.96)_100%)]" />
+                      <Image
+                        src="/logo.png"
+                        alt="MUTX logo"
+                        fill
+                        sizes="2.5rem"
+                        className="relative z-10 object-contain p-1 brightness-[1.08] contrast-[1.04]"
+                      />
+                    </div>
+                    <div>
+                      <p className="font-[family:var(--font-landing-mono)] text-[0.68rem] uppercase tracking-[0.28em] text-slate-300">
+                        MUTX
+                      </p>
+                      <p className="text-sm text-slate-400">
+                        Control, speed, predictable economics.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
+                    {footerLinks.map((item) => (
+                      <a
+                        key={item.label}
+                        href={item.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="transition hover:text-white"
+                      >
+                        {item.label}
+                      </a>
+                    ))}
+                  </div>
+                </footer>
               </div>
             </MotionIn>
           </div>
