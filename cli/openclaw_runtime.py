@@ -5,6 +5,7 @@ import os
 import shlex
 import shutil
 import subprocess
+from urllib.parse import urlparse
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -388,23 +389,77 @@ def detect_gateway_port() -> int | None:
 
 
 def detect_gateway_token() -> str:
+    auth_arg = resolve_gateway_auth_argument()
+    if auth_arg is None:
+        return ""
+    return auth_arg[1]
+
+
+def resolve_gateway_auth_argument() -> tuple[str, str] | None:
     for env_name in (
-        "OPENCLAW_GATEWAY_TOKEN",
-        "GATEWAY_TOKEN",
         "OPENCLAW_GATEWAY_PASSWORD",
         "GATEWAY_PASSWORD",
     ):
         env_value = os.environ.get(env_name)
         if env_value:
-            return env_value.strip()
+            value = env_value.strip()
+            if value:
+                return ("--password", value)
+
+    for env_name in (
+        "OPENCLAW_GATEWAY_TOKEN",
+        "GATEWAY_TOKEN",
+    ):
+        env_value = os.environ.get(env_name)
+        if env_value:
+            value = env_value.strip()
+            if value:
+                return ("--token", value)
 
     config = _read_json_file(detect_openclaw_config_path())
     gateway = config.get("gateway") or {}
     auth = gateway.get("auth") or {}
-    mode = auth.get("mode", "token")
+    mode = str(auth.get("mode") or "token").strip().lower()
     if mode == "password":
-        return str(auth.get("password") or "").strip()
-    return str(auth.get("token") or "").strip()
+        password = str(auth.get("password") or "").strip()
+        if password:
+            return ("--password", password)
+        token = str(auth.get("token") or "").strip()
+        if token:
+            return ("--token", token)
+        return None
+
+    token = str(auth.get("token") or "").strip()
+    if token:
+        return ("--token", token)
+    password = str(auth.get("password") or "").strip()
+    if password:
+        return ("--password", password)
+    return None
+
+
+def _is_default_gateway_url(gateway_url: str | None) -> bool:
+    if not gateway_url:
+        return True
+
+    port = detect_gateway_port()
+    if not port:
+        return False
+
+    normalized = gateway_url.rstrip("/")
+    defaults = {
+        f"http://127.0.0.1:{port}",
+        f"http://localhost:{port}",
+        f"ws://127.0.0.1:{port}",
+        f"ws://localhost:{port}",
+    }
+    if normalized in defaults:
+        return True
+
+    parsed = urlparse(normalized)
+    if parsed.hostname in {"127.0.0.1", "localhost"} and parsed.port == port:
+        return True
+    return False
 
 
 def get_gateway_health() -> OpenClawGatewayHealth:
@@ -641,8 +696,11 @@ def build_openclaw_surface_command(
 
     command = [claw_bin, normalized]
     if normalized == "tui":
-        if gateway_url:
+        if gateway_url and not _is_default_gateway_url(gateway_url):
             command.extend(["--url", gateway_url])
+            auth_arg = resolve_gateway_auth_argument()
+            if auth_arg is not None:
+                command.extend(list(auth_arg))
         if session_key:
             command.extend(["--session", session_key])
     return command

@@ -13,6 +13,7 @@ from cli.openclaw_runtime import (
     list_local_sessions,
     merge_runtime_binding,
     persist_openclaw_runtime_snapshot,
+    resolve_gateway_auth_argument,
 )
 from cli.errors import ValidationError
 from cli.runtime_registry import (
@@ -276,8 +277,68 @@ def test_inspect_importable_openclaw_runtime_requires_reachable_gateway(monkeypa
         raise AssertionError("Expected import inspection to reject an unreachable gateway.")
 
 
-def test_build_openclaw_surface_command_includes_gateway_url(monkeypatch) -> None:
+def test_resolve_gateway_auth_argument_reads_token_from_config(monkeypatch, tmp_path: Path) -> None:
+    config_path = tmp_path / "openclaw.json"
+    config_path.write_text(
+        json.dumps({"gateway": {"auth": {"mode": "token", "token": "gateway-token"}}}),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr("cli.openclaw_runtime.detect_openclaw_config_path", lambda: config_path)
+    monkeypatch.delenv("OPENCLAW_GATEWAY_TOKEN", raising=False)
+    monkeypatch.delenv("GATEWAY_TOKEN", raising=False)
+    monkeypatch.delenv("OPENCLAW_GATEWAY_PASSWORD", raising=False)
+    monkeypatch.delenv("GATEWAY_PASSWORD", raising=False)
+
+    assert resolve_gateway_auth_argument() == ("--token", "gateway-token")
+
+
+def test_resolve_gateway_auth_argument_reads_password_from_config(monkeypatch, tmp_path: Path) -> None:
+    config_path = tmp_path / "openclaw.json"
+    config_path.write_text(
+        json.dumps({"gateway": {"auth": {"mode": "password", "password": "gateway-password"}}}),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr("cli.openclaw_runtime.detect_openclaw_config_path", lambda: config_path)
+    monkeypatch.delenv("OPENCLAW_GATEWAY_TOKEN", raising=False)
+    monkeypatch.delenv("GATEWAY_TOKEN", raising=False)
+    monkeypatch.delenv("OPENCLAW_GATEWAY_PASSWORD", raising=False)
+    monkeypatch.delenv("GATEWAY_PASSWORD", raising=False)
+
+    assert resolve_gateway_auth_argument() == ("--password", "gateway-password")
+
+
+def test_build_openclaw_surface_command_includes_gateway_url_and_auth_for_override(monkeypatch) -> None:
     monkeypatch.setattr("cli.openclaw_runtime.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw")
+    monkeypatch.setattr("cli.openclaw_runtime.detect_gateway_port", lambda: 18789)
+    monkeypatch.setattr(
+        "cli.openclaw_runtime.resolve_gateway_auth_argument",
+        lambda: ("--token", "gateway-token"),
+    )
+
+    command = build_openclaw_surface_command(
+        surface="tui",
+        gateway_url="ws://remote.example.test:18789",
+    )
+
+    assert command == [
+        "/opt/homebrew/bin/openclaw",
+        "tui",
+        "--url",
+        "ws://remote.example.test:18789",
+        "--token",
+        "gateway-token",
+    ]
+
+
+def test_build_openclaw_surface_command_omits_local_url_override(monkeypatch) -> None:
+    monkeypatch.setattr("cli.openclaw_runtime.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw")
+    monkeypatch.setattr("cli.openclaw_runtime.detect_gateway_port", lambda: 18789)
+    monkeypatch.setattr(
+        "cli.openclaw_runtime.resolve_gateway_auth_argument",
+        lambda: ("--token", "gateway-token"),
+    )
 
     command = build_openclaw_surface_command(
         surface="tui",
@@ -287,8 +348,6 @@ def test_build_openclaw_surface_command_includes_gateway_url(monkeypatch) -> Non
     assert command == [
         "/opt/homebrew/bin/openclaw",
         "tui",
-        "--url",
-        "http://127.0.0.1:18789",
     ]
 
 
