@@ -9,10 +9,10 @@ import {
   GitBranch,
   PhoneCall,
   ShieldCheck,
-  TerminalSquare,
 } from "lucide-react";
 
 import { CalendlyPopupButton } from "@/components/site/CalendlyPopupButton";
+import { CommandCopyButton } from "@/components/site/CommandCopyButton";
 import { ComingSoonButton } from "@/components/site/ComingSoonButton";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { SiteReveal } from "@/components/site/SiteReveal";
@@ -156,7 +156,9 @@ function InstallCard({ label, caption, command }: InstallCardProps) {
           <p>{label}</p>
           <p>{caption}</p>
         </div>
-        <TerminalSquare className="h-4 w-4 text-[color:var(--site-accent)]" />
+        <div className="site-command-card-actions">
+          <CommandCopyButton value={command} />
+        </div>
       </div>
       <pre>{command}</pre>
     </article>
@@ -314,7 +316,13 @@ export default function LandingPage() {
                       <p>Start here</p>
                       <p>smallest credible proof path</p>
                     </div>
-                    <TerminalSquare className="h-4 w-4 text-[color:var(--site-accent)]" />
+                    <div className="site-command-card-actions">
+                      <CommandCopyButton
+                        value={`curl -fsSL https://mutx.dev/install.sh | bash
+mutx setup local --provider openclaw --install-openclaw
+mutx assistant overview`}
+                      />
+                    </div>
                   </div>
                   <pre>{`curl -fsSL https://mutx.dev/install.sh | bash
 mutx setup local --provider openclaw --install-openclaw

@@ -889,6 +889,38 @@
     color: #ffffff;
   }
 
+  .site-command-card-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .site-command-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 999px;
+    border: 1px solid rgba(173, 187, 206, 0.14);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 0.45rem 0.72rem;
+    font-family: var(--font-mono), monospace;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--site-text-soft);
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      color 160ms ease;
+  }
+
+  .site-command-copy:hover {
+    border-color: rgba(104, 225, 255, 0.26);
+    background: rgba(104, 225, 255, 0.08);
+    color: #ffffff;
+  }
+
   .site-command-card pre {
     overflow-x: auto;
     padding: 1rem;
