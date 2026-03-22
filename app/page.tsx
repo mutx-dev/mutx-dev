@@ -1,15 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
-import {
-  ArrowRight,
-  Binary,
-  BookOpen,
-  Boxes,
-  GitBranch,
-  PhoneCall,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowRight, Binary, GitBranch, PhoneCall, ShieldCheck } from "lucide-react";
 
 import { CalendlyPopupButton } from "@/components/site/CalendlyPopupButton";
 import { CommandCopyButton } from "@/components/site/CommandCopyButton";
@@ -18,22 +10,6 @@ import { PublicFooter } from "@/components/site/PublicFooter";
 import { SiteReveal } from "@/components/site/SiteReveal";
 
 const DOCS_URL = "https://docs.mutx.dev";
-const GITHUB_URL = "https://github.com/mutx-dev/mutx-dev";
-
-const heroSignals = [
-  {
-    label: "Auth boundary",
-    value: "keys, sessions, and ownership stay attached to real routes.",
-  },
-  {
-    label: "Deployment posture",
-    value: "inspect health, restarts, logs, and version drift before it spills.",
-  },
-  {
-    label: "Trace diagnosis",
-    value: "follow a run from operator action to receipt instead of guessing.",
-  },
-] as const;
 
 const surfaceCards = [
   {
@@ -50,38 +26,6 @@ const surfaceCards = [
     icon: Binary,
     title: "Trace the weird part",
     body: "Run history, traces, and webhook receipts make the failure legible instead of forcing another round of screenshot archaeology.",
-  },
-] as const;
-
-const installCards = [
-  {
-    label: "Recommended quickstart",
-    caption: "one command · hosted lane",
-    command: `curl -fsSL https://mutx.dev/install.sh | bash`,
-    note: "The MUTX installer stays in the same terminal, recommends Hosted, installs or imports OpenClaw, and opens the operator TUI for you.",
-  },
-  {
-    label: "Already running OpenClaw?",
-    caption: "advanced reuse path",
-    command: `mutx setup hosted --import-openclaw`,
-    note: "Use this after install if OpenClaw is already on the machine and you want MUTX to adopt it without reinstalling anything.",
-  },
-] as const;
-
-const launchCards = [
-  {
-    icon: BookOpen,
-    title: "Read the docs",
-    body: "Start with the route contract, install path, and operational references before you touch anything hosted.",
-    href: DOCS_URL,
-    external: true,
-  },
-  {
-    icon: Boxes,
-    title: "Read the repo",
-    body: "Web, API, CLI, SDK, and infra live together so the product truth is inspectable when things get weird.",
-    href: GITHUB_URL,
-    external: true,
   },
 ] as const;
 
@@ -117,7 +61,7 @@ type FeatureCardProps = {
 
 function FeatureCard({ icon: Icon, title, body }: FeatureCardProps) {
   return (
-    <article className="site-panel p-5 sm:p-6">
+    <article className="site-panel h-full p-5 sm:p-6">
       <div className="inline-flex rounded-full border border-white/10 bg-white/[0.04] p-3">
         <Icon className="h-4 w-4 text-[color:var(--site-accent)]" />
       </div>
@@ -128,80 +72,6 @@ function FeatureCard({ icon: Icon, title, body }: FeatureCardProps) {
         {body}
       </p>
     </article>
-  );
-}
-
-type InstallCardProps = {
-  label: string;
-  caption: string;
-  command: string;
-  note: string;
-};
-
-function InstallCard({ label, caption, command, note }: InstallCardProps) {
-  return (
-    <article className="site-command-card">
-      <div className="site-command-card-head">
-        <div>
-          <p>{label}</p>
-          <p>{caption}</p>
-        </div>
-        <div className="site-command-card-actions">
-          <CommandCopyButton value={command} />
-        </div>
-      </div>
-      <pre>{command}</pre>
-      <p className="mt-4 text-sm leading-7 text-[color:var(--site-text-soft)]">
-        {note}
-      </p>
-    </article>
-  );
-}
-
-type LaunchCardProps = {
-  icon: LucideIcon;
-  title: string;
-  body: string;
-  href: string;
-  external: boolean;
-};
-
-function LaunchCard({
-  icon: Icon,
-  title,
-  body,
-  href,
-  external,
-}: LaunchCardProps) {
-  const content = (
-    <>
-      <div className="inline-flex rounded-full border border-white/10 bg-white/[0.04] p-3">
-        <Icon className="h-4 w-4 text-[color:var(--site-accent)]" />
-      </div>
-      <div>
-        <h3 className="site-link-card-title">{title}</h3>
-        <p className="site-link-card-body mt-2">{body}</p>
-      </div>
-      <span className="inline-flex items-center gap-2 text-sm font-semibold text-white">
-        Open
-        <ArrowRight className="h-4 w-4" />
-      </span>
-    </>
-  );
-
-  return external ? (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      className="site-link-card"
-    >
-      {content}
-    </a>
-  ) : (
-    <Link href={href} className="site-link-card">
-      {content}
-    </Link>
   );
 }
 
@@ -303,11 +173,13 @@ export default function LandingPage() {
               </SiteReveal>
 
               <div className="site-hero-support">
-                <div className="site-command-card">
-                  <div className="site-command-card-head">
+                <article
+                  id="install"
+                  className="site-command-card site-command-card-hero scroll-mt-28"
+                >
+                  <div className="site-command-card-head site-command-card-head-hero">
                     <div>
                       <p>Start here</p>
-                      <p>smallest credible proof path</p>
                     </div>
                     <div className="site-command-card-actions">
                       <CommandCopyButton
@@ -315,23 +187,17 @@ export default function LandingPage() {
                       />
                     </div>
                   </div>
-                  <pre>{`curl -fsSL https://mutx.dev/install.sh | bash`}</pre>
-                  <p className="mt-4 text-sm leading-7 text-[color:var(--site-text-soft)]">
-                    The installer opens the MUTX wizard in the same terminal.
-                    Choose <span className="font-semibold text-white">Hosted</span>{" "}
-                    unless you explicitly want a private Docker-backed localhost
-                    control plane.
-                  </p>
-                </div>
 
-                <div className="site-signal-grid">
-                  {heroSignals.map((item) => (
-                    <div key={item.label} className="site-signal-card">
-                      <p className="site-signal-label">{item.label}</p>
-                      <p className="site-signal-value">{item.value}</p>
-                    </div>
-                  ))}
-                </div>
+                  <div className="site-command-card-body">
+                    <pre className="site-command-card-hero-pre">{`curl -fsSL https://mutx.dev/install.sh | bash`}</pre>
+                    <p className="site-command-card-note">
+                      The installer stays in the same terminal, recommends{" "}
+                      <span className="font-semibold text-white">Hosted</span>,
+                      installs or imports OpenClaw, and opens the operator TUI
+                      for you.
+                    </p>
+                  </div>
+                </article>
               </div>
             </div>
           </div>
@@ -377,15 +243,21 @@ export default function LandingPage() {
                       fill
                       sizes="(max-width: 1280px) 100vw, 44rem"
                       className="site-hero-art-cover"
-                      style={{ objectPosition: "center 38%" }}
+                      style={{ objectPosition: "center 58%" }}
                     />
                   </div>
                 </article>
               </SiteReveal>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid content-start gap-4 sm:grid-cols-2">
                 {surfaceCards.map((card, index) => (
-                  <SiteReveal key={card.title} delay={0.06 + index * 0.04}>
+                  <SiteReveal
+                    key={card.title}
+                    delay={0.06 + index * 0.04}
+                    className={
+                      index === surfaceCards.length - 1 ? "sm:col-span-2" : undefined
+                    }
+                  >
                     <FeatureCard {...card} />
                   </SiteReveal>
                 ))}
@@ -423,62 +295,6 @@ export default function LandingPage() {
                 </code>
               </article>
             </SiteReveal>
-          </div>
-        </section>
-
-        <section id="install" className="site-section site-defer">
-          <div className="site-shell space-y-8">
-            <SiteReveal>
-              <SectionIntro
-                eyebrow="Proof Path"
-                title="Start with one command, then let MUTX guide the rest."
-                body="New to MUTX? Run the installer and choose Hosted. Keep the Docker-backed localhost lane for self-hosting and contributor work."
-              />
-            </SiteReveal>
-
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.95fr)]">
-              <div className="grid gap-4">
-                {installCards.map((card, index) => (
-                  <SiteReveal key={card.label} delay={0.04 + index * 0.04}>
-                    <InstallCard {...card} />
-                  </SiteReveal>
-                ))}
-              </div>
-
-              <div className="grid gap-4">
-                <SiteReveal delay={0.08}>
-                  <article className="site-panel-strong overflow-hidden p-5 sm:p-6">
-                    <div className="site-kicker">Docs + routes + operator UI</div>
-                    <h3 className="mt-4 text-3xl font-semibold tracking-[-0.06em] text-white">
-                      One product, four honest surfaces.
-                    </h3>
-                    <p className="mt-4 text-sm leading-7 text-[color:var(--site-text-soft)]">
-                      MUTX works best when the site, docs, CLI, and API say the
-                      same thing about the same system.
-                    </p>
-
-                    <div className="site-figure-frame site-figure-frame-cover mt-6">
-                      <Image
-                        src="/landing/webp/reading-bench.webp"
-                        alt="MUTX robot reviewing the proof path before rollout"
-                        fill
-                        sizes="(max-width: 1280px) 100vw, 34rem"
-                        className="site-hero-art-cover"
-                        style={{ objectPosition: "center 24%" }}
-                      />
-                    </div>
-                  </article>
-                </SiteReveal>
-
-                <div className="grid gap-4">
-                  {launchCards.map((card, index) => (
-                    <SiteReveal key={card.title} delay={0.1 + index * 0.04}>
-                      <LaunchCard {...card} />
-                    </SiteReveal>
-                  ))}
-                </div>
-              </div>
-            </div>
           </div>
         </section>
 
