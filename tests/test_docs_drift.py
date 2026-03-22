@@ -209,6 +209,15 @@ def test_summary_points_only_to_existing_public_docs() -> None:
         assert_exact_case(resolved)
 
 
+def test_gitbook_config_keeps_legacy_contract_redirect() -> None:
+    gitbook_config = read_text(".gitbook.yaml")
+
+    assert 'root: ./' in gitbook_config
+    assert 'readme: README.md' in gitbook_config
+    assert 'summary: SUMMARY.md' in gitbook_config
+    assert '"docs/contracts/api": docs/api/reference.md' in gitbook_config
+
+
 def test_public_api_docs_reference_current_routes() -> None:
     for relative_path, expected_strings in API_DOC_EXPECTATIONS.items():
         content = read_text(relative_path)
