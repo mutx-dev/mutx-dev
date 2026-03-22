@@ -1,3 +1,8 @@
+---
+description: Community participation standards for contributors and maintainers.
+icon: scale-balanced
+---
+
 # Contributor Covenant Code of Conduct
 
 ## Our Pledge

@@ -435,6 +435,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Deploy Agent V1 Agents  Agent Id  Deploy Post"
                 }
               }
@@ -495,6 +496,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "additionalProperties": true,
                   "title": "Response Stop Agent V1 Agents  Agent Id  Stop Post"
                 }
               }
@@ -839,6 +841,525 @@
                     "$ref": "#/components/schemas/AgentResourceUsageResponse"
                   },
                   "title": "Response List Agent Resource Usage V1 Agents  Agent Id  Resource Usage Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/assistant/overview": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Assistant Overview",
+        "operationId": "assistant_overview_v1_assistant_overview_get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantOverviewEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/assistant/{agent_id}/skills": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Assistant Skills",
+        "operationId": "assistant_skills_v1_assistant__agent_id__skills_get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssistantSkillResponse"
+                  },
+                  "title": "Response Assistant Skills V1 Assistant  Agent Id  Skills Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/assistant/{agent_id}/skills/{skill_id}": {
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Install Assistant Skill",
+        "operationId": "install_assistant_skill_v1_assistant__agent_id__skills__skill_id__post",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "skill_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Skill Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssistantSkillResponse"
+                  },
+                  "title": "Response Install Assistant Skill V1 Assistant  Agent Id  Skills  Skill Id  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Uninstall Assistant Skill",
+        "operationId": "uninstall_assistant_skill_v1_assistant__agent_id__skills__skill_id__delete",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "skill_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Skill Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssistantSkillResponse"
+                  },
+                  "title": "Response Uninstall Assistant Skill V1 Assistant  Agent Id  Skills  Skill Id  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/assistant/{agent_id}/channels": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Assistant Channels",
+        "operationId": "assistant_channels_v1_assistant__agent_id__channels_get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssistantChannelResponse"
+                  },
+                  "title": "Response Assistant Channels V1 Assistant  Agent Id  Channels Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/assistant/{agent_id}/wakeups": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Assistant Wakeups",
+        "operationId": "assistant_wakeups_v1_assistant__agent_id__wakeups_get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssistantWakeupResponse"
+                  },
+                  "title": "Response Assistant Wakeups V1 Assistant  Agent Id  Wakeups Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/assistant/{agent_id}/health": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Assistant Health",
+        "operationId": "assistant_health_v1_assistant__agent_id__health_get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantHealthResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/assistant/{agent_id}/sessions": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Assistant Sessions",
+        "operationId": "assistant_sessions_v1_assistant__agent_id__sessions_get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssistantSessionResponse"
+                  },
+                  "title": "Response Assistant Sessions V1 Assistant  Agent Id  Sessions Get"
                 }
               }
             }
@@ -1696,6 +2217,99 @@
         }
       }
     },
+    "/v1/templates": {
+      "get": {
+        "tags": [
+          "templates"
+        ],
+        "summary": "List Templates",
+        "operationId": "list_templates_v1_templates_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AssistantTemplateResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Templates V1 Templates Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/templates/{template_id}/deploy": {
+      "post": {
+        "tags": [
+          "templates"
+        ],
+        "summary": "Deploy Template",
+        "operationId": "deploy_template_v1_templates__template_id__deploy_post",
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Template Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StarterDeploymentCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StarterDeploymentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/webhooks/": {
       "post": {
         "tags": [
@@ -2409,6 +3023,47 @@
         }
       }
     },
+    "/v1/auth/local-bootstrap": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Local Bootstrap",
+        "operationId": "local_bootstrap_v1_auth_local_bootstrap_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocalBootstrapRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/auth/refresh": {
       "post": {
         "tags": [
@@ -2737,7 +3392,7 @@
           "clawhub"
         ],
         "summary": "List Available Skills",
-        "description": "Returns the current trending skills from ClawHub.",
+        "description": "Returns the current MUTX/OpenClaw skill catalog.",
         "operationId": "list_available_skills_v1_clawhub_skills_get",
         "responses": {
           "200": {
@@ -3175,6 +3830,302 @@
         }
       }
     },
+    "/v1/leads/contacts": {
+      "post": {
+        "tags": [
+          "contacts"
+        ],
+        "summary": "Capture Lead",
+        "description": "Capture a new contact lead.\nPublic endpoint for landing pages and onboarding.",
+        "operationId": "capture_lead_v1_leads_contacts_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "contacts"
+        ],
+        "summary": "List Leads",
+        "description": "List captured leads.\nRestricted to internal/admin users.",
+        "operationId": "list_leads_v1_leads_contacts_get",
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Skip"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LeadResponse"
+                  },
+                  "title": "Response List Leads V1 Leads Contacts Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/leads/contacts/{lead_id}": {
+      "get": {
+        "tags": [
+          "contacts"
+        ],
+        "summary": "Get Lead",
+        "description": "Get a specific lead by ID.",
+        "operationId": "get_lead_v1_leads_contacts__lead_id__get",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "contacts"
+        ],
+        "summary": "Update Lead",
+        "description": "Update a specific lead/contact.",
+        "operationId": "update_lead_v1_leads_contacts__lead_id__patch",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "contacts"
+        ],
+        "summary": "Delete Lead",
+        "description": "Delete a specific lead/contact.",
+        "operationId": "delete_lead_v1_leads_contacts__lead_id__delete",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/leads": {
       "post": {
         "tags": [
@@ -3426,302 +4377,6 @@
         "summary": "Delete Lead",
         "description": "Delete a specific lead/contact.",
         "operationId": "delete_lead_v1_leads__lead_id__delete",
-        "parameters": [
-          {
-            "name": "lead_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Lead Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/contacts": {
-      "post": {
-        "tags": [
-          "contacts"
-        ],
-        "summary": "Capture Lead",
-        "description": "Capture a new contact lead.\nPublic endpoint for landing pages and onboarding.",
-        "operationId": "capture_lead_v1_contacts_post",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LeadCreate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LeadResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "contacts"
-        ],
-        "summary": "List Leads",
-        "description": "List captured leads.\nRestricted to internal/admin users.",
-        "operationId": "list_leads_v1_contacts_get",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0,
-              "title": "Skip"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "maximum": 100,
-              "minimum": 1,
-              "default": 50,
-              "title": "Limit"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LeadResponse"
-                  },
-                  "title": "Response List Leads V1 Contacts Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/contacts/{lead_id}": {
-      "get": {
-        "tags": [
-          "contacts"
-        ],
-        "summary": "Get Lead",
-        "description": "Get a specific lead by ID.",
-        "operationId": "get_lead_v1_contacts__lead_id__get",
-        "parameters": [
-          {
-            "name": "lead_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Lead Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LeadResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "patch": {
-        "tags": [
-          "contacts"
-        ],
-        "summary": "Update Lead",
-        "description": "Update a specific lead/contact.",
-        "operationId": "update_lead_v1_contacts__lead_id__patch",
-        "parameters": [
-          {
-            "name": "lead_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "title": "Lead Id"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LeadUpdate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LeadResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "contacts"
-        ],
-        "summary": "Delete Lead",
-        "description": "Delete a specific lead/contact.",
-        "operationId": "delete_lead_v1_contacts__lead_id__delete",
         "parameters": [
           {
             "name": "lead_id",
@@ -6059,6 +6714,441 @@
         }
       }
     },
+    "/v1/onboarding": {
+      "get": {
+        "tags": [
+          "onboarding"
+        ],
+        "summary": "Onboarding State",
+        "operationId": "onboarding_state_v1_onboarding_get",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "openclaw",
+              "title": "Provider"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingStateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "onboarding"
+        ],
+        "summary": "Onboarding Update",
+        "operationId": "onboarding_update_v1_onboarding_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnboardingUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingStateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/runtime/providers/{provider}": {
+      "get": {
+        "tags": [
+          "runtime"
+        ],
+        "summary": "Runtime Provider State",
+        "operationId": "runtime_provider_state_v1_runtime_providers__provider__get",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Provider"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuntimeProviderSnapshotResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "runtime"
+        ],
+        "summary": "Upsert Runtime Provider State",
+        "operationId": "upsert_runtime_provider_state_v1_runtime_providers__provider__put",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Provider"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuntimeProviderSnapshotUpsert"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuntimeProviderSnapshotResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions": {
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "List Sessions",
+        "description": "List assistant sessions discovered from OpenClaw state plus local sources.",
+        "operationId": "list_sessions_v1_sessions_get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Session Action",
+        "description": "Validate session action input, but do not mutate gateway state yet.",
+        "operationId": "session_action_v1_sessions_post",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Action"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionActionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Session Action V1 Sessions Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Delete Session",
+        "operationId": "delete_session_v1_sessions_delete",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionActionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Delete Session V1 Sessions Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/swarms": {
       "get": {
         "tags": [
@@ -6687,6 +7777,10 @@
                 "$ref": "#/components/schemas/CustomAgentConfig"
               },
               {
+                "$ref": "#/components/schemas/OpenClawAgentConfig"
+              },
+              {
+                "additionalProperties": true,
                 "type": "object"
               }
             ],
@@ -6718,6 +7812,7 @@
           "config": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -6755,16 +7850,13 @@
             "title": "Description"
           },
           "type": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AgentType"
-              }
-            ],
+            "$ref": "#/components/schemas/AgentType",
             "default": "openai"
           },
           "config": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -6827,6 +7919,10 @@
                 "$ref": "#/components/schemas/CustomAgentConfig"
               },
               {
+                "$ref": "#/components/schemas/OpenClawAgentConfig"
+              },
+              {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -7082,6 +8178,7 @@
             "default": ""
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata",
             "default": {}
@@ -7204,6 +8301,7 @@
           "extra_metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -7316,6 +8414,7 @@
           "extra_metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -7400,6 +8499,10 @@
                 "$ref": "#/components/schemas/CustomAgentConfig"
               },
               {
+                "$ref": "#/components/schemas/OpenClawAgentConfig"
+              },
+              {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -7551,7 +8654,8 @@
           "openai",
           "anthropic",
           "langchain",
-          "custom"
+          "custom",
+          "openclaw"
         ],
         "title": "AgentType"
       },
@@ -7910,6 +9014,510 @@
         "type": "object",
         "title": "AnthropicAgentConfig"
       },
+      "AssistantChannelResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode"
+          },
+          "allow_from": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Allow From"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "enabled",
+          "mode"
+        ],
+        "title": "AssistantChannelResponse"
+      },
+      "AssistantHealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "cli_available": {
+            "type": "boolean",
+            "title": "Cli Available"
+          },
+          "gateway_configured": {
+            "type": "boolean",
+            "title": "Gateway Configured"
+          },
+          "gateway_reachable": {
+            "type": "boolean",
+            "title": "Gateway Reachable"
+          },
+          "gateway_port": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gateway Port"
+          },
+          "gateway_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gateway Url"
+          },
+          "credential_detected": {
+            "type": "boolean",
+            "title": "Credential Detected",
+            "default": false
+          },
+          "config_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Path"
+          },
+          "state_dir": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State Dir"
+          },
+          "doctor_summary": {
+            "type": "string",
+            "title": "Doctor Summary"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "cli_available",
+          "gateway_configured",
+          "gateway_reachable",
+          "doctor_summary"
+        ],
+        "title": "AssistantHealthResponse"
+      },
+      "AssistantOverviewEnvelope": {
+        "properties": {
+          "has_assistant": {
+            "type": "boolean",
+            "title": "Has Assistant"
+          },
+          "recommended_template_id": {
+            "type": "string",
+            "title": "Recommended Template Id",
+            "default": "personal_assistant"
+          },
+          "assistant": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AssistantOverviewResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "has_assistant"
+        ],
+        "title": "AssistantOverviewEnvelope"
+      },
+      "AssistantOverviewResponse": {
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "runtime": {
+            "type": "string",
+            "title": "Runtime"
+          },
+          "template_id": {
+            "type": "string",
+            "title": "Template Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "onboarding_status": {
+            "type": "string",
+            "title": "Onboarding Status"
+          },
+          "assistant_id": {
+            "type": "string",
+            "title": "Assistant Id"
+          },
+          "workspace": {
+            "type": "string",
+            "title": "Workspace"
+          },
+          "last_activity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Activity"
+          },
+          "session_count": {
+            "type": "integer",
+            "title": "Session Count",
+            "default": 0
+          },
+          "installed_skills": {
+            "items": {
+              "$ref": "#/components/schemas/AssistantSkillResponse"
+            },
+            "type": "array",
+            "title": "Installed Skills"
+          },
+          "channels": {
+            "items": {
+              "$ref": "#/components/schemas/AssistantChannelResponse"
+            },
+            "type": "array",
+            "title": "Channels"
+          },
+          "wakeups": {
+            "items": {
+              "$ref": "#/components/schemas/AssistantWakeupResponse"
+            },
+            "type": "array",
+            "title": "Wakeups"
+          },
+          "gateway": {
+            "$ref": "#/components/schemas/AssistantHealthResponse"
+          },
+          "deployments": {
+            "items": {
+              "$ref": "#/components/schemas/DeploymentResponse"
+            },
+            "type": "array",
+            "title": "Deployments"
+          },
+          "config": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OpenClawAgentConfig"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              }
+            ],
+            "title": "Config"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_id",
+          "name",
+          "runtime",
+          "template_id",
+          "status",
+          "onboarding_status",
+          "assistant_id",
+          "workspace",
+          "gateway",
+          "config"
+        ],
+        "title": "AssistantOverviewResponse"
+      },
+      "AssistantSessionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "agent": {
+            "type": "string",
+            "title": "Agent"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "age": {
+            "type": "string",
+            "title": "Age"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "tokens": {
+            "type": "string",
+            "title": "Tokens"
+          },
+          "channel": {
+            "type": "string",
+            "title": "Channel"
+          },
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Flags"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "start_time": {
+            "type": "integer",
+            "title": "Start Time"
+          },
+          "last_activity": {
+            "type": "integer",
+            "title": "Last Activity"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "key",
+          "agent",
+          "kind",
+          "age",
+          "model",
+          "tokens",
+          "channel",
+          "active",
+          "start_time",
+          "last_activity",
+          "source"
+        ],
+        "title": "AssistantSessionResponse"
+      },
+      "AssistantSkillResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "author": {
+            "type": "string",
+            "title": "Author"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "is_official": {
+            "type": "boolean",
+            "title": "Is Official",
+            "default": false
+          },
+          "installed": {
+            "type": "boolean",
+            "title": "Installed",
+            "default": false
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "author",
+          "category",
+          "source"
+        ],
+        "title": "AssistantSkillResponse"
+      },
+      "AssistantTemplateResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "agent_type": {
+            "$ref": "#/components/schemas/AgentType"
+          },
+          "starter_prompt": {
+            "type": "string",
+            "title": "Starter Prompt"
+          },
+          "default_config": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OpenClawAgentConfig"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              }
+            ],
+            "title": "Default Config"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "summary",
+          "description",
+          "agent_type",
+          "starter_prompt",
+          "default_config"
+        ],
+        "title": "AssistantTemplateResponse"
+      },
+      "AssistantWakeupResponse": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "schedule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "title": "AssistantWakeupResponse"
+      },
       "BatchEmbedRequest": {
         "properties": {
           "texts": {
@@ -8024,6 +9632,7 @@
           "result": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -8068,6 +9677,7 @@
             "title": "Action"
           },
           "parameters": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Parameters"
           },
@@ -8840,6 +10450,21 @@
               }
             ],
             "title": "Uptime Seconds"
+          },
+          "components": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Components"
+          },
+          "schema_repairs_applied": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Schema Repairs Applied"
           }
         },
         "type": "object",
@@ -8890,11 +10515,7 @@
             "title": "Agent Id"
           },
           "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AgentStatus"
-              }
-            ],
+            "$ref": "#/components/schemas/AgentStatus",
             "default": "running"
           },
           "message": {
@@ -8999,6 +10620,7 @@
             "title": "Chain Id"
           },
           "parameters": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Parameters"
           }
@@ -9211,6 +10833,17 @@
         "type": "object",
         "title": "LeadUpdate"
       },
+      "LocalBootstrapRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "Local Operator"
+          }
+        },
+        "type": "object",
+        "title": "LocalBootstrapRequest"
+      },
       "LogRequest": {
         "properties": {
           "agent_id": {
@@ -9227,6 +10860,7 @@
             "title": "Message"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata",
             "default": {}
@@ -9391,6 +11025,7 @@
             "default": 0
           },
           "custom": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Custom",
             "default": {}
@@ -9406,6 +11041,211 @@
           "timestamp"
         ],
         "title": "MetricsRequest"
+      },
+      "OnboardingStateResponse": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "default": "openclaw"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "action_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action Type"
+          },
+          "import_source": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Import Source"
+          },
+          "current_step": {
+            "type": "string",
+            "title": "Current Step"
+          },
+          "completed_steps": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Completed Steps"
+          },
+          "failed_step": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Failed Step"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "checklist_dismissed": {
+            "type": "boolean",
+            "title": "Checklist Dismissed",
+            "default": false
+          },
+          "assistant_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assistant Name"
+          },
+          "assistant_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assistant Id"
+          },
+          "workspace": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workspace"
+          },
+          "gateway_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gateway Url"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/OnboardingStepResponse"
+            },
+            "type": "array",
+            "title": "Steps"
+          },
+          "providers": {
+            "items": {
+              "$ref": "#/components/schemas/ProviderOptionResponse"
+            },
+            "type": "array",
+            "title": "Providers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "current_step"
+        ],
+        "title": "OnboardingStateResponse"
+      },
+      "OnboardingStepResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "completed": {
+            "type": "boolean",
+            "title": "Completed",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title"
+        ],
+        "title": "OnboardingStepResponse"
+      },
+      "OnboardingUpdateRequest": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Action"
+          },
+          "provider": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Provider",
+            "default": "openclaw"
+          },
+          "step": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "title": "OnboardingUpdateRequest"
       },
       "OpenAIAgentConfig": {
         "properties": {
@@ -9470,6 +11310,271 @@
         "additionalProperties": false,
         "type": "object",
         "title": "OpenAIAgentConfig"
+      },
+      "OpenClawAgentConfig": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "system_prompt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 16000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System Prompt"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version",
+            "default": 1
+          },
+          "runtime": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Runtime",
+            "default": "personal_assistant"
+          },
+          "template": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Template",
+            "default": "personal_assistant"
+          },
+          "assistant_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assistant Id"
+          },
+          "workspace": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Workspace",
+            "default": "default"
+          },
+          "model": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Model",
+            "default": "openai/gpt-5"
+          },
+          "safety_mode": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Safety Mode",
+            "default": "pairing"
+          },
+          "channels": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/OpenClawChannelConfig"
+            },
+            "type": "object",
+            "title": "Channels"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Skills"
+          },
+          "wakeups": {
+            "items": {
+              "$ref": "#/components/schemas/OpenClawWakeupConfig"
+            },
+            "type": "array",
+            "title": "Wakeups"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          },
+          "gateway": {
+            "$ref": "#/components/schemas/OpenClawGatewayConfig"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "OpenClawAgentConfig"
+      },
+      "OpenClawChannelConfig": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Label"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": false
+          },
+          "mode": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Mode",
+            "default": "pairing"
+          },
+          "allow_from": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Allow From"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "label"
+        ],
+        "title": "OpenClawChannelConfig"
+      },
+      "OpenClawGatewayConfig": {
+        "properties": {
+          "port": {
+            "type": "integer",
+            "maximum": 65535.0,
+            "minimum": 1.0,
+            "title": "Port",
+            "default": 18789
+          },
+          "auth_mode": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Auth Mode",
+            "default": "token"
+          },
+          "dashboard_allowed_origins": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Dashboard Allowed Origins"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "OpenClawGatewayConfig"
+      },
+      "OpenClawWakeupConfig": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": false
+          },
+          "schedule": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "OpenClawWakeupConfig"
+      },
+      "ProviderOptionResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": false
+          },
+          "cue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "summary"
+        ],
+        "title": "ProviderOptionResponse"
       },
       "RefreshRequest": {
         "properties": {
@@ -9588,6 +11693,7 @@
             "title": "Error Message"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -9679,6 +11785,7 @@
             "title": "Error Message"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -9835,6 +11942,7 @@
             "title": "Error Message"
           },
           "metadata": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Metadata"
           },
@@ -9902,6 +12010,7 @@
             "title": "Message"
           },
           "payload": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Payload"
           },
@@ -9999,6 +12108,7 @@
             "title": "Message"
           },
           "payload": {
+            "additionalProperties": true,
             "type": "object",
             "title": "Payload"
           },
@@ -10023,6 +12133,646 @@
           "timestamp"
         ],
         "title": "RunTraceResponse"
+      },
+      "RuntimeProviderSnapshotResponse": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Provider",
+            "default": "openclaw"
+          },
+          "runtime_key": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Runtime Key",
+            "default": "openclaw"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Label",
+            "default": "OpenClaw"
+          },
+          "cue": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cue"
+          },
+          "provider_root": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Root"
+          },
+          "wizard_state_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wizard State Path"
+          },
+          "binary_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Binary Path"
+          },
+          "binary_confirmed": {
+            "type": "boolean",
+            "title": "Binary Confirmed",
+            "default": false
+          },
+          "home_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home Path"
+          },
+          "home_source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home Source"
+          },
+          "config_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Path"
+          },
+          "state_dir": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State Dir"
+          },
+          "install_method": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 32
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Install Method"
+          },
+          "installation_disposition": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Installation Disposition"
+          },
+          "tracking_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tracking Mode"
+          },
+          "imported_into_mutx": {
+            "type": "boolean",
+            "title": "Imported Into Mutx",
+            "default": false
+          },
+          "adopted_existing_runtime": {
+            "type": "boolean",
+            "title": "Adopted Existing Runtime",
+            "default": false
+          },
+          "keys_remain_local": {
+            "type": "boolean",
+            "title": "Keys Remain Local",
+            "default": false
+          },
+          "credential_sync_policy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credential Sync Policy"
+          },
+          "privacy_summary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Privacy Summary"
+          },
+          "last_action_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Action Type"
+          },
+          "import_source": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Import Source"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "status": {
+            "type": "string",
+            "maxLength": 64,
+            "title": "Status",
+            "default": "unknown"
+          },
+          "gateway": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Gateway"
+          },
+          "gateway_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gateway Url"
+          },
+          "gateway_port": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gateway Port"
+          },
+          "last_seen_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen At"
+          },
+          "last_synced_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Synced At"
+          },
+          "binding_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Binding Count",
+            "default": 0
+          },
+          "current_binding": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Binding"
+          },
+          "bindings": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Bindings"
+          },
+          "observed_source": {
+            "type": "string",
+            "maxLength": 64,
+            "title": "Observed Source",
+            "default": "local"
+          },
+          "stale": {
+            "type": "boolean",
+            "title": "Stale",
+            "default": false
+          },
+          "stale_after_seconds": {
+            "type": "integer",
+            "title": "Stale After Seconds",
+            "default": 900
+          }
+        },
+        "type": "object",
+        "title": "RuntimeProviderSnapshotResponse"
+      },
+      "RuntimeProviderSnapshotUpsert": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Provider",
+            "default": "openclaw"
+          },
+          "runtime_key": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Runtime Key",
+            "default": "openclaw"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Label",
+            "default": "OpenClaw"
+          },
+          "cue": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 8
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cue"
+          },
+          "provider_root": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Root"
+          },
+          "wizard_state_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wizard State Path"
+          },
+          "binary_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Binary Path"
+          },
+          "binary_confirmed": {
+            "type": "boolean",
+            "title": "Binary Confirmed",
+            "default": false
+          },
+          "home_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home Path"
+          },
+          "home_source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home Source"
+          },
+          "config_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Path"
+          },
+          "state_dir": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State Dir"
+          },
+          "install_method": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 32
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Install Method"
+          },
+          "installation_disposition": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Installation Disposition"
+          },
+          "tracking_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tracking Mode"
+          },
+          "imported_into_mutx": {
+            "type": "boolean",
+            "title": "Imported Into Mutx",
+            "default": false
+          },
+          "adopted_existing_runtime": {
+            "type": "boolean",
+            "title": "Adopted Existing Runtime",
+            "default": false
+          },
+          "keys_remain_local": {
+            "type": "boolean",
+            "title": "Keys Remain Local",
+            "default": false
+          },
+          "credential_sync_policy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credential Sync Policy"
+          },
+          "privacy_summary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Privacy Summary"
+          },
+          "last_action_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Action Type"
+          },
+          "import_source": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Import Source"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "status": {
+            "type": "string",
+            "maxLength": 64,
+            "title": "Status",
+            "default": "unknown"
+          },
+          "gateway": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Gateway"
+          },
+          "gateway_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gateway Url"
+          },
+          "gateway_port": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gateway Port"
+          },
+          "last_seen_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Seen At"
+          },
+          "last_synced_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Synced At"
+          },
+          "binding_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Binding Count",
+            "default": 0
+          },
+          "current_binding": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Binding"
+          },
+          "bindings": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Bindings"
+          },
+          "observed_source": {
+            "type": "string",
+            "maxLength": 64,
+            "title": "Observed Source",
+            "default": "local"
+          }
+        },
+        "type": "object",
+        "title": "RuntimeProviderSnapshotUpsert"
       },
       "SearchRequest": {
         "properties": {
@@ -10067,6 +12817,58 @@
         "title": "SearchResult",
         "description": "Single search result."
       },
+      "SessionActionRequest": {
+        "properties": {
+          "session_key": {
+            "type": "string",
+            "title": "Session Key"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_key"
+        ],
+        "title": "SessionActionRequest"
+      },
+      "SessionListResponse": {
+        "properties": {
+          "sessions": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Sessions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sessions"
+        ],
+        "title": "SessionListResponse"
+      },
       "Skill": {
         "properties": {
           "id": {
@@ -10109,6 +12911,117 @@
           "category"
         ],
         "title": "Skill"
+      },
+      "StarterDeploymentCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "default": "Personal Assistant"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "replicas": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Replicas",
+            "default": 1
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "assistant_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assistant Id"
+          },
+          "workspace": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workspace"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Skills"
+          },
+          "channels": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/OpenClawChannelConfig"
+            },
+            "type": "object",
+            "title": "Channels"
+          },
+          "runtime_metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Runtime Metadata"
+          }
+        },
+        "type": "object",
+        "title": "StarterDeploymentCreate"
+      },
+      "StarterDeploymentResponse": {
+        "properties": {
+          "template_id": {
+            "type": "string",
+            "title": "Template Id"
+          },
+          "agent": {
+            "$ref": "#/components/schemas/AgentResponse"
+          },
+          "deployment": {
+            "$ref": "#/components/schemas/DeploymentResponse"
+          }
+        },
+        "type": "object",
+        "required": [
+          "template_id",
+          "agent",
+          "deployment"
+        ],
+        "title": "StarterDeploymentResponse"
       },
       "SwarmAgentResponse": {
         "properties": {
@@ -10438,6 +13351,19 @@
             "title": "Event Type",
             "description": "Type of usage event (e.g., api_call, agent_run, deployment)"
           },
+          "resource_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Type",
+            "description": "Type of resource that was used"
+          },
           "resource_id": {
             "anyOf": [
               {
@@ -10451,9 +13377,17 @@
             "title": "Resource Id",
             "description": "Resource that was used"
           },
+          "credits_used": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Credits Used",
+            "description": "Credits consumed by this event",
+            "default": 1.0
+          },
           "metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -10519,6 +13453,17 @@
             "format": "uuid",
             "title": "User Id"
           },
+          "resource_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Type"
+          },
           "resource_id": {
             "anyOf": [
               {
@@ -10529,6 +13474,10 @@
               }
             ],
             "title": "Resource Id"
+          },
+          "credits_used": {
+            "type": "number",
+            "title": "Credits Used"
           },
           "event_metadata": {
             "anyOf": [
@@ -10549,6 +13498,7 @@
           "metadata": {
             "anyOf": [
               {
+                "additionalProperties": true,
                 "type": "object"
               },
               {
@@ -10565,7 +13515,9 @@
           "id",
           "event_type",
           "user_id",
+          "resource_type",
           "resource_id",
+          "credits_used",
           "created_at",
           "metadata"
         ],
@@ -10639,6 +13591,13 @@
           "type": {
             "type": "string",
             "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
           }
         },
         "type": "object",

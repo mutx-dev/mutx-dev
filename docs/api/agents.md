@@ -1,374 +1,202 @@
 # Agents
 
-Agents are autonomous entities that can perform tasks, report metrics, and receive commands.
+The `/v1/agents*` surface has two overlapping responsibilities:
 
-## Endpoints
+- control-plane CRUD for user-owned agents
+- runtime-compatible endpoints for agent registration, heartbeats, metrics, logs, commands, status, and version history
 
-### Register Agent
+## Control-Plane Routes
 
-Register a new agent with the platform.
+| Route | Purpose |
+| --- | --- |
+| `POST /v1/agents` | Create an agent owned by the authenticated user |
+| `GET /v1/agents` | List owned agents |
+| `GET /v1/agents/{agent_id}` | Get agent detail including deployments |
+| `GET /v1/agents/{agent_id}/config` | Read normalized config and config version |
+| `PATCH /v1/agents/{agent_id}/config` | Validate and update config, then bump version |
+| `DELETE /v1/agents/{agent_id}` | Delete an owned agent |
+| `POST /v1/agents/{agent_id}/deploy` | Legacy agent-scoped deployment shortcut |
+| `POST /v1/agents/{agent_id}/stop` | Stop running or deploying deployments for the agent |
+| `GET /v1/agents/{agent_id}/logs` | List logs for the agent |
+| `GET /v1/agents/{agent_id}/metrics` | List metrics for the agent |
+| `POST /v1/agents/{agent_id}/resource-usage` | Record token and cost usage |
+| `GET /v1/agents/{agent_id}/resource-usage` | List recorded resource usage |
+| `GET /v1/agents/{agent_id}/versions` | List agent config versions |
+| `POST /v1/agents/{agent_id}/rollback` | Roll back to a prior agent version |
 
-```http
-POST /agents/register
-```
+## Runtime-Compatible Routes
 
-**Headers:**
+| Route | Purpose |
+| --- | --- |
+| `POST /v1/agents/register` | Create a runtime-style agent and issue an agent API key |
+| `POST /v1/agents/heartbeat` | Report status |
+| `POST /v1/agents/metrics` | Report metrics |
+| `POST /v1/agents/logs` | Send logs |
+| `GET /v1/agents/commands` | Poll pending commands |
+| `POST /v1/agents/commands/acknowledge` | Acknowledge command completion |
+| `GET /v1/agents/{agent_id}/status` | Return runtime status for the authenticated agent |
 
-```
-Authorization: Bearer <access_token>
-```
+## Create An Agent
 
-**Request Body:**
+Ownership comes from the bearer token. Do not send `user_id` in the request body.
 
-```json
-{
-  "agent_type": "operator",
-  "name": "data-processor-01",
-  "metadata": {
-    "region": "us-east-1",
-    "version": "1.2.0"
-  }
-}
-```
+`config` can be a JSON object or a JSON string. The backend validates it against the selected `type`.
 
-**Response:**
+```bash
+BASE_URL=http://localhost:8000
 
-```json
-{
-  "agent_id": "agnt_abc123",
-  "agent_type": "operator",
-  "name": "data-processor-01",
-  "status": "registered",
-  "created_at": "2024-01-15T10:30:00Z"
-}
-```
-
----
-
-### List Agents
-
-Retrieve all registered agents.
-
-```http
-GET /agents
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `status` | string | Filter by status (registered, online, offline, error) |
-| `agent_type` | string | Filter by agent type |
-| `limit` | int | Maximum results (default: 50) |
-| `offset` | int | Pagination offset |
-
-**Response:**
-
-```json
-{
-  "data": [
-    {
-      "agent_id": "agnt_abc123",
-      "agent_type": "operator",
-      "name": "data-processor-01",
-      "status": "online",
-      "last_heartbeat": "2024-01-20T15:45:00Z"
+curl -X POST "$BASE_URL/v1/agents" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Personal Assistant",
+    "description": "Default assistant deployment",
+    "type": "openclaw",
+    "config": {
+      "runtime": "personal_assistant",
+      "template": "personal_assistant",
+      "workspace": "default",
+      "model": "openai/gpt-5",
+      "safety_mode": "pairing"
     }
-  ],
-  "total": 42
-}
+  }'
 ```
 
----
-
-### Get Agent Details
-
-Retrieve detailed information about an agent.
-
-```http
-GET /agents/{agent_id}
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Response:**
+Example response:
 
 ```json
 {
-  "agent_id": "agnt_abc123",
-  "agent_type": "operator",
-  "name": "data-processor-01",
-  "status": "online",
-  "metadata": {
-    "region": "us-east-1",
-    "version": "1.2.0"
-  },
-  "created_at": "2024-01-15T10:30:00Z",
-  "last_heartbeat": "2024-01-20T15:45:00Z"
-}
-```
-
----
-
-### Get Agent Status
-
-Get current operational status of an agent.
-
-```http
-GET /agents/{agent_id}/status
-```
-
-**Response:**
-
-```json
-{
-  "agent_id": "agnt_abc123",
-  "status": "online",
-  "state": "idle",
-  "current_task": null,
-  "uptime_seconds": 3600
-}
-```
-
----
-
-### Update Agent Status
-
-Update agent status from the agent itself.
-
-```http
-POST /agents/heartbeat
-```
-
-**Request Body:**
-
-```json
-{
-  "agent_id": "agnt_abc123",
-  "status": "online",
-  "state": "processing",
-  "current_task": "task_xyz789",
-  "metrics": {
-    "cpu_percent": 45.2,
-    "memory_percent": 62.1
-  }
-}
-```
-
----
-
-### Deploy Agent
-
-Trigger deployment for an agent.
-
-```http
-POST /agents/{agent_id}/deploy
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Request Body:**
-
-```json
-{
-  "version": "1.3.0",
+  "id": "uuid",
+  "name": "Personal Assistant",
+  "description": "Default assistant deployment",
+  "type": "openclaw",
+  "status": "creating",
   "config": {
-    "replicas": 2,
-    "environment": {
-      "LOG_LEVEL": "debug"
+    "name": "Personal Assistant",
+    "runtime": "personal_assistant",
+    "template": "personal_assistant",
+    "workspace": "default",
+    "model": "openai/gpt-5",
+    "safety_mode": "pairing",
+    "version": 1
+  },
+  "config_version": 1,
+  "created_at": "2026-03-22T12:00:00Z",
+  "updated_at": "2026-03-22T12:00:00Z",
+  "user_id": "uuid"
+}
+```
+
+## Config Validation
+
+Current typed config families:
+
+- `openai`
+- `anthropic`
+- `langchain`
+- `custom`
+- `openclaw`
+
+Unknown keys are rejected for typed configs. Successful config patches increment `config_version`.
+
+## List And Inspect Agents
+
+```bash
+curl "$BASE_URL/v1/agents?skip=0&limit=20" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl "$BASE_URL/v1/agents/YOUR_AGENT_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl "$BASE_URL/v1/agents/YOUR_AGENT_ID/config" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+## Update Config
+
+```bash
+curl -X PATCH "$BASE_URL/v1/agents/YOUR_AGENT_ID/config" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "config": {
+      "runtime": "personal_assistant",
+      "template": "personal_assistant",
+      "workspace": "default",
+      "model": "openai/gpt-5",
+      "safety_mode": "pairing",
+      "channels": {
+        "terminal": {
+          "label": "Terminal",
+          "enabled": true,
+          "mode": "pairing"
+        }
+      }
     }
-  }
-}
+  }'
 ```
 
-**Response:**
+## Deploy, Stop, And Delete
 
-```json
-{
-  "deployment_id": "dply_abc123",
-  "agent_id": "agnt_abc123",
-  "version": "1.3.0",
-  "status": "deploying"
-}
+`POST /v1/agents/{agent_id}/deploy` is still mounted, but the canonical full deployment create path is [`POST /v1/deployments`](./deployments.md).
+
+```bash
+curl -X POST "$BASE_URL/v1/agents/YOUR_AGENT_ID/deploy" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl -X POST "$BASE_URL/v1/agents/YOUR_AGENT_ID/stop" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl -X DELETE "$BASE_URL/v1/agents/YOUR_AGENT_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
----
+## Logs, Metrics, And Resource Usage
 
-### Stop Agent
+```bash
+curl "$BASE_URL/v1/agents/YOUR_AGENT_ID/logs?limit=100&level=info" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
-Stop a running agent.
+curl "$BASE_URL/v1/agents/YOUR_AGENT_ID/metrics?limit=100" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
-```http
-POST /agents/{agent_id}/stop
+curl "$BASE_URL/v1/agents/YOUR_AGENT_ID/resource-usage?limit=50" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-**Headers:**
+Resource usage records accept:
 
-```
-Authorization: Bearer <access_token>
-```
+- `prompt_tokens`
+- `completion_tokens`
+- `total_tokens`
+- `api_calls`
+- `cost_usd`
+- `model`
+- `extra_metadata`
+- `period_start`
+- `period_end`
 
-**Response:**
+## Versions And Rollback
 
-```json
-{
-  "message": "Agent stopped successfully"
-}
-```
+```bash
+curl "$BASE_URL/v1/agents/YOUR_AGENT_ID/versions" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
----
-
-### Get Agent Logs
-
-Retrieve logs for an agent.
-
-```http
-GET /agents/{agent_id}/logs
-```
-
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `level` | string | Filter by log level (debug, info, warn, error) |
-| `since` | string | ISO timestamp - only logs after this time |
-| `limit` | int | Maximum number of log entries |
-
-**Response:**
-
-```json
-{
-  "logs": [
-    {
-      "timestamp": "2024-01-20T15:45:00Z",
-      "level": "info",
-      "message": "Agent started successfully"
-    }
-  ]
-}
+curl -X POST "$BASE_URL/v1/agents/YOUR_AGENT_ID/rollback" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"version":1}'
 ```
 
----
+## Runtime Registration Notes
 
-### Get Agent Metrics
+`POST /v1/agents/register` is the runtime-facing registration entrypoint.
 
-Retrieve metrics for an agent.
+It returns a runtime payload containing:
 
-```http
-GET /agents/{agent_id}/metrics
-```
+- `agent_id`
+- `api_key`
+- `status`
+- `message`
 
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `metric_type` | string | Type of metric (cpu, memory, network, custom) |
-| `since` | string | ISO timestamp |
-| `until` | string | ISO timestamp |
-| `interval` | string | Aggregation interval (1m, 5m, 1h, 1d) |
-
-**Response:**
-
-```json
-{
-  "agent_id": "agnt_abc123",
-  "metrics": [
-    {
-      "timestamp": "2024-01-20T15:00:00Z",
-      "cpu_percent": 45.2,
-      "memory_percent": 62.1,
-      "requests_total": 1234
-    }
-  ]
-}
-```
-
----
-
-### Send Agent Command
-
-Send a command to an agent.
-
-```http
-POST /agents/commands
-```
-
-**Request Body:**
-
-```json
-{
-  "agent_id": "agnt_abc123",
-  "command": "execute_task",
-  "payload": {
-    "task_id": "task_xyz789",
-    "priority": "high"
-  }
-}
-```
-
-**Response:**
-
-```json
-{
-  "command_id": "cmd_abc123",
-  "status": "acknowledged"
-}
-```
-
----
-
-### Acknowledge Command
-
-Acknowledge receipt of a command.
-
-```http
-POST /agents/commands/acknowledge
-```
-
-**Request Body:**
-
-```json
-{
-  "command_id": "cmd_abc123",
-  "status": "accepted"
-}
-```
-
----
-
-### Get Agent Commands
-
-List pending commands for an agent.
-
-```http
-GET /agents/commands
-```
-
-**Response:**
-
-```json
-{
-  "commands": [
-    {
-      "command_id": "cmd_abc123",
-      "command": "execute_task",
-      "payload": {...},
-      "created_at": "2024-01-20T15:45:00Z"
-    }
-  ]
-}
-```
+Use the OpenAPI snapshot for the exact runtime request and response shapes if you are integrating at that layer.

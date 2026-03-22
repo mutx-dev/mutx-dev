@@ -5,51 +5,88 @@ icon: book
 
 # MUTX Docs
 
-This is the code-accurate documentation hub for MUTX.
+Use this section when you want the code-accurate view of setup, runtime surfaces, and current gaps.
 
-Use this directory to understand what exists now, how to get started, and how the three public surfaces relate:
-
-<table data-view="cards"><thead><tr><th>Title</th><th data-card-target data-type="content-ref">Target</th></tr></thead><tbody><tr><td>Fastest local setup</td><td><a href="deployment/quickstart.md">quickstart.md</a></td></tr><tr><td>Full local developer bootstrap</td><td><a href="deployment/local-developer-bootstrap.md">local-developer-bootstrap.md</a></td></tr><tr><td>API and integration reference</td><td><a href="contracts/api/">api</a></td></tr><tr><td>Platform architecture</td><td><a href="architecture/">architecture</a></td></tr><tr><td>Troubleshooting and support</td><td><a href="troubleshooting/">troubleshooting</a></td></tr></tbody></table>
+<table data-view="cards">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th data-hidden data-card-target data-type="content-ref">Target</th>
+      <th data-hidden data-card-cover data-type="files">Cover</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Setup and local flow</strong></td>
+      <td>Get from clone to a working stack with the shortest validated path.</td>
+      <td><a href="deployment/quickstart.md">quickstart.md</a></td>
+      <td><a href="../public/landing/victory-core.png">victory-core.png</a></td>
+    </tr>
+    <tr>
+      <td><strong>API and integration reference</strong></td>
+      <td>Read the live `/v1/*` contract, auth model, and public resource docs.</td>
+      <td><a href="api/">api</a></td>
+      <td><a href="../public/landing/wiring-bay.png">wiring-bay.png</a></td>
+    </tr>
+    <tr>
+      <td><strong>Platform architecture</strong></td>
+      <td>Understand the shape behind the app, backend, CLI, SDK, and infrastructure.</td>
+      <td><a href="architecture/">architecture</a></td>
+      <td><a href="../public/landing/running-agent.png">running-agent.png</a></td>
+    </tr>
+    <tr>
+      <td><strong>Troubleshooting and support</strong></td>
+      <td>Recover quickly when local setup, auth, or route assumptions drift.</td>
+      <td><a href="troubleshooting/">troubleshooting</a></td>
+      <td><a href="../public/landing/docs-surface.png">docs-surface.png</a></td>
+    </tr>
+  </tbody>
+</table>
 
 - `mutx.dev` = public marketing site and product narrative
 - `docs.mutx.dev` = canonical documentation and API truth surface
-- `app.mutx.dev` = operator-facing app shell and browser proxy surface
+- `app.mutx.dev/dashboard` = operator-facing dashboard surface
+- `app.mutx.dev/control/*` = operator demo surface
 
 ## Start Here
 
-### Product surfaces
-- [Platform Overview](./overview.md) - what MUTX is and how the public surfaces split
-- [Surface Matrix](./surfaces.md) - supported vs aspirational surface status
-- [Quickstart](./quickstart.md) - local bootstrap for API and web
-- [Local Developer Bootstrap](./deployment/local-developer-bootstrap.md) - full clone-to-validation local setup
-- [App and Dashboard](./app-dashboard.md) - what the current app surface does today
-- [API Overview](./api/index.md) - live route groups and auth model
-- [Project Status](./project-status.md) - what is real, rough, and next
+- [Overview](../README.md)
+- [Quickstart](./deployment/quickstart.md)
+- [Project Status](./project-status.md)
+- [Roadmap](../roadmap.md)
 
-### Core API docs
-- [Authentication](./api/authentication.md)
-- [API Keys](./api/api-keys.md)
-- [Agents](./api/agents.md)
-- [Deployments](./api/deployments.md)
-- [Webhooks and Ingestion](./api/webhooks.md)
-- [OpenAPI spec](./api/openapi.json)
+## By Area
 
-### Architecture and operations
-- [Architecture Overview](./architecture/overview.md)
-- [Agent Runtime](./architecture/agent-runtime.md)
-- [Infrastructure Overview](./architecture/infrastructure.md)
-- [Security Architecture](./architecture/security.md)
+### Setup And Workflow
+
 - [CLI Guide](./cli.md)
-- [Deployment Quickstart](./deployment/quickstart.md)
+- [Deployment](./deployment/README.md)
 - [Local Developer Bootstrap](./deployment/local-developer-bootstrap.md)
 
-### Supporting context
-- [Changelog and Status](./project-status.md)
-- [Troubleshooting FAQ](./troubleshooting/faq.md)
-- [Roadmap](../ROADMAP.md)
-- [Top-level README](../README.md)
-- [Manifesto](../MANIFESTO.md)
-- [Technical Whitepaper](../WHITEPAPER.md)
+### Platform References
+
+- [API Reference](./api/reference.md)
+- [API Overview](./api/index.md)
+- [Architecture](./architecture/README.md)
+- [Autonomy](./autonomy/README.md)
+- [MUTX Infrastructure](../infrastructure.md)
+- [Python SDK](../sdk.md)
+
+### Troubleshooting
+
+- [Troubleshooting](./troubleshooting/README.md)
+- [Common Issues](./troubleshooting/common-issues.md)
+- [Debugging](./troubleshooting/debugging.md)
+- [FAQ](./troubleshooting/faq.md)
+
+### Supporting Context
+
+- [Platform Overview](./overview.md)
+- [Surface Matrix](./surfaces.md)
+- [App and Dashboard](./app-dashboard.md)
+- [Manifesto](../manifesto.md)
+- [Technical Whitepaper](../whitepaper.md)
 
 ## Truth rules
 
@@ -65,6 +102,17 @@ Current hosted/documented split:
 
 - `mutx.dev` is the public landing site
 - `docs.mutx.dev` should explain the product and link to the current truth
-- `app.mutx.dev` is the operator-facing preview shell backed by Next.js route handlers under `app/api/`
+- `app.mutx.dev/dashboard` is the current operator shell
+- `app.mutx.dev/control/*` is the demo shell
+- `app/api/` contains the browser-facing same-origin proxies and dashboard fetch layer
+
+## GitBook sync rules
+
+The published docs site is synced from this repository.
+
+- GitHub is the canonical source for synced docs content.
+- `.gitbook.yaml` pins GitBook to the repo root and uses `README.md` plus `SUMMARY.md`.
+- Do not create or rename README pages from the GitBook UI.
+- Keep sidebar changes in `SUMMARY.md`, not in ad hoc GitBook-only content.
 
 If a doc drifts, update the doc or remove the claim.

@@ -1,3 +1,8 @@
+---
+description: Why MUTX focuses on control planes, operational trust, and systems over demos.
+icon: bullseye
+---
+
 # MUTX Manifesto
 
 ## We Do Not Think The Hard Part Is The Model

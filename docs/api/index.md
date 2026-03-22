@@ -1,77 +1,62 @@
 # API Overview
 
-The MUTX API provides a RESTful interface for managing agents, deployments, webhooks, and other platform resources.
+MUTX public control-plane routes are mounted under `/v1/*`.
 
-## Base URL
+Root operational probes remain at `/`, `/health`, `/ready`, and `/metrics`.
 
-```
-https://api.mutx.dev
-```
+## Base URLs
 
-## Authentication
+- Local API: `http://localhost:8000`
+- Hosted API: `https://api.mutx.dev`
+- Browser proxy surface: `http://localhost:3000/api/*` locally and `https://app.mutx.dev/api/*` when hosted
 
-All API requests require authentication via:
-- **Bearer tokens** (JWT) for user authentication
-- **API keys** for service-to-service communication
+## Source Of Truth
+
+When prose and implementation disagree, use this order:
+
+1. `src/api/main.py` router registration plus `src/api/routes/*.py`
+2. [`openapi.json`](./openapi.json)
+3. Markdown pages in `docs/api/*.md`
+
+## Authentication Model
+
+- Interactive user flows use `Authorization: Bearer <access_token>`.
+- Managed API keys can authenticate automation through `Authorization: Bearer <mutx_live_...>` or `X-API-Key: <mutx_live_...>`.
+- `POST /v1/auth/local-bootstrap` is for localhost-only, non-production operator setup.
 
 See [authentication.md](./authentication.md) and [api-keys.md](./api-keys.md) for details.
 
-## Request Format
+## Current Route Groups
 
-All request bodies should be JSON:
+| Group | Mounted routes |
+| --- | --- |
+| Auth | `/v1/auth/*` |
+| Assistant | `/v1/assistant/*` |
+| Agents | `/v1/agents`, `/v1/agents/{agent_id}/*`, runtime-compatible `/v1/agents/register`, `/v1/agents/heartbeat`, `/v1/agents/metrics`, `/v1/agents/logs`, `/v1/agents/commands*` |
+| Deployments | `/v1/deployments`, `/v1/deployments/{deployment_id}/*` |
+| API keys | `/v1/api-keys`, `/v1/api-keys/{key_id}`, `/v1/api-keys/{key_id}/rotate` |
+| Webhooks | `/v1/webhooks/*` for outbound webhook management |
+| Ingest | `/v1/ingest/agent-status`, `/v1/ingest/deployment`, `/v1/ingest/metrics` |
+| Leads | `/v1/leads` plus compatibility-shaped `/v1/leads/contacts` |
+| Other public families | `/v1/templates`, `/v1/sessions`, `/v1/runs`, `/v1/usage`, `/v1/analytics`, `/v1/monitoring`, `/v1/rag`, `/v1/runtime`, `/v1/swarms`, `/v1/budgets`, `/v1/onboarding`, `/v1/clawhub` |
 
-```bash
-curl -X POST https://api.mutx.dev/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "secret"}'
-```
+## Browser And App Surface
 
-## Response Format
+The Next.js app exposes same-origin route handlers under `app/api/*` for browser-facing flows such as auth, dashboard reads and writes, API keys, webhooks, and leads.
 
-All responses follow this structure:
+Use the FastAPI routes directly for server-to-server integrations. Use `app/api/*` when you are operating inside the browser app surface.
 
-```json
-{
-  "data": { ... },
-  "message": "Success"
-}
-```
+## Generated Contract Artifacts
 
-Error responses:
+- OpenAPI snapshot: [`openapi.json`](./openapi.json)
+- Generated TypeScript types: `app/types/api.ts`
+- Refresh commands: see [reference.md](./reference.md)
 
-```json
-{
-  "detail": "Error message",
-  "status_code": 400
-}
-```
+## Related Pages
 
-## Rate Limiting
-
-API requests are rate-limited. See response headers:
-- `X-RateLimit-Limit`: Maximum requests per window
-- `X-RateLimit-Remaining`: Remaining requests
-- `X-RateLimit-Reset`: Unix timestamp when the limit resets
-
-## API Sections
-
-| Section | Description |
-|---------|-------------|
-| [Authentication](./authentication.md) | Login, register, password management |
-| [API Keys](./api-keys.md) | Service authentication tokens |
-| [Agents](./agents.md) | Agent registration, commands, metrics |
-| [Deployments](./deployments.md) | Deployment management and scaling |
-| [Webhooks](./webhooks.md) | Webhook configuration and delivery |
-| [Leads](./leads.md) | Lead management |
-
-## OpenAPI Schema
-
-For detailed endpoint specifications, see the [OpenAPI JSON](./openapi.json) file.
-
-## SDK
-
-Official SDKs are available for:
-- Python: `pip install mutx-sdk`
-- JavaScript/TypeScript: `npm install @mutx/sdk`
-
-See [SDK documentation](../../sdk.md).
+- [Authentication](./authentication.md)
+- [API Keys](./api-keys.md)
+- [Agents](./agents.md)
+- [Deployments](./deployments.md)
+- [Webhooks And Ingestion](./webhooks.md)
+- [Leads](./leads.md)

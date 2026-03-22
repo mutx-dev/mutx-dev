@@ -4,7 +4,7 @@ Thanks for helping improve `mutx.dev`.
 
 ## Before You Start
 
-- Read `README.md`, `docs/README.md`, `ROADMAP.md`, and `docs/project-status.md`.
+- Read `README.md`, `docs/README.md`, `roadmap.md`, and `docs/project-status.md`.
 - Trust the code over older docs when they disagree.
 - Keep changes scoped. This repo spans web, API, CLI, SDK, Docker, Terraform, and Ansible.
 
@@ -31,7 +31,7 @@ This starts the FastAPI backend on http://localhost:8000 with API docs at http:/
 
 The best starting points live in:
 
-- `ROADMAP.md`
+- `roadmap.md`
 - `docs/project-status.md`
 - open issues created from those docs
 
@@ -42,6 +42,16 @@ Good contribution shapes:
 - dashboard/product surface improvements
 - docs drift cleanup
 - backend tests and CI improvements
+
+## GitBook Sync Guardrails
+
+GitBook is a presentation layer over repo content, not a second source of truth.
+
+- GitHub stays canonical for synced docs content.
+- `.gitbook.yaml` pins GitBook to the repo root.
+- `README.md` and `SUMMARY.md` are repo-owned and control the published homepage and sidebar.
+- Do not create README pages from the GitBook UI.
+- Prefer GitHub -> GitBook for the first sync after structural cleanup.
 
 ## Pull Requests
 
@@ -156,4 +166,4 @@ When behavior is unclear, inspect:
 
 ## Questions And Support
 
-See `SUPPORT.md`.
+See `support.md`.

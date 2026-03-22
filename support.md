@@ -1,3 +1,8 @@
+---
+description: Where to report bugs, request features, improve docs, or escalate security issues.
+icon: life-ring
+---
+
 # Support
 
 Use the smallest channel that fits the problem.
@@ -33,7 +38,7 @@ Start with:
 
 ## Security Reports
 
-See `SECURITY.md`.
+See [Security Policy](security.md).
 
 ## Product Or Commercial Questions
 

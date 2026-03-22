@@ -7,7 +7,8 @@ This page covers where to track MUTX changes, release processes, and live status
 - API health: `GET https://api.mutx.dev/health`
 - API readiness: `GET https://api.mutx.dev/ready`
 - Website availability: `https://mutx.dev`
-- App availability: `https://app.mutx.dev`
+- App availability: `https://app.mutx.dev/dashboard`
+- Control demo availability: `https://app.mutx.dev/control`
 - Docs availability: `https://docs.mutx.dev`
 
 ## Changelog
@@ -102,10 +103,16 @@ See [CHANGELOG.md](../CHANGELOG.md#versioning) for details on versioning scheme.
 - Webhook destination management is mounted at `/v1/webhooks/*`.
 - Deployment event history is available at `GET /v1/deployments/{deployment_id}/events`.
 
+## Docs publication notes
+
+- GitHub is the canonical source for synced docs content.
+- GitBook publication is rooted at the repo root through `.gitbook.yaml`.
+- `README.md` and `SUMMARY.md` are repo-owned docs entrypoints and should not be recreated from the GitBook UI.
+
 ## Related Planning Docs
 
 - [Project Status](./project-status.md)
-- [Roadmap](../ROADMAP.md)
+- [Roadmap](../roadmap.md)
 - [API Reference](./api/reference.md)
 - [Contributing](../CONTRIBUTING.md)
 - [CLI Reference](./cli.md)

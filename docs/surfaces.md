@@ -1,11 +1,11 @@
 ---
-description: Supported vs aspirational surface matrix for MUTX platforms.
+description: Supported vs preview surface matrix for MUTX platforms.
 icon: layered-shapes
 ---
 
 # Surface Matrix
 
-This document clearly maps MUTX's public surfaces and their maturity level — helping users understand what is production-ready versus what is still developing.
+This document maps MUTX's public surfaces and their maturity level so users can see what is stable, what is preview, and what is still clearly a demo.
 
 ## The Three Public Surfaces
 
@@ -13,7 +13,7 @@ This document clearly maps MUTX's public surfaces and their maturity level — h
 | ------- | --- | ---- | ------ |
 | Marketing | [mutx.dev](https://mutx.dev) | Public product narrative, waitlist capture, and entry point | **Supported** |
 | Documentation | [docs.mutx.dev](https://docs.mutx.dev) | Canonical docs, API reference, and operator guides | **Supported** |
-| App | [app.mutx.dev](https://app.mutx.dev) | Operator-facing authenticated app shell | **Aspirational** |
+| App host | [app.mutx.dev](https://app.mutx.dev) | Operator-facing dashboard plus control demo host | **Preview** |
 
 ## Status Definitions
 
@@ -26,14 +26,14 @@ Surfaces marked **Supported** are:
 - Documented as the canonical source for their respective domain
 - Stable APIs and user experience
 
-### Aspirational
+### Preview
 
-Surfaces marked **Aspirational** are:
+Surfaces marked **Preview** are:
 
-- In active development or preview
-- Not yet feature-complete for production use
-- Subject to breaking changes without notice
-- Documented to set expectations, not as stable contracts
+- Publicly reachable and backed by real code paths
+- Useful today, but still changing quickly
+- Not yet write-complete across every backend capability
+- Documented with explicit gaps instead of finished-product language
 
 ## Detailed Breakdown
 
@@ -47,7 +47,7 @@ Surfaces marked **Aspirational** are:
 
 **What it is not:**
 - The canonical API reference (see docs.mutx.dev)
-- The authenticated operator dashboard (see app.mutx.dev)
+- The authenticated operator dashboard (see app.mutx.dev/dashboard)
 - The source of truth for route behavior
 
 **Source of truth:** `app/page.tsx`
@@ -68,26 +68,25 @@ Surfaces marked **Aspirational** are:
 
 **Source of truth:** `docs/`
 
----
-
-### app.mutx.dev (Aspirational)
+### app.mutx.dev (Preview)
 
 **What it does today:**
-- Browser-facing auth flows (register, login, logout, me)
-- Read-oriented dashboard routes (agents, deployments, API keys, health)
-- Rendered app shell positioning around core primitives
+- Browser-facing auth flows (`/api/auth/*`)
+- Authenticated dashboard pages under `/dashboard`
+- Same-origin dashboard proxies for agents, deployments, runs, sessions, swarms, budgets, assistant overview, monitoring, API keys, and webhooks
+- Control demo routes under `/control/*`
 
 **What it is not yet:**
-- A complete production dashboard
-- A full replacement for direct API usage
-- A write-complete surface for all control-plane resources
+- A complete production dashboard for every backend resource
+- A replacement for the CLI in every operator workflow
+- Proof that every modeled backend capability has a finished frontend surface
 
 **Known gaps:**
-- No full write-complete dashboard for all resources
-- Dashboard maturity still trails the backend resource model
-- Some workflows remain easier through direct API or CLI usage
+- Some flows remain CLI-first or API-first
+- Scheduler and full RAG search are still placeholder-backed on the backend
+- Dashboard maturity still trails the full backend route surface
 
-**Source of truth:** `app/app/`, `app/api/`
+**Source of truth:** `app/dashboard/`, `app/control/`, `app/api/`
 
 ## Quick Reference
 
@@ -96,8 +95,8 @@ Surfaces marked **Aspirational** are:
 | Learn about MUTX | mutx.dev | Supported |
 | Understand APIs and integration | docs.mutx.dev | Supported |
 | Build on MUTX programmatically | docs.mutx.dev + API | Supported |
-| UI-based agent/deployment management | app.mutx.dev | Aspirational |
-| Full dashboard experience | app.mutx.dev | Aspirational |
+| UI-based operator workflows | app.mutx.dev/dashboard | Preview |
+| Browser control-plane demo | app.mutx.dev/control/* | Preview |
 
 ## Contributing
 
@@ -106,6 +105,6 @@ When adding features or documenting new capabilities:
 1. Identify which surface the work belongs to
 2. Document the maturity level honestly
 3. Update this matrix if surface status changes
-4. Flag aspirational features clearly in documentation
+4. Flag preview-only or placeholder-backed features clearly in documentation
 
 For current project status and contributor lanes, see [Project Status](./project-status.md).

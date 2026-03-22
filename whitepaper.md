@@ -1,4 +1,11 @@
+---
+description: Long-form technical framing with historical context and dated code-truth corrections.
+icon: file-lines
+---
+
 # MUTX Technical Whitepaper
+
+> Historical sections remain intact for context. For current route and surface truth, read [Addendum (2026-03-22)](#17-addendum-2026-03-22-code-truth-corrections) alongside the main body.
 
 ## Abstract
 
@@ -503,3 +510,51 @@ Its core contribution is not a claim that every piece of the runtime story is fi
 That combination is what turns agent software from an experiment into a platform.
 
 **Deploy agents like services. Operate them like systems.**
+
+---
+
+## 17. Addendum (2026-03-22): Code-Truth Corrections
+
+This addendum captures architecture facts that became clearer after the main body above was written. It is intentionally additive so the historical framing remains visible.
+
+### 17.1 Backend route prefix correction
+
+The live FastAPI public control-plane contract is mounted under **`/v1/*`**.
+
+That means the current public backend shape is:
+
+- root probes at `/`, `/health`, `/ready`, and `/metrics`
+- public control-plane routes such as `/v1/auth`, `/v1/agents`, `/v1/deployments`, `/v1/templates`, `/v1/assistant`, `/v1/sessions`, `/v1/runs`, `/v1/api-keys`, `/v1/webhooks`, `/v1/monitoring`, `/v1/budgets`, `/v1/rag`, `/v1/runtime`, and related families
+
+Earlier parts of this paper that describe top-level public routes without `/v1` should be read as superseded by the mounted code in `src/api/main.py` and the generated OpenAPI snapshot in `docs/api/openapi.json`.
+
+### 17.2 App-surface correction
+
+The app surface is broader than an abstract "preview shell" description suggests.
+
+Today the browser story splits into:
+
+- **`/dashboard`**: the canonical operator-facing shell, backed by live same-origin Next.js handlers under `app/api/dashboard/*` and related resource proxies
+- **`/control/*`**: the browser demo/control-plane showcase rendered from `app/control/[[...slug]]/page.tsx`
+
+This matters because the repo now contains both a real dashboard path and a distinct demo path, rather than one generic app shell.
+
+### 17.3 Placeholder-backed subsystem correction
+
+Several architectural pieces exist as code structure and API surface, but are still not fully backed by production-grade runtime behavior:
+
+- RAG search is mounted publicly, but the current `search` route still returns placeholder results until vector-backed storage is wired in
+- the scheduler route exists in code, but is currently unmounted from the public router set and still contains placeholder task logic
+- Vault integration exists as an infrastructure stub, not a live secret-management implementation
+
+These are important distinctions because MUTX is strongest where it already has durable contracts and honest surfaces. The remaining work is to harden substrate depth without overstating what is finished.
+
+### 17.4 Documentation truth rule
+
+The most reliable order of truth for MUTX documentation is now:
+
+1. mounted code in `src/api/`, `app/api/`, `app/dashboard/`, `app/control/`, `cli/`, and `sdk/mutx/`
+2. the generated OpenAPI snapshot in `docs/api/openapi.json`
+3. prose documentation in `README.md`, `docs/`, `roadmap.md`, and this white paper
+
+The published GitBook site should remain a presentation layer over repo truth, not a parallel source of documentation.

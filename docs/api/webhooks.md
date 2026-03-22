@@ -1,252 +1,151 @@
-# Webhooks
+# Webhooks And Ingestion
 
-Webhooks allow you to receive real-time notifications about events in MUTX.
+MUTX has two adjacent webhook-related surfaces:
 
-## Endpoints
+- outbound webhook management under `/v1/webhooks/*`
+- runtime ingestion endpoints under `/v1/ingest/*`
 
-### List Webhooks
+## Webhook Management Routes
 
-Retrieve all configured webhooks.
+| Route | Purpose |
+| --- | --- |
+| `POST /v1/webhooks/` | Create a webhook destination |
+| `GET /v1/webhooks/` | List webhook destinations |
+| `GET /v1/webhooks/{webhook_id}` | Fetch one webhook |
+| `PATCH /v1/webhooks/{webhook_id}` | Update URL, events, or active status |
+| `DELETE /v1/webhooks/{webhook_id}` | Delete a webhook |
+| `POST /v1/webhooks/{webhook_id}/test` | Send a test event |
+| `GET /v1/webhooks/{webhook_id}/deliveries` | List delivery attempts |
 
-```http
-GET /webhooks/
+## Ingest Routes
+
+| Route | Purpose |
+| --- | --- |
+| `POST /v1/ingest/agent-status` | Runtime status ingestion |
+| `POST /v1/ingest/deployment` | Deployment event ingestion |
+| `POST /v1/ingest/metrics` | Metrics ingestion |
+
+## Authentication
+
+Webhook management and ingest routes accept either:
+
+- `Authorization: Bearer <access_token or mutx_live key>`
+- `X-API-Key: <mutx_live key>`
+
+## Create A Webhook
+
+```bash
+BASE_URL=http://localhost:8000
+
+curl -X POST "$BASE_URL/v1/webhooks/" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com/webhooks/mutx",
+    "events": ["agent.*", "deployment.*"],
+    "secret": "optional-secret",
+    "is_active": true
+  }'
 ```
 
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Response:**
+Example response:
 
 ```json
 {
-  "data": [
-    {
-      "webhook_id": "whk_abc123",
-      "name": "Production Notifications",
-      "url": "https://example.com/webhooks/mutx",
-      "events": ["deployment.started", "deployment.completed", "agent.error"],
-      "active": true,
-      "created_at": "2024-01-15T10:30:00Z"
-    }
-  ]
-}
-```
-
----
-
-### Create Webhook
-
-Register a new webhook endpoint.
-
-```http
-POST /webhooks/
-```
-
-**Request Body:**
-
-```json
-{
-  "name": "Production Notifications",
+  "id": "uuid",
+  "user_id": "uuid",
   "url": "https://example.com/webhooks/mutx",
-  "events": ["deployment.started", "deployment.completed", "deployment.failed"],
-  "secret": "whsec_your_secret_key",
-  "active": true
+  "events": ["agent.*", "deployment.*"],
+  "secret": null,
+  "has_secret": true,
+  "is_active": true,
+  "created_at": "2026-03-22T12:00:00Z"
 }
 ```
 
-**Response:**
+Webhook secrets are write-only. Responses never return the original secret value.
 
-```json
-{
-  "webhook_id": "whk_abc123",
-  "name": "Production Notifications",
-  "url": "https://example.com/webhooks/mutx",
-  "events": ["deployment.started", "deployment.completed", "deployment.failed"],
-  "active": true,
-  "created_at": "2024-01-20T10:30:00Z"
-}
+## List, Update, Delete, And Test
+
+```bash
+curl "$BASE_URL/v1/webhooks/?limit=50&skip=0" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl -X PATCH "$BASE_URL/v1/webhooks/YOUR_WEBHOOK_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"events":["deployment.created"],"is_active":false}'
+
+curl -X POST "$BASE_URL/v1/webhooks/YOUR_WEBHOOK_ID/test" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl -X DELETE "$BASE_URL/v1/webhooks/YOUR_WEBHOOK_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
----
+`test` returns a small success payload when delivery succeeds and `502` when the destination is unreachable or rejects the request.
 
-### Get Webhook Details
+## Delivery History
 
-Retrieve webhook configuration.
-
-```http
-GET /webhooks/{webhook_id}
+```bash
+curl "$BASE_URL/v1/webhooks/YOUR_WEBHOOK_ID/deliveries?limit=20&success=false" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-**Response:**
+Delivery records expose:
 
-```json
-{
-  "webhook_id": "whk_abc123",
-  "name": "Production Notifications",
-  "url": "https://example.com/webhooks/mutx",
-  "events": ["deployment.started", "deployment.completed", "deployment.failed"],
-  "active": true,
-  "created_at": "2024-01-15T10:30:00Z",
-  "last_triggered_at": "2024-01-20T15:45:00Z"
-}
+- `id`
+- `webhook_id`
+- `event`
+- `payload`
+- `status_code`
+- `success`
+- `error_message`
+- `attempts`
+- `created_at`
+- `delivered_at`
+
+## Supported Event Values
+
+Current outbound event values come from `src/api/services/webhook_handler.py`:
+
+- `agent.status`
+- `agent.status_update`
+- `agent.heartbeat`
+- `agent.error`
+- `agent.started`
+- `agent.stopped`
+- `agent.crashed`
+- `deployment.created`
+- `deployment.updated`
+- `deployment.failed`
+- `deployment.rolled_back`
+- `metrics.report`
+- `health.check`
+
+Route validation also accepts:
+
+- `*`
+- wildcard families such as `agent.*`, `deployment.*`, and `metrics.*`
+
+## Signature Header
+
+When a webhook has a secret, outbound deliveries include:
+
+```text
+X-Webhook-Signature: sha256=<digest>
 ```
 
----
+## Retry Behavior
 
-### Update Webhook
+The current delivery service retries failed webhook deliveries after approximately:
 
-Update webhook configuration.
+- 2 seconds
+- 10 seconds
+- 30 seconds
 
-```http
-PUT /webhooks/{webhook_id}
-```
+## Ingest Notes
 
-**Request Body:**
+The ingest routes are for MUTX runtime updates entering the control plane, not for user-managed outbound webhooks.
 
-```json
-{
-  "name": "Updated Name",
-  "events": ["deployment.started", "deployment.completed"],
-  "active": false
-}
-```
-
----
-
-### Delete Webhook
-
-Remove a webhook.
-
-```http
-DELETE /webhooks/{webhook_id}
-```
-
-**Response:**
-
-```json
-{
-  "message": "Webhook deleted successfully"
-}
-```
-
----
-
-### Test Webhook
-
-Send a test event to a webhook.
-
-```http
-POST /webhooks/{webhook_id}/test
-```
-
-**Response:**
-
-```json
-{
-  "test_id": "test_abc123",
-  "status": "sent",
-  "message": "Test event sent successfully"
-}
-```
-
----
-
-### Get Webhook Deliveries
-
-View delivery history for a webhook.
-
-```http
-GET /webhooks/{webhook_id}/deliveries
-```
-
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `status` | string | Filter (success, failed, pending) |
-| `limit` | int | Maximum results |
-| `offset` | int | Pagination offset |
-
-**Response:**
-
-```json
-{
-  "deliveries": [
-    {
-      "delivery_id": "dlv_abc123",
-      "event": "deployment.completed",
-      "status": "success",
-      "status_code": 200,
-      "timestamp": "2024-01-20T15:45:00Z",
-      "duration_ms": 245
-    }
-  ]
-}
-```
-
-## Event Types
-
-| Event | Description |
-|-------|-------------|
-| `deployment.started` | Deployment initiated |
-| `deployment.completed` | Deployment successful |
-| `deployment.failed` | Deployment failed |
-| `deployment.stopped` | Deployment stopped |
-| `agent.registered` | New agent registered |
-| `agent.heartbeat` | Agent heartbeat received |
-| `agent.error` | Agent reported an error |
-| `agent.offline` | Agent went offline |
-
-## Webhook Payload
-
-All webhook events are sent as POST requests with a JSON body:
-
-```json
-{
-  "event": "deployment.completed",
-  "timestamp": "2024-01-20T15:45:00Z",
-  "data": {
-    "deployment_id": "dply_abc123",
-    "agent_id": "agnt_abc123",
-    "version": "1.3.0",
-    "status": "running"
-  }
-}
-```
-
-## Verifying Webhooks
-
-Webhooks include a signature header for verification:
-
-```
-X-Mutx-Signature: sha256=<signature>
-```
-
-Verify using the secret:
-
-```python
-import hmac
-import hashlib
-
-def verify_webhook(payload: bytes, signature: str, secret: str) -> bool:
-    expected = hmac.new(
-        secret.encode(),
-        payload,
-        hashlib.sha256
-    ).hexdigest()
-    return hmac.compare_digest(f"sha256={expected}", signature)
-```
-
-## Retry Policy
-
-Failed deliveries are retried with exponential backoff:
-- 1st retry: 1 minute
-- 2nd retry: 5 minutes
-- 3rd retry: 30 minutes
-- 4th retry: 2 hours
-- 5th retry: 24 hours
-
-After 5 failed attempts, the webhook is marked as failed and not retried automatically.
+Use [`openapi.json`](./openapi.json) for the exact ingestion payloads.

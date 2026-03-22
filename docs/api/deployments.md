@@ -1,288 +1,156 @@
 # Deployments
 
-Deployments manage the lifecycle of agent services in production.
+Deployments track the lifecycle of user-owned agent deployments.
 
-## Endpoints
+The canonical create path is `POST /v1/deployments`.
 
-### List Deployments
+## Routes
 
-Retrieve all deployments.
+| Route | Purpose |
+| --- | --- |
+| `GET /v1/deployments` | List deployments for the current user |
+| `POST /v1/deployments` | Create a deployment for an owned agent |
+| `GET /v1/deployments/{deployment_id}` | Fetch one deployment |
+| `GET /v1/deployments/{deployment_id}/events` | Fetch paginated deployment events |
+| `POST /v1/deployments/{deployment_id}/scale` | Update replica count |
+| `POST /v1/deployments/{deployment_id}/restart` | Restart stopped, failed, or killed deployments |
+| `GET /v1/deployments/{deployment_id}/logs` | Fetch logs |
+| `GET /v1/deployments/{deployment_id}/metrics` | Fetch metrics |
+| `GET /v1/deployments/{deployment_id}/versions` | Fetch version history |
+| `POST /v1/deployments/{deployment_id}/rollback` | Roll back to a prior version |
+| `DELETE /v1/deployments/{deployment_id}` | Mark the deployment as killed |
 
-```http
-GET /deployments
+## Current Lifecycle Rules
+
+- creation requires an owned `agent_id`
+- scaling only succeeds for deployments in `running` or `ready`
+- restart only succeeds for deployments in `stopped`, `failed`, or `killed`
+- delete does not hard-remove the record; it marks the deployment `killed`
+
+## Create A Deployment
+
+```bash
+BASE_URL=http://localhost:8000
+
+curl -X POST "$BASE_URL/v1/deployments" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agent_id": "YOUR_AGENT_ID",
+    "replicas": 1
+  }'
 ```
 
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `status` | string | Filter by status (pending, running, stopped, failed) |
-| `agent_id` | string | Filter by agent |
-| `limit` | int | Maximum results |
-| `offset` | int | Pagination offset |
-
-**Response:**
+Example response:
 
 ```json
 {
-  "data": [
-    {
-      "deployment_id": "dply_abc123",
-      "agent_id": "agnt_abc123",
-      "agent_name": "data-processor-01",
-      "version": "1.2.0",
-      "status": "running",
-      "replicas": 2,
-      "created_at": "2024-01-15T10:30:00Z"
-    }
-  ],
-  "total": 15
-}
-```
-
----
-
-### Create Deployment
-
-Create a new deployment.
-
-```http
-POST /deployments
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Request Body:**
-
-```json
-{
-  "agent_id": "agnt_abc123",
-  "version": "1.3.0",
-  "config": {
-    "replicas": 3,
-    "environment": {
-      "LOG_LEVEL": "info",
-      "DATABASE_URL": "postgresql://..."
-    },
-    "resources": {
-      "cpu": "500m",
-      "memory": "512Mi"
-    }
-  }
-}
-```
-
-**Response:**
-
-```json
-{
-  "deployment_id": "dply_xyz789",
-  "agent_id": "agnt_abc123",
-  "version": "1.3.0",
+  "id": "uuid",
+  "agent_id": "uuid",
   "status": "pending",
-  "replicas": 3,
-  "created_at": "2024-01-20T10:30:00Z"
-}
-```
-
----
-
-### Get Deployment Details
-
-Retrieve detailed information about a deployment.
-
-```http
-GET /deployments/{deployment_id}
-```
-
-**Response:**
-
-```json
-{
-  "deployment_id": "dply_abc123",
-  "agent_id": "agnt_abc123",
-  "agent_name": "data-processor-01",
-  "version": "1.3.0",
-  "status": "running",
-  "replicas": 2,
-  "config": {
-    "environment": {...},
-    "resources": {...}
-  },
-  "created_at": "2024-01-15T10:30:00Z",
-  "updated_at": "2024-01-20T15:45:00Z"
-}
-```
-
----
-
-### Restart Deployment
-
-Restart a running deployment.
-
-```http
-POST /deployments/{deployment_id}/restart
-```
-
-**Response:**
-
-```json
-{
-  "deployment_id": "dply_abc123",
-  "status": "restarting",
-  "message": "Deployment restart initiated"
-}
-```
-
----
-
-### Scale Deployment
-
-Scale deployment replicas up or down.
-
-```http
-POST /deployments/{deployment_id}/scale
-```
-
-**Request Body:**
-
-```json
-{
-  "replicas": 5
-}
-```
-
-**Response:**
-
-```json
-{
-  "deployment_id": "dply_abc123",
-  "replicas": 5,
-  "previous_replicas": 2,
-  "status": "scaling"
-}
-```
-
----
-
-### Get Deployment Logs
-
-Retrieve logs for a deployment.
-
-```http
-GET /deployments/{deployment_id}/logs
-```
-
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `container` | string | Container name (main, sidecar) |
-| `since` | string | ISO timestamp |
-| `limit` | int | Maximum log lines |
-| `follow` | bool | Stream logs (Server-Sent Events) |
-
-**Response:**
-
-```json
-{
-  "logs": [
-    {
-      "timestamp": "2024-01-20T15:45:00Z",
-      "container": "main",
-      "message": "Application started",
-      "level": "info"
-    }
-  ]
-}
-```
-
----
-
-### Get Deployment Events
-
-Retrieve lifecycle events for a deployment.
-
-```http
-GET /deployments/{deployment_id}/events
-```
-
-**Response:**
-
-```json
-{
+  "version": null,
+  "replicas": 1,
+  "node_id": null,
+  "started_at": "2026-03-22T12:00:00Z",
+  "ended_at": null,
+  "error_message": null,
   "events": [
     {
-      "event_id": "evt_abc123",
-      "type": "scaling",
-      "message": "Scaled to 5 replicas",
-      "timestamp": "2024-01-20T15:45:00Z",
-      "metadata": {
-        "previous_replicas": 2,
-        "new_replicas": 5
-      }
+      "id": "uuid",
+      "deployment_id": "uuid",
+      "event_type": "create",
+      "status": "pending",
+      "node_id": null,
+      "error_message": null,
+      "created_at": "2026-03-22T12:00:00Z"
     }
   ]
 }
 ```
 
----
+## Legacy Agent-Scoped Create
 
-### Get Deployment Metrics
-
-Retrieve metrics for a deployment.
-
-```http
-GET /deployments/{deployment_id}/metrics
-```
-
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `metric_type` | string | Type (cpu, memory, requests, custom) |
-| `since` | string | Start timestamp |
-| `until` | string | End timestamp |
-| `interval` | string | Aggregation (1m, 5m, 1h, 1d) |
-
-**Response:**
+`POST /v1/agents/{agent_id}/deploy` is still mounted and returns a lightweight payload:
 
 ```json
 {
-  "deployment_id": "dply_abc123",
-  "metrics": [
-    {
-      "timestamp": "2024-01-20T15:00:00Z",
-      "cpu_percent": 45.2,
-      "memory_percent": 62.1,
-      "requests_per_second": 125.5,
-      "error_rate": 0.01
-    }
-  ]
+  "deployment_id": "uuid",
+  "status": "deploying"
 }
 ```
 
-## Deployment States
+Use `POST /v1/deployments` for the canonical full deployment record.
 
-| State | Description |
-|-------|-------------|
-| `pending` | Deployment created, starting |
-| `running` | Successfully deployed and serving |
-| `stopped` | Deployment stopped |
-| `failed` | Deployment failed |
-| `restarting` | Restart in progress |
-| `scaling` | Scaling in progress |
+## List And Inspect Deployments
 
-## Webhooks for Deployments
+```bash
+curl "$BASE_URL/v1/deployments?skip=0&limit=20" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
-Configure webhooks to receive deployment notifications. See [webhooks.md](./webhooks.md).
+curl "$BASE_URL/v1/deployments?status=running&agent_id=YOUR_AGENT_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl "$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+## Event History
+
+```bash
+curl "$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/events?limit=50" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl "$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/events?event_type=scale&status=running" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+The paginated response includes:
+
+- `deployment_id`
+- `deployment_status`
+- `items`
+- `total`
+- `skip`
+- `limit`
+- optional echoed `event_type` and `status` filters
+
+## Scale, Restart, And Kill
+
+```bash
+curl -X POST "$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/scale" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"replicas":2}'
+
+curl -X POST "$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/restart" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl -X DELETE "$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+## Logs And Metrics
+
+```bash
+curl "$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/logs?limit=100&level=info" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl "$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/metrics?limit=100" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+Deployment log and metric reads currently proxy through the deployment's agent record.
+
+## Versions And Rollback
+
+```bash
+curl "$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/versions" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+curl -X POST "$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/rollback" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"version":1}'
+```
+
+Rollback restores the stored deployment snapshot for the selected version and records a deployment event.

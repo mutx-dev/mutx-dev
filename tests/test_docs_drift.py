@@ -1,13 +1,112 @@
 from __future__ import annotations
 
+import json
+import re
 from pathlib import Path
+
+from fastapi.openapi.utils import get_openapi
+
+from src.api.main import app
 
 
 ROOT = Path(__file__).resolve().parents[1]
+MARKDOWN_LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
+HTML_HREF_RE = re.compile(r'href="([^"]+)"')
+SKIP_PARTS = {
+    ".git",
+    ".next",
+    ".venv",
+    "__pycache__",
+    "build",
+    "coverage",
+    "dist",
+    "node_modules",
+    "venv",
+}
+STALE_REFERENCES = (
+    "ROADMAP.md",
+    "WHITEPAPER.md",
+    "MANIFESTO.md",
+    "SUPPORT.md",
+    "app/app/[[...slug]]/page.tsx",
+    "/v1/contacts",
+    "there is no global `/v1` backend prefix",
+    "docs/contracts/api/index.md",
+)
+API_DOC_EXPECTATIONS = {
+    "docs/api/index.md": ["/v1/auth/*", "/v1/agents", "/v1/deployments", "/v1/leads/contacts"],
+    "docs/api/authentication.md": [
+        "/v1/auth/register",
+        "/v1/auth/local-bootstrap",
+        "/v1/auth/refresh",
+    ],
+    "docs/api/agents.md": [
+        "/v1/agents/register",
+        "/v1/agents/{agent_id}/resource-usage",
+        "/v1/agents/{agent_id}/rollback",
+    ],
+    "docs/api/deployments.md": [
+        "/v1/deployments/{deployment_id}/events",
+        "/v1/deployments/{deployment_id}/versions",
+        "/v1/deployments/{deployment_id}/rollback",
+    ],
+    "docs/api/api-keys.md": [
+        "/v1/api-keys",
+        "/v1/api-keys/{key_id}/rotate",
+        "mutx_live_",
+    ],
+    "docs/api/webhooks.md": [
+        "/v1/webhooks/",
+        "/v1/ingest/agent-status",
+        "X-Webhook-Signature",
+    ],
+    "docs/api/leads.md": ["/v1/leads", "/v1/leads/contacts"],
+}
 
 
 def read_text(relative_path: str) -> str:
     return (ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def iter_markdown_files() -> list[Path]:
+    files: list[Path] = []
+    for path in ROOT.rglob("*.md"):
+        relative_parts = path.relative_to(ROOT).parts
+        if any(part in SKIP_PARTS for part in relative_parts):
+            continue
+        files.append(path)
+    return sorted(files)
+
+
+def assert_exact_case(path: Path) -> None:
+    relative = path.relative_to(ROOT)
+    current = ROOT
+    for part in relative.parts:
+        names = {child.name for child in current.iterdir()}
+        assert part in names, f"{relative} does not match on-disk casing"
+        current = current / part
+
+
+def extract_local_links(path: Path) -> list[str]:
+    content = path.read_text(encoding="utf-8")
+    links = MARKDOWN_LINK_RE.findall(content) + HTML_HREF_RE.findall(content)
+    local_links: list[str] = []
+    for link in links:
+        cleaned = link.strip().strip("<>").split("#", 1)[0].split("?", 1)[0]
+        if not cleaned:
+            continue
+        if cleaned.startswith(("http://", "https://", "mailto:", "tel:", "#")):
+            continue
+        local_links.append(cleaned)
+    return local_links
+
+
+def resolve_local_link(source: Path, target: str) -> Path:
+    if target.startswith("/"):
+        resolved = ROOT / target.lstrip("/")
+    else:
+        resolved = (source.parent / target).resolve()
+    return resolved
 
 
 def test_canonical_quickstart_surfaces_share_assistant_first_commands() -> None:
@@ -46,3 +145,88 @@ def test_readme_uses_access_token_config_shape() -> None:
 
     assert '"access_token": null' in readme
     assert '"api_key": null' not in readme
+
+
+def test_readme_keeps_demo_gif() -> None:
+    readme = read_text("README.md")
+
+    assert "![MUTX dashboard demo](demo.gif)" in readme
+
+
+def test_readme_keeps_gitbook_card_targets() -> None:
+    readme = read_text("README.md")
+
+    assert 'data-card-target data-type="content-ref"' in readme
+    assert 'data-card-cover data-type="files"' in readme
+    assert "public/landing/docs-surface.png" in readme
+    assert "docs/api/index.md" in readme
+
+
+def test_docs_hub_keeps_repo_backed_cards() -> None:
+    docs_hub = read_text("docs/README.md")
+
+    assert 'data-card-target data-type="content-ref"' in docs_hub
+    assert 'data-card-cover data-type="files"' in docs_hub
+    assert "../public/landing/wiring-bay.png" in docs_hub
+
+
+def test_public_agents_guidance_mentions_v1_contract() -> None:
+    agents_md = read_text("agents-1.md")
+
+    assert "/v1/*" in agents_md
+    assert "there is no global `/v1` backend prefix" not in agents_md
+
+
+def test_markdown_links_resolve_with_exact_case() -> None:
+    for markdown_file in iter_markdown_files():
+        for link in extract_local_links(markdown_file):
+            resolved = resolve_local_link(markdown_file, link)
+            assert resolved.exists(), (
+                f"{markdown_file.relative_to(ROOT)} links to missing target {link}"
+            )
+            assert_exact_case(resolved)
+
+
+def test_docs_do_not_contain_known_stale_references() -> None:
+    files_to_scan = iter_markdown_files() + [ROOT / ".github/ISSUE_TEMPLATE/config.yml"]
+
+    for path in files_to_scan:
+        content = path.read_text(encoding="utf-8")
+        for stale in STALE_REFERENCES:
+            assert stale not in content, f"{path.relative_to(ROOT)} still contains {stale}"
+
+
+def test_summary_points_only_to_existing_public_docs() -> None:
+    summary = read_text("SUMMARY.md")
+
+    assert ".github.md" not in summary
+    assert "pull_request_template" not in summary
+
+    summary_path = ROOT / "SUMMARY.md"
+    for link in extract_local_links(summary_path):
+        resolved = resolve_local_link(summary_path, link)
+        assert resolved.is_file(), f"SUMMARY.md points to non-file target {link}"
+        assert_exact_case(resolved)
+
+
+def test_public_api_docs_reference_current_routes() -> None:
+    for relative_path, expected_strings in API_DOC_EXPECTATIONS.items():
+        content = read_text(relative_path)
+        for expected in expected_strings:
+            assert expected in content, f"{relative_path} is missing {expected}"
+
+
+def test_contract_stubs_point_back_to_docs_api() -> None:
+    for path in sorted((ROOT / "docs/contracts/api").glob("*.md")):
+        content = path.read_text(encoding="utf-8")
+        assert "../../api/" in content or "../../api" in content
+        assert "canonical" in content.lower() or "compatibility" in content.lower()
+
+
+def test_openapi_snapshot_matches_current_app_routes() -> None:
+    snapshot = json.loads(read_text("docs/api/openapi.json"))
+    generated = get_openapi(title=app.title, version=app.version, routes=app.routes)
+
+    assert snapshot["paths"] == generated["paths"]
+    assert "/v1/leads/contacts" in snapshot["paths"]
+    assert "/v1/contacts" not in snapshot["paths"]

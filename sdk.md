@@ -376,5 +376,5 @@ with MutxClient(api_key="your-api-key") as client:
 
 ## Related Docs
 
-* [API Overview](docs/contracts/api/index.md)
+* [API Overview](docs/api/index.md)
 * [CLI Guide](docs/cli.md)

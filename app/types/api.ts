@@ -170,6 +170,126 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/assistant/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Assistant Overview */
+        get: operations["assistant_overview_v1_assistant_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assistant/{agent_id}/skills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Assistant Skills */
+        get: operations["assistant_skills_v1_assistant__agent_id__skills_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assistant/{agent_id}/skills/{skill_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Install Assistant Skill */
+        post: operations["install_assistant_skill_v1_assistant__agent_id__skills__skill_id__post"];
+        /** Uninstall Assistant Skill */
+        delete: operations["uninstall_assistant_skill_v1_assistant__agent_id__skills__skill_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assistant/{agent_id}/channels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Assistant Channels */
+        get: operations["assistant_channels_v1_assistant__agent_id__channels_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assistant/{agent_id}/wakeups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Assistant Wakeups */
+        get: operations["assistant_wakeups_v1_assistant__agent_id__wakeups_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assistant/{agent_id}/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Assistant Health */
+        get: operations["assistant_health_v1_assistant__agent_id__health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/assistant/{agent_id}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Assistant Sessions */
+        get: operations["assistant_sessions_v1_assistant__agent_id__sessions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/deployments": {
         parameters: {
             query?: never;
@@ -346,6 +466,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Templates */
+        get: operations["list_templates_v1_templates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/templates/{template_id}/deploy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Deploy Template */
+        post: operations["deploy_template_v1_templates__template_id__deploy_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/webhooks/": {
         parameters: {
             query?: never;
@@ -466,6 +620,23 @@ export interface paths {
         put?: never;
         /** Login */
         post: operations["login_v1_auth_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/local-bootstrap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Local Bootstrap */
+        post: operations["local_bootstrap_v1_auth_local_bootstrap_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -612,7 +783,7 @@ export interface paths {
         };
         /**
          * List Available Skills
-         * @description Returns the current trending skills from ClawHub.
+         * @description Returns the current MUTX/OpenClaw skill catalog.
          */
         get: operations["list_available_skills_v1_clawhub_skills_get"];
         put?: never;
@@ -731,6 +902,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/leads/contacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Leads
+         * @description List captured leads.
+         *     Restricted to internal/admin users.
+         */
+        get: operations["list_leads_v1_leads_contacts_get"];
+        put?: never;
+        /**
+         * Capture Lead
+         * @description Capture a new contact lead.
+         *     Public endpoint for landing pages and onboarding.
+         */
+        post: operations["capture_lead_v1_leads_contacts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/leads/contacts/{lead_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Lead
+         * @description Get a specific lead by ID.
+         */
+        get: operations["get_lead_v1_leads_contacts__lead_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Lead
+         * @description Delete a specific lead/contact.
+         */
+        delete: operations["delete_lead_v1_leads_contacts__lead_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Lead
+         * @description Update a specific lead/contact.
+         */
+        patch: operations["update_lead_v1_leads_contacts__lead_id__patch"];
+        trace?: never;
+    };
     "/v1/leads": {
         parameters: {
             query?: never;
@@ -783,60 +1008,6 @@ export interface paths {
          * @description Update a specific lead/contact.
          */
         patch: operations["update_lead_v1_leads__lead_id__patch"];
-        trace?: never;
-    };
-    "/v1/contacts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Leads
-         * @description List captured leads.
-         *     Restricted to internal/admin users.
-         */
-        get: operations["list_leads_v1_contacts_get"];
-        put?: never;
-        /**
-         * Capture Lead
-         * @description Capture a new contact lead.
-         *     Public endpoint for landing pages and onboarding.
-         */
-        post: operations["capture_lead_v1_contacts_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/contacts/{lead_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Lead
-         * @description Get a specific lead by ID.
-         */
-        get: operations["get_lead_v1_contacts__lead_id__get"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete Lead
-         * @description Delete a specific lead/contact.
-         */
-        delete: operations["delete_lead_v1_contacts__lead_id__delete"];
-        options?: never;
-        head?: never;
-        /**
-         * Update Lead
-         * @description Update a specific lead/contact.
-         */
-        patch: operations["update_lead_v1_contacts__lead_id__patch"];
         trace?: never;
     };
     "/v1/agents/register": {
@@ -1414,6 +1585,67 @@ export interface paths {
         patch: operations["resolve_alert_v1_monitoring_alerts__alert_id__patch"];
         trace?: never;
     };
+    "/v1/onboarding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Onboarding State */
+        get: operations["onboarding_state_v1_onboarding_get"];
+        put?: never;
+        /** Onboarding Update */
+        post: operations["onboarding_update_v1_onboarding_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runtime/providers/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Runtime Provider State */
+        get: operations["runtime_provider_state_v1_runtime_providers__provider__get"];
+        /** Upsert Runtime Provider State */
+        put: operations["upsert_runtime_provider_state_v1_runtime_providers__provider__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Sessions
+         * @description List assistant sessions discovered from OpenClaw state plus local sources.
+         */
+        get: operations["list_sessions_v1_sessions_get"];
+        put?: never;
+        /**
+         * Session Action
+         * @description Validate session action input, but do not mutate gateway state yet.
+         */
+        post: operations["session_action_v1_sessions_post"];
+        /** Delete Session */
+        delete: operations["delete_session_v1_sessions_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/swarms": {
         parameters: {
             query?: never;
@@ -1646,7 +1878,9 @@ export interface components {
             agent_id: string;
             type: components["schemas"]["AgentType"];
             /** Config */
-            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | Record<string, never>;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            };
             /** Config Version */
             config_version: number;
             /**
@@ -1661,7 +1895,9 @@ export interface components {
              * Config
              * @description Updated agent configuration payload. Can be a JSON object or JSON string.
              */
-            config: Record<string, never> | string;
+            config: {
+                [key: string]: unknown;
+            } | string;
         };
         /** AgentCreate */
         AgentCreate: {
@@ -1672,7 +1908,9 @@ export interface components {
             /** @default openai */
             type: components["schemas"]["AgentType"];
             /** Config */
-            config?: Record<string, never> | string | null;
+            config?: {
+                [key: string]: unknown;
+            } | string | null;
         };
         /** AgentDetailResponse */
         AgentDetailResponse: {
@@ -1689,7 +1927,9 @@ export interface components {
             /** Status */
             status: string;
             /** Config */
-            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | Record<string, never> | null;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            } | null;
             /**
              * Config Version
              * @default 1
@@ -1806,7 +2046,9 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Capabilities
              * @default []
@@ -1857,7 +2099,9 @@ export interface components {
             /** Model */
             model?: string | null;
             /** Extra Metadata */
-            extra_metadata?: Record<string, never> | null;
+            extra_metadata?: {
+                [key: string]: unknown;
+            } | null;
             /**
              * Period Start
              * Format: date-time
@@ -1906,7 +2150,9 @@ export interface components {
             /** Model */
             model?: string | null;
             /** Extra Metadata */
-            extra_metadata?: Record<string, never> | null;
+            extra_metadata?: {
+                [key: string]: unknown;
+            } | null;
             /**
              * Period Start
              * Format: date-time
@@ -1935,7 +2181,9 @@ export interface components {
             /** Status */
             status: string;
             /** Config */
-            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | Record<string, never> | null;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            } | null;
             /**
              * Config Version
              * @default 1
@@ -2001,7 +2249,7 @@ export interface components {
          * AgentType
          * @enum {string}
          */
-        AgentType: "openai" | "anthropic" | "langchain" | "custom";
+        AgentType: "openai" | "anthropic" | "langchain" | "custom" | "openclaw";
         /** AgentVersionHistoryResponse */
         AgentVersionHistoryResponse: {
             /** Agent Id */
@@ -2162,6 +2410,187 @@ export interface components {
              */
             max_tokens: number;
         };
+        /** AssistantChannelResponse */
+        AssistantChannelResponse: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /** Enabled */
+            enabled: boolean;
+            /** Mode */
+            mode: string;
+            /** Allow From */
+            allow_from?: string[];
+        };
+        /** AssistantHealthResponse */
+        AssistantHealthResponse: {
+            /** Status */
+            status: string;
+            /** Cli Available */
+            cli_available: boolean;
+            /** Gateway Configured */
+            gateway_configured: boolean;
+            /** Gateway Reachable */
+            gateway_reachable: boolean;
+            /** Gateway Port */
+            gateway_port?: number | null;
+            /** Gateway Url */
+            gateway_url?: string | null;
+            /**
+             * Credential Detected
+             * @default false
+             */
+            credential_detected: boolean;
+            /** Config Path */
+            config_path?: string | null;
+            /** State Dir */
+            state_dir?: string | null;
+            /** Doctor Summary */
+            doctor_summary: string;
+        };
+        /** AssistantOverviewEnvelope */
+        AssistantOverviewEnvelope: {
+            /** Has Assistant */
+            has_assistant: boolean;
+            /**
+             * Recommended Template Id
+             * @default personal_assistant
+             */
+            recommended_template_id: string;
+            assistant?: components["schemas"]["AssistantOverviewResponse"] | null;
+        };
+        /** AssistantOverviewResponse */
+        AssistantOverviewResponse: {
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Runtime */
+            runtime: string;
+            /** Template Id */
+            template_id: string;
+            /** Status */
+            status: string;
+            /** Onboarding Status */
+            onboarding_status: string;
+            /** Assistant Id */
+            assistant_id: string;
+            /** Workspace */
+            workspace: string;
+            /** Last Activity */
+            last_activity?: string | null;
+            /**
+             * Session Count
+             * @default 0
+             */
+            session_count: number;
+            /** Installed Skills */
+            installed_skills?: components["schemas"]["AssistantSkillResponse"][];
+            /** Channels */
+            channels?: components["schemas"]["AssistantChannelResponse"][];
+            /** Wakeups */
+            wakeups?: components["schemas"]["AssistantWakeupResponse"][];
+            gateway: components["schemas"]["AssistantHealthResponse"];
+            /** Deployments */
+            deployments?: components["schemas"]["DeploymentResponse"][];
+            /** Config */
+            config: components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            };
+        };
+        /** AssistantSessionResponse */
+        AssistantSessionResponse: {
+            /** Id */
+            id: string;
+            /** Key */
+            key: string;
+            /** Agent */
+            agent: string;
+            /** Kind */
+            kind: string;
+            /** Age */
+            age: string;
+            /** Model */
+            model: string;
+            /** Tokens */
+            tokens: string;
+            /** Channel */
+            channel: string;
+            /** Flags */
+            flags?: string[];
+            /** Active */
+            active: boolean;
+            /** Start Time */
+            start_time: number;
+            /** Last Activity */
+            last_activity: number;
+            /** Source */
+            source: string;
+        };
+        /** AssistantSkillResponse */
+        AssistantSkillResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Author */
+            author: string;
+            /** Category */
+            category: string;
+            /** Source */
+            source: string;
+            /**
+             * Is Official
+             * @default false
+             */
+            is_official: boolean;
+            /**
+             * Installed
+             * @default false
+             */
+            installed: boolean;
+            /** Tags */
+            tags?: string[];
+            /** Path */
+            path?: string | null;
+        };
+        /** AssistantTemplateResponse */
+        AssistantTemplateResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Summary */
+            summary: string;
+            /** Description */
+            description: string;
+            agent_type: components["schemas"]["AgentType"];
+            /** Starter Prompt */
+            starter_prompt: string;
+            /** Default Config */
+            default_config: components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            };
+        };
+        /** AssistantWakeupResponse */
+        AssistantWakeupResponse: {
+            /** Enabled */
+            enabled: boolean;
+            /** Schedule */
+            schedule?: string | null;
+            /** Timezone */
+            timezone?: string | null;
+            /** Label */
+            label?: string | null;
+        };
         /**
          * BatchEmbedRequest
          * @description Request model for batch embedding generation.
@@ -2219,7 +2648,9 @@ export interface components {
             /** Success */
             success: boolean;
             /** Result */
-            result?: Record<string, never> | null;
+            result?: {
+                [key: string]: unknown;
+            } | null;
             /** Error */
             error?: string | null;
             /** Completed At */
@@ -2232,7 +2663,9 @@ export interface components {
             /** Action */
             action: string;
             /** Parameters */
-            parameters: Record<string, never>;
+            parameters: {
+                [key: string]: unknown;
+            };
             /** Received At */
             received_at: string;
         };
@@ -2574,6 +3007,14 @@ export interface components {
             version: string;
             /** Uptime Seconds */
             uptime_seconds?: number | null;
+            /** Components */
+            components?: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+            /** Schema Repairs Applied */
+            schema_repairs_applied?: string[];
         };
         /** HealthStatusResponse */
         HealthStatusResponse: {
@@ -2633,7 +3074,9 @@ export interface components {
             /** Chain Id */
             chain_id: string;
             /** Parameters */
-            parameters?: Record<string, never>;
+            parameters?: {
+                [key: string]: unknown;
+            };
         };
         /** LeadCreate */
         LeadCreate: {
@@ -2687,6 +3130,14 @@ export interface components {
             /** Source */
             source?: string | null;
         };
+        /** LocalBootstrapRequest */
+        LocalBootstrapRequest: {
+            /**
+             * Name
+             * @default Local Operator
+             */
+            name: string;
+        };
         /** LogRequest */
         LogRequest: {
             /** Agent Id */
@@ -2702,7 +3153,9 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: unknown;
+            };
             /** Timestamp */
             timestamp: string;
         };
@@ -2780,9 +3233,82 @@ export interface components {
              * Custom
              * @default {}
              */
-            custom: Record<string, never>;
+            custom: {
+                [key: string]: unknown;
+            };
             /** Timestamp */
             timestamp: string;
+        };
+        /** OnboardingStateResponse */
+        OnboardingStateResponse: {
+            /**
+             * Provider
+             * @default openclaw
+             */
+            provider: string;
+            /** Status */
+            status: string;
+            /** Action Type */
+            action_type?: string | null;
+            /** Import Source */
+            import_source?: {
+                [key: string]: unknown;
+            };
+            /** Current Step */
+            current_step: string;
+            /** Completed Steps */
+            completed_steps?: string[];
+            /** Failed Step */
+            failed_step?: string | null;
+            /** Last Error */
+            last_error?: string | null;
+            /**
+             * Checklist Dismissed
+             * @default false
+             */
+            checklist_dismissed: boolean;
+            /** Assistant Name */
+            assistant_name?: string | null;
+            /** Assistant Id */
+            assistant_id?: string | null;
+            /** Workspace */
+            workspace?: string | null;
+            /** Gateway Url */
+            gateway_url?: string | null;
+            /** Updated At */
+            updated_at?: string | null;
+            /** Steps */
+            steps?: components["schemas"]["OnboardingStepResponse"][];
+            /** Providers */
+            providers?: components["schemas"]["ProviderOptionResponse"][];
+        };
+        /** OnboardingStepResponse */
+        OnboardingStepResponse: {
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Completed
+             * @default false
+             */
+            completed: boolean;
+        };
+        /** OnboardingUpdateRequest */
+        OnboardingUpdateRequest: {
+            /** Action */
+            action: string;
+            /**
+             * Provider
+             * @default openclaw
+             */
+            provider: string;
+            /** Step */
+            step?: string | null;
+            /** Payload */
+            payload?: {
+                [key: string]: unknown;
+            };
         };
         /** OpenAIAgentConfig */
         OpenAIAgentConfig: {
@@ -2807,6 +3333,120 @@ export interface components {
             temperature: number;
             /** Max Tokens */
             max_tokens?: number | null;
+        };
+        /** OpenClawAgentConfig */
+        OpenClawAgentConfig: {
+            /** Name */
+            name?: string | null;
+            /** System Prompt */
+            system_prompt?: string | null;
+            /**
+             * Version
+             * @default 1
+             */
+            version: number;
+            /**
+             * Runtime
+             * @default personal_assistant
+             */
+            runtime: string;
+            /**
+             * Template
+             * @default personal_assistant
+             */
+            template: string;
+            /** Assistant Id */
+            assistant_id?: string | null;
+            /**
+             * Workspace
+             * @default default
+             */
+            workspace: string;
+            /**
+             * Model
+             * @default openai/gpt-5
+             */
+            model: string;
+            /**
+             * Safety Mode
+             * @default pairing
+             */
+            safety_mode: string;
+            /** Channels */
+            channels?: {
+                [key: string]: components["schemas"]["OpenClawChannelConfig"];
+            };
+            /** Skills */
+            skills?: string[];
+            /** Wakeups */
+            wakeups?: components["schemas"]["OpenClawWakeupConfig"][];
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            };
+            gateway?: components["schemas"]["OpenClawGatewayConfig"];
+        };
+        /** OpenClawChannelConfig */
+        OpenClawChannelConfig: {
+            /** Label */
+            label: string;
+            /**
+             * Enabled
+             * @default false
+             */
+            enabled: boolean;
+            /**
+             * Mode
+             * @default pairing
+             */
+            mode: string;
+            /** Allow From */
+            allow_from?: string[];
+        };
+        /** OpenClawGatewayConfig */
+        OpenClawGatewayConfig: {
+            /**
+             * Port
+             * @default 18789
+             */
+            port: number;
+            /**
+             * Auth Mode
+             * @default token
+             */
+            auth_mode: string;
+            /** Dashboard Allowed Origins */
+            dashboard_allowed_origins?: string[];
+        };
+        /** OpenClawWakeupConfig */
+        OpenClawWakeupConfig: {
+            /**
+             * Enabled
+             * @default false
+             */
+            enabled: boolean;
+            /** Schedule */
+            schedule?: string | null;
+            /** Timezone */
+            timezone?: string | null;
+            /** Label */
+            label?: string | null;
+        };
+        /** ProviderOptionResponse */
+        ProviderOptionResponse: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /** Summary */
+            summary: string;
+            /**
+             * Enabled
+             * @default false
+             */
+            enabled: boolean;
+            /** Cue */
+            cue?: string | null;
         };
         /** RefreshRequest */
         RefreshRequest: {
@@ -2859,7 +3499,9 @@ export interface components {
             /** Error Message */
             error_message?: string | null;
             /** Metadata */
-            metadata?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
             /** Started At */
             started_at?: string | null;
             /** Completed At */
@@ -2888,7 +3530,9 @@ export interface components {
             /** Error Message */
             error_message: string | null;
             /** Metadata */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Started At
              * Format: date-time
@@ -2945,7 +3589,9 @@ export interface components {
             /** Error Message */
             error_message: string | null;
             /** Metadata */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Started At
              * Format: date-time
@@ -2971,7 +3617,9 @@ export interface components {
             /** Message */
             message?: string | null;
             /** Payload */
-            payload?: Record<string, never>;
+            payload?: {
+                [key: string]: unknown;
+            };
             /** Timestamp */
             timestamp?: string | null;
         };
@@ -3010,7 +3658,9 @@ export interface components {
             /** Message */
             message: string | null;
             /** Payload */
-            payload: Record<string, never>;
+            payload: {
+                [key: string]: unknown;
+            };
             /** Sequence */
             sequence: number;
             /**
@@ -3018,6 +3668,230 @@ export interface components {
              * Format: date-time
              */
             timestamp: string;
+        };
+        /** RuntimeProviderSnapshotResponse */
+        RuntimeProviderSnapshotResponse: {
+            /**
+             * Provider
+             * @default openclaw
+             */
+            provider: string;
+            /**
+             * Runtime Key
+             * @default openclaw
+             */
+            runtime_key: string;
+            /**
+             * Label
+             * @default OpenClaw
+             */
+            label: string;
+            /** Cue */
+            cue?: string | null;
+            /** Provider Root */
+            provider_root?: string | null;
+            /** Wizard State Path */
+            wizard_state_path?: string | null;
+            /** Binary Path */
+            binary_path?: string | null;
+            /**
+             * Binary Confirmed
+             * @default false
+             */
+            binary_confirmed: boolean;
+            /** Home Path */
+            home_path?: string | null;
+            /** Home Source */
+            home_source?: string | null;
+            /** Config Path */
+            config_path?: string | null;
+            /** State Dir */
+            state_dir?: string | null;
+            /** Install Method */
+            install_method?: string | null;
+            /** Installation Disposition */
+            installation_disposition?: string | null;
+            /** Tracking Mode */
+            tracking_mode?: string | null;
+            /**
+             * Imported Into Mutx
+             * @default false
+             */
+            imported_into_mutx: boolean;
+            /**
+             * Adopted Existing Runtime
+             * @default false
+             */
+            adopted_existing_runtime: boolean;
+            /**
+             * Keys Remain Local
+             * @default false
+             */
+            keys_remain_local: boolean;
+            /** Credential Sync Policy */
+            credential_sync_policy?: string | null;
+            /** Privacy Summary */
+            privacy_summary?: string | null;
+            /** Last Action Type */
+            last_action_type?: string | null;
+            /** Import Source */
+            import_source?: {
+                [key: string]: unknown;
+            };
+            /** Version */
+            version?: string | null;
+            /**
+             * Status
+             * @default unknown
+             */
+            status: string;
+            /** Gateway */
+            gateway?: {
+                [key: string]: unknown;
+            };
+            /** Gateway Url */
+            gateway_url?: string | null;
+            /** Gateway Port */
+            gateway_port?: number | null;
+            /** Last Seen At */
+            last_seen_at?: string | null;
+            /** Last Synced At */
+            last_synced_at?: string | null;
+            /**
+             * Binding Count
+             * @default 0
+             */
+            binding_count: number;
+            /** Current Binding */
+            current_binding?: {
+                [key: string]: unknown;
+            } | null;
+            /** Bindings */
+            bindings?: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Observed Source
+             * @default local
+             */
+            observed_source: string;
+            /**
+             * Stale
+             * @default false
+             */
+            stale: boolean;
+            /**
+             * Stale After Seconds
+             * @default 900
+             */
+            stale_after_seconds: number;
+        };
+        /** RuntimeProviderSnapshotUpsert */
+        RuntimeProviderSnapshotUpsert: {
+            /**
+             * Provider
+             * @default openclaw
+             */
+            provider: string;
+            /**
+             * Runtime Key
+             * @default openclaw
+             */
+            runtime_key: string;
+            /**
+             * Label
+             * @default OpenClaw
+             */
+            label: string;
+            /** Cue */
+            cue?: string | null;
+            /** Provider Root */
+            provider_root?: string | null;
+            /** Wizard State Path */
+            wizard_state_path?: string | null;
+            /** Binary Path */
+            binary_path?: string | null;
+            /**
+             * Binary Confirmed
+             * @default false
+             */
+            binary_confirmed: boolean;
+            /** Home Path */
+            home_path?: string | null;
+            /** Home Source */
+            home_source?: string | null;
+            /** Config Path */
+            config_path?: string | null;
+            /** State Dir */
+            state_dir?: string | null;
+            /** Install Method */
+            install_method?: string | null;
+            /** Installation Disposition */
+            installation_disposition?: string | null;
+            /** Tracking Mode */
+            tracking_mode?: string | null;
+            /**
+             * Imported Into Mutx
+             * @default false
+             */
+            imported_into_mutx: boolean;
+            /**
+             * Adopted Existing Runtime
+             * @default false
+             */
+            adopted_existing_runtime: boolean;
+            /**
+             * Keys Remain Local
+             * @default false
+             */
+            keys_remain_local: boolean;
+            /** Credential Sync Policy */
+            credential_sync_policy?: string | null;
+            /** Privacy Summary */
+            privacy_summary?: string | null;
+            /** Last Action Type */
+            last_action_type?: string | null;
+            /** Import Source */
+            import_source?: {
+                [key: string]: unknown;
+            };
+            /** Version */
+            version?: string | null;
+            /**
+             * Status
+             * @default unknown
+             */
+            status: string;
+            /** Gateway */
+            gateway?: {
+                [key: string]: unknown;
+            };
+            /** Gateway Url */
+            gateway_url?: string | null;
+            /** Gateway Port */
+            gateway_port?: number | null;
+            /** Last Seen At */
+            last_seen_at?: string | null;
+            /** Last Synced At */
+            last_synced_at?: string | null;
+            /**
+             * Binding Count
+             * @default 0
+             */
+            binding_count: number;
+            /** Current Binding */
+            current_binding?: {
+                [key: string]: unknown;
+            } | null;
+            /** Bindings */
+            bindings?: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Observed Source
+             * @default local
+             */
+            observed_source: string;
         };
         /**
          * SearchRequest
@@ -3047,6 +3921,22 @@ export interface components {
             /** Score */
             score: number;
         };
+        /** SessionActionRequest */
+        SessionActionRequest: {
+            /** Session Key */
+            session_key: string;
+            /** Level */
+            level?: string | null;
+            /** Label */
+            label?: string | null;
+        };
+        /** SessionListResponse */
+        SessionListResponse: {
+            /** Sessions */
+            sessions: {
+                [key: string]: unknown;
+            }[];
+        };
         /** Skill */
         Skill: {
             /** Id */
@@ -3066,6 +3956,44 @@ export interface components {
              * @default false
              */
             is_official: boolean;
+        };
+        /** StarterDeploymentCreate */
+        StarterDeploymentCreate: {
+            /**
+             * Name
+             * @default Personal Assistant
+             */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /**
+             * Replicas
+             * @default 1
+             */
+            replicas: number;
+            /** Model */
+            model?: string | null;
+            /** Assistant Id */
+            assistant_id?: string | null;
+            /** Workspace */
+            workspace?: string | null;
+            /** Skills */
+            skills?: string[];
+            /** Channels */
+            channels?: {
+                [key: string]: components["schemas"]["OpenClawChannelConfig"];
+            };
+            /** Runtime Metadata */
+            runtime_metadata?: {
+                [key: string]: unknown;
+            };
+        };
+        /** StarterDeploymentResponse */
+        StarterDeploymentResponse: {
+            /** Template Id */
+            template_id: string;
+            agent: components["schemas"]["AgentResponse"];
+            deployment: components["schemas"]["DeploymentResponse"];
         };
         /** SwarmAgentResponse */
         SwarmAgentResponse: {
@@ -3219,15 +4147,28 @@ export interface components {
              */
             event_type: string;
             /**
+             * Resource Type
+             * @description Type of resource that was used
+             */
+            resource_type?: string | null;
+            /**
              * Resource Id
              * @description Resource that was used
              */
             resource_id?: string | null;
             /**
+             * Credits Used
+             * @description Credits consumed by this event
+             * @default 1
+             */
+            credits_used: number;
+            /**
              * Metadata
              * @description Additional event metadata
              */
-            metadata?: Record<string, never> | null;
+            metadata?: {
+                [key: string]: unknown;
+            } | null;
         };
         /**
          * UsageEventListResponse
@@ -3260,8 +4201,12 @@ export interface components {
              * Format: uuid
              */
             user_id: string;
+            /** Resource Type */
+            resource_type: string | null;
             /** Resource Id */
             resource_id: string | null;
+            /** Credits Used */
+            credits_used: number;
             /** Event Metadata */
             event_metadata?: string | null;
             /**
@@ -3273,7 +4218,9 @@ export interface components {
              * Metadata
              * @description Deserialize event_metadata JSON string to dict
              */
-            readonly metadata: Record<string, never> | null;
+            readonly metadata: {
+                [key: string]: unknown;
+            } | null;
         };
         /** UserResponse */
         UserResponse: {
@@ -3306,6 +4253,10 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
         };
         /** VerifyEmailRequest */
         VerifyEmailRequest: {
@@ -3668,7 +4619,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -3701,7 +4654,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -3848,6 +4803,272 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AgentResourceUsageResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assistant_overview_v1_assistant_overview_get: {
+        parameters: {
+            query?: {
+                agent_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantOverviewEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assistant_skills_v1_assistant__agent_id__skills_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantSkillResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    install_assistant_skill_v1_assistant__agent_id__skills__skill_id__post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+                skill_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantSkillResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    uninstall_assistant_skill_v1_assistant__agent_id__skills__skill_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+                skill_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantSkillResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assistant_channels_v1_assistant__agent_id__channels_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantChannelResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assistant_wakeups_v1_assistant__agent_id__wakeups_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantWakeupResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assistant_health_v1_assistant__agent_id__health_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantHealthResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    assistant_sessions_v1_assistant__agent_id__sessions_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantSessionResponse"][];
                 };
             };
             /** @description Validation Error */
@@ -4247,6 +5468,63 @@ export interface operations {
             };
         };
     };
+    list_templates_v1_templates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantTemplateResponse"][];
+                };
+            };
+        };
+    };
+    deploy_template_v1_templates__template_id__deploy_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StarterDeploymentCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StarterDeploymentResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_webhooks_v1_webhooks__get: {
         parameters: {
             query?: {
@@ -4552,6 +5830,39 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    local_bootstrap_v1_auth_local_bootstrap_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LocalBootstrapRequest"];
             };
         };
         responses: {
@@ -5062,6 +6373,174 @@ export interface operations {
             };
         };
     };
+    list_leads_v1_leads_contacts_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    capture_lead_v1_leads_contacts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_lead_v1_leads_contacts__lead_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_lead_v1_leads_contacts__lead_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_lead_v1_leads_contacts__lead_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_leads_v1_leads_get: {
         parameters: {
             query?: {
@@ -5194,174 +6673,6 @@ export interface operations {
         };
     };
     update_lead_v1_leads__lead_id__patch: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                lead_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LeadUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LeadResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_leads_v1_contacts_get: {
-        parameters: {
-            query?: {
-                skip?: number;
-                limit?: number;
-            };
-            header?: {
-                authorization?: string | null;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LeadResponse"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    capture_lead_v1_contacts_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LeadCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LeadResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_lead_v1_contacts__lead_id__get: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                lead_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LeadResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_lead_v1_contacts__lead_id__delete: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string | null;
-            };
-            path: {
-                lead_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_lead_v1_contacts__lead_id__patch: {
         parameters: {
             query?: never;
             header?: {
@@ -6498,6 +7809,253 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AlertResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    onboarding_state_v1_onboarding_get: {
+        parameters: {
+            query?: {
+                provider?: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OnboardingStateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    onboarding_update_v1_onboarding_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OnboardingUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OnboardingStateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    runtime_provider_state_v1_runtime_providers__provider__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RuntimeProviderSnapshotResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upsert_runtime_provider_state_v1_runtime_providers__provider__put: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RuntimeProviderSnapshotUpsert"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RuntimeProviderSnapshotResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_sessions_v1_sessions_get: {
+        parameters: {
+            query?: {
+                agent_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    session_action_v1_sessions_post: {
+        parameters: {
+            query: {
+                action: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_session_v1_sessions_delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

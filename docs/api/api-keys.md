@@ -1,185 +1,120 @@
 # API Keys
 
-API keys provide service-to-service authentication without user sessions.
+Managed API keys provide user-scoped automation auth without an interactive login flow.
 
-## Endpoints
+New keys are issued with the `mutx_live_` prefix.
 
-### List API Keys
+## Routes
 
-Retrieve all API keys for the authenticated user.
+| Route | Purpose |
+| --- | --- |
+| `GET /v1/api-keys` | List API keys, including revoked keys for audit history |
+| `GET /v1/api-keys/{key_id}` | Fetch one API key record |
+| `POST /v1/api-keys` | Create a new key |
+| `POST /v1/api-keys/{key_id}/rotate` | Revoke the old key and issue a replacement |
+| `DELETE /v1/api-keys/{key_id}` | Revoke a key while keeping its record |
 
-```http
-GET /api-keys
+## Authentication
+
+Management calls use user auth.
+
+For interactive docs examples, use a bearer access token:
+
+```bash
+-H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-**Headers:**
+Issued API keys can then be used against protected routes in either of these forms:
 
-```
-Authorization: Bearer <access_token>
+```bash
+curl -H "Authorization: Bearer mutx_live_your_key_here" \
+  https://api.mutx.dev/v1/deployments
+
+curl -H "X-API-Key: mutx_live_your_key_here" \
+  https://api.mutx.dev/v1/webhooks/
 ```
 
-**Response:**
+## List API Keys
+
+```bash
+BASE_URL=http://localhost:8000
+
+curl "$BASE_URL/v1/api-keys?skip=0&limit=50" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+Example response:
 
 ```json
 {
-  "data": [
+  "items": [
     {
-      "id": "key_abc123",
-      "name": "Production Service",
-      "prefix": "mk_live_",
-      "created_at": "2024-01-15T10:30:00Z",
-      "last_used_at": "2024-01-20T15:45:00Z",
-      "expires_at": "2025-01-15T10:30:00Z"
+      "id": "uuid",
+      "name": "Dashboard automation",
+      "last_used": null,
+      "created_at": "2026-03-22T12:00:00Z",
+      "expires_at": null,
+      "is_active": true
     }
-  ]
+  ],
+  "total": 1,
+  "skip": 0,
+  "limit": 50
 }
 ```
 
----
-
-### Create API Key
-
-Generate a new API key.
-
-```http
-POST /api-keys
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Request Body:**
-
-```json
-{
-  "name": "CI/CD Pipeline",
-  "expires_in_days": 90,
-  "permissions": ["read:deployments", "write:deployments"]
-}
-```
-
-**Response:**
-
-```json
-{
-  "id": "key_xyz789",
-  "name": "CI/CD Pipeline",
-  "key": "mk_live_abc123def456...",  // Only shown once!
-  "prefix": "mk_live_",
-  "created_at": "2024-01-20T10:30:00Z",
-  "expires_at": "2024-04-20T10:30:00Z"
-}
-```
-
-> ⚠️ **Important:** The full key is only returned once at creation time. Store it securely!
-
----
-
-### Get API Key Details
-
-Retrieve details of a specific API key.
-
-```http
-GET /api-keys/{key_id}
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Response:**
-
-```json
-{
-  "id": "key_abc123",
-  "name": "Production Service",
-  "prefix": "mk_live_",
-  "created_at": "2024-01-15T10:30:00Z",
-  "last_used_at": "2024-01-20T15:45:00Z",
-  "expires_at": "2025-01-15T10:30:00Z",
-  "permissions": ["read:deployments", "write:deployments"]
-}
-```
-
----
-
-### Rotate API Key
-
-Rotate (regenerate) an existing API key.
-
-```http
-POST /api-keys/{key_id}/rotate
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Response:**
-
-```json
-{
-  "id": "key_abc123",
-  "name": "Production Service",
-  "key": "mk_live_newkey...",  // New key - shown once!
-  "prefix": "mk_live_",
-  "created_at": "2024-01-15T10:30:00Z",
-  "expires_at": "2025-01-15T10:30:00Z"
-}
-```
-
----
-
-### Delete API Key
-
-Revoke an API key.
-
-```http
-DELETE /api-keys/{key_id}
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Response:**
-
-```json
-{
-  "message": "API key deleted successfully"
-}
-```
-
-## Using API Keys
-
-Include the API key in requests:
+## Create A Key
 
 ```bash
-curl -H "X-API-Key: mk_live_abc123def456" \
-  https://api.mutx.dev/deployments
+curl -X POST "$BASE_URL/v1/api-keys" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "CI deployer",
+    "expires_in_days": 30
+  }'
 ```
 
-Or as a Bearer token:
+Example response:
+
+```json
+{
+  "id": "uuid",
+  "name": "CI deployer",
+  "key": "mutx_live_abc123...",
+  "created_at": "2026-03-22T12:00:00Z",
+  "expires_at": "2026-04-21T12:00:00Z"
+}
+```
+
+The plaintext `key` value is only returned once.
+
+If the current plan has reached its active API key quota, create returns `409 Conflict`.
+
+## Rotate A Key
 
 ```bash
-curl -H "Authorization: Bearer mk_live_abc123def456" \
-  https://api.mutx.dev/deployments
+curl -X POST "$BASE_URL/v1/api-keys/YOUR_KEY_ID/rotate" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-## Best Practices
+Rotation revokes the current active key and returns a newly issued plaintext key once.
 
-1. **Never commit keys to version control**
-2. **Use environment variables** for key storage
-3. **Set expiration dates** - shorter is safer
-4. **Rotate keys regularly**
-5. **Use minimal permissions** - only grant what's needed
-6. **Monitor usage** - check `last_used_at` regularly
+Rotating a revoked key returns `409 Conflict`.
+
+## Revoke A Key
+
+```bash
+curl -X DELETE "$BASE_URL/v1/api-keys/YOUR_KEY_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+Successful revoke returns `204 No Content`.
+
+The record remains visible in list responses for auditability.
+
+## Operational Notes
+
+- API key records currently expose `last_used`, `created_at`, `expires_at`, and `is_active`.
+- Expiration is optional.
+- The dashboard uses the same backend contract through its same-origin proxy routes under `app/api/api-keys/*`.

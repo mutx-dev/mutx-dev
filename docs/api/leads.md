@@ -1,209 +1,98 @@
 # Leads
 
-Leads represent potential customers or contacts in the MUTX platform.
+Lead capture is intentionally split between:
 
-## Endpoints
+- a public create path for landing pages and onboarding
+- authenticated internal follow-up routes for verified internal users
 
-### List Leads
+The same handlers are mounted on both `/v1/leads` and `/v1/leads/contacts`.
 
-Retrieve all leads.
+## Access Rules
 
-```http
-GET /leads
+- `POST /v1/leads` and `POST /v1/leads/contacts` are public
+- `GET`, `PATCH`, and `DELETE` routes require an authenticated user
+- internal follow-up access is further restricted to verified users whose email domain is in the configured internal allowlist
+
+## Routes
+
+| Route | Purpose |
+| --- | --- |
+| `POST /v1/leads` | Capture a new lead |
+| `GET /v1/leads` | List leads |
+| `GET /v1/leads/{lead_id}` | Fetch one lead |
+| `PATCH /v1/leads/{lead_id}` | Update one lead |
+| `DELETE /v1/leads/{lead_id}` | Delete one lead |
+| `POST /v1/leads/contacts` | Compatibility-shaped public capture route |
+| `GET /v1/leads/contacts` | Compatibility-shaped list route |
+| `GET /v1/leads/contacts/{lead_id}` | Compatibility-shaped detail route |
+| `PATCH /v1/leads/contacts/{lead_id}` | Compatibility-shaped update route |
+| `DELETE /v1/leads/contacts/{lead_id}` | Compatibility-shaped delete route |
+
+## Capture A Lead
+
+```bash
+BASE_URL=http://localhost:8000
+
+curl -X POST "$BASE_URL/v1/leads" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "founder@example.com",
+    "name": "Founder",
+    "company": "Example Co",
+    "message": "Interested in migration support.",
+    "source": "homepage"
+  }'
 ```
 
-**Headers:**
-
-```
-Authorization: Bearer <access_token>
-```
-
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `status` | string | Filter (new, contacted, qualified, converted, lost) |
-| `source` | string | Lead source |
-| `limit` | int | Maximum results |
-| `offset` | int | Pagination offset |
-
-**Response:**
+Example response:
 
 ```json
 {
-  "data": [
-    {
-      "lead_id": "lead_abc123",
-      "email": "john@company.com",
-      "name": "John Smith",
-      "company": "Acme Corp",
-      "status": "new",
-      "source": "website",
-      "created_at": "2024-01-15T10:30:00Z"
-    }
-  ],
-  "total": 42
+  "id": "uuid",
+  "email": "founder@example.com",
+  "name": "Founder",
+  "company": "Example Co",
+  "message": "Interested in migration support.",
+  "source": "homepage",
+  "created_at": "2026-03-22T12:00:00Z"
 }
 ```
 
----
+The create handler normalizes email casing and trims optional text fields.
 
-### Create Lead
+## List And Fetch Leads
 
-Create a new lead.
+```bash
+curl "$BASE_URL/v1/leads?skip=0&limit=50" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 
-```http
-POST /leads
+curl "$BASE_URL/v1/leads/YOUR_LEAD_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-**Request Body:**
+Equivalent compatibility routes are also mounted under `/v1/leads/contacts`.
 
-```json
-{
-  "email": "john@company.com",
-  "name": "John Smith",
-  "company": "Acme Corp",
-  "phone": "+1-555-0123",
-  "source": "website",
-  "metadata": {
-    "interest": "enterprise_plan",
-    "budget": "$5k-10k/month"
-  }
-}
+## Update And Delete
+
+```bash
+curl -X PATCH "$BASE_URL/v1/leads/YOUR_LEAD_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "company": "Updated Co",
+    "message": "Followed up with a live demo."
+  }'
+
+curl -X DELETE "$BASE_URL/v1/leads/YOUR_LEAD_ID" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-**Response:**
+`PATCH` accepts any subset of:
 
-```json
-{
-  "lead_id": "lead_xyz789",
-  "email": "john@company.com",
-  "name": "John Smith",
-  "company": "Acme Corp",
-  "status": "new",
-  "source": "website",
-  "created_at": "2024-01-20T10:30:00Z"
-}
-```
+- `email`
+- `name`
+- `company`
+- `message`
+- `source`
 
----
-
-### Get Lead Details
-
-Retrieve detailed information about a lead.
-
-```http
-GET /leads/{lead_id}
-```
-
-**Response:**
-
-```json
-{
-  "lead_id": "lead_abc123",
-  "email": "john@company.com",
-  "name": "John Smith",
-  "company": "Acme Corp",
-  "phone": "+1-555-0123",
-  "status": "qualified",
-  "source": "website",
-  "metadata": {
-    "interest": "enterprise_plan",
-    "budget": "$5k-10k/month"
-  },
-  "created_at": "2024-01-15T10:30:00Z",
-  "updated_at": "2024-01-20T15:45:00Z"
-}
-```
-
----
-
-### Update Lead
-
-Update lead information.
-
-```http
-PUT /leads/{lead_id}
-```
-
-**Request Body:**
-
-```json
-{
-  "status": "contacted",
-  "metadata": {
-    "notes": "Had a great call, interested in demo",
-    "next_follow_up": "2024-01-25T10:00:00Z"
-  }
-}
-```
-
-**Response:**
-
-```json
-{
-  "lead_id": "lead_abc123",
-  "status": "contacted",
-  "updated_at": "2024-01-20T15:45:00Z"
-}
-```
-
----
-
-### Delete Lead
-
-Remove a lead.
-
-```http
-DELETE /leads/{lead_id}
-```
-
-**Response:**
-
-```json
-{
-  "message": "Lead deleted successfully"
-}
-```
-
-## Lead Statuses
-
-| Status | Description |
-|--------|-------------|
-| `new` | Newly created lead |
-| `contacted` | Initial contact made |
-| `qualified` | Lead meets qualification criteria |
-| `converted` | Lead became a customer |
-| `lost` | Lead not pursuing |
-
-## Lead Sources
-
-| Source | Description |
-|--------|-------------|
-| `website` | Website form submission |
-| `api` | API-created lead |
-| `import` | Bulk import |
-| `referral` | Referred by existing customer |
-| `event` | Conference or event |
-| `other` | Other source |
-
-## Webhooks for Leads
-
-Configure webhooks to receive lead notifications:
-
-```json
-{
-  "event": "lead.created",
-  "data": {
-    "lead_id": "lead_abc123",
-    "email": "john@company.com",
-    "name": "John Smith"
-  }
-}
-```
-
-Available events:
-- `lead.created`
-- `lead.updated`
-- `lead.converted`
-- `lead.lost`
+An empty patch returns `400`.

@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: Support and troubleshooting
-    url: https://github.com/fortunexbt/mutx.dev/blob/main/SUPPORT.md
+    url: https://github.com/fortunexbt/mutx.dev/blob/main/support.md
     about: Start here for setup help, docs links, and the right support channel.
   - name: Security policy
     url: https://github.com/fortunexbt/mutx.dev/blob/main/SECURITY.md

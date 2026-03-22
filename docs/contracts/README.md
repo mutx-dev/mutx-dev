@@ -1,48 +1,40 @@
 ---
-description: Contract guardrails for coding against the live MUTX API.
+description: Legacy contract notes retained so old links do not hard-break.
 icon: scale-balanced
 ---
 
-# API Source of Truth
+# Legacy Contract Notes
 
-This document serves as the high-level contract reference for all API interactions. Coding agents MUST consult this document and `docs/api/openapi.json` before writing any code that consumes or provides API endpoints.
+This `docs/contracts/` tree is no longer the public API source of truth.
 
-## 1. Waitlist API (`/api/newsletter`)
+Use the repo-owned API docs in [`../api/reference.md`](../api/reference.md) instead.
 
-Used by the landing page for capturing early access intent.
+## Canonical Contract Order
 
-* **Endpoint**: `POST /api/newsletter`
-*   **Request Body**:
+1. `src/api/main.py` and `src/api/routes/*.py`
+2. [`../api/openapi.json`](../api/openapi.json)
+3. `docs/api/*.md`
 
-    ```json
-    {
-      "email": "string (email)",
-      "source": "string (optional)"
-    }
-    ```
-* **Constraint**: Field `email` is MANDATORY and must pass regex `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`.
-* **Response**: `200 OK` on success, `400` on validation error, `500` on server error.
-* **Side Effects**: Inserts into `waitlist` Postgres table, triggers Resend email (template `waitlist`).
+## Generated Artifacts
 
-## 2. Agent Management (`/agents`)
+```bash
+python scripts/generate_openapi.py
+npm run generate-types
+```
 
-* **Endpoints**:
-  * `POST /agents`: Create new agent. Requires `name`, `description`, and `config` (as a JSON string). Ownership comes from the authenticated user.
-  * `GET /agents`: List agents for current user.
-  * `GET /agents/{agent_id}`: Detail view.
-* **Critical Caveat**: The `config` field MUST be passed as a serialized **JSON string**, not a raw JSON object. Agents: do not attempt to send a raw object; stringify it first.
+## Why This Directory Still Exists
 
-## 3. Deployment Lifecycle (`/deployments`)
+- preserve old GitBook and GitHub links
+- avoid breaking existing references immediately
+- redirect readers to the repo-owned `docs/api/*` pages
 
-* **Endpoints**:
-  * `GET /deployments`: List status.
-  * `POST /deployments/{deployment_id}/scale`: Adjust replica count.
-* **State Machine**:
-  * Valid Statuses: `creating` | `running` | `stopped` | `failed`.
-  * Deployment Actions: Always require `deployment_id`.
+## Use These Pages Instead
 
-## 4. Operational Principles
-
-* **Route Truth**: The FastAPI app in `src/api/` is the absolute source of truth.
-* **No Prefix**: Routes do NOT use `/v1`.
-* **Type Safety**: Always generate TypeScript types from `docs/api/openapi.json` using `openapi-typescript` instead of writing custom interface files.
+- [API Overview](../api/index.md)
+- [API Reference](../api/reference.md)
+- [Authentication](../api/authentication.md)
+- [API Keys](../api/api-keys.md)
+- [Agents](../api/agents.md)
+- [Deployments](../api/deployments.md)
+- [Webhooks And Ingestion](../api/webhooks.md)
+- [Leads](../api/leads.md)

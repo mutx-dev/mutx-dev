@@ -1,19 +1,29 @@
 # API Reference
 
-This page is the docs-facing API reference entrypoint for MUTX.
+This directory is the public API reference for MUTX.
 
-## Source of Truth Order
+It should always match the mounted FastAPI application, not older GitBook prose.
+
+## Source Of Truth Order
 
 When docs and implementation disagree, use this order:
 
-1. `src/api/routes/*.py`
-2. `docs/api/openapi.json` (generated snapshot)
+1. `src/api/main.py` plus `src/api/routes/*.py`
+2. `docs/api/openapi.json`
 3. Prose docs in `docs/api/*.md`
 
-## Generate Fresh OpenAPI
+## Refresh Generated Artifacts
+
+Regenerate the OpenAPI snapshot from the live FastAPI app:
 
 ```bash
-/Users/fortune/MUTX/.venv/bin/python scripts/generate_openapi.py
+python scripts/generate_openapi.py
+```
+
+Regenerate the TypeScript types that power the app surface:
+
+```bash
+npm run generate-types
 ```
 
 Quick route inventory check:
@@ -22,20 +32,26 @@ Quick route inventory check:
 jq -r '.paths | keys[]' docs/api/openapi.json | sort
 ```
 
+## Hosted Surfaces
+
+- Marketing site: `https://mutx.dev`
+- Docs site: `https://docs.mutx.dev`
+- Operator app: `https://app.mutx.dev`
+- Direct API base: `https://api.mutx.dev`
+
 ## Reference Artifacts
 
-- OpenAPI JSON: [`openapi.json`](./openapi.json)
 - API overview: [index.md](./index.md)
-- Auth and tokens: [authentication.md](./authentication.md)
+- OpenAPI JSON: [`openapi.json`](./openapi.json)
+- Authentication: [authentication.md](./authentication.md)
 - API keys: [api-keys.md](./api-keys.md)
 - Agents: [agents.md](./agents.md)
 - Deployments: [deployments.md](./deployments.md)
 - Webhooks and ingestion: [webhooks.md](./webhooks.md)
 - Leads: [leads.md](./leads.md)
 
-## Hosted Surfaces
+## Publication Rules
 
-- Marketing site: `https://mutx.dev`
-- Docs site: `https://docs.mutx.dev`
-- Operator app: `https://app.mutx.dev`
-- Direct API base for integrations: `https://api.mutx.dev`
+- GitHub is the canonical source for `README.md`, `SUMMARY.md`, and `docs/api/*`.
+- GitBook should import from GitHub first when sync is reconnected.
+- Do not create replacement README pages from the GitBook UI.

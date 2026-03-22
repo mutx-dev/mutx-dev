@@ -1,6 +1,5 @@
 ---
 description: Repo operating notes and ground truth for coding agents working on MUTX.
-hidden: true
 icon: file-code
 ---
 
@@ -30,9 +29,9 @@ Repo guidance for agentic coding agents working in `/Users/fortune/MUTX`.
 ## Ground Truth And Known Drift
 
 * Trust source code and config over README/docs when they disagree.
-* FastAPI routes are mounted at plain prefixes like `/auth`, `/agents`, and `/deployments`; there is no global `/v1` backend prefix.
+* FastAPI public control-plane routes are mounted under `/v1/*`, with root probes at `/`, `/health`, `/ready`, and `/metrics`.
 * `docs/api/AGENTS.md` is stale: `POST /agents` no longer accepts `user_id` from the request body, and auth dependencies are attached.
-* Parts of the SDK and older docs still assume `/v1` routes; check the live route code before copying examples.
+* Parts of older docs still drift; check `src/api/main.py`, `src/api/routes/`, and `docs/api/openapi.json` before copying examples.
 * Frontend linting is currently broken: `next lint` and direct `eslint` both fail with the checked-in ESLint 10 plus `.eslintrc.json` setup.
 * `npm run build` works because it uses `next build --no-lint`.
 * `tests/conftest.py` is stale against `src/api/models/models.py`; pytest collects tests, but runtime execution currently fails because fixtures still pass `username` and `hashed_password` to `User`.
@@ -204,8 +203,8 @@ make -C infrastructure monitor-validate
 * Backlog creation is incomplete until at least one issue is actively becoming a PR.
 * If the queue gets thin, open the next roadmap-backed issues immediately.
 * If a merge wave lands, create the next roadmap-backed issues before the queue goes flat.
-* If `ROADMAP.md` is stale, update it like a senior engineer / CTO.
-* Update `ROADMAP.md` after meaningful merge waves, priority changes, newly obvious bottlenecks, or when a roadmap item is effectively complete.
+* If `roadmap.md` is stale, update it like a senior engineer / CTO.
+* Update `roadmap.md` after meaningful merge waves, priority changes, newly obvious bottlenecks, or when a roadmap item is effectively complete.
 * Fix CI or fix the code, but do not normalize living in red.
 * Keep changes small, reviewable, and truthful.
 * Do not claim success without matching repo-native validation.

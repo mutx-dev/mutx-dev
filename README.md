@@ -1,151 +1,188 @@
 # MUTX
 
-> Open-source MIT control plane for deploying and operating AI agents like systems, not demos.
+> Open-source control plane for deploying and operating AI agents like systems, not demos.
 
 ![MUTX dashboard demo](demo.gif)
 
-MUTX brings the operator surfaces into one repository:
+Fastest way to get oriented, get running, and go deeper in MUTX.
 
-- a FastAPI control plane mounted under `/v1/*`
-- a public browser demo at [`/app`](app/app/[[...slug]]/page.tsx)
-- a Next.js site and app host
+MUTX keeps the operator surfaces in one repo:
+
+- a FastAPI control plane with public routes mounted under `/v1/*`
+- a Next.js landing site at `mutx.dev`
+- a real dashboard surface at `app.mutx.dev/dashboard`
+- a browser demo surface at `app.mutx.dev/control/*`
 - a Python CLI and first-party Textual TUI
 - a Python SDK
-- local-first install and bootstrap flows for real operator setup
+- local-first setup and bootstrap flows for hosted and localhost operators
 
 Most teams can already prototype an agent. Very few can run one with durable identity, deployment semantics, sessions, health, access control, and honest operator contracts. MUTX is the layer around the agent system that makes those concerns explicit.
 
-## What MUTX Is
+> Start with [Quickstart](docs/deployment/quickstart.md) if you want proof, not theory.
 
-MUTX is an assistant-first control plane for AI operations.
+## Choose Your Path
 
-Today the project already models and exposes the operational shell around agents:
+<table data-view="cards">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th data-hidden data-card-target data-type="content-ref">Target</th>
+      <th data-hidden data-card-cover data-type="files">Cover</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Quickstart</strong></td>
+      <td>Install the stack, prove the local path, and create your first operator state.</td>
+      <td><a href="docs/deployment/quickstart.md">quickstart.md</a></td>
+      <td><a href="public/landing/victory-core.png">victory-core.png</a></td>
+    </tr>
+    <tr>
+      <td><strong>Documentation Hub</strong></td>
+      <td>Use the code-accurate docs hub when you want setup, surface, and status truth.</td>
+      <td><a href="docs/README.md">README.md</a></td>
+      <td><a href="public/landing/docs-surface.png">docs-surface.png</a></td>
+    </tr>
+    <tr>
+      <td><strong>API Overview</strong></td>
+      <td>Verify the mounted `/v1/*` contract, auth model, and public route families.</td>
+      <td><a href="docs/api/index.md">index.md</a></td>
+      <td><a href="public/landing/wiring-bay.png">wiring-bay.png</a></td>
+    </tr>
+    <tr>
+      <td><strong>Architecture Overview</strong></td>
+      <td>Read the platform shape behind the website, dashboard, API, CLI, SDK, and infra.</td>
+      <td><a href="docs/architecture/overview.md">overview.md</a></td>
+      <td><a href="public/landing/running-agent.png">running-agent.png</a></td>
+    </tr>
+  </tbody>
+</table>
 
-- starter templates, including `personal_assistant`
-- assistant overview, sessions, skills, channels, wakeups, and gateway health
-- agents, deployments, runs, usage, webhooks, API keys, and auth routes
-- a public dashboard demo that shows the intended operator surface
-- a CLI and TUI aligned around `mutx setup`, `mutx doctor`, and assistant workflows
-- shared local config and local operator bootstrap for localhost workflows
+## First 15 Minutes
 
-The core thesis is simple:
+### Prove The Local Path
 
-1. Deploy the assistant or agent as a real resource.
-2. Operate it through durable control-plane records.
-3. Keep the web surface, CLI, TUI, SDK, docs, and API contract speaking the same language.
-
-## Current Surfaces
-
-| Surface                   | Path / URL                                                | Current role                                              |
-| ------------------------- | --------------------------------------------------------- | --------------------------------------------------------- |
-| Public site               | `mutx.dev` / [`app/`](app)                                | Product narrative, quickstart, install path, metadata     |
-| Public control-plane demo | [`/app`](app/app/[[...slug]]/page.tsx)                    | Browser demo of the MUTX operator shell                   |
-| Docs                      | `docs.mutx.dev` / [`docs/`](docs)                         | Canonical setup, architecture, and contract documentation |
-| Control plane API         | [`src/api/`](src/api)                                     | FastAPI backend and mounted `/v1/*` routes                |
-| CLI + TUI                 | [`cli/`](cli) and root [`pyproject.toml`](pyproject.toml) | Terminal operator workflows                               |
-| SDK                       | [`sdk/mutx/`](sdk/mutx)                                   | Python client access to the control plane                 |
-
-## What Ships Today
-
-### Control plane
-
-- mounted public routes under `/v1/*`
-- route groups for `auth`, `assistant`, `agents`, `deployments`, `templates`, `sessions`, `runs`, `usage`, `api-keys`, `webhooks`, `monitoring`, `budgets`, `rag`, `clawhub`, and more
-- local and hosted operator setup paths
-- database initialization, schema-repair, and background monitor wiring
-
-### Assistant-first workflow
-
-- `personal_assistant` starter template
-- one-shot deploy flow through `mutx setup hosted` and `mutx setup local`
-- assistant overview, session discovery, channel inspection, skill management, and gateway health
-- workspace skill discovery, tracked OpenClaw bindings, and assistant config shaping in the control plane
-
-### Operator surfaces
-
-- public dashboard demo route under `/app`
-- browser site and app shell in Next.js
-- `mutx` CLI
-- `mutx tui` Textual operator shell
-
-### Delivery and operations
-
-- installer at `https://mutx.dev/install.sh`
-- local dev stack with `make dev-up`
-- infrastructure references in Docker, Terraform, Ansible, and monitoring assets
-
-## Quickstart
-
-Canonical guide: [docs/deployment/quickstart.md](docs/deployment/quickstart.md)
-
-### Hosted operator
-
-Recommended for almost everyone.
+Run the canonical setup flow first:
 
 ```bash
 curl -fsSL https://mutx.dev/install.sh | bash
 ```
 
-The installer opens a MUTX-owned setup wizard in the same terminal. Choose `Hosted` unless you explicitly want a private Docker-backed localhost control plane. MUTX can install OpenClaw, import an existing OpenClaw runtime, resume onboarding, track it under `~/.mutx/providers/openclaw`, and return you to the CLI or TUI without leaving the MUTX shell story.
+That path opens the hosted installer in your terminal. Choose `Hosted` unless you explicitly want the private Docker-backed localhost lane. MUTX can install OpenClaw, import an existing OpenClaw runtime, resume onboarding, track it under `~/.mutx/providers/openclaw`, and return you to the CLI or TUI without leaving the MUTX shell story.
 
-If OpenClaw is already installed, MUTX detects the upstream binary and home path, imports that runtime into the MUTX registry for tracking, and leaves the OpenClaw home plus gateway keys in place on the local machine.
-
-After setup:
-
-```bash
-mutx doctor
-mutx assistant overview
-mutx runtime inspect openclaw
-mutx runtime open openclaw --surface tui
-```
-
-### Local operator
-
-Advanced lane for self-hosting and contributor work.
-
-```bash
-mutx setup local --install-openclaw --open-tui
-```
-
-`mutx setup local` can provision a managed localhost stack under `~/.mutx/runtime/local-control`, start `http://localhost:8000` for you, bootstrap a local operator session, and then continue into the OpenClaw wizard. Docker is the required local runtime dependency for this lane.
-
-Expected result in either lane:
-
-1. authenticated operator state is stored in `~/.mutx/config.json`
-2. `Personal Assistant` is deployed against a dedicated OpenClaw assistant binding, never `main`
-3. OpenClaw runtime state is tracked in `~/.mutx/providers/openclaw`
-4. runtime truth is visible from the CLI, TUI, and browser surfaces as live local state or honest last-seen state
-
-## Operator Contract
-
-### Key routes
-
-These are the core route families worth knowing first:
-
-- `/v1/templates`
-- `/v1/assistant`
-- `/v1/sessions`
-- `/v1/deployments`
-- `/v1/agents`
-- `/v1/auth`
-- `/v1/webhooks`
-- `/v1/api-keys`
-
-### Core commands
+You can also start directly with the explicit commands:
 
 ```bash
 mutx setup hosted
 mutx setup local
 mutx doctor
-mutx assistant overview
-mutx assistant sessions
-mutx runtime list
-mutx runtime inspect openclaw
-mutx runtime open openclaw --surface tui
-mutx tui
 ```
 
-### Shared local config
+Expected result:
+
+1. authenticated operator state is stored in `~/.mutx/config.json`
+2. `Personal Assistant` is deployed against a dedicated OpenClaw assistant binding
+3. the `personal_assistant` template is visible as the default assistant starter
+4. runtime truth is visible from the CLI, TUI, dashboard, and browser demo surfaces
+
+### Inspect The Live Contract
+
+The public FastAPI control-plane contract is mounted under `/v1/*`, with root probes at `/`, `/health`, `/ready`, and `/metrics`.
+
+Use these references:
+
+- [API Overview](docs/api/index.md)
+- [API Reference](docs/api/reference.md)
+- [OpenAPI Snapshot](docs/api/openapi.json)
+
+### Check Platform Reality
+
+Use [Project Status](docs/project-status.md) to see what is solid, rough, or still placeholder-backed. It tracks the current truth across the web surfaces, API, CLI, SDK, infrastructure, and tests.
+
+### Go Deeper Only Where Needed
+
+Use these pages when you need more than the shortest path:
+
+- [Documentation Hub](docs/README.md)
+- [Architecture Overview](docs/architecture/overview.md)
+- [Troubleshooting](docs/troubleshooting/README.md)
+
+## By Goal
+
+### I Want To Ship Locally
+
+- [Quickstart](docs/deployment/quickstart.md) for the fastest path from clone to running services
+- [CLI Guide](docs/cli.md) for terminal workflows once the stack is up
+- [Debugging](docs/troubleshooting/debugging.md) when setup drifts
+
+### I Want To Understand The Product
+
+- [Manifesto](manifesto.md) for the thesis
+- [Technical Whitepaper](whitepaper.md) for the long-form architecture framing
+- [Project Status](docs/project-status.md) for current-state honesty
+- [Roadmap](roadmap.md) for the next high-leverage work
+
+### I Want To Integrate Or Build Against It
+
+- [API Overview](docs/api/index.md) for base URL, auth, and route map
+- [API Reference](docs/api/reference.md) for the public source-of-truth docs
+- [Python SDK](sdk.md) for programmatic access
+- [Architecture Overview](docs/architecture/overview.md) for the system shape behind the APIs
+
+### I Want To Operate Or Contribute
+
+- [Deployment](docs/deployment/README.md) for local and hosted install paths
+- [MUTX Infrastructure](infrastructure.md) for infra context and validation
+- [Autonomous Agent Team](agents/README.md) for specialist ownership boundaries
+- [Contributing](CONTRIBUTING.md) for repo workflow and review guardrails
+
+## Current Surfaces
+
+| Surface | Path / URL | Current role |
+| --- | --- | --- |
+| Public site | `mutx.dev` / [`app/page.tsx`](app/page.tsx) | Product narrative, quickstart, install path, metadata |
+| Operator dashboard | `app.mutx.dev/dashboard` / [`app/dashboard/`](app/dashboard) | Authenticated operator shell backed by live API reads and writes |
+| Control demo | `app.mutx.dev/control/*` / [`app/control/[[...slug]]/page.tsx`](app/control/[[...slug]]/page.tsx) | Browser demo of the control-plane surface |
+| Browser proxies | [`app/api/`](app/api) | Same-origin route handlers for auth, dashboard, API keys, webhooks, leads, and direct resource proxies |
+| Docs | `docs.mutx.dev` / [`docs/`](docs) | Canonical setup, architecture, API, and troubleshooting docs |
+| Control plane API | [`src/api/`](src/api) | FastAPI backend with public `/v1/*` routes plus root `/health`, `/ready`, and `/metrics` |
+| CLI + TUI | [`cli/`](cli) and root [`pyproject.toml`](pyproject.toml) | Terminal operator workflows |
+| SDK | [`sdk/mutx/`](sdk/mutx) | Python client access to the control plane |
+
+## What Ships Today
+
+### Control Plane
+
+- public route families under `/v1/*`
+- route groups for `auth`, `assistant`, `agents`, `deployments`, `templates`, `sessions`, `runs`, `usage`, `api-keys`, `webhooks`, `monitoring`, `budgets`, `rag`, `clawhub`, `runtime`, `analytics`, `onboarding`, `swarms`, and `leads`
+- root health probes at `/`, `/health`, `/ready`, and `/metrics`
+- database initialization, schema repair, and background monitor wiring
+
+### Assistant-First Workflow
+
+- `personal_assistant` starter template
+- one-shot deploy flows through `mutx setup hosted` and `mutx setup local`
+- assistant overview, session discovery, channel inspection, skill management, and gateway health
+- OpenClaw runtime import, tracking, and resync flows
+
+### Operator Surfaces
+
+- authenticated dashboard pages under [`app/dashboard/`](app/dashboard)
+- browser demo pages under [`app/control/`](app/control)
+- browser proxy handlers under [`app/api/`](app/api)
+- `mutx` CLI
+- `mutx tui` Textual operator shell
+
+### Delivery And Operations
+
+- installer at [mutx.dev/install.sh](https://mutx.dev/install.sh)
+- local dev stack with `make dev-up`
+- infrastructure references in Docker, Terraform, Ansible, and monitoring assets
+
+![MUTX architecture at a glance](docs/assets/readme-architecture.svg)
+
+## Shared Local Config
 
 `mutx` and `mutx tui` reuse the same config shape in `~/.mutx/config.json`:
 
@@ -163,35 +200,9 @@ mutx tui
 }
 ```
 
-## Recent Progress
-
-Recent work in the repository has materially changed what MUTX can show and prove:
-
-- public control-plane demo shipped under `/app`
-- installer handoff simplified and aligned with the assistant-first setup lane
-- OpenClaw provider wizard added across install, CLI, TUI, API sync, and dashboard setup
-- local operator auth bootstrap added for localhost and contributor workflows
-- CLI and TUI centered around one-command setup and assistant inspection
-- dashboard, landing, and docs moved closer to the same operational story
-
-![MUTX architecture at a glance](docs/assets/readme-architecture.svg)
-
-## Repository Map
-
-```text
-mutx-dev/
-├── app/             # Next.js site, app host, and route handlers
-├── cli/             # Python CLI and Textual TUI
-├── docs/            # Setup, architecture, contracts, and troubleshooting
-├── infrastructure/  # Docker, Terraform, Ansible, and monitoring assets
-├── sdk/             # Python SDK
-├── src/api/         # FastAPI control plane
-└── tests/           # API, CLI, and frontend coverage
-```
-
 ## Development
 
-### Local stack
+### Local Stack
 
 ```bash
 make dev-up
@@ -202,7 +213,8 @@ make dev-stop
 Useful local URLs:
 
 - site and app host: `http://localhost:3000`
-- public dashboard demo: `http://localhost:3000/app`
+- dashboard: `http://localhost:3000/dashboard`
+- control demo: `http://localhost:3000/control`
 - API: `http://localhost:8000`
 - API docs: `http://localhost:8000/docs`
 
@@ -211,45 +223,22 @@ Useful local URLs:
 ```bash
 ./scripts/test.sh
 npm run build
-pytest tests/test_cli_auth_and_tui.py tests/test_cli_setup_and_doctor.py
+pytest tests/test_cli_auth_and_tui.py tests/test_cli_setup_and_doctor.py tests/test_docs_drift.py
 ```
 
-## TODO
+## Keep These Close
 
-Near-term contributor priorities are intentionally short and concrete:
+- [Documentation Hub](docs/README.md) for the full docs index
+- [Troubleshooting](docs/troubleshooting/README.md) for common breakpoints and recovery steps
+- [Support](support.md) for escalation paths
+- [Security Policy](security.md) for private disclosure
+- [Hosted docs](https://docs.mutx.dev) for the published GitBook view
 
-- make the authenticated browser dashboard use live control-plane data end to end
-- keep API, CLI, SDK, docs, and public site aligned with the mounted `/v1/*` contract
-- finish durable deployment lifecycle history, events, and rollback posture
-- turn webhook and API-key flows into complete product surfaces with clear operator UX
-- expand local-first route, UI, and integration coverage in CI
+GitBook publication guardrails:
 
-## Documentation
-
-- [docs/README.md](docs/README.md)
-- [docs/deployment/quickstart.md](docs/deployment/quickstart.md)
-- [docs/cli.md](docs/cli.md)
-- [docs/architecture/overview.md](docs/architecture/overview.md)
-- [docs/contracts/api/index.md](docs/contracts/api/index.md)
-- [whitepaper.md](whitepaper.md)
-- [ROADMAP.md](ROADMAP.md)
-
-Hosted documentation: [docs.mutx.dev](https://docs.mutx.dev)
-
-## Contributing
-
-Start with:
-
-- [CONTRIBUTING.md](CONTRIBUTING.md)
-- [docs/project-status.md](docs/project-status.md)
-- [ROADMAP.md](ROADMAP.md)
-
-When docs and code disagree, trust the code first:
-
-- [`src/api/routes/`](src/api/routes)
-- [`app/api/`](app/api)
-- [`cli/`](cli)
-- [`sdk/mutx/`](sdk/mutx)
+- GitHub stays canonical for synced content.
+- GitBook reads `README.md` and `SUMMARY.md` from the repo root through `.gitbook.yaml`.
+- Do not create or rename README pages from the GitBook UI.
 
 ## License
 

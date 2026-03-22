@@ -1,3 +1,8 @@
+---
+description: Private disclosure path and scope for vulnerabilities in MUTX.
+icon: user-shield
+---
+
 # Security Policy
 
 If you find a security issue, please do not open a public GitHub issue.
