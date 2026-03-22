@@ -149,6 +149,7 @@ def test_tui_renders_logged_out_state() -> None:
     assert "No stored CLI auth." in detail
     assert logo == MUTX_ASCII_LOGO
     assert "__  __" in logo
+    assert "/_/\\_\\" in logo
     assert len(logo.splitlines()) == 5
     assert "/v1" in signal
     assert "login required" in signal

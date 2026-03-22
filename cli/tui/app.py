@@ -44,11 +44,11 @@ from cli.setup_wizard import mark_auth_completed, prepare_runtime_state_sync, ru
 
 
 MUTX_ASCII_LOGO = """\
- __  __ _   _ _____ __   __
-|  \\/  | | | |_   _|\\ \\ / /
-| |\\/| | | | | | |   \\ V /
-| |  | | |_| | | |    | |
-|_|  |_|\\___/  |_|    |_|
+ __  __ _   _ _____ __  __
+|  \\/  | | | |_   _|\\ \\/ /
+| |\\/| | | | | | |   \\  /
+| |  | | |_| | | |   /  \\
+|_|  |_|\\___/  |_|  /_/\\_\\
 """
 
 MUTX_OPERATOR_COPY = "control plane for agent infrastructure"
