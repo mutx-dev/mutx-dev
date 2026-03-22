@@ -125,7 +125,7 @@ start_stack() {
   echo -e "\n${YELLOW}Waiting for services to be ready...${NC}"
   wait_for_service "PostgreSQL" 30 "${COMPOSE_CMD_STRING} exec -T postgres pg_isready -U mutx"
   wait_for_service "Redis" 10 "${COMPOSE_CMD_STRING} exec -T redis redis-cli ping"
-  wait_for_service "Backend API" 60 "curl -fsS http://localhost:8000/health"
+  wait_for_service "Backend API" 60 "curl -fsS http://localhost:8000/ready"
   wait_for_service "Frontend" 60 "curl -fsS http://localhost:3000"
 
   show_summary

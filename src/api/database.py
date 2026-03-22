@@ -105,10 +105,14 @@ def build_sync_database_url(database_url: str) -> str:
         )
 
     if base_drivername == "postgres":
-        return url.set(drivername="postgresql", query=query).render_as_string(hide_password=False)
+        return url.set(drivername="postgresql+psycopg", query=query).render_as_string(
+            hide_password=False
+        )
 
     if base_drivername == "postgresql":
-        return url.set(drivername="postgresql", query=query).render_as_string(hide_password=False)
+        return url.set(drivername="postgresql+psycopg", query=query).render_as_string(
+            hide_password=False
+        )
 
     return database_url
 

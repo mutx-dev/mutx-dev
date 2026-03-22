@@ -1,9 +1,10 @@
 
+name: ${MUTX_COMPOSE_PROJECT:-mutx}
+
 services:
   # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
-    container_name: mutx-postgres
     environment:
       POSTGRES_USER: mutx
       POSTGRES_PASSWORD: mutx_password
@@ -23,7 +24,6 @@ services:
   # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: mutx-redis
     ports:
       - "6379:6379"
     volumes:
@@ -42,13 +42,13 @@ services:
       context: ../..
       dockerfile: infrastructure/docker/Dockerfile.api
       target: development
-    container_name: mutx-api
     environment:
       DATABASE_URL: postgresql://mutx:mutx_password@postgres:5432/mutx
       DATABASE_SSL_MODE: disable
+      DATABASE_REQUIRED_ON_STARTUP: "true"
       API_HOST: 0.0.0.0
       API_PORT: 8000
-      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production-123456}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       REDIS_URL: redis://redis:6379/0
@@ -59,16 +59,38 @@ services:
       - ../../src:/app/src
       - ../../requirements.txt:/app/requirements.txt
     depends_on:
+      migrate:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/ready"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
+    networks:
+      - mutx-network
+
+  migrate:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.api
+      target: development
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://mutx:mutx_password@postgres:5432/mutx
+      DATABASE_SSL_MODE: disable
+      DATABASE_REQUIRED_ON_STARTUP: "true"
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production-123456}
+      BACKGROUND_MONITOR_ENABLED: "false"
+      ENVIRONMENT: development
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - mutx-network
 
@@ -78,7 +100,6 @@ services:
       context: ../..
       dockerfile: infrastructure/docker/Dockerfile.frontend
       target: development
-    container_name: mutx-frontend
     environment:
       DATABASE_URL: postgresql://mutx:mutx_password@postgres:5432/mutx
       DATABASE_SSL_MODE: disable

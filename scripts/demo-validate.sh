@@ -5,6 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$ROOT_DIR/infrastructure/docker/docker-compose.yml"
+COMPOSE_PROJECT="${MUTX_COMPOSE_PROJECT:-mutx-demo}"
 
 echo "🚀 Starting MUTX local demo stack for validation..."
 
@@ -15,9 +16,9 @@ if ! command -v docker >/dev/null 2>&1; then
 fi
 
 if docker compose version >/dev/null 2>&1; then
-  COMPOSE_CMD=(docker compose -f "$COMPOSE_FILE")
+  COMPOSE_CMD=(docker compose -p "$COMPOSE_PROJECT" -f "$COMPOSE_FILE")
 elif command -v docker-compose >/dev/null 2>&1; then
-  COMPOSE_CMD=(docker-compose -f "$COMPOSE_FILE")
+  COMPOSE_CMD=(docker-compose -p "$COMPOSE_PROJECT" -f "$COMPOSE_FILE")
 else
   echo "✗ docker compose is required for one-command demo validation."
   echo "  Install Docker Compose or a Docker distribution with compose support."
@@ -34,7 +35,10 @@ if [[ ! -f "$ROOT_DIR/.env" && -f "$ROOT_DIR/.env.example" ]]; then
   cp "$ROOT_DIR/.env.example" "$ROOT_DIR/.env"
 fi
 
-"${COMPOSE_CMD[@]}" up --build -d postgres redis api frontend
+export JWT_SECRET="${JWT_SECRET:-dev-secret-change-in-production-123456}"
+echo "Using Docker project: $COMPOSE_PROJECT"
+"${COMPOSE_CMD[@]}" down --remove-orphans >/dev/null 2>&1 || true
+"${COMPOSE_CMD[@]}" up --build -d postgres redis migrate api frontend
 
 echo "Demo stack booted. Running validation checks (frontend + API)."
 
@@ -48,4 +52,4 @@ node "$ROOT_DIR/scripts/validate-demo.js"
 echo "Stack is running and ready for demo use."
 echo "Frontend: http://localhost:3000"
 echo "API: http://localhost:8000"
-echo "Stop stack later with: docker compose -f infrastructure/docker/docker-compose.yml down"
+echo "Stop stack later with: docker compose -p $COMPOSE_PROJECT -f infrastructure/docker/docker-compose.yml down"

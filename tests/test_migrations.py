@@ -231,6 +231,35 @@ def test_repair_live_auth_schema_drift_repairs_missing_objects(monkeypatch):
     ]
 
 
+def test_user_settings_migration_uses_uuid_user_foreign_key(monkeypatch):
+    module = _load_migration_module(
+        "add_user_settings_table",
+        "7f3e2c1b4a6d_add_user_settings_table.py",
+    )
+
+    captured: dict[str, object] = {}
+
+    def create_table(table_name, *items, **kwargs):
+        captured["table_name"] = table_name
+        captured["items"] = items
+
+    monkeypatch.setattr(module.op, "create_table", create_table)
+    monkeypatch.setattr(module.op, "create_index", lambda *args, **kwargs: None)
+    monkeypatch.setattr(module.op, "f", lambda name: name)
+
+    module.upgrade()
+
+    assert captured["table_name"] == "user_settings"
+    columns = {
+        item.name: item
+        for item in captured["items"]
+        if isinstance(item, sa.Column)
+    }
+
+    assert isinstance(columns["id"].type, sa.UUID)
+    assert isinstance(columns["user_id"].type, sa.UUID)
+
+
 def test_convergence_migration_converts_last_heartbeat_to_utc_aware_on_postgresql(monkeypatch):
     module = _load_migration_module(
         "converge_runtime_schema_repairs",
