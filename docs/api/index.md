@@ -21,7 +21,7 @@ See [authentication.md](./authentication.md) and [api-keys.md](./api-keys.md) fo
 All request bodies should be JSON:
 
 ```bash
-curl -X POST https://api.mutx.dev/auth/login \
+curl -X POST https://api.mutx.dev/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "secret"}'
 ```

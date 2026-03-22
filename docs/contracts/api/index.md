@@ -5,7 +5,7 @@ icon: circle-nodes
 
 # API Overview
 
-The MUTX control plane is a FastAPI application in `src/api/`. Routes are mounted directly at top-level prefixes. There is no global `/v1` backend prefix.
+The MUTX control plane is a FastAPI application in `src/api/`. Public control-plane routes are mounted under `/v1/*`, while root health and readiness probes stay at top-level.
 
 ## Platform Surface Split
 
@@ -27,17 +27,16 @@ The MUTX control plane is a FastAPI application in `src/api/`. Routes are mounte
 | Group                                | Routes                                                                                                                                                                                                                                                                                                                                     |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Root and monitoring                  | `GET /`, `GET /health`, `GET /ready`, `GET /metrics`                                                                                                                                                                                                                                                                                       |
-| Auth                                 | `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `GET /auth/me`, `POST /auth/forgot-password`, `POST /auth/resend-verification`, `POST /auth/verify-email`, `POST /auth/reset-password`                                                                                                               |
-| Agents (control plane)               | `POST /agents`, `GET /agents`, `GET /agents/{agent_id}`, `DELETE /agents/{agent_id}`, `POST /agents/{agent_id}/deploy`, `POST /agents/{agent_id}/stop`, `GET /agents/{agent_id}/logs`, `GET /agents/{agent_id}/metrics`                                                                                                                    |
-| Agent runtime                        | `POST /agents/register`, `POST /agents/heartbeat`, `POST /agents/metrics`, `GET /agents/commands`, `POST /agents/commands/acknowledge`, `POST /agents/logs`, `GET /agents/{agent_id}/status`                                                                                                                                               |
-| Runs and traces                      | `POST /runs`, `GET /runs`, `GET /runs/{run_id}`, `GET /runs/{run_id}/traces`                                                                                                                                                                                                                                                               |
-| Deployments                          | `GET /deployments`, `POST /deployments`, `GET /deployments/{deployment_id}`, `GET /deployments/{deployment_id}/events`, `GET /deployments/{deployment_id}/logs`, `GET /deployments/{deployment_id}/metrics`, `POST /deployments/{deployment_id}/restart`, `POST /deployments/{deployment_id}/scale`, `DELETE /deployments/{deployment_id}` |
-| API keys                             | `GET /api-keys`, `POST /api-keys`, `DELETE /api-keys/{key_id}`, `POST /api-keys/{key_id}/rotate`                                                                                                                                                                                                                                           |
-| Ingestion                            | `POST /ingest/agent-status`, `POST /ingest/deployment`, `POST /ingest/metrics`                                                                                                                                                                                                                                                             |
-| Webhooks (user-managed destinations) | `POST /webhooks/`, `GET /webhooks/`, `GET /webhooks/{webhook_id}`, `PATCH /webhooks/{webhook_id}`, `DELETE /webhooks/{webhook_id}`, `POST /webhooks/{webhook_id}/test`, `GET /webhooks/{webhook_id}/deliveries`                                                                                                                            |
-| Newsletter                           | `GET /newsletter`, `POST /newsletter`                                                                                                                                                                                                                                                                                                      |
-| Leads                                | `POST /leads`, `GET /leads`, `GET /leads/{lead_id}`                                                                                                                                                                                                                                                                                        |
-| ClawHub                              | `POST /clawhub/install`, `GET /clawhub/skills`, `POST /clawhub/uninstall`                                                                                                                                                                                                                                                                  |
+| Auth                                 | `POST /v1/auth/register`, `POST /v1/auth/login`, `POST /v1/auth/refresh`, `POST /v1/auth/logout`, `GET /v1/auth/me`, `POST /v1/auth/forgot-password`, `POST /v1/auth/resend-verification`, `POST /v1/auth/verify-email`, `POST /v1/auth/reset-password`                                                                                   |
+| Agents (control plane)               | `POST /v1/agents`, `GET /v1/agents`, `GET /v1/agents/{agent_id}`, `DELETE /v1/agents/{agent_id}`, `POST /v1/agents/{agent_id}/deploy`, `POST /v1/agents/{agent_id}/stop`, `GET /v1/agents/{agent_id}/logs`, `GET /v1/agents/{agent_id}/metrics`                                                                                           |
+| Agent runtime                        | `POST /v1/agents/register`, `POST /v1/agents/heartbeat`, `POST /v1/agents/metrics`, `GET /v1/agents/commands`, `POST /v1/agents/commands/acknowledge`, `POST /v1/agents/logs`, `GET /v1/agents/{agent_id}/status`                                                                                                                         |
+| Runs and traces                      | `POST /v1/runs`, `GET /v1/runs`, `GET /v1/runs/{run_id}`, `GET /v1/runs/{run_id}/traces`                                                                                                                                                                                                                                                  |
+| Deployments                          | `GET /v1/deployments`, `POST /v1/deployments`, `GET /v1/deployments/{deployment_id}`, `GET /v1/deployments/{deployment_id}/events`, `GET /v1/deployments/{deployment_id}/logs`, `GET /v1/deployments/{deployment_id}/metrics`, `POST /v1/deployments/{deployment_id}/restart`, `POST /v1/deployments/{deployment_id}/scale`, `DELETE /v1/deployments/{deployment_id}` |
+| API keys                             | `GET /v1/api-keys`, `POST /v1/api-keys`, `DELETE /v1/api-keys/{key_id}`, `POST /v1/api-keys/{key_id}/rotate`                                                                                                                                                                                                                               |
+| Ingestion                            | `POST /v1/ingest/agent-status`, `POST /v1/ingest/deployment`, `POST /v1/ingest/metrics`                                                                                                                                                                                                                                                   |
+| Webhooks (user-managed destinations) | `POST /v1/webhooks/`, `GET /v1/webhooks/`, `GET /v1/webhooks/{webhook_id}`, `PATCH /v1/webhooks/{webhook_id}`, `DELETE /v1/webhooks/{webhook_id}`, `POST /v1/webhooks/{webhook_id}/test`, `GET /v1/webhooks/{webhook_id}/deliveries`                                                                                                      |
+| Leads                                | `POST /v1/leads`, `GET /v1/leads`, `GET /v1/leads/{lead_id}`                                                                                                                                                                                                                                                                               |
+| ClawHub                              | `POST /v1/clawhub/install`, `GET /v1/clawhub/skills`, `POST /v1/clawhub/uninstall`                                                                                                                                                                                                                                                        |
 
 ## Auth Model
 
@@ -66,11 +65,11 @@ Use FastAPI routes for direct control-plane integrations and Next.js handlers fo
 ```bash
 BASE_URL=http://localhost:8000
 
-curl -X POST "$BASE_URL/auth/register" \
+curl -X POST "$BASE_URL/v1/auth/register" \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","name":"You","password":"StrongPass1!"}'
 
-curl -X POST "$BASE_URL/auth/login" \
+curl -X POST "$BASE_URL/v1/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"email":"you@example.com","password":"StrongPass1!"}'
 ```
@@ -78,7 +77,7 @@ curl -X POST "$BASE_URL/auth/login" \
 Authenticated requests require a bearer token:
 
 ```bash
-curl "$BASE_URL/auth/me" \
+curl "$BASE_URL/v1/auth/me" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 

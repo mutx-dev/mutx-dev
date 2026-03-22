@@ -11,15 +11,15 @@ The auth flow is the most complete part of the current API surface.
 
 | Route                 | Purpose                                                           |
 | --------------------- | ----------------------------------------------------------------- |
-| `POST /auth/register` | Create a user and return tokens                                   |
-| `POST /auth/login`    | Exchange email and password for tokens                            |
-| `POST /auth/refresh`  | Exchange a refresh token for a new access token and refresh token |
-| `POST /auth/logout`   | Return a success message                                          |
-| `GET /auth/me`        | Return the current user profile                                   |
+| `POST /v1/auth/register` | Create a user and return tokens                                   |
+| `POST /v1/auth/login`    | Exchange email and password for tokens                            |
+| `POST /v1/auth/refresh`  | Exchange a refresh token for a new access token and refresh token |
+| `POST /v1/auth/logout`   | Return a success message                                          |
+| `GET /v1/auth/me`        | Return the current user profile                                   |
 
 ## Password Rules
 
-`POST /auth/register` currently requires passwords that contain:
+`POST /v1/auth/register` currently requires passwords that contain:
 
 * at least 8 characters
 * one uppercase letter
@@ -39,7 +39,7 @@ From `src/api/auth/jwt.py` and `src/api/config.py`:
 ```bash
 BASE_URL=http://localhost:8000
 
-curl -X POST "$BASE_URL/auth/register" \
+curl -X POST "$BASE_URL/v1/auth/register" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "you@example.com",
@@ -62,7 +62,7 @@ Example response:
 ## Login
 
 ```bash
-curl -X POST "$BASE_URL/auth/login" \
+curl -X POST "$BASE_URL/v1/auth/login" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "you@example.com",
@@ -73,7 +73,7 @@ curl -X POST "$BASE_URL/auth/login" \
 ## Refresh
 
 ```bash
-curl -X POST "$BASE_URL/auth/refresh" \
+curl -X POST "$BASE_URL/v1/auth/refresh" \
   -H "Content-Type: application/json" \
   -d '{"refresh_token":"YOUR_REFRESH_TOKEN"}'
 ```
@@ -81,7 +81,7 @@ curl -X POST "$BASE_URL/auth/refresh" \
 ## Current User
 
 ```bash
-curl "$BASE_URL/auth/me" \
+curl "$BASE_URL/v1/auth/me" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
@@ -102,7 +102,7 @@ Example response:
 ## Logout
 
 ```bash
-curl -X POST "$BASE_URL/auth/logout" \
+curl -X POST "$BASE_URL/v1/auth/logout" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 

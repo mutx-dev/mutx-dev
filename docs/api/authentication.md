@@ -9,7 +9,7 @@ MUTX supports JWT-based authentication for user sessions.
 Create a new user account.
 
 ```http
-POST /auth/register
+POST /v1/auth/register
 ```
 
 **Request Body:**
@@ -40,7 +40,7 @@ POST /auth/register
 Authenticate and receive access tokens.
 
 ```http
-POST /auth/login
+POST /v1/auth/login
 ```
 
 **Request Body:**
@@ -69,7 +69,7 @@ POST /auth/login
 Refresh an expired access token.
 
 ```http
-POST /auth/refresh
+POST /v1/auth/refresh
 ```
 
 **Request Body:**
@@ -97,7 +97,7 @@ POST /auth/refresh
 Invalidate the current session.
 
 ```http
-POST /auth/logout
+POST /v1/auth/logout
 ```
 
 **Headers:**
@@ -121,7 +121,7 @@ Authorization: Bearer <access_token>
 Retrieve the authenticated user's profile.
 
 ```http
-GET /auth/me
+GET /v1/auth/me
 ```
 
 **Headers:**
@@ -149,7 +149,7 @@ Authorization: Bearer <access_token>
 Confirm user's email address.
 
 ```http
-POST /auth/verify-email
+POST /v1/auth/verify-email
 ```
 
 **Request Body:**
@@ -167,7 +167,7 @@ POST /auth/verify-email
 Resend the email verification link.
 
 ```http
-POST /auth/resend-verification
+POST /v1/auth/resend-verification
 ```
 
 **Request Body:**
@@ -185,7 +185,7 @@ POST /auth/resend-verification
 Request a password reset email.
 
 ```http
-POST /auth/forgot-password
+POST /v1/auth/forgot-password
 ```
 
 **Request Body:**
@@ -203,7 +203,7 @@ POST /auth/forgot-password
 Reset password using the reset token.
 
 ```http
-POST /auth/reset-password
+POST /v1/auth/reset-password
 ```
 
 **Request Body:**
@@ -221,7 +221,7 @@ Include the access token in the `Authorization` header:
 
 ```bash
 curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
-  https://api.mutx.dev/agents
+  https://api.mutx.dev/v1/agents
 ```
 
 Tokens expire after 1 hour (3600 seconds). Use the refresh token to obtain new access tokens.

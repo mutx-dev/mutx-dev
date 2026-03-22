@@ -3,10 +3,10 @@ class Mutx < Formula
 
   desc "Operator CLI and Textual TUI for the MUTX control plane"
   homepage "https://mutx.dev"
-  url "https://github.com/mutx-dev/mutx-dev/archive/refs/tags/cli-v0.2.0.tar.gz"
-  sha256 "1f864ed99912296e6bd9174a203b15c849bbcbe877fc0701f54202103e074c0a"
+  url "https://github.com/mutx-dev/mutx-dev/archive/refs/tags/cli-v0.2.1.tar.gz"
+  sha256 "b6fc16a429d1d5c48cfeb252a9503faba69fc6a49673b74815a3e940d5fddba2"
   license "MIT"
-  version "0.2.0"
+  version "0.2.1"
 
   depends_on "python@3.12"
 

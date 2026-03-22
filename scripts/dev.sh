@@ -14,6 +14,7 @@ ACTION="${1:-start}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COMPOSE_FILE="$ROOT_DIR/infrastructure/docker/docker-compose.yml"
+COMPOSE_PROJECT="${MUTX_COMPOSE_PROJECT:-mutx}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -39,9 +40,9 @@ require_docker() {
 
 resolve_compose() {
   if docker compose version >/dev/null 2>&1; then
-    COMPOSE_CMD=(docker compose -f "$COMPOSE_FILE")
+    COMPOSE_CMD=(docker compose -p "$COMPOSE_PROJECT" -f "$COMPOSE_FILE")
   elif command -v docker-compose >/dev/null 2>&1; then
-    COMPOSE_CMD=(docker-compose -f "$COMPOSE_FILE")
+    COMPOSE_CMD=(docker-compose -p "$COMPOSE_PROJECT" -f "$COMPOSE_FILE")
   else
     echo -e "${RED}Docker Compose not found.${NC}"
     echo "  Install Docker Compose (\`docker compose\` plugin or \`docker-compose\`) and retry."
@@ -73,12 +74,23 @@ ensure_env() {
 
   JWT_SECRET=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))" 2>/dev/null || openssl rand -base64 24)
   if sed --version >/dev/null 2>&1; then
-    sed -i "s|JWT_SECRET=replace-with-a-stable-secret|JWT_SECRET=$JWT_SECRET|" "$ROOT_DIR/.env"
+    sed -i "s|^JWT_SECRET=.*$|JWT_SECRET=$JWT_SECRET|" "$ROOT_DIR/.env"
   else
-    sed -i '' "s|JWT_SECRET=replace-with-a-stable-secret|JWT_SECRET=$JWT_SECRET|" "$ROOT_DIR/.env"
+    sed -i '' "s|^JWT_SECRET=.*$|JWT_SECRET=$JWT_SECRET|" "$ROOT_DIR/.env"
   fi
 
   echo -e "${GREEN}Created .env with generated JWT_SECRET${NC}"
+}
+
+stack_is_running() {
+  local services
+  services="$("${COMPOSE_CMD[@]}" ps --services --status running 2>/dev/null || true)"
+  for service in postgres redis api frontend; do
+    if ! printf '%s\n' "$services" | grep -qx "$service"; then
+      return 1
+    fi
+  done
+  return 0
 }
 
 wait_for_service() {
@@ -106,6 +118,7 @@ show_summary() {
   echo -e "${GREEN}Local stack is running${NC}"
   echo "========================================"
   echo ""
+  echo -e "  ${BLUE}Compose Project:${NC} $COMPOSE_PROJECT"
   echo -e "  ${BLUE}Frontend:${NC}    http://localhost:3000"
   echo -e "  ${BLUE}Backend API:${NC}  http://localhost:8000"
   echo -e "  ${BLUE}API Docs:${NC}    http://localhost:8000/docs"
@@ -119,6 +132,12 @@ show_summary() {
 }
 
 start_stack() {
+  if stack_is_running; then
+    echo -e "\n${GREEN}Existing local stack detected for project ${COMPOSE_PROJECT}; reusing it.${NC}"
+    show_summary
+    return
+  fi
+
   echo -e "\n${BLUE}Building and starting all services...${NC}"
   "${COMPOSE_CMD[@]}" up --build -d
 
