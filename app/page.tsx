@@ -243,7 +243,7 @@ export default function LandingPage() {
                       fill
                       sizes="(max-width: 1280px) 100vw, 44rem"
                       className="site-hero-art-cover"
-                      style={{ objectPosition: "center 58%" }}
+                      style={{ objectPosition: "center 34%" }}
                     />
                   </div>
                 </article>
