@@ -16,6 +16,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Root CLI distribution versioning now tracks the root `pyproject.toml` and `cli-vX.Y.Z` tags
 - CLI docs, quickstart, and debugging notes now reflect the `/v1/*` API contract and the TUI install flow
 
+## [1.1.0] - 2026-03-22
+
+### Added
+- MUTX-owned installer and setup wizard that keeps the first-run flow inside the MUTX shell instead of bouncing users through raw subprocess prompts
+- OpenClaw provider runtime support across the installer, CLI, TUI, API snapshot sync, and dashboard setup surfaces
+- Local runtime registry under `~/.mutx/providers/openclaw` for tracked manifests, bindings, wizard state, and pointer files to upstream OpenClaw assets
+- Assistant-first runtime commands such as `mutx runtime list`, `mutx runtime inspect openclaw`, and `mutx runtime open openclaw --surface tui|configure`
+- Managed localhost control-plane bootstrap under `~/.mutx/runtime/local-control` for the Docker-backed local lane
+- Provider-aware onboarding and runtime snapshot APIs for surfacing honest last-seen local state in hosted control-plane views
+- Demo validation coverage for the real Docker-backed stack boot path
+
+### Changed
+- Quickstart now centers a single primary install command: `curl -fsSL https://mutx.dev/install.sh | bash`
+- Hosted and local setup both run through the same assistant-first bootstrap path, with OpenClaw install, import, onboarding, tracking, binding, deploy, and verification steps
+- The TUI now prefers the control-plane workflow after setup and uses a smaller MUTX banner plus calmer first-run surfaces
+- Landing page, quickstart copy, and dashboard setup screens now explain the OpenClaw flow as a MUTX-managed provider experience instead of a loose external prerequisite
+- CLI release and packaging expectations now align around the root Python distribution, `cli-vX.Y.Z` tags, and a third-party Homebrew tap
+
+### Fixed
+- Local Docker demo boot no longer collides with stale fixed container names; the stack now uses project-scoped compose names
+- Demo validation now applies Alembic migrations before API readiness checks and waits on `/ready` instead of a weaker health probe
+- API migration boot now uses the correct sync PostgreSQL driver path for `psycopg`
+- The `user_settings` migration now matches the real UUID user schema instead of creating an invalid foreign-key type mismatch in PostgreSQL
+- Local development JWT defaults now satisfy runtime validation so the demo stack can boot without manual secret patching
+- Installer, local bootstrap, and OpenClaw tracking flows now produce cleaner recovery behavior when existing local state is present
+
+### Notes
+- Current repository footprint: 1,352 commits, 741 tracked files, 25 FastAPI route modules, 86 CLI/TUI files, and 246 test files in this checkout.
+- `v1.1` is meant to describe the real shipped operator surface in the repo today, not just the short delta from the previous `v1` release note.
+
 ## [1.0.0] - 2024-01-01
 
 ### Added
@@ -70,7 +100,7 @@ This project uses [Semantic Versioning](https://semver.org/). Given a version nu
 | Component | Current Version | Location |
 |-----------|-----------------|----------|
 | Frontend/App | 1.0.0 | `package.json` |
-| CLI distribution | 0.2.0 | root `pyproject.toml` |
+| CLI distribution | 0.2.1 | root `pyproject.toml` |
 | Python SDK | 0.1.0 | `sdk/pyproject.toml` |
 | API | Matches frontend | `package.json` |
 

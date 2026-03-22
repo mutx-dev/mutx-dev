@@ -47,11 +47,11 @@ The CLI version source of truth is the root `pyproject.toml` version.
 python -m build
 git checkout main
 git pull --ff-only origin main
-git tag -a cli-v0.2.0 -m "MUTX CLI v0.2.0"
-git push origin cli-v0.2.0
+git tag -a cli-v0.2.1 -m "MUTX CLI v0.2.1"
+git push origin cli-v0.2.1
 ```
 
-Publish GitHub release notes from the `cli-v0.2.0` tag and include:
+Publish GitHub release notes from the `cli-v0.2.1` tag and include:
 
 * install notes for `pip install -e ".[tui]"`
 * operator-facing TUI changes

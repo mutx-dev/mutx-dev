@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mutx"
-version = "0.2.0"
+version = "0.2.1"
 description = "CLI for mutx.dev - Deploy and manage agents"
 readme = "README.md"
 requires-python = ">=3.10"
