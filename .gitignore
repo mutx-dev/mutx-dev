@@ -9,6 +9,16 @@ public/_next/
 dist/
 build/
 tsconfig.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/
+.eslintcache
+.pnpm-store/
+.yarn/
+.turbo/
+.cache/
+.parcel-cache/
 
 # Python
 __pycache__/
@@ -16,16 +26,25 @@ __pycache__/
 *.pyo
 *.pyd
 .venv/
+.venv*/
 env/
 venv/
+venv*/
 ENV/
 .pytest_cache/
 .ruff_cache/
 .coverage
+.coverage.*
+.python-version
 htmlcov/
 *.egg-info/
 .mypy_cache/
 .tox/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
 
 # Infrastructure
 infrastructure/terraform/*.backup
@@ -37,6 +56,8 @@ infrastructure/terraform/*.backup
 *.tfvars
 *.tfvars.json
 .terraform.lock.hcl
+# Runtime/tooling workspace
+.minimax/
 
 # Archives and Docs
 archive/
