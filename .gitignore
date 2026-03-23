@@ -19,6 +19,7 @@ coverage/
 .turbo/
 .cache/
 .parcel-cache/
+.minimax/skills
 
 # Python
 __pycache__/
