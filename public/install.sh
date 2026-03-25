@@ -17,7 +17,15 @@ export HOMEBREW_NO_INSTALL_FROM_API="${HOMEBREW_NO_INSTALL_FROM_API:-1}"
 export HOMEBREW_NO_INSTALLED_HOST_CHECK="${HOMEBREW_NO_INSTALLED_HOST_CHECK:-1}"
 
 MUTX_INSTALL_TIMEOUT="${MUTX_INSTALL_TIMEOUT:-1200}"
-if command -v timeout >/dev/null 2>&1; then
+_start_watchdog() {
+  ( sleep "${MUTX_INSTALL_TIMEOUT}" && kill -USR1 $$ 2>/dev/null ) &
+  WATCHDOG_PID=$!
+}
+if command -v gtimeout >/dev/null 2>&1; then
+  gtimeout "${MUTX_INSTALL_TIMEOUT}" perl -e 'sleep $ARGV[0]' "${MUTX_INSTALL_TIMEOUT}" 2>/dev/null &
+  ( sleep "${MUTX_INSTALL_TIMEOUT}" && kill -USR1 $$ 2>/dev/null ) &
+  WATCHDOG_PID=$!
+elif command -v timeout >/dev/null 2>&1; then
   ( sleep "${MUTX_INSTALL_TIMEOUT}" && kill -USR1 $$ 2>/dev/null ) &
   WATCHDOG_PID=$!
 fi
@@ -135,11 +143,36 @@ timeout_watchdog() {
 run_with_timeout() {
   local timeout_secs="${1:-30}"
   shift
+
+  if command -v gtimeout >/dev/null 2>&1; then
+    command gtimeout "${timeout_secs}" "$@"
+    return $?
+  fi
+
   if command -v timeout >/dev/null 2>&1; then
     command timeout "${timeout_secs}" "$@"
-  else
-    "$@"
+    return $?
   fi
+
+  if command -v perl >/dev/null 2>&1; then
+    perl -e 'use IO::Handle; use IPC::Open3; use Symbol qw gensh; my $pid = open3(my $in, my $out, my $err, @ARGV); local $SIG{ALRM} = sub { kill TERM => $pid; die "timeout" }; alarm '"${timeout_secs}"'; waitpid($pid, 0); my $rc = $? >> 8; exit $rc' -- "$@"
+    return $?
+  fi
+
+  "$@" &
+  local cmd_pid=$!
+  (
+    sleep "${timeout_secs}"
+    kill -TERM "${cmd_pid}" 2>/dev/null || true
+    sleep 2
+    kill -KILL "${cmd_pid}" 2>/dev/null || true
+  ) &
+  local killer_pid=$!
+  wait "${cmd_pid}"
+  local rc=$?
+  kill "${killer_pid}" 2>/dev/null || true
+  wait "${killer_pid}" 2>/dev/null || true
+  return "${rc}"
 }
 
 trap cleanup EXIT
@@ -944,6 +977,14 @@ dashboard_render_hosted_creds() {
   dashboard_put_line "${row}" 3 "${C_GOOD}✓${C_RESET} ready for setup"
   row=$((row + 2))
 
+  if [[ -n "${WIZARD_ERROR}" ]]; then
+    while IFS= read -r message_line; do
+      dashboard_put_line "${row}" 3 "${C_WARN}${message_line}${C_RESET}"
+      row=$((row + 1))
+    done < <(wrap_text "${WIZARD_ERROR}" "${wrap_width}")
+    row=$((row + 1))
+  fi
+
   if [[ -n "${hint_text}" ]]; then
     while IFS= read -r message_line; do
       dashboard_put_line "${row}" 3 "${C_SOFT}${message_line}${C_RESET}"
@@ -1253,7 +1294,7 @@ resolve_python_bin() {
 }
 
 check_brew_upgrade_needed() {
-  local dry_run_output=""
+  local outdated_output=""
   BREW_UPGRADE_NEEDED=""
 
   if ! brew list --versions "${FORMULA}" >/dev/null 2>&1; then
@@ -1261,8 +1302,8 @@ check_brew_upgrade_needed() {
     return 0
   fi
 
-  dry_run_output="$(run_with_timeout 60 brew upgrade --dry-run "${FORMULA}" 2>&1 || true)"
-  if [[ "${dry_run_output}" == *"Already up-to-date"* ]] || [[ -z "${dry_run_output}" ]]; then
+  outdated_output="$(run_with_timeout 30 brew outdated --quiet "${FORMULA}" 2>&1 || true)"
+  if [[ -z "${outdated_output}" ]]; then
     BREW_UPGRADE_NEEDED="no"
     return 0
   fi
@@ -1307,29 +1348,13 @@ check_command_group() {
   local group_name="$1"
   shift
   local -a cmds=("$@")
-  local help_text=""
-  local cmd=""
   local result=0
+  local cmd=""
+  local -a parts=()
 
   if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
     SURFACE_CHECK_CURRENT_CMD="${group_name}"
     dashboard_render
-  fi
-
-  help_text="$("${MUTX_BIN}" --help 2>&1 || true)"
-  if [[ -z "${help_text}" ]]; then
-    for cmd in "${cmds[@]}"; do
-      if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-        SURFACE_CHECK_PROGRESS=$((SURFACE_CHECK_PROGRESS + 1))
-        SURFACE_CHECK_CURRENT_CMD="${cmd}"
-        dashboard_render
-      fi
-      if ! "${MUTX_BIN}" "${cmd}" --help >/dev/null 2>&1; then
-        CLI_MISSING_COMMANDS="${CLI_MISSING_COMMANDS}; ${cmd}"
-        result=1
-      fi
-    done
-    return "${result}"
   fi
 
   for cmd in "${cmds[@]}"; do
@@ -1338,7 +1363,10 @@ check_command_group() {
       SURFACE_CHECK_CURRENT_CMD="${cmd}"
       dashboard_render
     fi
-    if ! "${MUTX_BIN}" "${cmd}" --help >/dev/null 2>&1; then
+
+    parts=()
+    read -r -a parts <<< "${cmd}"
+    if ! "${MUTX_BIN}" "${parts[@]}" --help >/dev/null 2>&1; then
       CLI_MISSING_COMMANDS="${CLI_MISSING_COMMANDS}; ${cmd}"
       result=1
     fi
@@ -1368,6 +1396,7 @@ check_assistant_first_surface() {
   local -a runtime_cmds=( "runtime" "runtime inspect" "runtime open" )
   local -a extended_cmds=( "governance" "governance status" "observability" "observability runs" "security" "update" )
 
+  CLI_MISSING_COMMANDS=""
   SURFACE_CHECK_TOTAL=0
   SURFACE_CHECK_PROGRESS=0
   SURFACE_CHECK_CURRENT_CMD="starting..."
@@ -1653,15 +1682,17 @@ run_setup_handoff() {
   if [[ "${WIZARD_SELECTION}" == "1" || "${WIZARD_SELECTION}" == "h" || "${WIZARD_SELECTION}" == "H" || "${WIZARD_SELECTION}" == "hosted" || "${WIZARD_SELECTION}" == "Hosted" ]]; then
     WIZARD_VISIBLE=0
     WIZARD_HINT="Hosted keeps the control plane managed. Sign in here, then MUTX continues into the OpenClaw wizard."
-    WIZARD_PROMPT_LABEL="Email"
 
+    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+      dashboard_render_hosted_creds
+      printf '\033[%d;%dH%bEmail:%b ' 13 3 "${C_BOLD}" "${C_RESET}" > /dev/tty
+      PROMPT_CURSOR_ROW=13
+      PROMPT_CURSOR_COL=$((3 + 7))
+    fi
+
+    WIZARD_PROMPT_LABEL="Email"
     while [[ -z "${hosted_email}" ]]; do
-      if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-        dashboard_render_hosted_creds
-        printf '\033[%d;%dH%bEmail:%b ' 10 3 "${C_BOLD}" "${C_RESET}" > /dev/tty
-        PROMPT_CURSOR_ROW=10
-        PROMPT_CURSOR_COL=$((3 + 7))
-      else
+      if [[ "${DASHBOARD_ACTIVE}" != "1" ]]; then
         tty_print "\n${C_SOFT}${WIZARD_HINT}${C_RESET}\n"
         tty_prompt "${WIZARD_PROMPT_LABEL}"
       fi
@@ -1673,22 +1704,38 @@ run_setup_handoff() {
       else
         WIZARD_ERROR=""
       fi
+      if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+        dashboard_render_hosted_creds
+        printf '\033[%d;%dH%bEmail:%b ' 13 3 "${C_BOLD}" "${C_RESET}" > /dev/tty
+        PROMPT_CURSOR_ROW=13
+        PROMPT_CURSOR_COL=$((3 + 7))
+      fi
     done
+
+    WIZARD_ERROR=""
+    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+      dashboard_render_hosted_creds
+      printf '\033[%d;%dH%bPassword:%b ' 15 3 "${C_BOLD}" "${C_RESET}" > /dev/tty
+      PROMPT_CURSOR_ROW=15
+      PROMPT_CURSOR_COL=$((3 + 11))
+    fi
 
     WIZARD_PROMPT_LABEL="Password"
     while [[ -z "${hosted_password}" ]]; do
-      if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-        dashboard_render_hosted_creds
-        printf '\033[%d;%dH%bPassword:%b ' 12 3 "${C_BOLD}" "${C_RESET}" > /dev/tty
-        PROMPT_CURSOR_ROW=12
-        PROMPT_CURSOR_COL=$((3 + 11))
+      if [[ "${DASHBOARD_ACTIVE}" != "1" ]]; then
+        tty_prompt "${WIZARD_PROMPT_LABEL}"
       fi
-      tty_prompt "${WIZARD_PROMPT_LABEL}"
       read_tty_secret hosted_password
       if [[ -z "${hosted_password}" ]]; then
         WIZARD_ERROR="Password is required for the Hosted lane."
       else
         WIZARD_ERROR=""
+      fi
+      if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+        dashboard_render_hosted_creds
+        printf '\033[%d;%dH%bPassword:%b ' 15 3 "${C_BOLD}" "${C_RESET}" > /dev/tty
+        PROMPT_CURSOR_ROW=15
+        PROMPT_CURSOR_COL=$((3 + 11))
       fi
     done
 
@@ -1773,7 +1820,19 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 
 ui_stage "Preparing environment"
-run_stage "Syncing package lane" run_with_timeout 120 brew tap "${TAP}"
+if brew tap | grep -qx "${TAP}"; then
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    CURRENT_STEP_LABEL="Package lane"
+    CURRENT_STEP_STATE="done"
+    CURRENT_STEP_DETAIL="Already tapped."
+    success "Package lane already synced"
+    dashboard_render
+  else
+    success "Package lane already synced"
+  fi
+else
+  run_stage "Syncing package lane" run_with_timeout 120 brew tap "${TAP}"
+fi
 
 ui_stage "Installing MUTX runtime"
 check_brew_upgrade_needed
