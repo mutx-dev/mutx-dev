@@ -11,6 +11,7 @@ FROM python:3.11-slim AS base
 WORKDIR /app
 
 # Install system dependencies (common for all stages)
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     libpq-dev \
@@ -26,6 +27,7 @@ WORKDIR /app
 
 # Copy only requirements first for better caching
 COPY requirements.txt .
+# hadolint ignore=DL3013
 RUN pip install --no-cache-dir --upgrade pip wheel && \
     pip install --no-cache-dir -r requirements.txt
 
@@ -60,7 +62,7 @@ ENV ENVIRONMENT=production
 
 EXPOSE 8000
 
-CMD sh -c "pip install psycopg2-binary alembic -q 2>/dev/null; alembic upgrade head && uvicorn src.api.main:app --host 0.0.0.0 --port 8000"
+CMD ["sh", "-c", "alembic upgrade head && uvicorn src.api.main:app --host 0.0.0.0 --port 8000"]
 
 # -----------------------------------------------------------------------------
 # Stage 5: Development - With hot reload
