@@ -26,15 +26,35 @@
     },
     "files": [
       "desktop/**/*",
+      "package.json",
+      ".next/**/*",
       "package.json"
     ],
+    "extraMetadata": {
+      "main": "desktop/main.cjs"
+    },
     "mac": {
       "category": "public.app-category.developer-tools",
       "target": [
-        "dmg",
-        "zip"
-      ]
-    }
+        {
+          "target": "dmg",
+          "arch": ["arm64", "x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["arm64"]
+        }
+      ],
+      "icon": "public/icon.png",
+      "minimumSystemVersion": "10.15",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "desktop/entitlements.plist",
+      "entitlementsInherit": "desktop/entitlements.plist"
+    },
+    "afterSign": "desktop/scripts/notarize.js",
+    "asar": true,
+    "compression": "maximum"
   },
   "dependencies": {
     "@capacitor/android": "^8.2.0",
