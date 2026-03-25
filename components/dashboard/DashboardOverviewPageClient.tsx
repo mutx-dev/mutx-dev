@@ -14,6 +14,7 @@ import {
   LiveStatCard,
   asDashboardStatus,
   formatCurrency,
+  formatDateTime,
   formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
@@ -32,6 +33,38 @@ type WebhookSummary = {
   events: string[];
   is_active: boolean;
   created_at: string;
+};
+
+type OpenClawBinding = {
+  assistant_id?: string | null;
+  assistant_name?: string | null;
+  workspace?: string | null;
+  model?: string | null;
+};
+
+type OpenClawRuntimeSnapshot = {
+  label: string;
+  status: string;
+  gateway_url?: string | null;
+  binary_path?: string | null;
+  privacy_summary?: string | null;
+  last_seen_at?: string | null;
+  last_synced_at?: string | null;
+  binding_count: number;
+  bindings: OpenClawBinding[];
+  current_binding?: OpenClawBinding | null;
+  stale: boolean;
+  keys_remain_local?: boolean;
+};
+
+type OpenClawOnboardingState = {
+  status: string;
+  current_step: string;
+  assistant_id?: string | null;
+  assistant_name?: string | null;
+  workspace?: string | null;
+  gateway_url?: string | null;
+  last_error?: string | null;
 };
 
 function summarizeRunHealth(runs: Run[]) {
@@ -55,6 +88,8 @@ export function DashboardOverviewPageClient() {
   const [webhooks, setWebhooks] = useState<WebhookSummary[]>([]);
   const [budget, setBudget] = useState<Budget | null>(null);
   const [health, setHealth] = useState<Record<string, unknown> | null>(null);
+  const [openclawRuntime, setOpenclawRuntime] = useState<OpenClawRuntimeSnapshot | null>(null);
+  const [openclawOnboarding, setOpenclawOnboarding] = useState<OpenClawOnboardingState | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -73,6 +108,8 @@ export function DashboardOverviewPageClient() {
           readJson<unknown>("/api/webhooks"),
           readJson<Budget>("/api/dashboard/budgets"),
           readJson<unknown>("/api/dashboard/health"),
+          readJson<OpenClawRuntimeSnapshot>("/api/dashboard/runtime/providers/openclaw"),
+          readJson<OpenClawOnboardingState>("/api/dashboard/onboarding?provider=openclaw"),
         ]);
 
         const authFailure = results.find(
@@ -102,6 +139,8 @@ export function DashboardOverviewPageClient() {
           webhooksResult,
           budgetResult,
           healthResult,
+          runtimeResult,
+          onboardingResult,
         ] = results as [
           PromiseFulfilledResult<unknown>,
           PromiseFulfilledResult<unknown>,
@@ -110,6 +149,8 @@ export function DashboardOverviewPageClient() {
           PromiseFulfilledResult<unknown>,
           PromiseFulfilledResult<Budget>,
           PromiseFulfilledResult<unknown>,
+          PromiseFulfilledResult<OpenClawRuntimeSnapshot>,
+          PromiseFulfilledResult<OpenClawOnboardingState>,
         ];
 
         if (!cancelled) {
@@ -122,6 +163,8 @@ export function DashboardOverviewPageClient() {
           setWebhooks(normalizeCollection<WebhookSummary>(webhooksResult.value, ["webhooks", "items", "data"]));
           setBudget(budgetResult.value);
           setHealth((healthResult.value as Record<string, unknown>) ?? null);
+          setOpenclawRuntime(runtimeResult.value);
+          setOpenclawOnboarding(onboardingResult.value);
           setLoading(false);
         }
       } catch (loadError) {
@@ -146,6 +189,25 @@ export function DashboardOverviewPageClient() {
   const liveAgents = agents.filter((agent) => ["running", "healthy"].includes(agent.status));
   const activeWebhooks = webhooks.filter((webhook) => webhook.is_active);
   const healthStatus = typeof health?.status === "string" ? health.status : "unknown";
+  const openclawBinding =
+    openclawRuntime?.current_binding ??
+    openclawRuntime?.bindings?.[0] ??
+    (openclawOnboarding?.assistant_name ||
+    openclawOnboarding?.assistant_id ||
+    openclawOnboarding?.workspace
+      ? {
+          assistant_id: openclawOnboarding?.assistant_id,
+          assistant_name: openclawOnboarding?.assistant_name,
+          workspace: openclawOnboarding?.workspace,
+        }
+      : null);
+  const hasOpenClawRuntime = Boolean(
+    openclawBinding ||
+      openclawRuntime?.binary_path ||
+      openclawRuntime?.gateway_url ||
+      openclawOnboarding?.gateway_url,
+  );
+  const openclawStatus = openclawRuntime?.status ?? openclawOnboarding?.status ?? "unknown";
 
   if (loading) {
     return <LiveLoading title="Overview" />;
@@ -260,6 +322,98 @@ export function DashboardOverviewPageClient() {
         </div>
 
         <div className="grid gap-4">
+          <LivePanel title="OpenClaw runtime" meta="tracked provider">
+            {hasOpenClawRuntime ? (
+              <div className="grid gap-3">
+                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 text-slate-300">
+                        <Bot className="h-4 w-4 text-cyan-300" />
+                        <span className="text-sm font-medium">OpenClaw instance</span>
+                      </div>
+                      <p className="mt-3 truncate text-xl font-semibold text-white">
+                        {openclawBinding?.assistant_name ?? openclawRuntime?.label ?? "OpenClaw"}
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-slate-400">
+                        {openclawBinding?.workspace
+                          ? `Workspace ${openclawBinding.workspace} is bound into the operator surface.`
+                          : openclawRuntime?.privacy_summary ??
+                            "The dashboard is showing the last synced OpenClaw runtime snapshot from the operator host."}
+                      </p>
+                    </div>
+                    <StatusBadge status={asDashboardStatus(openclawStatus)} label={openclawStatus} />
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      Assistant
+                    </p>
+                    <p className="mt-2 break-all text-sm text-white">
+                      {openclawBinding?.assistant_id ?? openclawBinding?.assistant_name ?? "Not bound"}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      {openclawRuntime?.binding_count ?? 0} tracked binding{openclawRuntime?.binding_count === 1 ? "" : "s"}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      Workspace
+                    </p>
+                    <p className="mt-2 break-all text-sm text-white">
+                      {openclawBinding?.workspace ?? openclawOnboarding?.workspace ?? "Not recorded"}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      {openclawBinding?.model ?? "Model metadata syncs when the binding is available."}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      Gateway
+                    </p>
+                    <p className="mt-2 break-all text-sm text-white">
+                      {openclawRuntime?.gateway_url ?? openclawOnboarding?.gateway_url ?? "Not recorded"}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      {openclawRuntime?.keys_remain_local
+                        ? "Keys remain local to the operator host."
+                        : "Gateway metadata is synced from the last known runtime snapshot."}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      Sync state
+                    </p>
+                    <p className="mt-2 text-sm text-white">
+                      {formatDateTime(openclawRuntime?.last_synced_at ?? openclawRuntime?.last_seen_at)}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      {openclawRuntime?.stale
+                        ? `Snapshot is stale. Setup is waiting on ${openclawOnboarding?.current_step ?? "resync"}.`
+                        : "Snapshot is fresh enough for the current dashboard session."}
+                    </p>
+                  </div>
+                </div>
+
+                {openclawOnboarding?.last_error ? (
+                  <div className="rounded-xl border border-amber-300/20 bg-amber-300/10 p-4 text-sm text-amber-100">
+                    {openclawOnboarding.last_error}
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <LiveEmptyState
+                title="No OpenClaw runtime synced yet"
+                message="Once the operator host imports or resyncs OpenClaw, the bound instance will surface here immediately after sign-in."
+              />
+            )}
+          </LivePanel>
+
           <LivePanel title="Live alerts" meta={`${alerts.length} items`}>
             {alerts.length === 0 ? (
               <LiveEmptyState

@@ -12,7 +12,10 @@ import {
   Wallet,
 } from "lucide-react";
 
-import type { DemoSection } from "@/components/dashboard/demo/demoSections";
+import {
+  getDemoSectionHref,
+  type DemoSection,
+} from "@/components/dashboard/demo/demoSections";
 
 export type Tone = "healthy" | "warning" | "critical" | "focus" | "neutral";
 
@@ -95,16 +98,16 @@ export type QuickAction = {
 };
 
 export const NAV_ITEMS: DemoNavItem[] = [
-  { key: "overview", label: "Overview", href: "/", icon: ShieldCheck },
-  { key: "agents", label: "Agents", href: "/agents", icon: Bot },
-  { key: "deployments", label: "Deployments", href: "/deployments", icon: Layers3 },
-  { key: "runs", label: "Runs", href: "/runs", icon: Play },
-  { key: "environments", label: "Environments", href: "/environments", icon: Globe },
-  { key: "access", label: "Access", href: "/access", icon: KeyRound },
-  { key: "connectors", label: "Connectors", href: "/connectors", icon: Webhook },
-  { key: "audit", label: "Audit", href: "/audit", icon: Workflow },
-  { key: "usage", label: "Usage", href: "/usage", icon: Wallet },
-  { key: "settings", label: "Settings", href: "/settings", icon: Settings2 },
+  { key: "overview", label: "Overview", href: getDemoSectionHref("overview"), icon: ShieldCheck },
+  { key: "agents", label: "Agents", href: getDemoSectionHref("agents"), icon: Bot },
+  { key: "deployments", label: "Deployments", href: getDemoSectionHref("deployments"), icon: Layers3 },
+  { key: "runs", label: "Runs", href: getDemoSectionHref("runs"), icon: Play },
+  { key: "environments", label: "Environments", href: getDemoSectionHref("environments"), icon: Globe },
+  { key: "access", label: "Access", href: getDemoSectionHref("access"), icon: KeyRound },
+  { key: "connectors", label: "Connectors", href: getDemoSectionHref("connectors"), icon: Webhook },
+  { key: "audit", label: "Audit", href: getDemoSectionHref("audit"), icon: Workflow },
+  { key: "usage", label: "Usage", href: getDemoSectionHref("usage"), icon: Wallet },
+  { key: "settings", label: "Settings", href: getDemoSectionHref("settings"), icon: Settings2 },
 ];
 
 export const SECTION_META: Record<

@@ -1,5 +1,12 @@
-import { AuthHoldScreen } from "@/components/auth/AuthHoldScreen";
+import { AuthPage } from "@/components/auth/AuthPage";
 
-export default function RegisterPage() {
-  return <AuthHoldScreen mode="register" />;
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const nextPath = Array.isArray(params.next) ? params.next[0] : params.next;
+
+  return <AuthPage mode="register" nextPath={nextPath} />;
 }

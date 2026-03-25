@@ -108,7 +108,9 @@ export function AuthNav() {
               >
                 Docs
               </a>
-              <ComingSoonButton>Dashboard soon</ComingSoonButton>
+              <Link href="/dashboard" className="site-button-secondary">
+                Dashboard
+              </Link>
             </>
           )}
         </div>

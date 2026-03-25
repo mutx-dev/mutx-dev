@@ -11,7 +11,7 @@ const ibmPlexSans = IBM_Plex_Sans({
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: "https://app.mutx.dev",
+    canonical: "https://app.mutx.dev/control",
   },
   metadataBase: new URL("https://app.mutx.dev"),
   title: "MUTX Control Plane",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "MUTX Control Plane",
     description: "Operator-grade control plane for deploying, observing, and governing agent infrastructure.",
-    url: "https://app.mutx.dev",
+    url: "https://app.mutx.dev/control",
   },
   twitter: {
     title: "MUTX Control Plane",
