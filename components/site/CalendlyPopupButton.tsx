@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import Turnstile, { type BoundTurnstileObject } from "react-turnstile";
 
 import { cn } from "@/lib/utils";
 
@@ -84,13 +85,57 @@ export function CalendlyPopupButton({
   fallbackClassName,
   ariaLabel = "Book a call with MUTX",
 }: CalendlyPopupButtonProps) {
+  const [showChallenge, setShowChallenge] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [turnstileSiteKey, setTurnstileSiteKey] = useState("");
+  const [loadingSiteKey, setLoadingSiteKey] = useState(true);
+  const turnstileRef = useRef<BoundTurnstileObject | null>(null);
+
   useEffect(() => {
     void ensureCalendlyLoaded().catch(() => {
       // Fall back to a normal tab open if the widget script fails.
     });
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadTurnstileSiteKey() {
+      try {
+        const response = await fetch("/api/turnstile/site-key", {
+          cache: "no-store",
+        });
+        const payload = await response.json();
+        const nextSiteKey =
+          typeof payload.siteKey === "string" ? payload.siteKey.trim() : "";
+
+        if (!cancelled) {
+          setTurnstileSiteKey(nextSiteKey);
+        }
+      } catch {
+        if (!cancelled) {
+          setTurnstileSiteKey("");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingSiteKey(false);
+        }
+      }
+    }
+
+    void loadTurnstileSiteKey();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   async function handleClick() {
+    if (!captchaToken) {
+      setShowChallenge(true);
+      return;
+    }
+
     try {
       await ensureCalendlyLoaded();
       window.Calendly?.initPopupWidget({ url: CALENDLY_URL });
@@ -99,12 +144,60 @@ export function CalendlyPopupButton({
     }
   }
 
+  function handleTurnstileVerify(token: string, boundTurnstile: BoundTurnstileObject) {
+    turnstileRef.current = boundTurnstile;
+    setCaptchaToken(token);
+    void ensureCalendlyLoaded()
+      .then(() => {
+        window.Calendly?.initPopupWidget({ url: CALENDLY_URL });
+      })
+      .catch(() => {
+        window.open(CALENDLY_URL, "_blank", "noopener,noreferrer");
+      });
+    setShowChallenge(false);
+  }
+
+  function handleTurnstileError(_error?: unknown, boundTurnstile?: BoundTurnstileObject) {
+    turnstileRef.current = boundTurnstile ?? null;
+    setCaptchaToken(null);
+    setShowChallenge(false);
+  }
+
+  function handleTurnstileExpire(_token: string, boundTurnstile?: BoundTurnstileObject) {
+    turnstileRef.current = boundTurnstile ?? null;
+    setCaptchaToken(null);
+  }
+
+  if (showChallenge && turnstileSiteKey) {
+    return (
+      <div className={cn(fallbackClassName, className)}>
+        <Turnstile
+          action="book-call"
+          appearance="always"
+          className="min-h-[65px]"
+          fixedSize
+          onError={handleTurnstileError}
+          onExpire={handleTurnstileExpire}
+          onLoad={(_, boundTurnstile) => {
+            turnstileRef.current = boundTurnstile ?? null;
+          }}
+          onVerify={handleTurnstileVerify}
+          refreshExpired="auto"
+          sitekey={turnstileSiteKey}
+          size="flexible"
+          theme="auto"
+        />
+      </div>
+    );
+  }
+
   return (
     <button
       type="button"
       onClick={handleClick}
       aria-label={ariaLabel}
       className={cn(fallbackClassName, className)}
+      disabled={loadingSiteKey && !turnstileSiteKey}
     >
       {children}
     </button>
