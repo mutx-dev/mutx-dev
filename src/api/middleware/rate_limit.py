@@ -36,7 +36,24 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     @staticmethod
     def _fingerprint(value: str) -> str:
+        """Create a truncated pseudonymized fingerprint for rate limiting.
+
+        Uses SHA-256 for one-way hashing of API tokens for rate limit bucketing.
+        This is NOT for password hashing - it's just to prevent rate limit
+        bypass through token enumeration while keeping keys pseudonymous.
+        """
         return hashlib.sha256(value.encode()).hexdigest()[:24]
+
+    @staticmethod
+    def _mask_client_for_logging(client_id: str) -> str:
+        """Mask identifying parts of client_id for safe logging."""
+        if client_id.startswith("ip:"):
+            return "ip:***"
+        if client_id.startswith("api_key:"):
+            parts = client_id.split(":", 2)
+            if len(parts) >= 2:
+                return f"{parts[0]}:{parts[1][:8]}***"
+        return client_id[:16] + "***" if len(client_id) > 16 else "***"
 
     def _extract_api_key_token(self, request: Request) -> str | None:
         x_api_key = request.headers.get("X-API-Key")
@@ -97,7 +114,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             retry_after = self.window_seconds
             logger.warning(
                 "Rate limit exceeded | client=%s | count=%s | limit=%s",
-                client_id,
+                self._mask_client_for_logging(client_id),
                 current_count,
                 self.requests,
             )
