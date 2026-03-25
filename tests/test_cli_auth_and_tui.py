@@ -11,7 +11,7 @@ from click.testing import CliRunner
 
 from cli.main import cli
 from cli.services.base import APIService
-from cli.services.models import AgentRecord
+from cli.services.models import AgentRecord, DeploymentRecord
 
 
 class DummyResponse:
@@ -196,7 +196,7 @@ def test_tui_renders_logged_out_state(monkeypatch) -> None:
         async with app.run_test() as pilot:
             await pilot.pause()
             banner_widget = app.query_one("#status-banner")
-            detail_widget = app.query_one("#agent-detail-body")
+            detail_widget = app.query_one("#setup-body")
             logo_widget = app.query_one("#brand-art")
             signal_widget = app.query_one("#brand-signal")
             banner = getattr(banner_widget, "renderable", banner_widget.render())
@@ -242,7 +242,7 @@ def test_tui_logged_out_disables_mutating_actions(monkeypatch) -> None:
         async with app.run_test() as pilot:
             await pilot.pause()
             result = (
-                app.query_one("#agents-deploy").disabled,
+                app.query_one("#fleet-deploy").disabled,
                 app.query_one("#deployments-restart").disabled,
                 app.query_one("#deployments-delete").disabled,
             )
@@ -268,6 +268,375 @@ def test_setup_configure_button_opens_configure_surface(monkeypatch) -> None:
     monkeypatch.setattr(app, "_open_openclaw_surface", lambda surface: called.append(surface))
     app.on_button_pressed(SimpleNamespace(button=SimpleNamespace(id="setup-configure-openclaw")))
     assert called == ["configure"]
+
+
+def test_build_cockpit_snapshot_includes_local_and_managed_workspaces() -> None:
+    from cli.tui.cockpit import build_cockpit_snapshot
+
+    managed_agent = AgentRecord(
+        id="agent-pa",
+        name="Personal Assistant",
+        description=None,
+        type="openclaw",
+        status="running",
+        config={"assistant_id": "personal-assistant"},
+        config_version=1,
+        created_at=None,
+        updated_at=None,
+        user_id=None,
+        deployments=[],
+    )
+    deployment = DeploymentRecord(
+        id="dep-pa",
+        agent_id="agent-pa",
+        status="running",
+        version="v1",
+        replicas=1,
+        node_id="node-1",
+        started_at="2026-03-25T10:00:00Z",
+        ended_at=None,
+        error_message=None,
+        events=[],
+    )
+
+    snapshot = build_cockpit_snapshot(
+        runtime_snapshot={
+            "gateway": {"status": "healthy"},
+            "bindings": [
+                {
+                    "assistant_id": "personal-assistant",
+                    "assistant_name": "Personal Assistant",
+                    "workspace": "/tmp/workspace-personal-assistant",
+                    "tracked_by_mutx": True,
+                    "live_detected": True,
+                },
+                {
+                    "assistant_id": "x",
+                    "assistant_name": "Workspace X",
+                    "workspace": "/tmp/workspace-x",
+                    "tracked_by_mutx": False,
+                    "live_detected": True,
+                },
+            ],
+        },
+        onboarding={"status": "completed"},
+        assistant_name="Personal Assistant",
+        agents=[managed_agent],
+        deployments=[deployment],
+        raw_sessions=[
+            {
+                "id": "session-pa",
+                "key": "sess-pa",
+                "agent": "personal-assistant",
+                "channel": "discord",
+                "age": "2m",
+                "model": "openai/gpt-5",
+                "tokens": "2k",
+                "source": "openclaw",
+                "active": True,
+                "last_activity": 1_710_000_020_000,
+            },
+            {
+                "id": "session-x",
+                "key": "sess-x",
+                "agent": "x",
+                "channel": "cli",
+                "age": "5m",
+                "model": "openai/gpt-5-mini",
+                "tokens": "1k",
+                "source": "openclaw",
+                "active": True,
+                "last_activity": 1_710_000_010_000,
+            },
+        ],
+        governance_defers=[],
+        governance_decisions=[],
+    )
+
+    workspaces = {item.assistant_id: item for item in snapshot.workspaces}
+
+    assert set(workspaces) == {"personal-assistant", "x"}
+    assert workspaces["personal-assistant"].managed_by_mutx is True
+    assert workspaces["personal-assistant"].managed_label == "managed"
+    assert workspaces["x"].managed_by_mutx is False
+    assert workspaces["x"].managed_label == "local"
+    assert workspaces["x"].session_count == 1
+    assert workspaces["x"].status == "healthy"
+
+
+def test_build_cockpit_snapshot_ranks_incidents_by_urgency() -> None:
+    from cli.tui.cockpit import build_cockpit_snapshot
+
+    agents = [
+        AgentRecord(
+            id="agent-alpha",
+            name="Alpha",
+            description=None,
+            type="openclaw",
+            status="failed",
+            config={"assistant_id": "alpha"},
+            config_version=1,
+            created_at=None,
+            updated_at=None,
+            user_id=None,
+            deployments=[],
+        ),
+        AgentRecord(
+            id="agent-beta",
+            name="Beta",
+            description=None,
+            type="openclaw",
+            status="failed",
+            config={"assistant_id": "beta"},
+            config_version=1,
+            created_at=None,
+            updated_at=None,
+            user_id=None,
+            deployments=[],
+        ),
+    ]
+    deployments = [
+        DeploymentRecord(
+            id="dep-alpha",
+            agent_id="agent-alpha",
+            status="failed",
+            version="v1",
+            replicas=1,
+            node_id=None,
+            started_at=None,
+            ended_at=None,
+            error_message="image pull failed",
+            events=[],
+        ),
+        DeploymentRecord(
+            id="dep-beta",
+            agent_id="agent-beta",
+            status="failed",
+            version="v1",
+            replicas=1,
+            node_id=None,
+            started_at=None,
+            ended_at=None,
+            error_message="heartbeat timeout while waiting for runtime",
+            events=[],
+        ),
+    ]
+
+    snapshot = build_cockpit_snapshot(
+        runtime_snapshot={
+            "gateway": {"status": "healthy"},
+            "bindings": [
+                {"assistant_id": "alpha", "workspace": "/tmp/workspace-alpha", "tracked_by_mutx": True},
+                {"assistant_id": "beta", "workspace": "/tmp/workspace-beta", "tracked_by_mutx": True},
+                {"assistant_id": "x", "workspace": "/tmp/workspace-x", "tracked_by_mutx": False},
+            ],
+        },
+        onboarding={"status": "completed"},
+        assistant_name="Personal Assistant",
+        agents=agents,
+        deployments=deployments,
+        raw_sessions=[],
+        governance_defers=[SimpleNamespace(agent_id="x")],
+        governance_decisions=[],
+    )
+
+    assert [(item.assistant_id, item.status, item.severity) for item in snapshot.incidents] == [
+        ("alpha", "failed", "critical"),
+        ("beta", "stale", "critical"),
+        ("x", "healthy", "medium"),
+    ]
+
+
+def test_tui_keeps_workspace_selection_across_snapshot_refresh(monkeypatch) -> None:
+    textual = pytest.importorskip("textual")
+    assert textual is not None
+
+    import cli.tui.app as tui_app
+    from cli.tui.models import CockpitSnapshot, WorkspaceRecord
+
+    class DummyAuthService:
+        def status(self):
+            return SimpleNamespace(
+                authenticated=False,
+                api_url="http://localhost:8000",
+                config_path=Path("/tmp/mutx-config.json"),
+            )
+
+    monkeypatch.setattr(tui_app, "AuthService", DummyAuthService)
+
+    from cli.tui.app import MutxTUI
+
+    workspaces = [
+        WorkspaceRecord(
+            id="alpha",
+            name="Alpha",
+            assistant_id="alpha",
+            workspace="/tmp/workspace-alpha",
+            status="healthy",
+            managed_by_mutx=True,
+            managed_label="managed",
+            gateway_status="healthy",
+            session_count=1,
+            last_activity=100,
+            last_activity_label="1m",
+            incident_severity="healthy",
+            incident_summary="No active incidents.",
+            agent_id="agent-alpha",
+        ),
+        WorkspaceRecord(
+            id="beta",
+            name="Beta",
+            assistant_id="beta",
+            workspace="/tmp/workspace-beta",
+            status="failed",
+            managed_by_mutx=True,
+            managed_label="managed",
+            gateway_status="healthy",
+            session_count=0,
+            last_activity=50,
+            last_activity_label="failed",
+            incident_severity="critical",
+            incident_summary="Latest deployment failed.",
+            agent_id="agent-beta",
+        ),
+    ]
+    cockpit = CockpitSnapshot(
+        runtime_snapshot={"gateway": {"status": "healthy"}, "bindings": []},
+        onboarding={"status": "completed"},
+        assistant_name="Personal Assistant",
+        workspaces=workspaces,
+        incidents=[],
+        sessions=[],
+        deployments=[],
+        gateway_status="healthy",
+    )
+
+    async def run() -> str | None:
+        app = MutxTUI()
+        app.load_workspace_detail = lambda *args, **kwargs: None
+        app.load_deployment_detail = lambda *args, **kwargs: None
+        app._render_selected_session_detail = lambda: None
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._selection.workspace_id = "beta"
+            app._apply_cockpit_snapshot(cockpit)
+            app._apply_cockpit_snapshot(cockpit)
+            selected = app._selection.workspace_id
+            app.exit()
+            return selected
+
+    import asyncio
+
+    assert asyncio.run(run()) == "beta"
+
+
+def test_authenticated_tui_defaults_to_fleet_and_enter_opens_selected_session(monkeypatch) -> None:
+    textual = pytest.importorskip("textual")
+    assert textual is not None
+
+    import cli.tui.app as tui_app
+
+    class DummyAuthService:
+        def status(self):
+            return SimpleNamespace(
+                authenticated=True,
+                api_url="https://api.mutx.dev",
+                config_path=Path("/tmp/mutx-config.json"),
+            )
+
+        def whoami(self):
+            return SimpleNamespace(email="operator@example.com", plan="pro")
+
+    monkeypatch.setattr(tui_app, "AuthService", DummyAuthService)
+    monkeypatch.setattr(tui_app.MutxTUI, "load_operator_profile", lambda self: None)
+    monkeypatch.setattr(tui_app.MutxTUI, "load_cockpit", lambda self: None)
+
+    from cli.tui.app import MutxTUI
+    from cli.tui.models import SessionRecord
+
+    async def run() -> tuple[str, list[str]]:
+        app = MutxTUI()
+        called: list[str] = []
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            active = app.query_one("#workspace").active
+            app.query_one("#workspace").active = "sessions-pane"
+            app._session_cache["session-1"] = SessionRecord(
+                id="session-1",
+                key="sess-1",
+                assistant_id="personal-assistant",
+                workspace="/tmp/workspace-personal-assistant",
+                channel="discord",
+                age="1m",
+                model="openai/gpt-5",
+                tokens="2k",
+                source="openclaw",
+                active=True,
+                last_activity=100,
+                managed_by_mutx=True,
+                agent_id="agent-pa",
+            )
+            app._selection.session_id = "session-1"
+            monkeypatch.setattr(app, "_open_selected_session", lambda: called.append("session"))
+            app.action_default_current_row()
+            app.exit()
+            return active, called
+
+    import asyncio
+
+    active, called = asyncio.run(run())
+    assert active == "fleet-pane"
+    assert called == ["session"]
+
+
+def test_command_palette_and_button_share_deploy_action() -> None:
+    textual = pytest.importorskip("textual")
+    assert textual is not None
+
+    from cli.tui.app import MutxTUI
+
+    called: list[str] = []
+    app = MutxTUI()
+    app.action_deploy_selected_agent = lambda: called.append("deploy")
+
+    app._dispatch_palette_command("deploy")
+    app.on_button_pressed(SimpleNamespace(button=SimpleNamespace(id="fleet-deploy")))
+
+    assert called == ["deploy", "deploy"]
+
+
+def test_open_selected_session_forwards_session_key() -> None:
+    textual = pytest.importorskip("textual")
+    assert textual is not None
+
+    from cli.tui.app import MutxTUI
+    from cli.tui.models import SessionRecord
+
+    called: list[tuple[str, str | None]] = []
+    app = MutxTUI()
+    app._session_cache["session-1"] = SessionRecord(
+        id="session-1",
+        key="sess-1",
+        assistant_id="personal-assistant",
+        workspace="/tmp/workspace-personal-assistant",
+        channel="discord",
+        age="1m",
+        model="openai/gpt-5",
+        tokens="2k",
+        source="openclaw",
+        active=True,
+        last_activity=100,
+        managed_by_mutx=True,
+        agent_id="agent-pa",
+    )
+    app._selection.session_id = "session-1"
+    app._open_openclaw_surface = lambda surface, session_key=None: called.append(
+        (surface, session_key)
+    )
+
+    app._open_selected_session()
+
+    assert called == [("tui", "sess-1")]
 
 
 def test_tui_dashboard_button_opens_hosted_dashboard(monkeypatch) -> None:
