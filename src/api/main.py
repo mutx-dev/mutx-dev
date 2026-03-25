@@ -38,6 +38,7 @@ from src.api.routes import (
     clawhub,
     deployments,
     governance_credentials,
+    governance_supervision,
     ingest,
     leads,
     monitoring,
@@ -103,6 +104,7 @@ PUBLIC_ROUTE_REGISTRATIONS: tuple[RouterRegistration, ...] = (
     RouterRegistration("swarms", swarms.router),
     RouterRegistration("budgets", budgets.router),
     RouterRegistration("governance_credentials", governance_credentials.router),
+    RouterRegistration("governance_supervision", governance_supervision.router),
 )
 PUBLIC_ROUTER_ALLOWLIST: tuple[str, ...] = tuple(
     registration.name for registration in PUBLIC_ROUTE_REGISTRATIONS

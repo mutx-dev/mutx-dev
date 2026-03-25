@@ -957,3 +957,222 @@ def webhook_list_notify_command():
     click.echo("=" * 50)
     for name, config in notify_config.items():
         click.echo(f"  {name} -> {config['url']}")
+
+
+@governance_group.group(name="supervise")
+def supervise_group():
+    """Faramesh supervision mode for production agent deployment."""
+    pass
+
+
+@supervise_group.command(name="list")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def supervise_list_command(output_json: bool) -> None:
+    """List all supervised agents."""
+    try:
+        from cli.config import current_config, get_client
+
+        config = current_config()
+        if not config.is_authenticated():
+            click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+            sys.exit(1)
+
+        client = get_client(config)
+        response = client.get("/v1/runtime/governance/supervised")
+
+        if response.status_code == 401:
+            click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+            sys.exit(1)
+
+        if response.status_code != 200:
+            click.echo(f"Error: {response.text}", err=True)
+            sys.exit(1)
+
+        agents = response.json()
+
+        if output_json:
+            click.echo(json.dumps(agents, indent=2))
+            return
+
+        if not agents:
+            click.echo("No supervised agents.")
+            return
+
+        click.echo("Supervised Agents")
+        click.echo("=" * 80)
+        click.echo(f"{'Agent ID':<25} {'State':<12} {'PID':<8} {'Restarts':<10} {'Command'}")
+        click.echo("-" * 80)
+        for agent in agents:
+            pid = agent.get("pid") or "-"
+            restarts = agent.get("restart_count", 0)
+            state = agent.get("state", "unknown")
+            agent_id = agent.get("agent_id", "-")
+            cmd = " ".join(agent.get("command", []))[:40]
+            click.echo(f"{agent_id:<25} {state:<12} {pid:<8} {restarts:<10} {cmd}")
+
+    except ImportError:
+        click.echo("Error: Cannot import config client.", err=True)
+        sys.exit(1)
+
+
+@supervise_group.command(name="start")
+@click.argument("agent_id")
+@click.argument("command", nargs=-1, required=True)
+@click.option("--policy", "-p", help="FPL policy file path")
+@click.option("--env", "-e", multiple=True, help="Environment variables (KEY=VALUE)")
+def supervise_start_command(agent_id: str, command: tuple, policy: str | None, env: tuple) -> None:
+    """Start an agent under Faramesh supervision."""
+    try:
+        from cli.config import current_config, get_client
+
+        config = current_config()
+        if not config.is_authenticated():
+            click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+            sys.exit(1)
+
+        env_dict = {}
+        for e in env:
+            if "=" in e:
+                key, value = e.split("=", 1)
+                env_dict[key] = value
+
+        client = get_client(config)
+        payload = {
+            "agent_id": agent_id,
+            "command": list(command),
+            "env": env_dict,
+        }
+        if policy:
+            payload["faramesh_policy"] = policy
+
+        response = client.post("/v1/runtime/governance/supervised/start", json=payload)
+
+        if response.status_code == 401:
+            click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+            sys.exit(1)
+
+        if response.status_code not in (200, 201):
+            click.echo(f"Error: {response.text}", err=True)
+            sys.exit(1)
+
+        result = response.json()
+        click.echo(f"Agent {agent_id} started with PID {result.get('pid')}")
+
+    except ImportError:
+        click.echo("Error: Cannot import config client.", err=True)
+        sys.exit(1)
+
+
+@supervise_group.command(name="stop")
+@click.argument("agent_id")
+@click.option("--timeout", "-t", type=float, default=10.0, help="Shutdown timeout in seconds")
+def supervise_stop_command(agent_id: str, timeout: float) -> None:
+    """Stop a supervised agent."""
+    try:
+        from cli.config import current_config, get_client
+
+        config = current_config()
+        if not config.is_authenticated():
+            click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+            sys.exit(1)
+
+        client = get_client(config)
+        response = client.post(
+            f"/v1/runtime/governance/supervised/{agent_id}/stop",
+            json={"timeout": timeout},
+        )
+
+        if response.status_code == 401:
+            click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+            sys.exit(1)
+
+        if response.status_code not in (200, 204):
+            click.echo(f"Error: {response.text}", err=True)
+            sys.exit(1)
+
+        click.echo(f"Agent {agent_id} stopped")
+
+    except ImportError:
+        click.echo("Error: Cannot import config client.", err=True)
+        sys.exit(1)
+
+
+@supervise_group.command(name="restart")
+@click.argument("agent_id")
+def supervise_restart_command(agent_id: str) -> None:
+    """Restart a supervised agent."""
+    try:
+        from cli.config import current_config, get_client
+
+        config = current_config()
+        if not config.is_authenticated():
+            click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+            sys.exit(1)
+
+        client = get_client(config)
+        response = client.post(f"/v1/runtime/governance/supervised/{agent_id}/restart")
+
+        if response.status_code == 401:
+            click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+            sys.exit(1)
+
+        if response.status_code not in (200, 202):
+            click.echo(f"Error: {response.text}", err=True)
+            sys.exit(1)
+
+        result = response.json()
+        click.echo(f"Agent {agent_id} restarting (attempt {result.get('restart_count')})")
+
+    except ImportError:
+        click.echo("Error: Cannot import config client.", err=True)
+        sys.exit(1)
+
+
+@supervise_group.command(name="status")
+@click.argument("agent_id")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def supervise_status_command(agent_id: str, output_json: bool) -> None:
+    """Get status of a supervised agent."""
+    try:
+        from cli.config import current_config, get_client
+
+        config = current_config()
+        if not config.is_authenticated():
+            click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+            sys.exit(1)
+
+        client = get_client(config)
+        response = client.get(f"/v1/runtime/governance/supervised/{agent_id}")
+
+        if response.status_code == 401:
+            click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+            sys.exit(1)
+
+        if response.status_code == 404:
+            click.echo(f"Agent {agent_id} not found", err=True)
+            sys.exit(1)
+
+        if response.status_code != 200:
+            click.echo(f"Error: {response.text}", err=True)
+            sys.exit(1)
+
+        agent = response.json()
+
+        if output_json:
+            click.echo(json.dumps(agent, indent=2))
+            return
+
+        click.echo(f"Agent: {agent['agent_id']}")
+        click.echo(f"  State:        {agent['state']}")
+        click.echo(f"  PID:          {agent['pid'] or '-'}")
+        click.echo(f"  Restarts:     {agent['restart_count']}")
+        click.echo(f"  Last Exit:    {agent['last_exit_code'] or '-'}")
+        click.echo(f"  Policy:       {agent.get('faramesh_policy') or 'default'}")
+        click.echo(f"  Started:      {agent.get('started_at') or '-'}")
+        click.echo(f"  Last Start:   {agent.get('last_start_at') or '-'}")
+        click.echo(f"  Last Stop:    {agent.get('last_stop_at') or '-'}")
+        click.echo(f"  Command:      {' '.join(agent.get('command', []))}")
+
+    except ImportError:
+        click.echo("Error: Cannot import config client.", err=True)
+        sys.exit(1)
