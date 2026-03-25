@@ -112,12 +112,12 @@ resource "digitalocean_database_cluster" "postgres" {
 }
 
 resource "digitalocean_database_db" "database" {
-  name   = var.db_name
+  name       = var.db_name
   cluster_id = digitalocean_database_cluster.postgres.id
 }
 
 resource "digitalocean_database_user" "user" {
-  name     = var.db_user
+  name       = var.db_user
   cluster_id = digitalocean_database_cluster.postgres.id
 }
 

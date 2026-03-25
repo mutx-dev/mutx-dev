@@ -65,10 +65,10 @@ locals {
 }
 
 resource "digitalocean_spaces_bucket" "main" {
-  count   = 1
-  name    = local.bucket_name_prefix
-  region  = var.region
-  acl     = var.acl
+  count  = 1
+  name   = local.bucket_name_prefix
+  region = var.region
+  acl    = var.acl
 
   cors_rule {
     allowed_headers = ["*"]
@@ -83,8 +83,8 @@ resource "digitalocean_spaces_bucket" "main" {
     dynamic "rule" {
       for_each = var.lifecycle_policy
       content {
-        id       = "rule-${rule.key}"
-        prefix   = rule.key
+        id         = "rule-${rule.key}"
+        prefix     = rule.key
         expiration = rule.value
       }
     }

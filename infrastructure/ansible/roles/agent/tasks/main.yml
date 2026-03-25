@@ -30,6 +30,7 @@
     source: pull
     force_source: true
   register: agent_image_pull
+  notify: Restart agent
 
 - name: Create environment file
   ansible.builtin.template:
@@ -39,6 +40,7 @@
     group: "{{ agent_system_user }}"
     mode: '0640'
   no_log: true
+  notify: Restart agent
 
 - name: Create systemd service file
   ansible.builtin.template:
@@ -48,12 +50,6 @@
   notify:
     - Reload systemd
     - Restart agent
-
-- name: Ensure agent container is removed if exists
-  community.docker.docker_container:
-    name: "{{ agent_name }}"
-    state: absent
-  when: agent_image_pull.changed
 
 - name: Start and enable agent service
   ansible.builtin.systemd:

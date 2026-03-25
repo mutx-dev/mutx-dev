@@ -113,8 +113,8 @@ variable "redirect_http_to_https" {
 }
 
 resource "digitalocean_loadbalancer" "public" {
-  name   = "${var.project_name}-${var.customer_id}-lb"
-  region = var.region
+  name     = "${var.project_name}-${var.customer_id}-lb"
+  region   = var.region
   vpc_uuid = var.vpc_uuid
 
   algorithm = var.algorithm
@@ -130,20 +130,17 @@ resource "digitalocean_loadbalancer" "public" {
   }
 
   forwarding_rule {
-    entry_port       = var.http_port
-    entry_protocol   = "http"
+    entry_port     = var.http_port
+    entry_protocol = "http"
 
-    target_port     = var.http_port
-    target_protocol = "http"
-
-    if var.redirect_http_to_https {
-      redirect_http_to_https = true
-    }
+    target_port            = var.http_port
+    target_protocol        = "http"
+    redirect_http_to_https = var.redirect_http_to_https
   }
 
   forwarding_rule {
-    entry_port       = var.https_port
-    entry_protocol   = "https"
+    entry_port     = var.https_port
+    entry_protocol = "https"
 
     target_port     = var.https_port
     target_protocol = "https"
@@ -153,8 +150,8 @@ resource "digitalocean_loadbalancer" "public" {
 
   # Agent port forwarding (internal)
   forwarding_rule {
-    entry_port       = var.agent_port
-    entry_protocol   = "tcp"
+    entry_port     = var.agent_port
+    entry_protocol = "tcp"
 
     target_port     = var.agent_port
     target_protocol = "tcp"
@@ -191,8 +188,8 @@ resource "digitalocean_loadbalancer" "internal" {
   }
 
   forwarding_rule {
-    entry_port       = var.agent_port
-    entry_protocol   = "tcp"
+    entry_port     = var.agent_port
+    entry_protocol = "tcp"
 
     target_port     = var.agent_port
     target_protocol = "tcp"

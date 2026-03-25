@@ -90,12 +90,12 @@
     owner: "{{ n8n_user | default('ubuntu') }}"
     group: "{{ n8n_group | default('ubuntu') }}"
     mode: '0644'
+  notify: Restart n8n
 
 - name: Start n8n container
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: "{{ n8n_config_path }}"
     state: present
-    pull: true
 
 - name: Set up SSL with Let's Encrypt
   block:
@@ -158,6 +158,7 @@
       when: n8n_ssl_enabled | bool
 
 - name: Set up n8n systemd service (alternative to Docker)
+  when: false
   block:
     - name: Create n8n systemd service
       ansible.builtin.template:
@@ -175,7 +176,6 @@
         enabled: true
         state: started
       when: not n8n_use_docker | default(true)
-  when: false
 
 - name: Wait for n8n to be ready
   ansible.builtin.wait_for:

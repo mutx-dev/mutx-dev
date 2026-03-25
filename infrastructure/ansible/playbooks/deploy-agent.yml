@@ -29,14 +29,12 @@
       community.docker.docker_container:
         name: "{{ agent_name }}"
         state: started
-      register: container_status
 
     - name: Wait for agent API to be ready
       ansible.builtin.wait_for:
         port: "{{ agent_port }}"
         delay: 5
         timeout: 60
-      when: container_status.changed
 
     - name: Get agent container status
       community.docker.docker_container_info:

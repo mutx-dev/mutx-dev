@@ -59,6 +59,7 @@
         fail_msg: "POSTGRES_PASSWORD and REDIS_PASSWORD must be set in the environment before provisioning"
 
     - name: Configure PostgreSQL
+      when: "'agents' in group_names"
       block:
         - name: Add PostgreSQL APT repository
           ansible.builtin.apt_repository:
@@ -77,18 +78,29 @@
             enabled: true
 
         - name: Create application database
+          become: true
           become_user: postgres
           community.postgresql.postgresql_db:
             name: agent_db
             encoding: UTF-8
 
         - name: Create application user
+          become: true
           become_user: postgres
           community.postgresql.postgresql_user:
             name: agent_user
             password: "{{ postgres_password }}"
             db: agent_db
-            priv: ALL
+            state: present
+
+        - name: Grant application user privileges
+          become: true
+          become_user: postgres
+          community.postgresql.postgresql_privs:
+            db: agent_db
+            privs: ALL
+            roles: agent_user
+            type: database
 
         - name: Configure PostgreSQL listen addresses
           ansible.builtin.lineinfile:
@@ -96,9 +108,9 @@
             regexp: "^listen_addresses"
             line: "listen_addresses = '*'"
           notify: Restart PostgreSQL
-      when: "'agents' in group_names"
 
     - name: Configure Redis
+      when: "'agents' in group_names"
       block:
         - name: Install Redis
           ansible.builtin.apt:
@@ -124,9 +136,9 @@
             name: redis-server
             state: started
             enabled: true
-      when: "'agents' in group_names"
 
     - name: Install and configure Tailscale
+      when: tailscale_auth_key is defined and tailscale_auth_key != ""
       block:
         - name: Add Tailscale GPG key
           ansible.builtin.apt_key:
@@ -146,14 +158,16 @@
         - name: Start Tailscale
           ansible.builtin.command: tailscale up --auth-key {{ tailscale_auth_key }} --operator root
           register: tailscale_up
-          failed_when: false
+          changed_when: tailscale_up.rc == 0
+          failed_when:
+            - tailscale_up.rc != 0
+            - "'already' not in (((tailscale_up.stdout | default('')) ~ ' ' ~ (tailscale_up.stderr | default(''))) | lower)"
 
         - name: Enable Tailscale service
           ansible.builtin.systemd:
             name: tailscaled
             enabled: true
             state: started
-      when: tailscale_auth_key is defined and tailscale_auth_key != ""
 
     - name: Configure UFW firewall
       community.general.ufw:
@@ -200,6 +214,7 @@
       ansible.builtin.template:
         src: fail2ban.j2
         dest: /etc/fail2ban/jail.local
+        mode: "0644"
       vars:
         fail2ban_bantime: 3600
         fail2ban_findtime: 600

@@ -38,9 +38,9 @@ variable "ttl" {
 variable "a_records" {
   description = "List of A records"
   type = list(object({
-    name = string
+    name  = string
     value = string
-    ttl = number
+    ttl   = number
   }))
   default = []
 }
@@ -48,9 +48,9 @@ variable "a_records" {
 variable "aaaa_records" {
   description = "List of AAAA records"
   type = list(object({
-    name = string
+    name  = string
     value = string
-    ttl = number
+    ttl   = number
   }))
   default = []
 }
@@ -58,9 +58,9 @@ variable "aaaa_records" {
 variable "cname_records" {
   description = "List of CNAME records"
   type = list(object({
-    name = string
+    name  = string
     value = string
-    ttl = number
+    ttl   = number
   }))
   default = []
 }
@@ -68,10 +68,10 @@ variable "cname_records" {
 variable "mx_records" {
   description = "List of MX records"
   type = list(object({
-    name = string
-    value = string
+    name     = string
+    value    = string
     priority = number
-    ttl = number
+    ttl      = number
   }))
   default = []
 }
@@ -79,9 +79,9 @@ variable "mx_records" {
 variable "txt_records" {
   description = "List of TXT records"
   type = list(object({
-    name = string
+    name  = string
     value = string
-    ttl = number
+    ttl   = number
   }))
   default = []
 }
@@ -89,9 +89,9 @@ variable "txt_records" {
 variable "ns_records" {
   description = "List of NS records (for subdomain delegation)"
   type = list(object({
-    name = string
+    name  = string
     value = string
-    ttl = number
+    ttl   = number
   }))
   default = []
 }
@@ -182,22 +182,22 @@ resource "digitalocean_record" "ns" {
 
 # Point @ to droplet if specified
 resource "digitalocean_record" "droplet" {
-  count    = var.droplet_id != "" ? 1 : 0
-  domain   = digitalocean_domain.main.name
-  type     = "A"
-  name     = "@"
-  value    = var.droplet_id
-  ttl      = var.ttl
+  count  = var.droplet_id != "" ? 1 : 0
+  domain = digitalocean_domain.main.name
+  type   = "A"
+  name   = "@"
+  value  = var.droplet_id
+  ttl    = var.ttl
 }
 
 # Point @ to loadbalancer if specified
 resource "digitalocean_record" "loadbalancer" {
-  count    = var.loadbalancer_id != "" ? 1 : 0
-  domain   = digitalocean_domain.main.name
-  type     = "A"
-  name     = "@"
-  value    = var.loadbalancer_id
-  ttl      = var.ttl
+  count  = var.loadbalancer_id != "" ? 1 : 0
+  domain = digitalocean_domain.main.name
+  type   = "A"
+  name   = "@"
+  value  = var.loadbalancer_id
+  ttl    = var.ttl
 }
 
 output "domain_id" {

@@ -107,6 +107,7 @@ jobs:
       - name: Validate canonical docker-compose files
         env:
           POSTGRES_PASSWORD: testpass
+          REDIS_PASSWORD: testpass
           JWT_SECRET: test-secret-key-that-is-long-enough-32
           DATABASE_URL: postgresql://mutx:testpass@postgres:5432/mutx
           DATABASE_SSL_MODE: disable

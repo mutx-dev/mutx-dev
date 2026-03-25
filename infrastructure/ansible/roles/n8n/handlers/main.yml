@@ -1,8 +1,11 @@
 ---
 - name: Restart n8n
-  community.docker.docker_container:
-    name: n8n
-    state: restarted
+  community.docker.docker_compose_v2:
+    project_src: "{{ n8n_config_path }}"
+    services:
+      - n8n
+    state: present
+    recreate: always
   when: n8n_use_docker | default(true)
 
 - name: Reload systemd

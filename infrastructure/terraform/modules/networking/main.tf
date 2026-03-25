@@ -35,17 +35,17 @@ variable "environment" {
 }
 
 resource "digitalocean_vpc" "customer" {
-  name           = "${var.project_name}-${var.customer_id}-vpc"
-  region         = var.region
-  ip_range       = var.vpc_cidr
-  description    = "VPC for customer ${var.customer_id}"
+  name        = "${var.project_name}-${var.customer_id}-vpc"
+  region      = var.region
+  ip_range    = var.vpc_cidr
+  description = "VPC for customer ${var.customer_id}"
 }
 
 resource "digitalocean_project" "customer" {
-  name         = "${var.project_name}-${var.customer_id}"
-  description  = "Project for customer ${var.customer_id}"
-  purpose      = "Hosting and infrastructure"
-  environment  = var.environment
+  name        = "${var.project_name}-${var.customer_id}"
+  description = "Project for customer ${var.customer_id}"
+  purpose     = "Hosting and infrastructure"
+  environment = var.environment
 
   resources = [
     digitalocean_vpc.customer.urn,

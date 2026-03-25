@@ -92,11 +92,11 @@ resource "digitalocean_ssh_key" "customer" {
 }
 
 resource "digitalocean_droplet" "customer" {
-  name      = "${var.project_name}-${var.customer_id}-agent"
-  region    = var.region
-  size      = var.droplet_size
-  image     = var.droplet_image
-  vpc_uuid  = var.vpc_uuid
+  name     = "${var.project_name}-${var.customer_id}-agent"
+  region   = var.region
+  size     = var.droplet_size
+  image    = var.droplet_image
+  vpc_uuid = var.vpc_uuid
 
   ssh_keys = compact([
     digitalocean_ssh_key.customer.fingerprint,
@@ -124,9 +124,9 @@ resource "digitalocean_droplet" "customer" {
 }
 
 resource "digitalocean_volume" "customer" {
-  name       = "${var.project_name}-${var.customer_id}-data"
-  region     = var.region
-  size       = var.data_volume_size
+  name        = "${var.project_name}-${var.customer_id}-data"
+  region      = var.region
+  size        = var.data_volume_size
   description = "Data volume for customer ${var.customer_id}"
 
   tags = [
@@ -140,7 +140,7 @@ resource "digitalocean_volume_attachment" "customer" {
 }
 
 resource "digitalocean_firewall" "customer" {
-  name   = "${var.project_name}-${var.customer_id}-fw"
+  name        = "${var.project_name}-${var.customer_id}-fw"
   droplet_ids = [digitalocean_droplet.customer.id]
 
   inbound_rule {
@@ -157,14 +157,14 @@ resource "digitalocean_firewall" "customer" {
 
   inbound_rule {
     protocol         = "tcp"
-    port_range       = "${var.agent_port}"
+    port_range       = var.agent_port
     source_addresses = [var.vpc_ip_range]
   }
 
   outbound_rule {
     protocol              = "tcp"
     port_range            = "443"
-    destination_addresses  = ["0.0.0.0/0"]
+    destination_addresses = ["0.0.0.0/0"]
   }
 
   outbound_rule {
