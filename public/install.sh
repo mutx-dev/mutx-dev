@@ -1251,8 +1251,43 @@ read_tty_secret() {
 
 resolve_mutx_bin() {
   hash -r 2>/dev/null || true
-  MUTX_BIN="$(command -v mutx || true)"
-  [[ -n "${MUTX_BIN}" ]] || die "mutx was not found on PATH after install."
+
+  _try_mutx_bin() {
+    local path="$1"
+    if [[ -z "${path}" ]]; then
+      return 1
+    fi
+    if [[ -L "${path}" ]]; then
+      local target
+      target="$(readlink -f "${path}" 2>/dev/null || true)"
+      if [[ -x "${target}" ]]; then
+        MUTX_BIN="${path}"
+        return 0
+      fi
+    elif [[ -x "${path}" ]]; then
+      MUTX_BIN="${path}"
+      return 0
+    fi
+    return 1
+  }
+
+  _try_mutx_bin "$(command -v mutx 2>/dev/null || true)" && return 0
+  _try_mutx_bin "/opt/homebrew/bin/mutx" && return 0
+  _try_mutx_bin "/usr/local/bin/mutx" && return 0
+  _try_mutx_bin "${HOME}/.mutx/runtime/source-cli/venv/bin/mutx" && return 0
+
+  local cellar_mutx=""
+  cellar_mutx="$(run_with_timeout 15 brew --prefix mutx 2>/dev/null || true)"
+  if [[ -n "${cellar_mutx}" && -x "${cellar_mutx}/bin/mutx" ]]; then
+    MUTX_BIN="${cellar_mutx}/bin/mutx"
+    return 0
+  fi
+
+  if _try_mutx_bin "${cellar_mutx}/libexec/bin/mutx" 2>/dev/null; then
+    return 0
+  fi
+
+  die "mutx was not found on PATH after install."
 }
 
 mutx_points_to_source_overlay() {
@@ -1573,13 +1608,111 @@ maybe_start_local_control_plane() {
   return 1
 }
 
+is_mutx_authenticated() {
+  local config_path="${MUTX_HOME_DIR}/config.json"
+  if [[ ! -f "${config_path}" ]]; then
+    return 1
+  fi
+  if grep -q '"access_token"' "${config_path}" 2>/dev/null; then
+    return 0
+  fi
+  return 1
+}
+
 run_setup_handoff() {
   detect_openclaw_runtime
+
+  if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
+    leave_alt_screen
+    say "Install complete"
+    note "Next step:"
+    if is_mutx_authenticated; then
+      note "  mutx tui"
+    else
+      note "  mutx setup hosted --install-openclaw"
+    fi
+    if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
+      note "OpenClaw detected — setup will offer to import it."
+    fi
+    return
+  fi
+
+  if is_mutx_authenticated; then
+    WIZARD_VISIBLE=1
+    WIZARD_HINT="You're already signed in. Ready to set up your assistant."
+    WIZARD_ERROR=""
+
+    while true; do
+      if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+        dashboard_render
+        if [[ "${PROMPT_CURSOR_ROW}" -gt 0 && "${PROMPT_CURSOR_COL}" -gt 0 ]]; then
+          printf '\033[%d;%dH' "${PROMPT_CURSOR_ROW}" "${PROMPT_CURSOR_COL}" > /dev/tty
+        fi
+      else
+        render_banner
+        tty_print "${C_GOOD}✓${C_RESET} already signed in\n"
+        tty_print "\n"
+        tty_print "${C_PANEL}╭─ ${C_BOLD}Setup Wizard${C_RESET}${C_PANEL} ─────────────────────────────────────────────╮${C_RESET}\n"
+        tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}You're already authenticated.${C_RESET}\n"
+        tty_print "${C_PANEL}│${C_RESET}\n"
+        tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Open TUI         ${C_GOOD}(recommended)${C_RESET}\n"
+        tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Re-authenticate   ${C_DIM}sign in with a different account${C_RESET}\n"
+        tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}3${C_RESET}  Later            ${C_DIM}finish install and exit cleanly${C_RESET}\n"
+        tty_print "${C_PANEL}╰───────────────────────────────────────────────────────────────╯${C_RESET}\n"
+        tty_prompt "Select [1/2/3]"
+      fi
+
+      read_tty_line WIZARD_SELECTION
+      WIZARD_SELECTION="${WIZARD_SELECTION:-1}"
+      WIZARD_ERROR=""
+
+      case "${WIZARD_SELECTION}" in
+        1|tui|TUI|"")
+          WIZARD_SELECTION="tui"
+          break
+          ;;
+        2|r|reauth|Reauth)
+          WIZARD_SELECTION="reauth"
+          break
+          ;;
+        3|later|Later|q|Q|quit|exit)
+          WIZARD_SELECTION="later"
+          break
+          ;;
+        *)
+          WIZARD_ERROR="Choose 1, 2, or 3."
+          if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+            dashboard_render
+          else
+            note "${WIZARD_ERROR}"
+          fi
+          sleep 1
+          ;;
+      esac
+    done
+
+    if [[ "${WIZARD_SELECTION}" == "tui" ]]; then
+      leave_alt_screen
+      say "Opening MUTX TUI..."
+      exec "${MUTX_BIN}" tui < /dev/tty > /dev/tty 2>&1
+    elif [[ "${WIZARD_SELECTION}" == "reauth" ]]; then
+      local -a reauth_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}")
+      if [[ "${OPEN_TUI}" != "0" ]]; then
+        append_if_supported reauth_cmd "setup hosted" "--open-tui"
+      fi
+      append_if_supported reauth_cmd "setup hosted" "--no-input"
+      leave_alt_screen
+      exec "${reauth_cmd[@]}" < /dev/tty > /dev/tty 2>&1
+    fi
+
+    leave_alt_screen
+    say "Install complete"
+    note "Run 'mutx tui' when ready."
+    return
+  fi
+
   local -a hosted_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}")
   local -a local_cmd=("${MUTX_BIN}" setup local)
-  local handoff_note=""
-  local hosted_email=""
-  local hosted_password=""
 
   append_if_supported hosted_cmd "setup hosted" "--install-openclaw"
   append_if_supported local_cmd "setup local" "--install-openclaw"
@@ -1587,32 +1720,9 @@ run_setup_handoff() {
   if [[ "${OPEN_TUI}" != "0" ]]; then
     append_if_supported hosted_cmd "setup hosted" "--open-tui"
     append_if_supported local_cmd "setup local" "--open-tui"
-    handoff_note="Hosted is the easiest path for new users. MUTX handles OpenClaw setup, then opens the TUI."
-  else
-    handoff_note="Hosted is the easiest path for new users. MUTX handles OpenClaw setup and keeps you in the CLI."
-  fi
-
-  if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
-    leave_alt_screen
-    say "Install complete"
-    note "Next steps:"
-    note "  mutx setup hosted --install-openclaw"
-    note "  mutx setup local --install-openclaw"
-    note "  mutx setup hosted --import-openclaw"
-    note "  mutx setup local --import-openclaw"
-    note "Local setup can provision a private localhost control plane under ~/.mutx/runtime/local-control."
-    note "  mutx doctor"
-    note "  mutx runtime inspect openclaw"
-    if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
-      note "OpenClaw detected at ${OPENCLAW_BIN}; setup will offer Import Existing OpenClaw 🦞 and track it under ~/.mutx/providers/openclaw."
-    fi
-    note "MUTX leaves your upstream OpenClaw home in place and does not upload local gateway keys."
-    note "  mutx tui"
-    return
   fi
 
   WIZARD_VISIBLE=1
-  WIZARD_HINT="${handoff_note}"
   WIZARD_ERROR=""
 
   while true; do
@@ -1625,31 +1735,26 @@ run_setup_handoff() {
       render_banner
       tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}package lane synced${C_RESET}\n"
       tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}command surface verified${C_RESET}\n"
-      tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}ready for setup handoff${C_RESET}\n"
+      tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}ready for setup${C_RESET}\n"
       tty_print "\n"
       tty_print "${C_PANEL}╭─ ${C_BOLD}Setup Wizard${C_RESET}${C_PANEL} ─────────────────────────────────────────────╮${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}Choose the next lane. Hosted is the simplest path.${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}Create your MUTX account or sign in.${C_RESET}\n"
       if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
         tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} fresh CLI overlay active\n"
       else
         tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} packaged CLI is current\n"
       fi
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}runtime${C_RESET} OpenClaw is the default personal assistant runtime\n"
       if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
         tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}openclaw${C_RESET} detected at ${C_DIM}$(display_path "${OPENCLAW_BIN}" 34)${C_RESET}\n"
-        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}import${C_RESET} tracking ${C_DIM}$(display_path "${OPENCLAW_HOME}" 22)${C_RESET} in ~/.mutx/providers/openclaw\n"
       else
-        tty_print "${C_PANEL}│${C_RESET} ${C_WARN}openclaw${C_RESET} not detected yet · the wizard can install and track it for you\n"
+        tty_print "${C_PANEL}│${C_RESET} ${C_WARN}openclaw${C_RESET} not detected yet · the wizard can install it\n"
       fi
-      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}privacy${C_RESET} OpenClaw stays local and MUTX does not upload keys\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}${handoff_note}${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}local${C_RESET} MUTX can bootstrap a private localhost control plane and help start Docker Desktop on macOS\n"
       tty_print "${C_PANEL}│${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted lane   ${C_DIM}${HOSTED_API_URL}${C_RESET} ${C_GOOD}(recommended)${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local lane    ${C_DIM}${LOCAL_API_URL}${C_RESET} ${C_WARN}(advanced · Docker-backed)${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}3${C_RESET}  Later         ${C_DIM}finish install and exit cleanly${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted   ${C_DIM}${HOSTED_API_URL}${C_RESET} ${C_GOOD}(recommended)${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local    ${C_DIM}${LOCAL_API_URL}${C_RESET} ${C_DIM}(advanced · Docker-backed)${C_RESET}\n"
+      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}3${C_RESET}  Later    ${C_DIM}finish install and exit cleanly${C_RESET}\n"
       tty_print "${C_PANEL}╰───────────────────────────────────────────────────────────────╯${C_RESET}\n"
-      tty_prompt "Select a lane [1/2/3]"
+      tty_prompt "Select [1/2/3]"
     fi
 
     read_tty_line WIZARD_SELECTION
@@ -1680,93 +1785,24 @@ run_setup_handoff() {
   done
 
   if [[ "${WIZARD_SELECTION}" == "1" || "${WIZARD_SELECTION}" == "h" || "${WIZARD_SELECTION}" == "H" || "${WIZARD_SELECTION}" == "hosted" || "${WIZARD_SELECTION}" == "Hosted" ]]; then
-    WIZARD_VISIBLE=0
-    WIZARD_HINT="Hosted keeps the control plane managed. Sign in here, then MUTX continues into the OpenClaw wizard."
-
-    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-      dashboard_render_hosted_creds
-      printf '\033[%d;%dH%bEmail:%b ' 13 3 "${C_BOLD}" "${C_RESET}" > /dev/tty
-      PROMPT_CURSOR_ROW=13
-      PROMPT_CURSOR_COL=$((3 + 7))
-    fi
-
-    WIZARD_PROMPT_LABEL="Email"
-    while [[ -z "${hosted_email}" ]]; do
-      if [[ "${DASHBOARD_ACTIVE}" != "1" ]]; then
-        tty_print "\n${C_SOFT}${WIZARD_HINT}${C_RESET}\n"
-        tty_prompt "${WIZARD_PROMPT_LABEL}"
-      fi
-      read_tty_line hosted_email
-      hosted_email="${hosted_email#"${hosted_email%%[![:space:]]*}"}"
-      hosted_email="${hosted_email%"${hosted_email##*[![:space:]]}"}"
-      if [[ -z "${hosted_email}" ]]; then
-        WIZARD_ERROR="Email is required for the Hosted lane."
-      else
-        WIZARD_ERROR=""
-      fi
-      if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-        dashboard_render_hosted_creds
-        printf '\033[%d;%dH%bEmail:%b ' 13 3 "${C_BOLD}" "${C_RESET}" > /dev/tty
-        PROMPT_CURSOR_ROW=13
-        PROMPT_CURSOR_COL=$((3 + 7))
-      fi
-    done
-
-    WIZARD_ERROR=""
-    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-      dashboard_render_hosted_creds
-      printf '\033[%d;%dH%bPassword:%b ' 15 3 "${C_BOLD}" "${C_RESET}" > /dev/tty
-      PROMPT_CURSOR_ROW=15
-      PROMPT_CURSOR_COL=$((3 + 11))
-    fi
-
-    WIZARD_PROMPT_LABEL="Password"
-    while [[ -z "${hosted_password}" ]]; do
-      if [[ "${DASHBOARD_ACTIVE}" != "1" ]]; then
-        tty_prompt "${WIZARD_PROMPT_LABEL}"
-      fi
-      read_tty_secret hosted_password
-      if [[ -z "${hosted_password}" ]]; then
-        WIZARD_ERROR="Password is required for the Hosted lane."
-      else
-        WIZARD_ERROR=""
-      fi
-      if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-        dashboard_render_hosted_creds
-        printf '\033[%d;%dH%bPassword:%b ' 15 3 "${C_BOLD}" "${C_RESET}" > /dev/tty
-        PROMPT_CURSOR_ROW=15
-        PROMPT_CURSOR_COL=$((3 + 11))
-      fi
-    done
-
-    append_if_supported hosted_cmd "setup hosted" "--email" "${hosted_email}"
-    append_if_supported hosted_cmd "setup hosted" "--password" "${hosted_password}"
-    append_if_supported hosted_cmd "setup hosted" "--no-input"
+    local -a register_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}" --register)
+    append_if_supported register_cmd "setup hosted" "--install-openclaw"
+    append_if_supported register_cmd "setup hosted" "--open-tui"
+    append_if_supported register_cmd "setup hosted" "--no-input"
     leave_alt_screen
-    say "Launching MUTX hosted setup against ${HOSTED_API_URL}"
-    exec "${hosted_cmd[@]}" < /dev/tty > /dev/tty 2>&1
+    say "Launching MUTX hosted setup — new account registration included."
+    exec "${register_cmd[@]}" < /dev/tty > /dev/tty 2>&1
   fi
 
   if [[ "${WIZARD_SELECTION}" == "2" || "${WIZARD_SELECTION}" == "l" || "${WIZARD_SELECTION}" == "L" || "${WIZARD_SELECTION}" == "local" || "${WIZARD_SELECTION}" == "Local" ]]; then
     leave_alt_screen
-    say "Launching MUTX local setup against ${LOCAL_API_URL}"
+    say "Launching MUTX local setup..."
     exec "${local_cmd[@]}" < /dev/tty > /dev/tty 2>&1
   fi
 
   leave_alt_screen
   say "Install complete"
-  note "Run one of:"
-  note "  mutx setup hosted --install-openclaw"
-  note "  mutx setup local --install-openclaw"
-  note "  mutx setup hosted --import-openclaw"
-  note "  mutx setup local --import-openclaw"
-  note "  local setup can provision a private localhost stack under ~/.mutx/runtime/local-control"
-  note "  mutx doctor"
-  note "  mutx runtime inspect openclaw"
-  if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
-    note "OpenClaw detected at ${OPENCLAW_BIN}; setup will offer Import Existing OpenClaw 🦞 and track it under ~/.mutx/providers/openclaw."
-  fi
-  note "Local OpenClaw secrets remain on this machine."
+  note "Run 'mutx setup hosted --install-openclaw' to get started."
 }
 
 append_if_supported() {

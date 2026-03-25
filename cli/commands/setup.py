@@ -247,10 +247,23 @@ def _install_faramesh_governance() -> None:
 )
 @click.option("--open-tui", is_flag=True, help="Launch the TUI after setup")
 @click.option("--no-input", is_flag=True, help="Disable prompts")
+@click.option(
+    "--register/--login-existing",
+    default=False,
+    help="Register a new account (default: login to existing)",
+)
+@click.option(
+    "--name",
+    "display_name",
+    default=None,
+    help="Display name for new account (used with --register)",
+)
 def setup_hosted(
     api_url: str | None,
     email: str | None,
     password: str | None,
+    register: bool,
+    display_name: str | None,
     assistant_name: str,
     description: str | None,
     replicas: int,
@@ -268,11 +281,19 @@ def setup_hosted(
     config.api_url = target_api_url
 
     try:
-        _auth_service().login(
-            email=_require_value("Email", email, no_input),
-            password=_require_value("Password", password, no_input, secret=True),
-            api_url=target_api_url,
-        )
+        if register:
+            _auth_service().register(
+                name=_require_value("Name", display_name or "MUTX User", no_input),
+                email=_require_value("Email", email, no_input),
+                password=_require_value("Password", password, no_input, secret=True),
+                api_url=target_api_url,
+            )
+        else:
+            _auth_service().login(
+                email=_require_value("Email", email, no_input),
+                password=_require_value("Password", password, no_input, secret=True),
+                api_url=target_api_url,
+            )
         mark_auth_completed(
             mode="hosted",
             provider=provider,
