@@ -1087,7 +1087,7 @@ read_tty_secret() {
 
 relink_formula() {
   brew unlink "${FORMULA}" >/dev/null 2>&1 || true
-  brew link --force "${FORMULA}"
+  brew link --overwrite "${FORMULA}"
 }
 
 path_realpath() {
@@ -1255,7 +1255,7 @@ check_command_group() {
 }
 
 check_essential_commands() {
-  if ! "${MUTX_BIN}" --version >/dev/null 2>&1; then
+  if ! "${MUTX_BIN}" --help >/dev/null 2>&1; then
     CLI_MISSING_COMMANDS="binary-broken"
     return 1
   fi

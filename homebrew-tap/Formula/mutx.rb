@@ -20,8 +20,7 @@ class Mutx < Formula
   def install
     venv = libexec/"venv"
     system "python3.12", "-m", "venv", venv
-    venv.popen_ui = false
-    system venv/"bin"/"pip", "install", "--no-cache-dir", "git+https://github.com/mutx-dev/mutx-dev.git@v#{version}"
+    system venv/"bin"/"pip", "install", "--no-cache-dir", "git+https://github.com/mutx-dev/mutx-dev.git@cli-v#{version}"
     bin.install_symlink venv/"bin"/"mutx"
   end
 
