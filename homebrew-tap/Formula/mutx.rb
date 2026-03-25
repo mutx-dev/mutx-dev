@@ -7,24 +7,22 @@ class Mutx < Formula
   on_macos do
     on_arm do
       url "https://github.com/mutx-dev/mutx-dev/archive/refs/tags/cli-v1.2.0.tar.gz"
-      sha256 "b6fc16a429d1d5c48cfeb252a9503faba69fc6a49673b74815a3e940d5fddba2"
+      sha256 "39cbf66ed9d66bda6beed2042ce33b6d82f0e9c8228341a5cbaab6a3f97e1b92"
     end
     on_intel do
       url "https://github.com/mutx-dev/mutx-dev/archive/refs/tags/cli-v1.2.0.tar.gz"
-      sha256 "b6fc16a429d1d5c48cfeb252a9503faba69fc6a49673b74815a3e940d5fddba2"
+      sha256 "39cbf66ed9d66bda6beed2042ce33b6d82f0e9c8228341a5cbaab6a3f97e1b92"
     end
   end
 
   depends_on "python@3.12"
 
   def install
-    ENV.prepend_path "PATH", "#{Formula["python@3.12"].opt_bin}:#{ENV["PATH"]}"
-
-    system "python3.12", "-m", "pip", "install", "--no-cache-dir",
-           "--prefix=#{prefix}",
-           "git+https://github.com/mutx-dev/mutx-dev.git@v#{version}"
-
-    bin.install_symlink "#{prefix}/bin/mutx"
+    venv = libexec/"venv"
+    system "python3.12", "-m", "venv", venv
+    venv.popen_ui = false
+    system venv/"bin"/"pip", "install", "--no-cache-dir", "git+https://github.com/mutx-dev/mutx-dev.git@v#{version}"
+    bin.install_symlink venv/"bin"/"mutx"
   end
 
   test do
