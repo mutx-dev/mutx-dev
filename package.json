@@ -1,6 +1,6 @@
 {
   "name": "mutx",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "private": true,
   "main": "desktop/main.cjs",
   "scripts": {

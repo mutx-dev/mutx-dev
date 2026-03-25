@@ -5,16 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.2.0] - 2026-03-25
 
 ### Added
-- Textual-based `mutx tui` operator shell for agents and deployments
-- Shared CLI service layer under `cli/services/*` for auth, agents, and deployments
-- Homebrew tap scaffold with `Formula/mutx.rb` and non-network `mutx status` formula test guidance
+- **Faramesh Governance Engine** - Core auto-installed governance component for agent decision-making
+- **Credential Broker** - Multi-backend secret management (Vault, AWS Secrets, GCP Secret Manager, Azure Key Vault, 1Password, Infisical)
+- **Governance Webhooks** - Event streaming for decisions, approvals, and denials with FPL `notify` directive routing
+- **Faramesh Supervision** - Production agent supervision via `faramesh run` with auto-restart and health checks
+- **SPIFFE/SPIRE Identity** - Workload identity provider for secure agent authentication
+- **Observability Dashboard** - Agent run tracking with MutxRun/MutxStep schema (agent-run standard)
+- **AARM Security Layer** - Security evaluation, approvals, receipts, and sessions
+- **Textual-based `mutx tui`** operator shell for agents and deployments
+- **Shared CLI service layer** under `cli/services/*` for auth, agents, and deployments
+- **Homebrew tap** scaffold with `Formula/mutx.rb` and non-network `mutx status` formula test guidance
+- **`mutx update`** command to update MUTX from git without reinstallation
+- **`mutx governance`** CLI with subcommands: status, decisions, pending, metrics, tail, start, approve, deny, kill, policy, credential, webhook, supervise
+- **Dashboard navigation** for observability, analytics, sessions, and API keys
 
 ### Changed
 - Root CLI distribution versioning now tracks the root `pyproject.toml` and `cli-vX.Y.Z` tags
 - CLI docs, quickstart, and debugging notes now reflect the `/v1/*` API contract and the TUI install flow
+- TUI now loads governance and observability data on mount
+- Migrated to ESLint 9 flat config and Next.js 16.x
+- Upgraded to Next.js 16.2.1 with Turbopack
+- Fixed python-jose version constraint (3.5.0)
+
+### Fixed
+- Import errors: moved `InvalidCredentialsError` and `CLIServiceError` to `cli.errors`
+- Removed unused variables flagged by ruff
+- Fixed version constraints for langchain ecosystem (openai>=1.68.2, pydantic 2.x compatible)
+- Fixed npm peer dependency conflicts with ESLint 10
+
+### Security
+- Fixed CodeQL security findings
+- Fixed security vulnerabilities in Python and Node.js dependencies
+- Added Cloudflare Turnstile to Book a Call buttons
 
 ## [1.1.0] - 2026-03-22
 
