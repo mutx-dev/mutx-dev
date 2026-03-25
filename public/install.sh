@@ -1252,15 +1252,15 @@ read_tty_secret() {
 resolve_mutx_bin() {
   hash -r 2>/dev/null || true
 
-  _try_mutx_bin() {
+  _try_bin() {
     local path="$1"
     if [[ -z "${path}" ]]; then
       return 1
     fi
     if [[ -L "${path}" ]]; then
-      local target
-      target="$(readlink -f "${path}" 2>/dev/null || true)"
-      if [[ -x "${target}" ]]; then
+      local resolved
+      resolved="$(readlink -f "${path}" 2>/dev/null || true)"
+      if [[ -x "${resolved}" ]]; then
         MUTX_BIN="${path}"
         return 0
       fi
@@ -1271,20 +1271,16 @@ resolve_mutx_bin() {
     return 1
   }
 
-  _try_mutx_bin "$(command -v mutx 2>/dev/null || true)" && return 0
-  _try_mutx_bin "/opt/homebrew/bin/mutx" && return 0
-  _try_mutx_bin "/usr/local/bin/mutx" && return 0
-  _try_mutx_bin "${HOME}/.mutx/runtime/source-cli/venv/bin/mutx" && return 0
+  _try_bin "$(command -v mutx 2>/dev/null || true)" && return 0
+  _try_bin "/opt/homebrew/bin/mutx" && return 0
+  _try_bin "/usr/local/bin/mutx" && return 0
+  _try_bin "${HOME}/.mutx/runtime/source-cli/venv/bin/mutx" && return 0
 
-  local cellar_mutx=""
-  cellar_mutx="$(run_with_timeout 15 brew --prefix mutx 2>/dev/null || true)"
-  if [[ -n "${cellar_mutx}" && -x "${cellar_mutx}/bin/mutx" ]]; then
-    MUTX_BIN="${cellar_mutx}/bin/mutx"
-    return 0
-  fi
-
-  if _try_mutx_bin "${cellar_mutx}/libexec/bin/mutx" 2>/dev/null; then
-    return 0
+  local cellar=""
+  cellar="$(brew --prefix mutx 2>/dev/null || true)"
+  if [[ -n "${cellar}" ]]; then
+    _try_bin "${cellar}/bin/mutx" && return 0
+    _try_bin "${cellar}/libexec/bin/mutx" && return 0
   fi
 
   die "mutx was not found on PATH after install."
@@ -1889,7 +1885,7 @@ elif [[ "${BREW_UPGRADE_NEEDED}" == "yes" ]]; then
   run_stage "Upgrading MUTX runtime" upgrade_or_keep_formula
 fi
 
-run_stage "Linking mutx into PATH" run_with_timeout 60 brew link --overwrite "${FORMULA}"
+run_stage "Linking mutx into PATH" run_with_timeout 60 brew unlink "${FORMULA}" 2>/dev/null || true && run_with_timeout 60 brew link --force "${FORMULA}"
 resolve_mutx_bin
 run_stage "Warming CLI" "${MUTX_BIN}" --help
 
