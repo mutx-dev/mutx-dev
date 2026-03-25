@@ -6,6 +6,9 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 COMPOSE_FILE="infrastructure/docker/docker-compose.prod.yml"
+SSL_DIR="$ROOT_DIR/infrastructure/docker/ssl"
+TEMP_SSL_DIR_CREATED=0
+TEMP_SSL_CERT_CREATED=0
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "Docker is required for the production compose smoke test."
@@ -30,6 +33,12 @@ export WEB_CONCURRENCY="${WEB_CONCURRENCY:-1}"
 
 cleanup() {
   docker compose -f "$COMPOSE_FILE" down -v --remove-orphans >/dev/null 2>&1 || true
+  if [ "$TEMP_SSL_CERT_CREATED" = "1" ]; then
+    rm -f "$SSL_DIR/cert.pem" "$SSL_DIR/key.pem"
+  fi
+  if [ "$TEMP_SSL_DIR_CREATED" = "1" ]; then
+    rmdir "$SSL_DIR" >/dev/null 2>&1 || true
+  fi
 }
 
 dump_failure_context() {
@@ -66,6 +75,35 @@ wait_for_command() {
   return 1
 }
 
+ensure_ssl_material() {
+  if [ -f "$SSL_DIR/cert.pem" ] && [ -f "$SSL_DIR/key.pem" ]; then
+    return 0
+  fi
+
+  if [ -e "$SSL_DIR/cert.pem" ] || [ -e "$SSL_DIR/key.pem" ]; then
+    echo "Expected both $SSL_DIR/cert.pem and $SSL_DIR/key.pem for nginx TLS."
+    return 1
+  fi
+
+  if ! command -v openssl >/dev/null 2>&1; then
+    echo "OpenSSL is required to generate temporary nginx certificates for the smoke test."
+    return 1
+  fi
+
+  if [ ! -d "$SSL_DIR" ]; then
+    mkdir -p "$SSL_DIR"
+    TEMP_SSL_DIR_CREATED=1
+  fi
+
+  echo "Generating temporary self-signed TLS certificate for nginx smoke test..."
+  openssl req -x509 -nodes -newkey rsa:2048 \
+    -keyout "$SSL_DIR/key.pem" \
+    -out "$SSL_DIR/cert.pem" \
+    -days 1 \
+    -subj "/CN=localhost" >/dev/null 2>&1
+  TEMP_SSL_CERT_CREATED=1
+}
+
 trap dump_failure_context ERR
 trap cleanup EXIT
 
@@ -86,6 +124,7 @@ wait_for_command \
   "frontend health endpoint" \
   "docker compose -f \"$COMPOSE_FILE\" exec -T frontend node -e \"require('http').get('http://127.0.0.1:3000', (res) => process.exit(res.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))\" >/dev/null 2>&1"
 
+ensure_ssl_material
 docker compose -f "$COMPOSE_FILE" up -d nginx
 
 wait_for_command \
