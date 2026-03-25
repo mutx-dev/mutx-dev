@@ -10139,11 +10139,7 @@
             "title": "Description"
           },
           "type": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AgentType"
-              }
-            ],
+            "$ref": "#/components/schemas/AgentType",
             "default": "openai"
           },
           "config": {
@@ -13091,11 +13087,7 @@
             "title": "Agent Id"
           },
           "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AgentStatus"
-              }
-            ],
+            "$ref": "#/components/schemas/AgentStatus",
             "default": "running"
           },
           "message": {
@@ -14323,11 +14315,7 @@
             "description": "Associated task ID"
           },
           "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/MutxRunStatus"
-              }
-            ],
+            "$ref": "#/components/schemas/MutxRunStatus",
             "description": "Initial status",
             "default": "pending"
           },
@@ -15105,11 +15093,7 @@
             "description": "Unique step identifier within the run"
           },
           "type": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/MutxStepType"
-              }
-            ],
+            "$ref": "#/components/schemas/MutxStepType",
             "description": "What kind of step this is"
           },
           "tool_name": {
@@ -15261,11 +15245,7 @@
             "description": "Step ID. Auto-generated if not provided."
           },
           "type": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/MutxStepType"
-              }
-            ],
+            "$ref": "#/components/schemas/MutxStepType",
             "description": "Type of step"
           },
           "tool_name": {
