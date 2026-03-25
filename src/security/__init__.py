@@ -30,11 +30,11 @@ https://github.com/aarm-dev/docs/blob/main/LICENSE.txt
 """
 
 from src.security.mediator import ActionCategory, ActionMediator, NormalizedAction
-from src.security.context import ContextAccumulator, SessionContext
+from src.security.context import ContextAccumulator, IntentSignal, SessionContext
 from src.security.policy import PolicyDecision, PolicyDecisionResult, PolicyEngine
 from src.security.approvals import ApprovalRequest, ApprovalService
 from src.security.receipts import ActionReceipt, ReceiptGenerator
-from src.security.telemetry import TelemetryExporter
+from src.security.telemetry import TelemetryEventType, TelemetryExporter
 from src.security.compliance import AARMComplianceChecker
 
 __all__ = [
@@ -42,6 +42,7 @@ __all__ = [
     "ActionMediator",
     "NormalizedAction",
     "ContextAccumulator",
+    "IntentSignal",
     "SessionContext",
     "PolicyDecision",
     "PolicyDecisionResult",
@@ -50,6 +51,7 @@ __all__ = [
     "ApprovalService",
     "ActionReceipt",
     "ReceiptGenerator",
+    "TelemetryEventType",
     "TelemetryExporter",
     "AARMComplianceChecker",
 ]
