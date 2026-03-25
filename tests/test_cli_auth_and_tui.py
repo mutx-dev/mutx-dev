@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -9,8 +8,6 @@ import httpx
 import click
 import pytest
 from click.testing import CliRunner
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cli.main import cli
 

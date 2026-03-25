@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
 from click.testing import CliRunner
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cli.main import cli
 
@@ -45,7 +42,7 @@ def test_webhooks_list_hits_contract_route_and_forwards_filters(monkeypatch) -> 
             ],
         )
 
-    monkeypatch.setattr("cli.commands.webhooks.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.webhooks.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.webhooks.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -83,7 +80,7 @@ def test_webhooks_deliveries_hits_live_delivery_route_and_query_contract(monkeyp
             ],
         )
 
-    monkeypatch.setattr("cli.commands.webhooks.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.webhooks.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.webhooks.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -138,7 +135,7 @@ def test_webhooks_get_hits_contract_route_and_prints_created_timestamp(monkeypat
             },
         )
 
-    monkeypatch.setattr("cli.commands.webhooks.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.webhooks.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.webhooks.get_client", lambda config: SimpleNamespace(get=fake_get)
     )

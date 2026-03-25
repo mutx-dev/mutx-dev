@@ -6,6 +6,8 @@ import asyncio
 from datetime import datetime, timezone
 from collections.abc import AsyncGenerator
 import os
+from pathlib import Path
+import sys
 import uuid
 
 import pytest
@@ -31,6 +33,13 @@ TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "sqlite+aiosqlite:///:memory:
 
 # Configure pytest-asyncio
 pytest_plugins = ("pytest_asyncio",)
+
+ROOT = Path(__file__).resolve().parents[1]
+SDK_ROOT = ROOT / "sdk"
+
+for entry in (str(ROOT), str(SDK_ROOT)):
+    if entry not in sys.path:
+        sys.path.insert(0, entry)
 
 
 @compiles(PGUUID, "sqlite")

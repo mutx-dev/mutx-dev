@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-import sys
 import uuid
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
 from click.testing import CliRunner
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cli.main import cli
 
@@ -52,7 +49,7 @@ def test_clawhub_list_hits_canonical_route_and_renders_skills(monkeypatch) -> No
             ],
         )
 
-    monkeypatch.setattr("cli.commands.clawhub.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.clawhub.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.clawhub.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -73,7 +70,7 @@ def test_clawhub_list_empty(monkeypatch) -> None:
     def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
         return DummyResponse(200, [])
 
-    monkeypatch.setattr("cli.commands.clawhub.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.clawhub.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.clawhub.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -95,7 +92,7 @@ def test_clawhub_install_hits_canonical_route(monkeypatch) -> None:
         captured["json"] = json
         return DummyResponse(200, {"status": "installing"})
 
-    monkeypatch.setattr("cli.commands.clawhub.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.clawhub.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.clawhub.get_client", lambda config: SimpleNamespace(post=fake_post)
     )
@@ -121,7 +118,7 @@ def test_clawhub_install_agent_not_found(monkeypatch) -> None:
     def fake_post(path: str, json: dict[str, Any] | None = None) -> DummyResponse:
         return DummyResponse(404, {"detail": "Agent not found"})
 
-    monkeypatch.setattr("cli.commands.clawhub.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.clawhub.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.clawhub.get_client", lambda config: SimpleNamespace(post=fake_post)
     )
@@ -143,7 +140,7 @@ def test_clawhub_uninstall_hits_canonical_route(monkeypatch) -> None:
         captured["json"] = json
         return DummyResponse(200, {"status": "uninstalled"})
 
-    monkeypatch.setattr("cli.commands.clawhub.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.clawhub.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.clawhub.get_client", lambda config: SimpleNamespace(post=fake_post)
     )
@@ -167,7 +164,7 @@ def test_clawhub_uninstall_agent_not_found(monkeypatch) -> None:
     def fake_post(path: str, json: dict[str, Any] | None = None) -> DummyResponse:
         return DummyResponse(404, {"detail": "Agent not found"})
 
-    monkeypatch.setattr("cli.commands.clawhub.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.clawhub.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.clawhub.get_client", lambda config: SimpleNamespace(post=fake_post)
     )

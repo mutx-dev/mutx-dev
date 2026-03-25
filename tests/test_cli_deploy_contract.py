@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
 from click.testing import CliRunner
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from cli.main import cli
 
@@ -49,7 +46,7 @@ def test_deploy_events_hits_contract_route_and_renders_items(monkeypatch) -> Non
             },
         )
 
-    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.deploy.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.deploy.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -104,7 +101,7 @@ def test_deploy_list_passes_agent_and_status_filters(monkeypatch) -> None:
             ],
         )
 
-    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.deploy.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.deploy.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -147,7 +144,7 @@ def test_deploy_create_hits_canonical_route_with_replicas(monkeypatch) -> None:
         captured["json"] = json
         return DummyResponse(201, {"id": "dep-456", "status": "pending"})
 
-    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.deploy.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.deploy.get_client", lambda config: SimpleNamespace(post=fake_post)
     )
@@ -175,7 +172,7 @@ def test_deploy_restart_hits_contract_route_and_renders_status(monkeypatch) -> N
         captured["json"] = json
         return DummyResponse(200, {"id": "dep-789", "status": "pending"})
 
-    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.deploy.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.deploy.get_client", lambda config: SimpleNamespace(post=fake_post)
     )
@@ -209,7 +206,7 @@ def test_deploy_logs_hits_contract_route_and_supports_level_filter(monkeypatch) 
             ],
         )
 
-    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.deploy.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.deploy.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -249,7 +246,7 @@ def test_deploy_metrics_hits_contract_route_and_renders_points(monkeypatch) -> N
             ],
         )
 
-    monkeypatch.setattr("cli.commands.deploy.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.deploy.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.deploy.get_client", lambda config: SimpleNamespace(get=fake_get)
     )

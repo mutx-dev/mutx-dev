@@ -6,15 +6,12 @@ Tests verify that the SDK correctly maps to the backend API contract.
 from __future__ import annotations
 
 import json
-import sys
 import uuid
 from pathlib import Path
 from typing import Any
 
 import httpx
 import pytest
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "sdk"))
 
 from mutx.api_keys import APIKey, APIKeyWithSecret, APIKeys
 

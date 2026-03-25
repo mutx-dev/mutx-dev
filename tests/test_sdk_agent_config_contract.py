@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 import json
-import sys
 import uuid
 from pathlib import Path
 from typing import Any
 
 import httpx
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "sdk"))
 
 from mutx import Deployments, Webhooks
 from mutx.agents import Agent, AgentDetail, Agents
