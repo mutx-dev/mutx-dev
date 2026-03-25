@@ -147,9 +147,10 @@ For maintainers releasing new versions:
    - Frontend: `git tag v1.0.0 && git push origin v1.0.0`
    - CLI: `git tag cli-v0.2.0 && git push origin cli-v0.2.0`
 
-5. **Update the third-party tap**:
-   - Sync `mutx-dev/homebrew-tap`
-   - Update `Formula/mutx.rb` to the matching `cli-vX.Y.Z` archive and checksum
+5. **Publish the third-party tap**:
+   - Push the matching `cli-vX.Y.Z` tag
+   - The release workflow regenerates and pushes `mutx-dev/homebrew-tap`
+   - If automation fails, run `python scripts/generate_homebrew_formula.py --tag cli-vX.Y.Z --output homebrew-tap/Formula/mutx.rb`
    - Validate with `brew tap mutx-dev/homebrew-tap && brew install mutx && mutx status`
 
 See [docs/changelog-status.md](docs/changelog-status.md) for full release documentation.

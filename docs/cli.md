@@ -35,6 +35,8 @@ brew tap mutx-dev/homebrew-tap
 brew install mutx
 ```
 
+The published tap is updated from `cli-vX.Y.Z` release tags. Pushing `main` by itself does not move Homebrew.
+
 The tap formula is expected to smoke-test the package with non-networked command help such as `mutx --help`, `mutx setup --help`, and `mutx doctor --help`.
 
 If Homebrew says `mutx` is installed but not linked, there is usually an older `mutx` shim already present in `/opt/homebrew/bin`. Relink the Homebrew binary with:

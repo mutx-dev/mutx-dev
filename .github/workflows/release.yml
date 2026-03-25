@@ -120,6 +120,49 @@ jobs:
           PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         run: twine upload dist/*
 
+      - name: Require Homebrew tap publish token
+        if: github.event_name == 'push'
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          if [[ -z "${HOMEBREW_TAP_TOKEN}" ]]; then
+            echo "HOMEBREW_TAP_TOKEN is required to publish mutx-dev/homebrew-tap." >&2
+            exit 1
+          fi
+
+      - name: Checkout Homebrew tap
+        if: github.event_name == 'push'
+        uses: actions/checkout@v4
+        with:
+          repository: mutx-dev/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: published-homebrew-tap
+
+      - name: Generate Homebrew formula
+        if: github.event_name == 'push'
+        run: |
+          python scripts/generate_homebrew_formula.py \
+            --repo-root . \
+            --tag "${GITHUB_REF_NAME}" \
+            --output "published-homebrew-tap/Formula/mutx.rb"
+          ruby -c "published-homebrew-tap/Formula/mutx.rb"
+
+      - name: Commit and push Homebrew formula
+        if: github.event_name == 'push'
+        working-directory: published-homebrew-tap
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          if git diff --quiet -- Formula/mutx.rb; then
+            echo "Homebrew tap already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/mutx.rb
+          git commit -m "Update mutx formula to ${VERSION}"
+          git push origin HEAD:main
+
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:

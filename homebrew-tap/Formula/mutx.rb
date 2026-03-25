@@ -1,18 +1,18 @@
 class Mutx < Formula
   include Language::Python::Virtualenv
 
-  desc "Operator CLI and Textual TUI for the MUTX control plane"
+  desc "CLI for mutx.dev - Deploy and manage agents"
   homepage "https://mutx.dev"
-  url "https://codeload.github.com/mutx-dev/mutx-dev/tar.gz/9ec823b5171b20d407827c0cd67b79fc461ce52f"
-  sha256 "8fefd7096ac43e22dd35d13daeaca752da75510916fe72df2276d4680226275b"
+  url "https://codeload.github.com/mutx-dev/mutx-dev/tar.gz/refs/tags/cli-v1.2.0"
+  sha256 "39cbf66ed9d66bda6beed2042ce33b6d82f0e9c8228341a5cbaab6a3f97e1b92"
   license "MIT"
   version "1.2.0"
 
   depends_on "python@3.12"
 
   resource "anyio" do
-    url "https://files.pythonhosted.org/packages/38/0e/27be9fdef66e72d64c0cdc3cc2823101b80585f8119b5c112c2e8f5f7dab/anyio-4.12.1-py3-none-any.whl"
-    sha256 "d405828884fc140aa80a3c667b8beed277f1dfedec42ba031bd6ac3db606ab6c"
+    url "https://files.pythonhosted.org/packages/da/42/e921fccf5015463e32a3cf6ee7f980a6ed0f395ceeaa45060b61d86486c2/anyio-4.13.0-py3-none-any.whl"
+    sha256 "08b310f9e24a9594186fd75b4f73f4a4152069e3853f1ed8bfbf58369f4ad708"
   end
 
   resource "certifi" do
@@ -81,8 +81,8 @@ class Mutx < Formula
   end
 
   resource "textual" do
-    url "https://files.pythonhosted.org/packages/50/21/421b02bf5943172b7a9320712a5e0d74a02a8f7597284e3f8b5b06c70b8d/textual-8.1.1-py3-none-any.whl"
-    sha256 "6712f96e335cd782e76193dee16b9c8875fe0699d923bc8d3f1228fd23e773a6"
+    url "https://files.pythonhosted.org/packages/ac/bb/5fb6656c625019cd653d5215237d7cd6e0b12e7eae4195c3d1c91b2136fc/textual-1.0.0-py3-none-any.whl"
+    sha256 "2d4a701781c05104925e463ae370c630567c70c2880e92ab838052e3e23c986f"
   end
 
   resource "typing-extensions" do

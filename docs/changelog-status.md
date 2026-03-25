@@ -74,9 +74,10 @@ python -m pip install build
 python -m build
 ```
 
-Then update the Homebrew tap formula to the matching `cli-vX.Y.Z` archive and validate the assistant-first CLI surface without touching the network:
+Then push the matching `cli-vX.Y.Z` tag. The release workflow updates the published Homebrew tap automatically; use the manual formula flow only if that automation fails:
 
 ```bash
+python scripts/generate_homebrew_formula.py --tag cli-v0.2.0 --output homebrew-tap/Formula/mutx.rb
 brew tap mutx-dev/homebrew-tap
 brew install mutx
 mutx --help

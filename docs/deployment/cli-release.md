@@ -58,17 +58,20 @@ Publish GitHub release notes from the `cli-v0.2.1` tag and include:
 * config and auth compatibility notes
 * Homebrew tap formula update details
 
-## 4. Update the Homebrew tap
+## 4. Publish the Homebrew tap
 
-From the tap repo:
+Pushing the `cli-vX.Y.Z` tag now drives the tap update automatically. The release workflow:
+
+* regenerates `Formula/mutx.rb` from the tagged CLI source
+* commits the updated formula to `mutx-dev/homebrew-tap`
+* pushes the tap update before creating the CLI GitHub release
+
+The workflow requires a `HOMEBREW_TAP_TOKEN` repository secret with write access to `mutx-dev/homebrew-tap`.
+
+Manual fallback only if the workflow fails:
 
 ```bash
-cd ../homebrew-tap
-```
-
-Update `Formula/mutx.rb` to the matching `cli-vX.Y.Z` archive URL and `sha256`, then validate the assistant-first surface without hitting the network:
-
-```bash
+python scripts/generate_homebrew_formula.py --tag cli-v0.2.1 --output homebrew-tap/Formula/mutx.rb
 brew uninstall mutx || true
 brew tap mutx-dev/homebrew-tap
 brew install mutx
@@ -77,7 +80,7 @@ mutx setup --help
 mutx doctor --help
 ```
 
-The formula test must stay non-networked.
+The formula test must stay non-networked, and `main` pushes alone should not move the tap.
 
 ## 5. Post-release checks
 

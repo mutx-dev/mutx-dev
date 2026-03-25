@@ -1,6 +1,7 @@
 # MUTX Homebrew Tap
 
 Mirror of the published third-party tap repository `mutx-dev/homebrew-tap`.
+The live tap is published from CLI release tags (`cli-vX.Y.Z`) by the release workflow in the main repo.
 
 ## Install
 
@@ -47,7 +48,7 @@ If `mutx` throws `ModuleNotFoundError: No module named 'cli'`, your shell is sti
 1. Bump the CLI version in the monorepo `pyproject.toml`.
 2. Push the monorepo release to `main`.
 3. Create and push the matching `cli-vX.Y.Z` tag.
-4. Update `Formula/mutx.rb` to the new tag tarball and checksum.
-5. Commit and push the tap repo update.
+4. The release workflow regenerates `Formula/mutx.rb` from that tagged source, commits it to `mutx-dev/homebrew-tap`, and pushes the tap update.
 
-The formula test must remain non-networked. Keep it on `mutx status` or `mutx --help`.
+The workflow requires a `HOMEBREW_TAP_TOKEN` repository secret with write access to `mutx-dev/homebrew-tap`.
+`main` pushes alone do not update Homebrew. The formula test must remain non-networked.
