@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
@@ -26,6 +26,7 @@ export DATABASE_SSL_MODE="${DATABASE_SSL_MODE:-disable}"
 export NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL:-https://api.mutx.dev}"
 export NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://app.mutx.dev}"
 export CORS_ORIGINS="${CORS_ORIGINS:-https://mutx.dev,https://app.mutx.dev}"
+export WEB_CONCURRENCY="${WEB_CONCURRENCY:-1}"
 
 cleanup() {
   docker compose -f "$COMPOSE_FILE" down -v --remove-orphans >/dev/null 2>&1 || true
@@ -61,7 +62,8 @@ wait_for_command() {
     sleep 2
   done
 
-  eval "$command"
+  echo "Timed out waiting for ${description}."
+  return 1
 }
 
 trap dump_failure_context ERR

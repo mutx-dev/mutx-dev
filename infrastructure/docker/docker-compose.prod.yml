@@ -75,7 +75,7 @@ services:
     restart: unless-stopped
     environment:
       <<: *api-env
-      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-1}
       BACKGROUND_MONITOR_ENABLED: "false"
     depends_on:
       migrate:
