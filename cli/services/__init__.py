@@ -1,7 +1,7 @@
 from cli.services.agents import AgentsService
 from cli.services.assistant import AssistantService, TemplatesService
 from cli.services.auth import AuthService
-from cli.services.base import (
+from cli.errors import (
     APIRequestError,
     AuthenticationExpiredError,
     AuthenticationRequiredError,

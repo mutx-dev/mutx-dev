@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from cli.services.base import APIRequestError, APIService, InvalidCredentialsError
+from cli.errors import InvalidCredentialsError
+from cli.services.base import APIRequestError, APIService
 from cli.services.models import CLIStatus, UserProfile
 
 
@@ -78,7 +79,9 @@ class AuthService(APIService):
             status_code=response.status_code,
         )
 
-    def register(self, name: str, email: str, password: str, api_url: str | None = None) -> CLIStatus:
+    def register(
+        self, name: str, email: str, password: str, api_url: str | None = None
+    ) -> CLIStatus:
         if api_url:
             self.config.set_runtime_api_url(api_url)
 
