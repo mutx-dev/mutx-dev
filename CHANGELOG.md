@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-03-25
+
+### Changed
+- `mutx update` now supports the installer-managed Homebrew and source-overlay install lane instead of only git checkouts
+- CLI release tags now publish the Homebrew tap automatically by regenerating and pushing `mutx-dev/homebrew-tap`
+
+### Fixed
+- `mutx tui` no longer crashes when upstream session data contains duplicate session ids with different keys
+- Homebrew packaging now tracks tagged CLI release archives instead of a drifting raw commit snapshot
+
 ## [1.2.0] - 2026-03-25
 
 ### Added
@@ -125,7 +135,7 @@ This project uses [Semantic Versioning](https://semver.org/). Given a version nu
 | Component | Current Version | Location |
 |-----------|-----------------|----------|
 | Frontend/App | 1.0.0 | `package.json` |
-| CLI distribution | 0.2.1 | root `pyproject.toml` |
+| CLI distribution | 1.2.1 | root `pyproject.toml` |
 | Python SDK | 0.1.0 | `sdk/pyproject.toml` |
 | API | Matches frontend | `package.json` |
 
