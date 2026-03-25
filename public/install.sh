@@ -17,18 +17,14 @@ export HOMEBREW_NO_INSTALL_FROM_API="${HOMEBREW_NO_INSTALL_FROM_API:-1}"
 export HOMEBREW_NO_INSTALLED_HOST_CHECK="${HOMEBREW_NO_INSTALLED_HOST_CHECK:-1}"
 
 MUTX_INSTALL_TIMEOUT="${MUTX_INSTALL_TIMEOUT:-1200}"
-_start_watchdog() {
-  ( sleep "${MUTX_INSTALL_TIMEOUT}" && kill -USR1 $$ 2>/dev/null ) &
+
+start_watchdog() {
+  (
+    sleep "${MUTX_INSTALL_TIMEOUT}"
+    kill -USR1 "$$" 2>/dev/null || true
+  ) &
   WATCHDOG_PID=$!
 }
-if command -v gtimeout >/dev/null 2>&1; then
-  gtimeout "${MUTX_INSTALL_TIMEOUT}" perl -e 'sleep $ARGV[0]' "${MUTX_INSTALL_TIMEOUT}" 2>/dev/null &
-  ( sleep "${MUTX_INSTALL_TIMEOUT}" && kill -USR1 $$ 2>/dev/null ) &
-  WATCHDOG_PID=$!
-elif command -v timeout >/dev/null 2>&1; then
-  ( sleep "${MUTX_INSTALL_TIMEOUT}" && kill -USR1 $$ 2>/dev/null ) &
-  WATCHDOG_PID=$!
-fi
 
 HAS_TTY=0
 MOTION_OK=0
@@ -38,7 +34,6 @@ INSTALL_LOG="${TMPDIR:-/tmp}/mutx-install.$$.$RANDOM.log"
 CLI_MISSING_COMMANDS=""
 MUTX_BIN=""
 SOURCE_OVERLAY_USED=0
-WIZARD_SELECTION=""
 BANNER_HAS_ANIMATED=0
 OS_NAME="unknown"
 INSTALL_STAGE_TOTAL=3
@@ -55,14 +50,9 @@ CURRENT_STAGE_INDEX=-1
 CURRENT_STEP_LABEL=""
 CURRENT_STEP_DETAIL=""
 CURRENT_STEP_STATE="idle"
-FINISH_MESSAGE=""
-WIZARD_VISIBLE=0
-WIZARD_ERROR=""
-WIZARD_HINT=""
 SPINNER_FRAME_INDEX=0
 PROMPT_CURSOR_ROW=0
 PROMPT_CURSOR_COL=0
-WIZARD_PROMPT_LABEL="Select a lane [1/2/3]"
 OPENCLAW_DETECTED=0
 OPENCLAW_BIN=""
 OPENCLAW_HOME=""
@@ -145,22 +135,18 @@ run_with_timeout() {
   shift
 
   if command -v gtimeout >/dev/null 2>&1; then
-    command gtimeout "${timeout_secs}" "$@"
+    gtimeout "${timeout_secs}" "$@"
     return $?
   fi
 
   if command -v timeout >/dev/null 2>&1; then
-    command timeout "${timeout_secs}" "$@"
-    return $?
-  fi
-
-  if command -v perl >/dev/null 2>&1; then
-    perl -e 'use IO::Handle; use IPC::Open3; use Symbol qw gensh; my $pid = open3(my $in, my $out, my $err, @ARGV); local $SIG{ALRM} = sub { kill TERM => $pid; die "timeout" }; alarm '"${timeout_secs}"'; waitpid($pid, 0); my $rc = $? >> 8; exit $rc' -- "$@"
+    timeout "${timeout_secs}" "$@"
     return $?
   fi
 
   "$@" &
   local cmd_pid=$!
+
   (
     sleep "${timeout_secs}"
     kill -TERM "${cmd_pid}" 2>/dev/null || true
@@ -168,8 +154,10 @@ run_with_timeout() {
     kill -KILL "${cmd_pid}" 2>/dev/null || true
   ) &
   local killer_pid=$!
+
   wait "${cmd_pid}"
   local rc=$?
+
   kill "${killer_pid}" 2>/dev/null || true
   wait "${killer_pid}" 2>/dev/null || true
   return "${rc}"
@@ -177,6 +165,8 @@ run_with_timeout() {
 
 trap cleanup EXIT
 trap timeout_watchdog USR1
+
+start_watchdog
 
 tty_print() {
   if [[ "${HAS_TTY}" == "1" ]]; then
@@ -529,25 +519,6 @@ show_install_plan() {
   ui_kv "Secrets" "OpenClaw keys stay local and are not uploaded by MUTX"
 }
 
-show_finish_message() {
-  if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
-    FINISH_MESSAGE="Install complete. Run setup when you are ready."
-    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-      dashboard_render
-      return
-    fi
-    tty_print "\n${C_GOOD}${C_BOLD}${FINISH_MESSAGE}${C_RESET}\n"
-    return
-  fi
-
-  FINISH_MESSAGE="Install complete. Choose a setup lane."
-  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-    dashboard_render
-    return
-  fi
-  tty_print "\n${C_GOOD}${C_BOLD}${FINISH_MESSAGE}${C_RESET}\n"
-}
-
 ascii_frame_content() {
   cat <<'EOF'
                      ≠≠
@@ -825,97 +796,6 @@ dashboard_render_compact_status() {
       row=$((row + 1))
     done
   fi
-
-  if [[ -n "${FINISH_MESSAGE}" ]]; then
-    row=$((row + 1))
-    dashboard_put_line "${row}" 3 "${C_GOOD}${FINISH_MESSAGE}${C_RESET}"
-  fi
-}
-
-dashboard_render_wizard() {
-  local row=2
-  local wrap_width=$((TERM_COLS - 6))
-  local prompt_label="${WIZARD_PROMPT_LABEL}: "
-  local runtime_label=""
-  local path_label=""
-  local home_label=""
-  local note_text=""
-  local message_line=""
-
-  PROMPT_CURSOR_ROW=0
-  PROMPT_CURSOR_COL=0
-
-  runtime_label="package runtime current"
-  if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
-    runtime_label="fresh runtime active"
-  fi
-
-  if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
-    path_label="$(display_path "${OPENCLAW_BIN}" 52)"
-    home_label="$(display_path "${OPENCLAW_HOME}" 52)"
-  fi
-
-  printf '\033[H\033[2J' > /dev/tty
-  dashboard_put_line "${row}" 3 "${C_BOLD}${C_MUTX}MUTX setup${C_RESET}"
-  row=$((row + 1))
-  dashboard_put_line "${row}" 3 "${C_SOFT}One install path. One MUTX wizard. OpenClaw comes along for the ride.${C_RESET}"
-  row=$((row + 2))
-
-  dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Stages${C_RESET}"
-  row=$((row + 1))
-  dashboard_put_line "${row}" 3 "$(dashboard_stage_line 0)"
-  row=$((row + 1))
-  dashboard_put_line "${row}" 3 "$(dashboard_stage_line 1)"
-  row=$((row + 1))
-  dashboard_put_line "${row}" 3 "$(dashboard_stage_line 2)"
-  row=$((row + 2))
-
-  dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Runtime${C_RESET}"
-  row=$((row + 1))
-  dashboard_put_line "${row}" 3 "${C_GOOD}${runtime_label}${C_RESET}"
-  row=$((row + 1))
-  if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
-    dashboard_put_line "${row}" 3 "${C_GOOD}OpenClaw detected${C_RESET} ${C_DIM}${path_label}${C_RESET}"
-    row=$((row + 1))
-    dashboard_put_line "${row}" 3 "${C_GOOD}Importing for tracking${C_RESET} ${C_DIM}${home_label} -> ~/.mutx/providers/openclaw${C_RESET}"
-    row=$((row + 1))
-  else
-    dashboard_put_line "${row}" 3 "${C_WARN}OpenClaw not detected yet${C_RESET} ${C_DIM}the wizard can install it${C_RESET}"
-    row=$((row + 1))
-  fi
-  dashboard_put_line "${row}" 3 "${C_SOFT}Local OpenClaw keys stay on this machine.${C_RESET}"
-  row=$((row + 2))
-
-  dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Lanes${C_RESET}"
-  row=$((row + 1))
-  dashboard_put_line "${row}" 3 "${C_PANEL}1${C_RESET} Hosted   ${C_DIM}${HOSTED_API_URL}${C_RESET} ${C_GOOD}(recommended)${C_RESET}"
-  row=$((row + 1))
-  dashboard_put_line "${row}" 3 "${C_PANEL}2${C_RESET} Local    ${C_DIM}${LOCAL_API_URL}${C_RESET} ${C_WARN}(advanced · Docker-backed)${C_RESET}"
-  row=$((row + 1))
-  dashboard_put_line "${row}" 3 "${C_PANEL}3${C_RESET} Later    ${C_DIM}finish install and exit cleanly${C_RESET}"
-  row=$((row + 2))
-
-  note_text="${WIZARD_HINT}"
-  if [[ -n "${WIZARD_ERROR}" ]]; then
-    while IFS= read -r message_line; do
-      dashboard_put_line "${row}" 3 "${C_WARN}${message_line}${C_RESET}"
-      row=$((row + 1))
-    done < <(wrap_text "${WIZARD_ERROR}" "${wrap_width}")
-  elif [[ -n "${note_text}" ]]; then
-    while IFS= read -r message_line; do
-      dashboard_put_line "${row}" 3 "${C_SOFT}${message_line}${C_RESET}"
-      row=$((row + 1))
-    done < <(wrap_text "${note_text}" "${wrap_width}")
-  elif [[ -n "${FINISH_MESSAGE}" ]]; then
-    while IFS= read -r message_line; do
-      dashboard_put_line "${row}" 3 "${C_GOOD}${message_line}${C_RESET}"
-      row=$((row + 1))
-    done < <(wrap_text "${FINISH_MESSAGE}" "${wrap_width}")
-  fi
-
-  PROMPT_CURSOR_ROW="${row}"
-  PROMPT_CURSOR_COL=$((3 + ${#prompt_label}))
-  dashboard_put_line "${row}" 3 "${C_PANEL}${prompt_label}${C_RESET}"
 }
 
 dashboard_render_surface_check() {
@@ -958,41 +838,6 @@ dashboard_render_surface_check() {
   fi
 }
 
-dashboard_render_hosted_creds() {
-  local row=2
-  local wrap_width=$((TERM_COLS - 6))
-  local hint_text="${WIZARD_HINT}"
-  local message_line=""
-
-  printf '\033[H\033[2J' > /dev/tty
-  dashboard_put_line "${row}" 3 "${C_BOLD}${C_MUTX}MUTX setup${C_RESET}"
-  row=$((row + 1))
-  dashboard_put_line "${row}" 3 "${C_SOFT}Hosted lane · signing in${C_RESET}"
-  row=$((row + 2))
-
-  dashboard_put_line "${row}" 3 "${C_GOOD}✓${C_RESET} package lane synced"
-  row=$((row + 1))
-  dashboard_put_line "${row}" 3 "${C_GOOD}✓${C_RESET} command surface verified"
-  row=$((row + 1))
-  dashboard_put_line "${row}" 3 "${C_GOOD}✓${C_RESET} ready for setup"
-  row=$((row + 2))
-
-  if [[ -n "${WIZARD_ERROR}" ]]; then
-    while IFS= read -r message_line; do
-      dashboard_put_line "${row}" 3 "${C_WARN}${message_line}${C_RESET}"
-      row=$((row + 1))
-    done < <(wrap_text "${WIZARD_ERROR}" "${wrap_width}")
-    row=$((row + 1))
-  fi
-
-  if [[ -n "${hint_text}" ]]; then
-    while IFS= read -r message_line; do
-      dashboard_put_line "${row}" 3 "${C_SOFT}${message_line}${C_RESET}"
-      row=$((row + 1))
-    done < <(wrap_text "${hint_text}" "${wrap_width}")
-  fi
-}
-
 dashboard_render() {
   local frame_color=""
   local max_lines=0
@@ -1007,11 +852,6 @@ dashboard_render() {
   fi
 
   refresh_terminal_size
-
-  if [[ "${WIZARD_VISIBLE}" == "1" ]]; then
-    dashboard_render_wizard
-    return
-  fi
 
   if [[ "${SURFACE_CHECK_TOTAL}" -gt 0 ]]; then
     dashboard_render_surface_check
@@ -1057,10 +897,6 @@ dashboard_render() {
   esac
   if [[ -n "${CURRENT_STEP_DETAIL}" ]]; then
     info_lines+=("${C_SOFT}${CURRENT_STEP_DETAIL}${C_RESET}")
-  fi
-  if [[ -n "${FINISH_MESSAGE}" ]]; then
-    info_lines+=("")
-    info_lines+=("${C_GOOD}${FINISH_MESSAGE}${C_RESET}")
   fi
 
   max_lines="${#art_lines[@]}"
@@ -1249,6 +1085,18 @@ read_tty_secret() {
   printf -v "${__resultvar}" '%s' "${line}"
 }
 
+relink_formula() {
+  brew unlink "${FORMULA}" >/dev/null 2>&1 || true
+  brew link --force "${FORMULA}"
+}
+
+path_realpath() {
+  python3 - "$1" <<'PY'
+import os, sys
+print(os.path.realpath(sys.argv[1]))
+PY
+}
+
 resolve_mutx_bin() {
   hash -r 2>/dev/null || true
 
@@ -1259,7 +1107,7 @@ resolve_mutx_bin() {
     fi
     if [[ -L "${path}" ]]; then
       local resolved
-      resolved="$(readlink -f "${path}" 2>/dev/null || true)"
+      resolved="$(path_realpath "${path}" 2>/dev/null || true)"
       if [[ -x "${resolved}" ]]; then
         MUTX_BIN="${path}"
         return 0
@@ -1604,235 +1452,27 @@ maybe_start_local_control_plane() {
   return 1
 }
 
-is_mutx_authenticated() {
-  local config_path="${MUTX_HOME_DIR}/config.json"
-  if [[ ! -f "${config_path}" ]]; then
-    return 1
-  fi
-  if grep -q '"access_token"' "${config_path}" 2>/dev/null; then
-    return 0
-  fi
-  return 1
-}
-
 run_setup_handoff() {
   detect_openclaw_runtime
 
-  if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
-    leave_alt_screen
-    say "Install complete"
-    note "Next step:"
-    if is_mutx_authenticated; then
-      note "  mutx tui"
-    else
-      note "  mutx setup hosted --install-openclaw"
-    fi
-    if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
-      note "OpenClaw detected — setup will offer to import it."
-    fi
-    return
-  fi
-
-  if is_mutx_authenticated; then
-    WIZARD_VISIBLE=1
-    WIZARD_HINT="You're already signed in. Ready to set up your assistant."
-    WIZARD_ERROR=""
-
-    while true; do
-      if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-        dashboard_render
-        if [[ "${PROMPT_CURSOR_ROW}" -gt 0 && "${PROMPT_CURSOR_COL}" -gt 0 ]]; then
-          printf '\033[%d;%dH' "${PROMPT_CURSOR_ROW}" "${PROMPT_CURSOR_COL}" > /dev/tty
-        fi
-      else
-        render_banner
-        tty_print "${C_GOOD}✓${C_RESET} already signed in\n"
-        tty_print "\n"
-        tty_print "${C_PANEL}╭─ ${C_BOLD}Setup Wizard${C_RESET}${C_PANEL} ─────────────────────────────────────────────╮${C_RESET}\n"
-        tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}You're already authenticated.${C_RESET}\n"
-        tty_print "${C_PANEL}│${C_RESET}\n"
-        tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Open TUI         ${C_GOOD}(recommended)${C_RESET}\n"
-        tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Re-authenticate   ${C_DIM}sign in with a different account${C_RESET}\n"
-        tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}3${C_RESET}  Later            ${C_DIM}finish install and exit cleanly${C_RESET}\n"
-        tty_print "${C_PANEL}╰───────────────────────────────────────────────────────────────╯${C_RESET}\n"
-        tty_prompt "Select [1/2/3]"
-      fi
-
-      read_tty_line WIZARD_SELECTION
-      WIZARD_SELECTION="${WIZARD_SELECTION:-1}"
-      WIZARD_ERROR=""
-
-      case "${WIZARD_SELECTION}" in
-        1|tui|TUI|"")
-          WIZARD_SELECTION="tui"
-          break
-          ;;
-        2|r|reauth|Reauth)
-          WIZARD_SELECTION="reauth"
-          break
-          ;;
-        3|later|Later|q|Q|quit|exit)
-          WIZARD_SELECTION="later"
-          break
-          ;;
-        *)
-          WIZARD_ERROR="Choose 1, 2, or 3."
-          if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-            dashboard_render
-          else
-            note "${WIZARD_ERROR}"
-          fi
-          sleep 1
-          ;;
-      esac
-    done
-
-    if [[ "${WIZARD_SELECTION}" == "tui" ]]; then
-      leave_alt_screen
-      say "Opening MUTX TUI..."
-      exec "${MUTX_BIN}" tui < /dev/tty > /dev/tty 2>&1
-    elif [[ "${WIZARD_SELECTION}" == "reauth" ]]; then
-      local -a reauth_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}")
-      if [[ "${OPEN_TUI}" != "0" ]]; then
-        append_if_supported reauth_cmd "setup hosted" "--open-tui"
-      fi
-      append_if_supported reauth_cmd "setup hosted" "--no-input"
-      leave_alt_screen
-      exec "${reauth_cmd[@]}" < /dev/tty > /dev/tty 2>&1
-    fi
-
-    leave_alt_screen
-    say "Install complete"
-    note "Run 'mutx tui' when ready."
-    return
-  fi
-
-  local -a hosted_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}")
-  local -a local_cmd=("${MUTX_BIN}" setup local)
-
-  append_if_supported hosted_cmd "setup hosted" "--install-openclaw"
-  append_if_supported local_cmd "setup local" "--install-openclaw"
+  local -a onboard_cmd=("${MUTX_BIN}" onboard)
 
   if [[ "${OPEN_TUI}" != "0" ]]; then
-    append_if_supported hosted_cmd "setup hosted" "--open-tui"
-    append_if_supported local_cmd "setup local" "--open-tui"
+    onboard_cmd+=(--open-tui)
   fi
 
-  WIZARD_VISIBLE=1
-  WIZARD_ERROR=""
-
-  while true; do
-    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-      dashboard_render
-      if [[ "${PROMPT_CURSOR_ROW}" -gt 0 && "${PROMPT_CURSOR_COL}" -gt 0 ]]; then
-        printf '\033[%d;%dH' "${PROMPT_CURSOR_ROW}" "${PROMPT_CURSOR_COL}" > /dev/tty
-      fi
-    else
-      render_banner
-      tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}package lane synced${C_RESET}\n"
-      tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}command surface verified${C_RESET}\n"
-      tty_print "${C_MUTX_ALT}●${C_RESET} ${C_GOOD}ready for setup${C_RESET}\n"
-      tty_print "\n"
-      tty_print "${C_PANEL}╭─ ${C_BOLD}Setup Wizard${C_RESET}${C_PANEL} ─────────────────────────────────────────────╮${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_SOFT}Create your MUTX account or sign in.${C_RESET}\n"
-      if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
-        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} fresh CLI overlay active\n"
-      else
-        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}runtime${C_RESET} packaged CLI is current\n"
-      fi
-      if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
-        tty_print "${C_PANEL}│${C_RESET} ${C_GOOD}openclaw${C_RESET} detected at ${C_DIM}$(display_path "${OPENCLAW_BIN}" 34)${C_RESET}\n"
-      else
-        tty_print "${C_PANEL}│${C_RESET} ${C_WARN}openclaw${C_RESET} not detected yet · the wizard can install it\n"
-      fi
-      tty_print "${C_PANEL}│${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}1${C_RESET}  Hosted   ${C_DIM}${HOSTED_API_URL}${C_RESET} ${C_GOOD}(recommended)${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}2${C_RESET}  Local    ${C_DIM}${LOCAL_API_URL}${C_RESET} ${C_DIM}(advanced · Docker-backed)${C_RESET}\n"
-      tty_print "${C_PANEL}│${C_RESET} ${C_BOLD}3${C_RESET}  Later    ${C_DIM}finish install and exit cleanly${C_RESET}\n"
-      tty_print "${C_PANEL}╰───────────────────────────────────────────────────────────────╯${C_RESET}\n"
-      tty_prompt "Select [1/2/3]"
+  if [[ "${NO_ONBOARD}" == "1" ]] || ! is_promptable; then
+    leave_alt_screen
+    say "Install complete."
+    note "Run: mutx onboard"
+    if [[ "${OPENCLAW_DETECTED}" == "1" ]]; then
+      note "OpenClaw detected — onboard will offer to import it."
     fi
-
-    read_tty_line WIZARD_SELECTION
-    WIZARD_SELECTION="${WIZARD_SELECTION:-1}"
-    WIZARD_ERROR=""
-
-    case "${WIZARD_SELECTION}" in
-      1|h|H|hosted|Hosted)
-        break
-        ;;
-      2|l|L|local|Local)
-        break
-        ;;
-      3|later|Later|q|Q|quit|exit)
-        WIZARD_SELECTION="later"
-        break
-        ;;
-      *)
-        WIZARD_ERROR="Choose 1, 2, or 3."
-        if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-          dashboard_render
-        else
-          note "${WIZARD_ERROR}"
-        fi
-        sleep 1
-        ;;
-    esac
-  done
-
-  if [[ "${WIZARD_SELECTION}" == "1" || "${WIZARD_SELECTION}" == "h" || "${WIZARD_SELECTION}" == "H" || "${WIZARD_SELECTION}" == "hosted" || "${WIZARD_SELECTION}" == "Hosted" ]]; then
-    local -a register_cmd=("${MUTX_BIN}" setup hosted --api-url "${HOSTED_API_URL}" --register)
-    append_if_supported register_cmd "setup hosted" "--install-openclaw"
-    append_if_supported register_cmd "setup hosted" "--open-tui"
-    append_if_supported register_cmd "setup hosted" "--no-input"
-    leave_alt_screen
-    say "Launching MUTX hosted setup — new account registration included."
-    exec "${register_cmd[@]}" < /dev/tty > /dev/tty 2>&1
-  fi
-
-  if [[ "${WIZARD_SELECTION}" == "2" || "${WIZARD_SELECTION}" == "l" || "${WIZARD_SELECTION}" == "L" || "${WIZARD_SELECTION}" == "local" || "${WIZARD_SELECTION}" == "Local" ]]; then
-    leave_alt_screen
-    say "Launching MUTX local setup..."
-    exec "${local_cmd[@]}" < /dev/tty > /dev/tty 2>&1
+    return
   fi
 
   leave_alt_screen
-  say "Install complete"
-  note "Run 'mutx setup hosted --install-openclaw' to get started."
-}
-
-append_if_supported() {
-  local target_name="$1"
-  local spec="$2"
-  local option="$3"
-  shift 3
-
-  if mutx_supports_option "${spec}" "${option}"; then
-    eval "${target_name}+=(\"\${option}\")"
-    while [[ "$#" -gt 0 ]]; do
-      local value="$1"
-      shift
-      eval "${target_name}+=(\"\${value}\")"
-    done
-  fi
-}
-
-mutx_supports_option() {
-  local spec="$1"
-  local option="$2"
-  local help_text=""
-
-  help_text="$(mutx_help_output "${spec}")"
-  [[ "${help_text}" == *"${option}"* ]]
-}
-
-mutx_help_output() {
-  local spec="$1"
-  local -a cmd=("${MUTX_BIN}")
-  local -a parts=()
-  read -r -a parts <<< "${spec}"
-  cmd+=("${parts[@]}")
-  "${cmd[@]}" --help 2>&1 || true
+  exec "${onboard_cmd[@]}" < /dev/tty > /dev/tty 2>&1
 }
 
 parse_args "$@"
@@ -1885,11 +1525,10 @@ elif [[ "${BREW_UPGRADE_NEEDED}" == "yes" ]]; then
   run_stage "Upgrading MUTX runtime" upgrade_or_keep_formula
 fi
 
-run_stage "Linking mutx into PATH" run_with_timeout 60 brew unlink "${FORMULA}" 2>/dev/null || true && run_with_timeout 60 brew link --force "${FORMULA}"
+run_stage "Linking mutx into PATH" run_with_timeout 60 relink_formula
 resolve_mutx_bin
 run_stage "Warming CLI" "${MUTX_BIN}" --help
 
 ui_stage "Finalizing setup"
 ensure_assistant_first_surface
-show_finish_message
 run_setup_handoff

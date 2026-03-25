@@ -15,6 +15,7 @@ from cli.commands.governance import governance_group
 from cli.commands.observability import observability_group
 from cli.commands.runtime import runtime_group
 from cli.commands.security import security_group
+from cli.commands.onboard import onboard_command
 from cli.commands.setup import setup_group
 from cli.commands.tui import tui_command
 from cli.commands.update import update_command
@@ -113,6 +114,7 @@ cli.add_command(governance_group)
 cli.add_command(observability_group)
 cli.add_command(runtime_group)
 cli.add_command(security_group)
+cli.add_command(onboard_command)
 cli.add_command(setup_group)
 cli.add_command(update_command)
 cli.add_command(webhooks_group)
