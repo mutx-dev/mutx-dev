@@ -48,7 +48,7 @@ def test_agents_create_hits_canonical_route_and_renders_agent(monkeypatch) -> No
             },
         )
 
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.agents.get_client", lambda config: SimpleNamespace(post=fake_post)
     )
@@ -104,7 +104,7 @@ def test_agents_create_with_minimal_args(monkeypatch) -> None:
             },
         )
 
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.agents.get_client", lambda config: SimpleNamespace(post=fake_post)
     )
@@ -120,7 +120,7 @@ def test_agents_create_with_minimal_args(monkeypatch) -> None:
 
 
 def test_agents_create_with_invalid_json_config(monkeypatch) -> None:
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
 
     runner = CliRunner()
     result = runner.invoke(
@@ -146,7 +146,7 @@ def test_agents_deploy_hits_contract_route_and_renders_deployment(monkeypatch) -
             },
         )
 
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.agents.get_client", lambda config: SimpleNamespace(post=fake_post)
     )
@@ -187,7 +187,7 @@ def test_agents_list_hits_canonical_route_and_renders_agents(monkeypatch) -> Non
             ],
         )
 
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -211,7 +211,7 @@ def test_agents_list_with_pagination_options(monkeypatch) -> None:
         captured["params"] = params
         return DummyResponse(200, [])
 
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -240,7 +240,7 @@ def test_agents_status_hits_canonical_route_and_renders_agent(monkeypatch) -> No
             },
         )
 
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -279,7 +279,7 @@ def test_agents_logs_hits_canonical_route_and_renders_logs(monkeypatch) -> None:
             ],
         )
 
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -302,7 +302,7 @@ def test_agents_logs_with_level_filter(monkeypatch) -> None:
         captured["params"] = params
         return DummyResponse(200, [])
 
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -322,7 +322,7 @@ def test_agents_delete_hits_canonical_route(monkeypatch) -> None:
         captured["path"] = path
         return DummyResponse(204, None)
 
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.agents.get_client", lambda config: SimpleNamespace(delete=fake_delete)
     )
@@ -336,7 +336,7 @@ def test_agents_delete_hits_canonical_route(monkeypatch) -> None:
 
 
 def test_agents_delete_requires_confirmation_without_force(monkeypatch) -> None:
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
 
     runner = CliRunner()
     result = runner.invoke(cli, ["agents", "delete", "agent-id"], input="n\n")
@@ -369,7 +369,7 @@ def test_agents_list_with_table_format(monkeypatch) -> None:
             ],
         )
 
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -405,7 +405,7 @@ def test_agents_list_with_simple_format(monkeypatch) -> None:
             ],
         )
 
-    monkeypatch.setattr("cli.commands.agents.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.agents.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.agents.get_client", lambda config: SimpleNamespace(get=fake_get)
     )

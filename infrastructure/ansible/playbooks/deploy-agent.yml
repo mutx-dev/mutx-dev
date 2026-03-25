@@ -26,23 +26,23 @@
         name: agent
 
     - name: Verify agent is running
-      docker_container:
+      community.docker.docker_container:
         name: "{{ agent_name }}"
         state: started
       register: container_status
 
     - name: Wait for agent API to be ready
-      wait_for:
+      ansible.builtin.wait_for:
         port: "{{ agent_port }}"
         delay: 5
         timeout: 60
       when: container_status.changed
 
     - name: Get agent container status
-      docker_container_info:
+      community.docker.docker_container_info:
         name: "{{ agent_name }}"
       register: agent_info
 
     - name: Display agent status
-      debug:
+      ansible.builtin.debug:
         msg: "Agent {{ agent_name }} is {{ 'running' if agent_info.container.State.Running else 'stopped' }}"

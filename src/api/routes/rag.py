@@ -297,9 +297,12 @@ async def similarity_search(
         resource_id=request.model,
         metadata={"top_k": request.top_k, "query_length": len(request.query)},
     )
-    # TODO: Implement with pgvector once extension is added
-    # For now, return empty results with a clear message
-    return []
+    # pgvector-based similarity search is planned for v1.3
+    raise HTTPException(
+        status_code=503,
+        detail="RAG similarity search is not yet implemented. This feature requires pgvector extension which is planned for v1.3.",
+        headers={"X-Feature-Flag": "rag.search", "X-Available-In": "v1.3"},
+    )
 
 
 @router.get("/health")

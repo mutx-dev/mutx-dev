@@ -29,12 +29,12 @@
 
   tasks:
     - name: Update apt cache
-      ansible.apt:
-        update_cache: yes
+      ansible.builtin.apt:
+        update_cache: true
         cache_valid_time: 3600
 
     - name: Install essential packages
-      ansible.apt:
+      ansible.builtin.apt:
         name:
           - curl
           - wget
@@ -66,32 +66,32 @@
             state: present
 
         - name: Install PostgreSQL
-          ansible.apt:
+          ansible.builtin.apt:
             name: "postgresql-{{ postgres_version }}"
             state: present
 
         - name: Start PostgreSQL service
-          ansible.service:
+          ansible.builtin.systemd:
             name: postgresql
             state: started
-            enabled: yes
+            enabled: true
 
         - name: Create application database
           become_user: postgres
-          postgresql_db:
+          community.postgresql.postgresql_db:
             name: agent_db
             encoding: UTF-8
 
         - name: Create application user
           become_user: postgres
-          postgresql_user:
+          community.postgresql.postgresql_user:
             name: agent_user
             password: "{{ postgres_password }}"
             db: agent_db
             priv: ALL
 
         - name: Configure PostgreSQL listen addresses
-          lineinfile:
+          ansible.builtin.lineinfile:
             path: /etc/postgresql/{{ postgres_version }}/main/postgresql.conf
             regexp: "^listen_addresses"
             line: "listen_addresses = '*'"
@@ -101,29 +101,29 @@
     - name: Configure Redis
       block:
         - name: Install Redis
-          ansible.apt:
+          ansible.builtin.apt:
             name: redis-server
             state: present
 
         - name: Configure Redis bind address
-          lineinfile:
+          ansible.builtin.lineinfile:
             path: /etc/redis/redis.conf
             regexp: "^bind"
             line: "bind 0.0.0.0"
           notify: Restart Redis
 
         - name: Configure Redis password
-          lineinfile:
+          ansible.builtin.lineinfile:
             path: /etc/redis/redis.conf
             regexp: "^# requirepass"
             line: "requirepass {{ redis_password }}"
           notify: Restart Redis
 
         - name: Start Redis service
-          ansible.service:
+          ansible.builtin.systemd:
             name: redis-server
             state: started
-            enabled: yes
+            enabled: true
       when: "'agents' in group_names"
 
     - name: Install and configure Tailscale
@@ -139,29 +139,29 @@
             state: present
 
         - name: Install Tailscale
-          ansible.apt:
+          ansible.builtin.apt:
             name: tailscale
             state: present
 
         - name: Start Tailscale
-          command: tailscale up --auth-key {{ tailscale_auth_key }} --operator root
+          ansible.builtin.command: tailscale up --auth-key {{ tailscale_auth_key }} --operator root
           register: tailscale_up
           failed_when: false
 
         - name: Enable Tailscale service
-          systemd:
+          ansible.builtin.systemd:
             name: tailscaled
-            enabled: yes
+            enabled: true
             state: started
       when: tailscale_auth_key is defined and tailscale_auth_key != ""
 
     - name: Configure UFW firewall
-      ufw:
+      community.general.ufw:
         state: enabled
         policy: deny
 
     - name: Add UFW rules
-      ufw:
+      community.general.ufw:
         rule: "{{ item.rule }}"
         port: "{{ item.port }}"
         from_ip: "{{ item.src | default(omit) }}"
@@ -169,35 +169,35 @@
       loop: "{{ ufw_rules }}"
 
     - name: SSH hardening - Disable password authentication
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         regexp: "^PasswordAuthentication"
         line: "PasswordAuthentication no"
       notify: Restart SSH
 
     - name: SSH hardening - Disable root login
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         regexp: "^PermitRootLogin"
         line: "PermitRootLogin no"
       notify: Restart SSH
 
     - name: SSH hardening - Use only SSHv2
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         regexp: "^Protocol"
         line: "Protocol 2"
       notify: Restart SSH
 
     - name: SSH hardening - Disable X11Forwarding
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         regexp: "^X11Forwarding"
         line: "X11Forwarding no"
       notify: Restart SSH
 
     - name: Configure fail2ban
-      template:
+      ansible.builtin.template:
         src: fail2ban.j2
         dest: /etc/fail2ban/jail.local
       vars:
@@ -208,21 +208,21 @@
 
   handlers:
     - name: Restart PostgreSQL
-      ansible.service:
+      ansible.builtin.systemd:
         name: postgresql
         state: restarted
 
     - name: Restart Redis
-      ansible.service:
+      ansible.builtin.systemd:
         name: redis-server
         state: restarted
 
     - name: Restart SSH
-      ansible.service:
+      ansible.builtin.systemd:
         name: sshd
         state: restarted
 
     - name: Restart fail2ban
-      ansible.service:
+      ansible.builtin.systemd:
         name: fail2ban
         state: restarted

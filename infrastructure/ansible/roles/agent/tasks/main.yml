@@ -1,15 +1,15 @@
 ---
 - name: Create agent user
-  user:
+  ansible.builtin.user:
     name: "{{ agent_system_user }}"
     comment: "mutx.dev Agent User"
-    system: yes
-    create_home: yes
+    system: true
+    create_home: true
     home: "{{ agent_volume_path }}"
     shell: /bin/false
 
 - name: Create agent volume directory
-  file:
+  ansible.builtin.file:
     path: "{{ agent_volume_path }}"
     state: directory
     owner: "{{ agent_system_user }}"
@@ -17,7 +17,7 @@
     mode: '0750'
 
 - name: Create agent config directory
-  file:
+  ansible.builtin.file:
     path: /etc/{{ agent_name }}
     state: directory
     owner: root
@@ -25,14 +25,14 @@
     mode: '0750'
 
 - name: Pull agent Docker image
-  docker_image:
+  community.docker.docker_image:
     name: "{{ agent_image }}"
     source: pull
-    force_source: yes
+    force_source: true
   register: agent_image_pull
 
 - name: Create environment file
-  template:
+  ansible.builtin.template:
     src: env.j2
     dest: "/etc/{{ agent_name }}/env"
     owner: root
@@ -41,7 +41,7 @@
   no_log: true
 
 - name: Create systemd service file
-  template:
+  ansible.builtin.template:
     src: agent.service.j2
     dest: "/etc/systemd/system/{{ systemd_unit_name }}.service"
     mode: '0644'
@@ -50,14 +50,14 @@
     - Restart agent
 
 - name: Ensure agent container is removed if exists
-  docker_container:
+  community.docker.docker_container:
     name: "{{ agent_name }}"
     state: absent
   when: agent_image_pull.changed
 
 - name: Start and enable agent service
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ systemd_unit_name }}"
-    enabled: yes
+    enabled: true
     state: started
-    daemon_reload: yes
+    daemon_reload: true
