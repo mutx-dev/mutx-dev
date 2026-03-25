@@ -44,12 +44,12 @@ fi
 echo "Using Python interpreter: $PYTHON_BIN"
 
 echo "Running Python lint and format checks..."
-"$RUFF_BIN" check src/api cli sdk
-"$RUFF_BIN" format --check src/api cli sdk
+"$RUFF_BIN" check src/api cli sdk src/security
+"$RUFF_BIN" format --check src/api cli sdk src/security
 
 echo ""
 echo "Running Python compile check..."
-"$PYTHON_BIN" -m compileall src/api cli sdk/mutx
+"$PYTHON_BIN" -m compileall src/api cli sdk/mutx src/security
 
 echo ""
 echo "Running expanded Python validation suite..."
