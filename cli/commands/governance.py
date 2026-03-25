@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
 import signal
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -10,14 +12,21 @@ import click
 
 from cli.faramesh_runtime import (
     FAREMESH_SOCKET_PATH,
+    approve_defer,
     collect_faramesh_snapshot,
+    deny_defer,
     ensure_faramesh_installed,
     find_faramesh_bin,
+    generate_prometheus_metrics,
     get_faramesh_health,
     get_pending_defers,
     get_recent_decisions,
     is_faramesh_available,
+    kill_agent,
+    list_policy_packs,
+    reload_policy,
     start_faramesh_daemon,
+    validate_policy,
 )
 
 
@@ -355,3 +364,193 @@ def start_command(policy: str | None, auto_install: bool) -> None:
 
     click.echo("Faramesh daemon started but is not responding.", err=True)
     sys.exit(1)
+
+
+@governance_group.command(name="approve")
+@click.argument("token")
+def approve_command(token: str) -> None:
+    """Approve a deferred governance decision."""
+    if not _ensure_faramesh():
+        sys.exit(1)
+
+    click.echo(f"Approving deferred action: {token}")
+    success = approve_defer(FAREMESH_SOCKET_PATH, token)
+    if success:
+        click.echo("Approved.")
+    else:
+        click.echo("Approval failed.", err=True)
+        sys.exit(1)
+
+
+@governance_group.command(name="deny")
+@click.argument("token")
+def deny_command(token: str) -> None:
+    """Deny a deferred governance decision."""
+    if not _ensure_faramesh():
+        sys.exit(1)
+
+    click.echo(f"Denying deferred action: {token}")
+    success = deny_defer(FAREMESH_SOCKET_PATH, token)
+    if success:
+        click.echo("Denied.")
+    else:
+        click.echo("Denial failed.", err=True)
+        sys.exit(1)
+
+
+@governance_group.command(name="kill")
+@click.argument("agent_id")
+def kill_command(agent_id: str) -> None:
+    """Emergency kill an agent (stops all pending actions)."""
+    if not _ensure_faramesh():
+        sys.exit(1)
+
+    click.echo(f"Emergency kill for agent: {agent_id}")
+    success = kill_agent(FAREMESH_SOCKET_PATH, agent_id)
+    if success:
+        click.echo("Agent killed.")
+    else:
+        click.echo("Kill failed.", err=True)
+        sys.exit(1)
+
+
+@governance_group.group(name="policy")
+def policy_group():
+    """Policy management commands."""
+    pass
+
+
+@policy_group.command(name="validate")
+@click.argument("policy_path", type=click.Path(exists=True))
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def policy_validate_command(policy_path: str, output_json: bool) -> None:
+    """Validate an FPL policy file."""
+    result = validate_policy(FAREMESH_SOCKET_PATH, policy_path)
+
+    if output_json:
+        click.echo(json.dumps(result, indent=2))
+        return
+
+    if result.get("valid"):
+        click.echo(f"Policy is valid: {policy_path}")
+        if result.get("output"):
+            click.echo(result["output"])
+    else:
+        click.echo(f"Policy is invalid: {policy_path}", err=True)
+        click.echo(f"Error: {result.get('error', 'unknown')}", err=True)
+        sys.exit(1)
+
+
+@policy_group.command(name="reload")
+@click.option("--policy", "-p", type=click.Path(exists=True), default=None, help="New policy file")
+def policy_reload_command(policy: str | None) -> None:
+    """Hot-reload the running policy (no daemon restart required)."""
+    if not _ensure_faramesh():
+        sys.exit(1)
+
+    click.echo("Reloading policy...")
+    success = reload_policy(FAREMESH_SOCKET_PATH, policy)
+    if success:
+        click.echo("Policy reloaded.")
+    else:
+        click.echo("Reload failed.", err=True)
+        sys.exit(1)
+
+
+@policy_group.command(name="list")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def policy_list_command(output_json: bool) -> None:
+    """List all bundled policy packs."""
+    packs = list_policy_packs()
+
+    if output_json:
+        click.echo(json.dumps(packs, indent=2))
+        return
+
+    if not packs:
+        click.echo("No policy packs found.")
+        return
+
+    click.echo("Bundled Policy Packs")
+    click.echo("=" * 50)
+    for pack in packs:
+        click.echo(f"  {pack['name']:<20} {pack['description']}")
+        click.echo(f"    {pack['path']}")
+        click.echo()
+
+
+@policy_group.command(name="edit")
+@click.option("--policy", "-p", type=click.Path(), default=None, help="Policy file to edit")
+def policy_edit_command(policy: str | None) -> None:
+    """Edit a policy file in $EDITOR."""
+    policy_path = policy or _get_default_policy_path()
+
+    if not policy_path:
+        click.echo("No policy file found. Use --policy to specify one.", err=True)
+        sys.exit(1)
+
+    editor = os.environ.get("EDITOR", "vi")
+    try:
+        subprocess.call([editor, policy_path])
+    except Exception as exc:
+        click.echo(f"Failed to open editor: {exc}", err=True)
+        sys.exit(1)
+
+
+@governance_group.group(name="credential")
+def credential_group():
+    """Credential broker management (requires Faramesh credential broker addon)."""
+    pass
+
+
+@credential_group.command(name="list")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def credential_list_command(output_json: bool) -> None:
+    """List registered credential backends."""
+    if not _ensure_faramesh():
+        sys.exit(1)
+
+    if output_json:
+        click.echo(json.dumps({"credentials": []}, indent=2))
+        return
+
+    click.echo("Credential Broker Configuration")
+    click.echo("=" * 50)
+    click.echo("  No credentials registered.")
+    click.echo()
+    click.echo("Supported backends: vault, awssecrets, gcpsm, azurekv, onepassword, infisical")
+    click.echo("Register with: mutx governance credential register <backend> <name> [options]")
+
+
+@credential_group.command(name="register")
+@click.argument(
+    "backend",
+    type=click.Choice(["vault", "awssecrets", "gcpsm", "azurekv", "onepassword", "infisical"]),
+)
+@click.argument("name")
+@click.option("--path", "-p", help="Secret path/backend URL")
+@click.option("--ttl", "-t", default="15m", help="Credential TTL (e.g., 15m, 1h)")
+def credential_register_command(backend: str, name: str, path: str | None, ttl: str) -> None:
+    """Register a credential backend for credential brokering."""
+    click.echo(f"Registering {backend} credential backend: {name}")
+    click.echo("Credential broker configuration requires Faramesh credential broker addon.")
+    click.echo("See https://faramesh.dev/docs/credential-broker for setup instructions.")
+
+
+@governance_group.command(name="export-metrics")
+@click.option("--format", "-f", type=click.Choice(["prometheus", "json"]), default="prometheus")
+def export_metrics_command(format: str) -> None:
+    """Export governance metrics in Prometheus or JSON format."""
+    if not _ensure_faramesh():
+        sys.exit(1)
+
+    try:
+        snapshot = collect_faramesh_snapshot()
+    except Exception as exc:
+        click.echo(f"Error fetching metrics: {exc}", err=True)
+        sys.exit(1)
+
+    if format == "prometheus":
+        click.echo(generate_prometheus_metrics(snapshot))
+    else:
+        click.echo(json.dumps(snapshot.to_payload(), indent=2))

@@ -397,3 +397,126 @@ def install_faramesh(non_interactive: bool = True) -> str:
         return result if result else "installed"
     else:
         raise Exception(f"Faramesh installation failed: {result}")
+
+
+def approve_defer(socket_path: str, token: str) -> bool:
+    """Approve a deferred governance decision."""
+    result = _send_socket_request(
+        socket_path, {"type": "agent_approve", "token": token}, timeout=5.0
+    )
+    if not result:
+        return False
+    for r in result:
+        if isinstance(r, dict) and r.get("approved"):
+            return True
+    return False
+
+
+def deny_defer(socket_path: str, token: str) -> bool:
+    """Deny a deferred governance decision."""
+    result = _send_socket_request(socket_path, {"type": "agent_deny", "token": token}, timeout=5.0)
+    if not result:
+        return False
+    for r in result:
+        if isinstance(r, dict) and r.get("denied"):
+            return True
+    return False
+
+
+def kill_agent(socket_path: str, agent_id: str) -> bool:
+    """Emergency kill an agent."""
+    result = _send_socket_request(
+        socket_path, {"type": "agent_kill", "agent_id": agent_id}, timeout=5.0
+    )
+    if not result:
+        return False
+    for r in result:
+        if isinstance(r, dict) and r.get("killed"):
+            return True
+    return False
+
+
+def validate_policy(socket_path: str, policy_path: str) -> dict:
+    """Validate an FPL policy file."""
+    bin_path = find_faramesh_bin()
+    if not bin_path:
+        return {"valid": False, "error": "faramesh not installed"}
+
+    try:
+        proc = subprocess.run(
+            [bin_path, "policy", "validate", policy_path],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        if proc.returncode == 0:
+            return {"valid": True, "output": proc.stdout.strip()}
+        else:
+            return {"valid": False, "error": proc.stderr.strip() or proc.stdout.strip()}
+    except subprocess.TimeoutExpired:
+        return {"valid": False, "error": "validation timed out"}
+    except Exception as e:
+        return {"valid": False, "error": str(e)}
+
+
+def reload_policy(socket_path: str, policy_path: str | None = None) -> bool:
+    """Hot-reload the running policy."""
+    request = {"type": "policy_reload"}
+    if policy_path:
+        request["policy_path"] = policy_path
+    result = _send_socket_request(socket_path, request, timeout=5.0)
+    for r in result:
+        if isinstance(r, dict) and r.get("reloaded"):
+            return True
+    return False
+
+
+def list_policy_packs() -> list[dict]:
+    """List all bundled policy packs available."""
+    policies_dir = Path(__file__).parent / "policies"
+    packs = []
+    if policies_dir.exists():
+        for f in sorted(policies_dir.glob("*.fpl")):
+            packs.append(
+                {
+                    "name": f.stem,
+                    "path": str(f),
+                    "description": _get_policy_description(f),
+                }
+            )
+    return packs
+
+
+def _get_policy_description(path: Path) -> str:
+    """Extract description from policy file."""
+    try:
+        content = path.read_text()
+        for line in content.split("\n"):
+            line = line.strip()
+            if line.startswith("#"):
+                desc = line.lstrip("#").strip()
+                if desc and len(desc) > 5:
+                    return desc[:60]
+            elif line.startswith("agent "):
+                break
+    except Exception:
+        pass
+    return "No description"
+
+
+def generate_prometheus_metrics(snapshot: FarameshSnapshot) -> str:
+    """Generate Prometheus metrics text format."""
+    lines = [
+        "# HELP mutx_governance_decisions_total Total governance decisions by effect",
+        "# TYPE mutx_governance_decisions_total counter",
+        f'mutx_governance_decisions_total{{effect="permit"}} {snapshot.permits_today}',
+        f'mutx_governance_decisions_total{{effect="deny"}} {snapshot.denies_today}',
+        f'mutx_governance_decisions_total{{effect="defer"}} {snapshot.defers_today}',
+        "# HELP mutx_governance_pending_approvals Pending approval count",
+        "# TYPE mutx_governance_pending_approvals gauge",
+        f"mutx_governance_pending_approvals {snapshot.pending_approvals}",
+        "# HELP mutx_governance_daemon_up Daemon availability",
+        "# TYPE mutx_governance_daemon_up gauge",
+        f"mutx_governance_daemon_up {1 if snapshot.status == 'running' else 0}",
+    ]
+    return "\n".join(lines) + "\n"

@@ -28,6 +28,7 @@ from cli.openclaw_runtime import (
 from cli.faramesh_runtime import (
     collect_faramesh_snapshot,
     get_faramesh_health,
+    get_pending_defers,
 )
 from cli.runtime_registry import load_wizard_state
 from cli.services import (
@@ -643,6 +644,7 @@ class MutxTUI(App[None]):
         self.selected_agent_id: str | None = None
         self.selected_deployment_id: str | None = None
         self.selected_session_id: str | None = None
+        self._governance_selected_token: str | None = None
         self._agent_cache: dict[str, AgentRecord] = {}
         self._deployment_cache: dict[str, DeploymentRecord] = {}
         self._session_cache: list[dict] = []
@@ -744,6 +746,13 @@ class MutxTUI(App[None]):
                     with Horizontal(classes="action-bar"):
                         yield Button("Refresh", id="governance-refresh", variant="primary")
                         yield Button("Start Daemon", id="governance-start")
+                    with DataTable(id="governance-pending-table", classes="entity-table"):
+                        pass
+                    with Horizontal(classes="action-bar"):
+                        yield Button(
+                            "Approve", id="governance-approve", variant="primary", disabled=True
+                        )
+                        yield Button("Deny", id="governance-deny", variant="error", disabled=True)
                     with VerticalScroll(classes="detail-scroll"):
                         yield Static(id="governance-body", classes="detail-body")
         yield Static(id="context-footer")
@@ -781,6 +790,10 @@ class MutxTUI(App[None]):
         sessions_table.cursor_type = "row"
         sessions_table.zebra_stripes = True
         sessions_table.add_columns("Agent", "Channel", "Age", "Tokens")
+
+        governance_table = self.query_one("#governance-pending-table", DataTable)
+        governance_table.cursor_type = "row"
+        governance_table.zebra_stripes = True
 
     def _set_activity(self, label: str) -> None:
         self._activity_label = label
@@ -1313,9 +1326,87 @@ class MutxTUI(App[None]):
 
     def load_governance(self) -> None:
         self._set_activity("loading governance")
-        _, summary = _render_governance_body()
-        self.query_one("#governance-summary", Static).update("Faramesh Governance Engine")
-        self.query_one("#governance-body", Static).update(summary)
+        try:
+            health = get_faramesh_health()
+            defers = get_pending_defers()
+        except Exception as e:
+            self.call_from_thread(self._update_governance_error, str(e))
+            return
+
+        status_icon = "✓" if health.daemon_reachable else "✗"
+        summary = f"Daemon: {status_icon} {'running' if health.daemon_reachable else 'stopped'} | "
+        summary += f"Policy: {health.policy_name or 'none'} | "
+        summary += f"Pending: {len(defers)}"
+        self.call_from_thread(self._update_governance, summary, defers)
+
+    def _update_governance(self, summary: str, defers: list) -> None:
+        self.query_one("#governance-summary", Static).update(summary)
+        table = self.query_one("#governance-pending-table", DataTable)
+        table.clear()
+        if defers:
+            table.add_columns("Token", "Agent", "Tool", "Reason")
+            for d in defers:
+                table.add_row(
+                    d.defer_token or "-",
+                    d.agent_id or "-",
+                    d.tool_id or "-",
+                    d.reason or "-",
+                )
+            self.query_one("#governance-approve", Button).disabled = False
+            self.query_one("#governance-deny", Button).disabled = False
+        else:
+            self.query_one("#governance-approve", Button).disabled = True
+            self.query_one("#governance-deny", Button).disabled = True
+
+        health = get_faramesh_health()
+        snapshot = collect_faramesh_snapshot()
+        detail_lines = [
+            f"Version: {health.version or 'unknown'}",
+            f"Decisions (total): {snapshot.decisions_total}",
+            f"Decisions (denied today): {health.denied_today}",
+            f"Decisions (deferred today): {health.deferred_today}",
+        ]
+        if health.doctor_summary:
+            detail_lines.append("")
+            detail_lines.append(health.doctor_summary)
+        self.query_one("#governance-body", Static).update("\n".join(detail_lines))
+
+    def _update_governance_error(self, error: str) -> None:
+        self.query_one("#governance-summary", Static).update(f"Error: {error}")
+
+    @work(thread=True, exclusive=True, group="governance-action")
+    def _governance_approve_selected(self) -> None:
+        selected = self._governance_selected_token
+        if not selected:
+            return
+        try:
+            from cli.faramesh_runtime import FAREMESH_SOCKET_PATH, approve_defer
+
+            success = approve_defer(FAREMESH_SOCKET_PATH, selected)
+            if success:
+                self.call_from_thread(self.notify, f"Approved: {selected}", severity="information")
+                self.call_from_thread(self.load_governance)
+            else:
+                self.call_from_thread(self.notify, f"Approval failed: {selected}", severity="error")
+        except Exception as e:
+            self.call_from_thread(self.notify, f"Error: {e}", severity="error")
+
+    @work(thread=True, exclusive=True, group="governance-action")
+    def _governance_deny_selected(self) -> None:
+        selected = self._governance_selected_token
+        if not selected:
+            return
+        try:
+            from cli.faramesh_runtime import FAREMESH_SOCKET_PATH, deny_defer
+
+            success = deny_defer(FAREMESH_SOCKET_PATH, selected)
+            if success:
+                self.call_from_thread(self.notify, f"Denied: {selected}", severity="warning")
+                self.call_from_thread(self.load_governance)
+            else:
+                self.call_from_thread(self.notify, f"Denial failed: {selected}", severity="error")
+        except Exception as e:
+            self.call_from_thread(self.notify, f"Error: {e}", severity="error")
 
     def _start_faramesh_daemon(self) -> None:
         import os
@@ -1441,6 +1532,13 @@ class MutxTUI(App[None]):
         self._set_activity(f"loading {_shorten(deployment_id, 12)}")
         self.load_deployment_detail(deployment_id)
 
+    @on(DataTable.RowSelected, "#governance-pending-table")
+    def on_governance_row_selected(self, event: DataTable.RowSelected) -> None:
+        token = str(event.row_key.value)
+        self._governance_selected_token = token
+        self.query_one("#governance-approve", Button).disabled = False
+        self.query_one("#governance-deny", Button).disabled = False
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
         if button_id == "setup-refresh":
@@ -1471,6 +1569,10 @@ class MutxTUI(App[None]):
             self.load_governance()
         elif button_id == "governance-start":
             self._start_faramesh_daemon()
+        elif button_id == "governance-approve":
+            self._governance_approve_selected()
+        elif button_id == "governance-deny":
+            self._governance_deny_selected()
 
     def action_refresh_current(self) -> None:
         active = self.query_one("#workspace", TabbedContent).active

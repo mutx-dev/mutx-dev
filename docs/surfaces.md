@@ -97,6 +97,25 @@ Surfaces marked **Preview** are:
 | Build on MUTX programmatically | docs.mutx.dev + API | Supported |
 | UI-based operator workflows | app.mutx.dev/dashboard | Preview |
 | Browser control-plane demo | app.mutx.dev/control/* | Preview |
+| Agent governance (Faramesh) | `mutx governance` CLI | Preview |
+
+### Governance (Faramesh)
+
+Governance is integrated via [Faramesh](https://faramesh.dev) and provides deterministic policy enforcement, approval workflows, and credential brokering for MUTX-managed agents.
+
+**What it does today:**
+- Policy enforcement (PERMIT/DENY/DEFER) via FPL
+- CLI commands for governance inspection and approval actions
+- Governance tab in Textual TUI
+- Prometheus metrics export via `/v1/governance/metrics`
+- Bundled policy packs (starter, payment-bot, infra-bot, customer-support)
+
+**What is not yet:**
+- Webhook-based approval notifications
+- Policy editor UI in dashboard
+- Credential broker UI
+
+**Source of truth:** `cli/faramesh_runtime.py`, `cli/commands/governance.py`, `docs/governance.md`
 
 ## Contributing
 

@@ -18,6 +18,18 @@ MUTX keeps the operator surfaces in one repo:
 
 Most teams can already prototype an agent. Very few can run one with durable identity, deployment semantics, sessions, health, access control, and honest operator contracts. MUTX is the layer around the agent system that makes those concerns explicit.
 
+## Governance Engine
+
+MUTX integrates [Faramesh](https://faramesh.dev) by [Faramesh Technologies](https://github.com/faramesh/faramesh-core) as its governance engine. Faramesh provides deterministic AI agent governance through the [FPL (Faramesh Policy Language)](https://github.com/faramesh/fpl-lang):
+
+- **Policy enforcement** — Permit, deny, or defer tool calls based on rules
+- **Session budgets** — Max spend, daily limits, call counts per session
+- **Phase workflows** — Scope tool visibility by workflow stage (intake → execution)
+- **Credential brokering** — Strip API keys, inject ephemeral credentials per call
+- **Ambient guards** — Rate limiting across session, not just per call
+
+See the [Governance Guide](docs/governance.md) for CLI commands and policy reference.
+
 > Start with [Quickstart](docs/deployment/quickstart.md) if you want proof, not theory.
 
 ## Choose Your Path
