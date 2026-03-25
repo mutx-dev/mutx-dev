@@ -77,14 +77,23 @@ describe('host-aware UI routing middleware', () => {
     )
 
     expect(activityResponse.status).toBe(307)
-    expect(activityResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/monitoring')
+    expect(activityResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/observability')
 
     const apiKeysResponse = middleware(
       mockRequest('https://app.mutx.dev/app/api-keys', { host: 'app.mutx.dev' }),
     )
 
     expect(apiKeysResponse.status).toBe(307)
-    expect(apiKeysResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/security')
+    expect(apiKeysResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/api-keys')
+
+    const observabilityResponse = middleware(
+      mockRequest('https://app.mutx.dev/app/observability', { host: 'app.mutx.dev' }),
+    )
+
+    expect(observabilityResponse.status).toBe(307)
+    expect(observabilityResponse.headers.get('location')).toBe(
+      'https://app.mutx.dev/dashboard/observability',
+    )
 
     const cronResponse = middleware(
       mockRequest('https://app.mutx.dev/app/cron', { host: 'app.mutx.dev' }),

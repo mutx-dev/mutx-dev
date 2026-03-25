@@ -77,11 +77,11 @@ function mapLegacyAppPathToDashboard(pathname: string): string {
     '/app': '/dashboard',
     '/app/agents': '/dashboard/agents',
     '/app/deployments': '/dashboard/deployments',
-    '/app/api-keys': '/dashboard/security',
+    '/app/api-keys': '/dashboard/api-keys',
     '/app/webhooks': '/dashboard/webhooks',
     '/app/logs': '/dashboard/monitoring',
     '/app/history': '/dashboard/monitoring',
-    '/app/activity': '/dashboard/monitoring',
+    '/app/activity': '/dashboard/observability',
     '/app/budgets': '/dashboard/budgets',
     '/app/traces': '/dashboard/traces',
     '/app/runs': '/dashboard/runs',
@@ -92,7 +92,7 @@ function mapLegacyAppPathToDashboard(pathname: string): string {
     '/app/orchestration': '/dashboard/orchestration',
     '/app/cron': '/dashboard/orchestration',
     '/app/health': '/dashboard/monitoring',
-    '/app/observability': '/dashboard/monitoring',
+    '/app/observability': '/dashboard/observability',
   }
 
   if (directMap[normalized]) {

@@ -154,6 +154,38 @@ const mockedAnalyticsSummary = {
   period_end: '2025-03-31T23:59:59Z',
 };
 
+const mockedAnalyticsRunTrend = [
+  { timestamp: '2025-03-17T00:00:00Z', value: 2, label: 'Mar 17' },
+  { timestamp: '2025-03-18T00:00:00Z', value: 4, label: 'Mar 18' },
+  { timestamp: '2025-03-19T00:00:00Z', value: 6, label: 'Mar 19' },
+  { timestamp: '2025-03-20T00:00:00Z', value: 3, label: 'Mar 20' },
+  { timestamp: '2025-03-21T00:00:00Z', value: 5, label: 'Mar 21' },
+];
+
+const mockedAnalyticsLatencyTrend = [
+  { timestamp: '2025-03-17T00:00:00Z', value: 140, label: 'Mar 17' },
+  { timestamp: '2025-03-18T00:00:00Z', value: 164, label: 'Mar 18' },
+  { timestamp: '2025-03-19T00:00:00Z', value: 188, label: 'Mar 19' },
+  { timestamp: '2025-03-20T00:00:00Z', value: 176, label: 'Mar 20' },
+  { timestamp: '2025-03-21T00:00:00Z', value: 184, label: 'Mar 21' },
+];
+
+const mockedCostSummary = {
+  total_credits_used: 1420,
+  credits_remaining: 3580,
+  credits_total: 5000,
+  usage_by_event_type: {
+    'run.completed': 900,
+    'webhook.replay': 520,
+  },
+  usage_by_agent: {
+    agent_alpha: 840,
+    agent_beta: 580,
+  },
+  period_start: '2025-03-01T00:00:00Z',
+  period_end: '2025-03-31T23:59:59Z',
+};
+
 const mockedUsageEvents = [
   {
     id: 'usage_alpha',
@@ -251,6 +283,145 @@ const mockedApiKeys = [
   },
 ];
 
+const mockedSessions = [
+  {
+    id: 'session_alpha',
+    key: 'session_alpha',
+    agent: 'OpenClaw Operator',
+    kind: 'pairing',
+    age: '18m',
+    model: 'openai/gpt-5',
+    tokens: '12.4k',
+    channel: 'webchat',
+    flags: ['web', 'paired'],
+    active: true,
+    start_time: 1742547000,
+    last_activity: 1742548200,
+    source: 'gateway',
+  },
+  {
+    id: 'session_beta',
+    key: 'session_beta',
+    agent: 'OpenClaw Operator',
+    kind: 'handoff',
+    age: '54m',
+    model: 'openai/gpt-5-mini',
+    tokens: '3.2k',
+    channel: 'telegram',
+    flags: ['idle'],
+    active: false,
+    start_time: 1742543400,
+    last_activity: 1742545200,
+    source: 'gateway',
+  },
+];
+
+const mockedAssistantOverview = {
+  has_assistant: true,
+  recommended_template_id: 'personal_assistant',
+  assistant: {
+    agent_id: '11111111-1111-1111-1111-111111111111',
+    name: 'OpenClaw Operator',
+    description: 'Tracked OpenClaw assistant',
+    runtime: 'personal_assistant',
+    template_id: 'personal_assistant',
+    status: 'running',
+    onboarding_status: 'completed',
+    assistant_id: 'openclaw-demo',
+    workspace: 'operator-workspace',
+    last_activity: '2025-03-21T08:14:00Z',
+    session_count: 2,
+    installed_skills: [],
+    channels: [
+      { id: 'webchat', label: 'WebChat', enabled: true, mode: 'pairing', allow_from: [] },
+      { id: 'telegram', label: 'Telegram', enabled: false, mode: 'pairing', allow_from: [] },
+    ],
+    wakeups: [],
+    gateway: {
+      status: 'healthy',
+      cli_available: true,
+      gateway_configured: true,
+      gateway_reachable: true,
+      gateway_port: 18789,
+      gateway_url: 'http://127.0.0.1:18789',
+      credential_detected: true,
+      config_path: '/tmp/openclaw/config.json',
+      state_dir: '/tmp/openclaw',
+      doctor_summary: 'Gateway reachable from the operator host.',
+    },
+    deployments: [],
+    config: {
+      runtime: 'personal_assistant',
+      template: 'personal_assistant',
+      assistant_id: 'openclaw-demo',
+      workspace: 'operator-workspace',
+      model: 'openai/gpt-5',
+      safety_mode: 'pairing',
+      channels: {},
+      skills: [],
+      wakeups: [],
+      metadata: {},
+      gateway: {
+        port: 18789,
+        auth_mode: 'token',
+        dashboard_allowed_origins: [],
+      },
+    },
+  },
+};
+
+const mockedOnboarding = {
+  provider: 'openclaw',
+  status: 'completed',
+  action_type: 'import_existing_runtime',
+  current_step: 'complete',
+  completed_steps: ['detect', 'bind', 'complete'],
+  assistant_name: 'OpenClaw Operator',
+  assistant_id: 'openclaw-demo',
+  workspace: 'operator-workspace',
+  gateway_url: 'http://127.0.0.1:18789',
+  updated_at: '2025-03-21T08:15:00Z',
+  steps: [
+    { id: 'detect', title: 'Detect OpenClaw runtime', completed: true },
+    { id: 'bind', title: 'Bind assistant workspace', completed: true },
+    { id: 'complete', title: 'Complete operator sync', completed: true },
+  ],
+  providers: [
+    { id: 'openclaw', label: 'OpenClaw', summary: 'Tracked assistant runtime', enabled: true, cue: 'First' },
+    { id: 'codex', label: 'Codex', summary: 'Future provider surface', enabled: false, cue: 'Next' },
+  ],
+};
+
+const mockedRuntimeSnapshot = {
+  provider: 'openclaw',
+  label: 'OpenClaw',
+  status: 'healthy',
+  install_method: 'import_existing_runtime',
+  binary_path: '/usr/local/bin/openclaw',
+  gateway_url: 'http://127.0.0.1:18789',
+  version: '0.4.2',
+  home_path: '/tmp/openclaw',
+  tracking_mode: 'import_existing_runtime',
+  adopted_existing_runtime: true,
+  privacy_summary: 'Keys stay local and the dashboard reflects synced metadata only.',
+  keys_remain_local: true,
+  last_action_type: 'import',
+  config_path: '/tmp/openclaw/config.json',
+  state_dir: '/tmp/openclaw/state',
+  last_seen_at: '2025-03-21T08:15:00Z',
+  last_synced_at: '2025-03-21T08:15:00Z',
+  stale: false,
+  binding_count: 1,
+  bindings: [
+    {
+      assistant_id: 'openclaw-demo',
+      assistant_name: 'OpenClaw Operator',
+      workspace: 'operator-workspace',
+      model: 'openai/gpt-5',
+    },
+  ],
+};
+
 type RouteSpec = {
   path: string;
   heading: RegExp;
@@ -343,6 +514,26 @@ const dashboardRoutes: RouteSpec[] = [
     primaryText: /alert rail/i,
   },
   {
+    path: '/dashboard/observability',
+    heading: /observability/i,
+    primaryText: /agent runs/i,
+  },
+  {
+    path: '/dashboard/analytics',
+    heading: /analytics/i,
+    primaryText: /trend lane/i,
+  },
+  {
+    path: '/dashboard/sessions',
+    heading: /sessions/i,
+    primaryText: /session registry/i,
+  },
+  {
+    path: '/dashboard/api-keys',
+    heading: /api keys/i,
+    primaryText: /key registry/i,
+  },
+  {
     path: '/dashboard/budgets',
     heading: /budgets/i,
     primaryText: /usage by agent/i,
@@ -353,12 +544,9 @@ const dashboardRoutes: RouteSpec[] = [
     primaryText: /add webhook/i,
   },
   {
-    path: '/dashboard/api-keys',
+    path: '/dashboard/security',
     heading: /security/i,
-    primaryText: /alpha key/i,
-    afterLoad: async (page) => {
-      await expect(page).toHaveURL(/\/dashboard\/security(?:\/|$)/);
-    },
+    primaryText: /credential inventory/i,
   },
   {
     path: '/dashboard/memory',
@@ -374,6 +562,11 @@ const dashboardRoutes: RouteSpec[] = [
     path: '/dashboard/swarm',
     heading: /swarm/i,
     primaryText: /swarm topology/i,
+  },
+  {
+    path: '/dashboard/control',
+    heading: /setup/i,
+    primaryText: /provider wizard/i,
   },
 ];
 
@@ -400,6 +593,19 @@ async function mockMatrixTraffic(page: Page) {
     const url = new URL(request.url());
     const { pathname, searchParams } = url;
     const method = request.method();
+
+    if (pathname === '/api/auth/me' && method === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: '11111111-1111-1111-1111-111111111111',
+          email: 'operator@example.com',
+          name: 'Operator',
+        }),
+      });
+      return;
+    }
 
     if (pathname === '/api/dashboard/agents' && method === 'GET') {
       await route.fulfill({
@@ -510,6 +716,32 @@ async function mockMatrixTraffic(page: Page) {
       return;
     }
 
+    if (pathname === '/api/dashboard/analytics/timeseries' && method === 'GET') {
+      const metric = searchParams.get('metric');
+      const data = metric === 'latency' ? mockedAnalyticsLatencyTrend : mockedAnalyticsRunTrend;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          metric: metric || 'runs',
+          interval: searchParams.get('interval') || 'day',
+          data,
+          period_start: '2025-03-01T00:00:00Z',
+          period_end: '2025-03-31T23:59:59Z',
+        }),
+      });
+      return;
+    }
+
+    if (pathname === '/api/dashboard/analytics/costs' && method === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(mockedCostSummary),
+      });
+      return;
+    }
+
     if (pathname === '/api/dashboard/usage/events' && method === 'GET') {
       await route.fulfill({
         status: 200,
@@ -534,6 +766,24 @@ async function mockMatrixTraffic(page: Page) {
           skip: 0,
           limit: Number(searchParams.get('limit') || 16),
         }),
+      });
+      return;
+    }
+
+    if (pathname === '/api/dashboard/sessions' && method === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ sessions: mockedSessions }),
+      });
+      return;
+    }
+
+    if (pathname === '/api/dashboard/assistant/overview' && method === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(mockedAssistantOverview),
       });
       return;
     }
@@ -601,6 +851,24 @@ async function mockMatrixTraffic(page: Page) {
           agents: mockedAgents.length,
           deployments: mockedDeployments.length,
         }),
+      });
+      return;
+    }
+
+    if (pathname === '/api/dashboard/onboarding' && method === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(mockedOnboarding),
+      });
+      return;
+    }
+
+    if (pathname === '/api/dashboard/runtime/providers/openclaw' && method === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(mockedRuntimeSnapshot),
       });
       return;
     }
@@ -682,7 +950,7 @@ async function exerciseMobileSidebar(page: Page, heading: RegExp) {
   const closeSidebar = page.getByRole('button', { name: /close dashboard sidebar/i });
   await expect(closeSidebar.first()).toBeVisible({ timeout: 5000 });
 
-  await closeSidebar.first().click();
+  await closeSidebar.first().dispatchEvent('click');
   await expectVisibleRouteTitle(page, heading);
   await assertNoOverflow(page);
 }
