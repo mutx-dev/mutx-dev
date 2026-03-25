@@ -1,16 +1,17 @@
 """Add usage_events table for telemetry and quota enforcement
 
 Revision ID: f7e2a1c8d9b4
-Revises: 
+Revises:
 Create Date: 2026-03-18
 """
+
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import UUID
 
-revision: str = 'f7e2a1c8d9b4'
+revision: str = "f7e2a1c8d9b4"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

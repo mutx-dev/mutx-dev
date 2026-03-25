@@ -38,4 +38,3 @@ class RuntimeStateService(APIService):
         response = self._request("put", f"/v1/runtime/providers/{provider}", json=payload)
         self._expect_status(response, {200}, invalid_message="Unable to sync provider runtime")
         return RuntimeProviderRecord.from_payload(response.json())
-

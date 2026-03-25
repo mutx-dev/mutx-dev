@@ -14,7 +14,10 @@ from src.api.auth.ownership import get_owned_agent
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models import User
-from src.api.services.assistant_control_plane import collect_assistant_overview, list_gateway_sessions
+from src.api.services.assistant_control_plane import (
+    collect_assistant_overview,
+    list_gateway_sessions,
+)
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 logger = logging.getLogger(__name__)
@@ -59,7 +62,9 @@ def merge_and_dedupe_sessions(
         if not existing or current_activity > existing_activity:
             seen[key] = session
 
-    return sorted(seen.values(), key=lambda session: session.get("last_activity", 0), reverse=True)[:100]
+    return sorted(seen.values(), key=lambda session: session.get("last_activity", 0), reverse=True)[
+        :100
+    ]
 
 
 @router.get("", response_model=SessionListResponse)

@@ -46,7 +46,9 @@ def list_agents_command(output: str):
 @click.option("--type", "agent_type", default="openai", help="Agent type")
 @click.option("--template", default=None, help="Starter template id")
 @click.option("--config", default="{}", help="Agent config JSON")
-@click.option("--install-openclaw", is_flag=True, help="Install OpenClaw automatically if it is missing")
+@click.option(
+    "--install-openclaw", is_flag=True, help="Install OpenClaw automatically if it is missing"
+)
 @click.option(
     "--openclaw-install-method",
     type=click.Choice(["npm", "git"]),
@@ -101,7 +103,9 @@ def create_agent_command(
 
 @agent_group.command(name="deploy")
 @click.argument("agent_id")
-@click.option("--install-openclaw", is_flag=True, help="Install OpenClaw automatically if it is missing")
+@click.option(
+    "--install-openclaw", is_flag=True, help="Install OpenClaw automatically if it is missing"
+)
 @click.option(
     "--openclaw-install-method",
     type=click.Choice(["npm", "git"]),

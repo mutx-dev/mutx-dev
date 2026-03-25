@@ -69,7 +69,11 @@ async def assistant_overview(
 ):
     agent = await _resolve_assistant_agent(db=db, current_user=current_user, agent_id=agent_id)
     if agent is None:
-        return {"has_assistant": False, "recommended_template_id": "personal_assistant", "assistant": None}
+        return {
+            "has_assistant": False,
+            "recommended_template_id": "personal_assistant",
+            "assistant": None,
+        }
 
     deployment_payloads = [_serialize_deployment(deployment) for deployment in agent.deployments]
     return {

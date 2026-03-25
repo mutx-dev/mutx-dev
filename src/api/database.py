@@ -199,7 +199,9 @@ def _has_index(sync_connection: Connection, table_name: str, index_name: str) ->
     return any(index["name"] == index_name for index in inspector.get_indexes(table_name))
 
 
-def _get_column(sync_connection: Connection, table_name: str, column_name: str) -> dict[str, Any] | None:
+def _get_column(
+    sync_connection: Connection, table_name: str, column_name: str
+) -> dict[str, Any] | None:
     inspector = inspect(sync_connection)
     if not inspector.has_table(table_name):
         return None
@@ -224,7 +226,9 @@ def _is_timezone_aware_datetime(column: dict[str, Any] | None) -> bool:
     return "with time zone" in str(column_type).lower()
 
 
-def _has_postgresql_enum_value(sync_connection: Connection, enum_name: str, enum_value: str) -> bool:
+def _has_postgresql_enum_value(
+    sync_connection: Connection, enum_name: str, enum_value: str
+) -> bool:
     result = sync_connection.execute(
         text(
             "SELECT 1 "
@@ -308,7 +312,9 @@ def _repair_known_schema_drift(sync_connection: Connection) -> list[str]:
         RefreshTokenSession.__table__.create(bind=sync_connection, checkfirst=True)
         repaired_objects.append(RefreshTokenSession.__tablename__)
     else:
-        for index in sorted(RefreshTokenSession.__table__.indexes, key=lambda item: item.name or ""):
+        for index in sorted(
+            RefreshTokenSession.__table__.indexes, key=lambda item: item.name or ""
+        ):
             if index.name and not _has_index(
                 sync_connection,
                 RefreshTokenSession.__tablename__,

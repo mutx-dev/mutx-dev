@@ -157,15 +157,16 @@ def default_wizard_state(*, provider: str = "openclaw") -> dict[str, Any]:
         "gateway_url": None,
         "updated_at": _utcnow(),
         "steps": [
-            {"id": item["id"], "title": item["title"], "completed": False}
-            for item in WIZARD_STEPS
+            {"id": item["id"], "title": item["title"], "completed": False} for item in WIZARD_STEPS
         ],
         "providers": provider_catalog(),
     }
 
 
 def load_wizard_state(provider: str = "openclaw") -> dict[str, Any]:
-    state = _read_json_file(provider_wizard_state_path(provider), default=default_wizard_state(provider=provider))
+    state = _read_json_file(
+        provider_wizard_state_path(provider), default=default_wizard_state(provider=provider)
+    )
     if not state:
         state = default_wizard_state(provider=provider)
     completed_steps = state.get("completed_steps")
@@ -305,7 +306,9 @@ def fail_wizard_step(
     return save_wizard_state(provider, state)
 
 
-def complete_wizard(provider: str, *, mode: str | None = None, extra: dict[str, Any] | None = None) -> dict[str, Any]:
+def complete_wizard(
+    provider: str, *, mode: str | None = None, extra: dict[str, Any] | None = None
+) -> dict[str, Any]:
     state = load_wizard_state(provider)
     state.update(extra or {})
     state["completed_steps"] = [item["id"] for item in WIZARD_STEPS]

@@ -51,7 +51,9 @@ async def deploy_template(
         workspace=request.workspace,
         assistant_id=request.assistant_id,
         skills=request.skills,
-        channels={key: value.model_dump(exclude_none=True) for key, value in request.channels.items()},
+        channels={
+            key: value.model_dump(exclude_none=True) for key, value in request.channels.items()
+        },
         runtime_metadata=request.runtime_metadata,
     )
 

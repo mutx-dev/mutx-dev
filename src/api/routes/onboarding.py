@@ -38,4 +38,3 @@ async def onboarding_update(
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-

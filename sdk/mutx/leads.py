@@ -286,9 +286,7 @@ class Contacts(Leads):
         if source is not None:
             payload["source"] = source
 
-        response = await self._client.patch(
-            f"/v1/leads/contacts/{contact_id}", json=payload
-        )
+        response = await self._client.patch(f"/v1/leads/contacts/{contact_id}", json=payload)
         response.raise_for_status()
         return Lead(response.json())
 

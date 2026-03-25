@@ -168,7 +168,11 @@ async def monitor_agent_health(session: AsyncSession):
     running_agents = result.scalars().all()
 
     for agent in running_agents:
-        last_hb = as_utc(agent.last_heartbeat or agent.created_at) if (agent.last_heartbeat or agent.created_at) else None
+        last_hb = (
+            as_utc(agent.last_heartbeat or agent.created_at)
+            if (agent.last_heartbeat or agent.created_at)
+            else None
+        )
         if last_hb and now - last_hb > timedelta(seconds=STALE_THRESHOLD_SECONDS):
             logger.warning(f"Monitor: Agent {agent.name} ({agent.id}) is STALE. Marking as FAILED.")
             old_status = agent.status

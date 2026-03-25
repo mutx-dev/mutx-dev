@@ -74,14 +74,14 @@ def runtime_inspect_command(provider: str, output: str) -> None:
     click.echo(f"Home: {local_manifest.get('home_path') or 'n/a'}")
     click.echo(f"Tracking: {local_manifest.get('tracking_mode') or 'track_external_runtime'}")
     click.echo(
-        "Adopted runtime: "
-        + ("yes" if local_manifest.get("adopted_existing_runtime") else "no")
+        "Adopted runtime: " + ("yes" if local_manifest.get("adopted_existing_runtime") else "no")
     )
     click.echo(
-        "Keys stay local: "
-        + ("yes" if local_manifest.get("keys_remain_local", True) else "no")
+        "Keys stay local: " + ("yes" if local_manifest.get("keys_remain_local", True) else "no")
     )
-    click.echo(f"Privacy: {local_manifest.get('privacy_summary') or 'Local-only runtime tracking.'}")
+    click.echo(
+        f"Privacy: {local_manifest.get('privacy_summary') or 'Local-only runtime tracking.'}"
+    )
     if remote_payload:
         click.echo(f"Remote last_seen: {remote_payload.get('last_seen_at') or 'n/a'}")
 

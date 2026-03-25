@@ -150,11 +150,7 @@ class AssistantService(APIService):
 
         config = assistant.get("config")
         config_dict = config if isinstance(config, dict) else {}
-        assistant_id = str(
-            assistant.get("assistant_id")
-            or config_dict.get("assistant_id")
-            or ""
-        )
+        assistant_id = str(assistant.get("assistant_id") or config_dict.get("assistant_id") or "")
         local_health = get_gateway_health().to_payload()
         assistant["gateway"] = local_health
 

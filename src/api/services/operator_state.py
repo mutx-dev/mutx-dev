@@ -81,7 +81,9 @@ def _default_onboarding_state(provider: str = "openclaw") -> dict[str, Any]:
     }
 
 
-def _normalize_onboarding_state(payload: dict[str, Any] | None, *, provider: str = "openclaw") -> dict[str, Any]:
+def _normalize_onboarding_state(
+    payload: dict[str, Any] | None, *, provider: str = "openclaw"
+) -> dict[str, Any]:
     state = _default_onboarding_state(provider)
     if payload:
         state.update(payload)
@@ -124,7 +126,9 @@ def _parse_datetime(value: Any) -> datetime | None:
     return None
 
 
-def _normalize_runtime_snapshot(payload: dict[str, Any] | None, *, provider: str = "openclaw") -> dict[str, Any]:
+def _normalize_runtime_snapshot(
+    payload: dict[str, Any] | None, *, provider: str = "openclaw"
+) -> dict[str, Any]:
     state = {
         "provider": provider,
         "runtime_key": provider,
@@ -248,7 +252,9 @@ async def update_onboarding_state(
             completed_steps.append(step)
         state["completed_steps"] = completed_steps
         if state.get("status") not in {"failed", "skipped"}:
-            state["status"] = "completed" if len(completed_steps) == len(ONBOARDING_STEPS) else "in_progress"
+            state["status"] = (
+                "completed" if len(completed_steps) == len(ONBOARDING_STEPS) else "in_progress"
+            )
             for item in ONBOARDING_STEPS:
                 if item["id"] not in completed_steps:
                     state["current_step"] = item["id"]
@@ -289,4 +295,3 @@ async def upsert_runtime_provider_snapshot(
     await _upsert_setting(db, user=user, key=_runtime_key(provider), value=snapshot)
     await db.commit()
     return _normalize_runtime_snapshot(snapshot, provider=provider)
-

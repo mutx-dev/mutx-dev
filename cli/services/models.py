@@ -407,15 +407,9 @@ class OnboardingStateRecord:
             failed_step=_as_optional_str(payload.get("failed_step")),
             last_error=_as_optional_str(payload.get("last_error")),
             checklist_dismissed=bool(payload.get("checklist_dismissed", False)),
-            steps=[
-                dict(item)
-                for item in (payload.get("steps") or [])
-                if isinstance(item, dict)
-            ],
+            steps=[dict(item) for item in (payload.get("steps") or []) if isinstance(item, dict)],
             providers=[
-                dict(item)
-                for item in (payload.get("providers") or [])
-                if isinstance(item, dict)
+                dict(item) for item in (payload.get("providers") or []) if isinstance(item, dict)
             ],
             payload=payload,
         )

@@ -76,10 +76,7 @@ def ensure_local_container_runtime(
 
     if sys.platform == "darwin":
         if docker_bin is None:
-            prompt = (
-                "Docker Desktop is required for the Local lane. "
-                "Install it with Homebrew now?"
-            )
+            prompt = "Docker Desktop is required for the Local lane. Install it with Homebrew now?"
             if prompt_install is None or not prompt_install(prompt):
                 raise LocalControlPlaneError(
                     "Docker Desktop is required for the Local lane. "
@@ -214,7 +211,11 @@ def ensure_local_control_plane(
         source_kind = "managed_checkout"
 
     if progress is not None:
-        target = "~/.mutx/runtime/local-control" if source_kind == "managed_checkout" else str(checkout_root)
+        target = (
+            "~/.mutx/runtime/local-control"
+            if source_kind == "managed_checkout"
+            else str(checkout_root)
+        )
         progress(f"Starting the local control plane from {target}")
 
     return_code = _run_dev_up(checkout_root, command_runner=command_runner)
@@ -264,7 +265,9 @@ def ensure_managed_local_control_checkout(
         progress("Provisioning a managed localhost stack under ~/.mutx/runtime/local-control")
 
     resolved_source_ref = source_ref or DEFAULT_CONTROL_PLANE_SOURCE_REF
-    with tempfile.TemporaryDirectory(prefix="mutx-local-control-", dir=str(managed_root)) as tmp_dir:
+    with tempfile.TemporaryDirectory(
+        prefix="mutx-local-control-", dir=str(managed_root)
+    ) as tmp_dir:
         staging_root = Path(tmp_dir) / "source"
         staging_root.mkdir(parents=True, exist_ok=True)
         extracted_root = _materialize_source_ref(resolved_source_ref, staging_root)
