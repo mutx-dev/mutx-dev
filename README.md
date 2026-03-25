@@ -30,6 +30,17 @@ MUTX integrates [Faramesh](https://faramesh.dev) by [Faramesh Technologies](http
 
 See the [Governance Guide](docs/governance.md) for CLI commands and policy reference.
 
+## Built On
+
+MUTX acknowledges the open-source projects that form its foundation:
+
+- **[agent-run](https://github.com/builderz-labs/agent-run)** — Open standard for agent observability. MUTX Observability Schema is based on agent-run with renamed types (MutxRun, MutxStep, MutxCost, etc.).
+- **[AARM](https://github.com/aarm-dev/docs)** — Autonomous Action Runtime Management specification. MUTX Security Layer implements AARM components (Action Mediation, Context Accumulator, Policy Engine, Approval Service, Receipt Generator, Telemetry Exporter).
+- **[Faramesh](https://github.com/faramesh/faramesh-core)** — Pre-execution governance engine. MUTX uses Faramesh as the AARM-compliant policy enforcement backend.
+- **[Mission Control](https://github.com/builderz-labs/mission-control)** — Dashboard inspiration and agent fleet management concepts.
+
+See [CREDITS.md](CREDITS.md) for full attribution and license texts.
+
 > Start with [Quickstart](docs/deployment/quickstart.md) if you want proof, not theory.
 
 ## Choose Your Path

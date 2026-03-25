@@ -15,6 +15,7 @@ from mutx.api_keys import APIKeys
 from mutx.clawhub import ClawHub
 from mutx.deployments import Deployments
 from mutx.leads import Contacts, Leads
+from mutx.observability import Observability, _build_run_from_steps
 from mutx.webhooks import Webhooks
 
 
@@ -45,6 +46,7 @@ class MutxClient:
         self.leads = Leads(self._client)
         self.contacts = Contacts(self._client)
         self.webhooks = Webhooks(self._client)
+        self.observability = Observability(self._client)
 
     def __enter__(self):
         return self
@@ -111,6 +113,14 @@ class MutxClient:
     def webhooks(self, value: Webhooks):
         self._webhooks = value
 
+    @property
+    def observability(self) -> Observability:
+        return self._observability
+
+    @observability.setter
+    def observability(self, value: Observability):
+        self._observability = value
+
 
 class MutxAsyncClient:
     def __init__(
@@ -145,6 +155,7 @@ class MutxAsyncClient:
         self.leads = Leads(self._client)
         self.contacts = Contacts(self._client)
         self.webhooks = Webhooks(self._client)
+        self.observability = Observability(self._client)
 
     async def __aenter__(self):
         return self
@@ -211,6 +222,14 @@ class MutxAsyncClient:
     def webhooks(self, value: Webhooks):
         self._webhooks = value
 
+    @property
+    def observability(self) -> Observability:
+        return self._observability
+
+    @observability.setter
+    def observability(self, value: Observability):
+        self._observability = value
+
 
 __all__ = [
     "MutxClient",
@@ -226,5 +245,6 @@ __all__ = [
     "Deployments",
     "Leads",
     "Webhooks",
+    "Observability",
     "create_agent_client",
 ]

@@ -29,6 +29,7 @@ from cli.faramesh_runtime import (
     collect_faramesh_snapshot,
     get_faramesh_health,
     get_pending_defers,
+    get_recent_decisions,
 )
 from cli.runtime_registry import load_wizard_state
 from cli.services import (
@@ -257,7 +258,7 @@ def _render_setup_body(
         "MUTX uses this page as a short setup rail. The full runtime view lives in Control Plane.",
         "",
         f"Session: {'ready' if authenticated else 'login required'} on {api_url}",
-        f"Provider: OpenClaw 🦞",
+        "Provider: OpenClaw 🦞",
         f"Wizard: {status} · step {current_step}",
         "",
         "Runtime:",
@@ -591,6 +592,51 @@ class MutxTUI(App[None]):
         color: #dbe5f0;
     }
 
+    .governance-metrics {
+        height: auto;
+        padding: 1 1 1 1;
+        background: #050816;
+        border-bottom: solid #162032;
+    }
+
+    .metric-card {
+        width: 12;
+        height: 4;
+        padding: 1 1;
+        margin-right: 1;
+        background: #0a1628;
+        border: solid #1e3a5f;
+        content-align: center middle;
+    }
+
+    .metric-card > Static {
+        width: 100%;
+        color: #94a3b8;
+    }
+
+    #governance-permits + Static {
+        color: #22c55e;
+    }
+
+    #governance-denies + Static {
+        color: #ef4444;
+    }
+
+    #governance-defers + Static {
+        color: #eab308;
+    }
+
+    #governance-pending + Static {
+        color: #3b82f6;
+    }
+
+    #governance-pending-label, #governance-decisions-label {
+        width: 100%;
+        padding: 1 1 0 1;
+        color: #94a3b8;
+        text-style: bold;
+    }
+
     Button {
         background: #0b172b;
         color: #dbeafe;
@@ -752,6 +798,17 @@ class MutxTUI(App[None]):
                     with Horizontal(classes="action-bar"):
                         yield Button("Refresh", id="governance-refresh", variant="primary")
                         yield Button("Start Daemon", id="governance-start")
+                        yield Button("Tail", id="governance-tail")
+                    with Horizontal(classes="governance-metrics"):
+                        with Vertical(classes="metric-card"):
+                            yield Static("Permits", id="governance-permits")
+                        with Vertical(classes="metric-card"):
+                            yield Static("Denies", id="governance-denies")
+                        with Vertical(classes="metric-card"):
+                            yield Static("Defers", id="governance-defers")
+                        with Vertical(classes="metric-card"):
+                            yield Static("Pending", id="governance-pending")
+                    yield Label("Pending Approvals", id="governance-pending-label")
                     with DataTable(id="governance-pending-table", classes="entity-table"):
                         pass
                     with Horizontal(classes="action-bar"):
@@ -759,6 +816,9 @@ class MutxTUI(App[None]):
                             "Approve", id="governance-approve", variant="primary", disabled=True
                         )
                         yield Button("Deny", id="governance-deny", variant="error", disabled=True)
+                    yield Label("Recent Decisions", id="governance-decisions-label")
+                    with DataTable(id="governance-decisions-table", classes="entity-table"):
+                        pass
                     with VerticalScroll(classes="detail-scroll"):
                         yield Static(id="governance-body", classes="detail-body")
         yield Static(id="context-footer")
@@ -800,6 +860,12 @@ class MutxTUI(App[None]):
         governance_table = self.query_one("#governance-pending-table", DataTable)
         governance_table.cursor_type = "row"
         governance_table.zebra_stripes = True
+        governance_table.add_columns("Token", "Agent", "Tool", "Reason")
+
+        decisions_table = self.query_one("#governance-decisions-table", DataTable)
+        decisions_table.cursor_type = "row"
+        decisions_table.zebra_stripes = True
+        decisions_table.add_columns("Time", "Effect", "Tool", "Agent")
 
     def _set_activity(self, label: str) -> None:
         self._activity_label = label
@@ -1334,7 +1400,9 @@ class MutxTUI(App[None]):
         self._set_activity("loading governance")
         try:
             health = get_faramesh_health()
+            snapshot = collect_faramesh_snapshot()
             defers = get_pending_defers()
+            decisions = get_recent_decisions(limit=20)
         except Exception as e:
             self.call_from_thread(self._update_governance_error, str(e))
             return
@@ -1343,16 +1411,23 @@ class MutxTUI(App[None]):
         summary = f"Daemon: {status_icon} {'running' if health.daemon_reachable else 'stopped'} | "
         summary += f"Policy: {health.policy_name or 'none'} | "
         summary += f"Pending: {len(defers)}"
-        self.call_from_thread(self._update_governance, summary, defers)
+        self.call_from_thread(self._update_governance, summary, defers, decisions, health, snapshot)
 
-    def _update_governance(self, summary: str, defers: list) -> None:
+    def _update_governance(
+        self, summary: str, defers: list, decisions: list, health, snapshot
+    ) -> None:
         self.query_one("#governance-summary", Static).update(summary)
-        table = self.query_one("#governance-pending-table", DataTable)
-        table.clear()
+
+        self.query_one("#governance-permits", Static).update(f"Permits\n{snapshot.permits_today}")
+        self.query_one("#governance-denies", Static).update(f"Denies\n{health.denied_today}")
+        self.query_one("#governance-defers", Static).update(f"Defers\n{health.deferred_today}")
+        self.query_one("#governance-pending", Static).update(f"Pending\n{len(defers)}")
+
+        pending_table = self.query_one("#governance-pending-table", DataTable)
+        pending_table.clear()
         if defers:
-            table.add_columns("Token", "Agent", "Tool", "Reason")
             for d in defers:
-                table.add_row(
+                pending_table.add_row(
                     d.defer_token or "-",
                     d.agent_id or "-",
                     d.tool_id or "-",
@@ -1364,13 +1439,22 @@ class MutxTUI(App[None]):
             self.query_one("#governance-approve", Button).disabled = True
             self.query_one("#governance-deny", Button).disabled = True
 
-        health = get_faramesh_health()
-        snapshot = collect_faramesh_snapshot()
+        decisions_table = self.query_one("#governance-decisions-table", DataTable)
+        decisions_table.clear()
+        for d in decisions[:15]:
+            effect = d.effect or "-"
+            effect_display = effect[:6]
+            ts = d.timestamp[-8:] if d.timestamp else "-"
+            decisions_table.add_row(
+                ts,
+                effect_display,
+                (d.tool_id or "-")[:25],
+                (d.agent_id or "-")[:15],
+            )
+
         detail_lines = [
             f"Version: {health.version or 'unknown'}",
             f"Decisions (total): {snapshot.decisions_total}",
-            f"Decisions (denied today): {health.denied_today}",
-            f"Decisions (deferred today): {health.deferred_today}",
         ]
         if health.doctor_summary:
             detail_lines.append("")

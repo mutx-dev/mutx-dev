@@ -6,6 +6,7 @@ import signal
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 import click
 
@@ -482,27 +483,78 @@ def policy_edit_command(policy: str | None) -> None:
 
 @governance_group.group(name="credential")
 def credential_group():
-    """Credential broker management (requires Faramesh credential broker addon)."""
+    """Credential broker management for governance."""
     pass
+
+
+def _parse_ttl(ttl_str: str) -> int:
+    """Parse TTL string like '15m', '1h', '30s' to seconds."""
+    ttl_str = ttl_str.strip().lower()
+    if ttl_str.endswith("m"):
+        return int(ttl_str[:-1]) * 60
+    elif ttl_str.endswith("h"):
+        return int(ttl_str[:-1]) * 3600
+    elif ttl_str.endswith("s"):
+        return int(ttl_str[:-1])
+    else:
+        return int(ttl_str)
 
 
 @credential_group.command(name="list")
 @click.option("--json", "output_json", is_flag=True, help="Output as JSON")
 def credential_list_command(output_json: bool) -> None:
     """List registered credential backends."""
-    if not _ensure_faramesh():
+    try:
+        from cli.config import current_config, get_client
+
+        config = current_config()
+        if not config.is_authenticated():
+            click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+            sys.exit(1)
+
+        client = get_client(config)
+        response = client.get("/v1/governance/credentials/backends")
+
+        if response.status_code == 401:
+            click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+            sys.exit(1)
+
+        if response.status_code != 200:
+            click.echo(f"Error: {response.text}", err=True)
+            sys.exit(1)
+
+        backends = response.json()
+
+        if output_json:
+            click.echo(json.dumps(backends, indent=2))
+            return
+
+        if not backends:
+            click.echo("Credential Broker Configuration")
+            click.echo("=" * 50)
+            click.echo("  No credential backends registered.")
+            click.echo()
+            click.echo(
+                "Supported backends: vault, awssecrets, gcpsm, azurekv, onepassword, infisical"
+            )
+            click.echo(
+                "Register with: mutx governance credential register <backend> <name> [options]"
+            )
+            return
+
+        click.echo("Credential Broker Configuration")
+        click.echo("=" * 70)
+        click.echo(f"{'Name':<20} {'Backend':<12} {'Path':<20} {'Healthy':<8}")
+        click.echo("-" * 70)
+        for backend in backends:
+            healthy = "yes" if backend.get("is_healthy") else "NO"
+            click.echo(
+                f"{backend['name']:<20} {backend['backend']:<12} {backend['path']:<20} {healthy:<8}"
+            )
+
+    except ImportError:
+        click.echo("Error: Cannot import config client.", err=True)
         sys.exit(1)
-
-    if output_json:
-        click.echo(json.dumps({"credentials": []}, indent=2))
-        return
-
-    click.echo("Credential Broker Configuration")
-    click.echo("=" * 50)
-    click.echo("  No credentials registered.")
-    click.echo()
-    click.echo("Supported backends: vault, awssecrets, gcpsm, azurekv, onepassword, infisical")
-    click.echo("Register with: mutx governance credential register <backend> <name> [options]")
 
 
 @credential_group.command(name="register")
@@ -511,13 +563,138 @@ def credential_list_command(output_json: bool) -> None:
     type=click.Choice(["vault", "awssecrets", "gcpsm", "azurekv", "onepassword", "infisical"]),
 )
 @click.argument("name")
-@click.option("--path", "-p", help="Secret path/backend URL")
-@click.option("--ttl", "-t", default="15m", help="Credential TTL (e.g., 15m, 1h)")
-def credential_register_command(backend: str, name: str, path: str | None, ttl: str) -> None:
+@click.option("--path", "-p", required=True, help="Secret path/backend URL")
+@click.option("--ttl", "-t", default="15m", help="Credential TTL (e.g., 15m, 1h, 30s)")
+@click.option("--url", help="Backend URL (for Vault, Azure, Infisical)")
+@click.option("--token", help="API token or secret key")
+def credential_register_command(
+    backend: str, name: str, path: str, ttl: str, url: str | None, token: str | None
+) -> None:
     """Register a credential backend for credential brokering."""
-    click.echo(f"Registering {backend} credential backend: {name}")
-    click.echo("Credential broker configuration requires Faramesh credential broker addon.")
-    click.echo("See https://faramesh.dev/docs/credential-broker for setup instructions.")
+    try:
+        from cli.config import current_config, get_client
+
+        config = current_config()
+        if not config.is_authenticated():
+            click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+            sys.exit(1)
+
+        config_data = {}
+        if url:
+            config_data["url"] = url
+        if token:
+            config_data["token"] = token
+
+        client = get_client(config)
+        payload = {
+            "name": name,
+            "backend": backend,
+            "path": path,
+            "ttl": _parse_ttl(ttl),
+            "config": config_data,
+        }
+
+        response = client.post("/v1/governance/credentials/backends", json=payload)
+
+        if response.status_code == 401:
+            click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+            sys.exit(1)
+
+        if response.status_code not in (200, 201):
+            click.echo(f"Error: {response.text}", err=True)
+            sys.exit(1)
+
+        click.echo(f"Credential backend registered: {name} ({backend})")
+
+    except ImportError:
+        click.echo("Error: Cannot import config client.", err=True)
+        sys.exit(1)
+
+
+@credential_group.command(name="unregister")
+@click.argument("name")
+def credential_unregister_command(name: str) -> None:
+    """Unregister a credential backend."""
+    try:
+        from cli.config import current_config, get_client
+
+        config = current_config()
+        if not config.is_authenticated():
+            click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+            sys.exit(1)
+
+        client = get_client(config)
+        response = client.delete(f"/v1/governance/credentials/backends/{name}")
+
+        if response.status_code == 401:
+            click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+            sys.exit(1)
+
+        if response.status_code == 404:
+            click.echo(f"Error: Backend '{name}' not found.", err=True)
+            sys.exit(1)
+
+        if response.status_code != 200:
+            click.echo(f"Error: {response.text}", err=True)
+            sys.exit(1)
+
+        click.echo(f"Credential backend unregistered: {name}")
+
+    except ImportError:
+        click.echo("Error: Cannot import config client.", err=True)
+        sys.exit(1)
+
+
+@credential_group.command(name="health")
+@click.argument("name", required=False)
+def credential_health_command(name: str | None) -> None:
+    """Check health of credential backends."""
+    try:
+        from cli.config import current_config, get_client
+
+        config = current_config()
+        if not config.is_authenticated():
+            click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+            sys.exit(1)
+
+        client = get_client(config)
+
+        if name:
+            response = client.get(f"/v1/governance/credentials/backends/{name}/health")
+            if response.status_code == 404:
+                click.echo(f"Error: Backend '{name}' not found.", err=True)
+                sys.exit(1)
+        else:
+            response = client.get("/v1/governance/credentials/health")
+
+        if response.status_code == 401:
+            click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+            sys.exit(1)
+
+        if response.status_code != 200:
+            click.echo(f"Error: {response.text}", err=True)
+            sys.exit(1)
+
+        health_data = response.json()
+
+        if name:
+            backend_health = health_data
+            status = "healthy" if backend_health.get("healthy") else "UNHEALTHY"
+            click.echo(f"Backend '{name}': {status}")
+        else:
+            click.echo("Credential Backend Health")
+            click.echo("=" * 50)
+            for backend_name, health in health_data.items():
+                status = "healthy" if health.get("healthy") else "UNHEALTHY"
+                error = health.get("error", "")
+                if error:
+                    click.echo(f"  {backend_name}: {status} ({error})")
+                else:
+                    click.echo(f"  {backend_name}: {status}")
+
+    except ImportError:
+        click.echo("Error: Cannot import config client.", err=True)
+        sys.exit(1)
 
 
 @governance_group.command(name="export-metrics")
@@ -603,3 +780,180 @@ def bind_command(
     click.echo(f"Governance enabled for agent: {agent_id}")
     if policy_path:
         click.echo(f"  Policy: {policy_path}")
+
+
+@governance_group.group(name="webhook")
+def webhook_group():
+    """Manage webhook subscriptions for governance events."""
+    pass
+
+
+GOVERNANCE_EVENT_TYPES = [
+    {"name": "governance.decision.permit", "description": "Tool call was permitted"},
+    {"name": "governance.decision.deny", "description": "Tool call was denied"},
+    {"name": "governance.decision.defer", "description": "Tool call requires approval"},
+    {"name": "governance.pending", "description": "New pending approval request"},
+    {"name": "governance.approved", "description": "Deferred action was approved"},
+    {"name": "governance.denied", "description": "Deferred action was denied"},
+    {"name": "governance.killed", "description": "Agent was killed"},
+]
+
+
+@webhook_group.command(name="list-types")
+def webhook_list_types_command():
+    """List available governance event types for webhook subscriptions."""
+    click.echo("Governance Event Types")
+    click.echo("=" * 60)
+    click.echo(f"{'Event Type':<35} {'Description'}")
+    click.echo("-" * 60)
+    for event in GOVERNANCE_EVENT_TYPES:
+        click.echo(f"{event['name']:<35} {event['description']}")
+    click.echo()
+    click.echo("Use 'governance webhook create' to subscribe to these events.")
+    click.echo("Use 'governance webhook notify' to route FPL 'notify' directives to webhooks.")
+
+
+@webhook_group.command(name="create")
+@click.option(
+    "--url", "-u", required=True, help="Webhook URL (must start with http:// or https://)"
+)
+@click.option(
+    "--events",
+    "-e",
+    multiple=True,
+    help="Governance events to subscribe to (can specify multiple)",
+)
+@click.option("--all-events", "all_events", is_flag=True, help="Subscribe to all governance events")
+@click.option("--secret", "-s", help="Webhook secret for signature verification")
+def webhook_create_command(url: str, events: tuple, all_events: bool, secret: str | None):
+    """Create a webhook subscription for governance events."""
+    if not url.startswith(("http://", "https://")):
+        click.echo("Error: URL must start with http:// or https://", err=True)
+        sys.exit(1)
+
+    if all_events:
+        selected_events = [
+            "governance.decision.permit",
+            "governance.decision.deny",
+            "governance.decision.defer",
+            "governance.pending",
+            "governance.approved",
+            "governance.denied",
+            "governance.killed",
+        ]
+    elif events:
+        selected_events = list(events)
+    else:
+        click.echo("Error: Specify --events or --all-events", err=True)
+        sys.exit(1)
+
+    try:
+        from cli.config import current_config, get_client
+
+        config = current_config()
+        if not config.is_authenticated():
+            click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+            sys.exit(1)
+
+        client = get_client(config)
+        payload = {
+            "url": url,
+            "events": selected_events,
+            "is_active": True,
+        }
+        if secret:
+            payload["secret"] = secret
+
+        response = client.post("/v1/webhooks/", json=payload)
+
+        if response.status_code == 401:
+            click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+            sys.exit(1)
+
+        if response.status_code not in (200, 201):
+            click.echo(f"Error: {response.text}", err=True)
+            sys.exit(1)
+
+        webhook = response.json()
+        click.echo("Webhook created successfully!")
+        click.echo(f"  ID:     {webhook['id']}")
+        click.echo(f"  URL:    {webhook['url']}")
+        click.echo(f"  Events: {','.join(webhook['events'])}")
+
+    except ImportError:
+        click.echo("Error: Cannot import config client.", err=True)
+        sys.exit(1)
+
+
+@webhook_group.command(name="notify")
+@click.argument("notify_name")
+@click.option("--url", "-u", required=True, help="Webhook URL to route to this notify name")
+@click.option("--remove", "-r", is_flag=True, help="Remove routing for this notify name")
+def webhook_notify_command(notify_name: str, url: str, remove: bool):
+    """
+    Route FPL 'notify' directives to webhook URLs.
+
+    When an FPL policy uses 'notify: "finance"', this command configures
+    which webhook URL should receive those notifications.
+    """
+    config_dir = Path.home() / ".mutx"
+    notify_config_file = config_dir / "governance_notify.json"
+
+    config_dir.mkdir(parents=True, exist_ok=True)
+
+    if notify_config_file.exists():
+        try:
+            notify_config = json.loads(notify_config_file.read_text())
+        except json.JSONDecodeError:
+            notify_config = {}
+    else:
+        notify_config = {}
+
+    if remove:
+        if notify_name in notify_config:
+            del notify_config[notify_name]
+            notify_config_file.write_text(json.dumps(notify_config, indent=2))
+            click.echo(f"Removed webhook routing for notify: {notify_name}")
+        else:
+            click.echo(f"No webhook routing found for notify: {notify_name}")
+        return
+
+    if not url.startswith(("http://", "https://")):
+        click.echo("Error: URL must start with http:// or https://", err=True)
+        sys.exit(1)
+
+    notify_config[notify_name] = {"url": url}
+
+    notify_config_file.write_text(json.dumps(notify_config, indent=2))
+    click.echo(f"Configured webhook routing for notify '{notify_name}': {url}")
+    click.echo()
+    click.echo("Update your FPL policy to use this notify name:")
+    click.echo("  defer stripe/refund when amount > 500")
+    click.echo(f'    notify: "{notify_name}"')
+
+
+@webhook_group.command(name="list-notify")
+def webhook_list_notify_command():
+    """List configured FPL notify-to-webhook routings."""
+    config_dir = Path.home() / ".mutx"
+    notify_config_file = config_dir / "governance_notify.json"
+
+    if not notify_config_file.exists():
+        click.echo("No notify routings configured.")
+        click.echo("Use 'mutx governance webhook notify <name> --url <url>' to configure.")
+        return
+
+    try:
+        notify_config = json.loads(notify_config_file.read_text())
+    except json.JSONDecodeError:
+        click.echo("Error: Invalid notify configuration file.", err=True)
+        return
+
+    if not notify_config:
+        click.echo("No notify routings configured.")
+        return
+
+    click.echo("FPL Notify Routings")
+    click.echo("=" * 50)
+    for name, config in notify_config.items():
+        click.echo(f"  {name} -> {config['url']}")

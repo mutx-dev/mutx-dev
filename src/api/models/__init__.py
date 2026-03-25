@@ -26,6 +26,14 @@ from src.api.models.models import (
     AnalyticsEvent,
 )
 
+from src.api.models.observability_models import (
+    MutxRun,
+    MutxStep,
+    MutxCost,
+    MutxProvenance,
+    MutxEvalResult,
+)
+
 from src.api.models.plan_tiers import (
     PlanTier,
     PlanQuota,
@@ -67,4 +75,9 @@ __all__ = [
     "Command",
     "UsageEvent",
     "AnalyticsEvent",
+    "MutxRun",
+    "MutxStep",
+    "MutxCost",
+    "MutxProvenance",
+    "MutxEvalResult",
 ]

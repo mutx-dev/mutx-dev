@@ -37,13 +37,16 @@ from src.api.routes import (
     budgets,
     clawhub,
     deployments,
+    governance_credentials,
     ingest,
     leads,
     monitoring,
+    observability,
     onboarding,
     rag,
     runtime,
     runs,
+    security,
     sessions,
     swarms,
     templates,
@@ -51,6 +54,10 @@ from src.api.routes import (
     webhooks,
 )
 from src.api.services.monitor import MonitorRuntimeState, start_background_monitor
+from src.api.services.governance_webhook_service import (
+    start_governance_webhooks,
+    stop_governance_webhooks,
+)
 
 settings = get_settings()
 
@@ -84,6 +91,8 @@ PUBLIC_ROUTE_REGISTRATIONS: tuple[RouterRegistration, ...] = (
     RouterRegistration("agent_runtime", agent_runtime.router),
     RouterRegistration("ingest", ingest.router),
     RouterRegistration("runs", runs.router),
+    RouterRegistration("observability", observability.router),
+    RouterRegistration("security", security.router),
     RouterRegistration("rag", rag.router),
     RouterRegistration("usage", usage.router),
     RouterRegistration("analytics", analytics.router),
@@ -93,6 +102,7 @@ PUBLIC_ROUTE_REGISTRATIONS: tuple[RouterRegistration, ...] = (
     RouterRegistration("sessions", sessions.router),
     RouterRegistration("swarms", swarms.router),
     RouterRegistration("budgets", budgets.router),
+    RouterRegistration("governance_credentials", governance_credentials.router),
 )
 PUBLIC_ROUTER_ALLOWLIST: tuple[str, ...] = tuple(
     registration.name for registration in PUBLIC_ROUTE_REGISTRATIONS
@@ -181,6 +191,7 @@ def _build_lifespan(
         _initialize_app_state(app, background_monitor_enabled=background_monitor_enabled)
         database_init_task: asyncio.Task[None] | None = None
         monitor_task: asyncio.Task[None] | None = None
+        governance_webhook_task: asyncio.Task[None] | None = None
 
         if database_required_on_startup:
             await _initialize_database(app)
@@ -198,6 +209,17 @@ def _build_lifespan(
         else:
             logger.info("Background monitor disabled for this process")
 
+        if database_required_on_startup:
+            try:
+                from src.api.database import async_session_maker
+
+                governance_webhook_task = asyncio.create_task(
+                    start_governance_webhooks(async_session_maker)
+                )
+                logger.info("Governance webhook dispatcher started")
+            except Exception as e:
+                logger.warning(f"Failed to start governance webhook dispatcher: {e}")
+
         try:
             yield
         finally:
@@ -214,6 +236,14 @@ def _build_lifespan(
                     await database_init_task
                 except asyncio.CancelledError:
                     pass
+
+            if governance_webhook_task is not None:
+                governance_webhook_task.cancel()
+                try:
+                    await governance_webhook_task
+                except asyncio.CancelledError:
+                    pass
+                await stop_governance_webhooks()
 
             await dispose_engine()
 

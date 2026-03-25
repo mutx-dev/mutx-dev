@@ -157,6 +157,9 @@ class User(Base):
     runs: Mapped[list["AgentRun"]] = relationship(
         "AgentRun", back_populates="user", cascade="all, delete-orphan"
     )
+    mutx_runs: Mapped[list["MutxRun"]] = relationship(
+        "MutxRun", back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class UserSetting(Base):
@@ -168,7 +171,9 @@ class UserSetting(Base):
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
     key: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    value: Mapped[dict | list | str | int | float | bool | None] = mapped_column(JSONText(), nullable=True)
+    value: Mapped[dict | list | str | int | float | bool | None] = mapped_column(
+        JSONText(), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
