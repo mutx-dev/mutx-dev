@@ -25,6 +25,8 @@ RUN npm run build
 
 FROM base AS production
 ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 COPY --from=builder /app /app
 # Next standalone does not bundle public assets or .next/static by default.
 # Put them under the standalone runtime directory so `node .next/standalone/server.js`
