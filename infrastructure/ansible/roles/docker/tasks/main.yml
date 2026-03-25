@@ -12,7 +12,7 @@
         state: present
 
     - name: Install Docker packages
-      ansible.apt:
+      ansible.builtin.apt:
         name:
           - docker-ce
           - docker-ce-cli
@@ -22,7 +22,7 @@
         state: present
 
     - name: Ensure Docker is running
-      ansible.service:
+      ansible.builtin.service:
         name: docker
         state: started
         enabled: true
@@ -48,7 +48,7 @@
     state: present
 
 - name: Set up Docker network
-  community.docker.docker_network:
+  docker_network:
     name: agent_network
     driver: bridge
     ipam_config:

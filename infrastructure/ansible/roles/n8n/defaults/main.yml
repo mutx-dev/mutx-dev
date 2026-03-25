@@ -43,6 +43,6 @@ n8n_docker_container_name: "n8n"
 n8n_n8n_custom_extension_bundle: ""
 n8n_n8n_custom_extensions: ""
 
-n8n_log_LEVEL: "info"
+n8n_log_level: "info"
 
 n8n_generic_variables: {}

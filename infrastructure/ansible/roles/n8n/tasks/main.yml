@@ -2,7 +2,7 @@
 - name: Install n8n dependencies
   block:
     - name: Install required packages
-      ansible.apt:
+      ansible.builtin.apt:
         name:
           - curl
           - ca-certificates
@@ -44,13 +44,13 @@
 - name: Set up PostgreSQL for n8n
   block:
     - name: Check if PostgreSQL container exists
-      community.docker.docker_container_info:
+      docker_container_info:
         name: n8n_postgres
-      register: postgres_check
+      register: n8n_postgres_check
       ignore_errors: true
 
     - name: Create PostgreSQL container for n8n
-      community.docker.docker_container:
+      docker_container:
         name: n8n_postgres
         image: postgres:15
         state: started
@@ -64,10 +64,10 @@
         networks:
           - name: n8n_network
         pull: true
-      when: not postgres_check.exists
+      when: not n8n_postgres_check.exists
 
 - name: Create n8n Docker network
-  community.docker.docker_network:
+  docker_network:
     name: n8n_network
     driver: bridge
     ipam_config:
@@ -92,7 +92,7 @@
     mode: '0644'
 
 - name: Start n8n container
-  community.docker.docker_compose:
+  docker_compose:
     project_src: "{{ n8n_config_path }}"
     state: present
     pull: true
@@ -101,7 +101,7 @@
   block:
     - name: Check if Certbot is installed
       ansible.builtin.command: which certbot
-      register: certbot_check
+      register: n8n_certbot_check
       ignore_errors: true
       changed_when: false
 
@@ -109,7 +109,7 @@
       ansible.builtin.apt:
         name: certbot
         state: present
-      when: certbot_check.rc != 0
+      when: n8n_certbot_check.rc != 0
 
     - name: Generate SSL certificate
       ansible.builtin.command: >
@@ -178,14 +178,10 @@
   when: false
 
 - name: Wait for n8n to be ready
-  ansible.builtin.uri:
-    url: "http://{{ n8n_host }}:{{ n8n_port }}{{ n8n_api_path | default('/rest/health') }}"
-    method: GET
-    status_code: 200
-  register: n8n_health
-  until: n8n_health.status == 200
-  retries: 30
-  delay: 5
+  ansible.builtin.wait_for:
+    port: "{{ n8n_port }}"
+    delay: 5
+    timeout: 60
 
 - name: Set up n8n API key
   block:
