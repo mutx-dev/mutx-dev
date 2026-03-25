@@ -48,6 +48,12 @@ function ensureCalendlyLoaded() {
     ) as HTMLScriptElement | null;
 
     if (existingScript) {
+      // If the Calendly global is already available, the script has effectively loaded.
+      if (window.Calendly?.initPopupWidget) {
+        resolve();
+        return;
+      }
+
       existingScript.addEventListener("load", () => resolve(), { once: true });
       existingScript.addEventListener(
         "error",
@@ -160,7 +166,8 @@ export function CalendlyPopupButton({
   function handleTurnstileError(_error?: unknown, boundTurnstile?: BoundTurnstileObject) {
     turnstileRef.current = boundTurnstile ?? null;
     setCaptchaToken(null);
-    setShowChallenge(false);
+    // Keep the challenge visible and reset the widget so the user can retry immediately.
+    boundTurnstile?.reset();
   }
 
   function handleTurnstileExpire(_token: string, boundTurnstile?: BoundTurnstileObject) {
@@ -197,7 +204,7 @@ export function CalendlyPopupButton({
       onClick={handleClick}
       aria-label={ariaLabel}
       className={cn(fallbackClassName, className)}
-      disabled={loadingSiteKey && !turnstileSiteKey}
+      disabled={loadingSiteKey || !turnstileSiteKey}
     >
       {children}
     </button>
