@@ -147,13 +147,12 @@ export default function LandingPage() {
                     </div>
 
                     <div className="site-demo-screen">
-                      <img
+                      <Image
                         src="/demo.gif"
                         alt="MUTX operator dashboard demo"
                         width={1280}
                         height={801}
                         loading="eager"
-                        decoding="async"
                         fetchPriority="high"
                         className="site-demo-image"
                       />

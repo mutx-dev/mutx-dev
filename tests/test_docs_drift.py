@@ -68,7 +68,7 @@ def read_text(relative_path: str) -> str:
     return (ROOT / relative_path).read_text(encoding="utf-8")
 
 
-def iter_markdown_files() -> list[Path]:
+def get_markdown_files() -> list[Path]:
     files: list[Path] = []
     for path in ROOT.rglob("*.md"):
         relative_parts = path.relative_to(ROOT).parts
@@ -123,7 +123,10 @@ def test_canonical_quickstart_surfaces_share_assistant_first_commands() -> None:
         assert "mutx setup hosted" in content
         assert "mutx setup local" in content
         assert "mutx doctor" in content
-        assert "personal_assistant" in content or "Personal Assistant" in content
+        assert "personal_assistant" in content or "Personal Assistant" in content, (
+            "Expected content to mention the personal assistant using either "
+            "'personal_assistant' or 'Personal Assistant'."
+        )
 
     assert "mutx setup hosted --import-openclaw" in landing
     assert "Hosted" in landing
@@ -178,7 +181,7 @@ def test_public_agents_guidance_mentions_v1_contract() -> None:
 
 
 def test_markdown_links_resolve_with_exact_case() -> None:
-    for markdown_file in iter_markdown_files():
+    for markdown_file in get_markdown_files():
         for link in extract_local_links(markdown_file):
             resolved = resolve_local_link(markdown_file, link)
             assert resolved.exists(), (
@@ -188,7 +191,8 @@ def test_markdown_links_resolve_with_exact_case() -> None:
 
 
 def test_docs_do_not_contain_known_stale_references() -> None:
-    files_to_scan = iter_markdown_files() + [ROOT / ".github/ISSUE_TEMPLATE/config.yml"]
+    extra_files = [ROOT / ".github/ISSUE_TEMPLATE/config.yml"]
+    files_to_scan = get_markdown_files() + extra_files
 
     for path in files_to_scan:
         content = path.read_text(encoding="utf-8")

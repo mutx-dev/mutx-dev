@@ -143,29 +143,33 @@ flowchart LR
 
 The control plane is implemented as a FastAPI application with route groups mounted directly at top-level prefixes rather than behind a global `/v1` namespace.
 
+> Note (2026-03-22): This section describes the original routing layout. In the current implementation, all control-plane routes are mounted under `/v1/*`. For the up-to-date route structure, see [§17.1 Backend route prefix correction](#171-backend-route-prefix-correction) in the addendum.
+
 ### 6.1 Route groups
 
-The live route families in the codebase are:
+Historically, the live route families in the codebase were organized as:
 
-- `/auth`
-- `/agents`
-- `/deployments`
-- `/api-keys`
-- `/webhooks`
-- `/newsletter`
-- `/health`
-- `/ready`
+- `/v1/auth`
+- `/v1/agents`
+- `/v1/deployments`
+- `/v1/api-keys`
+- `/v1/webhooks`
+- `/v1/newsletter`
+- `/v1/health`
+- `/v1/ready`
+
+Additional `/v1/*` surfaces (for example `/v1/templates`, `/v1/assistant`, `/v1/sessions`, `/v1/runs`, `/v1/monitoring`, `/v1/budgets`, `/v1/rag`, and `/v1/runtime`) are described in detail in [Section&nbsp;17.1](#171-backend-route-prefix-correction).
 
 ```mermaid
 flowchart TD
     Root["FastAPI App"];
-    Auth["/auth"];
-    Agents["/agents"];
-    Deployments["/deployments"];
-    Keys["/api-keys"];
-    Hooks["/webhooks"];
-    Newsletter["/newsletter"];
-    Health["/health and /ready"];
+    Auth["/v1/auth"];
+    Agents["/v1/agents"];
+    Deployments["/v1/deployments"];
+    Keys["/v1/api-keys"];
+    Hooks["/v1/webhooks"];
+    Newsletter["/v1/newsletter"];
+    Health["/v1/health and /v1/ready"];
 
     Root --> Auth;
     Root --> Agents;
@@ -526,7 +530,7 @@ That means the current public backend shape is:
 - root probes at `/`, `/health`, `/ready`, and `/metrics`
 - public control-plane routes such as `/v1/auth`, `/v1/agents`, `/v1/deployments`, `/v1/templates`, `/v1/assistant`, `/v1/sessions`, `/v1/runs`, `/v1/api-keys`, `/v1/webhooks`, `/v1/monitoring`, `/v1/budgets`, `/v1/rag`, `/v1/runtime`, and related families
 
-Earlier parts of this paper that describe top-level public routes without `/v1` should be read as superseded by the mounted code in `src/api/main.py` and the generated OpenAPI snapshot in `docs/api/openapi.json`.
+Earlier parts of this paper (especially Sections 6 and 6.1) that describe top-level public routes without the `/v1` prefix are now outdated for implementation purposes and should be read as superseded by the mounted code in `src/api/main.py` and the generated OpenAPI snapshot in `docs/api/openapi.json`. When in doubt, prefer the `/v1/*` routes and the OpenAPI specification over any earlier prose examples.
 
 ### 17.2 App-surface correction
 

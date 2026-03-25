@@ -42,4 +42,5 @@ def test_dev_script_uses_project_scoped_compose_and_reuses_running_stack() -> No
     assert 'docker compose -p "$COMPOSE_PROJECT" -f "$COMPOSE_FILE"' in dev_script
     assert 'docker-compose -p "$COMPOSE_PROJECT" -f "$COMPOSE_FILE"' in dev_script
     assert 'sed -i "s|^JWT_SECRET=.*$|JWT_SECRET=$JWT_SECRET|"' in dev_script
+    assert 'sed -i \'\' "s|^JWT_SECRET=.*$|JWT_SECRET=$JWT_SECRET|"' in dev_script
     assert "Existing local stack detected for project" in dev_script
