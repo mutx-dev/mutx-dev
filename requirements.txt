@@ -20,7 +20,7 @@ python-jose[cryptography]==3.5.0
 python-multipart==0.0.22
 email-validator==2.1.0
 # Agent & AI
-openai==1.10.0
+openai>=1.68.2
 anthropic==0.18.0
 httpx==0.26.0
 langchain==0.3.14
