@@ -16,6 +16,12 @@ export HOMEBREW_NO_AUTO_UPDATE="${HOMEBREW_NO_AUTO_UPDATE:-1}"
 export HOMEBREW_NO_INSTALL_FROM_API="${HOMEBREW_NO_INSTALL_FROM_API:-1}"
 export HOMEBREW_NO_INSTALLED_HOST_CHECK="${HOMEBREW_NO_INSTALLED_HOST_CHECK:-1}"
 
+MUTX_INSTALL_TIMEOUT="${MUTX_INSTALL_TIMEOUT:-1200}"
+if [[ -n "${timeout}" ]]; then
+  ( sleep "${MUTX_INSTALL_TIMEOUT}" && kill -USR1 $$ 2>/dev/null ) &
+  WATCHDOG_PID=$!
+fi
+
 HAS_TTY=0
 MOTION_OK=0
 CURSOR_HIDDEN=0
@@ -102,9 +108,23 @@ cleanup() {
   leave_alt_screen
   show_cursor
 
+  if [[ -n "${WATCHDOG_PID:-}" ]]; then
+    kill -0 "${WATCHDOG_PID}" 2>/dev/null && kill "${WATCHDOG_PID}" 2>/dev/null || true
+  fi
+
   if [[ "${KEEP_LOG}" != "1" && -f "${INSTALL_LOG}" ]]; then
     rm -f "${INSTALL_LOG}"
   fi
+}
+
+timeout_watchdog() {
+  printf '%berror:%b Install timed out after %d seconds\n' "${C_WARN}" "${C_RESET}" "${MUTX_INSTALL_TIMEOUT}" >&2
+  printf '%b   You can increase the timeout with MUTX_INSTALL_TIMEOUT environment variable\n' "${C_DIM}" >&2
+  if [[ -f "${INSTALL_LOG}" ]]; then
+    printf '%b   log:%b %s\n' "${C_DIM}" "${C_RESET}" "${INSTALL_LOG}" >&2
+  fi
+  KEEP_LOG=1
+  exit 124
 }
 
 # Network operations with timeout and retry
@@ -132,6 +152,7 @@ run_step_with_timeout() {
 }
 
 trap cleanup EXIT
+trap timeout_watchdog USR1
 
 tty_print() {
   if [[ "${HAS_TTY}" == "1" ]]; then
@@ -1263,7 +1284,7 @@ resolve_python_bin() {
   fi
 
   local brew_python_prefix=""
-  brew_python_prefix="$(brew --prefix python@3.12 2>>"${INSTALL_LOG}" || true)"
+  brew_python_prefix="$(run_with_timeout 30 brew --prefix python@3.12 2>>"${INSTALL_LOG}" || true)"
   if [[ -n "${brew_python_prefix}" ]]; then
     if [[ -x "${brew_python_prefix}/bin/python3" ]]; then
       printf '%s\n' "${brew_python_prefix}/bin/python3"
@@ -1279,7 +1300,7 @@ resolve_python_bin() {
 }
 
 upgrade_or_keep_formula() {
-  command timeout "${MUTX_BREW_TIMEOUT:-300}" brew upgrade "${FORMULA}" || true
+  run_with_timeout "${MUTX_BREW_TIMEOUT:-300}" brew upgrade "${FORMULA}" || true
 }
 
 install_source_overlay() {
@@ -1298,7 +1319,7 @@ install_source_overlay() {
   "${final_venv}/bin/pip" install --timeout 120 --disable-pip-version-check --quiet --upgrade "${MUTX_CLI_SOURCE_REF}"
   "${final_venv}/bin/pip" install --timeout 120 --disable-pip-version-check --quiet --upgrade "textual>=0.58.0,<2.0.0"
 
-  brew_prefix="$(brew --prefix)"
+  brew_prefix="$(run_with_timeout 30 brew --prefix)"
   mkdir -p "${brew_prefix}/bin"
   ln -sf "${final_venv}/bin/mutx" "${brew_prefix}/bin/mutx"
   hash -r 2>/dev/null || true
@@ -1584,7 +1605,7 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 
 ui_stage "Preparing environment"
-run_stage "Syncing package lane" brew tap "${TAP}"
+run_stage "Syncing package lane" run_with_timeout 120 brew tap "${TAP}"
 
 ui_stage "Installing MUTX runtime"
 if brew list --versions "${FORMULA}" >/dev/null 2>&1; then
