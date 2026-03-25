@@ -17,7 +17,7 @@ export HOMEBREW_NO_INSTALL_FROM_API="${HOMEBREW_NO_INSTALL_FROM_API:-1}"
 export HOMEBREW_NO_INSTALLED_HOST_CHECK="${HOMEBREW_NO_INSTALLED_HOST_CHECK:-1}"
 
 MUTX_INSTALL_TIMEOUT="${MUTX_INSTALL_TIMEOUT:-1200}"
-if [[ -n "${timeout}" ]]; then
+if command -v timeout >/dev/null 2>&1; then
   ( sleep "${MUTX_INSTALL_TIMEOUT}" && kill -USR1 $$ 2>/dev/null ) &
   WATCHDOG_PID=$!
 fi
