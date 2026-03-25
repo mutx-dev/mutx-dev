@@ -22,11 +22,13 @@ async def test_generate_embedding_returns_placeholder_without_openai_key(
 
 
 @pytest.mark.asyncio
-async def test_similarity_search_returns_empty_placeholder_results(client: AsyncClient):
+async def test_similarity_search_returns_503_not_implemented(client: AsyncClient):
     response = await client.post(
         "/v1/rag/search",
         json={"query": "find related docs", "top_k": 3},
     )
 
-    assert response.status_code == 200
-    assert response.json() == []
+    assert response.status_code == 503
+    assert "not yet implemented" in response.json()["detail"].lower()
+    assert "X-Feature-Flag" in response.headers
+    assert response.headers["X-Feature-Flag"] == "rag.search"
