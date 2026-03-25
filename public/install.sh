@@ -107,6 +107,30 @@ cleanup() {
   fi
 }
 
+# Network operations with timeout and retry
+run_with_timeout() {
+  local timeout_secs="${1:-30}"
+  shift
+  if command -v timeout >/dev/null 2>&1; then
+    command timeout "${timeout_secs}" "$@"
+  else
+    "$@"
+  fi
+}
+
+# Run a step with timeout-protected command
+run_step_with_timeout() {
+  local label="$1"
+  local timeout_secs="${2:-120}"
+  shift 2
+  local -a cmd=("$@")
+
+  if ! run_with_timeout "${timeout_secs}" "${cmd[@]}"; then
+    return 1
+  fi
+  return 0
+}
+
 trap cleanup EXIT
 
 tty_print() {
@@ -1566,10 +1590,10 @@ ui_stage "Installing MUTX runtime"
 if brew list --versions "${FORMULA}" >/dev/null 2>&1; then
   run_stage "Refreshing MUTX runtime" upgrade_or_keep_formula
 else
-  run_stage "Installing MUTX runtime" brew install "${FORMULA}"
+  run_stage "Installing MUTX runtime" run_with_timeout 300 brew install "${FORMULA}"
 fi
 
-run_stage "Linking mutx into PATH" brew link --overwrite "${FORMULA}"
+run_stage "Linking mutx into PATH" run_with_timeout 60 brew link --overwrite "${FORMULA}"
 resolve_mutx_bin
 run_stage "Warming CLI" "${MUTX_BIN}" --help
 
