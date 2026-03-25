@@ -70,6 +70,11 @@ STAGE_STATUSES=(
 )
 FEED_LINES=()
 
+BREW_UPGRADE_NEEDED=""
+SURFACE_CHECK_PROGRESS=0
+SURFACE_CHECK_TOTAL=0
+SURFACE_CHECK_CURRENT_CMD=""
+
 if [[ -t 1 ]]; then
   C_RESET=$'\033[0m'
   C_BOLD=$'\033[1m'
@@ -127,7 +132,6 @@ timeout_watchdog() {
   exit 124
 }
 
-# Network operations with timeout and retry
 run_with_timeout() {
   local timeout_secs="${1:-30}"
   shift
@@ -136,19 +140,6 @@ run_with_timeout() {
   else
     "$@"
   fi
-}
-
-# Run a step with timeout-protected command
-run_step_with_timeout() {
-  local label="$1"
-  local timeout_secs="${2:-120}"
-  shift 2
-  local -a cmd=("$@")
-
-  if ! run_with_timeout "${timeout_secs}" "${cmd[@]}"; then
-    return 1
-  fi
-  return 0
 }
 
 trap cleanup EXIT
@@ -894,6 +885,73 @@ dashboard_render_wizard() {
   dashboard_put_line "${row}" 3 "${C_PANEL}${prompt_label}${C_RESET}"
 }
 
+dashboard_render_surface_check() {
+  local row=2
+  local wrap_width=$((TERM_COLS - 6))
+  local detail_line=""
+
+  printf '\033[H\033[2J' > /dev/tty
+  dashboard_put_line "${row}" 3 "${C_BOLD}${C_MUTX}MUTX install${C_RESET}"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "${C_SOFT}Verifying command surface...${C_RESET}"
+  row=$((row + 2))
+
+  dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Checking commands${C_RESET}"
+  row=$((row + 1))
+
+  if [[ "${SURFACE_CHECK_TOTAL}" -gt 0 ]]; then
+    dashboard_put_line "${row}" 3 "${C_SOFT}[${SURFACE_CHECK_PROGRESS}/${SURFACE_CHECK_TOTAL}]${C_RESET} ${SURFACE_CHECK_CURRENT_CMD}"
+  else
+    dashboard_put_line "${row}" 3 "${C_SOFT}${SURFACE_CHECK_CURRENT_CMD}${C_RESET}"
+  fi
+  row=$((row + 1))
+
+  if [[ -n "${CURRENT_STEP_DETAIL}" ]]; then
+    while IFS= read -r detail_line; do
+      dashboard_put_line "${row}" 3 "${C_DIM}${detail_line}${C_RESET}"
+      row=$((row + 1))
+    done < <(wrap_text "${CURRENT_STEP_DETAIL}" "${wrap_width}")
+  fi
+
+  if [[ "${#FEED_LINES[@]}" -gt 0 ]]; then
+    row=$((row + 1))
+    dashboard_put_line "${row}" 3 "${C_MUTX_ALT}Checked${C_RESET}"
+    row=$((row + 1))
+    local feed_entry=""
+    for feed_entry in "${FEED_LINES[@]}"; do
+      dashboard_put_line "${row}" 3 "$(dashboard_feed_line "${feed_entry}")"
+      row=$((row + 1))
+    done
+  fi
+}
+
+dashboard_render_hosted_creds() {
+  local row=2
+  local wrap_width=$((TERM_COLS - 6))
+  local hint_text="${WIZARD_HINT}"
+  local message_line=""
+
+  printf '\033[H\033[2J' > /dev/tty
+  dashboard_put_line "${row}" 3 "${C_BOLD}${C_MUTX}MUTX setup${C_RESET}"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "${C_SOFT}Hosted lane · signing in${C_RESET}"
+  row=$((row + 2))
+
+  dashboard_put_line "${row}" 3 "${C_GOOD}✓${C_RESET} package lane synced"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "${C_GOOD}✓${C_RESET} command surface verified"
+  row=$((row + 1))
+  dashboard_put_line "${row}" 3 "${C_GOOD}✓${C_RESET} ready for setup"
+  row=$((row + 2))
+
+  if [[ -n "${hint_text}" ]]; then
+    while IFS= read -r message_line; do
+      dashboard_put_line "${row}" 3 "${C_SOFT}${message_line}${C_RESET}"
+      row=$((row + 1))
+    done < <(wrap_text "${hint_text}" "${wrap_width}")
+  fi
+}
+
 dashboard_render() {
   local frame_color=""
   local max_lines=0
@@ -911,6 +969,11 @@ dashboard_render() {
 
   if [[ "${WIZARD_VISIBLE}" == "1" ]]; then
     dashboard_render_wizard
+    return
+  fi
+
+  if [[ "${SURFACE_CHECK_TOTAL}" -gt 0 ]]; then
+    dashboard_render_surface_check
     return
   fi
 
@@ -1145,40 +1208,6 @@ read_tty_secret() {
   printf -v "${__resultvar}" '%s' "${line}"
 }
 
-mutx_help_output() {
-  local spec="$1"
-  local -a cmd=("${MUTX_BIN}")
-  local -a parts=()
-  read -r -a parts <<< "${spec}"
-  cmd+=("${parts[@]}")
-  "${cmd[@]}" --help 2>&1 || true
-}
-
-mutx_supports_option() {
-  local spec="$1"
-  local option="$2"
-  local help_text=""
-
-  help_text="$(mutx_help_output "${spec}")"
-  [[ "${help_text}" == *"${option}"* ]]
-}
-
-append_if_supported() {
-  local target_name="$1"
-  local spec="$2"
-  local option="$3"
-  shift 3
-
-  if mutx_supports_option "${spec}" "${option}"; then
-    eval "${target_name}+=(\"\${option}\")"
-    while [[ "$#" -gt 0 ]]; do
-      local value="$1"
-      shift
-      eval "${target_name}+=(\"\${value}\")"
-    done
-  fi
-}
-
 resolve_mutx_bin() {
   hash -r 2>/dev/null || true
   MUTX_BIN="$(command -v mutx || true)"
@@ -1199,82 +1228,6 @@ mutx_points_to_source_overlay() {
   fi
 
   [[ "${candidate}" == "${MUTX_HOME_DIR}/runtime/source-cli/"* ]]
-}
-
-check_assistant_first_surface() {
-  local -a required_specs=(
-    "setup"
-    "setup hosted"
-    "setup local"
-    "doctor"
-    "runtime"
-    "runtime inspect"
-    "runtime open"
-    "governance"
-    "governance status"
-    "observability"
-    "observability runs"
-    "security"
-    "update"
-  )
-  local -a missing=()
-  local spec=""
-
-  for spec in "${required_specs[@]}"; do
-    local -a cmd=("${MUTX_BIN}")
-    local -a parts=()
-    read -r -a parts <<< "${spec}"
-    cmd+=("${parts[@]}")
-
-    if ! "${cmd[@]}" --help >/dev/null 2>&1; then
-      missing+=("mutx ${spec}")
-    fi
-  done
-
-  if ! mutx_supports_option "setup hosted" "--email"; then
-    missing+=("mutx setup hosted --email")
-  fi
-  if ! mutx_supports_option "setup hosted" "--password"; then
-    missing+=("mutx setup hosted --password")
-  fi
-  if ! mutx_supports_option "setup hosted" "--install-openclaw"; then
-    missing+=("mutx setup hosted --install-openclaw")
-  fi
-  if ! mutx_supports_option "setup hosted" "--import-openclaw"; then
-    missing+=("mutx setup hosted --import-openclaw")
-  fi
-  if ! mutx_supports_option "setup local" "--install-openclaw"; then
-    missing+=("mutx setup local --install-openclaw")
-  fi
-  if ! mutx_supports_option "setup local" "--import-openclaw"; then
-    missing+=("mutx setup local --import-openclaw")
-  fi
-
-  if [[ "${#missing[@]}" == "0" ]]; then
-    CLI_MISSING_COMMANDS=""
-    return 0
-  fi
-
-  CLI_MISSING_COMMANDS="${missing[0]}"
-  local idx=1
-  while [[ "${idx}" -lt "${#missing[@]}" ]]; do
-    CLI_MISSING_COMMANDS+=", ${missing[${idx}]}"
-    idx=$((idx + 1))
-  done
-
-  return 1
-}
-
-show_surface_status() {
-  local label="$1"
-  if check_assistant_first_surface; then
-    success "${label}"
-    return 0
-  fi
-
-  warn "${label}"
-  note "Missing commands: ${CLI_MISSING_COMMANDS}"
-  return 1
 }
 
 resolve_python_bin() {
@@ -1299,7 +1252,32 @@ resolve_python_bin() {
   return 1
 }
 
+check_brew_upgrade_needed() {
+  local dry_run_output=""
+  BREW_UPGRADE_NEEDED=""
+
+  if ! brew list --versions "${FORMULA}" >/dev/null 2>&1; then
+    BREW_UPGRADE_NEEDED="not-installed"
+    return 0
+  fi
+
+  dry_run_output="$(run_with_timeout 60 brew upgrade --dry-run "${FORMULA}" 2>&1 || true)"
+  if [[ "${dry_run_output}" == *"Already up-to-date"* ]] || [[ -z "${dry_run_output}" ]]; then
+    BREW_UPGRADE_NEEDED="no"
+    return 0
+  fi
+
+  BREW_UPGRADE_NEEDED="yes"
+  return 0
+}
+
 upgrade_or_keep_formula() {
+  if [[ "${BREW_UPGRADE_NEEDED}" == "no" ]]; then
+    return 0
+  fi
+  if [[ "${BREW_UPGRADE_NEEDED}" == "not-installed" ]]; then
+    return 1
+  fi
   run_with_timeout "${MUTX_BREW_TIMEOUT:-300}" brew upgrade "${FORMULA}" || true
 }
 
@@ -1325,7 +1303,155 @@ install_source_overlay() {
   hash -r 2>/dev/null || true
 }
 
+check_command_group() {
+  local group_name="$1"
+  shift
+  local -a cmds=("$@")
+  local help_text=""
+  local cmd=""
+  local result=0
+
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    SURFACE_CHECK_CURRENT_CMD="${group_name}"
+    dashboard_render
+  fi
+
+  help_text="$("${MUTX_BIN}" --help 2>&1 || true)"
+  if [[ -z "${help_text}" ]]; then
+    for cmd in "${cmds[@]}"; do
+      if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+        SURFACE_CHECK_PROGRESS=$((SURFACE_CHECK_PROGRESS + 1))
+        SURFACE_CHECK_CURRENT_CMD="${cmd}"
+        dashboard_render
+      fi
+      if ! "${MUTX_BIN}" "${cmd}" --help >/dev/null 2>&1; then
+        CLI_MISSING_COMMANDS="${CLI_MISSING_COMMANDS}; ${cmd}"
+        result=1
+      fi
+    done
+    return "${result}"
+  fi
+
+  for cmd in "${cmds[@]}"; do
+    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+      SURFACE_CHECK_PROGRESS=$((SURFACE_CHECK_PROGRESS + 1))
+      SURFACE_CHECK_CURRENT_CMD="${cmd}"
+      dashboard_render
+    fi
+    if ! "${MUTX_BIN}" "${cmd}" --help >/dev/null 2>&1; then
+      CLI_MISSING_COMMANDS="${CLI_MISSING_COMMANDS}; ${cmd}"
+      result=1
+    fi
+  done
+
+  return "${result}"
+}
+
+check_essential_commands() {
+  if ! "${MUTX_BIN}" --version >/dev/null 2>&1; then
+    CLI_MISSING_COMMANDS="binary-broken"
+    return 1
+  fi
+  if ! "${MUTX_BIN}" setup --help >/dev/null 2>&1; then
+    CLI_MISSING_COMMANDS="setup-missing"
+    return 1
+  fi
+  if ! "${MUTX_BIN}" doctor --help >/dev/null 2>&1; then
+    CLI_MISSING_COMMANDS="doctor-missing"
+    return 1
+  fi
+  return 0
+}
+
+check_assistant_first_surface() {
+  local -a setup_cmds=( "setup" "setup hosted" "setup local" )
+  local -a runtime_cmds=( "runtime" "runtime inspect" "runtime open" )
+  local -a extended_cmds=( "governance" "governance status" "observability" "observability runs" "security" "update" )
+
+  SURFACE_CHECK_TOTAL=0
+  SURFACE_CHECK_PROGRESS=0
+  SURFACE_CHECK_CURRENT_CMD="starting..."
+
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    FEED_LINES=()
+    dashboard_render
+  fi
+
+  if check_essential_commands; then
+    if [[ "${DASHBOARD_ACTIVE}" != "1" ]]; then
+      success "Core commands available"
+    fi
+  else
+    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+      CURRENT_STEP_DETAIL="Binary broken — refreshing from source"
+      dashboard_record "warn" "Binary broken or missing — refreshing from source"
+    else
+      note "The MUTX binary is broken. Refreshing from source."
+    fi
+    return 1
+  fi
+
+  SURFACE_CHECK_TOTAL=$((${#setup_cmds[@]} + ${#runtime_cmds[@]} + ${#extended_cmds[@]}))
+  SURFACE_CHECK_PROGRESS=0
+
+  if [[ "${DASHBOARD_ACTIVE}" != "1" ]]; then
+    say "Checking command surface..."
+  fi
+
+  if ! check_command_group "setup" "${setup_cmds[@]}"; then
+    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+      CURRENT_STEP_DETAIL="Some setup commands missing — refreshing from source"
+      dashboard_record "warn" "Some setup commands missing — refreshing from source"
+    else
+      note "Some setup commands missing. Refreshing from source."
+    fi
+    return 1
+  fi
+
+  if ! check_command_group "runtime" "${runtime_cmds[@]}"; then
+    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+      CURRENT_STEP_DETAIL="Some runtime commands missing — refreshing from source"
+      dashboard_record "warn" "Some runtime commands missing — refreshing from source"
+    else
+      note "Some runtime commands missing. Refreshing from source."
+    fi
+    return 1
+  fi
+
+  if ! check_command_group "extended" "${extended_cmds[@]}"; then
+    if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+      CURRENT_STEP_DETAIL="Some extended commands missing — using packaged CLI"
+      dashboard_record "warn" "Some extended commands missing — using packaged CLI"
+    fi
+  fi
+
+  SURFACE_CHECK_TOTAL=0
+  SURFACE_CHECK_PROGRESS=0
+  SURFACE_CHECK_CURRENT_CMD=""
+
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    dashboard_record "success" "Command surface verified"
+  fi
+
+  return 0
+}
+
+show_surface_status() {
+  local label="$1"
+  if check_assistant_first_surface; then
+    success "${label}"
+    return 0
+  fi
+
+  warn "${label}"
+  return 1
+}
+
 ensure_assistant_first_surface() {
+  SURFACE_CHECK_TOTAL=0
+  SURFACE_CHECK_PROGRESS=0
+  SURFACE_CHECK_CURRENT_CMD=""
+
   if mutx_points_to_source_overlay; then
     note "Refreshing the MUTX source overlay to the latest main build."
     run_stage "Refreshing local CLI overlay" install_source_overlay
@@ -1338,7 +1464,7 @@ ensure_assistant_first_surface() {
     return 0
   fi
 
-  note "The packaged CLI is older than this installer. Pulling a fresh MUTX runtime."
+  note "The packaged CLI is missing required commands. Pulling a fresh MUTX runtime."
   run_stage "Recovering current CLI surface" install_source_overlay
   SOURCE_OVERLAY_USED=1
   resolve_mutx_bin
@@ -1525,15 +1651,20 @@ run_setup_handoff() {
   done
 
   if [[ "${WIZARD_SELECTION}" == "1" || "${WIZARD_SELECTION}" == "h" || "${WIZARD_SELECTION}" == "H" || "${WIZARD_SELECTION}" == "hosted" || "${WIZARD_SELECTION}" == "Hosted" ]]; then
+    WIZARD_VISIBLE=0
     WIZARD_HINT="Hosted keeps the control plane managed. Sign in here, then MUTX continues into the OpenClaw wizard."
     WIZARD_PROMPT_LABEL="Email"
+
     while [[ -z "${hosted_email}" ]]; do
       if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-        dashboard_render
+        dashboard_render_hosted_creds
+        printf '\033[%d;%dH%bEmail:%b ' 10 3 "${C_BOLD}" "${C_RESET}" > /dev/tty
+        PROMPT_CURSOR_ROW=10
+        PROMPT_CURSOR_COL=$((3 + 7))
       else
         tty_print "\n${C_SOFT}${WIZARD_HINT}${C_RESET}\n"
+        tty_prompt "${WIZARD_PROMPT_LABEL}"
       fi
-      tty_prompt "${WIZARD_PROMPT_LABEL}"
       read_tty_line hosted_email
       hosted_email="${hosted_email#"${hosted_email%%[![:space:]]*}"}"
       hosted_email="${hosted_email%"${hosted_email##*[![:space:]]}"}"
@@ -1547,7 +1678,10 @@ run_setup_handoff() {
     WIZARD_PROMPT_LABEL="Password"
     while [[ -z "${hosted_password}" ]]; do
       if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
-        dashboard_render
+        dashboard_render_hosted_creds
+        printf '\033[%d;%dH%bPassword:%b ' 12 3 "${C_BOLD}" "${C_RESET}" > /dev/tty
+        PROMPT_CURSOR_ROW=12
+        PROMPT_CURSOR_COL=$((3 + 11))
       fi
       tty_prompt "${WIZARD_PROMPT_LABEL}"
       read_tty_secret hosted_password
@@ -1588,6 +1722,40 @@ run_setup_handoff() {
   note "Local OpenClaw secrets remain on this machine."
 }
 
+append_if_supported() {
+  local target_name="$1"
+  local spec="$2"
+  local option="$3"
+  shift 3
+
+  if mutx_supports_option "${spec}" "${option}"; then
+    eval "${target_name}+=(\"\${option}\")"
+    while [[ "$#" -gt 0 ]]; do
+      local value="$1"
+      shift
+      eval "${target_name}+=(\"\${value}\")"
+    done
+  fi
+}
+
+mutx_supports_option() {
+  local spec="$1"
+  local option="$2"
+  local help_text=""
+
+  help_text="$(mutx_help_output "${spec}")"
+  [[ "${help_text}" == *"${option}"* ]]
+}
+
+mutx_help_output() {
+  local spec="$1"
+  local -a cmd=("${MUTX_BIN}")
+  local -a parts=()
+  read -r -a parts <<< "${spec}"
+  cmd+=("${parts[@]}")
+  "${cmd[@]}" --help 2>&1 || true
+}
+
 parse_args "$@"
 
 if [[ "${HELP}" == "1" ]]; then
@@ -1608,10 +1776,22 @@ ui_stage "Preparing environment"
 run_stage "Syncing package lane" run_with_timeout 120 brew tap "${TAP}"
 
 ui_stage "Installing MUTX runtime"
-if brew list --versions "${FORMULA}" >/dev/null 2>&1; then
-  run_stage "Refreshing MUTX runtime" upgrade_or_keep_formula
-else
+check_brew_upgrade_needed
+
+if [[ "${BREW_UPGRADE_NEEDED}" == "not-installed" ]]; then
   run_stage "Installing MUTX runtime" run_with_timeout 300 brew install "${FORMULA}"
+elif [[ "${BREW_UPGRADE_NEEDED}" == "no" ]]; then
+  if [[ "${DASHBOARD_ACTIVE}" == "1" ]]; then
+    CURRENT_STEP_LABEL="MUTX runtime"
+    CURRENT_STEP_STATE="done"
+    CURRENT_STEP_DETAIL="Already current."
+    success "MUTX runtime already up-to-date"
+    dashboard_render
+  else
+    success "MUTX runtime already up-to-date"
+  fi
+elif [[ "${BREW_UPGRADE_NEEDED}" == "yes" ]]; then
+  run_stage "Upgrading MUTX runtime" upgrade_or_keep_formula
 fi
 
 run_stage "Linking mutx into PATH" run_with_timeout 60 brew link --overwrite "${FORMULA}"
