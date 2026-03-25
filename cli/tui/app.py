@@ -1603,12 +1603,6 @@ class MutxTUI(App[None]):
             service = ObservabilityService(config=self.config)
             runs = service.list_runs(limit=50)
 
-            security_service = None
-            try:
-                security_service = ObservabilityService(config=self.config)
-            except Exception:
-                pass
-
             metrics = {"total": len(runs), "running": 0, "completed": 0, "failed": 0}
             for run in runs:
                 status = run.get("status", "unknown")

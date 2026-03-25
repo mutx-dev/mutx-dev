@@ -337,7 +337,7 @@ def run_openclaw_setup_wizard(
             installation_disposition=install_resolution.disposition,
             action_type=action_type,
         )
-        track_state = complete_wizard_step(
+        complete_wizard_step(
             provider,
             "track",
             mode=mode,
@@ -373,7 +373,7 @@ def run_openclaw_setup_wizard(
             installation_disposition=install_resolution.disposition,
             action_type=action_type,
         )
-        bind_state = complete_wizard_step(
+        complete_wizard_step(
             provider,
             "bind",
             mode=mode,
@@ -455,7 +455,7 @@ def run_openclaw_setup_wizard(
                 workspace=binding.workspace,
                 runtime_metadata=binding.runtime_metadata(),
             )
-        deploy_state = complete_wizard_step(
+        complete_wizard_step(
             provider,
             "deploy",
             mode=mode,
