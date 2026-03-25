@@ -23,7 +23,6 @@ from cli.services import (
     DeploymentRecord,
     DeploymentsService,
     LogEntry,
-    MetricPoint,
     ObservabilityService,
     RuntimeStateService,
     TemplatesService,
@@ -34,7 +33,13 @@ from cli.setup_wizard import (
     run_openclaw_setup_wizard,
 )
 from cli.tui.cockpit import build_cockpit_snapshot
-from cli.tui.models import CockpitSnapshot, IncidentRecord, SelectionContext, SessionRecord, WorkspaceRecord
+from cli.tui.models import (
+    CockpitSnapshot,
+    IncidentRecord,
+    SelectionContext,
+    SessionRecord,
+    WorkspaceRecord,
+)
 from cli.tui.renderers import (
     render_deployment_inspector,
     render_openclaw_runtime_detail as _render_openclaw_runtime_detail,
@@ -362,7 +367,9 @@ class MutxTUI(App[None]):
                                     yield Static(id="incidents-summary-body", classes="detail-body")
                             with TabPane("Activity"):
                                 with VerticalScroll(classes="detail-scroll"):
-                                    yield Static(id="incidents-activity-body", classes="detail-body")
+                                    yield Static(
+                                        id="incidents-activity-body", classes="detail-body"
+                                    )
                             with TabPane("Logs"):
                                 with VerticalScroll(classes="detail-scroll"):
                                     yield Static(id="incidents-logs-body", classes="detail-body")
@@ -414,19 +421,27 @@ class MutxTUI(App[None]):
                         with TabbedContent(id="deployments-inspector-tabs"):
                             with TabPane("Summary"):
                                 with VerticalScroll(classes="detail-scroll"):
-                                    yield Static(id="deployments-summary-body", classes="detail-body")
+                                    yield Static(
+                                        id="deployments-summary-body", classes="detail-body"
+                                    )
                             with TabPane("Activity"):
                                 with VerticalScroll(classes="detail-scroll"):
-                                    yield Static(id="deployments-activity-body", classes="detail-body")
+                                    yield Static(
+                                        id="deployments-activity-body", classes="detail-body"
+                                    )
                             with TabPane("Logs"):
                                 with VerticalScroll(classes="detail-scroll"):
                                     yield Static(id="deployments-logs-body", classes="detail-body")
                             with TabPane("Events"):
                                 with VerticalScroll(classes="detail-scroll"):
-                                    yield Static(id="deployments-events-body", classes="detail-body")
+                                    yield Static(
+                                        id="deployments-events-body", classes="detail-body"
+                                    )
                             with TabPane("Actions"):
                                 with VerticalScroll(classes="detail-scroll"):
-                                    yield Static(id="deployments-actions-body", classes="detail-body")
+                                    yield Static(
+                                        id="deployments-actions-body", classes="detail-body"
+                                    )
 
             with TabPane("Setup", id="setup-pane"):
                 with Vertical(classes="panel detail-panel"):
@@ -612,7 +627,9 @@ class MutxTUI(App[None]):
         self._refresh_chrome()
 
     def _hosted_dashboard_url(self) -> str:
-        return HOSTED_DASHBOARD_URL if self.auth_service.status().authenticated else HOSTED_LOGIN_URL
+        return (
+            HOSTED_DASHBOARD_URL if self.auth_service.status().authenticated else HOSTED_LOGIN_URL
+        )
 
     def _open_hosted_dashboard(self) -> None:
         url = self._hosted_dashboard_url()
@@ -664,7 +681,9 @@ class MutxTUI(App[None]):
         elif active == "sessions-pane" and self._selection.session_id:
             self._render_selected_session_detail()
 
-    def _update_body(self, prefix: str, *, summary: str, activity: str, logs: str, events: str, actions: str) -> None:
+    def _update_body(
+        self, prefix: str, *, summary: str, activity: str, logs: str, events: str, actions: str
+    ) -> None:
         self.query_one(f"#{prefix}-summary-body", Static).update(summary)
         self.query_one(f"#{prefix}-activity-body", Static).update(activity)
         self.query_one(f"#{prefix}-logs-body", Static).update(logs)
@@ -719,7 +738,9 @@ class MutxTUI(App[None]):
             self.call_from_thread(self._set_notice, str(exc), ttl=8.0)
             return
 
-        self.call_from_thread(setattr, self, "_operator_profile", f"{profile.email} · {profile.plan}")
+        self.call_from_thread(
+            setattr, self, "_operator_profile", f"{profile.email} · {profile.plan}"
+        )
         self.call_from_thread(self._refresh_chrome)
 
     def _refresh_setup_actions(self, runtime_snapshot: dict[str, object]) -> None:
@@ -759,7 +780,10 @@ class MutxTUI(App[None]):
         self.query_one("#fleet-open-openclaw", Button).disabled = not bool(workspace)
         self.query_one("#fleet-open-dashboard", Button).disabled = False
         self.query_one("#fleet-deploy", Button).disabled = not (
-            authenticated and workspace is not None and workspace.managed_by_mutx and workspace.agent_id
+            authenticated
+            and workspace is not None
+            and workspace.managed_by_mutx
+            and workspace.agent_id
         )
 
         self.query_one("#incidents-jump", Button).disabled = not bool(incident)
@@ -769,7 +793,9 @@ class MutxTUI(App[None]):
         self.query_one("#incidents-open-openclaw", Button).disabled = not bool(workspace)
         self.query_one("#incidents-open-dashboard", Button).disabled = False
 
-        self.query_one("#sessions-open-session", Button).disabled = not bool(session and session.key)
+        self.query_one("#sessions-open-session", Button).disabled = not bool(
+            session and session.key
+        )
         self.query_one("#sessions-open-openclaw", Button).disabled = not bool(session)
         self.query_one("#sessions-open-dashboard", Button).disabled = False
 
@@ -778,7 +804,9 @@ class MutxTUI(App[None]):
         self.query_one("#deployments-delete", Button).disabled = not (authenticated and deployment)
         self.query_one("#deployments-open-dashboard", Button).disabled = False
 
-    def _resolve_workspace_row(self, table: DataTable, keys: list[str], selected_id: str | None) -> str | None:
+    def _resolve_workspace_row(
+        self, table: DataTable, keys: list[str], selected_id: str | None
+    ) -> str | None:
         if not keys:
             return None
         resolved = selected_id if selected_id in keys else keys[0]
@@ -927,7 +955,9 @@ class MutxTUI(App[None]):
             overview = self.assistant_service.overview()
             onboarding = load_wizard_state("openclaw")
             runtime_snapshot = persist_openclaw_runtime_snapshot(
-                assistant_name=overview.name if overview else str(onboarding.get("assistant_name") or "") or None
+                assistant_name=overview.name
+                if overview
+                else str(onboarding.get("assistant_name") or "") or None
             ).to_payload()
             agents = self.agents_service.list_agents(limit=100, skip=0)
             deployments = self.deployments_service.list_deployments(limit=100, skip=0)
@@ -959,7 +989,9 @@ class MutxTUI(App[None]):
         )
         self.call_from_thread(self._apply_cockpit_snapshot, snapshot)
 
-    def _governance_for_workspace(self, workspace: WorkspaceRecord) -> tuple[list[object], list[object]]:
+    def _governance_for_workspace(
+        self, workspace: WorkspaceRecord
+    ) -> tuple[list[object], list[object]]:
         keys = {workspace.assistant_id}
         if workspace.agent_id:
             keys.add(workspace.agent_id)
@@ -1027,9 +1059,7 @@ class MutxTUI(App[None]):
 
     def _apply_workspace_detail(self, surface: str, inspector) -> None:
         prefix = "fleet" if surface == "fleet-pane" else "incidents"
-        label = (
-            f"{inspector.workspace.name} | {inspector.workspace.status} | sessions {inspector.workspace.session_count}"
-        )
+        label = f"{inspector.workspace.name} | {inspector.workspace.status} | sessions {inspector.workspace.session_count}"
         self.query_one(f"#{prefix}-summary-label", Static).update(label)
         self._update_body(
             prefix,
@@ -1083,7 +1113,11 @@ class MutxTUI(App[None]):
             return
 
         workspace = next(
-            (item for item in self._workspace_cache.values() if item.agent_id == deployment.agent_id),
+            (
+                item
+                for item in self._workspace_cache.values()
+                if item.agent_id == deployment.agent_id
+            ),
             None,
         )
         sections = render_deployment_inspector(
@@ -1095,7 +1129,9 @@ class MutxTUI(App[None]):
         )
         self.call_from_thread(self._apply_deployment_detail, deployment, sections)
 
-    def _apply_deployment_detail(self, deployment: DeploymentRecord, sections: dict[str, str]) -> None:
+    def _apply_deployment_detail(
+        self, deployment: DeploymentRecord, sections: dict[str, str]
+    ) -> None:
         self._deployment_cache[deployment.id] = deployment
         self.query_one("#deployments-summary-label", Static).update(
             f"Deployments | {shorten(deployment.id, 12)} | {deployment.status}"
@@ -1234,13 +1270,27 @@ class MutxTUI(App[None]):
 
     def _command_entries(self) -> list[CommandEntry]:
         return [
-            CommandEntry("refresh", "Refresh current surface", "Reload the active cockpit surface."),
-            CommandEntry("open-dashboard", "Open hosted dashboard", "Open app.mutx.dev in a browser."),
-            CommandEntry("open-session", "Open selected session", "Jump into the selected OpenClaw session."),
-            CommandEntry("open-workspace", "Open selected workspace", "Open the upstream OpenClaw TUI."),
+            CommandEntry(
+                "refresh", "Refresh current surface", "Reload the active cockpit surface."
+            ),
+            CommandEntry(
+                "open-dashboard", "Open hosted dashboard", "Open app.mutx.dev in a browser."
+            ),
+            CommandEntry(
+                "open-session", "Open selected session", "Jump into the selected OpenClaw session."
+            ),
+            CommandEntry(
+                "open-workspace", "Open selected workspace", "Open the upstream OpenClaw TUI."
+            ),
             CommandEntry("deploy", "Deploy selected workspace", "Trigger a managed deploy."),
-            CommandEntry("restart", "Restart selected deployment", "Restart the active deployment."),
-            CommandEntry("scale", "Scale selected deployment", "Change replica count for the active deployment."),
+            CommandEntry(
+                "restart", "Restart selected deployment", "Restart the active deployment."
+            ),
+            CommandEntry(
+                "scale",
+                "Scale selected deployment",
+                "Change replica count for the active deployment.",
+            ),
             CommandEntry("delete", "Delete selected deployment", "Kill the active deployment."),
             CommandEntry("show-shortcuts", "Show shortcuts", "Open the shortcut reference."),
             CommandEntry("go-setup", "Open setup", "Switch to the setup surface."),
@@ -1318,7 +1368,13 @@ class MutxTUI(App[None]):
             self._open_hosted_dashboard()
         elif button_id == "brand-refresh-auth":
             self.load_operator_profile()
-        elif button_id in {"fleet-refresh", "incidents-refresh", "sessions-refresh", "deployments-refresh", "setup-refresh"}:
+        elif button_id in {
+            "fleet-refresh",
+            "incidents-refresh",
+            "sessions-refresh",
+            "deployments-refresh",
+            "setup-refresh",
+        }:
             self.action_refresh_current()
         elif button_id == "fleet-open-session":
             self._open_selected_session()
@@ -1360,7 +1416,9 @@ class MutxTUI(App[None]):
             self.action_deploy_selected_agent()
 
     def action_open_command_palette(self) -> None:
-        self.push_screen(CommandPaletteScreen(self._command_entries()), self._dispatch_palette_command)
+        self.push_screen(
+            CommandPaletteScreen(self._command_entries()), self._dispatch_palette_command
+        )
 
     def action_show_shortcuts(self) -> None:
         self.push_screen(ShortcutHelpScreen())
@@ -1547,4 +1605,3 @@ __all__ = [
     "_render_openclaw_runtime_detail",
     "_render_setup_body",
 ]
-

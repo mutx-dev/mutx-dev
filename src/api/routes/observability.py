@@ -552,7 +552,10 @@ async def update_run_status(
     if "error" in status_update:
         run.error = status_update["error"]
 
-    if any(key in status_update for key in ("input_tokens", "output_tokens", "total_tokens", "cost_usd")):
+    if any(
+        key in status_update
+        for key in ("input_tokens", "output_tokens", "total_tokens", "cost_usd")
+    ):
         if run.cost is None:
             run.cost = MutxCost(
                 input_tokens=0,

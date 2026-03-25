@@ -221,9 +221,7 @@ class CommandPaletteScreen(ModalScreen[str | None]):
         filtered = [
             entry
             for entry in self._entries
-            if not needle
-            or needle in entry.label.lower()
-            or needle in entry.description.lower()
+            if not needle or needle in entry.label.lower() or needle in entry.description.lower()
         ]
         for entry in filtered:
             table.add_row(entry.label, entry.description, key=entry.id)

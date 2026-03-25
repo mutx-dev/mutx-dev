@@ -119,4 +119,3 @@ class SelectionContext:
     incident_id: str | None = None
     session_id: str | None = None
     deployment_id: str | None = None
-

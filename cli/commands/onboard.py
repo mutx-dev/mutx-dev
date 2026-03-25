@@ -1,8 +1,8 @@
 import click
 
 from cli.commands.tui import launch_tui
-from cli.config import LOCAL_API_URL, current_config, get_client
-from cli.services import AuthService, CLIServiceError
+from cli.config import current_config, get_client
+from cli.services import AuthService
 
 
 @click.command(name="onboard")

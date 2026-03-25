@@ -262,7 +262,7 @@ def render_openclaw_runtime_detail(
                 f"  status    {assistant_overview.status}",
                 f"  sessions  {assistant_overview.session_count}",
                 f"  skills    {', '.join(skill.id for skill in assistant_overview.installed_skills) or 'none'}",
-                f"  channels  "
+                "  channels  "
                 + (
                     ", ".join(
                         f"{channel.id}:{'on' if channel.enabled else 'off'}"
@@ -472,4 +472,3 @@ def render_deployment_inspector(
         "events": render_events(events),
         "actions": actions,
     }
-

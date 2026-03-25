@@ -1311,6 +1311,406 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/observability/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Runs
+         * @description List runs with optional filters.
+         */
+        get: operations["list_runs_v1_observability_runs_get"];
+        put?: never;
+        /**
+         * Create Run
+         * @description Create or report a new MutxRun.
+         *
+         *     This is the primary ingestion endpoint for agent run observability.
+         */
+        post: operations["create_run_v1_observability_runs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/observability/runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Run
+         * @description Get a run with full step details.
+         */
+        get: operations["get_run_v1_observability_runs__run_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/observability/runs/{run_id}/steps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Steps
+         * @description Add steps to an existing run.
+         */
+        post: operations["add_steps_v1_observability_runs__run_id__steps_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/observability/runs/{run_id}/eval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Eval
+         * @description Get the evaluation for a run.
+         */
+        get: operations["get_eval_v1_observability_runs__run_id__eval_get"];
+        put?: never;
+        /**
+         * Submit Eval
+         * @description Submit or update the evaluation for a run.
+         */
+        post: operations["submit_eval_v1_observability_runs__run_id__eval_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/observability/runs/{run_id}/provenance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Provenance
+         * @description Get the provenance record for a run.
+         */
+        get: operations["get_provenance_v1_observability_runs__run_id__provenance_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/observability/runs/{run_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Run Status
+         * @description Update the status of a run (e.g., mark as completed, failed).
+         */
+        patch: operations["update_run_status_v1_observability_runs__run_id__status_patch"];
+        trace?: never;
+    };
+    "/v1/security/actions/evaluate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Evaluate Action
+         * @description Evaluate an action against policy without executing.
+         *
+         *     This endpoint allows you to check what the policy decision would be
+         *     for a given action without actually executing it.
+         */
+        post: operations["evaluate_action_v1_security_actions_evaluate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/security/approvals/request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request Approval
+         * @description Request human approval for a deferred action.
+         *
+         *     Creates an approval request that can be approved or denied via
+         *     the approve/deny endpoints.
+         */
+        post: operations["request_approval_v1_security_approvals_request_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/security/approvals/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Approval
+         * @description Get the status of an approval request.
+         */
+        get: operations["get_approval_v1_security_approvals__request_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/security/approvals/{token}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve Request
+         * @description Approve a pending request.
+         */
+        post: operations["approve_request_v1_security_approvals__token__approve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/security/approvals/{token}/deny": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deny Request
+         * @description Deny a pending request.
+         */
+        post: operations["deny_request_v1_security_approvals__token__deny_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/security/approvals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Pending Approvals
+         * @description List all pending approval requests.
+         */
+        get: operations["list_pending_approvals_v1_security_approvals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/security/receipts/{receipt_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Receipt
+         * @description Get a receipt by ID.
+         */
+        get: operations["get_receipt_v1_security_receipts__receipt_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/security/receipts/session/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Session Receipts
+         * @description Get receipts for a session.
+         */
+        get: operations["get_session_receipts_v1_security_receipts_session__session_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/security/compliance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Run Compliance Check
+         * @description Run AARM conformance checks.
+         */
+        get: operations["run_compliance_check_v1_security_compliance_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/security/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Metrics
+         * @description Get governance metrics.
+         */
+        get: operations["get_metrics_v1_security_metrics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/security/metrics/prometheus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Prometheus Metrics
+         * @description Get metrics in Prometheus format.
+         */
+        get: operations["get_prometheus_metrics_v1_security_metrics_prometheus_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/security/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Session
+         * @description Create a new session context.
+         */
+        post: operations["create_session_v1_security_sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/security/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Session
+         * @description Get session context.
+         */
+        get: operations["get_session_v1_security_sessions__session_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Close Session
+         * @description Close a session.
+         */
+        delete: operations["close_session_v1_security_sessions__session_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/rag/embed": {
         parameters: {
             query?: never;
@@ -1621,6 +2021,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/runtime/governance/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Governance Metrics */
+        get: operations["governance_metrics_v1_runtime_governance_metrics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runtime/governance/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Governance Status */
+        get: operations["governance_status_v1_runtime_governance_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/sessions": {
         parameters: {
             query?: never;
@@ -1750,6 +2184,216 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/governance/credentials/backends": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Credential Backends
+         * @description List all registered credential backends.
+         */
+        get: operations["list_credential_backends_v1_governance_credentials_backends_get"];
+        put?: never;
+        /**
+         * Register Credential Backend
+         * @description Register a new credential backend.
+         */
+        post: operations["register_credential_backend_v1_governance_credentials_backends_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/governance/credentials/backends/{backend_name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Unregister Credential Backend
+         * @description Unregister a credential backend.
+         */
+        delete: operations["unregister_credential_backend_v1_governance_credentials_backends__backend_name__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/governance/credentials/backends/{backend_name}/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Check Backend Health
+         * @description Check health of a specific credential backend.
+         */
+        get: operations["check_backend_health_v1_governance_credentials_backends__backend_name__health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/governance/credentials/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Check All Backends Health
+         * @description Check health of all credential backends.
+         */
+        get: operations["check_all_backends_health_v1_governance_credentials_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/governance/credentials/get/{full_path}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Credential
+         * @description Retrieve a credential by its full path.
+         *
+         *     Path format: backend:/path/to/secret
+         *     Examples:
+         *         vault:/secret/myapp/api-key
+         *         awssecrets:/prod/myapp/api-key
+         *         gcpsm:/my-project/my-secret
+         */
+        get: operations["get_credential_v1_governance_credentials_get__full_path__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runtime/governance/supervised/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Supervised Agents
+         * @description List all supervised agents.
+         */
+        get: operations["list_supervised_agents_v1_runtime_governance_supervised__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runtime/governance/supervised/{agent_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Supervised Agent
+         * @description Get status of a supervised agent.
+         */
+        get: operations["get_supervised_agent_v1_runtime_governance_supervised__agent_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runtime/governance/supervised/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Supervised Agent
+         * @description Start an agent under Faramesh supervision.
+         */
+        post: operations["start_supervised_agent_v1_runtime_governance_supervised_start_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runtime/governance/supervised/{agent_id}/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stop Supervised Agent
+         * @description Stop a supervised agent.
+         */
+        post: operations["stop_supervised_agent_v1_runtime_governance_supervised__agent_id__stop_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/runtime/governance/supervised/{agent_id}/restart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restart Supervised Agent
+         * @description Restart a supervised agent.
+         */
+        post: operations["restart_supervised_agent_v1_runtime_governance_supervised__agent_id__restart_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -1869,6 +2513,72 @@ export interface components {
             /** Is Active */
             is_active: boolean;
         };
+        /**
+         * ActionEvaluateRequest
+         * @description Request to evaluate an action without executing.
+         */
+        ActionEvaluateRequest: {
+            /**
+             * Tool Name
+             * @description Name of the tool
+             */
+            tool_name: string;
+            /**
+             * Tool Args
+             * @description Tool arguments
+             */
+            tool_args?: Record<string, never>;
+            /**
+             * Agent Id
+             * @description Agent ID
+             */
+            agent_id: string;
+            /**
+             * Session Id
+             * @description Session ID
+             */
+            session_id: string;
+            /**
+             * User Id
+             * @description User ID
+             */
+            user_id?: string | null;
+            /**
+             * Trigger
+             * @description What triggered this
+             * @default manual
+             */
+            trigger: string;
+            /**
+             * Runtime
+             * @description Runtime identifier
+             * @default mutx
+             */
+            runtime: string;
+        };
+        /**
+         * ActionEvaluateResponse
+         * @description Response from action evaluation.
+         */
+        ActionEvaluateResponse: {
+            /** Decision */
+            decision: string;
+            /** Rule Id */
+            rule_id?: string | null;
+            /** Rule Name */
+            rule_name?: string | null;
+            /** Reason */
+            reason: string;
+            /**
+             * Would Modify
+             * @default false
+             */
+            would_modify: boolean;
+            /** Action Id */
+            action_id: string;
+            /** Action Hash */
+            action_hash: string;
+        };
         /** AgentConfigResponse */
         AgentConfigResponse: {
             /**
@@ -1878,9 +2588,7 @@ export interface components {
             agent_id: string;
             type: components["schemas"]["AgentType"];
             /** Config */
-            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
-                [key: string]: unknown;
-            };
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | Record<string, never>;
             /** Config Version */
             config_version: number;
             /**
@@ -1895,9 +2603,7 @@ export interface components {
              * Config
              * @description Updated agent configuration payload. Can be a JSON object or JSON string.
              */
-            config: {
-                [key: string]: unknown;
-            } | string;
+            config: Record<string, never> | string;
         };
         /** AgentCreate */
         AgentCreate: {
@@ -1908,9 +2614,7 @@ export interface components {
             /** @default openai */
             type: components["schemas"]["AgentType"];
             /** Config */
-            config?: {
-                [key: string]: unknown;
-            } | string | null;
+            config?: Record<string, never> | string | null;
         };
         /** AgentDetailResponse */
         AgentDetailResponse: {
@@ -1927,9 +2631,7 @@ export interface components {
             /** Status */
             status: string;
             /** Config */
-            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
-                [key: string]: unknown;
-            } | null;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | Record<string, never> | null;
             /**
              * Config Version
              * @default 1
@@ -2046,9 +2748,7 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: {
-                [key: string]: unknown;
-            };
+            metadata: Record<string, never>;
             /**
              * Capabilities
              * @default []
@@ -2099,9 +2799,7 @@ export interface components {
             /** Model */
             model?: string | null;
             /** Extra Metadata */
-            extra_metadata?: {
-                [key: string]: unknown;
-            } | null;
+            extra_metadata?: Record<string, never> | null;
             /**
              * Period Start
              * Format: date-time
@@ -2150,9 +2848,7 @@ export interface components {
             /** Model */
             model?: string | null;
             /** Extra Metadata */
-            extra_metadata?: {
-                [key: string]: unknown;
-            } | null;
+            extra_metadata?: Record<string, never> | null;
             /**
              * Period Start
              * Format: date-time
@@ -2181,9 +2877,7 @@ export interface components {
             /** Status */
             status: string;
             /** Config */
-            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
-                [key: string]: unknown;
-            } | null;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | Record<string, never> | null;
             /**
              * Config Version
              * @default 1
@@ -2410,6 +3104,88 @@ export interface components {
              */
             max_tokens: number;
         };
+        /**
+         * ApprovalActionRequest
+         * @description Approve or deny a request.
+         */
+        ApprovalActionRequest: {
+            /**
+             * Reviewer
+             * @description Who is approving/denying
+             */
+            reviewer: string;
+            /**
+             * Comment
+             * @description Optional comment
+             * @default
+             */
+            comment: string;
+        };
+        /**
+         * ApprovalRequestCreate
+         * @description Request human approval for an action.
+         */
+        ApprovalRequestCreate: {
+            /**
+             * Tool Name
+             * @description Name of the tool
+             */
+            tool_name: string;
+            /**
+             * Tool Args
+             * @description Tool arguments
+             */
+            tool_args?: Record<string, never>;
+            /**
+             * Agent Id
+             * @description Agent ID
+             */
+            agent_id: string;
+            /**
+             * Session Id
+             * @description Session ID
+             */
+            session_id: string;
+            /**
+             * User Id
+             * @description User ID
+             */
+            user_id?: string | null;
+            /**
+             * Reason
+             * @description Why approval is needed
+             * @default
+             */
+            reason: string;
+            /**
+             * Timeout Minutes
+             * @description Timeout in minutes
+             * @default 5
+             */
+            timeout_minutes: number;
+        };
+        /**
+         * ApprovalRequestResponse
+         * @description Response for approval request.
+         */
+        ApprovalRequestResponse: {
+            /** Request Id */
+            request_id: string;
+            /** Token */
+            token: string;
+            /** Status */
+            status: string;
+            /** Tool Name */
+            tool_name: string;
+            /** Reason */
+            reason: string;
+            /** Created At */
+            created_at: string;
+            /** Expires At */
+            expires_at: string;
+            /** Remaining Seconds */
+            remaining_seconds: number;
+        };
         /** AssistantChannelResponse */
         AssistantChannelResponse: {
             /** Id */
@@ -2500,9 +3276,7 @@ export interface components {
             /** Deployments */
             deployments?: components["schemas"]["DeploymentResponse"][];
             /** Config */
-            config: components["schemas"]["OpenClawAgentConfig"] | {
-                [key: string]: unknown;
-            };
+            config: components["schemas"]["OpenClawAgentConfig"] | Record<string, never>;
         };
         /** AssistantSessionResponse */
         AssistantSessionResponse: {
@@ -2576,9 +3350,7 @@ export interface components {
             /** Starter Prompt */
             starter_prompt: string;
             /** Default Config */
-            default_config: components["schemas"]["OpenClawAgentConfig"] | {
-                [key: string]: unknown;
-            };
+            default_config: components["schemas"]["OpenClawAgentConfig"] | Record<string, never>;
         };
         /** AssistantWakeupResponse */
         AssistantWakeupResponse: {
@@ -2590,6 +3362,21 @@ export interface components {
             timezone?: string | null;
             /** Label */
             label?: string | null;
+        };
+        /** BackendHealthResponse */
+        BackendHealthResponse: {
+            /** Name */
+            name: string;
+            /** Backend */
+            backend: string;
+            /** Path */
+            path: string;
+            /** Ttl */
+            ttl: number;
+            /** Is Active */
+            is_active: boolean;
+            /** Is Healthy */
+            is_healthy: boolean;
         };
         /**
          * BatchEmbedRequest
@@ -2648,9 +3435,7 @@ export interface components {
             /** Success */
             success: boolean;
             /** Result */
-            result?: {
-                [key: string]: unknown;
-            } | null;
+            result?: Record<string, never> | null;
             /** Error */
             error?: string | null;
             /** Completed At */
@@ -2663,9 +3448,7 @@ export interface components {
             /** Action */
             action: string;
             /** Parameters */
-            parameters: {
-                [key: string]: unknown;
-            };
+            parameters: Record<string, never>;
             /** Received At */
             received_at: string;
         };
@@ -2673,6 +3456,22 @@ export interface components {
         CommandsListResponse: {
             /** Commands */
             commands: components["schemas"]["CommandResponse"][];
+        };
+        /**
+         * ComplianceResponse
+         * @description AARM compliance check response.
+         */
+        ComplianceResponse: {
+            /** Overall Satisfied */
+            overall_satisfied: boolean;
+            /** Version */
+            version: string;
+            /** Checked At */
+            checked_at: string;
+            /** Summary */
+            summary: Record<string, never>;
+            /** Results */
+            results: Record<string, never>[];
         };
         /** CostSummaryResponse */
         CostSummaryResponse: {
@@ -2700,6 +3499,43 @@ export interface components {
              * Format: date-time
              */
             period_end: string;
+        };
+        /** CredentialBackendRegister */
+        CredentialBackendRegister: {
+            /** Name */
+            name: string;
+            /** Backend */
+            backend: string;
+            /** Path */
+            path: string;
+            /**
+             * Ttl
+             * @default 900
+             */
+            ttl: number | null;
+            /**
+             * Config
+             * @default {}
+             */
+            config: Record<string, never> | null;
+        };
+        /** CredentialResponse */
+        CredentialResponse: {
+            /** Name */
+            name: string;
+            /** Backend */
+            backend: string;
+            /** Path */
+            path: string;
+            /** Value */
+            value: string;
+            /** Expires At */
+            expires_at?: string | null;
+            /**
+             * Metadata
+             * @default {}
+             */
+            metadata: Record<string, never>;
         };
         /** CustomAgentConfig */
         CustomAgentConfig: {
@@ -3009,9 +3845,7 @@ export interface components {
             uptime_seconds?: number | null;
             /** Components */
             components?: {
-                [key: string]: {
-                    [key: string]: unknown;
-                };
+                [key: string]: Record<string, never>;
             };
             /** Schema Repairs Applied */
             schema_repairs_applied?: string[];
@@ -3074,9 +3908,7 @@ export interface components {
             /** Chain Id */
             chain_id: string;
             /** Parameters */
-            parameters?: {
-                [key: string]: unknown;
-            };
+            parameters?: Record<string, never>;
         };
         /** LeadCreate */
         LeadCreate: {
@@ -3153,9 +3985,7 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: {
-                [key: string]: unknown;
-            };
+            metadata: Record<string, never>;
             /** Timestamp */
             timestamp: string;
         };
@@ -3233,12 +4063,704 @@ export interface components {
              * Custom
              * @default {}
              */
-            custom: {
-                [key: string]: unknown;
-            };
+            custom: Record<string, never>;
             /** Timestamp */
             timestamp: string;
         };
+        /**
+         * MetricsResponse
+         * @description Governance metrics response.
+         */
+        MetricsResponse: {
+            /** Total Evaluations */
+            total_evaluations: number;
+            /** Permits */
+            permits: number;
+            /** Denials */
+            denials: number;
+            /** Defers */
+            defers: number;
+            /** Pending Approvals */
+            pending_approvals: number;
+            /** Intent Drifts */
+            intent_drifts: number;
+            /** Active Sessions */
+            active_sessions: number;
+            /** Avg Latency Ms */
+            avg_latency_ms: number;
+            /** Decisions Per Minute */
+            decisions_per_minute: number;
+            /** Decisions Per Hour */
+            decisions_per_hour: number;
+        };
+        /**
+         * MutxCost
+         * @description Token usage and cost attribution for a run.
+         *
+         *     Ported from agent-run/cost.json schema.
+         */
+        MutxCost: {
+            /**
+             * Input Tokens
+             * @description Total input/prompt tokens consumed
+             */
+            input_tokens: number;
+            /**
+             * Output Tokens
+             * @description Total output/completion tokens consumed
+             */
+            output_tokens: number;
+            /**
+             * Cache Read Tokens
+             * @description Tokens served from prompt cache (reduced cost)
+             */
+            cache_read_tokens?: number | null;
+            /**
+             * Cache Write Tokens
+             * @description Tokens written to prompt cache
+             */
+            cache_write_tokens?: number | null;
+            /**
+             * Total Tokens
+             * @description Sum of all token fields. Convenience field.
+             */
+            total_tokens?: number | null;
+            /**
+             * Cost Usd
+             * @description Estimated cost in USD. Null if pricing is unknown.
+             */
+            cost_usd?: number | null;
+            /**
+             * Model
+             * @description Model used for cost calculation (may differ from run-level model)
+             */
+            model?: string | null;
+        };
+        /**
+         * MutxEval
+         * @description Evaluation result for a scored agent run.
+         *
+         *     Ported from agent-run/eval.json schema.
+         *
+         *     Runs can be scored after completion. MutxEval tracks:
+         *     - pass/fail against acceptance criteria
+         *     - score (0-100) for nuanced grading
+         *     - metrics: cost, duration, tool calls, retries, convergence
+         *     - regression detection via regression_from linking
+         */
+        MutxEval: {
+            /**
+             * Task Type
+             * @description Category of task being evaluated (e.g., 'pr-review', 'bug-fix', 'test-gen')
+             */
+            task_type?: string | null;
+            /**
+             * Eval Layer
+             * @description Which evaluation layer scored this (e.g., 'convergence', 'quality', 'regression')
+             */
+            eval_layer?: string | null;
+            /**
+             * Pass
+             * @description Whether the run met its acceptance criteria
+             */
+            pass: boolean;
+            /**
+             * Score
+             * @description Numeric score (0-100). Interpretation depends on task_type.
+             */
+            score: number;
+            /**
+             * Expected Outcome
+             * @description What the eval expected the agent to produce
+             */
+            expected_outcome?: string | null;
+            /**
+             * Actual Outcome
+             * @description What the agent actually produced
+             */
+            actual_outcome?: string | null;
+            /** @description Quantitative metrics for this evaluation */
+            metrics?: components["schemas"]["MutxEvalMetrics"] | null;
+            /**
+             * Regression From
+             * @description Run ID this was compared against for regression detection
+             */
+            regression_from?: string | null;
+            /**
+             * Detail
+             * @description Human-readable evaluation notes or failure explanation
+             */
+            detail?: string | null;
+            /**
+             * Benchmark Id
+             * @description Identifier of the benchmark pack used (e.g., 'mutx/bench/bug-fix@1.0')
+             */
+            benchmark_id?: string | null;
+        };
+        /**
+         * MutxEvalCreate
+         * @description Schema for submitting an evaluation result.
+         */
+        MutxEvalCreate: {
+            /** Task Type */
+            task_type?: string | null;
+            /** Eval Layer */
+            eval_layer?: string | null;
+            /**
+             * Pass
+             * @description Pass/fail result
+             */
+            pass: boolean;
+            /**
+             * Score
+             * @description Score 0-100
+             */
+            score: number;
+            /** Expected Outcome */
+            expected_outcome?: string | null;
+            /** Actual Outcome */
+            actual_outcome?: string | null;
+            metrics?: components["schemas"]["MutxEvalMetrics"] | null;
+            /** Regression From */
+            regression_from?: string | null;
+            /** Detail */
+            detail?: string | null;
+            /** Benchmark Id */
+            benchmark_id?: string | null;
+        };
+        /**
+         * MutxEvalMetrics
+         * @description Quantitative metrics for evaluation.
+         *
+         *     Ported from agent-run/eval.json metrics schema.
+         */
+        MutxEvalMetrics: {
+            /** Cost Usd */
+            cost_usd?: number | null;
+            /** Duration S */
+            duration_s?: number | null;
+            /** Tool Calls */
+            tool_calls?: number | null;
+            /** Retries */
+            retries?: number | null;
+            /**
+             * Convergence Score
+             * @description How directly the agent reached the solution (1.0 = optimal path, 0.0 = lost)
+             */
+            convergence_score?: number | null;
+            /** Total Steps */
+            total_steps?: number | null;
+            /** Optimal Steps */
+            optimal_steps?: number | null;
+        };
+        /**
+         * MutxOutcome
+         * @description Result quality of a run - distinct from status.
+         * @enum {string}
+         */
+        MutxOutcome: "success" | "failed" | "partial" | "abandoned";
+        /**
+         * MutxProvenance
+         * @description Cryptographic provenance record - proves how an output was produced.
+         *
+         *     Ported from agent-run/provenance.json schema.
+         *
+         *     Every run gets a run_hash - a SHA-256 of the canonical inputs
+         *     (agent_id, model, tools_available, config_hash, trigger).
+         *     Runs triggered by other runs form a hash chain via lineage.
+         */
+        MutxProvenance: {
+            /**
+             * Run Hash
+             * @description SHA-256 hash of canonical run inputs
+             */
+            run_hash: string;
+            /**
+             * Parent Run Hash
+             * @description Hash of the parent run that triggered this one, forming a hash chain
+             */
+            parent_run_hash?: string | null;
+            /**
+             * Lineage
+             * @description Ordered chain of ancestor run hashes (root first). Enables full audit trail traversal.
+             */
+            lineage?: string[];
+            /**
+             * Model Version
+             * @description Exact model version string used (e.g., 'claude-sonnet-4-5-20250514')
+             */
+            model_version?: string | null;
+            /**
+             * Config Hash
+             * @description SHA-256 hash of the agent's configuration at time of run
+             */
+            config_hash?: string | null;
+            /**
+             * Runtime
+             * @description Runtime that produced this run (e.g., 'mutx@1.0.0', 'openclaw@0.4.0')
+             */
+            runtime?: string | null;
+            /**
+             * Signed By
+             * @description Public key or key ID that signed this provenance record
+             */
+            signed_by?: string | null;
+            /**
+             * Signature
+             * @description Ed25519 signature over the canonical provenance JSON
+             */
+            signature?: string | null;
+            /**
+             * Created At
+             * @description When this provenance record was generated
+             */
+            created_at?: string | null;
+        };
+        /**
+         * MutxRunCreate
+         * @description Schema for creating a new MutxRun via API.
+         */
+        MutxRunCreate: {
+            /**
+             * Id
+             * @description Unique run identifier (UUID v7 recommended). Auto-generated if not provided.
+             */
+            id?: string | null;
+            /**
+             * Agent Id
+             * @description Identifier for the agent
+             */
+            agent_id: string;
+            /**
+             * Agent Name
+             * @description Human-readable agent name
+             */
+            agent_name?: string | null;
+            /**
+             * Model
+             * @description Model identifier
+             */
+            model?: string | null;
+            /**
+             * Provider
+             * @description LLM provider
+             */
+            provider?: string | null;
+            /**
+             * Runtime
+             * @description Agent runtime
+             */
+            runtime?: string | null;
+            /**
+             * Runtime Version
+             * @description Runtime version
+             */
+            runtime_version?: string | null;
+            /** @description What initiated this run */
+            trigger?: components["schemas"]["MutxRunTrigger"] | null;
+            /**
+             * Parent Run Id
+             * @description Parent run ID if triggered by another run
+             */
+            parent_run_id?: string | null;
+            /**
+             * Task Id
+             * @description Associated task ID
+             */
+            task_id?: string | null;
+            /**
+             * @description Initial status
+             * @default pending
+             */
+            status: components["schemas"]["MutxRunStatus"];
+            /** @description Expected outcome */
+            outcome?: components["schemas"]["MutxOutcome"] | null;
+            /**
+             * Started At
+             * @description Start timestamp. Defaults to now if not provided.
+             */
+            started_at?: string | null;
+            /**
+             * Ended At
+             * @description End timestamp
+             */
+            ended_at?: string | null;
+            /**
+             * Duration Ms
+             * @description Duration in milliseconds
+             */
+            duration_ms?: number | null;
+            /**
+             * Steps
+             * @description Initial steps
+             */
+            steps?: components["schemas"]["MutxStep"][];
+            /**
+             * Tools Available
+             * @description Available tools
+             */
+            tools_available?: string[];
+            /** @description Cost info. Will be set to zero-cost if not provided. */
+            cost?: components["schemas"]["MutxCost"] | null;
+            /** @description Provenance. Will be generated if not provided. */
+            provenance?: components["schemas"]["MutxProvenance"] | null;
+            /** @description Evaluation result */
+            eval?: components["schemas"]["MutxEval"] | null;
+            /**
+             * Error
+             * @description Error message if failed
+             */
+            error?: string | null;
+            /**
+             * Git Branch
+             * @description Git branch
+             */
+            git_branch?: string | null;
+            /**
+             * Git Commit
+             * @description Git commit SHA
+             */
+            git_commit?: string | null;
+            /**
+             * Workspace Id
+             * @description Workspace/tenant scope
+             */
+            workspace_id?: string | null;
+            /**
+             * Tags
+             * @description Tags
+             */
+            tags?: string[];
+            /**
+             * Run Metadata
+             * @description Additional metadata
+             */
+            run_metadata?: Record<string, never>;
+        };
+        /**
+         * MutxRunDetailResponse
+         * @description MutxRun with full step details.
+         */
+        MutxRunDetailResponse: {
+            /** Id */
+            id: string;
+            /** Agent Id */
+            agent_id: string;
+            /** Agent Name */
+            agent_name?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Provider */
+            provider?: string | null;
+            /** Runtime */
+            runtime?: string | null;
+            /** Runtime Version */
+            runtime_version?: string | null;
+            trigger?: components["schemas"]["MutxRunTrigger"] | null;
+            /** Parent Run Id */
+            parent_run_id?: string | null;
+            /** Task Id */
+            task_id?: string | null;
+            status: components["schemas"]["MutxRunStatus"];
+            outcome?: components["schemas"]["MutxOutcome"] | null;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Ended At */
+            ended_at?: string | null;
+            /** Duration Ms */
+            duration_ms?: number | null;
+            /**
+             * Step Count
+             * @default 0
+             */
+            step_count: number;
+            /**
+             * Tools Available
+             * @default []
+             */
+            tools_available: string[];
+            cost?: components["schemas"]["MutxCost"] | null;
+            provenance?: components["schemas"]["MutxProvenance"] | null;
+            eval?: components["schemas"]["MutxEval"] | null;
+            /** Error */
+            error?: string | null;
+            /** Git Branch */
+            git_branch?: string | null;
+            /** Git Commit */
+            git_commit?: string | null;
+            /** Workspace Id */
+            workspace_id?: string | null;
+            /**
+             * Tags
+             * @default []
+             */
+            tags: string[];
+            /**
+             * Run Metadata
+             * @default {}
+             */
+            run_metadata: Record<string, never>;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Steps
+             * @default []
+             */
+            steps: components["schemas"]["MutxStep"][];
+        };
+        /**
+         * MutxRunHistoryResponse
+         * @description Paginated list of runs.
+         */
+        MutxRunHistoryResponse: {
+            /** Items */
+            items: components["schemas"]["MutxRunResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Agent Id */
+            agent_id?: string | null;
+            /** Status */
+            status?: string | null;
+        };
+        /**
+         * MutxRunResponse
+         * @description Schema for MutxRun API responses.
+         */
+        MutxRunResponse: {
+            /** Id */
+            id: string;
+            /** Agent Id */
+            agent_id: string;
+            /** Agent Name */
+            agent_name?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Provider */
+            provider?: string | null;
+            /** Runtime */
+            runtime?: string | null;
+            /** Runtime Version */
+            runtime_version?: string | null;
+            trigger?: components["schemas"]["MutxRunTrigger"] | null;
+            /** Parent Run Id */
+            parent_run_id?: string | null;
+            /** Task Id */
+            task_id?: string | null;
+            status: components["schemas"]["MutxRunStatus"];
+            outcome?: components["schemas"]["MutxOutcome"] | null;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Ended At */
+            ended_at?: string | null;
+            /** Duration Ms */
+            duration_ms?: number | null;
+            /**
+             * Step Count
+             * @default 0
+             */
+            step_count: number;
+            /**
+             * Tools Available
+             * @default []
+             */
+            tools_available: string[];
+            cost?: components["schemas"]["MutxCost"] | null;
+            provenance?: components["schemas"]["MutxProvenance"] | null;
+            eval?: components["schemas"]["MutxEval"] | null;
+            /** Error */
+            error?: string | null;
+            /** Git Branch */
+            git_branch?: string | null;
+            /** Git Commit */
+            git_commit?: string | null;
+            /** Workspace Id */
+            workspace_id?: string | null;
+            /**
+             * Tags
+             * @default []
+             */
+            tags: string[];
+            /**
+             * Run Metadata
+             * @default {}
+             */
+            run_metadata: Record<string, never>;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * MutxRunStatus
+         * @description Current status of a run.
+         * @enum {string}
+         */
+        MutxRunStatus: "pending" | "running" | "completed" | "failed" | "cancelled" | "timeout";
+        /**
+         * MutxRunTrigger
+         * @description What initiated a run.
+         * @enum {string}
+         */
+        MutxRunTrigger: "manual" | "cron" | "webhook" | "agent" | "pipeline" | "queue";
+        /**
+         * MutxStep
+         * @description A single step within an agent run - a reasoning block, tool call, or error.
+         *
+         *     Ported from agent-run/step.json schema.
+         */
+        MutxStep: {
+            /**
+             * Id
+             * @description Unique step identifier within the run
+             */
+            id: string;
+            /** @description What kind of step this is */
+            type: components["schemas"]["MutxStepType"];
+            /**
+             * Tool Name
+             * @description Name of the tool called (for tool_call/tool_result steps)
+             */
+            tool_name?: string | null;
+            /**
+             * Mcp Server
+             * @description MCP server that provided the tool, if applicable
+             */
+            mcp_server?: string | null;
+            /**
+             * Input Preview
+             * @description Truncated preview of the step input (for observability without leaking full prompts)
+             */
+            input_preview?: string | null;
+            /**
+             * Output Preview
+             * @description Truncated preview of the step output
+             */
+            output_preview?: string | null;
+            /**
+             * Success
+             * @description Whether this step succeeded (for tool calls)
+             */
+            success?: boolean | null;
+            /**
+             * Error
+             * @description Error message if the step failed
+             */
+            error?: string | null;
+            /**
+             * Started At
+             * Format: date-time
+             * @description ISO 8601 timestamp
+             */
+            started_at: string;
+            /**
+             * Ended At
+             * @description ISO 8601 timestamp
+             */
+            ended_at?: string | null;
+            /**
+             * Duration Ms
+             * @description Wall-clock duration of this step
+             */
+            duration_ms?: number | null;
+            /**
+             * Tokens Used
+             * @description Total tokens consumed by this step (input + output)
+             */
+            tokens_used?: number | null;
+            /**
+             * Step Metadata
+             * @description Extension point for step-specific data
+             */
+            step_metadata?: Record<string, never>;
+        };
+        /**
+         * MutxStepCreate
+         * @description Schema for adding a step to an existing run.
+         */
+        MutxStepCreate: {
+            /**
+             * Id
+             * @description Step ID. Auto-generated if not provided.
+             */
+            id?: string | null;
+            /** @description Type of step */
+            type: components["schemas"]["MutxStepType"];
+            /**
+             * Tool Name
+             * @description Tool name if applicable
+             */
+            tool_name?: string | null;
+            /**
+             * Mcp Server
+             * @description MCP server if applicable
+             */
+            mcp_server?: string | null;
+            /**
+             * Input Preview
+             * @description Input preview
+             */
+            input_preview?: string | null;
+            /**
+             * Output Preview
+             * @description Output preview
+             */
+            output_preview?: string | null;
+            /**
+             * Success
+             * @description Success status
+             */
+            success?: boolean | null;
+            /**
+             * Error
+             * @description Error message
+             */
+            error?: string | null;
+            /**
+             * Started At
+             * @description Step start time. Defaults to now if not provided.
+             */
+            started_at?: string | null;
+            /**
+             * Ended At
+             * @description Step end time
+             */
+            ended_at?: string | null;
+            /**
+             * Duration Ms
+             * @description Duration in ms
+             */
+            duration_ms?: number | null;
+            /**
+             * Tokens Used
+             * @description Tokens consumed
+             */
+            tokens_used?: number | null;
+            /**
+             * Step Metadata
+             * @description Additional metadata
+             */
+            step_metadata?: Record<string, never>;
+        };
+        /**
+         * MutxStepType
+         * @description Types of steps within an agent run.
+         * @enum {string}
+         */
+        MutxStepType: "reasoning" | "tool_call" | "tool_result" | "message" | "error" | "handoff";
         /** OnboardingStateResponse */
         OnboardingStateResponse: {
             /**
@@ -3251,9 +4773,7 @@ export interface components {
             /** Action Type */
             action_type?: string | null;
             /** Import Source */
-            import_source?: {
-                [key: string]: unknown;
-            };
+            import_source?: Record<string, never>;
             /** Current Step */
             current_step: string;
             /** Completed Steps */
@@ -3306,9 +4826,7 @@ export interface components {
             /** Step */
             step?: string | null;
             /** Payload */
-            payload?: {
-                [key: string]: unknown;
-            };
+            payload?: Record<string, never>;
         };
         /** OpenAIAgentConfig */
         OpenAIAgentConfig: {
@@ -3381,9 +4899,7 @@ export interface components {
             /** Wakeups */
             wakeups?: components["schemas"]["OpenClawWakeupConfig"][];
             /** Metadata */
-            metadata?: {
-                [key: string]: unknown;
-            };
+            metadata?: Record<string, never>;
             gateway?: components["schemas"]["OpenClawGatewayConfig"];
         };
         /** OpenClawChannelConfig */
@@ -3499,9 +5015,7 @@ export interface components {
             /** Error Message */
             error_message?: string | null;
             /** Metadata */
-            metadata?: {
-                [key: string]: unknown;
-            };
+            metadata?: Record<string, never>;
             /** Started At */
             started_at?: string | null;
             /** Completed At */
@@ -3530,9 +5044,7 @@ export interface components {
             /** Error Message */
             error_message: string | null;
             /** Metadata */
-            metadata: {
-                [key: string]: unknown;
-            };
+            metadata: Record<string, never>;
             /**
              * Started At
              * Format: date-time
@@ -3589,9 +5101,7 @@ export interface components {
             /** Error Message */
             error_message: string | null;
             /** Metadata */
-            metadata: {
-                [key: string]: unknown;
-            };
+            metadata: Record<string, never>;
             /**
              * Started At
              * Format: date-time
@@ -3617,9 +5127,7 @@ export interface components {
             /** Message */
             message?: string | null;
             /** Payload */
-            payload?: {
-                [key: string]: unknown;
-            };
+            payload?: Record<string, never>;
             /** Timestamp */
             timestamp?: string | null;
         };
@@ -3658,9 +5166,7 @@ export interface components {
             /** Message */
             message: string | null;
             /** Payload */
-            payload: {
-                [key: string]: unknown;
-            };
+            payload: Record<string, never>;
             /** Sequence */
             sequence: number;
             /**
@@ -3735,9 +5241,7 @@ export interface components {
             /** Last Action Type */
             last_action_type?: string | null;
             /** Import Source */
-            import_source?: {
-                [key: string]: unknown;
-            };
+            import_source?: Record<string, never>;
             /** Version */
             version?: string | null;
             /**
@@ -3746,9 +5250,7 @@ export interface components {
              */
             status: string;
             /** Gateway */
-            gateway?: {
-                [key: string]: unknown;
-            };
+            gateway?: Record<string, never>;
             /** Gateway Url */
             gateway_url?: string | null;
             /** Gateway Port */
@@ -3763,13 +5265,9 @@ export interface components {
              */
             binding_count: number;
             /** Current Binding */
-            current_binding?: {
-                [key: string]: unknown;
-            } | null;
+            current_binding?: Record<string, never> | null;
             /** Bindings */
-            bindings?: {
-                [key: string]: unknown;
-            }[];
+            bindings?: Record<string, never>[];
             /**
              * Observed Source
              * @default local
@@ -3852,9 +5350,7 @@ export interface components {
             /** Last Action Type */
             last_action_type?: string | null;
             /** Import Source */
-            import_source?: {
-                [key: string]: unknown;
-            };
+            import_source?: Record<string, never>;
             /** Version */
             version?: string | null;
             /**
@@ -3863,9 +5359,7 @@ export interface components {
              */
             status: string;
             /** Gateway */
-            gateway?: {
-                [key: string]: unknown;
-            };
+            gateway?: Record<string, never>;
             /** Gateway Url */
             gateway_url?: string | null;
             /** Gateway Port */
@@ -3880,13 +5374,9 @@ export interface components {
              */
             binding_count: number;
             /** Current Binding */
-            current_binding?: {
-                [key: string]: unknown;
-            } | null;
+            current_binding?: Record<string, never> | null;
             /** Bindings */
-            bindings?: {
-                [key: string]: unknown;
-            }[];
+            bindings?: Record<string, never>[];
             /**
              * Observed Source
              * @default local
@@ -3933,9 +5423,7 @@ export interface components {
         /** SessionListResponse */
         SessionListResponse: {
             /** Sessions */
-            sessions: {
-                [key: string]: unknown;
-            }[];
+            sessions: Record<string, never>[];
         };
         /** Skill */
         Skill: {
@@ -3984,9 +5472,7 @@ export interface components {
                 [key: string]: components["schemas"]["OpenClawChannelConfig"];
             };
             /** Runtime Metadata */
-            runtime_metadata?: {
-                [key: string]: unknown;
-            };
+            runtime_metadata?: Record<string, never>;
         };
         /** StarterDeploymentResponse */
         StarterDeploymentResponse: {
@@ -3994,6 +5480,30 @@ export interface components {
             template_id: string;
             agent: components["schemas"]["AgentResponse"];
             deployment: components["schemas"]["DeploymentResponse"];
+        };
+        /** SupervisedAgentStartRequest */
+        SupervisedAgentStartRequest: {
+            /** Agent Id */
+            agent_id: string;
+            /** Command */
+            command: string[];
+            /**
+             * Env
+             * @default {}
+             */
+            env: {
+                [key: string]: string;
+            } | null;
+            /** Faramesh Policy */
+            faramesh_policy?: string | null;
+        };
+        /** SupervisedAgentStopRequest */
+        SupervisedAgentStopRequest: {
+            /**
+             * Timeout
+             * @default 10
+             */
+            timeout: number | null;
         };
         /** SwarmAgentResponse */
         SwarmAgentResponse: {
@@ -4166,9 +5676,7 @@ export interface components {
              * Metadata
              * @description Additional event metadata
              */
-            metadata?: {
-                [key: string]: unknown;
-            } | null;
+            metadata?: Record<string, never> | null;
         };
         /**
          * UsageEventListResponse
@@ -4218,9 +5726,7 @@ export interface components {
              * Metadata
              * @description Deserialize event_metadata JSON string to dict
              */
-            readonly metadata: {
-                [key: string]: unknown;
-            } | null;
+            readonly metadata: Record<string, never> | null;
         };
         /** UserResponse */
         UserResponse: {
@@ -4253,10 +5759,6 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
-            /** Input */
-            input?: unknown;
-            /** Context */
-            ctx?: Record<string, never>;
         };
         /** VerifyEmailRequest */
         VerifyEmailRequest: {
@@ -4619,9 +6121,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": Record<string, never>;
                 };
             };
             /** @description Validation Error */
@@ -4654,9 +6154,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": Record<string, never>;
                 };
             };
             /** @description Validation Error */
@@ -7316,6 +8814,770 @@ export interface operations {
             };
         };
     };
+    list_runs_v1_observability_runs_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                /** @description Filter by agent ID */
+                agent_id?: string | null;
+                /** @description Filter by status */
+                status?: string | null;
+                /** @description Filter by runtime */
+                runtime?: string | null;
+                /** @description Filter by trigger */
+                trigger?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MutxRunHistoryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_run_v1_observability_runs_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MutxRunCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MutxRunDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_run_v1_observability_runs__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MutxRunDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_steps_v1_observability_runs__run_id__steps_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MutxStepCreate"][];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MutxRunHistoryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_eval_v1_observability_runs__run_id__eval_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MutxEval"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_eval_v1_observability_runs__run_id__eval_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MutxEvalCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MutxEval"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_provenance_v1_observability_runs__run_id__provenance_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MutxProvenance"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_run_status_v1_observability_runs__run_id__status_patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MutxRunResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluate_action_v1_security_actions_evaluate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionEvaluateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionEvaluateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    request_approval_v1_security_approvals_request_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalRequestCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRequestResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_approval_v1_security_approvals__request_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRequestResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approve_request_v1_security_approvals__token__approve_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deny_request_v1_security_approvals__token__deny_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_pending_approvals_v1_security_approvals_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRequestResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_receipt_v1_security_receipts__receipt_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                receipt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_session_receipts_v1_security_receipts_session__session_id__get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_compliance_check_v1_security_compliance_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComplianceResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_metrics_v1_security_metrics_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_prometheus_metrics_v1_security_metrics_prometheus_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_session_v1_security_sessions_post: {
+        parameters: {
+            query: {
+                /** @description Session ID */
+                session_id: string;
+                /** @description Agent ID */
+                agent_id: string;
+                /** @description User ID */
+                user_id?: string | null;
+                /** @description Original user request */
+                original_request?: string;
+                /** @description Stated user intent */
+                stated_intent?: string;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_session_v1_security_sessions__session_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    close_session_v1_security_sessions__session_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     generate_embedding_v1_rag_embed_post: {
         parameters: {
             query?: never;
@@ -7960,6 +10222,68 @@ export interface operations {
             };
         };
     };
+    governance_metrics_v1_runtime_governance_metrics_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    governance_status_v1_runtime_governance_status_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_sessions_v1_sessions_get: {
         parameters: {
             query?: {
@@ -8016,9 +10340,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": Record<string, never>;
                 };
             };
             /** @description Validation Error */
@@ -8053,9 +10375,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": Record<string, never>;
                 };
             };
             /** @description Validation Error */
@@ -8260,6 +10580,371 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UsageBreakdownResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_credential_backends_v1_governance_credentials_backends_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BackendHealthResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    register_credential_backend_v1_governance_credentials_backends_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CredentialBackendRegister"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unregister_credential_backend_v1_governance_credentials_backends__backend_name__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                backend_name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_backend_health_v1_governance_credentials_backends__backend_name__health_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                backend_name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_all_backends_health_v1_governance_credentials_health_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_credential_v1_governance_credentials_get__full_path__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                full_path: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_supervised_agents_v1_runtime_governance_supervised__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_supervised_agent_v1_runtime_governance_supervised__agent_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_supervised_agent_v1_runtime_governance_supervised_start_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupervisedAgentStartRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stop_supervised_agent_v1_runtime_governance_supervised__agent_id__stop_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SupervisedAgentStopRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    restart_supervised_agent_v1_runtime_governance_supervised__agent_id__restart_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
