@@ -1525,7 +1525,7 @@ elif [[ "${BREW_UPGRADE_NEEDED}" == "yes" ]]; then
   run_stage "Upgrading MUTX runtime" upgrade_or_keep_formula
 fi
 
-run_stage "Linking mutx into PATH" run_with_timeout 60 relink_formula
+run_stage "Linking mutx into PATH" relink_formula
 resolve_mutx_bin
 run_stage "Warming CLI" "${MUTX_BIN}" --help
 
