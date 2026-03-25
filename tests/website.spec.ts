@@ -50,37 +50,45 @@ test.describe('mutx.dev QA', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     await expect(
-      page.getByRole('heading', { name: /operate deployed agents like infrastructure\./i })
+      page.getByRole('heading', {
+        name: /the control plane for agents that have to survive production\./i,
+      })
     ).toBeVisible({ timeout: 10000 });
-    await expect(page.getByRole('link', { name: /open live demo/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /run quickstart/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /read docs/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /contact mutx/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /github/i }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: /book a demo/i }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: /book a call/i }).first()).toBeVisible();
+    await expect(page.getByText(/^Dashboard soon$/).first()).toBeVisible();
+    await expect(
+      page.getByText(/curl -fsSL https:\/\/mutx\.dev\/install\.sh \| bash/i).first()
+    ).toBeVisible();
     await expect(page.getByRole('button', { name: /sign in/i })).toHaveCount(0);
   });
 
   test('landing page exposes proof rail and operator flow sections', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.getByText(/^Broken deploys$/).first()).toBeVisible();
-    await expect(page.getByText(/^Security stalls$/).first()).toBeVisible();
-    await expect(page.getByText(/^Cost drift$/).first()).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /the sale dies at production handoff\./i })
+      page.getByRole('heading', {
+        name: /demos do not page you at 3:14 am\. deployments do\./i,
+      })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /run the proof path\./i })
+      page.getByRole('heading', { name: /operator truth, not ai pageantry\./i })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /20-minute working session/i })
+      page.getByRole('heading', {
+        name: /bring the rollout that already escaped the demo\./i,
+      })
     ).toBeVisible();
-    await expect(page.getByRole('tab', { name: /hosted operator/i })).toBeVisible();
-    await expect(page.getByText(/curl -fsSL https:\/\/mutx\.dev\/install\.sh \| bash/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: /book a demo/i })).toHaveCount(2);
-    await expect(
-      page.getByRole('heading', { name: /see it\. change it\. recover it\./i })
-    ).toHaveCount(0);
+    await expect(page.getByText(/^Auth with receipts$/).first()).toBeVisible();
+    await expect(page.getByText(/^Deployments with memory$/).first()).toBeVisible();
+    await expect(page.getByText(/^Trace the weird part$/).first()).toBeVisible();
+    await expect(page.getByText(/^Already running OpenClaw\?$/).first()).toBeVisible();
+    await expect(page.getByText(/mutx setup hosted --import-openclaw/i)).toBeVisible();
+    await expect(page.getByText(/^\/v1\/auth$/).first()).toBeVisible();
+    await expect(page.getByText(/^\/v1\/runs\/\{id\}\/traces$/).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: /book a call/i })).toHaveCount(1);
   });
 
   test('no console errors', async ({ page }) => {
