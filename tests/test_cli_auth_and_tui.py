@@ -364,6 +364,62 @@ def test_build_cockpit_snapshot_includes_local_and_managed_workspaces() -> None:
     assert workspaces["x"].status == "healthy"
 
 
+def test_build_cockpit_snapshot_deduplicates_session_row_ids() -> None:
+    from cli.tui.cockpit import build_cockpit_snapshot
+
+    snapshot = build_cockpit_snapshot(
+        runtime_snapshot={
+            "gateway": {"status": "healthy"},
+            "bindings": [
+                {
+                    "assistant_id": "x",
+                    "assistant_name": "Workspace X",
+                    "workspace": "/tmp/workspace-x",
+                    "tracked_by_mutx": False,
+                    "live_detected": True,
+                }
+            ],
+        },
+        onboarding={"status": "completed"},
+        assistant_name=None,
+        agents=[],
+        deployments=[],
+        raw_sessions=[
+            {
+                "id": "session-x",
+                "key": "agent:x:base",
+                "agent": "x",
+                "channel": "cli",
+                "age": "2m",
+                "model": "openai/gpt-5-mini",
+                "tokens": "1k",
+                "source": "openclaw",
+                "active": True,
+                "last_activity": 100,
+            },
+            {
+                "id": "session-x",
+                "key": "agent:x:base:run:123",
+                "agent": "x",
+                "channel": "cli",
+                "age": "2m",
+                "model": "openai/gpt-5-mini",
+                "tokens": "1k",
+                "source": "openclaw",
+                "active": True,
+                "last_activity": 100,
+            },
+        ],
+        governance_defers=[],
+        governance_decisions=[],
+    )
+
+    assert [item.id for item in snapshot.sessions] == [
+        "session-x",
+        "session-x:agent:x:base:run:123",
+    ]
+
+
 def test_build_cockpit_snapshot_ranks_incidents_by_urgency() -> None:
     from cli.tui.cockpit import build_cockpit_snapshot
 

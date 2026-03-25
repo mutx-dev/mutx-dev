@@ -160,14 +160,23 @@ def build_session_records(
     agent_ids_by_assistant: dict[str, str],
 ) -> list[SessionRecord]:
     items: list[SessionRecord] = []
+    seen_ids: dict[str, int] = defaultdict(int)
     for payload in raw_sessions:
         assistant_id = _safe_str(payload.get("agent")).strip()
         binding = bindings_by_id.get(assistant_id, {})
+        raw_id = _safe_str(payload.get("id")).strip()
+        session_key = _safe_str(payload.get("key")).strip()
+        base_id = raw_id or session_key or f"{assistant_id}:unknown"
+        seen_ids[base_id] += 1
+        record_id = base_id
+        if seen_ids[base_id] > 1:
+            suffix = session_key or str(seen_ids[base_id])
+            record_id = f"{base_id}:{suffix}"
         items.append(
             SessionRecord(
-                id=_safe_str(payload.get("id")) or f"{assistant_id}:{_safe_str(payload.get('key'))}",
-                key=_safe_str(payload.get("key")),
-                assistant_id=assistant_id or _safe_str(payload.get("id")) or "unknown",
+                id=record_id,
+                key=session_key,
+                assistant_id=assistant_id or raw_id or "unknown",
                 workspace=_safe_str(binding.get("workspace")) or assistant_id or "n/a",
                 channel=_safe_str(payload.get("channel")) or "no-channel",
                 age=_safe_str(payload.get("age")) or "-",
@@ -419,4 +428,3 @@ def build_cockpit_snapshot(
         governance_decisions_total=len(governance_decisions),
         gateway_status=gateway_status or "unknown",
     )
-
