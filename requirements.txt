@@ -16,7 +16,7 @@ python-digitalocean==1.17.0
 boto3==1.34.25
 botocore==1.34.25
 # Security
-python-jose[cryptography]==3.4.2
+python-jose[cryptography]==3.5.0
 #passlib removed - using bcrypt directly
 python-multipart==0.0.22
 email-validator==2.1.0
