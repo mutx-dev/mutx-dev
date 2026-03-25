@@ -10,6 +10,10 @@ import {
   Wallet,
   Webhook,
   Workflow,
+  Key,
+  BarChart3,
+  Activity,
+  Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -76,6 +80,38 @@ export const DASHBOARD_NAV_ITEMS: DashboardNavItem[] = [
     publicHref: "/environments",
     icon: BellRing,
     group: "control",
+  },
+  {
+    title: "Observability",
+    description: "Agent run observability and metrics",
+    href: "/dashboard/observability",
+    publicHref: "/observability",
+    icon: Activity,
+    group: "control",
+  },
+  {
+    title: "Analytics",
+    description: "Usage analytics and trends",
+    href: "/dashboard/analytics",
+    publicHref: "/analytics",
+    icon: BarChart3,
+    group: "control",
+  },
+  {
+    title: "Sessions",
+    description: "Active sessions and connections",
+    href: "/dashboard/sessions",
+    publicHref: "/sessions",
+    icon: Users,
+    group: "control",
+  },
+  {
+    title: "API Keys",
+    description: "Manage API keys and access tokens",
+    href: "/dashboard/api-keys",
+    publicHref: "/api-keys",
+    icon: Key,
+    group: "system",
   },
   {
     title: "Budgets",

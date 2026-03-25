@@ -890,6 +890,10 @@ class MutxTUI(App[None]):
             self.load_deployments()
             self._set_activity("loading control plane")
             self.load_control_plane()
+            self._set_activity("loading governance")
+            self.load_governance()
+            self._set_activity("loading observability")
+            self.load_observability()
         else:
             self._render_logged_out_state()
 
@@ -946,6 +950,8 @@ class MutxTUI(App[None]):
             "agents-pane": "assistant",
             "deployments-pane": "deployments",
             "control-pane": "control-plane",
+            "governance-pane": "governance",
+            "observability-pane": "observability",
         }
         return mapping.get(active, active)
 
@@ -1946,6 +1952,10 @@ class MutxTUI(App[None]):
             self.load_governance()
         elif button_id == "governance-start":
             self._start_faramesh_daemon()
+        elif button_id == "governance-tail":
+            self.notify(
+                "Run 'mutx governance tail' in terminal for live streaming", severity="information"
+            )
         elif button_id == "governance-approve":
             self._governance_approve_selected()
         elif button_id == "governance-deny":
