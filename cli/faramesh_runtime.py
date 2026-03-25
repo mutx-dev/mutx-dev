@@ -399,6 +399,23 @@ def install_faramesh(non_interactive: bool = True) -> str:
         raise Exception(f"Faramesh installation failed: {result}")
 
 
+def get_default_policy_path() -> str | None:
+    """Look for bundled starter policy in standard locations."""
+    bundled = Path(__file__).parent / "policies" / "starter.fpl"
+    if bundled.exists():
+        return str(bundled)
+
+    user_policy_1 = Path.home() / ".mutx" / "policies" / "starter.fpl"
+    if user_policy_1.exists():
+        return str(user_policy_1)
+
+    user_policy_2 = Path.home() / ".faramesh" / "policy.fpl"
+    if user_policy_2.exists():
+        return str(user_policy_2)
+
+    return None
+
+
 def approve_defer(socket_path: str, token: str) -> bool:
     """Approve a deferred governance decision."""
     result = _send_socket_request(
@@ -520,3 +537,194 @@ def generate_prometheus_metrics(snapshot: FarameshSnapshot) -> str:
         f"mutx_governance_daemon_up {1 if snapshot.status == 'running' else 0}",
     ]
     return "\n".join(lines) + "\n"
+
+
+@dataclass
+class GateDecision:
+    outcome: str
+    effect: str
+    reason_code: str | None = None
+    reason: str | None = None
+    defer_token: str | None = None
+    latency_ms: int | None = None
+
+
+@dataclass
+class ActionResult:
+    action_id: str | None = None
+    status: str | None = None
+    executed: bool = False
+    payload: dict | None = None
+    error: str | None = None
+
+
+def gate_decide(
+    agent_id: str,
+    tool_id: str,
+    params: dict,
+    context: dict | None = None,
+    socket_path: str = FAREMESH_SOCKET_PATH,
+) -> GateDecision:
+    """Ask Faramesh if a tool call is permitted. Returns immediately (sync)."""
+    if not is_faramesh_available():
+        return GateDecision(outcome="ABSTAIN", effect="PERMIT", reason="governance unavailable")
+
+    request = {
+        "type": "gate_decide",
+        "agent_id": agent_id,
+        "tool_id": tool_id,
+        "params": params,
+        "context": context or {},
+    }
+
+    try:
+        responses = _send_socket_request(socket_path, request, timeout=2.0)
+        if not responses:
+            return GateDecision(outcome="ABSTAIN", effect="PERMIT", reason="no governance response")
+
+        resp = responses[0]
+        effect = resp.get("effect", "PERMIT")
+
+        if effect == "PERMIT":
+            return GateDecision(
+                outcome="EXECUTE",
+                effect=effect,
+                reason_code=resp.get("reason_code"),
+                reason=resp.get("reason"),
+                latency_ms=resp.get("latency_ms"),
+            )
+        elif effect == "DENY":
+            return GateDecision(
+                outcome="HALT",
+                effect=effect,
+                reason_code=resp.get("reason_code"),
+                reason=resp.get("reason"),
+            )
+        else:  # DEFER
+            return GateDecision(
+                outcome="ABSTAIN",
+                effect=effect,
+                reason_code=resp.get("reason_code"),
+                reason=resp.get("reason"),
+                defer_token=resp.get("defer_token"),
+            )
+    except Exception:
+        return GateDecision(outcome="ABSTAIN", effect="PERMIT", reason="governance error")
+
+
+def submit_action(
+    agent_id: str,
+    tool_id: str,
+    params: dict,
+    context: dict | None = None,
+    socket_path: str = FAREMESH_SOCKET_PATH,
+) -> ActionResult:
+    """Submit an action for governance review. Returns immediately with defer_token if DEFER."""
+    if not is_faramesh_available():
+        return ActionResult(status="governance_unavailable", executed=True)
+
+    request = {
+        "type": "action_submit",
+        "agent_id": agent_id,
+        "tool_id": tool_id,
+        "params": params,
+        "context": context or {},
+    }
+
+    try:
+        responses = _send_socket_request(socket_path, request, timeout=5.0)
+        if not responses:
+            return ActionResult(status="no_response")
+
+        resp = responses[0]
+        effect = resp.get("effect", "PERMIT")
+
+        if effect == "PERMIT":
+            return ActionResult(
+                action_id=resp.get("action_id"),
+                status="executed",
+                executed=True,
+                payload=resp.get("payload"),
+            )
+        elif effect == "DENY":
+            return ActionResult(
+                action_id=resp.get("action_id"),
+                status="denied",
+                executed=False,
+                error=resp.get("reason", "denied by policy"),
+            )
+        else:  # DEFER
+            return ActionResult(
+                action_id=resp.get("action_id"),
+                status="pending_approval",
+                executed=False,
+                defer_token=resp.get("defer_token"),
+            )
+    except Exception as e:
+        return ActionResult(status="error", error=str(e))
+
+
+def wait_for_decision(
+    defer_token: str,
+    timeout: float = 300.0,
+    socket_path: str = FAREMESH_SOCKET_PATH,
+) -> ActionResult:
+    """Wait for a deferred action to be approved or denied."""
+    start = time.time()
+    poll_interval = 1.0
+
+    while time.time() - start < timeout:
+        defers = get_pending_defers(socket_path)
+        defer_ids = [d.defer_token for d in defers]
+
+        if defer_token not in defer_ids:
+            for d in defers:
+                if d.defer_token == defer_token:
+                    return ActionResult(
+                        status=d.status,
+                        executed=d.status == "approved",
+                    )
+            return ActionResult(status="resolved")
+
+        time.sleep(poll_interval)
+
+    return ActionResult(status="timeout")
+
+
+def execute_if_allowed(
+    agent_id: str,
+    tool_id: str,
+    params: dict,
+    executor: callable,
+    context: dict | None = None,
+    socket_path: str = FAREMESH_SOCKET_PATH,
+) -> ActionResult:
+    """Execute tool if governance permits, using submit_action for DEFER handling."""
+    if not is_faramesh_available():
+        result = executor(tool_id, params)
+        return ActionResult(executed=True, payload=result if result else {})
+
+    decision = gate_decide(agent_id, tool_id, params, context, socket_path)
+
+    if decision.outcome == "HALT":
+        return ActionResult(
+            status="blocked",
+            executed=False,
+            error=f"Tool {tool_id} denied: {decision.reason_code}",
+        )
+
+    if decision.outcome == "ABSTAIN" and decision.effect == "DEFER":
+        submit_result = submit_action(agent_id, tool_id, params, context, socket_path)
+
+        if submit_result.status == "pending_approval":
+            wait_result = wait_for_decision(submit_result.defer_token, socket_path=socket_path)
+            if wait_result.status == "approved":
+                result = executor(tool_id, params)
+                return ActionResult(executed=True, payload=result if result else {})
+            else:
+                return ActionResult(status="denied_by_approver", executed=False)
+
+        return submit_result
+
+    result = executor(tool_id, params)
+    return ActionResult(executed=True, payload=result if result else {})

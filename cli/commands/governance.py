@@ -6,7 +6,6 @@ import signal
 import subprocess
 import sys
 import time
-from pathlib import Path
 
 import click
 
@@ -18,6 +17,7 @@ from cli.faramesh_runtime import (
     ensure_faramesh_installed,
     find_faramesh_bin,
     generate_prometheus_metrics,
+    get_default_policy_path,
     get_faramesh_health,
     get_pending_defers,
     get_recent_decisions,
@@ -40,7 +40,7 @@ def _ensure_faramesh() -> bool:
         click.echo("Failed to install Faramesh.", err=True)
         return False
 
-    policy_path = _get_default_policy_path()
+    policy_path = get_default_policy_path()
     proc = start_faramesh_daemon(policy_path=policy_path, socket_path=FAREMESH_SOCKET_PATH)
     if proc is None:
         click.echo("Failed to start Faramesh daemon.", err=True)
@@ -53,23 +53,6 @@ def _ensure_faramesh() -> bool:
 
     click.echo("Faramesh daemon started but is not responding.", err=True)
     return False
-
-
-def _get_default_policy_path() -> str | None:
-    """Look for bundled starter policy in standard locations."""
-    bundled = Path(__file__).parent.parent / "policies" / "starter.fpl"
-    if bundled.exists():
-        return str(bundled)
-
-    user_policy_1 = Path.home() / ".mutx" / "policies" / "starter.fpl"
-    if user_policy_1.exists():
-        return str(user_policy_1)
-
-    user_policy_2 = Path.home() / ".faramesh" / "policy.fpl"
-    if user_policy_2.exists():
-        return str(user_policy_2)
-
-    return None
 
 
 @click.group(name="governance")
@@ -344,7 +327,7 @@ def start_command(policy: str | None, auto_install: bool) -> None:
         )
         sys.exit(1)
 
-    policy_path = policy or _get_default_policy_path()
+    policy_path = policy or get_default_policy_path()
 
     if policy_path:
         click.echo(f"Starting daemon with policy: {policy_path}")
@@ -483,7 +466,7 @@ def policy_list_command(output_json: bool) -> None:
 @click.option("--policy", "-p", type=click.Path(), default=None, help="Policy file to edit")
 def policy_edit_command(policy: str | None) -> None:
     """Edit a policy file in $EDITOR."""
-    policy_path = policy or _get_default_policy_path()
+    policy_path = policy or get_default_policy_path()
 
     if not policy_path:
         click.echo("No policy file found. Use --policy to specify one.", err=True)
@@ -554,3 +537,69 @@ def export_metrics_command(format: str) -> None:
         click.echo(generate_prometheus_metrics(snapshot))
     else:
         click.echo(json.dumps(snapshot.to_payload(), indent=2))
+
+
+@governance_group.command(name="bind")
+@click.argument("agent_id", required=False)
+@click.option("--enable/--disable", default=None, help="Enable or disable governance")
+@click.option(
+    "--policy", "-p", type=click.Path(exists=True), default=None, help="FPL policy file path"
+)
+@click.option("--list", "list_policies", is_flag=True, help="List available policy packs")
+def bind_command(
+    agent_id: str | None, enable: bool | None, policy: str | None, list_policies: bool
+) -> None:
+    """Bind governance policy to an OpenClaw agent."""
+    if list_policies:
+        packs = list_policy_packs()
+        click.echo("Available Policy Packs")
+        click.echo("=" * 50)
+        for pack in packs:
+            click.echo(f"  {pack['name']}")
+            click.echo(f"    {pack['description']}")
+            click.echo(f"    Path: {pack['path']}")
+            click.echo()
+        return
+
+    if agent_id is None:
+        click.echo("Specify agent_id or use --list to see available policies", err=True)
+        sys.exit(1)
+
+    if enable is None and policy is None:
+        click.echo("Specify --enable or --disable, and optionally --policy", err=True)
+        sys.exit(1)
+
+    try:
+        from cli.openclaw_runtime import (
+            ensure_personal_assistant_binding,
+            update_binding_governance,
+        )
+    except ImportError as exc:
+        click.echo(f"Failed to import OpenClaw runtime: {exc}", err=True)
+        sys.exit(1)
+
+    binding = ensure_personal_assistant_binding(assistant_id=agent_id)
+
+    if enable is not None and not enable:
+        update_binding_governance(binding, enabled=False, assistant_name=agent_id)
+        click.echo(f"Governance disabled for agent: {agent_id}")
+        return
+
+    if not _ensure_faramesh():
+        click.echo("Faramesh must be running. Start with: mutx governance start", err=True)
+        sys.exit(1)
+
+    if policy is None:
+        policy_path = get_default_policy_path()
+    else:
+        policy_path = policy
+
+    update_binding_governance(
+        binding,
+        enabled=True,
+        policy=policy_path,
+        assistant_name=agent_id,
+    )
+    click.echo(f"Governance enabled for agent: {agent_id}")
+    if policy_path:
+        click.echo(f"  Policy: {policy_path}")

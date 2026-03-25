@@ -694,6 +694,12 @@ class MutxTUI(App[None]):
                         with Horizontal(classes="action-bar"):
                             yield Button("Refresh", id="agents-refresh", variant="primary")
                             yield Button("Deploy", id="agents-deploy")
+                            yield Button(
+                                "Enable Gov", id="agents-enable-governance", variant="primary"
+                            )
+                            yield Button(
+                                "Disable Gov", id="agents-disable-governance", variant="warning"
+                            )
                         with TabbedContent(id="agents-detail-tabs"):
                             with TabPane("Detail"):
                                 with VerticalScroll(classes="detail-scroll"):
@@ -1441,6 +1447,47 @@ class MutxTUI(App[None]):
         self.notify(f"Faramesh daemon started (PID: {proc.pid})")
         self.load_governance()
 
+    @work(thread=True, exclusive=True, group="governance-action")
+    def _toggle_agent_governance(self, enabled: bool) -> None:
+        if not self.selected_agent_id:
+            self.notify("Select an agent first.", severity="warning")
+            return
+        try:
+            from cli.openclaw_runtime import (
+                ensure_personal_assistant_binding,
+                update_binding_governance,
+            )
+            from cli.faramesh_runtime import (
+                ensure_faramesh_installed,
+                is_faramesh_available,
+                start_faramesh_daemon,
+                FAREMESH_SOCKET_PATH,
+                _get_default_policy_path,
+            )
+
+            if enabled:
+                ensure_faramesh_installed(install_if_missing=True, non_interactive=True)
+                if not is_faramesh_available():
+                    default_policy = _get_default_policy_path()
+                    start_faramesh_daemon(
+                        policy_path=default_policy, socket_path=FAREMESH_SOCKET_PATH
+                    )
+
+            binding = ensure_personal_assistant_binding(assistant_id=self.selected_agent_id)
+            policy = _get_default_policy_path() if enabled else None
+            update_binding_governance(
+                binding,
+                enabled=enabled,
+                policy=policy,
+                assistant_name=self.selected_agent_id,
+            )
+            self.call_from_thread(
+                self.notify,
+                f"Governance {'enabled' if enabled else 'disabled'} for {self.selected_agent_id}",
+            )
+        except Exception as e:
+            self.call_from_thread(self.notify, f"Error: {e}", severity="error")
+
     @work(thread=True, exclusive=True, group="agent-action")
     def deploy_selected_agent_worker(self, agent_id: str) -> None:
         try:
@@ -1555,6 +1602,10 @@ class MutxTUI(App[None]):
             self.load_agents()
         elif button_id == "agents-deploy":
             self.action_deploy_selected_agent()
+        elif button_id == "agents-enable-governance":
+            self._toggle_agent_governance(enabled=True)
+        elif button_id == "agents-disable-governance":
+            self._toggle_agent_governance(enabled=False)
         elif button_id == "deployments-refresh":
             self.load_deployments()
         elif button_id == "deployments-restart":

@@ -8,6 +8,16 @@ from typing import Any, Optional
 logger = logging.getLogger(__name__)
 
 
+class GovernanceError(Exception):
+    """Raised when governance blocks a tool call."""
+
+    def __init__(self, tool_id: str, reason: str, reason_code: str | None = None):
+        self.tool_id = tool_id
+        self.reason = reason
+        self.reason_code = reason_code
+        super().__init__(f"Tool {tool_id} blocked: {reason}")
+
+
 def _parse_gateway_json_output(raw: str) -> Any:
     """Parse JSON from gateway CLI output."""
     trimmed = raw.strip()
@@ -121,7 +131,75 @@ def call_gateway_method_sync(
     return asyncio.get_event_loop().run_until_complete(_call())
 
 
+async def call_gateway_method_governed(
+    method: str,
+    params: Optional[dict] = None,
+    agent_id: str | None = None,
+    governance_enabled: bool = True,
+    timeout_ms: int = 10000,
+) -> Any:
+    """
+    Call an OpenClaw gateway method with governance pre-check.
+
+    Args:
+        method: Gateway method name
+        params: Method parameters dict
+        agent_id: Agent ID for governance context
+        governance_enabled: Whether to check governance
+        timeout_ms: Timeout in milliseconds
+
+    Returns:
+        Parsed JSON response from gateway
+
+    Raises:
+        GovernanceError: If governance blocks the tool call
+        TimeoutError: If command times out
+        RuntimeError: If OpenClaw CLI not found or invalid response
+    """
+    if governance_enabled and agent_id:
+        try:
+            from cli.faramesh_runtime import gate_decide
+        except ImportError:
+            governance_enabled = False
+
+        if governance_enabled:
+            decision = gate_decide(
+                agent_id=agent_id,
+                tool_id=method,
+                params=params or {},
+            )
+            if decision.outcome == "HALT":
+                raise GovernanceError(
+                    tool_id=method,
+                    reason=decision.reason or "denied by policy",
+                    reason_code=decision.reason_code,
+                )
+
+    return await call_gateway_method(method, params, timeout_ms)
+
+
+def call_gateway_method_sync_governed(
+    method: str,
+    params: Optional[dict] = None,
+    agent_id: str | None = None,
+    governance_enabled: bool = True,
+    timeout_ms: int = 10000,
+) -> Any:
+    """Synchronous version of call_gateway_method_governed."""
+    import asyncio
+
+    async def _call():
+        return await call_gateway_method_governed(
+            method, params, agent_id, governance_enabled, timeout_ms
+        )
+
+    return asyncio.get_event_loop().run_until_complete(_call())
+
+
 __all__ = [
     "call_gateway_method",
     "call_gateway_method_sync",
+    "call_gateway_method_governed",
+    "call_gateway_method_sync_governed",
+    "GovernanceError",
 ]

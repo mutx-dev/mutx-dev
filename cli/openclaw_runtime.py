@@ -74,6 +74,8 @@ class OpenClawAgentBinding:
     install_method: str
     gateway_port: int | None
     created: bool
+    governance_enabled: bool = False
+    governance_policy: str | None = None
 
     def runtime_metadata(self) -> dict[str, Any]:
         return {
@@ -81,6 +83,8 @@ class OpenClawAgentBinding:
             "install_method": self.install_method,
             "gateway_port": self.gateway_port,
             "agent_dir": self.agent_dir,
+            "governance_enabled": self.governance_enabled,
+            "governance_policy": self.governance_policy,
             "provisioned_at": datetime.now(timezone.utc).isoformat(),
         }
 
@@ -802,10 +806,38 @@ def _binding_payload(
         "model": binding.model,
         "install_method": binding.install_method,
         "gateway_port": binding.gateway_port,
+        "governance_enabled": binding.governance_enabled,
+        "governance_policy": binding.governance_policy,
         "managed_by_mutx": True,
         "created_by_last_run": binding.created,
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
+
+
+def update_binding_governance(
+    binding: OpenClawAgentBinding,
+    *,
+    enabled: bool | None = None,
+    policy: str | None = None,
+    assistant_name: str | None = None,
+) -> OpenClawAgentBinding:
+    """Update governance settings on an existing binding."""
+    updated = OpenClawAgentBinding(
+        agent_id=binding.agent_id,
+        workspace=binding.workspace,
+        agent_dir=binding.agent_dir,
+        model=binding.model,
+        install_method=binding.install_method,
+        gateway_port=binding.gateway_port,
+        created=binding.created,
+        governance_enabled=enabled if enabled is not None else binding.governance_enabled,
+        governance_policy=policy if policy is not None else binding.governance_policy,
+    )
+    save_binding(
+        OPENCLAW_PROVIDER_ID,
+        _binding_payload(updated, assistant_name=assistant_name),
+    )
+    return updated
 
 
 def collect_openclaw_runtime_snapshot(
@@ -844,7 +876,9 @@ def collect_openclaw_runtime_snapshot(
         else resolved_disposition == "detected_existing"
     )
     resolved_action_type = str(
-        action_type or manifest.get("last_action_type") or ("import" if adopted_existing_runtime else "install")
+        action_type
+        or manifest.get("last_action_type")
+        or ("import" if adopted_existing_runtime else "install")
     )
     import_source = manifest.get("import_source")
     if not isinstance(import_source, dict):
@@ -860,7 +894,9 @@ def collect_openclaw_runtime_snapshot(
     bindings = list_bindings(OPENCLAW_PROVIDER_ID)
     if binding is not None:
         current = _binding_payload(binding, assistant_name=assistant_name)
-        bindings = [item for item in bindings if str(item.get("assistant_id") or "") != binding.agent_id]
+        bindings = [
+            item for item in bindings if str(item.get("assistant_id") or "") != binding.agent_id
+        ]
         bindings.append(current)
         bindings.sort(key=lambda item: str(item.get("assistant_id") or ""))
     current_binding = None
@@ -1078,7 +1114,11 @@ def reconcile_openclaw_agent_config(
         else None
     )
     requested_model = current.get("model")
-    model = str(requested_model) if isinstance(requested_model, str) and requested_model.strip() else None
+    model = (
+        str(requested_model)
+        if isinstance(requested_model, str) and requested_model.strip()
+        else None
+    )
 
     binding, health = prepare_personal_assistant_runtime(
         assistant_name=agent_name,

@@ -15,6 +15,14 @@ from cli.openclaw_runtime import (
     inspect_importable_openclaw_runtime,
     open_openclaw_surface,
     persist_openclaw_runtime_snapshot,
+    update_binding_governance,
+)
+from cli.faramesh_runtime import (
+    ensure_faramesh_installed,
+    get_default_policy_path,
+    is_faramesh_available,
+    start_faramesh_daemon,
+    FAREMESH_SOCKET_PATH,
 )
 from cli.runtime_registry import (
     complete_wizard,
@@ -43,7 +51,14 @@ class SetupWizardResult:
     action_type: str
 
 
-def _progress(callback: ProgressCallback | None, *, step: str, state: str, message: str, payload: dict[str, Any] | None = None) -> None:
+def _progress(
+    callback: ProgressCallback | None,
+    *,
+    step: str,
+    state: str,
+    message: str,
+    payload: dict[str, Any] | None = None,
+) -> None:
     if callback is None:
         return
     callback(
@@ -56,7 +71,9 @@ def _progress(callback: ProgressCallback | None, *, step: str, state: str, messa
     )
 
 
-def _sync_onboarding(runtime_service: RuntimeStateService | None, *, action: str, step: str | None = None) -> None:
+def _sync_onboarding(
+    runtime_service: RuntimeStateService | None, *, action: str, step: str | None = None
+) -> None:
     if runtime_service is None:
         return
     try:
@@ -139,7 +156,9 @@ def mark_auth_completed(
         extra={"assistant_name": assistant_name},
     )
     _sync_onboarding(runtime_service, action="complete_step", step="auth")
-    _progress(progress, step="auth", state="completed", message="Operator authenticated", payload=state)
+    _progress(
+        progress, step="auth", state="completed", message="Operator authenticated", payload=state
+    )
     return state
 
 
@@ -170,7 +189,9 @@ def run_openclaw_setup_wizard(
         reset_wizard_state(provider, mode=mode)
         _sync_onboarding(runtime_service, action="reset")
 
-    action_type = (requested_action or ("import" if find_openclaw_bin() else "install")).strip().lower()
+    action_type = (
+        (requested_action or ("import" if find_openclaw_bin() else "install")).strip().lower()
+    )
     if action_type not in {"import", "install", "tui", "configure"}:
         raise CLIServiceError(f"Unsupported OpenClaw setup action '{action_type}'.")
 
@@ -195,13 +216,21 @@ def run_openclaw_setup_wizard(
             },
         )
         _sync_onboarding(runtime_service, action="complete_step", step="provider")
-        _progress(progress, step="provider", state="completed", message="OpenClaw selected", payload=provider_state)
+        _progress(
+            progress,
+            step="provider",
+            state="completed",
+            message="OpenClaw selected",
+            payload=provider_state,
+        )
 
         update_wizard_progress(provider, step_id="install", status="in_progress", mode=mode)
         install_resolution = None
         health: OpenClawGatewayHealth | None = None
         if action_type == "import":
-            _progress(progress, step="install", state="running", message="🦞 Import Existing OpenClaw")
+            _progress(
+                progress, step="install", state="running", message="🦞 Import Existing OpenClaw"
+            )
             install_resolution, health = inspect_importable_openclaw_runtime(
                 install_method=openclaw_install_method,
             )
@@ -215,7 +244,9 @@ def run_openclaw_setup_wizard(
                 install_method=openclaw_install_method,
             )
         else:
-            _progress(progress, step="install", state="running", message="🦞 Checking OpenClaw install")
+            _progress(
+                progress, step="install", state="running", message="🦞 Checking OpenClaw install"
+            )
             install_resolution = ensure_openclaw_installed(
                 install_if_missing=install_openclaw,
                 install_method=openclaw_install_method,
@@ -251,10 +282,18 @@ def run_openclaw_setup_wizard(
                 if install_resolution.imported_existing
                 else f"🦞 OpenClaw installed at {install_resolution.binary_path}; importing it into MUTX tracking"
             )
-        _progress(progress, step="install", state="completed", message=install_message, payload=install_snapshot)
+        _progress(
+            progress,
+            step="install",
+            state="completed",
+            message=install_message,
+            payload=install_snapshot,
+        )
 
         update_wizard_progress(provider, step_id="onboard", status="in_progress", mode=mode)
-        _progress(progress, step="onboard", state="running", message="🦞 Verifying gateway onboarding")
+        _progress(
+            progress, step="onboard", state="running", message="🦞 Verifying gateway onboarding"
+        )
         if health is None:
             health = ensure_openclaw_onboarded(
                 no_input=no_input,
@@ -274,11 +313,23 @@ def run_openclaw_setup_wizard(
             extra={"gateway_url": health.gateway_url, "action_type": action_type},
         )
         _sync_onboarding(runtime_service, action="complete_step", step="onboard")
-        onboard_message = "🦞 Imported gateway ready" if action_type in {"import", "configure"} else "🦞 Gateway onboarded"
-        _progress(progress, step="onboard", state="completed", message=onboard_message, payload=onboard_snapshot)
+        onboard_message = (
+            "🦞 Imported gateway ready"
+            if action_type in {"import", "configure"}
+            else "🦞 Gateway onboarded"
+        )
+        _progress(
+            progress,
+            step="onboard",
+            state="completed",
+            message=onboard_message,
+            payload=onboard_snapshot,
+        )
 
         update_wizard_progress(provider, step_id="track", status="in_progress", mode=mode)
-        _progress(progress, step="track", state="running", message="Tracking provider under ~/.mutx")
+        _progress(
+            progress, step="track", state="running", message="Tracking provider under ~/.mutx"
+        )
         track_snapshot = prepare_runtime_state_sync(
             runtime_service,
             assistant_name=assistant_name,
@@ -296,10 +347,18 @@ def run_openclaw_setup_wizard(
             },
         )
         _sync_onboarding(runtime_service, action="complete_step", step="track")
-        _progress(progress, step="track", state="completed", message="Provider registry updated", payload=track_snapshot)
+        _progress(
+            progress,
+            step="track",
+            state="completed",
+            message="Provider registry updated",
+            payload=track_snapshot,
+        )
 
         update_wizard_progress(provider, step_id="bind", status="in_progress", mode=mode)
-        _progress(progress, step="bind", state="running", message="🦞 Binding dedicated assistant runtime")
+        _progress(
+            progress, step="bind", state="running", message="🦞 Binding dedicated assistant runtime"
+        )
         binding = ensure_personal_assistant_binding(
             assistant_name=assistant_name,
             model=model,
@@ -326,7 +385,59 @@ def run_openclaw_setup_wizard(
             },
         )
         _sync_onboarding(runtime_service, action="complete_step", step="bind")
-        _progress(progress, step="bind", state="completed", message="Assistant binding ready", payload=bind_snapshot)
+        _progress(
+            progress,
+            step="bind",
+            state="completed",
+            message="Assistant binding ready",
+            payload=bind_snapshot,
+        )
+
+        update_wizard_progress(provider, step_id="governance", status="in_progress", mode=mode)
+        _progress(
+            progress, step="governance", state="running", message="Configuring governance engine"
+        )
+
+        faramesh_installed, _ = ensure_faramesh_installed(
+            install_if_missing=True, non_interactive=True
+        )
+        governance_enabled = False
+        governance_policy = None
+
+        if faramesh_installed:
+            if not is_faramesh_available():
+                default_policy = get_default_policy_path()
+                start_faramesh_daemon(policy_path=default_policy, socket_path=FAREMESH_SOCKET_PATH)
+
+            if mode != "hosted":
+                governance_enabled = True
+                governance_policy = get_default_policy_path()
+                update_binding_governance(
+                    binding,
+                    enabled=governance_enabled,
+                    policy=governance_policy,
+                    assistant_name=assistant_name,
+                )
+
+        governance_state = complete_wizard_step(
+            provider,
+            "governance",
+            mode=mode,
+            extra={
+                "governance_enabled": governance_enabled,
+                "governance_policy": governance_policy,
+            },
+        )
+        _sync_onboarding(runtime_service, action="complete_step", step="governance")
+        _progress(
+            progress,
+            step="governance",
+            state="completed",
+            message="Governance configured"
+            if governance_enabled
+            else "Governance skipped (opt-in)",
+            payload=governance_state,
+        )
 
         update_wizard_progress(provider, step_id="deploy", status="in_progress", mode=mode)
         _progress(progress, step="deploy", state="running", message="Deploying starter assistant")
@@ -358,12 +469,20 @@ def run_openclaw_setup_wizard(
             progress,
             step="deploy",
             state="completed",
-            message="Starter assistant already present" if reused_existing_assistant else "Starter assistant deployed",
-            payload=deployment_result or {"assistant_id": existing_overview.agent_id if existing_overview else None},
+            message="Starter assistant already present"
+            if reused_existing_assistant
+            else "Starter assistant deployed",
+            payload=deployment_result
+            or {"assistant_id": existing_overview.agent_id if existing_overview else None},
         )
 
         update_wizard_progress(provider, step_id="verify", status="in_progress", mode=mode)
-        _progress(progress, step="verify", state="running", message="Verifying local health and session surface")
+        _progress(
+            progress,
+            step="verify",
+            state="running",
+            message="Verifying local health and session surface",
+        )
         health = get_gateway_health()
         verify_snapshot = prepare_runtime_state_sync(
             runtime_service,
@@ -386,7 +505,13 @@ def run_openclaw_setup_wizard(
         )
         _sync_onboarding(runtime_service, action="complete_step", step="verify")
         _sync_onboarding(runtime_service, action="complete")
-        _progress(progress, step="verify", state="completed", message="Local runtime verified", payload=verify_snapshot)
+        _progress(
+            progress,
+            step="verify",
+            state="completed",
+            message="Local runtime verified",
+            payload=verify_snapshot,
+        )
         return SetupWizardResult(
             binding=binding,
             health=health,
