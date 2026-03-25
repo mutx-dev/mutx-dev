@@ -72,9 +72,10 @@ Surfaces marked **Preview** are:
 
 **What it does today:**
 - Browser-facing auth flows (`/api/auth/*`)
-- Authenticated dashboard pages under `/dashboard`
+- Authenticated dashboard pages under `/dashboard` (agents, deployments, runs, sessions, swarms, budgets, observability, API keys, webhooks)
 - Same-origin dashboard proxies for agents, deployments, runs, sessions, swarms, budgets, assistant overview, monitoring, API keys, and webhooks
 - Control demo routes under `/control/*`
+- Onboarding flow for desktop app
 
 **What it is not yet:**
 - A complete production dashboard for every backend resource
@@ -83,7 +84,8 @@ Surfaces marked **Preview** are:
 
 **Known gaps:**
 - Some flows remain CLI-first or API-first
-- Scheduler and full RAG search are still placeholder-backed on the backend
+- RAG search and scheduler return 503 with feature flags until runtime is configured
+- Shell pages (channels, skills, orchestration) are placeholder-backed
 - Dashboard maturity still trails the full backend route surface
 
 **Source of truth:** `app/dashboard/`, `app/control/`, `app/api/`
@@ -96,6 +98,7 @@ Surfaces marked **Preview** are:
 | Understand APIs and integration | docs.mutx.dev | Supported |
 | Build on MUTX programmatically | docs.mutx.dev + API | Supported |
 | UI-based operator workflows | app.mutx.dev/dashboard | Preview |
+| Agent run observability | app.mutx.dev/dashboard/observability | Preview |
 | Browser control-plane demo | app.mutx.dev/control/* | Preview |
 | Agent governance (Faramesh) | `mutx governance` CLI | Preview |
 
@@ -106,16 +109,19 @@ Governance is integrated via [Faramesh](https://faramesh.dev) and provides deter
 **What it does today:**
 - Policy enforcement (PERMIT/DENY/DEFER) via FPL
 - CLI commands for governance inspection and approval actions
-- Governance tab in Textual TUI
+- Governor tab in Textual TUI
 - Prometheus metrics export via `/v1/governance/metrics`
 - Bundled policy packs (starter, payment-bot, infra-bot, customer-support)
+- SPIFFE/SPIRE workload identity
+- Governance webhooks with FPL `notify` directive routing
+- Credential broker (Vault, AWS, GCP, Azure, 1Password, Infisical)
 
 **What is not yet:**
-- Webhook-based approval notifications
+- Webhook-based approval notifications (governance webhooks fire but approval workflow is CLI-first)
 - Policy editor UI in dashboard
 - Credential broker UI
 
-**Source of truth:** `cli/faramesh_runtime.py`, `cli/commands/governance.py`, `docs/governance.md`
+**Source of truth:** `cli/faramesh_runtime.py`, `cli/commands/governance.py`, `docs/governance.md`, `src/security/`
 
 ## Contributing
 
