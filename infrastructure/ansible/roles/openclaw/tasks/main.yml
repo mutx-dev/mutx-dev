@@ -71,7 +71,7 @@
         mode: '0644'
 
 - name: Set up OpenClaw Docker network
-  docker_network:
+  community.docker.docker_network:
     name: openclaw_network
     driver: bridge
     ipam_config:

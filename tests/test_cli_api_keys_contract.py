@@ -52,7 +52,7 @@ def test_api_keys_list_hits_canonical_route_and_renders_keys(monkeypatch) -> Non
             ],
         )
 
-    monkeypatch.setattr("cli.commands.api_keys.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.api_keys.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.api_keys.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -73,7 +73,7 @@ def test_api_keys_list_empty(monkeypatch) -> None:
     def fake_get(path: str, params: dict[str, Any] | None = None) -> DummyResponse:
         return DummyResponse(200, [])
 
-    monkeypatch.setattr("cli.commands.api_keys.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.api_keys.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.api_keys.get_client", lambda config: SimpleNamespace(get=fake_get)
     )
@@ -105,7 +105,7 @@ def test_api_keys_create_hits_canonical_route_and_renders_key(monkeypatch) -> No
             },
         )
 
-    monkeypatch.setattr("cli.commands.api_keys.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.api_keys.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.api_keys.get_client", lambda config: SimpleNamespace(post=fake_post)
     )
@@ -139,7 +139,7 @@ def test_api_keys_create_with_expiry(monkeypatch) -> None:
             },
         )
 
-    monkeypatch.setattr("cli.commands.api_keys.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.api_keys.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.api_keys.get_client", lambda config: SimpleNamespace(post=fake_post)
     )
@@ -159,7 +159,7 @@ def test_api_keys_revoke_hits_canonical_route(monkeypatch) -> None:
         captured["path"] = path
         return DummyResponse(204, None)
 
-    monkeypatch.setattr("cli.commands.api_keys.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.api_keys.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.api_keys.get_client", lambda config: SimpleNamespace(delete=fake_delete)
     )
@@ -173,7 +173,7 @@ def test_api_keys_revoke_hits_canonical_route(monkeypatch) -> None:
 
 
 def test_api_keys_revoke_requires_confirmation_without_force(monkeypatch) -> None:
-    monkeypatch.setattr("cli.commands.api_keys.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.api_keys.current_config", lambda: DummyConfig())
 
     runner = CliRunner()
     result = runner.invoke(cli, ["api-keys", "revoke", "key-id"], input="n\n")
@@ -202,7 +202,7 @@ def test_api_keys_rotate_hits_canonical_route_and_renders_new_key(monkeypatch) -
             },
         )
 
-    monkeypatch.setattr("cli.commands.api_keys.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.api_keys.current_config", lambda: DummyConfig())
     monkeypatch.setattr(
         "cli.commands.api_keys.get_client", lambda config: SimpleNamespace(post=fake_post)
     )
@@ -218,7 +218,7 @@ def test_api_keys_rotate_hits_canonical_route_and_renders_new_key(monkeypatch) -
 
 
 def test_api_keys_rotate_requires_confirmation_without_force(monkeypatch) -> None:
-    monkeypatch.setattr("cli.commands.api_keys.CLIConfig", DummyConfig)
+    monkeypatch.setattr("cli.commands.api_keys.current_config", lambda: DummyConfig())
 
     runner = CliRunner()
     result = runner.invoke(cli, ["api-keys", "rotate", "key-id"], input="n\n")

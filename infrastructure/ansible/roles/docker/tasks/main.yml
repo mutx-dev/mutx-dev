@@ -48,7 +48,7 @@
     state: present
 
 - name: Set up Docker network
-  docker_network:
+  community.docker.docker_network:
     name: agent_network
     driver: bridge
     ipam_config:

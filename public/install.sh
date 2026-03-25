@@ -14,6 +14,7 @@ NO_PROMPT="${MUTX_NO_PROMPT:-0}"
 HELP=0
 export HOMEBREW_NO_AUTO_UPDATE="${HOMEBREW_NO_AUTO_UPDATE:-1}"
 export HOMEBREW_NO_INSTALL_FROM_API="${HOMEBREW_NO_INSTALL_FROM_API:-1}"
+export HOMEBREW_NO_INSTALLED_HOST_CHECK="${HOMEBREW_NO_INSTALLED_HOST_CHECK:-1}"
 
 HAS_TTY=0
 MOTION_OK=0
@@ -1164,6 +1165,12 @@ check_assistant_first_surface() {
     "runtime"
     "runtime inspect"
     "runtime open"
+    "governance"
+    "governance status"
+    "observability"
+    "observability runs"
+    "security"
+    "update"
   )
   local -a missing=()
   local spec=""
@@ -1248,7 +1255,7 @@ resolve_python_bin() {
 }
 
 upgrade_or_keep_formula() {
-  brew upgrade "${FORMULA}" || true
+  command timeout "${MUTX_BREW_TIMEOUT:-300}" brew upgrade "${FORMULA}" || true
 }
 
 install_source_overlay() {
@@ -1263,9 +1270,9 @@ install_source_overlay() {
   rm -rf "${final_venv}"
 
   "${python_bin}" -m venv "${final_venv}"
-  "${final_venv}/bin/pip" install --disable-pip-version-check --quiet --upgrade pip setuptools wheel
-  "${final_venv}/bin/pip" install --disable-pip-version-check --quiet --upgrade "${MUTX_CLI_SOURCE_REF}"
-  "${final_venv}/bin/pip" install --disable-pip-version-check --quiet --upgrade "textual>=0.58.0,<2.0.0"
+  "${final_venv}/bin/pip" install --timeout 120 --disable-pip-version-check --quiet --upgrade pip setuptools wheel
+  "${final_venv}/bin/pip" install --timeout 120 --disable-pip-version-check --quiet --upgrade "${MUTX_CLI_SOURCE_REF}"
+  "${final_venv}/bin/pip" install --timeout 120 --disable-pip-version-check --quiet --upgrade "textual>=0.58.0,<2.0.0"
 
   brew_prefix="$(brew --prefix)"
   mkdir -p "${brew_prefix}/bin"

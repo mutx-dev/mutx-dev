@@ -44,13 +44,13 @@
 - name: Set up PostgreSQL for n8n
   block:
     - name: Check if PostgreSQL container exists
-      docker_container_info:
+      community.docker.docker_container_info:
         name: n8n_postgres
       register: n8n_postgres_check
       ignore_errors: true
 
     - name: Create PostgreSQL container for n8n
-      docker_container:
+      community.docker.docker_container:
         name: n8n_postgres
         image: postgres:15
         state: started
@@ -67,7 +67,7 @@
       when: not n8n_postgres_check.exists
 
 - name: Create n8n Docker network
-  docker_network:
+  community.docker.docker_network:
     name: n8n_network
     driver: bridge
     ipam_config:
@@ -92,7 +92,7 @@
     mode: '0644'
 
 - name: Start n8n container
-  docker_compose:
+  community.docker.docker_compose:
     project_src: "{{ n8n_config_path }}"
     state: present
     pull: true

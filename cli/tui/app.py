@@ -614,19 +614,19 @@ class MutxTUI(App[None]):
         color: #94a3b8;
     }
 
-    #governance-permits + Static {
+    #governance-permits {
         color: #22c55e;
     }
 
-    #governance-denies + Static {
+    #governance-denies {
         color: #ef4444;
     }
 
-    #governance-defers + Static {
+    #governance-defers {
         color: #eab308;
     }
 
-    #governance-pending + Static {
+    #governance-pending {
         color: #3b82f6;
     }
 
@@ -644,19 +644,19 @@ class MutxTUI(App[None]):
         border-bottom: solid #162032;
     }
 
-    #observability-total-runs + Static {
+    #observability-total-runs {
         color: #94a3b8;
     }
 
-    #observability-running + Static {
+    #observability-running {
         color: #22c55e;
     }
 
-    #observability-completed + Static {
+    #observability-completed {
         color: #3b82f6;
     }
 
-    #observability-failed + Static {
+    #observability-failed {
         color: #ef4444;
     }
 
