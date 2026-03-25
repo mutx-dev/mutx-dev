@@ -1,20 +1,66 @@
 from __future__ import annotations
 
 import json
+import signal
 import sys
 import time
+from pathlib import Path
 
 import click
 
 from cli.faramesh_runtime import (
-    FarameshDecision,
+    FAREMESH_SOCKET_PATH,
     collect_faramesh_snapshot,
+    ensure_faramesh_installed,
     find_faramesh_bin,
     get_faramesh_health,
     get_pending_defers,
     get_recent_decisions,
     is_faramesh_available,
+    start_faramesh_daemon,
 )
+
+
+def _ensure_faramesh() -> bool:
+    """Ensure Faramesh is installed and the daemon is running."""
+    if is_faramesh_available():
+        return True
+
+    installed, bin_path = ensure_faramesh_installed(install_if_missing=True, non_interactive=True)
+    if not installed:
+        click.echo("Failed to install Faramesh.", err=True)
+        return False
+
+    policy_path = _get_default_policy_path()
+    proc = start_faramesh_daemon(policy_path=policy_path, socket_path=FAREMESH_SOCKET_PATH)
+    if proc is None:
+        click.echo("Failed to start Faramesh daemon.", err=True)
+        return False
+
+    for _ in range(10):
+        time.sleep(0.5)
+        if is_faramesh_available():
+            return True
+
+    click.echo("Faramesh daemon started but is not responding.", err=True)
+    return False
+
+
+def _get_default_policy_path() -> str | None:
+    """Look for bundled starter policy in standard locations."""
+    bundled = Path(__file__).parent.parent / "policies" / "starter.fpl"
+    if bundled.exists():
+        return str(bundled)
+
+    user_policy_1 = Path.home() / ".mutx" / "policies" / "starter.fpl"
+    if user_policy_1.exists():
+        return str(user_policy_1)
+
+    user_policy_2 = Path.home() / ".faramesh" / "policy.fpl"
+    if user_policy_2.exists():
+        return str(user_policy_2)
+
+    return None
 
 
 @click.group(name="governance")
@@ -76,6 +122,8 @@ def decisions_command(limit: int, output_json: bool) -> None:
     click.echo(f"{'EFFECT':<8} {'TOOL_ID':<25} {'AGENT':<20} {'RULE':<15} {'LATENCY'}")
     click.echo("-" * 85)
     for d in decisions:
+        if not d.effect:
+            continue
         rule = d.rule_id or "-"
         agent = d.agent_id or "-"
         if len(agent) > 18:
@@ -90,7 +138,7 @@ def decisions_command(limit: int, output_json: bool) -> None:
             effect_color = "\033[93m"
         reset = "\033[0m"
         click.echo(
-            f"{effect_color}{d.effect:<8}{reset} {d.tool_id:<25} {agent:<20} {rule:<15} {latency}"
+            f"{effect_color}{d.effect:<8}{reset} {d.tool_id or '-':<25} {agent:<20} {rule:<15} {latency}"
         )
 
 
@@ -198,8 +246,7 @@ def tail_command(limit: int) -> None:
         click.echo("Start it with: faramesh serve --policy policy.yaml", err=True)
         sys.exit(1)
 
-    from cli.faramesh_runtime import _send_socket_request, FAREMESH_SOCKET_PATH
-    import signal
+    from cli.faramesh_runtime import _send_socket_request
 
     interrupted = False
 
@@ -258,3 +305,53 @@ def tail_command(limit: int) -> None:
     except Exception as exc:
         click.echo(f"\nError: {exc}", err=True)
         sys.exit(1)
+
+
+@governance_group.command(name="start")
+@click.option(
+    "--policy", "-p", type=click.Path(exists=False), default=None, help="Policy file path"
+)
+@click.option(
+    "--install/--no-install", "auto_install", default=True, help="Install Faramesh if missing"
+)
+def start_command(policy: str | None, auto_install: bool) -> None:
+    """Install Faramesh if needed and start the governance daemon."""
+    if is_faramesh_available():
+        click.echo("Faramesh daemon is already running.")
+        return
+
+    if auto_install:
+        installed, bin_path = ensure_faramesh_installed(
+            install_if_missing=True, non_interactive=True
+        )
+        if not installed:
+            click.echo("Failed to install Faramesh.", err=True)
+            sys.exit(1)
+        click.echo(f"Faramesh installed: {bin_path}")
+
+    if not find_faramesh_bin():
+        click.echo(
+            "Faramesh is not installed. Use --install or run with --no-install to skip.", err=True
+        )
+        sys.exit(1)
+
+    policy_path = policy or _get_default_policy_path()
+
+    if policy_path:
+        click.echo(f"Starting daemon with policy: {policy_path}")
+    else:
+        click.echo("Starting daemon without a policy file.")
+
+    proc = start_faramesh_daemon(policy_path=policy_path, socket_path=FAREMESH_SOCKET_PATH)
+    if proc is None:
+        click.echo("Failed to start Faramesh daemon.", err=True)
+        sys.exit(1)
+
+    for i in range(10):
+        time.sleep(0.5)
+        if is_faramesh_available():
+            click.echo("Faramesh daemon is now running.")
+            return
+
+    click.echo("Faramesh daemon started but is not responding.", err=True)
+    sys.exit(1)

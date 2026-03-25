@@ -11,6 +11,7 @@ from cli.commands.config import config_group
 from cli.commands.deployment import deployment_group
 from cli.commands.deploy import deploy_group
 from cli.commands.doctor import doctor_command
+from cli.commands.governance import governance_group
 from cli.commands.runtime import runtime_group
 from cli.commands.setup import setup_group
 from cli.commands.tui import tui_command
@@ -105,6 +106,7 @@ cli.add_command(deploy_group)
 cli.add_command(deployment_group)
 cli.add_command(doctor_command)
 cli.add_command(config_group)
+cli.add_command(governance_group)
 cli.add_command(runtime_group)
 cli.add_command(setup_group)
 cli.add_command(webhooks_group)

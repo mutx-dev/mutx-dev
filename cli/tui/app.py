@@ -25,6 +25,10 @@ from cli.openclaw_runtime import (
     open_openclaw_surface,
     persist_openclaw_runtime_snapshot,
 )
+from cli.faramesh_runtime import (
+    collect_faramesh_snapshot,
+    get_faramesh_health,
+)
 from cli.runtime_registry import load_wizard_state
 from cli.services import (
     AgentRecord,
@@ -40,7 +44,11 @@ from cli.services import (
     RuntimeStateService,
     TemplatesService,
 )
-from cli.setup_wizard import mark_auth_completed, prepare_runtime_state_sync, run_openclaw_setup_wizard
+from cli.setup_wizard import (
+    mark_auth_completed,
+    prepare_runtime_state_sync,
+    run_openclaw_setup_wizard,
+)
 
 
 MUTX_ASCII_LOGO = """\
@@ -227,7 +235,11 @@ def _render_setup_body(
     if not isinstance(gateway, dict):
         gateway = {}
     bindings = runtime_snapshot.get("bindings") if isinstance(runtime_snapshot, dict) else []
-    binding = bindings[0] if isinstance(bindings, list) and bindings and isinstance(bindings[0], dict) else {}
+    binding = (
+        bindings[0]
+        if isinstance(bindings, list) and bindings and isinstance(bindings[0], dict)
+        else {}
+    )
 
     last_error = str(onboarding.get("last_error") or "").strip()
     status = str(onboarding.get("status") or "pending")
@@ -293,6 +305,33 @@ def _render_setup_body(
             ]
         )
     return "\n".join(lines)
+
+
+def _render_governance_body() -> tuple[str, str]:
+    try:
+        health = get_faramesh_health()
+        snapshot = collect_faramesh_snapshot()
+    except Exception as e:
+        return (f"Error loading governance: {e}", "")
+
+    status_icon = "✓" if health.daemon_reachable else "✗"
+    status_line = f"Daemon: {status_icon} {'running' if health.daemon_reachable else 'stopped'}"
+
+    summary_lines = [
+        f"Version: {health.version or 'unknown'}",
+        status_line,
+        f"Policy: {health.policy_name or 'none'}",
+        f"Decisions (total): {snapshot.decisions_total}",
+        f"Decisions (denied today): {health.denied_today}",
+        f"Decisions (deferred today): {health.deferred_today}",
+        f"Pending approvals: {health.pending_approvals}",
+    ]
+
+    if health.doctor_summary:
+        summary_lines.append("")
+        summary_lines.append(health.doctor_summary)
+
+    return ("", "\n".join(summary_lines))
 
 
 def _render_control_plane_body(overview, sessions: list[dict]) -> tuple[str, str]:
@@ -628,7 +667,10 @@ class MutxTUI(App[None]):
                 yield Static("MUTX operator terminal", id="brand-title")
                 yield Static(MUTX_OPERATOR_COPY, id="brand-copy")
                 yield Static(id="brand-signal")
-                yield Static("setup · assistant · deployments · control plane", id="brand-context")
+                yield Static(
+                    "setup · assistant · deployments · control plane · governance",
+                    id="brand-context",
+                )
         yield Static(id="status-banner")
         with TabbedContent(id="workspace"):
             with TabPane("Setup", id="setup-pane"):
@@ -696,6 +738,14 @@ class MutxTUI(App[None]):
                             with TabPane("Gateway"):
                                 with VerticalScroll(classes="detail-scroll"):
                                     yield Static(id="control-health-body", classes="detail-body")
+            with TabPane("Governance", id="governance-pane"):
+                with Vertical(classes="panel detail-panel"):
+                    yield Static("Faramesh Governance Engine", id="governance-summary")
+                    with Horizontal(classes="action-bar"):
+                        yield Button("Refresh", id="governance-refresh", variant="primary")
+                        yield Button("Start Daemon", id="governance-start")
+                    with VerticalScroll(classes="detail-scroll"):
+                        yield Static(id="governance-body", classes="detail-body")
         yield Static(id="context-footer")
         yield Footer()
 
@@ -764,7 +814,8 @@ class MutxTUI(App[None]):
     def _signal_wave(self, width: int = 14) -> str:
         offset = self._animation_tick % len(MUTX_SIGNAL_PATTERN)
         return "".join(
-            MUTX_SIGNAL_PATTERN[(offset + index) % len(MUTX_SIGNAL_PATTERN)] for index in range(width)
+            MUTX_SIGNAL_PATTERN[(offset + index) % len(MUTX_SIGNAL_PATTERN)]
+            for index in range(width)
         )
 
     def _brand_signal_text(self, authenticated: bool) -> str:
@@ -790,7 +841,9 @@ class MutxTUI(App[None]):
         )
         self.sub_title = status.api_url
         self.query_one("#status-banner", Static).update(banner)
-        self.query_one("#brand-signal", Static).update(self._brand_signal_text(status.authenticated))
+        self.query_one("#brand-signal", Static).update(
+            self._brand_signal_text(status.authenticated)
+        )
         self.query_one("#brand-context", Static).update(
             f"assistant {self._assistant_name or 'not deployed'} · deployments {self._deployment_count} · config {status.config_path}"
         )
@@ -859,10 +912,14 @@ class MutxTUI(App[None]):
         self._wizard_state_cache = onboarding
         self._runtime_snapshot_cache = runtime_snapshot
         self.query_one("#setup-summary", Static).update(
-            "Setup complete" if assistant_name else f"Setup {str(onboarding.get('status') or 'pending')}"
+            "Setup complete"
+            if assistant_name
+            else f"Setup {str(onboarding.get('status') or 'pending')}"
         )
         self.query_one("#setup-body", Static).update(
-            _render_setup_body(status.authenticated, status.api_url, assistant_name, onboarding, runtime_snapshot)
+            _render_setup_body(
+                status.authenticated, status.api_url, assistant_name, onboarding, runtime_snapshot
+            )
         )
         if assistant_name and not self._initial_workspace_selected:
             self.query_one("#workspace", TabbedContent).active = "control-pane"
@@ -1001,9 +1058,7 @@ class MutxTUI(App[None]):
         message = str(event.get("message") or step)
         self._wizard_state_cache = load_wizard_state("openclaw")
         self._runtime_snapshot_cache = collect_openclaw_runtime_snapshot().to_payload()
-        self.query_one("#setup-summary", Static).update(
-            f"OpenClaw wizard | {step} | {state}"
-        )
+        self.query_one("#setup-summary", Static).update(f"OpenClaw wizard | {step} | {state}")
         self.query_one("#setup-body", Static).update(
             _render_setup_body(
                 self.auth_service.status().authenticated,
@@ -1064,7 +1119,10 @@ class MutxTUI(App[None]):
     def _run_setup_wizard(self, *, requested_action: str | None = None) -> None:
         status = self.auth_service.status()
         if not status.authenticated:
-            self.notify("Authenticate with `mutx setup hosted` or `mutx setup local` first.", severity="warning")
+            self.notify(
+                "Authenticate with `mutx setup hosted` or `mutx setup local` first.",
+                severity="warning",
+            )
             return
 
         mode = "local" if status.api_url.startswith("http://localhost") else "hosted"
@@ -1146,7 +1204,9 @@ class MutxTUI(App[None]):
             return
 
         self._after_action(
-            "Returned from OpenClaw TUI" if surface == "tui" else "Returned from OpenClaw configure",
+            "Returned from OpenClaw TUI"
+            if surface == "tui"
+            else "Returned from OpenClaw configure",
             False,
         )
 
@@ -1211,7 +1271,9 @@ class MutxTUI(App[None]):
             return
 
         assistant_name = overview.name if overview else None
-        self.call_from_thread(self._render_setup_payload, assistant_name, onboarding, runtime_snapshot)
+        self.call_from_thread(
+            self._render_setup_payload, assistant_name, onboarding, runtime_snapshot
+        )
 
     @work(thread=True, exclusive=True, group="deployments-list")
     def load_deployments(self) -> None:
@@ -1248,6 +1310,45 @@ class MutxTUI(App[None]):
             return
 
         self.call_from_thread(self._render_control_plane, overview, sessions)
+
+    def load_governance(self) -> None:
+        self._set_activity("loading governance")
+        _, summary = _render_governance_body()
+        self.query_one("#governance-summary", Static).update("Faramesh Governance Engine")
+        self.query_one("#governance-body", Static).update(summary)
+
+    def _start_faramesh_daemon(self) -> None:
+        import os
+        import shutil
+
+        from cli.faramesh_runtime import (
+            ensure_faramesh_installed,
+            start_faramesh_daemon,
+        )
+
+        self._set_activity("starting faramesh")
+        installed, bin_path = ensure_faramesh_installed(
+            install_if_missing=True, non_interactive=True
+        )
+        if not installed:
+            self.notify("Failed to install Faramesh.", severity="error")
+            return
+
+        bundled = os.path.join(os.path.dirname(__file__), "..", "policies", "starter.fpl")
+        bundled = os.path.abspath(bundled)
+        policy_dir = os.path.expanduser("~/.mutx/policies")
+        policy_path = os.path.join(policy_dir, "starter.fpl")
+        os.makedirs(policy_dir, exist_ok=True)
+        if not os.path.exists(policy_path):
+            shutil.copy(bundled, policy_path)
+
+        proc = start_faramesh_daemon(policy_path=policy_path, socket_path="/tmp/faramesh.sock")
+        if proc is None:
+            self.notify("Failed to start Faramesh daemon.", severity="error")
+            return
+
+        self.notify(f"Faramesh daemon started (PID: {proc.pid})")
+        self.load_governance()
 
     @work(thread=True, exclusive=True, group="agent-action")
     def deploy_selected_agent_worker(self, agent_id: str) -> None:
@@ -1366,6 +1467,10 @@ class MutxTUI(App[None]):
             self.action_delete_selected_deployment()
         elif button_id == "control-refresh":
             self.load_control_plane()
+        elif button_id == "governance-refresh":
+            self.load_governance()
+        elif button_id == "governance-start":
+            self._start_faramesh_daemon()
 
     def action_refresh_current(self) -> None:
         active = self.query_one("#workspace", TabbedContent).active
@@ -1378,6 +1483,9 @@ class MutxTUI(App[None]):
         elif active == "control-pane":
             self._set_activity("loading control plane")
             self.load_control_plane()
+        elif active == "governance-pane":
+            self._set_activity("loading governance")
+            self.load_governance()
         else:
             self._set_activity("loading deployments")
             self.load_deployments()

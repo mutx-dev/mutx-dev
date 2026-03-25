@@ -1,0 +1,8 @@
+agent mutx-agent {
+  default deny
+
+  rules {
+    deny! shell/* reason: "shell access not permitted"
+    permit *
+  }
+}

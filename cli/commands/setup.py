@@ -2,6 +2,12 @@ import click
 
 from cli.commands.tui import launch_tui
 from cli.config import LOCAL_API_URL, current_config, get_client, resolve_hosted_api_url
+from cli.faramesh_runtime import (
+    ensure_faramesh_installed,
+    is_faramesh_available,
+    start_faramesh_daemon,
+    FAREMESH_SOCKET_PATH,
+)
 from cli.local_control_plane import ensure_local_container_runtime, ensure_local_control_plane
 from cli.openclaw_runtime import find_openclaw_bin
 from cli.services import AssistantService, AuthService, CLIServiceError, RuntimeStateService
@@ -39,7 +45,9 @@ def _require_value(label: str, value: str | None, no_input: bool, *, secret: boo
     return click.prompt(label, hide_input=secret)
 
 
-def _choose_openclaw_action(*, no_input: bool, import_openclaw: bool, install_openclaw: bool) -> str:
+def _choose_openclaw_action(
+    *, no_input: bool, import_openclaw: bool, install_openclaw: bool
+) -> str:
     existing_binary = find_openclaw_bin()
     if import_openclaw:
         if not existing_binary:
@@ -85,7 +93,9 @@ def _finish_setup(
     open_tui: bool,
 ) -> None:
     if provider != "openclaw":
-        raise click.ClickException(f"Unsupported provider '{provider}'. Only openclaw is enabled in this sprint.")
+        raise click.ClickException(
+            f"Unsupported provider '{provider}'. Only openclaw is enabled in this sprint."
+        )
 
     action_type = _choose_openclaw_action(
         no_input=no_input,
@@ -140,16 +150,72 @@ def _finish_setup(
     click.echo(f"Gateway: {result.health.gateway_url or 'n/a'} ({result.health.status})")
     click.echo("Tracking: imported into ~/.mutx/providers/openclaw")
     if result.action_type in {"import", "tui", "configure"}:
-        click.echo("Adoption: existing OpenClaw runtime added to MUTX tracking without moving the upstream home.")
+        click.echo(
+            "Adoption: existing OpenClaw runtime added to MUTX tracking without moving the upstream home."
+        )
     click.echo(
         f"Privacy: {result.runtime_snapshot.get('privacy_summary') or 'Local-only runtime tracking.'}"
     )
+
+    _install_faramesh_governance()
+
     if open_tui:
         launch_tui()
 
 
+def _install_faramesh_governance() -> None:
+    """Auto-install and start Faramesh governance daemon as part of MUTX setup."""
+    import os
+    import shutil
+
+    click.echo("")
+    click.echo("… Installing Faramesh governance engine")
+
+    installed, bin_path = ensure_faramesh_installed(install_if_missing=True, non_interactive=True)
+    if not installed:
+        click.echo("  ⚠ Faramesh installation skipped (will be available later)")
+        return
+
+    click.echo(f"  ✓ Faramesh installed: {bin_path}")
+
+    if is_faramesh_available():
+        click.echo("  ✓ Faramesh governance daemon already running")
+        return
+
+    bundled_policy = os.path.join(os.path.dirname(__file__), "..", "policies", "starter.fpl")
+    bundled_policy = os.path.abspath(bundled_policy)
+    policy_dir = os.path.expanduser("~/.mutx/policies")
+    policy_path = os.path.join(policy_dir, "starter.fpl")
+
+    os.makedirs(policy_dir, exist_ok=True)
+    if not os.path.exists(policy_path):
+        shutil.copy(bundled_policy, policy_path)
+        click.echo(f"  ✓ Bundled policy installed to {policy_path}")
+
+    proc = start_faramesh_daemon(policy_path=policy_path, socket_path=FAREMESH_SOCKET_PATH)  # noqa: F821
+    if proc is None:
+        click.echo("  ⚠ Faramesh daemon could not be started automatically")
+        click.echo("    Run manually: faramesh serve --policy <policy.yaml>")
+        return
+
+    import time
+
+    time.sleep(0.3)
+    if proc.poll() is not None:
+        click.echo("  ⚠ Faramesh daemon exited immediately - may need a policy file")
+        click.echo("    Run manually: faramesh serve --policy <policy.yaml>")
+        return
+
+    click.echo(f"  ✓ Faramesh governance daemon started on {FAREMESH_SOCKET_PATH}")
+    click.echo("    Governance is now active for all agent tool calls.")
+
+
 @setup_group.command(name="hosted")
-@click.option("--api-url", default=None, help="Hosted API base URL (defaults to the configured remote or https://api.mutx.dev)")
+@click.option(
+    "--api-url",
+    default=None,
+    help="Hosted API base URL (defaults to the configured remote or https://api.mutx.dev)",
+)
 @click.option("--email", default=None, help="Account email")
 @click.option("--password", default=None, help="Account password")
 @click.option("--assistant-name", default="Personal Assistant", help="Assistant display name")
@@ -164,8 +230,14 @@ def _finish_setup(
     show_default=True,
     help="Runtime provider for the starter assistant",
 )
-@click.option("--install-openclaw", is_flag=True, help="Install OpenClaw automatically if it is missing")
-@click.option("--import-openclaw", is_flag=True, help="Import and track an existing OpenClaw runtime without reinstalling it")
+@click.option(
+    "--install-openclaw", is_flag=True, help="Install OpenClaw automatically if it is missing"
+)
+@click.option(
+    "--import-openclaw",
+    is_flag=True,
+    help="Import and track an existing OpenClaw runtime without reinstalling it",
+)
 @click.option(
     "--openclaw-install-method",
     type=click.Choice(["npm", "git"]),
@@ -229,7 +301,9 @@ def setup_hosted(
 @setup_group.command(name="local")
 @click.option("--email", default=None, help="Existing local account email (advanced)")
 @click.option("--password", default=None, help="Existing local account password (advanced)")
-@click.option("--name", "display_name", default="Local Operator", help="Local operator display name")
+@click.option(
+    "--name", "display_name", default="Local Operator", help="Local operator display name"
+)
 @click.option(
     "--register/--login-existing",
     default=True,
@@ -247,8 +321,14 @@ def setup_hosted(
     show_default=True,
     help="Runtime provider for the starter assistant",
 )
-@click.option("--install-openclaw", is_flag=True, help="Install OpenClaw automatically if it is missing")
-@click.option("--import-openclaw", is_flag=True, help="Import and track an existing OpenClaw runtime without reinstalling it")
+@click.option(
+    "--install-openclaw", is_flag=True, help="Install OpenClaw automatically if it is missing"
+)
+@click.option(
+    "--import-openclaw",
+    is_flag=True,
+    help="Import and track an existing OpenClaw runtime without reinstalling it",
+)
 @click.option(
     "--openclaw-install-method",
     type=click.Choice(["npm", "git"]),
@@ -284,16 +364,16 @@ def setup_local(
             container_runtime_ensurer=lambda progress: ensure_local_container_runtime(
                 progress=progress,
                 prompt_install=(
-                    None
-                    if no_input
-                    else lambda prompt: click.confirm(prompt, default=True)
+                    None if no_input else lambda prompt: click.confirm(prompt, default=True)
                 ),
             ),
         )
         if local_state.bootstrapped_now:
             click.echo(f"✓ Local control plane ready at {LOCAL_API_URL}")
             if local_state.source_kind == "managed_checkout":
-                click.echo("Tracking: managed localhost stack lives under ~/.mutx/runtime/local-control")
+                click.echo(
+                    "Tracking: managed localhost stack lives under ~/.mutx/runtime/local-control"
+                )
         if email or password:
             email_value = _require_value("Email", email, no_input)
             password_value = _require_value("Password", password, no_input, secret=True)
