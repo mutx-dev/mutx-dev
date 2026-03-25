@@ -25,7 +25,7 @@ https://github.com/builderz-labs/agent-run/blob/main/LICENSE
 
 import warnings
 from datetime import datetime
-from typing import Any, Optional
+from typing import Optional
 
 import httpx
 
@@ -412,7 +412,7 @@ def _build_run_from_steps(
     """
     import hashlib
     import uuid
-    from datetime import datetime, timezone
+    from datetime import timezone
 
     run_id = str(uuid.uuid7())
     started_at = datetime.now(timezone.utc).isoformat()

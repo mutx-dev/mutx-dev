@@ -29,6 +29,7 @@ from cli.services.models import (
     TemplateRecord,
     UserProfile,
 )
+from cli.services.observability import ObservabilityService, SecurityService
 from cli.services.runtime import RuntimeStateService
 
 __all__ = [
@@ -53,10 +54,12 @@ __all__ = [
     "InvalidCredentialsError",
     "LogEntry",
     "MetricPoint",
+    "ObservabilityService",
     "OnboardingStateRecord",
     "ResourceNotFoundError",
     "RuntimeProviderRecord",
     "RuntimeStateService",
+    "SecurityService",
     "TemplatesService",
     "TemplateRecord",
     "UserProfile",

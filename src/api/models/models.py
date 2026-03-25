@@ -157,9 +157,6 @@ class User(Base):
     runs: Mapped[list["AgentRun"]] = relationship(
         "AgentRun", back_populates="user", cascade="all, delete-orphan"
     )
-    mutx_runs: Mapped[list["MutxRun"]] = relationship(
-        "MutxRun", back_populates="user", cascade="all, delete-orphan"
-    )
 
 
 class UserSetting(Base):

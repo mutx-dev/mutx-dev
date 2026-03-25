@@ -12,7 +12,7 @@ https://github.com/builderz-labs/agent-run/blob/main/LICENSE
 """
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
 from typing import Any, Optional
 

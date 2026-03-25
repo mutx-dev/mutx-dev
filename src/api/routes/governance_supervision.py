@@ -10,7 +10,7 @@ from src.api.middleware.auth import get_current_user
 from src.api.models import User
 from src.api.services.faramesh_supervisor import get_faramesh_supervisor
 
-router = APIRouter(prefix="/v1/runtime/governance/supervised", tags=["governance"])
+router = APIRouter(prefix="/runtime/governance/supervised", tags=["governance"])
 
 
 class SupervisedAgentStartRequest(BaseModel):

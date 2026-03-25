@@ -262,7 +262,7 @@ def run_openclaw_setup_wizard(
             installation_disposition=install_resolution.disposition,
             action_type=action_type,
         )
-        install_state = complete_wizard_step(
+        complete_wizard_step(
             provider,
             "install",
             mode=mode,
@@ -306,7 +306,7 @@ def run_openclaw_setup_wizard(
             installation_disposition=install_resolution.disposition,
             action_type=action_type,
         )
-        onboard_state = complete_wizard_step(
+        complete_wizard_step(
             provider,
             "onboard",
             mode=mode,

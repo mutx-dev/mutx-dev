@@ -48,18 +48,23 @@ def test_app_factory_mounts_expected_public_routes():
         "/v1/budgets",
         "/v1/clawhub",
         "/v1/deployments",
+        "/v1/governance",
         "/v1/ingest",
         "/v1/leads",
         "/v1/leads/contacts",
         "/v1/monitoring",
+        "/v1/observability",
         "/v1/rag",
+        "/v1/runtime",
         "/v1/runs",
+        "/v1/security",
         "/v1/sessions",
         "/v1/swarms",
         "/v1/templates",
         "/v1/usage",
         "/v1/webhooks",
         "/v1/analytics",
+        "/v1/onboarding",
     }
     assert "/v1/newsletter" not in mounted_prefixes
     assert "/v1/scheduler" not in mounted_prefixes

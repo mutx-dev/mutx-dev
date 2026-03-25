@@ -11,9 +11,7 @@ from cli.errors import (
     APIRequestError,
     AuthenticationExpiredError,
     AuthenticationRequiredError,
-    InvalidCredentialsError,
     ResourceNotFoundError,
-    CLIServiceError,
     ValidationError,
 )
 

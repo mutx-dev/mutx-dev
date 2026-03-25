@@ -637,6 +637,36 @@ class MutxTUI(App[None]):
         text-style: bold;
     }
 
+    .observability-metrics {
+        height: auto;
+        padding: 1 1 1 1;
+        background: #050816;
+        border-bottom: solid #162032;
+    }
+
+    #observability-total-runs + Static {
+        color: #94a3b8;
+    }
+
+    #observability-running + Static {
+        color: #22c55e;
+    }
+
+    #observability-completed + Static {
+        color: #3b82f6;
+    }
+
+    #observability-failed + Static {
+        color: #ef4444;
+    }
+
+    #observability-pending-label, #observability-runs-label {
+        width: 100%;
+        padding: 1 1 0 1;
+        color: #94a3b8;
+        text-style: bold;
+    }
+
     Button {
         background: #0b172b;
         color: #dbeafe;
@@ -821,6 +851,28 @@ class MutxTUI(App[None]):
                         pass
                     with VerticalScroll(classes="detail-scroll"):
                         yield Static(id="governance-body", classes="detail-body")
+            with TabPane("Observability", id="observability-pane"):
+                with Vertical(classes="panel detail-panel"):
+                    yield Static("Agent Run Observability", id="observability-summary")
+                    with Horizontal(classes="action-bar"):
+                        yield Button("Refresh", id="observability-refresh", variant="primary")
+                        yield Input(
+                            placeholder="Filter by agent_id...", id="observability-filter-agent"
+                        )
+                    with Horizontal(classes="observability-metrics"):
+                        with Vertical(classes="metric-card"):
+                            yield Static("Runs", id="observability-total-runs")
+                        with Vertical(classes="metric-card"):
+                            yield Static("Running", id="observability-running")
+                        with Vertical(classes="metric-card"):
+                            yield Static("Completed", id="observability-completed")
+                        with Vertical(classes="metric-card"):
+                            yield Static("Failed", id="observability-failed")
+                    yield Label("Recent Runs", id="observability-runs-label")
+                    with DataTable(id="observability-runs-table", classes="entity-table"):
+                        pass
+                    with VerticalScroll(classes="detail-scroll"):
+                        yield Static(id="observability-body", classes="detail-body")
         yield Static(id="context-footer")
         yield Footer()
 
@@ -866,6 +918,11 @@ class MutxTUI(App[None]):
         decisions_table.cursor_type = "row"
         decisions_table.zebra_stripes = True
         decisions_table.add_columns("Time", "Effect", "Tool", "Agent")
+
+        observability_table = self.query_one("#observability-runs-table", DataTable)
+        observability_table.cursor_type = "row"
+        observability_table.zebra_stripes = True
+        observability_table.add_columns("Run ID", "Agent", "Status", "Started", "Duration")
 
     def _set_activity(self, label: str) -> None:
         self._activity_label = label
@@ -1403,24 +1460,77 @@ class MutxTUI(App[None]):
             snapshot = collect_faramesh_snapshot()
             defers = get_pending_defers()
             decisions = get_recent_decisions(limit=20)
-        except Exception as e:
-            self.call_from_thread(self._update_governance_error, str(e))
-            return
+        except Exception:
+            health = snapshot = None
+            defers = []
+            decisions = []
 
-        status_icon = "✓" if health.daemon_reachable else "✗"
-        summary = f"Daemon: {status_icon} {'running' if health.daemon_reachable else 'stopped'} | "
-        summary += f"Policy: {health.policy_name or 'none'} | "
+        aarm_compliance = None
+        aarm_metrics = None
+        try:
+            from cli.services import SecurityService
+
+            sec_service = SecurityService(config=self.config)
+            aarm_compliance = sec_service.get_compliance_report()
+            aarm_metrics = sec_service.get_metrics()
+        except Exception:
+            pass
+
+        status_icon = "✓" if (health and health.daemon_reachable) else "✗"
+        summary = f"Daemon: {status_icon} {'running' if (health and health.daemon_reachable) else 'stopped'} | "
+        summary += f"Policy: {(health and health.policy_name) or 'none'} | "
         summary += f"Pending: {len(defers)}"
-        self.call_from_thread(self._update_governance, summary, defers, decisions, health, snapshot)
+        if aarm_compliance:
+            overall = "✓" if aarm_compliance.get("overall_satisfied") else "✗"
+            summary += f" | AARM: {overall}"
+        self.call_from_thread(
+            self._update_governance,
+            summary,
+            defers,
+            decisions,
+            health,
+            snapshot,
+            aarm_compliance,
+            aarm_metrics,
+        )
 
     def _update_governance(
-        self, summary: str, defers: list, decisions: list, health, snapshot
+        self,
+        summary: str,
+        defers: list,
+        decisions: list,
+        health,
+        snapshot,
+        aarm_compliance=None,
+        aarm_metrics=None,
     ) -> None:
         self.query_one("#governance-summary", Static).update(summary)
 
-        self.query_one("#governance-permits", Static).update(f"Permits\n{snapshot.permits_today}")
-        self.query_one("#governance-denies", Static).update(f"Denies\n{health.denied_today}")
-        self.query_one("#governance-defers", Static).update(f"Defers\n{health.deferred_today}")
+        if snapshot:
+            self.query_one("#governance-permits", Static).update(
+                f"Permits\n{snapshot.permits_today}"
+            )
+            self.query_one("#governance-denies", Static).update(
+                f"Denies\n{(health and health.denied_today) or 0}"
+            )
+            self.query_one("#governance-defers", Static).update(
+                f"Defers\n{(health and health.deferred_today) or 0}"
+            )
+        elif aarm_metrics:
+            self.query_one("#governance-permits", Static).update(
+                f"Permits\n{aarm_metrics.get('permits', 0)}"
+            )
+            self.query_one("#governance-denies", Static).update(
+                f"Denies\n{aarm_metrics.get('denials', 0)}"
+            )
+            self.query_one("#governance-defers", Static).update(
+                f"Defers\n{aarm_metrics.get('defers', 0)}"
+            )
+        else:
+            self.query_one("#governance-permits", Static).update("Permits\n-")
+            self.query_one("#governance-denies", Static).update("Denies\n-")
+            self.query_one("#governance-defers", Static).update("Defers\n-")
+
         self.query_one("#governance-pending", Static).update(f"Pending\n{len(defers)}")
 
         pending_table = self.query_one("#governance-pending-table", DataTable)
@@ -1452,17 +1562,105 @@ class MutxTUI(App[None]):
                 (d.agent_id or "-")[:15],
             )
 
-        detail_lines = [
-            f"Version: {health.version or 'unknown'}",
-            f"Decisions (total): {snapshot.decisions_total}",
-        ]
-        if health.doctor_summary:
+        detail_lines = []
+        if health and health.version:
+            detail_lines.append(f"Faramesh v{health.version}")
+            detail_lines.append(f"Decisions (total): {snapshot.decisions_total if snapshot else 0}")
+        else:
+            detail_lines.append("Faramesh: not running")
+
+        if aarm_compliance:
+            detail_lines.append("")
+            detail_lines.append("AARM Security Layer:")
+            overall = "PASS" if aarm_compliance.get("overall_satisfied") else "FAIL"
+            detail_lines.append(f"  Compliance: {overall}")
+            results = aarm_compliance.get("results", [])
+            must_pass = sum(1 for r in results if r.get("level") == "MUST" and r.get("satisfied"))
+            must_total = sum(1 for r in results if r.get("level") == "MUST")
+            should_pass = sum(
+                1 for r in results if r.get("level") == "SHOULD" and r.get("satisfied")
+            )
+            should_total = sum(1 for r in results if r.get("level") == "SHOULD")
+            detail_lines.append(f"  MUST: {must_pass}/{must_total}")
+            detail_lines.append(f"  SHOULD: {should_pass}/{should_total}")
+
+        if health and health.doctor_summary:
             detail_lines.append("")
             detail_lines.append(health.doctor_summary)
+
         self.query_one("#governance-body", Static).update("\n".join(detail_lines))
 
     def _update_governance_error(self, error: str) -> None:
         self.query_one("#governance-summary", Static).update(f"Error: {error}")
+
+    @work(thread=True, exclusive=True)
+    def load_observability(self) -> None:
+        """Load observability data from the API."""
+        self._set_activity("loading observability")
+        try:
+            from cli.services import ObservabilityService
+
+            service = ObservabilityService(config=self.config)
+            runs = service.list_runs(limit=50)
+
+            security_service = None
+            try:
+                security_service = ObservabilityService(config=self.config)
+            except Exception:
+                pass
+
+            metrics = {"total": len(runs), "running": 0, "completed": 0, "failed": 0}
+            for run in runs:
+                status = run.get("status", "unknown")
+                if status == "running":
+                    metrics["running"] += 1
+                elif status == "completed":
+                    metrics["completed"] += 1
+                elif status == "failed":
+                    metrics["failed"] += 1
+
+            self.call_from_thread(self._update_observability, runs, metrics)
+        except Exception as e:
+            self.call_from_thread(self._update_observability_error, str(e))
+
+    def _update_observability(self, runs: list[dict], metrics: dict) -> None:
+        self.query_one("#observability-summary", Static).update("Agent Run Observability")
+        self.query_one("#observability-total-runs", Static).update(f"Runs\n{metrics['total']}")
+        self.query_one("#observability-running", Static).update(f"Running\n{metrics['running']}")
+        self.query_one("#observability-completed", Static).update(
+            f"Completed\n{metrics['completed']}"
+        )
+        self.query_one("#observability-failed", Static).update(f"Failed\n{metrics['failed']}")
+
+        runs_table = self.query_one("#observability-runs-table", DataTable)
+        runs_table.clear()
+
+        for run in runs[:30]:
+            run_id = run.get("id", "-")[:20]
+            agent_id = run.get("agent_id", "-")[:20]
+            status = run.get("status", "-")
+            started = run.get("started_at", "-")
+            if started and len(started) > 10:
+                started = started[-19:-10] if started.endswith("Z") else started[:10]
+            duration = run.get("duration_ms", 0) or 0
+            duration_str = f"{duration / 1000:.1f}s" if duration else "-"
+            runs_table.add_row(run_id, agent_id, status, started, duration_str)
+
+        detail_lines = [f"Total runs: {len(runs)}"]
+        if runs:
+            recent = runs[0]
+            detail_lines.append("")
+            detail_lines.append("Most recent run:")
+            detail_lines.append(f"  ID: {recent.get('id', '-')[:30]}")
+            detail_lines.append(f"  Agent: {recent.get('agent_id', '-')}")
+            detail_lines.append(f"  Status: {recent.get('status', '-')}")
+            if recent.get("cost"):
+                cost = recent["cost"]
+                detail_lines.append(f"  Cost: ${cost.get('cost_usd', 0):.4f}")
+        self.query_one("#observability-body", Static).update("\n".join(detail_lines))
+
+    def _update_observability_error(self, error: str) -> None:
+        self.query_one("#observability-summary", Static).update(f"Error: {error}")
 
     @work(thread=True, exclusive=True, group="governance-action")
     def _governance_approve_selected(self) -> None:
@@ -1670,6 +1868,56 @@ class MutxTUI(App[None]):
         self.query_one("#governance-approve", Button).disabled = False
         self.query_one("#governance-deny", Button).disabled = False
 
+    @on(DataTable.RowSelected, "#observability-runs-table")
+    def on_observability_row_selected(self, event: DataTable.RowSelected) -> None:
+        run_id = str(event.row_key.value)
+        self._set_activity(f"loading run {run_id[:12]}...")
+        self.load_run_detail(run_id)
+
+    def load_run_detail(self, run_id: str) -> None:
+        """Load detailed view of a specific run."""
+        try:
+            from cli.services import ObservabilityService
+
+            service = ObservabilityService(config=self.config)
+            run = service.get_run(run_id)
+            self.call_from_thread(self._update_run_detail, run)
+        except Exception as e:
+            self.call_from_thread(self._update_run_detail_error, str(e))
+
+    def _update_run_detail(self, run: dict) -> None:
+        lines = [
+            f"Run: {run.get('id', '-')}",
+            f"Agent: {run.get('agent_id', '-')}",
+            f"Status: {run.get('status', '-')}",
+            f"Model: {run.get('model', '-')}",
+            "",
+            "Steps:",
+        ]
+        steps = run.get("steps", [])
+        for i, step in enumerate(steps[:10], 1):
+            step_type = step.get("type", "-")
+            tool = step.get("tool_name", "-") or "-"
+            success = step.get("success", "?")
+            duration = step.get("duration_ms", 0) or 0
+            lines.append(f"  {i}. [{step_type}] {tool} - {success} ({duration}ms)")
+
+        if len(steps) > 10:
+            lines.append(f"  ... and {len(steps) - 10} more steps")
+
+        if run.get("cost"):
+            cost = run["cost"]
+            lines.append("")
+            lines.append("Cost:")
+            lines.append(f"  Input tokens: {cost.get('input_tokens', 0)}")
+            lines.append(f"  Output tokens: {cost.get('output_tokens', 0)}")
+            lines.append(f"  Cost: ${cost.get('cost_usd', 0):.4f}")
+
+        self.query_one("#observability-body", Static).update("\n".join(lines))
+
+    def _update_run_detail_error(self, error: str) -> None:
+        self.query_one("#observability-body", Static).update(f"Error loading run: {error}")
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
         if button_id == "setup-refresh":
@@ -1708,6 +1956,8 @@ class MutxTUI(App[None]):
             self._governance_approve_selected()
         elif button_id == "governance-deny":
             self._governance_deny_selected()
+        elif button_id == "observability-refresh":
+            self.load_observability()
 
     def action_refresh_current(self) -> None:
         active = self.query_one("#workspace", TabbedContent).active
@@ -1723,6 +1973,9 @@ class MutxTUI(App[None]):
         elif active == "governance-pane":
             self._set_activity("loading governance")
             self.load_governance()
+        elif active == "observability-pane":
+            self._set_activity("loading observability")
+            self.load_observability()
         else:
             self._set_activity("loading deployments")
             self.load_deployments()

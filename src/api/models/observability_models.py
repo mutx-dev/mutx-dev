@@ -18,7 +18,6 @@ from typing import Optional
 from sqlalchemy import (
     Boolean,
     DateTime,
-    Enum as SQLEnum,
     Float,
     ForeignKey,
     Integer,
@@ -72,7 +71,6 @@ class MutxRun(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
 
-    user: Mapped["User"] = relationship("User", back_populates="mutx_runs")
     steps: Mapped[list["MutxStep"]] = relationship(
         "MutxStep",
         back_populates="run",

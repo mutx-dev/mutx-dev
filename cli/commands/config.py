@@ -1,6 +1,6 @@
 import click
 
-from cli.config import CLIConfig, current_config
+from cli.config import current_config
 
 
 @click.group(name="config")

@@ -15,7 +15,7 @@ from src.api.services.credential_broker import (
     get_credential_broker,
 )
 
-router = APIRouter(prefix="/v1/governance/credentials", tags=["governance"])
+router = APIRouter(prefix="/governance/credentials", tags=["governance"])
 
 
 class CredentialBackendRegister(BaseModel):

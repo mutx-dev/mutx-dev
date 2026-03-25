@@ -15,7 +15,7 @@ from mutx.api_keys import APIKeys
 from mutx.clawhub import ClawHub
 from mutx.deployments import Deployments
 from mutx.leads import Contacts, Leads
-from mutx.observability import Observability, _build_run_from_steps
+from mutx.observability import Observability
 from mutx.webhooks import Webhooks
 
 
