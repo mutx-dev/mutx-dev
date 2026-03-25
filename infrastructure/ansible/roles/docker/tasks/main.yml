@@ -25,30 +25,30 @@
       ansible.service:
         name: docker
         state: started
-        enabled: yes
+        enabled: true
 
 - name: Configure Docker daemon
   block:
     - name: Create Docker daemon config directory
-      file:
+      ansible.builtin.file:
         path: /etc/docker
         state: directory
         mode: '0755'
 
     - name: Configure Docker daemon
-      template:
+      ansible.builtin.template:
         src: daemon.json.j2
         dest: /etc/docker/daemon.json
         mode: '0644'
       notify: Restart Docker
 
 - name: Install Docker Python library
-  pip:
+  ansible.builtin.pip:
     name: docker
     state: present
 
 - name: Set up Docker network
-  docker_network:
+  community.docker.docker_network:
     name: agent_network
     driver: bridge
     ipam_config:

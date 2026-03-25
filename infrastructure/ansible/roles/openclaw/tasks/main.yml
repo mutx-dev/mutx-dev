@@ -8,7 +8,7 @@
           - python3-pip
           - python3-venv
         state: present
-        update_cache: yes
+        update_cache: true
 
     - name: Install Docker
       ansible.builtin.include_role:
@@ -17,7 +17,7 @@
 - name: Clone OpenClaw repository
   block:
     - name: Create OpenClaw directory
-      file:
+      ansible.builtin.file:
         path: "{{ openclaw_install_path }}"
         state: directory
         owner: "{{ openclaw_system_user | default('root') }}"
@@ -25,30 +25,28 @@
         mode: '0755'
 
     - name: Clone OpenClaw repository
-      git:
+      ansible.builtin.git:
         repo: "{{ openclaw_repo_url }}"
         dest: "{{ openclaw_install_path }}"
         version: "{{ openclaw_version | default('main') }}"
         depth: 1
-        force: yes
-      register: openclaw_clone
+        force: true
 
 - name: Configure OpenClaw
   block:
     - name: Create OpenClaw virtual environment
-      python_venv:
-        virtualenv: "{{ openclaw_venv_path }}"
-        system_site_packages: no
-        executable: python3
+      ansible.builtin.command:
+        cmd: python3 -m venv {{ openclaw_venv_path }}
+        creates: "{{ openclaw_venv_path }}/bin/activate"
 
     - name: Install OpenClaw Python dependencies
-      pip:
+      ansible.builtin.pip:
         virtualenv: "{{ openclaw_venv_path }}"
         requirements: "{{ openclaw_install_path }}/requirements.txt"
         state: present
 
     - name: Create OpenClaw configuration directory
-      file:
+      ansible.builtin.file:
         path: "{{ openclaw_config_path }}"
         state: directory
         owner: "{{ openclaw_system_user | default('root') }}"
@@ -56,7 +54,7 @@
         mode: '0755'
 
     - name: Create OpenClaw environment file
-      template:
+      ansible.builtin.template:
         src: openclaw.env.j2
         dest: "{{ openclaw_config_path }}/env"
         owner: "{{ openclaw_system_user | default('root') }}"
@@ -65,7 +63,7 @@
       no_log: true
 
     - name: Create OpenClaw config file
-      template:
+      ansible.builtin.template:
         src: openclaw.yaml.j2
         dest: "{{ openclaw_config_path }}/config.yaml"
         owner: "{{ openclaw_system_user | default('root') }}"
@@ -73,7 +71,7 @@
         mode: '0644'
 
 - name: Set up OpenClaw Docker network
-  docker_network:
+  community.docker.docker_network:
     name: openclaw_network
     driver: bridge
     ipam_config:
@@ -83,7 +81,7 @@
 - name: Set up OpenClaw as systemd service
   block:
     - name: Create systemd service file
-      template:
+      ansible.builtin.template:
         src: openclaw.service.j2
         dest: "/etc/systemd/system/openclaw.service"
         mode: '0644'
@@ -92,11 +90,11 @@
         - Restart OpenClaw
 
     - name: Reload systemd
-      systemd:
-        daemon_reload: yes
+      ansible.builtin.systemd:
+        daemon_reload: true
 
     - name: Start and enable OpenClaw service
-      systemd:
+      ansible.builtin.systemd:
         name: openclaw
-        enabled: yes
+        enabled: true
         state: started
