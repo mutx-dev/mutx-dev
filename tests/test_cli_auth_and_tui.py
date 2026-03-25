@@ -10,6 +10,8 @@ import pytest
 from click.testing import CliRunner
 
 from cli.main import cli
+from cli.services.base import APIService
+from cli.services.models import AgentRecord
 
 
 class DummyResponse:
@@ -109,6 +111,53 @@ def test_login_reports_unreachable_api_without_traceback(monkeypatch) -> None:
     assert "Traceback" not in result.output
 
 
+def test_api_service_refreshes_tokens_after_401() -> None:
+    calls: list[tuple[str, str]] = []
+
+    class DummyClient:
+        def __init__(self) -> None:
+            self.resource_calls = 0
+
+        def get(self, path: str, **kwargs):
+            calls.append(("get", path))
+            self.resource_calls += 1
+            if self.resource_calls == 1:
+                return DummyResponse(401, {"detail": "expired"})
+            return DummyResponse(200, {"ok": True})
+
+        def post(self, path: str, **kwargs):
+            calls.append(("post", path))
+            if path == "/v1/auth/refresh":
+                return DummyResponse(
+                    200,
+                    {"access_token": "new-access", "refresh_token": "new-refresh"},
+                )
+            raise AssertionError(f"unexpected post path: {path}")
+
+        def close(self) -> None:
+            return None
+
+    class DummyService(APIService):
+        pass
+
+    config = LoginConfig()
+    config.api_key = "expired-access"
+    config.refresh_token = "refresh-token"
+    client = DummyClient()
+    service = DummyService(config=config, client_factory=lambda _: client)
+
+    response = service._request("get", "/v1/agents")
+
+    assert response.status_code == 200
+    assert config.api_key == "new-access"
+    assert config.refresh_token == "new-refresh"
+    assert calls == [
+        ("get", "/v1/agents"),
+        ("post", "/v1/auth/refresh"),
+        ("get", "/v1/agents"),
+    ]
+
+
 def test_tui_command_dispatches_to_launcher(monkeypatch) -> None:
     launched = {"value": False}
 
@@ -168,6 +217,194 @@ def test_tui_renders_logged_out_state(monkeypatch) -> None:
     assert len(logo.splitlines()) == 5
     assert "/v1" in signal
     assert "login required" in signal
+
+
+def test_tui_logged_out_disables_mutating_actions(monkeypatch) -> None:
+    textual = pytest.importorskip("textual")
+    assert textual is not None
+
+    import cli.tui.app as tui_app
+
+    class DummyAuthService:
+        def status(self):
+            return SimpleNamespace(
+                authenticated=False,
+                api_url="http://localhost:8000",
+                config_path=Path("/tmp/mutx-config.json"),
+            )
+
+    monkeypatch.setattr(tui_app, "AuthService", DummyAuthService)
+
+    from cli.tui.app import MutxTUI
+
+    async def run() -> tuple[bool, bool, bool]:
+        app = MutxTUI()
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            result = (
+                app.query_one("#agents-deploy").disabled,
+                app.query_one("#deployments-restart").disabled,
+                app.query_one("#deployments-delete").disabled,
+            )
+            app.exit()
+            return result
+
+    import asyncio
+
+    deploy_disabled, restart_disabled, delete_disabled = asyncio.run(run())
+    assert deploy_disabled is True
+    assert restart_disabled is True
+    assert delete_disabled is True
+
+
+def test_setup_configure_button_opens_configure_surface(monkeypatch) -> None:
+    textual = pytest.importorskip("textual")
+    assert textual is not None
+
+    from cli.tui.app import MutxTUI
+
+    called: list[str] = []
+    app = MutxTUI()
+    monkeypatch.setattr(app, "_open_openclaw_surface", lambda surface: called.append(surface))
+    app.on_button_pressed(SimpleNamespace(button=SimpleNamespace(id="setup-configure-openclaw")))
+    assert called == ["configure"]
+
+
+def test_tui_dashboard_button_opens_hosted_dashboard(monkeypatch) -> None:
+    textual = pytest.importorskip("textual")
+    assert textual is not None
+
+    import cli.tui.app as tui_app
+
+    class DummyAuthService:
+        def status(self):
+            return SimpleNamespace(
+                authenticated=False,
+                api_url="http://localhost:8000",
+                config_path=Path("/tmp/mutx-config.json"),
+            )
+
+    monkeypatch.setattr(tui_app, "AuthService", DummyAuthService)
+
+    from cli.tui.app import HOSTED_LOGIN_URL, MutxTUI
+
+    opened: list[str] = []
+    monkeypatch.setattr("cli.tui.app.webbrowser.open", lambda url: opened.append(url) or True)
+
+    app = MutxTUI()
+    monkeypatch.setattr(app, "_set_notice", lambda *args, **kwargs: None)
+    app.on_button_pressed(SimpleNamespace(button=SimpleNamespace(id="brand-open-dashboard")))
+
+    assert opened == [HOSTED_LOGIN_URL]
+
+
+def test_render_openclaw_runtime_detail_shows_gateway_binding_and_sessions() -> None:
+    from cli.tui.app import _render_openclaw_runtime_detail
+
+    agent = AgentRecord(
+        id="agent-1",
+        name="Personal Assistant",
+        description=None,
+        type="openclaw",
+        status="failed",
+        config={
+            "assistant_id": "personal-assistant",
+            "workspace": "/tmp/ws",
+            "model": "openai/gpt-5",
+            "metadata": {
+                "runtime": {
+                    "gateway_status": "healthy",
+                    "gateway_url": "http://127.0.0.1:18789",
+                    "gateway_port": 18789,
+                    "agent_dir": "/tmp/agent",
+                }
+            },
+        },
+        config_version=1,
+        created_at=None,
+        updated_at=None,
+        user_id=None,
+        deployments=[],
+    )
+
+    overview = SimpleNamespace(
+        status="failed",
+        session_count=2,
+        installed_skills=[SimpleNamespace(id="web_search")],
+        channels=[SimpleNamespace(id="discord", enabled=False)],
+        deployments=[SimpleNamespace(id="dep-1", status="failed", node_id=None, error_message="heartbeat timeout")],
+    )
+
+    rendered = _render_openclaw_runtime_detail(
+        agent=agent,
+        runtime_snapshot={
+            "binary_path": "/opt/homebrew/bin/openclaw",
+            "config_path": "/Users/test/.openclaw/openclaw.json",
+            "state_dir": "/Users/test/.openclaw",
+            "adopted_existing_runtime": True,
+            "gateway": {
+                "status": "healthy",
+                "gateway_url": "http://127.0.0.1:18789",
+                "gateway_port": 18789,
+                "config_path": "/Users/test/.openclaw/openclaw.json",
+                "state_dir": "/Users/test/.openclaw",
+                "doctor_summary": "Gateway is reachable.",
+            },
+            "current_binding": {
+                "assistant_id": "personal-assistant",
+                "workspace": "/tmp/ws",
+                "model": "openai/gpt-5",
+                "agent_dir": "/tmp/agent",
+            },
+            "bindings": [
+                {
+                    "assistant_id": "personal-assistant",
+                    "workspace": "/tmp/ws",
+                    "tracked_by_mutx": True,
+                    "live_detected": True,
+                },
+                {
+                    "assistant_id": "x",
+                    "workspace": "/tmp/workspace-x",
+                    "tracked_by_mutx": False,
+                    "live_detected": True,
+                },
+            ],
+            "tracked_binding_count": 1,
+            "live_binding_count": 2,
+        },
+        assistant_overview=overview,
+        local_sessions=[
+            {
+                "age": "5m",
+                "channel": "discord",
+                "tokens": "2k/128k (1%)",
+                "model": "openai/gpt-5",
+            }
+        ],
+    )
+
+    assert "Gateway:" in rendered
+    assert "Binding:" in rendered
+    assert "Detected workspaces (2):" in rendered
+    assert "Local sessions:" in rendered
+    assert "/tmp/workspace-x" in rendered
+    assert "discord" in rendered
+    assert "heartbeat timeout" in rendered
+
+
+def test_assistant_service_lists_all_local_sessions_without_agent_id(monkeypatch) -> None:
+    from cli.services.assistant import AssistantService
+
+    sessions = [
+        {"id": "session-x", "agent": "x", "channel": "cli"},
+        {"id": "session-pa", "agent": "personal-assistant", "channel": "discord"},
+    ]
+    monkeypatch.setattr("cli.services.assistant.list_local_sessions", lambda assistant_id=None: sessions)
+
+    service = AssistantService(config=LoginConfig(), client_factory=lambda _: None)
+
+    assert service.list_sessions() == sessions
 
 
 def test_onboard_hosted_can_register(monkeypatch) -> None:

@@ -201,9 +201,14 @@ class AssistantService(APIService):
         return overview.gateway
 
     def list_sessions(self, *, agent_id: str | None = None) -> list[dict[str, Any]]:
-        overview = self.overview(agent_id=agent_id)
-        if overview is not None:
-            return list_local_sessions(assistant_id=overview.assistant_id)
+        if agent_id:
+            overview = self.overview(agent_id=agent_id)
+            if overview is not None:
+                return list_local_sessions(assistant_id=overview.assistant_id)
+        else:
+            local_sessions = list_local_sessions()
+            if local_sessions:
+                return local_sessions
 
         params = {"agent_id": agent_id} if agent_id else None
         response = self._request("get", "/v1/sessions", params=params)

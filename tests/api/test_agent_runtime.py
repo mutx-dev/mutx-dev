@@ -129,6 +129,64 @@ async def test_runtime_registered_agent_api_key_authenticates_status_and_heartbe
 
 
 @pytest.mark.asyncio
+async def test_heartbeat_promotes_latest_deploying_deployment_to_running(client, db_session):
+    from src.api.models import Deployment, DeploymentEvent
+
+    register_response = await client.post(
+        "/v1/agents/register",
+        json={
+            "name": "runtime-deployment-promote",
+            "description": "runtime deployment promote coverage",
+            "metadata": {"provider": "openclaw"},
+            "capabilities": ["heartbeat"],
+        },
+    )
+
+    assert register_response.status_code == 200
+    payload = register_response.json()
+    agent_id = payload["agent_id"]
+    api_key = payload["api_key"]
+
+    deployment = Deployment(
+        agent_id=uuid.UUID(agent_id),
+        status="deploying",
+        replicas=1,
+        started_at=None,
+    )
+    db_session.add(deployment)
+    await db_session.commit()
+
+    heartbeat_response = await client.post(
+        "/v1/agents/heartbeat",
+        headers={"Authorization": f"Bearer {api_key}"},
+        json={
+            "agent_id": agent_id,
+            "status": "running",
+            "message": "runtime healthy",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        },
+    )
+
+    assert heartbeat_response.status_code == 200
+
+    await db_session.refresh(deployment)
+    assert deployment.status == "running"
+    assert deployment.started_at is not None
+    assert deployment.ended_at is None
+
+    events = (
+        (
+            await db_session.execute(
+                select(DeploymentEvent).where(DeploymentEvent.deployment_id == deployment.id)
+            )
+        )
+        .scalars()
+        .all()
+    )
+    assert any(event.event_type == "heartbeat_running" for event in events)
+
+
+@pytest.mark.asyncio
 async def test_agent_log_submission_persists_metadata_as_json(
     client, db_session, test_agent
 ):

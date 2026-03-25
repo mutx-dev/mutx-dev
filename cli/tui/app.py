@@ -4,6 +4,7 @@ import json
 import subprocess
 import threading
 import time
+import webbrowser
 
 from textual import on, work
 from textual.app import App, ComposeResult
@@ -23,6 +24,7 @@ from textual.widgets import (
 
 from cli.openclaw_runtime import (
     collect_openclaw_runtime_snapshot,
+    list_local_sessions,
     open_openclaw_surface,
     persist_openclaw_runtime_snapshot,
 )
@@ -33,6 +35,8 @@ from cli.faramesh_runtime import (
     get_recent_decisions,
 )
 from cli.runtime_registry import load_wizard_state
+from cli.config import current_config
+from cli.personal_assistant import slugify_assistant_id
 from cli.services import (
     AgentRecord,
     AgentsService,
@@ -63,11 +67,13 @@ MUTX_ASCII_LOGO = """\
 """
 
 MUTX_OPERATOR_COPY = "control plane for agent infrastructure"
-KEY_HINTS = "r refresh  d deploy  x restart  s scale  backspace delete  tab switch"
+KEY_HINTS = "r refresh  d deploy  x restart  s scale  o dashboard  backspace delete  tab switch"
 MUTX_ACCENT_FRAMES = ("#3B82F6", "#2563EB", "#06B6D4", "#22D3EE")
 MUTX_IDLE_FRAMES = ("◢", "◣", "◤", "◥")
 MUTX_BUSY_FRAMES = ("◐", "◓", "◑", "◒")
 MUTX_SIGNAL_PATTERN = "▁▂▃▄▅▆▇█▇▆▅▄▃▂"
+HOSTED_DASHBOARD_URL = "https://app.mutx.dev/dashboard"
+HOSTED_LOGIN_URL = "https://app.mutx.dev/login"
 
 
 def _shorten(value: str | None, limit: int = 32) -> str:
@@ -185,6 +191,170 @@ def _render_deployment_detail(deployment: DeploymentRecord) -> str:
     return "\n".join(lines)
 
 
+def _render_openclaw_runtime_detail(
+    *,
+    agent: AgentRecord,
+    runtime_snapshot: dict[str, object] | None,
+    assistant_overview,
+    local_sessions: list[dict[str, object]],
+) -> str:
+    snapshot = runtime_snapshot if isinstance(runtime_snapshot, dict) else {}
+    gateway = snapshot.get("gateway")
+    if not isinstance(gateway, dict):
+        gateway = {}
+    bindings = snapshot.get("bindings")
+    if not isinstance(bindings, list):
+        bindings = []
+
+    metadata = {}
+    if isinstance(agent.config, dict):
+        meta = agent.config.get("metadata")
+        if isinstance(meta, dict):
+            runtime = meta.get("runtime")
+            if isinstance(runtime, dict):
+                metadata = runtime
+    assistant_id = (
+        str(agent.config.get("assistant_id") or "").strip()
+        if isinstance(agent.config, dict)
+        else ""
+    )
+    current_binding = snapshot.get("current_binding")
+    if isinstance(current_binding, dict) and current_binding:
+        binding = current_binding
+    else:
+        binding = next(
+            (
+                item
+                for item in bindings
+                if isinstance(item, dict) and str(item.get("assistant_id") or "") == assistant_id
+            ),
+            {},
+        )
+    if not isinstance(binding, dict):
+        binding = {}
+
+    gateway_lines = [
+        "Gateway:",
+        f"  status    {gateway.get('status') or metadata.get('gateway_status') or 'unknown'}",
+        f"  url       {gateway.get('gateway_url') or metadata.get('gateway_url') or 'n/a'}",
+        f"  port      {gateway.get('gateway_port') or metadata.get('gateway_port') or 'n/a'}",
+        f"  config    {gateway.get('config_path') or snapshot.get('config_path') or 'n/a'}",
+        f"  state dir {gateway.get('state_dir') or snapshot.get('state_dir') or 'n/a'}",
+        f"  binary    {snapshot.get('binary_path') or 'n/a'}",
+        f"  agents    {snapshot.get('live_binding_count') or len(bindings)} live / {snapshot.get('tracked_binding_count') or len(bindings)} tracked",
+    ]
+
+    binding_lines = [
+        "Binding:",
+        f"  assistant {binding.get('assistant_id') or agent.config.get('assistant_id') if isinstance(agent.config, dict) else 'n/a'}",
+        f"  workspace {binding.get('workspace') or agent.config.get('workspace') if isinstance(agent.config, dict) else 'n/a'}",
+        f"  model     {binding.get('model') or agent.config.get('model') if isinstance(agent.config, dict) else 'n/a'}",
+        f"  agent dir {binding.get('agent_dir') or metadata.get('agent_dir') or 'n/a'}",
+        f"  imported  {'yes' if snapshot.get('adopted_existing_runtime') else 'no'}",
+    ]
+
+    workspace_lines = [f"Detected workspaces ({len(bindings)}):"]
+    if bindings:
+        for item in bindings[:10]:
+            if not isinstance(item, dict):
+                continue
+            labels = []
+            if str(item.get("assistant_id") or "") == assistant_id:
+                labels.append("selected")
+            if item.get("tracked_by_mutx"):
+                labels.append("tracked")
+            if item.get("live_detected"):
+                labels.append("live")
+            source = "+".join(labels) or str(item.get("source") or "unknown")
+            workspace_lines.append(
+                f"  {item.get('assistant_id') or 'n/a'} | {item.get('workspace') or 'n/a'} | {source}"
+            )
+        if len(bindings) > 10:
+            workspace_lines.append(f"  … {len(bindings) - 10} more")
+    else:
+        workspace_lines.append("  No OpenClaw workspaces detected.")
+
+    session_lines = ["Local sessions:"]
+    if local_sessions:
+        for session in local_sessions[:8]:
+            session_lines.append(
+                "  "
+                + " | ".join(
+                    [
+                        str(session.get("age") or "n/a"),
+                        str(session.get("channel") or "no-channel"),
+                        str(session.get("tokens") or "n/a"),
+                        str(session.get("model") or "n/a"),
+                    ]
+                )
+            )
+    else:
+        session_lines.append("  No local sessions found for this OpenClaw agent.")
+
+    overview_lines = ["Assistant state:"]
+    if assistant_overview is not None:
+        overview_lines.extend(
+            [
+                f"  status    {assistant_overview.status}",
+                f"  sessions  {assistant_overview.session_count}",
+                f"  skills    {', '.join(skill.id for skill in assistant_overview.installed_skills) or 'none'}",
+                f"  channels  "
+                + (
+                    ", ".join(
+                        f"{channel.id}:{'on' if channel.enabled else 'off'}"
+                        for channel in assistant_overview.channels
+                    )
+                    or "none"
+                ),
+            ]
+        )
+        failed = [item for item in assistant_overview.deployments if item.status == "failed"]
+        latest = assistant_overview.deployments[0] if assistant_overview.deployments else None
+        if latest is not None:
+            overview_lines.append(
+                f"  latest deploy { _shorten(latest.id, 12)} | {latest.status} | node {latest.node_id or 'n/a'}"
+            )
+            if latest.error_message:
+                overview_lines.append(f"  last error {latest.error_message}")
+        if failed:
+            overview_lines.append(f"  failed deploys {len(failed)}")
+        if assistant_overview.deployments:
+            overview_lines.extend(["", "Recent deployments:"])
+            for item in assistant_overview.deployments[:5]:
+                summary = f"  {_shorten(item.id, 12)} | {item.status}"
+                if item.error_message:
+                    summary += f" | {item.error_message}"
+                overview_lines.append(summary)
+    else:
+        overview_lines.append("  Assistant overview unavailable from the control plane.")
+
+    doctor_summary = str(gateway.get("doctor_summary") or "").strip()
+    if doctor_summary:
+        overview_lines.extend(["", "Doctor:", f"  {doctor_summary}"])
+
+    return "\n".join(
+        gateway_lines
+        + [""]
+        + binding_lines
+        + [""]
+        + workspace_lines
+        + [""]
+        + session_lines
+        + [""]
+        + overview_lines
+    )
+
+
+def _safe_row_key(event: DataTable.RowSelected) -> str | None:
+    row_key = getattr(event, "row_key", None)
+    if row_key is None:
+        return None
+    value = getattr(row_key, "value", row_key)
+    if value in (None, ""):
+        return None
+    return str(value)
+
+
 def _render_provider_lines(onboarding: dict[str, object]) -> list[str]:
     lines = ["Providers:"]
     current_provider = str(onboarding.get("provider") or "openclaw")
@@ -238,11 +408,25 @@ def _render_setup_body(
     if not isinstance(gateway, dict):
         gateway = {}
     bindings = runtime_snapshot.get("bindings") if isinstance(runtime_snapshot, dict) else []
-    binding = (
-        bindings[0]
-        if isinstance(bindings, list) and bindings and isinstance(bindings[0], dict)
-        else {}
-    )
+    if not isinstance(bindings, list):
+        bindings = []
+    binding = runtime_snapshot.get("current_binding") if isinstance(runtime_snapshot, dict) else None
+    if not isinstance(binding, dict):
+        binding = {}
+    if not binding:
+        expected_assistant_id = str(onboarding.get("assistant_id") or "").strip()
+        if not expected_assistant_id and assistant_name:
+            expected_assistant_id = slugify_assistant_id(assistant_name)
+        if expected_assistant_id:
+            binding = next(
+                (
+                    item
+                    for item in bindings
+                    if isinstance(item, dict)
+                    and str(item.get("assistant_id") or "").strip() == expected_assistant_id
+                ),
+                {},
+            )
 
     last_error = str(onboarding.get("last_error") or "").strip()
     status = str(onboarding.get("status") or "pending")
@@ -268,6 +452,7 @@ def _render_setup_body(
         f"  home     {runtime_snapshot.get('home_path') or 'n/a'}",
         f"  config   {runtime_snapshot.get('config_path') or 'n/a'}",
         f"  tracking {tracked_root}",
+        f"  agents   {runtime_snapshot.get('live_binding_count') or len(bindings)} live · {runtime_snapshot.get('tracked_binding_count') or len(bindings)} tracked",
         "",
         "Assistant:",
         f"  name {assistant_name or 'not deployed'}",
@@ -277,6 +462,21 @@ def _render_setup_body(
         "Privacy:",
         f"  {privacy_summary}",
     ]
+    if bindings:
+        lines.extend(["", f"Detected OpenClaw workspaces ({len(bindings)}):"])
+        for item in bindings[:8]:
+            if not isinstance(item, dict):
+                continue
+            flags = []
+            if item.get("tracked_by_mutx"):
+                flags.append("tracked")
+            if item.get("live_detected"):
+                flags.append("live")
+            lines.append(
+                f"  {item.get('assistant_id') or 'n/a'} | {item.get('workspace') or 'n/a'} | {'+'.join(flags) or 'unknown'}"
+            )
+        if len(bindings) > 8:
+            lines.append(f"  … {len(bindings) - 8} more")
     if last_error:
         lines.extend(["", f"Needs attention: {last_error}"])
     if not authenticated:
@@ -338,11 +538,18 @@ def _render_governance_body() -> tuple[str, str]:
 
 
 def _render_control_plane_body(overview, sessions: list[dict]) -> tuple[str, str]:
+    workspace_count = len({str(item.get("agent") or "") for item in sessions if item.get("agent")})
     if overview is None:
-        return (
-            "No Personal Assistant found.",
+        sessions_body = [
+            f"{item.get('agent')} | {item.get('channel')} | {item.get('age')} | {item.get('tokens')}"
+            for item in sessions[:50]
+        ] or ["No sessions found."]
+        health_lines = [
+            "No managed assistant selected.",
+            f"Detected local workspaces: {workspace_count}",
             "Gateway health will appear after the starter assistant is deployed.",
-        )
+        ]
+        return ("\n".join(sessions_body), "\n".join(health_lines))
 
     session_lines = [
         f"{item.get('agent')} | {item.get('channel')} | {item.get('age')} | {item.get('tokens')}"
@@ -352,10 +559,10 @@ def _render_control_plane_body(overview, sessions: list[dict]) -> tuple[str, str
     health_lines = [
         f"Assistant: {overview.name}",
         f"Gateway: {overview.gateway.status}",
-        f"Sessions: {overview.session_count}",
+        f"Sessions: {len(sessions)} visible across {workspace_count or 1} workspaces",
         f"Workspace: {overview.workspace}",
         "",
-        overview.gateway.doctor_summary,
+        overview.gateway.doctor_summary or "Gateway health details unavailable.",
     ]
     return ("\n".join(session_lines), "\n".join(health_lines))
 
@@ -461,8 +668,8 @@ class MutxTUI(App[None]):
     TITLE = "mutx tui"
     CSS = """
     Screen {
-        background: #030307;
-        color: #e2e8f0;
+        background: #02050b;
+        color: #e5edf7;
     }
 
     Footer {
@@ -472,9 +679,9 @@ class MutxTUI(App[None]):
 
     #brand-rail {
         height: auto;
-        padding: 1 2 1 1;
-        background: #050816;
-        border-bottom: solid #162032;
+        padding: 1 2;
+        background: #07111d;
+        border-bottom: solid #16314f;
     }
 
     #brand-art {
@@ -503,9 +710,9 @@ class MutxTUI(App[None]):
     #brand-signal {
         height: auto;
         margin-top: 1;
-        padding: 0 1;
-        background: #091224;
-        color: #22d3ee;
+        padding: 0 1 0 2;
+        background: #0b1727;
+        color: #67e8f9;
         border: round #1d4ed8;
     }
 
@@ -514,12 +721,21 @@ class MutxTUI(App[None]):
         margin-top: 1;
     }
 
+    #brand-actions {
+        height: auto;
+        margin-top: 1;
+    }
+
+    #brand-actions Button {
+        margin-right: 1;
+    }
+
     #status-banner {
         height: 2;
-        padding: 0 1;
-        background: #0a1428;
-        color: #dbeafe;
-        border-bottom: solid #1e2c45;
+        padding: 0 2;
+        background: #0c1b2d;
+        color: #dcecff;
+        border-bottom: solid #1b3657;
     }
 
     #context-footer {
@@ -559,8 +775,8 @@ class MutxTUI(App[None]):
     }
 
     .panel {
-        border: round #1e2c45;
-        background: #0a0a0e;
+        border: round #1c385b;
+        background: #08111b;
     }
 
     .entity-table {
@@ -585,7 +801,7 @@ class MutxTUI(App[None]):
 
     .detail-scroll {
         height: 1fr;
-        padding: 0 1 1 1;
+        padding: 1;
     }
 
     .detail-body {
@@ -669,9 +885,9 @@ class MutxTUI(App[None]):
     }
 
     Button {
-        background: #0b172b;
+        background: #0d1b2f;
         color: #dbeafe;
-        border: round #22314b;
+        border: round #29486c;
     }
 
     Button.-primary {
@@ -686,8 +902,14 @@ class MutxTUI(App[None]):
         border: round #fb7185;
     }
 
+    Button.-warning {
+        background: #3a2508;
+        color: #fde68a;
+        border: round #f59e0b;
+    }
+
     Button:focus {
-        border: round #22d3ee;
+        border: round #67e8f9;
     }
 
     DataTable {
@@ -712,12 +934,14 @@ class MutxTUI(App[None]):
         Binding("d", "deploy_selected_agent", "Deploy Agent"),
         Binding("x", "restart_selected_deployment", "Restart Deployment"),
         Binding("s", "scale_selected_deployment", "Scale Deployment"),
+        Binding("o", "open_hosted_dashboard", "Dashboard"),
         Binding("backspace", "delete_selected_deployment", "Delete Deployment"),
     ]
 
     def __init__(self) -> None:
         super().__init__()
         self.auth_service = AuthService()
+        self.config = getattr(self.auth_service, "config", current_config())
         self.agents_service = AgentsService()
         self.assistant_service = AssistantService()
         self.deployments_service = DeploymentsService()
@@ -743,6 +967,7 @@ class MutxTUI(App[None]):
         self._notice_deadline = 0.0
         self._animation_tick = 0
         self._initial_workspace_selected = False
+        self._operator_profile = "operator unknown"
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="brand-rail"):
@@ -755,6 +980,9 @@ class MutxTUI(App[None]):
                     "setup · assistant · deployments · control plane · governance",
                     id="brand-context",
                 )
+                with Horizontal(id="brand-actions"):
+                    yield Button("Open Dashboard", id="brand-open-dashboard", variant="primary")
+                    yield Button("Refresh Auth", id="brand-refresh-auth")
         yield Static(id="status-banner")
         with TabbedContent(id="workspace"):
             with TabPane("Setup", id="setup-pane"):
@@ -789,6 +1017,9 @@ class MutxTUI(App[None]):
                             with TabPane("Logs"):
                                 with VerticalScroll(classes="detail-scroll"):
                                     yield Static(id="agent-logs-body", classes="detail-body")
+                            with TabPane("OpenClaw"):
+                                with VerticalScroll(classes="detail-scroll"):
+                                    yield Static(id="agent-openclaw-body", classes="detail-body")
             with TabPane("Deployments", id="deployments-pane"):
                 with Horizontal(classes="workspace-split"):
                     yield DataTable(id="deployments-table", classes="panel entity-table")
@@ -888,6 +1119,7 @@ class MutxTUI(App[None]):
         self._refresh_chrome()
 
         if self.auth_service.status().authenticated:
+            self.load_operator_profile()
             self._set_activity("loading setup")
             self.load_setup()
             self._set_activity("loading agents")
@@ -999,10 +1231,10 @@ class MutxTUI(App[None]):
             self._brand_signal_text(status.authenticated)
         )
         self.query_one("#brand-context", Static).update(
-            f"assistant {self._assistant_name or 'not deployed'} · deployments {self._deployment_count} · config {status.config_path}"
+            f"{self._operator_profile} · assistant {self._assistant_name or 'not deployed'} · deployments {self._deployment_count} · config {status.config_path}"
         )
         self.query_one("#context-footer", Static).update(
-            f"{KEY_HINTS} | workspace {self._active_workspace()} | selected agent {_shorten(self.selected_agent_id, 12)} | selected deployment {_shorten(self.selected_deployment_id, 12)}"
+            f"{KEY_HINTS} | dashboard {self._hosted_dashboard_url()} | workspace {self._active_workspace()} | selected agent {_shorten(self.selected_agent_id, 12)} | selected deployment {_shorten(self.selected_deployment_id, 12)}"
         )
         accent = MUTX_ACCENT_FRAMES[self._animation_tick % len(MUTX_ACCENT_FRAMES)]
         self.query_one("#brand-art", Static).styles.color = accent
@@ -1012,9 +1244,12 @@ class MutxTUI(App[None]):
         self._agent_count = 0
         self._deployment_count = 0
         self._assistant_name = None
+        self._operator_profile = "operator unauthenticated"
         self._initial_workspace_selected = False
         self._wizard_state_cache = load_wizard_state("openclaw")
-        self._runtime_snapshot_cache = collect_openclaw_runtime_snapshot().to_payload()
+        self._runtime_snapshot_cache = collect_openclaw_runtime_snapshot(
+            assistant_name=self._assistant_name
+        ).to_payload()
         message = _render_setup_body(
             False,
             self.auth_service.status().api_url,
@@ -1030,6 +1265,9 @@ class MutxTUI(App[None]):
         self.query_one("#agent-detail-body", Static).update(message)
         self.query_one("#agent-logs-body", Static).update(
             "Agent logs require an authenticated session."
+        )
+        self.query_one("#agent-openclaw-body", Static).update(
+            "OpenClaw runtime detail requires an authenticated session."
         )
         self.query_one("#deployment-detail-body", Static).update(message)
         self.query_one("#deployment-events-body", Static).update(
@@ -1048,12 +1286,39 @@ class MutxTUI(App[None]):
             "Gateway health requires an authenticated session."
         )
         self._refresh_setup_actions()
+        self._refresh_action_states()
         self._clear_activity()
 
     def _handle_service_error(self, error: CLIServiceError) -> None:
         self.notify(str(error), severity="error")
         self._set_notice(str(error), ttl=8.0)
         self._clear_activity()
+
+    def _hosted_dashboard_url(self) -> str:
+        return HOSTED_DASHBOARD_URL if self.auth_service.status().authenticated else HOSTED_LOGIN_URL
+
+    def _open_hosted_dashboard(self) -> None:
+        url = self._hosted_dashboard_url()
+        if webbrowser.open(url):
+            self._set_notice(f"Opened {url}")
+            return
+        self.notify(f"Unable to open {url}", severity="error")
+
+    @work(thread=True, exclusive=True, group="auth-profile")
+    def load_operator_profile(self) -> None:
+        try:
+            profile = self.auth_service.whoami()
+        except CLIServiceError as exc:
+            self.call_from_thread(self._set_notice, str(exc), ttl=8.0)
+            return
+
+        self.call_from_thread(
+            setattr,
+            self,
+            "_operator_profile",
+            f"{profile.email} · {profile.plan}",
+        )
+        self.call_from_thread(self._refresh_chrome)
 
     def _render_setup_payload(
         self,
@@ -1079,6 +1344,7 @@ class MutxTUI(App[None]):
             self.query_one("#workspace", TabbedContent).active = "control-pane"
             self._initial_workspace_selected = True
         self._refresh_setup_actions()
+        self._refresh_action_states()
         self._clear_activity()
 
     def _render_agents(self, agents: list[AgentRecord]) -> None:
@@ -1091,6 +1357,7 @@ class MutxTUI(App[None]):
             self.query_one("#agent-detail-body", Static).update("No agents found.")
             self.query_one("#agent-logs-body", Static).update("No logs found.")
             self.query_one("#agents-summary", Static).update("Agents: 0")
+            self._refresh_action_states()
             self._set_notice("Agents refreshed")
             self._clear_activity()
             return
@@ -1111,16 +1378,35 @@ class MutxTUI(App[None]):
         self.query_one("#agents-summary", Static).update(
             f"Agents: {len(agents)} | Selected: {agents[0].name}"
         )
+        self._refresh_action_states()
         self._set_notice("Agents refreshed")
 
-    def _render_agent_payload(self, agent: AgentRecord, logs: list[LogEntry]) -> None:
+    def _render_agent_payload(
+        self,
+        agent: AgentRecord,
+        logs: list[LogEntry],
+        assistant_overview,
+        local_runtime_snapshot: dict[str, object] | None,
+        local_sessions: list[dict[str, object]],
+    ) -> None:
         self.query_one("#agent-detail-body", Static).update(_render_agent_detail(agent))
         self.query_one("#agent-logs-body", Static).update(
             _render_logs(logs, empty="No agent logs found.")
         )
+        self.query_one("#agent-openclaw-body", Static).update(
+            _render_openclaw_runtime_detail(
+                agent=agent,
+                runtime_snapshot=local_runtime_snapshot,
+                assistant_overview=assistant_overview,
+                local_sessions=local_sessions,
+            )
+            if agent.type == "openclaw"
+            else "Selected agent is not using the OpenClaw runtime."
+        )
         self.query_one("#agents-summary", Static).update(
             f"Agent: {agent.name} | Status: {agent.status} | Deployments: {len(agent.deployments)}"
         )
+        self._refresh_action_states()
         self._clear_activity()
 
     def _render_deployments(self, deployments: list[DeploymentRecord]) -> None:
@@ -1137,6 +1423,7 @@ class MutxTUI(App[None]):
                 "No deployment metrics found."
             )
             self.query_one("#deployments-summary", Static).update("Deployments: 0")
+            self._refresh_action_states()
             self._set_notice("Deployments refreshed")
             self._clear_activity()
             return
@@ -1157,6 +1444,7 @@ class MutxTUI(App[None]):
         self.query_one("#deployments-summary", Static).update(
             f"Deployments: {len(deployments)} | Selected: {_shorten(deployments[0].id, 12)}"
         )
+        self._refresh_action_states()
         self._set_notice("Deployments refreshed")
 
     def _render_deployment_payload(
@@ -1178,12 +1466,16 @@ class MutxTUI(App[None]):
         self.query_one("#deployments-summary", Static).update(
             f"Deployment: {_shorten(deployment.id, 12)} | Status: {deployment.status} | Replicas: {deployment.replicas}"
         )
+        self._refresh_action_states()
         self._clear_activity()
 
     def _render_control_plane(self, overview, sessions: list[dict]) -> None:
         table = self.query_one("#sessions-table", DataTable)
         table.clear(columns=False)
         self._session_cache = sessions
+        workspace_count = len(
+            {str(item.get("agent") or "") for item in sessions if str(item.get("agent") or "").strip()}
+        )
 
         for session in sessions[:100]:
             table.add_row(
@@ -1196,7 +1488,7 @@ class MutxTUI(App[None]):
 
         sessions_body, health_body = _render_control_plane_body(overview, sessions)
         self.query_one("#control-summary", Static).update(
-            f"Control plane | sessions: {len(sessions)} | gateway: {overview.gateway.status if overview else 'n/a'}"
+            f"Control plane | sessions: {len(sessions)} | workspaces: {workspace_count} | gateway: {overview.gateway.status if overview else 'n/a'}"
         )
         self.query_one("#control-sessions-body", Static).update(sessions_body)
         self.query_one("#control-health-body", Static).update(health_body)
@@ -1255,6 +1547,28 @@ class MutxTUI(App[None]):
         deploy_button.display = not has_openclaw and not assistant_exists
         deploy_button.disabled = has_openclaw or assistant_exists
         deploy_button.variant = "primary"
+
+    def _refresh_action_states(self) -> None:
+        authenticated = self.auth_service.status().authenticated
+        has_agent = bool(self.selected_agent_id)
+        has_deployment = bool(self.selected_deployment_id)
+
+        self.query_one("#agents-deploy", Button).disabled = not (authenticated and has_agent)
+        self.query_one("#agents-enable-governance", Button).disabled = not (
+            authenticated and has_agent
+        )
+        self.query_one("#agents-disable-governance", Button).disabled = not (
+            authenticated and has_agent
+        )
+        self.query_one("#deployments-restart", Button).disabled = not (
+            authenticated and has_deployment
+        )
+        self.query_one("#deployments-scale", Button).disabled = not (
+            authenticated and has_deployment
+        )
+        self.query_one("#deployments-delete", Button).disabled = not (
+            authenticated and has_deployment
+        )
 
     def _run_external_command(self, command: str | list[str], *, label: str) -> None:
         self._set_notice(label, ttl=12.0)
@@ -1408,18 +1722,48 @@ class MutxTUI(App[None]):
         try:
             agent = self.agents_service.get_agent(agent_id)
             logs = self.agents_service.get_logs(agent_id, limit=50)
+            assistant_overview = None
+            local_runtime_snapshot: dict[str, object] | None = None
+            local_sessions: list[dict[str, object]] = []
+
+            if agent.type == "openclaw":
+                assistant_id = None
+                if isinstance(agent.config, dict):
+                    assistant_id = str(agent.config.get("assistant_id") or "").strip() or None
+                try:
+                    assistant_overview = self.assistant_service.overview(agent_id=agent_id)
+                except CLIServiceError:
+                    assistant_overview = None
+                try:
+                    local_runtime_snapshot = persist_openclaw_runtime_snapshot().to_payload()
+                except Exception:
+                    local_runtime_snapshot = None
+                if assistant_id:
+                    try:
+                        local_sessions = list_local_sessions(assistant_id=assistant_id)
+                    except Exception:
+                        local_sessions = []
         except CLIServiceError as exc:
             self.call_from_thread(self._handle_service_error, exc)
             return
 
-        self.call_from_thread(self._render_agent_payload, agent, logs)
+        self.call_from_thread(
+            self._render_agent_payload,
+            agent,
+            logs,
+            assistant_overview,
+            local_runtime_snapshot,
+            local_sessions,
+        )
 
     @work(thread=True, exclusive=True, group="setup")
     def load_setup(self) -> None:
         try:
             overview = self.assistant_service.overview()
             onboarding = load_wizard_state("openclaw")
-            runtime_snapshot = collect_openclaw_runtime_snapshot().to_payload()
+            runtime_snapshot = persist_openclaw_runtime_snapshot(
+                assistant_name=overview.name if overview else str(onboarding.get("assistant_name") or "") or None
+            ).to_payload()
         except CLIServiceError as exc:
             self.call_from_thread(self._handle_service_error, exc)
             return
@@ -1456,9 +1800,7 @@ class MutxTUI(App[None]):
     def load_control_plane(self) -> None:
         try:
             overview = self.assistant_service.overview()
-            sessions = self.assistant_service.list_sessions(
-                agent_id=overview.agent_id if overview else None
-            )
+            sessions = self.assistant_service.list_sessions()
         except CLIServiceError as exc:
             self.call_from_thread(self._handle_service_error, exc)
             return
@@ -1554,6 +1896,7 @@ class MutxTUI(App[None]):
                     d.agent_id or "-",
                     d.tool_id or "-",
                     d.reason or "-",
+                    key=d.defer_token or None,
                 )
             self.query_one("#governance-approve", Button).disabled = False
             self.query_one("#governance-deny", Button).disabled = False
@@ -1601,9 +1944,11 @@ class MutxTUI(App[None]):
             detail_lines.append(health.doctor_summary)
 
         self.query_one("#governance-body", Static).update("\n".join(detail_lines))
+        self._clear_activity()
 
     def _update_governance_error(self, error: str) -> None:
         self.query_one("#governance-summary", Static).update(f"Error: {error}")
+        self._clear_activity()
 
     @work(thread=True, exclusive=True)
     def load_observability(self) -> None:
@@ -1650,7 +1995,14 @@ class MutxTUI(App[None]):
                 started = started[-19:-10] if started.endswith("Z") else started[:10]
             duration = run.get("duration_ms", 0) or 0
             duration_str = f"{duration / 1000:.1f}s" if duration else "-"
-            runs_table.add_row(run_id, agent_id, status, started, duration_str)
+            runs_table.add_row(
+                run_id,
+                agent_id,
+                status,
+                started,
+                duration_str,
+                key=run.get("id", "-"),
+            )
 
         detail_lines = [f"Total runs: {len(runs)}"]
         if runs:
@@ -1664,9 +2016,12 @@ class MutxTUI(App[None]):
                 cost = recent["cost"]
                 detail_lines.append(f"  Cost: ${cost.get('cost_usd', 0):.4f}")
         self.query_one("#observability-body", Static).update("\n".join(detail_lines))
+        self._clear_activity()
 
     def _update_observability_error(self, error: str) -> None:
         self.query_one("#observability-summary", Static).update(f"Error: {error}")
+        self.query_one("#observability-body", Static).update(f"Error loading observability: {error}")
+        self._clear_activity()
 
     @work(thread=True, exclusive=True, group="governance-action")
     def _governance_approve_selected(self) -> None:
@@ -1855,33 +2210,43 @@ class MutxTUI(App[None]):
 
     @on(DataTable.RowSelected, "#agents-table")
     def on_agent_row_selected(self, event: DataTable.RowSelected) -> None:
-        agent_id = str(event.row_key.value)
+        agent_id = _safe_row_key(event)
+        if not agent_id:
+            return
         self.selected_agent_id = agent_id
+        self._refresh_action_states()
         self._set_activity(f"loading {_shorten(agent_id, 12)}")
         self.load_agent_detail(agent_id)
 
     @on(DataTable.RowSelected, "#deployments-table")
     def on_deployment_row_selected(self, event: DataTable.RowSelected) -> None:
-        deployment_id = str(event.row_key.value)
+        deployment_id = _safe_row_key(event)
+        if not deployment_id:
+            return
         self.selected_deployment_id = deployment_id
+        self._refresh_action_states()
         self._set_activity(f"loading {_shorten(deployment_id, 12)}")
         self.load_deployment_detail(deployment_id)
 
     @on(DataTable.RowSelected, "#governance-pending-table")
     def on_governance_row_selected(self, event: DataTable.RowSelected) -> None:
-        token = str(event.row_key.value)
+        token = _safe_row_key(event)
+        if not token:
+            return
         self._governance_selected_token = token
         self.query_one("#governance-approve", Button).disabled = False
         self.query_one("#governance-deny", Button).disabled = False
 
     @on(DataTable.RowSelected, "#observability-runs-table")
     def on_observability_row_selected(self, event: DataTable.RowSelected) -> None:
-        run_id = str(event.row_key.value)
+        run_id = _safe_row_key(event)
+        if not run_id:
+            return
         self._set_activity(f"loading run {run_id[:12]}...")
-        self.load_run_detail(run_id)
+        self.load_run_detail_worker(run_id)
 
-    def load_run_detail(self, run_id: str) -> None:
-        """Load detailed view of a specific run."""
+    @work(thread=True, exclusive=True, group="observability-detail")
+    def load_run_detail_worker(self, run_id: str) -> None:
         try:
             from cli.services import ObservabilityService
 
@@ -1920,18 +2285,24 @@ class MutxTUI(App[None]):
             lines.append(f"  Cost: ${cost.get('cost_usd', 0):.4f}")
 
         self.query_one("#observability-body", Static).update("\n".join(lines))
+        self._clear_activity()
 
     def _update_run_detail_error(self, error: str) -> None:
         self.query_one("#observability-body", Static).update(f"Error loading run: {error}")
+        self._clear_activity()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         button_id = event.button.id
-        if button_id == "setup-refresh":
+        if button_id == "brand-open-dashboard":
+            self._open_hosted_dashboard()
+        elif button_id == "brand-refresh-auth":
+            self.load_operator_profile()
+        elif button_id == "setup-refresh":
             self.load_setup()
         elif button_id == "setup-import":
             self._run_setup_wizard(requested_action="import")
         elif button_id == "setup-configure-openclaw":
-            self._open_openclaw_surface("tui")
+            self._open_openclaw_surface("configure")
         elif button_id == "setup-openclaw-tui":
             self._open_openclaw_surface("tui")
         elif button_id == "setup-deploy":
@@ -1968,6 +2339,9 @@ class MutxTUI(App[None]):
             self._governance_deny_selected()
         elif button_id == "observability-refresh":
             self.load_observability()
+
+    def action_open_hosted_dashboard(self) -> None:
+        self._open_hosted_dashboard()
 
     def action_refresh_current(self) -> None:
         active = self.query_one("#workspace", TabbedContent).active

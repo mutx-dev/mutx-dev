@@ -814,6 +814,159 @@ def _binding_payload(
     }
 
 
+def _normalize_binding_record(
+    payload: dict[str, Any],
+    *,
+    install_method: str,
+    gateway_port: int | None,
+    observed_at: str,
+) -> dict[str, Any] | None:
+    assistant_id = str(payload.get("assistant_id") or payload.get("agent_id") or "").strip()
+    if not assistant_id:
+        return None
+
+    workspace = str(payload.get("workspace") or _default_workspace(assistant_id)).strip()
+    agent_dir = str(payload.get("agent_dir") or payload.get("agentDir") or "").strip() or None
+    model = str(payload.get("model") or "").strip() or None
+    assistant_name = str(payload.get("assistant_name") or "").strip() or None
+
+    normalized = dict(payload)
+    normalized.update(
+        {
+            "provider": OPENCLAW_PROVIDER_ID,
+            "assistant_id": assistant_id,
+            "assistant_name": assistant_name,
+            "workspace": workspace,
+            "agent_dir": agent_dir,
+            "model": model,
+            "install_method": str(payload.get("install_method") or install_method),
+            "gateway_port": payload.get("gateway_port", gateway_port),
+            "managed_by_mutx": bool(payload.get("managed_by_mutx", True)),
+            "created_by_last_run": bool(payload.get("created_by_last_run", False)),
+            "tracked_by_mutx": bool(payload.get("tracked_by_mutx", True)),
+            "live_detected": bool(payload.get("live_detected", False)),
+            "source": str(payload.get("source") or "mutx-registry"),
+            "updated_at": str(payload.get("updated_at") or observed_at),
+        }
+    )
+    return normalized
+
+
+def _binding_payload_from_live_agent(
+    agent: dict[str, Any],
+    *,
+    install_method: str,
+    gateway_port: int | None,
+    observed_at: str,
+) -> dict[str, Any] | None:
+    assistant_id = str(agent.get("id") or agent.get("agentId") or "").strip()
+    if not assistant_id:
+        return None
+
+    workspace = str(agent.get("workspace") or _default_workspace(assistant_id)).strip()
+    agent_dir = str(agent.get("agentDir") or agent.get("agent_dir") or "").strip() or None
+    model = str(agent.get("model") or "").strip() or None
+    assistant_name = str(agent.get("name") or agent.get("label") or "").strip() or None
+
+    return {
+        "provider": OPENCLAW_PROVIDER_ID,
+        "assistant_id": assistant_id,
+        "assistant_name": assistant_name,
+        "workspace": workspace,
+        "agent_dir": agent_dir,
+        "model": model,
+        "install_method": install_method,
+        "gateway_port": gateway_port,
+        "managed_by_mutx": False,
+        "created_by_last_run": False,
+        "tracked_by_mutx": False,
+        "live_detected": True,
+        "source": "openclaw-live",
+        "updated_at": observed_at,
+    }
+
+
+def _merge_runtime_bindings(
+    *,
+    tracked_bindings: list[dict[str, Any]],
+    live_agents: list[dict[str, Any]],
+    current_binding: dict[str, Any] | None,
+    assistant_name: str | None,
+    install_method: str,
+    gateway_port: int | None,
+    observed_at: str,
+) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
+    merged: dict[str, dict[str, Any]] = {}
+
+    for payload in tracked_bindings:
+        normalized = _normalize_binding_record(
+            payload,
+            install_method=install_method,
+            gateway_port=gateway_port,
+            observed_at=observed_at,
+        )
+        if normalized is not None:
+            merged[normalized["assistant_id"]] = normalized
+
+    for agent in live_agents:
+        live_payload = _binding_payload_from_live_agent(
+            agent,
+            install_method=install_method,
+            gateway_port=gateway_port,
+            observed_at=observed_at,
+        )
+        if live_payload is None:
+            continue
+
+        assistant_id = str(live_payload["assistant_id"])
+        existing = merged.get(assistant_id)
+        if existing is None:
+            merged[assistant_id] = live_payload
+            continue
+
+        merged[assistant_id] = {
+            **existing,
+            "workspace": live_payload["workspace"],
+            "agent_dir": live_payload["agent_dir"],
+            "model": live_payload["model"],
+            "gateway_port": live_payload["gateway_port"],
+            "live_detected": True,
+            "tracked_by_mutx": True,
+            "source": "mutx-registry+openclaw-live",
+            "updated_at": observed_at,
+        }
+
+    if current_binding is not None:
+        normalized_current = _normalize_binding_record(
+            current_binding,
+            install_method=install_method,
+            gateway_port=gateway_port,
+            observed_at=observed_at,
+        )
+        if normalized_current is not None:
+            existing = merged.get(normalized_current["assistant_id"])
+            if existing is not None:
+                normalized_current["live_detected"] = bool(existing.get("live_detected"))
+                normalized_current["source"] = (
+                    "mutx-registry+openclaw-live"
+                    if existing.get("live_detected")
+                    else "mutx-registry"
+                )
+            merged[normalized_current["assistant_id"]] = normalized_current
+
+    resolved_current_binding = None
+    if current_binding is not None:
+        current_assistant_id = str(current_binding.get("assistant_id") or "").strip()
+        if current_assistant_id:
+            resolved_current_binding = merged.get(current_assistant_id)
+    elif assistant_name:
+        requested_assistant_id = slugify_assistant_id(assistant_name)
+        resolved_current_binding = merged.get(requested_assistant_id)
+
+    bindings = sorted(merged.values(), key=lambda item: str(item.get("assistant_id") or ""))
+    return bindings, resolved_current_binding
+
+
 def update_binding_governance(
     binding: OpenClawAgentBinding,
     *,
@@ -892,17 +1045,33 @@ def collect_openclaw_runtime_snapshot(
         "home_source": home_source,
     }
 
-    bindings = list_bindings(OPENCLAW_PROVIDER_ID)
-    if binding is not None:
-        current = _binding_payload(binding, assistant_name=assistant_name)
-        bindings = [
-            item for item in bindings if str(item.get("assistant_id") or "") != binding.agent_id
-        ]
-        bindings.append(current)
-        bindings.sort(key=lambda item: str(item.get("assistant_id") or ""))
-    current_binding = None
-    if binding is not None:
-        current_binding = _binding_payload(binding, assistant_name=assistant_name)
+    tracked_bindings = list_bindings(OPENCLAW_PROVIDER_ID)
+    try:
+        live_agents = list_openclaw_agents() if binary_path else []
+    except CLIServiceError:
+        live_agents = []
+    explicit_current_binding = (
+        _binding_payload(binding, assistant_name=assistant_name) if binding is not None else None
+    )
+    bindings, current_binding = _merge_runtime_bindings(
+        tracked_bindings=tracked_bindings,
+        live_agents=live_agents,
+        current_binding=explicit_current_binding,
+        assistant_name=assistant_name,
+        install_method=resolved_install_method,
+        gateway_port=health.gateway_port,
+        observed_at=observed_at,
+    )
+
+    tracked_binding_ids = {
+        str(item.get("assistant_id") or item.get("agent_id") or "").strip()
+        for item in tracked_bindings
+        if str(item.get("assistant_id") or item.get("agent_id") or "").strip()
+    }
+    if explicit_current_binding is not None:
+        current_tracked_id = str(explicit_current_binding.get("assistant_id") or "").strip()
+        if current_tracked_id:
+            tracked_binding_ids.add(current_tracked_id)
 
     payload = {
         "provider": OPENCLAW_PROVIDER_ID,
@@ -936,6 +1105,8 @@ def collect_openclaw_runtime_snapshot(
         "last_synced_at": manifest.get("last_synced_at"),
         "bindings": bindings,
         "binding_count": len(bindings),
+        "tracked_binding_count": len(tracked_binding_ids),
+        "live_binding_count": len(live_agents),
         "current_binding": current_binding,
         "observed_source": "local",
     }
@@ -992,6 +1163,8 @@ def persist_openclaw_runtime_snapshot(
         "last_seen_at": payload["last_seen_at"],
         "last_synced_at": synced_at or payload.get("last_synced_at"),
         "binding_count": payload["binding_count"],
+        "tracked_binding_count": payload.get("tracked_binding_count", payload["binding_count"]),
+        "live_binding_count": payload.get("live_binding_count", payload["binding_count"]),
         "current_binding": payload["current_binding"],
     }
     save_manifest(OPENCLAW_PROVIDER_ID, manifest)

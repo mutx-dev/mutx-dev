@@ -44,15 +44,33 @@ class APIService:
         path: str,
         *,
         require_auth: bool = True,
+        allow_refresh: bool = True,
         **kwargs: Any,
     ):
         if require_auth:
             self.require_authentication()
 
+        response = self._perform_request(method, path, **kwargs)
+
+        if (
+            response.status_code == 401
+            and require_auth
+            and allow_refresh
+            and path != "/v1/auth/refresh"
+            and self._refresh_auth_tokens()
+        ):
+            response = self._perform_request(method, path, **kwargs)
+
+        if response.status_code == 401:
+            raise AuthenticationExpiredError("Authentication expired. Run 'mutx login' again.")
+
+        return response
+
+    def _perform_request(self, method: str, path: str, **kwargs: Any):
         client = self._client_factory(self.config)
         try:
             try:
-                response = getattr(client, method.lower())(path, **kwargs)
+                return getattr(client, method.lower())(path, **kwargs)
             except httpx.HTTPError as exc:
                 raise APIRequestError(self._unreachable_api_message()) from exc
         finally:
@@ -60,10 +78,29 @@ class APIService:
             if callable(close):
                 close()
 
-        if response.status_code == 401:
-            raise AuthenticationExpiredError("Authentication expired. Run 'mutx login' again.")
+    def _refresh_auth_tokens(self) -> bool:
+        refresh_token = getattr(self.config, "refresh_token", None)
+        if not refresh_token:
+            return False
 
-        return response
+        response = self._perform_request(
+            "post",
+            "/v1/auth/refresh",
+            json={"refresh_token": refresh_token},
+        )
+        if response.status_code != 200:
+            return False
+
+        payload = response.json()
+        access_token = payload.get("access_token")
+        next_refresh_token = payload.get("refresh_token")
+
+        if hasattr(self.config, "access_token"):
+            self.config.access_token = access_token
+        else:
+            self.config.api_key = access_token
+        self.config.refresh_token = next_refresh_token
+        return True
 
     def _expect_status(
         self,

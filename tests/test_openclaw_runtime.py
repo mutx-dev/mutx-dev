@@ -197,6 +197,85 @@ def test_persist_openclaw_runtime_snapshot_tracks_manifest_bindings_and_pointers
     assert (mutx_home / "providers" / "openclaw" / "pointers" / "home").exists()
 
 
+def test_persist_openclaw_runtime_snapshot_merges_live_openclaw_agents(
+    monkeypatch, tmp_path: Path
+) -> None:
+    mutx_home = tmp_path / ".mutx"
+    openclaw_home = tmp_path / ".openclaw"
+    openclaw_home.mkdir()
+    config_path = openclaw_home / "openclaw.json"
+    config_path.write_text(json.dumps({"gateway": {"port": 18789}}), encoding="utf-8")
+    binding = OpenClawAgentBinding(
+        agent_id="personal-assistant",
+        workspace=str(openclaw_home / "workspace-personal-assistant"),
+        agent_dir=str(openclaw_home / "agents" / "personal-assistant" / "agent"),
+        model="openai/gpt-5",
+        install_method="npm",
+        gateway_port=18789,
+        created=False,
+    )
+
+    monkeypatch.setenv("MUTX_HOME", str(mutx_home))
+    monkeypatch.setenv("OPENCLAW_HOME", str(openclaw_home))
+    monkeypatch.setattr("cli.openclaw_runtime.find_openclaw_bin", lambda: "/usr/local/bin/openclaw")
+    monkeypatch.setattr("cli.openclaw_runtime.detect_openclaw_config_path", lambda: config_path)
+    monkeypatch.setattr("cli.openclaw_runtime.detect_openclaw_state_dir", lambda: openclaw_home)
+    monkeypatch.setattr("cli.openclaw_runtime.detect_gateway_port", lambda: 18789)
+    monkeypatch.setattr("cli.openclaw_runtime.detect_openclaw_version", lambda: "openclaw 1.2.3")
+    monkeypatch.setattr(
+        "cli.openclaw_runtime.get_gateway_health",
+        lambda: OpenClawGatewayHealth(
+            status="healthy",
+            cli_available=True,
+            installed=True,
+            onboarded=True,
+            gateway_configured=True,
+            gateway_reachable=True,
+            gateway_port=18789,
+            gateway_url="http://127.0.0.1:18789",
+            credential_detected=True,
+            config_path=str(config_path),
+            state_dir=str(openclaw_home),
+            doctor_summary="Gateway is reachable and ready for assistant operations.",
+        ),
+    )
+    monkeypatch.setattr(
+        "cli.openclaw_runtime.list_openclaw_agents",
+        lambda: [
+            {
+                "id": "personal-assistant",
+                "workspace": str(openclaw_home / "workspace-personal-assistant"),
+                "agentDir": str(openclaw_home / "agents" / "personal-assistant" / "agent"),
+                "model": "openai/gpt-5",
+            },
+            {
+                "id": "x",
+                "workspace": str(openclaw_home / "workspace-x"),
+                "agentDir": str(openclaw_home / "agents" / "x" / "agent"),
+                "model": "openai/gpt-5-mini",
+            },
+        ],
+    )
+
+    snapshot = persist_openclaw_runtime_snapshot(
+        binding=binding,
+        assistant_name="Personal Assistant",
+        install_method="npm",
+    ).to_payload()
+
+    assert snapshot["binding_count"] == 2
+    assert snapshot["tracked_binding_count"] == 1
+    assert snapshot["live_binding_count"] == 2
+    assert snapshot["current_binding"]["assistant_id"] == "personal-assistant"
+
+    bindings_by_id = {item["assistant_id"]: item for item in snapshot["bindings"]}
+    assert bindings_by_id["personal-assistant"]["tracked_by_mutx"] is True
+    assert bindings_by_id["personal-assistant"]["live_detected"] is True
+    assert bindings_by_id["x"]["tracked_by_mutx"] is False
+    assert bindings_by_id["x"]["live_detected"] is True
+    assert bindings_by_id["x"]["workspace"].endswith("workspace-x")
+
+
 def test_wizard_state_defaults_and_reset(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setenv("MUTX_HOME", str(tmp_path / ".mutx"))
 

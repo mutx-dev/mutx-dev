@@ -24,11 +24,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_agent, get_current_user
-from src.api.models import Agent, AgentLog, AgentMetric, AgentStatus, AgentVersion, Command, User
+from src.api.models import (
+    Agent,
+    AgentLog,
+    AgentMetric,
+    AgentStatus,
+    AgentVersion,
+    Command,
+    Deployment,
+    DeploymentEvent as DeploymentEventModel,
+    User,
+)
 from src.api.models.schemas import AgentResponse
 from src.api.services.user_service import hash_api_key
-from src.api.services.webhook_service import trigger_webhook_event
-from src.api.time_utils import as_utc
+from src.api.services.webhook_service import trigger_deployment_event, trigger_webhook_event
+from src.api.time_utils import as_utc, as_utc_naive
 
 logger = logging.getLogger(__name__)
 
@@ -131,6 +141,41 @@ class AgentRollbackRequest(BaseModel):
 # --- Routes ---
 
 
+async def _promote_latest_deployment_from_heartbeat(
+    *,
+    db: AsyncSession,
+    agent: Agent,
+    now: datetime,
+    new_status: str,
+) -> tuple[uuid.UUID | None, str | None]:
+    if new_status != AgentStatus.RUNNING.value:
+        return None, None
+
+    result = await db.execute(
+        select(Deployment)
+        .where(Deployment.agent_id == agent.id)
+        .order_by(Deployment.created_at.desc())
+        .limit(1)
+    )
+    deployment = result.scalar_one_or_none()
+    if deployment is None or deployment.status != "deploying":
+        return None, None
+
+    deployment.status = "running"
+    deployment.started_at = deployment.started_at or as_utc_naive(now)
+    deployment.ended_at = None
+    deployment.error_message = None
+    db.add(
+        DeploymentEventModel(
+            deployment_id=deployment.id,
+            event_type="heartbeat_running",
+            status="running",
+            node_id=deployment.node_id,
+        )
+    )
+    return deployment.id, "heartbeat_running"
+
+
 @router.post("/register", response_model=AgentRegisterResponse)
 async def register_agent(
     request: AgentRegisterRequest,
@@ -189,6 +234,12 @@ async def heartbeat(
     new_status = request.status.value
     agent.status = new_status
     agent.last_heartbeat = as_utc(now)
+    promoted_deployment_id, deployment_event_type = await _promote_latest_deployment_from_heartbeat(
+        db=db,
+        agent=agent,
+        now=now,
+        new_status=new_status,
+    )
 
     await db.commit()
 
@@ -233,6 +284,25 @@ async def heartbeat(
         except Exception:
             logger.exception(
                 "Failed to emit agent.status webhook", extra={"agent_id": str(agent.id)}
+            )
+
+    if promoted_deployment_id and deployment_event_type:
+        try:
+            await trigger_deployment_event(
+                db,
+                promoted_deployment_id,
+                agent.id,
+                event_type=deployment_event_type,
+                status="running",
+            )
+        except Exception:
+            logger.exception(
+                "Failed to emit deployment.event webhook",
+                extra={
+                    "agent_id": str(agent.id),
+                    "deployment_id": str(promoted_deployment_id),
+                    "event_type": deployment_event_type,
+                },
             )
 
     return {
