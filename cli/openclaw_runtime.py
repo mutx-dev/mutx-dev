@@ -835,6 +835,7 @@ def update_binding_governance(
     )
     save_binding(
         OPENCLAW_PROVIDER_ID,
+        updated.agent_id,
         _binding_payload(updated, assistant_name=assistant_name),
     )
     return updated

@@ -18,6 +18,7 @@ ONBOARDING_STEPS: tuple[dict[str, str], ...] = (
     {"id": "onboard", "title": "Onboard gateway"},
     {"id": "track", "title": "Track local runtime"},
     {"id": "bind", "title": "Bind assistant"},
+    {"id": "governance", "title": "Configure governance"},
     {"id": "deploy", "title": "Deploy starter assistant"},
     {"id": "verify", "title": "Verify local health"},
 )

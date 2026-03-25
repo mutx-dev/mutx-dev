@@ -61,11 +61,29 @@ def _handle_unauthenticated(ctx: click.Context):
     selection = click.prompt("Select a lane", type=click.IntRange(1, 3), default=1)
 
     if selection == 1:
-        click.echo("Launching hosted setup — create an account or sign in...")
-        ctx.invoke(_get_setup_hosted_command(), register=True)
+        _handle_hosted_account_flow(ctx)
     elif selection == 2:
         click.echo("Launching local setup...")
         ctx.invoke(_get_setup_local_command())
+    else:
+        click.echo("Run 'mutx onboard' when ready to continue.")
+
+
+def _handle_hosted_account_flow(ctx: click.Context) -> None:
+    click.echo("")
+    click.echo("  1.  Create a new MUTX account  (recommended)")
+    click.echo("  2.  Sign in to an existing account")
+    click.echo("  3.  Back")
+    click.echo("")
+
+    selection = click.prompt("Select a hosted action", type=click.IntRange(1, 3), default=1)
+
+    if selection == 1:
+        click.echo("Launching hosted setup — create a new account...")
+        ctx.invoke(_get_setup_hosted_command(), register=True)
+    elif selection == 2:
+        click.echo("Launching hosted setup — sign in to an existing account...")
+        ctx.invoke(_get_setup_hosted_command(), register=False)
     else:
         click.echo("Run 'mutx onboard' when ready to continue.")
 

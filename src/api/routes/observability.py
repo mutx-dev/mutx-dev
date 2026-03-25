@@ -152,6 +152,10 @@ def _serialize_eval(eval_result: Optional[MutxEvalResult]) -> Optional[MutxEvalS
 
 
 def _serialize_run(run: MutxRun, include_steps: bool = False) -> MutxRunResponse:
+    loaded_steps = run.__dict__.get("steps")
+    loaded_cost = run.__dict__.get("cost")
+    loaded_provenance = run.__dict__.get("provenance")
+    loaded_eval = run.__dict__.get("eval_result")
     response = MutxRunResponse(
         id=run.id,
         agent_id=run.agent_id,
@@ -168,11 +172,11 @@ def _serialize_run(run: MutxRun, include_steps: bool = False) -> MutxRunResponse
         started_at=run.started_at,
         ended_at=run.ended_at,
         duration_ms=run.duration_ms,
-        step_count=len(run.steps) if hasattr(run, "steps") else 0,
+        step_count=len(loaded_steps) if loaded_steps is not None else 0,
         tools_available=_decode_list(run.tools_available),
-        cost=_serialize_cost(run.cost),
-        provenance=_serialize_provenance(run.provenance),
-        eval=_serialize_eval(run.eval_result),
+        cost=_serialize_cost(loaded_cost),
+        provenance=_serialize_provenance(loaded_provenance),
+        eval=_serialize_eval(loaded_eval),
         error=run.error,
         git_branch=run.git_branch,
         git_commit=run.git_commit,
@@ -187,6 +191,7 @@ def _serialize_run(run: MutxRun, include_steps: bool = False) -> MutxRunResponse
 async def _get_user_run(run_id: str, current_user: User, db: AsyncSession) -> MutxRun:
     result = await db.execute(
         select(MutxRun)
+        .execution_options(populate_existing=True)
         .options(
             selectinload(MutxRun.steps),
             selectinload(MutxRun.cost),
@@ -200,6 +205,7 @@ async def _get_user_run(run_id: str, current_user: User, db: AsyncSession) -> Mu
         raise HTTPException(status_code=404, detail="Run not found")
     if run.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to access this run")
+    await db.refresh(run, attribute_names=["steps", "cost", "provenance", "eval_result"])
     return run
 
 
@@ -279,7 +285,7 @@ async def create_run(
         git_commit=request.git_commit,
         workspace_id=request.workspace_id,
         tags=_encode_list(request.tags),
-        metadata=_encode_json(request.run_metadata),
+        run_metadata=_encode_json(request.run_metadata),
         error=request.error,
     )
 
@@ -312,7 +318,7 @@ async def create_run(
                 duration_ms=step.duration_ms,
                 tokens_used=step.tokens_used,
                 sequence=idx,
-                metadata=_encode_json(step.step_metadata),
+                step_metadata=_encode_json(step.step_metadata),
             )
         )
 
@@ -429,7 +435,7 @@ async def add_steps(
             duration_ms=step.duration_ms,
             tokens_used=step.tokens_used,
             sequence=current_max_seq + 1 + idx,
-            metadata=_encode_json(step.step_metadata),
+            step_metadata=_encode_json(step.step_metadata),
         )
         db.add(new_step)
         new_steps.append(new_step)
@@ -546,7 +552,27 @@ async def update_run_status(
     if "error" in status_update:
         run.error = status_update["error"]
 
-    await db.commit()
-    await db.refresh(run)
+    if any(key in status_update for key in ("input_tokens", "output_tokens", "total_tokens", "cost_usd")):
+        if run.cost is None:
+            run.cost = MutxCost(
+                input_tokens=0,
+                output_tokens=0,
+                total_tokens=0,
+                cost_usd=0.0,
+                model=run.model,
+            )
+            db.add(run.cost)
+        if "input_tokens" in status_update:
+            run.cost.input_tokens = status_update["input_tokens"]
+        if "output_tokens" in status_update:
+            run.cost.output_tokens = status_update["output_tokens"]
+        if "total_tokens" in status_update:
+            run.cost.total_tokens = status_update["total_tokens"]
+        else:
+            run.cost.total_tokens = (run.cost.input_tokens or 0) + (run.cost.output_tokens or 0)
+        if "cost_usd" in status_update:
+            run.cost.cost_usd = status_update["cost_usd"]
 
-    return _serialize_run(run)
+    await db.commit()
+    persisted_run = await _get_user_run(run_id, current_user, db)
+    return _serialize_run(persisted_run)

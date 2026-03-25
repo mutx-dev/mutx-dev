@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import threading
 import time
 
 from textual import on, work
@@ -698,6 +699,11 @@ class MutxTUI(App[None]):
         border: round #22d3ee;
     }
     """
+
+    def _invoke_ui(self, callback, *args, **kwargs):
+        if getattr(self, "_thread_id", None) == threading.get_ident():
+            return callback(*args, **kwargs)
+        return self.call_from_thread(callback, *args, **kwargs)
     BINDINGS = [
         Binding("q", "quit", "Quit"),
         Binding("tab", "focus_next", "Next"),
@@ -1489,7 +1495,7 @@ class MutxTUI(App[None]):
         if aarm_compliance:
             overall = "✓" if aarm_compliance.get("overall_satisfied") else "✗"
             summary += f" | AARM: {overall}"
-        self.call_from_thread(
+        self._invoke_ui(
             self._update_governance,
             summary,
             defers,

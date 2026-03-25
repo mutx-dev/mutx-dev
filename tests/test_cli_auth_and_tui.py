@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from typing import Any
 
 import httpx
+import click
 import pytest
 from click.testing import CliRunner
 
@@ -126,9 +127,21 @@ def test_tui_command_dispatches_to_launcher(monkeypatch) -> None:
     assert launched["value"] is True
 
 
-def test_tui_renders_logged_out_state() -> None:
+def test_tui_renders_logged_out_state(monkeypatch) -> None:
     textual = pytest.importorskip("textual")
     assert textual is not None
+
+    import cli.tui.app as tui_app
+
+    class DummyAuthService:
+        def status(self):
+            return SimpleNamespace(
+                authenticated=False,
+                api_url="http://localhost:8000",
+                config_path=Path("/tmp/mutx-config.json"),
+            )
+
+    monkeypatch.setattr(tui_app, "AuthService", DummyAuthService)
 
     from cli.tui.app import MUTX_ASCII_LOGO, MutxTUI
 
@@ -136,20 +149,81 @@ def test_tui_renders_logged_out_state() -> None:
         app = MutxTUI()
         async with app.run_test() as pilot:
             await pilot.pause()
-            banner = app.query_one("#status-banner").renderable
-            detail = app.query_one("#agent-detail-body").renderable
-            logo = app.query_one("#brand-art").renderable
-            signal = app.query_one("#brand-signal").renderable
+            banner_widget = app.query_one("#status-banner")
+            detail_widget = app.query_one("#agent-detail-body")
+            logo_widget = app.query_one("#brand-art")
+            signal_widget = app.query_one("#brand-signal")
+            banner = getattr(banner_widget, "renderable", banner_widget.render())
+            detail = getattr(detail_widget, "renderable", detail_widget.render())
+            logo = getattr(logo_widget, "renderable", logo_widget.render())
+            signal = getattr(signal_widget, "renderable", signal_widget.render())
             return str(banner), str(detail), str(logo), str(signal)
 
     import asyncio
 
     banner, detail, logo, signal = asyncio.run(run())
     assert "Auth: local only" in banner
-    assert "No stored CLI auth." in detail
+    assert "login required" in detail
+    assert "mutx setup hosted" in detail
     assert logo == MUTX_ASCII_LOGO
     assert "__  __" in logo
     assert "/_/\\_\\" in logo
     assert len(logo.splitlines()) == 5
     assert "/v1" in signal
     assert "login required" in signal
+
+
+def test_onboard_hosted_can_register(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    class DummyAuth:
+        def __init__(self, *args, **kwargs) -> None:
+            return None
+
+        def status(self):
+            return SimpleNamespace(authenticated=False)
+
+    @click.command()
+    @click.option("--register/--login-existing", default=False)
+    def fake_setup_hosted(register: bool) -> None:
+        captured["register"] = register
+
+    monkeypatch.setattr("cli.commands.onboard.current_config", lambda: SimpleNamespace())
+    monkeypatch.setattr("cli.commands.onboard.AuthService", DummyAuth)
+    monkeypatch.setattr("cli.commands.onboard.get_client", lambda *_: None)
+    monkeypatch.setattr("cli.commands.onboard._get_setup_hosted_command", lambda: fake_setup_hosted)
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["onboard"], input="1\n1\n")
+
+    assert result.exit_code == 0
+    assert captured["register"] is True
+    assert "Create a new MUTX account" in result.output
+
+
+def test_onboard_hosted_can_login_existing(monkeypatch) -> None:
+    captured: dict[str, Any] = {}
+
+    class DummyAuth:
+        def __init__(self, *args, **kwargs) -> None:
+            return None
+
+        def status(self):
+            return SimpleNamespace(authenticated=False)
+
+    @click.command()
+    @click.option("--register/--login-existing", default=False)
+    def fake_setup_hosted(register: bool) -> None:
+        captured["register"] = register
+
+    monkeypatch.setattr("cli.commands.onboard.current_config", lambda: SimpleNamespace())
+    monkeypatch.setattr("cli.commands.onboard.AuthService", DummyAuth)
+    monkeypatch.setattr("cli.commands.onboard.get_client", lambda *_: None)
+    monkeypatch.setattr("cli.commands.onboard._get_setup_hosted_command", lambda: fake_setup_hosted)
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["onboard"], input="1\n2\n")
+
+    assert result.exit_code == 0
+    assert captured["register"] is False
+    assert "sign in to an existing account" in result.output.lower()

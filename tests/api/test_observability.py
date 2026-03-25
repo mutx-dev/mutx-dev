@@ -66,6 +66,70 @@ async def test_get_nonexistent_run(client):
 
 
 @pytest.mark.asyncio
+async def test_add_steps_accepts_step_list(client):
+    create_response = await client.post(
+        "/v1/observability/runs",
+        json={
+            "agent_id": "test-agent-steps",
+            "status": "running",
+        },
+    )
+    run_id = create_response.json()["id"]
+
+    response = await client.post(
+        f"/v1/observability/runs/{run_id}/steps",
+        json=[
+            {
+                "type": "tool_call",
+                "tool_name": "bash",
+                "started_at": "2026-03-25T10:00:00+00:00",
+                "step_metadata": {"source": "openclaw"},
+            }
+        ],
+    )
+
+    assert response.status_code == 201
+    payload = response.json()
+    assert payload["total"] == 1
+
+    detail_response = await client.get(f"/v1/observability/runs/{run_id}")
+    detail_payload = detail_response.json()
+    assert len(detail_payload["steps"]) == 1
+    assert detail_payload["steps"][0]["tool_name"] == "bash"
+
+
+@pytest.mark.asyncio
+async def test_update_run_status_updates_cost_fields(client):
+    create_response = await client.post(
+        "/v1/observability/runs",
+        json={
+            "agent_id": "test-agent-costs",
+            "status": "running",
+        },
+    )
+    run_id = create_response.json()["id"]
+
+    response = await client.patch(
+        f"/v1/observability/runs/{run_id}/status",
+        json={
+            "status": "completed",
+            "ended_at": "2026-03-25T10:05:00+00:00",
+            "input_tokens": 120,
+            "output_tokens": 80,
+            "cost_usd": 0.42,
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "completed"
+    assert payload["cost"]["input_tokens"] == 120
+    assert payload["cost"]["output_tokens"] == 80
+    assert payload["cost"]["total_tokens"] == 200
+    assert payload["cost"]["cost_usd"] == 0.42
+
+
+@pytest.mark.asyncio
 async def test_security_evaluate_endpoint(client):
     """Test the security action evaluation endpoint."""
     response = await client.post(

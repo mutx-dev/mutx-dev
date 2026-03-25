@@ -6,6 +6,8 @@ from datetime import datetime, timezone
 from tenacity import retry, stop_after_attempt, wait_exponential
 import uuid
 
+from src.api.models.observability import compute_run_hash
+
 logger = logging.getLogger(__name__)
 
 
@@ -180,6 +182,7 @@ class OpenClawObservability:
     ) -> str:
         """Report the start of an agent run. Returns run_id."""
         run_id = str(uuid.uuid4())
+        normalized_tools = tools or []
         run_data = {
             "id": run_id,
             "agent_id": agent_id,
@@ -190,7 +193,7 @@ class OpenClawObservability:
             "trigger": trigger,
             "status": "running",
             "started_at": datetime.now(timezone.utc).isoformat(),
-            "tools_available": tools or [],
+            "tools_available": normalized_tools,
             "steps": [],
             "cost": {
                 "input_tokens": 0,
@@ -200,7 +203,13 @@ class OpenClawObservability:
                 "model": model,
             },
             "provenance": {
-                "run_hash": str(uuid.uuid4())[:16],
+                "run_hash": compute_run_hash(
+                    agent_id=agent_id,
+                    model=model,
+                    tools_available=normalized_tools,
+                    config_hash=None,
+                    trigger=trigger,
+                ),
                 "lineage": [],
                 "runtime": "mutx@1.0.0",
                 "created_at": datetime.now(timezone.utc).isoformat(),
@@ -246,7 +255,7 @@ class OpenClawObservability:
         try:
             response = self._client.post(
                 f"{self.mutx_api_url}/v1/observability/runs/{run_id}/steps",
-                json=step_data,
+                json=[step_data],
                 headers=self._headers(),
             )
             response.raise_for_status()
@@ -268,8 +277,10 @@ class OpenClawObservability:
             "status": status,
             "outcome": outcome,
             "error": error,
+            "ended_at": datetime.now(timezone.utc).isoformat(),
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
+            "total_tokens": input_tokens + output_tokens,
             "cost_usd": cost_usd,
         }
 

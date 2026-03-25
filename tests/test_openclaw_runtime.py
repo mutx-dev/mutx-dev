@@ -14,6 +14,7 @@ from cli.openclaw_runtime import (
     merge_runtime_binding,
     persist_openclaw_runtime_snapshot,
     resolve_gateway_auth_argument,
+    update_binding_governance,
 )
 from cli.errors import ValidationError
 from cli.runtime_registry import (
@@ -206,6 +207,33 @@ def test_wizard_state_defaults_and_reset(monkeypatch, tmp_path: Path) -> None:
     assert state["current_step"] == "auth"
     assert state["completed_steps"] == []
     assert load_wizard_state("openclaw")["providers"][0]["id"] == "openclaw"
+
+
+def test_update_binding_governance_persists_binding(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setenv("MUTX_HOME", str(tmp_path / ".mutx"))
+    binding = OpenClawAgentBinding(
+        agent_id="personal-assistant",
+        workspace="/tmp/openclaw/workspace-personal-assistant",
+        agent_dir=None,
+        model="openai/gpt-5",
+        install_method="npm",
+        gateway_port=18789,
+        created=False,
+    )
+
+    updated = update_binding_governance(
+        binding,
+        enabled=True,
+        policy="/tmp/.mutx/policies/starter.fpl",
+        assistant_name="Personal Assistant",
+    )
+    saved = load_binding("openclaw", "personal-assistant")
+
+    assert updated.governance_enabled is True
+    assert updated.governance_policy == "/tmp/.mutx/policies/starter.fpl"
+    assert saved["assistant_id"] == "personal-assistant"
+    assert saved["governance_enabled"] is True
+    assert saved["governance_policy"] == "/tmp/.mutx/policies/starter.fpl"
 
 
 def test_inspect_importable_openclaw_runtime_succeeds_for_valid_existing_install(monkeypatch) -> None:
