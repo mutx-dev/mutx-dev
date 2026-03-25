@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.4] - 2026-03-25
+
+### Fixed
+- Committed formatter drift in `cli/commands/update.py` that was still failing the GitHub validation suite
+
 ## [1.2.3] - 2026-03-25
 
 ### Fixed
@@ -146,7 +151,7 @@ This project uses [Semantic Versioning](https://semver.org/). Given a version nu
 | Component | Current Version | Location |
 |-----------|-----------------|----------|
 | Frontend/App | 1.0.0 | `package.json` |
-| CLI distribution | 1.2.3 | root `pyproject.toml` |
+| CLI distribution | 1.2.4 | root `pyproject.toml` |
 | Python SDK | 0.1.0 | `sdk/pyproject.toml` |
 | API | Matches frontend | `package.json` |
 

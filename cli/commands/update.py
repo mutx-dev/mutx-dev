@@ -281,11 +281,15 @@ def _install_or_upgrade_formula() -> tuple[bool, str | None]:
     if state == "installed":
         return True, None
 
-    command = ["brew", "install", _formula_name()] if state == "not-installed" else [
-        "brew",
-        "upgrade",
-        _formula_name(),
-    ]
+    command = (
+        ["brew", "install", _formula_name()]
+        if state == "not-installed"
+        else [
+            "brew",
+            "upgrade",
+            _formula_name(),
+        ]
+    )
     try:
         result = _run_command(command, timeout=300, capture_output=True)
     except Exception as exc:
@@ -483,7 +487,9 @@ def _run_git_update(check: bool, force: bool, pip_args: str | None) -> None:
             cwd=MUTX_REPO_DIR,
             timeout=10,
         )
-        commits_ahead = len(log_result.stdout.strip().splitlines()) if log_result.stdout.strip() else 0
+        commits_ahead = (
+            len(log_result.stdout.strip().splitlines()) if log_result.stdout.strip() else 0
+        )
     except Exception:
         commits_behind = 0
         commits_ahead = 0
