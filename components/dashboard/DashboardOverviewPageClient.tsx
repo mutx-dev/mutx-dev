@@ -77,6 +77,14 @@ function summarizeRunHealth(runs: Run[]) {
   };
 }
 
+function isAuthError(error: unknown): error is ApiRequestError {
+  return error instanceof ApiRequestError && (error.status === 401 || error.status === 403);
+}
+
+function isSettledAuthError(result: PromiseSettledResult<unknown>) {
+  return result.status === "rejected" && isAuthError(result.reason);
+}
+
 export function DashboardOverviewPageClient() {
   const [loading, setLoading] = useState(true);
   const [authRequired, setAuthRequired] = useState(false);
@@ -100,6 +108,8 @@ export function DashboardOverviewPageClient() {
       setAuthRequired(false);
 
       try {
+        await readJson<unknown>("/api/auth/me");
+
         const results = await Promise.allSettled([
           readJson<unknown>("/api/dashboard/agents"),
           readJson<unknown>("/api/dashboard/deployments"),
@@ -112,23 +122,8 @@ export function DashboardOverviewPageClient() {
           readJson<OpenClawOnboardingState>("/api/dashboard/onboarding?provider=openclaw"),
         ]);
 
-        const authFailure = results.find(
-          (result) =>
-            result.status === "rejected" &&
-            result.reason instanceof ApiRequestError &&
-            (result.reason.status === 401 || result.reason.status === 403),
-        );
-        if (authFailure) {
-          if (!cancelled) {
-            setAuthRequired(true);
-            setLoading(false);
-          }
+        if (cancelled) {
           return;
-        }
-
-        const hardFailure = results.find((result) => result.status === "rejected");
-        if (hardFailure && hardFailure.status === "rejected") {
-          throw hardFailure.reason;
         }
 
         const [
@@ -141,34 +136,60 @@ export function DashboardOverviewPageClient() {
           healthResult,
           runtimeResult,
           onboardingResult,
-        ] = results as [
-          PromiseFulfilledResult<unknown>,
-          PromiseFulfilledResult<unknown>,
-          PromiseFulfilledResult<components["schemas"]["RunHistoryResponse"]>,
-          PromiseFulfilledResult<components["schemas"]["AlertListResponse"]>,
-          PromiseFulfilledResult<unknown>,
-          PromiseFulfilledResult<Budget>,
-          PromiseFulfilledResult<unknown>,
-          PromiseFulfilledResult<OpenClawRuntimeSnapshot>,
-          PromiseFulfilledResult<OpenClawOnboardingState>,
-        ];
+        ] = results;
 
-        if (!cancelled) {
-          setAgents(normalizeCollection<Agent>(agentsResult.value, ["agents", "items", "data"]));
-          setDeployments(
-            normalizeCollection<Deployment>(deploymentsResult.value, ["deployments", "items", "data"]),
-          );
-          setRuns(runsResult.value.items ?? []);
-          setAlerts(alertsResult.value.items ?? []);
-          setWebhooks(normalizeCollection<WebhookSummary>(webhooksResult.value, ["webhooks", "items", "data"]));
-          setBudget(budgetResult.value);
-          setHealth((healthResult.value as Record<string, unknown>) ?? null);
-          setOpenclawRuntime(runtimeResult.value);
-          setOpenclawOnboarding(onboardingResult.value);
-          setLoading(false);
+        const coreResults = [
+          agentsResult,
+          deploymentsResult,
+          runsResult,
+          alertsResult,
+          budgetResult,
+        ];
+        const coreHasData = coreResults.some((result) => result.status === "fulfilled");
+        const coreHardFailure = coreResults.find(
+          (result) => result.status === "rejected" && !isSettledAuthError(result),
+        );
+
+        if (!coreHasData && coreHardFailure?.status === "rejected") {
+          throw coreHardFailure.reason;
         }
+
+        setAgents(
+          agentsResult.status === "fulfilled"
+            ? normalizeCollection<Agent>(agentsResult.value, ["agents", "items", "data"])
+            : [],
+        );
+        setDeployments(
+          deploymentsResult.status === "fulfilled"
+            ? normalizeCollection<Deployment>(deploymentsResult.value, ["deployments", "items", "data"])
+            : [],
+        );
+        setRuns(runsResult.status === "fulfilled" ? runsResult.value.items ?? [] : []);
+        setAlerts(alertsResult.status === "fulfilled" ? alertsResult.value.items ?? [] : []);
+        setWebhooks(
+          webhooksResult.status === "fulfilled"
+            ? normalizeCollection<WebhookSummary>(webhooksResult.value, ["webhooks", "items", "data"])
+            : [],
+        );
+        setBudget(budgetResult.status === "fulfilled" ? budgetResult.value : null);
+        setHealth(
+          healthResult.status === "fulfilled"
+            ? ((healthResult.value as Record<string, unknown>) ?? null)
+            : null,
+        );
+        setOpenclawRuntime(runtimeResult.status === "fulfilled" ? runtimeResult.value : null);
+        setOpenclawOnboarding(
+          onboardingResult.status === "fulfilled" ? onboardingResult.value : null,
+        );
+        setLoading(false);
       } catch (loadError) {
         if (!cancelled) {
+          if (isAuthError(loadError)) {
+            setAuthRequired(true);
+            setLoading(false);
+            return;
+          }
+
           setError(loadError instanceof Error ? loadError.message : "Failed to load dashboard overview");
           setLoading(false);
         }

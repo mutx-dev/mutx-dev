@@ -18,6 +18,20 @@ async function mockOverviewTraffic(page: import('@playwright/test').Page) {
     const url = new URL(request.url())
     const { pathname } = url
 
+    if (pathname === '/api/auth/me') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'user_alpha',
+          email: 'operator@mutx.dev',
+          name: 'Operator',
+          plan: 'operator',
+        }),
+      })
+      return
+    }
+
     if (pathname === '/api/dashboard/agents') {
       await route.fulfill({
         status: 200,
@@ -162,5 +176,21 @@ test.describe('Dashboard OpenClaw overview', () => {
     ).toBeVisible()
     await expect(page.getByText('http://127.0.0.1:18789', { exact: true })).toBeVisible()
     await expect(page.getByText(/1 tracked binding/i)).toBeVisible()
+  })
+
+  test('does not fall back to auth-required when an overview-only endpoint is forbidden', async ({ page }) => {
+    await page.route('**/api/dashboard/runtime/providers/openclaw', async (route) => {
+      await route.fulfill({
+        status: 403,
+        contentType: 'application/json',
+        body: JSON.stringify({ detail: 'Forbidden' }),
+      })
+    })
+
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
+
+    await expect(page.getByRole('heading', { name: /overview/i }).first()).toBeVisible()
+    await expect(page.getByText(/operator session required/i)).toHaveCount(0)
+    await expect(page.getByText('Personal Assistant')).toBeVisible()
   })
 })
