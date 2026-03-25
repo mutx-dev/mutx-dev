@@ -129,6 +129,6 @@ docker compose -f "$COMPOSE_FILE" up -d nginx
 
 wait_for_command \
   "nginx health endpoint" \
-  "docker compose -f \"$COMPOSE_FILE\" exec -T nginx wget -q -O - http://localhost/health >/dev/null 2>&1"
+  "docker compose -f \"$COMPOSE_FILE\" exec -T nginx wget -q -O - http://127.0.0.1/health >/dev/null 2>&1"
 
 echo "Production compose smoke test passed."
