@@ -6,6 +6,7 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
   output: 'standalone',
+  turbopack: {},
   webpack(config, { webpack, dev }) {
     if (dev) {
       config.plugins.push(

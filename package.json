@@ -54,7 +54,7 @@
     "framer-motion": "^12.35.2",
     "lenis": "^1.1.9",
     "lucide-react": "^0.323.0",
-    "next": "15.5.14",
+    "next": "16.2.1",
     "pg": "^8.20.0",
     "postgres": "^3.4.8",
     "react": "^18.2.0",
@@ -69,6 +69,8 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.2.0",
+    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.2",
     "@types/jest": "^30.0.0",
     "@types/node": "25.3.5",
@@ -78,8 +80,9 @@
     "autoprefixer": "^10.4.17",
     "electron": "^39.1.0",
     "electron-builder": "^26.0.12",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "15.5.14",
+    "eslint": "^10.1.0",
+    "eslint-config-next": "16.2.1",
+    "globals": "^17.4.0",
     "jest": "^30.2.0",
     "openapi-typescript": "^7.13.0",
     "playwright": "^1.58.2",
@@ -91,6 +94,7 @@
     "three": "^0.169.0",
     "ts-jest": "^29.4.5",
     "typescript": "5.9.3",
+    "typescript-eslint": "^8.57.2",
     "zod": "^4.3.6"
   }
 }

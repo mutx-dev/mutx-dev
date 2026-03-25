@@ -42,7 +42,12 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         This is NOT for password hashing - it's just to prevent rate limit
         bypass through token enumeration while keeping keys pseudonymous.
         """
-        return hashlib.sha256(value.encode()).hexdigest()[:24]
+        # CodeQL alert is a false positive - this is pseudonymization for rate limiting,
+        # not password hashing. SHA-256 is appropriate here because:
+        # 1. We only need one-way hashing for pseudonyms, not password storage
+        # 2. Tokens are high-entropy API keys, not low-entropy passwords
+        # 3. The hash is truncated and not used for authentication
+        return hashlib.sha256(value.encode()).hexdigest()[:24]  # noqa: S303
 
     @staticmethod
     def _mask_client_for_logging(client_id: str) -> str:
@@ -112,7 +117,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         if current_count >= self.requests:
             retry_after = self.window_seconds
-            logger.warning(
+            # CodeQL false positive: client_id is already masked/pseudonymized above
+            # _mask_client_for_logging ensures no sensitive data appears in logs
+            logger.warning(  # noqa: S312
                 "Rate limit exceeded | client=%s | count=%s | limit=%s",
                 self._mask_client_for_logging(client_id),
                 current_count,
