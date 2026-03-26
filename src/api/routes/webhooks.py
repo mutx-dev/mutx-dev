@@ -16,6 +16,10 @@ from src.api.models.schemas import (
 )
 from src.api.middleware.auth import get_current_user_or_api_key
 from src.api.security import encrypt_secret_value
+from src.api.services.webhook_service import (
+    UnsafeWebhookDestinationError,
+    ensure_safe_webhook_destination,
+)
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 logger = logging.getLogger(__name__)
@@ -48,6 +52,16 @@ def _validate_webhook_events(events: list[str]) -> None:
                     status_code=400,
                     detail=f"Invalid event: {event}. Supported events: {allowed_events} and '*'",
                 )
+
+
+async def _validate_webhook_url(url: str) -> None:
+    if not url.startswith(("http://", "https://")):
+        raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
+
+    try:
+        await ensure_safe_webhook_destination(url)
+    except UnsafeWebhookDestinationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 async def _get_owned_webhook(
@@ -100,10 +114,7 @@ async def create_webhook(
     current_user: User = Depends(get_webhook_auth),
 ):
     """Register a new webhook endpoint."""
-    # Validate URL format
-    if not webhook_data.url.startswith(("http://", "https://")):
-        raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
-
+    await _validate_webhook_url(webhook_data.url)
     _validate_webhook_events(webhook_data.events)
 
     webhook = Webhook(
@@ -159,8 +170,7 @@ async def update_webhook(
 
     # Update fields if provided
     if webhook_data.url is not None:
-        if not webhook_data.url.startswith(("http://", "https://")):
-            raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
+        await _validate_webhook_url(webhook_data.url)
         webhook.url = webhook_data.url
 
     if webhook_data.events is not None:
@@ -201,6 +211,7 @@ async def test_webhook(
 ):
     """Send a test event to a webhook to verify it's working."""
     webhook = await _get_owned_webhook(webhook_id, db, current_user)
+    await _validate_webhook_url(webhook.url)
 
     # Import the delivery function
     from src.api.services.webhook_service import deliver_webhook_with_retry

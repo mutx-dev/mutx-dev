@@ -2,13 +2,18 @@ import type { NextRequest } from 'next/server'
 
 import { middleware } from '../../middleware'
 
-function mockRequest(url: string, headers: Record<string, string> = {}) {
+function mockRequest(
+  url: string,
+  headers: Record<string, string> = {},
+  method = 'GET',
+) {
   const normalizedHeaders = Object.fromEntries(
     Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]),
   )
 
   return {
     url,
+    method,
     nextUrl: new URL(url),
     headers: {
       get(name: string) {
@@ -50,6 +55,8 @@ describe('host-aware UI routing middleware', () => {
     expect(response.headers.get('cache-control')).toBe(
       'private, no-cache, no-store, max-age=0, must-revalidate',
     )
+    expect(response.headers.get('x-frame-options')).toBe('DENY')
+    expect(response.headers.get('x-content-type-options')).toBe('nosniff')
   })
 
   it('allows direct /control routes on the app host to pass through unchanged', () => {
@@ -145,5 +152,43 @@ describe('host-aware UI routing middleware', () => {
     expect(response.headers.get('X-RateLimit-Limit')).toBe('8')
     expect(response.headers.get('X-RateLimit-Remaining')).toBe('7')
     expect(response.headers.get('X-RateLimit-Reset')).not.toBeNull()
+    expect(response.headers.get('cache-control')).toBe('no-store')
+    expect(response.headers.get('referrer-policy')).toBe('strict-origin-when-cross-origin')
+  })
+
+  it('rejects cross-origin browser writes to api routes', async () => {
+    const response = middleware(
+      mockRequest(
+        'https://app.mutx.dev/api/auth/logout',
+        {
+          host: 'app.mutx.dev',
+          origin: 'https://evil.example',
+        },
+        'POST',
+      ),
+    )
+
+    expect(response.status).toBe(403)
+    expect(await response.json()).toEqual({
+      detail: 'CSRF validation failed: origin is not allowed',
+    })
+    expect(response.headers.get('cache-control')).toBe('no-store')
+  })
+
+  it('allows same-origin browser writes to api routes when x-forwarded-proto indicates https', () => {
+    const response = middleware(
+      mockRequest(
+        'http://app.mutx.dev/api/auth/logout',
+        {
+          host: 'app.mutx.dev',
+          origin: 'https://app.mutx.dev',
+          'x-forwarded-proto': 'https',
+        },
+        'POST',
+      ),
+    )
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('cache-control')).toBe('no-store')
   })
 })

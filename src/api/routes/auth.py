@@ -165,8 +165,11 @@ async def login(request: LoginRequest, session: AsyncSession = Depends(get_db)):
             detail="Account is deactivated",
         )
 
-    # Check if email is verified (optional - can be enabled by setting REQUIRE_EMAIL_VERIFICATION)
-    # For now, we'll allow login but warn if not verified
+    if settings.require_email_verification and not user.is_email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email verification is required before login",
+        )
 
     access_token, access_token_expires_at, refresh_token = await issue_token_pair(session, user.id)
 
@@ -304,6 +307,11 @@ class MessageResponse(BaseModel):
     message: str
 
 
+VERIFICATION_EMAIL_RESPONSE_MESSAGE = (
+    "If an account exists and is not verified, a verification email has been sent"
+)
+
+
 @router.post("/forgot-password", response_model=MessageResponse)
 async def forgot_password(request: ForgotPasswordRequest, session: AsyncSession = Depends(get_db)):
     """Request a password reset email."""
@@ -373,19 +381,14 @@ async def resend_verification(
     user = await user_service.get_user_by_email(request.email)
     if not user:
         # Don't reveal if email exists
-        return MessageResponse(
-            message="If an account exists and is not verified, a verification email has been sent"
-        )
+        return MessageResponse(message=VERIFICATION_EMAIL_RESPONSE_MESSAGE)
 
     if user.is_email_verified:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email is already verified",
-        )
+        return MessageResponse(message=VERIFICATION_EMAIL_RESPONSE_MESSAGE)
 
     # Create new verification token
     token = await user_service.create_email_verification_token(user.id)
     # Send email
     send_verification_email(user.email, user.name, token)
 
-    return MessageResponse(message="Verification email has been sent")
+    return MessageResponse(message=VERIFICATION_EMAIL_RESPONSE_MESSAGE)

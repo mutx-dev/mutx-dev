@@ -96,11 +96,13 @@ variable "telemetry_enabled" {
 variable "admin_cidr" {
   description = "CIDR block for admin SSH access"
   type        = string
-  default     = "0.0.0.0/0"
 
   validation {
-    condition     = can(cidrhost(var.admin_cidr, 0))
-    error_message = "admin_cidr must be a valid CIDR block."
+    condition = can(cidrhost(var.admin_cidr, 0)) && !contains([
+      "0.0.0.0/0",
+      "::/0",
+    ], var.admin_cidr)
+    error_message = "admin_cidr must be a valid, explicitly configured CIDR block and cannot allow world-wide SSH access."
   }
 }
 

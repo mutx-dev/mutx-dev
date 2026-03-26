@@ -56,7 +56,8 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONHASHSEED=0 \
     ENVIRONMENT=production \
-    LOG_LEVEL=info
+    LOG_LEVEL=info \
+    FORWARDED_ALLOW_IPS=*
 
 # Switch to non-root user
 USER appuser
@@ -68,4 +69,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-CMD ["sh", "-c", "uvicorn src.api.main:app --host ${API_HOST:-0.0.0.0} --port ${API_PORT:-8000} --workers ${WEB_CONCURRENCY:-1} --log-level $(printf '%s' \"${LOG_LEVEL:-info}\" | tr '[:upper:]' '[:lower:]') --proxy-headers --forwarded-allow-ips='*'"]
+CMD ["sh", "-c", "uvicorn src.api.main:app --host ${API_HOST:-0.0.0.0} --port ${API_PORT:-8000} --workers ${WEB_CONCURRENCY:-1} --log-level $(printf '%s' \"${LOG_LEVEL:-info}\" | tr '[:upper:]' '[:lower:]') --proxy-headers --forwarded-allow-ips='${FORWARDED_ALLOW_IPS:-*}'"]

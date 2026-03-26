@@ -230,6 +230,39 @@ class TestAuthEndpoints:
         assert response.status_code == 403
 
     @pytest.mark.asyncio
+    async def test_login_can_require_verified_email(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession, monkeypatch
+    ):
+        from src.api.auth.password import hash_password
+        from src.api.routes import auth as auth_routes
+
+        user = User(
+            id=uuid.uuid4(),
+            email="unverified-login@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Unverified Login User",
+            is_active=True,
+            is_email_verified=False,
+        )
+        db_session.add(user)
+        await db_session.commit()
+
+        monkeypatch.setattr(auth_routes.settings, "require_email_verification", True)
+        try:
+            response = await client_no_auth.post(
+                "/v1/auth/login",
+                json={
+                    "email": "unverified-login@example.com",
+                    "password": "StrongPassword123!",
+                },
+            )
+        finally:
+            monkeypatch.setattr(auth_routes.settings, "require_email_verification", False)
+
+        assert response.status_code == 403
+        assert "verification is required" in response.json()["detail"].lower()
+
+    @pytest.mark.asyncio
     async def test_register_weak_password(self, client_no_auth: AsyncClient):
         """Test registration with weak password fails."""
         response = await client_no_auth.post(
@@ -327,13 +360,13 @@ class TestAuthEndpoints:
             json={"email": "unverified@example.com"},
         )
         assert response.status_code == 200
-        assert "Verification email has been sent" in response.json()["message"]
+        assert "If an account exists and is not verified" in response.json()["message"]
 
     @pytest.mark.asyncio
     async def test_resend_verification_already_verified(
         self, client_no_auth: AsyncClient, db_session: AsyncSession
     ):
-        """Test resend verification for already verified user fails."""
+        """Test resend verification for already verified user returns generic success."""
         from src.api.auth.password import hash_password
 
         user = User(
@@ -351,8 +384,8 @@ class TestAuthEndpoints:
             "/v1/auth/resend-verification",
             json={"email": "verified@example.com"},
         )
-        assert response.status_code == 400
-        assert "already verified" in response.json()["detail"].lower()
+        assert response.status_code == 200
+        assert "If an account exists and is not verified" in response.json()["message"]
 
     @pytest.mark.asyncio
     async def test_resend_verification_nonexistent_user(self, client_no_auth: AsyncClient):
@@ -362,6 +395,50 @@ class TestAuthEndpoints:
             json={"email": "nonexistent@example.com"},
         )
         assert response.status_code == 200
+
+    @pytest.mark.asyncio
+    async def test_verify_email_rejects_expired_token(
+        self, client_no_auth: AsyncClient, db_session: AsyncSession
+    ):
+        from datetime import datetime, timedelta, timezone
+        from sqlalchemy import update
+
+        from src.api.auth.password import hash_password
+        from src.api.services.user_service import UserService
+
+        user = User(
+            id=uuid.uuid4(),
+            email="verify-expired@example.com",
+            password_hash=hash_password("StrongPassword123!"),
+            name="Expired Verification User",
+            is_active=True,
+            is_email_verified=False,
+        )
+        db_session.add(user)
+        await db_session.commit()
+
+        token = await UserService(db_session).create_email_verification_token(user.id)
+        await db_session.execute(
+            update(User)
+            .where(User.id == user.id)
+            .values(
+                email_verification_expires_at=datetime.now(timezone.utc) - timedelta(minutes=1)
+            )
+        )
+        await db_session.commit()
+
+        response = await client_no_auth.post(
+            "/v1/auth/verify-email",
+            json={"token": token},
+        )
+
+        assert response.status_code == 400
+        assert "invalid or expired" in response.json()["detail"].lower()
+
+        await db_session.refresh(user)
+        assert user.is_email_verified is False
+        assert user.email_verification_token is None
+        assert user.email_verification_expires_at is None
 
     @pytest.mark.asyncio
     async def test_refresh_token_sliding_expiry(

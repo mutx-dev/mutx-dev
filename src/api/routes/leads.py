@@ -5,9 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.config import get_settings
 from src.api.database import get_db
-from src.api.middleware.auth import get_current_user
+from src.api.middleware.auth import assert_internal_user, get_current_user
 from src.api.models.models import Lead, User
 from src.api.models.schemas import LeadCreate, LeadResponse, LeadUpdate
 
@@ -17,19 +16,7 @@ contacts_router = APIRouter(prefix="/contacts", tags=["contacts"])
 
 def _assert_internal_user(current_user: User) -> None:
     """Restrict internal lead access to configured internal email domains."""
-    if not current_user.is_email_verified:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
-
-    settings = get_settings()
-    allowed_domains = {
-        domain.strip().lower()
-        for domain in settings.internal_user_email_domains
-        if domain and domain.strip()
-    }
-
-    user_domain = current_user.email.rsplit("@", 1)[-1].lower() if "@" in current_user.email else ""
-    if user_domain not in allowed_domains:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+    assert_internal_user(current_user)
 
 
 def _normalize_optional_text(value: str | None) -> str | None:

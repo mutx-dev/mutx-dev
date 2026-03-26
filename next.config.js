@@ -18,7 +18,8 @@ const nextConfig = {
     return config;
   },
   async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    // Prefer a server-only upstream when the frontend and API share a private network.
+    const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || '';
     return {
       beforeFiles: [
         // Map /api/v1/* to /api/* for SDK/CLI backward compatibility

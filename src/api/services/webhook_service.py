@@ -10,11 +10,14 @@ Handles:
 import asyncio
 import hashlib
 import hmac
+import ipaddress
 import json
 import logging
+import socket
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
+from urllib.parse import urlsplit
 
 import aiohttp
 from sqlalchemy import select
@@ -31,11 +34,86 @@ RETRY_DELAYS = [2, 10, 30]  # Seconds between retries
 TIMEOUT_SECONDS = 30
 
 
+class UnsafeWebhookDestinationError(ValueError):
+    """Raised when a webhook destination points to a non-public network target."""
+
+
 def generate_signature(payload: str, secret: str) -> str:
     """Generate HMAC-SHA256 signature for webhook payload."""
     if not secret:
         return ""
     return hmac.new(secret.encode("utf-8"), payload.encode("utf-8"), hashlib.sha256).hexdigest()
+
+
+def _normalize_ip_address(value: str) -> ipaddress.IPv4Address | ipaddress.IPv6Address:
+    ip = ipaddress.ip_address(value)
+    if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped is not None:
+        return ip.ipv4_mapped
+    return ip
+
+
+def _assert_public_ip_address(value: str, *, hostname: str) -> None:
+    ip = _normalize_ip_address(value)
+    if not ip.is_global:
+        raise UnsafeWebhookDestinationError(
+            f"Webhook destination '{hostname}' resolves to a non-public address"
+        )
+
+
+async def resolve_webhook_destination_ips(hostname: str, port: int) -> set[str]:
+    loop = asyncio.get_running_loop()
+    try:
+        addrinfo = await loop.getaddrinfo(
+            hostname,
+            port,
+            type=socket.SOCK_STREAM,
+            proto=socket.IPPROTO_TCP,
+        )
+    except socket.gaierror as exc:
+        raise UnsafeWebhookDestinationError(
+            f"Webhook destination '{hostname}' could not be resolved"
+        ) from exc
+
+    resolved_ips = {
+        sockaddr[0]
+        for _, _, _, _, sockaddr in addrinfo
+        if sockaddr and sockaddr[0]
+    }
+    if not resolved_ips:
+        raise UnsafeWebhookDestinationError(
+            f"Webhook destination '{hostname}' could not be resolved"
+        )
+
+    return resolved_ips
+
+
+async def ensure_safe_webhook_destination(url: str) -> None:
+    parsed = urlsplit(url)
+    if parsed.scheme not in {"http", "https"}:
+        raise UnsafeWebhookDestinationError("URL must start with http:// or https://")
+
+    hostname = parsed.hostname
+    if not hostname:
+        raise UnsafeWebhookDestinationError("Webhook URL must include a hostname")
+    if hostname == "localhost" or hostname.endswith(".localhost"):
+        raise UnsafeWebhookDestinationError(
+            f"Webhook destination '{hostname}' resolves to a non-public address"
+        )
+
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+
+    try:
+        parsed_ip = _normalize_ip_address(hostname)
+    except ValueError:
+        parsed_ip = None
+
+    if parsed_ip is not None:
+        _assert_public_ip_address(parsed_ip.compressed, hostname=hostname)
+        return
+
+    resolved_ips = await resolve_webhook_destination_ips(hostname, port)
+    for resolved_ip in resolved_ips:
+        _assert_public_ip_address(resolved_ip, hostname=hostname)
 
 
 async def deliver_webhook(
@@ -77,11 +155,19 @@ async def deliver_webhook(
         headers["X-Webhook-Signature"] = f"sha256={signature}"
 
     try:
+        await ensure_safe_webhook_destination(url)
+    except UnsafeWebhookDestinationError as exc:
+        error_msg = str(exc)
+        logger.warning("Blocked webhook delivery to unsafe destination %s: %s", url, error_msg)
+        return False, None, error_msg
+
+    try:
         async with session.post(
             url,
             data=payload_json.encode("utf-8"),
             headers=headers,
             timeout=aiohttp.ClientTimeout(total=TIMEOUT_SECONDS),
+            allow_redirects=False,
         ) as response:
             status_code = response.status
             response_body = await response.text()

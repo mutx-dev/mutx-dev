@@ -11,10 +11,13 @@ type RateLimitState = {
   resetTime: number
 }
 
+const SAFE_HTTP_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE'])
+const CSRF_FAILURE_DETAIL = 'CSRF validation failed: origin is not allowed'
 const APP_HOST = 'app.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
 const UI_CACHE_CONTROL = 'private, no-cache, no-store, max-age=0, must-revalidate'
+const API_CACHE_CONTROL = 'no-store'
 const APP_PUBLIC_PATHS = new Set([
   '/',
   '/overview',
@@ -60,6 +63,27 @@ function getRequestHost(request: NextRequest): string {
   const host = request.headers.get('host')?.split(',')[0]?.trim()
   const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim()
   return (host || forwardedHost || request.nextUrl.hostname).split(':')[0].toLowerCase()
+}
+
+function getRequestScheme(request: NextRequest): string {
+  const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim()
+  if (forwardedProto) {
+    return forwardedProto.toLowerCase()
+  }
+
+  return request.nextUrl.protocol.replace(':', '').toLowerCase()
+}
+
+function normalizeOrigin(origin: string | null): string | null {
+  if (!origin) {
+    return null
+  }
+
+  try {
+    return new URL(origin).origin.toLowerCase()
+  } catch {
+    return null
+  }
 }
 
 function normalizePathname(pathname: string): string {
@@ -183,6 +207,35 @@ function applyUiCacheHeaders(response: NextResponse, host: string, pathname: str
   return response
 }
 
+function applySecurityHeaders(response: NextResponse, pathname: string) {
+  response.headers.set('X-Frame-Options', 'DENY')
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
+
+  if (pathname.startsWith('/api')) {
+    response.headers.set('Cache-Control', API_CACHE_CONTROL)
+  }
+
+  return response
+}
+
+function finalizeResponse(response: NextResponse, host: string, pathname: string) {
+  applyUiCacheHeaders(response, host, pathname)
+  applySecurityHeaders(response, pathname)
+  return response
+}
+
+function isAllowedApiOrigin(request: NextRequest, host: string): boolean {
+  const requestOrigin = normalizeOrigin(request.headers.get('origin'))
+  if (!requestOrigin) {
+    return false
+  }
+
+  const expectedOrigin = `${getRequestScheme(request)}://${host}`.toLowerCase()
+  return requestOrigin === expectedOrigin
+}
+
 function getPolicy(pathname: string): RateLimitPolicy | null {
   for (const [prefix, policy] of POLICY_BY_PATH) {
     if (pathname.startsWith(prefix)) {
@@ -229,10 +282,23 @@ export function middleware(request: NextRequest) {
   const normalizedPath = normalizePathname(pathname)
   const host = getRequestHost(request)
 
+  if (
+    normalizedPath.startsWith('/api') &&
+    !SAFE_HTTP_METHODS.has(request.method.toUpperCase()) &&
+    request.headers.get('origin') &&
+    !isAllowedApiOrigin(request, host)
+  ) {
+    return finalizeResponse(
+      NextResponse.json({ detail: CSRF_FAILURE_DETAIL }, { status: 403 }),
+      host,
+      normalizedPath,
+    )
+  }
+
   if (MARKETING_HOSTS.has(host)) {
     const publicDemoPath = internalDemoPathToPublicPath(normalizedPath)
     if (publicDemoPath !== normalizedPath) {
-      return applyUiCacheHeaders(
+      return finalizeResponse(
         redirectToHost(request, APP_HOST, publicDemoPath),
         host,
         normalizedPath,
@@ -240,7 +306,7 @@ export function middleware(request: NextRequest) {
     }
 
     if (normalizedPath === '/login' || normalizedPath === '/register') {
-      return applyUiCacheHeaders(
+      return finalizeResponse(
         redirectToHost(request, APP_HOST, normalizedPath),
         host,
         normalizedPath,
@@ -248,7 +314,7 @@ export function middleware(request: NextRequest) {
     }
 
     if (normalizedPath !== '/' && APP_PUBLIC_PATHS.has(normalizedPath)) {
-      return applyUiCacheHeaders(
+      return finalizeResponse(
         redirectToHost(request, APP_HOST, normalizedPath === '/overview' ? '/' : normalizedPath),
         host,
         normalizedPath,
@@ -264,7 +330,7 @@ export function middleware(request: NextRequest) {
       const canonicalDashboardPath = normalizedPath.startsWith('/app')
         ? mapLegacyAppPathToDashboard(normalizedPath)
         : normalizedPath
-      return applyUiCacheHeaders(
+      return finalizeResponse(
         redirectToHost(request, APP_HOST, canonicalDashboardPath),
         host,
         normalizedPath,
@@ -274,15 +340,15 @@ export function middleware(request: NextRequest) {
 
   if (APP_HOSTS.has(host)) {
     if (normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/')) {
-      return applyUiCacheHeaders(NextResponse.next(), host, normalizedPath)
+      return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }
 
     if (normalizedPath === '/control' || normalizedPath.startsWith('/control/')) {
-      return applyUiCacheHeaders(NextResponse.next(), host, normalizedPath)
+      return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }
 
     if (normalizedPath === '/app' || normalizedPath.startsWith('/app/')) {
-      return applyUiCacheHeaders(
+      return finalizeResponse(
         redirectWithinHost(request, mapLegacyAppPathToDashboard(normalizedPath)),
         host,
         normalizedPath,
@@ -291,7 +357,7 @@ export function middleware(request: NextRequest) {
 
     const internalPath = appHostPathToInternalDemoPath(normalizedPath)
     if (internalPath !== normalizedPath) {
-      return applyUiCacheHeaders(
+      return finalizeResponse(
         rewriteWithinHost(request, internalPath),
         host,
         normalizedPath,
@@ -301,7 +367,7 @@ export function middleware(request: NextRequest) {
 
   const policy = getPolicy(pathname)
   if (!policy) {
-    return applyUiCacheHeaders(NextResponse.next(), host, normalizedPath)
+    return finalizeResponse(NextResponse.next(), host, normalizedPath)
   }
 
   const { allowed, remaining, resetTime } = checkRateLimit(request, policy)
@@ -313,10 +379,10 @@ export function middleware(request: NextRequest) {
   if (!allowed) {
     const headers = new Headers(response.headers)
     headers.set('Retry-After', String(Math.ceil((resetTime - Date.now()) / 1000)))
-    return new NextResponse('Too Many Requests', { status: 429, headers })
+    return finalizeResponse(new NextResponse('Too Many Requests', { status: 429, headers }), host, normalizedPath)
   }
 
-  return response
+  return finalizeResponse(response, host, normalizedPath)
 }
 
 export const config = {

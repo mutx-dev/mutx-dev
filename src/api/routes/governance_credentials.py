@@ -6,9 +6,9 @@ from datetime import timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from src.api.middleware.auth import get_current_user
+from src.api.middleware.auth import get_current_internal_user
 from src.api.models import User
 from src.api.services.credential_broker import (
     CredentialBackend,
@@ -18,21 +18,26 @@ from src.api.services.credential_broker import (
 router = APIRouter(prefix="/governance/credentials", tags=["governance"])
 
 
+def _broker_for_user(current_user: User):
+    return get_credential_broker(namespace=str(current_user.id))
+
+
 class CredentialBackendRegister(BaseModel):
     name: str
     backend: str
     path: str
     ttl: Optional[int] = 900
-    config: Optional[dict] = {}
+    config: dict = Field(default_factory=dict)
 
 
 class CredentialResponse(BaseModel):
     name: str
     backend: str
     path: str
-    value: str
+    value: Optional[str] = None
+    has_value: bool = False
     expires_at: Optional[str] = None
-    metadata: dict = {}
+    metadata: dict = Field(default_factory=dict)
 
 
 class BackendHealthResponse(BaseModel):
@@ -46,10 +51,10 @@ class BackendHealthResponse(BaseModel):
 
 @router.get("/backends", response_model=list[BackendHealthResponse])
 async def list_credential_backends(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ):
     """List all registered credential backends."""
-    broker = get_credential_broker()
+    broker = _broker_for_user(current_user)
     backends = await broker.list_backends()
     return [
         BackendHealthResponse(
@@ -67,7 +72,7 @@ async def list_credential_backends(
 @router.post("/backends", status_code=201)
 async def register_credential_backend(
     request: CredentialBackendRegister,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ):
     """Register a new credential backend."""
     try:
@@ -79,7 +84,7 @@ async def register_credential_backend(
             f"Supported: vault, awssecrets, gcpsm, azurekv, onepassword, infisical",
         )
 
-    broker = get_credential_broker()
+    broker = _broker_for_user(current_user)
     success = await broker.register_backend(
         name=request.name,
         backend=backend_enum,
@@ -97,10 +102,10 @@ async def register_credential_backend(
 @router.delete("/backends/{backend_name}")
 async def unregister_credential_backend(
     backend_name: str,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ):
     """Unregister a credential backend."""
-    broker = get_credential_broker()
+    broker = _broker_for_user(current_user)
     success = await broker.unregister_backend(backend_name)
 
     if not success:
@@ -112,10 +117,10 @@ async def unregister_credential_backend(
 @router.get("/backends/{backend_name}/health")
 async def check_backend_health(
     backend_name: str,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ):
     """Check health of a specific credential backend."""
-    broker = get_credential_broker()
+    broker = _broker_for_user(current_user)
     backends = await broker.list_backends()
 
     for backend in backends:
@@ -131,17 +136,17 @@ async def check_backend_health(
 
 @router.get("/health")
 async def check_all_backends_health(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ):
     """Check health of all credential backends."""
-    broker = get_credential_broker()
+    broker = _broker_for_user(current_user)
     return await broker.health_check()
 
 
 @router.get("/get/{full_path:path}", response_model=CredentialResponse)
 async def get_credential(
     full_path: str,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ):
     """
     Retrieve a credential by its full path.
@@ -152,7 +157,7 @@ async def get_credential(
         awssecrets:/prod/myapp/api-key
         gcpsm:/my-project/my-secret
     """
-    broker = get_credential_broker()
+    broker = _broker_for_user(current_user)
     credential = await broker.get_credential_by_path(full_path)
 
     if not credential:
@@ -162,7 +167,8 @@ async def get_credential(
         name=credential.name,
         backend=credential.backend,
         path=credential.path,
-        value=credential.value,
+        value=None,
+        has_value=bool(credential.value),
         expires_at=credential.expires_at.isoformat() if credential.expires_at else None,
         metadata=credential.metadata,
     )

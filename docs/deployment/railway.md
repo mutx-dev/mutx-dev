@@ -66,7 +66,14 @@ DATABASE_REQUIRED_ON_STARTUP=false
 
 # Site URLs
 NEXT_PUBLIC_SITE_URL=https://your-app.railway.app
-NEXT_PUBLIC_API_URL=https://your-app.railway.app
+
+# Frontend -> API routing
+# For a single Railway service, NEXT_PUBLIC_API_URL can stay public.
+# For split frontend/backend Railway services, prefer the backend private domain here.
+INTERNAL_API_URL=http://your-backend.railway.internal:8080
+
+# Optional public API URL if you intentionally expose the backend directly.
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com
 
 # Email (optional)
 RESEND_API_KEY=re_your_resend_api_key

@@ -7,7 +7,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -65,11 +65,10 @@ def _serialize_alert(alert: Alert) -> AlertResponse:
 
 @router.get("/health", response_model=HealthStatusResponse)
 async def get_health(
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ):
     """Get system health status."""
-    from src.api.main import start_time
-
     # Check database connectivity
     db_status = "healthy"
     try:
@@ -77,7 +76,12 @@ async def get_health(
     except Exception:
         db_status = "unhealthy"
 
-    uptime = datetime.now(timezone.utc).timestamp() - start_time
+    start_time = getattr(request.app.state, "start_time", None)
+    uptime = (
+        datetime.now(timezone.utc).timestamp() - start_time
+        if start_time is not None
+        else 0.0
+    )
 
     return HealthStatusResponse(
         status=db_status,

@@ -9,12 +9,15 @@ from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.password import hash_password, verify_password
+from src.api.config import get_settings
 from src.api.models.models import User, APIKey, Plan, Agent, Deployment, RefreshTokenSession
 from src.api.security import hash_token_value
 from src.api.services.email.email_service import (
     generate_token,
     PASSWORD_RESET_TOKEN_EXPIRE_HOURS,
 )
+
+settings = get_settings()
 
 
 def generate_api_key() -> str:
@@ -45,6 +48,14 @@ def verify_api_key(plain_key: str, hashed_key: str) -> bool:
         return bcrypt.checkpw(plain_key[:72].encode(), hashed_key.encode())
     except (ValueError, TypeError):
         return False
+
+
+def _as_utc_datetime(value: datetime | None) -> datetime | None:
+    if value is None:
+        return None
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
 
 
 class UserService:
@@ -110,6 +121,8 @@ class UserService:
         if not user.is_email_verified:
             user.is_email_verified = True
             user.email_verified_at = now
+            user.email_verification_token = None
+            user.email_verification_expires_at = None
             changed = True
 
         if changed:
@@ -306,10 +319,16 @@ class UserService:
     async def create_email_verification_token(self, user_id: uuid.UUID) -> str:
         """Create and store an email verification token."""
         token = generate_token()
+        expires_at = datetime.now(timezone.utc) + timedelta(
+            hours=settings.email_verification_token_expire_hours
+        )
         await self.session.execute(
             update(User)
             .where(User.id == user_id)
-            .values(email_verification_token=hash_token_value(token))
+            .values(
+                email_verification_token=hash_token_value(token),
+                email_verification_expires_at=expires_at,
+            )
         )
         await self.session.commit()
         return token
@@ -323,14 +342,31 @@ class UserService:
         if not user:
             return None
 
+        now = datetime.now(timezone.utc)
+        if (
+            _as_utc_datetime(user.email_verification_expires_at)
+            and _as_utc_datetime(user.email_verification_expires_at) < now
+        ):
+            await self.session.execute(
+                update(User)
+                .where(User.id == user.id)
+                .values(
+                    email_verification_token=None,
+                    email_verification_expires_at=None,
+                )
+            )
+            await self.session.commit()
+            return None
+
         # Update user as verified
         await self.session.execute(
             update(User)
             .where(User.id == user.id)
             .values(
                 is_email_verified=True,
-                email_verified_at=datetime.now(timezone.utc),
+                email_verified_at=now,
                 email_verification_token=None,
+                email_verification_expires_at=None,
             )
         )
         await self.session.commit()
@@ -344,7 +380,24 @@ class UserService:
         result = await self.session.execute(
             select(User).where(User.email_verification_token == hash_token_value(token))
         )
-        return result.scalar_one_or_none()
+        user = result.scalar_one_or_none()
+        if not user:
+            return None
+
+        expires_at = _as_utc_datetime(user.email_verification_expires_at)
+        if expires_at and expires_at < datetime.now(timezone.utc):
+            await self.session.execute(
+                update(User)
+                .where(User.id == user.id)
+                .values(
+                    email_verification_token=None,
+                    email_verification_expires_at=None,
+                )
+            )
+            await self.session.commit()
+            return None
+
+        return user
 
     # Password reset methods
     async def create_password_reset_token(self, user_id: uuid.UUID) -> str:

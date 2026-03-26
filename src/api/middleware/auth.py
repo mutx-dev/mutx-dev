@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from src.api.auth.jwt import verify_access_token
+from src.api.config import get_settings
 from src.api.database import async_session_maker, get_db
 from src.api.models.models import User
 from src.api.services.user_service import UserService, verify_api_key
@@ -139,6 +140,30 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    return user
+
+
+def assert_internal_user(user: User) -> None:
+    """Restrict access to verified users on configured internal email domains."""
+    if not user.is_email_verified:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    settings = get_settings()
+    allowed_domains = {
+        domain.strip().lower()
+        for domain in settings.internal_user_email_domains
+        if domain and domain.strip()
+    }
+
+    user_domain = user.email.rsplit("@", 1)[-1].lower() if "@" in user.email else ""
+    if user_domain not in allowed_domains:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+
+async def get_current_internal_user(
+    user: User = Depends(get_current_user),
+) -> User:
+    assert_internal_user(user)
     return user
 
 
