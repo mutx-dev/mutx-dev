@@ -1,7 +1,5 @@
 const { app, BrowserWindow, shell, Menu, Tray, Notification, ipcMain, nativeImage } = require("electron");
 const path = require("path");
-const { spawn } = require("child_process");
-
 const DEFAULT_URL = "https://app.mutx.dev";
 const LOCAL_URL = "http://localhost:3000";
 
@@ -312,38 +310,6 @@ function setupIpcHandlers() {
       return true;
     }
     return false;
-  });
-
-  ipcMain.handle("run-cli-command", async (event, { command, args }) => {
-    return new Promise((resolve) => {
-      try {
-        const child = spawn(command, args, {
-          shell: true,
-          stdio: ["ignore", "pipe", "pipe"],
-        });
-
-        let stdout = "";
-        let stderr = "";
-
-        child.stdout.on("data", (data) => {
-          stdout += data.toString();
-        });
-
-        child.stderr.on("data", (data) => {
-          stderr += data.toString();
-        });
-
-        child.on("close", (code) => {
-          resolve({ code, stdout, stderr });
-        });
-
-        child.on("error", (error) => {
-          resolve({ code: -1, stdout: "", stderr: error.message });
-        });
-      } catch (error) {
-        resolve({ code: -1, stdout: "", stderr: error.message });
-      }
-    });
   });
 
   ipcMain.handle("minimize-window", () => {

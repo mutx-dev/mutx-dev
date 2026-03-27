@@ -13,8 +13,6 @@ contextBridge.exposeInMainWorld("mutxDesktop", {
 
   showNotification: (options) => ipcRenderer.invoke("show-notification", options),
 
-  runCliCommand: (command, args) =>
-    ipcRenderer.invoke("run-cli-command", { command, args }),
 
   minimizeWindow: () => ipcRenderer.invoke("minimize-window"),
 
