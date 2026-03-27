@@ -50,6 +50,24 @@ def wizard_result_payload(*, reused_existing_assistant: bool = False) -> SimpleN
     )
 
 
+
+
+def test_setup_faramesh_does_not_auto_install(monkeypatch) -> None:
+    from cli.commands import setup as setup_module
+
+    captured: dict[str, object] = {}
+
+    def fake_ensure(*, install_if_missing: bool, non_interactive: bool):
+        captured["install_if_missing"] = install_if_missing
+        captured["non_interactive"] = non_interactive
+        return False, None
+
+    monkeypatch.setattr(setup_module, "ensure_faramesh_installed", fake_ensure)
+
+    setup_module._install_faramesh_governance()
+
+    assert captured == {"install_if_missing": False, "non_interactive": True}
+
 def test_setup_hosted_deploys_personal_assistant(monkeypatch, tmp_path: Path) -> None:
     captured: dict[str, object] = {}
     launched = {"value": False}
