@@ -19,75 +19,7 @@ def write_executable(path: Path, content: str) -> None:
     path.chmod(path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
 
-def build_fake_cli_package(package_dir: Path) -> Path:
-    package_dir.mkdir(parents=True, exist_ok=True)
-    (package_dir / "pyproject.toml").write_text(
-        inspect.cleandoc(
-            """
-            [build-system]
-            requires = ["setuptools>=61.0", "wheel"]
-            build-backend = "setuptools.build_meta"
-
-            [project]
-            name = "mutx"
-            version = "9.9.9"
-
-            [project.scripts]
-            mutx = "fakecli:main"
-            """
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    (package_dir / "fakecli.py").write_text(
-        inspect.cleandoc(
-            """
-            from __future__ import annotations
-
-            import sys
-
-
-            def main() -> None:
-                args = sys.argv[1:]
-                if not args or args == ["--help"]:
-                    print("Usage: mutx [OPTIONS] COMMAND [ARGS]...")
-                    print("")
-                    print("Commands:")
-                    print("  doctor")
-                    print("  setup")
-                    print("  status")
-                    print("  tui")
-                    return
-
-                if args in (
-                    ["setup", "--help"],
-                    ["setup", "hosted", "--help"],
-                    ["setup", "local", "--help"],
-                    ["doctor", "--help"],
-                    ["tui", "--help"],
-                ):
-                    return
-
-                if args[:2] == ["setup", "hosted"]:
-                    print("HOSTED SETUP", " ".join(args[2:]).strip())
-                    return
-
-                if args[:2] == ["setup", "local"]:
-                    print("LOCAL SETUP", " ".join(args[2:]).strip())
-                    return
-
-                if args and args[0] == "doctor":
-                    print("doctor ok")
-                    return
-            """
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    return package_dir
-
-
-def build_install_env(tmp_path: Path, *, source_ref: str | None = None) -> tuple[dict[str, str], Path]:
+def build_install_env(tmp_path: Path) -> tuple[dict[str, str], Path]:
     brew_prefix = tmp_path / "brew-prefix"
     brew_bin = brew_prefix / "bin"
     brew_bin.mkdir(parents=True, exist_ok=True)
@@ -133,9 +65,6 @@ def build_install_env(tmp_path: Path, *, source_ref: str | None = None) -> tuple
     env["HOMEBREW_NO_AUTO_UPDATE"] = "1"
     env["HOMEBREW_NO_INSTALL_FROM_API"] = "1"
     env["PATH"] = f"{brew_bin}:{env['PATH']}"
-    if source_ref is not None:
-      env["MUTX_CLI_SOURCE_REF"] = source_ref
-
     return env, brew_prefix
 
 
@@ -143,10 +72,9 @@ def run_install_script(
     tmp_path: Path,
     *,
     mutx_script: str,
-    source_ref: str | None = None,
     args: list[str] | None = None,
 ) -> tuple[subprocess.CompletedProcess[str], Path]:
-    env, brew_prefix = build_install_env(tmp_path, source_ref=source_ref)
+    env, brew_prefix = build_install_env(tmp_path)
     write_executable(brew_prefix / "bin" / "mutx", mutx_script)
 
     result = subprocess.run(
@@ -164,11 +92,10 @@ def run_install_script_in_tty(
     tmp_path: Path,
     *,
     mutx_script: str,
-    source_ref: str,
     replies: list[tuple[str, str]],
     timeout_seconds: float = 45.0,
 ) -> tuple[int, str, Path]:
-    env, brew_prefix = build_install_env(tmp_path, source_ref=source_ref)
+    env, brew_prefix = build_install_env(tmp_path)
     env["MUTX_OPEN_TUI"] = "1"
     env["TERM"] = "xterm-256color"
     write_executable(brew_prefix / "bin" / "mutx", mutx_script)
@@ -282,26 +209,13 @@ exit 0
 """
 
 
-def test_install_script_bootstraps_current_cli_when_packaged_binary_is_stale(tmp_path: Path) -> None:
-    source_ref = str(build_fake_cli_package(tmp_path / "source-cli"))
-    result, brew_prefix = run_install_script(tmp_path, mutx_script=STALE_MUTX_SCRIPT, source_ref=source_ref)
+def test_install_script_fails_when_packaged_binary_is_stale(tmp_path: Path) -> None:
+    result, _ = run_install_script(tmp_path, mutx_script=STALE_MUTX_SCRIPT)
 
-    assert result.returncode == 0
-    assert "Recovering current CLI surface" in result.stdout
-    assert "Install complete" in result.stdout
-    assert "mutx setup hosted" in result.stdout
-    assert "mutx setup local" in result.stdout
-    assert "mutx-dev/homebrew-tap" not in result.stdout
-    assert "formula:" not in result.stdout
-    assert result.stderr == ""
-
-    setup_help = subprocess.run(
-        [str(brew_prefix / "bin" / "mutx"), "setup", "--help"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert setup_help.returncode == 0
+    assert result.returncode != 0
+    assert "Checking onboarding surface" in result.stdout
+    assert "Recovering current CLI surface" not in result.stdout
+    assert "missing required commands" in result.stderr
 
 
 def test_install_script_allows_assistant_first_cli_surface_without_recovery(tmp_path: Path) -> None:
@@ -339,31 +253,16 @@ def test_install_script_no_onboard_skips_wizard_and_prints_next_steps(tmp_path: 
     assert "mutx setup local" in result.stdout
 
 
-def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recovery(tmp_path: Path) -> None:
-    source_ref = str(build_fake_cli_package(tmp_path / "source-cli"))
-    exit_code, transcript, brew_prefix = run_install_script_in_tty(
+def test_install_script_tty_fails_fast_when_packaged_binary_is_stale(tmp_path: Path) -> None:
+    exit_code, transcript, _ = run_install_script_in_tty(
         tmp_path,
         mutx_script=STALE_MUTX_SCRIPT,
-        source_ref=source_ref,
         replies=[
             ("Select a lane [1/2/3]", "2\n"),
         ],
     )
 
-    assert exit_code == 0
-    assert "Recovering current CLI surface" in transcript
-    assert "Setup Wizard" in transcript
-    assert "Select a lane [1/2/3]" in transcript
-    assert "Hosted lane" in transcript
-    assert "Local lane" in transcript
-    assert "Launching:" in transcript
-    assert "LOCAL SETUP --open-tui" in transcript
-    assert "No such command 'setup'" not in transcript
-
-    setup_help = subprocess.run(
-        [str(brew_prefix / "bin" / "mutx"), "setup", "local", "--help"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert setup_help.returncode == 0
+    assert exit_code != 0
+    assert "Recovering current CLI surface" not in transcript
+    assert "Setup Wizard" not in transcript
+    assert "missing required commands" in transcript

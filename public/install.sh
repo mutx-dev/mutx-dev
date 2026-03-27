@@ -5,7 +5,6 @@ TAP="${MUTX_TAP:-mutx-dev/homebrew-tap}"
 FORMULA="${MUTX_FORMULA:-mutx}"
 OPEN_TUI="${MUTX_OPEN_TUI:-1}"
 MUTX_HOME_DIR="${MUTX_HOME_DIR:-$HOME/.mutx}"
-MUTX_CLI_SOURCE_REF="${MUTX_CLI_SOURCE_REF:-https://github.com/mutx-dev/mutx-dev/archive/refs/heads/main.tar.gz}"
 MUTX_NO_ANIMATION="${MUTX_NO_ANIMATION:-0}"
 NO_ONBOARD="${MUTX_NO_ONBOARD:-0}"
 NO_PROMPT="${MUTX_NO_PROMPT:-0}"
@@ -157,7 +156,6 @@ Environment:
   MUTX_NO_ANIMATION=1      Disable animated installer output
   MUTX_NO_ONBOARD=1        Skip the setup wizard handoff
   MUTX_NO_PROMPT=1         Disable prompts and finish with next-step commands
-  MUTX_CLI_SOURCE_REF=...  Override the fallback source runtime reference
 EOF
 }
 
@@ -248,7 +246,7 @@ show_install_plan() {
   ui_section "Install plan"
   ui_kv "OS" "${OS_NAME}"
   ui_kv "Package lane" "homebrew"
-  ui_kv "Runtime fallback" "source overlay if packaged CLI is stale"
+  ui_kv "Runtime fallback" "none (requires packaged CLI commands)"
   ui_kv "Onboarding" "${onboarding_mode}"
   ui_kv "Prompt mode" "${prompt_mode}"
   ui_kv "TUI" "${tui_mode}"
@@ -651,52 +649,8 @@ show_surface_status() {
   return 1
 }
 
-resolve_python_bin() {
-  if command -v python3 >/dev/null 2>&1; then
-    command -v python3
-    return 0
-  fi
-
-  local brew_python_prefix=""
-  brew_python_prefix="$(brew --prefix python@3.12 2>>"${INSTALL_LOG}" || true)"
-  if [[ -n "${brew_python_prefix}" ]]; then
-    if [[ -x "${brew_python_prefix}/bin/python3" ]]; then
-      printf '%s\n' "${brew_python_prefix}/bin/python3"
-      return 0
-    fi
-    if [[ -x "${brew_python_prefix}/bin/python3.12" ]]; then
-      printf '%s\n' "${brew_python_prefix}/bin/python3.12"
-      return 0
-    fi
-  fi
-
-  return 1
-}
-
 upgrade_or_keep_formula() {
   brew upgrade "${FORMULA}" || true
-}
-
-install_source_overlay() {
-  local python_bin=""
-  python_bin="$(resolve_python_bin)" || return 1
-
-  local overlay_root="${MUTX_HOME_DIR}/runtime/source-cli"
-  local final_venv="${overlay_root}/venv"
-  local brew_prefix=""
-
-  mkdir -p "${overlay_root}"
-  rm -rf "${final_venv}"
-
-  "${python_bin}" -m venv "${final_venv}"
-  "${final_venv}/bin/pip" install --disable-pip-version-check --quiet --upgrade pip setuptools wheel
-  "${final_venv}/bin/pip" install --disable-pip-version-check --quiet --upgrade "${MUTX_CLI_SOURCE_REF}"
-  "${final_venv}/bin/pip" install --disable-pip-version-check --quiet --upgrade "textual>=0.58.0,<2.0.0"
-
-  brew_prefix="$(brew --prefix)"
-  mkdir -p "${brew_prefix}/bin"
-  ln -sf "${final_venv}/bin/mutx" "${brew_prefix}/bin/mutx"
-  hash -r 2>/dev/null || true
 }
 
 ensure_assistant_first_surface() {
@@ -704,17 +658,7 @@ ensure_assistant_first_surface() {
     return 0
   fi
 
-  note "The packaged CLI is older than this installer. Pulling a fresh MUTX runtime."
-  run_stage "Recovering current CLI surface" install_source_overlay
-  SOURCE_OVERLAY_USED=1
-  resolve_mutx_bin
-
-  if show_surface_status "Rechecking onboarding surface"; then
-    note "mutx now resolves to ${MUTX_BIN}"
-    return 0
-  fi
-
-  die "The installed CLI is still missing required commands: ${CLI_MISSING_COMMANDS}"
+  die "The installed CLI is missing required commands: ${CLI_MISSING_COMMANDS}. Upgrade ${FORMULA} from ${TAP} and re-run this installer."
 }
 
 run_setup_handoff() {
