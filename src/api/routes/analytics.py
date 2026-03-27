@@ -185,7 +185,11 @@ async def get_analytics_timeseries(
             data.append(AnalyticsTimeSeries(timestamp=row.ts.replace(tzinfo=timezone.utc) if row.ts else now, value=row.count))
     elif metric == "latency":
         q = select(func.date_trunc(interval, Metrics.timestamp).label("ts"), func.avg(Metrics.latency).label("avg")
-        ).where(and_(Metrics.timestamp >= period_start_dt, Metrics.timestamp <= period_end_dt))
+        ).join(Agent, Agent.id == Metrics.agent_id).where(and_(
+            Agent.user_id == current_user.id,
+            Metrics.timestamp >= period_start_dt,
+            Metrics.timestamp <= period_end_dt,
+        ))
         if agent_id: q = q.where(Metrics.agent_id == agent_id)
         q = q.group_by("ts").order_by("ts")
         for row in await db.execute(q):
@@ -241,4 +245,3 @@ async def get_budget(db: AsyncSession = Depends(get_db), current_user: User = De
     return BudgetResponse(user_id=current_user.id, plan=current_user.plan.value, credits_total=credits_total,
         credits_used=credits_used, credits_remaining=credits_remaining, reset_date=reset_date,
         usage_percentage=round(credits_used / credits_total * 100, 2) if credits_total > 0 else 0)
-
