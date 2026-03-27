@@ -7,6 +7,15 @@ function getDesktopUrl() {
   return process.env.MUTX_DESKTOP_URL || DEFAULT_URL;
 }
 
+function isSafeExternalUrl(url) {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.protocol === "https:" || parsedUrl.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 1366,
@@ -21,7 +30,9 @@ function createWindow() {
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
+    if (isSafeExternalUrl(url)) {
+      shell.openExternal(url);
+    }
     return { action: "deny" };
   });
 
