@@ -14,21 +14,12 @@ const nextConfig = {
   },
   async rewrites() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.mutx.dev';
-    return {
-      beforeFiles: [
-        {
-          source: '/api/v1/:path*',
-          destination: '/api/:path*',
-        },
-      ],
-      afterFiles: [],
-      fallback: [
-        {
-          source: '/api/:path*',
-          destination: `${apiUrl}/:path*`,
-        },
-      ],
-    };
+    return [
+      {
+        source: '/api/v1/:path*',
+        destination: `${apiUrl}/api/:path*`,
+      },
+    ];
   },
 };
 
