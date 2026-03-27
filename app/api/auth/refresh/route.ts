@@ -16,6 +16,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const { refresh_token } = validation.data
+    const refreshCookie = request.cookies.get('refresh_token')?.value
+
+    if (!refreshCookie || refreshCookie !== refresh_token) {
+      return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 })
+    }
     
     const secureCookies = shouldUseSecureCookies(request)
     const cookieDomain = getCookieDomain(request)
