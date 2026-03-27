@@ -171,9 +171,10 @@ def _install_faramesh_governance() -> None:
     click.echo("")
     click.echo("… Installing Faramesh governance engine")
 
-    installed, bin_path = ensure_faramesh_installed(install_if_missing=True, non_interactive=True)
+    installed, bin_path = ensure_faramesh_installed(install_if_missing=False, non_interactive=True)
     if not installed:
-        click.echo("  ⚠ Faramesh installation skipped (will be available later)")
+        click.echo("  ⚠ Faramesh is not installed; skipping automatic install for security")
+        click.echo("    Install manually via trusted channel, then run: mutx governance start")
         return
 
     click.echo(f"  ✓ Faramesh installed: {bin_path}")
