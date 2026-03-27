@@ -8,6 +8,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
+from src.api.config import get_settings
 from src.api.middleware.auth import get_current_user
 from src.api.models import User
 from src.api.services.credential_broker import (
@@ -44,11 +45,28 @@ class BackendHealthResponse(BaseModel):
     is_healthy: bool
 
 
+def _assert_internal_user(current_user: User) -> None:
+    """Restrict credential broker access to internal/admin users."""
+    if not current_user.is_email_verified:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    settings = get_settings()
+    allowed_domains = {
+        domain.strip().lower()
+        for domain in settings.internal_user_email_domains
+        if domain and domain.strip()
+    }
+    user_domain = current_user.email.rsplit("@", 1)[-1].lower() if "@" in current_user.email else ""
+    if user_domain not in allowed_domains:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+
 @router.get("/backends", response_model=list[BackendHealthResponse])
 async def list_credential_backends(
     current_user: User = Depends(get_current_user),
 ):
     """List all registered credential backends."""
+    _assert_internal_user(current_user)
     broker = get_credential_broker()
     backends = await broker.list_backends()
     return [
@@ -70,6 +88,7 @@ async def register_credential_backend(
     current_user: User = Depends(get_current_user),
 ):
     """Register a new credential backend."""
+    _assert_internal_user(current_user)
     try:
         backend_enum = CredentialBackend(request.backend)
     except ValueError:
@@ -100,6 +119,7 @@ async def unregister_credential_backend(
     current_user: User = Depends(get_current_user),
 ):
     """Unregister a credential backend."""
+    _assert_internal_user(current_user)
     broker = get_credential_broker()
     success = await broker.unregister_backend(backend_name)
 
@@ -115,6 +135,7 @@ async def check_backend_health(
     current_user: User = Depends(get_current_user),
 ):
     """Check health of a specific credential backend."""
+    _assert_internal_user(current_user)
     broker = get_credential_broker()
     backends = await broker.list_backends()
 
@@ -134,6 +155,7 @@ async def check_all_backends_health(
     current_user: User = Depends(get_current_user),
 ):
     """Check health of all credential backends."""
+    _assert_internal_user(current_user)
     broker = get_credential_broker()
     return await broker.health_check()
 
@@ -152,6 +174,7 @@ async def get_credential(
         awssecrets:/prod/myapp/api-key
         gcpsm:/my-project/my-secret
     """
+    _assert_internal_user(current_user)
     broker = get_credential_broker()
     credential = await broker.get_credential_by_path(full_path)
 
