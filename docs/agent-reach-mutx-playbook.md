@@ -12,6 +12,23 @@ Current local install result:
 - Working now: GitHub, X/Twitter, Reddit, Bilibili, YouTube, RSS, web/Jina, Exa search, V2EX, WeChat articles
 - Partially broken / not configured: Weibo MCP load, Xueqiu connectivity, Xiaoyuzhou (needs Groq key), XiaoHongShu, Douyin, LinkedIn
 
+## Live wiring
+
+Agent Reach is now wired into a live MUTX lane:
+- cron: `MUTX Outside-In Intelligence v1`
+- jobId: `996120e8-d629-482d-b80f-f3e080a064e6`
+- sessionTarget: `session:mutx-outside-in-intelligence`
+- schedule: `20 8,13,18 * * *`
+- workspace: `mutx-agents/gtm/outside-in-intelligence`
+
+The lane writes a shared `reports/signal-brief.md` and now feeds:
+- social-media-strategist
+- outbound-strategist
+- account-strategist
+- developer-advocate
+- product-manager
+- report-distribution-agent
+
 ## What Agent Reach actually is
 
 Agent Reach is **not** a new control plane for MUTX.

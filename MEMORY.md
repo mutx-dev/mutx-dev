@@ -37,6 +37,7 @@
 - No silent fallback to paid remote embeddings for memory.
 - Local memory is now strategic infrastructure, not optional convenience.
 - X replies should be proof-based and additive by default; avoid explicit MUTX shilling unless the thread naturally calls for a concrete product reference.
+- Agent Reach is installed for MUTX as an outside-in intelligence layer feeding GTM/product agents; keep public execution in the guarded browser/X lane instead of making Agent Reach the default posting path.
 
 ## Canonical paths
 - Primary repo: `/Users/fortune/MUTX`
