@@ -47,6 +47,27 @@ REVIEWER_BY_AGENT = {
 }
 
 BLOCKING_LABELS = {"autonomy:blocked", "autonomy:claimed"}
+EXCLUDED_LABEL_TERMS = (
+    "duplicate",
+    "stale",
+    "closed-live",
+    "post-close-audit",
+)
+STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "for",
+    "from",
+    "in",
+    "into",
+    "of",
+    "on",
+    "or",
+    "the",
+    "to",
+    "with",
+}
 
 
 def slugify(value: str) -> str:
@@ -62,6 +83,8 @@ def score_issue(labels: list[str]) -> int:
         score += SIZE_PRIORITY.get(label, 0)
     if "autonomy:safe" in labels:
         score += 10
+    if "autonomy:canonical" in labels:
+        score += 15
     return score
 
 
@@ -73,19 +96,78 @@ def extract_labels(issue: dict[str, Any]) -> list[str]:
     return labels
 
 
+def should_exclude_issue(labels: list[str]) -> bool:
+    lowered = {label.lower() for label in labels}
+    if "autonomy:force-dispatch" in lowered:
+        return False
+    return any(term in label for label in lowered for term in EXCLUDED_LABEL_TERMS)
+
+
+URL_RE = re.compile(r"https?://\S+")
+TOKEN_RE = re.compile(r"[^a-z0-9]+")
+
+
+def canonical_issue_key(issue: dict[str, Any]) -> str:
+    body = str(issue.get("body") or "")
+    title = str(issue.get("title") or "")
+    first_signal_lines = [line.strip() for line in body.splitlines() if line.strip()][:6]
+    candidate_text = f"{title} {' '.join(first_signal_lines)}"
+    candidate_text = URL_RE.sub(" ", candidate_text.lower())
+    tokens = [token for token in TOKEN_RE.sub(" ", candidate_text).split() if token and token not in STOPWORDS]
+    if not tokens:
+        return f"issue-{issue.get('number', 'unknown')}"
+    return " ".join(tokens[:24])
+
+
+def issue_richness(issue: dict[str, Any], labels: list[str]) -> int:
+    body = str(issue.get("body") or "")
+    nonempty_lines = sum(1 for line in body.splitlines() if line.strip())
+    heading_count = body.count("## ")
+    checklist_count = body.count("- [")
+    bullet_count = body.count("- ")
+    return (
+        len(body.strip())
+        + nonempty_lines * 20
+        + heading_count * 40
+        + checklist_count * 30
+        + bullet_count * 5
+        + len(labels) * 10
+    )
+
+
 def choose_issue(issues: list[dict[str, Any]]) -> dict[str, Any] | None:
-    eligible = []
+    representative_by_key: dict[str, tuple[int, int, dict[str, Any]]] = {}
+
     for issue in issues:
         labels = extract_labels(issue)
         if any(label in BLOCKING_LABELS for label in labels):
             continue
         if "autonomy:ready" not in labels:
             continue
-        eligible.append((score_issue(labels), issue))
+        if should_exclude_issue(labels):
+            continue
+
+        score = score_issue(labels)
+        richness = issue_richness(issue, labels)
+        key = canonical_issue_key(issue)
+        current = representative_by_key.get(key)
+
+        if current is None:
+            representative_by_key[key] = (score, richness, issue)
+            continue
+
+        current_score, current_richness, current_issue = current
+        candidate_rank = (score, richness, -int(issue["number"]))
+        current_rank = (current_score, current_richness, -int(current_issue["number"]))
+        if candidate_rank > current_rank:
+            representative_by_key[key] = (score, richness, issue)
+
+    eligible = [payload for payload in representative_by_key.values()]
     if not eligible:
         return None
-    eligible.sort(key=lambda item: (item[0], item[1]["number"]), reverse=True)
-    return eligible[0][1]
+
+    eligible.sort(key=lambda item: (-item[0], -item[1], int(item[2]["number"])))
+    return eligible[0][2]
 
 
 def build_work_order(issue: dict[str, Any]) -> dict[str, Any]:

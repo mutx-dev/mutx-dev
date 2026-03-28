@@ -9,8 +9,26 @@ on:
         description: 'Skip issue claiming and executor handoff'
         required: false
         default: 'true'
+  issues:
+    types:
+      - opened
+      - reopened
+      - labeled
+      - unlabeled
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+      - closed
+  workflow_run:
+    workflows:
+      - Autonomous Executor Runner
+    types:
+      - completed
 
 permissions:
+  actions: write
   contents: write
   issues: write
   pull-requests: write
@@ -25,6 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AUTONOMY_STALE_CLAIM_MINUTES: ${{ vars.AUTONOMY_STALE_CLAIM_MINUTES || '120' }}
+      AUTONOMY_MAX_ACTIVE_SLOTS: ${{ vars.AUTONOMY_MAX_ACTIVE_SLOTS || '2' }}
 
     steps:
       - name: Check out repository
@@ -187,11 +206,20 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const fs = require('fs');
-            const issues = await github.paginate(github.rest.issues.listForRepo, {
+            const maxActiveSlots = parseInt(process.env.AUTONOMY_MAX_ACTIVE_SLOTS || '2', 10);
+
+            const readyIssues = await github.paginate(github.rest.issues.listForRepo, {
               owner,
               repo,
               state: 'open',
               labels: 'autonomy:ready',
+              per_page: 100,
+            });
+            const claimedIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              labels: 'autonomy:claimed',
               per_page: 100,
             });
             const openPrs = await github.paginate(github.rest.pulls.list, {
@@ -201,31 +229,74 @@ jobs:
               per_page: 100,
             });
 
-            const emptyQueueViolation = issues.length === 0 && openPrs.length === 0;
-            const stalledQueueViolation = issues.length > 0 && openPrs.length === 0;
-            const violations = [];
-            if (emptyQueueViolation) {
-              violations.push('queue floor failed: zero autonomy:ready issues and zero open PRs');
+            const hasLabel = (issue, labelName) =>
+              (issue.labels || []).some((label) => (label && label.name) === labelName);
+
+            const isAutonomyPr = (pullRequest) => {
+              const title = String(pullRequest.title || '').toLowerCase();
+              const body = String(pullRequest.body || '').toLowerCase();
+              const headRef = String(pullRequest.head && pullRequest.head.ref || '');
+              return (
+                headRef.startsWith('autonomy/') ||
+                title.startsWith('autonomy:') ||
+                body.includes('autonomous implementation for #')
+              );
+            };
+
+            const autonomyPrs = openPrs.filter(isAutonomyPr);
+            const readyUnclaimedIssues = readyIssues.filter((issue) => !hasLabel(issue, 'autonomy:claimed'));
+
+            const activeKeys = new Set();
+            for (const issue of claimedIssues) {
+              activeKeys.add(`issue:${issue.number}`);
             }
-            if (stalledQueueViolation) {
-              violations.push('queue handoff failed: autonomy:ready issues exist but zero open PRs');
+            for (const pullRequest of autonomyPrs) {
+              const body = String(pullRequest.body || '');
+              const matches = [...body.matchAll(/#(\d+)/g)];
+              if (matches.length === 0) {
+                activeKeys.add(`pr:${pullRequest.number}`);
+                continue;
+              }
+              for (const match of matches) {
+                activeKeys.add(`issue:${match[1]}`);
+              }
+            }
+
+            const activeAutonomySlots = activeKeys.size;
+            const freeSlots = Math.max(0, maxActiveSlots - activeAutonomySlots);
+            const dispatchNeeded = readyUnclaimedIssues.length > 0 && freeSlots > 0;
+            const idleGapViolation = readyUnclaimedIssues.length > 0 && freeSlots > 0 && activeAutonomySlots === 0;
+            const violations = [];
+            if (idleGapViolation) {
+              violations.push('ready autonomy issues exist with free slots, but zero active autonomy claims/PRs are in flight');
             }
 
             const snapshot = {
               generated_at: new Date().toISOString(),
-              open_autonomy_ready_issues: issues.length,
-              open_pull_requests: openPrs.length,
+              max_active_slots: maxActiveSlots,
+              open_autonomy_ready_issues: readyIssues.length,
+              open_autonomy_ready_unclaimed_issues: readyUnclaimedIssues.length,
+              open_autonomy_claimed_issues: claimedIssues.length,
+              open_autonomy_pull_requests: autonomyPrs.length,
+              active_autonomy_slots: activeAutonomySlots,
+              free_slots: freeSlots,
+              dispatch_needed: dispatchNeeded,
               violations,
             };
 
-            fs.writeFileSync('autonomy-queue.json', JSON.stringify(issues, null, 2));
+            fs.writeFileSync('autonomy-queue.json', JSON.stringify(readyIssues, null, 2));
             fs.writeFileSync('autonomy-queue-health.json', JSON.stringify(snapshot, null, 2));
 
             const lines = [
               '## Queue Health',
               '',
-              `- open \`autonomy:ready\` issues: ${issues.length}`,
-              `- open PRs: ${openPrs.length}`,
+              `- open \`autonomy:ready\` issues: ${readyIssues.length}`,
+              `- open \`autonomy:ready\` + unclaimed issues: ${readyUnclaimedIssues.length}`,
+              `- open \`autonomy:claimed\` issues: ${claimedIssues.length}`,
+              `- open autonomy PRs: ${autonomyPrs.length}`,
+              `- active autonomy slots: ${activeAutonomySlots}/${maxActiveSlots}`,
+              `- free slots: ${freeSlots}`,
+              `- dispatch needed: ${dispatchNeeded ? 'yes' : 'no'}`,
             ];
             if (violations.length === 0) {
               lines.push('- status: healthy');
@@ -239,8 +310,9 @@ jobs:
             }
             await core.summary.addRaw(lines.join('\n')).write();
 
-            core.setOutput('empty_violation', String(emptyQueueViolation));
-            core.setOutput('stalled_violation', String(stalledQueueViolation));
+            core.setOutput('dispatch_needed', String(dispatchNeeded));
+            core.setOutput('free_slots', String(freeSlots));
+            core.setOutput('ready_unclaimed', String(readyUnclaimedIssues.length));
 
       - name: Upload queue health snapshot
         uses: actions/upload-artifact@v4
@@ -248,33 +320,21 @@ jobs:
           name: autonomy-queue-health
           path: autonomy-queue-health.json
 
-      - name: Enforce queue floor
-        if: ${{ steps.queue_health.outputs.empty_violation == 'true' }}
-        run: |
-          echo "Queue floor violation: no autonomy:ready issues and no open PRs."
-          cat autonomy-queue-health.json
-          exit 1
-
-      - name: Flag stalled queue handoff
-        if: ${{ steps.queue_health.outputs.stalled_violation == 'true' }}
-        run: |
-          echo "Queue handoff violation: autonomy:ready issues exist but there are no open PRs."
-          cat autonomy-queue-health.json
-
       - name: Build work order
+        if: ${{ steps.queue_health.outputs.dispatch_needed == 'true' }}
         run: python scripts/autonomy/build_work_order.py --queue autonomy-queue.json --output autonomy-work-order.json
 
       - name: Show work order
+        if: ${{ steps.queue_health.outputs.dispatch_needed == 'true' }}
         run: cat autonomy-work-order.json
 
       - name: Claim issue for autonomous execution
-        if: ${{ github.event.inputs.dry_run != 'true' }}
+        if: ${{ steps.queue_health.outputs.dispatch_needed == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.dry_run != 'true') }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           python - <<'PY'
           import json
-          import os
           import subprocess
 
           work_order = json.load(open('autonomy-work-order.json'))
@@ -300,22 +360,43 @@ jobs:
                   f'- reviewer agent: `{reviewer}`\\n'
                   f'- lane: `{lane}`\\n'
                   f'- branch: `{branch}`\\n'
+                  f'- handoff: `autonomous-executor.yml`\\n'
               ),
           ], check=True)
           PY
 
-      - name: Hand off to local executor
-        if: ${{ github.event.inputs.dry_run != 'true' }}
+      - name: Trigger executor workflow
+        if: ${{ steps.queue_health.outputs.dispatch_needed == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.dry_run != 'true') }}
+        uses: actions/github-script@v7
         env:
-          AUTONOMY_EXECUTOR_SETUP_CMD: ${{ vars.AUTONOMY_EXECUTOR_SETUP_CMD }}
-          AUTONOMY_AGENT_CMD_TEMPLATE: ${{ vars.AUTONOMY_AGENT_CMD_TEMPLATE }}
-          AUTONOMY_OPEN_PR: ${{ vars.AUTONOMY_OPEN_PR }}
-          AUTONOMY_MODEL: ${{ vars.AUTONOMY_MODEL }}
-          GH_TOKEN: ${{ github.token }}
-          GITHUB_MODELS_TOKEN: ${{ secrets.GITHUB_MODELS_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          if [ -n "$AUTONOMY_EXECUTOR_SETUP_CMD" ]; then
-            bash -lc "$AUTONOMY_EXECUTOR_SETUP_CMD"
-          fi
-          python scripts/autonomy/execute_work_order.py autonomy-work-order.json
+          WORK_ORDER_PATH: autonomy-work-order.json
+        with:
+          script: |
+            const fs = require('fs');
+            const workOrder = JSON.parse(fs.readFileSync(process.env.WORK_ORDER_PATH, 'utf8'));
+            if (workOrder.status === 'idle') {
+              core.notice('No work order selected.');
+              return;
+            }
+
+            const ref = context.payload.repository?.default_branch || 'main';
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'autonomous-executor.yml',
+              ref,
+              inputs: {
+                work_order_json: JSON.stringify(workOrder),
+              },
+            });
+
+            await core.summary
+              .addRaw([
+                '',
+                '## Dispatch Handoff',
+                '',
+                `- issue: #${workOrder.issue}`,
+                `- branch: \`${workOrder.branch}\``,
+                `- executor workflow: \`autonomous-executor.yml\``,
+              ].join('\n'))
+              .write();

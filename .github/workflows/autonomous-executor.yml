@@ -1,0 +1,73 @@
+name: Autonomous Executor Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      work_order_json:
+        description: 'JSON-encoded work order payload'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  execute:
+    name: Execute Work Order
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      AUTONOMY_EXECUTOR_SETUP_CMD: ${{ vars.AUTONOMY_EXECUTOR_SETUP_CMD }}
+      AUTONOMY_AGENT_CMD_TEMPLATE: ${{ vars.AUTONOMY_AGENT_CMD_TEMPLATE }}
+      AUTONOMY_OPEN_PR: ${{ vars.AUTONOMY_OPEN_PR }}
+      AUTONOMY_MODEL: ${{ vars.AUTONOMY_MODEL }}
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_MODELS_TOKEN: ${{ secrets.GITHUB_MODELS_TOKEN }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      WORK_ORDER_JSON: ${{ inputs.work_order_json }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Configure git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Materialize work order
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          work_order = json.loads(os.environ['WORK_ORDER_JSON'])
+          Path('autonomy-work-order.json').write_text(
+              json.dumps(work_order, indent=2, sort_keys=True) + '\n'
+          )
+          PY
+
+      - name: Show work order
+        run: cat autonomy-work-order.json
+
+      - name: Run executor setup
+        if: ${{ env.AUTONOMY_EXECUTOR_SETUP_CMD != '' }}
+        run: bash -lc "$AUTONOMY_EXECUTOR_SETUP_CMD"
+
+      - name: Execute work order
+        run: python scripts/autonomy/execute_work_order.py autonomy-work-order.json
