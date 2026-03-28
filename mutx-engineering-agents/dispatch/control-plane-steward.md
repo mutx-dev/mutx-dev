@@ -9,8 +9,8 @@ Goal:
 - If no bounded fix exists, report the truth gap and stop.
 
 Current signal:
-- The latest steward report was clean/no-change and did not surface a tiny fix.
-- This remains the next dispatch because the queue still ranks issue-117 parity truth first.
+- Latest control-plane and CLI/SDK reports stayed clean/no-change.
+- No bounded API truth fix surfaced, but `issue-117` still remains the top ready audit in queue, so this is still the correct next dispatch.
 
 Guardrails:
 - Stay inside owned files.

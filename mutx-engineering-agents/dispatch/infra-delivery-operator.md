@@ -9,8 +9,8 @@ Goal:
 - Validate by checking script path resolution and compose references.
 
 Current signal:
-- The infra lane still points at the smallest ready delivery fix after the two audit lanes.
-- The lane report says no actionable dispatch was present in that worktree, so this brief is the artifact that should move next.
+- This remains the smallest ready infra task in queue after the two closed-issue audits.
+- The lane report still says no actionable dispatch was present in the lane workspace, so the brief needs to stay explicit and centralized here.
 
 Guardrails:
 - Stay inside owned files.
