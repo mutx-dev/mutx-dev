@@ -1,6 +1,6 @@
 # latest.md
 
-## Control brief — 2026-03-28 20:00 Europe/Rome
+## Control brief — 2026-03-28 20:15 Europe/Rome
 
 ### Review queue
 1. PR #1211 `Bind auth refresh to refresh cookie` → reviewer `qa-reliability-engineer`
