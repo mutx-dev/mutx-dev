@@ -133,7 +133,7 @@ def test_canonical_quickstart_surfaces_share_assistant_first_commands() -> None:
     assert "/download" in landing_content
     assert "/releases" in landing_content
     assert "Download for Mac" in landing_content
-    assert "Read release" in landing_content
+    assert "Releases" in landing_content
     assert "run_setup_handoff" in install_script
     assert "MUTX_OPEN_TUI" in install_script
     assert "mutx login" not in install_script

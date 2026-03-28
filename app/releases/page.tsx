@@ -5,7 +5,6 @@ import {
   AppWindow,
   ArrowRight,
   BookOpenText,
-  Github,
   ShieldCheck,
 } from "lucide-react";
 
@@ -70,16 +69,8 @@ export default async function ReleasesPage() {
       external: true,
     },
     {
-      title: "GitHub release",
-      body: "Tagged assets, provenance, and the release payload on GitHub Releases.",
-      href: releaseHref,
-      label: "Open GitHub",
-      icon: Github,
-      external: true,
-    },
-    {
-      title: "Docs release notes",
-      body: "Repo-backed release narrative synced to docs.mutx.dev for the current launch.",
+      title: "Docs notes",
+      body: "Docs-backed notes for the current desktop release.",
       href: docsReleaseNotesHref,
       label: "Read notes",
       icon: BookOpenText,
@@ -111,9 +102,9 @@ export default async function ReleasesPage() {
   ] as const;
 
   const shippedSurfaces = [
-    "Signed and notarized Mac release for Apple Silicon and Intel.",
-    "Docs notes, checksums, and GitHub all point at the same stable artifact set.",
-    "Preview control surfaces stay out of the primary stable lane.",
+    "Signed Mac release for Apple Silicon and Intel.",
+    "Docs notes, checksums, and GitHub point at the same build.",
+    "Preview surfaces stay out of the primary release lane.",
   ] as const;
 
   return (
@@ -132,9 +123,7 @@ export default async function ReleasesPage() {
                     <span className={styles.displayAccent}>Signed desktop release.</span>
                   </h1>
                   <p className={`${styles.bodyText} ${styles.bodyTextOnDark}`}>
-                    This page is the public release summary for the current MUTX operator
-                    build: notarized Mac downloads, checksums, GitHub tag, and the
-                    docs-backed release notes that describe what actually ships.
+                    Current signed Mac release, checksums, docs notes, and GitHub tag.
                   </p>
                 </div>
 
@@ -158,8 +147,8 @@ export default async function ReleasesPage() {
                   <a href={docsReleaseNotesHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
                     Docs notes
                   </a>
-                  <a href={checksumsHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
-                    Checksums
+                  <a href={releaseHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                    GitHub release
                   </a>
                 </div>
               </div>
@@ -180,11 +169,9 @@ export default async function ReleasesPage() {
               <div className={styles.routeReleaseBandCopy}>
                 <div className={styles.intro}>
                   <p className={styles.eyebrow}>What ships now</p>
-                  <h2 className={styles.sectionTitle}>One public story for the operator app.</h2>
+                  <h2 className={styles.sectionTitle}>One release lane.</h2>
                   <p className={styles.bodyText}>
-                    Download routes, docs release notes, checksums, and the GitHub tag
-                    all point at the same stable Mac artifact set. This page is the
-                    public handoff, not a second product pitch.
+                    Downloads, notes, checksums, and the GitHub tag all point at the same build.
                   </p>
                 </div>
               </div>
@@ -202,7 +189,10 @@ export default async function ReleasesPage() {
                   Open dashboard
                 </Link>
                 <a href={docsReleaseNotesHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
-                  Docs release notes
+                  Docs notes
+                </a>
+                <a href={releaseHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                  GitHub release
                 </a>
                 <a href={MUTX_GITHUB_RELEASES_URL} target="_blank" rel="noreferrer" className={styles.inlineLink}>
                   All releases
@@ -238,8 +228,7 @@ export default async function ReleasesPage() {
                   <p className={styles.eyebrow}>Artifact contract</p>
                   <h2 className={styles.sectionTitle}>Release files</h2>
                   <p className={styles.bodyText}>
-                    The current desktop release publishes both macOS architectures, both
-                    ZIPs, and one checksum file for rollout verification.
+                    DMGs, ZIPs, and one checksum file for the current desktop release.
                   </p>
                 </div>
 

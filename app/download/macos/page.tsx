@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, AppWindow, Github, ShieldCheck } from "lucide-react";
+import { ArrowRight, BookOpenText, Github, ShieldCheck } from "lucide-react";
 
 import { AuthNav } from "@/components/AuthNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
@@ -26,40 +26,31 @@ export default async function MacDownloadPage() {
     title: string;
     body: string;
     href: string;
-    icon: typeof AppWindow;
+    icon: typeof BookOpenText;
     label: string;
     external?: boolean;
   }> = [
     {
-      title: "Apple Silicon",
-      body: "Download the current signed and notarized build for M-series Macs.",
-      href: arm64Href,
-      icon: AppWindow,
-      label: "Download arm64",
-      external: Boolean(release?.assets.arm64Dmg),
+      title: "Release summary",
+      body: "Current version, public download lane, notes, and checksums in one place.",
+      href: "/releases",
+      icon: BookOpenText,
+      label: "Open release summary",
     },
     {
-      title: "Intel Mac",
-      body: "Use the x64 build if the operator machine is still on Intel hardware.",
-      href: intelHref,
-      icon: AppWindow,
-      label: "Download x64",
-      external: Boolean(release?.assets.x64Dmg),
-    },
-    {
-      title: "Checksums",
-      body: "Verify the release asset against the published SHA-256 file before rollout.",
-      href: checksumsHref,
-      icon: ShieldCheck,
-      label: "View checksums",
+      title: "Docs notes",
+      body: "Docs-backed notes for the current desktop build.",
+      href: docsReleaseNotesHref,
+      icon: BookOpenText,
+      label: "Read docs notes",
       external: true,
     },
     {
-      title: "GitHub release",
-      body: "Inspect tagged assets, release notes, and artifact history on GitHub.",
-      href: release?.htmlUrl ?? MUTX_GITHUB_RELEASES_URL,
-      icon: Github,
-      label: "View release",
+      title: "Checksums",
+      body: "SHA-256 file for rollout verification.",
+      href: checksumsHref,
+      icon: ShieldCheck,
+      label: "View checksums",
       external: true,
     },
   ];
@@ -79,9 +70,8 @@ export default async function MacDownloadPage() {
                     Download MUTX for macOS.
                   </h1>
                   <p className={`${styles.bodyText} ${styles.bodyTextOnDark}`}>
-                    MUTX {releaseLabel} is the signed and notarized desktop operator app.
-                    Pick Apple Silicon or Intel, install once, then move straight into the
-                    dashboard and runtime lane.
+                    MUTX {releaseLabel} is the signed macOS operator app for Apple Silicon
+                    and Intel. Install it, then move straight into the dashboard.
                   </p>
                 </div>
 
@@ -118,13 +108,8 @@ export default async function MacDownloadPage() {
                   <a href={checksumsHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
                     Checksums
                   </a>
-                  <a
-                    href="https://docs.mutx.dev"
-                    target="_blank"
-                    rel="noreferrer"
-                    className={styles.inlineLink}
-                  >
-                    Docs
+                  <a href={release?.htmlUrl ?? MUTX_GITHUB_RELEASES_URL} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                    GitHub release
                   </a>
                 </div>
               </div>
@@ -145,41 +130,39 @@ export default async function MacDownloadPage() {
               <div className={styles.routeReleaseBandCopy}>
                 <div className={styles.intro}>
                   <p className={styles.eyebrow}>Stable operator lane</p>
-                  <h2 className={styles.sectionTitle}>Install once. Operate from one lane.</h2>
+                  <h2 className={styles.sectionTitle}>Mac app first.</h2>
                   <p className={styles.bodyText}>
-                    The Mac app is the primary operator surface. These routes resolve to
-                    the current stable release assets, checksum file, release summary,
-                    and docs-backed notes without detouring through a fake handoff.
+                    Downloads, notes, and checksums stay in one public lane.
                   </p>
                 </div>
               </div>
 
               <div className={styles.routeReleaseSignalGrid}>
                 <p className={`${styles.surfaceListItem} ${styles.surfaceListItemDark}`}>
-                  Signed and notarized build for Apple Silicon and Intel.
+                  Signed builds for Apple Silicon and Intel.
                 </p>
                 <p className={`${styles.surfaceListItem} ${styles.surfaceListItemDark}`}>
-                  Current release summary, checksums, and docs notes stay aligned.
+                  Release summary, notes, and checksums stay aligned.
                 </p>
                 <p className={`${styles.surfaceListItem} ${styles.surfaceListItemDark}`}>
-                  Use the dashboard after install instead of a fake browser handoff.
+                  Install once, then move into the dashboard.
                 </p>
               </div>
 
               <div className={styles.utilityLinks}>
-                <Link href="/releases" className={styles.inlineLink}>
-                  Release summary
-                </Link>
                 <Link href="/dashboard" className={styles.inlineLink}>
                   Open dashboard
                 </Link>
                 <Link href="/login" className={styles.inlineLink}>
                   Sign in
                 </Link>
+                <a href={release?.htmlUrl ?? MUTX_GITHUB_RELEASES_URL} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                  GitHub release
+                </a>
               </div>
             </div>
 
-            <div className={`${styles.routeDownloadCards} ${styles.routeReleaseCards}`}>
+            <div className={styles.routeDownloadCards}>
               {cards.map((card) => (
                 <a
                   key={card.title}

@@ -13,7 +13,7 @@ const CONTACT_EMAIL = "hello@mutx.dev";
 export const metadata: Metadata = {
   title: "Contact | MUTX",
   description:
-    "Contact MUTX for serious evaluations, working sessions, and direct operator conversations.",
+    "Contact MUTX for evaluation, rollout review, or a concrete operator issue.",
 };
 
 export default function ContactPage() {
@@ -28,11 +28,10 @@ export default function ContactPage() {
               <div className={`${styles.intro} ${styles.contactHeroCopy}`}>
                 <p className={`${styles.eyebrow} ${styles.eyebrowOnDark}`}>Contact MUTX</p>
                 <h1 className={`${styles.displayTitle} ${styles.darkText} ${styles.contactHeroTitle}`}>
-                  Bring the rollout that needs a real answer.
+                  Talk to MUTX.
                 </h1>
                 <p className={`${styles.bodyText} ${styles.bodyTextOnDark} ${styles.contactHeroBody}`}>
-                  Use this page for a serious MUTX evaluation, a working session, or a
-                  concrete operator problem.
+                  Use this for evaluation, rollout review, or a concrete operator issue.
                 </p>
               </div>
 

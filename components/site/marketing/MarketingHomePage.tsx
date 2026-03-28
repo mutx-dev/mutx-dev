@@ -260,7 +260,6 @@ export function MarketingHomePage() {
               <div className={home.finalPreview} data-testid="homepage-demo-preview">
                 <div className={home.finalPreviewDevice}>
                   <div className={home.finalPreviewScreen}>
-                    <span className={home.finalPreviewLabel}>Operator demo</span>
                     <img
                       src="/demo.gif"
                       alt="MUTX operator demo showing the control plane in motion"

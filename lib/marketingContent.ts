@@ -69,12 +69,12 @@ const homepageActions: MarketingActionLink[] = [
     tone: "primary",
   },
   {
-    label: "Read release",
+    label: "Releases",
     href: "/releases",
     tone: "secondary",
   },
   {
-    label: "Read docs",
+    label: "Docs",
     href: "https://docs.mutx.dev",
     external: true,
     tone: "ghost",
@@ -91,35 +91,34 @@ export const marketingHomepage: MarketingHomepage = {
   hero: {
     tagline: "Signed. Notarized. Shipping now.",
     title: "Deploy. Govern. Share.",
-    support:
-      "Install the Mac operator app, move into the browser dashboard, and keep runtime, auth, traces, and release in one control plane.",
+    support: "The open control plane for deployed agents.",
     backgroundSrc: "/landing/webp/victory-core.webp",
     backgroundAlt: "MUTX robot raising the MUTX mark inside a blue-lit control chamber",
     actions: homepageActions,
   },
   proofStrip: {
-    eyebrow: "Why it matters",
-    title: "The control plane starts when the demo ends.",
-    body: "Identity, tools, and rollout need one operator surface teams can actually run.",
+    eyebrow: "What ships now",
+    title: "Production needs control.",
+    body: "MUTX keeps access explicit, release paths visible, and the operator lane public.",
     items: [
-      {
-        label: "Shipping now",
-        value: "Mac app, release lane, and stable dashboard.",
-      },
-      {
-        label: "Explicit policy",
-        value: "Runtime boundaries stay legible under pressure.",
-      },
       {
         label: "Open source",
         value: "The control layer stays inspectable and yours.",
+      },
+      {
+        label: "Signed Mac app",
+        value: "Apple Silicon and Intel builds ship now.",
+      },
+      {
+        label: "Public release lane",
+        value: "Downloads, notes, docs, and checksums stay aligned.",
       },
     ],
   },
   depthNarrative: {
     eyebrow: "How it works",
-    title: "Three moves from first run to governed release.",
-    body: "Set the boundary, inspect the run, and ship from the same surface.",
+    title: "Policy first. Access explicit. Every run reviewable.",
+    body: "Define the boundary, inspect the run, and release from the same lane.",
     media: {
       posterSrc: "/landing/webp/wiring-bay.webp",
       alt: "MUTX control runtime wiring bay with the MUTX robot operating inside the control surface",
@@ -130,29 +129,29 @@ export const marketingHomepage: MarketingHomepage = {
         id: "define-boundary",
         index: "01",
         title: "Define the boundary.",
-        body: "Keep identity, tool policy, and runtime access outside the agent.",
-        detail: "No permission logic buried in prompts.",
+        body: "Keep identity, tools, and runtime access outside the agent.",
+        detail: "Policy stays explicit.",
       },
       {
         id: "run-with-receipts",
         index: "02",
-        title: "Inspect each run.",
-        body: "Prompts, tool calls, actions, and outcomes stay reviewable.",
-        detail: "Execution stays inspectable under pressure.",
+        title: "Inspect the run.",
+        body: "Prompts, tool calls, and outcomes stay reviewable.",
+        detail: "Nothing critical is buried.",
       },
       {
         id: "ship-through-one-surface",
         index: "03",
-        title: "Release without switching surfaces.",
-        body: "Move from local proving to governed rollout without rebuilding the path.",
-        detail: "The control plane compounds instead of resetting.",
+        title: "Ship from the same lane.",
+        body: "Move from local proof to governed release without rebuilding the path.",
+        detail: "Release stays legible.",
       },
     ],
   },
   finalCta: {
-    eyebrow: "Take the controlled path",
-    title: "Install the operator app.",
-    body: "Start with the signed Mac release, then keep docs, downloads, and release history in one public lane.",
+    eyebrow: "Start here",
+    title: "Install the Mac app.",
+    body: "Start with the signed build, then keep docs, notes, and source aligned.",
     actions: homepageActions,
   },
 };
@@ -175,8 +174,8 @@ export const marketingFooterLinks: MarketingFooterLink[] = [
 ];
 
 export const marketingFooterCallout: MarketingFooterCallout = {
-  title: "OPEN CONTROL. SHIP CLEANLY.",
-  body: "Download the operator app, read the docs, or inspect the source.",
+  title: "OPEN-SOURCE CONTROL FOR AGENTS.",
+  body: "Start with the Mac app. Keep docs, notes, and source aligned.",
   action: {
     label: "Download for Mac",
     href: "/download",

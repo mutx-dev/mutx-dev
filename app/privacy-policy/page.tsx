@@ -9,7 +9,7 @@ import styles from "@/components/site/marketing/MarketingCore.module.css";
 export const metadata: Metadata = {
   title: "Privacy Policy | MUTX",
   description:
-    "Privacy Policy for MUTX, including what data we collect, how we use it, and how to contact us about privacy matters.",
+    "How MUTX handles data across the site, downloads, docs, and support surfaces.",
 };
 
 const sections = [
@@ -95,9 +95,8 @@ export default function PrivacyPolicyPage() {
               <p className={`${styles.eyebrow} ${styles.eyebrowOnDark}`}>Legal</p>
               <h1 className={`${styles.displayTitle} ${styles.darkText}`}>Privacy policy</h1>
               <p className={`${styles.bodyText} ${styles.bodyTextOnDark}`}>
-                Effective date: March 13, 2026. This page explains how MUTX handles
-                information across the website, docs, download flows, and related
-                product surfaces.
+                Effective date: March 13, 2026. How MUTX handles site, download,
+                docs, and support data.
               </p>
             </div>
           </div>
@@ -119,10 +118,9 @@ export default function PrivacyPolicyPage() {
             <aside className={`${styles.panel} ${styles.panelPadded} ${styles.routeMetaPanel}`}>
               <div className={styles.intro}>
                 <p className={styles.eyebrow}>Legal scope</p>
-                <h2 className={styles.sectionTitle}>The site policy in one place.</h2>
+                <h2 className={styles.sectionTitle}>Site policy.</h2>
                 <p className={styles.bodyText}>
-                  This policy covers mutx.dev, the download flow, and closely related
-                  product communication surfaces.
+                  Covers mutx.dev, downloads, docs, and support communication.
                 </p>
               </div>
 

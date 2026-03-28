@@ -187,16 +187,11 @@ test.describe('mutx.dev QA', () => {
       timeout: 10000,
     });
     await expect(
-      page.getByText(/control access, runtime, and release for deployed agents\./i)
-    ).toHaveCount(0);
-    await expect(
-      page.getByText(
-        /install the mac operator app, move into the browser dashboard, and keep runtime, auth, traces, and release in one control plane\./i
-      )
+      page.getByText(/the open control plane for deployed agents\./i)
     ).toBeVisible();
     await expect(page.getByRole('link', { name: /download for mac/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /read release/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /read docs/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /^releases$/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /^docs$/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^github$/i }).first()).toBeVisible();
     await expect(page.getByTestId('homepage-hero-proof-line')).toHaveCount(0);
     await expect(page.getByLabel(/hero proof points/i)).toHaveCount(0);
@@ -234,7 +229,7 @@ test.describe('mutx.dev QA', () => {
         });
       })
       .toBeGreaterThan(0.95);
-    expect(heroActions).toEqual(['Download for Mac', 'Read release', 'Read docs']);
+    expect(heroActions).toEqual(['Download for Mac', 'Releases', 'Docs']);
     expect(strayLargeLogos).toBe(0);
     await expect(page.getByTestId('marketing-loader-stage')).toHaveCount(0);
 
@@ -386,11 +381,12 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('link', { name: 'Release summary', exact: true }).first()).toBeVisible();
     await expect(
       page.getByText(
-        /the mac app is the primary operator surface\. these routes resolve to the current stable release assets, checksum file, release summary, and docs-backed release notes/i
+        /downloads, notes, and checksums stay in one public lane\./i
       )
     ).toBeVisible();
-    await expect(page.getByRole('heading', { name: /^Apple Silicon$/i })).toBeVisible();
-    await expect(page.getByRole('heading', { name: /^Intel Mac$/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^Release summary$/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^Docs notes$/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^Checksums$/i })).toBeVisible();
   });
 
   test('releases page exposes the current release summary and artifact links', async ({ page }) => {
@@ -404,11 +400,10 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('heading', { name: /^Apple Silicon DMG$/i })).toBeVisible();
     await expect(page.getByRole('heading', { name: /^Intel Mac DMG$/i })).toBeVisible();
     await expect(page.getByRole('heading', { name: /^Checksums$/i })).toBeVisible();
-    await expect(page.getByRole('heading', { name: /^GitHub release$/i })).toBeVisible();
-    await expect(page.getByRole('heading', { name: /^Docs release notes$/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^Docs notes$/i })).toBeVisible();
     await expect(
       page.getByText(
-        /this page is the public release summary for the current mutx operator build/i
+        /current signed mac release, checksums, docs notes, and github tag\./i
       )
     ).toBeVisible();
   });
@@ -421,7 +416,7 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByTestId('public-auth-nav')).toBeVisible();
     await expect(page.getByTestId('public-auth-nav').getByRole('link')).toHaveCount(1);
     await expect(
-      page.getByRole('heading', { name: /bring the rollout that needs a real answer\./i })
+      page.getByRole('heading', { name: /talk to mutx\./i })
     ).toBeVisible();
     await expect(page.getByRole('button', { name: /book a call/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /email mutx/i })).toBeVisible();
