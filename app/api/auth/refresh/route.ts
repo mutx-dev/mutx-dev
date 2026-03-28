@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { applyAuthCookies, getApiBaseUrl } from '@/app/api/_lib/controlPlane'
-import { validateRequest, schemas } from '@/app/api/_lib/validation'
+import { applyAuthCookies, getApiBaseUrl, getRefreshToken } from '@/app/api/_lib/controlPlane'
 import { withErrorHandling } from '@/app/api/_lib/errors'
 
 const FETCH_TIMEOUT_MS = 5000
@@ -11,7 +10,7 @@ export const dynamic = 'force-dynamic'
 async function fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Response> {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
-  
+
   try {
     return await fetch(url, {
       ...options,
@@ -24,17 +23,15 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}): Promise
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   return withErrorHandling(async (req: Request) => {
-    const validation = await validateRequest(schemas.refresh, req)
-    if (!validation.success) {
-      return validation.response
+    const refreshToken = getRefreshToken(request)
+    if (!refreshToken) {
+      return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 })
     }
 
-    const { refresh_token } = validation.data
-    
     const response = await fetchWithTimeout(`${getApiBaseUrl()}/v1/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token }),
+      body: JSON.stringify({ refresh_token: refreshToken }),
       cache: 'no-store',
     })
 
