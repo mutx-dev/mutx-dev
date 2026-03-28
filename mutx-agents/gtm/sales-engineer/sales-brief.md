@@ -19,6 +19,15 @@ MUTX helps teams deploy, operate, observe, and govern them like production infra
 - the CLI is real and covers setup, auth, assistants, agents, deployments, runtime inspection, and governance
 - the macOS app is a supported operator surface for local operators
 
+### Proof matrix
+| Buyer question | Proof surface | What we should show |
+| --- | --- | --- |
+| Can this run an agent like production infra? | `/dashboard`, CLI, docs | deployment records, runs/traces, sessions, budgets, monitoring |
+| Can we operate it without lying about gaps? | `/dashboard` + CLI | supported vs preview boundaries, CLI fallbacks where UI is thin |
+| Can we govern risky work? | `mutx governance` | permit / deny / defer decisions, pending queue, metrics |
+| Can we keep the runtime honest? | `mutx runtime inspect openclaw` | durable runtime tracking instead of ad hoc local state |
+| Is the SDK story truthful? | SDK docs | `MutxAsyncClient` is deprecated and limited; use `MutxClient` for production code |
+
 ### Durable control-plane primitives
 - auth
 - agents and deployments
@@ -35,23 +44,27 @@ MUTX helps teams deploy, operate, observe, and govern them like production infra
 - operators can inspect decisions, pending approvals, and metrics from the CLI
 - credential backends exist, but the operator UX is still CLI-first
 
-## Best demo / POC spine
-1. **Setup the operator lane**
+## 20-minute demo spine
+1. **Open with the truth boundary**
+   - state that `/dashboard` is supported and `/control/*` is preview
+   - say some workflows stay CLI/API-first by design
+2. **Setup the operator lane**
    - `mutx setup hosted` or `mutx setup local`
    - `mutx doctor`
    - `mutx assistant overview`
-2. **Show the runtime is tracked**
+3. **Show runtime tracking**
    - `mutx runtime inspect openclaw`
-   - explain that MUTX keeps a durable runtime record instead of an informal local setup
-3. **Show the stable browser surface**
+   - explain the durable runtime record
+4. **Show the stable browser surface**
    - use `app.mutx.dev/dashboard` for overview, agents, deployments, runs, traces, sessions, budgets, monitoring, API keys, and webhooks
-4. **Show operator depth**
-   - move to CLI for flows that are still deeper there than in the dashboard
 5. **Show governance**
    - `mutx governance status`
    - `mutx governance decisions --limit 50`
    - `mutx governance pending`
    - `mutx governance metrics`
+6. **Close on the buyer’s gap**
+   - ask whether the real pain is deployment control, observability, governance, or API surface drift
+   - map that pain to the proof matrix above
 
 ## POC success criteria
 A good POC ends with the buyer able to say:

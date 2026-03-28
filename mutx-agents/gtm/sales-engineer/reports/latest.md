@@ -1,17 +1,6 @@
 # latest.md — Sales Engineer
 
-## Lead
-Highest-leverage GTM move right now: sell MUTX as the operator-trust layer for teams that already have agent code, then prove it with an honest POC.
-
-## What changed
-- Created `sales-brief.md` as the first sales-engineering asset.
-- Anchored the story on supported surfaces: dashboard, CLI, docs, and the macOS operator app.
-- Made the risky boundaries explicit: `/control/*` is preview, some flows remain CLI/API-first, scheduler/RAG are not ready proof points, and governance is real but CLI-first.
-
-## Why it matters
-This gives sales a cleaner technical wedge against "we already built the agent" and reduces overpromise risk in demos.
-
-## Next
-- capture live proof/screenshots for the operator-trust story
-- turn the brief into a 20-minute demo script
-- pair with account strategy on buyer-specific POC success criteria
+- `sales-brief.md` now has a proof matrix and a 20-minute demo spine, so the POC is framed as a buyer conversation instead of a vague product tour.
+- `/dashboard` is now a sellable MUTX operator surface: the story is anchored in MUTX language plus cleaner, more truthful dashboard contracts.
+- The biggest trust gap is still runtime proof: issue `#39` stays blocked while the Backend Executor is quarantined, so monitoring/self-healing must be framed as partial, not finished.
+- Highest-leverage SE move now is a bounded operator-trust POC around deployment parity (`#117`) with explicit caveats on the async SDK gap (`#114`) instead of broader platform claims.
