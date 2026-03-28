@@ -11,7 +11,7 @@ Goals:
 - Keep validation lightweight and slice-specific.
 
 Current signal:
-- PR #1211 is the newest auth review target and should replace the older duplicated auth PR in the active queue.
+- PR #1211 is the active auth review target and supersedes the older duplicate auth PR in the queue.
 - PR #1210 is a small docs truth fix that can be reviewed after or alongside the auth review while the lane stays warm.
 
 Review / merge posture:
