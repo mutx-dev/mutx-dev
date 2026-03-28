@@ -1,0 +1,102 @@
+# MUTX Sales Brief — Operator-Trust POC
+
+## Lead
+Do not sell MUTX as "how to build an agent."
+Sell it as how a team runs an agent without losing control.
+
+## One-line position
+Agent frameworks help teams build agents.
+MUTX helps teams deploy, operate, observe, and govern them like production infrastructure.
+
+## Best-fit buyer
+- already has agent code, pilots, or an internal prototype
+- feels pain around deployment ownership, secrets, tracing, approvals, or surface drift
+- wants an operator layer, not another prompt builder
+
+## What we can prove now
+### Supported operator lane
+- `app.mutx.dev/dashboard` is the supported browser shell for stable routes
+- the CLI is real and covers setup, auth, assistants, agents, deployments, runtime inspection, and governance
+- the macOS app is a supported operator surface for local operators
+
+### Durable control-plane primitives
+- auth
+- agents and deployments
+- runs and traces
+- sessions
+- budgets and monitoring
+- API keys
+- webhooks
+- health and readiness
+
+### Governance story
+- Faramesh-backed governance is real today
+- policy decisions are permit / deny / defer
+- operators can inspect decisions, pending approvals, and metrics from the CLI
+- credential backends exist, but the operator UX is still CLI-first
+
+## Best demo / POC spine
+1. **Setup the operator lane**
+   - `mutx setup hosted` or `mutx setup local`
+   - `mutx doctor`
+   - `mutx assistant overview`
+2. **Show the runtime is tracked**
+   - `mutx runtime inspect openclaw`
+   - explain that MUTX keeps a durable runtime record instead of an informal local setup
+3. **Show the stable browser surface**
+   - use `app.mutx.dev/dashboard` for overview, agents, deployments, runs, traces, sessions, budgets, monitoring, API keys, and webhooks
+4. **Show operator depth**
+   - move to CLI for flows that are still deeper there than in the dashboard
+5. **Show governance**
+   - `mutx governance status`
+   - `mutx governance decisions --limit 50`
+   - `mutx governance pending`
+   - `mutx governance metrics`
+
+## POC success criteria
+A good POC ends with the buyer able to say:
+- we can onboard an operator and deploy an assistant without hand-wavy setup
+- we can inspect agent state from both dashboard and CLI
+- we can trace runs, sessions, budgets, and monitoring data as operator artifacts
+- we understand which surfaces are supported and which are still preview
+- if governance matters, we can see a real decision path instead of a policy slide
+
+## What not to promise
+- full dashboard coverage for every backend capability
+- dashboard-only operation for every workflow
+- production-ready scheduler or RAG proof
+- full async SDK parity
+- governance approval UX in the dashboard
+- credential broker UI
+
+## Objection handling
+### "We already use LangChain / OpenClaw / n8n."
+Good. MUTX does not need to replace the framework.
+The value is the control plane around the agent: deployment records, runtime inspection, observability, governance, API keys, webhooks, and operator surfaces.
+
+### "Is this just a demo?"
+No. `/dashboard` is the supported operator lane. `/control/*` is the preview demo lane.
+That distinction is a trust signal, not a weakness.
+
+### "Can my team stay entirely in the UI?"
+Not for every workflow yet.
+Stable dashboard routes are real, but some operator tasks are still better in CLI or direct API.
+
+### "Can you govern risky actions?"
+Yes, with Faramesh.
+But be precise: governance exists today, while the approval workflow is still CLI-first rather than dashboard-first.
+
+## Best current call-to-action
+If you already have an agent that kind of works, MUTX is the lane to prove it can be operated, observed, and governed without lying about the gaps.
+
+## Source anchors
+- `mutx-md-corpus/docs/overview.md`
+- `mutx-md-corpus/docs/app-dashboard.md`
+- `mutx-md-corpus/docs/surfaces.md`
+- `mutx-md-corpus/docs/project-status.md`
+- `mutx-md-corpus/docs/cli.md`
+- `mutx-md-corpus/docs/deployment/quickstart.md`
+- `mutx-md-corpus/docs/governance.md`
+- `mutx-md-corpus/docs/releases/v1.3.md`
+- `mutx-md-corpus/docs/adr/006-agent-runtime-architecture.md`
+- `mutx-md-corpus/whitepaper.md`
