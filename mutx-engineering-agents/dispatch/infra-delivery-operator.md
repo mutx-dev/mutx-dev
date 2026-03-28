@@ -9,8 +9,9 @@ Goal:
 - If the dashboard truth looks right, request/approve the PR review path; otherwise ask for the smallest bounded correction.
 
 Current signal:
-- This is the live review path for the observability lane.
-- The author work is done; what remains is second-agent truth check and CI.
+- No merge-ready state yet; the dashboard review still needs second-agent truth and CI.
+- This remains the live review path for the observability lane.
+- The author work is done; what remains is review gating.
 
 Review / merge posture:
 - Reviewer default: `observability-sre`.

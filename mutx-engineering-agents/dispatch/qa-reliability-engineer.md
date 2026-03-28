@@ -11,8 +11,9 @@ Goals:
 - Keep validation lightweight and slice-specific.
 
 Current signal:
-- PR #1211 is the active auth review target and supersedes the older duplicate auth PR in the queue.
-- PR #1210 is a small docs truth fix that can be reviewed after or alongside the auth review while the lane stays warm.
+- No merge-ready state yet; both PRs are still waiting on review/CI truth.
+- PR #1211 remains the active auth review target and supersedes the older duplicate auth PR in the queue.
+- PR #1210 stays a small docs truth fix that can be reviewed after or alongside the auth review while the lane stays warm.
 
 Review / merge posture:
 - Reviewer default: `mission-control-orchestrator`.
