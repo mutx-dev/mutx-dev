@@ -1,0 +1,29 @@
+{
+  "updated": "2026-03-28T19:30:00+01:00",
+  "items": [
+    {
+      "pr": 1202,
+      "title": "fix(auth): bind refresh endpoint to existing refresh cookie",
+      "owner": "auth-identity-guardian",
+      "reviewer": "qa-reliability-engineer",
+      "status": "awaiting-review",
+      "risk": "medium"
+    },
+    {
+      "pr": 1209,
+      "title": "Fix system overview CPU and memory queries",
+      "owner": "observability-sre",
+      "reviewer": "infra-delivery-operator",
+      "status": "awaiting-review",
+      "risk": "monitoring-truth"
+    },
+    {
+      "pr": 1210,
+      "title": "Fix local bootstrap dashboard path",
+      "owner": "docs-drift-curator",
+      "reviewer": "qa-reliability-engineer",
+      "status": "awaiting-review",
+      "risk": "low"
+    }
+  ]
+}
