@@ -132,8 +132,8 @@
 }
 
 .heroLockupMarkImage {
-  width: 68%;
-  height: 68%;
+  width: 78%;
+  height: 78%;
   object-fit: contain;
   display: block;
   filter:
@@ -203,8 +203,8 @@
 }
 
 .heroLockupMark {
-  width: clamp(3.2rem, 4vw, 4.05rem);
-  height: clamp(3.2rem, 4vw, 4.05rem);
+  width: clamp(3.45rem, 4.3vw, 4.35rem);
+  height: clamp(3.45rem, 4.3vw, 4.35rem);
   opacity: 0;
   transition:
     opacity 150ms ease,
@@ -838,9 +838,9 @@
   }
 
   .heroLockupMark {
-    width: 2.8rem;
-    height: 2.8rem;
-    border-radius: 0.88rem;
+    width: 3.1rem;
+    height: 3.1rem;
+    border-radius: 0.96rem;
   }
 
   .heroLockupWord {
