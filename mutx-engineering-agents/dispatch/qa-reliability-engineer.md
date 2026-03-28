@@ -9,7 +9,7 @@ Goal:
 - Leave approval if the patch is sound; otherwise request the smallest bounded correction.
 
 Current signal:
-- The auth lane now needs the reviewer’s eyes more than the CI-workflow PR.
+- The auth lane now needs the reviewer’s eyes.
 - PR #1201 stays queued as secondary until this review path clears.
 
 Review / merge posture:

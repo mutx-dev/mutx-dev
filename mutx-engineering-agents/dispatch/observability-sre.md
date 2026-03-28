@@ -2,13 +2,11 @@
 
 No active dispatch right now.
 
-Current status:
-- Live truth shows the old queue items are closed and the current top trio is already covered by other specialists.
-- Keep this lane idle unless a bounded monitoring/executor truth issue appears or a review request is explicitly assigned.
-
-Possible next move:
-- If the top trio clears, this lane may pick up a secondary review around monitoring or infra-adjacent PRs.
+Status:
+- PR #1209 has shipped the dashboard truth fix in the observability lane.
+- The live next move is review/CI, not more observability coding.
+- Keep this lane idle unless another monitoring truth mismatch appears.
 
 Guardrails:
-- Stay idle until a real owned-area signal appears.
+- Stay idle unless a real observability-owned signal appears.
 - Do not invent work.

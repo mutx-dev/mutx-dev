@@ -1,22 +1,12 @@
 # dispatch — auth-identity-guardian
 
-Priority dispatch: PR #1202 — `fix(auth): bind refresh endpoint to existing refresh cookie`
+No active dispatch right now.
 
-Goal:
-- Review the active auth PR in `app/api/auth/refresh/route.ts` and `tests/unit/authRoutes.test.ts`.
-- Confirm the refresh endpoint is bound to the existing refresh cookie and that the test coverage matches the intended behavior.
-- Keep validation tight and auth-specific.
-- If the PR is correct, approve; if not, request the smallest bounded correction.
-
-Current signal:
-- The auth patch is implemented and unit-tested.
-- It now needs second-agent review and CI truth before it can move forward.
-
-Review / merge posture:
-- Reviewer default: `qa-reliability-engineer`.
-- Auth changes are risky; do not auto-merge unless policy and CI are both satisfied and the change remains tiny.
+Status:
+- PR #1202 is implemented and unit-tested.
+- The live next move is second-agent review, not more auth coding.
+- Keep this lane idle unless a reviewer finds a bounded correction.
 
 Guardrails:
-- Stay inside owned auth files and the test slice.
-- No broad refactor.
-- Treat security correctness as the priority.
+- Stay idle unless a real auth-owned signal appears.
+- Do not invent work.

@@ -1,15 +1,22 @@
 # dispatch — infra-delivery-operator
 
-No active dispatch right now.
+Priority dispatch: PR #1209 — `Fix system overview CPU and memory queries`
 
-Current status:
-- Live GitHub truth shows the old queue items are closed.
-- The current top trio is already covered by control-plane, auth, and QA lanes.
-- Keep this lane idle unless a bounded scripts/infrastructure task is explicitly assigned.
+Goal:
+- Review the observability dashboard fix in `infrastructure/monitoring/grafana/dashboards/system-overview-dashboard.json`.
+- Verify the CPU and memory panels use real node-exporter queries instead of stale expressions.
+- Keep validation lightweight and infra-specific.
+- If the dashboard truth looks right, request/approve the PR review path; otherwise ask for the smallest bounded correction.
 
-Possible next move:
-- If the top trio clears, this lane can resume on a real script/path or infra delivery item.
+Current signal:
+- This is the live review path for the observability lane.
+- The author work is done; what remains is second-agent truth check and CI.
+
+Review / merge posture:
+- Reviewer default: `observability-sre`.
+- Auto-merge remains blocked for monitoring/executor truth work unless policy and CI are both satisfied.
 
 Guardrails:
-- Stay idle until a real owned-area signal appears.
-- Do not invent work.
+- Stay inside the dashboard slice.
+- No broad infra refactor.
+- Report blockers or policy mismatches plainly.
