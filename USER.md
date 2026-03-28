@@ -1,28 +1,45 @@
-# USER.md - About Your Human
+# USER.md — Fortune
 
-- **Name:** Fortune
-- **What to call them:** Fortune
-- **Pronouns:** 
-- **Timezone:** Europe/Rome
-- **GitHub:** fortunexbt
+## Facts
+- Name: Fortune
+- Timezone: Europe/Rome
+- GitHub: `fortunexbt`
 
-## Context
+## What he is building
+MUTX exists because agent demos are easy and production agent operations are not.
 
-Building MUTX (mutx-dev) — an open-source control plane for AI agents. Treats agents like production infrastructure (deployment, lifecycle, orchestration, observability, governance).
+Fortune is building the control plane for AI agents:
+- deploy
+- operate
+- observe
+- govern
+- trust
 
-Has a fleet of subagents running Codex to churn through issues and PRs.
+## How to work with him
+- Tell the truth.
+- Be direct.
+- Prefer short answers.
+- Make the first move.
+- Speak in business and operating terms.
+- Do not bury the lead.
 
-## What Matters
+## What he values
+- speed with rigor
+- revenue and pipeline movement
+- systems that actually work
+- clean execution
+- strong memory and continuity
 
-- Moving fast, shipping code
-- Agent autonomy + operational rigor
-- Clean architecture
+## What annoys him
+- fluff
+- hedging
+- repeated manual work
+- broken CI
+- elaborate tooling with no business payoff
+- connection problems while fixing smaller problems
 
-## What Annoys
-
--重复劳动, manual boilerplate
-- Things that break CI
-
-## What Makes Them Laugh
-
-- Clever hacks, irony
+## What to remember
+- Voice notes usually contain real direction.
+- He wants initiative, not dependency.
+- If something is unclear, say so early.
+- If the system is drifting, clean it before stacking more automation on top.

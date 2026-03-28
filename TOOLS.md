@@ -1,48 +1,37 @@
-# TOOLS.md - Local Notes
+# TOOLS.md — Environment Notes
 
-Skills define _how_ tools work. This file is for _your_ specifics — the stuff that's unique to your setup.
+## Canonical repo + docs paths
+- Primary MUTX repo: `/Users/fortune/MUTX`
+- OpenClaw workspace: `/Users/fortune/.openclaw/workspace`
+- OpenClaw docs mirror in workspace: `/Users/fortune/.openclaw/workspace/docs`
+- Factory worktrees:
+  - backend -> `~/mutx-worktrees/factory/backend`
+  - frontend -> `~/mutx-worktrees/factory/frontend`
+  - ship -> `~/mutx-worktrees/factory/ship`
 
-## What Goes Here
+## GitHub
+- `GH_TOKEN` is available in env
 
-Things like:
+## Local memory stack
+- Assistant-facing memory search: local GGUF embeddings, fallback `none`
+- Builtin vector store: SQLite + `sqlite-vec`
+- QMD binary: `/opt/homebrew/bin/qmd`
+- QMD models cache: `~/.cache/qmd/models`
+- Per-agent QMD state: `~/.openclaw/agents/<agentId>/qmd/`
 
-- Camera names and locations
-- SSH hosts and aliases
-- Preferred voices for TTS
-- Speaker/room names
-- Device nicknames
-- Anything environment-specific
+## OpenClaw runtime
+- Gateway port: `18789`
+- Gateway mode: local / loopback
+- ACP backend: `acpx`
+- Default coding agent: `codex`
+- Default model lane: `openai-codex/gpt-5.4`
+- Default thinking: `xhigh`
 
-## Examples
+## MUTX local dev
+- Full stack: `make dev`
+- Auth bootstrap: `make test-auth`
+- Seed data: `make seed`
+- Docker Compose path: `infrastructure/docker/docker-compose.yml`
 
-```markdown
-### Cameras
-
-- living-room → Main area, 180° wide angle
-- front-door → Entrance, motion-triggered
-
-### SSH
-
-- home-server → 192.168.1.100, user: admin
-
-### TTS
-
-- Preferred voice: "Nova" (warm, slightly British)
-- Default speaker: Kitchen HomePod
-```
-
-## Why Separate?
-
-Skills are shared. Your setup is yours. Keeping them apart means you can update skills without losing your notes, and share skills without leaking your infrastructure.
-
----
-
-Add whatever helps you do your job. This is your cheat sheet.
-
-### GitHub
-
-- Token: stored in env var `GH_TOKEN`
-- Worktrees: `~/mutx-worktrees/factory/`
-  - backend → mutx-dev/backend
-  - frontend → mutx-dev/frontend  
-  - ship → mutx-dev/mutx-dev
+## Operating principle
+If a path or binary matters repeatedly, pin it here explicitly so future sessions do not guess.
