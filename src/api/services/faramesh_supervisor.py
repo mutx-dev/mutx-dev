@@ -14,11 +14,13 @@ import asyncio
 import logging
 import os
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
+
+from src.api.config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -34,11 +36,16 @@ class SupervisionState(str, Enum):
     RESTARTING = "restarting"
 
 
+class SupervisionValidationError(ValueError):
+    """Raised when a supervised launch request violates local policy."""
+
+
 @dataclass
 class SupervisedAgent:
     agent_id: str
     command: list[str]
     env: dict[str, str]
+    launch_profile: Optional[str] = None
     state: SupervisionState = SupervisionState.STOPPED
     process: Optional[subprocess.Popen] = None
     pid: Optional[int] = None
@@ -54,12 +61,34 @@ class SupervisedAgent:
 class SupervisionConfig:
     faramesh_bin: Optional[str] = None
     policy_path: Optional[str] = None
+    allowed_commands: tuple[str, ...] = ()
+    allowed_env_keys: tuple[str, ...] = ()
+    allow_direct_commands: bool = False
+    profiles: dict[str, object] = field(default_factory=dict)
+    allowed_policy_dir: Optional[str] = None
     socket_path: str = FAREMESH_SOCKET_PATH
     auto_restart: bool = True
     max_restarts: int = 3
     restart_delay: float = 5.0
     health_check_interval: float = 30.0
     shutdown_timeout: float = 10.0
+
+
+@dataclass(frozen=True)
+class SupervisedLaunchProfile:
+    name: str
+    command: list[str]
+    env: dict[str, str]
+    faramesh_policy: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class PreparedLaunch:
+    agent_id: str
+    command: list[str]
+    env: dict[str, str]
+    faramesh_policy: Optional[str] = None
+    launch_profile: Optional[str] = None
 
 
 class FarameshSupervisor:
@@ -75,6 +104,7 @@ class FarameshSupervisor:
         self._agents: dict[str, SupervisedAgent] = {}
         self._health_check_task: Optional[asyncio.Task] = None
         self._running = False
+        self._profiles = self._load_profiles(self.config.profiles)
 
     def _find_faramesh_bin(self) -> Optional[str]:
         if self.config.faramesh_bin:
@@ -88,25 +118,238 @@ class FarameshSupervisor:
 
         return shutil.which("faramesh")
 
-    async def start_agent(
+    @staticmethod
+    def _normalize_agent_id(agent_id: str) -> str:
+        normalized_agent_id = agent_id.strip()
+        if not normalized_agent_id:
+            raise SupervisionValidationError("agent_id must not be empty")
+        return normalized_agent_id
+
+    @staticmethod
+    def _normalize_command(command: list[str]) -> list[str]:
+        if not command:
+            raise SupervisionValidationError("command must contain at least one executable")
+
+        normalized_command = []
+        for part in command:
+            if not isinstance(part, str):
+                raise SupervisionValidationError("command entries must be strings")
+            normalized_part = part.strip()
+            if not normalized_part:
+                raise SupervisionValidationError("command entries must not be empty")
+            normalized_command.append(normalized_part)
+        return normalized_command
+
+    def _normalize_env(
+        self,
+        env: Optional[dict[str, str]],
+        *,
+        enforce_allowlist: bool,
+    ) -> dict[str, str]:
+        normalized_env: dict[str, str] = {}
+        for key, value in (env or {}).items():
+            if not isinstance(key, str) or not key.strip():
+                raise SupervisionValidationError(
+                    "Environment variable names must be non-empty strings"
+                )
+            if not isinstance(value, str):
+                raise SupervisionValidationError(
+                    f"Environment variable '{key}' must have a string value"
+                )
+            normalized_key = key.strip()
+            if "\x00" in normalized_key or "\x00" in value or "=" in normalized_key:
+                raise SupervisionValidationError(
+                    f"Environment variable '{normalized_key}' contains invalid characters"
+                )
+            normalized_env[normalized_key] = value
+
+        if enforce_allowlist:
+            disallowed_keys = sorted(
+                key for key in normalized_env if key not in self.config.allowed_env_keys
+            )
+            if disallowed_keys:
+                raise SupervisionValidationError(
+                    "Environment variables are not in the supervised allowlist: "
+                    + ", ".join(disallowed_keys)
+                )
+
+        return normalized_env
+
+    def _resolve_trusted_policy_path(self, faramesh_policy: Optional[str]) -> Optional[str]:
+        if not faramesh_policy:
+            return self.config.policy_path
+
+        configured_path = Path(faramesh_policy).expanduser()
+        if not configured_path.is_absolute() and self.config.allowed_policy_dir:
+            configured_path = Path(self.config.allowed_policy_dir).expanduser() / configured_path
+        configured_path = configured_path.resolve()
+
+        if not configured_path.is_file():
+            raise SupervisionValidationError(
+                f"Configured Faramesh policy does not exist: {configured_path}"
+            )
+
+        return str(configured_path)
+
+    def _load_profiles(self, raw_profiles: dict[str, object]) -> dict[str, SupervisedLaunchProfile]:
+        profiles: dict[str, SupervisedLaunchProfile] = {}
+        for raw_name, raw_profile in (raw_profiles or {}).items():
+            try:
+                if not isinstance(raw_name, str) or not raw_name.strip():
+                    raise SupervisionValidationError("Profile names must be non-empty strings")
+                if not isinstance(raw_profile, dict):
+                    raise SupervisionValidationError("Profile definitions must be JSON objects")
+
+                normalized_name = raw_name.strip()
+                command = self._normalize_command(raw_profile.get("command", []))
+                env = self._normalize_env(raw_profile.get("env", {}), enforce_allowlist=False)
+                faramesh_policy = self._resolve_trusted_policy_path(
+                    raw_profile.get("faramesh_policy")
+                )
+                profiles[normalized_name] = SupervisedLaunchProfile(
+                    name=normalized_name,
+                    command=command,
+                    env=env,
+                    faramesh_policy=faramesh_policy,
+                )
+            except SupervisionValidationError as exc:
+                logger.error("Invalid supervised launch profile %s: %s", raw_name, exc)
+        return profiles
+
+    def _normalize_policy_path(self, faramesh_policy: Optional[str]) -> Optional[str]:
+        if not faramesh_policy:
+            return self.config.policy_path
+
+        if not self.config.allowed_policy_dir:
+            raise SupervisionValidationError(
+                "Custom Faramesh policies are disabled until GOVERNANCE_SUPERVISED_POLICY_DIR is configured"
+            )
+
+        allowed_dir = Path(self.config.allowed_policy_dir).expanduser().resolve()
+        requested_path = Path(faramesh_policy).expanduser()
+        if not requested_path.is_absolute():
+            requested_path = allowed_dir / requested_path
+        requested_path = requested_path.resolve()
+
+        try:
+            requested_path.relative_to(allowed_dir)
+        except ValueError as exc:
+            raise SupervisionValidationError(
+                f"Faramesh policy must stay within {allowed_dir}"
+            ) from exc
+
+        if not requested_path.is_file():
+            raise SupervisionValidationError(f"Faramesh policy does not exist: {requested_path}")
+
+        return str(requested_path)
+
+    def sanitize_launch_request(
         self,
         agent_id: str,
         command: list[str],
         env: Optional[dict[str, str]] = None,
         faramesh_policy: Optional[str] = None,
-    ) -> bool:
-        """
-        Start an agent under Faramesh supervision.
+    ) -> tuple[str, list[str], dict[str, str], Optional[str]]:
+        normalized_agent_id = self._normalize_agent_id(agent_id)
+        normalized_command = self._normalize_command(command)
 
-        Args:
-            agent_id: Unique identifier for the agent
-            command: Command to run (e.g., ["python", "agent.py"])
-            env: Environment variables
-            faramesh_policy: Path to FPL policy file
+        executable = Path(normalized_command[0]).name
+        if not self.config.allowed_commands:
+            raise SupervisionValidationError(
+                "Supervised process launch is disabled until GOVERNANCE_SUPERVISED_COMMAND_ALLOWLIST is configured"
+            )
+        if executable not in self.config.allowed_commands:
+            raise SupervisionValidationError(
+                f"Executable '{executable}' is not in the supervised command allowlist"
+            )
 
-        Returns:
-            True if agent started successfully
-        """
+        normalized_env = self._normalize_env(env, enforce_allowlist=True)
+
+        normalized_policy = self._normalize_policy_path(faramesh_policy)
+        return normalized_agent_id, normalized_command, normalized_env, normalized_policy
+
+    def prepare_launch_request(
+        self,
+        agent_id: str,
+        *,
+        command: Optional[list[str]] = None,
+        env: Optional[dict[str, str]] = None,
+        faramesh_policy: Optional[str] = None,
+        profile_name: Optional[str] = None,
+    ) -> PreparedLaunch:
+        normalized_agent_id = self._normalize_agent_id(agent_id)
+        normalized_profile_name = profile_name.strip() if isinstance(profile_name, str) else None
+
+        has_command = bool(command)
+        has_profile = bool(normalized_profile_name)
+        if has_command == has_profile:
+            raise SupervisionValidationError(
+                "Specify exactly one of profile or command when starting a supervised agent"
+            )
+
+        if has_profile:
+            profile = self._profiles.get(normalized_profile_name)
+            if profile is None:
+                raise SupervisionValidationError(
+                    f"Unknown supervised launch profile: {normalized_profile_name}"
+                )
+            if faramesh_policy:
+                raise SupervisionValidationError(
+                    "faramesh_policy cannot override a configured launch profile"
+                )
+
+            env_overrides = self._normalize_env(env, enforce_allowlist=True)
+            merged_env = dict(profile.env)
+            merged_env.update(env_overrides)
+            return PreparedLaunch(
+                agent_id=normalized_agent_id,
+                command=list(profile.command),
+                env=merged_env,
+                faramesh_policy=profile.faramesh_policy,
+                launch_profile=profile.name,
+            )
+
+        if not self.config.allow_direct_commands:
+            raise SupervisionValidationError(
+                "Direct supervised commands are disabled. Use a configured launch profile."
+            )
+
+        (
+            normalized_agent_id,
+            normalized_command,
+            normalized_env,
+            normalized_policy,
+        ) = self.sanitize_launch_request(
+            normalized_agent_id,
+            command or [],
+            env,
+            faramesh_policy,
+        )
+        return PreparedLaunch(
+            agent_id=normalized_agent_id,
+            command=normalized_command,
+            env=normalized_env,
+            faramesh_policy=normalized_policy,
+            launch_profile=None,
+        )
+
+    def list_profiles(self) -> list[dict[str, Any]]:
+        return [
+            {
+                "name": profile.name,
+                "command": list(profile.command),
+                "env_keys": sorted(profile.env.keys()),
+                "faramesh_policy": profile.faramesh_policy,
+            }
+            for profile in self._profiles.values()
+        ]
+
+    async def start_prepared_agent(self, prepared: PreparedLaunch) -> bool:
+        agent_id = prepared.agent_id
+        command = list(prepared.command)
+        env = dict(prepared.env)
+        faramesh_policy = prepared.faramesh_policy
+
         if agent_id in self._agents:
             agent = self._agents[agent_id]
             if agent.state in (SupervisionState.RUNNING, SupervisionState.STARTING):
@@ -141,7 +384,8 @@ class FarameshSupervisor:
             agent = SupervisedAgent(
                 agent_id=agent_id,
                 command=command,
-                env=full_env,
+                env=env,
+                launch_profile=prepared.launch_profile,
                 state=SupervisionState.STARTING,
                 process=process,
                 pid=process.pid,
@@ -170,6 +414,33 @@ class FarameshSupervisor:
         except Exception as e:
             logger.error(f"Failed to start agent {agent_id}: {e}")
             return False
+
+    async def start_agent(
+        self,
+        agent_id: str,
+        command: list[str],
+        env: Optional[dict[str, str]] = None,
+        faramesh_policy: Optional[str] = None,
+    ) -> bool:
+        """
+        Start an agent under Faramesh supervision using a direct command.
+        """
+        try:
+            normalized_agent_id, normalized_command, normalized_env, normalized_policy = (
+                self.sanitize_launch_request(agent_id, command, env, faramesh_policy)
+            )
+        except SupervisionValidationError as exc:
+            logger.warning("Rejected supervised launch for %s: %s", agent_id, exc)
+            return False
+
+        return await self.start_prepared_agent(
+            PreparedLaunch(
+                agent_id=normalized_agent_id,
+                command=normalized_command,
+                env=normalized_env,
+                faramesh_policy=normalized_policy,
+            )
+        )
 
     async def stop_agent(self, agent_id: str, timeout: Optional[float] = None) -> bool:
         """
@@ -241,11 +512,14 @@ class FarameshSupervisor:
 
         await asyncio.sleep(self.config.restart_delay)
 
-        success = await self.start_agent(
-            agent_id,
-            agent.command,
-            agent.env,
-            agent.faramesh_policy,
+        success = await self.start_prepared_agent(
+            PreparedLaunch(
+                agent_id=agent_id,
+                command=list(agent.command),
+                env=dict(agent.env),
+                faramesh_policy=agent.faramesh_policy,
+                launch_profile=agent.launch_profile,
+            )
         )
 
         return success
@@ -303,6 +577,7 @@ class FarameshSupervisor:
             "last_start_at": agent.last_start_at.isoformat() if agent.last_start_at else None,
             "last_stop_at": agent.last_stop_at.isoformat() if agent.last_stop_at else None,
             "faramesh_policy": agent.faramesh_policy,
+            "launch_profile": agent.launch_profile,
             "command": agent.command,
         }
 
@@ -345,5 +620,18 @@ _supervisor: Optional[FarameshSupervisor] = None
 def get_faramesh_supervisor() -> FarameshSupervisor:
     global _supervisor
     if _supervisor is None:
-        _supervisor = FarameshSupervisor()
+        settings = get_settings()
+        _supervisor = FarameshSupervisor(
+            SupervisionConfig(
+                allowed_commands=tuple(settings.governance_supervised_command_allowlist),
+                allowed_env_keys=tuple(settings.governance_supervised_env_allowlist),
+                allow_direct_commands=settings.governance_supervised_allow_direct_commands,
+                profiles=(
+                    settings.governance_supervised_profiles
+                    if isinstance(settings.governance_supervised_profiles, dict)
+                    else {}
+                ),
+                allowed_policy_dir=settings.governance_supervised_policy_dir,
+            )
+        )
     return _supervisor

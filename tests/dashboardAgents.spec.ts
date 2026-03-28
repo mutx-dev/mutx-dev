@@ -27,6 +27,11 @@ const mockAgents = [
   },
 ];
 
+async function openAgentsPage(page: import('@playwright/test').Page) {
+  await page.goto('/dashboard/agents', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('heading', { name: /agents/i })).toBeVisible({ timeout: 10000 });
+}
+
 test.describe('Dashboard Agents List', () => {
   test.beforeEach(async ({ page }) => {
     // Mock Turnstile for any pages that might check it
@@ -51,36 +56,46 @@ test.describe('Dashboard Agents List', () => {
         body: JSON.stringify(mockAgents),
       });
     });
+
+    await page.route('/api/auth/me', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'operator_alpha',
+          email: 'operator@mutx.dev',
+          name: 'Operator',
+        }),
+      });
+    });
   });
 
   test('page loads and displays agent list', async ({ page }) => {
-    await page.goto('/dashboard/agents');
-    await page.waitForLoadState('domcontentloaded');
+    await openAgentsPage(page);
 
     // Check page title
     await expect(page.getByRole('heading', { name: /agents/i })).toBeVisible();
 
     // Check agent cards are displayed
-    await expect(page.getByText('test-agent-1')).toBeVisible();
-    await expect(page.getByText('test-agent-2')).toBeVisible();
-    await expect(page.getByText('test-agent-3')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'test-agent-1' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'test-agent-2' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'test-agent-3' })).toBeVisible();
   });
 
   test('search filters agents correctly', async ({ page }) => {
-    await page.goto('/dashboard/agents');
-    await page.waitForLoadState('domcontentloaded');
+    await openAgentsPage(page);
 
     // Wait for agents to load
-    await expect(page.getByText('test-agent-1')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'test-agent-1' })).toBeVisible();
 
     // Search for a specific agent
     const searchInput = page.getByPlaceholder(/search agents/i);
     await searchInput.fill('test-agent-1');
 
     // Should show only matching agent
-    await expect(page.getByText('test-agent-1')).toBeVisible();
-    await expect(page.getByText('test-agent-2')).toBeHidden();
-    await expect(page.getByText('test-agent-3')).toBeHidden();
+    await expect(page.getByRole('heading', { name: 'test-agent-1' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'test-agent-2' })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'test-agent-3' })).toHaveCount(0);
 
     // Should show "No matching agents" when no results
     await searchInput.fill('nonexistent');
@@ -88,11 +103,10 @@ test.describe('Dashboard Agents List', () => {
   });
 
   test('refresh button works', async ({ page }) => {
-    await page.goto('/dashboard/agents');
-    await page.waitForLoadState('domcontentloaded');
+    await openAgentsPage(page);
 
     // Wait for initial load
-    await expect(page.getByText('test-agent-1')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'test-agent-1' })).toBeVisible();
 
     // Track API calls
     let apiCallCount = 0;
@@ -114,13 +128,16 @@ test.describe('Dashboard Agents List', () => {
   });
 
   test('displays agent status correctly', async ({ page }) => {
-    await page.goto('/dashboard/agents');
-    await page.waitForLoadState('domcontentloaded');
+    await openAgentsPage(page);
 
     // Check that agent statuses are displayed
-    await expect(page.getByText('running', { exact: true })).toBeVisible();
-    await expect(page.getByText('stopped', { exact: true })).toBeVisible();
-    await expect(page.getByText('failed', { exact: true })).toBeVisible();
+    const runningCard = page.locator('article').filter({ hasText: 'test-agent-1' }).first();
+    const stoppedCard = page.locator('article').filter({ hasText: 'test-agent-2' }).first();
+    const failedCard = page.locator('article').filter({ hasText: 'test-agent-3' }).first();
+
+    await expect(runningCard).toContainText('running');
+    await expect(stoppedCard).toContainText('stopped');
+    await expect(failedCard).toContainText('failed');
   });
 
   test('displays empty state when no agents', async ({ page }) => {
@@ -133,39 +150,33 @@ test.describe('Dashboard Agents List', () => {
       });
     });
 
-    await page.goto('/dashboard/agents');
-    await page.waitForLoadState('domcontentloaded');
-    
-    // Wait for the page to settle
-    await page.waitForTimeout(1000);
+    await openAgentsPage(page);
 
     // Should show empty state
-    await expect(page.getByText('No agents found')).toBeVisible();
+    await expect(page.getByText('No agents found')).toBeVisible({ timeout: 10000 });
   });
 
   test('search by agent ID works', async ({ page }) => {
-    await page.goto('/dashboard/agents');
-    await page.waitForLoadState('domcontentloaded');
+    await openAgentsPage(page);
 
     // Search by partial ID
     const searchInput = page.getByPlaceholder(/search agents/i);
     await searchInput.fill('a1b2c3d4');
 
     // Should show matching agent
-    await expect(page.getByText('test-agent-1')).toBeVisible();
-    await expect(page.getByText('test-agent-2')).toBeHidden();
+    await expect(page.getByRole('heading', { name: 'test-agent-1' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'test-agent-2' })).toHaveCount(0);
   });
 
   test('search by description works', async ({ page }) => {
-    await page.goto('/dashboard/agents');
-    await page.waitForLoadState('domcontentloaded');
+    await openAgentsPage(page);
 
     // Search by description text
     const searchInput = page.getByPlaceholder(/search agents/i);
     await searchInput.fill('e2e testing');
 
     // Should show matching agent
-    await expect(page.getByText('test-agent-1')).toBeVisible();
-    await expect(page.getByText('test-agent-2')).toBeHidden();
+    await expect(page.getByRole('heading', { name: 'test-agent-1' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'test-agent-2' })).toHaveCount(0);
   });
 });

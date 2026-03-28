@@ -1015,12 +1015,65 @@ def supervise_list_command(output_json: bool) -> None:
         sys.exit(1)
 
 
+@supervise_group.command(name="profiles")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON")
+def supervise_profiles_command(output_json: bool) -> None:
+    """List configured supervised launch profiles."""
+    try:
+        from cli.config import current_config, get_client
+
+        config = current_config()
+        if not config.is_authenticated():
+            click.echo("Error: Not authenticated. Run 'mutx login' first.", err=True)
+            sys.exit(1)
+
+        client = get_client(config)
+        response = client.get("/v1/runtime/governance/supervised/profiles")
+
+        if response.status_code == 401:
+            click.echo("Error: Authentication expired. Run 'mutx login' again.", err=True)
+            sys.exit(1)
+
+        if response.status_code != 200:
+            click.echo(f"Error: {response.text}", err=True)
+            sys.exit(1)
+
+        profiles = response.json()
+        if output_json:
+            click.echo(json.dumps(profiles, indent=2))
+            return
+
+        if not profiles:
+            click.echo("No supervised launch profiles configured.")
+            return
+
+        click.echo("Supervised Launch Profiles")
+        click.echo("=" * 80)
+        click.echo(f"{'Profile':<24} {'Env Keys':<24} {'Command'}")
+        click.echo("-" * 80)
+        for profile in profiles:
+            env_keys = ", ".join(profile.get("env_keys", [])) or "-"
+            cmd = " ".join(profile.get("command", []))
+            click.echo(f"{profile['name']:<24} {env_keys[:24]:<24} {cmd}")
+
+    except ImportError:
+        click.echo("Error: Cannot import config client.", err=True)
+        sys.exit(1)
+
+
 @supervise_group.command(name="start")
 @click.argument("agent_id")
-@click.argument("command", nargs=-1, required=True)
+@click.argument("command", nargs=-1, required=False)
+@click.option("--profile", help="Configured supervised launch profile name")
 @click.option("--policy", "-p", help="FPL policy file path")
 @click.option("--env", "-e", multiple=True, help="Environment variables (KEY=VALUE)")
-def supervise_start_command(agent_id: str, command: tuple, policy: str | None, env: tuple) -> None:
+def supervise_start_command(
+    agent_id: str,
+    command: tuple,
+    profile: str | None,
+    policy: str | None,
+    env: tuple,
+) -> None:
     """Start an agent under Faramesh supervision."""
     try:
         from cli.config import current_config, get_client
@@ -1036,12 +1089,24 @@ def supervise_start_command(agent_id: str, command: tuple, policy: str | None, e
                 key, value = e.split("=", 1)
                 env_dict[key] = value
 
+        has_command = bool(command)
+        has_profile = bool(profile)
+        if has_command == has_profile:
+            click.echo(
+                "Error: Specify exactly one of a raw COMMAND or --profile PROFILE.",
+                err=True,
+            )
+            sys.exit(1)
+
         client = get_client(config)
         payload = {
             "agent_id": agent_id,
-            "command": list(command),
             "env": env_dict,
         }
+        if has_command:
+            payload["command"] = list(command)
+        if has_profile:
+            payload["profile"] = profile
         if policy:
             payload["faramesh_policy"] = policy
 

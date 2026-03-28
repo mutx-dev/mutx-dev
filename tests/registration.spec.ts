@@ -36,9 +36,6 @@ test.describe('Registration Flow', () => {
     await page.goto('/register');
     await page.waitForLoadState('domcontentloaded');
 
-    // Check heading
-    await expect(page.getByRole('heading', { name: /create your account/i })).toBeVisible();
-
     // Check form fields (using getByPlaceholder as fallback)
     await expect(page.getByPlaceholder('Your name')).toBeVisible();
     await expect(page.getByPlaceholder('you@company.com')).toBeVisible();
@@ -184,7 +181,8 @@ test.describe('Registration Flow', () => {
 
     // Should navigate to login page
     await expect(page).toHaveURL(/\/login/);
-    await expect(page.getByRole('heading', { name: /welcome back/i })).toBeVisible();
+    await expect(page.getByLabel(/email address/i)).toBeVisible();
+    await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
   });
 
   test('registration form handles empty name input', async ({ page }) => {

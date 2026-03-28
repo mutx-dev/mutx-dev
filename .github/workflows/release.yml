@@ -50,11 +50,12 @@ jobs:
           TURNSTILE_SECRET_KEY: ci-test-secret-key
           MUTX_SKIP_PLAYWRIGHT: "0"
           MUTX_SKIP_COMPOSE_SMOKE: "0"
+          MUTX_SKIP_DESKTOP_RELEASE: "1"
         run: bash scripts/test.sh
 
-  release-frontend:
+  release-app-desktop:
     needs: validate
-    runs-on: ubuntu-latest
+    runs-on: macos-14
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
@@ -68,8 +69,28 @@ jobs:
           node-version: "24"
           cache: "npm"
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci --legacy-peer-deps
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e ".[dev]"
+
+      - name: Configure macOS signing and notarization
+        env:
+          APPLE_DEVELOPER_ID_APP_CERT_B64: ${{ secrets.APPLE_DEVELOPER_ID_APP_CERT_B64 }}
+          APPLE_DEVELOPER_ID_APP_CERT_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_APP_CERT_PASSWORD }}
+          APPLE_API_KEY_B64: ${{ secrets.APPLE_API_KEY_B64 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_KEYCHAIN_PASSWORD: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
+        run: bash desktop/scripts/setup-ci-signing.sh
 
       - name: Build
         run: npm run build
@@ -78,16 +99,59 @@ jobs:
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
+      - name: Validate signed desktop release
+        run: npm run desktop:release:validate
+
+      - name: Generate desktop checksums
+        run: npm run desktop:checksums
+
+      - name: Create or update GitHub release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ steps.version.outputs.VERSION }}
-          draft: false
-          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') }}
-          body_path: CHANGELOG.md
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          release_title="Release ${VERSION}"
+          release_notes_file="docs/releases/v$(echo "${VERSION}" | cut -d. -f1-2).md"
+          if [[ ! -f "${release_notes_file}" ]]; then
+            release_notes_file="CHANGELOG.md"
+          fi
+          prerelease_flag=""
+          if [[ "${GITHUB_REF_NAME}" == *alpha* || "${GITHUB_REF_NAME}" == *beta* ]]; then
+            prerelease_flag="--prerelease"
+          fi
+
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release edit "${GITHUB_REF_NAME}" \
+              --title "${release_title}" \
+              --notes-file "${release_notes_file}" \
+              ${prerelease_flag}
+          else
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "${release_title}" \
+              --notes-file "${release_notes_file}" \
+              ${prerelease_flag}
+          fi
+
+      - name: Upload signed desktop assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          gh release upload "${GITHUB_REF_NAME}" \
+            "dist/desktop/MUTX-${VERSION}-macos-arm64.dmg" \
+            "dist/desktop/MUTX-${VERSION}-macos-x64.dmg" \
+            "dist/desktop/MUTX-${VERSION}-macos-arm64.zip" \
+            "dist/desktop/MUTX-${VERSION}-macos-x64.zip" \
+            "dist/desktop/MUTX-${VERSION}-SHA256SUMS.txt" \
+            --clobber
+
+  promote-production:
+    needs: release-app-desktop
+    if: startsWith(github.ref, 'refs/tags/v') && needs.release-app-desktop.result == 'success'
+    uses: ./.github/workflows/railway-production-promotion.yml
+    with:
+      release_tag: ${{ github.ref_name }}
+    secrets: inherit
 
   release-cli:
     needs: validate
@@ -166,13 +230,25 @@ jobs:
           git commit -m "Update mutx formula to ${VERSION}"
           git push origin HEAD:main
 
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
+      - name: Create or update CLI GitHub release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: CLI Release ${{ steps.version.outputs.VERSION }}
-          draft: false
-          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') }}
-          body_path: CHANGELOG.md
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          release_title="CLI Release ${VERSION}"
+          prerelease_flag=""
+          if [[ "${GITHUB_REF_NAME}" == *alpha* || "${GITHUB_REF_NAME}" == *beta* ]]; then
+            prerelease_flag="--prerelease"
+          fi
+
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release edit "${GITHUB_REF_NAME}" \
+              --title "${release_title}" \
+              --notes-file CHANGELOG.md \
+              ${prerelease_flag}
+          else
+            gh release create "${GITHUB_REF_NAME}" \
+              --title "${release_title}" \
+              --notes-file CHANGELOG.md \
+              ${prerelease_flag}
+          fi

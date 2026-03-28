@@ -21,10 +21,11 @@ function SkeletonBlock({ className }: { className?: string }) {
 function CardSkeleton() {
   return (
     <div
-      className="rounded-xl border p-4"
+      className="rounded-[20px] border p-4"
       style={{
         borderColor: dashboardTokens.borderSubtle,
-        backgroundColor: dashboardTokens.bgSurface,
+        background: dashboardTokens.panelGradient,
+        boxShadow: dashboardTokens.shadowSm,
       }}
     >
       <div className="flex items-center justify-between gap-3">
@@ -42,7 +43,7 @@ function CardSkeleton() {
 function RowSkeleton() {
   return (
     <div
-      className="flex items-center gap-3 rounded-lg border px-3 py-2.5"
+      className="flex items-center gap-3 rounded-[16px] border px-3 py-3"
       style={{
         borderColor: dashboardTokens.borderSubtle,
         backgroundColor: dashboardTokens.bgSurface,
@@ -61,10 +62,11 @@ function RowSkeleton() {
 function DetailSkeleton() {
   return (
     <div
-      className="rounded-xl border p-4"
+      className="rounded-[20px] border p-4"
       style={{
         borderColor: dashboardTokens.borderSubtle,
-        backgroundColor: dashboardTokens.bgSurface,
+        background: dashboardTokens.panelGradient,
+        boxShadow: dashboardTokens.shadowSm,
       }}
     >
       <SkeletonBlock className="h-5 w-48" />

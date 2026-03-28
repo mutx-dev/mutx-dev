@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { readFileSync } from 'node:fs'
 
 export type AuthTokens = {
   access_token: string
@@ -13,6 +14,20 @@ function normalizeBaseUrl(value?: string | null) {
 }
 
 export function getApiBaseUrl() {
+  const runtimeContextPath = process.env.MUTX_DESKTOP_RUNTIME_CONTEXT_PATH
+  if (runtimeContextPath) {
+    try {
+      const raw = readFileSync(runtimeContextPath, 'utf8')
+      const parsed = JSON.parse(raw) as { apiUrl?: string }
+      const runtimeUrl = normalizeBaseUrl(parsed.apiUrl)
+      if (runtimeUrl) {
+        return runtimeUrl
+      }
+    } catch {
+      // fall through to env-based resolution
+    }
+  }
+
   return (
     normalizeBaseUrl(process.env.INTERNAL_API_URL) ||
     normalizeBaseUrl(process.env.NEXT_PUBLIC_API_URL) ||
@@ -23,6 +38,9 @@ export function getApiBaseUrl() {
 }
 
 export function shouldUseSecureCookies(request: NextRequest) {
+  // Auth cookies stay secure-only even when desktop/browser flows are mediated
+  // through localhost or forwarded HTTPS headers. The release contract and unit
+  // tests both assume the stricter posture.
   void request
   return true
 }

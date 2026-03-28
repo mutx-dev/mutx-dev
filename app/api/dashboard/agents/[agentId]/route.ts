@@ -6,7 +6,6 @@ import { withErrorHandling, badRequest } from '@/app/api/_lib/errors'
 import { checkAgentOwnership } from '@/app/api/_lib/ownership'
 import { z } from 'zod'
 
-const API_BASE_URL = getApiBaseUrl()
 
 export const dynamic = 'force-dynamic'
 
@@ -28,10 +27,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const path = searchParams.get('path') || ''
     const targetUrl =
       path === 'logs'
-        ? `${API_BASE_URL}/v1/agents/${agentId}/logs`
+        ? `${getApiBaseUrl()}/v1/agents/${agentId}/logs`
         : path === 'metrics'
-          ? `${API_BASE_URL}/v1/agents/${agentId}/metrics`
-          : `${API_BASE_URL}/v1/agents/${agentId}`
+          ? `${getApiBaseUrl()}/v1/agents/${agentId}/metrics`
+          : `${getApiBaseUrl()}/v1/agents/${agentId}`
 
     return proxyJson(request, targetUrl, {
       method: 'GET',
@@ -59,7 +58,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return ownershipError
     }
 
-    return proxyJson(request, `${API_BASE_URL}/v1/agents/${agentId}`, {
+    return proxyJson(request, `${getApiBaseUrl()}/v1/agents/${agentId}`, {
       method: 'DELETE',
       fallbackMessage: 'Failed to delete agent',
     })
@@ -84,14 +83,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const action = searchParams.get('action')
 
     if (action === 'stop') {
-      return proxyJson(request, `${API_BASE_URL}/v1/agents/${agentId}/stop`, {
+      return proxyJson(request, `${getApiBaseUrl()}/v1/agents/${agentId}/stop`, {
         method: 'POST',
         fallbackMessage: 'Failed to stop agent',
       })
     }
 
     if (action === 'deploy') {
-      return proxyJson(request, `${API_BASE_URL}/v1/agents/${agentId}/deploy`, {
+      return proxyJson(request, `${getApiBaseUrl()}/v1/agents/${agentId}/deploy`, {
         method: 'POST',
         fallbackMessage: 'Failed to deploy agent',
       })

@@ -5,7 +5,6 @@ import { proxyJson } from "@/app/api/_lib/proxy";
 import { validateRequest, schemas } from "@/app/api/_lib/validation";
 import { withErrorHandling } from "@/app/api/_lib/errors";
 
-const API_BASE_URL = getApiBaseUrl();
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +19,7 @@ export async function PATCH(
       return validation.response;
     }
 
-    return proxyJson(request, `${API_BASE_URL}/v1/webhooks/${id}`, {
+    return proxyJson(request, `${getApiBaseUrl()}/v1/webhooks/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +36,7 @@ export async function DELETE(
 ) {
   return withErrorHandling(async () => {
     const { id } = await params;
-    return proxyJson(request, `${API_BASE_URL}/v1/webhooks/${id}`, {
+    return proxyJson(request, `${getApiBaseUrl()}/v1/webhooks/${id}`, {
       method: "DELETE",
       fallbackMessage: "Failed to delete webhook",
     });

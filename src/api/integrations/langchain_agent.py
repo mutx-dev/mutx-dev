@@ -4,6 +4,8 @@ from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
 from enum import Enum
 from abc import ABC, abstractmethod
+import ast
+import operator
 from datetime import datetime, timezone
 
 from langchain_openai import ChatOpenAI
@@ -22,6 +24,101 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from .vector_store import VectorStoreRegistry
 
 logger = logging.getLogger(__name__)
+
+
+_SAFE_BINARY_OPERATORS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.FloorDiv: operator.floordiv,
+    ast.Mod: operator.mod,
+    ast.Pow: operator.pow,
+}
+_SAFE_UNARY_OPERATORS = {
+    ast.UAdd: operator.pos,
+    ast.USub: operator.neg,
+}
+_SAFE_CALCULATE_FUNCTIONS = {
+    "abs": abs,
+    "round": round,
+    "min": min,
+    "max": max,
+    "sum": sum,
+}
+_MAX_CALCULATE_COLLECTION_ITEMS = 32
+_MAX_CALCULATE_POWER_EXPONENT = 1000
+_MAX_CALCULATE_MAGNITUDE = 10**12
+_MAX_CALCULATE_RESULT_MAGNITUDE = 10**18
+
+
+def _validate_safe_number(value: int | float) -> int | float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError("Only numeric values are allowed")
+    if abs(value) > _MAX_CALCULATE_MAGNITUDE:
+        raise ValueError("Numeric value is too large")
+    return value
+
+
+def _validate_safe_result(value: int | float) -> int | float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError("Only numeric results are allowed")
+    if abs(value) > _MAX_CALCULATE_RESULT_MAGNITUDE:
+        raise ValueError("Result is too large")
+    return value
+
+
+def _safe_calculate_eval(
+    node: ast.AST,
+) -> int | float | list[int | float] | tuple[int | float, ...]:
+    if isinstance(node, ast.Expression):
+        return _safe_calculate_eval(node.body)
+
+    if isinstance(node, ast.Constant):
+        if isinstance(node.value, bool) or not isinstance(node.value, (int, float)):
+            raise ValueError("Only numeric constants are allowed")
+        return _validate_safe_number(node.value)
+
+    if isinstance(node, ast.List):
+        if len(node.elts) > _MAX_CALCULATE_COLLECTION_ITEMS:
+            raise ValueError("Too many items in expression")
+        return [_safe_calculate_eval(element) for element in node.elts]
+
+    if isinstance(node, ast.Tuple):
+        if len(node.elts) > _MAX_CALCULATE_COLLECTION_ITEMS:
+            raise ValueError("Too many items in expression")
+        return tuple(_safe_calculate_eval(element) for element in node.elts)
+
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _SAFE_UNARY_OPERATORS:
+        return _validate_safe_result(
+            _SAFE_UNARY_OPERATORS[type(node.op)](_safe_calculate_eval(node.operand))
+        )
+
+    if isinstance(node, ast.BinOp) and type(node.op) in _SAFE_BINARY_OPERATORS:
+        left = _safe_calculate_eval(node.left)
+        right = _safe_calculate_eval(node.right)
+        if type(node.op) is ast.Pow:
+            if not isinstance(left, (int, float)) or not isinstance(right, (int, float)):
+                raise ValueError("Power operands must be numeric")
+            if isinstance(right, float) and not right.is_integer():
+                raise ValueError("Power exponent must be an integer")
+            if abs(int(right)) > _MAX_CALCULATE_POWER_EXPONENT:
+                raise ValueError("Power exponent is too large")
+        return _validate_safe_result(_SAFE_BINARY_OPERATORS[type(node.op)](left, right))
+
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+        function_name = node.func.id
+        safe_function = _SAFE_CALCULATE_FUNCTIONS.get(function_name)
+        if safe_function is None:
+            raise ValueError(f"Function '{function_name}' is not allowed")
+        if node.keywords:
+            raise ValueError("Keyword arguments are not allowed")
+        if len(node.args) > _MAX_CALCULATE_COLLECTION_ITEMS:
+            raise ValueError("Too many function arguments")
+        result = safe_function(*[_safe_calculate_eval(argument) for argument in node.args])
+        return _validate_safe_result(result)
+
+    raise ValueError("Unsupported expression")
 
 
 class LLMProvider(str, Enum):
@@ -177,7 +274,14 @@ class BuiltInTools:
     @staticmethod
     def calculate(expression: str) -> str:
         try:
-            result = eval(expression, {"__builtins__": {}}, {})
+            normalized_expression = str(expression or "").strip()
+            if not normalized_expression:
+                return "Error: Expression is empty"
+            if len(normalized_expression) > 200:
+                return "Error: Expression is too long"
+
+            parsed = ast.parse(normalized_expression, mode="eval")
+            result = _safe_calculate_eval(parsed)
             return str(result)
         except Exception as e:
             return f"Error: {str(e)}"

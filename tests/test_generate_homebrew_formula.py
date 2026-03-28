@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import tomllib
 
 import pytest
 
@@ -13,11 +14,17 @@ from scripts.generate_homebrew_formula import (
 )
 
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+with (REPO_ROOT / "pyproject.toml").open("rb") as handle:
+    CURRENT_CLI_VERSION = str(tomllib.load(handle)["project"]["version"])
+CURRENT_CLI_TAG = f"cli-v{CURRENT_CLI_VERSION}"
+
+
 def test_dependency_resources_from_report_skips_root_package_and_normalizes_names() -> None:
     report = {
         "install": [
             {
-                "metadata": {"name": "mutx", "version": "1.2.0"},
+                "metadata": {"name": "mutx", "version": CURRENT_CLI_VERSION},
                 "download_info": {"url": "file:///repo", "dir_info": {}},
             },
             {
@@ -55,17 +62,19 @@ def test_dependency_resources_from_report_skips_root_package_and_normalizes_name
 
 def test_validate_release_tag_rejects_version_mismatch() -> None:
     with pytest.raises(ValueError, match="release tag mismatch"):
-        validate_release_tag("1.2.0", "cli-v1.2.1")
+        validate_release_tag(CURRENT_CLI_VERSION, f"{CURRENT_CLI_TAG}-mismatch")
 
 
 def test_render_formula_uses_tagged_source_and_non_network_smoke_checks() -> None:
     formula = render_formula(
         description='CLI "operator" shell',
         homepage="https://mutx.dev",
-        source_url="https://codeload.github.com/mutx-dev/mutx-dev/tar.gz/refs/tags/cli-v1.2.0",
+        source_url=(
+            f"https://codeload.github.com/mutx-dev/mutx-dev/tar.gz/refs/tags/{CURRENT_CLI_TAG}"
+        ),
         source_sha256="deadbeef",
         license_name="MIT",
-        version="1.2.0",
+        version=CURRENT_CLI_VERSION,
         python_formula="python@3.12",
         resources=[
             HomebrewResource(
@@ -76,8 +85,11 @@ def test_render_formula_uses_tagged_source_and_non_network_smoke_checks() -> Non
         ],
     )
 
-    assert 'url "https://codeload.github.com/mutx-dev/mutx-dev/tar.gz/refs/tags/cli-v1.2.0"' in formula
-    assert 'version "1.2.0"' in formula
+    assert (
+        f'url "https://codeload.github.com/mutx-dev/mutx-dev/tar.gz/refs/tags/{CURRENT_CLI_TAG}"'
+        in formula
+    )
+    assert f'version "{CURRENT_CLI_VERSION}"' in formula
     assert 'resource "click" do' in formula
     assert 'assert_match "Usage: mutx onboard [OPTIONS]"' in formula
     assert 'assert_match "--install-openclaw"' in formula
@@ -89,12 +101,12 @@ def test_main_writes_formula_with_resolved_resources(monkeypatch, tmp_path: Path
     repo_root = tmp_path / "repo"
     repo_root.mkdir()
     (repo_root / "pyproject.toml").write_text(
-        """
+        f"""
 [project]
 name = "mutx"
-version = "1.2.0"
+version = "{CURRENT_CLI_VERSION}"
 description = "CLI for mutx.dev"
-license = { text = "MIT" }
+license = {{ text = "MIT" }}
 """.strip()
         + "\n",
         encoding="utf-8",
@@ -122,7 +134,7 @@ license = { text = "MIT" }
             "--repo-root",
             str(repo_root),
             "--tag",
-            "cli-v1.2.0",
+            CURRENT_CLI_TAG,
             "--output",
             str(output_path),
         ]

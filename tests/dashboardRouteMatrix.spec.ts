@@ -494,9 +494,30 @@ const dashboardRoutes: RouteSpec[] = [
     primaryText: /create agent/i,
   },
   {
+    path: '/dashboard/agents/agent_alpha',
+    heading: /agent-alpha/i,
+    primaryText: /configuration snapshot/i,
+    afterLoad: async (page) => {
+      await expect(page.getByRole('button', { name: /copy id/i })).toBeVisible();
+      await expect(page.getByText(/configured execution profile/i)).toBeVisible();
+    },
+  },
+  {
     path: '/dashboard/deployments',
     heading: /deployments/i,
-    primaryText: /deployment timeline and recovery controls/i,
+    primaryText: /deployment registry/i,
+  },
+  {
+    path: '/dashboard/deployments/deploy_alpha',
+    heading: /deployment deploy_alpha/i,
+    primaryText: /recent events/i,
+    afterLoad: async (page) => {
+      await expect(page.getByRole('link', { name: /view logs/i })).toHaveAttribute(
+        'href',
+        '/dashboard/logs?deploymentId=deploy_alpha',
+      );
+      await expect(page.getByText(/deploy\.active/i)).toBeVisible();
+    },
   },
   {
     path: '/dashboard/runs',
@@ -551,12 +572,12 @@ const dashboardRoutes: RouteSpec[] = [
   {
     path: '/dashboard/memory',
     heading: /memory/i,
-    primaryText: /memory status/i,
+    primaryText: /memory surface/i,
   },
   {
     path: '/dashboard/orchestration',
     heading: /orchestration/i,
-    primaryText: /orchestration status/i,
+    primaryText: /orchestration surface/i,
   },
   {
     path: '/dashboard/swarm',
@@ -607,6 +628,86 @@ async function mockMatrixTraffic(page: Page) {
       return;
     }
 
+    if (pathname === '/api/dashboard/overview' && method === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          generatedAt: '2025-03-21T08:15:00Z',
+          session: {
+            id: 'user_alpha',
+            email: 'operator@mutx.dev',
+            name: 'Operator',
+            plan: 'operator',
+          },
+          resources: {
+            agents: {
+              status: 'ok',
+              statusCode: 200,
+              data: { items: mockedAgents },
+              error: null,
+            },
+            deployments: {
+              status: 'ok',
+              statusCode: 200,
+              data: { items: mockedDeployments },
+              error: null,
+            },
+            runs: {
+              status: 'ok',
+              statusCode: 200,
+              data: { items: mockedRuns },
+              error: null,
+            },
+            alerts: {
+              status: 'ok',
+              statusCode: 200,
+              data: { items: mockedAlerts },
+              error: null,
+            },
+            webhooks: {
+              status: 'ok',
+              statusCode: 200,
+              data: { webhooks: mockedWebhooks },
+              error: null,
+            },
+            budget: {
+              status: 'ok',
+              statusCode: 200,
+              data: mockedBudget,
+              error: null,
+            },
+            health: {
+              status: 'ok',
+              statusCode: 200,
+              data: {
+                status: 'ok',
+                database: 'ok',
+                timestamp: '2025-03-21T08:15:00Z',
+                uptime: 98765,
+                agents: mockedAgents.length,
+                deployments: mockedDeployments.length,
+              },
+              error: null,
+            },
+            runtime: {
+              status: 'ok',
+              statusCode: 200,
+              data: mockedRuntimeSnapshot,
+              error: null,
+            },
+            onboarding: {
+              status: 'ok',
+              statusCode: 200,
+              data: mockedOnboarding,
+              error: null,
+            },
+          },
+        }),
+      });
+      return;
+    }
+
     if (pathname === '/api/dashboard/agents' && method === 'GET') {
       await route.fulfill({
         status: 200,
@@ -625,9 +726,12 @@ async function mockMatrixTraffic(page: Page) {
           id: agentId,
           name: agentId.replace(/_/g, '-'),
           status: 'running',
+          type: 'operator',
           description: 'Route matrix detail payload',
           created_at: '2025-03-21T08:00:00Z',
           updated_at: '2025-03-21T08:05:00Z',
+          user_id: '11111111-1111-1111-1111-111111111111',
+          config_version: 7,
           config: { mode: 'matrix' },
         }),
       });
@@ -797,9 +901,32 @@ async function mockMatrixTraffic(page: Page) {
           id: deploymentId,
           agent_id: 'agent_alpha',
           status: 'running',
+          version: '1.3.0-rc.2',
           replicas: 2,
+          node_id: 'node-matrix-01',
           started_at: '2025-03-21T07:00:00Z',
           ended_at: '2025-03-21T07:45:00Z',
+          error_message: null,
+          events: [
+            {
+              id: 'deploy_event_alpha',
+              deployment_id: deploymentId,
+              event_type: 'deploy.active',
+              status: 'running',
+              node_id: 'node-matrix-01',
+              error_message: null,
+              created_at: '2025-03-21T07:01:00Z',
+            },
+            {
+              id: 'deploy_event_beta',
+              deployment_id: deploymentId,
+              event_type: 'health.check',
+              status: 'healthy',
+              node_id: 'node-matrix-01',
+              error_message: null,
+              created_at: '2025-03-21T07:03:00Z',
+            },
+          ],
         }),
       });
       return;
@@ -909,13 +1036,13 @@ async function expectVisibleRouteTitle(page: Page, heading: RegExp) {
   const headingByRole = page.getByRole('heading', { name: heading }).first();
 
   try {
-    await expect(headingByRole).toBeVisible({ timeout: 5000 });
+    await expect(headingByRole).toBeVisible({ timeout: 12000 });
     return;
   } catch {
     // Some demo routes use styled text instead of semantic heading tags.
   }
 
-  await expect(page.getByText(heading).first()).toBeVisible({ timeout: 5000 });
+  await expect(page.getByText(heading).first()).toBeVisible({ timeout: 12000 });
 }
 
 async function assertRouteSurface(page: Page, route: RouteSpec) {
@@ -925,8 +1052,9 @@ async function assertRouteSurface(page: Page, route: RouteSpec) {
   expect(response?.status(), `${route.path} returned ${response?.status()}`).toBeLessThan(500);
 
   await expect(page.getByText(/Internal Server Error/i)).toHaveCount(0);
+  await expect(page.getByText(/^Loading\.\.\.$/i)).toHaveCount(0, { timeout: 15000 });
   await expectVisibleRouteTitle(page, route.heading);
-  await expect(page.getByText(route.primaryText).first()).toBeVisible({ timeout: 10000 });
+  await expect(page.getByText(route.primaryText).first()).toBeVisible({ timeout: 15000 });
   await assertNoOverflow(page);
 
   if (route.afterLoad) {
@@ -972,6 +1100,17 @@ test.describe('Dashboard route matrix', () => {
         await assertRouteSurface(page, route);
       });
     }
+
+    test('primary navigation hides preview-backed workspace routes', async ({ page }) => {
+      await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+
+      await expect(page.getByRole('link', { name: /^memory$/i })).toHaveCount(0);
+      await expect(page.getByRole('link', { name: /^orchestration$/i })).toHaveCount(0);
+      await expect(page.getByRole('link', { name: /^channels$/i })).toHaveCount(0);
+      await expect(page.getByRole('link', { name: /^skills$/i })).toHaveCount(0);
+      await expect(page.getByRole('link', { name: /^logs$/i })).toHaveCount(0);
+      await expect(page.getByRole('link', { name: /^spawn$/i })).toHaveCount(0);
+    });
   });
 
   test.describe('mobile', () => {

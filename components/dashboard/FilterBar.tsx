@@ -1,6 +1,6 @@
 "use client";
 
-import type { HTMLAttributes, ReactNode } from "react";
+import type { HTMLAttributes, ReactNode, RefObject } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -23,6 +23,7 @@ export interface FilterControl {
 export interface FilterBarProps extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
   searchValue: string;
   onSearchChange: (nextValue: string) => void;
+  searchInputRef?: RefObject<HTMLInputElement | null>;
   searchPlaceholder?: string;
   filters?: FilterControl[];
   trailing?: ReactNode;
@@ -32,6 +33,7 @@ export interface FilterBarProps extends Omit<HTMLAttributes<HTMLDivElement>, "on
 export function FilterBar({
   searchValue,
   onSearchChange,
+  searchInputRef,
   searchPlaceholder = "Search...",
   filters = [],
   trailing,
@@ -51,25 +53,27 @@ export function FilterBar({
 
   return (
     <section
-      className={cn("rounded-xl border p-3", className)}
+      className={cn("dashboard-entry rounded-[20px] border p-3.5", className)}
       style={{
         borderColor: dashboardTokens.borderSubtle,
-        backgroundColor: dashboardTokens.bgSurface,
+        background: dashboardTokens.panelGradient,
+        boxShadow: dashboardTokens.shadowSm,
         ...style,
       }}
       {...props}
     >
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2.5">
         <div
-          className="flex min-h-10 min-w-[240px] flex-1 items-center gap-2 rounded-lg border px-3"
+          className="flex min-h-11 min-w-[240px] flex-1 items-center gap-2 rounded-[14px] border px-3.5"
           style={{
-            borderColor: dashboardTokens.borderSubtle,
-            backgroundColor: dashboardTokens.bgSurfaceStrong,
+            borderColor: dashboardTokens.borderStrong,
+            backgroundColor: dashboardTokens.bgInset,
             color: dashboardTokens.textSubtle,
           }}
         >
           <Search className="h-4 w-4 shrink-0" style={{ color: dashboardTokens.textMuted }} />
           <input
+            ref={searchInputRef}
             value={searchValue}
             onChange={(event) => onSearchChange(event.currentTarget.value)}
             onKeyDown={handleKeyDown}
@@ -92,10 +96,10 @@ export function FilterBar({
             {filters.map((filter) => (
               <label
                 key={filter.id}
-                className="flex items-center gap-2 rounded-lg border px-2.5 py-2 text-sm"
+                className="flex items-center gap-2 rounded-[14px] border px-3 py-2 text-sm"
                 style={{
                   borderColor: dashboardTokens.borderSubtle,
-                  backgroundColor: dashboardTokens.bgSurfaceStrong,
+                  backgroundColor: dashboardTokens.bgInset,
                   color: dashboardTokens.textSubtle,
                 }}
               >
@@ -124,10 +128,10 @@ export function FilterBar({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex h-10 items-center gap-1 rounded-lg border px-2.5 text-sm"
+            className="inline-flex h-11 items-center gap-1 rounded-[14px] border px-3 text-sm"
             style={{
               borderColor: dashboardTokens.borderSubtle,
-              backgroundColor: dashboardTokens.bgSurfaceStrong,
+              backgroundColor: dashboardTokens.bgInset,
               color: dashboardTokens.textSubtle,
             }}
           >

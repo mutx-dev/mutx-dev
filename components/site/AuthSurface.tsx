@@ -1,7 +1,10 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 
+import { AuthNav } from "@/components/AuthNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
+import { PublicSurface } from "@/components/site/PublicSurface";
+import styles from "@/components/site/marketing/MarketingCore.module.css";
 
 type AuthSurfaceProps = {
   eyebrow: string;
@@ -33,57 +36,66 @@ export function AuthSurface({
   children,
 }: AuthSurfaceProps) {
   return (
-    <div className="site-page">
-      <main className="site-main">
-        <section className="site-section pt-20 sm:pt-24 lg:pt-28">
-          <div className="site-shell">
-            <div className="site-auth-grid">
-              <div className="space-y-6">
-                <div className="max-w-2xl">
-                  <div className="site-kicker">{eyebrow}</div>
-                  <h1 className="site-title mt-4">{title}</h1>
-                  <p className="site-copy mt-4 max-w-xl">{description}</p>
-                </div>
+    <PublicSurface className={`${styles.page} ${styles.publicPage}`}>
+      <AuthNav />
 
-                <div className="site-form-card p-6 sm:p-8">{children}</div>
+      <main className={styles.main}>
+        <section className={styles.routeDarkSection} data-route-surface="dark">
+          <div className={`${styles.shell} ${styles.routeGrid}`}>
+            <div className={`${styles.routeMain} ${styles.routeHeroCopy}`}>
+              <div className={styles.intro}>
+                <p className={`${styles.eyebrow} ${styles.eyebrowOnDark}`}>{eyebrow}</p>
+                <h1 className={`${styles.displayTitle} ${styles.darkText}`}>{title}</h1>
+                <p className={`${styles.bodyText} ${styles.bodyTextOnDark}`}>{description}</p>
               </div>
-
-              <aside className="site-auth-aside">
-                <div className="site-auth-media">
-                  <Image
-                    src={mediaSrc}
-                    alt={mediaAlt}
-                    width={mediaWidth}
-                    height={mediaHeight}
-                    sizes="(max-width: 1024px) 100vw, 34rem"
-                    className="site-auth-media-image"
-                  />
-                </div>
-
-                <div className="site-panel p-5 sm:p-6">
-                  <div className="site-kicker">{asideEyebrow}</div>
-                  <h2 className="mt-4 text-2xl font-semibold tracking-[-0.05em] text-white">
-                    {asideTitle}
-                  </h2>
-                  <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-soft)]">
-                    {asideBody}
-                  </p>
-
-                  <div className="mt-5 grid gap-3">
-                    {highlights.map((item) => (
-                      <div key={item} className="site-inline-card">
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </aside>
             </div>
+
+            <aside className={styles.routeAside}>
+              <div className={styles.routeVisualFrame}>
+                <div className={styles.routeVisualGlow} aria-hidden="true" />
+                <Image
+                  src={mediaSrc}
+                  alt={mediaAlt}
+                  width={mediaWidth}
+                  height={mediaHeight}
+                  sizes="(max-width: 1024px) 100vw, 34rem"
+                  className={styles.routeVisualImage}
+                />
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section className={styles.routeLightSection} data-route-surface="light">
+          <div className={`${styles.shell} ${styles.routeGrid}`}>
+            <div className={styles.routeMain}>
+              <div className={`${styles.panel} ${styles.panelPadded} ${styles.routeFormPanel}`}>
+                {children}
+              </div>
+            </div>
+
+            <aside className={styles.routeAside}>
+              <div className={`${styles.panel} ${styles.panelPadded} ${styles.routeInfoPanel}`}>
+                <div className={styles.intro}>
+                  <p className={styles.eyebrow}>{asideEyebrow}</p>
+                  <h2 className={styles.sectionTitle}>{asideTitle}</h2>
+                  <p className={styles.bodyText}>{asideBody}</p>
+                </div>
+
+                <div className={styles.surfaceList}>
+                  {highlights.map((item) => (
+                    <div key={item} className={styles.surfaceListItem}>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </aside>
           </div>
         </section>
       </main>
 
       <PublicFooter />
-    </div>
+    </PublicSurface>
   );
 }

@@ -14,6 +14,8 @@
     * [Leads API](docs/api/leads.md)
     * [Webhooks and Ingestion API](docs/api/webhooks.md)
   * [CLI Guide](docs/cli.md)
+  * [v1.3 Release Notes](docs/releases/v1.3.md)
+  * [v1.3 Release Checklist](docs/releases/v1.3-checklist.md)
   * [Webhook Integration Guide](docs/webhook-guide.md)
   * [Project Status](docs/project-status.md)
   * [Surface Matrix](docs/surfaces.md)

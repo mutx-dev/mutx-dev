@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getApiBaseUrl, getAuthToken } from './controlPlane'
 import { forbidden, notFound } from './errors'
 
-const API_BASE_URL = getApiBaseUrl()
 
 // Architectural improvements: timeout + observability
 const FETCH_TIMEOUT_MS = 3000
@@ -46,11 +45,11 @@ export async function verifyDeploymentOwnership(
   try {
     // Parallelize: fetch deployment and user info concurrently
     const [deploymentResponse, userResponse] = await Promise.all([
-      fetchWithTimeout(`${API_BASE_URL}/v1/deployments/${deploymentId}`, {
+      fetchWithTimeout(`${getApiBaseUrl()}/v1/deployments/${deploymentId}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       }),
-      fetchWithTimeout(`${API_BASE_URL}/v1/auth/me`, {
+      fetchWithTimeout(`${getApiBaseUrl()}/v1/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       }),
@@ -83,7 +82,7 @@ export async function verifyDeploymentOwnership(
     }
 
     // Now fetch the agent (depends on agent_id from deployment)
-    const agentResponse = await fetchWithTimeout(`${API_BASE_URL}/v1/agents/${deployment.agent_id}`, {
+    const agentResponse = await fetchWithTimeout(`${getApiBaseUrl()}/v1/agents/${deployment.agent_id}`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
     })
@@ -148,11 +147,11 @@ export async function verifyAgentOwnership(
   try {
     // Parallelize: fetch agent and user concurrently
     const [agentResponse, userResponse] = await Promise.all([
-      fetchWithTimeout(`${API_BASE_URL}/v1/agents/${agentId}`, {
+      fetchWithTimeout(`${getApiBaseUrl()}/v1/agents/${agentId}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       }),
-      fetchWithTimeout(`${API_BASE_URL}/v1/auth/me`, {
+      fetchWithTimeout(`${getApiBaseUrl()}/v1/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       }),

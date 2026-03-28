@@ -1,7 +1,8 @@
 import pytest
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from datetime import datetime, timezone
 
+from src.api import main as main_module
 from src.api.main import create_app
 
 
@@ -68,6 +69,91 @@ def test_app_factory_mounts_expected_public_routes():
     }
     assert "/v1/newsletter" not in mounted_prefixes
     assert "/v1/scheduler" not in mounted_prefixes
+
+
+def test_app_factory_disables_docs_in_production_by_default(monkeypatch):
+    monkeypatch.setattr(main_module.settings, "environment", "production")
+    monkeypatch.setattr(main_module.settings, "expose_api_docs_in_production", False)
+
+    app = create_app(
+        enable_lifespan=False,
+        background_monitor_enabled=False,
+        database_required_on_startup=False,
+    )
+
+    assert app.docs_url is None
+    assert app.redoc_url is None
+    assert app.openapi_url is None
+
+
+def test_app_factory_can_opt_in_docs_in_production(monkeypatch):
+    monkeypatch.setattr(main_module.settings, "environment", "production")
+    monkeypatch.setattr(main_module.settings, "expose_api_docs_in_production", True)
+
+    app = create_app(
+        enable_lifespan=False,
+        background_monitor_enabled=False,
+        database_required_on_startup=False,
+    )
+
+    assert app.docs_url == "/docs"
+    assert app.redoc_url == "/redoc"
+    assert app.openapi_url == "/openapi.json"
+
+
+@pytest.mark.asyncio
+async def test_app_factory_rejects_untrusted_host_headers(monkeypatch):
+    monkeypatch.setattr(main_module.settings, "allowed_hosts", ["testserver", "localhost"])
+
+    app = create_app(
+        enable_lifespan=False,
+        background_monitor_enabled=False,
+        database_required_on_startup=False,
+    )
+    app.state.start_time = datetime.now(timezone.utc).timestamp()
+    app.state.database_ready = True
+    app.state.database_error = None
+    app.state.database_error_detail = None
+    app.state.schema_repairs_applied = []
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://testserver",
+    ) as trusted_client:
+        trusted_response = await trusted_client.get("/health")
+        assert trusted_response.status_code == 200
+
+        rejected_response = await trusted_client.get(
+            "/health",
+            headers={"host": "evil.example"},
+        )
+
+    assert rejected_response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_app_factory_allows_railway_private_domain_when_present(monkeypatch):
+    monkeypatch.setattr(main_module.settings, "allowed_hosts", ["localhost"])
+    monkeypatch.setenv("RAILWAY_PRIVATE_DOMAIN", "zooming-youth.railway.internal")
+
+    app = create_app(
+        enable_lifespan=False,
+        background_monitor_enabled=False,
+        database_required_on_startup=False,
+    )
+    app.state.start_time = datetime.now(timezone.utc).timestamp()
+    app.state.database_ready = True
+    app.state.database_error = None
+    app.state.database_error_detail = None
+    app.state.schema_repairs_applied = []
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://zooming-youth.railway.internal",
+    ) as railway_client:
+        response = await railway_client.get("/health")
+
+    assert response.status_code == 200
 
 
 @pytest.mark.asyncio

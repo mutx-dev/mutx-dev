@@ -16,7 +16,7 @@ export function StatusBadge({ status, label, className, style, ...props }: Statu
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-medium capitalize",
+        "inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.14em]",
         className,
       )}
       style={{
@@ -30,7 +30,7 @@ export function StatusBadge({ status, label, className, style, ...props }: Statu
     >
       <span
         aria-hidden
-        className="h-1.5 w-1.5 rounded-full"
+        className="dashboard-live-dot h-1.5 w-1.5 rounded-full"
         style={{ backgroundColor: tone.dot }}
       />
       {label ?? status}

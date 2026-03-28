@@ -12,13 +12,15 @@ def _request_with_headers(
     headers: list[tuple[bytes, bytes]],
     client_host: str = "127.0.0.1",
     state: dict | None = None,
+    path: str = "/v1/test",
+    method: str = "GET",
 ) -> Request:
     scope = {
         "type": "http",
         "http_version": "1.1",
-        "method": "GET",
-        "path": "/v1/test",
-        "raw_path": b"/v1/test",
+        "method": method,
+        "path": path,
+        "raw_path": path.encode(),
         "query_string": b"",
         "headers": headers,
         "client": (client_host, 12345),
@@ -107,3 +109,98 @@ async def test_dispatch_rate_limits_per_api_key_not_per_ip() -> None:
     assert first_response.status_code == 200
     assert second_response.status_code == 200
     assert third_response.status_code == 429
+
+
+@pytest.mark.asyncio
+async def test_dispatch_uses_stricter_limit_for_auth_paths() -> None:
+    middleware = RateLimitMiddleware(
+        FastAPI(),
+        requests=5,
+        window_seconds=60,
+        auth_requests=2,
+        auth_window_seconds=300,
+    )
+
+    async def call_next(_request: Request):
+        return JSONResponse({"ok": True}, status_code=200)
+
+    first_request = _request_with_headers(
+        headers=[(b"host", b"testserver")],
+        client_host="192.0.2.50",
+        path="/v1/auth/login",
+        method="POST",
+    )
+    second_request = _request_with_headers(
+        headers=[(b"host", b"testserver")],
+        client_host="192.0.2.50",
+        path="/v1/auth/login",
+        method="POST",
+    )
+    third_request = _request_with_headers(
+        headers=[(b"host", b"testserver")],
+        client_host="192.0.2.50",
+        path="/v1/auth/login",
+        method="POST",
+    )
+
+    assert (await middleware.dispatch(first_request, call_next)).status_code == 200
+    assert (await middleware.dispatch(second_request, call_next)).status_code == 200
+    assert (await middleware.dispatch(third_request, call_next)).status_code == 429
+
+
+@pytest.mark.asyncio
+async def test_dispatch_keeps_auth_and_general_buckets_separate() -> None:
+    middleware = RateLimitMiddleware(
+        FastAPI(),
+        requests=2,
+        window_seconds=60,
+        auth_requests=1,
+        auth_window_seconds=300,
+    )
+
+    async def call_next(_request: Request):
+        return JSONResponse({"ok": True}, status_code=200)
+
+    auth_request = _request_with_headers(
+        headers=[(b"host", b"testserver")],
+        client_host="192.0.2.50",
+        path="/v1/auth/forgot-password",
+        method="POST",
+    )
+    repeated_auth_request = _request_with_headers(
+        headers=[(b"host", b"testserver")],
+        client_host="192.0.2.50",
+        path="/v1/auth/forgot-password",
+        method="POST",
+    )
+    general_request = _request_with_headers(
+        headers=[(b"host", b"testserver")],
+        client_host="192.0.2.50",
+        path="/v1/deployments",
+        method="GET",
+    )
+
+    assert (await middleware.dispatch(auth_request, call_next)).status_code == 200
+    assert (await middleware.dispatch(repeated_auth_request, call_next)).status_code == 429
+    assert (await middleware.dispatch(general_request, call_next)).status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_dispatch_skips_options_preflight_requests() -> None:
+    middleware = RateLimitMiddleware(FastAPI(), requests=1, window_seconds=60)
+
+    async def call_next(_request: Request):
+        return JSONResponse({"ok": True}, status_code=200)
+
+    preflight_request = _request_with_headers(
+        headers=[(b"origin", b"https://app.mutx.dev"), (b"host", b"testserver")],
+        client_host="192.0.2.50",
+        path="/v1/auth/login",
+        method="OPTIONS",
+    )
+
+    first_response = await middleware.dispatch(preflight_request, call_next)
+    second_response = await middleware.dispatch(preflight_request, call_next)
+
+    assert first_response.status_code == 200
+    assert second_response.status_code == 200

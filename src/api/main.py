@@ -3,12 +3,15 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import logging
+import os
 import time
+from urllib.parse import urlparse
 
 from fastapi import APIRouter, FastAPI, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import ValidationError
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from src.api.config import get_settings
 from src.api.database import dispose_engine, init_db
@@ -125,6 +128,39 @@ def _initialize_app_state(
     app.state.background_monitor_enabled = background_monitor_enabled
     app.state.background_monitor_state = MonitorRuntimeState()
     app.state.public_router_allowlist = PUBLIC_ROUTER_ALLOWLIST
+
+
+def _extract_hostname(value: str | None) -> str | None:
+    if not value:
+        return None
+
+    candidate = value.strip()
+    if not candidate:
+        return None
+
+    if "://" not in candidate:
+        candidate = f"https://{candidate}"
+
+    parsed = urlparse(candidate)
+    if not parsed.hostname:
+        return None
+
+    return parsed.hostname.lower()
+
+
+def _build_allowed_hosts() -> list[str]:
+    allowed_hosts = {
+        host.strip().lower()
+        for host in settings.allowed_hosts
+        if isinstance(host, str) and host.strip()
+    }
+
+    for env_name in ("RAILWAY_PUBLIC_DOMAIN", "RAILWAY_PRIVATE_DOMAIN", "API_BASE_URL"):
+        host = _extract_hostname(os.environ.get(env_name))
+        if host:
+            allowed_hosts.add(host)
+
+    return sorted(allowed_hosts)
 
 
 async def _initialize_database(app: FastAPI) -> None:
@@ -371,11 +407,16 @@ def create_app(
             database_required_on_startup=resolved_database_required_on_startup,
         )
 
+    expose_api_docs = not settings.is_production or settings.expose_api_docs_in_production
+
     app = FastAPI(
         title="mutx.dev API",
         description="API for the mutx platform",
         version="1.0.0",
         lifespan=lifespan,
+        docs_url="/docs" if expose_api_docs else None,
+        redoc_url="/redoc" if expose_api_docs else None,
+        openapi_url="/openapi.json" if expose_api_docs else None,
     )
     _initialize_app_state(app, background_monitor_enabled=resolved_background_monitor_enabled)
 
@@ -385,6 +426,11 @@ def create_app(
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["*"],
+    )
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=_build_allowed_hosts(),
+        www_redirect=False,
     )
 
     add_security_middleware(app, settings.cors_origins)

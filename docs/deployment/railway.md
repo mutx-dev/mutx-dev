@@ -66,7 +66,14 @@ DATABASE_REQUIRED_ON_STARTUP=false
 
 # Site URLs
 NEXT_PUBLIC_SITE_URL=https://your-app.railway.app
-NEXT_PUBLIC_API_URL=https://your-app.railway.app
+
+# Frontend -> API routing
+# For a single Railway service, NEXT_PUBLIC_API_URL can stay public.
+# For split frontend/backend Railway services, prefer the backend private domain here.
+INTERNAL_API_URL=http://your-backend.railway.internal:8080
+
+# Optional public API URL if you intentionally expose the backend directly.
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com
 
 # Email (optional)
 RESEND_API_KEY=re_your_resend_api_key
@@ -212,6 +219,51 @@ COPY . .
 
 CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
+
+## Production Promotion
+
+MUTX v1.3 treats Railway as the production host for:
+
+- `mutx.dev`
+- `app.mutx.dev`
+- `api.mutx.dev`
+
+The repo now includes a production-promotion lane for Railway so web/app rollout does not depend on a local operator shell.
+
+### GitHub Actions secrets
+
+Set these repository secrets before using the Railway promotion workflow:
+
+- `RAILWAY_TOKEN`
+- `RAILWAY_PROJECT_ID`
+- `RAILWAY_FRONTEND_SERVICE_ID`
+- `RAILWAY_API_SERVICE_ID`
+- `RAILWAY_ENVIRONMENT_ID`
+
+Optional repository variables or workflow inputs:
+
+- `MUTX_SITE_URL`
+- `MUTX_APP_URL`
+- `MUTX_API_URL`
+- `MUTX_DOCS_RELEASE_URL`
+
+### Promotion flow
+
+```bash
+bash scripts/promote-railway-production.sh
+bash scripts/verify-production-release.sh
+```
+
+The verification step should confirm:
+
+- `https://mutx.dev`
+- `https://mutx.dev/download/macos`
+- `https://app.mutx.dev/login`
+- `https://app.mutx.dev/register`
+- `https://app.mutx.dev/dashboard`
+- `https://api.mutx.dev/health`
+- `https://api.mutx.dev/ready`
+- `https://docs.mutx.dev/docs/releases/v1.3`
 
 Create `railway.json` for API:
 

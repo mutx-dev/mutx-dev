@@ -5,6 +5,9 @@ cd "$(dirname "$0")/.."
 
 MUTX_SKIP_PLAYWRIGHT="${MUTX_SKIP_PLAYWRIGHT:-0}"
 MUTX_SKIP_COMPOSE_SMOKE="${MUTX_SKIP_COMPOSE_SMOKE:-1}"
+MUTX_PLAYWRIGHT_WORKERS="${MUTX_PLAYWRIGHT_WORKERS:-1}"
+MUTX_RELEASE_WEB_SMOKE="${MUTX_RELEASE_WEB_SMOKE:-0}"
+MUTX_SKIP_DESKTOP_RELEASE="${MUTX_SKIP_DESKTOP_RELEASE:-1}"
 
 PYTHON_BIN=""
 for candidate in ".venv/bin/python" "python3.11" "python3.10" "python3"; do
@@ -57,25 +60,19 @@ echo "Running expanded Python validation suite..."
   tests/api \
   tests/unit/python \
   tests/test_cli_*.py \
+  tests/test_generate_homebrew_formula.py \
+  tests/test_release_soft_launch.py \
   tests/test_sdk_*.py \
   tests/test_hosted_llm_executor.py \
   --maxfail=1 -q
-
-echo ""
-echo "Generating OpenAPI spec..."
-"$PYTHON_BIN" scripts/generate_openapi.py
-
-echo ""
-echo "Generating frontend API types..."
-npm run generate-types
 
 echo ""
 echo "Running app-level frontend unit tests..."
 npm run test:app
 
 echo ""
-echo "Checking generated OpenAPI artifacts are committed..."
-git diff --exit-code -- docs/api/openapi.json app/types/api.ts
+echo "Verifying generated OpenAPI artifacts are current..."
+PYTHON_BIN="$PYTHON_BIN" bash scripts/verify-generated-artifacts.sh
 
 echo ""
 echo "Running frontend lint..."
@@ -90,7 +87,11 @@ if [ "$MUTX_SKIP_PLAYWRIGHT" = "1" ]; then
   echo "Skipping frontend smoke tests (MUTX_SKIP_PLAYWRIGHT=1)."
 else
   echo "Running frontend smoke tests..."
-  npx playwright test --project=chromium
+  if [ "$MUTX_RELEASE_WEB_SMOKE" = "1" ]; then
+    npm run test:e2e:release
+  else
+    npx playwright test --project=chromium --workers="$MUTX_PLAYWRIGHT_WORKERS"
+  fi
 fi
 
 echo ""
@@ -99,6 +100,14 @@ if [ "$MUTX_SKIP_COMPOSE_SMOKE" = "1" ]; then
 else
   echo "Running production compose smoke test..."
   bash scripts/smoke-compose-prod.sh
+fi
+
+echo ""
+if [ "$MUTX_SKIP_DESKTOP_RELEASE" = "1" ]; then
+  echo "Skipping signed desktop artifact validation (MUTX_SKIP_DESKTOP_RELEASE=1)."
+else
+  echo "Running signed desktop artifact validation..."
+  npm run desktop:release:validate
 fi
 
 echo ""

@@ -9482,6 +9482,60 @@
         }
       }
     },
+    "/v1/runtime/governance/supervised/profiles": {
+      "get": {
+        "tags": [
+          "governance"
+        ],
+        "summary": "List Supervised Launch Profiles",
+        "description": "List configured launch profiles for supervised agents.",
+        "operationId": "list_supervised_launch_profiles_v1_runtime_governance_supervised_profiles_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SupervisedLaunchProfileResponse"
+                  },
+                  "title": "Response List Supervised Launch Profiles V1 Runtime Governance Supervised Profiles Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/runtime/governance/supervised/{agent_id}": {
       "get": {
         "tags": [
@@ -12271,16 +12325,8 @@
             "default": 900
           },
           "config": {
-            "anyOf": [
-              {
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Config",
-            "default": {}
+            "type": "object",
+            "title": "Config"
           }
         },
         "type": "object",
@@ -12306,8 +12352,20 @@
             "title": "Path"
           },
           "value": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Value"
+          },
+          "has_value": {
+            "type": "boolean",
+            "title": "Has Value",
+            "default": false
           },
           "expires_at": {
             "anyOf": [
@@ -12322,16 +12380,14 @@
           },
           "metadata": {
             "type": "object",
-            "title": "Metadata",
-            "default": {}
+            "title": "Metadata"
           }
         },
         "type": "object",
         "required": [
           "name",
           "backend",
-          "path",
-          "value"
+          "path"
         ],
         "title": "CredentialResponse"
       },
@@ -17370,26 +17426,36 @@
             "title": "Agent Id"
           },
           "command": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Command"
-          },
-          "env": {
             "anyOf": [
               {
-                "additionalProperties": {
+                "items": {
                   "type": "string"
                 },
-                "type": "object"
+                "type": "array"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Env",
-            "default": {}
+            "title": "Command"
+          },
+          "profile": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile"
+          },
+          "env": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Env"
           },
           "faramesh_policy": {
             "anyOf": [
@@ -17405,8 +17471,7 @@
         },
         "type": "object",
         "required": [
-          "agent_id",
-          "command"
+          "agent_id"
         ],
         "title": "SupervisedAgentStartRequest"
       },
@@ -17427,6 +17492,45 @@
         },
         "type": "object",
         "title": "SupervisedAgentStopRequest"
+      },
+      "SupervisedLaunchProfileResponse": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "command": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Command"
+          },
+          "env_keys": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Env Keys"
+          },
+          "faramesh_policy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Faramesh Policy"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "command"
+        ],
+        "title": "SupervisedLaunchProfileResponse"
       },
       "SwarmAgentResponse": {
         "properties": {

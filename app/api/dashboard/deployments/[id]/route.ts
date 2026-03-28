@@ -4,7 +4,6 @@ import { getApiBaseUrl } from "@/app/api/_lib/controlPlane";
 import { proxyJson } from "@/app/api/_lib/proxy";
 import { withErrorHandling, badRequest } from "@/app/api/_lib/errors";
 
-const API_BASE_URL = getApiBaseUrl();
 
 export const dynamic = "force-dynamic";
 
@@ -18,12 +17,12 @@ export async function GET(
     const path = searchParams.get("path") || "";
     const targetUrl =
       path === "versions"
-        ? `${API_BASE_URL}/v1/deployments/${id}/versions`
+        ? `${getApiBaseUrl()}/v1/deployments/${id}/versions`
         : path === "logs"
-          ? `${API_BASE_URL}/v1/deployments/${id}/logs`
+          ? `${getApiBaseUrl()}/v1/deployments/${id}/logs`
           : path === "metrics"
-            ? `${API_BASE_URL}/v1/deployments/${id}/metrics`
-            : `${API_BASE_URL}/v1/deployments/${id}`;
+            ? `${getApiBaseUrl()}/v1/deployments/${id}/metrics`
+            : `${getApiBaseUrl()}/v1/deployments/${id}`;
 
     return proxyJson(request, targetUrl, {
       fallbackMessage:
@@ -52,7 +51,7 @@ export async function POST(
     }
 
     if (action === "restart") {
-      return proxyJson(request, `${API_BASE_URL}/v1/deployments/${id}/restart`, {
+      return proxyJson(request, `${getApiBaseUrl()}/v1/deployments/${id}/restart`, {
         method: "POST",
         fallbackMessage: "Failed to restart deployment",
       });
@@ -62,7 +61,7 @@ export async function POST(
       const body = await request.json();
       const actionPath = action === "rollback" ? "rollback" : "scale";
 
-      return proxyJson(request, `${API_BASE_URL}/v1/deployments/${id}/${actionPath}`, {
+      return proxyJson(request, `${getApiBaseUrl()}/v1/deployments/${id}/${actionPath}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -83,7 +82,7 @@ export async function DELETE(
 ) {
   return withErrorHandling(async () => {
     const { id } = await params;
-    return proxyJson(request, `${API_BASE_URL}/v1/deployments/${id}`, {
+    return proxyJson(request, `${getApiBaseUrl()}/v1/deployments/${id}`, {
       method: "DELETE",
       fallbackMessage: "Failed to delete deployment",
     });

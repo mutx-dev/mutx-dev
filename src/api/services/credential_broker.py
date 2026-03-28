@@ -26,6 +26,8 @@ from typing import Optional
 
 import aiohttp
 
+from src.api.security import decrypt_secret_value, encrypt_secret_value
+
 logger = logging.getLogger(__name__)
 
 
@@ -62,7 +64,7 @@ class BackendConfig:
     ttl: timedelta = field(default_factory=lambda: timedelta(minutes=15))
     config: dict = field(default_factory=dict)
     is_active: bool = True
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class CredentialProvider(ABC):
@@ -615,46 +617,142 @@ class CredentialBroker:
     a unified interface for agents to retrieve credentials.
     """
 
-    def __init__(self):
+    def __init__(self, namespace: str = "default"):
+        self.namespace = self._normalize_namespace(namespace)
         self._backends: dict[str, BackendConfig] = {}
         self._providers: dict[str, CredentialProvider] = {}
         self._lock = asyncio.Lock()
-        self._config_dir = Path.home() / ".mutx" / "credential_broker"
+        mutx_home = Path(
+            os.environ.get("MUTX_HOME")
+            or os.environ.get("MUTX_HOME_DIR")
+            or (Path.home() / ".mutx")
+        ).expanduser()
+        self._config_dir = mutx_home / "credential_broker"
         self._config_file = self._config_dir / "backends.json"
         self._load_config()
+
+    @staticmethod
+    def _normalize_namespace(namespace: str) -> str:
+        normalized = (namespace or "default").strip()
+        if not normalized:
+            return "default"
+        return normalized
+
+    def _is_namespaced_payload(self, data: object) -> bool:
+        return isinstance(data, dict) and isinstance(data.get("namespaces"), dict)
+
+    def _serialize_backends(self, backends: dict[str, BackendConfig]) -> dict[str, dict]:
+        data = {}
+        for name, config in backends.items():
+            data[name] = {
+                "backend": config.backend.value,
+                "path": config.path,
+                "ttl": int(config.ttl.total_seconds()),
+                "config_encrypted": (
+                    encrypt_secret_value(json.dumps(config.config, sort_keys=True))
+                    if config.config
+                    else None
+                ),
+                "is_active": config.is_active,
+            }
+        return data
+
+    def _read_config_payload(self) -> object:
+        if not self._config_file.exists():
+            return {}
+        return json.loads(self._config_file.read_text())
+
+    def _write_namespaced_payload(self, namespaces: dict[str, dict[str, dict]]) -> None:
+        self._config_dir.mkdir(parents=True, exist_ok=True)
+        os.chmod(self._config_dir, 0o700)
+        payload = {
+            "schema_version": 2,
+            "namespaces": namespaces,
+        }
+        self._config_file.write_text(json.dumps(payload, indent=2))
+        os.chmod(self._config_file, 0o600)
+
+    def _parse_backend_entries(self, data: dict[str, dict]) -> bool:
+        needs_rewrite = False
+        for name, config_data in data.items():
+            encrypted_config = config_data.get("config_encrypted")
+            if encrypted_config:
+                decrypted_config = decrypt_secret_value(encrypted_config)
+                if decrypted_config is None:
+                    logger.error(f"Failed to decrypt credential broker config for {name}")
+                    continue
+                try:
+                    backend_config = json.loads(decrypted_config)
+                except json.JSONDecodeError:
+                    logger.error(f"Failed to decode credential broker config for {name}")
+                    continue
+            else:
+                backend_config = config_data.get("config", {})
+                if backend_config:
+                    needs_rewrite = True
+
+            config = BackendConfig(
+                name=name,
+                backend=CredentialBackend(config_data["backend"]),
+                path=config_data["path"],
+                ttl=timedelta(seconds=config_data.get("ttl", 900)),
+                config=backend_config if isinstance(backend_config, dict) else {},
+                is_active=config_data.get("is_active", True),
+            )
+            self._backends[name] = config
+            self._providers[name] = PROVIDER_CLASSES[config.backend](config)
+        return needs_rewrite
 
     def _load_config(self) -> None:
         if not self._config_file.exists():
             return
 
         try:
-            data = json.loads(self._config_file.read_text())
-            for name, config_data in data.items():
-                config = BackendConfig(
-                    name=name,
-                    backend=CredentialBackend(config_data["backend"]),
-                    path=config_data["path"],
-                    ttl=timedelta(seconds=config_data.get("ttl", 900)),
-                    config=config_data.get("config", {}),
-                    is_active=config_data.get("is_active", True),
-                )
-                self._backends[name] = config
-                self._providers[name] = PROVIDER_CLASSES[config.backend](config)
+            payload = self._read_config_payload()
+            if self._is_namespaced_payload(payload):
+                namespaces = payload.get("namespaces", {})
+                namespace_data = namespaces.get(self.namespace, {})
+                needs_rewrite = self._parse_backend_entries(namespace_data)
+                if needs_rewrite:
+                    self._save_config()
+                return
+
+            if not isinstance(payload, dict):
+                raise ValueError("Credential broker config payload must be a JSON object")
+
+            logger.warning(
+                "Migrating legacy global credential broker config into namespace '%s'",
+                self.namespace,
+            )
+            needs_rewrite = self._parse_backend_entries(payload)
+            namespaces = {self.namespace: self._serialize_backends(self._backends)}
+            self._write_namespaced_payload(namespaces)
+            if needs_rewrite:
+                self._save_config()
         except Exception as e:
             logger.error(f"Error loading credential broker config: {e}")
 
     def _save_config(self) -> None:
-        self._config_dir.mkdir(parents=True, exist_ok=True)
-        data = {}
-        for name, config in self._backends.items():
-            data[name] = {
-                "backend": config.backend.value,
-                "path": config.path,
-                "ttl": int(config.ttl.total_seconds()),
-                "config": config.config,
-                "is_active": config.is_active,
-            }
-        self._config_file.write_text(json.dumps(data, indent=2))
+        namespaces: dict[str, dict[str, dict]] = {}
+        try:
+            payload = self._read_config_payload()
+            if self._is_namespaced_payload(payload):
+                raw_namespaces = payload.get("namespaces", {})
+                if isinstance(raw_namespaces, dict):
+                    namespaces = {
+                        str(namespace): data
+                        for namespace, data in raw_namespaces.items()
+                        if isinstance(data, dict)
+                    }
+        except Exception as exc:
+            logger.error(f"Error reading credential broker config for save: {exc}")
+
+        if self._backends:
+            namespaces[self.namespace] = self._serialize_backends(self._backends)
+        else:
+            namespaces.pop(self.namespace, None)
+
+        self._write_namespaced_payload(namespaces)
 
     async def register_backend(
         self,
@@ -755,11 +853,11 @@ class CredentialBroker:
         return results
 
 
-_broker: Optional[CredentialBroker] = None
+_brokers: dict[str, CredentialBroker] = {}
 
 
-def get_credential_broker() -> CredentialBroker:
-    global _broker
-    if _broker is None:
-        _broker = CredentialBroker()
-    return _broker
+def get_credential_broker(namespace: str = "default") -> CredentialBroker:
+    normalized_namespace = CredentialBroker._normalize_namespace(namespace)
+    if normalized_namespace not in _brokers:
+        _brokers[normalized_namespace] = CredentialBroker(namespace=normalized_namespace)
+    return _brokers[normalized_namespace]

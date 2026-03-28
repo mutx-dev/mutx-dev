@@ -7,7 +7,6 @@ import {
   hasAuthSession,
 } from '@/app/api/_lib/controlPlane'
 
-const API_BASE_URL = getApiBaseUrl()
 
 export const dynamic = 'force-dynamic'
 
@@ -19,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     const { response, tokenRefreshed, refreshedTokens } = await authenticatedFetch(
       request,
-      `${API_BASE_URL}/v1/api-keys`,
+      `${getApiBaseUrl()}/v1/api-keys`,
       {
         cache: 'no-store',
       }
@@ -49,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     const { response, tokenRefreshed, refreshedTokens } = await authenticatedFetch(
       request,
-      `${API_BASE_URL}/v1/api-keys`,
+      `${getApiBaseUrl()}/v1/api-keys`,
       {
         method: 'POST',
         headers: {

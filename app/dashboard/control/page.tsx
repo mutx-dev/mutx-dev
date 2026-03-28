@@ -1,6 +1,5 @@
-import { OpenclawSetupSurface } from "@/components/dashboard/control/OpenclawSetupSurface";
+import { DesktopControlDeck } from "@/components/desktop/DesktopControlDeck";
 
 export default function DashboardControlPage() {
-  return <OpenclawSetupSurface />;
+  return <DesktopControlDeck />;
 }
-

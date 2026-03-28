@@ -4,8 +4,6 @@ import { applyAuthCookies, getApiBaseUrl } from '@/app/api/_lib/controlPlane'
 import { validateRequest, schemas } from '@/app/api/_lib/validation'
 import { withErrorHandling } from '@/app/api/_lib/errors'
 
-const API_BASE_URL = getApiBaseUrl()
-
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -18,7 +16,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { email, password, name } = validation.data
     const body = { email, password, name }
     
-    const response = await fetch(`${API_BASE_URL}/v1/auth/register`, {
+    const response = await fetch(`${getApiBaseUrl()}/v1/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

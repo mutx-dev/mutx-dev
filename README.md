@@ -10,7 +10,9 @@ MUTX keeps the operator surfaces in one repo:
 
 - a FastAPI control plane with public routes mounted under `/v1/*`
 - a Next.js landing site at `mutx.dev`
-- a real dashboard surface at `app.mutx.dev/dashboard`
+- a public release summary at `mutx.dev/releases`
+- a supported browser dashboard surface at `app.mutx.dev/dashboard` for stable routes
+- a signed macOS operator app distributed from `mutx.dev/download/macos`
 - a browser demo surface at `app.mutx.dev/control/*`
 - a Python CLI and first-party Textual TUI
 - a Python SDK
@@ -85,6 +87,19 @@ See [CREDITS.md](CREDITS.md) for full attribution and license texts.
 ## First 15 Minutes
 
 ### Prove The Local Path
+
+If you want the desktop operator app first, use the signed macOS download lane:
+
+```text
+https://mutx.dev/download/macos
+```
+
+And use the public release summary when you need the current artifact set, checksums,
+and docs-backed release notes in one place:
+
+```text
+https://mutx.dev/releases
+```
 
 Run the canonical setup flow first:
 
@@ -165,7 +180,9 @@ Use these pages when you need more than the shortest path:
 | Surface | Path / URL | Current role |
 | --- | --- | --- |
 | Public site | `mutx.dev` / [`app/page.tsx`](app/page.tsx) | Product narrative, quickstart, install path, metadata |
-| Operator dashboard | `app.mutx.dev/dashboard` / [`app/dashboard/`](app/dashboard) | Authenticated operator shell backed by live API reads and writes |
+| Release summary | `mutx.dev/releases` / [`app/releases/page.tsx`](app/releases/page.tsx) | Current desktop release, asset links, checksums, and release-note handoff |
+| Desktop operator app | `mutx.dev/download/macos` | Signed and notarized macOS operator app release lane |
+| Operator dashboard | `app.mutx.dev/dashboard` / [`app/dashboard/`](app/dashboard) | Supported authenticated operator shell for stable routes |
 | Control demo | `app.mutx.dev/control/*` / [`app/control/[[...slug]]/page.tsx`](app/control/[[...slug]]/page.tsx) | Browser demo of the control-plane surface |
 | Browser proxies | [`app/api/`](app/api) | Same-origin route handlers for auth, dashboard, API keys, webhooks, leads, and direct resource proxies |
 | Docs | `docs.mutx.dev` / [`docs/`](docs) | Canonical setup, architecture, API, and troubleshooting docs |
@@ -252,6 +269,7 @@ pytest tests/test_cli_auth_and_tui.py tests/test_cli_setup_and_doctor.py tests/t
 ## Keep These Close
 
 - [Documentation Hub](docs/README.md) for the full docs index
+- [v1.3 Release Notes](docs/releases/v1.3.md) for the current public launch posture
 - [Troubleshooting](docs/troubleshooting/README.md) for common breakpoints and recovery steps
 - [Support](support.md) for escalation paths
 - [Security Policy](security.md) for private disclosure

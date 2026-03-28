@@ -4,7 +4,6 @@ import { getApiBaseUrl, getAuthToken } from '@/app/api/_lib/controlPlane'
 import { withErrorHandling, unauthorized } from '@/app/api/_lib/errors'
 import { checkAgentOwnership } from '@/app/api/_lib/ownership'
 
-const API_BASE_URL = getApiBaseUrl()
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +25,7 @@ export async function POST(
       return ownershipError
     }
 
-    const response = await fetch(`${API_BASE_URL}/v1/agents/${id}/stop`, {
+    const response = await fetch(`${getApiBaseUrl()}/v1/agents/${id}/stop`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,

@@ -134,6 +134,9 @@ class User(Base):
     # Email verification fields
     is_email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     email_verification_token: Mapped[str] = mapped_column(String(255), nullable=True, index=True)
+    email_verification_expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     email_verified_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     # Password reset fields
     password_reset_token: Mapped[str] = mapped_column(String(255), nullable=True, index=True)

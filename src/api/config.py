@@ -33,6 +33,16 @@ class Settings(BaseSettings):
         "https://mutx.dev",
         "https://app.mutx.dev",
     ]
+    allowed_hosts: list[str] | str = [
+        "localhost",
+        "127.0.0.1",
+        "[::1]",
+        "test",
+        "testserver",
+        "api.mutx.dev",
+        "*.up.railway.app",
+        "*.railway.internal",
+    ]
     log_level: str = "INFO"
     json_logging: bool = Field(
         default=False,
@@ -52,6 +62,28 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
     refresh_token_max_sliding_days: int = 30  # Max days for sliding expiry
+    expose_api_docs_in_production: bool = Field(
+        default=False,
+        validation_alias=AliasChoices(
+            "EXPOSE_API_DOCS_IN_PRODUCTION",
+            "ENABLE_API_DOCS_IN_PRODUCTION",
+        ),
+        description="Expose /docs, /redoc, and /openapi.json in production.",
+    )
+    require_email_verification: bool = Field(
+        default=False,
+        validation_alias=AliasChoices(
+            "REQUIRE_EMAIL_VERIFICATION",
+        ),
+        description="Require email verification before allowing password-based login.",
+    )
+    email_verification_token_expire_hours: int = Field(
+        default=72,
+        ge=1,
+        validation_alias=AliasChoices(
+            "EMAIL_VERIFICATION_TOKEN_EXPIRE_HOURS",
+        ),
+    )
     # Email settings
     smtp_host: str = Field(default="smtp.gmail.com")
     smtp_port: int = Field(default=587)
@@ -95,6 +127,22 @@ class Settings(BaseSettings):
         ge=1,
         description="Time window in seconds for rate limiting",
     )
+    auth_rate_limit_requests: int = Field(
+        default=10,
+        ge=1,
+        validation_alias=AliasChoices(
+            "AUTH_RATE_LIMIT_REQUESTS",
+        ),
+        description="Number of auth-sensitive requests allowed per time window",
+    )
+    auth_rate_limit_window_seconds: int = Field(
+        default=60,
+        ge=1,
+        validation_alias=AliasChoices(
+            "AUTH_RATE_LIMIT_WINDOW_SECONDS",
+        ),
+        description="Time window in seconds for auth-sensitive rate limiting",
+    )
 
     internal_user_email_domains: list[str] = Field(
         default=["mutx.dev"],
@@ -103,6 +151,51 @@ class Settings(BaseSettings):
             "ADMIN_EMAIL_DOMAINS",
         ),
         description="Email domains allowed to access internal-only endpoints.",
+    )
+    governance_supervised_command_allowlist: list[str] | str = Field(
+        default_factory=list,
+        validation_alias=AliasChoices(
+            "GOVERNANCE_SUPERVISED_COMMAND_ALLOWLIST",
+            "SUPERVISED_COMMAND_ALLOWLIST",
+        ),
+        description="Allowed executable basenames for governance-supervised process launch.",
+    )
+    governance_supervised_env_allowlist: list[str] | str = Field(
+        default_factory=list,
+        validation_alias=AliasChoices(
+            "GOVERNANCE_SUPERVISED_ENV_ALLOWLIST",
+            "SUPERVISED_ENV_ALLOWLIST",
+        ),
+        description="Allowed environment variable names for governance-supervised process launch.",
+    )
+    governance_supervised_allow_direct_commands: bool = Field(
+        default=False,
+        validation_alias=AliasChoices(
+            "GOVERNANCE_SUPERVISED_ALLOW_DIRECT_COMMANDS",
+            "SUPERVISED_ALLOW_DIRECT_COMMANDS",
+        ),
+        description="Allow direct raw command launch via governance supervision APIs.",
+    )
+    governance_supervised_profiles: dict[str, object] | str = Field(
+        default_factory=dict,
+        validation_alias=AliasChoices(
+            "GOVERNANCE_SUPERVISED_PROFILES",
+            "SUPERVISED_PROFILES",
+        ),
+        description="JSON object mapping supervised launch profile names to command/env/policy definitions.",
+    )
+    governance_supervised_policy_dir: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "GOVERNANCE_SUPERVISED_POLICY_DIR",
+            "SUPERVISED_POLICY_DIR",
+        ),
+        description="Optional directory that bounds user-selectable Faramesh policy files.",
+    )
+    forwarded_allow_ips: list[str] | str = Field(
+        default_factory=lambda: ["*"],
+        validation_alias=AliasChoices("FORWARDED_ALLOW_IPS"),
+        description="Trusted proxy IPs for forwarded headers.",
     )
     background_monitor_enabled: bool = Field(
         default=True,
@@ -148,6 +241,65 @@ class Settings(BaseSettings):
             ]
 
         return [origin.strip() for origin in raw_value.split(",") if origin.strip()]
+
+    @field_validator(
+        "governance_supervised_command_allowlist",
+        "governance_supervised_env_allowlist",
+        "forwarded_allow_ips",
+        "allowed_hosts",
+        mode="before",
+    )
+    @classmethod
+    def parse_string_list(cls, value: object) -> object:
+        if value is None:
+            return []
+
+        if isinstance(value, list):
+            return [item.strip() for item in value if isinstance(item, str) and item.strip()]
+
+        if not isinstance(value, str):
+            raise ValueError("Expected a JSON array or comma-separated string")
+
+        raw_value = value.strip()
+        if not raw_value:
+            return []
+
+        if raw_value.startswith("["):
+            try:
+                parsed_value = loads(raw_value)
+            except JSONDecodeError as exc:
+                raise ValueError("Value must be a JSON array or comma-separated list") from exc
+            if not isinstance(parsed_value, list):
+                raise ValueError("JSON value must be an array")
+            return [item.strip() for item in parsed_value if isinstance(item, str) and item.strip()]
+
+        return [item.strip() for item in raw_value.split(",") if item.strip()]
+
+    @field_validator("governance_supervised_profiles", mode="before")
+    @classmethod
+    def parse_json_mapping(cls, value: object) -> object:
+        if value is None:
+            return {}
+
+        if isinstance(value, dict):
+            return value
+
+        if not isinstance(value, str):
+            raise ValueError("Expected a JSON object")
+
+        raw_value = value.strip()
+        if not raw_value:
+            return {}
+
+        try:
+            parsed_value = loads(raw_value)
+        except JSONDecodeError as exc:
+            raise ValueError("Value must be a JSON object") from exc
+
+        if not isinstance(parsed_value, dict):
+            raise ValueError("JSON value must be an object")
+
+        return parsed_value
 
     @model_validator(mode="after")
     def validate_environment_variables(self) -> "Settings":
@@ -215,6 +367,12 @@ class Settings(BaseSettings):
                 warnings.append(
                     "CORS_ORIGINS contains localhost origins. "
                     "This may not be suitable for production."
+                )
+
+            if "*" in self.forwarded_allow_ips:
+                warnings.append(
+                    "FORWARDED_ALLOW_IPS trusts all proxy sources ('*'). "
+                    "Set explicit ingress proxy IPs in production when possible."
                 )
 
         # Raise errors if any

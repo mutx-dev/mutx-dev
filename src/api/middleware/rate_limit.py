@@ -24,10 +24,32 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     For production, consider using Redis-backed storage.
     """
 
-    def __init__(self, app: FastAPI, requests: int = None, window_seconds: int = None):
+    AUTH_SENSITIVE_PATHS = frozenset(
+        {
+            "/v1/auth/register",
+            "/v1/auth/login",
+            "/v1/auth/local-bootstrap",
+            "/v1/auth/refresh",
+            "/v1/auth/forgot-password",
+            "/v1/auth/reset-password",
+            "/v1/auth/verify-email",
+            "/v1/auth/resend-verification",
+        }
+    )
+
+    def __init__(
+        self,
+        app: FastAPI,
+        requests: int = None,
+        window_seconds: int = None,
+        auth_requests: int = None,
+        auth_window_seconds: int = None,
+    ):
         super().__init__(app)
         self.requests = requests or settings.rate_limit_requests
         self.window_seconds = window_seconds or settings.rate_limit_window_seconds
+        self.auth_requests = auth_requests or settings.auth_rate_limit_requests
+        self.auth_window_seconds = auth_window_seconds or settings.auth_rate_limit_window_seconds
         self._requests: dict[str, list[datetime]] = {}
 
     def _get_client_ip(self, request: Request) -> str:
@@ -93,9 +115,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         return f"ip:{self._get_client_ip(request)}"
 
-    def _clean_old_requests(self) -> None:
-        """Remove requests outside the current window and stale client entries."""
-        cutoff = datetime.now(timezone.utc) - timedelta(seconds=self.window_seconds)
+    def _prune_all_buckets(self) -> None:
+        """Remove timestamps outside the largest configured window."""
+        max_window_seconds = max(self.window_seconds, self.auth_window_seconds)
+        cutoff = datetime.now(timezone.utc) - timedelta(seconds=max_window_seconds)
         for client_id, timestamps in list(self._requests.items()):
             active_timestamps = [ts for ts in timestamps if ts > cutoff]
             if active_timestamps:
@@ -103,27 +126,48 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             else:
                 del self._requests[client_id]
 
+    def _clean_old_requests(self) -> None:
+        """Backwards-compatible wrapper used by unit tests."""
+        self._prune_all_buckets()
+
+    @classmethod
+    def _resolve_policy(cls, path: str) -> tuple[str, bool]:
+        if path in cls.AUTH_SENSITIVE_PATHS:
+            return ("auth", True)
+        return ("default", False)
+
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """Process request with rate limiting."""
         # Skip rate limiting for health checks and metrics
         path = request.url.path
-        if path in ["/health", "/ready", "/", "/metrics"]:
+        if request.method.upper() == "OPTIONS" or path in ["/health", "/ready", "/", "/metrics"]:
             return await call_next(request)
 
-        self._clean_old_requests()
+        self._prune_all_buckets()
         client_id = self._get_client_identifier(request)
+        policy_name, is_auth_policy = self._resolve_policy(path)
+        bucket_id = f"{policy_name}:{client_id}"
+        window_seconds = self.auth_window_seconds if is_auth_policy else self.window_seconds
+        limit = self.auth_requests if is_auth_policy else self.requests
+        cutoff = datetime.now(timezone.utc) - timedelta(seconds=window_seconds)
+        active_timestamps = [ts for ts in self._requests.get(bucket_id, []) if ts > cutoff]
+        if active_timestamps:
+            self._requests[bucket_id] = active_timestamps
+        else:
+            self._requests.pop(bucket_id, None)
 
-        current_count = len(self._requests.get(client_id, []))
+        current_count = len(active_timestamps)
 
-        if current_count >= self.requests:
-            retry_after = self.window_seconds
+        if current_count >= limit:
+            retry_after = window_seconds
             # CodeQL false positive: client_id is already masked/pseudonymized above
             # _mask_client_for_logging ensures no sensitive data appears in logs
             logger.warning(  # noqa: S312
-                "Rate limit exceeded | client=%s | count=%s | limit=%s",
+                "Rate limit exceeded | policy=%s | client=%s | count=%s | limit=%s",
+                policy_name,
                 self._mask_client_for_logging(client_id),
                 current_count,
-                self.requests,
+                limit,
             )
 
             response = RateLimitErrorResponse(
@@ -140,13 +184,14 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             )
 
         # Record this request
-        self._requests.setdefault(client_id, []).append(datetime.now(timezone.utc))
+        self._requests.setdefault(bucket_id, active_timestamps).append(datetime.now(timezone.utc))
 
         logger.debug(
-            "Rate limit check | client_fp=%s | count=%s | limit=%s | path=%s",
+            "Rate limit check | policy=%s | client_fp=%s | count=%s | limit=%s | path=%s",
+            policy_name,
             self._fingerprint(client_id),
             current_count + 1,
-            self.requests,
+            limit,
             path,
         )
 

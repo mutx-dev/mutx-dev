@@ -25,8 +25,8 @@
     --site-accent: #68e1ff;
     --site-accent-strong: #19c8ff;
     --site-accent-soft: rgba(104, 225, 255, 0.12);
-    --site-warm: #ffbd66;
-    --site-warm-soft: rgba(255, 189, 102, 0.12);
+    --site-warm: #71b8ff;
+    --site-warm-soft: rgba(113, 184, 255, 0.12);
     --site-glow: 0 28px 90px rgba(1, 4, 10, 0.44);
     --site-glow-soft: 0 18px 54px rgba(1, 4, 10, 0.28);
     --site-radius-md: 1.15rem;
@@ -42,6 +42,7 @@
   html {
     min-height: 100%;
     scroll-behavior: smooth;
+    scrollbar-gutter: stable both-edges;
   }
 
   body {
@@ -163,7 +164,7 @@
     overflow-x: clip;
     color: var(--site-text);
     background:
-      radial-gradient(circle at 12% 0%, rgba(255, 189, 102, 0.16), transparent 22%),
+      radial-gradient(circle at 12% 0%, rgba(113, 184, 255, 0.18), transparent 22%),
       radial-gradient(circle at 88% 4%, rgba(104, 225, 255, 0.18), transparent 24%),
       radial-gradient(circle at 52% 32%, rgba(12, 20, 32, 0.7), transparent 56%),
       linear-gradient(180deg, #080b13 0%, #09101a 42%, #060810 100%);
@@ -318,10 +319,10 @@
 
   .site-button-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition;
-    border: 1px solid rgba(255, 216, 156, 0.28);
-    background: linear-gradient(135deg, #ffe5b3 0%, #ffbd66 100%);
-    box-shadow: 0 16px 40px rgba(255, 189, 102, 0.18);
-    color: #14181f;
+    border: 1px solid rgba(113, 184, 255, 0.28);
+    background: linear-gradient(135deg, #b7deff 0%, #5a93ff 100%);
+    box-shadow: 0 16px 40px rgba(90, 147, 255, 0.22);
+    color: #07111f;
   }
 
   .site-button-secondary {
@@ -373,7 +374,7 @@
   }
 
   .site-button-primary:hover {
-    background: linear-gradient(135deg, #fff0ca 0%, #ffc979 100%);
+    background: linear-gradient(135deg, #cce9ff 0%, #74a5ff 100%);
   }
 
   .site-table {
@@ -409,7 +410,7 @@
     border: 1px solid rgba(173, 187, 206, 0.18);
     background:
       radial-gradient(circle at top right, rgba(104, 225, 255, 0.12), transparent 24%),
-      radial-gradient(circle at bottom left, rgba(255, 189, 102, 0.1), transparent 26%),
+      radial-gradient(circle at bottom left, rgba(113, 184, 255, 0.12), transparent 26%),
       linear-gradient(180deg, rgba(14, 19, 30, 0.94), rgba(9, 13, 21, 0.96));
     box-shadow: var(--site-glow);
   }
@@ -1174,6 +1175,37 @@
     }
   }
 
+}
+
+@keyframes dashboard-rise-fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dashboard-live-pulse {
+  0%,
+  100% {
+    opacity: 0.82;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
+.dashboard-app .dashboard-entry {
+  animation: dashboard-rise-fade 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.dashboard-app .dashboard-live-dot {
+  animation: dashboard-live-pulse 2.4s ease-in-out infinite;
 }
 
 @keyframes blink {

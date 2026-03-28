@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-03-27
+
+### Added
+- first-party macOS download routes under `mutx.dev/download/macos/*` with stable GitHub release asset resolution
+- a public `mutx.dev/releases` surface that ties together the current desktop release, GitHub assets, checksums, and docs-backed notes
+- GitBook-backed public release notes at `docs/releases/v1.3.md`
+- Railway production-promotion workflow and runbook for the public site, app host, and API
+- post-deploy production verification for `mutx.dev`, `app.mutx.dev`, `api.mutx.dev`, and the synced docs release page
+
+### Changed
+- `app.mutx.dev/dashboard` is now positioned as the supported browser operator shell for stable routes
+- `app.mutx.dev/control/*` stays public but explicitly preview and out of primary stable navigation
+- the landing site, release page, GitHub release, and first-party macOS download lane now tell the same `v1.3.0` distribution story
+- GitHub app releases now use the versioned docs-backed release note file instead of dumping the full root changelog into the release body
+- release notes from `mutx.dev/download/macos/release-notes` now resolve to the synced docs release page instead of only the GitHub release
+- release-facing smoke fixtures and desktop status payloads now read the real repo version instead of stale hardcoded values
+- release-facing docs, changelog guidance, and install surfaces now describe the desktop + dashboard soft launch coherently
+
+### Fixed
+- stale repository support links in GitHub issue templates
+- stale release examples in CLI and release docs
+- version drift in desktop smoke mocks, bridge system info, and Homebrew formula tests
+
 ## [1.2.4] - 2026-03-25
 
 ### Fixed
@@ -150,9 +173,9 @@ This project uses [Semantic Versioning](https://semver.org/). Given a version nu
 
 | Component | Current Version | Location |
 |-----------|-----------------|----------|
-| Frontend/App | 1.0.0 | `package.json` |
-| CLI distribution | 1.2.4 | root `pyproject.toml` |
-| Python SDK | 0.1.0 | `sdk/pyproject.toml` |
+| Frontend/App | 1.3.0 | `package.json` |
+| CLI distribution | 1.3.0 | root `pyproject.toml` |
+| Python SDK | 1.3.0 | `sdk/pyproject.toml` |
 | API | Matches frontend | `package.json` |
 
 ## How We Release
@@ -162,6 +185,6 @@ This project uses [Semantic Versioning](https://semver.org/). Given a version nu
 3. **Merge**: Merged changes land in `main`
 4. **Version Bump**: Maintainers update version numbers in relevant files
 5. **Release**: A GitHub Release is created with changelog notes
-6. **Deployment**: CI/CD pipelines deploy to staging/production
+6. **Deployment**: GitHub Actions promotes the public site/app host/API on Railway and GitBook sync publishes repo-owned docs pages
 
 See [docs/changelog-status.md](./docs/changelog-status.md) for status sources and live endpoints.

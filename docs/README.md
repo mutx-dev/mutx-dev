@@ -36,6 +36,12 @@ Use this section when you want the code-accurate view of setup, runtime surfaces
       <td><a href="../public/landing/running-agent.png">running-agent.png</a></td>
     </tr>
     <tr>
+      <td><strong>v1.3 release notes</strong></td>
+      <td>Read the current public release posture, supported surfaces, and download path.</td>
+      <td><a href="releases/v1.3.md">v1.3.md</a></td>
+      <td><a href="../public/landing/docs-surface.png">docs-surface.png</a></td>
+    </tr>
+    <tr>
       <td><strong>Troubleshooting and support</strong></td>
       <td>Recover quickly when local setup, auth, or route assumptions drift.</td>
       <td><a href="troubleshooting/">troubleshooting</a></td>
@@ -45,6 +51,7 @@ Use this section when you want the code-accurate view of setup, runtime surfaces
 </table>
 
 - `mutx.dev` = public marketing site and product narrative
+- `mutx.dev/releases` = public release summary and signed desktop artifact handoff
 - `docs.mutx.dev` = canonical documentation and API truth surface
 - `app.mutx.dev/dashboard` = operator-facing dashboard surface
 - `app.mutx.dev/control/*` = operator demo surface
@@ -53,6 +60,7 @@ Use this section when you want the code-accurate view of setup, runtime surfaces
 
 - [Overview](../README.md)
 - [Quickstart](./deployment/quickstart.md)
+- [v1.3 Release Notes](./releases/v1.3.md)
 - [Project Status](./project-status.md)
 - [Roadmap](../roadmap.md)
 
@@ -85,6 +93,7 @@ Use this section when you want the code-accurate view of setup, runtime surfaces
 - [Platform Overview](./overview.md)
 - [Surface Matrix](./surfaces.md)
 - [App and Dashboard](./app-dashboard.md)
+- [v1.3 Release Checklist](./releases/v1.3-checklist.md)
 - [Manifesto](../manifesto.md)
 - [Technical Whitepaper](../whitepaper.md)
 
@@ -101,6 +110,7 @@ When docs and code disagree, trust the code:
 Current hosted/documented split:
 
 - `mutx.dev` is the public landing site
+- `mutx.dev/releases` is the public release summary for the current desktop build
 - `docs.mutx.dev` should explain the product and link to the current truth
 - `app.mutx.dev/dashboard` is the current operator shell
 - `app.mutx.dev/control/*` is the demo shell

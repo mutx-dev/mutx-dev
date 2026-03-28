@@ -2314,6 +2314,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/runtime/governance/supervised/profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Supervised Launch Profiles
+         * @description List configured launch profiles for supervised agents.
+         */
+        get: operations["list_supervised_launch_profiles_v1_runtime_governance_supervised_profiles_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/runtime/governance/supervised/{agent_id}": {
         parameters: {
             query?: never;
@@ -3513,11 +3533,8 @@ export interface components {
              * @default 900
              */
             ttl: number | null;
-            /**
-             * Config
-             * @default {}
-             */
-            config: Record<string, never> | null;
+            /** Config */
+            config?: Record<string, never>;
         };
         /** CredentialResponse */
         CredentialResponse: {
@@ -3528,14 +3545,16 @@ export interface components {
             /** Path */
             path: string;
             /** Value */
-            value: string;
+            value?: string | null;
+            /**
+             * Has Value
+             * @default false
+             */
+            has_value: boolean;
             /** Expires At */
             expires_at?: string | null;
-            /**
-             * Metadata
-             * @default {}
-             */
-            metadata: Record<string, never>;
+            /** Metadata */
+            metadata?: Record<string, never>;
         };
         /** CustomAgentConfig */
         CustomAgentConfig: {
@@ -5486,14 +5505,13 @@ export interface components {
             /** Agent Id */
             agent_id: string;
             /** Command */
-            command: string[];
-            /**
-             * Env
-             * @default {}
-             */
-            env: {
+            command?: string[] | null;
+            /** Profile */
+            profile?: string | null;
+            /** Env */
+            env?: {
                 [key: string]: string;
-            } | null;
+            };
             /** Faramesh Policy */
             faramesh_policy?: string | null;
         };
@@ -5504,6 +5522,17 @@ export interface components {
              * @default 10
              */
             timeout: number | null;
+        };
+        /** SupervisedLaunchProfileResponse */
+        SupervisedLaunchProfileResponse: {
+            /** Name */
+            name: string;
+            /** Command */
+            command: string[];
+            /** Env Keys */
+            env_keys?: string[];
+            /** Faramesh Policy */
+            faramesh_policy?: string | null;
         };
         /** SwarmAgentResponse */
         SwarmAgentResponse: {
@@ -10807,6 +10836,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_supervised_launch_profiles_v1_runtime_governance_supervised_profiles_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupervisedLaunchProfileResponse"][];
                 };
             };
             /** @description Validation Error */

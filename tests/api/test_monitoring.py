@@ -1,11 +1,25 @@
 from datetime import datetime, timedelta, timezone
 
 import pytest
+from httpx import AsyncClient
 from sqlalchemy import select
 
 from src.api.models import AlertType, DeploymentEvent
 from src.api.models.models import AgentStatus
 from src.api.services.monitoring import monitor_agent_health
+
+
+@pytest.mark.asyncio
+async def test_monitoring_health_uses_app_state_start_time(client: AsyncClient):
+    client.app.state.start_time = datetime.now(timezone.utc).timestamp() - 5
+
+    response = await client.get("/v1/monitoring/health")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "healthy"
+    assert payload["database"] == "healthy"
+    assert payload["uptime_seconds"] >= 5
 
 
 @pytest.mark.asyncio

@@ -6,6 +6,7 @@ import { AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react'
 import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
 
 import { cn } from '@/lib/utils'
+import styles from './WaitlistForm.module.css'
 
 export type WaitlistFormProps = {
   source?: string
@@ -151,18 +152,18 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
   }
 
   return (
-    <div className={cn('relative overflow-hidden rounded-xl border border-white/10 bg-[#111111] p-5 sm:p-6 shadow-xl', compact && 'p-4 sm:p-5', className)}>
-      <div className="relative">
-        <div className="flex flex-wrap items-center gap-3 mb-4">
-          <span className="eyebrow">Waitlist Live</span>
-          <span className="text-sm text-white/60">
+    <div className={cn(styles.card, compact && styles.compact, className)}>
+      <div>
+        <div className={styles.topline}>
+          <span className={styles.eyebrow}>Waitlist Live</span>
+          <span className={styles.count}>
             {count === null ? 'Join the waitlist' : `${count.toLocaleString()} registered`}
           </span>
         </div>
 
-        <div className="space-y-1 mb-6">
-          <p className="text-lg font-medium text-white sm:text-xl">Join the early access list</p>
-          <p className="text-sm text-white/60">
+        <div>
+          <p className={styles.title}>Join the early access list</p>
+          <p className={styles.body}>
             We’re opening hosted access in waves. Join the list for launch updates and priority invites.
           </p>
         </div>
@@ -171,16 +172,16 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-white"
+            className={styles.success}
           >
             <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-white" />
             <div>
-              <p className="font-medium text-sm">{successMessage}</p>
-              <p className="mt-1 text-xs text-white/60">We&apos;ll be in touch soon.</p>
+              <p>{successMessage}</p>
+              <p className={styles.successNote}>We&apos;ll be in touch soon.</p>
             </div>
           </motion.div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex w-full flex-col gap-3" data-testid={`waitlist-form-${source}`}>
+          <form onSubmit={handleSubmit} className={styles.form} data-testid={`waitlist-form-${source}`}>
             <input
               type="text"
               name="honeypot"
@@ -198,7 +199,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@company.com"
               required
-              className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/30 transition-colors"
+              className={styles.input}
             />
 
             {turnstileSiteKey ? (
@@ -236,7 +237,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
                 theme="auto"
               />
             ) : (
-              <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+              <div className={styles.turnstileFallback}>
                 {loadingTurnstileSiteKey
                   ? 'Loading verification challenge...'
                   : 'Waitlist verification is unavailable right now. Please try again later.'}
@@ -246,9 +247,9 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
             <button
               type="submit"
               disabled={loading || !captchaToken || !turnstileSiteKey}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              className={styles.button}
             >
-              {loading ? 'Submitting...' : 'Request Access'}
+              {loading ? 'Submitting...' : 'Request access'}
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>
@@ -258,7 +259,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-3 flex items-center gap-2 text-sm text-red-400"
+            className={styles.error}
           >
             <AlertCircle className="h-4 w-4" />
             {error}

@@ -4,6 +4,7 @@ import { type FormEvent, useMemo, useState } from 'react'
 import { AlertCircle, CheckCircle2, Loader2, Send } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
+import marketing from '@/components/site/marketing/MarketingCore.module.css'
 
 type ContactLeadFormProps = {
   source?: string
@@ -65,8 +66,14 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
       })
 
       const payload = await response.json().catch(() => ({}))
+      const errorMessage =
+        payload?.error?.message ||
+        payload?.detail ||
+        (typeof payload?.error === 'string' ? payload.error : null) ||
+        'Failed to send contact request'
+
       if (!response.ok) {
-        throw new Error(payload.detail || payload.error || 'Failed to send contact request')
+        throw new Error(errorMessage)
       }
 
       setInquiryType('general')
@@ -74,7 +81,7 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
       setName('')
       setOrganization('')
       setMessage('')
-      setSuccess('Message received. The right MUTX lane will follow up.')
+      setSuccess(payload?.message || 'Message received. The right MUTX lane will follow up.')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send contact request')
     } finally {
@@ -83,25 +90,17 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
   }
 
   return (
-    <div className={cn('site-panel-strong p-6', className)}>
-      <div className="mb-5">
-        <div className="site-kicker mb-3">Bring the real workflow</div>
-        <h2 className="text-2xl font-medium text-white">Send a structured inquiry</h2>
-        <p className="mt-2 text-sm leading-6 text-white/60">
-          Use one slim form for hosted evaluations, design-partner workflows, infrastructure conversations, contributions, or other serious MUTX work.
-        </p>
-      </div>
-
+    <div data-testid="contact-lead-form" className={cn(marketing.panel, marketing.panelPadded, className)}>
       {success ? (
-        <div className="flex items-start gap-3 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-emerald-100">
+        <div className={marketing.success}>
           <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
           <div>
             <p className="font-medium">{success}</p>
-            <p className="mt-1 text-sm text-emerald-100/70">If it is urgent, email hello@mutx.dev directly.</p>
+            <p className="mt-1 text-sm">If it is urgent, email hello@mutx.dev directly.</p>
           </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className={marketing.formWrap}>
           <input
             type="text"
             name="company_website"
@@ -112,13 +111,13 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
             className="hidden"
           />
 
-          <label className="block text-sm text-white/70">
-            <span className="site-form-label">Inquiry type</span>
+          <label className={marketing.field}>
+            <span className={marketing.fieldLabel}>Inquiry type</span>
             <select
               required
               value={inquiryType}
               onChange={(event) => setInquiryType(event.target.value)}
-              className="site-input"
+              className={marketing.select}
             >
               {INQUIRY_TYPES.map((item) => (
                 <option key={item.value} value={item.value}>
@@ -129,59 +128,63 @@ export function ContactLeadForm({ source = 'contact-page', className }: ContactL
           </label>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block text-sm text-white/70">
-              <span className="site-form-label">Name</span>
+            <label className={marketing.field}>
+              <span className={marketing.fieldLabel}>Name</span>
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder="Your name"
-                className="site-input"
+                className={marketing.input}
               />
             </label>
 
-            <label className="block text-sm text-white/70">
-              <span className="site-form-label">Work email</span>
+            <label className={marketing.field}>
+              <span className={marketing.fieldLabel}>Work email</span>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@company.com"
-                className="site-input"
+                className={marketing.input}
               />
             </label>
           </div>
 
-          <label className="block text-sm text-white/70">
-            <span className="site-form-label">Organization</span>
+          <label className={marketing.field}>
+            <span className={marketing.fieldLabel}>Organization</span>
             <input
               value={organization}
               onChange={(event) => setOrganization(event.target.value)}
               placeholder="Firm, company, studio, or fund"
-              className="site-input"
+              className={marketing.input}
             />
           </label>
 
-          <label className="block text-sm text-white/70">
-            <span className="site-form-label">Message</span>
+          <label className={marketing.field}>
+            <span className={marketing.fieldLabel}>Message</span>
             <textarea
               required
               value={message}
               onChange={(event) => setMessage(event.target.value)}
               placeholder={MESSAGE_PLACEHOLDERS[inquiryType]}
               rows={6}
-              className="site-input"
+              className={marketing.textarea}
             />
           </label>
 
           {error ? (
-            <div className="flex items-start gap-3 rounded-xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-rose-100">
+            <div className={marketing.error}>
               <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
-              <p className="text-sm">{error}</p>
+              <p>{error}</p>
             </div>
           ) : null}
 
-          <button type="submit" disabled={loading} className="site-button-primary disabled:cursor-not-allowed disabled:opacity-50">
+          <button
+            type="submit"
+            disabled={loading}
+            className={`${marketing.buttonPrimary} disabled:cursor-not-allowed disabled:opacity-50`}
+          >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             {loading ? 'Sending…' : 'Send inquiry'}
           </button>

@@ -8,6 +8,20 @@ from src.api.auth.jwt import create_access_token
 from src.api.models.models import Webhook, WebhookDeliveryLog
 
 
+@pytest.fixture(autouse=True)
+def _mock_public_webhook_dns(monkeypatch):
+    import src.api.services.webhook_service as webhook_service
+
+    async def fake_resolve_webhook_destination_ips(hostname: str, port: int) -> set[str]:
+        return {"93.184.216.34"}
+
+    monkeypatch.setattr(
+        webhook_service,
+        "resolve_webhook_destination_ips",
+        fake_resolve_webhook_destination_ips,
+    )
+
+
 @pytest.mark.asyncio
 async def test_webhook_lifecycle(client: AsyncClient, test_user):
     # 1. Create Webhook
@@ -425,6 +439,17 @@ async def test_webhook_create_rejects_invalid_event(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_webhook_create_rejects_loopback_destination(client: AsyncClient):
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "http://127.0.0.1/webhook", "events": ["agent.*"]},
+    )
+
+    assert response.status_code == 400
+    assert "non-public address" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
 async def test_webhook_update_rejects_invalid_url(client: AsyncClient):
     # Create first
     response = await client.post(
@@ -441,6 +466,35 @@ async def test_webhook_update_rejects_invalid_url(client: AsyncClient):
     )
     assert response.status_code == 400
     assert "http:// or https://" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_webhook_update_rejects_private_dns_destination(client: AsyncClient, monkeypatch):
+    import src.api.services.webhook_service as webhook_service
+
+    response = await client.post(
+        "/v1/webhooks/",
+        json={"url": "https://example.com/webhook", "events": ["agent.*"]},
+    )
+    assert response.status_code == 201
+    webhook_id = response.json()["id"]
+
+    async def resolve_to_private_ip(hostname: str, port: int) -> set[str]:
+        return {"10.0.0.12"}
+
+    monkeypatch.setattr(
+        webhook_service,
+        "resolve_webhook_destination_ips",
+        resolve_to_private_ip,
+    )
+
+    response = await client.patch(
+        f"/v1/webhooks/{webhook_id}",
+        json={"url": "https://internal.example.com/webhook"},
+    )
+
+    assert response.status_code == 400
+    assert "non-public address" in response.json()["detail"]
 
 
 @pytest.mark.asyncio
@@ -534,6 +588,57 @@ async def test_webhook_test_delivery_failure_returns_502(
     response = await client.post(f"/v1/webhooks/{webhook_id}/test")
     assert response.status_code == 502
     assert "delivery failed" in response.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_webhook_test_rejects_unsafe_stored_destination(
+    client: AsyncClient, db_session, test_user
+):
+    webhook = Webhook(
+        user_id=test_user.id,
+        url="http://127.0.0.1/webhook",
+        events=["*"],
+        secret=None,
+        is_active=True,
+    )
+    db_session.add(webhook)
+    await db_session.commit()
+    await db_session.refresh(webhook)
+
+    response = await client.post(f"/v1/webhooks/{webhook.id}/test")
+
+    assert response.status_code == 400
+    assert "non-public address" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_deliver_webhook_blocks_unsafe_destination_before_network():
+    from src.api.services.webhook_service import deliver_webhook
+
+    class ExplodingSession:
+        def post(self, *args, **kwargs):
+            raise AssertionError("network request should not be attempted")
+
+    webhook = Webhook(
+        user_id=uuid.uuid4(),
+        url="http://127.0.0.1/webhook",
+        events=["*"],
+        secret=None,
+        is_active=True,
+    )
+
+    success, status_code, error_message = await deliver_webhook(
+        ExplodingSession(),
+        webhook,
+        "test",
+        {"message": "blocked"},
+        uuid.uuid4(),
+    )
+
+    assert success is False
+    assert status_code is None
+    assert error_message is not None
+    assert "non-public address" in error_message
 
 
 @pytest.mark.asyncio

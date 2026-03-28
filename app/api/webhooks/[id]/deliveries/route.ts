@@ -8,7 +8,6 @@ import {
 } from "@/app/api/_lib/controlPlane";
 import { unauthorized, withErrorHandling } from "@/app/api/_lib/errors";
 
-const API_BASE_URL = getApiBaseUrl();
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +33,7 @@ export async function GET(
 
     const { response, tokenRefreshed, refreshedTokens } = await authenticatedFetch(
       request,
-      `${API_BASE_URL}/v1/webhooks/${id}/deliveries?${queryParams.toString()}`,
+      `${getApiBaseUrl()}/v1/webhooks/${id}/deliveries?${queryParams.toString()}`,
       {
         headers: { "Content-Type": "application/json" },
         cache: "no-store",

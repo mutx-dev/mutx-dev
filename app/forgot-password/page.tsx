@@ -5,10 +5,11 @@ import Link from 'next/link'
 import { AlertCircle, ArrowLeft, ArrowRight, Loader2, Mail } from 'lucide-react'
 
 import { AuthSurface } from '@/components/site/AuthSurface'
+import styles from '@/components/site/marketing/MarketingCore.module.css'
 
 const authSurfaceProps = {
   eyebrow: 'Password recovery',
-  title: 'Recover operator access without leaving the control surface.',
+  title: 'Recover operator access without leaving the control plane.',
   description:
     'Use the email attached to your MUTX account and we will send a reset link. If hosted auth is not the lane you need today, the dashboard, docs, and install flow are still available.',
   asideEyebrow: 'Recovery notes',
@@ -61,47 +62,43 @@ export default function ForgotPasswordPage() {
   return (
     <AuthSurface {...authSurfaceProps}>
       {success ? (
-        <div className="flex flex-col items-start gap-6">
+        <div className={styles.formWrap}>
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10">
             <Mail className="h-7 w-7 text-emerald-300" />
           </div>
 
           <div>
-            <h2 className="text-2xl font-semibold tracking-[-0.05em] text-white">
-              Check your email
-            </h2>
-            <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-soft)]">
-              We&apos;ve sent password reset instructions to <span className="text-white">{email}</span>.
+            <h2 className={styles.sectionTitle}>Check your email</h2>
+            <p className={styles.bodyText}>
+              We&apos;ve sent password reset instructions to <strong>{email}</strong>.
             </p>
-            <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-muted)]">
+            <p className={styles.bodyText}>
               If the email does not show up, check spam or request another link.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <Link href="/login" className="site-button-primary">
+          <div className={styles.ctaRow}>
+            <Link href="/login" className={styles.buttonPrimary}>
               Back to sign in
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <button type="button" onClick={() => setSuccess(false)} className="site-button-secondary">
+            <button type="button" onClick={() => setSuccess(false)} className={styles.buttonSecondary}>
               Try again
             </button>
           </div>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className={styles.formWrap}>
           <div>
-            <h2 className="text-2xl font-semibold tracking-[-0.05em] text-white">
-              Send reset instructions
-            </h2>
-            <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-soft)]">
+            <h2 className={styles.sectionTitle}>Send reset instructions</h2>
+            <p className={styles.bodyText}>
               No drama. Just the email and a fresh link.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="email" className="site-form-label">
+          <form onSubmit={handleSubmit} className={styles.formWrap}>
+            <div className={styles.field}>
+              <label htmlFor="email" className={styles.fieldLabel}>
                 Email address
               </label>
               <input
@@ -111,18 +108,18 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
                 required
-                className="site-input"
+                className={styles.input}
               />
             </div>
 
             {error && (
-              <div className="site-status-error">
+              <div className={styles.error}>
                 <AlertCircle className="h-4 w-4" />
                 {error}
               </div>
             )}
 
-            <button type="submit" disabled={loading} className="site-button-primary w-full disabled:cursor-not-allowed disabled:opacity-60">
+            <button type="submit" disabled={loading} className={`${styles.buttonPrimary} w-full disabled:cursor-not-allowed disabled:opacity-60`}>
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -137,7 +134,7 @@ export default function ForgotPasswordPage() {
             </button>
           </form>
 
-          <Link href="/login" className="inline-flex items-center gap-2 text-sm text-[color:var(--site-text-muted)] transition hover:text-white">
+          <Link href="/login" className={styles.inlineLink}>
             <ArrowLeft className="h-4 w-4" />
             Back to sign in
           </Link>

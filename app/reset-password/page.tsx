@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { AlertCircle, ArrowLeft, ArrowRight, Loader2, Lock } from 'lucide-react'
 
 import { AuthSurface } from '@/components/site/AuthSurface'
+import styles from '@/components/site/marketing/MarketingCore.module.css'
 
 const authSurfaceProps = {
   eyebrow: 'Reset password',
@@ -85,26 +86,24 @@ function ResetPasswordForm() {
   if (tokenError) {
     return (
       <AuthSurface {...authSurfaceProps}>
-        <div className="flex flex-col items-start gap-6">
+        <div className={styles.formWrap}>
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-rose-400/20 bg-rose-400/10">
             <AlertCircle className="h-7 w-7 text-rose-300" />
           </div>
 
           <div>
-            <h2 className="text-2xl font-semibold tracking-[-0.05em] text-white">
-              Invalid reset link
-            </h2>
-            <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-soft)]">
+            <h2 className={styles.sectionTitle}>Invalid reset link</h2>
+            <p className={styles.bodyText}>
               This password reset link is missing, invalid, or already expired.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <Link href="/forgot-password" className="site-button-primary">
+          <div className={styles.ctaRow}>
+            <Link href="/forgot-password" className={styles.buttonPrimary}>
               Request a new link
               <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/login" className="site-button-secondary">
+            <Link href="/login" className={styles.buttonSecondary}>
               Back to sign in
               <ArrowLeft className="h-4 w-4" />
             </Link>
@@ -117,21 +116,19 @@ function ResetPasswordForm() {
   if (success) {
     return (
       <AuthSurface {...authSurfaceProps}>
-        <div className="flex flex-col items-start gap-6">
+        <div className={styles.formWrap}>
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10">
             <Lock className="h-7 w-7 text-emerald-300" />
           </div>
 
           <div>
-            <h2 className="text-2xl font-semibold tracking-[-0.05em] text-white">
-              Password reset complete
-            </h2>
-            <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-soft)]">
+            <h2 className={styles.sectionTitle}>Password reset complete</h2>
+            <p className={styles.bodyText}>
               Your password has been updated. The sign-in lane can use the new credentials now.
             </p>
           </div>
 
-          <Link href="/login" className="site-button-primary">
+          <Link href="/login" className={styles.buttonPrimary}>
             Sign in
             <ArrowRight className="h-4 w-4" />
           </Link>
@@ -142,19 +139,17 @@ function ResetPasswordForm() {
 
   return (
     <AuthSurface {...authSurfaceProps}>
-      <div className="space-y-6">
+      <div className={styles.formWrap}>
         <div>
-          <h2 className="text-2xl font-semibold tracking-[-0.05em] text-white">
-            Choose a new password
-          </h2>
-          <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-soft)]">
+          <h2 className={styles.sectionTitle}>Choose a new password</h2>
+          <p className={styles.bodyText}>
             Keep it strong, confirm it once, and the form will do the rest.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="password" className="site-form-label">
+        <form onSubmit={handleSubmit} className={styles.formWrap}>
+          <div className={styles.field}>
+            <label htmlFor="password" className={styles.fieldLabel}>
               New password
             </label>
             <input
@@ -165,12 +160,12 @@ function ResetPasswordForm() {
               placeholder="••••••••"
               required
               minLength={8}
-              className="site-input"
+              className={styles.input}
             />
           </div>
 
-          <div>
-            <label htmlFor="confirmPassword" className="site-form-label">
+          <div className={styles.field}>
+            <label htmlFor="confirmPassword" className={styles.fieldLabel}>
               Confirm password
             </label>
             <input
@@ -181,18 +176,18 @@ function ResetPasswordForm() {
               placeholder="••••••••"
               required
               minLength={8}
-              className="site-input"
+              className={styles.input}
             />
           </div>
 
           {error && (
-            <div className="site-status-error">
+            <div className={styles.error}>
               <AlertCircle className="h-4 w-4" />
               {error}
             </div>
           )}
 
-          <button type="submit" disabled={loading} className="site-button-primary w-full disabled:cursor-not-allowed disabled:opacity-60">
+          <button type="submit" disabled={loading} className={`${styles.buttonPrimary} w-full disabled:cursor-not-allowed disabled:opacity-60`}>
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -207,7 +202,7 @@ function ResetPasswordForm() {
           </button>
         </form>
 
-        <Link href="/login" className="inline-flex items-center gap-2 text-sm text-[color:var(--site-text-muted)] transition hover:text-white">
+        <Link href="/login" className={styles.inlineLink}>
           <ArrowLeft className="h-4 w-4" />
           Back to sign in
         </Link>
@@ -220,8 +215,8 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className="site-page">
-          <main className="site-main flex min-h-screen items-center justify-center text-white">
+        <div className={styles.page}>
+          <main className="flex min-h-screen items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin" />
           </main>
         </div>

@@ -286,6 +286,7 @@ def _run_command(
     *,
     capture_output: bool = True,
     check: bool = True,
+    timeout: float | None = None,
 ) -> subprocess.CompletedProcess[str]:
     try:
         return subprocess.run(
@@ -293,9 +294,15 @@ def _run_command(
             check=check,
             capture_output=capture_output,
             text=True,
+            timeout=timeout,
         )
     except FileNotFoundError as exc:
         raise CLIServiceError(f"Command not found: {command[0]}") from exc
+    except subprocess.TimeoutExpired as exc:
+        timeout_label = f"{timeout:g}s" if timeout is not None else "the allotted time"
+        raise CLIServiceError(
+            f"Command timed out after {timeout_label}: {' '.join(command)}"
+        ) from exc
     except subprocess.CalledProcessError as exc:
         stderr = (exc.stderr or exc.stdout or "").strip()
         raise CLIServiceError(stderr or f"Command failed: {' '.join(command)}") from exc
@@ -313,12 +320,12 @@ def _last_nonempty_line(raw: str) -> str | None:
     return None
 
 
-def run_openclaw_text(args: list[str]) -> str:
+def run_openclaw_text(args: list[str], *, timeout: float | None = None) -> str:
     claw_bin = find_openclaw_bin()
     if claw_bin is None:
         raise ValidationError("OpenClaw is not installed.")
 
-    result = _run_command([claw_bin, *args])
+    result = _run_command([claw_bin, *args], timeout=timeout)
     output = (result.stdout or "").strip()
     if output:
         return output
@@ -672,12 +679,12 @@ def inspect_importable_openclaw_runtime(
     return install_resolution, health
 
 
-def run_openclaw_json(args: list[str]) -> Any:
+def run_openclaw_json(args: list[str], *, timeout: float | None = None) -> Any:
     claw_bin = find_openclaw_bin()
     if claw_bin is None:
         raise ValidationError("OpenClaw is not installed.")
 
-    result = _run_command([claw_bin, *args])
+    result = _run_command([claw_bin, *args], timeout=timeout)
     payload = _extract_json_payload(result.stdout)
     if payload is None:
         raise CLIServiceError(f"OpenClaw returned invalid JSON for: {' '.join(args)}")
@@ -729,7 +736,7 @@ def open_openclaw_surface(
 
 
 def list_openclaw_agents() -> list[dict[str, Any]]:
-    payload = run_openclaw_json(["agents", "list", "--json"])
+    payload = run_openclaw_json(["agents", "list", "--json"], timeout=2.0)
     if isinstance(payload, list):
         return [item for item in payload if isinstance(item, dict)]
     return []

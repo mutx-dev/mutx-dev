@@ -1,0 +1,114 @@
+name: Railway Production Promotion
+
+on:
+  workflow_call:
+    inputs:
+      release_tag:
+        required: false
+        type: string
+      site_url:
+        required: false
+        type: string
+      app_url:
+        required: false
+        type: string
+      api_url:
+        required: false
+        type: string
+      docs_release_url:
+        required: false
+        type: string
+    secrets:
+      RAILWAY_TOKEN:
+        required: true
+      RAILWAY_PROJECT_ID:
+        required: true
+      RAILWAY_FRONTEND_SERVICE_ID:
+        required: true
+      RAILWAY_API_SERVICE_ID:
+        required: true
+      RAILWAY_ENVIRONMENT_ID:
+        required: true
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Release tag to promote (defaults to v<package-version>)
+        required: false
+        type: string
+      site_url:
+        description: Override the public marketing URL
+        required: false
+        type: string
+      app_url:
+        description: Override the public app-host URL
+        required: false
+        type: string
+      api_url:
+        description: Override the public API URL
+        required: false
+        type: string
+      docs_release_url:
+        description: Override the docs release-notes URL
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Determine release tag
+        id: release
+        env:
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          if [[ -n "${INPUT_RELEASE_TAG}" ]]; then
+            tag="${INPUT_RELEASE_TAG}"
+          else
+            tag="v$(node -p "require('./package.json').version")"
+          fi
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Require docs release notes page in repo
+        run: test -f docs/releases/v1.3.md
+
+      - name: Require GitHub release to exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release view "${{ steps.release.outputs.tag }}" >/dev/null
+
+      - name: Promote Railway frontend and backend
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+          RAILWAY_FRONTEND_SERVICE_ID: ${{ secrets.RAILWAY_FRONTEND_SERVICE_ID }}
+          RAILWAY_API_SERVICE_ID: ${{ secrets.RAILWAY_API_SERVICE_ID }}
+          RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
+        run: bash scripts/promote-railway-production.sh
+
+      - name: Verify public release surfaces
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          SITE_URL: ${{ inputs.site_url }}
+          APP_URL: ${{ inputs.app_url }}
+          API_URL: ${{ inputs.api_url }}
+          DOCS_RELEASE_URL: ${{ inputs.docs_release_url }}
+        run: bash scripts/verify-production-release.sh

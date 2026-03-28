@@ -37,3 +37,58 @@ def test_cors_origins_rejects_invalid_json_array_env(monkeypatch):
 
     with pytest.raises(ValidationError):
         Settings(_env_file=None)
+
+
+def test_forwarded_allow_ips_accepts_comma_separated_env(monkeypatch):
+    monkeypatch.setenv("FORWARDED_ALLOW_IPS", "10.0.0.1, 10.0.0.2")
+
+    settings = Settings(_env_file=None)
+
+    assert settings.forwarded_allow_ips == ["10.0.0.1", "10.0.0.2"]
+
+
+def test_allowed_hosts_accepts_comma_separated_env(monkeypatch):
+    monkeypatch.setenv("ALLOWED_HOSTS", "api.example.com, *.railway.internal")
+
+    settings = Settings(_env_file=None)
+
+    assert settings.allowed_hosts == ["api.example.com", "*.railway.internal"]
+
+
+def test_supervised_profiles_accepts_json_object_env(monkeypatch):
+    monkeypatch.setenv(
+        "GOVERNANCE_SUPERVISED_PROFILES",
+        '{"assistant-runner":{"command":["python","agent.py"],"env":{"LOG_LEVEL":"info"}}}',
+    )
+
+    settings = Settings(_env_file=None)
+
+    assert settings.governance_supervised_profiles == {
+        "assistant-runner": {
+            "command": ["python", "agent.py"],
+            "env": {"LOG_LEVEL": "info"},
+        }
+    }
+
+
+def test_production_warns_when_forwarded_allow_ips_trusts_all(monkeypatch, caplog):
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("JWT_SECRET", "test-secret-key-that-is-long-enough-32")
+    monkeypatch.setenv("DATABASE_URL", "postgresql://prod:secret@db.example.com:5432/mutx")
+    monkeypatch.setenv("CORS_ORIGINS", "https://app.example.com")
+    monkeypatch.setenv("FORWARDED_ALLOW_IPS", "*")
+
+    with caplog.at_level("WARNING"):
+        Settings(_env_file=None)
+
+    assert "FORWARDED_ALLOW_IPS trusts all proxy sources" in caplog.text
+
+
+def test_api_docs_are_disabled_in_production_by_default(monkeypatch):
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("JWT_SECRET", "test-secret-key-that-is-long-enough-32")
+    monkeypatch.setenv("DATABASE_URL", "postgresql://prod:secret@db.example.com:5432/mutx")
+
+    settings = Settings(_env_file=None)
+
+    assert settings.expose_api_docs_in_production is False
