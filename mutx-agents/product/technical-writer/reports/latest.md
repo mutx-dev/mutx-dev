@@ -1,16 +1,16 @@
 # Docs brief — 2026-03-28
 
 ## Gap closed
-`docs/deployment/local-developer-bootstrap.md` still sent first-time operators to `http://localhost:3000/app`, which is stale. The canonical local dashboard surface is `/dashboard` now.
+`docs/deployment/quickstart.md` still described the local app surface as an “app shell” and did not name the canonical dashboard route. That leaves onboarding ambiguous after the `/dashboard` cutover.
 
-Source: `docs/deployment/local-developer-bootstrap.md#L113-L118`
+Source: `docs/deployment/quickstart.md`
 
 ## What changed
-- Replaced the local URL from `http://localhost:3000/app` to `http://localhost:3000/dashboard`.
-- Kept the Docker Compose bootstrap path intact under `infrastructure/docker/docker-compose.yml`.
+- Added `http://localhost:3000/dashboard` to the local URLs list.
+- Replaced “site and app shell” with “site and dashboard” so the bootstrap path matches current operator truth.
 
 ## Why it matters
-This is an onboarding trust issue, not a cosmetic one. New users following the bootstrap doc would land on a legacy path and get mixed signals about the supported operator surface.
+This is the first place many operators land after install. If the quickstart still points them at legacy app-shell language, it weakens the `/dashboard` truth stack right at entry.
 
 ## Next docs move
-Run the deployment parity pass next: backend routes, `cli/commands/deploy.py`, `sdk/mutx/deployments.py`, and `docs/api/deployments.md`.
+Sweep the remaining operator-facing docs for old `app/app` wording, starting with `docs/app-dashboard.md` and `docs/overview.md`.
