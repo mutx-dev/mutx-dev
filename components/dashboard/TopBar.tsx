@@ -69,9 +69,9 @@ export function TopBar({
 
   return (
     <header
-      className={cn("sticky top-0 z-20 border-b px-6 py-4 backdrop-blur-md", className)}
+      className={cn("sticky top-0 z-20 border-b px-5 py-4 backdrop-blur-md", className)}
       style={{
-        backgroundColor: "color-mix(in srgb, transparent 18%, black)",
+        backgroundColor: "color-mix(in srgb, rgba(10, 15, 21, 0.92) 86%, transparent)",
         borderColor: dashboardTokens.borderSubtle,
         color: dashboardTokens.textPrimary,
       }}
@@ -80,7 +80,7 @@ export function TopBar({
         <div className="min-w-0 space-y-1.5">
           {breadcrumbs.length > 0 ? (
             <nav
-              className="flex items-center gap-1 text-xs"
+              className="flex items-center gap-1 text-[11px] uppercase tracking-[0.16em]"
               aria-label="Breadcrumb"
               style={{ color: dashboardTokens.textMuted }}
             >
@@ -98,9 +98,9 @@ export function TopBar({
               ))}
             </nav>
           ) : null}
-          <h1 className="truncate text-2xl font-semibold tracking-tight">{title}</h1>
+          <h1 className="truncate text-[1.35rem] font-semibold tracking-[-0.03em]">{title}</h1>
           {subtitle ? (
-            <p className="text-sm" style={{ color: dashboardTokens.textSubtle }}>
+            <p className="max-w-3xl text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
               {subtitle}
             </p>
           ) : null}
@@ -113,7 +113,7 @@ export function TopBar({
             <div className="relative" ref={menuRef}>
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left transition-colors"
+                className="inline-flex items-center gap-2 rounded-[14px] border px-2.5 py-1.5 text-left transition-colors"
                 style={{
                   borderColor: dashboardTokens.borderSubtle,
                   backgroundColor: dashboardTokens.bgSurfaceStrong,
@@ -145,7 +145,7 @@ export function TopBar({
               {open ? (
                 <div
                   role="menu"
-                  className="absolute right-0 mt-2 min-w-[220px] overflow-hidden rounded-lg border py-1 shadow-2xl"
+                  className="absolute right-0 mt-2 min-w-[220px] overflow-hidden rounded-[16px] border py-1 shadow-2xl"
                   style={{
                     borderColor: dashboardTokens.borderSubtle,
                     backgroundColor: dashboardTokens.bgSurfaceStrong,

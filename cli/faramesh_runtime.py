@@ -122,16 +122,20 @@ def _send_socket_request(socket_path: str, request: dict, timeout: float = 5.0) 
             pass
 
 
-def get_daemon_status(socket_path: str = FAREMESH_SOCKET_PATH) -> dict:
-    result = _send_socket_request(socket_path, {"type": "audit_subscribe"})
+def get_daemon_status(socket_path: str = FAREMESH_SOCKET_PATH, timeout: float = 1.0) -> dict:
+    result = _send_socket_request(socket_path, {"type": "audit_subscribe"}, timeout=timeout)
     subscribed = len(result) > 0 and any(r.get("subscribed") for r in result)
     return {"reachable": bool(result), "subscribed": subscribed}
 
 
 def get_recent_decisions(
-    socket_path: str = FAREMESH_SOCKET_PATH, limit: int = 50
+    socket_path: str = FAREMESH_SOCKET_PATH, limit: int = 50, timeout: float = 1.0
 ) -> list[FarameshDecision]:
-    result = _send_socket_request(socket_path, {"type": "decisions_recent", "limit": limit})
+    result = _send_socket_request(
+        socket_path,
+        {"type": "decisions_recent", "limit": limit},
+        timeout=timeout,
+    )
     decisions = []
     for item in result:
         decisions.append(
@@ -149,8 +153,10 @@ def get_recent_decisions(
     return decisions
 
 
-def get_pending_defers(socket_path: str = FAREMESH_SOCKET_PATH) -> list[FarameshDeferItem]:
-    result = _send_socket_request(socket_path, {"type": "defers_pending"})
+def get_pending_defers(
+    socket_path: str = FAREMESH_SOCKET_PATH, timeout: float = 1.0
+) -> list[FarameshDeferItem]:
+    result = _send_socket_request(socket_path, {"type": "defers_pending"}, timeout=timeout)
     defers = []
     for item in result:
         defers.append(

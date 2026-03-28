@@ -49,9 +49,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.requests = requests or settings.rate_limit_requests
         self.window_seconds = window_seconds or settings.rate_limit_window_seconds
         self.auth_requests = auth_requests or settings.auth_rate_limit_requests
-        self.auth_window_seconds = (
-            auth_window_seconds or settings.auth_rate_limit_window_seconds
-        )
+        self.auth_window_seconds = auth_window_seconds or settings.auth_rate_limit_window_seconds
         self._requests: dict[str, list[datetime]] = {}
 
     def _get_client_ip(self, request: Request) -> str:

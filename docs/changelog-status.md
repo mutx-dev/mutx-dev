@@ -7,7 +7,8 @@ This page covers where to track MUTX changes, release processes, and live status
 - API health: `GET https://api.mutx.dev/health`
 - API readiness: `GET https://api.mutx.dev/ready`
 - Website availability: `https://mutx.dev`
-- App availability: `https://app.mutx.dev/dashboard`
+- Release summary: `https://mutx.dev/releases`
+- App availability: `https://app.mutx.dev/dashboard` (stable operator routes)
 - Control demo availability: `https://app.mutx.dev/control`
 - Docs availability: `https://docs.mutx.dev`
 
@@ -15,10 +16,12 @@ This page covers where to track MUTX changes, release processes, and live status
 
 The canonical changelog lives at [CHANGELOG.md](../CHANGELOG.md) in the repository root.
 
+The canonical public release narrative for the current launch lives at [docs/releases/v1.3.md](./releases/v1.3.md), with the public website summary at `mutx.dev/releases`.
+
 ### Changelog Sources
 
-- GitHub releases: `https://github.com/fortunexbt/mutx-dev/releases`
-- Merged pull requests: `https://github.com/fortunexbt/mutx-dev/pulls?q=is%3Apr+is%3Amerged`
+- GitHub releases: `https://github.com/mutx-dev/mutx-dev/releases`
+- Merged pull requests: `https://github.com/mutx-dev/mutx-dev/pulls?q=is%3Apr+is%3Amerged`
 - OpenAPI contract diff: compare revisions of [`docs/api/openapi.json`](./api/openapi.json)
 
 ## Release Process
@@ -38,19 +41,27 @@ When preparing a release:
    - Use appropriate version type (Major/Minor/Patch)
 
 3. **Create GitHub Release**:
-   - Tag format: `v1.0.0` (frontend/app) or `cli-v0.2.0` (CLI distribution)
-   - Include changelog notes for that release
+   - Tag format: `v1.3.0` (web/app/desktop) and `cli-v1.3.0` (CLI distribution)
+   - Use the matching `docs/releases/vX.Y.md` page as the release notes body when available
+   - Keep the attached desktop assets plus checksums on GitHub Releases
+
+4. **Publish the docs-backed release narrative**:
+   - Merge `docs/releases/v1.3.md`
+   - Verify GitBook sync publishes `https://docs.mutx.dev/docs/releases/v1.3`
+   - Keep `mutx.dev/releases` aligned with the same version and download contract
+   - Keep `mutx.dev/download/macos/release-notes` resolving to that synced page
+
+5. **Promote production on Railway**:
+   - Run the Railway production-promotion workflow or `bash scripts/promote-railway-production.sh`
+   - Verify `mutx.dev`, `app.mutx.dev/dashboard`, `api.mutx.dev/health`, and `api.mutx.dev/ready`
 
 ### Release Validation
 
 Run the release check script before publishing:
 
 ```bash
-# Without Playwright (faster)
+# Fail-closed release validation
 npm run release:check
-
-# With Playwright (full validation)
-npm run release:check -- --with-playwright
 ```
 
 Or manually:
@@ -62,8 +73,8 @@ npm run lint
 # Build
 npm run build
 
-# API tests
-make test-api
+# Signed desktop release validation
+npm run desktop:release:validate
 ```
 
 ### Python CLI Release
@@ -77,7 +88,7 @@ python -m build
 Then push the matching `cli-vX.Y.Z` tag. The release workflow updates the published Homebrew tap automatically; use the manual formula flow only if that automation fails:
 
 ```bash
-python scripts/generate_homebrew_formula.py --tag cli-v0.2.0 --output homebrew-tap/Formula/mutx.rb
+python scripts/generate_homebrew_formula.py --tag cli-v1.3.0 --output homebrew-tap/Formula/mutx.rb
 brew tap mutx-dev/homebrew-tap
 brew install mutx
 mutx --help
@@ -109,9 +120,12 @@ See [CHANGELOG.md](../CHANGELOG.md#versioning) for details on versioning scheme.
 - GitHub is the canonical source for synced docs content.
 - GitBook publication is rooted at the repo root through `.gitbook.yaml`.
 - `README.md` and `SUMMARY.md` are repo-owned docs entrypoints and should not be recreated from the GitBook UI.
+- Release notes for the public launch should live in repo-owned docs pages such as `docs/releases/v1.3.md`, not only in GitHub release prose.
 
 ## Related Planning Docs
 
+- [v1.3 Release Notes](./releases/v1.3.md)
+- [v1.3 Release Checklist](./releases/v1.3-checklist.md)
 - [Project Status](./project-status.md)
 - [Roadmap](../roadmap.md)
 - [API Reference](./api/reference.md)

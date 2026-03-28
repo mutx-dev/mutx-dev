@@ -271,11 +271,7 @@ class Settings(BaseSettings):
                 raise ValueError("Value must be a JSON array or comma-separated list") from exc
             if not isinstance(parsed_value, list):
                 raise ValueError("JSON value must be an array")
-            return [
-                item.strip()
-                for item in parsed_value
-                if isinstance(item, str) and item.strip()
-            ]
+            return [item.strip() for item in parsed_value if isinstance(item, str) and item.strip()]
 
         return [item.strip() for item in raw_value.split(",") if item.strip()]
 

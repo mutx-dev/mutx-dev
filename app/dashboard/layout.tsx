@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 
+import { appFontVariables } from "@/app/fonts/app";
 import { ErrorBoundary } from "@/components/app/ErrorBoundary";
+import { DesktopJobProvider } from "@/components/desktop/useDesktopJob";
+import { DesktopRouteListener } from "@/components/desktop/DesktopRouteListener";
+import { DesktopStatusProvider } from "@/components/desktop/useDesktopStatus";
+import { DesktopWindowProvider } from "@/components/desktop/useDesktopWindow";
 import { DashboardShell } from "@/components/dashboard/DashboardShell";
 
 export const metadata: Metadata = {
@@ -38,8 +43,17 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ErrorBoundary>
-      <DashboardShell>{children}</DashboardShell>
-    </ErrorBoundary>
+    <div className={`${appFontVariables} h-full font-[family:var(--font-display)]`}>
+      <ErrorBoundary>
+        <DesktopStatusProvider>
+          <DesktopWindowProvider>
+            <DesktopJobProvider>
+              <DesktopRouteListener />
+              <DashboardShell>{children}</DashboardShell>
+            </DesktopJobProvider>
+          </DesktopWindowProvider>
+        </DesktopStatusProvider>
+      </ErrorBoundary>
+    </div>
   );
 }

@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
-import { AlertTriangle, Lock, Sparkles } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { AlertTriangle, ArrowRight, Lock, Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 import { EmptyState } from "@/components/dashboard/EmptyState";
 import { LoadingState } from "@/components/dashboard/LoadingState";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import { dashboardTokens } from "@/components/dashboard/tokens";
 import type { DashboardStatus } from "@/components/dashboard/types";
 
 export function formatRelativeTime(value?: string | null) {
@@ -105,24 +107,37 @@ export function LivePanel({
   return (
     <section
       className={cn(
-        "overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.9)_0%,rgba(2,6,23,0.96)_100%)]",
+        "dashboard-entry overflow-hidden rounded-[22px] border shadow-[0_18px_48px_rgba(1,5,11,0.24)]",
         className,
       )}
+      style={{
+        borderColor: dashboardTokens.borderSubtle,
+        background: dashboardTokens.panelGradient,
+        boxShadow: dashboardTokens.shadowSm,
+      }}
     >
-      <header className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
+      <header
+        className="flex items-center justify-between gap-3 border-b px-4 py-3"
+        style={{
+          borderColor: dashboardTokens.borderSubtle,
+          backgroundColor: "color-mix(in srgb, rgba(17, 24, 33, 0.94) 86%, transparent)",
+        }}
+      >
         <div className="min-w-0">
-          <h2 className="truncate text-sm font-semibold text-white">{title}</h2>
+          <h2 className="truncate text-[13px] font-semibold uppercase tracking-[0.12em] text-[#eff5fb]">
+            {title}
+          </h2>
         </div>
         <div className="flex items-center gap-3">
           {meta ? (
-            <span className="hidden text-[10px] font-medium uppercase tracking-[0.18em] text-slate-500 sm:inline">
+            <span className="hidden text-[10px] font-medium uppercase tracking-[0.16em] text-[#7f92a6] sm:inline">
               {meta}
             </span>
           ) : null}
           {action}
         </div>
       </header>
-      <div className="p-4">{children}</div>
+      <div className="p-4 sm:p-5">{children}</div>
     </section>
   );
 }
@@ -139,21 +154,75 @@ export function LiveStatCard({
   status?: DashboardStatus;
 }) {
   return (
-    <article className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+    <article
+      className="dashboard-entry rounded-[18px] border p-3.5"
+      style={{
+        borderColor: dashboardTokens.borderSubtle,
+        background: dashboardTokens.panelGradientStrong,
+        boxShadow: dashboardTokens.shadowSm,
+      }}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-          <p className="mt-2 truncate text-2xl font-semibold tracking-[-0.04em] text-white">{value}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7f92a6]">{label}</p>
+          <p className="mt-2 truncate text-[1.22rem] font-semibold tracking-[-0.04em] text-[#f3f7fb]">
+            {value}
+          </p>
         </div>
         {status ? <StatusBadge status={status} /> : null}
       </div>
-      <p className="mt-2 text-sm text-slate-400">{detail}</p>
+      <p className="mt-3 text-[12px] leading-5 text-[#9fb0c2]">{detail}</p>
     </article>
   );
 }
 
 export function LiveKpiGrid({ children }: { children: ReactNode }) {
-  return <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{children}</div>;
+  return <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">{children}</div>;
+}
+
+export function LiveMiniStatGrid({
+  children,
+  columns = 2,
+}: {
+  children: ReactNode;
+  columns?: 2 | 3;
+}) {
+  return <div className={cn("grid gap-3", columns === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2")}>{children}</div>;
+}
+
+export function LiveMiniStat({
+  label,
+  value,
+  detail,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  detail?: string;
+  icon?: LucideIcon;
+}) {
+  return (
+    <div
+      className="rounded-[16px] border p-3"
+      style={{
+        borderColor: dashboardTokens.borderSubtle,
+        backgroundColor: dashboardTokens.bgInset,
+      }}
+    >
+      <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.16em]" style={{ color: dashboardTokens.textMuted }}>
+        {Icon ? <Icon className="h-3.5 w-3.5" /> : null}
+        <span>{label}</span>
+      </div>
+      <p className="mt-2 text-sm font-medium" style={{ color: dashboardTokens.textPrimary }}>
+        {value}
+      </p>
+      {detail ? (
+        <p className="mt-1 text-[11px] leading-5" style={{ color: dashboardTokens.textMuted }}>
+          {detail}
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 export function LiveLoading({ title }: { title: string }) {
@@ -173,26 +242,54 @@ export function LiveAuthRequired({
 }) {
   return (
     <LivePanel title={title} meta="auth required">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(240px,0.7fr)]">
-        <div className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-slate-300">
-            <Lock className="h-4 w-4" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-white">{title}</p>
-            <p className="mt-2 text-sm leading-6 text-slate-400">{message}</p>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(260px,0.92fr)]">
+        <div
+          className="rounded-[20px] border p-4"
+          style={{
+            borderColor: dashboardTokens.borderStrong,
+            background: dashboardTokens.panelGradientStrong,
+          }}
+        >
+          <div className="flex items-start gap-3">
+            <div
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] border"
+              style={{
+                borderColor: dashboardTokens.borderStrong,
+                backgroundColor: dashboardTokens.bgSurfaceHigher,
+                color: dashboardTokens.brand,
+              }}
+            >
+              <Lock className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8091a3]">
+                Sign-in gate
+              </p>
+              <p className="mt-2 text-base font-semibold text-white">{title}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">{message}</p>
+            </div>
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-          <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Next step</p>
-            <p className="mt-2 text-sm text-white">Install, configure, and sign in with the guided `mutx` setup flow.</p>
-          </div>
-          <div className="rounded-xl border border-white/10 bg-black/20 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">When signed in</p>
-            <p className="mt-2 text-sm text-white">This route swaps the lock state for live operator data instead of a dead-end shell.</p>
-          </div>
+        <div className="grid gap-3">
+          {[
+            "Run the MUTX setup lane or sign back in with the active operator account.",
+            "Once authenticated, this route swaps the gate state for the real control-plane payload.",
+          ].map((note) => (
+            <div
+              key={note}
+              className="rounded-[18px] border px-4 py-3"
+              style={{
+                borderColor: dashboardTokens.borderSubtle,
+                backgroundColor: dashboardTokens.bgSurface,
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-sky-200" />
+                <p className="text-sm leading-6 text-slate-300">{note}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </LivePanel>

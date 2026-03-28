@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 
 import { getApiBaseUrl } from '@/app/api/_lib/controlPlane'
 
-const API_BASE_URL = getApiBaseUrl()
 const DEFAULT_HEALTH_TIMEOUT_MS = 2500
 const parsedTimeoutMs = Number(process.env.DASHBOARD_HEALTH_TIMEOUT_MS)
 const HEALTH_TIMEOUT_MS =
@@ -43,7 +42,7 @@ export async function GET() {
   }, HEALTH_TIMEOUT_MS)
 
   try {
-    const response = await fetch(`${API_BASE_URL}/health`, {
+    const response = await fetch(`${getApiBaseUrl()}/health`, {
       cache: 'no-store',
       signal: controller.signal,
     })

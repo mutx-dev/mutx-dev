@@ -4,7 +4,6 @@ import { applyAuthCookies, getApiBaseUrl } from '@/app/api/_lib/controlPlane'
 import { validateRequest, schemas } from '@/app/api/_lib/validation'
 import { withErrorHandling } from '@/app/api/_lib/errors'
 
-const API_BASE_URL = getApiBaseUrl()
 const FETCH_TIMEOUT_MS = 5000
 
 export const dynamic = 'force-dynamic'
@@ -32,7 +31,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const { refresh_token } = validation.data
     
-    const response = await fetchWithTimeout(`${API_BASE_URL}/v1/auth/refresh`, {
+    const response = await fetchWithTimeout(`${getApiBaseUrl()}/v1/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh_token }),

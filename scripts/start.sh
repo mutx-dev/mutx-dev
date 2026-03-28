@@ -11,7 +11,7 @@ sleep 3
 
 # Start frontend
 cd /app
-node .next/standalone/server.js
+node scripts/start-standalone.mjs
 
 # If frontend exits, kill backend
 kill $BACKEND_PID

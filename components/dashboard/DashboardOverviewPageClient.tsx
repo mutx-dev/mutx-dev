@@ -67,6 +67,64 @@ type OpenClawOnboardingState = {
   last_error?: string | null;
 };
 
+type OverviewResource<T = unknown> = {
+  status: "ok" | "auth_error" | "error";
+  statusCode: number;
+  data: T | null;
+  error: string | null;
+};
+
+type DashboardOverviewPayload = {
+  generatedAt: string;
+  session: {
+    email: string;
+    name: string;
+    plan: string;
+  };
+  resources: {
+    agents: OverviewResource<unknown>;
+    deployments: OverviewResource<unknown>;
+    runs: OverviewResource<components["schemas"]["RunHistoryResponse"]>;
+    alerts: OverviewResource<components["schemas"]["AlertListResponse"]>;
+    webhooks: OverviewResource<unknown>;
+    budget: OverviewResource<unknown>;
+    health: OverviewResource<Record<string, unknown>>;
+    runtime: OverviewResource<OpenClawRuntimeSnapshot>;
+    onboarding: OverviewResource<OpenClawOnboardingState>;
+  };
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function pickBudget(payload: unknown): Budget | null {
+  if (!payload) {
+    return null;
+  }
+
+  if (Array.isArray(payload)) {
+    return (payload[0] as Budget | undefined) ?? null;
+  }
+
+  if (isRecord(payload)) {
+    const budgetItems = normalizeCollection<Budget>(payload, ["items", "budgets", "data"]);
+    if (budgetItems.length > 0) {
+      return budgetItems[0] ?? null;
+    }
+
+    if (
+      typeof payload.plan === "string" &&
+      typeof payload.credits_remaining === "number" &&
+      typeof payload.usage_percentage === "number"
+    ) {
+      return payload as Budget;
+    }
+  }
+
+  return null;
+}
+
 function summarizeRunHealth(runs: Run[]) {
   const completed = runs.filter((run) => run.status === "completed").length;
   const failed = runs.filter((run) => run.status === "failed").length;
@@ -81,14 +139,11 @@ function isAuthError(error: unknown): error is ApiRequestError {
   return error instanceof ApiRequestError && (error.status === 401 || error.status === 403);
 }
 
-function isSettledAuthError(result: PromiseSettledResult<unknown>) {
-  return result.status === "rejected" && isAuthError(result.reason);
-}
-
 export function DashboardOverviewPageClient() {
   const [loading, setLoading] = useState(true);
   const [authRequired, setAuthRequired] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [partialFailures, setPartialFailures] = useState<string[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [runs, setRuns] = useState<Run[]>([]);
@@ -101,42 +156,34 @@ export function DashboardOverviewPageClient() {
 
   useEffect(() => {
     let cancelled = false;
+    const controller = new AbortController();
 
     async function load() {
       setLoading(true);
       setError(null);
       setAuthRequired(false);
+      setPartialFailures([]);
 
       try {
-        await readJson<unknown>("/api/auth/me");
-
-        const results = await Promise.allSettled([
-          readJson<unknown>("/api/dashboard/agents"),
-          readJson<unknown>("/api/dashboard/deployments"),
-          readJson<components["schemas"]["RunHistoryResponse"]>("/api/dashboard/runs"),
-          readJson<components["schemas"]["AlertListResponse"]>("/api/dashboard/monitoring/alerts"),
-          readJson<unknown>("/api/webhooks"),
-          readJson<Budget>("/api/dashboard/budgets"),
-          readJson<unknown>("/api/dashboard/health"),
-          readJson<OpenClawRuntimeSnapshot>("/api/dashboard/runtime/providers/openclaw"),
-          readJson<OpenClawOnboardingState>("/api/dashboard/onboarding?provider=openclaw"),
-        ]);
+        const payload = await readJson<DashboardOverviewPayload>("/api/dashboard/overview", {
+          signal: controller.signal,
+        });
 
         if (cancelled) {
           return;
         }
 
-        const [
-          agentsResult,
-          deploymentsResult,
-          runsResult,
-          alertsResult,
-          webhooksResult,
-          budgetResult,
-          healthResult,
-          runtimeResult,
-          onboardingResult,
-        ] = results;
+        const {
+          agents: agentsResult,
+          deployments: deploymentsResult,
+          runs: runsResult,
+          alerts: alertsResult,
+          webhooks: webhooksResult,
+          budget: budgetResult,
+          health: healthResult,
+          runtime: runtimeResult,
+          onboarding: onboardingResult,
+        } = payload.resources;
 
         const coreResults = [
           agentsResult,
@@ -145,45 +192,48 @@ export function DashboardOverviewPageClient() {
           alertsResult,
           budgetResult,
         ];
-        const coreHasData = coreResults.some((result) => result.status === "fulfilled");
-        const coreHardFailure = coreResults.find(
-          (result) => result.status === "rejected" && !isSettledAuthError(result),
-        );
+        const coreHasData = coreResults.some((result) => result.status === "ok");
+        const coreHardFailure = coreResults.find((result) => result.status === "error");
 
-        if (!coreHasData && coreHardFailure?.status === "rejected") {
-          throw coreHardFailure.reason;
+        if (!coreHasData && coreHardFailure) {
+          throw new Error(coreHardFailure.error || "Failed to load dashboard overview");
         }
 
+        setPartialFailures(
+          Object.entries(payload.resources).flatMap(([key, result]) =>
+            result.status === "ok" || !result.error ? [] : [`${key}: ${result.error}`],
+          ),
+        );
         setAgents(
-          agentsResult.status === "fulfilled"
-            ? normalizeCollection<Agent>(agentsResult.value, ["agents", "items", "data"])
+          agentsResult.status === "ok"
+            ? normalizeCollection<Agent>(agentsResult.data, ["agents", "items", "data"])
             : [],
         );
         setDeployments(
-          deploymentsResult.status === "fulfilled"
-            ? normalizeCollection<Deployment>(deploymentsResult.value, ["deployments", "items", "data"])
+          deploymentsResult.status === "ok"
+            ? normalizeCollection<Deployment>(deploymentsResult.data, ["deployments", "items", "data"])
             : [],
         );
-        setRuns(runsResult.status === "fulfilled" ? runsResult.value.items ?? [] : []);
-        setAlerts(alertsResult.status === "fulfilled" ? alertsResult.value.items ?? [] : []);
+        setRuns(runsResult.status === "ok" ? runsResult.data?.items ?? [] : []);
+        setAlerts(alertsResult.status === "ok" ? alertsResult.data?.items ?? [] : []);
         setWebhooks(
-          webhooksResult.status === "fulfilled"
-            ? normalizeCollection<WebhookSummary>(webhooksResult.value, ["webhooks", "items", "data"])
+          webhooksResult.status === "ok"
+            ? normalizeCollection<WebhookSummary>(webhooksResult.data, ["webhooks", "items", "data"])
             : [],
         );
-        setBudget(budgetResult.status === "fulfilled" ? budgetResult.value : null);
-        setHealth(
-          healthResult.status === "fulfilled"
-            ? ((healthResult.value as Record<string, unknown>) ?? null)
-            : null,
-        );
-        setOpenclawRuntime(runtimeResult.status === "fulfilled" ? runtimeResult.value : null);
+        setBudget(budgetResult.status === "ok" ? pickBudget(budgetResult.data) : null);
+        setHealth(healthResult.status === "ok" ? (healthResult.data ?? null) : null);
+        setOpenclawRuntime(runtimeResult.status === "ok" ? runtimeResult.data : null);
         setOpenclawOnboarding(
-          onboardingResult.status === "fulfilled" ? onboardingResult.value : null,
+          onboardingResult.status === "ok" ? onboardingResult.data : null,
         );
         setLoading(false);
       } catch (loadError) {
         if (!cancelled) {
+          if (loadError instanceof DOMException && loadError.name === "AbortError") {
+            return;
+          }
+
           if (isAuthError(loadError)) {
             setAuthRequired(true);
             setLoading(false);
@@ -199,6 +249,7 @@ export function DashboardOverviewPageClient() {
     void load();
     return () => {
       cancelled = true;
+      controller.abort();
     };
   }, []);
 
@@ -249,6 +300,15 @@ export function DashboardOverviewPageClient() {
 
   return (
     <div className="space-y-4">
+      {partialFailures.length > 0 ? (
+        <div className="rounded-xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
+          <p className="font-medium">Overview is running with partial data.</p>
+          <p className="mt-1 text-xs text-amber-100/80">
+            {partialFailures.slice(0, 3).join(" · ")}
+          </p>
+        </div>
+      ) : null}
+
       <LiveKpiGrid>
         <LiveStatCard
           label="Fleet"

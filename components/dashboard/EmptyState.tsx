@@ -30,27 +30,31 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={cn("flex flex-col items-center justify-center rounded-2xl border px-6 py-12 text-center", className)}
+      className={cn(
+        "dashboard-entry flex flex-col items-center justify-center rounded-[22px] border px-6 py-12 text-center",
+        className,
+      )}
       style={{
         borderColor: dashboardTokens.borderSubtle,
-        backgroundColor: dashboardTokens.bgSurface,
+        background: dashboardTokens.panelGradient,
         color: dashboardTokens.textPrimary,
+        boxShadow: dashboardTokens.shadowSm,
         ...style,
       }}
       {...props}
     >
       <div
-        className="flex h-14 w-14 items-center justify-center rounded-xl border"
+        className="flex h-14 w-14 items-center justify-center rounded-[18px] border"
         style={{
-          borderColor: dashboardTokens.borderSubtle,
+          borderColor: dashboardTokens.borderStrong,
           backgroundColor: dashboardTokens.bgSurfaceStrong,
-          color: dashboardTokens.textMuted,
+          color: dashboardTokens.brand,
         }}
       >
         {icon ?? <Inbox className="h-7 w-7" />}
       </div>
-      <h3 className="mt-4 text-lg font-semibold">{title}</h3>
-      <p className="mt-2 max-w-md text-sm" style={{ color: dashboardTokens.textSubtle }}>
+      <h3 className="mt-4 text-lg font-semibold tracking-[-0.02em]">{title}</h3>
+      <p className="mt-2 max-w-md text-sm leading-6" style={{ color: dashboardTokens.textSubtle }}>
         {message}
       </p>
 
@@ -58,7 +62,7 @@ export function EmptyState({
       {!cta && ctaLabel && ctaHref ? (
         <Link
           href={ctaHref}
-          className="mt-5 inline-flex h-10 items-center rounded-lg px-4 text-sm font-medium"
+          className="mt-5 inline-flex h-10 items-center rounded-[12px] px-4 text-sm font-medium"
           style={{
             backgroundColor: dashboardTokens.brand,
             color: dashboardTokens.bgCanvas,
@@ -71,7 +75,7 @@ export function EmptyState({
         <button
           type="button"
           onClick={onCtaClick}
-          className="mt-5 inline-flex h-10 items-center rounded-lg px-4 text-sm font-medium"
+          className="mt-5 inline-flex h-10 items-center rounded-[12px] px-4 text-sm font-medium"
           style={{
             backgroundColor: dashboardTokens.brand,
             color: dashboardTokens.bgCanvas,

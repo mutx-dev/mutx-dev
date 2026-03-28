@@ -1,5 +1,7 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { DesktopRouteBoundary } from "@/components/desktop/DesktopRouteBoundary";
 
 export default function DashboardLogsPage() {
-  redirect("/dashboard/monitoring");
+  return <DesktopRouteBoundary routeKey="logs" browserRedirectTo="/dashboard/monitoring" />;
 }

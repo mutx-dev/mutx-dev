@@ -1,36 +1,5 @@
 import type { Metadata } from "next";
-import {
-  IBM_Plex_Mono,
-  IBM_Plex_Sans,
-  Space_Grotesk,
-  Syne,
-} from "next/font/google";
-
-import { AuthNav } from "@/components/AuthNav";
 import "./globals.css";
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-display",
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-mono",
-});
-
-const ibmPlexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-site-body",
-});
-
-const syne = Syne({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-  variable: "--font-site-display",
-});
 
 export const metadata: Metadata = {
   alternates: {
@@ -84,19 +53,26 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{if(window.sessionStorage.getItem('mutx-home-loader-played')==='1'){document.documentElement.setAttribute('data-home-loader-played','1');}}catch(_error){}})();",
+          }}
+        />
         <link rel="preconnect" href="https://calendly.com" />
         <link rel="dns-prefetch" href="https://calendly.com" />
         <link rel="preconnect" href="https://challenges.cloudflare.com" />
+        <link
+          rel="preload"
+          href="/landing/webp/victory-core.webp"
+          as="image"
+          type="image/webp"
+        />
         <meta name="theme-color" content="#060810" />
       </head>
-      <body
-        className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} ${ibmPlexSans.variable} ${syne.variable} h-full min-h-screen font-[family:var(--font-display)] antialiased`}
-      >
-        <AuthNav />
-        {children}
-      </body>
+      <body className="h-full min-h-screen antialiased">{children}</body>
     </html>
   );
 }

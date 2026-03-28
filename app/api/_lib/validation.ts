@@ -79,6 +79,10 @@ export const schemas = {
     name: z.string().min(1, 'Name is required').max(100, 'Name too long'),
   }),
 
+  localBootstrap: z.object({
+    name: z.string().min(1, 'Name is required').max(100, 'Name too long').default('Local Operator'),
+  }),
+
   refresh: z.object({
     refresh_token: z.string().min(1, 'Refresh token is required'),
   }),
@@ -94,7 +98,7 @@ export const schemas = {
   
   // Lead schema
   lead: z.object({
-    email: z.string().email('Invalid email format').optional(),
+    email: z.string().email('Invalid email format'),
     name: z.string().max(100, 'Name too long').optional(),
     company: z.string().max(200, 'Company name too long').optional(),
     message: z.string().max(2000, 'Message too long').optional(),

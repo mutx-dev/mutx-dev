@@ -47,11 +47,11 @@ The CLI version source of truth is the root `pyproject.toml` version.
 python -m build
 git checkout main
 git pull --ff-only origin main
-git tag -a cli-v0.2.1 -m "MUTX CLI v0.2.1"
-git push origin cli-v0.2.1
+git tag -a cli-v1.3.0 -m "MUTX CLI v1.3.0"
+git push origin cli-v1.3.0
 ```
 
-Publish GitHub release notes from the `cli-v0.2.1` tag and include:
+Publish GitHub release notes from the `cli-v1.3.0` tag and include:
 
 * install notes for `pip install -e ".[tui]"`
 * operator-facing TUI changes
@@ -71,7 +71,7 @@ The workflow requires a `HOMEBREW_TAP_TOKEN` repository secret with write access
 Manual fallback only if the workflow fails:
 
 ```bash
-python scripts/generate_homebrew_formula.py --tag cli-v0.2.1 --output homebrew-tap/Formula/mutx.rb
+python scripts/generate_homebrew_formula.py --tag cli-v1.3.0 --output homebrew-tap/Formula/mutx.rb
 brew uninstall mutx || true
 brew tap mutx-dev/homebrew-tap
 brew install mutx

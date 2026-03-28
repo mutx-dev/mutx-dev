@@ -24,5 +24,11 @@ export default tseslint.config(
         ...globals.node,
       },
     },
-  }
+  },
+  {
+    files: ["desktop/**/*.cjs", "desktop/**/*.js", "scripts/**/*.js", "scripts/**/*.mjs"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
 );

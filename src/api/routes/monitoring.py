@@ -77,11 +77,7 @@ async def get_health(
         db_status = "unhealthy"
 
     start_time = getattr(request.app.state, "start_time", None)
-    uptime = (
-        datetime.now(timezone.utc).timestamp() - start_time
-        if start_time is not None
-        else 0.0
-    )
+    uptime = datetime.now(timezone.utc).timestamp() - start_time if start_time is not None else 0.0
 
     return HealthStatusResponse(
         status=db_status,

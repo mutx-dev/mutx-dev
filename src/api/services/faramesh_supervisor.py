@@ -73,6 +73,7 @@ class SupervisionConfig:
     health_check_interval: float = 30.0
     shutdown_timeout: float = 10.0
 
+
 @dataclass(frozen=True)
 class SupervisedLaunchProfile:
     name: str

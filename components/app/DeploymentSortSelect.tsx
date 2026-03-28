@@ -10,7 +10,7 @@ export function DeploymentSortSelect({ value, onChange }: DeploymentSortSelectPr
     <select
       value={value}
       onChange={(e) => onChange(e.target.value as "date" | "status" | "agent")}
-      className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80 focus:border-white/20 focus:outline-none"
+      className="rounded-[14px] border border-[#2f3c49] bg-[#10161d] px-3 py-2 text-sm text-white/80 focus:border-emerald-300/30 focus:outline-none"
     >
       <option value="date">Date (newest)</option>
       <option value="status">Status</option>

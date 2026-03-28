@@ -4,7 +4,6 @@ import { getApiBaseUrl, getAuthToken } from '@/app/api/_lib/controlPlane'
 import { withErrorHandling, unauthorized } from '@/app/api/_lib/errors'
 import { checkDeploymentOwnership } from '@/app/api/_lib/ownership'
 
-const API_BASE_URL = getApiBaseUrl()
 
 export const dynamic = 'force-dynamic'
 
@@ -28,7 +27,7 @@ export async function POST(
     
     const body = await req.json()
     
-    const response = await fetch(`${API_BASE_URL}/v1/deployments/${id}/scale`, {
+    const response = await fetch(`${getApiBaseUrl()}/v1/deployments/${id}/scale`, {
       method: 'POST',
       headers: { 
         Authorization: `Bearer ${token}`,

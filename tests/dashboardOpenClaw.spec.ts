@@ -18,135 +18,116 @@ async function mockOverviewTraffic(page: import('@playwright/test').Page) {
     const url = new URL(request.url())
     const { pathname } = url
 
-    if (pathname === '/api/auth/me') {
+    if (pathname === '/api/dashboard/overview') {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          id: 'user_alpha',
-          email: 'operator@mutx.dev',
-          name: 'Operator',
-          plan: 'operator',
-        }),
-      })
-      return
-    }
-
-    if (pathname === '/api/dashboard/agents') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([{ id: 'agent_alpha', name: 'alpha-agent', status: 'running' }]),
-      })
-      return
-    }
-
-    if (pathname === '/api/dashboard/deployments') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([{ id: 'deploy_alpha', agent_id: 'agent_alpha', status: 'healthy', replicas: 1 }]),
-      })
-      return
-    }
-
-    if (pathname === '/api/dashboard/runs') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ items: [] }),
-      })
-      return
-    }
-
-    if (pathname === '/api/dashboard/monitoring/alerts') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ items: [] }),
-      })
-      return
-    }
-
-    if (pathname === '/api/webhooks') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ webhooks: [] }),
-      })
-      return
-    }
-
-    if (pathname === '/api/dashboard/budgets') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          plan: 'operator',
-          credits_remaining: 3580,
-          usage_percentage: 28,
-        }),
-      })
-      return
-    }
-
-    if (pathname === '/api/dashboard/health') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          status: 'healthy',
-          timestamp: '2025-03-21T08:15:00Z',
-        }),
-      })
-      return
-    }
-
-    if (pathname === '/api/dashboard/runtime/providers/openclaw') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          label: 'OpenClaw',
-          status: 'healthy',
-          gateway_url: 'http://127.0.0.1:18789',
-          binary_path: '/opt/homebrew/bin/openclaw',
-          privacy_summary: 'MUTX tracks your local OpenClaw runtime without uploading local gateway keys or secrets.',
-          last_seen_at: '2025-03-21T08:14:00Z',
-          last_synced_at: '2025-03-21T08:15:00Z',
-          binding_count: 1,
-          stale: false,
-          keys_remain_local: true,
-          current_binding: {
-            assistant_id: 'personal-assistant',
-            assistant_name: 'Personal Assistant',
-            workspace: '/Users/fortune/.openclaw/workspace-personal-assistant',
-            model: 'openai/gpt-5',
+          generatedAt: '2025-03-21T08:15:00Z',
+          session: {
+            id: 'user_alpha',
+            email: 'operator@mutx.dev',
+            name: 'Operator',
+            plan: 'operator',
           },
-          bindings: [
-            {
-              assistant_id: 'personal-assistant',
-              assistant_name: 'Personal Assistant',
-              workspace: '/Users/fortune/.openclaw/workspace-personal-assistant',
-              model: 'openai/gpt-5',
+          resources: {
+            agents: {
+              status: 'ok',
+              statusCode: 200,
+              data: [{ id: 'agent_alpha', name: 'alpha-agent', status: 'running' }],
+              error: null,
             },
-          ],
-        }),
-      })
-      return
-    }
-
-    if (pathname === '/api/dashboard/onboarding') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          status: 'completed',
-          current_step: 'verify',
-          assistant_id: 'personal-assistant',
-          assistant_name: 'Personal Assistant',
-          workspace: '/Users/fortune/.openclaw/workspace-personal-assistant',
-          gateway_url: 'http://127.0.0.1:18789',
+            deployments: {
+              status: 'ok',
+              statusCode: 200,
+              data: [
+                { id: 'deploy_alpha', agent_id: 'agent_alpha', status: 'healthy', replicas: 1 },
+              ],
+              error: null,
+            },
+            runs: {
+              status: 'ok',
+              statusCode: 200,
+              data: { items: [] },
+              error: null,
+            },
+            alerts: {
+              status: 'ok',
+              statusCode: 200,
+              data: { items: [] },
+              error: null,
+            },
+            webhooks: {
+              status: 'ok',
+              statusCode: 200,
+              data: { webhooks: [] },
+              error: null,
+            },
+            budget: {
+              status: 'ok',
+              statusCode: 200,
+              data: {
+                plan: 'operator',
+                credits_remaining: 3580,
+                usage_percentage: 28,
+              },
+              error: null,
+            },
+            health: {
+              status: 'ok',
+              statusCode: 200,
+              data: {
+                status: 'healthy',
+                timestamp: '2025-03-21T08:15:00Z',
+              },
+              error: null,
+            },
+            runtime: {
+              status: 'ok',
+              statusCode: 200,
+              data: {
+                label: 'OpenClaw',
+                status: 'healthy',
+                gateway_url: 'http://127.0.0.1:18789',
+                binary_path: '/opt/homebrew/bin/openclaw',
+                privacy_summary:
+                  'MUTX tracks your local OpenClaw runtime without uploading local gateway keys or secrets.',
+                last_seen_at: '2025-03-21T08:14:00Z',
+                last_synced_at: '2025-03-21T08:15:00Z',
+                binding_count: 1,
+                stale: false,
+                keys_remain_local: true,
+                current_binding: {
+                  assistant_id: 'personal-assistant',
+                  assistant_name: 'Personal Assistant',
+                  workspace: '/Users/fortune/.openclaw/workspace-personal-assistant',
+                  model: 'openai/gpt-5',
+                },
+                bindings: [
+                  {
+                    assistant_id: 'personal-assistant',
+                    assistant_name: 'Personal Assistant',
+                    workspace: '/Users/fortune/.openclaw/workspace-personal-assistant',
+                    model: 'openai/gpt-5',
+                  },
+                ],
+              },
+              error: null,
+            },
+            onboarding: {
+              status: 'ok',
+              statusCode: 200,
+              data: {
+                status: 'completed',
+                current_step: 'verify',
+                assistant_id: 'personal-assistant',
+                assistant_name: 'Personal Assistant',
+                workspace: '/Users/fortune/.openclaw/workspace-personal-assistant',
+                gateway_url: 'http://127.0.0.1:18789',
+              },
+              error: null,
+            },
+          },
         }),
       })
       return
@@ -179,11 +160,89 @@ test.describe('Dashboard OpenClaw overview', () => {
   })
 
   test('does not fall back to auth-required when an overview-only endpoint is forbidden', async ({ page }) => {
-    await page.route('**/api/dashboard/runtime/providers/openclaw', async (route) => {
+    await page.route('**/api/dashboard/overview', async (route) => {
       await route.fulfill({
-        status: 403,
+        status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ detail: 'Forbidden' }),
+        body: JSON.stringify({
+          generatedAt: '2025-03-21T08:15:00Z',
+          session: {
+            id: 'user_alpha',
+            email: 'operator@mutx.dev',
+            name: 'Operator',
+            plan: 'operator',
+          },
+          resources: {
+            agents: {
+              status: 'ok',
+              statusCode: 200,
+              data: [{ id: 'agent_alpha', name: 'alpha-agent', status: 'running' }],
+              error: null,
+            },
+            deployments: {
+              status: 'ok',
+              statusCode: 200,
+              data: [],
+              error: null,
+            },
+            runs: {
+              status: 'ok',
+              statusCode: 200,
+              data: { items: [] },
+              error: null,
+            },
+            alerts: {
+              status: 'ok',
+              statusCode: 200,
+              data: { items: [] },
+              error: null,
+            },
+            webhooks: {
+              status: 'ok',
+              statusCode: 200,
+              data: { webhooks: [] },
+              error: null,
+            },
+            budget: {
+              status: 'ok',
+              statusCode: 200,
+              data: {
+                plan: 'operator',
+                credits_remaining: 3580,
+                usage_percentage: 28,
+              },
+              error: null,
+            },
+            health: {
+              status: 'ok',
+              statusCode: 200,
+              data: {
+                status: 'healthy',
+                timestamp: '2025-03-21T08:15:00Z',
+              },
+              error: null,
+            },
+            runtime: {
+              status: 'auth_error',
+              statusCode: 403,
+              data: null,
+              error: 'Forbidden',
+            },
+            onboarding: {
+              status: 'ok',
+              statusCode: 200,
+              data: {
+                status: 'completed',
+                current_step: 'verify',
+                assistant_id: 'personal-assistant',
+                assistant_name: 'Personal Assistant',
+                workspace: '/Users/fortune/.openclaw/workspace-personal-assistant',
+                gateway_url: 'http://127.0.0.1:18789',
+              },
+              error: null,
+            },
+          },
+        }),
       })
     })
 

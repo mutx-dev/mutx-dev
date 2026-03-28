@@ -68,7 +68,9 @@ def _validate_safe_result(value: int | float) -> int | float:
     return value
 
 
-def _safe_calculate_eval(node: ast.AST) -> int | float | list[int | float] | tuple[int | float, ...]:
+def _safe_calculate_eval(
+    node: ast.AST,
+) -> int | float | list[int | float] | tuple[int | float, ...]:
     if isinstance(node, ast.Expression):
         return _safe_calculate_eval(node.body)
 

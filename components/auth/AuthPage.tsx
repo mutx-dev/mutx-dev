@@ -7,6 +7,7 @@ import { AlertCircle, ArrowRight, Loader2 } from "lucide-react";
 
 import { extractApiErrorMessage } from "@/components/app/http";
 import { AuthSurface } from "@/components/site/AuthSurface";
+import styles from "@/components/site/marketing/MarketingCore.module.css";
 
 type AuthMode = "login" | "register";
 
@@ -18,17 +19,17 @@ type AuthPageProps = {
 const authContent = {
   login: {
     eyebrow: "Operator sign-in",
-    title: "Use the hosted auth lane when you want the real dashboard.",
+    title: "Sign in to the governed runtime.",
     description:
-      "Sign in with the hosted operator account, establish the session cleanly, and go straight into the live dashboard.",
+      "Use the hosted operator account, establish the session cleanly, and continue into the dashboard that reflects real deployment state instead of a demo shell.",
     asideEyebrow: "What unlocks next",
-    asideTitle: "The dashboard should fail honestly, not hide behind a paused auth shell.",
+    asideTitle: "The dashboard should tell the truth the moment auth succeeds.",
     asideBody:
-      "Once the session is live, the dashboard can load fleet posture, deployment state, run activity, and security surfaces from the same operator boundary.",
-    mediaSrc: "/landing/webp/docs-surface.webp",
-    mediaAlt: "MUTX operator surface with documentation and dashboard context",
+      "Once the session is live, MUTX can load fleet posture, deployment state, traces, and security surfaces from the same operator boundary.",
+    mediaSrc: "/landing/webp/wiring-bay.webp",
+    mediaAlt: "MUTX robot operating inside a wiring bay",
     mediaWidth: 1024,
-    mediaHeight: 1024,
+    mediaHeight: 1536,
     highlights: [
       "Hosted sign-in now routes into the live dashboard instead of a hold screen.",
       "Session cookies stay scoped to the app host so auth does not leak across subdomains.",
@@ -41,11 +42,11 @@ const authContent = {
   },
   register: {
     eyebrow: "Operator access",
-    title: "Create a hosted operator account and start in the real dashboard.",
+    title: "Create an operator account and enter the real dashboard.",
     description:
-      "Register with the hosted auth flow, confirm the password cleanly, and land in the same dashboard surface used for live operator work.",
+      "Register with the hosted auth flow, confirm the password cleanly, and land in the same control surface used for live operator work.",
     asideEyebrow: "Account rules",
-    asideTitle: "Registration should be explicit and easy to verify.",
+    asideTitle: "Registration should be explicit, boring, and easy to verify.",
     asideBody:
       "The registration lane now validates what matters, sends the request through the hosted auth API, and only moves forward once the session is established.",
     mediaSrc: "/landing/webp/victory-core.webp",
@@ -154,20 +155,16 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
 
   return (
     <AuthSurface {...content}>
-      <div className="space-y-6">
+      <div className={styles.formWrap}>
         <div>
-          <h2 className="text-2xl font-semibold tracking-[-0.05em] text-white">
-            {content.heading}
-          </h2>
-          <p className="mt-3 text-sm leading-7 text-[color:var(--site-text-soft)]">
-            {content.subheading}
-          </p>
+          <h2 className={styles.sectionTitle}>{content.heading}</h2>
+          <p className={styles.bodyText}>{content.subheading}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className={styles.formWrap}>
           {isRegister ? (
-            <div>
-              <label htmlFor="name" className="site-form-label">
+            <div className={styles.field}>
+              <label htmlFor="name" className={styles.fieldLabel}>
                 Name
               </label>
               <input
@@ -178,13 +175,13 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
                 placeholder="Your name"
                 required
                 autoComplete="name"
-                className="site-input"
+                className={styles.input}
               />
             </div>
           ) : null}
 
-          <div>
-            <label htmlFor="email" className="site-form-label">
+          <div className={styles.field}>
+            <label htmlFor="email" className={styles.fieldLabel}>
               Email address
             </label>
             <input
@@ -195,12 +192,12 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
               placeholder="you@company.com"
               required
               autoComplete="email"
-              className="site-input"
+              className={styles.input}
             />
           </div>
 
-          <div>
-            <label htmlFor="password" className="site-form-label">
+          <div className={styles.field}>
+            <label htmlFor="password" className={styles.fieldLabel}>
               Password
             </label>
             <input
@@ -211,13 +208,13 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
               placeholder="••••••••"
               required
               autoComplete={isRegister ? "new-password" : "current-password"}
-              className="site-input"
+              className={styles.input}
             />
           </div>
 
           {isRegister ? (
-            <div>
-              <label htmlFor="confirmPassword" className="site-form-label">
+            <div className={styles.field}>
+              <label htmlFor="confirmPassword" className={styles.fieldLabel}>
                 Confirm password
               </label>
               <input
@@ -228,13 +225,13 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
               placeholder="••••••••"
               required
               autoComplete="new-password"
-              className="site-input"
+              className={styles.input}
             />
             </div>
           ) : null}
 
           {error ? (
-            <div className="site-status-error" role="alert">
+            <div className={styles.error} role="alert">
               <AlertCircle className="h-4 w-4" />
               {error}
             </div>
@@ -243,7 +240,7 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
           <button
             type="submit"
             disabled={loading}
-            className="site-button-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+            className={`${styles.buttonPrimary} w-full disabled:cursor-not-allowed disabled:opacity-60`}
           >
             {loading ? (
               <>
@@ -259,26 +256,26 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
           </button>
         </form>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+        <div className={styles.utilityLinks}>
           {mode === "login" ? (
             <>
               <Link
                 href="/forgot-password"
-                className="text-[color:var(--site-text-muted)] transition hover:text-white"
+                className={styles.inlineLink}
               >
                 Forgot password?
               </Link>
-              <p className="text-[color:var(--site-text-muted)]">
+              <p className={styles.bodyText}>
                 Need access?{" "}
-                <Link href="/register" className="text-white transition hover:text-cyan-200">
+                <Link href="/register" className={styles.inlineLink}>
                   Create one
                 </Link>
               </p>
             </>
           ) : (
-            <p className="text-[color:var(--site-text-muted)]">
+            <p className={styles.bodyText}>
               Already have an operator account?{" "}
-              <Link href="/login" className="text-white transition hover:text-cyan-200">
+              <Link href="/login" className={styles.inlineLink}>
                 Sign in
               </Link>
             </p>

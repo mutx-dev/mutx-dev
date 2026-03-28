@@ -1,0 +1,143 @@
+.card {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 1.15rem;
+  padding: 1.35rem;
+  border-radius: 1.15rem;
+  border: 1px solid rgba(248, 247, 245, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f8f7f5;
+}
+
+.compact {
+  padding: 1.1rem;
+}
+
+.topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  min-height: 1.9rem;
+  align-items: center;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(248, 247, 245, 0.18);
+  font-family: var(--font-marketing-accent), sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.count {
+  font-size: 0.9rem;
+  color: rgba(248, 247, 245, 0.64);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.body {
+  margin: 0.35rem 0 0;
+  color: rgba(248, 247, 245, 0.66);
+  line-height: 1.5;
+}
+
+.success {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.95rem 1rem;
+  border-radius: 0.95rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.success p {
+  margin: 0;
+}
+
+.successNote {
+  margin-top: 0.15rem;
+  color: rgba(248, 247, 245, 0.54);
+  font-size: 0.88rem;
+}
+
+.form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(248, 247, 245, 0.18);
+  background: rgba(0, 0, 0, 0.24);
+  color: #f8f7f5;
+  font: inherit;
+}
+
+.input::placeholder {
+  color: rgba(248, 247, 245, 0.38);
+}
+
+.input:focus {
+  outline: none;
+  border-color: rgba(255, 85, 0, 0.9);
+  box-shadow: 0 0 0 3px rgba(255, 85, 0, 0.12);
+}
+
+.turnstileFallback {
+  padding: 0.9rem 1rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(255, 176, 0, 0.2);
+  background: rgba(255, 176, 0, 0.08);
+  color: rgba(255, 236, 202, 0.92);
+  line-height: 1.45;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 3rem;
+  padding: 0 1.25rem;
+  border: 0;
+  border-radius: 0.95rem;
+  background: #ff5500;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease, opacity 160ms ease, transform 160ms ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  background: #111;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  transform: none;
+}
+
+.error {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  color: #ffb3b3;
+  font-size: 0.92rem;
+}

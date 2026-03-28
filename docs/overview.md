@@ -2,11 +2,11 @@
 
 MUTX is an open-source control plane for operating AI agents with clearer boundaries than a demo app.
 
-Today the repo exposes three distinct public surfaces, and understanding that split is the fastest way to orient yourself.
+Today the repo exposes a supported marketing site, a supported dashboard lane, and a separate preview control demo. Understanding that split is the fastest way to orient yourself.
 
 For a detailed supported-vs-preview matrix, see [Surface Matrix](surfaces.md).
 
-## The three surfaces
+## The public surfaces
 
 ### `mutx.dev`
 
@@ -16,8 +16,8 @@ What it does today:
 
 - explains the product thesis
 - links people to the docs and GitHub repo
-- captures waitlist signups through the Next.js waitlist flow
-- points users toward the app preview
+- publishes the desktop download flow
+- points operators toward the supported dashboard and CLI install lanes
 
 What it is not:
 
@@ -47,15 +47,15 @@ What exists today:
 
 - login and register browser flows via `app/api/auth/*`
 - current-user lookup via `app/api/auth/me`
-- authenticated dashboard pages under `app/dashboard/*`
+- supported dashboard pages under `app/dashboard/*` for stable routes
 - same-origin dashboard and control-plane proxies under `app/api/dashboard/*`, `app/api/agents/*`, `app/api/deployments/*`, `app/api/api-keys/*`, and `app/api/webhooks/*`
 - a catch-all control demo rendered from `app/control/[[...slug]]/page.tsx`
 
 What it is not yet:
 
-- not a complete production dashboard
+- not a complete production dashboard for every backend capability
 - not a full replacement for direct API usage
-- not yet a write-complete surface for every backend resource
+- not a blanket guarantee that preview-labeled routes are stable
 
 ## Product model right now
 

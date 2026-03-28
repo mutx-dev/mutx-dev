@@ -268,7 +268,7 @@ function checkRateLimit(
   return { allowed: true, remaining: Math.max(0, policy.limit - current.count), resetTime: current.resetTime }
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   if (
@@ -384,6 +384,8 @@ export function middleware(request: NextRequest) {
 
   return finalizeResponse(response, host, normalizedPath)
 }
+
+export const middleware = proxy
 
 export const config = {
   matcher: ['/:path*'],

@@ -4,9 +4,7 @@ import json
 import re
 from pathlib import Path
 
-from fastapi.openapi.utils import get_openapi
-
-from src.api.main import app
+from scripts.generate_openapi import build_openapi_document
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,7 +14,9 @@ SKIP_PARTS = {
     ".git",
     ".next",
     ".venv",
+    ".venv-sdktest",
     "__pycache__",
+    "archive",
     "build",
     "coverage",
     "dist",
@@ -28,6 +28,7 @@ STALE_REFERENCES = (
     "WHITEPAPER.md",
     "MANIFESTO.md",
     "SUPPORT.md",
+    "github.com/fortunexbt/mutx.dev",
     "app/app/[[...slug]]/page.tsx",
     "/v1/contacts",
     "there is no global `/v1` backend prefix",
@@ -112,10 +113,11 @@ def resolve_local_link(source: Path, target: str) -> Path:
 def test_canonical_quickstart_surfaces_share_assistant_first_commands() -> None:
     readme = read_text("README.md")
     quickstart = read_text("docs/deployment/quickstart.md")
-    landing = read_text("app/page.tsx")
+    install_surface = read_text("components/site/InstallSurface.tsx")
+    landing_content = read_text("lib/marketingContent.ts")
     install_script = read_text("public/install.sh")
 
-    for content in (readme, quickstart, landing):
+    for content in (readme, quickstart, install_surface):
         assert "curl -fsSL https://mutx.dev/install.sh | bash" in content
         assert "OpenClaw" in content
 
@@ -128,11 +130,12 @@ def test_canonical_quickstart_surfaces_share_assistant_first_commands() -> None:
             "'personal_assistant' or 'Personal Assistant'."
         )
 
-    assert "mutx setup hosted --import-openclaw" in landing
-    assert "Hosted" in landing
-    assert "mutx setup hosted" in install_script
-    assert "mutx setup local" in install_script
-    assert "mutx doctor" in install_script
+    assert "/download/macos" in landing_content
+    assert "/releases" in landing_content
+    assert "Download for Mac" in landing_content
+    assert "Read release" in landing_content
+    assert "run_setup_handoff" in install_script
+    assert "MUTX_OPEN_TUI" in install_script
     assert "mutx login" not in install_script
 
 
@@ -171,6 +174,20 @@ def test_docs_hub_keeps_repo_backed_cards() -> None:
     assert 'data-card-target data-type="content-ref"' in docs_hub
     assert 'data-card-cover data-type="files"' in docs_hub
     assert "../public/landing/wiring-bay.png" in docs_hub
+    assert "docs/releases/v1.3.md" in read_text("SUMMARY.md")
+    assert "./releases/v1.3.md" in read_text("docs/changelog-status.md")
+    assert "releases/v1.3.md" in docs_hub
+
+
+def test_v13_release_notes_page_keeps_soft_launch_truth() -> None:
+    release_notes = read_text("docs/releases/v1.3.md")
+
+    assert "mutx.dev/releases" in release_notes
+    assert "mutx.dev/download/macos" in release_notes
+    assert "app.mutx.dev/dashboard" in release_notes
+    assert "app.mutx.dev/control/*" in release_notes
+    assert "Railway" in release_notes
+    assert "GitHub Releases" in release_notes
 
 
 def test_public_agents_guidance_mentions_v1_contract() -> None:
@@ -238,7 +255,7 @@ def test_contract_stubs_point_back_to_docs_api() -> None:
 
 def test_openapi_snapshot_matches_current_app_routes() -> None:
     snapshot = json.loads(read_text("docs/api/openapi.json"))
-    generated = get_openapi(title=app.title, version=app.version, routes=app.routes)
+    generated = build_openapi_document()
 
     assert snapshot["paths"] == generated["paths"]
     assert "/v1/leads/contacts" in snapshot["paths"]

@@ -7,7 +7,6 @@ import {
   hasAuthSession,
 } from '@/app/api/_lib/controlPlane'
 
-const API_BASE_URL = getApiBaseUrl()
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +23,7 @@ export async function DELETE(
 
     const { response, tokenRefreshed, refreshedTokens } = await authenticatedFetch(
       request,
-      `${API_BASE_URL}/v1/api-keys/${id}`,
+      `${getApiBaseUrl()}/v1/api-keys/${id}`,
       {
         method: 'DELETE',
         cache: 'no-store',

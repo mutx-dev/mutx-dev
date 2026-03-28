@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import {
   Activity,
   Calendar,
@@ -20,60 +21,26 @@ import {
 } from "lucide-react";
 import { DeploymentSortSelect } from "./DeploymentSortSelect";
 
-import { Card } from "@/components/ui/Card";
 import { ApiRequestError, normalizeCollection, readJson, writeJson } from "@/components/app/http";
-import { LiveAuthRequired } from "@/components/dashboard/livePrimitives";
+import { DashboardDialog } from "@/components/dashboard/DashboardDialog";
+import { EmptyState as DashboardEmptyState } from "@/components/dashboard/EmptyState";
+import { FilterBar } from "@/components/dashboard/FilterBar";
+import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import {
+  LiveAuthRequired,
+  LiveKpiGrid,
+  LiveMiniStat,
+  LiveMiniStatGrid,
+  LivePanel,
+  LiveStatCard,
+  asDashboardStatus,
+  formatRelativeTime,
+} from "@/components/dashboard/livePrimitives";
 import { DeploymentHistory } from "./DeploymentHistory";
 import { type components } from "@/app/types/api";
 
 type Deployment = components["schemas"]["DeploymentResponse"];
 type Agent = components["schemas"]["AgentResponse"];
-
-function formatRelativeDate(value?: string | null) {
-  if (!value) return "Not recorded";
-
-  const then = new Date(value).getTime();
-  if (Number.isNaN(then)) return "Invalid timestamp";
-
-  const diffMs = then - Date.now();
-  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
-  const minutes = Math.round(diffMs / 60000);
-
-  if (Math.abs(minutes) < 60) {
-    return rtf.format(minutes, "minute");
-  }
-
-  const hours = Math.round(minutes / 60);
-  if (Math.abs(hours) < 48) {
-    return rtf.format(hours, "hour");
-  }
-
-  const days = Math.round(hours / 24);
-  return rtf.format(days, "day");
-}
-
-function StatusDot({ status }: { status: string }) {
-  const color =
-    status === "running" || status === "healthy"
-      ? "bg-emerald-300"
-      : status === "failed" || status === "error" || status === "unhealthy"
-        ? "bg-rose-300"
-        : "bg-amber-300";
-
-  return <span className={`inline-block h-2.5 w-2.5 rounded-full ${color}`} />;
-}
-
-function statusTone(status: string) {
-  if (status === "running" || status === "healthy") {
-    return "bg-emerald-400/10 text-emerald-300 border-emerald-400/20";
-  }
-
-  if (status === "failed" || status === "error" || status === "unhealthy") {
-    return "bg-rose-400/10 text-rose-300 border-rose-400/20";
-  }
-
-  return "bg-amber-400/10 text-amber-300 border-amber-400/20";
-}
 
 function DeploymentCardSkeleton() {
   return (
@@ -115,64 +82,38 @@ function DeploymentCard({ deployment, onRestart, onStop, onStart, onDelete, isPr
   const copied = copiedId === deployment.id;
 
   return (
-    <Card className="border border-white/5 bg-white/[0.02] p-5 transition hover:border-emerald-400/20">
+    <article className="dashboard-entry rounded-[20px] border border-[#273543] bg-[linear-gradient(180deg,#18212b_0%,#0f151d_100%)] p-5 shadow-[0_18px_40px_rgba(1,5,11,0.22)] transition hover:border-emerald-300/26">
       <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0 flex-1 flex items-center gap-2">
-          <p className="truncate text-sm font-medium text-white">
-            {deployment.id}
-          </p>
-          <button
-            onClick={() => onCopyId(deployment.id)}
-            className="text-slate-500 hover:text-cyan-400 transition-colors"
-            title="Copy ID"
-          >
-            {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-          </button>
-          <p className="mt-1 text-xs text-slate-500">
-            Agent: {deployment.agent_id}
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="truncate text-sm font-medium text-white">
+              {deployment.id}
+            </p>
+            <button
+              onClick={() => onCopyId(deployment.id)}
+              className="inline-flex items-center gap-1 rounded-full border border-[#293543] bg-[#10161d] px-2.5 py-1 text-[11px] text-slate-500 transition-colors hover:border-cyan-400/24 hover:text-cyan-300"
+              title="Copy deployment ID"
+            >
+              {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied ? "Copied" : "Copy ID"}
+            </button>
+          </div>
+          <p className="mt-2 truncate text-xs text-slate-500 font-[family:var(--font-mono)]">
+            Agent assignment: {deployment.agent_id}
           </p>
         </div>
-        <span
-          className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium ${statusTone(
-            deployment.status,
-          )}`}
-        >
-          <StatusDot status={deployment.status} />
-          {deployment.status}
-        </span>
+        <StatusBadge status={asDashboardStatus(deployment.status)} label={deployment.status} />
       </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        <div className="flex items-center gap-2 rounded-lg bg-white/5 p-3">
-          <Server className="h-4 w-4 text-slate-500" />
-          <div>
-            <p className="text-xs text-slate-500">Replicas</p>
-            <p className="text-sm font-medium text-white">
-              {deployment.replicas}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 rounded-lg bg-white/5 p-3">
-          <Calendar className="h-4 w-4 text-slate-500" />
-          <div>
-            <p className="text-xs text-slate-500">Created</p>
-            <p className="text-sm font-medium text-white">
-              {formatRelativeDate(deployment.started_at)}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 rounded-lg bg-white/5 p-3">
-          <Clock className="h-4 w-4 text-slate-500" />
-          <div>
-            <p className="text-xs text-slate-500">Updated</p>
-            <p className="text-sm font-medium text-white">
-              {formatRelativeDate(deployment.ended_at)}
-            </p>
-          </div>
-        </div>
+      <div className="mt-4">
+        <LiveMiniStatGrid columns={3}>
+          <LiveMiniStat label="Replicas" value={String(deployment.replicas)} detail="Desired runtime count" icon={Server} />
+          <LiveMiniStat label="Started" value={formatRelativeTime(deployment.started_at)} detail="Initial rollout timestamp" icon={Calendar} />
+          <LiveMiniStat label="Updated" value={formatRelativeTime(deployment.ended_at)} detail="Most recent deployment event" icon={Clock} />
+        </LiveMiniStatGrid>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
         <button
-          className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-[12px] border border-[#293543] bg-[#0e141b] px-3 py-2 text-xs font-medium text-white transition hover:border-emerald-400/24 hover:bg-[#131c24] disabled:opacity-50"
           onClick={() => onRestart(deployment.id)}
           disabled={processing}
         >
@@ -180,23 +121,23 @@ function DeploymentCard({ deployment, onRestart, onStop, onStart, onDelete, isPr
           Restart
         </button>
         <button
-          className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-[12px] border border-[#293543] bg-[#0e141b] px-3 py-2 text-xs font-medium text-white transition hover:border-amber-400/24 hover:bg-[#131c24] disabled:opacity-50"
           onClick={() => deployment.status === "running" ? onStop(deployment.id) : onStart(deployment.id)}
           disabled={processing}
         >
           <Power className="h-3.5 w-3.5" />
           {deployment.status === "running" ? "Stop" : "Start"}
         </button>
-        <button
-          className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10"
-          onClick={() => {}}
+        <Link
+          href={`/dashboard/logs?deploymentId=${encodeURIComponent(deployment.id)}`}
+          className="inline-flex items-center gap-2 rounded-[12px] border border-[#293543] bg-[#0e141b] px-3 py-2 text-xs font-medium text-white transition hover:border-sky-300/24 hover:bg-[#131c24]"
         >
           <Activity className="h-3.5 w-3.5" />
           Logs
-        </button>
+        </Link>
         <DeploymentHistory deploymentId={deployment.id} />
         <button
-          className="inline-flex items-center gap-2 rounded-lg border border-rose-400/20 bg-rose-400/10 px-3 py-1.5 text-xs font-medium text-rose-300 transition hover:bg-rose-400/20 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-[12px] border border-rose-400/20 bg-rose-400/10 px-3 py-2 text-xs font-medium text-rose-300 transition hover:bg-rose-400/20 disabled:opacity-50"
           onClick={() => onDelete(deployment.id)}
           disabled={processing}
         >
@@ -204,7 +145,7 @@ function DeploymentCard({ deployment, onRestart, onStop, onStart, onDelete, isPr
           Delete
         </button>
       </div>
-    </Card>
+    </article>
   );
 }
 
@@ -230,7 +171,8 @@ function CreateDeploymentDialog({ open, onOpenChange, agents, onSubmit }: Create
   const [replicas, setReplicas] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [authRequired, setAuthRequired] = useState(false);
+  const fieldClassName =
+    "w-full rounded-[14px] border border-[#2e3946] bg-[#0b1017] px-4 py-3 text-sm text-white focus:border-emerald-300/30 focus:outline-none";
 
   const availableAgents = agents.filter(a => a.status !== "deployed");
 
@@ -262,22 +204,41 @@ function CreateDeploymentDialog({ open, onOpenChange, agents, onSubmit }: Create
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => onOpenChange(false)} />
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-white/10 bg-[#0a0a0f] p-6 shadow-2xl">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-white">Create Deployment</h2>
+    <DashboardDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Create Deployment"
+      description="Assign an agent to runtime capacity and create a new deployment record in the registry."
+      footer={
+        <>
           <button
+            type="button"
             onClick={() => onOpenChange(false)}
-            className="rounded-lg p-1 text-slate-400 hover:text-white hover:bg-white/10"
+            className="rounded-[12px] border border-[#2e3946] bg-[#0d131a] px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-emerald-300/24"
           >
-            <X className="h-5 w-5" />
+            Cancel
           </button>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
+          <button
+            type="submit"
+            form="create-deployment-form"
+            disabled={submitting || !agentId || availableAgents.length === 0}
+            className="rounded-[12px] bg-emerald-400 px-4 py-2 text-sm font-medium text-[#071018] transition hover:bg-emerald-300 disabled:opacity-50"
+          >
+            {submitting ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Creating...
+              </span>
+            ) : (
+              "Create Deployment"
+            )}
+          </button>
+        </>
+      }
+    >
+      <form id="create-deployment-form" onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="rounded-lg border border-rose-400/20 bg-rose-400/10 p-3 text-sm text-rose-300">
+            <div className="rounded-[14px] border border-rose-400/20 bg-rose-400/10 p-3 text-sm text-rose-300">
               {error}
             </div>
           )}
@@ -289,7 +250,7 @@ function CreateDeploymentDialog({ open, onOpenChange, agents, onSubmit }: Create
             <select
               value={agentId}
               onChange={(e) => setAgentId(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-emerald-400 focus:outline-none"
+              className={fieldClassName}
               required
             >
               {availableAgents.length === 0 ? (
@@ -314,37 +275,12 @@ function CreateDeploymentDialog({ open, onOpenChange, agents, onSubmit }: Create
               max="10"
               value={replicas}
               onChange={(e) => setReplicas(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-emerald-400 focus:outline-none"
+              className={fieldClassName}
               required
             />
           </div>
-          
-          <div className="flex justify-end gap-3 pt-4">
-            <button
-              type="button"
-              onClick={() => onOpenChange(false)}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:bg-white/10"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={submitting || !agentId || availableAgents.length === 0}
-              className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 disabled:opacity-50"
-            >
-              {submitting ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Creating...
-                </span>
-              ) : (
-                "Create Deployment"
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </DashboardDialog>
   );
 }
 
@@ -599,13 +535,7 @@ export function DeploymentsPageClient() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="h-8 w-32 rounded bg-white/10 animate-pulse" />
-            <div className="mt-2 h-4 w-48 rounded bg-white/5 animate-pulse" />
-          </div>
-        </div>
+      <div className="space-y-4">
         <LoadingState />
       </div>
     );
@@ -620,45 +550,8 @@ export function DeploymentsPageClient() {
         onSubmit={handleCreateDeployment}
       />
       
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-400">
-              <Server className="h-6 w-6" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-white">Deployments</h1>
-              <p className="mt-1 text-sm text-slate-400">
-                Deployment timeline and recovery controls
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setCreateDialogOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-400 transition hover:bg-emerald-400/20"
-          >
-            <Plus className="h-4 w-4" />
-            New Deployment
-          </button>
-          <button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
-          >
-            {refreshing ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCcw className="h-4 w-4" />
-            )}
-            {refreshing ? "Refreshing..." : "Refresh"}
-          </button>
-        </div>
-      </div>
-
-      {error && (
-        <div className="rounded-xl border border-rose-400/20 bg-rose-400/10 p-4 text-sm text-rose-300 flex items-center justify-between gap-4">
+      {error && !authRequired && (
+        <div className="flex items-center justify-between gap-4 rounded-[18px] border border-rose-400/20 bg-rose-400/10 p-4 text-sm text-rose-300">
           <div className="flex items-center gap-3">
             <span>{error}</span>
             <button
@@ -681,61 +574,68 @@ export function DeploymentsPageClient() {
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="border border-white/5 bg-white/[0.02] p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-400/10 text-emerald-400">
-              <Server className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-semibold text-white">
-                {deployments.length}
-              </p>
-              <p className="text-xs text-slate-500">Total Deployments</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="border border-white/5 bg-white/[0.02] p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-400/10 text-emerald-400">
-              <Play className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-semibold text-white">
-                {runningDeployments}
-              </p>
-              <p className="text-xs text-slate-500">Running</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="border border-white/5 bg-white/[0.02] p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-400/10 text-cyan-400">
-              <Clock className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-semibold text-white">
-                {lastUpdated ? formatRelativeDate(new Date(lastUpdated).toISOString()) : "N/A"}
-              </p>
-              <p className="text-xs text-slate-500">Last Updated</p>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={isMac ? "Search deployments by ID, agent ID, or status... (⌘K)" : "Search deployments by ID, agent ID, or status... (Ctrl+K)"}
-          className="w-full rounded-xl border border-white/10 bg-black/40 py-3 pl-12 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-emerald-400 focus:outline-none"
+      <LiveKpiGrid>
+        <LiveStatCard
+          label="Deployments"
+          value={String(deployments.length)}
+          detail="Total runtime records returned by the deployment registry."
+          status={asDashboardStatus(deployments.length > 0 ? "running" : "idle")}
         />
-      </div>
-      <div className="flex items-center gap-3">
-        <DeploymentSortSelect value={sortBy} onChange={setSortBy} />
-      </div>
+        <LiveStatCard
+          label="Running"
+          value={String(runningDeployments)}
+          detail="Deployments currently reporting live runtime state."
+          status={asDashboardStatus(runningDeployments > 0 ? "running" : "idle")}
+        />
+        <LiveStatCard
+          label="Last Updated"
+          value={lastUpdated ? formatRelativeTime(new Date(lastUpdated).toISOString()) : "N/A"}
+          detail="Freshest deployment activity visible in the current registry."
+          status={asDashboardStatus(lastUpdated ? "running" : "idle")}
+        />
+        <LiveStatCard
+          label="Search Scope"
+          value={searchQuery ? `${filteredDeployments.length} visible` : "registry"}
+          detail="Search matches deployment id, agent id, and status."
+          status={asDashboardStatus(searchQuery ? "active" : "idle")}
+        />
+      </LiveKpiGrid>
+
+      <FilterBar
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchInputRef={searchInputRef}
+        searchPlaceholder={
+          isMac
+            ? "Search deployments by ID, agent ID, or status... (⌘K)"
+            : "Search deployments by ID, agent ID, or status... (Ctrl+K)"
+        }
+        onReset={() => setSearchQuery("")}
+        trailing={
+          <div className="flex flex-wrap items-center gap-2">
+            <DeploymentSortSelect value={sortBy} onChange={setSortBy} />
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="inline-flex items-center gap-2 rounded-[14px] border border-[#2f3c49] bg-[#10161d] px-3.5 py-2 text-sm font-medium text-white transition hover:border-emerald-300/30 disabled:opacity-50"
+            >
+              {refreshing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCcw className="h-4 w-4" />
+              )}
+              {refreshing ? "Refreshing..." : "Refresh"}
+            </button>
+            <button
+              onClick={() => setCreateDialogOpen(true)}
+              className="inline-flex items-center gap-2 rounded-[14px] border border-emerald-400/20 bg-emerald-400/12 px-3.5 py-2 text-sm font-medium text-emerald-300 transition hover:bg-emerald-400/20"
+            >
+              <Plus className="h-4 w-4" />
+              New Deployment
+            </button>
+          </div>
+        }
+      />
 
       {authRequired ? (
         <LiveAuthRequired
@@ -743,40 +643,44 @@ export function DeploymentsPageClient() {
           message="Sign in again to load the real deployment inventory, rollout actions, and runtime posture for this tenant."
         />
       ) : filteredDeployments.length === 0 ? (
-        <div className="rounded-xl border border-white/5 bg-white/[0.02] p-12 text-center">
-          <Server className="mx-auto h-12 w-12 text-slate-600" />
-          <p className="mt-4 text-lg font-medium text-white">No deployments found</p>
-          <p className="mt-1 text-sm text-slate-500">
-            {searchQuery
-              ? "Try adjusting your search query"
-              : "Deployments will appear here when agents are deployed"}
-          </p>
-          {!searchQuery && (
-            <button
-              onClick={() => setCreateDialogOpen(true)}
-              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600"
-            >
-              <Plus className="h-4 w-4" />
-              Create Deployment
-            </button>
-          )}
-        </div>
+        <DashboardEmptyState
+          title="No deployments found"
+          message={
+            searchQuery
+              ? "Try adjusting your search query."
+              : "Deployments will appear here when agents are deployed."
+          }
+          icon={<Server className="h-8 w-8" />}
+          cta={
+            !searchQuery ? (
+              <button
+                onClick={() => setCreateDialogOpen(true)}
+                className="inline-flex items-center gap-2 rounded-[12px] bg-emerald-400 px-4 py-2 text-sm font-medium text-[#071018] hover:bg-emerald-300"
+              >
+                <Plus className="h-4 w-4" />
+                Create Deployment
+              </button>
+            ) : undefined
+          }
+        />
       ) : (
-        <div className="space-y-4">
-          {filteredDeployments.map((deployment) => (
-            <DeploymentCard
-              key={deployment.id}
-              deployment={deployment}
-              onRestart={handleRestart}
-              onStop={handleStop}
-              onStart={handleStart}
-              onDelete={handleDelete}
-              isProcessing={isProcessing}
-              copiedId={copiedId}
-              onCopyId={handleCopyId}
-            />
-          ))}
-        </div>
+        <LivePanel title="Deployment registry" meta={`${filteredDeployments.length} visible`}>
+          <div className="space-y-3">
+            {filteredDeployments.map((deployment) => (
+              <DeploymentCard
+                key={deployment.id}
+                deployment={deployment}
+                onRestart={handleRestart}
+                onStop={handleStop}
+                onStart={handleStart}
+                onDelete={handleDelete}
+                isProcessing={isProcessing}
+                copiedId={copiedId}
+                onCopyId={handleCopyId}
+              />
+            ))}
+          </div>
+        </LivePanel>
       )}
     </div>
   );

@@ -4,7 +4,6 @@ import { getApiBaseUrl } from "@/app/api/_lib/controlPlane";
 import { withErrorHandling } from "@/app/api/_lib/errors";
 import { proxyJson } from "@/app/api/_lib/proxy";
 
-const API_BASE_URL = getApiBaseUrl();
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +12,7 @@ export async function GET(request: NextRequest) {
     const query = request.nextUrl.search;
     return proxyJson(
       request,
-      `${API_BASE_URL}/v1/assistant/overview${query}`,
+      `${getApiBaseUrl()}/v1/assistant/overview${query}`,
       { fallbackMessage: "Failed to fetch assistant overview" },
     );
   })(request);

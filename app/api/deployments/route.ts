@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getApiBaseUrl, getAuthToken } from '@/app/api/_lib/controlPlane'
 import { withErrorHandling, unauthorized } from '@/app/api/_lib/errors'
 
-const API_BASE_URL = getApiBaseUrl()
 
 export const dynamic = 'force-dynamic'
 
@@ -22,7 +21,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const params = new URLSearchParams(searchParams)
     
     // Proxy to control plane
-    const response = await fetch(`${API_BASE_URL}/v1/deployments?${params}`, {
+    const response = await fetch(`${getApiBaseUrl()}/v1/deployments?${params}`, {
       headers: { 
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -45,7 +44,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const body = await req.json()
     
     // Proxy to control plane
-    const response = await fetch(`${API_BASE_URL}/v1/deployments`, {
+    const response = await fetch(`${getApiBaseUrl()}/v1/deployments`, {
       method: 'POST',
       headers: { 
         Authorization: `Bearer ${token}`,

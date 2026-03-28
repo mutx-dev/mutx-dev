@@ -4,7 +4,6 @@ import { clearAuthCookies, getApiBaseUrl, getRefreshToken } from '@/app/api/_lib
 
 export const dynamic = 'force-dynamic'
 
-const API_BASE_URL = getApiBaseUrl()
 
 export async function POST(request: NextRequest) {
   const refreshToken = getRefreshToken(request)
@@ -12,7 +11,7 @@ export async function POST(request: NextRequest) {
 
   if (refreshToken || accessToken) {
     try {
-      await fetch(`${API_BASE_URL}/v1/auth/logout`, {
+      await fetch(`${getApiBaseUrl()}/v1/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

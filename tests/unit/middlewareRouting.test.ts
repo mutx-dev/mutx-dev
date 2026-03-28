@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server'
 
-import { middleware } from '../../middleware'
+import { proxy } from '../../proxy'
 
 function mockRequest(
   url: string,
@@ -23,9 +23,9 @@ function mockRequest(
   } as unknown as NextRequest
 }
 
-describe('host-aware UI routing middleware', () => {
+describe('host-aware UI routing proxy', () => {
   it('redirects marketing-host legacy /app traffic to canonical dashboard paths on app.mutx.dev', () => {
-    const response = middleware(
+    const response = proxy(
       mockRequest('https://mutx.dev/app/agents?tab=live', { host: 'mutx.dev' }),
     )
 
@@ -37,7 +37,7 @@ describe('host-aware UI routing middleware', () => {
   })
 
   it('redirects marketing-host auth pages to the app host', () => {
-    const response = middleware(
+    const response = proxy(
       mockRequest('https://mutx.dev/login?next=%2Fdashboard', { host: 'mutx.dev' }),
     )
 
@@ -46,7 +46,7 @@ describe('host-aware UI routing middleware', () => {
   })
 
   it('rewrites app host root into the canonical dashboard shell without caching the HTML', () => {
-    const response = middleware(
+    const response = proxy(
       mockRequest('https://app.mutx.dev/', { host: 'app.mutx.dev' }),
     )
 
@@ -60,7 +60,7 @@ describe('host-aware UI routing middleware', () => {
   })
 
   it('allows direct /control routes on the app host to pass through unchanged', () => {
-    const response = middleware(
+    const response = proxy(
       mockRequest('https://app.mutx.dev/control/agents', { host: 'app.mutx.dev' }),
     )
 
@@ -70,7 +70,7 @@ describe('host-aware UI routing middleware', () => {
   })
 
   it('redirects app host legacy /app pages to canonical dashboard routes', () => {
-    const response = middleware(
+    const response = proxy(
       mockRequest('https://app.mutx.dev/app/health', { host: 'app.mutx.dev' }),
     )
 
@@ -79,21 +79,21 @@ describe('host-aware UI routing middleware', () => {
   })
 
   it('maps stale legacy workflow routes onto canonical dashboard destinations', () => {
-    const activityResponse = middleware(
+    const activityResponse = proxy(
       mockRequest('https://app.mutx.dev/app/activity', { host: 'app.mutx.dev' }),
     )
 
     expect(activityResponse.status).toBe(307)
     expect(activityResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/observability')
 
-    const apiKeysResponse = middleware(
+    const apiKeysResponse = proxy(
       mockRequest('https://app.mutx.dev/app/api-keys', { host: 'app.mutx.dev' }),
     )
 
     expect(apiKeysResponse.status).toBe(307)
     expect(apiKeysResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/api-keys')
 
-    const observabilityResponse = middleware(
+    const observabilityResponse = proxy(
       mockRequest('https://app.mutx.dev/app/observability', { host: 'app.mutx.dev' }),
     )
 
@@ -102,14 +102,14 @@ describe('host-aware UI routing middleware', () => {
       'https://app.mutx.dev/dashboard/observability',
     )
 
-    const cronResponse = middleware(
+    const cronResponse = proxy(
       mockRequest('https://app.mutx.dev/app/cron', { host: 'app.mutx.dev' }),
     )
 
     expect(cronResponse.status).toBe(307)
     expect(cronResponse.headers.get('location')).toBe('https://app.mutx.dev/dashboard/orchestration')
 
-    const settingsResponse = middleware(
+    const settingsResponse = proxy(
       mockRequest('https://app.mutx.dev/app/settings', { host: 'app.mutx.dev' }),
     )
 
@@ -118,7 +118,7 @@ describe('host-aware UI routing middleware', () => {
   })
 
   it('allows canonical app-host dashboard routes to pass through unchanged', () => {
-    const response = middleware(
+    const response = proxy(
       mockRequest('https://app.mutx.dev/dashboard/agents', { host: 'app.mutx.dev' }),
     )
 
@@ -131,7 +131,7 @@ describe('host-aware UI routing middleware', () => {
   })
 
   it('passes through unrelated marketing routes without injecting auth-form rate-limit headers', () => {
-    const response = middleware(
+    const response = proxy(
       mockRequest('https://mutx.dev/contact', { host: 'mutx.dev' }),
     )
 
@@ -144,7 +144,7 @@ describe('host-aware UI routing middleware', () => {
   })
 
   it('still applies rate-limit headers on protected auth endpoints', () => {
-    const response = middleware(
+    const response = proxy(
       mockRequest('https://app.mutx.dev/api/auth/login', { host: 'app.mutx.dev' }),
     )
 
@@ -157,7 +157,7 @@ describe('host-aware UI routing middleware', () => {
   })
 
   it('rejects cross-origin browser writes to api routes', async () => {
-    const response = middleware(
+    const response = proxy(
       mockRequest(
         'https://app.mutx.dev/api/auth/logout',
         {
@@ -176,7 +176,7 @@ describe('host-aware UI routing middleware', () => {
   })
 
   it('allows same-origin browser writes to api routes when x-forwarded-proto indicates https', () => {
-    const response = middleware(
+    const response = proxy(
       mockRequest(
         'http://app.mutx.dev/api/auth/logout',
         {

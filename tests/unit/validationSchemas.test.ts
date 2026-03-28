@@ -79,6 +79,13 @@ describe('validation schemas', () => {
       expect(result.success).toBe(true)
     })
 
+    it('rejects missing email', async () => {
+      const result = await schemas.lead.safeParseAsync({
+        name: 'Missing Email',
+      })
+      expect(result.success).toBe(false)
+    })
+
     it('rejects invalid email format', async () => {
       const result = await schemas.lead.safeParseAsync({
         email: 'not-email',

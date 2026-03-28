@@ -1,5 +1,7 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { DesktopRouteBoundary } from "@/components/desktop/DesktopRouteBoundary";
 
 export default function DashboardSpawnPage() {
-  redirect("/dashboard/agents?create=1");
+  return <DesktopRouteBoundary routeKey="spawn" browserRedirectTo="/dashboard/agents?create=1" />;
 }

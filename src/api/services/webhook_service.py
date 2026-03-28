@@ -74,11 +74,7 @@ async def resolve_webhook_destination_ips(hostname: str, port: int) -> set[str]:
             f"Webhook destination '{hostname}' could not be resolved"
         ) from exc
 
-    resolved_ips = {
-        sockaddr[0]
-        for _, _, _, _, sockaddr in addrinfo
-        if sockaddr and sockaddr[0]
-    }
+    resolved_ips = {sockaddr[0] for _, _, _, _, sockaddr in addrinfo if sockaddr and sockaddr[0]}
     if not resolved_ips:
         raise UnsafeWebhookDestinationError(
             f"Webhook destination '{hostname}' could not be resolved"

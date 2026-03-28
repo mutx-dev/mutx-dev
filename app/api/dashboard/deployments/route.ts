@@ -9,7 +9,6 @@ import {
 import { validateRequest, schemas } from '@/app/api/_lib/validation'
 import { withErrorHandling, unauthorized } from '@/app/api/_lib/errors'
 
-const API_BASE_URL = getApiBaseUrl()
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +25,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const { response, tokenRefreshed, refreshedTokens } = await authenticatedFetch(
       request,
-      `${API_BASE_URL}/v1/deployments?limit=20`,
+      `${getApiBaseUrl()}/v1/deployments?limit=20`,
       { cache: 'no-store' }
     )
 
@@ -54,7 +53,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const { response, tokenRefreshed, refreshedTokens } = await authenticatedFetch(
       request,
-      `${API_BASE_URL}/v1/deployments`,
+      `${getApiBaseUrl()}/v1/deployments`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getApiBaseUrl, getAuthToken } from '@/app/api/_lib/controlPlane'
 import { withErrorHandling, unauthorized } from '@/app/api/_lib/errors'
 
-const API_BASE_URL = getApiBaseUrl()
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +25,7 @@ export async function GET(
     const { searchParams } = new URL(request.url)
     const paramsStr = searchParams.toString()
     
-    const response = await fetch(`${API_BASE_URL}/v1/runs/${runId}/traces${paramsStr ? '?' + paramsStr : ''}`, {
+    const response = await fetch(`${getApiBaseUrl()}/v1/runs/${runId}/traces${paramsStr ? '?' + paramsStr : ''}`, {
       headers: { 
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -52,7 +51,7 @@ export async function POST(
     const { runId } = await params
     const body = await req.json()
     
-    const response = await fetch(`${API_BASE_URL}/v1/runs/${runId}/traces`, {
+    const response = await fetch(`${getApiBaseUrl()}/v1/runs/${runId}/traces`, {
       method: 'POST',
       headers: { 
         Authorization: `Bearer ${token}`,
