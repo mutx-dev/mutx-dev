@@ -1,6 +1,9 @@
 # Signal Brief — Outside-In Intelligence
 
-_Last refreshed: 2026-03-28 21:30 Europe/Rome_
+_Last refreshed: 2026-03-28 21:35 Europe/Rome_
+
+## Status
+No materially new signal surfaced since the prior pass. The standing brief remains valid.
 
 ## Top 5 operator pain signals
 1. **Agents need an actual runtime, not just prompts.** Public builders are repeatedly framing production AI as explicit lifecycle, typed state, tool contracts, and shared observability — “an OS, not scripts.”
