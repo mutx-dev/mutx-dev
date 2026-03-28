@@ -10,7 +10,7 @@ Goal:
 
 Current signal:
 - The latest steward report was clean/no-change and did not surface a tiny fix.
-- This dispatch remains the next action because the queue still ranks issue-117 parity truth first.
+- This remains the next dispatch because the queue still ranks issue-117 parity truth first.
 
 Guardrails:
 - Stay inside owned files.

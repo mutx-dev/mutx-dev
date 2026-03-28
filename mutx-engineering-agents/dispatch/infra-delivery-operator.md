@@ -9,7 +9,8 @@ Goal:
 - Validate by checking script path resolution and compose references.
 
 Current signal:
-- The bootstrap drift is still real; this is the smallest ready infra task in queue after the two closed-issue audits.
+- The infra lane still points at the smallest ready delivery fix after the two audit lanes.
+- The lane report says no actionable dispatch was present in that worktree, so this brief is the artifact that should move next.
 
 Guardrails:
 - Stay inside owned files.

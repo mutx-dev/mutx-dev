@@ -1,6 +1,6 @@
 # latest.md
 
-## Control brief — 2026-03-28 17:05 Europe/Rome
+## Control brief — 2026-03-28 17:26 Europe/Rome
 
 ### Dispatched now
 1. `control-plane-steward` — `audit-117-parity-truth`
@@ -10,10 +10,11 @@
 ### Why these
 - They are still the top ready items in `autonomy-queue.json`.
 - They map cleanly to the repo routing rules and do not overlap owned file areas.
-- The newest lane reports did not produce a better bounded dispatch:
+- The newest lane reports still did not produce a better bounded dispatch:
   - `control-plane-steward` stayed clean/no-change.
   - `cli-sdk-contract-keeper` stayed clean/no-change.
   - `qa-reliability-engineer` found an environment dependency block, not a product fix.
+  - `infra-delivery-operator` reported no actionable dispatch in its lane workspace, which confirms the brief needs to stay centralized here.
 
 ### Control notes
 - No code changes made in this pass.

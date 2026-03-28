@@ -9,7 +9,8 @@ Goal:
 - Otherwise report the audit result plainly; do not manufacture a fix.
 
 Current signal:
-- There is still no bounded runtime-truth fix from the latest report set, so this remains the audit lane to run next.
+- The latest runtime-truth report still shows no bounded fix to apply.
+- This remains the next dispatch because the queue still ranks issue-39 runtime truth second.
 
 Guardrails:
 - Stay inside owned files.
