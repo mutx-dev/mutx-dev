@@ -1,5 +1,6 @@
 # TODAY.md — CLI SDK Contract Keeper
 
-- No active dispatch file was present in the workspace.
-- No tiny owned-area contract/drift fix was isolated without expanding scope.
-- Next move: wait for dispatch or narrow to one specific CLI/SDK parity target before editing.
+- Re-read lane docs and dispatch state.
+- Inspected the dedicated worktree.
+- No active dispatch and no unambiguous tiny owned-file fix found.
+- Next move: wait for dispatch or narrow to one bounded CLI/SDK parity target before editing.
