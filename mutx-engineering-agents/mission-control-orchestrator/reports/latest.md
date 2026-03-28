@@ -1,6 +1,6 @@
 # latest.md
 
-## Control brief — 2026-03-28 16:59 Europe/Rome
+## Control brief — 2026-03-28 17:05 Europe/Rome
 
 ### Dispatched now
 1. `control-plane-steward` — `audit-117-parity-truth`
@@ -8,18 +8,17 @@
 3. `infra-delivery-operator` — `issue-115`
 
 ### Why these
-- They remain the top ready items in `autonomy-queue.json`.
-- They fit the routing map and do not overlap file ownership.
-- `issue-112` is still the next likely follow-up, but it stays queued until one of the current lanes reports something actionable.
-
-### Recent report signal
-- `runtime-protocol-engineer` reported a clean contract check with no active dispatch and no tiny owned-area fix to apply.
-- That report does not create new work; it reinforces that the current active trio is still the right focus.
+- They are still the top ready items in `autonomy-queue.json`.
+- They map cleanly to the repo routing rules and do not overlap owned file areas.
+- The newest lane reports did not produce a better bounded dispatch:
+  - `control-plane-steward` stayed clean/no-change.
+  - `cli-sdk-contract-keeper` stayed clean/no-change.
+  - `qa-reliability-engineer` found an environment dependency block, not a product fix.
 
 ### Control notes
 - No code changes made in this pass.
 - No merge/push activity.
-- Next check: wait for the three active lane reports, then consider `issue-112` if the queue still needs a fourth move.
+- `issue-112` remains the next queued follow-up if one of the current lanes lands cleanly.
 
 ### Truth sources
 - `mutx-fleet-state.md`
