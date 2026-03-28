@@ -47,8 +47,8 @@ services:
     image: grafana/grafana:11.2.2
     container_name: mutx-grafana-otel
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-mutx_admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD in your environment or .env file}
       - GF_USERS_ALLOW_SIGN_UP=false
     ports:
       - "3001:3000"
@@ -129,8 +129,8 @@ services:
     image: grafana/grafana:11.2.2
     container_name: mutx-grafana-collector
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-mutx_admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD in your environment or .env file}
       - GF_USERS_ALLOW_SIGN_UP=false
     ports:
       - "3002:3000"

@@ -131,6 +131,13 @@ Or use the Makefile:
 make up-otel-tempo
 ```
 
+Set secure Grafana credentials before starting:
+
+```bash
+export GRAFANA_ADMIN_USER=mutx_admin
+export GRAFANA_ADMIN_PASSWORD='<strong-password>'
+```
+
 Access:
 - Grafana: http://localhost:3001 (traces via Tempo)
 - Tempo: http://localhost:3200
@@ -154,9 +161,16 @@ Full stack with collector:
 docker-compose -f otel-compose.yml up -d otel-collector
 ```
 
+Set secure Grafana credentials before starting:
+
+```bash
+export GRAFANA_ADMIN_USER=mutx_admin
+export GRAFANA_ADMIN_PASSWORD='<strong-password>'
+```
+
 Access:
-- Grafana: http://localhost:3001
-- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3002
+- Prometheus: http://localhost:9091
 - OTLP Receiver: http://localhost:4318
 
 See `infrastructure/docker/otel-compose.yml` for complete configuration.
