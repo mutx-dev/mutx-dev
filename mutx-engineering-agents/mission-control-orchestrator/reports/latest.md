@@ -1,20 +1,22 @@
 # latest.md
 
-## Control brief — 2026-03-28 18:45 Europe/Rome
+## Control brief — 2026-03-28 19:00 Europe/Rome
 
 ### Dispatched now
 1. `qa-reliability-engineer` — review PR #1202 `fix(auth): bind refresh endpoint to existing refresh cookie`
 2. `infra-delivery-operator` — review PR #1209 `Fix system overview CPU and memory queries`
+3. `qa-reliability-engineer` — review PR #1210 `Fix local bootstrap dashboard path`
 
 ### Handled / suppressed
 - `control-plane-steward` on PR #1206 is handled: browser verification completed and no code change was needed.
-- `auth-identity-guardian` is now idle; PR #1202 is implemented and waiting on review.
-- `observability-sre` is now idle; PR #1209 is implemented and waiting on review.
+- `auth-identity-guardian` is idle; PR #1202 is implemented and waiting on review.
+- `observability-sre` is idle; PR #1209 is implemented and waiting on review.
+- `docs-drift-curator` is idle; PR #1210 is implemented and waiting on review.
 
 ### Why these
-- The live work is now review-bound, not code-bound.
-- QA is the reviewer for the auth lane, and infra is the reviewer for the observability lane, which matches the review matrix.
-- This keeps the fleet moving without bouncing back to stale closed issues.
+- The fleet is review-bound, not code-bound.
+- QA can absorb both the auth review and the docs review, while infra handles the observability dashboard review.
+- This keeps the loop moving across the real open PRs without resurrecting stale closed issues.
 
 ### Control notes
 - No code changes made in this pass.

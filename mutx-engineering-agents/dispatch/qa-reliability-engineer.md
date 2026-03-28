@@ -1,23 +1,25 @@
 # dispatch — qa-reliability-engineer
 
-Priority dispatch: PR #1202 — `fix(auth): bind refresh endpoint to existing refresh cookie`
+Priority dispatches:
+1. PR #1202 — `fix(auth): bind refresh endpoint to existing refresh cookie`
+2. PR #1210 — `Fix local bootstrap dashboard path`
 
-Goal:
+Goals:
 - Review the auth refresh change in `app/api/auth/refresh/route.ts` and `tests/unit/authRoutes.test.ts`.
 - Verify the endpoint is bound to the existing refresh cookie and that the unit tests cover the intended behavior.
-- Keep validation lightweight and auth-specific.
-- Leave approval if the patch is sound; otherwise request the smallest bounded correction.
+- Also review the docs-only dashboard path fix in `docs/deployment/local-developer-bootstrap.md`.
+- Keep validation lightweight and slice-specific.
 
 Current signal:
-- The auth lane now needs the reviewer’s eyes.
-- PR #1201 stays queued as secondary until this review path clears.
+- PR #1202 is the primary live auth review.
+- PR #1210 is a small docs truth fix and can ride as a secondary review item while the lane stays warm.
 
 Review / merge posture:
 - Reviewer default: `mission-control-orchestrator`.
-- This is a bounded security/auth review; keep the scope tight.
-- Do not widen into unrelated auth cleanup.
+- Keep both reviews tight and bounded.
+- Do not widen into unrelated cleanup.
 
 Guardrails:
-- Stay inside the auth refresh slice.
+- Stay inside the auth refresh slice and the docs dashboard-path slice.
 - No broad refactor.
 - Report blockers or policy mismatches plainly.
