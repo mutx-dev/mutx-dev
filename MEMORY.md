@@ -36,6 +36,7 @@
 - Worktrees are the unit of parallelism.
 - No silent fallback to paid remote embeddings for memory.
 - Local memory is now strategic infrastructure, not optional convenience.
+- X replies should be proof-based and additive by default; avoid explicit MUTX shilling unless the thread naturally calls for a concrete product reference.
 
 ## Canonical paths
 - Primary repo: `/Users/fortune/MUTX`
