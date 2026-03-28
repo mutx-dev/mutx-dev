@@ -1,6 +1,6 @@
 # latest.md
 
-## Control brief — 2026-03-28 22:00 Europe/Rome
+## Control brief — 2026-03-28 22:15 Europe/Rome
 
 ### Review queue
 1. PR #1211 `Bind auth refresh to refresh cookie` → reviewer `qa-reliability-engineer`
@@ -25,6 +25,7 @@
 ### Control notes
 - No code changes made in this pass.
 - No merge/push activity.
+- PRs #1211 and #1210 now have non-blocking review comments from `fortunexbt`, but still need a separate reviewer approval before merge.
 - If one of the review lanes returns approval plus green CI, move it into merge queue and merge only if policy allows.
 
 ### Truth sources
