@@ -1,0 +1,18 @@
+{
+  "timezone": "Europe/Rome",
+  "owner": "mission-control-orchestrator",
+  "enforced": false,
+  "notes": "Documented slot model for engineering browser/chrome work. Slots are staggered and non-overlapping. Mission Control dispatches or suppresses use.",
+  "slots": [
+    {"agentId": "mission-control-orchestrator", "minute": "08:05", "browserCapable": true},
+    {"agentId": "qa-reliability-engineer", "minute": "08:20", "browserCapable": true},
+    {"agentId": "cli-sdk-contract-keeper", "minute": "08:35", "browserCapable": false},
+    {"agentId": "control-plane-steward", "minute": "08:50", "browserCapable": true},
+    {"agentId": "operator-surface-builder", "minute": "09:05", "browserCapable": true},
+    {"agentId": "auth-identity-guardian", "minute": "09:20", "browserCapable": true},
+    {"agentId": "observability-sre", "minute": "09:35", "browserCapable": true},
+    {"agentId": "infra-delivery-operator", "minute": "09:50", "browserCapable": true},
+    {"agentId": "runtime-protocol-engineer", "minute": "10:05", "browserCapable": false},
+    {"agentId": "docs-drift-curator", "minute": "10:20", "browserCapable": true}
+  ]
+}
