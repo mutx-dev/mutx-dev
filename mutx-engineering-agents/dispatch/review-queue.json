@@ -1,9 +1,9 @@
 {
-  "updated": "2026-03-28T19:30:00+01:00",
+  "updated": "2026-03-28T19:45:00+01:00",
   "items": [
     {
-      "pr": 1202,
-      "title": "fix(auth): bind refresh endpoint to existing refresh cookie",
+      "pr": 1211,
+      "title": "Bind auth refresh to refresh cookie",
       "owner": "auth-identity-guardian",
       "reviewer": "qa-reliability-engineer",
       "status": "awaiting-review",

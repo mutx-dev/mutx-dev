@@ -1,7 +1,7 @@
 # dispatch — qa-reliability-engineer
 
 Priority dispatches:
-1. PR #1202 — `fix(auth): bind refresh endpoint to existing refresh cookie`
+1. PR #1211 — `Bind auth refresh to refresh cookie`
 2. PR #1210 — `Fix local bootstrap dashboard path`
 
 Goals:
@@ -11,7 +11,7 @@ Goals:
 - Keep validation lightweight and slice-specific.
 
 Current signal:
-- PR #1202 is the primary live auth review.
+- PR #1211 is the newest auth review target and should replace the older duplicated auth PR in the active queue.
 - PR #1210 is a small docs truth fix that can be reviewed after or alongside the auth review while the lane stays warm.
 
 Review / merge posture:

@@ -3,9 +3,8 @@
 No active dispatch right now.
 
 Status:
-- PR #1209 has shipped the dashboard truth fix in the observability lane.
-- The live next move is review/CI, not more observability coding.
-- Keep this lane idle unless another monitoring truth mismatch appears.
+- PR #1209 is in review and the author lane is idle.
+- Keep this lane idle unless another monitoring truth mismatch appears or the dashboard review reopens as a coding task.
 
 Guardrails:
 - Stay idle unless a real observability-owned signal appears.

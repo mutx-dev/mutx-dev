@@ -3,8 +3,7 @@
 No active dispatch right now.
 
 Status:
-- PR #1210 is a real docs truth fix and is already open.
-- The live next move is QA review, not more docs authoring.
+- PR #1210 is in review and the author lane is idle.
 - Keep this lane idle unless a bounded docs correction is requested.
 
 Guardrails:
