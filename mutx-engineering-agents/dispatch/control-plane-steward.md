@@ -1,23 +1,23 @@
 # dispatch — control-plane-steward
 
-Priority dispatch: `audit-117-parity-truth`
+Priority dispatch: PR #1206 — `fix(api): scope analytics latency timeseries by current user`
 
 Goal:
-- Validate post-close deployment parity truth across API and adjacent contract surfaces.
-- Start with `src/api/**`; compare live repo truth against CLI/SDK/docs.
-- If drift is real, make the smallest owned-area fix and file linked follow-ups for `cli-sdk-contract-keeper` and/or `docs-drift-curator`.
-- If no bounded fix exists, report the truth gap and stop.
+- Review the active API PR in `src/api/routes/analytics.py`.
+- Confirm the timeseries is scoped to the current user and does not leak cross-tenant metrics.
+- Run the smallest targeted backend validation that proves the scope change is truthful.
+- If the diff is good, leave review/approval; if not, request a bounded fix only.
 
 Current signal:
-- The latest control-plane and CLI/SDK reports are still clean/no-change.
-- No bounded API truth fix surfaced, but `issue-117` remains the top ready audit in queue, so this is still the next dispatch.
+- Live repo truth says the stale issue queue items are closed.
+- This PR is the real bounded API work currently in flight, so it should replace the stale issue-based dispatch.
 
 Review / merge posture:
 - Reviewer default: `qa-reliability-engineer`.
-- Only pursue a PR if a tiny owned-area fix appears.
-- Auto-merge is only possible if the change stays low-risk and CI is green.
+- Keep the change small and verify only the affected analytics path.
+- If it remains low-risk after review and CI is green, it may follow the normal low-risk lane; otherwise stop at review.
 
 Guardrails:
-- Stay inside owned files.
-- No main pushes, no merge, no broad refactor.
-- Validate with targeted tests/docs checks only.
+- Stay inside owned API files and the PR's touched surface.
+- No broad refactor.
+- Report truth, not optimism.
