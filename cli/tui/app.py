@@ -8,6 +8,7 @@ import webbrowser
 from textual import on, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
+from textual.css.query import NoMatches
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.widgets import Button, DataTable, Footer, Static, TabbedContent, TabPane
 
@@ -595,21 +596,28 @@ class MutxTUI(App[None]):
             f" | {self._activity_label}{elapsed}{notice}"
         )
         self.sub_title = status.api_url
-        self.query_one("#status-banner", Static).update(banner)
-        self.query_one("#brand-signal", Static).update(
-            self._brand_signal_text(status.authenticated)
-        )
+        try:
+            status_banner = self.query_one("#status-banner", Static)
+            brand_signal = self.query_one("#brand-signal", Static)
+            brand_context = self.query_one("#brand-context", Static)
+            context_footer = self.query_one("#context-footer", Static)
+            brand_art = self.query_one("#brand-art", Static)
+        except NoMatches:
+            return
+
+        status_banner.update(banner)
+        brand_signal.update(self._brand_signal_text(status.authenticated))
         selected_workspace = self._selected_workspace()
         selected_deployment = self._selected_deployment()
-        self.query_one("#brand-context", Static).update(
+        brand_context.update(
             f"{self._operator_profile} · workspaces {workspace_count} · incidents {incident_count} · sessions {session_count} · deployments {deployment_count} · selected {selected_workspace.name if selected_workspace else 'none'}"
         )
-        self.query_one("#context-footer", Static).update(
+        context_footer.update(
             f"{KEY_HINTS} | dashboard {self._hosted_dashboard_url()} | workspace {self._active_workspace()} | selected workspace {shorten(selected_workspace.assistant_id if selected_workspace else None, 18)} | selected deployment {shorten(selected_deployment.id if selected_deployment else None, 12)}"
         )
         accent = MUTX_ACCENT_FRAMES[self._animation_tick % len(MUTX_ACCENT_FRAMES)]
-        self.query_one("#brand-art", Static).styles.color = accent
-        self.query_one("#brand-signal", Static).styles.color = accent
+        brand_art.styles.color = accent
+        brand_signal.styles.color = accent
 
     def _set_activity(self, label: str) -> None:
         self._activity_label = label

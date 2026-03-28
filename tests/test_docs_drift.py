@@ -130,7 +130,7 @@ def test_canonical_quickstart_surfaces_share_assistant_first_commands() -> None:
             "'personal_assistant' or 'Personal Assistant'."
         )
 
-    assert "/download/macos" in landing_content
+    assert "/download" in landing_content
     assert "/releases" in landing_content
     assert "Download for Mac" in landing_content
     assert "Read release" in landing_content
@@ -183,7 +183,8 @@ def test_v13_release_notes_page_keeps_soft_launch_truth() -> None:
     release_notes = read_text("docs/releases/v1.3.md")
 
     assert "mutx.dev/releases" in release_notes
-    assert "mutx.dev/download/macos" in release_notes
+    assert "mutx.dev/download" in release_notes
+    assert "/download/macos/arm64" in release_notes
     assert "app.mutx.dev/dashboard" in release_notes
     assert "app.mutx.dev/control/*" in release_notes
     assert "Railway" in release_notes

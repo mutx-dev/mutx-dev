@@ -109,7 +109,7 @@ export function InstallSurface() {
               <Link href="/releases" className="site-inline-link">
                 Release page
               </Link>
-              <Link href="/download/macos" className="site-inline-link">
+              <Link href="/download" className="site-inline-link">
                 Choose a build
               </Link>
               <a

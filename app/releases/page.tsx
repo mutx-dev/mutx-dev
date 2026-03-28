@@ -140,7 +140,7 @@ export default async function ReleasesPage() {
                 </div>
 
                 <div className={styles.ctaRow}>
-                  <Link href="/download/macos" className={styles.buttonPrimary}>
+                  <Link href="/download" className={styles.buttonPrimary}>
                     Open Mac downloads
                     <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -153,7 +153,7 @@ export default async function ReleasesPage() {
                   <p className={styles.routeDownloadMetaItem}>
                     Current stable release: <span>{releaseLabel}</span>
                   </p>
-                  <Link href="/download/macos" className={styles.inlineLink}>
+                  <Link href="/download" className={styles.inlineLink}>
                     Download lane
                   </Link>
                   <a href={docsReleaseNotesHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
@@ -275,7 +275,7 @@ export default async function ReleasesPage() {
                 <section className={styles.proseSection}>
                   <h2>Distribution truth</h2>
                   <p>
-                    Use <strong>mutx.dev/download/macos</strong> for the first-party
+                    Use <strong>mutx.dev/download</strong> for the first-party
                     Mac handoff, <strong>mutx.dev/releases</strong> for the public
                     release summary, <strong>docs.mutx.dev</strong> for the repo-backed
                     release notes, and GitHub Releases for the attached artifacts.
@@ -293,7 +293,7 @@ export default async function ReleasesPage() {
                 </section>
 
                 <div className={styles.utilityLinks}>
-                  <Link href="/download/macos" className={styles.inlineLink}>
+                  <Link href="/download" className={styles.inlineLink}>
                     Mac downloads
                   </Link>
                   <a href={docsReleaseNotesHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>

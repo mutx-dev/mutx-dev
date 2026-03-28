@@ -21,7 +21,8 @@ def test_v13_release_notes_describe_supported_and_preview_surfaces() -> None:
     release_notes = read_text("docs/releases/v1.3.md")
 
     assert "mutx.dev/releases" in release_notes
-    assert "mutx.dev/download/macos" in release_notes
+    assert "mutx.dev/download" in release_notes
+    assert "/download/macos/arm64" in release_notes
     assert "app.mutx.dev/dashboard" in release_notes
     assert "app.mutx.dev/control/*" in release_notes
     assert "Railway" in release_notes

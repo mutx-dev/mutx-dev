@@ -65,7 +65,7 @@ export type MarketingHomepage = {
 const homepageActions: MarketingActionLink[] = [
   {
     label: "Download for Mac",
-    href: "/download/macos",
+    href: "/download",
     tone: "primary",
   },
   {
@@ -158,7 +158,7 @@ export const marketingHomepage: MarketingHomepage = {
 };
 
 export const marketingPublicRailLinks: MarketingActionLink[] = [
-  { label: "Download", href: "/download/macos" },
+  { label: "Download", href: "/download" },
   { label: "Releases", href: "/releases" },
   { label: "Docs", href: "https://docs.mutx.dev", external: true },
   { label: "GitHub", href: "https://github.com/mutx-dev/mutx-dev", external: true },
@@ -168,7 +168,7 @@ export const marketingFooterLinks: MarketingFooterLink[] = [
   { label: "Releases", href: "/releases" },
   { label: "Docs", href: "https://docs.mutx.dev", external: true },
   { label: "GitHub", href: "https://github.com/mutx-dev/mutx-dev", external: true },
-  { label: "Download", href: "/download/macos" },
+  { label: "Download", href: "/download" },
   { label: "Dashboard", href: "/dashboard" },
   { label: "Contact", href: "/contact" },
   { label: "Privacy", href: "/privacy-policy" },
@@ -179,7 +179,7 @@ export const marketingFooterCallout: MarketingFooterCallout = {
   body: "Download the operator app, read the docs, or inspect the source.",
   action: {
     label: "Download for Mac",
-    href: "/download/macos",
+    href: "/download",
     tone: "primary",
   },
 };

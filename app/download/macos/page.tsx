@@ -19,6 +19,8 @@ export default async function MacDownloadPage() {
   const releaseLabel = release ? `v${release.version}` : "the latest stable GitHub release";
   const checksumsHref = release?.assets.checksums ?? release?.htmlUrl ?? MUTX_GITHUB_RELEASES_URL;
   const docsReleaseNotesHref = release ? buildReleaseNotesUrl(release.version) : "/download/macos/release-notes";
+  const arm64Href = release?.assets.arm64Dmg ?? "/download/macos/arm64";
+  const intelHref = release?.assets.x64Dmg ?? "/download/macos/intel";
 
   const cards: ReadonlyArray<{
     title: string;
@@ -31,16 +33,18 @@ export default async function MacDownloadPage() {
     {
       title: "Apple Silicon",
       body: "Download the current signed and notarized build for M-series Macs.",
-      href: "/download/macos/arm64",
+      href: arm64Href,
       icon: AppWindow,
       label: "Download arm64",
+      external: Boolean(release?.assets.arm64Dmg),
     },
     {
       title: "Intel Mac",
       body: "Use the x64 build if the operator machine is still on Intel hardware.",
-      href: "/download/macos/intel",
+      href: intelHref,
       icon: AppWindow,
       label: "Download x64",
+      external: Boolean(release?.assets.x64Dmg),
     },
     {
       title: "Release summary",
@@ -89,11 +93,21 @@ export default async function MacDownloadPage() {
                 </div>
 
                 <div className={styles.ctaRow}>
-                  <a href="/download/macos/arm64" className={styles.buttonPrimary}>
+                  <a
+                    href={arm64Href}
+                    target={release?.assets.arm64Dmg ? "_blank" : undefined}
+                    rel={release?.assets.arm64Dmg ? "noreferrer" : undefined}
+                    className={styles.buttonPrimary}
+                  >
                     Download for Apple Silicon
                     <ArrowRight className="h-4 w-4" />
                   </a>
-                  <a href="/download/macos/intel" className={styles.buttonGhost}>
+                  <a
+                    href={intelHref}
+                    target={release?.assets.x64Dmg ? "_blank" : undefined}
+                    rel={release?.assets.x64Dmg ? "noreferrer" : undefined}
+                    className={styles.buttonGhost}
+                  >
                     Download for Intel Mac
                   </a>
                 </div>
