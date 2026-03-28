@@ -12,7 +12,7 @@ Goals:
 
 Current signal:
 - PR #1202 is the primary live auth review.
-- PR #1210 is a small docs truth fix and can ride as a secondary review item while the lane stays warm.
+- PR #1210 is a small docs truth fix that can be reviewed after or alongside the auth review while the lane stays warm.
 
 Review / merge posture:
 - Reviewer default: `mission-control-orchestrator`.

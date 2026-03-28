@@ -1,6 +1,6 @@
 # latest.md
 
-## Control brief — 2026-03-28 19:00 Europe/Rome
+## Control brief — 2026-03-28 19:15 Europe/Rome
 
 ### Dispatched now
 1. `qa-reliability-engineer` — review PR #1202 `fix(auth): bind refresh endpoint to existing refresh cookie`
@@ -14,7 +14,7 @@
 - `docs-drift-curator` is idle; PR #1210 is implemented and waiting on review.
 
 ### Why these
-- The fleet is review-bound, not code-bound.
+- The fleet remains review-bound, not code-bound.
 - QA can absorb both the auth review and the docs review, while infra handles the observability dashboard review.
 - This keeps the loop moving across the real open PRs without resurrecting stale closed issues.
 
