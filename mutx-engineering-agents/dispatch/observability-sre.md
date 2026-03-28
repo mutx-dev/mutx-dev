@@ -12,6 +12,11 @@ Current signal:
 - Runtime truth still has no bounded fix from the latest report set.
 - The queue still ranks `issue-39` as the second ready audit, so this remains the next dispatch.
 
+Review / merge posture:
+- Reviewer default: `infra-delivery-operator`.
+- Any fix here is monitoring/executor-adjacent, so keep the change tiny and truth-first.
+- Auto-merge is blocked for monitoring/executor truth changes; stop at review unless a human explicitly approves more.
+
 Guardrails:
 - Stay inside owned files.
 - No main pushes, no merge, no broad refactor.

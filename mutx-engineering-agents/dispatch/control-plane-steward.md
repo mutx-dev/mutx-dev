@@ -12,6 +12,11 @@ Current signal:
 - The latest control-plane and CLI/SDK reports are still clean/no-change.
 - No bounded API truth fix surfaced, but `issue-117` remains the top ready audit in queue, so this is still the next dispatch.
 
+Review / merge posture:
+- Reviewer default: `qa-reliability-engineer`.
+- Only pursue a PR if a tiny owned-area fix appears.
+- Auto-merge is only possible if the change stays low-risk and CI is green.
+
 Guardrails:
 - Stay inside owned files.
 - No main pushes, no merge, no broad refactor.
