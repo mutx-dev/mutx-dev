@@ -411,7 +411,7 @@ export function MarketingLoader() {
         ref={stageRef}
         data-testid="marketing-loader-stage"
         className={`${styles.loaderStage} ${styles.loaderMarkShell}`}
-        initial={{ opacity: 0, scale: 0.82, y: 18 }}
+        initial={{ opacity: 0, scale: 0.82, y: 0 }}
         animate={
           loaderState === "handoff"
             ? canHandoffToTarget
