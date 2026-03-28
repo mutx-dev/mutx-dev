@@ -1,0 +1,4 @@
+- Highest-leverage move: publish one founder-led thread on the canonical `/dashboard` reset.
+- Angle: **The home surface is now the setup surface.** MUTX is not pitching a bigger demo; it is showing the operator shell that matches shipped reality.
+- Proof to attach: dashboard screenshots, the exact live line `Deploy agents like services. Operate them like systems.`, and commits `4d960204`, `739760e1`, `b47d82c8`.
+- Distribution rule: manual-only until X lane state is reconciled; no automated posting.
