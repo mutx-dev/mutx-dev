@@ -1,32 +1,31 @@
 # TODAY.md — Project Shepherd
 
 ## Current operating truth
-- Material change: promoted-lane coverage is real now. Every promoted lane has a first `reports/latest.md`, and `lane-scorecard.md` exists.
-- Cross-lane consensus is tighter: `/dashboard` is canonical, the fleet is operational, and the main gap is truth convergence, not missing lane coverage.
-- Control’s job this window is to stop stale narrative drift and force one shared proof path.
+- The fleet is operational, but truth hygiene is still the bottleneck.
+- Live company brief says `#117` and `#39` are already closed in GitHub, while local planning files still lag behind that truth.
+- The next move is to refresh control artifacts from source-of-truth audits, not to expand scope.
 
 ## Next operating window
-- Window: 2026-03-28 16:10–18:10 Europe/Rome
-- Objective: lock the first design-partner-ready operator path, reconcile post-close truth on `#117` and `#39`, and keep trust-boundary claims conservative.
+- Window: 2026-03-28 18:10–20:10 Europe/Rome
+- Objective: publish the post-close truth audit set, then refresh control files so local planning matches live reality.
 
 ## Top 3 cross-lane priorities
-1. **Design-partner-ready first 15 minutes**
-   - One truthful path from install/download → auth → deploy → inspect, turned into a usable GTM proof asset.
-2. **Post-close truth audits on `#117` and `#39`**
-   - Reconcile whether deployment parity is actually closed, and make runtime/monitoring truth visible in dashboard/docs before adding claims.
-3. **Trust-boundary hardening**
-   - Close the gateway exposure and fail-open SSH provisioning gaps before widening automation or shared access.
+1. **Post-close parity audit for `#117`**
+   - Verify deployment parity truth across API, CLI, SDK, and docs, then mark the canonical deployment path and legacy compatibility path cleanly.
+2. **Post-close runtime-truth audit for `#39`**
+   - Make dashboard/docs/operator UX reflect the real runtime signals: live/partial/stale/auth-blocked instead of generic healthy/empty states.
+3. **Trust + distribution discipline**
+   - Keep gateway/SSH hardening moving and keep X/manual distribution conservative until source-of-truth mismatch is settled.
 
 ## Owner pushes for this window
-- **Proof path / GTM handoff:** product-manager, developer-advocate, sales-engineer, account-strategist, outbound-strategist
-- **Contract + runtime truth:** workflow-architect, technical-writer, ai-engineer, frontend-developer, project-shepherd
+- **Parity + contract truth:** workflow-architect, technical-writer, product-manager
+- **Runtime truth / UI:** ai-engineer, frontend-developer, project-shepherd
 - **Trust hardening:** infrastructure-maintainer, security-engineer
 - **Distribution discipline:** social-media-strategist, report-distribution-agent
 
 ## Blockers / stale / unowned
-- **Blocker:** no single published audit yet resolves the cross-lane disagreement on whether `#117` is done or still the main wedge.
-- **Blocker:** `#39` is still a truth gap in the operator layer; monitoring/runtime signals exist, but the UX/docs story is still weaker than the backend reality.
-- **Blocker:** gateway trust boundary and Ansible SSH defaults still fail trust.
-- **Degraded:** X distribution remains red / unclear; treat automation as unreliable until reality matches reporting.
-- **Stale artifacts:** the old blank-lane story is stale; the real stale risk now is control files drifting behind live lane reports.
-- **Unowned unless named now:** the final canonical first-15-minutes proof artifact spanning product, GTM, and reporting.
+- **Blocker:** local control files still trail live truth on `#117`, `#39`, and `#114`.
+- **Blocker:** dashboard routes still need a shared truth strip so operators can see live vs partial vs stale vs auth-blocked before the main cards render.
+- **Blocker:** gateway trust boundary and fail-open SSH provisioning remain trust risks.
+- **Degraded:** X automation stays manual-only until the lane is reconciled.
+- **Unowned unless named now:** the refresh pass that aligns queue/report artifacts with live company truth.

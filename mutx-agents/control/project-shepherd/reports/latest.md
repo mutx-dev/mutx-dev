@@ -1,34 +1,33 @@
 # latest.md — Project Shepherd
 
 ## Status
-**State:** YELLOW, MOVING, AND NO LONGER IN BOOTSTRAP MODE.
+**State:** GREEN-ISH, BUT THE CONTROL FILES ARE STILL LAGGING LIVE TRUTH.
 
-Material change: the promoted fleet is now producing real artifacts. Every promoted lane has a first `reports/latest.md`, and `lane-scorecard.md` is present. The old story about blank lanes is stale. The control problem has shifted: not coverage, but convergence.
+New material landed today: the company brief says the promoted fleet is operational, and live truth says `#117` / `#39` are already closed while local planning files still trail behind. The control problem is now source-of-truth reconciliation, not lane coverage.
 
 ## Top 3 cross-lane priorities
-1. **Lock the design-partner-ready first 15 minutes**
-   - One truthful install/download → auth → deploy → inspect path, turned into a proof asset and POC motion.
-2. **Run post-close truth audits on `#117` and `#39`**
-   - Resolve deployment-parity ambiguity and make runtime/monitoring truth visible in the operator layer.
-3. **Harden trust boundaries**
-   - Fix the gateway exposure posture and the fail-open SSH provisioning path before expanding shared automation.
+1. **Post-close parity audit for `#117`**
+   - Confirm deployment parity truth across API, CLI, SDK, and docs, then normalize the canonical deployment path vs compatibility path.
+2. **Post-close runtime-truth audit for `#39`**
+   - Make the dashboard and docs expose live/partial/stale/auth-blocked state instead of generic health fallbacks.
+3. **Trust + distribution discipline**
+   - Keep gateway/SSH hardening moving and keep X/manual distribution conservative until the truth gap is fully reconciled.
 
 ## Blockers, stale lanes, and unowned work
-- **No blank promoted lanes remain.** First-report coverage exists across product, build, GTM, control, and reporting.
-- **Main blocker:** cross-lane disagreement on `#117`. Product Manager treats deployment parity as materially landed; workflow/docs/reporting/GTM still treat it as the main open wedge. That needs one audit, not more parallel opinion.
-- **Main blocker:** `#39` still has an operator-truth gap. Backend health signals exist, but dashboard/docs/operator UX still underrepresent runtime state.
-- **Trust blocker:** gateway security posture is too open for shared use, and the Ansible path still fails open on SSH.
-- **Degraded lane:** X distribution remains red / unclear, so social/distribution claims must stay conservative.
-- **Stale work now:** control-file drift behind live lane reports, not missing lane activity.
-- **Unowned unless assigned clearly:** the final canonical first-15-minutes proof artifact that spans product truth, GTM packaging, and reporting.
+- **Main blocker:** local control-state files are stale relative to live company truth on `#117`, `#39`, and `#114`.
+- **Main blocker:** the dashboard still needs a shared truth strip on `/dashboard/agents`, `/dashboard/deployments`, and `/dashboard/monitoring`.
+- **Main blocker:** gateway posture is still too open for shared use, and the Ansible SSH path still fails open.
+- **Degraded lane:** X distribution remains manual-only / conservative.
+- **Stale work now:** refreshing control artifacts from live source-of-truth audits.
+- **Unowned unless assigned clearly:** the reconcile-and-refresh pass that aligns queue/report files with live company reality.
 
 ## Owner map
 | Priority | Primary owners | Immediate output expected |
 | --- | --- | --- |
-| First 15 minutes proof path | product-manager, developer-advocate, sales-engineer, account-strategist, outbound-strategist | one named walkthrough / POC brief that sales and design-partner outreach can actually use |
-| Post-close truth audits (`#117`, `#39`) | workflow-architect, technical-writer, ai-engineer, frontend-developer, project-shepherd | one reconciled truth brief covering deployment parity, runtime health visibility, and conservative supported claims |
-| Trust-boundary hardening | infrastructure-maintainer, security-engineer | one approval-ready hardening brief covering gateway posture and fail-closed SSH provisioning |
-| Distribution discipline | social-media-strategist, report-distribution-agent | one conservative distribution/reporting line that does not outrun product/runtime reality |
+| `#117` parity truth | workflow-architect, technical-writer, product-manager | one short audit note that names the canonical deployment path and the compatibility path cleanly |
+| `#39` runtime truth | ai-engineer, frontend-developer, project-shepherd | one UI/docs brief for live vs partial vs stale vs auth-blocked state |
+| Trust hardening | infrastructure-maintainer, security-engineer | one approval-ready hardening brief for gateway posture and fail-closed SSH |
+| Distribution discipline | social-media-strategist, report-distribution-agent | one conservative/manual-only distribution note until truth is reconciled |
 
 ## Control call
-Do not reopen bootstrap narratives. The fleet is on. The next leverage is to make the product story, operator truth, and trust boundary say the same thing.
+Keep the fleet moving, but stop treating stale local control files as truth. Refresh from the source of record first.
