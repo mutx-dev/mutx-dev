@@ -2,17 +2,57 @@
   "timezone": "Europe/Rome",
   "owner": "mission-control-orchestrator",
   "enforced": false,
-  "notes": "Documented slot model for engineering browser/chrome work. Slots are staggered and non-overlapping. Mission Control dispatches or suppresses use.",
+  "notes": "Every engineering agent has an assigned staggered browser slot. Mission Control decides whether the slot is used or skipped.",
   "slots": [
-    {"agentId": "mission-control-orchestrator", "minute": "08:05", "browserCapable": true},
-    {"agentId": "qa-reliability-engineer", "minute": "08:20", "browserCapable": true},
-    {"agentId": "cli-sdk-contract-keeper", "minute": "08:35", "browserCapable": false},
-    {"agentId": "control-plane-steward", "minute": "08:50", "browserCapable": true},
-    {"agentId": "operator-surface-builder", "minute": "09:05", "browserCapable": true},
-    {"agentId": "auth-identity-guardian", "minute": "09:20", "browserCapable": true},
-    {"agentId": "observability-sre", "minute": "09:35", "browserCapable": true},
-    {"agentId": "infra-delivery-operator", "minute": "09:50", "browserCapable": true},
-    {"agentId": "runtime-protocol-engineer", "minute": "10:05", "browserCapable": false},
-    {"agentId": "docs-drift-curator", "minute": "10:20", "browserCapable": true}
+    {
+      "agentId": "mission-control-orchestrator",
+      "schedule": "5 8,12,16,20 * * *",
+      "browserCapable": true
+    },
+    {
+      "agentId": "qa-reliability-engineer",
+      "schedule": "20 8,12,16,20 * * *",
+      "browserCapable": true
+    },
+    {
+      "agentId": "cli-sdk-contract-keeper",
+      "schedule": "35 8,12,16,20 * * *",
+      "browserCapable": true
+    },
+    {
+      "agentId": "control-plane-steward",
+      "schedule": "50 8,12,16,20 * * *",
+      "browserCapable": true
+    },
+    {
+      "agentId": "operator-surface-builder",
+      "schedule": "5 9,13,17,21 * * *",
+      "browserCapable": true
+    },
+    {
+      "agentId": "auth-identity-guardian",
+      "schedule": "20 9,13,17,21 * * *",
+      "browserCapable": true
+    },
+    {
+      "agentId": "observability-sre",
+      "schedule": "35 9,13,17,21 * * *",
+      "browserCapable": true
+    },
+    {
+      "agentId": "infra-delivery-operator",
+      "schedule": "50 9,13,17,21 * * *",
+      "browserCapable": true
+    },
+    {
+      "agentId": "runtime-protocol-engineer",
+      "schedule": "5 10,14,18,22 * * *",
+      "browserCapable": true
+    },
+    {
+      "agentId": "docs-drift-curator",
+      "schedule": "20 10,14,18,22 * * *",
+      "browserCapable": true
+    }
   ]
 }

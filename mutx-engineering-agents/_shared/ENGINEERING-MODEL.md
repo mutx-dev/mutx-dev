@@ -17,7 +17,8 @@
 
 ## Browser / Chrome orchestration
 - Browser work is orchestrator-owned and slot-based.
+- Every engineering agent has a staggered Chrome job.
 - Engineering agents do not overlap Chrome jobs.
-- Mission Control dispatches browser work in staggered windows.
+- Mission Control dispatches or suppresses browser work in those windows.
 - Browser work is for verification and bounded UI tasks, not idle activity.
 - See `_shared/CHROME-JOBS.md` for the slot model.
