@@ -9,10 +9,13 @@ Read in this order:
 6. `/Users/fortune/.openclaw/workspace/docs/agent-reach-mutx-playbook.md`
 7. `/Users/fortune/.openclaw/workspace/mutx-agents/_shared/MUTX-CONTEXT.md`
 8. `/Users/fortune/.openclaw/workspace/mutx-agents/_shared/GUARDRAILS.md`
-9. `/Users/fortune/.openclaw/workspace/MEMORY.md`
-10. `/Users/fortune/.openclaw/workspace/memory/2026-03-28.md`
-11. `queue/TODAY.md`
-12. `reports/latest.md`
-13. `reports/signal-brief.md`
+9. `/Users/fortune/.openclaw/workspace/mutx-agents/_shared/CONTEXT-REGISTRY.md`
+10. `/Users/fortune/.openclaw/workspace/mutx-agents/_shared/ROUNDTABLE-LOOP.md`
+11. `/Users/fortune/.openclaw/workspace/mutx-agents/reports/roundtable.md`
+12. `/Users/fortune/.openclaw/workspace/MEMORY.md`
+13. `/Users/fortune/.openclaw/workspace/memory/2026-03-28.md`
+14. `queue/TODAY.md`
+15. `reports/latest.md`
+16. `reports/signal-brief.md`
 
 First question: what is the single highest-signal external truth MUTX should absorb right now?
