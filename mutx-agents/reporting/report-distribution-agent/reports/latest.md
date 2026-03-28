@@ -1,0 +1,3 @@
+- Company state is review-bound and trust-bound, not code-bound: clear the active review queue, then harden the operator boundary before widening automation.
+- Product priority shifted: v1.3 gives MUTX one coherent public operator story; the sharpest proof wedge is a design-partner-ready first 15 minutes path, not broader deployment-parity chatter.
+- GTM and distribution stay conservative/manual until the runtime truth, dashboard truth strip, and SSH/gateway trust gaps are fixed.

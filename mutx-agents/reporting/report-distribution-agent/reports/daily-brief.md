@@ -1,33 +1,40 @@
-# daily-brief.md — MUTX Executive Brief
+# MUTX Executive Brief — 2026-03-28 22:45 Europe/Rome
 
-> 2026-03-28 16:05 Europe/Rome
+## Lead / decision for Fortune
+The company is review-bound and trust-bound, not code-bound. The immediate call is to harden the operator boundary before widening automation: current OpenClaw defaults still show `exec=full`, `sandbox=off`, `workspaceOnly=false`, and the Ansible SSH path can still fail open. Do not expand automation or external distribution beyond conservative/manual until those are fixed.
 
-## Lead
-The MUTX fleet is now operational: 14 promoted agents have proven they can boot, read shared control state, and write useful lane artifacts. The limiting factor is no longer fleet readiness; it is company truth hygiene.
+Secondary blocker: the active review queue still needs to be cleared (`#1211` auth refresh, `#1210` local bootstrap path, `#1209` system overview CPU/memory).
 
-## What is true now
-- `/dashboard` is the canonical app surface.
-- Local memory + QMD are live and stable.
-- Gateway + node + ACP are healthy.
-- Promoted lanes across control, product, build, GTM, and reporting are working.
+## Product
+- v1.3 now gives MUTX one coherent public operator story across `mutx.dev/download`, `mutx.dev/releases`, the v1.3 docs note, and `/dashboard`.
+- The sharpest product move is no longer “close deployment parity” in the abstract; it is a design-partner-ready first 15 minutes: install or download, authenticate, deploy once, and see truthful runtime state without crossing into preview territory.
+- Keep async SDK ambiguity out of the supported story until the contract is real; `MutxAsyncClient` remains explicitly limited/deprecated.
 
-## What changed today
-- Shared control-state files were wired into all promoted agent workspaces.
-- Both Wave 1 and Wave 2 agents produced real lane artifacts.
-- Stale queue/fleet state around `#117`, `#39`, and `#114` was identified.
-- Live GitHub truth shows those issues are already closed.
+## Build
+- The best tightening target is a shared truth strip on `/dashboard/agents`, `/dashboard/deployments`, and `/dashboard/monitoring` so live / partial / stale / auth-blocked state is obvious before the main cards render.
+- Runtime health truth needs to show the real operator signals: background monitor state, failure streak, last success/error, and schema repairs; `ready` should stay DB-readiness only.
+- Deployment workflow docs and SDK helpers still need a single state/action matrix, with the canonical `POST /v1/deployments` path first and the legacy agent-scoped deploy route marked compatibility-only.
 
-## Main company risk
-The biggest remaining risk is stale or over-optimistic state:
-- local planning files said key issues were open
-- live GitHub says they are closed
-- executor/runtime trust is still treated as questionable across multiple lanes
+## GTM
+- The best wedge remains platform / developer-infra teams shipping an agent product with public API, CLI, SDK, and docs surfaces that already drift.
+- The message should stay: MUTX keeps the control plane truthful across dashboard, API, CLI, SDK, and docs.
+- Proof should stay bounded and conservative: runtime posture, approval-aware operator state, signed Mac download lane, and honest current-state docs. No self-heal or autonomy claims.
 
-## Immediate company priorities
-1. run a post-close parity audit for `#117`
-2. run a post-close runtime-truth audit for `#39`
-3. refresh control files from those audits
-4. keep X automation conservative until source-of-truth mismatch is resolved
+## Control
+- `Project Shepherd` says the fleet is operational, but the live state is still review-bound and the queue is the bottleneck.
+- Keep local planning files from outrunning live review state.
+- X distribution stays manual-only / conservative.
 
-## Decision for Fortune
-Do not widen product/runtime claims or scale distribution until the two post-close audit lanes come back clean.
+## Engineering / security
+- `Security Engineer` flagged the clearest concrete trust defect: Ansible provisioning still defaults SSH to world-open `ADMIN_CIDR`, and tracked docs still show `StrictHostKeyChecking=no`.
+- `Infrastructure Maintainer` says the gateway is healthy, but the control boundary is not yet safe enough for shared operator access.
+- Fix the fail-open SSH path and the gateway trust boundary before adding more automation or reopening older executor-recovery threads.
+
+## Outside-in signal
+- No materially new signal surfaced in the latest scan.
+- The market signal still points to agent control planes, runtime policy, approvals, identity / permissioning, and observability as first-class production requirements.
+
+## Next move
+1. Clear the active review queue.
+2. Patch the trust boundary / fail-open SSH path.
+3. Ship the truthful first-15-minutes proof path and keep GTM conservative until it is clean.
