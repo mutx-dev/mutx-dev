@@ -9,8 +9,8 @@ Goal:
 - If the PR is correct, approve; if not, request the smallest bounded correction.
 
 Current signal:
-- The stale issue queue entries are closed in live GitHub truth.
-- This auth PR is the real work item currently in flight and should replace stale dispatches.
+- The auth patch is implemented and unit-tested.
+- It now needs second-agent review and CI truth before it can move forward.
 
 Review / merge posture:
 - Reviewer default: `qa-reliability-engineer`.

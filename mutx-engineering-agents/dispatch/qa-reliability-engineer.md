@@ -1,23 +1,23 @@
 # dispatch — qa-reliability-engineer
 
-Priority dispatch: PR #1201 — `fix(ci): pin Trivy GitHub Action to immutable commit`
+Priority dispatch: PR #1202 — `fix(auth): bind refresh endpoint to existing refresh cookie`
 
 Goal:
-- Review the CI workflow change in `.github/workflows/ci.yml`.
-- Verify the Trivy action pin is immutable and that the workflow still matches repo policy.
-- Keep validation lightweight: workflow syntax, pin sanity, and any repo-local CI truth checks that fit the diff.
-- Leave approval if the pin is sound; otherwise request a bounded correction.
+- Review the auth refresh change in `app/api/auth/refresh/route.ts` and `tests/unit/authRoutes.test.ts`.
+- Verify the endpoint is bound to the existing refresh cookie and that the unit tests cover the intended behavior.
+- Keep validation lightweight and auth-specific.
+- Leave approval if the patch is sound; otherwise request the smallest bounded correction.
 
 Current signal:
-- The stale issue queue entries are closed in live GitHub truth.
-- This CI workflow PR is the active low-risk pipeline item that should keep the fleet moving.
+- The auth lane now needs the reviewer’s eyes more than the CI-workflow PR.
+- PR #1201 stays queued as secondary until this review path clears.
 
 Review / merge posture:
 - Reviewer default: `mission-control-orchestrator`.
-- This is a low-risk CI truth fix only if the workflow diff stays narrow and validation is clean.
-- Do not widen scope into unrelated workflow cleanup.
+- This is a bounded security/auth review; keep the scope tight.
+- Do not widen into unrelated auth cleanup.
 
 Guardrails:
-- Stay inside the workflow slice.
+- Stay inside the auth refresh slice.
 - No broad refactor.
 - Report blockers or policy mismatches plainly.

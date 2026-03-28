@@ -1,24 +1,28 @@
 # latest.md
 
-## Control brief — 2026-03-28 18:15 Europe/Rome
+## Control brief — 2026-03-28 18:30 Europe/Rome
 
 ### Dispatched now
-1. `control-plane-steward` — PR #1206 `fix(api): scope analytics latency timeseries by current user`
-2. `auth-identity-guardian` — PR #1202 `fix(auth): bind refresh endpoint to existing refresh cookie`
-3. `qa-reliability-engineer` — PR #1201 `fix(ci): pin Trivy GitHub Action to immutable commit`
+1. `auth-identity-guardian` — PR #1202 `fix(auth): bind refresh endpoint to existing refresh cookie`
+2. `qa-reliability-engineer` — review PR #1202 `fix(auth): bind refresh endpoint to existing refresh cookie`
+
+### Handled / suppressed
+- `control-plane-steward` on PR #1206 is handled: browser verification completed and no code change was needed.
+- `observability-sre` remains idle.
+- `infra-delivery-operator` remains idle.
 
 ### Why these
-- Live GitHub truth shows the old queue items are stale/closed (`#117`, `#39`, `#114`, `#115`, `#112`).
-- The open PRs above are the real bounded work currently in flight and map cleanly to owned areas.
-- They keep the fleet moving without forcing Fortune into branch/PR plumbing.
+- PR #1202 is the active auth truth task and now needs the reviewer’s eyes.
+- The review matrix routes auth review to QA, so this keeps the loop aligned with the repo’s operating model.
+- The earlier CI PR #1201 stays queued as secondary; it does not displace the current auth review path.
 
 ### Control notes
 - No code changes made in this pass.
 - No merge/push activity.
-- Secondary open PRs exist (`#1203`, `#1204`, `#1205`, `#1200`), but they stay queued until one of the top three clears or blocks.
+- Keep the fleet low-idle by focusing on the live auth review path until it closes or blocks.
 
 ### Truth sources
 - `mutx-fleet-state.md`
-- `autonomy-queue.json` (for stale-queue comparison)
-- `gh pr list` / `gh issue view`
+- live GitHub PR state via `gh pr list` / `gh pr view`
+- `_shared/REVIEW-MATRIX.md`
 - recent lane reports under `/Users/fortune/.openclaw/workspace/mutx-engineering-agents`

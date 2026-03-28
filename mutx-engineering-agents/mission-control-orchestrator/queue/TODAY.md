@@ -1,10 +1,9 @@
 # TODAY.md — Mission Control Orchestrator
 
-- Move the real live work, not the stale queue:
-  - `control-plane-steward` → PR #1206 `fix(api): scope analytics latency timeseries by current user`
+- Move the live auth work:
   - `auth-identity-guardian` → PR #1202 `fix(auth): bind refresh endpoint to existing refresh cookie`
-  - `qa-reliability-engineer` → PR #1201 `fix(ci): pin Trivy GitHub Action to immutable commit`
-- Treat `#117`, `#39`, `#114`, `#115`, and `#112` as stale/closed live-truth references, not active dispatch.
-- Keep the fleet low-idle by focusing on the open PRs that are already in flight.
-- Secondary PRs (`#1203`, `#1204`, `#1205`, `#1200`) stay queued until the top trio clears or blocks.
-- Keep the control brief aligned with live GitHub truth; do not resurrect closed queue items.
+  - `qa-reliability-engineer` → review PR #1202
+- Treat PR #1206 as handled/browser-verified and keep it off the active dispatch list.
+- Keep `observability-sre` and `infra-delivery-operator` idle until a real bounded signal appears.
+- Keep PR #1201 queued as a secondary CI item; do not let it displace the auth review path.
+- Keep the control brief aligned with live GitHub truth and the review matrix.
