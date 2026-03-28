@@ -1,4 +1,5 @@
-- Highest-leverage move: publish one founder-led thread on the canonical `/dashboard` reset.
-- Angle: **The home surface is now the setup surface.** MUTX is not pitching a bigger demo; it is showing the operator shell that matches shipped reality.
-- Proof to attach: dashboard screenshots, the exact live line `Deploy agents like services. Operate them like systems.`, and commits `4d960204`, `739760e1`, `b47d82c8`.
-- Distribution rule: manual-only until X lane state is reconciled; no automated posting.
+- Best move now: shift from a generic `/dashboard` reset thread to a proof-first **runtime policy + approval boundary** thread.
+- Angle: **Agents need an OS, not scripts.** Use the outside-in signal to lead with approvals, identity, and hidden-cost visibility — then point to `/dashboard` as the operator surface that makes that concrete.
+- Why this is better: it matches market pain (tool approval, retries, spend leakage, accountability) and stays inside MUTX’s honest control-plane truth.
+- Proof to use: dashboard/monitoring screenshots, the live `/dashboard` surface, and the canonical line `Deploy agents like services. Operate them like systems.`
+- Distribution rule: manual-only; no public posting from this lane.

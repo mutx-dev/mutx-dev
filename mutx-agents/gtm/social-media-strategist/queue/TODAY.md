@@ -1,4 +1,4 @@
 ## Next 3 moves
-- Draft the founder thread on the canonical `/dashboard` reset and keep it proof-first.
-- Build the proof pack in `deliverables/` with 2–3 dashboard screenshots, the exact live positioning line, and commit receipts (`4d960204`, `739760e1`, `b47d82c8`).
-- Keep distribution manual-only until X lane state is reconciled; do not schedule or automate posting.
+- Draft a founder-led thread on the runtime-policy / approval-boundary angle: agents need an OS, not scripts.
+- Pull proof assets that show operator visibility: `/dashboard`, monitoring/health, and any spend/retry/accountability surfaces that are already live.
+- Keep the distribution path manual-only and conservative until review truth and GTM proof stay aligned; do not schedule or automate posting.
