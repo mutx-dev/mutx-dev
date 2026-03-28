@@ -407,89 +407,91 @@ export function MarketingLoader() {
         }}
       />
 
-      <motion.div
-        ref={stageRef}
-        data-testid="marketing-loader-stage"
-        className={`${styles.loaderStage} ${styles.loaderMarkShell}`}
-        initial={{ opacity: 0, scale: 0.82, y: 0 }}
-        animate={
-          loaderState === "handoff"
-            ? canHandoffToTarget
-              ? {
-                  opacity: 1,
-                  scale: exitTransform.scale,
-                  x: exitTransform.x,
-                  y: exitTransform.y,
-                }
-              : {
-                  opacity: 0,
-                  scale: 0.72,
-                  y: -72,
-                }
-            : {
-                opacity: 1,
-                scale: 1,
-                x: 0,
-                y: 0,
-            }
-        }
-        transition={stageTransition}
-        onAnimationComplete={() => {
-          if (loaderState !== "handoff") {
-            return;
-          }
-
-          if (window.performance.now() - handoffStartedAtRef.current < HANDOFF_DURATION_MS * 0.7) {
-            return;
-          }
-
-          if (!canHandoffToTarget) {
-            finishLoader();
-            return;
-          }
-
-          if (!targetVisible) {
-            setTargetVisible(true);
-            window.requestAnimationFrame(() => {
-              finishLoader();
-            });
-            return;
-          }
-
-          finishLoader();
-        }}
-      >
+      <div className={styles.loaderStageAnchor}>
         <motion.div
-          className={styles.loaderStageGlow}
-          initial={{ opacity: 0, scale: 0.82 }}
+          ref={stageRef}
+          data-testid="marketing-loader-stage"
+          className={`${styles.loaderStage} ${styles.loaderMarkShell}`}
+          initial={{ opacity: 0, scale: 0.82, y: 0 }}
           animate={
             loaderState === "handoff"
               ? canHandoffToTarget
-                ? { opacity: [0.28, 0.16, 0], scale: [1, 1.02, 0.92] }
-                : { opacity: 0, scale: 0.86 }
-              : { opacity: [0.16, 0.38, 0.24], scale: [0.9, 1.06, 1] }
+                ? {
+                    opacity: 1,
+                    scale: exitTransform.scale,
+                    x: exitTransform.x,
+                    y: exitTransform.y,
+                  }
+                : {
+                    opacity: 0,
+                    scale: 0.72,
+                    y: -72,
+                  }
+              : {
+                  opacity: 1,
+                  scale: 1,
+                  x: 0,
+                  y: 0,
+              }
           }
-          transition={{
-            duration:
-              (loaderState === "handoff" ? HANDOFF_DURATION_MS : STAGE_SETTLE_DURATION_MS) /
-              1000,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-        />
+          transition={stageTransition}
+          onAnimationComplete={() => {
+            if (loaderState !== "handoff") {
+              return;
+            }
 
-        <video
-          ref={videoRef}
-          poster={LOADER_VIDEO_POSTER}
-          className={styles.loaderMarkVideo}
-          muted
-          playsInline
-          autoPlay
-          preload="auto"
+            if (window.performance.now() - handoffStartedAtRef.current < HANDOFF_DURATION_MS * 0.7) {
+              return;
+            }
+
+            if (!canHandoffToTarget) {
+              finishLoader();
+              return;
+            }
+
+            if (!targetVisible) {
+              setTargetVisible(true);
+              window.requestAnimationFrame(() => {
+                finishLoader();
+              });
+              return;
+            }
+
+            finishLoader();
+          }}
         >
-          <source src={LOADER_VIDEO_WEBM_SRC} type="video/webm" />
-          <source src={LOADER_VIDEO_MP4_SRC} type="video/mp4" />
-        </video>
-      </motion.div>
+          <motion.div
+            className={styles.loaderStageGlow}
+            initial={{ opacity: 0, scale: 0.82 }}
+            animate={
+              loaderState === "handoff"
+                ? canHandoffToTarget
+                  ? { opacity: [0.28, 0.16, 0], scale: [1, 1.02, 0.92] }
+                  : { opacity: 0, scale: 0.86 }
+                : { opacity: [0.16, 0.38, 0.24], scale: [0.9, 1.06, 1] }
+            }
+            transition={{
+              duration:
+                (loaderState === "handoff" ? HANDOFF_DURATION_MS : STAGE_SETTLE_DURATION_MS) /
+                1000,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          />
+
+          <video
+            ref={videoRef}
+            poster={LOADER_VIDEO_POSTER}
+            className={styles.loaderMarkVideo}
+            muted
+            playsInline
+            autoPlay
+            preload="auto"
+          >
+            <source src={LOADER_VIDEO_WEBM_SRC} type="video/webm" />
+            <source src={LOADER_VIDEO_MP4_SRC} type="video/mp4" />
+          </video>
+        </motion.div>
+      </div>
     </div>
   );
 }

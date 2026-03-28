@@ -1,6 +1,42 @@
 import { test, expect, type Page } from '@playwright/test';
 import { marketingHomepage } from '../lib/marketingContent';
 
+async function expectLoaderStageCentered(page: Page, viewportLabel: string) {
+  await page.waitForFunction(() => {
+    const state = document.documentElement.dataset.loaderState;
+    return (
+      (state === 'active' || state === 'handoff') &&
+      Boolean(document.querySelector('[data-testid="marketing-loader-stage"]'))
+    );
+  }, { timeout: 5000 });
+
+  const alignmentSamples = await page.evaluate(async () => {
+    const samples: Array<{ deltaX: number; deltaY: number }> = [];
+
+    for (let index = 0; index < 6; index += 1) {
+      const stage = document.querySelector<HTMLElement>('[data-testid="marketing-loader-stage"]');
+
+      if (stage) {
+        const rect = stage.getBoundingClientRect();
+        samples.push({
+          deltaX: Math.abs(rect.left + rect.width / 2 - window.innerWidth / 2),
+          deltaY: Math.abs(rect.top + rect.height / 2 - window.innerHeight / 2),
+        });
+      }
+
+      await new Promise((resolve) => window.requestAnimationFrame(() => resolve(undefined)));
+    }
+
+    return samples;
+  });
+
+  expect(alignmentSamples.length, `${viewportLabel} loader stage never rendered`).toBeGreaterThan(0);
+  expect(
+    alignmentSamples.every((sample) => sample.deltaX <= 4 && sample.deltaY <= 4),
+    `${viewportLabel} loader stage drifted off center: ${JSON.stringify(alignmentSamples)}`
+  ).toBe(true);
+}
+
 async function expectRouteSurfaceSplit(page: Page) {
   const dark = page.locator('[data-route-surface="dark"]').first();
   const light = page.locator('[data-route-surface="light"]').first();
@@ -122,6 +158,7 @@ test.describe('mutx.dev QA', () => {
       return state === 'active' || state === 'handoff';
     }, { timeout: 5000 });
     await expect(loader).toBeVisible({ timeout: 5000 });
+    await expectLoaderStageCentered(page, 'desktop');
 
     await expect
       .poll(async () => {
@@ -308,6 +345,7 @@ test.describe('mutx.dev QA', () => {
     await page.waitForFunction(() => {
       return Boolean(document.documentElement.dataset.loaderState);
     }, { timeout: 5000 });
+    await expectLoaderStageCentered(page, 'mobile');
     await expect(page.getByTestId('marketing-loader')).toBeHidden({ timeout: 9000 });
     await expect(page.locator('html')).toHaveAttribute('data-loader-state', 'complete');
 
