@@ -4,8 +4,8 @@
   - `control-plane-steward`: `audit-117-parity-truth`
   - `observability-sre`: `audit-39-runtime-truth`
   - `infra-delivery-operator`: `issue-115`
-- Treat the latest clean/no-change reports as confirmation that the current dispatch set is still correct.
-- `qa-reliability-engineer` hit an environment-only Playwright block; do not widen the control brief around that until the environment is fixed or a product defect appears.
+- Treat the current lane set as still correct; no newer bounded dispatch has displaced it.
+- `qa-reliability-engineer` remains blocked by missing Playwright deps, not a product defect.
 - `infra-delivery-operator` still reports no actionable dispatch in the lane workspace; keep the brief centralized and explicit here.
 - If one of the active lanes closes cleanly, reassess `issue-112` next.
 - Keep the control brief aligned with `autonomy-queue.json` and `mutx-fleet-state.md`; do not widen scope without a fresh truth signal.

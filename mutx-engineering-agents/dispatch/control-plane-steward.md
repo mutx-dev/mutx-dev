@@ -9,8 +9,8 @@ Goal:
 - If no bounded fix exists, report the truth gap and stop.
 
 Current signal:
-- Latest control-plane and CLI/SDK reports stayed clean/no-change.
-- No bounded API truth fix surfaced, but `issue-117` still remains the top ready audit in queue, so this is still the correct next dispatch.
+- The latest control-plane and CLI/SDK reports are still clean/no-change.
+- No bounded API truth fix surfaced, but `issue-117` remains the top ready audit in queue, so this is still the next dispatch.
 
 Guardrails:
 - Stay inside owned files.
