@@ -1,3 +1,3 @@
 - Draft the deployment state/action matrix and compatibility note so the canonical create/restart/observe loop is explicit.
+- Add the missing SDK deployment-history surface (`versions`/`rollback`) to the contract matrix or explicitly mark it unsupported until implemented.
 - Reconcile CLI help, SDK docs, and API docs so `POST /v1/deployments` is clearly first-class and `POST /v1/agents/{agent_id}/deploy` is labeled legacy.
-- After deployment truth is pinned, revisit #39 and #114 as follow-up contract cleanup.
