@@ -1,0 +1,3 @@
+- The deployment workflow is the best tightening target right now: the repo already exposes the full lifecycle route family, but the operator contract is split between the canonical `POST /v1/deployments` path and the legacy `POST /v1/agents/{agent_id}/deploy` compatibility path.
+- Spec direction: define one deployment state/action matrix for `create -> pending -> running/ready -> scale/restart/logs/metrics/events -> stopped/failed/killed -> rollback/delete`, and mark the agent-scoped deploy route as compatibility-only everywhere it appears.
+- Acceptance bar: dashboard, CLI, SDK, and docs should answer the same questions about what actions are valid in each deployment state, and the canonical create path should be the first thing operators see.

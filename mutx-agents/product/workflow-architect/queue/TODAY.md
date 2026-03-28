@@ -1,0 +1,3 @@
+- Draft the deployment state/action matrix and compatibility note so the canonical create/restart/observe loop is explicit.
+- Reconcile CLI help, SDK docs, and API docs so `POST /v1/deployments` is clearly first-class and `POST /v1/agents/{agent_id}/deploy` is labeled legacy.
+- After deployment truth is pinned, revisit #39 and #114 as follow-up contract cleanup.
