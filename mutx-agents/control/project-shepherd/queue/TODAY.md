@@ -1,12 +1,12 @@
 # TODAY.md — Project Shepherd
 
 ## Current operating truth
-- The fleet is operational, but the active work is review-bound.
-- Live GitHub review state is the source of truth for the current queue; local planning must stay synchronized.
+- The fleet is operational, and the active work is still review-bound.
+- Fortune’s comments on `#1211` and `#1210` are non-blocking; independent approval is now the gate.
 - The next move is to clear the review queue and keep product/runtime claims conservative.
 
 ## Next operating window
-- Window: 2026-03-28 22:10–00:10 Europe/Rome
+- Window: 2026-03-28 22:58–00:58 Europe/Rome
 - Objective: clear the active review queue, keep dashboard truth honest, and avoid overclaiming on GTM/distribution.
 
 ## Top 3 cross-lane priorities
@@ -23,7 +23,7 @@
 - **Proof + distribution:** outbound-strategist, developer-advocate, sales-engineer, account-strategist, social-media-strategist, report-distribution-agent
 
 ## Blockers / stale / unowned
-- **Blocker:** no merge queue yet; reviews are the bottleneck.
+- **Blocker:** independent approvals are still the bottleneck; no merge queue yet.
 - **Blocker:** dashboard routes still need a shared truth strip.
 - **Blocker:** gateway/SSH trust hardening remains open.
 - **Degraded:** X distribution stays manual-only / conservative.

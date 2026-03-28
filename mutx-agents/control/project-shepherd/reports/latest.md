@@ -1,9 +1,9 @@
 # latest.md — Project Shepherd
 
 ## Status
-**State:** REVIEW-BOUND AND STABLE.
+**State:** REVIEW-BLOCKED BUT MOVING.
 
-The roundtable says the fleet is operational, but the active work is review-bound. The queue is live, the control file set is current, and the highest leverage is clearing the review queue while keeping product/runtime and GTM claims conservative.
+The active queue is still review-bound, but a material change landed: Fortune left non-blocking review comments on `#1211` and `#1210`. That means the comments are no longer the blocker; independent approval and CI are.
 
 ## Top 3 cross-lane priorities
 1. **Clear the active review queue**
@@ -14,7 +14,7 @@ The roundtable says the fleet is operational, but the active work is review-boun
    - Keep GTM/distribution focused on supported operator proof; keep X manual-only/conservative.
 
 ## Blockers, stale lanes, and unowned work
-- **Main blocker:** reviews are the bottleneck; no merge queue yet.
+- **Main blocker:** independent approvals are still the bottleneck; no merge queue yet.
 - **Main blocker:** dashboard routes still need a shared truth strip.
 - **Main blocker:** gateway/SSH trust hardening remains open.
 - **Degraded lane:** X distribution remains manual-only / conservative.
@@ -24,7 +24,7 @@ The roundtable says the fleet is operational, but the active work is review-boun
 ## Owner map
 | Priority | Primary owners | Immediate output expected |
 | --- | --- | --- |
-| Review queue | qa-reliability-engineer, infra-delivery-operator | clear review comments and move approved items toward merge |
+| Review queue | qa-reliability-engineer, infra-delivery-operator | clear remaining review comments, get approvals, move approved items toward merge |
 | Product/runtime truth | product-manager, workflow-architect, technical-writer, ai-engineer, frontend-developer | one shared truth-strip brief for `/dashboard` |
 | Proof + distribution | outbound-strategist, developer-advocate, sales-engineer, account-strategist, social-media-strategist, report-distribution-agent | one supported proof path and one conservative distribution note |
 
