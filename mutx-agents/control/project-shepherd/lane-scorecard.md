@@ -1,6 +1,6 @@
 # lane-scorecard.md — Project Shepherd
 
-> Refreshed: 2026-03-28 16:05 Europe/Rome
+> Refreshed: 2026-03-28 22:09 Europe/Rome
 
 ## Fleet score
 - Control plane: **GREEN**
@@ -29,19 +29,19 @@
 - Report Distribution Agent — working
 
 ## Cross-lane consensus
-- `/dashboard` is canonical.
 - The fleet is operational.
-- The main remaining blocker is truthful validation of runtime/contracts, not agent availability.
-- The old queue/fleet files were stale about `#117`, `#39`, and `#114`.
+- Current work is review-bound, not code-bound.
+- Live company truth and local control files must stay synchronized.
+- `/dashboard` remains canonical.
 
 ## Immediate priorities
-1. Post-close parity truth audit for `#117`
-2. Post-close runtime/executor truth audit for `#39`
-3. Fix stale control-file drift
-4. Keep X lane conservative until reality matches reports
+1. Clear the active review queue (`#1211`, `#1210`, `#1209`)
+2. Keep product/runtime truth honest on `/dashboard`
+3. Keep trust hardening and X distribution conservative
 
 ## Owner map
 - Truth / orchestration: Project Shepherd
+- Review queue / QA: QA Reliability Engineer + Infra Delivery Operator
 - Product / contract truth: Product Manager + Workflow Architect + Technical Writer
 - Runtime / infra truth: Infrastructure Maintainer + Security Engineer + AI Engineer
 - Revenue / pipeline: Outbound Strategist + Sales Engineer + Account Strategist + Developer Advocate
