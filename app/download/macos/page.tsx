@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, AppWindow, FileCheck2, Github, ShieldCheck } from "lucide-react";
+import { ArrowRight, AppWindow, Github, ShieldCheck } from "lucide-react";
 
 import { AuthNav } from "@/components/AuthNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
@@ -45,13 +45,6 @@ export default async function MacDownloadPage() {
       icon: AppWindow,
       label: "Download x64",
       external: Boolean(release?.assets.x64Dmg),
-    },
-    {
-      title: "Release summary",
-      body: "See the current MUTX release page with download lanes, checksums, and shipped-surface notes.",
-      href: "/releases",
-      icon: FileCheck2,
-      label: "Read release",
     },
     {
       title: "Checksums",
@@ -148,54 +141,64 @@ export default async function MacDownloadPage() {
               </div>
             </div>
 
-            <div className={styles.routeDownloadLowerGrid}>
-              <div className={`${styles.routeDownloadStrip} ${styles.routeHeroPanel}`}>
-                <div className={styles.routeDownloadStripCopy}>
-                  <div className={styles.intro}>
-                    <p className={styles.eyebrow}>Stable operator lane</p>
-                    <h2 className={styles.sectionTitle}>One installer. One operator path.</h2>
-                    <p className={styles.bodyText}>
-                      The Mac app is the primary operator surface. These routes resolve to
-                      the current stable release assets, checksum file, release summary,
-                      and docs-backed release notes without detouring through a fake
-                      handoff.
-                    </p>
-                  </div>
-                </div>
-                <div className={styles.utilityLinks}>
-                  <Link href="/releases" className={styles.inlineLink}>
-                    Release summary
-                  </Link>
-                  <Link href="/dashboard" className={styles.inlineLink}>
-                    Open dashboard
-                  </Link>
-                  <Link href="/login" className={styles.inlineLink}>
-                    Sign in
-                  </Link>
+            <div className={`${styles.routeReleaseBand} ${styles.routeHeroPanel}`}>
+              <div className={styles.routeReleaseBandCopy}>
+                <div className={styles.intro}>
+                  <p className={styles.eyebrow}>Stable operator lane</p>
+                  <h2 className={styles.sectionTitle}>Install once. Operate from one lane.</h2>
+                  <p className={styles.bodyText}>
+                    The Mac app is the primary operator surface. These routes resolve to
+                    the current stable release assets, checksum file, release summary,
+                    and docs-backed notes without detouring through a fake handoff.
+                  </p>
                 </div>
               </div>
 
-              <div className={styles.routeDownloadCards}>
-                {cards.map((card) => (
-                  <a
-                    key={card.title}
-                    href={card.href}
-                    target={card.external ? "_blank" : undefined}
-                    rel={card.external ? "noreferrer" : undefined}
-                    className={`${styles.panel} ${styles.panelDark} ${styles.panelPadded} ${styles.routeCard} ${styles.routeDownloadCard}`}
-                  >
-                    <div className={styles.routeCardIcon}>
-                      <card.icon className="h-4 w-4" />
-                    </div>
-                    <h3 className={styles.routeCardTitle}>{card.title}</h3>
-                    <p className={styles.bodyText}>{card.body}</p>
-                    <span className={styles.inlineLink}>
-                      {card.label}
-                      <ArrowRight className="h-4 w-4" />
-                    </span>
-                  </a>
-                ))}
+              <div className={styles.routeReleaseSignalGrid}>
+                <p className={`${styles.surfaceListItem} ${styles.surfaceListItemDark}`}>
+                  Signed and notarized build for Apple Silicon and Intel.
+                </p>
+                <p className={`${styles.surfaceListItem} ${styles.surfaceListItemDark}`}>
+                  Current release summary, checksums, and docs notes stay aligned.
+                </p>
+                <p className={`${styles.surfaceListItem} ${styles.surfaceListItemDark}`}>
+                  Use the dashboard after install instead of a fake browser handoff.
+                </p>
               </div>
+
+              <div className={styles.utilityLinks}>
+                <Link href="/releases" className={styles.inlineLink}>
+                  Release summary
+                </Link>
+                <Link href="/dashboard" className={styles.inlineLink}>
+                  Open dashboard
+                </Link>
+                <Link href="/login" className={styles.inlineLink}>
+                  Sign in
+                </Link>
+              </div>
+            </div>
+
+            <div className={`${styles.routeDownloadCards} ${styles.routeReleaseCards}`}>
+              {cards.map((card) => (
+                <a
+                  key={card.title}
+                  href={card.href}
+                  target={card.external ? "_blank" : undefined}
+                  rel={card.external ? "noreferrer" : undefined}
+                  className={`${styles.panel} ${styles.panelDark} ${styles.panelPadded} ${styles.routeCard} ${styles.routeDownloadCard}`}
+                >
+                  <div className={styles.routeCardIcon}>
+                    <card.icon className="h-4 w-4" />
+                  </div>
+                  <h3 className={styles.routeCardTitle}>{card.title}</h3>
+                  <p className={styles.bodyText}>{card.body}</p>
+                  <span className={styles.inlineLink}>
+                    {card.label}
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                </a>
+              ))}
             </div>
           </div>
         </section>

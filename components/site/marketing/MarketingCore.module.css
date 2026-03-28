@@ -53,6 +53,13 @@
     linear-gradient(180deg, #06080d 0%, #101621 46rem, #0c1119 100%);
 }
 
+.releasesPage {
+  background:
+    radial-gradient(circle at 14% 0%, rgba(75, 141, 255, 0.18), transparent 24rem),
+    radial-gradient(circle at 88% 0%, rgba(104, 225, 255, 0.14), transparent 30rem),
+    linear-gradient(180deg, #06080d 0%, #101621 58rem, #0c1119 100%);
+}
+
 .shell {
   width: min(100% - 2.5rem, 104rem);
   margin: 0 auto;
@@ -796,6 +803,28 @@
   margin-top: 1.4rem;
 }
 
+.routeReleaseBand {
+  display: grid;
+  gap: 1rem 1.4rem;
+  margin-top: 1.4rem;
+  padding: clamp(1.2rem, 2.6vw, 1.7rem) clamp(1.2rem, 3vw, 1.8rem);
+  border-radius: 1.4rem;
+}
+
+.routeReleaseBandCopy {
+  max-width: 41rem;
+}
+
+.routeReleaseSignalGrid {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+}
+
+.routeReleaseCards {
+  margin-top: 1rem;
+}
+
 .routeDownloadCards {
   display: grid;
   gap: 1rem;
@@ -823,6 +852,56 @@
   background:
     radial-gradient(circle at 30% 20%, rgba(75, 141, 255, 0.18), transparent 70%),
     rgba(255, 255, 255, 0.04);
+}
+
+.routeReleaseArtifactRow {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.routeArtifactPanel {
+  border-color: rgba(248, 247, 245, 0.12);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(75, 141, 255, 0.14), transparent 22rem),
+    linear-gradient(180deg, rgba(15, 19, 28, 0.94), rgba(8, 10, 16, 0.98));
+  box-shadow: 0 26px 60px rgba(2, 7, 18, 0.22);
+}
+
+.routeArtifactPanel .eyebrow,
+.routeArtifactPanel .sectionTitle,
+.routeArtifactPanel .bodyText,
+.routeArtifactPanel .routeMetaLabel,
+.routeArtifactPanel .routeMetaValue {
+  color: var(--marketing-text-reverse);
+}
+
+.routeArtifactPanel .bodyText {
+  color: rgba(248, 247, 245, 0.72);
+}
+
+.routeArtifactPanel .eyebrow {
+  border-color: rgba(248, 247, 245, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(248, 247, 245, 0.84);
+}
+
+.routeArtifactPanel .routeMetaLabel {
+  color: rgba(248, 247, 245, 0.54);
+}
+
+.routeArtifactPanel .routeMetaValue {
+  color: rgba(248, 247, 245, 0.94);
+}
+
+.routeArtifactList {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.4rem;
+}
+
+.routeArtifactList .routeMetaItem {
+  padding-top: 0.9rem;
+  border-top-color: rgba(248, 247, 245, 0.1);
 }
 
 .contactHero {
@@ -1136,7 +1215,15 @@
   padding-top: clamp(2.6rem, 6vw, 4rem);
 }
 
+.releasesPage .footer {
+  padding-top: clamp(2.6rem, 6vw, 4rem);
+}
+
 .downloadPage .footerBottom {
+  border-top-color: rgba(248, 247, 245, 0.12);
+}
+
+.releasesPage .footerBottom {
   border-top-color: rgba(248, 247, 245, 0.12);
 }
 
@@ -1144,7 +1231,15 @@
   color: rgba(248, 247, 245, 0.78);
 }
 
+.releasesPage .footerLink {
+  color: rgba(248, 247, 245, 0.78);
+}
+
 .downloadPage .footerMeta {
+  color: rgba(248, 247, 245, 0.56);
+}
+
+.releasesPage .footerMeta {
   color: rgba(248, 247, 245, 0.56);
 }
 
@@ -1179,13 +1274,30 @@
     align-items: center;
   }
 
+  .routeReleaseBand {
+    grid-template-columns: minmax(0, 0.96fr) minmax(22rem, 1.04fr);
+    align-items: start;
+  }
+
+  .routeReleaseBand .utilityLinks {
+    grid-column: 1 / -1;
+  }
+
   .routeDownloadLowerGrid {
-    grid-template-columns: minmax(19rem, 0.82fr) minmax(0, 1.18fr);
+    grid-template-columns: minmax(24rem, 0.92fr) minmax(0, 1.08fr);
     align-items: stretch;
   }
 
   .routeDownloadCards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .routeReleaseCards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .routeReleaseArtifactRow {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .routeLegalGrid {
@@ -1261,6 +1373,14 @@
 
   .routeDownloadLowerGrid {
     margin-top: 1rem;
+  }
+
+  .routeReleaseBand {
+    margin-top: 1rem;
+  }
+
+  .routeArtifactList {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .routeCardsGridCompact {

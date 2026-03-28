@@ -263,7 +263,7 @@ The verification step should confirm:
 - `https://app.mutx.dev/dashboard`
 - `https://api.mutx.dev/health`
 - `https://api.mutx.dev/ready`
-- `https://docs.mutx.dev/docs/releases/v1.3`
+- `https://docs.mutx.dev/docs/v1.3`
 
 Create `railway.json` for API:
 

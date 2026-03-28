@@ -111,14 +111,13 @@ export default async function ReleasesPage() {
   ] as const;
 
   const shippedSurfaces = [
-    "Signed and notarized macOS app for Apple Silicon and Intel.",
-    "Stable browser dashboard lane for supported operator routes.",
-    "Docs-backed release notes plus GitHub-hosted assets and checksums.",
-    "Preview control demo kept out of the primary stable navigation.",
+    "Signed and notarized Mac release for Apple Silicon and Intel.",
+    "Docs notes, checksums, and GitHub all point at the same stable artifact set.",
+    "Preview control surfaces stay out of the primary stable lane.",
   ] as const;
 
   return (
-    <PublicSurface className={`${styles.page} ${styles.publicPage}`}>
+    <PublicSurface className={`${styles.page} ${styles.publicPage} ${styles.releasesPage}`}>
       <AuthNav />
 
       <main className={styles.main}>
@@ -177,43 +176,41 @@ export default async function ReleasesPage() {
               </div>
             </div>
 
-            <div className={styles.routeDownloadLowerGrid}>
-              <div className={`${styles.routeDownloadStrip} ${styles.routeHeroPanel}`}>
-                <div className={styles.routeDownloadStripCopy}>
-                  <div className={styles.intro}>
-                    <p className={styles.eyebrow}>What ships now</p>
-                    <h2 className={styles.sectionTitle}>One public story for the operator app.</h2>
-                    <p className={styles.bodyText}>
-                      The marketing site, docs, and GitHub release now point at the same
-                      artifact set. Download routes resolve to the current stable Mac
-                      assets, release notes live on the docs surface, and GitHub stays
-                      the distribution source of truth.
-                    </p>
-                  </div>
-                </div>
-
-                <div className={styles.surfaceList}>
-                  {shippedSurfaces.map((item) => (
-                    <p key={item} className={`${styles.surfaceListItem} ${styles.surfaceListItemDark}`}>
-                      {item}
-                    </p>
-                  ))}
-                </div>
-
-                <div className={styles.utilityLinks}>
-                  <Link href="/dashboard" className={styles.inlineLink}>
-                    Open dashboard
-                  </Link>
-                  <a href={docsReleaseNotesHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
-                    Docs release notes
-                  </a>
-                  <a href={MUTX_GITHUB_RELEASES_URL} target="_blank" rel="noreferrer" className={styles.inlineLink}>
-                    All releases
-                  </a>
+            <div className={`${styles.routeReleaseBand} ${styles.routeHeroPanel}`}>
+              <div className={styles.routeReleaseBandCopy}>
+                <div className={styles.intro}>
+                  <p className={styles.eyebrow}>What ships now</p>
+                  <h2 className={styles.sectionTitle}>One public story for the operator app.</h2>
+                  <p className={styles.bodyText}>
+                    Download routes, docs release notes, checksums, and the GitHub tag
+                    all point at the same stable Mac artifact set. This page is the
+                    public handoff, not a second product pitch.
+                  </p>
                 </div>
               </div>
 
-              <div className={styles.routeDownloadCards} data-testid="releases-download-cards">
+              <div className={styles.routeReleaseSignalGrid}>
+                {shippedSurfaces.map((item) => (
+                  <p key={item} className={`${styles.surfaceListItem} ${styles.surfaceListItemDark}`}>
+                    {item}
+                  </p>
+                ))}
+              </div>
+
+              <div className={styles.utilityLinks}>
+                <Link href="/dashboard" className={styles.inlineLink}>
+                  Open dashboard
+                </Link>
+                <a href={docsReleaseNotesHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                  Docs release notes
+                </a>
+                <a href={MUTX_GITHUB_RELEASES_URL} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                  All releases
+                </a>
+              </div>
+            </div>
+
+            <div className={`${styles.routeDownloadCards} ${styles.routeReleaseCards}`} data-testid="releases-download-cards">
                 {cards.map((card) => (
                   <a
                     key={card.title}
@@ -233,15 +230,10 @@ export default async function ReleasesPage() {
                     </span>
                   </a>
                 ))}
-              </div>
             </div>
-          </div>
-        </section>
 
-        <section className={styles.routeLightSection} data-route-surface="light">
-          <div className={styles.shell}>
-            <div className={styles.splitGrid}>
-              <aside className={`${styles.panel} ${styles.panelPadded} ${styles.routeMetaPanel}`}>
+            <div className={styles.routeReleaseArtifactRow}>
+              <aside className={`${styles.panel} ${styles.panelDark} ${styles.panelPadded} ${styles.routeArtifactPanel}`}>
                 <div className={styles.intro}>
                   <p className={styles.eyebrow}>Artifact contract</p>
                   <h2 className={styles.sectionTitle}>Release files</h2>
@@ -251,7 +243,7 @@ export default async function ReleasesPage() {
                   </p>
                 </div>
 
-                <div className={styles.routeMetaList}>
+                <div className={`${styles.routeMetaList} ${styles.routeArtifactList}`}>
                   {artifactRows.map((row) => (
                     <div key={row.label} className={styles.routeMetaItem}>
                       <p className={styles.routeMetaLabel}>{row.label}</p>
@@ -260,50 +252,6 @@ export default async function ReleasesPage() {
                   ))}
                 </div>
               </aside>
-
-              <div className={`${styles.panel} ${styles.prosePanel}`}>
-                <section className={styles.proseSection}>
-                  <h2>Release scope</h2>
-                  <p>
-                    MUTX {releaseLabel} makes the Mac app the primary signed operator
-                    surface, keeps the browser dashboard in the stable route lane, and
-                    preserves the control demo as preview instead of pretending every
-                    browser path is equally mature.
-                  </p>
-                </section>
-
-                <section className={styles.proseSection}>
-                  <h2>Distribution truth</h2>
-                  <p>
-                    Use <strong>mutx.dev/download</strong> for the first-party
-                    Mac handoff, <strong>mutx.dev/releases</strong> for the public
-                    release summary, <strong>docs.mutx.dev</strong> for the repo-backed
-                    release notes, and GitHub Releases for the attached artifacts.
-                  </p>
-                </section>
-
-                <section className={styles.proseSection}>
-                  <h2>Supported versus preview</h2>
-                  <p>
-                    The signed desktop app, the public site, the docs surface, and the
-                    stable browser dashboard routes are the supported v1.3.0 operator
-                    story. <code>app.mutx.dev/control/*</code> and explicitly
-                    preview-backed dashboard routes remain preview.
-                  </p>
-                </section>
-
-                <div className={styles.utilityLinks}>
-                  <Link href="/download" className={styles.inlineLink}>
-                    Mac downloads
-                  </Link>
-                  <a href={docsReleaseNotesHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
-                    Docs notes
-                  </a>
-                  <a href={releaseHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
-                    GitHub release
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
         </section>

@@ -47,7 +47,7 @@ When preparing a release:
 
 4. **Publish the docs-backed release narrative**:
    - Merge `docs/releases/v1.3.md`
-   - Verify GitBook sync publishes `https://docs.mutx.dev/docs/releases/v1.3`
+   - Verify GitBook sync publishes `https://docs.mutx.dev/docs/v1.3`
    - Keep `mutx.dev/releases` aligned with the same version and download contract
    - Keep `mutx.dev/download/macos/release-notes` resolving to that synced page
 

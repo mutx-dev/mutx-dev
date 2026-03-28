@@ -2,8 +2,8 @@ const fetchLatestStableDesktopRelease = jest.fn()
 
 jest.mock('../../lib/desktopRelease', () => ({
   MUTX_GITHUB_RELEASES_URL: 'https://github.com/mutx-dev/mutx-dev/releases',
-  MUTX_RELEASE_NOTES_URL: 'https://docs.mutx.dev/docs/releases/v1.3',
-  buildReleaseNotesUrl: (version: string) => `https://docs.mutx.dev/docs/releases/v${version.split('.').slice(0, 2).join('.')}`,
+  MUTX_RELEASE_NOTES_URL: 'https://docs.mutx.dev/docs/v1.3',
+  buildReleaseNotesUrl: (version: string) => `https://docs.mutx.dev/docs/v${version.split('.').slice(0, 2).join('.')}`,
   fetchLatestStableDesktopRelease,
 }))
 
@@ -77,7 +77,7 @@ describe('download routes', () => {
     const response = await GET()
 
     expect(response.status).toBe(307)
-    expect(response.headers.get('location')).toBe('https://docs.mutx.dev/docs/releases/v1.3')
+    expect(response.headers.get('location')).toBe('https://docs.mutx.dev/docs/v1.3')
   })
 
   it('falls back to the current GitBook release notes page when release lookup fails', async () => {
@@ -87,6 +87,6 @@ describe('download routes', () => {
     const response = await GET()
 
     expect(response.status).toBe(307)
-    expect(response.headers.get('location')).toBe('https://docs.mutx.dev/docs/releases/v1.3')
+    expect(response.headers.get('location')).toBe('https://docs.mutx.dev/docs/v1.3')
   })
 })

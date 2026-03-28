@@ -98,7 +98,7 @@ describe('desktop release resolver', () => {
   })
 
   it('maps stable app releases to the GitBook-backed major.minor release notes page', () => {
-    expect(buildReleaseNotesUrl('1.3.0')).toBe('https://docs.mutx.dev/docs/releases/v1.3')
+    expect(buildReleaseNotesUrl('1.3.0')).toBe('https://docs.mutx.dev/docs/v1.3')
   })
 
   it('returns null when the GitHub releases lookup fails', async () => {

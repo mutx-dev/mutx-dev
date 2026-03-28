@@ -93,7 +93,7 @@ export function buildDesktopArtifactName(version: string, kind: DesktopAssetKind
 
 export function buildReleaseNotesUrl(version: string) {
   const [major, minor] = version.split(".");
-  return `${MUTX_DOCS_URL}/docs/releases/v${major}.${minor}`;
+  return `${MUTX_DOCS_URL}/docs/v${major}.${minor}`;
 }
 
 function getAssetUrl(assets: GitHubReleaseAsset[], assetName: string) {
