@@ -1,6 +1,6 @@
 # lane-scorecard.md — Project Shepherd
 
-> Refreshed: 2026-03-29 14:10 Europe/Rome
+> Refreshed: 2026-03-29 20:10 Europe/Rome
 
 ## Fleet score
 - Control plane: **GREEN**
@@ -29,20 +29,19 @@
 - Report Distribution Agent — working
 
 ## Cross-lane consensus
-- The fleet is operational.
-- CI is now green on `#1211` and `#1210` — bottleneck is approvals only.
-- Market signal now sharper on governed execution: **intent scope**, **least-privilege scoped to operation**, **approval hooks as responsible automation**.
-- Live company truth and local control files must stay synchronized.
+- Queue is CLEAR — all three PRs merged, review queue and merge queue both empty.
+- Market signal now leads with Gartner: governance failure is the #1 deployment risk, $58B enterprise shakeup by 2027.
+- Runtime path evaluation ("is this action safe given prior path?") is the new permission model.
 - `/dashboard` remains canonical.
 
 ## Immediate priorities
-1. Attach a second reviewer to `#1211` and `#1210` — only gate remaining.
+1. Identify the next bounded dispatch slice — fleet is unblocked
 2. Keep product/runtime truth honest on `/dashboard`
 3. Keep trust hardening and X distribution conservative
 
 ## Owner map
 - Truth / orchestration: Project Shepherd
-- Review queue / QA: QA Reliability Engineer + Fortune (second reviewer attach)
+- Next dispatch: Fortune + Project Shepherd
 - Product / contract truth: Product Manager + Workflow Architect + Technical Writer
 - Runtime / infra truth: Infrastructure Maintainer + Security Engineer + AI Engineer
 - Revenue / pipeline: Outbound Strategist + Sales Engineer + Account Strategist + Developer Advocate
