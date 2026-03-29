@@ -7,17 +7,17 @@ Priority dispatches:
 Goals:
 - Review the auth refresh change in `app/api/auth/refresh/route.ts` and `tests/unit/authRoutes.test.ts`.
 - Verify the endpoint is bound to the existing refresh cookie and that the unit tests cover the intended behavior.
-- Review the docs-only bootstrap path fix in `docs/deployment/local-developer-bootstrap.md` only if the reviewer request is cleanly resolvable and validation is trustworthy.
+- Review the docs-only bootstrap path fix in `docs/deployment/local-developer-bootstrap.md`.
 
 Current signal:
-- PR #1211 is still the active auth review target, but GitHub is not resolving the reviewer request cleanly and validation is failing.
-- PR #1210 remains docs-only, but CI is red and the reviewer request for `qa-reliability-engineer` is not resolving cleanly either.
+- PR #1211 is the active auth review target; Validation passes, but Container Image Scan is failing and the GitHub reviewer request is still unresolved.
+- PR #1210 is docs-only again; Validation passes, but Container Image Scan is failing and the reviewer request is still not cleanly attached.
 - Do not reopen the split blocker unless the `agents/registry.yml` change reappears.
 
 Review / merge posture:
 - Reviewer default: `mission-control-orchestrator`.
 - Keep the auth review tight and bounded.
-- Do not approve #1210 until CI is green and the review path is clean.
+- Do not approve #1210 until the check noise is understood and the review path is clean.
 
 Guardrails:
 - Stay inside the auth refresh slice.

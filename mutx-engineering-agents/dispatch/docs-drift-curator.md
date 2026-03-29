@@ -3,19 +3,19 @@
 Priority dispatch: PR #1210 — `Fix local bootstrap dashboard path`
 
 Goal:
-- Keep the branch docs-only and track validation truth.
-- The split is complete, but GitHub still has not resolved the reviewer request for `qa-reliability-engineer`, and CI is red.
+- Keep the branch docs-only and make sure the queue truth stays honest.
+- The split is complete and the docs slice is clean; the current blocker is reviewer-path resolution plus a failing Container Image Scan check.
 - Stay bounded to the docs slice and report the blocker plainly.
 
 Current signal:
-- PR #1210 is docs-only again, but it is not merge-ready.
-- Validation is failing, and the requested reviewer path is not resolving cleanly in GitHub.
+- PR #1210 remains docs-only and review-ready.
+- Validation is currently passing, but Container Image Scan is failing.
 - Do not reintroduce the `agents/registry.yml` change.
 
 Review / merge posture:
 - Reviewer default: `qa-reliability-engineer`.
-- Keep the review request honest: if the reviewer identity cannot be resolved, say that plainly.
-- No merge until CI is green and review identity is clean.
+- Keep the review request honest: the GitHub reviewer path is still not attaching cleanly.
+- No merge until the check noise is resolved and the review is complete.
 
 Guardrails:
 - Stay inside the docs slice.

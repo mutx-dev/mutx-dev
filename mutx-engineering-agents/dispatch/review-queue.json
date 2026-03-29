@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-29T04:15:00+02:00",
+  "updated": "2026-03-29T12:45:00+02:00",
   "items": [
     {
       "pr": 1211,
@@ -8,7 +8,7 @@
       "reviewer": "qa-reliability-engineer",
       "status": "awaiting-review",
       "risk": "medium",
-      "note": "GitHub reviewer request could not be resolved for qa-reliability-engineer; PR still needs a real second reviewer and validation is failing."
+      "note": "Live checks pass for Validation, but Container Image Scan is failing and the GitHub reviewer request is still not attached; needs a real second reviewer."
     },
     {
       "pr": 1210,
@@ -17,7 +17,7 @@
       "reviewer": "qa-reliability-engineer",
       "status": "awaiting-review",
       "risk": "low",
-      "note": "Docs-only split is complete, but GitHub reviewer request could not be resolved for qa-reliability-engineer and CI is red with Validation failing; not merge-ready."
+      "note": "Docs-only split remains clean; Validation passes, but Container Image Scan is failing and the reviewer request is still unresolved."
     },
     {
       "pr": 1209,
@@ -26,7 +26,7 @@
       "reviewer": "infra-delivery-operator",
       "status": "blocked-reviewer-identity",
       "risk": "monitoring-truth",
-      "note": "Reviewer identity cannot self-approve; GitHub-resolvable second reviewer still needed."
+      "note": "Validation passes, but Container Image Scan is failing and the reviewer identity cannot self-approve; GitHub-resolvable second reviewer still needed."
     }
   ]
 }
