@@ -1,5 +1,7 @@
 # TODAY.md — Account Strategist
 
-- Name one actual design-partner account and attach the champion, operator user, and buyer before any more follow-up work.
-- Turn the current product truth into a one-page account brief centered on deployment parity and runtime visibility, not issue numbers.
-- Keep the next expansion conversation conservative until we have one concrete proof point we can show an account.
+1. Keep the named target account fixed: **GitHub Actions / Agentic Workflows**.
+2. Attach one stakeholder each for champion, operator user, and buyer before widening anything else.
+3. Build a 3-line whitespace map: what they already believe, what they still need, and what MUTX proves.
+4. Keep the design-partner path conservative: one governed workflow or runner boundary proof, then expand to broader policy, audit, and trace coverage.
+5. Use the supported proof boundary only: `/dashboard`, CLI governance, and runtime inspection.
