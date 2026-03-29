@@ -2,11 +2,11 @@
 - Status: BLOCKED
 - Recommendation: REWIRE
 
-## What changed since the last control pass
-- Live queue truth tightened: PR #1211 and PR #1210 still point to `qa-reliability-engineer`, but GitHub is not resolving the reviewer request cleanly and validation is failing on both.
-- PR #1210 remains docs-only after the split, so the scope blocker is gone; the current blocker is review identity plus red CI.
-- PR #1209 still has the reviewer-identity problem and remains non-mergeable.
-- No merge-ready PR exists right now.
+## Live verification pass
+- Verified on 2026-03-29 08:07 Europe/Rome via live GitHub PR reads: #1211, #1210, and #1209 are still open, and none is merge-ready.
+- #1211 still has no GitHub-resolved second reviewer request and CI Validation is red.
+- #1210 remains docs-only after the split, but CI Validation is still red and the reviewer path is not resolving cleanly.
+- #1209 still has no reviewer assignment and CI Validation is red.
 
 ## Exact queue evidence
 - Review queue:
@@ -15,9 +15,9 @@
   3. PR #1209 `Fix system overview CPU and memory queries` -> `blocked-reviewer-identity`
 - Merge queue: empty.
 - Live PR evidence:
-  - #1211 has auth review notes, but the required second reviewer is not resolved in GitHub and Validation is red.
+  - #1211 has review comments from Fortune, but there is still no GitHub-resolved second reviewer request and Validation is red.
   - #1210 is docs-only again, but Validation is red and the requested reviewer path is not resolving cleanly.
-  - #1209 remains open with the reviewer identity problem unresolved.
+  - #1209 remains open with no reviewer request and Validation is red.
 
 ## Which lanes are producing signal vs idling
 - Producing signal:
