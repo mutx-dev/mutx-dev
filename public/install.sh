@@ -4,7 +4,6 @@ set -euo pipefail
 TAP="${MUTX_TAP:-mutx-dev/homebrew-tap}"
 FORMULA="${MUTX_FORMULA:-mutx}"
 MUTX_HOME_DIR="${MUTX_HOME_DIR:-$HOME/.mutx}"
-MUTX_CLI_SOURCE_REF="${MUTX_CLI_SOURCE_REF:-https://github.com/mutx-dev/mutx-dev/archive/refs/heads/main.tar.gz}"
 MUTX_INSTALL_TIMEOUT="${MUTX_INSTALL_TIMEOUT:-1200}"
 MUTX_BREW_TIMEOUT="${MUTX_BREW_TIMEOUT:-300}"
 MUTX_OPEN_TUI="${MUTX_OPEN_TUI:-1}"
@@ -24,7 +23,6 @@ HAS_TTY=0
 MOTION_OK=0
 CURSOR_HIDDEN=0
 MUTX_BIN=""
-SOURCE_OVERLAY_USED=0
 OPENCLAW_BIN=""
 OPENCLAW_HOME="${OPENCLAW_HOME:-${OPENCLAW_STATE_DIR:-$HOME/.openclaw}}"
 OPENCLAW_DETECTED=0
@@ -262,7 +260,6 @@ Environment:
   MUTX_NO_ANIMATION=1      Disable animated output
   MUTX_NO_ONBOARD=1        Skip automatic handoff to onboarding
   MUTX_NO_PROMPT=1         Disable prompts and print next steps only
-  MUTX_CLI_SOURCE_REF=...  Override the fallback CLI source archive
   MUTX_INSTALL_TIMEOUT=... Overall installer timeout in seconds
   MUTX_BREW_TIMEOUT=...    Timeout for individual brew install/upgrade calls
 EOF
@@ -337,7 +334,7 @@ show_install_plan() {
   print_tty "${C_ACCENT}${C_BOLD}install plan${C_RESET}\n"
   ui_kv "OS" "${OS_NAME}"
   ui_kv "Package lane" "homebrew"
-  ui_kv "Runtime fallback" "source overlay if packaged cli is unavailable"
+  ui_kv "Runtime fallback" "none (requires packaged CLI commands)"
   ui_kv "Onboarding" "${onboarding_mode}"
   ui_kv "Prompt mode" "${prompt_mode}"
   ui_kv "TUI" "${tui_mode}"
@@ -400,56 +397,6 @@ resolve_mutx_bin() {
   return 1
 }
 
-resolve_python_bin() {
-  local candidate=""
-  if candidate="$(command -v python3 2>/dev/null || true)" && [[ -n "${candidate}" ]]; then
-    printf '%s\n' "${candidate}"
-    return 0
-  fi
-
-  candidate="$(run_with_timeout 30 brew --prefix python@3.12 2>/dev/null || true)"
-  for p in "${candidate}/bin/python3" "${candidate}/bin/python3.12"; do
-    if [[ -x "${p}" ]]; then
-      printf '%s\n' "${p}"
-      return 0
-    fi
-  done
-
-  return 1
-}
-
-relink_formula() {
-  brew unlink "${FORMULA}" >/dev/null 2>&1 || true
-  brew link --overwrite "${FORMULA}"
-}
-
-install_source_overlay() {
-  local python_bin=""
-  python_bin="$(resolve_python_bin)" || die "python3 is required for the source fallback"
-
-  local overlay_root="${MUTX_HOME_DIR}/runtime/source-cli"
-  local venv_path="${overlay_root}/venv"
-  local brew_prefix=""
-
-  mkdir -p "${overlay_root}"
-  rm -rf "${venv_path}"
-
-  "${python_bin}" -m venv "${venv_path}"
-  "${venv_path}/bin/pip" install --disable-pip-version-check --quiet --upgrade pip setuptools wheel
-  "${venv_path}/bin/pip" install --disable-pip-version-check --quiet --upgrade "${MUTX_CLI_SOURCE_REF}"
-  "${venv_path}/bin/pip" install --disable-pip-version-check --quiet --upgrade "textual>=0.58.0,<2.0.0"
-
-  if ! "${venv_path}/bin/mutx" --help >/dev/null 2>&1; then
-    die "source fallback installed but mutx is still not runnable"
-  fi
-
-  brew_prefix="$(brew --prefix)"
-  mkdir -p "${brew_prefix}/bin"
-  ln -sf "${venv_path}/bin/mutx" "${brew_prefix}/bin/mutx"
-  hash -r 2>/dev/null || true
-  SOURCE_OVERLAY_USED=1
-}
-
 check_brew_upgrade_needed() {
   if ! brew list --versions "${FORMULA}" >/dev/null 2>&1; then
     BREW_UPGRADE_NEEDED="not-installed"
@@ -509,6 +456,30 @@ verify_cli_surface() {
   "${MUTX_BIN}" onboard --help >/dev/null 2>&1 || return 1
   return 0
 }
+
+show_surface_status() {
+  local -a missing=()
+  local cmd=""
+  for cmd in onboard doctor setup tui; do
+    if ! "${MUTX_BIN}" "${cmd}" --help >/dev/null 2>&1; then
+      missing+=("${cmd}")
+    fi
+  done
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    return 0
+  fi
+  CLI_MISSING_COMMANDS="${missing[*]}"
+  return 1
+}
+
+ensure_assistant_first_surface() {
+  if show_surface_status "Checking onboarding surface"; then
+    return 0
+  fi
+
+  die "The installed CLI is missing required commands: ${CLI_MISSING_COMMANDS}. Upgrade ${FORMULA} from ${TAP} and re-run this installer."
+}
+
 
 run_setup_handoff() {
   detect_openclaw_runtime
@@ -576,32 +547,7 @@ case "${BREW_UPGRADE_NEEDED}" in
     ;;
 esac
 
-if [[ "${FORMULA_OK}" == "1" ]]; then
-  if ! run_stage --soft "Linking mutx into PATH" relink_formula; then
-    FORMULA_OK=0
-    warn "Homebrew link step failed — switching to source fallback"
-  fi
-fi
-
-if [[ "${FORMULA_OK}" != "1" ]]; then
-  run_stage "Installing source fallback" install_source_overlay
-fi
-
 ui_stage "Finalizing setup"
-if ! run_stage --soft "Verifying CLI" verify_cli_surface; then
-  if [[ "${SOURCE_OVERLAY_USED}" != "1" ]]; then
-    warn "Packaged CLI is incomplete — switching to source fallback"
-    run_stage "Installing source fallback" install_source_overlay
-    run_stage "Verifying CLI" verify_cli_surface
-  else
-    die "Installed CLI is still missing required commands after source fallback"
-  fi
-fi
-
-if [[ "${SOURCE_OVERLAY_USED}" == "1" ]]; then
-  note "Using fresh source overlay at ${MUTX_HOME_DIR}/runtime/source-cli/venv"
-else
-  note "Using packaged Homebrew CLI"
-fi
+ensure_assistant_first_surface
 note "mutx resolves to ${MUTX_BIN}"
 run_setup_handoff

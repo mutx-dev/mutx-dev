@@ -19,176 +19,7 @@ def write_executable(path: Path, content: str) -> None:
     path.chmod(path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
 
-def build_fake_cli_package(package_dir: Path) -> Path:
-    package_dir.mkdir(parents=True, exist_ok=True)
-    (package_dir / "pyproject.toml").write_text(
-        inspect.cleandoc(
-            """
-            [build-system]
-            requires = ["setuptools>=61.0", "wheel"]
-            build-backend = "setuptools.build_meta"
-
-            [project]
-            name = "mutx"
-            version = "9.9.9"
-
-            [project.scripts]
-            mutx = "fakecli:main"
-            """
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    (package_dir / "fakecli.py").write_text(
-        inspect.cleandoc(
-            """
-            from __future__ import annotations
-
-            import sys
-
-
-            def _prompt(label: str) -> str:
-                print(f"{label}: ", end="", flush=True)
-                return (sys.stdin.readline() or "").strip()
-
-
-            def _run_onboard(args: list[str]) -> None:
-                open_tui = "--open-tui" in args
-                print("")
-                print("  1.  Hosted  (recommended)  — sign up or log in to your MUTX account")
-                print("  2.  Local   (advanced)       — run everything on this machine")
-                print("  3.  Later")
-                print("")
-                print("Select a lane [1/2/3]: ", end="", flush=True)
-                selection = (sys.stdin.readline() or "").strip() or "1"
-
-                if selection == "1":
-                    print("Launching MUTX hosted setup against https://api.mutx.dev")
-                    _prompt("Email")
-                    _prompt("Password")
-                    suffix = " --open-tui" if open_tui else ""
-                    print(f"HOSTED SETUP --api-url https://api.mutx.dev --install-openclaw{suffix}")
-                    return
-
-                if selection == "2":
-                    print("Launching MUTX local setup against http://localhost:8000")
-                    suffix = " --open-tui" if open_tui else ""
-                    print(f"LOCAL SETUP --install-openclaw{suffix}")
-                    return
-
-                print("Run 'mutx onboard' when ready to continue.")
-
-
-            def main() -> None:
-                args = sys.argv[1:]
-                if not args or args == ["--help"]:
-                    print("Usage: mutx [OPTIONS] COMMAND [ARGS]...")
-                    print("")
-                    print("Commands:")
-                    print("  doctor")
-                    print("  onboard")
-                    print("  runtime")
-                    print("  setup")
-                    print("  status")
-                    print("  tui")
-                    return
-
-                if args == ["setup", "--help"]:
-                    print("Usage: mutx setup [OPTIONS] COMMAND [ARGS]...")
-                    print("")
-                    print("Commands:")
-                    print("  hosted")
-                    print("  local")
-                    return
-
-                if args == ["setup", "hosted", "--help"]:
-                    print("Usage: mutx setup hosted [OPTIONS]")
-                    print("")
-                    print("Options:")
-                    print("  --api-url TEXT")
-                    print("  --email TEXT")
-                    print("  --password TEXT")
-                    print("  --provider [openclaw]")
-                    print("  --install-openclaw")
-                    print("  --import-openclaw")
-                    print("  --open-tui")
-                    print("  --no-input")
-                    return
-
-                if args == ["setup", "local", "--help"]:
-                    print("Usage: mutx setup local [OPTIONS]")
-                    print("")
-                    print("Options:")
-                    print("  --provider [openclaw]")
-                    print("  --install-openclaw")
-                    print("  --import-openclaw")
-                    print("  --open-tui")
-                    print("  --no-input")
-                    return
-
-                if args == ["runtime", "--help"]:
-                    print("Usage: mutx runtime [OPTIONS] COMMAND [ARGS]...")
-                    print("")
-                    print("Commands:")
-                    print("  inspect")
-                    print("  list")
-                    print("  open")
-                    return
-
-                if args in (["runtime", "inspect", "--help"], ["runtime", "open", "--help"]):
-                    print("Usage: mutx runtime inspect [OPTIONS] PROVIDER")
-                    return
-
-                if args in (
-                    ["onboard", "--help"],
-                    ["onboard", "--open-tui", "--help"],
-                ):
-                    print("Usage: mutx onboard [OPTIONS]")
-                    print("")
-                    print("Options:")
-                    print("  --open-tui")
-                    return
-
-                if args in (
-                    ["doctor", "--help"],
-                    ["tui", "--help"],
-                ):
-                    return
-
-                if args and args[0] == "onboard":
-                    _run_onboard(args)
-                    return
-
-                if args[:2] == ["setup", "hosted"]:
-                    print("HOSTED SETUP", " ".join(args[2:]).strip())
-                    return
-
-                if args[:2] == ["setup", "local"]:
-                    print("LOCAL SETUP", " ".join(args[2:]).strip())
-                    return
-
-                if args[:2] == ["runtime", "inspect"]:
-                    print("RUNTIME INSPECT", " ".join(args[2:]).strip())
-                    return
-
-                if args and args[0] == "doctor":
-                    print("doctor ok")
-                    return
-            """
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    return package_dir
-
-
-def build_install_env(
-    tmp_path: Path,
-    *,
-    source_ref: str | None = None,
-    extra_path: str | None = None,
-    local_ready: bool = True,
-) -> tuple[dict[str, str], Path]:
+def build_install_env(tmp_path: Path) -> tuple[dict[str, str], Path]:
     brew_prefix = tmp_path / "brew-prefix"
     brew_bin = brew_prefix / "bin"
     brew_bin.mkdir(parents=True, exist_ok=True)
@@ -225,25 +56,6 @@ def build_install_env(
         """,
     )
 
-    write_executable(
-        brew_bin / "curl",
-        """#!/usr/bin/env bash
-        set -euo pipefail
-
-        target="${@: -1}"
-        case "${target}" in
-          http://localhost:8000/health|http://localhost:8000/ready)
-            if [[ "${FAKE_LOCAL_READY:-1}" == "1" ]]; then
-              exit 0
-            fi
-            exit 22
-            ;;
-        esac
-
-        exit 22
-        """,
-    )
-
     env = os.environ.copy()
     env["FAKE_BREW_PREFIX"] = str(brew_prefix)
     env["HOME"] = str(tmp_path / "home")
@@ -252,13 +64,7 @@ def build_install_env(
     env["MUTX_OPEN_TUI"] = "0"
     env["HOMEBREW_NO_AUTO_UPDATE"] = "1"
     env["HOMEBREW_NO_INSTALL_FROM_API"] = "1"
-    env["FAKE_LOCAL_READY"] = "1" if local_ready else "0"
     env["PATH"] = f"{brew_bin}:{env['PATH']}"
-    if extra_path:
-        env["PATH"] = f"{extra_path}:{env['PATH']}"
-    if source_ref is not None:
-        env["MUTX_CLI_SOURCE_REF"] = source_ref
-
     return env, brew_prefix
 
 
@@ -266,17 +72,9 @@ def run_install_script(
     tmp_path: Path,
     *,
     mutx_script: str,
-    source_ref: str | None = None,
     args: list[str] | None = None,
-    extra_path: str | None = None,
-    local_ready: bool = True,
 ) -> tuple[subprocess.CompletedProcess[str], Path]:
-    env, brew_prefix = build_install_env(
-        tmp_path,
-        source_ref=source_ref,
-        extra_path=extra_path,
-        local_ready=local_ready,
-    )
+    env, brew_prefix = build_install_env(tmp_path)
     write_executable(brew_prefix / "bin" / "mutx", mutx_script)
 
     result = subprocess.run(
@@ -294,18 +92,10 @@ def run_install_script_in_tty(
     tmp_path: Path,
     *,
     mutx_script: str,
-    source_ref: str,
     replies: list[tuple[str, str]],
     timeout_seconds: float = 45.0,
-    extra_path: str | None = None,
-    local_ready: bool = True,
 ) -> tuple[int, str, Path]:
-    env, brew_prefix = build_install_env(
-        tmp_path,
-        source_ref=source_ref,
-        extra_path=extra_path,
-        local_ready=local_ready,
-    )
+    env, brew_prefix = build_install_env(tmp_path)
     env["MUTX_OPEN_TUI"] = "1"
     env["TERM"] = "xterm-256color"
     write_executable(brew_prefix / "bin" / "mutx", mutx_script)
@@ -381,13 +171,6 @@ EOF
     echo "Error: No such command 'setup'." >&2
     exit 2
     ;;
-  "onboard"|"onboard --help"|"onboard --open-tui"|"onboard --open-tui --help")
-    echo "Usage: mutx [OPTIONS] COMMAND [ARGS]..." >&2
-    echo "Try 'mutx --help' for help." >&2
-    echo >&2
-    echo "Error: No such command 'onboard'." >&2
-    exit 2
-    ;;
   "doctor"|"doctor --help")
     echo "Usage: mutx [OPTIONS] COMMAND [ARGS]..." >&2
     echo "Try 'mutx --help' for help." >&2
@@ -411,105 +194,13 @@ Usage: mutx [OPTIONS] COMMAND [ARGS]...
 
 Commands:
   doctor
-  onboard
-  runtime
   setup
   status
   tui
 EOF
     exit 0
     ;;
-  "setup --help")
-    cat <<'EOF'
-Usage: mutx setup [OPTIONS] COMMAND [ARGS]...
-
-Commands:
-  hosted
-  local
-EOF
-    exit 0
-    ;;
-  "setup hosted --help")
-    cat <<'EOF'
-Usage: mutx setup hosted [OPTIONS]
-
-Options:
-  --api-url TEXT
-  --email TEXT
-  --password TEXT
-  --provider [openclaw]
-  --install-openclaw
-  --import-openclaw
-  --open-tui
-  --no-input
-EOF
-    exit 0
-    ;;
-  "setup local --help")
-    cat <<'EOF'
-Usage: mutx setup local [OPTIONS]
-
-Options:
-  --provider [openclaw]
-  --install-openclaw
-  --import-openclaw
-  --open-tui
-  --no-input
-EOF
-    exit 0
-    ;;
-  "runtime --help")
-    cat <<'EOF'
-Usage: mutx runtime [OPTIONS] COMMAND [ARGS]...
-
-Commands:
-  inspect
-  list
-  open
-EOF
-    exit 0
-    ;;
-  "runtime inspect --help"|"runtime open --help"|"doctor --help")
-    exit 0
-    ;;
-  "onboard --help"|"onboard --open-tui --help")
-    cat <<'EOF'
-Usage: mutx onboard [OPTIONS]
-
-Options:
-  --open-tui
-EOF
-    exit 0
-    ;;
-  "onboard"|"onboard --open-tui")
-    open_tui_flag=""
-    if [[ "${*:-}" == *"--open-tui"* ]]; then
-      open_tui_flag=" --open-tui"
-    fi
-    printf '\n'
-    printf '  1.  Hosted  (recommended)  — sign up or log in to your MUTX account\n'
-    printf '  2.  Local   (advanced)       — run everything on this machine\n'
-    printf '  3.  Later\n\n'
-    printf 'Select a lane [1/2/3]: '
-    read -r lane
-    lane="${lane:-1}"
-    case "${lane}" in
-      1)
-        printf 'Launching MUTX hosted setup against https://api.mutx.dev\n'
-        printf 'Email: '
-        read -r _
-        printf 'Password: '
-        read -r _
-        printf 'HOSTED SETUP --api-url https://api.mutx.dev --install-openclaw%s\n' "${open_tui_flag}"
-        ;;
-      2)
-        printf 'Launching MUTX local setup against http://localhost:8000\n'
-        printf 'LOCAL SETUP --install-openclaw%s\n' "${open_tui_flag}"
-        ;;
-      *)
-        printf "Run 'mutx onboard' when ready to continue.\n"
-        ;;
-    esac
+  "setup --help"|"setup hosted --help"|"setup local --help"|"doctor --help")
     exit 0
     ;;
 esac
@@ -518,194 +209,26 @@ exit 0
 """
 
 
-PROVIDER_STALE_MUTX_SCRIPT = """#!/usr/bin/env bash
-set -euo pipefail
+def test_install_script_fails_when_packaged_binary_is_stale(tmp_path: Path) -> None:
+    result, _ = run_install_script(tmp_path, mutx_script=STALE_MUTX_SCRIPT)
 
-case "${*:-}" in
-  "--help")
-    cat <<'EOF'
-Usage: mutx [OPTIONS] COMMAND [ARGS]...
-
-Commands:
-  doctor
-  onboard
-  runtime
-  setup
-  status
-  tui
-EOF
-    exit 0
-    ;;
-  "setup --help")
-    cat <<'EOF'
-Usage: mutx setup [OPTIONS] COMMAND [ARGS]...
-
-Commands:
-  hosted
-  local
-EOF
-    exit 0
-    ;;
-  "setup hosted --help")
-    cat <<'EOF'
-Usage: mutx setup hosted [OPTIONS]
-
-Options:
-  --api-url TEXT
-  --open-tui
-EOF
-    exit 0
-    ;;
-  "setup local --help")
-    cat <<'EOF'
-Usage: mutx setup local [OPTIONS]
-
-Options:
-  --open-tui
-EOF
-    exit 0
-    ;;
-  "runtime --help")
-    cat <<'EOF'
-Usage: mutx runtime [OPTIONS] COMMAND [ARGS]...
-
-Commands:
-  inspect
-  list
-EOF
-    exit 0
-    ;;
-  "runtime inspect --help"|"doctor --help")
-    exit 0
-    ;;
-  "onboard --help")
-    cat <<'EOF'
-Usage: mutx onboard [OPTIONS]
-
-Options:
-  --open-tui
-EOF
-    exit 0
-    ;;
-esac
-
-exit 0
-"""
-
-
-def test_install_script_bootstraps_current_cli_when_packaged_binary_is_stale(tmp_path: Path) -> None:
-    source_ref = str(build_fake_cli_package(tmp_path / "source-cli"))
-    result, brew_prefix = run_install_script(tmp_path, mutx_script=STALE_MUTX_SCRIPT, source_ref=source_ref)
-    visible_summary = result.stdout.split("Last output:", 1)[0]
-
-    assert result.returncode == 0
-    assert "source fallback" in result.stdout
-    assert "install complete." in result.stdout.lower()
-    assert "mutx onboard" in result.stdout
-    assert "mutx-dev/homebrew-tap" not in visible_summary
-    assert "formula:" not in result.stdout
-    assert result.stderr == ""
-
-    setup_help = subprocess.run(
-        [str(brew_prefix / "bin" / "mutx"), "setup", "--help"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert setup_help.returncode == 0
+    assert result.returncode != 0
+    assert "Checking onboarding surface" in result.stdout
+    assert "Recovering current CLI surface" not in result.stdout
+    assert "missing required commands" in result.stderr
 
 
 def test_install_script_allows_assistant_first_cli_surface_without_recovery(tmp_path: Path) -> None:
     result, _ = run_install_script(tmp_path, mutx_script=CURRENT_MUTX_SCRIPT)
 
     assert result.returncode == 0
-    assert "source fallback" not in result.stdout
-    assert "install plan" in result.stdout.lower()
+    assert "Recovering current CLI surface" not in result.stdout
+    assert "Install plan" in result.stdout
     assert "[1/3] Preparing environment" in result.stdout
-    assert "Verifying CLI" in result.stdout
-    assert "install complete." in result.stdout.lower()
+    assert "Checking onboarding surface" in result.stdout
+    assert "Install complete" in result.stdout
     assert "mutx-dev/homebrew-tap" not in result.stdout
     assert result.stderr == ""
-
-
-def test_install_script_recovers_when_packaged_cli_lacks_openclaw_flags(tmp_path: Path) -> None:
-    source_ref = str(build_fake_cli_package(tmp_path / "source-cli"))
-    result, _ = run_install_script(
-        tmp_path,
-        mutx_script=PROVIDER_STALE_MUTX_SCRIPT,
-        source_ref=source_ref,
-    )
-
-    assert result.returncode == 0
-    assert "source fallback" in result.stdout
-    assert "mutx onboard" in result.stdout
-
-
-def test_install_script_refreshes_existing_source_overlay_even_when_surface_looks_current(tmp_path: Path) -> None:
-    source_ref = str(build_fake_cli_package(tmp_path / "source-cli"))
-    env, brew_prefix = build_install_env(tmp_path, source_ref=source_ref)
-    overlay_bin = Path(env["MUTX_HOME_DIR"]) / "runtime" / "source-cli" / "venv" / "bin"
-    overlay_bin.mkdir(parents=True, exist_ok=True)
-    write_executable(overlay_bin / "mutx", CURRENT_MUTX_SCRIPT)
-
-    target = brew_prefix / "bin" / "mutx"
-    if target.exists() or target.is_symlink():
-        target.unlink()
-    target.symlink_to(overlay_bin / "mutx")
-
-    result = subprocess.run(
-        ["bash", str(INSTALL_SCRIPT)],
-        cwd=ROOT,
-        env=env,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
-    assert result.returncode == 0
-    assert "source fallback" not in result.stdout
-    assert "install complete." in result.stdout.lower()
-
-
-def test_install_script_collects_hosted_credentials_inside_the_wizard(tmp_path: Path) -> None:
-    exit_code, transcript, _ = run_install_script_in_tty(
-        tmp_path,
-        mutx_script=CURRENT_MUTX_SCRIPT,
-        source_ref=str(build_fake_cli_package(tmp_path / "source-cli")),
-        replies=[
-            ("Select a lane [1/2/3]", "1\n"),
-            ("Email", "operator@example.com\n"),
-            ("Password", "StrongPass1!\n"),
-        ],
-    )
-
-    assert exit_code == 0
-    assert "Email" in transcript
-    assert "Password" in transcript
-    assert "Launching MUTX hosted setup against https://api.mutx.dev" in transcript
-    assert "Error: No such option" not in transcript
-
-
-def test_install_script_reports_detected_openclaw_and_local_key_policy(tmp_path: Path) -> None:
-    extra_bin = tmp_path / "extra-bin"
-    extra_bin.mkdir(parents=True, exist_ok=True)
-    write_executable(
-        extra_bin / "openclaw",
-        """#!/usr/bin/env bash
-        exit 0
-        """,
-    )
-
-    result, _ = run_install_script(
-        tmp_path,
-        mutx_script=CURRENT_MUTX_SCRIPT,
-        extra_path=str(extra_bin),
-    )
-
-    assert result.returncode == 0
-    assert "detected at" in result.stdout
-    assert "Tracking:" in result.stdout
-    assert "keys stay local and are not uploaded by MUTX" in result.stdout
 
 
 def test_install_script_help_shows_usage_without_running_install(tmp_path: Path) -> None:
@@ -724,70 +247,22 @@ def test_install_script_no_onboard_skips_wizard_and_prints_next_steps(tmp_path: 
     assert result.returncode == 0
     assert "Onboarding:" in result.stdout
     assert "skipped" in result.stdout
-    assert "install complete." in result.stdout.lower()
-    assert "mutx onboard" in result.stdout
+    assert "Setup Wizard" not in result.stdout
+    assert "Install complete" in result.stdout
+    assert "mutx setup hosted" in result.stdout
+    assert "mutx setup local" in result.stdout
 
 
-def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recovery(tmp_path: Path) -> None:
-    source_ref = str(build_fake_cli_package(tmp_path / "source-cli"))
-    exit_code, transcript, brew_prefix = run_install_script_in_tty(
+def test_install_script_tty_fails_fast_when_packaged_binary_is_stale(tmp_path: Path) -> None:
+    exit_code, transcript, _ = run_install_script_in_tty(
         tmp_path,
         mutx_script=STALE_MUTX_SCRIPT,
-        source_ref=source_ref,
         replies=[
             ("Select a lane [1/2/3]", "2\n"),
         ],
     )
 
-    assert exit_code == 0
-    assert "source fallback" in transcript
-    assert "Select a lane [1/2/3]" in transcript
-    assert "http://localhost:8000" in transcript
-    assert "Launching MUTX local setup against http://localhost:8000" in transcript
-    assert "LOCAL SETUP --install-openclaw --open-tui" in transcript
-    assert "MUTX setup wizard\\nInstall the CLI" not in transcript
-    assert "No such command 'setup'" not in transcript
-
-    setup_help = subprocess.run(
-        [str(brew_prefix / "bin" / "mutx"), "setup", "local", "--help"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert setup_help.returncode == 0
-
-
-def test_install_script_tty_local_lane_does_not_require_ready_localhost(tmp_path: Path) -> None:
-    exit_code, transcript, _ = run_install_script_in_tty(
-        tmp_path,
-        mutx_script=CURRENT_MUTX_SCRIPT,
-        source_ref=str(build_fake_cli_package(tmp_path / "source-cli")),
-        replies=[
-            ("Select a lane [1/2/3]", "2\n"),
-        ],
-        local_ready=False,
-    )
-
-    assert exit_code == 0
-    assert "http://localhost:8000" in transcript
-    assert "Local dev lane needs a running control plane" not in transcript
-    assert "This lane is for contributor checkouts" not in transcript
-    assert "Launching MUTX local setup against http://localhost:8000" in transcript
-
-
-def test_install_script_tty_hosted_lane_targets_hosted_api(tmp_path: Path) -> None:
-    exit_code, transcript, _ = run_install_script_in_tty(
-        tmp_path,
-        mutx_script=CURRENT_MUTX_SCRIPT,
-        source_ref=str(build_fake_cli_package(tmp_path / "source-cli")),
-        replies=[
-            ("Select a lane [1/2/3]", "1\n"),
-            ("Email", "operator@example.com\n"),
-            ("Password", "StrongPass1!\n"),
-        ],
-    )
-
-    assert exit_code == 0
-    assert "https://api.mutx.dev" in transcript
-    assert "Launching MUTX hosted setup against https://api.mutx.dev" in transcript
-    assert "Error: No such option" not in transcript
+    assert exit_code != 0
+    assert "Recovering current CLI surface" not in transcript
+    assert "Setup Wizard" not in transcript
+    assert "missing required commands" in transcript
