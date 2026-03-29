@@ -3,26 +3,24 @@
 - Recommendation: REWIRE
 
 ## What changed since the last control pass
-- A concurrent run cleared the shared review and merge queues; they have been restored to reflect the live open PRs.
-- Live GitHub checks: Validation is passing on PRs #1211, #1210, and #1209, but Container Image Scan is failing on all three.
-- No merge-ready PR exists; the bottleneck is still review identity, with check noise on top.
+- PRs #1211 and #1210: CI is now fully green (Validation, Container Image Scan, and Trivy all passing). The blocker for both has shifted from CI to reviewer identity — no GitHub-resolvable second reviewer is attached yet.
+- PR #1206 (`fix(api): scope analytics latency timeseries by current user`) is now CLEAN (mergeStateStatus=CLEAN) with all checks passing, but it has no review decision and is not yet approved.
+- PR #1209 still has Container Image Scan failing alongside the reviewer-identity bottleneck.
+- No PR is merge-ready yet; the review gate remains the active constraint.
 
 ## Exact queue evidence
 - Review queue:
-  1. PR #1211 `Bind auth refresh to refresh cookie` -> `awaiting-review` (Validation passes; Container Image Scan failing; reviewer request unresolved)
-  2. PR #1210 `Fix local bootstrap dashboard path` -> `awaiting-review` (docs-only; Validation passes; Container Image Scan failing; reviewer request unresolved)
-  3. PR #1209 `Fix system overview CPU and memory queries` -> `blocked-reviewer-identity` (Validation passes; Container Image Scan failing; GitHub-resolvable second reviewer still needed)
-- Merge queue: empty.
-- Live PR evidence:
-  - #1211 has the auth slice in review posture but no resolvable second reviewer attached.
-  - #1210 is docs-only again, but review routing is still not clean and scan noise remains.
-  - #1209 still cannot self-approve and needs a real GitHub reviewer path.
+  1. PR #1211 `Bind auth refresh to refresh cookie` -> `awaiting-review` (CI green; reviewer request unresolved)
+  2. PR #1210 `Fix local bootstrap dashboard path` -> `awaiting-review` (docs-only; CI green; reviewer request unresolved)
+  3. PR #1209 `Fix system overview CPU and memory queries` -> `blocked-reviewer-identity` (Validation passes; Container Image Scan still failing; GitHub-resolvable second reviewer still needed)
+- Merge queue: empty (nothing is approved yet).
+- Notable non-queue PR: #1206 is now CLEAN but still needs a review decision.
 
 ## Which lanes are producing signal vs idling
 - Producing signal:
-  - `qa-reliability-engineer` on #1211 and #1210 review routing.
-  - `docs-drift-curator` because the split is complete and the docs-only PR is still the cleanest bounded slice.
-  - `infra-delivery-operator` because the monitoring truth review is explicit, even though the reviewer-identity blocker remains.
+  - `qa-reliability-engineer` on #1211 and #1210 routing; CI is no longer blocking but reviewer identity is.
+  - `docs-drift-curator` because #1210 is still the cleanest bounded slice and CI is green.
+  - `infra-delivery-operator` on #1209 monitoring truth review, but blocked by reviewer identity and scan failure.
 - Idling:
   - `auth-identity-guardian`
   - `observability-sre`
@@ -32,11 +30,12 @@
   - `runtime-protocol-engineer`
 
 ## What Fortune can do with this today
-- Fix the GitHub reviewer-resolution problem for #1211 and #1210 so the second-reviewer gate is real, not nominal.
-- Resolve the reviewer-identity bottleneck on #1209 by assigning a GitHub-resolvable second reviewer or fixing the mapping.
-- Leave the merge queue empty until there is a green reviewed PR.
+- Attach a real GitHub reviewer to #1211 and #1210 so the review gate is real. CI is no longer a blocker for those two.
+- Decide whether #1209's Container Image Scan failure is acceptable to override or must be fixed before review proceeds.
+- Approve #1206 if the changes are acceptable — it is CLEAN and ready for merge once approved.
+- Leave the merge queue empty until there is a green approved PR.
 
 ### Control brief
 - The fleet is still review-bound, not code-bound.
-- The real bottleneck is approvals/review identity, plus noisy Container Image Scan failures.
-- No merge-ready PR exists.
+- The CI bottleneck has cleared for #1211 and #1210; the real bottleneck is now approvals/reviewer identity.
+- #1206 is CLEAN and worth watching — if approved, it can merge immediately.

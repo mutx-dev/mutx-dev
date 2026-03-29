@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-29T13:05:02+02:00",
+  "updated": "2026-03-29T13:45:00+02:00",
   "items": [
     {
       "pr": 1211,
@@ -8,7 +8,7 @@
       "reviewer": "qa-reliability-engineer",
       "status": "awaiting-review",
       "risk": "medium",
-      "note": "Validation passes; Container Image Scan failing; GitHub reviewer request not attached; needs a real second reviewer."
+      "note": "CI is now green (Validation + Container Image Scan + Trivy all passing). Reviewer request still not attached; needs a real second reviewer to unblock."
     },
     {
       "pr": 1210,
@@ -17,7 +17,7 @@
       "reviewer": "qa-reliability-engineer",
       "status": "awaiting-review",
       "risk": "low",
-      "note": "Docs-only split clean; Validation passes; Container Image Scan failing; reviewer request not attached."
+      "note": "Docs-only split clean. CI is now green (Validation + Container Image Scan + Trivy all passing). Reviewer request still not attached."
     },
     {
       "pr": 1209,
@@ -26,7 +26,7 @@
       "reviewer": "infra-delivery-operator",
       "status": "blocked-reviewer-identity",
       "risk": "monitoring-truth",
-      "note": "Validation passes; Container Image Scan failing; reviewer identity cannot self-approve; GitHub-resolvable second reviewer still needed."
+      "note": "Validation passes; Container Image Scan still failing. Reviewer identity cannot self-approve; GitHub-resolvable second reviewer still needed."
     }
   ]
 }
