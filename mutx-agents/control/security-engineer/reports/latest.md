@@ -1,24 +1,35 @@
-# latest.md — Security Engineer
+## Lane utility verdict
+- Status: THIN
+- Recommendation: KEEP
 
-## Security brief — 2026-03-28
+## What changed in truth
+I did a bounded fresh read of the live infra files today. The risk from yesterday is still real:
+- `infrastructure/ansible/playbooks/provision.yml` still defaults `admin_cidr` to `0.0.0.0/0`, so the Ansible path can still open SSH to the world if an operator does not override it.
+- `infrastructure/ansible/inventory.ini` and `docs/architecture/infrastructure.md` still document `StrictHostKeyChecking=no`.
+- `infrastructure/scripts/generate-inventory.sh` has already moved to `StrictHostKeyChecking=accept-new`, which means the generated inventory is safer than the tracked inventory/docs.
 
-**Highest-leverage risk:** the Ansible provisioning path still fails open on SSH even though Terraform now fails closed.
+Net: the repo still has split trust defaults across provisioning surfaces. Terraform fails closed; Ansible/docs still do not.
 
-### What I verified
-- `infrastructure/ansible/playbooks/provision.yml:10-16` defaults `ADMIN_CIDR` to `0.0.0.0/0` and uses it for the SSH UFW allow rule.
-- `infrastructure/README.md:53-61` still documents `ADMIN_CIDR` as optional with a world-open default.
-- `infrastructure/ansible/inventory.ini:11-13` and `docs/architecture/infrastructure.md:123-125` still disable SSH host verification with `StrictHostKeyChecking=no`.
-- `infrastructure/terraform/variables.tf:96-106` already rejects `0.0.0.0/0` and `::/0`, so the repo currently has conflicting trust defaults across provisioning paths.
-- `infrastructure/scripts/generate-inventory.sh:37-39` already moved to `StrictHostKeyChecking=accept-new`, which confirms the tracked inventory/docs are stale.
+## Exact evidence
+Checked today:
+- `/Users/fortune/MUTX/infrastructure/ansible/playbooks/provision.yml`
+- `/Users/fortune/MUTX/infrastructure/README.md`
+- `/Users/fortune/MUTX/infrastructure/ansible/inventory.ini`
+- `/Users/fortune/MUTX/docs/architecture/infrastructure.md`
+- `/Users/fortune/MUTX/infrastructure/scripts/generate-inventory.sh`
+- `/Users/fortune/MUTX/infrastructure/terraform/variables.tf`
+- `/Users/fortune/.openclaw/workspace/mutx-agents/reports/roundtable.md`
+- `/Users/fortune/.openclaw/workspace/mutx-agents/control/security-engineer/queue/TODAY.md`
+- `/Users/fortune/.openclaw/workspace/mutx-engineering-agents/mission-control-orchestrator/reports/latest.md`
 
-### Why this matters
-A rushed operator can still follow the Ansible path or stale docs and end up with publicly reachable SSH plus no host-key verification during first access. That is a real day-0 trust failure, not security theater.
+## If idle or blocked, why exactly
+Not blocked by tooling. The real constraint is stale tracked infra content: the repo already contains the safer inventory-generation path, but the human-facing inventory/docs and Ansible default still advertise weaker trust behavior.
 
-### Recommended move
-Close the remaining Ansible/docs gap so every infra path fails closed by default:
-1. require an explicit `ADMIN_CIDR` for Ansible provisioning and reject `0.0.0.0/0` / `::/0`
-2. replace `StrictHostKeyChecking=no` with `accept-new` or a managed `known_hosts` workflow
-3. add a lightweight CI/lint guard that flags world-open admin SSH and disabled host-key verification in tracked infra files
+## What Fortune can do with this today
+Pick the baseline for first SSH contact: `accept-new` or an explicit `known_hosts` workflow. Then have the tracked Ansible/docs path match that baseline so there is one trust rule, not two.
 
-### Lane call
-Do not spend time on broad hardening churn first. Fix the fail-open SSH path, because it is simple, concrete, and directly tied to operator trust.
+## What should change in this lane next
+1. Require explicit `ADMIN_CIDR` in Ansible provisioning, or at minimum reject `0.0.0.0/0` and `::/0`.
+2. Replace `StrictHostKeyChecking=no` in tracked inventory/docs with `accept-new` or a managed `known_hosts` workflow.
+3. Add a grep/lint guard so tracked infra files cannot reintroduce world-open admin SSH or disabled host-key checking.
+4. Refresh `infrastructure/README.md` so it no longer describes Ansible provisioning as world-open by default.
