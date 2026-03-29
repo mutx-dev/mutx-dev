@@ -25,7 +25,7 @@ MUTX helps teams deploy, operate, observe, and govern them like production infra
 | --- | --- | --- |
 | Can this run an agent like production infra? | `/dashboard`, CLI, docs | deployment records, runs/traces, sessions, budgets, monitoring |
 | Can we operate it without lying about gaps? | `/dashboard` + CLI | supported vs preview boundaries, CLI fallbacks where UI is thin, no fake dashboard parity |
-| Can we govern risky work? | `mutx governance status`, `mutx governance decisions --limit 50`, `mutx governance pending`, `mutx governance metrics` | permit / deny / defer decisions, pending approvals, Prometheus metrics, CLI-first approval path |
+| Can we govern risky work? | `mutx governance status`, `mutx governance decisions --limit 50`, `mutx governance pending`, `mutx governance metrics` | runtime path evaluation (not tool whitelisting), permit / deny / defer decisions, pending approvals, Prometheus metrics, CLI-first approval path |
 | Can we keep the runtime honest? | `mutx runtime inspect openclaw` | durable runtime tracking instead of ad hoc local state |
 | Is the SDK story truthful? | `sdk/README.md` | `MutxAsyncClient` is deprecated and limited; use `MutxClient` for production code |
 
@@ -40,7 +40,8 @@ MUTX helps teams deploy, operate, observe, and govern them like production infra
 - health and readiness
 
 ### Governance story
-- Faramesh-backed governance is real today
+- Faramesh-backed governance is real today — it evaluates whether an action is safe given the prior execution path, not just whether a tool can be called (runtime path evaluation, not tool whitelisting)
+- Gartner (March 2026): 50% of AI agent deployments will fail due to insufficient governance platforms, causing a $58B enterprise software shakeup — governance failure is the #1 deployment risk
 - policy decisions are permit / deny / defer
 - operators can inspect decisions, pending approvals, and metrics from the CLI
 - approval workflows remain CLI-first; the dashboard should not be positioned as the approval surface yet
@@ -97,8 +98,7 @@ Not for every workflow yet.
 Stable dashboard routes are real, but some operator tasks are still better in CLI or direct API.
 
 ### "Can you govern risky actions?"
-Yes, with Faramesh.
-But be precise: governance exists today, while the approval workflow is still CLI-first rather than dashboard-first.
+Yes. Governance failure is the #1 AI agent deployment risk (Gartner: 50% of deployments will fail due to insufficient governance platforms, $58B shakeup by 2027). MUTX evaluates whether an action is safe given the prior execution path — not just whether a tool can be called. Approval workflow is still CLI-first today; be precise on that.
 
 ## Best current call-to-action
 If you already have an agent that kind of works, MUTX is the lane to prove it can be operated, observed, and governed without lying about the gaps.
