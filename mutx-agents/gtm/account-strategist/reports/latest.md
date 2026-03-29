@@ -5,32 +5,25 @@
 - **Recommendation:** KEEP
 
 ## What changed in truth
-- The lane now has one concrete target account instead of an unnamed design-partner placeholder: **GitHub Actions / Agentic Workflows**.
-- That choice is grounded in the freshest outside-in signal: GitHub’s own March 2026 language is the sharpest public evidence that the market is buying **governed execution** — secure defaults, policy controls, scoped credentials, constrained outputs, comprehensive logging, and enforceable network boundaries.
-- The account map is now tighter: the right MUTX wedge is not “generic agent observability,” but a control plane for agentic workflows that need policy, auditability, and runtime truth.
-- The previous account brief treated the target as unnamed; that is no longer useful.
+- **Signal layer sharpened materially since this morning.** The evening signal brief added: (1) Gartner's $58B governance failure framing with 50% of AI agent deployments predicted to fail due to insufficient governance platforms by 2027; (2) runtime path evaluation as the precise enforcement mechanism — "is this action safe given prior path?" via execution-path policies, not tool lists; (3) sandbox is not the security boundary, the access model is; (4) $470M on-chain agent GDP and $40B DAO treasury figures as financial-scale proof of the accountability gap.
+- **Roundtable moved to CI-green on `#1211` and `#1210`**, with reviewer attachment as the sole remaining gate.
+- **The account map now has three confirmed account-level triggers:** Gartner (enterprise buyers), GitHub Actions / Agentic Workflows (platform signal), and OpenClaw plugin approval hooks (product-adjacent proof). These are not speculation — they are documented market movements from today.
+- **The whitespace map is now tighter.** The gap is not "they don't know about observability" — it is "tool whitelist ≠ authorization, sandbox ≠ security boundary, and runtime path evaluation with session context is the missing model." MUTX's proof is CLI governance + execution-path awareness, not dashboard parity.
 
 ## Exact evidence
-- Read `BOOTSTRAP.md`.
-- Read `../reports/roundtable.md`.
-- Read `../outside-in-intelligence/reports/signal-brief.md`.
-- Read `queue/TODAY.md`.
-- Read the existing `reports/latest.md` and confirmed it still said the design-partner target was unnamed.
-- Read `LANE.md`, `MUTX-CONTEXT.md`, `GUARDRAILS.md`, `CONTEXT-REGISTRY.md`, `ROUNDTABLE-LOOP.md`, `MEMORY.md`, and `memory/2026-03-28.md`.
-- Read `gtm/sales-engineer/sales-brief.md` for the supported proof boundary: `/dashboard`, CLI governance, and runtime truth.
-- Ran a bounded truth search with `rg -n "design-partner|design partner|account brief|champion|operator user|buyer|whitespace mapping|deployment parity|runtime visibility" /Users/fortune/.openclaw/workspace/mutx-agents /Users/fortune/MUTX -g '!**/.git/**'` to confirm there was no named target account already hidden in the lane.
-- Wrote `account-brief.md` for the named target account.
+- Read `queue/TODAY.md` and `reports/latest.md` — confirmed prior run state.
+- Read `mutx-agents/reports/roundtable.md` — CI-green on `#1211` and `#1210`, reviewer attachment is the sole gate.
+- Read `gtm/outside-in-intelligence/reports/signal-brief.md` — evening refresh at 18:20 Europe/Rome with new Gartner, runtime path evaluation, and financial-scale accountability evidence.
+- Read `account-brief.md` and updated it with: Gartner account trigger, runtime path evaluation in the whitespace map, execution-path policies, and the OpenClaw plugin approval hooks as a product-adjacent proof point.
+- Read `BOOTSTRAP.md` and cross-referenced the lane's prior state.
 
 ## If idle or blocked, why exactly
-- Not blocked. The gap was specificity, not access.
-- The lane previously had enough truth to talk about buyer pain, but not enough specificity to attach that pain to a real account-shaped target.
+- Not blocked. The constraint is that the account strategist cannot action Fortune's reviewer attachment decisions — that gate is Fortune's to close. Otherwise the lane has everything it needs to move forward.
 
 ## What Fortune can do with this today
-- Use **GitHub Actions / Agentic Workflows** as the account-shaped reference for the next design-partner conversation.
-- Keep the conversation centered on **governed execution**: secure defaults, policy controls, scoped credentials, network boundaries, and auditability.
-- Use the supported proof boundary honestly: `/dashboard` plus CLI governance and runtime inspection, not fake dashboard parity.
+- Use the updated `account-brief.md` as the live artifact for the next design-partner conversation — it now has Gartner framing, runtime path evaluation language, and a real whitespace map.
+- Close the reviewer attachment gate on `#1211` and `#1210` — that is the only remaining blocker in the engineering/control lane that directly affects GTM proof quality.
 
 ## What should change in this lane next
-- Build the next pass around one named stakeholder profile per role: champion, operator user, buyer.
-- Add a 3-line whitespace map for the account: what they already believe, what they are missing, what MUTX proves.
-- Keep the expansion path narrow until one workflow/boundary proof is credible.
+- Attach one named stakeholder profile per role (champion, operator user, buyer) to the account map — the roles are defined but not yet populated with real names.
+- Keep the expansion path narrow: one governed workflow or runner boundary proof, then widen only when the control-plane framing is validated by the account.
