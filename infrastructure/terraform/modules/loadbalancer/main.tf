@@ -88,6 +88,12 @@ variable "agent_port" {
   default     = 8080
 }
 
+variable "expose_agent_port_public" {
+  description = "Whether to expose the agent TCP port on the public load balancer"
+  type        = bool
+  default     = false
+}
+
 variable "enable_proxy_protocol" {
   description = "Enable PROXY protocol for preserving client IP"
   type        = bool
@@ -148,13 +154,15 @@ resource "digitalocean_loadbalancer" "public" {
     certificate_id = var.certificate_id != "" ? var.certificate_id : null
   }
 
-  # Agent port forwarding (internal)
-  forwarding_rule {
-    entry_port     = var.agent_port
-    entry_protocol = "tcp"
-
-    target_port     = var.agent_port
-    target_protocol = "tcp"
+  dynamic "forwarding_rule" {
+    for_each = var.expose_agent_port_public ? [1] : []
+    content {
+      # Agent port forwarding (opt-in)
+      entry_port      = var.agent_port
+      entry_protocol  = "tcp"
+      target_port     = var.agent_port
+      target_protocol = "tcp"
+    }
   }
 
   droplet_ids = var.droplet_ids

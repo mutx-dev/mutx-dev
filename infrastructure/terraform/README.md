@@ -129,9 +129,10 @@ module "loadbalancer" {
   region        = var.region
   vpc_uuid      = module.networking["customer1"].vpc_id
   droplet_ids   = [module.droplet["customer1"].droplet_id]
-  http_port     = 80
-  https_port    = 443
-  agent_port    = 8080
+  http_port                = 80
+  https_port               = 443
+  agent_port               = 8080
+  expose_agent_port_public = false # set true only when external TCP access is required
 }
 ```
 
