@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-29T13:45:00+02:00",
+  "updated": "2026-03-29T14:05:00+02:00",
   "items": [
     {
       "pr": 1211,
@@ -8,7 +8,7 @@
       "reviewer": "qa-reliability-engineer",
       "status": "awaiting-review",
       "risk": "medium",
-      "note": "CI is now green (Validation + Container Image Scan + Trivy all passing). Reviewer request still not attached; needs a real second reviewer to unblock."
+      "note": "CI is green (Validation + Container Image Scan + Trivy all passing). Reviewer request still not attached in GitHub; needs a real second reviewer to unblock."
     },
     {
       "pr": 1210,
@@ -17,7 +17,7 @@
       "reviewer": "qa-reliability-engineer",
       "status": "awaiting-review",
       "risk": "low",
-      "note": "Docs-only split clean. CI is now green (Validation + Container Image Scan + Trivy all passing). Reviewer request still not attached."
+      "note": "Docs-only split clean. CI is green (Validation + Container Image Scan + Trivy all passing). Reviewer request still not attached in GitHub."
     },
     {
       "pr": 1209,
