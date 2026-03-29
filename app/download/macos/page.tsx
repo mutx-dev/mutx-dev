@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpenText, Github, ShieldCheck } from "lucide-react";
+import { ArrowRight, BookOpenText, ShieldCheck } from "lucide-react";
 
 import { AuthNav } from "@/components/AuthNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
