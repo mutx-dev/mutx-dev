@@ -5505,7 +5505,7 @@ export interface components {
             /** Agent Id */
             agent_id: string;
             /** Command */
-            command?: string[] | null;
+            command: string[];
             /** Profile */
             profile?: string | null;
             /** Env */
