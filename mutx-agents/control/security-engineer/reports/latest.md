@@ -3,33 +3,32 @@
 - Recommendation: KEEP
 
 ## What changed in truth
-I did a bounded fresh read of the live infra files today. The risk from yesterday is still real:
-- `infrastructure/ansible/playbooks/provision.yml` still defaults `admin_cidr` to `0.0.0.0/0`, so the Ansible path can still open SSH to the world if an operator does not override it.
-- `infrastructure/ansible/inventory.ini` and `docs/architecture/infrastructure.md` still document `StrictHostKeyChecking=no`.
-- `infrastructure/scripts/generate-inventory.sh` has already moved to `StrictHostKeyChecking=accept-new`, which means the generated inventory is safer than the tracked inventory/docs.
+Fresh grep pass at 2026-03-29 15:15 Europe/Rome. The SSH fail-open risk is confirmed still present — files are unchanged from this morning:
 
-Net: the repo still has split trust defaults across provisioning surfaces. Terraform fails closed; Ansible/docs still do not.
+```
+provision.yml:10:  admin_cidr defaults to 0.0.0.0/0
+inventory.ini:13:   StrictHostKeyChecking=no
+docs/infrastructure.md:125: StrictHostKeyChecking=no
+README.md:59:       ADMIN_CIDR defaults to 0.0.0.0/0
+```
+
+generate-inventory.sh still uses `accept-new`, confirming the generated inventory is safer than tracked docs. Nothing resolved itself.
+
+Cross-lane update from roundtable: #1211 and #1210 are now CI-green (reviewer identity is the only remaining gate). This is good progress for the fleet but does not affect the security lane.
 
 ## Exact evidence
-Checked today:
-- `/Users/fortune/MUTX/infrastructure/ansible/playbooks/provision.yml`
-- `/Users/fortune/MUTX/infrastructure/README.md`
-- `/Users/fortune/MUTX/infrastructure/ansible/inventory.ini`
-- `/Users/fortune/MUTX/docs/architecture/infrastructure.md`
-- `/Users/fortune/MUTX/infrastructure/scripts/generate-inventory.sh`
-- `/Users/fortune/MUTX/infrastructure/terraform/variables.tf`
-- `/Users/fortune/.openclaw/workspace/mutx-agents/reports/roundtable.md`
-- `/Users/fortune/.openclaw/workspace/mutx-agents/control/security-engineer/queue/TODAY.md`
-- `/Users/fortune/.openclaw/workspace/mutx-engineering-agents/mission-control-orchestrator/reports/latest.md`
+- `git -C /Users/fortune/MUTX diff HEAD~1 -- infrastructure/ansible/playbooks/provision.yml infrastructure/README.md infrastructure/ansible/inventory.ini docs/architecture/infrastructure.md` — no changes
+- `grep -n "admin_cidr\|0\.0\.0\.0\|StrictHostKeyChecking"` on the four target files — risk lines unchanged
+- `/Users/fortune/.openclaw/workspace/mutx-agents/reports/roundtable.md` @ 2026-03-29 14:10 Europe/Rome
 
 ## If idle or blocked, why exactly
-Not blocked by tooling. The real constraint is stale tracked infra content: the repo already contains the safer inventory-generation path, but the human-facing inventory/docs and Ansible default still advertise weaker trust behavior.
+Not blocked. The risk is concrete and the fix is a known pattern. Waiting on Fortune's call: `accept-new` vs explicit `known_hosts` as the baseline.
 
 ## What Fortune can do with this today
-Pick the baseline for first SSH contact: `accept-new` or an explicit `known_hosts` workflow. Then have the tracked Ansible/docs path match that baseline so there is one trust rule, not two.
+One decision, no code: pick `accept-new` or require a managed `known_hosts` workflow for first SSH contact. Then the lane can close the gap across all four files.
 
 ## What should change in this lane next
-1. Require explicit `ADMIN_CIDR` in Ansible provisioning, or at minimum reject `0.0.0.0/0` and `::/0`.
-2. Replace `StrictHostKeyChecking=no` in tracked inventory/docs with `accept-new` or a managed `known_hosts` workflow.
-3. Add a grep/lint guard so tracked infra files cannot reintroduce world-open admin SSH or disabled host-key checking.
-4. Refresh `infrastructure/README.md` so it no longer describes Ansible provisioning as world-open by default.
+1. Require explicit `ADMIN_CIDR` in Ansible provisioning — reject `0.0.0.0/0` / `::/0`.
+2. Replace `StrictHostKeyChecking=no` with `accept-new` (or managed `known_hosts`) in tracked inventory/docs.
+3. Refresh `infrastructure/README.md` so it no longer describes Ansible provisioning as world-open by default.
+4. Add a grep/lint guard to prevent regression.
