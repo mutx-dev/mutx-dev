@@ -3,29 +3,24 @@
 - Recommendation: KEEP
 
 ## What changed in truth
-Fresh grep pass at 2026-03-29 15:15 Europe/Rome. The SSH fail-open risk is confirmed still present — files are unchanged from this morning:
+Fleet-wide: the review queue cleared at ~19:15–19:17 UTC. Three PRs merged (#1209, #1210, #1211). The roundtable now flags "Gateway/SSH trust hardening remains open" as the next cross-fleet blocker.
 
+My SSH risk is confirmed unchanged at 2026-03-29 21:15 Europe/Rome:
 ```
 provision.yml:10:  admin_cidr defaults to 0.0.0.0/0
 inventory.ini:13:   StrictHostKeyChecking=no
-docs/infrastructure.md:125: StrictHostKeyChecking=no
-README.md:59:       ADMIN_CIDR defaults to 0.0.0.0/0
 ```
-
-generate-inventory.sh still uses `accept-new`, confirming the generated inventory is safer than tracked docs. Nothing resolved itself.
-
-Cross-lane update from roundtable: #1211 and #1210 are now CI-green (reviewer identity is the only remaining gate). This is good progress for the fleet but does not affect the security lane.
+The fix is a known pattern. The lane is unblocked and this is the natural next work slice.
 
 ## Exact evidence
-- `git -C /Users/fortune/MUTX diff HEAD~1 -- infrastructure/ansible/playbooks/provision.yml infrastructure/README.md infrastructure/ansible/inventory.ini docs/architecture/infrastructure.md` — no changes
-- `grep -n "admin_cidr\|0\.0\.0\.0\|StrictHostKeyChecking"` on the four target files — risk lines unchanged
-- `/Users/fortune/.openclaw/workspace/mutx-agents/reports/roundtable.md` @ 2026-03-29 14:10 Europe/Rome
+- `grep -n "admin_cidr.*0\.0\.0\.0/0\|StrictHostKeyChecking=no"` on provision.yml and inventory.ini — risk lines confirmed present
+- `/Users/fortune/.openclaw/workspace/mutx-agents/reports/roundtable.md` @ 2026-03-29 20:10 Europe/Rome — "Gateway/SSH trust hardening remains open" listed as a cross-fleet blocker
 
 ## If idle or blocked, why exactly
-Not blocked. The risk is concrete and the fix is a known pattern. Waiting on Fortune's call: `accept-new` vs explicit `known_hosts` as the baseline.
+Not blocked. The queue is clear and the SSH gap is concrete. Waiting on one Fortune call: `accept-new` or explicit `known_hosts` as the baseline.
 
 ## What Fortune can do with this today
-One decision, no code: pick `accept-new` or require a managed `known_hosts` workflow for first SSH contact. Then the lane can close the gap across all four files.
+One decision, no code needed yet: pick `accept-new` as the SSH baseline, and this lane closes the gap across all four files (provision.yml, inventory.ini, README.md, docs/architecture/infrastructure.md) in short order.
 
 ## What should change in this lane next
 1. Require explicit `ADMIN_CIDR` in Ansible provisioning — reject `0.0.0.0/0` / `::/0`.
