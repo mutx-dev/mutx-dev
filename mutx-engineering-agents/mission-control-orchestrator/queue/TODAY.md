@@ -1,10 +1,8 @@
 # TODAY.md — Mission Control Orchestrator
 
-- Keep the review queue honest:
-  - PR #1218 -> `qa-reliability-engineer` (awaiting-review; cross-lane lint fix, CI now green; needs second reviewer)
-- Keep the merge queue empty; still needs second reviewer before merge.
-- PR #1218 spans `tests/**`, `src/runtime/adapters/openai.py`, and `scripts/**` — no single lane owns it.
-  - Primary reviewer: `qa-reliability-engineer` (test files dominate).
-  - Side-band awareness: `runtime-protocol-engineer` and `cli-sdk-contract-keeper`.
-- All other owned lanes (`auth-identity-guardian`, `observability-sre`, `docs-drift-curator`, `infra-delivery-operator`, `control-plane-steward`, `operator-surface-builder`) are idle.
-- Do not merge until second reviewer is confirmed.
+- PR #1218 `chore: lint fixes 2026-03-29` was merged at 21:34 UTC.
+- Review queue: empty.
+- Merge queue: empty.
+- All owned lanes are idle with no active dispatches.
+- No new owned-area signals detected in this control pass.
+- Do not invent work; keep lanes idle until real signals appear.
