@@ -1,4 +1,14 @@
 {
-  "updated": "2026-03-29T23:15:00+02:00",
-  "items": []
+  "updated": "2026-03-29T23:25:00+02:00",
+  "items": [
+    {
+      "pr": 1218,
+      "title": "chore: lint fixes 2026-03-29",
+      "owner": "multi-lane (runtime-protocol-engineer + qa-reliability-engineer + cli-sdk-contract-keeper)",
+      "reviewer": "qa-reliability-engineer",
+      "status": "awaiting-review",
+      "risk": "low",
+      "note": "Cross-lane lint fix PR touching tests/**, src/runtime/adapters/openai.py, and scripts/**. Validation passes, but Container Image Scan is still pending. Primary reviewer routed to qa-reliability-engineer for test coverage. Second reviewer still needed."
+    }
+  ]
 }

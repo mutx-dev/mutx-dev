@@ -1,24 +1,38 @@
 ## Lane utility verdict
-- Status: CLEAR — review and merge queues empty
-- Recommendation: SCAN for next dispatch
+- Status: THIN
+- Recommendation: KEEP
 
-## What changed since the last control pass (22:15 Europe/Rome)
-- PR #1212 `fix(test): add missing getRefreshToken mock in refresh token test` → **MERGED** at ~20:16 UTC.
-- PR #1213 `fix(ci): add missing GRAFANA_ADMIN_PASSWORD in infrastructure CI env` → **CLOSED** (not merged).
-- PR #1215 `fix(desktop): remove unused isSafeExternalUrl lint error on credential broker branch` → **MERGED** at ~20:20 UTC.
-- PRs #1214, #1216, #1217 (chore/format/lint fixes) → all **CLOSED**.
-- Review queue: empty.
-- Merge queue: empty.
+## What changed since the last control pass
+- New PR #1218 `chore: lint fixes 2026-03-29` appeared — a cross-lane lint fix touching `tests/**`, `src/runtime/adapters/openai.py`, and `scripts/**`.
+- Validation passes on PR #1218, but Container Image Scan is still pending — not merge-ready yet.
+- The PR was routed to `qa-reliability-engineer` as primary reviewer since test files dominate the diff.
+- `runtime-protocol-engineer` and `cli-sdk-contract-keeper` are on side-band awareness for their respective slices.
 
 ## Exact queue evidence
-- All previously tracked PRs resolved: #1212 merged, #1213 closed.
-- No open PRs currently in the review or merge queue.
+- Review queue:
+  1. PR #1218 `chore: lint fixes 2026-03-29` -> `qa-reliability-engineer` (awaiting-review; cross-lane; Validation passes; Container Image Scan pending)
+- Merge queue: empty.
+- Live PR evidence:
+  - #1218 has `tests/**` + `src/runtime/adapters/openai.py` + `scripts/**` changed — no single owning lane.
+  - Validation pass confirmed; Container Image Scan pending.
 
-## Lane state
-- Producing signal: none — queue is empty.
-- All specialist lanes are available for new dispatch work.
+## Which lanes are producing signal vs idling
+- Producing signal:
+  - `qa-reliability-engineer` on PR #1218 routing.
+  - `runtime-protocol-engineer` and `cli-sdk-contract-keeper` on side-band awareness.
+- Idling:
+  - `auth-identity-guardian`
+  - `observability-sre`
+  - `docs-drift-curator`
+  - `infra-delivery-operator`
+  - `control-plane-steward`
+  - `operator-surface-builder`
+
+## What Fortune can do with this today
+- Let `qa-reliability-engineer` complete the review on #1218 once Container Image Scan settles.
+- Do not merge until CI is fully green and a second reviewer is confirmed.
 
 ### Control brief
-- Queue is CLEAR.
-- All blockers resolved.
-- Ready for next dispatch.
+- The fleet has one active review target.
+- CI is partially green — waiting on Container Image Scan.
+- No merge-ready PR exists yet.
