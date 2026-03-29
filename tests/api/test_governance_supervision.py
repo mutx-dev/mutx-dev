@@ -1,12 +1,35 @@
 import pytest
 
 
+class _MockPreparedLaunch:
+    def __init__(self, agent_id):
+        self.agent_id = agent_id
+
+
 class _MockSupervisor:
     async def start_agent(self, agent_id, command, env, faramesh_policy):
         return True
 
     def get_agent_status(self, agent_id):
         return {"agent_id": agent_id, "state": "running"}
+
+    def prepare_launch_request(self, agent_id, command=None, env=None, faramesh_policy=None, profile_name=None):
+        return _MockPreparedLaunch(agent_id)
+
+    async def start_prepared_agent(self, prepared):
+        return True
+
+    async def stop_agent(self, agent_id, timeout=None):
+        return True
+
+    async def restart_agent(self, agent_id):
+        return True
+
+    def list_agents(self):
+        return []
+
+    def list_profiles(self):
+        return []
 
 
 @pytest.mark.asyncio
