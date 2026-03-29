@@ -1,36 +1,37 @@
-## Ops brief — 2026-03-29 16:05 Europe/Rome
+## Ops brief — 2026-03-29 20:05 Europe/Rome
 
 ## Lane utility verdict
 - Status: BLOCKED
 - Recommendation: REWIRE
 
 ## What changed in truth
-- MUTX repo PR status shifted: #1211 and #1210 are now **CI-green** (were CI-red at last control pass). Remaining gate is second reviewer attachment only — no longer a CI problem.
-- #1209 still blocked by reviewer identity and Container Image Scan failure.
-- Gateway/SSH trust hardening remains **open** — no change from 08:06 and 12:05 passes.
-- Control lane hardening patch (sandbox mode, fs.workspaceOnly, exec security allowlist) is still unapproved after 3 consecutive passes.
-- Uptime is fine. The gap is still policy, not runtime health.
+- Nothing material changed since the last control pass at 16:05.
+- MUTX repo state confirmed via roundtable: #1211 and #1210 are CI-green with reviewer attachment as the only remaining gate. No change.
+- Gateway health: LaunchAgent running, 188 sessions, 713 memory chunks, no new warnings or criticals since last pass.
+- Same 3 open warnings from `openclaw security audit`: trustedProxies empty, exec security=full, multi-user heuristic triggered. Unchanged.
+- Hardening patch still unapproved after 4 passes (08:06, 12:05, 16:05, 20:05).
 
 ## Exact evidence
-- Checked `openclaw status` on 2026-03-29 16:05 Europe/Rome — gateway reachable, 188 active sessions, 713 memory chunks, no new warnings
-- Read `mutx-agents/reports/roundtable.md` — updated 2026-03-29 14:10 Europe/Rome
+- Checked `openclaw status` on 2026-03-29 20:05 Europe/Rome — gateway local loopback, LaunchAgent active, no new warnings
+- Ran `openclaw security audit` — same 3 WARNs as previous passes
+- Read `mutx-agents/reports/roundtable.md` — no new update since 2026-03-29 14:10
+- Read `mutx-engineering-agents/mission-control-orchestrator/reports/latest.md` — no new update since previous control pass
 - Read `mutx-agents/control/infrastructure-maintainer/queue/TODAY.md`
-- Read `mutx-agents/control/infrastructure-maintainer/reports/latest.md` — previous pass 2026-03-29 12:05
+- Read `mutx-agents/control/infrastructure-maintainer/reports/latest.md` — previous pass 2026-03-29 16:05
 
 ## If idle or blocked, why exactly
 - No hard outage, no broken daemon, no dead scheduler.
-- Control lane itself is healthy. The blocker is that the hardening patch has been in front of Fortune for 3 consecutive passes (08:06, 12:05, 16:05) without a decision.
-- The trust boundary is still wrong for shared-operator surface: `tools.exec.security="full"` across 174 agents, `agents.defaults.sandbox.mode=off`, `tools.fs.workspaceOnly=false` — unchanged.
+- Control lane is healthy at the runtime layer. The lane is blocked because the hardening patch — which has been on Fortune's desk since 08:06 this morning — has not received a decision.
+- The trust boundary mismatch persists: `tools.exec.security="full"` across 174 agents, `agents.defaults.sandbox.mode=off`, `tools.fs.workspaceOnly=false` — paired with a Discord group-policy that triggers multi-user heuristic. This is the same risk as the last 3 passes.
 
 ## What Fortune can do with this today
-- **Approve or kill the hardening patch.** It has been in queue for 3 days. The config changes are bounded and reversible:
-  - `agents.defaults.sandbox.mode="all"`
-  - `tools.fs.workspaceOnly=true`
-  - `tools.exec.security="allowlist"` with ask prompts
-  - prune runtime/fs/web from agents that do not need them
-- If the intent is single-operator/local-only, say so and I will update the config to lock that model explicitly (trustedProxies pinned, Discord scoped to one user).
-- Either way: make the call. This lane cannot rewire itself without a decision.
+- **Approve or decline the hardening patch.** Four passes have now surfaced it. The changes are bounded and the rollback path is clear.
+  - Patch: `agents.defaults.sandbox.mode="all"`, `tools.fs.workspaceOnly=true`, `tools.exec.security="allowlist"` + ask, prune unused tool exposures.
+  - If single-operator/local-only is the model: say so and I lock it down explicitly (trustedProxies pinned, Discord scoped to one account).
+- This lane cannot advance without a decision. The queue is correct; the call is Fortune's.
 
 ## What should change in this lane next
-- After hardening patch approved: rerun `openclaw security audit --deep` to confirm posture improvement.
-- `queue/TODAY.md` stays unchanged because the 3 next moves are the same as this morning. The queue is correct; the decision is not.
+- After hardening decision: apply and rerun `openclaw security audit --deep` to confirm posture shift.
+- If approved: queue/TODAY.md moves to the next tier of control-plane work (scheduler hygiene, cron verification, memory pruning).
+- If declined: document the explicit operating model decision and re-evaluate the lane scope.
+- `queue/TODAY.md` unchanged — still reflects the correct next moves; pending only the approval decision.
