@@ -1,61 +1,63 @@
 # Signal Brief — Outside-In Intelligence
 
-_Last refreshed: 2026-03-29 13:20 Europe/Rome_
+_Last refreshed: 2026-03-29 18:20 Europe/Rome_
 
 ## Lane utility verdict
 - **Status:** STRONG
 - **Recommendation:** KEEP
 
 ## What changed in signal truth
-- The morning pass established the **governed execution** framing from GitHub platform messaging.
-- This noon pass adds **operator-level specificity**: the market is now describing **intent scope**, **least-privilege scoped to operation**, **no persistent credentials**, and **approval hooks as responsible automation**.
-- Key conceptual shift: **"Can call this API" ≠ "authorized to execute this action class."** This is a materially more precise way of framing the permission problem than tool whitelisting.
-- The OpenClaw plugin approval hooks (March 28, 2026) is the most concrete product proof that approval gates are shipping now, not on a roadmap.
+- The noon pass established **intent scope** and **IAM model for agents** as the new operator framing.
+- This evening pass adds two new layers:
+  1. **Market-scale proof**: Gartner (March 29) named governance failure as the #1 deployment risk — 50% of AI agent deployments will fail due to insufficient governance platforms, causing a $58B enterprise software shakeup. This is the clearest enterprise buyer evidence yet.
+  2. **Runtime path evaluation**: the permission question is now explicitly "is this action safe given prior path?" via execution-path policies, not just "can this tool be called?"
+- On-chain agent GDP ($470M with zero accountability) and DAO treasury figures ($40B managed by part-time Discord mods) provide budget-level evidence that accountability gaps are causing real financial exposure.
 
 ## Exact evidence
-- **@Pete_yes_please — March 29, 2026:** "Tool approval is the wrong unit. Whitelist every tool and you still have no visibility into what an agent is permitted to *do* across a session. 'Can call this API' ≠ 'authorized to execute this action class.' Agent audits need to surface intent scope."
+- **Gartner via @carloxthebot — March 29, 2026:** "AI agents will trigger the first $58B enterprise software shakeup in 30 years by 2027. 50% of AI agent deployments will FAIL due to insufficient governance platforms. The bottleneck isn't capability — it's control."
+- **@TheRabbitPy — March 29, 2026:** "true agent governance demands runtime path evaluation, where actions are authorized based on session context, cumulative intent, and proposed next steps. Shifts from 'can call API' to 'is this action safe given prior path?' via execution-path policies."
+- **@Pete_yes_please — March 29, 2026:** "Tool approval is the wrong unit. Whitelist every tool and you still have no visibility into what an agent is permitted to *do* across a session. 'Can call this API' ≠ 'authorized to execute this action class.'"
 - **@nithin_k_anil — March 29, 2026:** "least privilege, scoped to the operation, no persistent credentials. sandbox mode was never the security boundary. the access model is."
-- **@aginaut — March 29, 2026:** "governance feels organizational before it feels technical. If delegation, approval, and liability stay fuzzy, the agent is not autonomous — the accountability is."
-- **@clearframelabs — March 29, 2026:** "Add agent specific approval gates" + "Shift from Shadow IT thinking to Shadow AI thinking."
-- **@hex_agent — March 29, 2026:** "the ability to pause any tool call for human review is exactly what separates responsible automation from chaos."
+- **@azentiqnexus — March 29, 2026:** "The missing piece in every viral AI agent thread: accountability. That is the difference between a demo and a deployment."
+- **@abdyweb3 — March 29, 2026:** "$470M in agent GDP. Zero accountability. One rogue agent can wipe you out."
 - **GitHub Blog — March 26, 2026:** "secure defaults, policy controls, and CI/CD observability" and "real-time observability and enforceable network boundaries for CI/CD runners."
 - **GitHub Blog — March 9, 2026:** "isolation, constrained outputs, and comprehensive logging" plus "don't trust agents with secrets," "stage and vet all writes," and "log everything."
 
 ## Top 5 operator pain signals
-1. **Intent scope vs. tool access.** The operator conversation has moved beyond "which tools can the agent call" to "which action classes is the agent authorized to execute in a given session." Tool whitelisting is now explicitly called insufficient.
-2. **Sandbox is not the security boundary.** Operators are naming this directly: sandbox mode was never the security boundary — the access model is. Least-privilege scoped to operation with no persistent credentials is the right frame.
-3. **Approval hooks are table stakes, not a nice-to-have.** OpenClaw shipped plugin approval hooks and operators are calling it the feature that "separates responsible automation from chaos." The market is moving fast on this.
-4. **Governance is organizational before it is technical.** Fuzzy delegation, approval, and liability mean the agent is not autonomous — accountability is also fuzzy. This is the framing that resonates with buyers who are not engineers.
-5. **Shadow AI is replacing Shadow IT.** Operators are explicitly describing the risk as Shadow AI: agents running with access that was never formally approved, tracked, or scoped.
+1. **Governance failure is the #1 deployment risk.** Gartner just named it: 50% of AI agent deployments will fail due to insufficient governance platforms. The bottleneck is control, not capability. This reframes the entire competitive landscape.
+2. **Runtime path evaluation — not tool lists.** The market is moving from "can call this API" to "is this action safe given prior path?" via execution-path policies. Session context and cumulative intent are now part of the authorization model.
+3. **Sandbox is not the security boundary.** Least-privilege scoped to operation with no persistent credentials is the right model — the same model IAM solved for human access.
+4. **Approval hooks are table stakes.** OpenClaw shipped plugin approval hooks (March 28) and operators called it the feature that "separates responsible automation from chaos."
+5. **Accountability is organizational before it is technical.** Fuzzy delegation, approval, and liability mean the agent is not autonomous — accountability is also fuzzy. This resonates with non-technical buyers.
 
 ## Top 3 reply targets
-1. **@Pete_yes_please** — "intent scope" framing is the sharpest operator articulation of the permission problem. Good angle: MUTX as the layer that surfaces action-class authorization, not just tool lists.
-2. **@nithin_k_anil** — "IAM model for agents" is the right analogy for buyers. Good angle: MUTX as the runtime access model that makes least-privilege agent permissions enforceable fleet-wide.
-3. **@aginaut** — governance is organizational before technical. Good angle for non-technical buyers and for sales positioning: accountability requires a control plane, not just a prompt.
+1. **@TheRabbitPy** — "runtime path evaluation" is the sharpest articulation of policy-based enforcement. Good angle: execution-path policies that evaluate "is this action safe given prior path?" are exactly what a control plane enables.
+2. **@Pete_yes_please** — "intent scope" framing remains the clearest permission problem description. Good angle: MUTX as the layer that surfaces action-class authorization, not just tool lists.
+3. **@azentiqnexus** — demo vs. deployment framing is buyer-level. Good angle: the missing piece is a control plane that makes accountability enforceable and auditable.
 
 ## Top 3 content hooks
-1. **"Can call this API" ≠ "authorized to execute this action class."**
-2. **Sandbox mode was never the security boundary — the access model is.**
-3. **Approval hooks are what separate responsible automation from chaos.**
+1. **"Is this action safe given prior path?" — Runtime path evaluation is the new permission model.**
+2. **50% of AI agent deployments will fail due to insufficient governance. The bottleneck is control, not capability.**
+3. **Demo vs. deployment: the missing piece is accountability, not capability.**
 
 ## Top 3 product implications
-1. **Build action-class authorization, not just tool lists.** The market is moving past tool whitelisting. MUTX needs to support intent-scoping at the action-class level.
-2. **Treat the access model as the security boundary, not sandboxing.** Enforceable least-privilege scoped to operation, no persistent credentials — this is the IAM analogy for agents.
-3. **Approval hooks and governance primitives are shipping now, not future work.** OpenClaw shipped them in March 2026. MUTX should position itself as the control plane that makes these primitives enforceable and auditable fleet-wide.
+1. **Execution-path policies are the right product direction.** Runtime path evaluation that asks "is this action safe given prior path?" is more precise than tool whitelisting. MUTX should support session-context and cumulative-intent authorization.
+2. **Governance failure is the category entry point.** Lead with the Gartner framing for enterprise buyers: control-plane maturity is the deployment bottleneck, not model quality.
+3. **On-chain and off-chain accountability are both real.** The $470M agent GDP and DAO treasury figures show the problem exists at every financial scale. MUTX should be able to address both.
 
 ## Top 3 account / design-partner triggers
-1. **OpenClaw plugin approval hooks (March 28, 2026)** — most concrete product proof that the approval-gate direction is real and shipping. MUTX-adjacent if built on OpenClaw.
-2. **GitHub Actions / Agentic Workflows** — strongest platform signal that secure defaults, scoped credentials, and CI/CD observability are bundled expectations.
-3. **Microsoft Foundry / Anthropic Claude Code** — Foundry for managed runtime governance language; Claude Code for directory-scoped permission direction.
+1. **Gartner March 2026** — enterprise buyers will come in with this framing already loaded. MUTX needs to be positioned as the solution before they finish the sentence.
+2. **OpenClaw plugin approval hooks (March 28, 2026)** — most concrete product proof that approval-gate direction is shipping. MUTX-adjacent if built on OpenClaw.
+3. **GitHub Actions / Agentic Workflows** — strongest platform signal that secure defaults, scoped credentials, and CI/CD observability are bundled expectations.
 
 ## What Fortune can do with this today
-- Quote **@Pete_yes_please** ("intent scope") and **@nithin_k_anil** (IAM model for agents) in positioning and proof packaging.
-- Use the IAM analogy internally: agents need the same least-privilege, scoped-to-operation, no-persistent-credentials model that IAM solved for human access.
-- Position MUTX as the **runtime access model for agents** — not another logging dashboard.
-- Keep public claims conservative but update internal language to **action-class intent scope** and **approval hooks as responsible automation**.
-- If MUTX is OpenClaw-based, the plugin approval hooks release validates the direction without requiring MUTX to build it from scratch.
+- Lead every enterprise conversation with **Gartner's "bottleneck is control" framing** — it reframes the competition from model quality to control-plane maturity.
+- Use **"runtime path evaluation"** in internal product and positioning docs — it is the most precise description of what policy-based enforcement means.
+- Quote **@TheRabbitPy** and **@Pete_yes_please** together: the combination of "runtime path evaluation" and "intent scope" is the clearest two-sentence description of the category.
+- Keep `/dashboard` and public claims conservative but update the internal framing: **governance failure is the #1 deployment risk, and the bottleneck is control**.
+- The $470M agent GDP and $40B DAO treasury figures are proof that accountability gaps cause real financial exposure — use them in sales enablement.
 
 ## What should change in this lane next
-- Run a bounded Reddit pass for posts describing agent failures tied to wrong permission models or missing approval gates.
-- Monitor whether the OpenClaw approval hooks release generates more discussion about production agent governance patterns.
-- If X stays clean, keep the bounded pass cadence; if it gets noisy again, return to GitHub/RSS-only proof collection.
+- Run a bounded Reddit or RSS pass to see if the Gartner framing and "runtime path evaluation" language appears in non-X channels.
+- Look for GitHub repos or posts that mention **execution-path policies** as an implementation approach.
+- If the GitHub/RSS lane confirms the same language, "runtime path evaluation" becomes the strongest content hook for the next cycle.
