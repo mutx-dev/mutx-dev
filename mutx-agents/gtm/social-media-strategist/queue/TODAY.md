@@ -1,4 +1,5 @@
-## Next 3 moves
-- Draft a founder-led thread on the runtime-policy / approval-boundary angle: agents need an OS, not scripts.
-- Pull proof assets that show operator visibility: `/dashboard`, monitoring/health, and any spend/retry/accountability surfaces that are already live.
-- Keep the distribution path manual-only and conservative until review truth and GTM proof stay aligned; do not schedule or automate posting.
+# Today — Social Media Strategist
+
+1. Draft a proof-first founder thread on **governed execution**: hook it with **"Agents need an OS, not scripts."**
+2. Assemble the proof stack before any draft is finalized: `/dashboard/security`, `/dashboard/monitoring`, `/dashboard/budgets`, and the supported `/dashboard` vs preview `/control/*` split.
+3. Keep the path manual-only and conservative; do **not** schedule, automate, or publicly post from this lane.
