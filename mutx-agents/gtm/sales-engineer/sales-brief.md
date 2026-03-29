@@ -15,18 +15,19 @@ MUTX helps teams deploy, operate, observe, and govern them like production infra
 
 ## What we can prove now
 ### Supported operator lane
-- `app.mutx.dev/dashboard` is the supported browser shell for stable routes
+- `app.mutx.dev/dashboard` is the supported browser shell for stable routes, backed by live same-origin dashboard proxies
 - the CLI is real and covers setup, auth, assistants, agents, deployments, runtime inspection, and governance
+- governance approval flows are CLI-first today; do not imply a dashboard approval UI
 - the macOS app is a supported operator surface for local operators
 
 ### Proof matrix
 | Buyer question | Proof surface | What we should show |
 | --- | --- | --- |
 | Can this run an agent like production infra? | `/dashboard`, CLI, docs | deployment records, runs/traces, sessions, budgets, monitoring |
-| Can we operate it without lying about gaps? | `/dashboard` + CLI | supported vs preview boundaries, CLI fallbacks where UI is thin |
-| Can we govern risky work? | `mutx governance` | permit / deny / defer decisions, pending queue, metrics |
+| Can we operate it without lying about gaps? | `/dashboard` + CLI | supported vs preview boundaries, CLI fallbacks where UI is thin, no fake dashboard parity |
+| Can we govern risky work? | `mutx governance status`, `mutx governance decisions --limit 50`, `mutx governance pending`, `mutx governance metrics` | permit / deny / defer decisions, pending approvals, Prometheus metrics, CLI-first approval path |
 | Can we keep the runtime honest? | `mutx runtime inspect openclaw` | durable runtime tracking instead of ad hoc local state |
-| Is the SDK story truthful? | SDK docs | `MutxAsyncClient` is deprecated and limited; use `MutxClient` for production code |
+| Is the SDK story truthful? | `sdk/README.md` | `MutxAsyncClient` is deprecated and limited; use `MutxClient` for production code |
 
 ### Durable control-plane primitives
 - auth
@@ -42,7 +43,7 @@ MUTX helps teams deploy, operate, observe, and govern them like production infra
 - Faramesh-backed governance is real today
 - policy decisions are permit / deny / defer
 - operators can inspect decisions, pending approvals, and metrics from the CLI
-- credential backends exist, but the operator UX is still CLI-first
+- approval workflows remain CLI-first; the dashboard should not be positioned as the approval surface yet
 
 ## 20-minute demo spine
 1. **Open with the truth boundary**
