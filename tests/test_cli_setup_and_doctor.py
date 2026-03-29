@@ -47,8 +47,6 @@ def wizard_result_payload(*, reused_existing_assistant: bool = False) -> SimpleN
     )
 
 
-
-
 def test_setup_faramesh_does_not_auto_install(monkeypatch) -> None:
     from cli.commands import setup as setup_module
 
@@ -64,6 +62,7 @@ def test_setup_faramesh_does_not_auto_install(monkeypatch) -> None:
     setup_module._install_faramesh_governance()
 
     assert captured == {"install_if_missing": False, "non_interactive": True}
+
 
 def test_setup_hosted_deploys_personal_assistant(monkeypatch, tmp_path: Path) -> None:
     captured: dict[str, object] = {}
@@ -375,7 +374,9 @@ def test_doctor_json_reports_assistant_state(monkeypatch, tmp_path: Path) -> Non
     }
 
 
-def test_setup_hosted_no_input_requires_explicit_openclaw_install(monkeypatch, tmp_path: Path) -> None:
+def test_setup_hosted_no_input_requires_explicit_openclaw_install(
+    monkeypatch, tmp_path: Path
+) -> None:
     config = CLIConfig(config_path=tmp_path / "config.json")
 
     class DummyAuth:
@@ -423,7 +424,9 @@ def test_setup_hosted_uses_import_action_when_openclaw_exists(monkeypatch, tmp_p
             return None
 
     monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
-    monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw")
+    monkeypatch.setattr(
+        "cli.commands.setup.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw"
+    )
     monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
     monkeypatch.setattr("cli.commands.setup.mark_auth_completed", lambda **kwargs: None)
     monkeypatch.setattr(
@@ -459,7 +462,9 @@ def test_setup_hosted_interactive_can_choose_openclaw_tui(monkeypatch, tmp_path:
             return None
 
     monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
-    monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw")
+    monkeypatch.setattr(
+        "cli.commands.setup.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw"
+    )
     monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
     monkeypatch.setattr("cli.commands.setup.mark_auth_completed", lambda **kwargs: None)
     monkeypatch.setattr(
@@ -496,7 +501,9 @@ def test_setup_hosted_interactive_can_choose_repair(monkeypatch, tmp_path: Path)
             return None
 
     monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
-    monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw")
+    monkeypatch.setattr(
+        "cli.commands.setup.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw"
+    )
     monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
     monkeypatch.setattr("cli.commands.setup.mark_auth_completed", lambda **kwargs: None)
     monkeypatch.setattr(

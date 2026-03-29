@@ -13,7 +13,9 @@ class _MockSupervisor:
     def get_agent_status(self, agent_id):
         return {"agent_id": agent_id, "state": "running"}
 
-    def prepare_launch_request(self, agent_id, command=None, env=None, faramesh_policy=None, profile_name=None):
+    def prepare_launch_request(
+        self, agent_id, command=None, env=None, faramesh_policy=None, profile_name=None
+    ):
         return _MockPreparedLaunch(agent_id)
 
     async def start_prepared_agent(self, prepared):
@@ -39,7 +41,9 @@ async def test_start_supervised_agent_forbidden_for_non_internal_user(
 ):
     from src.api.routes import governance_supervision
 
-    monkeypatch.setattr(governance_supervision, "get_faramesh_supervisor", lambda: _MockSupervisor())
+    monkeypatch.setattr(
+        governance_supervision, "get_faramesh_supervisor", lambda: _MockSupervisor()
+    )
 
     response = await other_user_client.post(
         "/v1/runtime/governance/supervised/start",
@@ -53,7 +57,9 @@ async def test_start_supervised_agent_forbidden_for_non_internal_user(
 async def test_start_supervised_agent_allowed_for_internal_user(client, monkeypatch):
     from src.api.routes import governance_supervision
 
-    monkeypatch.setattr(governance_supervision, "get_faramesh_supervisor", lambda: _MockSupervisor())
+    monkeypatch.setattr(
+        governance_supervision, "get_faramesh_supervisor", lambda: _MockSupervisor()
+    )
 
     response = await client.post(
         "/v1/runtime/governance/supervised/start",
