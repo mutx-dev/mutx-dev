@@ -1,38 +1,28 @@
 # latest.md — Developer Advocate
 
 ## Lane utility verdict
-Status: STRONG
+Status: THIN
 Recommendation: KEEP
 
 ## What changed in truth
-Two material updates since the 10:00 AM run:
+Three material changes since the 4:00 PM run:
 
-1. **Signal brief (13:20 refresh):** Market language sharpened on three points that sharpen the demo narrative:
-   - "Can call this API" ≠ "authorized to execute this action class" — intent scope is the right permission unit, not tool lists
-   - Sandbox is not the security boundary — the access model is
-   - OpenClaw plugin approval hooks (March 28, 2026) are shipping now — approval gates are not future work
+1. **Queue is clear (roundtable 20:10):** `#1211`, `#1210`, `#1209` all merged. No PR blockers remaining. This unblocks any downstream proof work that was waiting on clean CI.
 
-2. **MUTX docs updates (today):** Three commits since yesterday confirm canonical surface truth:
-   - `5d99f5ad` — `/dashboard` is explicit in quickstart URLs, not just `/app` or root
-   - `21b08f90` — local bootstrap docs now point to `/dashboard`, not `/app`
-   - `454dc7a0` — dashboard stable pages confirmed: overview, auth, deployments, runs, agents, api-keys, webhooks. Preview/demo pages: channels, skills, orchestration, memory, spawn, logs
+2. **Signal sharpened at 18:20:** Gartner named governance failure the #1 deployment risk — 50% of AI agent deployments will fail due to insufficient governance platforms, causing a $58B enterprise shakeup. The new permission model is "runtime path evaluation" — asking "is this action safe given prior path?" via execution-path policies, not just tool whitelisting.
 
-The walkthrough asset remains the right first move. The new signal gives it sharper buyer framing — the walkthrough demonstrates runtime state and event history, which is exactly the "action-class intent scope" and "who changed what" accountability story the market is now asking for.
+3. **Next dispatch slice is unnamed:** Roundtable explicitly flags this as the next decision point. Developer-advocate lane is unblocked but waiting on a named direction before moving from asset definition to asset production.
 
 ## Exact evidence
-- `git -C /Users/fortune/MUTX log --oneline -10` — checked at 16:00 Europe/Rome
-- `git -C /Users/fortune/MUTX diff --stat HEAD~5..HEAD` — 6 files, 19 insertions, 6 deletions
-- `git -C /Users/fortune/MUTX show 5d99f5ad -- docs/deployment/quickstart.md`
-- `git -C /Users/fortune/MUTX show 21b08f90 -- docs/deployment/local-developer-bootstrap.md`
-- `git -C /Users/fortune/MUTX show 454dc7a0 -- docs/app-dashboard.md`
-- `gtm/outside-in-intelligence/reports/signal-brief.md` — refreshed 2026-03-29 13:20 Europe/Rome
-- `mutx-agents/reports/roundtable.md` — refreshed 2026-03-29 14:10 Europe/Rome
+- `mutx-agents/reports/roundtable.md` — refreshed 2026-03-29 20:10 Europe/Rome; confirmed queue clear and `#1211`/`#1210`/`#1209` merged
+- `gtm/outside-in-intelligence/reports/signal-brief.md` — refreshed 2026-03-29 18:20 Europe/Rome; Gartner $58B framing + "runtime path evaluation" language
+- `gtm/developer-advocate/reports/latest.md` — prior run at 16:00 Europe/Rome
 
 ## If idle or blocked, why exactly
-Not blocked. The surfaces exist and the walkthrough path is clear. The hard constraint remains: some deployments expose no event history, so the pack needs a deployment with actual events, or that payload must be explicit as a fallback.
+Not blocked — but the lane is effectively waiting on a named next dispatch slice before it can convert the defined asset into a shipped proof. The walkthrough is the right asset but it has not been built yet. "THIN" is honest: the asset is defined, not delivered.
 
 ## What Fortune can do with this today
-Approve the walkthrough asset with one sharpening addition: frame it as "runtime state + action accountability" not just "who changed what." The signal brief language does the heavy lifting — the walkthrough just needs to show the proof without overclaiming.
+Name the next dispatch slice so this lane can convert the walkthrough definition into a deliverable. If the walkthrough is still the right first proof, approve it and this lane ships. If the dispatch priority shifted, tell this lane the new direction.
 
 ## What should change in this lane next
-Turn the walkthrough into a screenshot/payload pack + 5-step demo script. Do not pull preview/demo surfaces (channels, skills, orchestration, memory, spawn, logs) into the story — they are explicitly unstable. Stick to the confirmed stable surfaces only.
+Once Fortune names the next dispatch slice: ship the walkthrough as a screenshot/payload pack + 5-step demo script, anchored to the stable dashboard surfaces confirmed in `454dc7a0`. Use the Gartner framing internally to sharpen the positioning without overclaiming in public-facing material.
