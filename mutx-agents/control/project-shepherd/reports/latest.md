@@ -1,43 +1,43 @@
 # latest.md — Project Shepherd
 
 ## Status
-**State:** REVIEW-BLOCKED, BUT MOVING.
+**State:** REVIEW-BOUND / CI-GREEN. Bottleneck narrowed to approvals only.
 
-No material review-state change landed in the last pass. The fleet is still review-bound, and Fortune’s comments on `#1211` and `#1210` remain non-blocking. The real gate is still independent approval plus CI.
+CI is now green on `#1211` and `#1210` — Validation, Container Image Scan, and Trivy all passing. The gate is now a second reviewer attached to each. This is a material improvement from the CI-noise state.
 
 ## Fleet utility verdicts
 - **Strongest lanes:** control/orchestration, QA routing, product/runtime truth, GTM signal digestion.
 - **Thin but honest lanes:** outbound proof packaging, docs synchronization, infra trust hardening.
-- **Idle / blocked lanes:** X distribution is manual-only/conservative; merge flow is still blocked by approvals and validation.
+- **Idle / blocked lanes:** X distribution is manual-only/conservative; `#1209` still blocked by reviewer identity and Container Image Scan.
 
 ## Keep / downshift / rewire / cut calls
-- **Keep:** review-queue clearing, `/dashboard` truth strip work, conservative proof packaging.
+- **Keep:** reviewer-attach push on `#1211` and `#1210`, `/dashboard` truth strip work, conservative proof packaging.
 - **Downshift:** any GTM claim that outruns live dashboard truth.
-- **Rewire:** reviewer-resolution flow for the active PRs so approvals are real, not nominal.
-- **Cut:** optimistic status language that implies merge readiness where none exists.
+- **Rewire:** attach a real GitHub user as second reviewer — this is the only remaining gate.
+- **Cut:** CI-noise framing — that is no longer the bottleneck.
 
 ## Exact evidence
-- `signal-brief.md` now points at a stronger governed-execution market pattern: secure defaults, policy controls, scoped credentials, comprehensive logging, and enforceable network boundaries.
-- `reports/roundtable.md` and `queue/TODAY.md` still point at the same three priorities.
-- Engineering latest still reads review-blocked: no merge-ready PRs, approvals and CI remain the gate.
+- `engineering/mission-control-orchestrator/reports/latest.md` @ 2026-03-29 13:20 Europe/Rome: CI green on `#1211` and `#1210`; reviewer-identity is the only blocker.
+- `signal-brief.md` @ 2026-03-29 13:20 Europe/Rome: new X posts sharpen the governed execution frame — "intent scope," "least privilege scoped to operation," "approval hooks as responsible automation."
+- `#1209`: still blocked by reviewer identity AND Container Image Scan failure.
+- Merge queue: empty — no PR has a second reviewer attached.
 
 ## What changed in truth
-- Fresh market signal improved, but operational truth did not.
-- The lane still reads review-bound, not code-bound.
-- GTM framing can lean harder into governed execution, but local status must stay conservative.
+- CI noise resolved on the top two PRs — bottleneck is now approvals only.
+- The signal brief gained specific operator language from March 29 X posts that sharpens the governed execution frame.
+- Control lane: the `queue/TODAY.md` window and blocker framing are now stale and need updating.
 
 ## What Fortune can do with this today
-- Use the fresh market words: **secure defaults, policy controls, scoped credentials, network boundaries, comprehensive logging**.
-- Push the reviewer-resolution path on `#1211` and `#1210` so the second-reviewer gate is real.
-- Keep `#1209` blocked until a GitHub-resolvable reviewer exists.
-- Leave the merge queue empty until there is a green reviewed PR.
+- Attach a real GitHub user as second reviewer to `#1211` and `#1210` — this is the only thing preventing merge.
+- Resolve `#1209` reviewer-identity and Container Image Scan — either fix the scan or split the PR.
+- Use the new market words in internal framing: **intent scope**, **least-privilege scoped to operation**, **approval hooks as responsible automation**.
 
 ## Owner map
 | Priority | Primary owner | Immediate output expected |
 | --- | --- | --- |
-| Review queue | qa-reliability-engineer | clear remaining review comments, get approvals, move approved items toward merge |
+| Review queue | qa-reliability-engineer + Fortune | second reviewer attached to #1211 and #1210 |
 | Product/runtime truth | product-manager | one shared truth-strip brief for `/dashboard` |
 | Proof + distribution | outbound-strategist | one supported proof path and one conservative distribution note |
 
 ## Control call
-Keep the fleet moving, but do not let local files outrun live review state.
+CI is no longer the blocker. The bottleneck is now purely approvals — name a reviewer, get it merged.

@@ -1,6 +1,6 @@
 # lane-scorecard.md — Project Shepherd
 
-> Refreshed: 2026-03-29 10:10 Europe/Rome
+> Refreshed: 2026-03-29 14:10 Europe/Rome
 
 ## Fleet score
 - Control plane: **GREEN**
@@ -30,19 +30,19 @@
 
 ## Cross-lane consensus
 - The fleet is operational.
-- Work is still review-bound; Fortune’s comments on the active auth/bootstrap PRs remain non-blocking.
-- The market signal now favors governed execution: secure defaults, policy controls, scoped credentials, logging, and network boundaries.
+- CI is now green on `#1211` and `#1210` — bottleneck is approvals only.
+- Market signal now sharper on governed execution: **intent scope**, **least-privilege scoped to operation**, **approval hooks as responsible automation**.
 - Live company truth and local control files must stay synchronized.
 - `/dashboard` remains canonical.
 
 ## Immediate priorities
-1. Clear the active review queue (`#1211`, `#1210`, `#1209`)
+1. Attach a second reviewer to `#1211` and `#1210` — only gate remaining.
 2. Keep product/runtime truth honest on `/dashboard`
 3. Keep trust hardening and X distribution conservative
 
 ## Owner map
 - Truth / orchestration: Project Shepherd
-- Review queue / QA: QA Reliability Engineer + Infra Delivery Operator
+- Review queue / QA: QA Reliability Engineer + Fortune (second reviewer attach)
 - Product / contract truth: Product Manager + Workflow Architect + Technical Writer
 - Runtime / infra truth: Infrastructure Maintainer + Security Engineer + AI Engineer
 - Revenue / pipeline: Outbound Strategist + Sales Engineer + Account Strategist + Developer Advocate
