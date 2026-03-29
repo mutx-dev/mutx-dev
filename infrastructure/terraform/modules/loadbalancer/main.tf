@@ -158,10 +158,10 @@ resource "digitalocean_loadbalancer" "public" {
     for_each = var.expose_agent_port_public ? [1] : []
     content {
       # Agent port forwarding (opt-in)
-      entry_port       = var.agent_port
-      entry_protocol   = "tcp"
-      target_port       = var.agent_port
-      target_protocol   = "tcp"
+      entry_port      = var.agent_port
+      entry_protocol  = "tcp"
+      target_port     = var.agent_port
+      target_protocol = "tcp"
     }
   }
 
