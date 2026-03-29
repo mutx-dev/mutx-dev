@@ -3,8 +3,8 @@
 Priority dispatch: PR #1210 — `Fix local bootstrap dashboard path`
 
 Goal:
-- Keep the branch docs-only and make sure the queue truth stays honest.
-- The split is complete and the docs slice is clean; the current blocker is reviewer-path resolution plus a failing Container Image Scan check.
+- Keep the branch docs-only and keep the queue truth honest.
+- The split is complete and the docs slice is clean; the current blockers are reviewer-path resolution and a failing Container Image Scan check.
 - Stay bounded to the docs slice and report the blocker plainly.
 
 Current signal:

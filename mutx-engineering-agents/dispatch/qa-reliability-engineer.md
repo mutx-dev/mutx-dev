@@ -11,7 +11,7 @@ Goals:
 
 Current signal:
 - PR #1211 is the active auth review target; Validation passes, but Container Image Scan is failing and the GitHub reviewer request is still unresolved.
-- PR #1210 is docs-only again; Validation passes, but Container Image Scan is failing and the reviewer request is still not cleanly attached.
+- PR #1210 is docs-only; Validation passes, but Container Image Scan is failing and the reviewer request is still not cleanly attached.
 - Do not reopen the split blocker unless the `agents/registry.yml` change reappears.
 
 Review / merge posture:

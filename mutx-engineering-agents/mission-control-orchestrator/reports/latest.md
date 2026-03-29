@@ -3,10 +3,9 @@
 - Recommendation: REWIRE
 
 ## What changed since the last control pass
-- Live queue truth now reflects the current open PRs again.
-- Validation is green on PRs #1211, #1210, and #1209.
-- Container Image Scan is now the active blocker on all three PRs.
-- No merge-ready PR exists; the remaining bottleneck is still review identity, with scan noise on top.
+- A concurrent run cleared the shared review and merge queues; they have been restored to reflect the live open PRs.
+- Live GitHub checks: Validation is passing on PRs #1211, #1210, and #1209, but Container Image Scan is failing on all three.
+- No merge-ready PR exists; the bottleneck is still review identity, with check noise on top.
 
 ## Exact queue evidence
 - Review queue:
