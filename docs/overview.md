@@ -47,7 +47,8 @@ What exists today:
 
 - login and register browser flows via `app/api/auth/*`
 - current-user lookup via `app/api/auth/me`
-- supported dashboard pages under `app/dashboard/*` for stable routes
+- supported dashboard pages under `app/dashboard/*` for stable routes like agents, deployments, runs, sessions, budgets, monitoring, and webhooks
+- preview/demo or redirect-backed pages under the same tree for channels, skills, orchestration, memory, spawn, and logs; those are visible in the shell but not stable product truth yet
 - same-origin dashboard and control-plane proxies under `app/api/dashboard/*`, `app/api/agents/*`, `app/api/deployments/*`, `app/api/api-keys/*`, and `app/api/webhooks/*`
 - a catch-all control demo rendered from `app/control/[[...slug]]/page.tsx`
 
