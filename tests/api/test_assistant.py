@@ -41,7 +41,9 @@ class TestAssistantTemplates:
         assert payload["template_id"] == "personal_assistant"
         assert payload["agent"]["type"] == "openclaw"
         assert payload["agent"]["config"]["assistant_id"] == "personal-assistant"
-        assert payload["agent"]["config"]["workspace"] == "/tmp/openclaw/workspace-personal-assistant"
+        assert (
+            payload["agent"]["config"]["workspace"] == "/tmp/openclaw/workspace-personal-assistant"
+        )
         assert payload["agent"]["config"]["metadata"]["runtime"]["managed_by_mutx"] is True
         assert payload["deployment"]["status"] == "pending"
 
@@ -84,7 +86,10 @@ class TestAssistantOverview:
 
         install_response = await client.post(f"/v1/assistant/{agent_id}/skills/browser_control")
         assert install_response.status_code == 200
-        assert any(item["id"] == "browser_control" and item["installed"] for item in install_response.json())
+        assert any(
+            item["id"] == "browser_control" and item["installed"]
+            for item in install_response.json()
+        )
 
         uninstall_response = await client.delete(f"/v1/assistant/{agent_id}/skills/browser_control")
         assert uninstall_response.status_code == 200

@@ -115,10 +115,13 @@ def test_runtime_open_tui(monkeypatch, tmp_path: Path) -> None:
     )
     monkeypatch.setattr(
         "cli.commands.runtime.prepare_runtime_state_sync",
-        lambda *_args, **kwargs: captured.__setitem__("sync_kwargs", kwargs) or {
-            "status": "healthy",
-            "last_seen_at": "2026-03-21T10:00:00+00:00",
-        },
+        lambda *_args, **kwargs: (
+            captured.__setitem__("sync_kwargs", kwargs)
+            or {
+                "status": "healthy",
+                "last_seen_at": "2026-03-21T10:00:00+00:00",
+            }
+        ),
     )
 
     runner = CliRunner()

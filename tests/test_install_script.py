@@ -593,9 +593,13 @@ exit 0
 """
 
 
-def test_install_script_bootstraps_current_cli_when_packaged_binary_is_stale(tmp_path: Path) -> None:
+def test_install_script_bootstraps_current_cli_when_packaged_binary_is_stale(
+    tmp_path: Path,
+) -> None:
     source_ref = str(build_fake_cli_package(tmp_path / "source-cli"))
-    result, brew_prefix = run_install_script(tmp_path, mutx_script=STALE_MUTX_SCRIPT, source_ref=source_ref)
+    result, brew_prefix = run_install_script(
+        tmp_path, mutx_script=STALE_MUTX_SCRIPT, source_ref=source_ref
+    )
     visible_summary = result.stdout.split("Last output:", 1)[0]
 
     assert result.returncode == 0
@@ -641,7 +645,9 @@ def test_install_script_recovers_when_packaged_cli_lacks_openclaw_flags(tmp_path
     assert "mutx onboard" in result.stdout
 
 
-def test_install_script_refreshes_existing_source_overlay_even_when_surface_looks_current(tmp_path: Path) -> None:
+def test_install_script_refreshes_existing_source_overlay_even_when_surface_looks_current(
+    tmp_path: Path,
+) -> None:
     source_ref = str(build_fake_cli_package(tmp_path / "source-cli"))
     env, brew_prefix = build_install_env(tmp_path, source_ref=source_ref)
     overlay_bin = Path(env["MUTX_HOME_DIR"]) / "runtime" / "source-cli" / "venv" / "bin"
@@ -728,7 +734,9 @@ def test_install_script_no_onboard_skips_wizard_and_prints_next_steps(tmp_path: 
     assert "mutx onboard" in result.stdout
 
 
-def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recovery(tmp_path: Path) -> None:
+def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recovery(
+    tmp_path: Path,
+) -> None:
     source_ref = str(build_fake_cli_package(tmp_path / "source-cli"))
     exit_code, transcript, brew_prefix = run_install_script_in_tty(
         tmp_path,

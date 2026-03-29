@@ -87,8 +87,8 @@ def test_dev_compose_is_project_scoped_without_fixed_container_names() -> None:
     assert "container_name:" not in compose
     assert "dev-secret-change-in-production-123456" in compose
     assert "migrate:" in compose
-    assert 'condition: service_completed_successfully' in compose
-    assert 'http://localhost:8000/ready' in compose
+    assert "condition: service_completed_successfully" in compose
+    assert "http://localhost:8000/ready" in compose
 
 
 def test_demo_env_example_uses_valid_local_jwt_secret() -> None:

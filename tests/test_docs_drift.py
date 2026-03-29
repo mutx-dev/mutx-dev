@@ -234,9 +234,9 @@ def test_summary_points_only_to_existing_public_docs() -> None:
 def test_gitbook_config_keeps_legacy_contract_redirect() -> None:
     gitbook_config = read_text(".gitbook.yaml")
 
-    assert 'root: ./' in gitbook_config
-    assert 'readme: README.md' in gitbook_config
-    assert 'summary: SUMMARY.md' in gitbook_config
+    assert "root: ./" in gitbook_config
+    assert "readme: README.md" in gitbook_config
+    assert "summary: SUMMARY.md" in gitbook_config
     assert '"docs/contracts/api": docs/api/reference.md' in gitbook_config
 
 

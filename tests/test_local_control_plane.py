@@ -14,7 +14,9 @@ from cli.local_control_plane import (
 def _build_fake_control_plane_repo(root: Path) -> Path:
     (root / "scripts").mkdir(parents=True, exist_ok=True)
     (root / "infrastructure" / "docker").mkdir(parents=True, exist_ok=True)
-    (root / ".env.example").write_text("JWT_SECRET=replace-with-a-stable-secret\n", encoding="utf-8")
+    (root / ".env.example").write_text(
+        "JWT_SECRET=replace-with-a-stable-secret\n", encoding="utf-8"
+    )
     (root / "scripts" / "dev.sh").write_text("#!/usr/bin/env bash\nexit 0\n", encoding="utf-8")
     (root / "infrastructure" / "docker" / "docker-compose.yml").write_text(
         "services: {}\n",
@@ -23,7 +25,9 @@ def _build_fake_control_plane_repo(root: Path) -> Path:
     return root
 
 
-def test_ensure_managed_local_control_checkout_materializes_source_and_manifest(tmp_path: Path) -> None:
+def test_ensure_managed_local_control_checkout_materializes_source_and_manifest(
+    tmp_path: Path,
+) -> None:
     source_repo = _build_fake_control_plane_repo(tmp_path / "source-repo")
     home_dir = tmp_path / "home"
 
@@ -40,7 +44,9 @@ def test_ensure_managed_local_control_checkout_materializes_source_and_manifest(
     assert manifest["source_ref"] == str(source_repo)
 
 
-def test_ensure_local_control_plane_bootstraps_managed_checkout_and_waits_for_ready(tmp_path: Path) -> None:
+def test_ensure_local_control_plane_bootstraps_managed_checkout_and_waits_for_ready(
+    tmp_path: Path,
+) -> None:
     source_repo = _build_fake_control_plane_repo(tmp_path / "source-repo")
     home_dir = tmp_path / "home"
     progress: list[str] = []
@@ -67,7 +73,11 @@ def test_ensure_local_control_plane_bootstraps_managed_checkout_and_waits_for_re
     assert state.bootstrapped_now is True
     assert state.source_kind == "managed_checkout"
     assert started["cwd"] == state.checkout_root
-    assert started["command"] == ["/bin/bash", str(state.checkout_root / "scripts" / "dev.sh"), "up"]
+    assert started["command"] == [
+        "/bin/bash",
+        str(state.checkout_root / "scripts" / "dev.sh"),
+        "up",
+    ]
     assert any("Provisioning a managed localhost stack" in message for message in progress)
     assert any("Starting the local control plane" in message for message in progress)
 
@@ -80,7 +90,9 @@ def test_ensure_local_container_runtime_starts_docker_desktop_on_macos(
     ready_checks = {"count": 0}
 
     monkeypatch.setattr("cli.local_control_plane.sys.platform", "darwin")
-    monkeypatch.setattr("cli.local_control_plane.shutil.which", lambda name: "/usr/local/bin/docker")
+    monkeypatch.setattr(
+        "cli.local_control_plane.shutil.which", lambda name: "/usr/local/bin/docker"
+    )
 
     def fake_ready() -> bool:
         ready_checks["count"] += 1

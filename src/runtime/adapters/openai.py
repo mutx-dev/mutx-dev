@@ -156,11 +156,15 @@ class OpenAIAdapter(AgentRuntime):
             try:
                 if timeout:
                     response = await asyncio.wait_for(
-                        self._create_completion(messages=conversation, tools=active_tools, stream=False, **kwargs),
+                        self._create_completion(
+                            messages=conversation, tools=active_tools, stream=False, **kwargs
+                        ),
                         timeout=timeout,
                     )
                 else:
-                    response = await self._create_completion(messages=conversation, tools=active_tools, stream=False, **kwargs)
+                    response = await self._create_completion(
+                        messages=conversation, tools=active_tools, stream=False, **kwargs
+                    )
             except asyncio.TimeoutError:
                 timed_out = True
                 break
@@ -238,13 +242,21 @@ class OpenAIAdapter(AgentRuntime):
         try:
             if timeout:
                 stream = await asyncio.wait_for(
-                    self._create_completion(messages=conversation, tools=active_tools, stream=True, **kwargs),
+                    self._create_completion(
+                        messages=conversation, tools=active_tools, stream=True, **kwargs
+                    ),
                     timeout=timeout,
                 )
             else:
-                stream = await self._create_completion(messages=conversation, tools=active_tools, stream=True, **kwargs)
+                stream = await self._create_completion(
+                    messages=conversation, tools=active_tools, stream=True, **kwargs
+                )
         except asyncio.TimeoutError:
-            yield {"type": "timeout", "error": f"Execution timed out after {timeout} seconds", "timed_out": True}
+            yield {
+                "type": "timeout",
+                "error": f"Execution timed out after {timeout} seconds",
+                "timed_out": True,
+            }
             return
         except Exception as exc:
             yield {"type": "error", "error": str(exc)}
@@ -258,7 +270,11 @@ class OpenAIAdapter(AgentRuntime):
                     elapsed = time.monotonic() - start_time
                     remaining = timeout - elapsed
                     if remaining <= 0:
-                        yield {"type": "timeout", "error": f"Execution timed out after {timeout} seconds", "timed_out": True}
+                        yield {
+                            "type": "timeout",
+                            "error": f"Execution timed out after {timeout} seconds",
+                            "timed_out": True,
+                        }
                         return
 
                 if not chunk.choices:
@@ -271,7 +287,10 @@ class OpenAIAdapter(AgentRuntime):
 
                 for partial_call in getattr(delta, "tool_calls", []) or []:
                     index = getattr(partial_call, "index", 0) or 0
-                    call = pending_tool_calls.setdefault(index, {"id": "", "type": "function", "function": {"name": "", "arguments": ""}})
+                    call = pending_tool_calls.setdefault(
+                        index,
+                        {"id": "", "type": "function", "function": {"name": "", "arguments": ""}},
+                    )
                     call_id = getattr(partial_call, "id", None)
                     if call_id:
                         call["id"] = call_id
@@ -284,7 +303,11 @@ class OpenAIAdapter(AgentRuntime):
                         if arguments_delta:
                             call["function"]["arguments"] += arguments_delta
         except asyncio.TimeoutError:
-            yield {"type": "timeout", "error": f"Execution timed out after {timeout} seconds", "timed_out": True}
+            yield {
+                "type": "timeout",
+                "error": f"Execution timed out after {timeout} seconds",
+                "timed_out": True,
+            }
             return
         except Exception as exc:
             yield {"type": "error", "error": str(exc)}
@@ -371,7 +394,13 @@ class OpenAIAdapter(AgentRuntime):
                 else:
                     raise
 
-    async def _append_tool_results(self, *, conversation: list[RuntimeMessage], tool_calls: list[RuntimeToolCall], tool_handlers: dict[str, ToolHandler]) -> list[RuntimeToolCall]:
+    async def _append_tool_results(
+        self,
+        *,
+        conversation: list[RuntimeMessage],
+        tool_calls: list[RuntimeToolCall],
+        tool_handlers: dict[str, ToolHandler],
+    ) -> list[RuntimeToolCall]:
         unresolved_calls: list[RuntimeToolCall] = []
         for tool_call in tool_calls:
             function = tool_call["function"]
@@ -387,12 +416,22 @@ class OpenAIAdapter(AgentRuntime):
                     tool_output = await tool_output
             except Exception as exc:
                 tool_output = {"error": str(exc)}
-            conversation.append({"role": "tool", "tool_call_id": tool_call["id"], "name": tool_name, "content": self._serialize_tool_output(tool_output)})
+            conversation.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": tool_call["id"],
+                    "name": tool_name,
+                    "content": self._serialize_tool_output(tool_output),
+                }
+            )
         return unresolved_calls
 
     @staticmethod
     def _message_to_runtime_message(message: Any) -> RuntimeMessage:
-        runtime_message: RuntimeMessage = {"role": getattr(message, "role", "assistant"), "content": getattr(message, "content", None)}
+        runtime_message: RuntimeMessage = {
+            "role": getattr(message, "role", "assistant"),
+            "content": getattr(message, "content", None),
+        }
         tool_calls = OpenAIAdapter._extract_tool_calls(message)
         if tool_calls:
             runtime_message["tool_calls"] = tool_calls
@@ -406,7 +445,16 @@ class OpenAIAdapter(AgentRuntime):
         runtime_calls: list[RuntimeToolCall] = []
         for tool_call in getattr(message, "tool_calls", []) or []:
             function = getattr(tool_call, "function", None)
-            runtime_calls.append({"id": getattr(tool_call, "id", ""), "type": "function", "function": {"name": getattr(function, "name", ""), "arguments": getattr(function, "arguments", "{}")}})
+            runtime_calls.append(
+                {
+                    "id": getattr(tool_call, "id", ""),
+                    "type": "function",
+                    "function": {
+                        "name": getattr(function, "name", ""),
+                        "arguments": getattr(function, "arguments", "{}"),
+                    },
+                }
+            )
         return runtime_calls
 
     @staticmethod

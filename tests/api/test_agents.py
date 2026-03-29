@@ -300,11 +300,7 @@ class TestCreateAgent:
         assert response.status_code == 201
         created_id = response.json()["id"]
         usage_events = (
-            (
-                await db_session.execute(
-                    select(UsageEvent).where(UsageEvent.user_id == test_user.id)
-                )
-            )
+            (await db_session.execute(select(UsageEvent).where(UsageEvent.user_id == test_user.id)))
             .scalars()
             .all()
         )

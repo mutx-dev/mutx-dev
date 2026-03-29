@@ -60,7 +60,9 @@ async def test_governance_credentials_require_internal_user_and_redact_secret(
     forbidden_response = await other_user_client.get("/v1/governance/credentials/backends")
     assert forbidden_response.status_code == 403
     assert captured_namespaces
-    assert all(namespace == "11111111-1111-4111-a111-111111111111" for namespace in captured_namespaces)
+    assert all(
+        namespace == "11111111-1111-4111-a111-111111111111" for namespace in captured_namespaces
+    )
 
 
 @pytest.mark.asyncio
@@ -114,9 +116,7 @@ async def test_governance_supervision_start_returns_400_for_rejected_launch(
             )
 
         async def start_prepared_agent(self, *args, **kwargs):
-            raise AssertionError(
-                "start_prepared_agent should not be called for rejected launches"
-            )
+            raise AssertionError("start_prepared_agent should not be called for rejected launches")
 
     monkeypatch.setattr(
         governance_supervision,
