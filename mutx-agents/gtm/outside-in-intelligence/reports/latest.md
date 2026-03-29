@@ -1,37 +1,39 @@
 # Latest — Outside-In Intelligence
 
-Updated: 2026-03-29 08:21 Europe/Rome
+Updated: 2026-03-29 13:20 Europe/Rome
 
-- Fresh bounded pass found **new reinforcing signal**: major platform language is now explicitly converging on **secure defaults, policy controls, scoped credentials, network boundaries, and comprehensive logging** for agentic workflows.
-- This is a meaningful upgrade from the prior broader "agents need observability" theme: the market is now spelling out **governed execution** and **CI/CD-grade trust boundaries**.
-- Source health this pass:
-  - Web fetch: healthy for GitHub blog posts.
-  - X search: not re-run this pass; prior flakiness remains a constraint.
-  - Reddit / GitHub / YouTube: still good lanes, but not sampled in this pass.
+- Bounded X pass ran cleanly and surfaced **materially sharper operator language** than the morning pass.
+- Key new signals:
+  - Approval architecture is shifting from **tool-level** to **action-class intent scope**.
+  - **Sandbox is not the security boundary**; least-privilege access scoped to operation with no persistent credentials is.
+  - **Governance is organizational before it is technical** — fuzzy delegation, approval, and liability means accountability is also fuzzy.
+  - OpenClaw shipped **plugin approval hooks** (March 28, 2026) — any tool can pause and request human confirmation before executing; this is being described as the feature that "separates responsible automation from chaos."
+- Source health: X/bird worked this pass despite Safari cookie warning. Web fetch, GitHub, Reddit, YouTube all healthy per prior passes.
 
 ## Lane utility verdict
 - **Status:** STRONG
 - **Recommendation:** KEEP
 
 ## What changed in signal truth
-- GitHub publicly advanced two adjacent messages in March 2026:
-  1. **Agentic workflows need isolation, constrained outputs, and comprehensive logging.**
-  2. **GitHub Actions’ 2026 roadmap** is centered on secure defaults, policy controls, scoped credentials, and CI/CD observability.
-- That combination suggests the category is moving from “agent demos” to “managed execution with enforceable boundaries.”
-- The language is now close enough to product truth that MUTX can use it directly in positioning, proof packaging, and reply framing.
+- The morning pass established the **governed execution** framing from GitHub platform messaging.
+- This noon pass adds **operator-level specificity**: the market is not just talking about policies and scopes in the abstract — it is now describing **intent scope**, **least-privilege scoped to operation**, **no persistent credentials**, and **approval hooks as the responsible automation differentiator**.
+- The OpenClaw plugin approval hooks release (March 28) is the most concrete product proof that approval gates are becoming a first-class shipping feature, not a future roadmap item.
 
 ## Exact evidence
-- **GitHub Blog — March 26, 2026:** “secure defaults, policy controls, and CI/CD observability” and “real-time observability and enforceable network boundaries for CI/CD runners.”
-- **GitHub Blog — March 9, 2026:** “isolation, constrained outputs, and comprehensive logging” plus “don’t trust agents with secrets,” “stage and vet all writes,” and “log everything.”
-- **Superpal blog — December 2025:** agent observability needs to cover flow adherence, task completion, tool selection quality, efficiency, self-correction, and cost tracking — not just generic LLM metrics.
+- **@Pete_yes_please — March 29, 11:02 UTC:** "Tool approval is the wrong unit. Whitelist every tool and you still have no visibility into what an agent is permitted to *do* across a session. 'Can call this API' ≠ 'authorized to execute this action class.' Agent audits need to surface intent scope."
+- **@clearframelabs — March 29, 10:33 UTC:** "Add agent specific approval gates" + "Shift from Shadow IT thinking to Shadow AI thinking."
+- **@Mike_onX — March 29, 10:31 UTC:** "plugin approval hooks. any tool can pause and ask for confirmation before executing. the agent proposes, you approve."
+- **@nithin_k_anil — March 29, 09:51 UTC:** "the answer isn't 'don't give agents S3 access' — it's the same model as IAM: least privilege, scoped to the operation, no persistent credentials. sandbox mode was never the security boundary. the access model is."
+- **@aginaut — March 29, 09:28 UTC:** "governance feels organizational before it feels technical. If delegation, approval, and liability stay fuzzy, the agent is not autonomous — the accountability is."
+- **@hex_agent — March 29, 09:03 UTC:** "plugin approval hooks are huge... the ability to pause any tool call for human review is exactly what separates responsible automation from chaos."
 
 ## What Fortune can do with this today
-- Use **governed execution** language instead of generic “AI observability” phrasing.
-- Tie observability to **auditability, approvals, scoped permissions, and cost leakage**.
-- Keep `/dashboard` and public claims conservative until proof packaging matches live state.
-- Reuse GitHub’s own wording when shaping operator-facing content: **secure defaults, policy controls, scoped credentials, and network boundaries**.
+- Quote **@Pete_yes_please** ("intent scope" framing) and **@nithin_k_anil** (IAM model for agents) as evidence that the market is moving toward action-class authorization, not tool whitelisting.
+- Position MUTX as the **runtime access model** for agents — not another tool list — using the IAM language that operators already understand.
+- The OpenClaw plugin approval hooks are adjacent product news; if MUTX is OpenClaw-based, this validates the approval-gate direction without MUTX having to build it from scratch.
+- Keep `/dashboard` and public claims conservative but start using **"action-class intent scope"** and **"least-privilege scoped to operation"** in internal positioning language.
 
 ## What should change in this lane next
-- Run one more **bounded X pass** for operator posts mentioning agentic workflows, approvals, scoped credentials, or trust boundaries.
-- If X stays noisy, downshift this lane toward **GitHub/RSS/blog proof collection** and stop expecting social to lead the category.
-- Keep the scan tight: search for posts where builders describe **agent runtime security**, not generic AI enthusiasm.
+- Try a **bounded Reddit pass** for posts describing agent failures tied to wrong permission models or missing approval gates.
+- Monitor whether the OpenClaw approval hooks release generates more discussion about production agent governance patterns.
+- If X continues to produce clean signal, keep the bounded pass cadence; if it gets noisy again, return to GitHub/RSS-only sampling.

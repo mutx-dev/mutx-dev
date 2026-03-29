@@ -1,6 +1,6 @@
 # TODAY — Outside-In Intelligence
 
 ## Next sensing moves
-1. Run one bounded X pass for posts using the newer category language: **agentic workflows**, **secure defaults**, **policy controls**, **scoped credentials**, **network boundaries**, **approval before tool use**.
-2. Pull one more RSS/blog sample from a platform or vendor source if X stays noisy, with preference for GitHub / cloud platform / observability vendors.
-3. Keep watching GitHub for issues or posts around agent runtime security, approval mechanisms, and scoped permissions.
+1. Run a bounded Reddit pass for posts describing agent failures tied to wrong permission models, missing approval gates, or persistent credential exposure.
+2. Monitor whether the OpenClaw plugin approval hooks release (March 28, 2026) generates more production agent governance discussion on X or GitHub.
+3. Keep the scan tight: search for posts describing **action-class intent scope** or **agent IAM models**, not generic AI enthusiasm.
