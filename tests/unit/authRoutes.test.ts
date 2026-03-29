@@ -339,6 +339,59 @@ describe('auth route handlers', () => {
     })
   })
 
+  describe('POST /api/auth/refresh', () => {
+    it('returns 401 when no refresh cookie exists', async () => {
+      getRefreshToken.mockReturnValue(null)
+      const { POST } = await import('../../app/api/auth/refresh/route')
+
+      const response = await POST(mockRequest())
+
+      expect(response.status).toBe(401)
+      await expect(response.json()).resolves.toEqual({ detail: 'Unauthorized' })
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('uses the existing refresh cookie to request new auth tokens', async () => {
+      getRefreshToken.mockReturnValue('refresh-token')
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          access_token: 'new_access_token',
+          refresh_token: 'new_refresh_token',
+          expires_in: 1800,
+        }),
+      })
+      const { POST } = await import('../../app/api/auth/refresh/route')
+
+      const request = mockRequest({ refresh_token: 'refresh-token' })
+      const response = await POST(request)
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:8000/v1/auth/refresh',
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: 'refresh-token' }),
+          cache: 'no-store',
+        })
+      )
+      expect(response.status).toBe(200)
+      await expect(response.json()).resolves.toEqual({
+        access_token: 'new_access_token',
+        expires_in: 1800,
+      })
+      expect(applyAuthCookies).toHaveBeenCalledWith(
+        expect.anything(),
+        request,
+        expect.objectContaining({
+          access_token: 'new_access_token',
+          refresh_token: 'new_refresh_token',
+        })
+      )
+    })
+  })
+
   describe('GET /api/auth/me', () => {
     it('returns 401 when no auth token exists', async () => {
       hasAuthSession.mockReturnValue(false)
