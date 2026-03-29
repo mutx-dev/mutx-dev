@@ -10,9 +10,7 @@ Recommendation: DOWNSHIFT
 - Confirmed again that `review-queue.json` has no active items and `merge-queue.json` is empty.
 - Re-checked PR #1211 with `gh pr view`; it is open, `mergeStateStatus` is `UNSTABLE`, and there are still no current review requests.
 - Did not dispatch any code change because the lane is explicitly review-bound and still has no bounded auth task assigned.
-- This 20:36 run confirmed PR #1211 is now MERGED (auth refresh cookie binding complete).
-- review-queue.json has no items; merge-queue.json has no items.
-- No new auth-owned signal detected. Lane remains idle.
+- This 00:36 (Mar 30) run: queues still empty, no new signal. Lane remains idle.
 
 ## Exact evidence
 - `dispatch/auth-identity-guardian.md` (20:21 update): "PR #1211 was merged. No new auth-owned signal detected. Keep this lane idle until a new owned-area signal appears."
