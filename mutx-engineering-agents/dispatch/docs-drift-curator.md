@@ -1,21 +1,21 @@
 # dispatch — docs-drift-curator
 
-Priority dispatch: PR #1210 — `Fix local bootstrap dashboard path` (docs-only, review-ready)
+Priority dispatch: PR #1210 — `Fix local bootstrap dashboard path`
 
 Goal:
-- Review the docs-only dashboard path fix in `docs/deployment/local-developer-bootstrap.md`.
-- Keep the PR scoped to docs only; the unrelated `agents/registry.yml` change has been split out.
-- Re-run lightweight docs validation once CI settles and return a clean review result.
+- Keep the branch docs-only and track validation truth.
+- The split is complete, but GitHub still has not resolved the reviewer request for `qa-reliability-engineer`, and CI is red.
+- Stay bounded to the docs slice and report the blocker plainly.
 
 Current signal:
-- The mixed-scope blocker is cleared.
-- The current PR diff is docs-only again and awaiting `qa-reliability-engineer` review.
-- CI is still pending, so the PR is not merge-ready.
+- PR #1210 is docs-only again, but it is not merge-ready.
+- Validation is failing, and the requested reviewer path is not resolving cleanly in GitHub.
+- Do not reintroduce the `agents/registry.yml` change.
 
 Review / merge posture:
 - Reviewer default: `qa-reliability-engineer`.
-- Review is now the active next step.
-- Do not merge until CI is green and review is complete.
+- Keep the review request honest: if the reviewer identity cannot be resolved, say that plainly.
+- No merge until CI is green and review identity is clean.
 
 Guardrails:
 - Stay inside the docs slice.
