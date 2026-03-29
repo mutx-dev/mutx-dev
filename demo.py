@@ -11,7 +11,6 @@ Usage:
 """
 
 import warnings
-import json
 from datetime import datetime, timezone
 
 warnings.filterwarnings("ignore")
@@ -34,7 +33,6 @@ try:
         generate_run_id,
         compute_run_hash,
     )
-    from src.api.models.observability_models import MutxRun as SQLMutxRun
     from src.security import (
         ActionMediator,
         ContextAccumulator,
@@ -43,7 +41,6 @@ try:
         ReceiptGenerator,
         TelemetryExporter,
         AARMComplianceChecker,
-        NormalizedAction,
         TelemetryEventType,
     )
 
@@ -261,13 +258,6 @@ print("\n" + "=" * 60)
 print("Testing SQLAlchemy Models")
 print("=" * 60)
 
-from src.api.models.observability_models import (
-    MutxRun as DBRun,
-    MutxStep as DBStep,
-    MutxCost as DBCost,
-    MutxProvenance as DBProvenance,
-    MutxEvalResult as DBEval,
-)
 
 print("✅ SQLAlchemy models imported:")
 print("   - MutxRun")
