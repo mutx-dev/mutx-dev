@@ -3,8 +3,9 @@
 No active dispatch right now.
 
 Status:
-- PR #1211 is the active auth review target and is waiting on QA review.
-- Keep this lane idle unless a reviewer finds a bounded correction or the auth review reopens as a coding task.
+- PR #1211 (auth refresh cookie binding) was merged.
+- No new auth-owned signal detected.
+- Keep this lane idle until a new owned-area signal appears.
 
 Guardrails:
 - Stay idle unless a real auth-owned signal appears.

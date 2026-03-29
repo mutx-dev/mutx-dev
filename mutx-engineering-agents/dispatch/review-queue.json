@@ -1,32 +1,4 @@
 {
-  "updated": "2026-03-29T14:05:00+02:00",
-  "items": [
-    {
-      "pr": 1211,
-      "title": "Bind auth refresh to refresh cookie",
-      "owner": "auth-identity-guardian",
-      "reviewer": "qa-reliability-engineer",
-      "status": "awaiting-review",
-      "risk": "medium",
-      "note": "CI is green (Validation + Container Image Scan + Trivy all passing). Reviewer request still not attached in GitHub; needs a real second reviewer to unblock."
-    },
-    {
-      "pr": 1210,
-      "title": "Fix local bootstrap dashboard path",
-      "owner": "docs-drift-curator",
-      "reviewer": "qa-reliability-engineer",
-      "status": "awaiting-review",
-      "risk": "low",
-      "note": "Docs-only split clean. CI is green (Validation + Container Image Scan + Trivy all passing). Reviewer request still not attached in GitHub."
-    },
-    {
-      "pr": 1209,
-      "title": "Fix system overview CPU and memory queries",
-      "owner": "observability-sre",
-      "reviewer": "infra-delivery-operator",
-      "status": "blocked-reviewer-identity",
-      "risk": "monitoring-truth",
-      "note": "Validation passes; Container Image Scan still failing. Reviewer identity cannot self-approve; GitHub-resolvable second reviewer still needed."
-    }
-  ]
+  "updated": "2026-03-29T20:06:00+02:00",
+  "items": []
 }
