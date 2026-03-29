@@ -9,13 +9,13 @@ Goal:
 - If the dashboard truth looks right, request/approve the PR review path; otherwise ask for the smallest bounded correction.
 
 Current signal:
-- No merge-ready state yet; the dashboard review still needs second-agent truth and CI.
-- This remains the live review path for the observability lane.
-- The author work is done; what remains is review gating.
+- PR #1209 has a fresh human review note confirming the direction is right, but the PR is still not merge-ready.
+- The blocker is reviewer identity resolution: the designated reviewer cannot self-approve and the GitHub-resolvable reviewer path is still missing.
 
 Review / merge posture:
 - Reviewer default: `observability-sre`.
 - Auto-merge remains blocked for monitoring/executor truth work unless policy and CI are both satisfied.
+- Request a GitHub-resolvable second reviewer before treating this lane as green.
 
 Guardrails:
 - Stay inside the dashboard slice.
