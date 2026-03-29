@@ -277,7 +277,8 @@ async def get_analytics_timeseries(
             Metrics.timestamp >= period_start_dt,
             Metrics.timestamp <= period_end_dt,
         ))
-        if agent_id: q = q.where(Metrics.agent_id == agent_id)
+        if agent_id:
+            q = q.where(Metrics.agent_id == agent_id)
         q = q.group_by("ts").order_by("ts")
         for row in await db.execute(q):
             data.append(
