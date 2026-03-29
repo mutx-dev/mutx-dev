@@ -271,12 +271,13 @@ async def get_analytics_timeseries(
                 )
             )
     elif metric == "latency":
-        q = select(
-            func.date_trunc(interval, Metrics.timestamp).label("ts"),
-            func.avg(Metrics.latency).label("avg"),
-        ).where(and_(Metrics.timestamp >= period_start_dt, Metrics.timestamp <= period_end_dt))
-        if agent_id:
-            q = q.where(Metrics.agent_id == agent_id)
+        q = select(func.date_trunc(interval, Metrics.timestamp).label("ts"), func.avg(Metrics.latency).label("avg")
+        ).join(Agent, Agent.id == Metrics.agent_id).where(and_(
+            Agent.user_id == current_user.id,
+            Metrics.timestamp >= period_start_dt,
+            Metrics.timestamp <= period_end_dt,
+        ))
+        if agent_id: q = q.where(Metrics.agent_id == agent_id)
         q = q.group_by("ts").order_by("ts")
         for row in await db.execute(q):
             data.append(
