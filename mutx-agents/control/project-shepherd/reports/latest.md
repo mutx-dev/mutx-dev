@@ -3,7 +3,7 @@
 ## Status
 **State:** REVIEW-BLOCKED, BUT MOVING.
 
-No material truth change landed in the last pass. The fleet is still review-bound, and Fortune’s comments on `#1211` and `#1210` remain non-blocking. The real gate is still independent approval plus CI.
+No material review-state change landed in the last pass. The fleet is still review-bound, and Fortune’s comments on `#1211` and `#1210` remain non-blocking. The real gate is still independent approval plus CI.
 
 ## Fleet utility verdicts
 - **Strongest lanes:** control/orchestration, QA routing, product/runtime truth, GTM signal digestion.
@@ -16,36 +16,18 @@ No material truth change landed in the last pass. The fleet is still review-boun
 - **Rewire:** reviewer-resolution flow for the active PRs so approvals are real, not nominal.
 - **Cut:** optimistic status language that implies merge readiness where none exists.
 
-## Top 3 cross-lane priorities
-1. **Clear the active review queue**
-   - PR `#1211` auth refresh, `#1210` local bootstrap path, `#1209` system overview CPU/memory.
-   - Owner: **qa-reliability-engineer**.
-2. **Keep product/runtime truth honest on `/dashboard`**
-   - Add the shared truth strip so live vs partial vs stale vs auth-blocked state is obvious.
-   - Owner: **product-manager**.
-3. **Turn canonical truth into safe proof**
-   - Keep GTM/distribution focused on supported operator proof.
-   - Owner: **outbound-strategist**.
-
-## Blockers, stale lanes, and unowned work
-- **Main blocker:** independent approvals are still the bottleneck; merge queue is empty.
-- **Main blocker:** dashboard routes still need a shared truth strip.
-- **Main blocker:** gateway/SSH trust hardening remains open.
-- **Degraded lane:** X distribution remains manual-only / conservative.
-- **Stale work:** any local control note that lags live review state.
-- **Unowned unless assigned clearly:** the reconcile-and-advance pass that clears the review queue.
-
 ## Exact evidence
+- `signal-brief.md` now points at a stronger governed-execution market pattern: secure defaults, policy controls, scoped credentials, comprehensive logging, and enforceable network boundaries.
 - `reports/roundtable.md` and `queue/TODAY.md` still point at the same three priorities.
-- `signal-brief.md` had no materially new signal since the prior pass.
 - Engineering latest still reads review-blocked: no merge-ready PRs, approvals and CI remain the gate.
 
 ## What changed in truth
-- Freshness only: no new material lane signal.
-- The operating read stayed the same: review-bound, not code-bound.
-- The only meaningful change is that the control artifacts now explicitly call out utility, rewiring, and the lack of merge readiness.
+- Fresh market signal improved, but operational truth did not.
+- The lane still reads review-bound, not code-bound.
+- GTM framing can lean harder into governed execution, but local status must stay conservative.
 
 ## What Fortune can do with this today
+- Use the fresh market words: **secure defaults, policy controls, scoped credentials, network boundaries, comprehensive logging**.
 - Push the reviewer-resolution path on `#1211` and `#1210` so the second-reviewer gate is real.
 - Keep `#1209` blocked until a GitHub-resolvable reviewer exists.
 - Leave the merge queue empty until there is a green reviewed PR.

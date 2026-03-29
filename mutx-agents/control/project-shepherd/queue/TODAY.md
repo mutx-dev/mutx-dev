@@ -3,10 +3,10 @@
 ## Current operating truth
 - The fleet is operational, and the active work is still review-bound.
 - Fortune’s comments on `#1211` and `#1210` are non-blocking; independent approval is still the gate.
-- The next move is to clear the review queue and keep product/runtime claims conservative.
+- The market signal now supports governed execution language, but the local operating truth stays conservative.
 
 ## Next operating window
-- Window: 2026-03-29 08:10–10:10 Europe/Rome
+- Window: 2026-03-29 10:10–12:10 Europe/Rome
 - Objective: clear the active review queue, keep dashboard truth honest, and avoid overclaiming on GTM/distribution.
 
 ## Top 3 cross-lane priorities

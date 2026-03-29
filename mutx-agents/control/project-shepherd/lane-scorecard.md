@@ -1,6 +1,6 @@
 # lane-scorecard.md — Project Shepherd
 
-> Refreshed: 2026-03-29 08:10 Europe/Rome
+> Refreshed: 2026-03-29 10:10 Europe/Rome
 
 ## Fleet score
 - Control plane: **GREEN**
@@ -31,6 +31,7 @@
 ## Cross-lane consensus
 - The fleet is operational.
 - Work is still review-bound; Fortune’s comments on the active auth/bootstrap PRs remain non-blocking.
+- The market signal now favors governed execution: secure defaults, policy controls, scoped credentials, logging, and network boundaries.
 - Live company truth and local control files must stay synchronized.
 - `/dashboard` remains canonical.
 
