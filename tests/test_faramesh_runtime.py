@@ -1,23 +1,15 @@
 from __future__ import annotations
 
-import os
-import socket
 from unittest.mock import patch, MagicMock
-
-import pytest
 
 from cli.faramesh_runtime import (
     FarameshDaemonHealth,
     FarameshDecision,
-    FarameshDeferItem,
-    FarameshSnapshot,
     collect_faramesh_snapshot,
-    find_faramesh_bin,
     get_daemon_status,
     get_faramesh_health,
     get_pending_defers,
     get_recent_decisions,
-    is_faramesh_available,
     is_socket_reachable,
     _count_decisions_by_effect,
 )
