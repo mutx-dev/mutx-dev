@@ -17426,17 +17426,10 @@
             "title": "Agent Id"
           },
           "command": {
-            "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
             "title": "Command"
           },
           "profile": {
@@ -17471,7 +17464,8 @@
         },
         "type": "object",
         "required": [
-          "agent_id"
+          "agent_id",
+          "command"
         ],
         "title": "SupervisedAgentStartRequest"
       },
