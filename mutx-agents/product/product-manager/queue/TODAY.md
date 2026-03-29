@@ -1,6 +1,6 @@
 # TODAY.md — Product Manager
 
 ## Next moves
-1. Lock one design-partner-ready v1.3 path: `mutx.dev/download/macos` or `mutx setup hosted` → first deployment → truthful runtime state in `/dashboard`; sell and test that path before widening scope.
-2. Keep the supported story brutally honest: `/dashboard`, the desktop download lane, and `mutx.dev/releases` are supported; preview or placeholder-backed surfaces stay out of the primary product narrative until they are real.
-3. Force an explicit SDK contract call: keep `MutxAsyncClient` deprecated/limited everywhere, or remove it from the design-partner path until full async support exists.
+1. Keep `/dashboard` and the release/download surfaces as the only supported story until live truth and docs stay aligned; do not widen the narrative into preview or placeholder-backed routes.
+2. Preserve the design-partner path as: install/download → authenticate → deploy once → verify truthful runtime state in `/dashboard`.
+3. Keep `MutxAsyncClient` explicitly deprecated/limited everywhere until the async contract is actually complete.
