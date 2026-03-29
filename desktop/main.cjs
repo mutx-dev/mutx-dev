@@ -113,15 +113,6 @@ function pickString(value, keys) {
   return null;
 }
 
-function isSafeExternalUrl(url) {
-  try {
-    const parsedUrl = new URL(url);
-    return parsedUrl.protocol === "https:" || parsedUrl.protocol === "http:";
-  } catch {
-    return false;
-  }
-}
-
 function resolveCurrentBinding(runtimeInfo) {
   const openclaw = asRecord(runtimeInfo?.openclaw);
   const currentBinding = asRecord(openclaw?.current_binding);
