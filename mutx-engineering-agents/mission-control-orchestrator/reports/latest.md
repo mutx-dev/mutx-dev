@@ -1,30 +1,43 @@
 ## Lane utility verdict
-- Status: CLEAR — queue empty, all blockers resolved
-- Recommendation: SCAN for next dispatch
+- Status: ACTIVE — new work in queue
+- Recommendation: PROCESS
 
-## Live verification pass — 2026-03-29 18:07 UTC
-- Verified on 2026-03-29 18:07 Europe/Rome via live GitHub PR reads.
-- All three PRs merged between 10:08–11:17 UTC today.
-- Review queue: empty.
-- Merge queue: empty.
+## What changed since the last control pass
+- Two new PRs appeared since the 18:07 UTC verification pass:
+  - PR #1213 `fix(ci): add missing GRAFANA_ADMIN_PASSWORD in infrastructure CI env` — CI validation still in progress; owner `control-plane-steward`.
+  - PR #1212 `fix(test): add missing getRefreshToken mock in refresh token test` — CI validation failing (2x Validation FAILURE); owner `auth-identity-guardian`.
+- The morning queue (PRs #1211, #1210, #1209) is fully merged — confirmed at 18:07 UTC.
+- No merge-ready PR exists; #1212 must clear its CI failures before it can advance.
 
 ## Exact queue evidence
-- PR #1211 `Bind auth refresh to refresh cookie` → **MERGED** at ~11:17 UTC (CI green, Validation SUCCESS)
-- PR #1210 `Fix local bootstrap dashboard path` → **MERGED** at ~11:15 UTC (CI green, Validation SUCCESS)
-- PR #1209 `Fix system overview CPU and memory queries` → **MERGED** at ~10:08 UTC (CI green, Validation SUCCESS)
-- Review queue: empty.
+- Review queue:
+  1. PR #1213 `fix(ci): add missing GRAFANA_ADMIN_PASSWORD in infrastructure CI env` -> `awaiting-review` (CI Validation IN_PROGRESS; owner: control-plane-steward; reviewer: qa-reliability-engineer)
+  2. PR #1212 `fix(test): add missing getRefreshToken mock in refresh token test` -> `awaiting-review` (CI Validation FAILING; owner: auth-identity-guardian; reviewer: qa-reliability-engineer)
 - Merge queue: empty.
+- Live PR evidence:
+  - #1213: UNSTABLE — Validation still running, all CodeQL/Infra checks green so far.
+  - #1212: UNSTABLE — Validation FAILURE on both runs; Container Image Scan was SKIPPED (not blocked). CodeQL and GitGuardian are green.
 
-## What changed since the morning pass (08:07 UTC)
-- All three PRs cleared reviewer-identity and validation blockers and are now merged.
-- The morning bottleneck (reviewer resolution + failing CI) is fully resolved.
-- Fleet is now free to accept new dispatch work.
+## Which lanes are producing signal vs idling
+- Producing signal:
+  - `control-plane-steward` on #1213 — infrastructure CI fix, needs CI to complete.
+  - `auth-identity-guardian` on #1212 — test mock fix, CI is failing.
+  - `qa-reliability-engineer` review routing for both.
+- Idling:
+  - `observability-sre`
+  - `infra-delivery-operator`
+  - `docs-drift-curator`
+  - `operator-surface-builder`
+  - `cli-sdk-contract-keeper`
+  - `runtime-protocol-engineer`
 
-## Lane state
-- Producing signal: none currently — queue is empty.
-- All specialist lanes (`auth-identity-guardian`, `observability-sre`, `infra-delivery-operator`, `qa-reliability-engineer`, `docs-drift-curator`) are now unblocked and available for new work.
+## What Fortune can do with this today
+- Let #1213 CI complete — once green, it needs a second reviewer from `qa-reliability-engineer`.
+- Investigate and fix #1212's Validation failures — the missing mock is causing test failures; once fixed and CI is green, it needs a `qa-reliability-engineer` review.
+- No merge action available until both PRs are reviewed and approved.
 
 ### Control brief
-- Queue is CLEAR.
-- All blockers resolved.
-- Ready for next dispatch.
+- Fleet is active again with two new PRs.
+- #1212 is blocked by CI failures, not reviewer identity.
+- #1213 is waiting on CI completion.
+- Merge queue stays empty until review gate clears.
