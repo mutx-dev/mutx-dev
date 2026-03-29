@@ -5,48 +5,28 @@ Status: STRONG
 Recommendation: KEEP
 
 ## What changed in truth
-I closed one real docs-truth gap around the dashboard surface: the repo docs no longer imply that every page under `app/dashboard/*` is stable/live. The docs now separate stable operator pages from preview/demo or redirect-backed pages.
+Nothing material changed since the 11:40 UTC pass.
+
+Checked:
+- MUTX git log: 2 new commits since last pass (`3e955da2` macos import fix, `88010738` docker CI fix) — neither touches docs
+- Agent workspace git log: no new commits since last pass
+- PR queue: #1206 is new but is a backend/API analytics fix, no docs surface touched
+- Review queue (#1211, #1210, #1209) unchanged — still open
 
 ## Exact evidence
 Checked:
-- `BOOTSTRAP.md`
-- `mutx-agents/reports/roundtable.md`
-- `mutx-engineering-agents/mission-control-orchestrator/reports/latest.md`
-- `queue/TODAY.md`
-- `reports/latest.md`
-- `docs/overview.md`
-- `docs/app-dashboard.md`
-- `docs/surfaces.md`
-- `docs/project-status.md`
-- `app/dashboard/channels/page.tsx`
-- `app/dashboard/skills/page.tsx`
-- `app/dashboard/orchestration/page.tsx`
-- `app/dashboard/memory/page.tsx`
-- `app/dashboard/spawn/page.tsx`
-- `app/dashboard/logs/page.tsx`
-- `app/api/dashboard/overview/route.ts`
-- `app/api/dashboard/*` route inventory via `find`
-- `src/api/routes/deployments.py`
-- `cli/services/deployments.py`
-- `sdk/mutx/deployments.py`
-
-Commands run:
-- `rg -n "app/app|app shell|/dashboard|deployment|deployments" docs cli sdk -g '!**/node_modules/**'`
-- `rg -n "dashboard/overview|api/dashboard/overview" app src docs -g '!**/node_modules/**'`
-- `find app/api/dashboard -maxdepth 3 -type f | sort`
-- `find app/dashboard -maxdepth 2 -type f | sort`
-
-Files changed:
-- `docs/overview.md`
-- `docs/app-dashboard.md`
+- `git log --oneline -5` in MUTX and agent workspace
+- `gh pr list --state all --limit 15`
+- `gh pr diff 1206 --name-only` (confirmed: API-only)
+- `git status --short` in MUTX
 
 ## If idle or blocked, why exactly
-Not blocked. The lane had a real documentation drift issue, and it was small enough to fix directly without waiting on repo changes.
+Not blocked. The lane is idle because the docs-truth gap closed in the last pass is holding and no new drift has surfaced.
 
 ## What Fortune can do with this today
-Treat `docs/overview.md` and `docs/app-dashboard.md` as the current truth when describing `/dashboard`: stable pages are distinct from preview/demo and redirect-backed pages.
+No action required from the docs lane. The deployment parity checklist remains the highest-leverage next move when capacity is available.
 
 ## What should change in this lane next
 1. Finish the deployment parity checklist across backend routes, `cli/services/deployments.py`, `sdk/mutx/deployments.py`, and `docs/api/deployments.md`.
-2. Spot-check `docs/surfaces.md` and `docs/project-status.md` for any leftover blanket “supported dashboard” phrasing; only edit if they drift from the live/preview split.
+2. Spot-check `docs/surfaces.md` and `docs/project-status.md` for any leftover blanket "supported dashboard" phrasing.
 3. Keep runtime monitoring/self-healing claims gated until issue-39 / PR #1183 is unblocked.
