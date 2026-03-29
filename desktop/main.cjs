@@ -110,8 +110,16 @@ function pickString(value, keys) {
       return candidate;
     }
   }
-
   return null;
+}
+
+function isSafeExternalUrl(url) {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.protocol === "https:" || parsedUrl.protocol === "http:";
+  } catch {
+    return false;
+  }
 }
 
 function resolveCurrentBinding(runtimeInfo) {
