@@ -1,34 +1,30 @@
 ## Lane utility verdict
-- Status: IDLE
-- Recommendation: KEEP
+- Status: CLEAR — queue empty, all blockers resolved
+- Recommendation: SCAN for next dispatch
 
-## What changed since the last control pass
-- PRs #1211, #1210, and #1209 were all merged at 18:01 UTC.
-- All active review and merge queue items are now resolved.
-- All owned engineering lanes are idle with no active dispatches.
-
-## Exact queue evidence
+## Live verification pass — 2026-03-29 18:07 UTC
+- Verified on 2026-03-29 18:07 Europe/Rome via live GitHub PR reads.
+- All three PRs merged between 10:08–11:17 UTC today.
 - Review queue: empty.
 - Merge queue: empty.
-- Live GitHub: PRs #1211, #1210, #1209 all show state=MERGED.
 
-## Which lanes are producing signal vs idling
-- All owned lanes are idling:
-  - `auth-identity-guardian`
-  - `observability-sre`
-  - `docs-drift-curator`
-  - `infra-delivery-operator`
-  - `qa-reliability-engineer`
-  - `control-plane-steward`
-  - `operator-surface-builder`
-  - `cli-sdk-contract-keeper`
-  - `runtime-protocol-engineer`
+## Exact queue evidence
+- PR #1211 `Bind auth refresh to refresh cookie` → **MERGED** at ~11:17 UTC (CI green, Validation SUCCESS)
+- PR #1210 `Fix local bootstrap dashboard path` → **MERGED** at ~11:15 UTC (CI green, Validation SUCCESS)
+- PR #1209 `Fix system overview CPU and memory queries` → **MERGED** at ~10:08 UTC (CI green, Validation SUCCESS)
+- Review queue: empty.
+- Merge queue: empty.
 
-## What Fortune can do with this today
-- Scan the repo for the next owned-area signal or await new issues/PRs.
-- No merge or review action needed right now.
+## What changed since the morning pass (08:07 UTC)
+- All three PRs cleared reviewer-identity and validation blockers and are now merged.
+- The morning bottleneck (reviewer resolution + failing CI) is fully resolved.
+- Fleet is now free to accept new dispatch work.
+
+## Lane state
+- Producing signal: none currently — queue is empty.
+- All specialist lanes (`auth-identity-guardian`, `observability-sre`, `infra-delivery-operator`, `qa-reliability-engineer`, `docs-drift-curator`) are now unblocked and available for new work.
 
 ### Control brief
-- The fleet just cleared three PRs and is now idle.
-- No material blocker exists at this control pass.
-- Await new signals before reactivating lanes.
+- Queue is CLEAR.
+- All blockers resolved.
+- Ready for next dispatch.
