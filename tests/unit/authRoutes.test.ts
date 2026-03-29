@@ -321,6 +321,7 @@ describe('auth route handlers', () => {
           expires_in: 1800,
         }),
       })
+      getRefreshToken.mockReturnValue('matching_token')
       const { POST } = await import('../../app/api/auth/refresh/route')
 
       const response = await POST({
@@ -330,12 +331,15 @@ describe('auth route handlers', () => {
         },
       } as unknown as NextRequest)
 
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8000/v1/auth/refresh', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh_token: 'matching_token' }),
-        cache: 'no-store',
-      })
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:8000/v1/auth/refresh',
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: 'matching_token' }),
+          cache: 'no-store',
+        }),
+      )
       expect(response.status).toBe(200)
       await expect(response.json()).resolves.toEqual({
         access_token: 'new_access_token',
