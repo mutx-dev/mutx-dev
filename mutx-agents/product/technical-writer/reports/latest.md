@@ -5,26 +5,21 @@ Status: STRONG
 Recommendation: KEEP
 
 ## What changed in truth
-Nothing material changed since the 11:40 UTC pass.
-
-Checked:
-- MUTX git log: 2 new commits since last pass (`3e955da2` macos import fix, `88010738` docker CI fix) — neither touches docs
-- Agent workspace git log: no new commits since last pass
-- PR queue: #1206 is new but is a backend/API analytics fix, no docs surface touched
-- Review queue (#1211, #1210, #1209) unchanged — still open
+Review queue cleared — PRs #1211, #1210, and #1209 all merged since last pass. No docs-impacting changes in the newly merged PRs (#1215, #1212, #1191). The dashboard path fix in #1210 is already reflected in `docs/deployment/local-developer-bootstrap.md`. No new docs-truth gaps surfaced.
 
 ## Exact evidence
 Checked:
-- `git log --oneline -5` in MUTX and agent workspace
-- `gh pr list --state all --limit 15`
-- `gh pr diff 1206 --name-only` (confirmed: API-only)
-- `git status --short` in MUTX
+- `git log --oneline -5` in MUTX
+- `gh pr list --state all --limit 10`
+- `gh pr diff 1210 --name-only`
+- `gh pr diff 1209 --name-only`
+- `docs/deployment/local-developer-bootstrap.md` — confirmed `http://localhost:3000/dashboard` is present
 
 ## If idle or blocked, why exactly
-Not blocked. The lane is idle because the docs-truth gap closed in the last pass is holding and no new drift has surfaced.
+Idle. No new drift since the last pass. The dashboard/preview split fix is holding and no merged code has introduced new doc misalignments.
 
 ## What Fortune can do with this today
-No action required from the docs lane. The deployment parity checklist remains the highest-leverage next move when capacity is available.
+No action needed from docs lane. The review queue being clear means other lanes can now advance.
 
 ## What should change in this lane next
 1. Finish the deployment parity checklist across backend routes, `cli/services/deployments.py`, `sdk/mutx/deployments.py`, and `docs/api/deployments.md`.
