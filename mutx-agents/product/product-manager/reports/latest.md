@@ -1,33 +1,31 @@
-# Product Decision Brief — 2026-03-29
+# Product Decision Brief — 2026-03-29 (Evening)
 
 ## Lane utility verdict
 - **Status:** STRONG
 - **Recommendation:** KEEP
 
 ## What changed in truth
-- The outside-in signal is now sharper: the market is describing agent products as **governed execution** — isolation, constrained outputs, logging, scoped credentials, policy controls, and enforceable boundaries.
-- MUTX already has the right lane shape for that story: supported `/dashboard`, signed desktop download, release summary, and docs-backed release notes are all positioned as the trusted surfaces.
-- The bottleneck did **not** move operationally: the roundtable is still review-bound, no merge-ready PRs landed, and independent approvals plus CI remain the gate.
-- SDK truth is still delicate: `MutxAsyncClient` remains limited/deprecated, so async support should stay out of the supported story until the contract is real.
+- **Signal sharpened materially**: Gartner (March 29) published that AI agents will trigger the first $58B enterprise software shakeup in 30 years by 2027. 50% of AI agent deployments will fail due to insufficient governance platforms. This is the sharpest enterprise buyer evidence so far.
+- **Runtime path evaluation language is now in market**: operators are explicitly describing authorization as "is this action safe given prior path?" — not just "can this tool be called?" Session context and cumulative intent are now part of the permission model.
+- **Engineering state improved**: `#1211` and `#1210` are both CI-green (all checks pass as of 2026-03-29 11:25 UTC). The only remaining gate is a second reviewer attachment. No other PRs are blocking the queue.
+- **The morning queue items are still valid** but the new signal makes item #1 more urgent: Fortune attaching a second reviewer directly unblocks the merge queue.
 
 ## Exact evidence
-- `reports/roundtable.md` — state remains review-bound; product/runtime truth on `/dashboard` must stay conservative.
-- `gtm/outside-in-intelligence/reports/signal-brief.md` — market language has shifted to governed execution, secure defaults, policy controls, and comprehensive logging.
-- `queue/TODAY.md` — current product priorities center on supported surfaces, first deployment path, and async contract honesty.
-- `README.md` and `docs/surfaces.md` in `/Users/fortune/MUTX` — supported surfaces are already defined around `mutx.dev/download/macos`, `mutx.dev/releases`, and `app.mutx.dev/dashboard`.
-- `sdk.md` / `sdk/README.md` / `tests/test_sdk_async_client_contract.py` in `/Users/fortune/MUTX` — `MutxAsyncClient` is explicitly deprecated/limited.
-- Fresh truth pass command: `rg -n "MutxAsyncClient|/dashboard|mutx.dev/download|mutx setup hosted|v1.3|releases" /Users/fortune/MUTX -g '!node_modules' -g '!dist'`
+- `gh pr view 1211 --json state,title,reviewDecision,statusCheckRollup` — state=OPEN, all CI checks SUCCESS, reviewDecision empty.
+- `gh pr view 1210 --json state,title,reviewDecision,statusCheckRollup` — state=OPEN, all CI checks SUCCESS, reviewDecision empty.
+- `reports/roundtable.md` — updated 2026-03-29 14:10 Europe/Rome; confirms CI-green on `#1211`/`#1210` with reviewer identity as only gate.
+- `gtm/outside-in-intelligence/reports/signal-brief.md` — updated 2026-03-29 18:20 Europe/Rome; Gartner $58B shakeup data + "runtime path evaluation" language.
+- `queue/TODAY.md` (morning version) — previous priorities on supported surfaces and async contract.
 
 ## If idle or blocked, why exactly
-- The product lane is blocked by truth maintenance, not by a missing grand plan: supported surfaces are defined, but the live review/merge gate is still elsewhere.
-- The real constraint is approval throughput plus CI, so this lane should not invent new scope while the release story is still being validated.
+- The product lane is not idle but it is held by one human action: Fortune needs to attach a second reviewer to `#1211` and `#1210` on GitHub. This is not a code problem, not a CI problem — it is a single social action that is fully Fortune's to take.
+- All other product priorities depend on this unblocking first.
 
 ## What Fortune can do with this today
-- Keep selling only the supported path: download/install, authenticate, deploy once, and confirm runtime truth in `/dashboard`.
-- Treat any preview or placeholder route as internal-only until it is wired into the supported narrative.
-- Keep async SDK ambiguity out of design-partner conversations.
+- **Do it now**: go to GitHub, open `#1211` and `#1210`, and request a second reviewer. That single action clears the merge queue and moves v1.3 from review-bound to shippable.
+- The Gartner framing ("governance failure is the #1 deployment risk") is already loaded in enterprise buyers' minds. Fortune should lead with it before the buyer brings it up.
 
 ## What should change in this lane next
-- Tighten the `/dashboard` truth strip so docs, overview copy, and runtime state all say the same thing.
-- Keep the supported story narrow until review pressure clears and the release lane proves stable.
-- Do not expand the product narrative until the first 15 minutes path is clean enough to trust.
+- Once `#1211` and `#1210` merge: refresh the supported story against live `/dashboard` state and update the design-partner narrative.
+- Wire "runtime path evaluation" into internal positioning docs — it is the most precise description of what MUTX's policy-based enforcement actually does.
+- The async SDK contract (`MutxAsyncClient`) remains limited; keep it out of the supported story until the contract is real.
