@@ -5,33 +5,30 @@
 - **Recommendation:** KEEP
 
 ## What changed in truth
-- **New repo state**: `#1211` and `#1210` are now CI-green. Bottleneck is reviewer attachment only — independent second reviewer is the only remaining gate. This removes the CI-red qualifier from the GTM constraint.
-- **New market signal (March 29)**: Three fresh operator posts sharpen the angle materially:
-  - `"Can call this API" ≠ "authorized to execute this action class."` — intent scope is the right unit, not tool whitelisting.
-  - `Sandbox mode was never the security boundary — the access model is.` — the IAM analogy is live.
-  - `Approval hooks are what separate responsible automation from chaos.` — approval gates are table stakes, not future work.
-- **New concrete product anchor**: OpenClaw shipped plugin approval hooks March 28, 2026. This is proof that the approval-gate direction is shipping, not on a roadmap.
-- **Sharpened editorial hook**: The angle should now lead with **"Can call this API ≠ authorized to execute."** This is more precise than "Agents need an OS" and matches the live operator language.
-- The thread anchor stays conservative: no new GTM claims, just the permission/proof angle anchored to the supported `/dashboard` surfaces.
+- **Queue is CLEAR.** `#1211`, `#1210`, and `#1209` all merged. The review bottleneck that constrained GTM framing all day is gone.
+- **Gartner $58B governance-shakeup** (March 29): "50% of AI agent deployments will FAIL due to insufficient governance platforms. The bottleneck isn't capability — it's control." This is enterprise-grade validation that was not present in any earlier pass.
+- **Runtime path evaluation** (`@TheRabbitPy`, March 29): "is this action safe given prior path?" via execution-path policies — this is the sharpest permission model articulation yet and directly maps to MUTX's control-plane positioning.
+- **Financial proof line** (`@abdyweb3`): "$470M in agent GDP. Zero accountability. One rogue agent can wipe you out." — the accountability gap now has a dollar figure attached.
+- **Next dispatch slice is unblocked.** Roundtable explicitly calls for Fortune/project-shepherd to name the next bounded dispatch. The specialist lanes are no longer constrained by review queue.
 
 ## Exact evidence
-- Read `mutx-agents/reports/roundtable.md` (updated 2026-03-29 14:10 Europe/Rome) and `gtm/outside-in-intelligence/reports/signal-brief.md` (updated 2026-03-29 13:20 Europe/Rome) for fresh cross-lane and market state.
-- `git -C /Users/fortune/MUTX log --oneline -5` and `git -C /Users/fortune/MUTX status --short --branch` — repo has not advanced since morning.
-- Prior `queue/TODAY.md` and `reports/latest.md` from morning run confirmed no prior-commit state changes.
-- Fresh operator signals from March 29: `@Pete_yes_please` (intent scope), `@nithin_k_anil` (IAM model), `@aginaut` (accountability), `@clearframelabs` (Shadow AI), `@hex_agent` (approval hooks).
-- OpenClaw plugin approval hooks release: March 28, 2026 — concrete product proof.
+- Read `mutx-agents/reports/roundtable.md` (updated 2026-03-29 20:10 Europe/Rome) — queue is clear, all PRs merged.
+- Read `gtm/outside-in-intelligence/reports/signal-brief.md` (updated 2026-03-29 18:20 Europe/Rome) — Gartner framing, runtime path evaluation, $470M figure.
+- `git -C /Users/fortune/MUTX status` — repo state unchanged since morning runs.
+- Prior `reports/latest.md` and `queue/TODAY.md` from 17:11 Europe/Rome confirmed stale before this pass.
+- Verified all files: `roundtable.md` (20:10), `signal-brief.md` (18:21), `reports/latest.md` (17:11, stale), `queue/TODAY.md` (11:10, stale).
 
 ## If idle or blocked, why exactly
 - Not blocked.
-- The constraint remains: this lane cannot post publicly and cannot invent proof. It can only package what already exists.
-- Proof stack is still unassembled — no screenshots from `/dashboard/security`, `/dashboard/monitoring`, or `/dashboard/budgets` have been pulled into a usable format.
+- Proof stack is still unassembled — no screenshots from `/dashboard/security`, `/dashboard/monitoring`, or `/dashboard/budgets` have been captured for the founder thread.
+- The founder thread draft has not been written. No draft artifact exists yet in this lane.
 
 ## What Fortune can do with this today
-- Pull one set of screenshots from `/dashboard/security`, `/dashboard/monitoring`, and `/dashboard/budgets` as the proof stack for the thread.
-- Approve the sharpened hook: **"Can call this API ≠ authorized to execute this action class."** — this is the sharpest single-line framing in the current market conversation.
-- If he wants to engage any of the March 29 reply targets (`@Pete_yes_please`, `@nithin_k_anil`, `@aginaut`) in DMs or replies, now is the window — the thread language is aligned with their framing.
+- **Name the next dispatch slice.** Roundtable explicitly calls this out: the specialist lanes are unblocked and waiting. If this does not happen tonight, the queue opens back up tomorrow without a clear target.
+- **Use the Gartner hook in the next enterprise conversation.** Buyers will come in with "governance failure is the #1 risk" already loaded — Fortune should finish the sentence with MUTX.
+- **Pull the proof stack screenshots** from `/dashboard/security`, `/dashboard/monitoring`, `/dashboard/budgets` so the thread draft can be finalized when approved.
 
 ## What should change in this lane next
-- Assemble the proof stack first, then draft the founder thread.
-- Do not widen the content crawl — the March 29 signals are specific enough. Stop looking for more and start packaging.
-- The thread draft should land in a drafts file or shared location so Fortune can review before any action.
+- The founder thread draft should use the combined hook: **Gartner $58B framing + "is this action safe given prior path?" + $470M accountability figure + supported `/dashboard` proof**.
+- If Fortune names the dispatch slice tonight, this lane should be ready to package the thread draft for the next review cycle.
+- Do not crawl for more signals — the evening pass has enough specific, dollar-backed, enterprise-validated language to last two full content cycles.
