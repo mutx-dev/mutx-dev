@@ -10,7 +10,7 @@ Recommendation: DOWNSHIFT
 - Confirmed again that `review-queue.json` has no active items and `merge-queue.json` is empty.
 - Re-checked PR #1211 with `gh pr view`; it is open, `mergeStateStatus` is `UNSTABLE`, and there are still no current review requests.
 - Did not dispatch any code change because the lane is explicitly review-bound and still has no bounded auth task assigned.
-- No next move changed since the previous checkpoint.
+- This 12:36 run did not change the lane state or next move.
 
 ## Exact evidence
 - `dispatch/auth-identity-guardian.md`: "No active dispatch right now" and "PR #1211 is the active auth review target and is waiting on QA review. Keep this lane idle unless a reviewer finds a bounded correction or the auth review reopens as a coding task."
