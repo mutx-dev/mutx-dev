@@ -1,19 +1,21 @@
 # dispatch — docs-drift-curator
 
-Priority dispatch: PR #1210 — `Fix local bootstrap dashboard path` (split required)
+Priority dispatch: PR #1210 — `Fix local bootstrap dashboard path` (docs-only, review-ready)
 
 Goal:
-- Split the docs-only dashboard path fix from the unrelated `agents/registry.yml` change.
-- Keep the docs fix in `docs/deployment/local-developer-bootstrap.md` and move the registry normalization into the correct owning lane.
-- Once split, re-run the lightweight docs validation and hand back a clean docs-only PR for review.
+- Review the docs-only dashboard path fix in `docs/deployment/local-developer-bootstrap.md`.
+- Keep the PR scoped to docs only; the unrelated `agents/registry.yml` change has been split out.
+- Re-run lightweight docs validation once CI settles and return a clean review result.
 
 Current signal:
-- The current PR is mixed-scope and not review-clean.
-- A reviewer already confirmed the docs change itself is correct, but the extra `agents/registry.yml` edit is outside docs-drift-curator ownership and CI is failing.
+- The mixed-scope blocker is cleared.
+- The current PR diff is docs-only again and awaiting `qa-reliability-engineer` review.
+- CI is still pending, so the PR is not merge-ready.
 
 Review / merge posture:
 - Reviewer default: `qa-reliability-engineer`.
-- Do not seek approval until the PR is split and CI is green.
+- Review is now the active next step.
+- Do not merge until CI is green and review is complete.
 
 Guardrails:
 - Stay inside the docs slice.

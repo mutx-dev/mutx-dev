@@ -1,50 +1,43 @@
-# latest.md
-
 ## Lane utility verdict
 - Status: BLOCKED
 - Recommendation: REWIRE
 
 ## What changed since the last control pass
-- PR #1209 received a fresh review note confirming the dashboard direction is correct, but it is still not merge-ready because the reviewer identity cannot self-approve and a GitHub-resolvable second reviewer is still missing.
-- PR #1210 received a review note confirming the docs change is correct, but it now has a clear split requirement: the mixed-scope `agents/registry.yml` edit must be separated from the docs-only change, and CI is failing.
-- Review queue truth changed from generic `awaiting-review` to explicit blockers for #1209 and #1210.
+- PR #1210 is split cleanly now: the current branch is docs-only again and the unrelated `agents/registry.yml` change is gone.
+- Review queue truth changed again: #1210 moved from `blocked-split` to `awaiting-review`.
+- Live GitHub checks still show pending validation on #1210 and #1211, while #1209 still carries the reviewer-identity bottleneck.
+- No merge-ready PR exists right now.
 
 ## Exact queue evidence
 - Review queue:
-  1. PR #1211 `Bind auth refresh to refresh cookie` → `awaiting-review`
-  2. PR #1209 `Fix system overview CPU and memory queries` → `blocked-reviewer-identity`
-  3. PR #1210 `Fix local bootstrap dashboard path` → `blocked-split`
+  1. PR #1211 `Bind auth refresh to refresh cookie` -> `awaiting-review`
+  2. PR #1210 `Fix local bootstrap dashboard path` -> `awaiting-review` (`docs-only`, split complete, CI still pending)
+  3. PR #1209 `Fix system overview CPU and memory queries` -> `blocked-reviewer-identity`
 - Merge queue: empty.
-- Chrome slots: unchanged; no browser-capacity scheduling change.
 - Live PR evidence:
-  - PR #1209 latest note: dashboard direction is right, but approval is blocked by reviewer identity.
-  - PR #1210 latest note: docs change is correct, but the unrelated `agents/registry.yml` change must be split out and CI is failing.
+  - #1211 has auth review notes but still no review decision.
+  - #1210 now only touches `docs/deployment/local-developer-bootstrap.md`; the mixed-scope blocker is gone, but validation is still settling.
+  - #1209 is still open with no review decision and the reviewer identity problem remains unresolved.
 
 ## Which lanes are producing signal vs idling
 - Producing signal:
-  - `infra-delivery-operator` lane: meaningful review feedback on PR #1209, but blocked by identity resolution.
-  - `docs-drift-curator` lane: meaningful review feedback on PR #1210, but blocked by cross-owner scope split.
+  - `qa-reliability-engineer` on #1211 and #1210 review routing.
+  - `docs-drift-curator` because the split is complete and the docs-only PR is back in review posture.
+  - `infra-delivery-operator` because the monitoring truth review is explicit, even though the reviewer-identity blocker remains.
 - Idling:
   - `auth-identity-guardian`
   - `observability-sre`
   - `control-plane-steward`
-  - `docs-drift-curator` as an author lane once the split is made
-  - `qa-reliability-engineer` still has the auth/doc review assignment but cannot close #1210 until the split exists
+  - `operator-surface-builder`
+  - `cli-sdk-contract-keeper`
+  - `runtime-protocol-engineer`
 
 ## What Fortune can do with this today
-- Resolve the reviewer-identity bottleneck for PR #1209 by assigning a GitHub-resolvable second reviewer or fixing the reviewer mapping.
-- Split PR #1210 into a docs-only PR plus a separate `agents/registry.yml` change in the correct lane.
-- Do not merge anything yet; the merge queue is correctly empty.
-- Keep the active review queue pointed at the three open PRs, but treat #1209 and #1210 as blocked until their specific blockers are cleared.
+- Keep QA focused on #1211 and #1210; #1210 is now review-clean again.
+- Resolve the reviewer-identity bottleneck on #1209 by assigning a GitHub-resolvable second reviewer or fixing the reviewer mapping.
+- Leave the merge queue empty until there is a green reviewed PR.
 
 ### Control brief
-- Live work remains review-bound, not code-bound.
-- The true bottleneck is approvals/review identity plus a mixed-scope PR that needs splitting.
-- No merge-ready PR exists right now.
-
-### Truth sources
-- `mutx-fleet-state.md`
-- live GitHub PR state via `gh pr list` / `gh pr view`
-- `_shared/REVIEW-MATRIX.md`
-- `_shared/AUTO-MERGE-POLICY.md`
-- `dispatch/review-queue.json`
+- The fleet is still review-bound, not code-bound.
+- The real bottleneck is approvals/review identity.
+- No merge-ready PR exists.

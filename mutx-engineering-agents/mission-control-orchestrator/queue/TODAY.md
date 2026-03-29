@@ -1,10 +1,11 @@
 # TODAY.md — Mission Control Orchestrator
 
 - Keep the review queue honest:
-  - PR #1211 → `qa-reliability-engineer` (awaiting review)
-  - PR #1209 → `infra-delivery-operator` (blocked-reviewer-identity; needs a GitHub-resolvable second reviewer)
-  - PR #1210 → `qa-reliability-engineer` (blocked-split; must separate `agents/registry.yml` from docs)
+  - PR #1211 -> `qa-reliability-engineer` (awaiting-review)
+  - PR #1210 -> `qa-reliability-engineer` (awaiting-review; split complete, docs-only, CI still pending)
+  - PR #1209 -> `infra-delivery-operator` (blocked-reviewer-identity; needs a GitHub-resolvable second reviewer)
 - Keep the merge queue empty; nothing is merge-ready.
-- Treat `control-plane-steward` as handled and keep author lanes (`auth-identity-guardian`, `observability-sre`, `docs-drift-curator`) idle until blockers clear.
-- The real bottleneck is approvals/review identity plus a mixed-scope docs PR that needs splitting.
+- `docs-drift-curator` is back in a bounded docs-only review posture on #1210; keep the author lane idle until review returns.
+- `control-plane-steward`, `auth-identity-guardian`, and `observability-sre` stay idle until their blockers clear.
+- The bottleneck is still approvals/review identity, not more code churn.
 - Do not widen scope or merge anything until the blockers are removed.

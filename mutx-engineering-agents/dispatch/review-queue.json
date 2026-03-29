@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-29T01:05:00+01:00",
+  "updated": "2026-03-29T04:05:00+02:00",
   "items": [
     {
       "pr": 1211,
@@ -10,6 +10,15 @@
       "risk": "medium"
     },
     {
+      "pr": 1210,
+      "title": "Fix local bootstrap dashboard path",
+      "owner": "docs-drift-curator",
+      "reviewer": "qa-reliability-engineer",
+      "status": "awaiting-review",
+      "risk": "low",
+      "note": "Split complete; PR is docs-only again. CI is still pending, so it is not merge-ready yet."
+    },
+    {
       "pr": 1209,
       "title": "Fix system overview CPU and memory queries",
       "owner": "observability-sre",
@@ -17,15 +26,6 @@
       "status": "blocked-reviewer-identity",
       "risk": "monitoring-truth",
       "note": "Reviewer identity cannot self-approve; GitHub-resolvable second reviewer still needed."
-    },
-    {
-      "pr": 1210,
-      "title": "Fix local bootstrap dashboard path",
-      "owner": "docs-drift-curator",
-      "reviewer": "qa-reliability-engineer",
-      "status": "blocked-split",
-      "risk": "low",
-      "note": "Mixed-scope PR includes unrelated agents/registry.yml change; split required before review."
     }
   ]
 }

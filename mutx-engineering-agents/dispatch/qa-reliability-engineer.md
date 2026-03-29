@@ -2,21 +2,22 @@
 
 Priority dispatches:
 1. PR #1211 — `Bind auth refresh to refresh cookie`
-2. PR #1210 — `Fix local bootstrap dashboard path` (blocked: split required)
+2. PR #1210 — `Fix local bootstrap dashboard path` (docs-only, split complete)
 
 Goals:
 - Review the auth refresh change in `app/api/auth/refresh/route.ts` and `tests/unit/authRoutes.test.ts`.
 - Verify the endpoint is bound to the existing refresh cookie and that the unit tests cover the intended behavior.
-- For PR #1210, hold review until the author splits out the unrelated `agents/registry.yml` change; the current PR is not review-clean.
+- Review the docs-only bootstrap path fix in `docs/deployment/local-developer-bootstrap.md` once CI is green enough to trust the diff.
 
 Current signal:
 - PR #1211 is still the active auth review target.
-- PR #1210 is not merge-ready as a mixed-scope PR; it needs a split before QA can complete a truthful review.
+- PR #1210 is now docs-only again after the split; it is review-clean but still waiting on validation to settle.
+- Do not reopen the split blocker unless the `agents/registry.yml` change reappears.
 
 Review / merge posture:
 - Reviewer default: `mission-control-orchestrator`.
 - Keep the auth review tight and bounded.
-- Do not approve PR #1210 until the cross-owner change is removed or explained and CI is green.
+- Keep #1210 review grounded in the docs slice and do not approve until CI is green.
 
 Guardrails:
 - Stay inside the auth refresh slice.
