@@ -5,40 +5,33 @@
 - **Recommendation:** KEEP
 
 ## What changed in truth
-- The market signal is no longer just "agents need observability". It is now clearly **governed execution**: secure defaults, policy controls, scoped credentials, network boundaries, approvals, and logging.
-- Local repo truth supports that framing better than a generic dashboard story: `/dashboard` is the supported operator shell, while governance/approval remains CLI-first and `/control/*` stays the preview boundary.
-- That means the best GTM move is now narrower and stronger: **lead with runtime policy and approval boundaries, then use dashboard proof as evidence**.
-- New editorial wedge: **"Agents need an OS, not scripts."** This is more concrete than “better observability” and aligns with the live control-plane surface.
+- **New repo state**: `#1211` and `#1210` are now CI-green. Bottleneck is reviewer attachment only — independent second reviewer is the only remaining gate. This removes the CI-red qualifier from the GTM constraint.
+- **New market signal (March 29)**: Three fresh operator posts sharpen the angle materially:
+  - `"Can call this API" ≠ "authorized to execute this action class."` — intent scope is the right unit, not tool whitelisting.
+  - `Sandbox mode was never the security boundary — the access model is.` — the IAM analogy is live.
+  - `Approval hooks are what separate responsible automation from chaos.` — approval gates are table stakes, not future work.
+- **New concrete product anchor**: OpenClaw shipped plugin approval hooks March 28, 2026. This is proof that the approval-gate direction is shipping, not on a roadmap.
+- **Sharpened editorial hook**: The angle should now lead with **"Can call this API ≠ authorized to execute."** This is more precise than "Agents need an OS" and matches the live operator language.
+- The thread anchor stays conservative: no new GTM claims, just the permission/proof angle anchored to the supported `/dashboard` surfaces.
 
 ## Exact evidence
-- Read `mutx-agents/reports/roundtable.md` and `gtm/outside-in-intelligence/reports/signal-brief.md` for the cross-lane and market framing.
-- Checked repo truth with `git -C /Users/fortune/MUTX status --short --branch`.
-- Fresh truth pass with `rg -n "dashboard|approval|policy|scoped credentials|network boundaries|logging|observability|spend|retry" /Users/fortune/MUTX /Users/fortune/.openclaw/workspace -g '!**/node_modules/**' -g '!**/.git/**'`.
-- Relevant live surfaces found in repo/docs:
-  - `MUTX/docs/project-status.md`
-  - `MUTX/docs/overview.md`
-  - `MUTX/docs/governance.md`
-  - `MUTX/app/dashboard/security/page.tsx`
-  - `MUTX/app/dashboard/monitoring/page.tsx`
-  - `MUTX/app/dashboard/budgets/page.tsx`
-  - `MUTX/components/dashboard/control/OpenclawSetupSurface.tsx`
-  - `MUTX/components/dashboard/DashboardOverviewPageClient.tsx`
-  - `MUTX/components/dashboard/ObservabilityPageClient.tsx`
-  - `MUTX/components/app/DeploymentsPageClient.tsx`
-  - `MUTX/components/desktop/DesktopRouteBoundary.tsx`
-- Current lane state also checked via `queue/TODAY.md` and this file’s prior contents.
+- Read `mutx-agents/reports/roundtable.md` (updated 2026-03-29 14:10 Europe/Rome) and `gtm/outside-in-intelligence/reports/signal-brief.md` (updated 2026-03-29 13:20 Europe/Rome) for fresh cross-lane and market state.
+- `git -C /Users/fortune/MUTX log --oneline -5` and `git -C /Users/fortune/MUTX status --short --branch` — repo has not advanced since morning.
+- Prior `queue/TODAY.md` and `reports/latest.md` from morning run confirmed no prior-commit state changes.
+- Fresh operator signals from March 29: `@Pete_yes_please` (intent scope), `@nithin_k_anil` (IAM model), `@aginaut` (accountability), `@clearframelabs` (Shadow AI), `@hex_agent` (approval hooks).
+- OpenClaw plugin approval hooks release: March 28, 2026 — concrete product proof.
 
 ## If idle or blocked, why exactly
 - Not blocked.
-- The real constraint is that this lane cannot publish externally and should not invent new proof. It can only package truth that already exists.
-- So the work is bounded to drafting, proof selection, and next-move planning.
+- The constraint remains: this lane cannot post publicly and cannot invent proof. It can only package what already exists.
+- Proof stack is still unassembled — no screenshots from `/dashboard/security`, `/dashboard/monitoring`, or `/dashboard/budgets` have been pulled into a usable format.
 
 ## What Fortune can do with this today
-- Approve the new thread angle: **governed execution / approval boundary / OS-not-scripts**.
-- Use one proof asset stack: `/dashboard/security`, `/dashboard/monitoring`, `/dashboard/budgets`, plus the supported-vs-preview split.
-- If he wants a post today, it should be a proof-first founder thread, not a generic “dashboard update.”
+- Pull one set of screenshots from `/dashboard/security`, `/dashboard/monitoring`, and `/dashboard/budgets` as the proof stack for the thread.
+- Approve the sharpened hook: **"Can call this API ≠ authorized to execute this action class."** — this is the sharpest single-line framing in the current market conversation.
+- If he wants to engage any of the March 29 reply targets (`@Pete_yes_please`, `@nithin_k_anil`, `@aginaut`) in DMs or replies, now is the window — the thread language is aligned with their framing.
 
 ## What should change in this lane next
-- Stop widening the crawl for generic AI observability hooks.
-- Build one reusable founder post template around: **policy gate → approval trail → cost visibility → supported dashboard surface**.
-- Keep distribution manual-only until proof assets are assembled and the claim boundary stays tight.
+- Assemble the proof stack first, then draft the founder thread.
+- Do not widen the content crawl — the March 29 signals are specific enough. Stop looking for more and start packaging.
+- The thread draft should land in a drafts file or shared location so Fortune can review before any action.
