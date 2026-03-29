@@ -1,6 +1,6 @@
 # lane-scorecard.md — Project Shepherd
 
-> Refreshed: 2026-03-28 22:58 Europe/Rome
+> Refreshed: 2026-03-29 08:10 Europe/Rome
 
 ## Fleet score
 - Control plane: **GREEN**
@@ -30,7 +30,7 @@
 
 ## Cross-lane consensus
 - The fleet is operational.
-- Work is review-bound, with Fortune already leaving non-blocking comments on the active auth/bootstrap PRs.
+- Work is still review-bound; Fortune’s comments on the active auth/bootstrap PRs remain non-blocking.
 - Live company truth and local control files must stay synchronized.
 - `/dashboard` remains canonical.
 
