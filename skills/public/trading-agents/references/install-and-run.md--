@@ -1,0 +1,187 @@
+# Install and run TradingAgents
+
+
+## Contents
+
+- [When to read this](#when-to-read-this)
+- [Repo facts](#repo-facts)
+- [Install flow](#install-flow)
+- [Environment variables](#environment-variables)
+- [Fastest first run](#fastest-first-run)
+- [Ticker handling](#ticker-handling)
+- [Python API usage](#python-api-usage)
+- [Output locations](#output-locations)
+  - [CLI results directory](#cli-results-directory)
+  - [Graph eval logs](#graph-eval-logs)
+- [Good first experiments](#good-first-experiments)
+  - [Cheapest smoke test](#cheapest-smoke-test)
+  - [Comparative experiment](#comparative-experiment)
+
+## When to read this
+
+Read this file when you need practical setup steps, environment variables, CLI usage, or a minimal Python run.
+
+## Repo facts
+
+- Repo: `TauricResearch/TradingAgents`
+- Package name: `tradingagents`
+- Current repo version in `pyproject.toml`: `0.2.2`
+- Recommended environment in README: Python `3.13`
+- Declared package floor in `pyproject.toml`: Python `>=3.10`
+- Main installed CLI command: `tradingagents`
+- Direct source CLI alternative: `python -m cli.main`
+
+## Install flow
+
+```bash
+git clone https://github.com/TauricResearch/TradingAgents.git
+cd TradingAgents
+
+conda create -n tradingagents python=3.13
+conda activate tradingagents
+
+pip install .
+```
+
+If conda is not desired, a normal virtualenv should also work as long as Python is compatible.
+
+## Environment variables
+
+TradingAgents needs at least one LLM provider configured.
+
+Common variables mentioned by the repo:
+
+```bash
+export OPENAI_API_KEY=...
+export GOOGLE_API_KEY=...
+export ANTHROPIC_API_KEY=...
+export XAI_API_KEY=...
+export OPENROUTER_API_KEY=...
+export ALPHA_VANTAGE_API_KEY=...
+```
+
+Important nuance:
+
+- `.env.example` currently lists only `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `ANTHROPIC_API_KEY`, `XAI_API_KEY`, and `OPENROUTER_API_KEY`.
+- README also mentions `ALPHA_VANTAGE_API_KEY`.
+- Alpha Vantage is optional because the default data-vendor config uses `yfinance` everywhere.
+
+For local models:
+
+- Set `config["llm_provider"] = "ollama"`
+- Ensure an OpenAI-compatible Ollama endpoint is available at `http://localhost:11434/v1`
+- The code internally uses a placeholder API key value for Ollama
+
+## Fastest first run
+
+Use the default `yfinance` data vendor and a single provider key.
+
+Then launch:
+
+```bash
+tradingagents
+```
+
+The interactive CLI prompts for:
+
+1. ticker symbol
+2. analysis date
+3. analyst selection
+4. research depth
+5. LLM provider
+6. quick-thinking model
+7. deep-thinking model
+8. provider-specific thinking config when applicable
+
+## Ticker handling
+
+Pass the exact ticker, including exchange suffixes where needed:
+
+- `SPY`
+- `CNC.TO`
+- `7203.T`
+- `0700.HK`
+
+The repo explicitly preserves exchange-qualified symbols in both CLI normalization and agent context.
+
+## Python API usage
+
+Minimal example:
+
+```python
+from tradingagents.graph.trading_graph import TradingAgentsGraph
+from tradingagents.default_config import DEFAULT_CONFIG
+
+config = DEFAULT_CONFIG.copy()
+config["llm_provider"] = "openai"
+config["quick_think_llm"] = "minimax-portal/MiniMax-M2.7"
+config["deep_think_llm"] = "minimax-portal/MiniMax-M2.7"
+config["max_debate_rounds"] = 1
+config["max_risk_discuss_rounds"] = 1
+
+ta = TradingAgentsGraph(debug=True, config=config)
+final_state, decision = ta.propagate("NVDA", "2026-01-15")
+print(decision)
+```
+
+Repo example script:
+
+```bash
+python main.py
+```
+
+That example uses `yfinance` and `gpt-5-mini` for both quick and deep thinking.
+
+## Output locations
+
+There are **two different output paths** to keep straight:
+
+### CLI results directory
+
+Default config sets:
+
+- `results_dir = os.getenv("TRADINGAGENTS_RESULTS_DIR", "./results")`
+
+The CLI writes structured results under approximately:
+
+```text
+./results/<TICKER>/<DATE>/
+```
+
+including:
+
+- `reports/`
+- `message_tool.log`
+- optional saved report folders if the user chooses to save them after completion
+
+### Graph eval logs
+
+`TradingAgentsGraph._log_state()` writes JSON logs to:
+
+```text
+eval_results/<TICKER>/TradingAgentsStrategy_logs/
+```
+
+This path is hard-coded and does **not** follow `results_dir`.
+
+## Good first experiments
+
+### Cheapest smoke test
+
+- one ticker
+- one date
+- one provider
+- research depth 1
+- `quick_think_llm`: small/cheap model
+- `deep_think_llm`: same or slightly stronger model
+
+### Comparative experiment
+
+Keep everything fixed except one variable:
+
+- provider
+- deep model
+- debate rounds
+- data vendor category/tool override
+
+Avoid changing multiple knobs at once if the user wants interpretable comparisons.

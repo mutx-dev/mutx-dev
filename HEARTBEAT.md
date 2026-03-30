@@ -4,19 +4,16 @@ Keep heartbeat work minimal and current.
 Do not infer from old chats.
 
 ## Check in one pass
-1. `workspace-x/queue/execution.log` — last 4h
-2. `workspace-x/queue/posted_log.md` — last 10 entries
-3. `workspace-x/worker_state.json`
-4. `openclaw status`
+1. `openclaw status` — gateway reachable, memory vector ready, sessions healthy
+2. `mutx-engineering-agents/dispatch/action-queue.json` — any shared CI blockers or deadlocks?
+3. Recent gateway logs: `tail -50 /Users/fortune/.openclaw/logs/gateway.log` — any new ERROR patterns?
 
 ## Alert if any of these are true
-- `healthStatus = BLOCKED`
-- `qualityScore < 40`
-- follower count drops without explanation
-- 2+ unresolved X errors remain in `execution.log`
-- gateway is not healthy
-- ACP backend is not ready
-- local memory is not ready
+- gateway is not reachable or `openclaw status` shows gateway down
+- local memory vector is not ready
+- 3+ consecutive session failures in recent logs
+- new model-switch errors in gateway logs (GPT refs appearing after model migration)
+- a shared CI blocker sits in action-queue.json for more than 2 hours without an owner assigned
 
 ## Response
 If nothing needs attention, reply exactly:

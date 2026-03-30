@@ -1,0 +1,8 @@
+so overall it's decent i'm happy that i even received the pdf i wasn't expecting it
+but from your own words you can see that
+you know basically only
+two of the 15 or 14 or however many agents we set up actually did something the rest of them did
+basically nothing so either it needs to be rewired they need to be given a new mission or
+we need to set up a better agent to agent communication with github so that we just
+close the nprs and keep pushing the the project forward i want green ci's like are we able to get
+green ci's today autonomously again autonomously not without me interjecting

@@ -1,12 +1,18 @@
-# MUTX Sales Brief — Operator-Trust POC
+# MUTX Sales Brief - Operator-Trust POC
 
 ## Lead
 Do not sell MUTX as "how to build an agent."
-Sell it as how a team runs an agent without losing control.
+Sell it as how a team runs agents - plural - without losing control.
 
 ## One-line position
 Agent frameworks help teams build agents.
-MUTX helps teams deploy, operate, observe, and govern them like production infrastructure.
+MUTX is the control plane: the agent proposes, MUTX decides.
+
+## Positioning for multi-agent buyers
+"One agent is a workflow. Five agents are an organization."
+The jump from single-agent to multi-agent is not a tooling problem - it is a governance problem.
+Who resolves state conflicts between agents? What is the escalation path when two agents reach incompatible outputs?
+MUTX provides the arbitration layer: durable runtime records, decision logs, and enforcement across all agents in the fleet - not per-agent, not ad hoc.
 
 ## Best-fit buyer
 - already has agent code, pilots, or an internal prototype
@@ -40,8 +46,8 @@ MUTX helps teams deploy, operate, observe, and govern them like production infra
 - health and readiness
 
 ### Governance story
-- Faramesh-backed governance is real today — it evaluates whether an action is safe given the prior execution path, not just whether a tool can be called (runtime path evaluation, not tool whitelisting)
-- Gartner (March 2026): 50% of AI agent deployments will fail due to insufficient governance platforms, causing a $58B enterprise software shakeup — governance failure is the #1 deployment risk
+- Faramesh-backed governance is real today - it evaluates whether an action is safe given the prior execution path, not just whether a tool can be called (runtime path evaluation, not tool whitelisting)
+- Gartner (March 2026): 50% of AI agent deployments will fail due to insufficient governance platforms, causing a $58B enterprise software shakeup - governance failure is the #1 deployment risk
 - policy decisions are permit / deny / defer
 - operators can inspect decisions, pending approvals, and metrics from the CLI
 - approval workflows remain CLI-first; the dashboard should not be positioned as the approval surface yet
@@ -59,14 +65,16 @@ MUTX helps teams deploy, operate, observe, and govern them like production infra
    - explain the durable runtime record
 4. **Show the stable browser surface**
    - use `app.mutx.dev/dashboard` for overview, agents, deployments, runs, traces, sessions, budgets, monitoring, API keys, and webhooks
-5. **Show governance**
+5. **Show governance - single-agent first, then escalate**
    - `mutx governance status`
    - `mutx governance decisions --limit 50`
    - `mutx governance pending`
    - `mutx governance metrics`
-6. **Close on the buyer’s gap**
-   - ask whether the real pain is deployment control, observability, governance, or API surface drift
-   - map that pain to the proof matrix above
+   - frame it: "This is what it looks like when the agent proposes and the control plane decides. The agent cannot skip this layer."
+6. **Close on the buyer's actual problem**
+   - if single-agent: deployment control, observability, or secrets - map to proof matrix above
+   - if multi-agent: state conflict, escalation paths, fleet-wide audit - frame MUTX as the arbitration layer
+   - ask which problem they are solving today
 
 ## POC success criteria
 A good POC ends with the buyer able to say:
@@ -98,7 +106,17 @@ Not for every workflow yet.
 Stable dashboard routes are real, but some operator tasks are still better in CLI or direct API.
 
 ### "Can you govern risky actions?"
-Yes. Governance failure is the #1 AI agent deployment risk (Gartner: 50% of deployments will fail due to insufficient governance platforms, $58B shakeup by 2027). MUTX evaluates whether an action is safe given the prior execution path — not just whether a tool can be called. Approval workflow is still CLI-first today; be precise on that.
+Yes. Governance failure is the #1 AI agent deployment risk (Gartner: 50% of deployments will fail due to insufficient governance platforms, $58B shakeup by 2027). MUTX evaluates whether an action is safe given the prior execution path — not just whether a tool can be called. The agent proposes. MUTX decides. Approval workflow is still CLI-first today; be precise on that.
+
+### "We run multiple agents — is this the same problem at scale?"
+Single-agent governance and multi-agent governance are different problems. Single-agent: can this tool be called safely? Multi-agent: who arbitrates when two agents reach incompatible outputs? Who defines the escalation path?
+MUTX provides fleet-wide decision logs and enforcement — not just per-agent controls.
+
+### "How is this different from IntentBound / IBA?"
+IntentBound is a named competitor with patent GB2603013.0 and institutional positioning. MUTX differentiation: open governance hooks, CLI-first evidence path, and operator-first UX rather than procurement-layer positioning. If a buyer mentions IBA specifically, flag it as a competitive signal internally.
+
+## Competitive note
+**IntentBound (IBA)** is a named competitor with patent GB2603013.0, NIST/NCCoE filings, and sub-5ms validation - positioned as "The Authorization Layer for High-Stakes AI." Monitor for buyer mentions of IBA or intent-bounded authorization. MUTX differentiation: runtime path evaluation with CLI-first evidence, open governance hooks, and operator-first UX - not institutional procurement positioning.
 
 ## Best current call-to-action
 If you already have an agent that kind of works, MUTX is the lane to prove it can be operated, observed, and governed without lying about the gaps.

@@ -1,0 +1,7 @@
+the last time we used 52 workers it's not that it broke it's it's two two were the problems first
+of all we actually hit rate limits on mini max just because like we were running out of codex
+usage and then we switched to mini max and then we had to upgrade mini max and it was like it's
+fine we don't have to the city to workers but we we get to 40 you know what i mean 40 and we can and we
+can use sub agents we can use acp and we're going to be doing this 24 7. i want zero idle time okay
+like i need this project to be moving forward without me nudging you ever because i've got other
+shit to do

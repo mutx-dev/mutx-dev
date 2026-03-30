@@ -1,0 +1,167 @@
+{
+  "tasks": [
+    {
+      "id": "task-1701",
+      "type": "ci-fix",
+      "priority": "critical",
+      "status": "done",
+      "createdAt": "2026-03-29T20:00:00Z",
+      "updatedAt": "2026-03-29T20:40:23Z",
+      "owner": "proactive-coder",
+      "claimedBy": "proactive-coder",
+      "branch": "main",
+      "title": "fix: resolve validation suite failure after PR #1191",
+      "description": "CI run 23715637824 failed on main. Job 'Validation' failed at step 'Run validation suite'. PR #1191 ('fix: restrict governance credential broker to internal users') broke the validation suite. Check what validation was added/changed and fix the test or implementation. CI URL: https://github.com/mutx-dev/mutx-dev/actions/runs/23715637824",
+      "repo": "mutx-dev/mutx-dev",
+      "assignee": "proactive-coder",
+      "handoffs": [
+        {
+          "to": "code-reviewer",
+          "when": "status=review"
+        },
+        {
+          "to": "merge-manager",
+          "when": "status=approved"
+        }
+      ],
+      "links": {
+        "pr": "https://github.com/mutx-dev/mutx-dev/pull/1212",
+        "ci": "https://github.com/mutx-dev/mutx-dev/actions/runs/23715637824",
+        "issue": null
+      },
+      "tags": [
+        "ci",
+        "main",
+        "validation",
+        "critical"
+      ],
+      "error": null,
+      "attempts": 1,
+      "maxAttempts": 3,
+      "reviewNotes": "Code review: APPROVE. Test fix (getRefreshToken.mockReturnValue) is correct and targeted. PR already merged. Validation suite was ultimately unblocked by PR #1215 fixing the desktop/main.cjs lint error."
+    },
+    {
+      "id": "task-1702",
+      "type": "ci-fix",
+      "priority": "critical",
+      "status": "in-progress",
+      "createdAt": "2026-03-29T20:00:00Z",
+      "updatedAt": "2026-03-29T22:30:00Z",
+      "owner": "proactive-coder",
+      "claimedBy": "proactive-coder",
+      "branch": "main",
+      "title": "fix: resolve docker-compose validation failure after PR #1200",
+      "description": "Infrastructure CI run 23715637039 failed on main. Job 'Docker Compose' failed at step 'Validate canonical docker-compose files'. PR #1200 ('fix(terraform): make public agent port exposure opt-in') broke docker-compose validation. Check docker-compose files and fix. CI URL: https://github.com/mutx-dev/mutx-dev/actions/runs/23715637039",
+      "repo": "mutx-dev/mutx-dev",
+      "assignee": "proactive-coder",
+      "handoffs": [
+        {
+          "to": "code-reviewer",
+          "when": "status=review"
+        },
+        {
+          "to": "merge-manager",
+          "when": "status=approved"
+        }
+      ],
+      "links": {
+        "pr": "https://github.com/mutx-dev/mutx-dev/pull/1213",
+        "ci": "https://github.com/mutx-dev/mutx-dev/actions/runs/23715637039",
+        "issue": null
+      },
+      "tags": [
+        "ci",
+        "main",
+        "docker-compose",
+        "infrastructure",
+        "critical"
+      ],
+      "error": null,
+      "attempts": 1,
+      "maxAttempts": 3,
+      "reviewNotes": "CHANGES REQUESTED. The GRAFANA_ADMIN_PASSWORD env var fix in infrastructure-ci.yml is correct and resolves the Docker Compose validation. However PR #1213 was closed without being merged. The validation suite is still failing due to a separate lint error in desktop/main.cjs (fixed by PR #1215). Need to reopen/rebase this PR against current main to verify it passes full CI."
+    },
+    {
+      "id": "task-1703",
+      "type": "pr-patch",
+      "priority": "high",
+      "status": "done",
+      "createdAt": "2026-03-29T20:00:00Z",
+      "updatedAt": "2026-03-29T22:30:00Z",
+      "owner": "proactive-coder",
+      "claimedBy": "proactive-coder",
+      "branch": "codex/fix-credential-broker-api-vulnerability",
+      "title": "fix: CI failure on credential broker fix branch",
+      "description": "CI run 23715630188 failed on branch codex/fix-credential-broker-api-vulnerability. The PR/branch fixing the credential broker API vulnerability has a failing CI check. Get it green before it can be reviewed/merged. CI URL: https://github.com/mutx-dev/mutx-dev/actions/runs/23715630188",
+      "repo": "mutx-dev/mutx-dev",
+      "assignee": "proactive-coder",
+      "handoffs": [
+        {
+          "to": "code-reviewer",
+          "when": "status=review"
+        }
+      ],
+      "links": {
+        "pr": "https://github.com/mutx-dev/mutx-dev/pull/1215",
+        "ci": "https://github.com/mutx-dev/mutx-dev/actions/runs/23715630188",
+        "issue": null
+      },
+      "tags": [
+        "ci",
+        "pr-patch",
+        "security",
+        "credential-broker"
+      ],
+      "error": null,
+      "attempts": 1,
+      "maxAttempts": 3,
+      "reviewNotes": "Code review: APPROVE. Removing unused isSafeExternalUrl function from desktop/main.cjs correctly fixes the ESLint error. All Validation checks passed (SUCCESS). PR merged. No further action needed."
+    },
+    {
+      "id": "task-1704",
+      "type": "lint-fix",
+      "priority": "high",
+      "status": "in-progress",
+      "createdAt": "2026-03-29T20:00:00Z",
+      "updatedAt": "2026-03-29T22:30:00Z",
+      "owner": "proactive-coder",
+      "claimedBy": "proactive-coder",
+      "branch": "main",
+      "title": "lint/format drift: 10 files out of sync with origin/main",
+      "description": "10 files have drifted from origin/main and need linting/formatting: app/api/auth/refresh/route.ts, app/api/v1/leads/route.ts, app/types/api.ts, cli/commands/setup.py, src/api/routes/analytics.py, src/api/routes/governance_supervision.py, tests/api/test_governance_credentials_authz.py, tests/api/test_governance_supervision.py, tests/test_cli_setup_and_doctor.py, tests/unit/authRoutes.test.ts. Run lint and format on these files and commit to main.",
+      "repo": "mutx-dev/mutx-dev",
+      "assignee": "proactive-coder",
+      "handoffs": [],
+      "links": {
+        "pr": "https://github.com/mutx-dev/mutx-dev/pull/1214",
+        "ci": null,
+        "issue": null
+      },
+      "tags": [
+        "lint",
+        "format",
+        "main",
+        "drift"
+      ],
+      "error": null,
+      "attempts": 1,
+      "maxAttempts": 3,
+      "reviewNotes": "CHANGES REQUESTED. The format changes (refresh route.ts unused param removal, test_governance_supervision.py line-length formatting, test_cli_setup_and_doctor.py blank line cleanup) are all correct. However PR #1214 was closed without being merged. The CI Validation failures are due to desktop/main.cjs lint error (separate issue fixed by PR #1215). Need to reopen/rebase this PR against current main to verify CI passes. Format changes are correct and should be preserved."
+    },
+    {
+      "id": "task-1774818980",
+      "type": "lint",
+      "status": "done",
+      "title": "chore: lint fixes 2026-03-29",
+      "prUrl": "https://github.com/mutx-dev/mutx-dev/pull/1218",
+      "pr": "1218",
+      "branch": "mutx/auto/1218",
+      "owner": "code-reviewer",
+      "createdAt": "now",
+      "reviewNotes": "Code review: APPROVE. All CI checks passed. PR is MERGEABLE per gh CLI. Ready for merge.",
+      "mergedAt": "2026-03-29T23:34:00Z"
+    }
+  ],
+  "version": 1,
+  "lastUpdated": "2026-03-29T22:30:00Z"
+}

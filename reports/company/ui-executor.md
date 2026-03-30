@@ -1,0 +1,133 @@
+## 2026-03-19 08:54 CET — dashboard auth/error handling landed
+- Worktree: `/Users/fortune/mutx-worktrees/factory/live-main`
+- Picked one coherent UI slice: normalized dashboard API error parsing for agent/deployment surfaces so structured backend errors stop rendering as raw object strings in the operator UI.
+- Shipped shared client helper: `components/app/http.ts`
+  - centralizes `readJson` / `writeJson`
+  - extracts readable messages from `detail`, `message`, `error`, and nested `error.message` payload shapes
+- Updated dashboard clients:
+  - `components/app/AgentsPageClient.tsx`
+  - `components/app/DeploymentsPageClient.tsx`
+  - `components/app/AppDashboardClient.tsx`
+- Validation: `npm run build` ✅
+- Commit pushed straight to `origin/main`: `bfd5d981aff86317d4619bafe3e7f8ccda019b29`
+- Commit message: `ui: normalize dashboard api error handling`
+- Note: first push attempt hit a normal non-fast-forward because `main` had advanced; rebased cleanly onto latest `origin/main`, revalidated with `npm run build`, then pushed successfully.
+## 2026-03-19 09:20 CET — canonical dashboard surface landed
+- Worktree: `/Users/fortune/mutx-worktrees/factory/live-main`
+- Goal: collapse the split-brain dashboard toward one canonical `/dashboard` experience and remove borrowed identity leakage.
+- Shipped:
+  - replaced legacy `app/app/[[...slug]]/page.tsx` with a hard redirect to `/dashboard...` so the old `/app` surface cannot keep drifting as a second operator UI
+  - rewired `app/dashboard/page.tsx` to be the canonical richer operator landing page, centered on MUTX control-plane messaging plus the existing `AppDashboardClient`
+  - removed visible borrowed identity markers from the shared dashboard shell (`Mission Control`, `builderz`) and restored MUTX/operator wording
+  - tightened nav and section copy so labels/readouts speak in MUTX terms (`Runs`, `Traces`, `Deployments`, `API Keys`, `Monitoring`, `Orchestration`) instead of hand-me-down dashboard language
+- MUTX positioning restored in the canonical hero:
+  - `Deploy agents like services. Operate them like systems.`
+  - explicit control-plane framing around lifecycle, governance, and operator execution
+- Validation: `npm run build` ✅
+  - build still emits the pre-existing Next.js deprecation warning that `middleware.ts` should move to `proxy`, but the build passed cleanly
+- Commit pushed straight to `origin/main`: `4d9602047efb7a00c45b3518088e5319e0d8af2e`
+- Commit message: `ui: make dashboard the canonical operator surface`
+- Note: initial push hit a normal non-fast-forward because `origin/main` had advanced; fetched latest, revalidated, then pushed successfully.
+## 2026-03-19 09:31 CET — final borrowed monitoring copy removed
+- Worktree: `/Users/fortune/mutx-worktrees/factory/live-main`
+- Follow-up scope: remove the last user-facing borrowed `Mission-control` wording still visible on the canonical `/dashboard` surface after the larger convergence landing.
+- Shipped:
+  - updated `app/dashboard/monitoring/page.tsx`
+  - route description now reads: `Truthful health, telemetry, and alerting integrations for the MUTX control plane.`
+- Validation: `npm run build` ✅
+- Commit pushed straight to `origin/main`: `5902c4ca6b0852c83cd3576f57a70bde699fc38a`
+- Commit message: `ui: remove final borrowed monitoring copy`
+- Note: this was intentionally small and surgical — no new shell cloning, just removing the remaining copied identity leak on the canonical dashboard.
+## 2026-03-19 09:37 CET — website MUTX framing restored
+- Worktree: `/Users/fortune/mutx-worktrees/factory/live-main`
+- Shipped a homepage identity reset on the canonical site surface (`app/page.tsx`) to remove remaining borrowed mission-control framing and align public copy with the MUTX message stack / whitepaper thesis.
+- Updated public-site copy to emphasize:
+  - `Deploy agents like services. Operate them like systems.`
+  - control plane vs session dashboard category framing
+  - lifecycle / governance / operator execution pillars
+  - truthful MUTX product surfaces (`API`, `CLI`, `SDK`, `App`) instead of speculative vanity metrics
+  - OpenClaw compatibility framed as a runtime path under MUTX governance, not the product identity
+- Explicitly kept canonical `/dashboard` direction intact; no second dashboard system introduced.
+- Validation: `npm run build` ✅
+  - build still emits the existing Next.js `middleware` -> `proxy` deprecation warning, but completed successfully
+- Commit pushed straight to `origin/main`: `e98fbecb303269737f2f50b44fe1fdbf9bf92859`
+- Commit message: `ui: restore mutx website control-plane framing`
+- Note: first push attempt hit a normal non-fast-forward because `main` moved during execution; fetched/revalidated, then pushed cleanly.
+- 2026-03-19 09:47 CET — pushed `7780095d` (`ui: harden dashboard auth and payload states`) after clean `npm run build`; hardened canonical `/dashboard` API Keys + Webhooks surfaces against malformed/wrapped payloads, normalized API-key loading on the main dashboard, and swapped misleading fake-empty unauthenticated states for explicit sign-in-required messaging.
+## 2026-03-19 09:58 CET — dashboard chrome made truthful
+- Worktree: `/Users/fortune/mutx-worktrees/factory/live-main`
+- Picked one coherent follow-up: remove the last fake operator chrome from the canonical `/dashboard` shell instead of adding more decorative dashboard theater.
+- Shipped:
+  - replaced the fake read-only search box in `components/dashboard/DashboardShell.tsx` with a truthful MUTX control-plane summary (`Canonical /dashboard surface`)
+  - removed misleading static status copy like `Sessions n/a` and `Events • Live`
+  - replaced it with MUTX-native framing around resources/posture (`Agents · Deployments · Runs`, `Governed`)
+  - cleaned `app/dashboard/SPEC.md` so future dashboard work stops inheriting borrowed platform metaphors (`"The Vercel for production AI agents"`, `projects → agents`, `deployments → swarms`)
+- Validation: `npm run build` ✅
+  - build still emits the existing Next.js `middleware` -> `proxy` deprecation warning, but completed successfully
+- Commit pushed straight to `origin/main`: `014cd9bd4a7010f056250d0145192d7a1b83767c`
+- Commit message: `ui: make dashboard chrome truthful`
+- Note: first push attempts failed for two honest reasons — non-fast-forward on `origin/main`, then a mistaken `git push origin main` from the `live-main` worktree branch. Resolved by revalidating and pushing the validated HEAD explicitly via `git push origin HEAD:main`.
+
+## 2026-03-19 10:12 CET — canonical dashboard identity spec aligned
+- Worktree: `/Users/fortune/mutx-worktrees/factory/live-main`
+- Shipped a small but durable identity follow-up on the website/dashboard surface contract: updated `tests/website.spec.ts` so `/app` is asserted as a legacy redirect into canonical `/dashboard` and no longer expects borrowed `mission control` copy.
+- New spec truth: asserts MUTX-native dashboard language (`Deploy agents like services. Operate them like systems.`, `MUTX control plane`, `Canonical /dashboard surface`) instead of the old split-brain shell.
+- Validation: `npm run build` ✅
+- Commit pushed straight to `origin/main`: `53860335c3d392a6f8b557c17ed0420a9a0c25a9`
+- Commit message: `ui: align website spec with canonical dashboard`
+## 2026-03-19 10:19 CET — swarm alias collapsed into canonical deployments
+- Worktree: `/Users/fortune/mutx-worktrees/factory/live-main`
+- Picked one more small high-impact identity cleanup on the canonical `/dashboard` surface instead of adding more shell chrome.
+- Shipped:
+  - removed `Swarm` as a first-class concept from the shared canonical dashboard nav and centered `Deployments` as the MUTX-native resource
+  - turned `/dashboard/swarm` into a hard redirect to `/dashboard/deployments` so the old alias cannot keep acting like a second product concept
+  - cleaned the canonical shell/status wording (`Control plane online`) and default API-key naming (`MUTX operator key`)
+  - updated `public/og-image.svg` to remove the remaining borrowed tagline and use MUTX’s own line: `Deploy agents like services. Operate them like systems.`
+  - cleaned `app/dashboard/SPEC.md` again so future work stops reintroducing `Control Center` / `Swarm` language
+- Validation: `npm run build` ✅
+  - build still emits the existing Next.js `middleware` -> `proxy` deprecation warning, but completed successfully
+- Commit pushed straight to `origin/main`: `739760e1163ca8c4bfe66a14d866358bfbd34393`
+- Commit message: `ui: collapse swarm alias into deployments`
+- Note: this keeps the useful UX bones but removes one of the last copied dashboard metaphors still visible inside the canonical MUTX operator shell.
+## 2026-03-19 10:26 CET — stale /app route drift collapsed further into canonical /dashboard
+- Worktree: `/Users/fortune/mutx-worktrees/factory/live-main`
+- Picked one narrow convergence pass instead of adding new UI: remove remaining internal `/app` entrypoints that could still send signed-in operators into legacy or non-canonical routes.
+- Shipped:
+  - expanded `middleware.ts` legacy route mapping so stale `/app/activity`, `/app/cron`, and `/app/settings` traffic lands on truthful canonical destinations (`/dashboard/history`, `/dashboard/orchestration`, `/dashboard/control`) instead of drifting into dead-end surfaces
+  - rewired stale internal nav components (`components/ui/nav-rail.tsx`, `components/ui/sidebar.tsx`) to point directly at `/dashboard/*`
+  - cleaned the older dashboard sidebar copy so it no longer advertises `Control Center` / `Swarm Command`
+  - added focused middleware coverage for the new legacy-route redirects in `tests/unit/middlewareRouting.test.ts`
+- Validation: `npm run build` ✅
+  - build still emits the existing Next.js `middleware` -> `proxy` deprecation warning, but completed successfully
+- Commit pushed straight to `origin/main`: `b0795c0294cfbe21f43f241f87d74f0a275a4da9`
+- Commit message: `ui: collapse stale app routes into dashboard`
+## 2026-03-19 10:46 CET — canonical /app redirect follow-up landed
+- Worktree: `/Users/fortune/mutx-worktrees/factory/live-main`
+- Picked one narrow convergence fix: preserve query params when the legacy `app/app/[[...slug]]` entrypoint redirects into canonical `/dashboard`, so old signed-in/deep-link flows do not lose context outside middleware-controlled host cases.
+- Shipped:
+  - updated `app/app/[[...slug]]/page.tsx` to carry `searchParams` through the legacy `/app...` -> `/dashboard...` redirect
+  - tightened `tests/website.spec.ts` so the legacy redirect contract now asserts preserved query params on the canonical dashboard surface
+  - updated `scripts/validate-demo.js` to validate and advertise `/dashboard` as the canonical operator surface instead of `/app`
+- Validation: `npm run build` ✅
+- Commit pushed straight to `origin/main`: `f9edc7817073cf6691c5c32c85c13e5c06972b7b`
+- Commit message: `ui: preserve canonical dashboard redirects`
+
+## 2026-03-19 10:56 Europe/Rome — Dashboard truthfulness follow-through
+- Shipped `ui: truthify dashboard data contracts` to `origin/main` (`b47d82c8`).
+- Validation: `npm run build` ✅ after rebase onto latest `origin/main`.
+- Scope:
+  - normalized canonical `/dashboard` data handling across agents, deployments, API keys, version history, logs, and metrics payload shapes
+  - made unauthenticated `/dashboard` reads degrade honestly instead of surfacing broken-state noise
+  - routed dashboard observability panels through canonical dashboard proxies and extended those proxies to support agent/deployment logs + metrics
+- Notes:
+  - initial push was rejected because `origin/main` moved; rebased cleanly and revalidated before pushing
+  - build still emits the existing Next.js middleware→proxy deprecation warning, but the production build passed
+## 2026-03-19 11:15 Europe/Rome — Middleware canonical dashboard restore
+- Shipped `ui: restore canonical dashboard middleware redirects` after finding `middleware.ts` had regressed to rate-limit-only behavior, which removed host-aware `/app` -> `/dashboard` canonicalization from the live-main worktree.
+- Validation: `npm run test:app -- --runTestsByPath tests/unit/middlewareRouting.test.ts` ✅ and `npm run build` ✅.
+- Scope:
+  - restored marketing-host -> app-host redirects for auth and operator traffic so `mutx.dev/app*` and `mutx.dev/dashboard*` land on `app.mutx.dev/dashboard*`
+  - restored app-host legacy `/app*` -> canonical `/dashboard*` mappings, including stale workflow aliases like `/app/activity`, `/app/cron`, and `/app/settings`
+  - kept real auth/newsletter/leads rate limiting in place instead of fake global headers, and updated middleware tests to match that truthful behavior
+- Notes:
+  - build still emits the existing Next.js middleware->proxy deprecation warning, but the production build passed

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MUTX — Nome + custos</title>
+<style>
+  :root {
+    --bg:#f5f7fb; --ink:#101828; --muted:#475467; --line:#d0d5dd;
+    --card:#ffffff; --brand:#111827; --accent:#2563eb; --soft:#eef4ff;
+    --warn:#fff7ed; --warn-line:#fdba74; --good:#ecfdf3; --good-line:#86efac;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,Arial,sans-serif; }
+  .wrap { max-width:980px; margin:0 auto; padding:40px 28px 72px; }
+  .hero { background:linear-gradient(135deg,#111827,#1f2937); color:#fff; border-radius:20px; padding:32px; margin-bottom:24px; }
+  .eyebrow { opacity:.75; font-size:13px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; }
+  h1 { margin:8px 0 12px; font-size:38px; line-height:1.08; letter-spacing:-.03em; }
+  .sub { color:#d1d5db; max-width:760px; font-size:18px; }
+  .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin:20px 0 28px; }
+  .cards4 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin:18px 0 28px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px 18px 16px; box-shadow:0 1px 2px rgba(16,24,40,.04); }
+  .card h3 { margin:0 0 6px; font-size:14px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+  .big { font-size:30px; line-height:1.1; font-weight:800; letter-spacing:-.02em; margin:0 0 4px; }
+  .small { font-size:13px; color:var(--muted); }
+  .section { margin-top:30px; }
+  .section h2 { font-size:24px; line-height:1.15; margin:0 0 14px; letter-spacing:-.02em; }
+  .lead { font-size:17px; color:var(--muted); margin-bottom:14px; }
+  .callout { border-radius:16px; padding:16px 18px; margin:14px 0; border:1px solid var(--line); background:var(--soft); }
+  .callout.warn { background:var(--warn); border-color:var(--warn-line); }
+  .callout.good { background:var(--good); border-color:var(--good-line); }
+  ul { margin:10px 0 0 20px; padding:0; }
+  li { margin:6px 0; }
+  table { width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+  th, td { padding:14px 12px; border-bottom:1px solid var(--line); vertical-align:top; text-align:left; }
+  th { background:#f8fafc; font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  tr:last-child td { border-bottom:none; }
+  .pill { display:inline-block; padding:4px 10px; border-radius:999px; background:#eff6ff; color:#1d4ed8; font-size:12px; font-weight:700; }
+  .footer { margin-top:28px; color:var(--muted); font-size:13px; }
+  @media print { .wrap { padding:20px; } .hero,.card,.callout,table { break-inside:avoid; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="eyebrow">MUTX · Briefing para CMO</div>
+      <h1>Origem do nome + custo de desenvolvimento e operação</h1>
+      <div class="sub">Versão executiva, pronta para encaminhar. Onde há dado medido, usei dado medido. Onde não há billing instrumentado, marquei explicitamente como estimativa.</div>
+    </section>
+
+    <div class="cards4">
+      <div class="card"><h3>AI spend · 30 dias</h3><div class="big">US$ 929.69</div><div class="small">CodexBar local · dado medido</div></div>
+      <div class="card"><h3>Tokens · 30 dias</h3><div class="big">2.10B</div><div class="small">Codex · dado medido</div></div>
+      <div class="card"><h3>AI Dev Spend</h3><div class="big">US$ 790.24</div><div class="small">Estimativa heurística · 85%</div></div>
+      <div class="card"><h3>AI Ops Spend</h3><div class="big">US$ 139.45</div><div class="small">Estimativa heurística · 15%</div></div>
+    </div>
+
+    <section class="section">
+      <h2>1) Origem do nome “MUTX”</h2>
+      <p class="lead">Não encontrei, no repositório nem nas memórias locais, uma explicação canônica escrita do nome. A leitura mais provável e defensável é a seguinte:</p>
+      <div class="callout good"><strong>MUTX</strong> soa como uma forma curta e brandável de <strong>“mutex”</strong> — isto é, a primitive de coordenação/controle em sistemas concorrentes.</div>
+      <ul>
+        <li>coordenação de múltiplos agentes</li>
+        <li>controle operacional sobre execuções autônomas</li>
+        <li>evitar colisão, caos e drift entre processos, permissões e lifecycle</li>
+      </ul>
+      <div class="callout"><strong>Forma boa de explicar para terceiros:</strong><br>“MUTX é uma versão mais curta e mais brandável de ‘mutex’: a camada de controle e coordenação que faz múltiplos agentes operarem como sistema, não como demo.”</div>
+      <div class="small">Importante: essa é a melhor explicação inferida, não uma citação histórica confirmada em documento interno.</div>
+    </section>
+
+    <section class="section">
+      <h2>2) Custo de AI para desenvolver e operar a MUTX</h2>
+      <p class="lead">Os números abaixo vêm de <strong>CodexBar local</strong>. Portanto, aqui estamos falando de <strong>AI spend medido</strong>, não de estimativa vaga.</p>
+      <table>
+        <thead>
+          <tr><th>Período</th><th>Métrica</th><th>Valor</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Últimos 30 dias</td><td>Custo AI total</td><td><strong>US$ 929.69</strong></td><td><span class="pill">medido</span></td></tr>
+          <tr><td>Últimos 30 dias</td><td>Tokens totais</td><td><strong>2,102,977,528</strong></td><td><span class="pill">medido</span></td></tr>
+          <tr><td>Hoje (2026-03-26)</td><td>Custo AI</td><td><strong>US$ 54.29</strong></td><td><span class="pill">medido</span></td></tr>
+          <tr><td>Hoje (2026-03-26)</td><td>Tokens</td><td><strong>131,884,852</strong></td><td><span class="pill">medido</span></td></tr>
+          <tr><td>Ontem (2026-03-25)</td><td>Custo AI</td><td><strong>US$ 54.31</strong></td><td><span class="pill">medido</span></td></tr>
+          <tr><td>Ontem (2026-03-25)</td><td>Tokens</td><td><strong>138,375,078</strong></td><td><span class="pill">medido</span></td></tr>
+          <tr><td>Claude local</td><td>Custo / tokens rastreados</td><td><strong>US$ 0.00 / 0</strong></td><td><span class="pill">medido</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>3) Separação: AI Dev Spend vs AI Ops Spend</h2>
+      <p class="lead">Hoje não existe uma contabilidade perfeita por tarefa. Então a divisão abaixo é <strong>heurística explícita</strong> — útil para gestão, mas não equivalente a fechamento financeiro.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>AI Dev Spend · 30 dias</h3>
+          <div class="big">US$ 790.24</div>
+          <p class="small">~85% do gasto medido em AI. Racional: período fortemente code-heavy — implementação, review, refactors, parity work, PR healing.</p>
+          <p><strong>1,787,530,898</strong> tokens estimados</p>
+        </div>
+        <div class="card">
+          <h3>AI Ops Spend · 30 dias</h3>
+          <div class="big">US$ 139.45</div>
+          <p class="small">~15% do gasto medido em AI. Inclui debugging operacional, orchestration, healing, configuração e loops de manutenção.</p>
+          <p><strong>315,446,629</strong> tokens estimados</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>4) Infra spend mensal e SaaS spend mensal</h2>
+      <p class="lead">Aqui a situação é diferente: o repo mostra <strong>quais serviços existem</strong>, mas não contém billing consolidado dos providers. Então abaixo eu separo <strong>o que parece estar no stack</strong> de <strong>quanto ainda precisa de reconciliação por invoice</strong>.</p>
+      <table>
+        <thead>
+          <tr><th>Bloco</th><th>Stack visível no repo / docs</th><th>Faixa mensal</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Infra spend mensal</td>
+            <td>Railway / Vercel-style edge-control-plane, Postgres, Redis, frontend/app hosting, monitoring, nginx</td>
+            <td><strong>US$ 120–300/mês</strong></td>
+            <td><span class="pill">estimativa baixa confiança</span></td>
+          </tr>
+          <tr>
+            <td>SaaS spend mensal</td>
+            <td>Resend/email, domain/DNS layer, Cloudflare-style edge/security, Tailscale/access tooling, misc tooling</td>
+            <td><strong>US$ 20–90/mês</strong></td>
+            <td><span class="pill">estimativa baixa confiança</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout warn"><strong>Importante:</strong> esses números de Infra/SaaS são <strong>faixas operacionais</strong> para briefing executivo — não substituem uma leitura real de invoice em Railway, Vercel, DigitalOcean, Cloudflare, Resend, Tailscale etc.</div>
+    </section>
+
+    <section class="section">
+      <h2>5) Sobre “6 milhões de linhas de código + reasoning”</h2>
+      <p class="lead">A melhor forma de explicar isso para um stakeholder é: o custo real não vem de “ler o código uma vez”. Vem da <strong>iteração</strong>.</p>
+      <table>
+        <thead>
+          <tr><th>Base</th><th>Aproximação</th><th>Leitura</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>6M LOC × 6 tokens/linha</td><td><strong>36M tokens</strong></td><td>estimativa conservadora</td></tr>
+          <tr><td>6M LOC × 9 tokens/linha</td><td><strong>54M tokens</strong></td><td>ponto médio</td></tr>
+          <tr><td>6M LOC × 12 tokens/linha</td><td><strong>72M tokens</strong></td><td>estimativa alta</td></tr>
+          <tr><td>Últimos 30 dias medidos</td><td><strong>2,102,977,528 tokens</strong></td><td>uso real com loops, retries, reviews e reasoning</td></tr>
+        </tbody>
+      </table>
+      <div class="callout"><strong>Resumo:</strong> o gasto do projeto é dominado por <strong>re-leitura, reasoning, retries, debugging, orchestration e múltiplos passes</strong> — não pela simples tokenização bruta de um snapshot do código.</div>
+    </section>
+
+    <section class="section">
+      <h2>6) Resumo executivo para forward</h2>
+      <div class="callout good">
+        <p><strong>MUTX</strong> provavelmente deriva de uma forma brandável de <strong>“mutex”</strong>: coordenação e controle de múltiplos processos/agentes.</p>
+        <p>No lado de custos, o dado medido mostra aproximadamente <strong>US$ 929.69</strong> e <strong>2,102,977,528 tokens</strong> de AI spend nos últimos 30 dias. Para gestão, a leitura mais útil hoje é separar isso em <strong>AI Dev Spend (~US$ 790.24)</strong> e <strong>AI Ops Spend (~US$ 139.45)</strong>.</p>
+        <p>Além disso, faz sentido apresentar um bloco separado de <strong>Infra spend mensal</strong> e <strong>SaaS spend mensal</strong>, mas esses itens ainda precisam de reconciliação por invoice para sair de faixa estimada e virar número financeiro definitivo.</p>
+      </div>
+    </section>
+
+    <div class="footer">Documento preparado em 2026-03-26 · versão executiva · pronto para encaminhamento</div>
+  </div>
+</body>
+</html>

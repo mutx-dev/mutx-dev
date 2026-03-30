@@ -1,37 +1,32 @@
-# latest.md
-
 ## Lane utility verdict
-Status: BLOCKED
-Recommendation: DOWNSHIFT
+Status: IDLE
+Recommendation: KEEP
 
 ## What I actually did since the last meaningful checkpoint
-- Performed a bounded browser verification pass on PR #1210 during the assigned Chrome slot.
-- Confirmed the PR is still docs-only and still not merge-ready.
-- Verified the dedicated worktree remains clean and still on `eng/docs-local-bootstrap-dashboard-path` at `40cd4377`.
+- Confirmed PR #1210 is MERGED on GitHub (merged 2026-03-28T17:47:38Z).
+- Verified no review is pending on this lane (review-queue.json is empty).
+- Verified no bounded dispatch task exists (dispatch/docs-drift-curator.md confirms no active dispatch).
+- Confirmed worktree is on stale branch `eng/docs-local-bootstrap-dashboard-path` which has already been merged; no uncommitted changes.
+- No new PRs or signals in the docs-owned area detected.
 
 ## Exact evidence
-- GitHub PR page for #1210 still shows the docs-only bootstrap URL change and the review request text for `qa-reliability-engineer` in the PR history.
-- `gh pr view 1210 --json reviewRequests,statusCheckRollup,mergeStateStatus` reports:
-  - `mergeStateStatus: UNSTABLE`
-  - no active `reviewRequests`
-  - `Validation: FAILURE`
-- Checks tab on the PR still shows two failing `Validation` checks.
-- `git status --short --branch` shows a clean branch:
-  - `## eng/docs-local-bootstrap-dashboard-path...origin/eng/docs-local-bootstrap-dashboard-path`
-- `git log --oneline -n 1` shows the current tip:
-  - `40cd4377 Fix local bootstrap dashboard path`
+- `gh pr view 1210` → state: MERGED
+- `gh pr list --head eng/docs-local-bootstrap-dashboard-path --state all` → 1210 MERGED
+- review-queue.json → items: []
+- merge-queue.json → items: []
+- dispatch/docs-drift-curator.md → "No active dispatch right now. Stay idle."
+- Worktree has no uncommitted changes; branch is identical to origin/eng/docs-local-bootstrap-dashboard-path
 
-## If blocked, why exactly
-- The lane has no fresh bounded docs task beyond PR #1210.
-- The PR remains blocked by failing validation.
-- The internal reviewer path still does not resolve cleanly to an actionable GitHub review request from this environment.
+## If idle or blocked, why exactly
+- IDLE: PR #1210 is closed and merged. No bounded docs task is queued. No review is pending. No dispatch signal.
+- Not blocked — simply no work assigned to this lane at this time.
 
 ## What Fortune can do with this today
-- Assign a real GitHub reviewer to PR #1210 or have the queue owner map the internal reviewer label to an actual account.
-- Re-run / monitor validation once the PR is retriggered.
-- Keep the lane review-first and avoid inventing new docs work while the queue is empty.
+- Verify the worktree branch `eng/docs-local-bootstrap-dashboard-path` can be deleted or reset to main (housekeeping).
+- The dispatch queue updater should be run to reflect PR #1210 as merged instead of the stale "Docs-only split clean" note.
+- No docs-owned code change is needed until a new signal arrives.
 
 ## What should change in this lane next
-- Add a reliable mapping from internal reviewer labels to GitHub accounts for docs lane PRs.
-- Preserve the docs-only split discipline on future PRs.
-- Do not widen scope until CI is green and review routing is clean.
+- Await new bounded dispatch or a docs-owned PR review request.
+- If the worktree branch cleanup is desired, `git checkout main && git branch -D eng/docs-local-bootstrap-dashboard-path` is the correct operation.
+- Lane should stay KEEP — docs drift curation is still a valid owned area; it just has no active task right now.

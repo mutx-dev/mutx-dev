@@ -1,0 +1,7 @@
+Getting MUTX running across your team takes one command and about five minutes.
+
+curl -fsSL mutx.dev/install.sh | bash
+
+Once it boots, your team gets a live agent dashboard, audit trails for every action, role-based access controls, and a CLI that doesn't require specialist expertise to operate.
+
+The control plane is the product.

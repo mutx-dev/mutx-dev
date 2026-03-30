@@ -1,20 +1,30 @@
 # TODAY.md — Security Engineer
+**Updated: 2026-03-30 09:15 Europe/Rome**
 
 ## Current focus
-- Close the last fail-open SSH path in Ansible/docs so every infra path matches Terraform’s fail-closed trust defaults.
+SSH fail-open hardening. Two tracked gaps, one decision away from execution.
 
 ## Highest-leverage move
-- Remove the repo-supported path that can still open SSH to the world or suppress host-key verification during provisioning.
+Fortune says `accept-new` → lane patches provision.yml, inventory.ini, README.md, and adds a grep guard in CI. Same day.
 
-## Next steps
-1. Patch `infrastructure/ansible/playbooks/provision.yml` so `ADMIN_CIDR` is required and rejects `0.0.0.0/0` / `::/0`.
-2. Replace `StrictHostKeyChecking=no` in tracked inventory/docs with `accept-new` or an explicit `known_hosts` workflow.
-3. Update `infrastructure/README.md` so Ansible provisioning no longer documents a world-open SSH default.
-4. Add a grep/test/lint guard to fail CI if tracked infra files reintroduce world-open admin SSH or disabled host-key verification.
+## Specific gaps
+- `provision.yml:10` — `admin_cidr` defaults to `0.0.0.0/0` (world-open SSH admin by default)
+- `inventory.ini:13` — `StrictHostKeyChecking=no` (host-key verification suppressed)
+
+## Next steps (ready to execute on Fortune's call)
+1. Patch `infrastructure/ansible/playbooks/provision.yml` — require `ADMIN_CIDR`, reject `0.0.0.0/0` / `::/0`.
+2. Patch `infrastructure/ansible/inventory.ini` — replace `StrictHostKeyChecking=no` with `StrictHostKeyChecking=accept-new`.
+3. Update `infrastructure/README.md` — remove world-open SSH default from Ansible provisioning docs.
+4. Add a grep/lint guard in CI to fail if tracked infra files reintroduce world-open admin SSH or disabled host-key verification.
 
 ## Blockers
-- No hard blocker.
-- One small decision needed: whether `accept-new` is the baseline or first-connect should require a managed `known_hosts` workflow.
+- One decision from Fortune: `accept-new` as baseline.
+- No code work blocked — just needs the call.
 
 ## Escalation to Fortune
-- None yet. This is a straightforward hardening cleanup with low product risk and high trust payoff.
+- SSH gap is 12+ hours old across fleet reports. This is the right next hardening move.
+- Gateway patch also 12+ hours unapproved — secondary but named.
+
+## Lane utility verdict
+- Status: THIN
+- Recommendation: KEEP

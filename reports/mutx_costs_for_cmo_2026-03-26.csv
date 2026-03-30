@@ -1,0 +1,12 @@
+period,bucket,cost_usd,tokens,basis,confidence
+last_30_days,measured_codex_total,929.69,2102977528,CodexBar local,high
+last_30_days,estimated_development,790.24,1787530898,85% of measured codex total,medium
+last_30_days,estimated_operations_maintenance,139.45,315446629,15% of measured codex total,medium
+today_2026_03_26,measured_codex_total,54.29,131884852,CodexBar local,high
+today_2026_03_26,estimated_development,38.01,92319396,70% of measured codex total,medium
+today_2026_03_26,estimated_operations_maintenance,16.29,39565455,30% of measured codex total,medium
+yesterday_2026_03_25,measured_codex_total,54.31,138375078,CodexBar local,high
+project_scale,loc_token_equivalent_low,,36000000,6M LOC * 6 tokens/line,low
+project_scale,loc_token_equivalent_mid,,54000000,6M LOC * 9 tokens/line,low
+project_scale,loc_token_equivalent_high,,72000000,6M LOC * 12 tokens/line,low
+last_30_days,measured_claude_total,0.00,0,CodexBar local,high

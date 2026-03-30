@@ -1,31 +1,38 @@
 # Control Plane Steward — Backend Truth Report
 
-Date: 2026-03-28
-Status: browser-verified dispatch handled, no code changes
+Date: 2026-03-30T04:24 UTC
+Status: IDLE — dispatch-bound, no owned-area signal
 
-## What I checked
-- `BOOTSTRAP.md`
-- `MUTX/agents/control-plane-steward/agent.md` as the source agent spec
-- `_shared/ENGINEERING-MODEL.md`
-- `_shared/REPO-AUTOPILOT.md`
-- `_shared/REVIEW-MATRIX.md`
-- `_shared/AUTO-MERGE-POLICY.md`
-- `queue/TODAY.md`
-- `reports/latest.md`
-- Dedicated worktree: `/Users/fortune/mutx-worktrees/engineering/control-plane-steward`
-- Dispatch artifact: `/Users/fortune/.openclaw/workspace/mutx-engineering-agents/dispatch/control-plane-steward.md`
-- PR #1206 in browser: `fix(api): scope analytics latency timeseries by current user`
+## Lane utility verdict
+- **Status:** IDLE
+- **Recommendation:** KEEP — lane is correctly gated on dispatch; backend truth is stable; no noise-needed.
 
-## Current truth
-- The active browser-worthy dispatch was the analytics timeseries PR review.
-- The diff is bounded to `src/api/routes/analytics.py` and scopes the latency timeseries by joining `Agent` and filtering on `Agent.user_id == current_user.id`.
-- Targeted validation passed: `python -m compileall src/api/routes/analytics.py` and `pytest -q tests/api/test_analytics.py`.
-- I left a PR comment with the verification result; GitHub blocked self-approval on the same PR.
-- No code changes were made in the owned workspace.
+## What I actually did since the last meaningful checkpoint
+- Bootstrapped: read dispatch artifact, review queue, merge queue, GH open PRs.
+- Verified worktree is clean (branch `eng/control-plane-steward`, no uncommitted changes).
+- Confirmed review queue and merge queue are both empty.
+- Confirmed no open PRs with `control-plane-steward` as requested reviewer on `mutx-dev/mutx-dev`.
+- Confirmed no active dispatch in `control-plane-steward.md`.
+- Previous checkpoint (PR #1206) was fully handled: browser-verified, PR comment left, blocked on self-approval.
 
-## Next moves
-1. Wait for the next concrete browser-dispatched task in this lane.
-2. If another owned-area backend mismatch appears, verify it with the smallest truthful validation and stay inside owned API files.
+## Exact evidence
+```
+gh pr list (mutx-dev/mutx-dev): 0 open PRs
+review-queue.json items: 0
+merge-queue.json items: 0
+dispatch/control-plane-steward.md: no active dispatch
+worktree git status: clean
+worktree branch: eng/control-plane-steward
+```
 
-## Handoff
-- Dispatch handled and documented; no code patch was needed.
+## If idle or blocked, why exactly
+Idle because the dispatch layer has no backend API task assigned to this lane. No browser-worthy dispatch, no backend truth mismatch, no review request. The lane correctly has nothing to do until a new signal arrives.
+
+## What Fortune can do with this today
+- If a new backend API bug or feature lands, assign it to this lane via dispatch.
+- If PR #1206 needs re-review (reviewer unblocked), trigger a re-dispatch.
+- Otherwise this lane will remain idle until the next dispatch cycle.
+
+## What should change in this lane next
+- Next concrete signal: a new dispatch item in `control-plane-steward.md` or a GH review request.
+- No code, no PR, no process change needed in this lane right now.

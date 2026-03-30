@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "threads": {
+    "dispatcher": "dispatcher-24h",
+    "proactive-coder": "coder-24h",
+    "code-reviewer": "reviewer-24h",
+    "merge-manager": "merger-24h",
+    "human-escalation": "human-escalation"
+  },
+  "taskQueue": "dispatch/tasks.json",
+  "logFile": "dispatch/24h-activity-log.md"
+}

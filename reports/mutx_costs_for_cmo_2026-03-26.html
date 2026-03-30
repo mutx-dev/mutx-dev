@@ -1,0 +1,37 @@
+<!doctype html><html><head><meta charset="utf-8"><title>MUTX Costs for CMO</title><style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;max-width:900px;margin:40px auto;padding:0 24px;color:#111;line-height:1.55}
+h1,h2,h3{line-height:1.2} h1{font-size:32px} h2{font-size:24px;margin-top:32px} h3{font-size:18px;margin-top:24px}
+code{background:#f4f4f4;padding:2px 4px;border-radius:4px} blockquote{border-left:4px solid #ddd;padding-left:16px;color:#444;margin-left:0}
+strong{font-weight:700} ul{margin:8px 0 16px 24px} p{margin:10px 0} hr{border:none;border-top:1px solid #e5e5e5;margin:28px 0}
+.small{color:#666;font-size:14px}
+</style></head><body><h1>MUTX — origem do nome + custo de desenvolvimento/operação</h1>
+<p class="small">Data: 2026-03-26</p>
+<h2>1) Origem do nome “MUTX”</h2>
+<p>**Resposta curta:** não encontrei, no repositório nem nas memórias locais, uma explicação canônica escrita pelo Fortune para a origem do nome.</p>
+<p>**Leitura mais provável e defensável:** **MUTX soa como “mutex”** — a primitive de coordenação/controle em sistemas concorrentes.</p>
+<p>Isso combina bem com o que a MUTX quer ser:</p><li>camada de **coordenação** para agentes</li><li>**controle operacional** sobre muitos processos autônomos</li><li>evitar caos/colisão entre execuções, estados, permissões e lifecycle</li>
+<p>**Forma boa de explicar para terceiros / CMO:**</p><blockquote><p>“MUTX é uma versão curta, mais brandável e infra-native de ‘mutex’: a camada de controle e coordenação que faz múltiplos agentes operarem como sistema, não como demo.”</p></blockquote>
+<p>**Observação importante:** isso é a **melhor explicação inferida**, não uma citação histórica confirmada em documento interno.</p>
+<hr>
+<h2>2) Custos de AI para desenvolver e operar a MUTX</h2>
+<h3>O que está medido de verdade agora</h3><p>Fonte usada: **CodexBar local** (custo/tokens do provider Codex).</p>
+<p>#### Hard numbers</p><li>**Últimos 30 dias — Codex**</li><p>  - **Custo:** **US$ 929.69**</p><p>  - **Tokens:** **2,102,977,528**</p><li>**Hoje (2026-03-26) — Codex**</li><p>  - **Custo:** **US$ 54.29**</p><p>  - **Tokens:** **131,884,852**</p><li>**Ontem (2026-03-25) — Codex**</li><p>  - **Custo:** **US$ 54.31**</p><p>  - **Tokens:** **138,375,078**</p><li>**Claude local**</li><p>  - **Custo rastreado:** **US$ 0.00**</p><p>  - **Tokens rastreados:** **0**</p>
+<h3>Separação desenvolvimento vs manutenção/operação</h3><p>Não existe hoje, no workspace, uma contabilidade perfeita por tarefa. Então a separação abaixo é **heurística explícita**, não contabilidade financeira fechada.</p>
+<p>#### Heurística usada</p><li>**Últimos 30 dias:** assumir **85% desenvolvimento** / **15% manutenção-operação**</li><p>  - porque o padrão visível foi fortemente code-heavy: implementação, review, refactors, parity work, PR healing, etc.</p><li>**Hoje:** assumir **70% desenvolvimento** / **30% manutenção-operação**</li><p>  - porque hoje houve mais overhead operacional (debug de ACP, OpenClaw config, heartbeats, X worker, orchestration)</p>
+<p>#### Estimativa — últimos 30 dias</p><li>**Desenvolvimento:**</li><p>  - **US$ 790.24**</p><p>  - **1,787,530,898 tokens**</p><li>**Manutenção / operação:**</li><p>  - **US$ 139.45**</p><p>  - **315,446,629 tokens**</p>
+<p>#### Estimativa — hoje</p><li>**Desenvolvimento:**</li><p>  - **US$ 38.01**</p><p>  - **92,319,396 tokens**</p><li>**Manutenção / operação:**</li><p>  - **US$ 16.29**</p><p>  - **39,565,455 tokens**</p>
+<hr>
+<h2>3) Aproximação de tokens para “6 milhões de linhas de código + reasoning”</h2>
+<p>Se alguém olhar só para **6 milhões de linhas de código**, o impulso é achar que isso equivale a um número parecido de tokens. Não equivale.</p>
+<h3>Regra prática</h3><p>Código costuma cair, grosseiramente, em algo como:</p><li>**6 tokens por linha** (estimativa conservadora)</li><li>**9 tokens por linha** (meio do caminho)</li><li>**12 tokens por linha** (estimativa alta)</li>
+<p>Para **6.000.000 LOC**, isso dá:</p><li>**baixo:** ~**36,000,000 tokens**</li><li>**meio:** ~**54,000,000 tokens**</li><li>**alto:** ~**72,000,000 tokens**</li>
+<h3>O ponto importante</h3><p>O custo real do projeto não vem de “ler o código uma vez”.</p><p>Vem de:</p><li>re-leitura de contexto</li><li>múltiplos passes sobre os mesmos arquivos</li><li>diffs / reviews / retries</li><li>reasoning entre etapas</li><li>loops de PR / CI / healing / orchestration</li>
+<p>Por isso, o número **medido** nos últimos 30 dias (**2,102,977,528 tokens**) é muito maior do que a estimativa de “tokenizar 6M LOC uma vez”.</p>
+<p>Em outras palavras:</p><blockquote><p>**o custo do projeto é dominado por iteração e reasoning, não por snapshot bruto do código.**</p></blockquote>
+<hr>
+<h2>4) Resumo executivo pro CMO</h2>
+<h3>Texto curto</h3><blockquote><p>A origem mais provável de “MUTX” é uma variação brandável de “mutex”, remetendo a coordenação e controle de sistemas concorrentes — exatamente o papel da plataforma para agentes.</p></blockquote><p>></p><blockquote><p>Em custo de AI, o dado medido hoje mostra aproximadamente **US$ 929.69 / 2,102,977,528 tokens** nos últimos 30 dias via Codex, com uma divisão heurística de **~85% desenvolvimento** e **~15% manutenção/operação**. No dia de hoje, a estimativa fica em **US$ 54.29 / 131,884,852 tokens**, com um mix mais operacional (**70/30**).</p></blockquote><p>></p><blockquote><p>A maior parte do gasto não vem de “ler 6 milhões de linhas uma vez”, e sim da iteração contínua: reasoning, revisões, retries, debugging, orchestration e múltiplos passes sobre o mesmo código.</p></blockquote>
+<hr>
+<h2>5) Limites deste material</h2>
+<p>Este material **não inclui** ainda:</p><li>billing de cloud / infra / domains / SaaS externos</li><li>custo consolidado de todos os modelos fora do CodexBar local</li><li>alocação perfeita por squad, feature ou workstream</li>
+<p>Se quiser, o próximo passo é montar uma **versão financeira de verdade**, com 3 blocos:</p><p>1. **AI dev spend**</p><p>2. **AI ops spend**</p><p>3. **infra / SaaS / fixed monthly stack**</p></body></html>

@@ -1,0 +1,54 @@
+---
+name: trading-agents
+description: Use TradingAgents, Tauric Research’s multi-agent LLM financial trading framework, for tasks involving setup, configuration, running experiments, comparing LLM/provider choices, analyzing the framework’s analyst→research→trader→risk-manager workflow, or wiring TradingAgents into Python research code. Trigger on requests like: run TradingAgents on a ticker/date, configure OpenAI/Gemini/Claude/Grok/Ollama/OpenRouter for TradingAgents, explain the repo architecture, tune debate rounds or data vendors, inspect TradingAgents outputs/logs, or evaluate caveats/safety for LLM-driven trading experiments.
+---
+
+# Trading Agents
+
+Use this skill for research and experimentation around the `TauricResearch/TradingAgents` repo.
+
+## Quick workflow
+
+1. Read `references/install-and-run.md` for environment setup, CLI usage, and Python entrypoints.
+2. Read `references/architecture-and-config.md` when the task is about internals, configuration, provider selection, or agent flow.
+3. Read `references/caveats-and-truths.md` before giving operational guidance, evaluation claims, or safety advice.
+
+## Do
+
+- Treat TradingAgents as a **research/backtesting framework**, not a production trading executor.
+- Preserve the user’s ticker exactly, including exchange suffixes like `.TO`, `.T`, `.HK`, `.L`.
+- Prefer small, reproducible experiments first: one ticker, one date, one provider, shallow debate depth.
+- State which pieces are model-dependent and data-vendor-dependent.
+- Surface where outputs are written and whether they come from the CLI results directory or graph-level eval logs.
+
+## Default operating pattern
+
+- For first-run setup or debugging, use the CLI path first.
+- For automation or integration, use the Python API via `TradingAgentsGraph`.
+- When a user wants cheaper/faster runs, reduce debate rounds and use smaller quick/deep models.
+- When a user wants more thorough analysis, increase debate/risk rounds carefully and call out cost/latency growth.
+
+## Minimal Python pattern
+
+```python
+from tradingagents.graph.trading_graph import TradingAgentsGraph
+from tradingagents.default_config import DEFAULT_CONFIG
+
+config = DEFAULT_CONFIG.copy()
+config["llm_provider"] = "openai"
+config["quick_think_llm"] = "gpt-5-mini"
+config["deep_think_llm"] = "minimax-portal/MiniMax-M2.7"
+config["max_debate_rounds"] = 1
+config["max_risk_discuss_rounds"] = 1
+
+ta = TradingAgentsGraph(debug=True, config=config)
+state, decision = ta.propagate("NVDA", "2026-01-15")
+print(decision)
+```
+
+## Key reminders
+
+- `yfinance` is the default vendor for stock, indicators, fundamentals, and news; Alpha Vantage is optional and mainly matters when the user explicitly wants that data source or fallback behavior.
+- The repo supports multiple LLM providers, but `.env.example` is incomplete relative to README claims; verify env vars explicitly.
+- Final BUY/SELL-style extraction is itself LLM-based, so even the final normalized rating is not purely deterministic.
+- Always include a financial-risk disclaimer when summarizing results or proposing usage.

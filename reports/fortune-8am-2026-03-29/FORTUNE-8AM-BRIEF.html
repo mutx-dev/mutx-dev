@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fortune 8am Fleet Brief</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #111827;
+      --muted: #4b5563;
+      --line: #e5e7eb;
+      --accent: #0f172a;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.55;
+    }
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 40px 32px 56px;
+    }
+    header {
+      border-bottom: 2px solid var(--line);
+      padding-bottom: 18px;
+      margin-bottom: 28px;
+    }
+    h1 {
+      font-size: 34px;
+      line-height: 1.1;
+      margin: 0 0 8px;
+      color: var(--accent);
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0;
+    }
+    h2 {
+      margin: 30px 0 10px;
+      font-size: 22px;
+      line-height: 1.25;
+      color: var(--accent);
+      border-top: 1px solid var(--line);
+      padding-top: 22px;
+    }
+    h3 {
+      margin: 22px 0 8px;
+      font-size: 18px;
+      color: var(--accent);
+    }
+    p { margin: 10px 0; }
+    ul, ol { margin: 8px 0 12px 24px; padding: 0; }
+    li { margin: 5px 0; }
+    strong { color: var(--accent); }
+    code {
+      background: #f3f4f6;
+      padding: 0 4px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.95em;
+    }
+    .note {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin: 14px 0 18px;
+    }
+    .scorecard {
+      columns: 2;
+      column-gap: 24px;
+    }
+    .scorecard li { break-inside: avoid; }
+    @media print {
+      .page { max-width: none; padding: 24px 28px; }
+      h2 { page-break-after: avoid; }
+      li { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>Fortune 8am Fleet Brief</h1>
+      <p class="subtitle">PDF pack version for the 8am fleet brief</p>
+    </header>
+
+    <h2>Executive summary</h2>
+    <p>This fleet is still review-bound and trust-bound, not code-bound.</p>
+    <p>The clearest signal today: the company has real work to act on, but most lanes are either idle because no bounded task exists, or thin because they produced diagnosis without shipping proof. The strongest output came from <code>workflow-architect</code> and <code>social-media-strategist</code>. The most important blockers are still the same: reviewer identity / validation on the active PR stack, missing <code>/dashboard</code> truth-strip coverage, and the trust-boundary gap in infra/security.</p>
+    <p>What Fortune can actually act on today:</p>
+    <ul>
+      <li>force the GitHub reviewer path to resolve cleanly for <code>#1211</code>, <code>#1210</code>, and <code>#1209</code></li>
+      <li>decide whether deployment <code>versions</code> / <code>rollback</code> belong in CLI + SDK now, or get explicitly de-scoped</li>
+      <li>ship the shared <code>/dashboard</code> truth strip so the operator story matches live state</li>
+      <li>approve the small infra/security patch to stop world-open SSH defaults and stale host-key handling</li>
+      <li>keep outbound and social distribution conservative until proof is real</li>
+    </ul>
+    <p>No lane deserves celebration for motion alone. The useful lanes are the ones that turned uncertainty into a concrete next move.</p>
+
+    <h2>Performance audit</h2>
+
+    <h3>Strong output</h3>
+    <ul>
+      <li><code>workflow-architect</code> — strongest systems call in the fleet; it clarified the deployment contract gap cleanly and named the exact parity decision Fortune needs.</li>
+      <li><code>social-media-strategist</code> — strongest GTM call; it correctly refused to post without proof and sharpened the message from generic dashboard reset to proof-first runtime-policy / approval-boundary framing.</li>
+    </ul>
+
+    <h3>Thin but honest</h3>
+    <ul>
+      <li><code>security-engineer</code> — gave a concrete hardening patch direction with specific repo defaults that still fail closed/open incorrectly.</li>
+      <li><code>infra-delivery-operator</code> — surfaced the real blocker on <code>#1209</code>: reviewer identity mismatch, not code.</li>
+      <li><code>qa-reliability-engineer</code> — confirmed <code>#1210</code> and <code>#1211</code> are still externally blocked by CI / mergeability.</li>
+      <li><code>technical-writer</code> — made the clean call that docs already outrun client surfaces on deployment history / rollback.</li>
+      <li><code>product-manager</code> — kept the first-15-minutes operator path honest and named the actual user-validation gap.</li>
+      <li><code>outbound-strategist</code> — preserved the truthful outbound wedge without overclaiming.</li>
+      <li><code>outside-in-intelligence</code> — reinforced the buyer-language frame: runtime governance, approvals, identity, auditability.</li>
+      <li><code>report-distribution-agent</code> — useful as a packaging lane, but no new company signal.</li>
+      <li><code>project-shepherd</code> — proper control hygiene; refreshed truth and kept the queue focus narrow.</li>
+      <li><code>developer-advocate</code> — honest about missing proof assets; no bluffing.</li>
+      <li><code>ai-engineer</code> — correctly held the runtime health truth pass, but did not ship the surface fix.</li>
+      <li><code>account-strategist</code> — correctly named the missing design-partner anchor; still no real account map.</li>
+      <li><code>docs-drift-curator</code> — identified the docs-only split and failing validation; still external-gate bound.</li>
+      <li><code>front-end-developer</code> — good gap report on the missing truth strip, but no implementation landed.</li>
+      <li><code>sales-engineer</code> — coherent story, but still short on executable proof.</li>
+      <li><code>infrastructure-maintainer</code> — useful trust-boundary diagnosis, but no approved operating-model decision yet.</li>
+    </ul>
+
+    <h3>Idle / blocked / underfed</h3>
+    <ul>
+      <li><code>auth-identity-guardian</code> — idle because no bounded auth dispatch exists in owned files.</li>
+      <li><code>cli-sdk-contract-keeper</code> — idle because no active dispatch or review assignment exists.</li>
+      <li><code>control-plane-steward</code> — idle; queue is empty for this lane.</li>
+      <li><code>observability-sre</code> — idle; no work is actually queued here.</li>
+      <li><code>operator-surface-builder</code> — idle; no explicit task or validation target.</li>
+      <li><code>runtime-protocol-engineer</code> — idle; no runtime dispatch or review request.</li>
+      <li><code>mission-control-orchestrator</code> — blocked by the same review identity / validation bottleneck as the active PR stack.</li>
+      <li><code>x</code> — blocked by weekly mode constraints, depleted originals, and no threshold-cleared reply target.</li>
+    </ul>
+
+    <h2>Keep / downshift / rewire / cut decisions</h2>
+
+    <h3>KEEP</h3>
+    <ul>
+      <li><code>social-media-strategist</code></li>
+      <li><code>workflow-architect</code></li>
+      <li><code>security-engineer</code></li>
+      <li><code>qa-reliability-engineer</code></li>
+      <li><code>product-manager</code></li>
+      <li><code>outside-in-intelligence</code></li>
+      <li><code>outbound-strategist</code></li>
+      <li><code>developer-advocate</code></li>
+      <li><code>report-distribution-agent</code></li>
+      <li><code>ai-engineer</code></li>
+      <li><code>project-shepherd</code></li>
+    </ul>
+
+    <h3>DOWNSHIFT</h3>
+    <ul>
+      <li><code>auth-identity-guardian</code></li>
+      <li><code>cli-sdk-contract-keeper</code></li>
+      <li><code>docs-drift-curator</code></li>
+      <li><code>observability-sre</code></li>
+    </ul>
+
+    <h3>REWIRE</h3>
+    <ul>
+      <li><code>account-strategist</code></li>
+      <li><code>control-plane-steward</code></li>
+      <li><code>frontend-developer</code></li>
+      <li><code>infra-delivery-operator</code></li>
+      <li><code>infrastructure-maintainer</code></li>
+      <li><code>mission-control-orchestrator</code></li>
+      <li><code>operator-surface-builder</code></li>
+      <li><code>runtime-protocol-engineer</code></li>
+      <li><code>sales-engineer</code></li>
+      <li><code>technical-writer</code></li>
+      <li><code>x</code></li>
+    </ul>
+
+    <h3>CUT</h3>
+    <ul>
+      <li>None today. The problem is routing and proof, not a clean ability cutoff.</li>
+    </ul>
+
+    <h2>Agents with material output</h2>
+    <ul>
+      <li><code>workflow-architect</code>: explicit deployment contract decision point — choose parity now or explicitly de-scope SDK history.</li>
+      <li><code>social-media-strategist</code>: proof-first distribution posture — do not post until proof exists.</li>
+      <li><code>security-engineer</code>: concrete infra patch target — fix <code>ADMIN_CIDR</code> fail-open behavior and host-key verification defaults.</li>
+      <li><code>infra-delivery-operator</code>: reviewer identity is the blocker on <code>#1209</code>; stop self-review routing.</li>
+      <li><code>qa-reliability-engineer</code>: <code>#1210</code> and <code>#1211</code> are still externally blocked; no merge motion until CI / mergeability changes.</li>
+      <li><code>technical-writer</code>: docs already promise more than CLI/SDK support; parity gap is real.</li>
+      <li><code>product-manager</code>: the real product test is still first-15-minutes user friction, not internal polish.</li>
+      <li><code>project-shepherd</code>: review-bound fleet, queue still the bottleneck, and the control loop should stay tight.</li>
+    </ul>
+
+    <h2>Thin but honest lanes</h2>
+    <p>These lanes did not ship much, but they told the truth cleanly:</p>
+    <ul>
+      <li><code>ai-engineer</code></li>
+      <li><code>account-strategist</code></li>
+      <li><code>developer-advocate</code></li>
+      <li><code>outbound-strategist</code></li>
+      <li><code>outside-in-intelligence</code></li>
+      <li><code>report-distribution-agent</code></li>
+      <li><code>security-engineer</code></li>
+      <li><code>sales-engineer</code></li>
+      <li><code>infrastructure-maintainer</code></li>
+      <li><code>docs-drift-curator</code></li>
+    </ul>
+    <p>Verdict on this set: useful diagnosis, low delivery. Keep the honest ones, but do not confuse analysis with progress.</p>
+
+    <h2>Idle / blocked lanes</h2>
+    <h3>Idle</h3>
+    <ul>
+      <li><code>auth-identity-guardian</code></li>
+      <li><code>cli-sdk-contract-keeper</code></li>
+      <li><code>control-plane-steward</code></li>
+      <li><code>observability-sre</code></li>
+      <li><code>operator-surface-builder</code></li>
+      <li><code>runtime-protocol-engineer</code></li>
+    </ul>
+    <h3>Blocked</h3>
+    <ul>
+      <li><code>infra-delivery-operator</code></li>
+      <li><code>mission-control-orchestrator</code></li>
+      <li><code>x</code></li>
+    </ul>
+    <h3>Underfed / not yet assigned enough real work</h3>
+    <ul>
+      <li><code>frontend-developer</code></li>
+      <li><code>account-strategist</code></li>
+      <li><code>sales-engineer</code></li>
+      <li><code>technical-writer</code></li>
+      <li><code>docs-drift-curator</code></li>
+    </ul>
+
+    <h2>Top blockers and risks</h2>
+    <ol>
+      <li><strong>GitHub reviewer identity is still broken on the active PR stack.</strong>
+        <ul>
+          <li><code>#1211</code>, <code>#1210</code>, and <code>#1209</code> are still not moving cleanly through the review gate.</li>
+          <li>This is a routing problem as much as a code problem.</li>
+        </ul>
+      </li>
+      <li><strong>Validation is still red where it matters.</strong>
+        <ul>
+          <li><code>#1210</code> remains docs-only but not merge-ready because CI is failing.</li>
+          <li>No merge queue should form until green.</li>
+        </ul>
+      </li>
+      <li><strong>Dashboard truth still lags product claims.</strong>
+        <ul>
+          <li>The shared truth strip is still missing on the main operator routes.</li>
+          <li>That gap can mislead both users and GTM.</li>
+        </ul>
+      </li>
+      <li><strong>Infra trust defaults are still too loose.</strong>
+        <ul>
+          <li><code>ADMIN_CIDR</code> still has fail-open risk in the Ansible path.</li>
+          <li>Tracked docs still use <code>StrictHostKeyChecking=no</code> in places that should be <code>accept-new</code> or managed correctly.</li>
+        </ul>
+      </li>
+      <li><strong>Outbound and social distribution remain proof-starved.</strong>
+        <ul>
+          <li>The fleet has a narrative, but not yet enough live proof to widen claims safely.</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h2>Today's next moves</h2>
+    <ol>
+      <li><strong>Fix the reviewer path.</strong>
+        <ul>
+          <li>Make the second-reviewer route real for <code>#1211</code> and <code>#1210</code>.</li>
+          <li>Stop relying on a nominal review request that GitHub does not resolve cleanly.</li>
+        </ul>
+      </li>
+      <li><strong>Decide the deployment parity call.</strong>
+        <ul>
+          <li>Either add <code>versions</code> / <code>rollback</code> to CLI + SDK, or explicitly mark them unsupported in docs.</li>
+          <li>Do not leave the contract ambiguous.</li>
+        </ul>
+      </li>
+      <li><strong>Ship the <code>/dashboard</code> truth strip.</strong>
+        <ul>
+          <li>Start with <code>/dashboard/agents</code>, <code>/dashboard/deployments</code>, and <code>/dashboard/monitoring</code>.</li>
+          <li>The surface should say live / partial / stale / auth-blocked before the main content.</li>
+        </ul>
+      </li>
+      <li><strong>Apply the infra trust patch.</strong>
+        <ul>
+          <li>Close the world-open SSH default and normalize host-key verification behavior.</li>
+          <li>Then rerun the deeper security audit.</li>
+        </ul>
+      </li>
+      <li><strong>Keep outbound conservative.</strong>
+        <ul>
+          <li>Use the runtime-governance / approval-boundary frame.</li>
+          <li>Do not publish or amplify claims that still depend on missing proof.</li>
+        </ul>
+      </li>
+      <li><strong>Keep X on reply-only.</strong>
+        <ul>
+          <li>Do not force an original while the weekly gate is exhausted and the reply threshold is not met.</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h2>Appendix: one-line scorecard by agent</h2>
+    <ul class="scorecard">
+      <li><code>account-strategist</code> — THIN / REWIRE — no named account anchor yet; useful diagnosis, no real map.</li>
+      <li><code>ai-engineer</code> — THIN / KEEP — preserved the runtime-health truth pass; still no shipped surface fix.</li>
+      <li><code>auth-identity-guardian</code> — IDLE / DOWNSHIFT — no bounded auth dispatch exists; parked on review state.</li>
+      <li><code>cli-sdk-contract-keeper</code> — IDLE / DOWNSHIFT — no active dispatch or review target; nothing to execute.</li>
+      <li><code>control-plane-steward</code> — IDLE / REWIRE — queue is empty for this lane; needs real ownership routing.</li>
+      <li><code>developer-advocate</code> — THIN / KEEP — honest proof-gap diagnosis; no new proof asset yet.</li>
+      <li><code>docs-drift-curator</code> — THIN / DOWNSHIFT — docs-only split is real, but CI/review still gates merge.</li>
+      <li><code>frontend-developer</code> — THIN / REWIRE — confirmed the truth-strip gap; implementation still missing.</li>
+      <li><code>infra-delivery-operator</code> — BLOCKED / REWIRE — reviewer identity on <code>#1209</code> is the blocker, not code.</li>
+      <li><code>infrastructure-maintainer</code> — THIN / REWIRE — trust-boundary diagnosis is sharp; no approved patch yet.</li>
+      <li><code>mission-control-orchestrator</code> — BLOCKED / REWIRE — same review/validation bottleneck as the active PR stack.</li>
+      <li><code>observability-sre</code> — IDLE / DOWNSHIFT — no active review request or bounded task.</li>
+      <li><code>operator-surface-builder</code> — IDLE / REWIRE — parked; needs one explicit owned-file task.</li>
+      <li><code>outbound-strategist</code> — THIN / KEEP — solid truth on contract honesty; no new outbound artifact.</li>
+      <li><code>outside-in-intelligence</code> — THIN / KEEP — useful market-language reinforcement; no new lane direction.</li>
+      <li><code>product-manager</code> — THIN / KEEP — clarified the first-15-minutes path and the user-validation gap.</li>
+      <li><code>project-shepherd</code> — THIN / KEEP — control hygiene is correct; the queue remains the bottleneck.</li>
+      <li><code>qa-reliability-engineer</code> — THIN / KEEP — confirmed external blockers on <code>#1210</code> and <code>#1211</code>.</li>
+      <li><code>report-distribution-agent</code> — THIN / KEEP — packaging lane only; no upstream signal change.</li>
+      <li><code>runtime-protocol-engineer</code> — IDLE / REWIRE — no runtime dispatch or review assignment to act on.</li>
+      <li><code>sales-engineer</code> — THIN / REWIRE — story is coherent, but still short on executable proof.</li>
+      <li><code>security-engineer</code> — THIN / KEEP — concrete hardening target identified; patch not applied.</li>
+      <li><code>social-media-strategist</code> — STRONG / KEEP — best GTM signal; correctly refused to overpost without proof.</li>
+      <li><code>technical-writer</code> — THIN / REWIRE — documentation is ahead of client parity; needs a narrow closeout.</li>
+      <li><code>workflow-architect</code> — STRONG / KEEP — best systems signal; clean call on deployment parity and compatibility.</li>
+      <li><code>x</code> — BLOCKED / REWIRE — reply-only week, no originals left, and no publishable target.</li>
+    </ul>
+  </div>
+</body>
+</html>

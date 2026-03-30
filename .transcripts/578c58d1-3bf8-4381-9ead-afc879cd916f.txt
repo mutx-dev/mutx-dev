@@ -1,0 +1,3 @@
+I don't understand why we don't have like 12 different agents working on MUTX right now as we speak autonomously, parallelly and using ACP codex sessions.
+Like what's going on? Why is this not working? Why are we not pushing code? Why did we slow down?
+Yesterday we were so fast. We shipped like 2 million lines of code in like 24 hours, dude.

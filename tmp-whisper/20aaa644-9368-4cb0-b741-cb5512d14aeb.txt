@@ -1,0 +1,9 @@
+yes triage all the 19 pull requests separate what's fixable today versus what to close and
+restart but i don't think we need to be closing or restarting anything i think we just need patchwork
+so if a few of the agents didn't make it then we need to fix them it's as simple as that
+um and if the new fears are failing on a dump ci issue then pick the dump ci issue please
+orchestrate agent to agent communication let the agents use some agents in order to get to the
+bottom of this issue efficiently smoothly with great code quality and with no idle time and with
+need to time please also by the way now i want to report every four hours on how much work has been
+done keep it super short and sweet i don't know how many lines of change have happened
+um or lines of code changes like that sort of stuff

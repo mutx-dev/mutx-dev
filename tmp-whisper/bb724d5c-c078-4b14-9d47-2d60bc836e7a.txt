@@ -1,0 +1,4 @@
+we'll fix the heartbeat then and update all of the core files that are still outdated now that
+we have a whole fleet of agents that are supposed to be shipping 24 7. so of those 39 crons is any
+of them actually opening prs and improving the code we have to get a full 24 7 0 idle time
+code dev shop running

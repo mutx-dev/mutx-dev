@@ -1,34 +1,35 @@
 # TODAY.md — Project Shepherd
 
-## Current operating truth
-- **Queue is CLEAR.** All three PRs merged: `#1211` (~19:17 UTC), `#1210` (~19:15 UTC), `#1209` (~10:08 UTC).
-- Review queue and merge queue are both empty.
-- Market signal upgraded: Gartner's $58B governance-shakeup framing + "runtime path evaluation" as the new permission model.
-- Fleet is unblocked and ready for next dispatch.
+**Refreshed: 2026-03-30 08:10 Europe/Rome**
 
-## Next operating window
-- Window: 2026-03-29 20:10–22:10 Europe/Rome
-- Objective: name the next bounded dispatch slice, keep dashboard truth honest, avoid overclaiming on GTM/distribution.
+## Current operating truth
+- **Engineering fleet is IDLE.** No new PRs since #1218 at 21:34 UTC. All queues empty. 9 specialist lanes are unblocked but not dispatched.
+- **Queue is CLEAR** — all three PRs merged, review queue and merge queue both empty.
+- Issue #1187 is 7 days old with no owner.
+- **Two security decisions are on Fortune's desk for 12+ hours.**
+- Market signal holds: Gartner $58B governance-shakeup framing + runtime path evaluation language.
 
 ## Top 3 cross-lane priorities
-1. **Identify the next bounded dispatch slice**
-   - Queue is clear; fleet is unblocked.
-   - Owner: **Fortune** + **project-shepherd**.
-2. **Keep product/runtime truth honest on `/dashboard`**
-   - Add the shared truth strip so operators can see live vs partial vs stale vs auth-blocked state.
-   - Owner: **product-manager**.
-3. **Turn canonical truth into safe proof**
-   - Keep GTM/distribution focused on supported, truthful operator proof; keep X manual-only/conservative.
-   - Owner: **outbound-strategist**.
 
-## Owner pushes for this window
-- **Next dispatch:** Fortune + project-shepherd to name the next bounded work slice.
-- **Product/runtime truth:** product-manager, workflow-architect, technical-writer, ai-engineer, frontend-developer.
-- **Proof + distribution:** outbound-strategist, developer-advocate, sales-engineer, account-strategist, social-media-strategist, report-distribution-agent.
+| # | Priority | Owner | Blocked by |
+|---|----------|-------|------------|
+| 1 | **SSH hardening call** | Fortune | needs `accept-new` decision |
+| 2 | **Gateway hardening patch decision** | Fortune | 4 passes, 12+ hours, needs approve/decline + operating model |
+| 3 | **Route or close issue #1187** | Fortune + project-shepherd | 7 days old, no owner |
+
+## Next bounded dispatch options (pick one)
+- **A. Runtime health truth pass** — bounded, shippable, ai-engineer can run now.
+- **B. `/dashboard` truth strip** — product-manager tied to issue #39, more product-facing.
 
 ## Blockers / stale / unowned
-- **Open:** next dispatch slice not yet named.
-- **Blocker:** `#39` still needs a shared truth strip in dashboard/docs.
-- **Blocker:** gateway/SSH trust hardening remains open.
-- **Degraded:** X distribution stays manual-only / conservative.
-- **Stale:** reviewer-resolution framing — queue is clear, that is no longer the gate.
+- **Decision needed now:** SSH `accept-new` call.
+- **Decision needed now:** gateway patch approve/decline.
+- **Stale:** issue #1187 (7 days, no owner).
+- **Blocked:** social-media-strategist needs screenshots from `/dashboard/security`, `/dashboard/monitoring`, `/dashboard/budgets`.
+- **Idle:** all 9 engineering specialist lanes, awaiting next dispatch slice.
+
+## Owner pushes for this window
+- **Fortune**: make the two security calls, route or close #1187, name the next dispatch.
+- **project-shepherd**: close or flag issue #1187.
+- **product-manager**: prepare `/dashboard` truth strip brief.
+- **social-media-strategist**: request screenshot assets from `/dashboard`.

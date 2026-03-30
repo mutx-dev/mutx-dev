@@ -1,0 +1,142 @@
+[
+  {
+    "id": "80b31cad-7614-4381-8412-1b9d533b4839",
+    "name": "MUTX Project Shepherd v1",
+    "agentId": "project-shepherd",
+    "sessionTarget": "session:mutx-project-shepherd",
+    "lastRunStatus": null,
+    "runningAtMs": 1774707238501,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774710600000
+  },
+  {
+    "id": "e0480819-c602-4a14-a8f5-72dc9707de2e",
+    "name": "MUTX Workflow Architect v1",
+    "agentId": "workflow-architect",
+    "sessionTarget": "session:mutx-workflow-architect",
+    "lastRunStatus": null,
+    "runningAtMs": null,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774715100000
+  },
+  {
+    "id": "c22e423d-af3a-447c-afc4-3c3e87e02dc0",
+    "name": "MUTX Product Manager v1",
+    "agentId": "product-manager",
+    "sessionTarget": "session:mutx-product-manager",
+    "lastRunStatus": null,
+    "runningAtMs": null,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774722900000
+  },
+  {
+    "id": "a5945c29-7626-492b-bc95-4efa67f644fb",
+    "name": "MUTX AI Engineer v1",
+    "agentId": "ai-engineer",
+    "sessionTarget": "session:mutx-ai-engineer",
+    "lastRunStatus": null,
+    "runningAtMs": null,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774709100000
+  },
+  {
+    "id": "430a8c51-7901-4eb2-97f5-02f0496183ec",
+    "name": "MUTX Frontend Developer v1",
+    "agentId": "frontend-developer",
+    "sessionTarget": "session:mutx-frontend-developer",
+    "lastRunStatus": null,
+    "runningAtMs": null,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774713000000
+  },
+  {
+    "id": "cdc042e7-4b70-4700-a7ac-8e13071b1451",
+    "name": "MUTX Infrastructure Maintainer v1",
+    "agentId": "infrastructure-maintainer",
+    "sessionTarget": "session:mutx-infrastructure-maintainer",
+    "lastRunStatus": null,
+    "runningAtMs": null,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774710300000
+  },
+  {
+    "id": "e7d0d05a-3de2-4ee8-9ed1-64d636e1ad6b",
+    "name": "MUTX Security Engineer v1",
+    "agentId": "security-engineer",
+    "sessionTarget": "session:mutx-security-engineer",
+    "lastRunStatus": null,
+    "runningAtMs": 1774707302033,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774707300000
+  },
+  {
+    "id": "5895deee-80e5-4e6a-a722-6437a3d43b8b",
+    "name": "MUTX Technical Writer v1",
+    "agentId": "technical-writer",
+    "sessionTarget": "session:mutx-technical-writer",
+    "lastRunStatus": null,
+    "runningAtMs": null,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774716000000
+  },
+  {
+    "id": "9b02f329-d318-402b-a9c5-53955c3ff65c",
+    "name": "MUTX Outbound Strategist v1",
+    "agentId": "outbound-strategist",
+    "sessionTarget": "session:mutx-outbound-strategist",
+    "lastRunStatus": null,
+    "runningAtMs": null,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774726200000
+  },
+  {
+    "id": "95708277-a85a-4fc7-a5be-dfae9754b0b1",
+    "name": "MUTX Sales Engineer v1",
+    "agentId": "sales-engineer",
+    "sessionTarget": "session:mutx-sales-engineer",
+    "lastRunStatus": null,
+    "runningAtMs": null,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774707600000
+  },
+  {
+    "id": "d65929b8-2be9-4c7f-8f30-f2e928cb3492",
+    "name": "MUTX Account Strategist v1",
+    "agentId": "account-strategist",
+    "sessionTarget": "session:mutx-account-strategist",
+    "lastRunStatus": null,
+    "runningAtMs": null,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774720500000
+  },
+  {
+    "id": "d484c569-c8a5-4c29-b1be-fe72dc790a89",
+    "name": "MUTX Developer Advocate v1",
+    "agentId": "developer-advocate",
+    "sessionTarget": "session:mutx-developer-advocate",
+    "lastRunStatus": null,
+    "runningAtMs": null,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774710000000
+  },
+  {
+    "id": "8dd52d38-de4e-44c0-8a0a-9860ead810c6",
+    "name": "MUTX Social Media Strategist v1",
+    "agentId": "social-media-strategist",
+    "sessionTarget": "session:mutx-social-media-strategist",
+    "lastRunStatus": null,
+    "runningAtMs": null,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774714200000
+  },
+  {
+    "id": "5e2c0615-2b5d-4b10-a198-c969a9e1332a",
+    "name": "MUTX Report Distribution Agent v1",
+    "agentId": "report-distribution-agent",
+    "sessionTarget": "session:mutx-report-distribution-agent",
+    "lastRunStatus": null,
+    "runningAtMs": null,
+    "lastRunAtMs": null,
+    "nextRunAtMs": 1774734300000
+  }
+]

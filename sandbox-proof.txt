@@ -1,0 +1,3 @@
+SANDBOX-PROOF-1773848400
+This file proves the isolated session can write to ~/.openclaw/workspace/.
+Timestamp: 2026-03-18T16:27:00Z

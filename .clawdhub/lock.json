@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "skills": {
+    "session-logs": {
+      "version": "1.0.0",
+      "installedAt": 1774330639573
+    },
+    "xurl": {
+      "version": "1.0.0",
+      "installedAt": 1774330643940
+    },
+    "github-ops": {
+      "version": "1.0.0",
+      "installedAt": 1774330648870
+    },
+    "github-issue-resolver": {
+      "version": "1.0.0",
+      "installedAt": 1774330654854
+    },
+    "codex-sub-agents": {
+      "version": "1.0.0",
+      "installedAt": 1774330669159
+    }
+  }
+}

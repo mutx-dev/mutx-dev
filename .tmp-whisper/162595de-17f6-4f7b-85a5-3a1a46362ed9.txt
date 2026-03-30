@@ -1,0 +1,47 @@
+All right, do whatever you think you want to do.
+Let's get 24-7 agency, shall we?
+I want all of these agents to be talking to each other,
+reading the code, understanding what Mutex is about,
+first of all, yeah?
+So we're just going to be doing no code editing.
+We're just using codecs to read, okay?
+And the tool calls and the code,
+and whatever else you want to do, okay?
+And then, yeah, just do the most,
+you know, implement whatever you can.
+It would be cool to get, you know,
+as many agents as possible working.
+Get ACP fixed, first of all, for sure.
+And then build the orchestration pattern,
+whatever you have to do.
+I don't know how this stuff works,
+but it would be cool if you could get everything working.
+If there is a skill that you have to find on,
+you know, whatever,
+on Claw Hub or something about agent orchestration
+in the OpenCloud documentation,
+there's a lot of stuff that you could be looking at,
+which you should be looking at, okay?
+So just look for an end-to-end plan and implement it.
+Don't, no more narrating from now on, okay?
+You're actually fixing ACP
+and getting all of these agents up and running
+with Chrome jobs or whatever you need to use.
+And I want to hear from all of them about Mutex,
+and I want them to give me options
+about things that they could do,
+you know, using Discord buttons,
+the Discord V2 components,
+whatever thingy.
+Yeah, and I'm here.
+I'm waiting for you to finish this.
+So take your time
+and really go through the entire config,
+get everything working
+and get all of the agents booted up.
+Okay.
+Okay.
+...
+...
+...
+...
