@@ -1,34 +1,34 @@
-# Sales Engineer Brief — 2026-03-30 (3:20 PM Europe/Rome)
+# Sales Engineer Brief — 2026-03-30 (9:20 PM Europe/Rome)
 
 ## Lane utility verdict
 - **Status:** STRONG
 - **Recommendation:** KEEP
 
 ## What changed in truth
-Two material new competitive signals since the morning cycle (08:20):
+Two new market data signals since the 13:20 cycle that sharpen enterprise proof:
 
-1. **Baton — new named competitor in agent team control.** "A control plane for AI agent teams built around clean baton passes between planning, execution, review, and approval." Works with Claude Code, Codex, Gemini. Direct positioning against the same problem space as MUTX — agent coordination and governance. Differentiation: Baton uses phase-gate workflow routing; MUTX uses deterministic runtime path evaluation via Faramesh policies.
+1. **Cisco/RSAC 2026: 85% pilot → 5% production.** The single strongest quantitative anchor for the governance gap conversation. Enterprise buyers feel this number viscerally — it is not an AI capability problem or an enthusiasm problem. It is a governance-readiness problem. MUTX closes that gap. This should be in the opening of every enterprise governance conversation.
 
-2. **Palantir Foundry Agent Service and Observability — now GA.** Enterprise incumbent shipping agent governance and observability as a platform feature. This both compresses MUTX's competitive window (enterprise buyers may default to Palantir) and legitimizes the category. The differentiation for MUTX is stack-agnosticism and operator-first UX vs. Palantir's enterprise platform requirement.
+2. **MergeShield $70M raise.** Per-agent trust scoring and risk-proportional rules are the new mechanism language in the governance category. $70M institutional validation of the category — even if MergeShield is a point solution, the funding signals that buyers and investors believe the governance problem is worth real money.
 
-**Sustained from morning cycle:** "agent proposes, MUTX decides" positioning, multi-agent state conflict framing, IntentBound competitive profile, Gartner $58B governance framing, queue clear (repo idle since lint fix #1215 at ~09:00 UTC March 30).
+**Sustained from prior cycles:** "agent proposes, MUTX decides," multi-agent state conflict framing, IntentBound/Baton/Palantir competitive landscape, Gartner $58B framing, queue clear (repo idle since lint fix #1215 ~09:00 UTC March 30).
 
 ## Exact evidence
-- `gtm/outside-in-intelligence/reports/signal-brief.md` @ 2026-03-30 13:20 Europe/Rome: Baton competitor profile, Palantir Foundry GA, MUTX X posting active
-- `gtm/reports/roundtable.md` @ 2026-03-30 08:10 Europe/Rome: queue clear, SSH + gateway hardening unaddressed
-- `MUTX/docs/governance.md`: Faramesh runtime path evaluation, Unix socket enforcement, CLI commands
-- `git -C /Users/fortune/MUTX log --oneline --since="2026-03-30T07:20:00Z"`: no new commits since lint fix #1215
-- `sales-brief.md`: added competitive landscape table (IntentBound / Baton / Palantir), added objection handling for Baton and Palantir
+- `gtm/outside-in-intelligence/reports/signal-brief.md` @ 2026-03-30 18:20 Europe/Rome: Cisco/RSAC 85%→5% data, MergeShield $70M raise
+- `gtm/outside-in-intelligence/reports/signal-brief.md` @ 2026-03-30 13:20 Europe/Rome: Baton competitor, Palantir Foundry GA
+- `gtm/reports/roundtable.md` @ 2026-03-30 08:10 Europe/Rome: queue clear, engineering idle
+- `MUTX/docs/governance.md`: Faramesh runtime path evaluation, CLI commands
+- `git -C /Users/fortune/MUTX log --oneline --since="2026-03-30T13:20:00Z"`: no new commits
+- `sales-brief.md`: added Cisco/RSAC 85%→5% to governance story, proof matrix, and objection handling; added MergeShield to governance story
 
 ## If idle or blocked, why exactly
-Not blocked. Constraint remains editorial: translating new competitive signals (Baton, Palantir GA) into buyer-facing positioning while the product matures the multi-agent governance story. Repo is idle — no new product truth to incorporate.
+Not blocked. Constraint is editorial — the market signals are sharp and actionable; the translation into buyer-ready proof is current. Product still idle on the multi-agent governance shipping path.
 
 ## What Fortune can do with this today
-1. **Know the three-competitor landscape before the next enterprise call** — IntentBound (institutional, patented), Baton (phase-gate coordination), Palantir (enterprise incumbent). Each requires a different objection response.
-2. **Use "agent proposes, MUTX decides" as the default positioning line** — it survives comparison against all three because it describes the enforcement model, not the workflow pattern.
-3. **If a buyer mentions Palantir** — immediately assess whether they are Palantir-committed or Palantir-curious. MUTX does not displace Palantir for committed shops; it is the accessible alternative for teams outside that stack.
+1. **Open every enterprise governance conversation with the Cisco/RSAC number** — 85% pilot, 5% production. Let the buyer fill in the silence. Most enterprise teams have lived this and will feel it immediately.
+2. **Use "agent proposes, MUTX decides" + Cisco/RSAC together** — the former is MUTX's architecture, the latter is the market proof that this architecture matters. Combine them in the same sentence: "That's exactly why 85% of agents stall at pilot — the control plane isn't there."
 
 ## What should change in this lane next
-- The 1-page sales enablement sheet (sharpened positioning + multi-agent framing + competitive comparison) is still outstanding — flag for Fortune's attention.
-- Add a "competitive comparison card" for the three competitors to the deliverable shelf — one sentence per competitor differentiation.
-- When multi-agent fleet management ships, update the POC success criteria to include fleet-wide arbitration and escalation path proof points.
+- The 1-page sales enablement sheet is still outstanding — incorporate the Cisco/RSAC number prominently as the lead proof point for enterprise buyers.
+- When multi-agent fleet governance ships, the 5% production statistic becomes the before/after story: MUTX buyers move from 5% to a measurably higher production rate.
+- Competitive comparison card (IntentBound / Baton / Palantir) is now on the deliverable shelf — add it to the deliverable queue.

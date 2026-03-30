@@ -34,6 +34,7 @@ MUTX provides the arbitration layer: durable runtime records, decision logs, and
 | Can we govern risky work? | `mutx governance status`, `mutx governance decisions --limit 50`, `mutx governance pending`, `mutx governance metrics` | runtime path evaluation (not tool whitelisting), permit / deny / defer decisions, pending approvals, Prometheus metrics, CLI-first approval path |
 | Can we keep the runtime honest? | `mutx runtime inspect openclaw` | durable runtime tracking instead of ad hoc local state |
 | Is the SDK story truthful? | `sdk/README.md` | `MutxAsyncClient` is deprecated and limited; use `MutxClient` for production code |
+| Why does this gap matter at scale? | Cisco/RSAC 2026 data | 85% pilot → 5% production. The bottleneck is governance readiness, not AI capability. Buyers who feel this gap will nod immediately |
 
 ### Durable control-plane primitives
 - auth
@@ -48,6 +49,8 @@ MUTX provides the arbitration layer: durable runtime records, decision logs, and
 ### Governance story
 - Faramesh-backed governance is real today - it evaluates whether an action is safe given the prior execution path, not just whether a tool can be called (runtime path evaluation, not tool whitelisting)
 - Gartner (March 2026): 50% of AI agent deployments will fail due to insufficient governance platforms, causing a $58B enterprise software shakeup - governance failure is the #1 deployment risk
+- Cisco/RSAC 2026 data: 85% of AI agents reach pilot stage; only 5% reach production. The bottleneck is not AI capability or enthusiasm - it is governance and security readiness. MUTX closes that gap by making the runtime accountable before production
+- MergeShield ($70M raise): per-agent trust scoring and risk-proportional rules are the emerging mechanism language for enterprise governance
 - policy decisions are permit / deny / defer
 - operators can inspect decisions, pending approvals, and metrics from the CLI
 - approval workflows remain CLI-first; the dashboard should not be positioned as the approval surface yet
@@ -106,7 +109,7 @@ Not for every workflow yet.
 Stable dashboard routes are real, but some operator tasks are still better in CLI or direct API.
 
 ### "Can you govern risky actions?"
-Yes. Governance failure is the #1 AI agent deployment risk (Gartner: 50% of deployments will fail due to insufficient governance platforms, $58B shakeup by 2027). MUTX evaluates whether an action is safe given the prior execution path - not just whether a tool can be called. The agent proposes. MUTX decides. Approval workflow is still CLI-first today; be precise on that.
+Yes. Governance failure is the #1 AI agent deployment risk (Gartner: 50% of deployments will fail due to insufficient governance platforms, $58B shakeup by 2027). Cisco/RSAC 2026 data confirms the bottleneck: 85% of agents reach pilot but only 5% reach production — the gap is governance readiness, not AI capability. MUTX evaluates whether an action is safe given the prior execution path — not just whether a tool can be called. The agent proposes. MUTX decides. Approval workflow is still CLI-first today; be precise on that.
 
 ### "We run multiple agents - is this the same problem at scale?"
 Single-agent governance and multi-agent governance are different problems. Single-agent: can this tool be called safely? Multi-agent: who arbitrates when two agents reach incompatible outputs? Who defines the escalation path?
@@ -116,16 +119,16 @@ MUTX provides fleet-wide decision logs and enforcement - not just per-agent cont
 IntentBound is a named competitor with patent GB2603013.0 and institutional positioning. MUTX differentiation: open governance hooks, CLI-first evidence path, and operator-first UX rather than procurement-layer positioning. If a buyer mentions IBA specifically, flag it as a competitive signal internally.
 
 ### "We already looked at Baton / Palantir Foundry."
-Baton solves agent team coordination through phase gates (planning → execution → review → approval). MUTX evaluates whether an action is safe given the prior execution path — not just which phase the team is in. Faramesh's runtime path evaluation is deterministic policy enforcement, not workflow routing.
-Palantir Foundry requires the Foundry stack. MUTX is agent-framework-agnostic and operator-first. If a buyer is already Palantir-committed, MUTX may not displace that — but for teams that want agent governance without the enterprise platform lock-in, MUTX is the accessible alternative.
+Baton solves agent team coordination through phase gates (planning → execution → review → approval). MUTX evaluates whether an action is safe given the prior execution path - not just which phase the team is in. Faramesh's runtime path evaluation is deterministic policy enforcement, not workflow routing.
+Palantir Foundry requires the Foundry stack. MUTX is agent-framework-agnostic and operator-first. If a buyer is already Palantir-committed, MUTX may not displace that - but for teams that want agent governance without the enterprise platform lock-in, MUTX is the accessible alternative.
 
-### "Palantir is already in our stack — why add another agent governance tool?"
-MUTX is not a replacement for Palantir. It is agent-framework-agnostic and CLI-first — designed to layer on top of any agent stack without requiring the Foundry platform. If the buyer's agents run outside Foundry or if they need a lighter operator surface, MUTX fills that gap without displacing existing investments.
+### "Palantir is already in our stack - why add another agent governance tool?"
+MUTX is not a replacement for Palantir. It is agent-framework-agnostic and CLI-first - designed to layer on top of any agent stack without requiring the Foundry platform. If the buyer's agents run outside Foundry or if they need a lighter operator surface, MUTX fills that gap without displacing existing investments.
 
 ## Competitive landscape (live)
 | Player | What they claim | MUTX differentiation |
 |---|---|---|
-| **IntentBound (IBA)** | Patent GB2603013.0, NIST/NCCoE filings, sub-5ms validation — "The Authorization Layer for High-Stakes AI" | Open governance hooks, CLI-first evidence path, operator-first UX — not procurement-layer positioning |
+| **IntentBound (IBA)** | Patent GB2603013.0, NIST/NCCoE filings, sub-5ms validation - "The Authorization Layer for High-Stakes AI" | Open governance hooks, CLI-first evidence path, operator-first UX - not procurement-layer positioning |
 | **Baton** | Control plane for AI agent teams with clean baton passes between planning/execution/review/approval; works with Claude Code, Codex, Gemini | MUTX's enforcement is runtime-path-based, not phase-gate-based; Faramesh provides deterministic evaluation not just workflow routing |
 | **Palantir Foundry (now GA)** | Enterprise incumbent shipping agent governance and observability as platform feature | MUTX is agent-framework-agnostic and operator-first; Palantir requires the Foundry stack; MUTX is the accessible alternative for non-Pantair shops |
 
