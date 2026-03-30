@@ -1,37 +1,34 @@
-# Sales Engineer Brief — 2026-03-30
+# Sales Engineer Brief — 2026-03-30 (3:20 PM Europe/Rome)
 
 ## Lane utility verdict
 - **Status:** STRONG
 - **Recommendation:** KEEP
 
 ## What changed in truth
-Three new signals since the last cycle sharpen the sales positioning materially:
+Two material new competitive signals since the morning cycle (08:20):
 
-1. **"Agent proposes, [control plane] decides"** — SurfitAI's articulation is the cleanest one-line summary of MUTX's architecture. The agent can hold credentials but cannot bypass the control plane. This is the exact enforcement posture MUTX claims. It belongs in every SE brief as the crispest positioning line.
+1. **Baton — new named competitor in agent team control.** "A control plane for AI agent teams built around clean baton passes between planning, execution, review, and approval." Works with Claude Code, Codex, Gemini. Direct positioning against the same problem space as MUTX — agent coordination and governance. Differentiation: Baton uses phase-gate workflow routing; MUTX uses deterministic runtime path evaluation via Faramesh policies.
 
-2. **Multi-agent state conflict is a named operator problem.** Petrus: "One agent is a workflow. Five agents are an organization. The jump isn't technical — it's governance." State conflicts between agents, escalation paths, and arbitration are unsolved for most teams. This reframes the buyer conversation from single-agent control to multi-agent governance — a larger problem, a higher-stakes buyer, a wider budget conversation.
+2. **Palantir Foundry Agent Service and Observability — now GA.** Enterprise incumbent shipping agent governance and observability as a platform feature. This both compresses MUTX's competitive window (enterprise buyers may default to Palantir) and legitimizes the category. The differentiation for MUTX is stack-agnosticism and operator-first UX vs. Palantir's enterprise platform requirement.
 
-3. **IntentBound (IBA) is a funded, patented competitor.** Patent GB2603013.0, NIST/NCCoE filings, DeepMind arXiv endorsement, sub-5ms validation, GTC San Jose presence. Positioned as "The Authorization Layer for High-Stakes AI." This is not a blog — it is institutional positioning with legal backing. SE must know this name.
-
-**Sustained from prior cycle:** Gartner governance framing ($58B shakeup, 50% deployment failure rate), runtime path evaluation as the permission model shift, queue clear (PRs #1211, #1210, #1209 all merged, lint fix #1215 merged March 30).
+**Sustained from morning cycle:** "agent proposes, MUTX decides" positioning, multi-agent state conflict framing, IntentBound competitive profile, Gartner $58B governance framing, queue clear (repo idle since lint fix #1215 at ~09:00 UTC March 30).
 
 ## Exact evidence
-- `gtm/outside-in-intelligence/reports/signal-brief.md` @ 2026-03-30 08:20 Europe/Rome: Petrus multi-agent framing, SurfitAI positioning line, IntentBound competitive profile
-- `gtm/reports/roundtable.md` @ 2026-03-30 08:10 Europe/Rome: queue clear, engineering idle, SSH + gateway hardening still unaddressed
-- `MUTX/docs/governance.md`: Faramesh runtime path evaluation, `mutx governance status/decisions/pending/metrics/kill` CLI commands, Unix socket enforcement model
-- `MUTX/docs/project-status.md`: dashboard vs. preview boundary, CLI-first approval posture, credential broker internal-only restriction (PRs #1191, #1195)
-- `git -C /Users/fortune/MUTX log --oneline -15`: PRs #1215 (lint fix), #1212, #1191, #1200, #1202, #1195, #1197, #1201, #1203, #1204, #1205, #1209, #1210, #1211 — all merged; no open PRs on main
-- `sales-brief.md`: updated positioning line ("agent proposes, MUTX decides"), multi-agent framing, IntentBound competitive note, demo spine step 5 sharpened with enforcement framing
+- `gtm/outside-in-intelligence/reports/signal-brief.md` @ 2026-03-30 13:20 Europe/Rome: Baton competitor profile, Palantir Foundry GA, MUTX X posting active
+- `gtm/reports/roundtable.md` @ 2026-03-30 08:10 Europe/Rome: queue clear, SSH + gateway hardening unaddressed
+- `MUTX/docs/governance.md`: Faramesh runtime path evaluation, Unix socket enforcement, CLI commands
+- `git -C /Users/fortune/MUTX log --oneline --since="2026-03-30T07:20:00Z"`: no new commits since lint fix #1215
+- `sales-brief.md`: added competitive landscape table (IntentBound / Baton / Palantir), added objection handling for Baton and Palantir
 
 ## If idle or blocked, why exactly
-Not blocked. Constraint is editorial: translating three sharp new signals into buyer-ready materials without overclaiming on multi-agent product maturity before it's shipped.
+Not blocked. Constraint remains editorial: translating new competitive signals (Baton, Palantir GA) into buyer-facing positioning while the product matures the multi-agent governance story. Repo is idle — no new product truth to incorporate.
 
 ## What Fortune can do with this today
-1. **Use "agent proposes, MUTX decides" in every enterprise conversation** — it is the cleanest 7-word summary of MUTX's architecture. Buyers who have felt the pain of agents ignoring governance layers will feel this immediately.
-2. **Qualify the buyer problem as single-agent or multi-agent** — the demo spine now differentiates. Single-agent buyers get proof of runtime enforcement. Multi-agent buyers get the arbitration and escalation framing.
-3. **Flag IntentBound mentions internally** — any enterprise buyer who shows up with IBA vocabulary already has a named alternative in mind. Know the competitive landscape before the second call.
+1. **Know the three-competitor landscape before the next enterprise call** — IntentBound (institutional, patented), Baton (phase-gate coordination), Palantir (enterprise incumbent). Each requires a different objection response.
+2. **Use "agent proposes, MUTX decides" as the default positioning line** — it survives comparison against all three because it describes the enforcement model, not the workflow pattern.
+3. **If a buyer mentions Palantir** — immediately assess whether they are Palantir-committed or Palantir-curious. MUTX does not displace Palantir for committed shops; it is the accessible alternative for teams outside that stack.
 
 ## What should change in this lane next
-- Package the sharpened positioning ("agent proposes, MUTX decides") + multi-agent framing into the 1-page sales enablement sheet — still outstanding from prior cycle.
-- Add a multi-agent POC track to the POC success criteria once the fleet-management features are shipped (not yet — do not promise this).
-- If Fortune approves, do a competitive depth pass on IntentBound's positioning, pricing signals, and buyer objections vs. MUTX.
+- The 1-page sales enablement sheet (sharpened positioning + multi-agent framing + competitive comparison) is still outstanding — flag for Fortune's attention.
+- Add a "competitive comparison card" for the three competitors to the deliverable shelf — one sentence per competitor differentiation.
+- When multi-agent fleet management ships, update the POC success criteria to include fleet-wide arbitration and escalation path proof points.

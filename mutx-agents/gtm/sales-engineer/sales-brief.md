@@ -106,17 +106,28 @@ Not for every workflow yet.
 Stable dashboard routes are real, but some operator tasks are still better in CLI or direct API.
 
 ### "Can you govern risky actions?"
-Yes. Governance failure is the #1 AI agent deployment risk (Gartner: 50% of deployments will fail due to insufficient governance platforms, $58B shakeup by 2027). MUTX evaluates whether an action is safe given the prior execution path — not just whether a tool can be called. The agent proposes. MUTX decides. Approval workflow is still CLI-first today; be precise on that.
+Yes. Governance failure is the #1 AI agent deployment risk (Gartner: 50% of deployments will fail due to insufficient governance platforms, $58B shakeup by 2027). MUTX evaluates whether an action is safe given the prior execution path - not just whether a tool can be called. The agent proposes. MUTX decides. Approval workflow is still CLI-first today; be precise on that.
 
-### "We run multiple agents — is this the same problem at scale?"
+### "We run multiple agents - is this the same problem at scale?"
 Single-agent governance and multi-agent governance are different problems. Single-agent: can this tool be called safely? Multi-agent: who arbitrates when two agents reach incompatible outputs? Who defines the escalation path?
-MUTX provides fleet-wide decision logs and enforcement — not just per-agent controls.
+MUTX provides fleet-wide decision logs and enforcement - not just per-agent controls.
 
 ### "How is this different from IntentBound / IBA?"
 IntentBound is a named competitor with patent GB2603013.0 and institutional positioning. MUTX differentiation: open governance hooks, CLI-first evidence path, and operator-first UX rather than procurement-layer positioning. If a buyer mentions IBA specifically, flag it as a competitive signal internally.
 
-## Competitive note
-**IntentBound (IBA)** is a named competitor with patent GB2603013.0, NIST/NCCoE filings, and sub-5ms validation - positioned as "The Authorization Layer for High-Stakes AI." Monitor for buyer mentions of IBA or intent-bounded authorization. MUTX differentiation: runtime path evaluation with CLI-first evidence, open governance hooks, and operator-first UX - not institutional procurement positioning.
+### "We already looked at Baton / Palantir Foundry."
+Baton solves agent team coordination through phase gates (planning → execution → review → approval). MUTX evaluates whether an action is safe given the prior execution path — not just which phase the team is in. Faramesh's runtime path evaluation is deterministic policy enforcement, not workflow routing.
+Palantir Foundry requires the Foundry stack. MUTX is agent-framework-agnostic and operator-first. If a buyer is already Palantir-committed, MUTX may not displace that — but for teams that want agent governance without the enterprise platform lock-in, MUTX is the accessible alternative.
+
+### "Palantir is already in our stack — why add another agent governance tool?"
+MUTX is not a replacement for Palantir. It is agent-framework-agnostic and CLI-first — designed to layer on top of any agent stack without requiring the Foundry platform. If the buyer's agents run outside Foundry or if they need a lighter operator surface, MUTX fills that gap without displacing existing investments.
+
+## Competitive landscape (live)
+| Player | What they claim | MUTX differentiation |
+|---|---|---|
+| **IntentBound (IBA)** | Patent GB2603013.0, NIST/NCCoE filings, sub-5ms validation — "The Authorization Layer for High-Stakes AI" | Open governance hooks, CLI-first evidence path, operator-first UX — not procurement-layer positioning |
+| **Baton** | Control plane for AI agent teams with clean baton passes between planning/execution/review/approval; works with Claude Code, Codex, Gemini | MUTX's enforcement is runtime-path-based, not phase-gate-based; Faramesh provides deterministic evaluation not just workflow routing |
+| **Palantir Foundry (now GA)** | Enterprise incumbent shipping agent governance and observability as platform feature | MUTX is agent-framework-agnostic and operator-first; Palantir requires the Foundry stack; MUTX is the accessible alternative for non-Pantair shops |
 
 ## Best current call-to-action
 If you already have an agent that kind of works, MUTX is the lane to prove it can be operated, observed, and governed without lying about the gaps.
