@@ -16,22 +16,22 @@ check_health() {
         echo "[$(date)] Container $container is not running"
         return 1
     fi
-
+    
     local health_status
     health_status=$(docker inspect --format='{{.State.Health.Status}}' "$container" 2>/dev/null || echo "none")
-
+    
     if [ "$health_status" = "unhealthy" ]; then
         echo "[$(date)] Container $container is unhealthy"
         return 1
     fi
-
+    
     local state
     state=$(docker inspect --format='{{.State.Status}}' "$container" 2>/dev/null || echo "unknown")
     if [ "$state" != "running" ]; then
         echo "[$(date)] Container $container is in state: $state"
         return 1
     fi
-
+    
     echo "[$(date)] Container $container is healthy"
     return 0
 }
@@ -39,14 +39,14 @@ check_health() {
 restart_container() {
     local container="$1"
     local attempt="$2"
-
+    
     echo "[$(date)] Attempting to restart container $container (attempt $attempt/$MAX_RETRIES)"
-
+    
     docker stop "$container" 2>/dev/null || true
     sleep 2
     docker start "$container"
     sleep 5
-
+    
     if check_health "$container"; then
         echo "[$(date)] Successfully recovered container $container"
         return 0
@@ -59,16 +59,16 @@ while [ $attempt -le $MAX_RETRIES ]; do
     if check_health "$CONTAINER_NAME"; then
         exit 0
     fi
-
+    
     if restart_container "$CONTAINER_NAME" "$attempt"; then
         exit 0
     fi
-
+    
     if [ $attempt -lt $MAX_RETRIES ]; then
         echo "[$(date)] Waiting ${RETRY_DELAY}s before next attempt..."
         sleep $RETRY_DELAY
     fi
-
+    
     attempt=$((attempt + 1))
 done
 
