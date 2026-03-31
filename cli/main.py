@@ -8,6 +8,10 @@ from cli.commands.deploy import deploy_group
 from cli.commands.config import config_group
 from cli.commands.webhooks import webhooks_group
 from cli.commands.tui import tui_group
+from cli.commands.scheduler import scheduler_group
+from cli.commands.observability import runs_group
+from cli.commands.budgets import budgets_group
+from cli.commands.usage import usage_group
 
 
 @click.group()
@@ -109,6 +113,10 @@ cli.add_command(deploy_group)
 cli.add_command(config_group)
 cli.add_command(webhooks_group)
 cli.add_command(tui_group)
+cli.add_command(scheduler_group)
+cli.add_command(runs_group)
+cli.add_command(budgets_group)
+cli.add_command(usage_group)
 
 
 if __name__ == "__main__":
