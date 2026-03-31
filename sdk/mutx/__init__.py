@@ -11,10 +11,24 @@ from mutx.agent_runtime import (
     create_agent_client,
 )
 from mutx.agents import Agents
+from mutx.analytics import Analytics
 from mutx.api_keys import APIKeys
+from mutx.assistant import Assistant
+from mutx.budgets import Budgets
 from mutx.clawhub import ClawHub
 from mutx.deployments import Deployments
-from mutx.leads import Contacts, Leads
+from mutx.governance_credentials import GovernanceCredentials
+from mutx.governance_supervision import GovernanceSupervision
+from mutx.ingest import Ingest
+from mutx.newsletter import Newsletter
+from mutx.onboarding import Onboarding
+from mutx.runtime import Runtime
+from mutx.scheduler import Scheduler
+from mutx.security import Security
+from mutx.sessions import Sessions
+from mutx.swarms import Swarms
+from mutx.templates import Templates
+from mutx.usage import UsageEvents
 from mutx.webhooks import Webhooks
 
 
@@ -39,11 +53,24 @@ class MutxClient:
         )
 
         self.agents = Agents(self._client)
+        self.analytics = Analytics(self._client)
         self.api_keys = APIKeys(self._client)
+        self.assistant = Assistant(self._client)
+        self.budgets = Budgets(self._client)
         self.clawhub = ClawHub(self._client)
         self.deployments = Deployments(self._client)
-        self.leads = Leads(self._client)
-        self.contacts = Contacts(self._client)
+        self.governance_credentials = GovernanceCredentials(self._client)
+        self.governance_supervision = GovernanceSupervision(self._client)
+        self.ingest = Ingest(self._client)
+        self.newsletter = Newsletter(self._client)
+        self.onboarding = Onboarding(self._client)
+        self.runtime = Runtime(self._client)
+        self.scheduler = Scheduler(self._client)
+        self.security = Security(self._client)
+        self.sessions = Sessions(self._client)
+        self.swarms = Swarms(self._client)
+        self.templates = Templates(self._client)
+        self.usage = UsageEvents(self._client)
         self.webhooks = Webhooks(self._client)
 
     def __enter__(self):
@@ -64,12 +91,36 @@ class MutxClient:
         self._agents = value
 
     @property
+    def analytics(self) -> Analytics:
+        return self._analytics
+
+    @analytics.setter
+    def analytics(self, value: Analytics):
+        self._analytics = value
+
+    @property
     def api_keys(self) -> APIKeys:
         return self._api_keys
 
     @api_keys.setter
     def api_keys(self, value: APIKeys):
         self._api_keys = value
+
+    @property
+    def assistant(self) -> Assistant:
+        return self._assistant
+
+    @assistant.setter
+    def assistant(self, value: Assistant):
+        self._assistant = value
+
+    @property
+    def budgets(self) -> Budgets:
+        return self._budgets
+
+    @budgets.setter
+    def budgets(self, value: Budgets):
+        self._budgets = value
 
     @property
     def clawhub(self) -> ClawHub:
@@ -88,20 +139,100 @@ class MutxClient:
         self._deployments = value
 
     @property
-    def leads(self) -> Leads:
-        return self._leads
+    def governance_credentials(self) -> GovernanceCredentials:
+        return self._governance_credentials
 
-    @leads.setter
-    def leads(self, value: Leads):
-        self._leads = value
+    @governance_credentials.setter
+    def governance_credentials(self, value: GovernanceCredentials):
+        self._governance_credentials = value
 
     @property
-    def contacts(self) -> Contacts:
-        return self._contacts
+    def governance_supervision(self) -> GovernanceSupervision:
+        return self._governance_supervision
 
-    @contacts.setter
-    def contacts(self, value: Contacts):
-        self._contacts = value
+    @governance_supervision.setter
+    def governance_supervision(self, value: GovernanceSupervision):
+        self._governance_supervision = value
+
+    @property
+    def ingest(self) -> Ingest:
+        return self._ingest
+
+    @ingest.setter
+    def ingest(self, value: Ingest):
+        self._ingest = value
+
+    @property
+    def newsletter(self) -> Newsletter:
+        return self._newsletter
+
+    @newsletter.setter
+    def newsletter(self, value: Newsletter):
+        self._newsletter = value
+
+    @property
+    def onboarding(self) -> Onboarding:
+        return self._onboarding
+
+    @onboarding.setter
+    def onboarding(self, value: Onboarding):
+        self._onboarding = value
+
+    @property
+    def runtime(self) -> Runtime:
+        return self._runtime
+
+    @runtime.setter
+    def runtime(self, value: Runtime):
+        self._runtime = value
+
+    @property
+    def scheduler(self) -> Scheduler:
+        return self._scheduler
+
+    @scheduler.setter
+    def scheduler(self, value: Scheduler):
+        self._scheduler = value
+
+    @property
+    def security(self) -> Security:
+        return self._security
+
+    @security.setter
+    def security(self, value: Security):
+        self._security = value
+
+    @property
+    def sessions(self) -> Sessions:
+        return self._sessions
+
+    @sessions.setter
+    def sessions(self, value: Sessions):
+        self._sessions = value
+
+    @property
+    def swarms(self) -> Swarms:
+        return self._swarms
+
+    @swarms.setter
+    def swarms(self, value: Swarms):
+        self._swarms = value
+
+    @property
+    def templates(self) -> Templates:
+        return self._templates
+
+    @templates.setter
+    def templates(self, value: Templates):
+        self._templates = value
+
+    @property
+    def usage(self) -> UsageEvents:
+        return self._usage
+
+    @usage.setter
+    def usage(self, value: UsageEvents):
+        self._usage = value
 
     @property
     def webhooks(self) -> Webhooks:
@@ -139,11 +270,24 @@ class MutxAsyncClient:
         )
 
         self.agents = Agents(self._client)
+        self.analytics = Analytics(self._client)
         self.api_keys = APIKeys(self._client)
+        self.assistant = Assistant(self._client)
+        self.budgets = Budgets(self._client)
         self.clawhub = ClawHub(self._client)
         self.deployments = Deployments(self._client)
-        self.leads = Leads(self._client)
-        self.contacts = Contacts(self._client)
+        self.governance_credentials = GovernanceCredentials(self._client)
+        self.governance_supervision = GovernanceSupervision(self._client)
+        self.ingest = Ingest(self._client)
+        self.newsletter = Newsletter(self._client)
+        self.onboarding = Onboarding(self._client)
+        self.runtime = Runtime(self._client)
+        self.scheduler = Scheduler(self._client)
+        self.security = Security(self._client)
+        self.sessions = Sessions(self._client)
+        self.swarms = Swarms(self._client)
+        self.templates = Templates(self._client)
+        self.usage = UsageEvents(self._client)
         self.webhooks = Webhooks(self._client)
 
     async def __aenter__(self):
@@ -164,12 +308,36 @@ class MutxAsyncClient:
         self._agents = value
 
     @property
+    def analytics(self) -> Analytics:
+        return self._analytics
+
+    @analytics.setter
+    def analytics(self, value: Analytics):
+        self._analytics = value
+
+    @property
     def api_keys(self) -> APIKeys:
         return self._api_keys
 
     @api_keys.setter
     def api_keys(self, value: APIKeys):
         self._api_keys = value
+
+    @property
+    def assistant(self) -> Assistant:
+        return self._assistant
+
+    @assistant.setter
+    def assistant(self, value: Assistant):
+        self._assistant = value
+
+    @property
+    def budgets(self) -> Budgets:
+        return self._budgets
+
+    @budgets.setter
+    def budgets(self, value: Budgets):
+        self._budgets = value
 
     @property
     def clawhub(self) -> ClawHub:
@@ -188,20 +356,100 @@ class MutxAsyncClient:
         self._deployments = value
 
     @property
-    def leads(self) -> Leads:
-        return self._leads
+    def governance_credentials(self) -> GovernanceCredentials:
+        return self._governance_credentials
 
-    @leads.setter
-    def leads(self, value: Leads):
-        self._leads = value
+    @governance_credentials.setter
+    def governance_credentials(self, value: GovernanceCredentials):
+        self._governance_credentials = value
 
     @property
-    def contacts(self) -> Contacts:
-        return self._contacts
+    def governance_supervision(self) -> GovernanceSupervision:
+        return self._governance_supervision
 
-    @contacts.setter
-    def contacts(self, value: Contacts):
-        self._contacts = value
+    @governance_supervision.setter
+    def governance_supervision(self, value: GovernanceSupervision):
+        self._governance_supervision = value
+
+    @property
+    def ingest(self) -> Ingest:
+        return self._ingest
+
+    @ingest.setter
+    def ingest(self, value: Ingest):
+        self._ingest = value
+
+    @property
+    def newsletter(self) -> Newsletter:
+        return self._newsletter
+
+    @newsletter.setter
+    def newsletter(self, value: Newsletter):
+        self._newsletter = value
+
+    @property
+    def onboarding(self) -> Onboarding:
+        return self._onboarding
+
+    @onboarding.setter
+    def onboarding(self, value: Onboarding):
+        self._onboarding = value
+
+    @property
+    def runtime(self) -> Runtime:
+        return self._runtime
+
+    @runtime.setter
+    def runtime(self, value: Runtime):
+        self._runtime = value
+
+    @property
+    def scheduler(self) -> Scheduler:
+        return self._scheduler
+
+    @scheduler.setter
+    def scheduler(self, value: Scheduler):
+        self._scheduler = value
+
+    @property
+    def security(self) -> Security:
+        return self._security
+
+    @security.setter
+    def security(self, value: Security):
+        self._security = value
+
+    @property
+    def sessions(self) -> Sessions:
+        return self._sessions
+
+    @sessions.setter
+    def sessions(self, value: Sessions):
+        self._sessions = value
+
+    @property
+    def swarms(self) -> Swarms:
+        return self._swarms
+
+    @swarms.setter
+    def swarms(self, value: Swarms):
+        self._swarms = value
+
+    @property
+    def templates(self) -> Templates:
+        return self._templates
+
+    @templates.setter
+    def templates(self, value: Templates):
+        self._templates = value
+
+    @property
+    def usage(self) -> UsageEvents:
+        return self._usage
+
+    @usage.setter
+    def usage(self, value: UsageEvents):
+        self._usage = value
 
     @property
     def webhooks(self) -> Webhooks:
@@ -218,13 +466,26 @@ __all__ = [
     "MutxAgentClient",
     "MutxAgentSyncClient",
     "AgentInfo",
-    "Command",
     "AgentMetrics",
+    "Analytics",
     "APIKeys",
+    "Assistant",
+    "Budgets",
     "ClawHub",
-    "Contacts",
-    "Deployments",
-    "Leads",
-    "Webhooks",
+    "Command",
     "create_agent_client",
+    "Deployments",
+    "GovernanceCredentials",
+    "GovernanceSupervision",
+    "Ingest",
+    "Newsletter",
+    "Onboarding",
+    "Runtime",
+    "Scheduler",
+    "Security",
+    "Sessions",
+    "Swarms",
+    "Templates",
+    "UsageEvents",
+    "Webhooks",
 ]
