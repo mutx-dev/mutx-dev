@@ -248,6 +248,15 @@ jobs:
           name: autonomy-queue-health
           path: autonomy-queue-health.json
 
+      - name: Commit queue health snapshot to repo
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          file_pattern: autonomy-queue-health.json
+          commit_message: "chore(ops): commit queue health snapshot [skip ci]"
+          skip_dirty_check: false
+          skip_fetch: false
+          quiet: true
+
       - name: Report empty queue (non-fatal)
         if: ${{ steps.queue_health.outputs.empty_violation == 'true' }}
         run: |
