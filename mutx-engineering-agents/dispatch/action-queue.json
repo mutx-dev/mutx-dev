@@ -3,276 +3,6 @@
   "generated": "2026-04-01T09:58:00Z",
   "items": [
     {
-      "id": "branch-copilot-add-contact-form-real-persistence",
-      "title": "cleanup: push or close stale branch `copilot/add-contact-form-real-persistence` (1 commits, 15d old)",
-      "description": "Branch `copilot/add-contact-form-real-persistence` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-contract-tests-cli-commands",
-      "title": "cleanup: push or close stale branch `copilot/add-contract-tests-cli-commands` (2 commits, 15d old)",
-      "description": "Branch `copilot/add-contract-tests-cli-commands` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-contract-tests-sdk-methods",
-      "title": "cleanup: push or close stale branch `copilot/add-contract-tests-sdk-methods` (1 commits, 15d old)",
-      "description": "Branch `copilot/add-contract-tests-sdk-methods` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-dark-mode-toggle",
-      "title": "cleanup: push or close stale branch `copilot/add-dark-mode-toggle` (2 commits, 15d old)",
-      "description": "Branch `copilot/add-dark-mode-toggle` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-dashboard-sidebar-navigation",
-      "title": "cleanup: push or close stale branch `copilot/add-dashboard-sidebar-navigation` (2 commits, 15d old)",
-      "description": "Branch `copilot/add-dashboard-sidebar-navigation` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-deployment-detail-page",
-      "title": "cleanup: push or close stale branch `copilot/add-deployment-detail-page` (2 commits, 15d old)",
-      "description": "Branch `copilot/add-deployment-detail-page` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-deployment-guide-production",
-      "title": "cleanup: push or close stale branch `copilot/add-deployment-guide-production` (1 commits, 15d old)",
-      "description": "Branch `copilot/add-deployment-guide-production` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-global-search-dashboard-navigation",
-      "title": "cleanup: push or close stale branch `copilot/add-global-search-dashboard-navigation` (2 commits, 15d old)",
-      "description": "Branch `copilot/add-global-search-dashboard-navigation` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-local-first-playwright-config",
-      "title": "cleanup: push or close stale branch `copilot/add-local-first-playwright-config` (1 commits, 15d old)",
-      "description": "Branch `copilot/add-local-first-playwright-config` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-mutation-testing",
-      "title": "cleanup: push or close stale branch `copilot/add-mutation-testing` (1 commits, 15d old)",
-      "description": "Branch `copilot/add-mutation-testing` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-openapi-spec-auto-generation",
-      "title": "cleanup: push or close stale branch `copilot/add-openapi-spec-auto-generation` (2 commits, 15d old)",
-      "description": "Branch `copilot/add-openapi-spec-auto-generation` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-playwright-tests-dashboard-agent-list",
-      "title": "cleanup: push or close stale branch `copilot/add-playwright-tests-dashboard-agent-list` (1 commits, 15d old)",
-      "description": "Branch `copilot/add-playwright-tests-dashboard-agent-list` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-playwright-tests-login-flow",
-      "title": "cleanup: push or close stale branch `copilot/add-playwright-tests-login-flow` (2 commits, 15d old)",
-      "description": "Branch `copilot/add-playwright-tests-login-flow` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-playwright-tests-registration-flow",
-      "title": "cleanup: push or close stale branch `copilot/add-playwright-tests-registration-flow` (1 commits, 15d old)",
-      "description": "Branch `copilot/add-playwright-tests-registration-flow` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-real-time-status-indicators",
-      "title": "cleanup: push or close stale branch `copilot/add-real-time-status-indicators` (1 commits, 15d old)",
-      "description": "Branch `copilot/add-real-time-status-indicators` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-request-id-tracking",
-      "title": "cleanup: push or close stale branch `copilot/add-request-id-tracking` (2 commits, 15d old)",
-      "description": "Branch `copilot/add-request-id-tracking` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-route-tests-api-key-endpoints",
-      "title": "cleanup: push or close stale branch `copilot/add-route-tests-api-key-endpoints` (2 commits, 15d old)",
-      "description": "Branch `copilot/add-route-tests-api-key-endpoints` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-route-tests-for-deployments",
-      "title": "cleanup: push or close stale branch `copilot/add-route-tests-for-deployments` (2 commits, 14d old)",
-      "description": "Branch `copilot/add-route-tests-for-deployments` has 2 commits ahead of main and is 14 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-route-tests-webhook-endpoints",
-      "title": "cleanup: push or close stale branch `copilot/add-route-tests-webhook-endpoints` (2 commits, 15d old)",
-      "description": "Branch `copilot/add-route-tests-webhook-endpoints` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-sdk-usage-guide",
-      "title": "cleanup: push or close stale branch `copilot/add-sdk-usage-guide` (1 commits, 15d old)",
-      "description": "Branch `copilot/add-sdk-usage-guide` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-typed-agent-config-schema-validation",
-      "title": "cleanup: push or close stale branch `copilot/add-typed-agent-config-schema-validation` (2 commits, 15d old)",
-      "description": "Branch `copilot/add-typed-agent-config-schema-validation` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-typed-response-models-sdk",
-      "title": "cleanup: push or close stale branch `copilot/add-typed-response-models-sdk` (2 commits, 15d old)",
-      "description": "Branch `copilot/add-typed-response-models-sdk` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-webhook-management-page",
-      "title": "cleanup: push or close stale branch `copilot/add-webhook-management-page` (1 commits, 15d old)",
-      "description": "Branch `copilot/add-webhook-management-page` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-webhook-signature-verification",
-      "title": "cleanup: push or close stale branch `copilot/add-webhook-signature-verification` (4 commits, 15d old)",
-      "description": "Branch `copilot/add-webhook-signature-verification` has 4 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-feat-api-add-health-check-dependencies",
-      "title": "cleanup: push or close stale branch `copilot/feat-api-add-health-check-dependencies` (2 commits, 15d old)",
-      "description": "Branch `copilot/feat-api-add-health-check-dependencies` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-fix-268524951-1176305415-0d1041d7-ebf4-4cc7-8c32-5a72c16a1396",
-      "title": "cleanup: push or close stale branch `copilot/fix-268524951-1176305415-0d1041d7-ebf4-4cc7-8c32-5a72c16a1396` (2 commits, 15d old)",
-      "description": "Branch `copilot/fix-268524951-1176305415-0d1041d7-ebf4-4cc7-8c32-5a72c16a1396` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-fix-268524951-1176305415-252cc9b4-2ebf-4e07-b74c-202929663831",
-      "title": "cleanup: push or close stale branch `copilot/fix-268524951-1176305415-252cc9b4-2ebf-4e07-b74c-202929663831` (1 commits, 15d old)",
-      "description": "Branch `copilot/fix-268524951-1176305415-252cc9b4-2ebf-4e07-b74c-202929663831` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-fix-268524951-1176305415-452a02b9-af7f-4a62-a515-f239aeb89ff0",
-      "title": "cleanup: push or close stale branch `copilot/fix-268524951-1176305415-452a02b9-af7f-4a62-a515-f239aeb89ff0` (1 commits, 15d old)",
-      "description": "Branch `copilot/fix-268524951-1176305415-452a02b9-af7f-4a62-a515-f239aeb89ff0` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-merge-all-prs",
-      "title": "cleanup: push or close stale branch `copilot/merge-all-prs` (1 commits, 15d old)",
-      "description": "Branch `copilot/merge-all-prs` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-sub-pr-1041",
-      "title": "cleanup: push or close stale branch `copilot/sub-pr-1041` (6 commits, 15d old)",
-      "description": "Branch `copilot/sub-pr-1041` has 6 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
       "id": "branch-autonomy-cli-sdk-contract-keeper-issue-952-test-sdk-add-contract-tests-for-all-sdk-methods",
       "title": "cleanup: push or close stale branch `autonomy/cli-sdk-contract-keeper/issue-952-test-sdk-add-contract-tests-for-all-sdk-methods` (1 commits, 15d old)",
       "description": "Branch `autonomy/cli-sdk-contract-keeper/issue-952-test-sdk-add-contract-tests-for-all-sdk-methods` has 1 commits ahead of main and is 15 days old. Push or close.",
@@ -315,87 +45,6 @@
       "area": "ops",
       "priority": "p2",
       "status": "failed",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-autonomy-control-plane-steward-issue-913-feat-api-add-openapi-spec-auto-generation-from-f",
-      "title": "cleanup: push or close stale branch `autonomy/control-plane-steward/issue-913-feat-api-add-openapi-spec-auto-generation-from-f` (1 commits, 15d old)",
-      "description": "Branch `autonomy/control-plane-steward/issue-913-feat-api-add-openapi-spec-auto-generation-from-f` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-autonomy-control-plane-steward-issue-947-test-api-add-route-tests-for-post-deployments",
-      "title": "cleanup: push or close stale branch `autonomy/control-plane-steward/issue-947-test-api-add-route-tests-for-post-deployments` (1 commits, 15d old)",
-      "description": "Branch `autonomy/control-plane-steward/issue-947-test-api-add-route-tests-for-post-deployments` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-autonomy-control-plane-steward-issue-948-test-api-add-route-tests-for-webhook-endpoints",
-      "title": "cleanup: push or close stale branch `autonomy/control-plane-steward/issue-948-test-api-add-route-tests-for-webhook-endpoints` (1 commits, 15d old)",
-      "description": "Branch `autonomy/control-plane-steward/issue-948-test-api-add-route-tests-for-webhook-endpoints` has 1 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-autonomy-operator-surface-builder-issue-955-test-e2e-add-playwright-tests-for-dashboard-agen",
-      "title": "cleanup: push or close stale branch `autonomy/operator-surface-builder/issue-955-test-e2e-add-playwright-tests-for-dashboard-agen` (1 commits, 14d old)",
-      "description": "Branch `autonomy/operator-surface-builder/issue-955-test-e2e-add-playwright-tests-for-dashboard-agen` has 1 commits ahead of main and is 14 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-codex-issue-1029",
-      "title": "cleanup: push or close stale branch `codex/issue-1029` (2 commits, 15d old)",
-      "description": "Branch `codex/issue-1029` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-codex-issue-260-runtime-abstraction",
-      "title": "cleanup: push or close stale branch `codex/issue-260-runtime-abstraction` (4 commits, 15d old)",
-      "description": "Branch `codex/issue-260-runtime-abstraction` has 4 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-codex-issue-914",
-      "title": "cleanup: push or close stale branch `codex/issue-914` (3 commits, 14d old)",
-      "description": "Branch `codex/issue-914` has 3 commits ahead of main and is 14 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-codex-issue-928",
-      "title": "cleanup: push or close stale branch `codex/issue-928` (2 commits, 15d old)",
-      "description": "Branch `codex/issue-928` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-codex-issue-931",
-      "title": "cleanup: push or close stale branch `codex/issue-931` (2 commits, 15d old)",
-      "description": "Branch `codex/issue-931` has 2 commits ahead of main and is 15 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
       "source": "gap-scanner:stale-branches"
     },
     {
@@ -453,96 +102,6 @@
       "source": "gap-scanner:stale-branches"
     },
     {
-      "id": "branch-copilot-add-contact-form-real-persistence",
-      "title": "cleanup: push or close stale branch `copilot/add-contact-form-real-persistence` (1 commits, 16d old)",
-      "description": "Branch `copilot/add-contact-form-real-persistence` has 1 commits ahead of main and is 16 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-contract-tests-sdk-methods",
-      "title": "cleanup: push or close stale branch `copilot/add-contract-tests-sdk-methods` (1 commits, 16d old)",
-      "description": "Branch `copilot/add-contract-tests-sdk-methods` has 1 commits ahead of main and is 16 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-deployment-guide-production",
-      "title": "cleanup: push or close stale branch `copilot/add-deployment-guide-production` (1 commits, 16d old)",
-      "description": "Branch `copilot/add-deployment-guide-production` has 1 commits ahead of main and is 16 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-local-first-playwright-config",
-      "title": "cleanup: push or close stale branch `copilot/add-local-first-playwright-config` (1 commits, 16d old)",
-      "description": "Branch `copilot/add-local-first-playwright-config` has 1 commits ahead of main and is 16 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-mutation-testing",
-      "title": "cleanup: push or close stale branch `copilot/add-mutation-testing` (1 commits, 16d old)",
-      "description": "Branch `copilot/add-mutation-testing` has 1 commits ahead of main and is 16 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-playwright-tests-dashboard-agent-list",
-      "title": "cleanup: push or close stale branch `copilot/add-playwright-tests-dashboard-agent-list` (1 commits, 16d old)",
-      "description": "Branch `copilot/add-playwright-tests-dashboard-agent-list` has 1 commits ahead of main and is 16 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-playwright-tests-registration-flow",
-      "title": "cleanup: push or close stale branch `copilot/add-playwright-tests-registration-flow` (1 commits, 16d old)",
-      "description": "Branch `copilot/add-playwright-tests-registration-flow` has 1 commits ahead of main and is 16 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-real-time-status-indicators",
-      "title": "cleanup: push or close stale branch `copilot/add-real-time-status-indicators` (1 commits, 16d old)",
-      "description": "Branch `copilot/add-real-time-status-indicators` has 1 commits ahead of main and is 16 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-sdk-usage-guide",
-      "title": "cleanup: push or close stale branch `copilot/add-sdk-usage-guide` (1 commits, 16d old)",
-      "description": "Branch `copilot/add-sdk-usage-guide` has 1 commits ahead of main and is 16 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
-      "id": "branch-copilot-add-webhook-management-page",
-      "title": "cleanup: push or close stale branch `copilot/add-webhook-management-page` (1 commits, 16d old)",
-      "description": "Branch `copilot/add-webhook-management-page` has 1 commits ahead of main and is 16 days old. Push or close.",
-      "area": "ops",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:stale-branches"
-    },
-    {
       "id": "branch-cleanup-codex-issue-957",
       "title": "cleanup: push or close stale branch `codex/issue-957` (2 commits, 15d old)",
       "description": "Branch `codex/issue-957` is 2 commits ahead of main, 15d old, never pushed. Push or delete.",
@@ -586,6 +145,105 @@
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:stale-branches"
+    },
+    {
+      "id": "audit-104",
+      "title": "SDK: replace thread pool with async/await in analytics.py",
+      "description": "sdk/mutx/analytics.py uses synchronous requests. Replace with httpx async client. Add mutx_api.py.",
+      "area": "backend",
+      "priority": "p1",
+      "status": "queued",
+      "source": "audit:github-issues"
+    },
+    {
+      "id": "audit-106",
+      "title": "Backend: protect all dashboard API routes with auth middleware",
+      "description": "app/routers/ dashboard routes have no auth decorator. Add auth checks to all endpoints.",
+      "area": "backend",
+      "priority": "p0",
+      "status": "in_progress",
+      "source": "audit:github-issues"
+    },
+    {
+      "id": "audit-107",
+      "title": "Backend: fix auth middleware coverage gaps",
+      "description": "Some backend routes are not protected by auth middleware. Audit all routes, add auth to missing ones.",
+      "area": "backend",
+      "priority": "p0",
+      "status": "queued",
+      "source": "audit:github-issues"
+    },
+    {
+      "id": "audit-109",
+      "title": "Backend: load SSO_USERNAME and SSO_PASSWORD from env vars",
+      "description": "auth.py does not read SSO_USERNAME and SSO_PASSWORD from environment variables. Fix.",
+      "area": "backend",
+      "priority": "p1",
+      "status": "queued",
+      "source": "audit:github-issues"
+    },
+    {
+      "id": "audit-110",
+      "title": "Backend: make CORS configurable, remove hardcoded allow_origins=['*']",
+      "description": "app/main.py has hardcoded allow_origins=['*'] with credentials=True. Make this configurable via env.",
+      "area": "backend",
+      "priority": "p1",
+      "status": "queued",
+      "source": "audit:github-issues"
+    },
+    {
+      "id": "audit-112",
+      "title": "Queue: enforce async governance, not just logging",
+      "description": "Queue governance logs violations but doesn't block. Add enforcement \u2014 reject non-compliant submissions.",
+      "area": "backend",
+      "priority": "p1",
+      "status": "queued",
+      "source": "audit:github-issues"
+    },
+    {
+      "id": "audit-118",
+      "title": "Backend: persist session recordings to storage",
+      "description": "Session recording path not implemented. Add storage layer for session recordings.",
+      "area": "backend",
+      "priority": "p1",
+      "status": "queued",
+      "source": "audit:github-issues"
+    },
+    {
+      "id": "audit-119",
+      "title": "SDK: add timeouts and cancellation support to API calls",
+      "description": "requests calls have no timeout= parameter. Add timeouts and cancellation support to all SDK calls.",
+      "area": "sdk",
+      "priority": "p1",
+      "status": "queued",
+      "source": "audit:github-issues"
+    },
+    {
+      "id": "audit-121",
+      "title": "Docs: complete SDK reference documentation",
+      "description": "SDK docs missing: deployment, observability, auth, and many endpoint references.",
+      "area": "docs",
+      "priority": "p1",
+      "status": "queued",
+      "source": "audit:github-issues"
+    },
+    {
+      "id": "audit-123",
+      "title": "Docs: write agent session deployment guide",
+      "description": "No agent deployment documentation exists. Write a runbook for deploying agent sessions.",
+      "area": "docs",
+      "priority": "p2",
+      "status": "queued",
+      "source": "audit:github-issues"
+    },
+    {
+      "id": "audit-124",
+      "title": "SDK: implement async mutx_api.py for async/await interface",
+      "description": "mutx_api.py is entirely missing. Create it with httpx AsyncClient providing the full async API surface.",
+      "area": "sdk",
+      "priority": "p1",
+      "status": "queued",
+      "source": "audit:github-issues"
     }
   ]
 }
