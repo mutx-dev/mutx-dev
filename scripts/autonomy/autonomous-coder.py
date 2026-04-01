@@ -3,7 +3,7 @@
 MUTX Autonomous Coding Loop
 Reads queue → MiniMax generates code → git commits → gh PRs → loops
 """
-import json, os, time, subprocess, urllib.request, urllib.error
+import json, os, time, subprocess, urllib.request, urllib.error, shlex
 from datetime import datetime
 
 REPO = "/Users/fortune/MUTX"
@@ -155,7 +155,7 @@ Respond with ONLY the JSON, no explanation."""
         run("git add -A", cwd=wt, timeout=30)
         
         commit_body = f"autonomy: {title}\n\nid: {id_}\narea: {area}\nautonomous: yes"
-        code, out, err = run(f'git commit -m "{commit_body}"', cwd=wt, timeout=30)
+        code, out, err = run(f'git commit -m {shlex.quote(commit_body)}', cwd=wt, timeout=30)
         
         if code != 0:
             log(f"Commit failed: {err[:100]}")
@@ -168,10 +168,11 @@ Respond with ONLY the JSON, no explanation."""
         
         run(f"git push -u origin {branch}", cwd=wt, timeout=60)
         
-        # Create PR
+        # Create PR — title and pr_body are untrusted, quote them
+        pr_title = f"[autonomy] {title}"
         pr_body = f"Autonomous PR | id: {id_} | area: {area}\n\n{title}"
         code, out, err = run(
-            f'gh pr create --title "[autonomy] {title}" --body "{pr_body}" --base main',
+            f'gh pr create --title {shlex.quote(pr_title)} --body {shlex.quote(pr_body)} --base main',
             cwd=wt, timeout=30
         )
         
