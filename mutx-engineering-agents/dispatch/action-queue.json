@@ -3,15 +3,6 @@
   "generated": "2026-04-01T15:45:00Z",
   "items": [
     {
-      "id": "coverage-agent_runtime",
-      "title": "test: add coverage for SDK module `agent_runtime`",
-      "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "queued",
-      "source": "gap-scanner:coverage"
-    },
-    {
       "id": "coverage-agents",
       "title": "test: add coverage for SDK module `agents`",
       "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
