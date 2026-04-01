@@ -220,7 +220,7 @@ Use these pages when you need more than the shortest path:
 - local dev stack with `make dev-up`
 - infrastructure references in Docker, Terraform, Ansible, and monitoring assets
 
-![MUTX architecture at a glance](docs/assets/readme-architecture.svg)
+![MUTX architecture at a glance](/Users/fortune/Desktop/architecture overview.png)
 
 ## Shared Local Config
 
