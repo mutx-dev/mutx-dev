@@ -1,81 +1,39 @@
 # mutx-fleet-state.md
 
-> Last refreshed: 2026-03-28 16:05 Europe/Rome
+> Last refreshed: 2026-04-01 14:46 Europe/Rome
 
 ## Executive state
-MUTX is operational, but not yet at full maximum power.
+**MUTX is running.** Docker stack is up. API (`localhost:8000`) reports healthy. Postgres, Redis, API containers all running. Repo is on main.
 
-The control plane is healthy enough to run automation:
-- OpenClaw gateway + node services are running
-- ACP backend is ready
-- local memory is healthy
-- QMD-backed recall is live
-- 14 promoted MUTX agents now have mission-ready workspaces and proven lane artifacts
-
-The company bottleneck is no longer "can the fleet run?"
-It is "are the product/runtime/contracts truthful enough to scale automation and claims?"
-
-## Canonical truths
-- `/dashboard` is the canonical app surface.
-- GitHub live truth as of 2026-03-28:
-  - Issue `#117` is **closed**
-  - Issue `#39` is **closed**
-  - Issue `#114` is **closed**
-  - PR `#1183` is **closed**
-- Local queue/fleet files were stale and were previously overstating `#117`, `#39`, and `#114` as active issue work.
-
-## What is proven working
-### Control plane
-- gateway service
-- node service
-- ACP backend
-- QMD memory + local fallback
-
-### Proven promoted agents
-- project-shepherd
-- workflow-architect
-- product-manager
-- technical-writer
-- security-engineer
-- infrastructure-maintainer
-- outbound-strategist
-- ai-engineer
-- frontend-developer
-- sales-engineer
-- account-strategist
-- developer-advocate
-- social-media-strategist
-- report-distribution-agent
-
-All of the above have successfully written real lane artifacts in their promoted workspaces.
+The autonomy infrastructure is now versioned, wired, and live:
+- Heartbeat cron: every 4 hours, runs `make dev`, posts to Discord + opens GitHub issue on failure
+- Autonomous daemon: persistent Python process, processes action queue via Codex subagents, creates branches + PRs
+- Queue feeder: cron every 15min, watches GitHub issues labeled `autonomy:ready`, adds to action queue
+- Scripts now versioned in `scripts/autonomy/` (were previously unversioned)
+- Backend worktree: on `main`, up to date
+- Frontend worktree: on `main`, up to date
 
 ## Current active risks
-1. **Post-close truth risk**
-   - Closed GitHub issues `#117`, `#39`, and `#114` must be validated against live repo/runtime/docs truth.
-2. **Executor / runtime trust risk**
-   - Fleet reports still converge on backend executor trust as the main scaling blocker.
-3. **Mixed-timestamp state drift**
-   - Older state files and newer lane reports can disagree and confuse automation.
-4. **X lane degraded**
-   - X automation/distribution remains unreliable and should be treated conservatively.
+1. **Docker Desktop must be running** — if Docker daemon dies, heartbeat fails silently, entire stack collapses. No redundant container host.
+2. **20+ unmerged branches** in backend worktree — most are stale `autonomy/*`, `codex/*`, `copilot/*` branches with no active PR. These are drift amplifiers. Should be pruned.
+3. **GitHub issues `#117`, `#39`, `#114`, `#115`**: not yet audited against live truth.
+4. **Autonomy queue is empty** — daemon is running but has no items. No active autonomous work happening.
+5. **Discord webhook for heartbeat not configured** — heartbeat posts to log file only.
 
-## Current priorities
-1. `audit-117-parity-truth` — validate post-close deployment parity truth
-2. `audit-39-runtime-truth` — validate post-close runtime/self-heal/executor truth
-3. `issue-115` — fix local bootstrap scripts after Docker Compose relocation
-4. `issue-112` — enforce queue health and Codex review handoff in autonomy tooling
-5. refresh stale control files before widening automation claims
+## What's proven working (as of 2026-04-01)
+- `make dev`: starts Docker Compose stack (API, Postgres, Redis healthy)
+- API health: `GET /health → {"status":"healthy","database":"ready"}`
+- Autonomy daemon: running (PID verified)
+- Heartbeat cron: registered, every 4h
+- Queue feeder cron: registered, every 15min
+- Gateway: `openclaw status` shows gateway reachable
+
+## Priority actions
+1. **Prune stale branches** — 20+ branches with no PR should be closed
+2. **Add items to action queue** — put real work into the queue so the daemon has something to process
+3. **Configure Discord webhook for heartbeat** — set `DISCORD_MUTX_WEBHOOK` env var to get heartbeat alerts in Discord
+4. **Audit closed issues** — `#117`, `#39`, `#114`, `#115` need post-close validation against live truth
+5. **Set up CI on main** — wire `make test` to run on every PR merge
 
 ## Operational rule
-Do not scale claims or automation beyond what is validated by:
-- live repo truth
-- live runtime truth
-- fresh lane artifacts
-- current memory/queue state
-
-## Next move
-Run the two bounded recovery ACP lanes in clean worktrees:
-- `issue-117-parity` audit lane
-- `issue-39-runtime-truth` audit lane
-
-Then refresh the lane scorecard and daily control brief from their output.
+Do not scale claims beyond what is validated by live `make dev` and live API health. The heartbeat is now the ground truth signal.

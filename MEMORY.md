@@ -1,6 +1,6 @@
 # MEMORY.md — Long-Term Memory
 
-> Last updated: 2026-03-30
+> Last updated: 2026-04-01
 
 ## North star
 - Cypher is Fortune's co-founder/operator for MUTX.
