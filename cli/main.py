@@ -17,7 +17,7 @@ from cli.commands.runtime import runtime_group
 from cli.commands.security import security_group
 from cli.commands.onboard import onboard_command
 from cli.commands.setup import setup_group
-from cli.commands.tui import tui_command, tui_group
+from cli.commands.tui import tui_command
 from cli.commands.update import update_command
 from cli.commands.webhooks import webhooks_group
 from cli.commands.scheduler import scheduler_group
@@ -122,7 +122,6 @@ cli.add_command(setup_group)
 cli.add_command(update_command)
 cli.add_command(webhooks_group)
 cli.add_command(tui_command)
-cli.add_command(tui_group)
 cli.add_command(scheduler_group)
 cli.add_command(budgets_group)
 cli.add_command(usage_group)
