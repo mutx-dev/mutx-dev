@@ -3,21 +3,12 @@
   "generated": "2026-04-01T15:45:00Z",
   "items": [
     {
-      "id": "coverage-assistant",
-      "title": "test: add coverage for SDK module `assistant`",
-      "description": "No test found for SDK module `assistant`. Create tests/sdk/test_assistant.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "in_progress",
-      "source": "gap-scanner:coverage"
-    },
-    {
       "id": "coverage-agent_runtime",
       "title": "test: add coverage for SDK module `agent_runtime`",
       "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
       "area": "backend",
       "priority": "p1",
-      "status": "failed",
+      "status": "queued",
       "source": "gap-scanner:coverage"
     },
     {
@@ -26,7 +17,7 @@
       "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
       "area": "backend",
       "priority": "p1",
-      "status": "failed",
+      "status": "queued",
       "source": "gap-scanner:coverage"
     },
     {
@@ -35,7 +26,7 @@
       "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
       "area": "backend",
       "priority": "p1",
-      "status": "failed",
+      "status": "queued",
       "source": "gap-scanner:coverage"
     },
     {
@@ -44,7 +35,16 @@
       "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
       "area": "backend",
       "priority": "p1",
-      "status": "failed",
+      "status": "queued",
+      "source": "gap-scanner:coverage"
+    },
+    {
+      "id": "coverage-assistant",
+      "title": "test: add coverage for SDK module `assistant`",
+      "description": "No test found for SDK module `assistant`. Create tests/sdk/test_assistant.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "queued",
       "source": "gap-scanner:coverage"
     }
   ]
