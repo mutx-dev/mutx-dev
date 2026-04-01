@@ -1,17 +1,18 @@
 {
-  "acceptance": "## Summary\nThe repo contract says queue health must stay non-empty and every PR should get an `@codex please review` comment, but the current autonomy tooling mostly summarizes state instead of enforcing those invariants.\n\n## Why This Matters\n- queue health is part of the repo's operating model, not optional ceremony\n- required review handoff should be automatic if PR creation is automated\n- job summaries alone are too ephemeral for real operational continuity\n\n## Evidence\n- `AGENTS.md:169`\n- `AGENTS.md:170`\n- `AGENTS.md:173`\n- `.github/workflows/autonomous-shipping.yml:64`\n- `.github/workflows/autonomous-shipping.yml:69`\n- `.github/workflows/autonomous-shipping.yml:70`\n- `docs/autonomy/ACTIVATION.md:95`\n- `scripts/autonomy/execute_work_order.py:156`\n\n## Acceptance Criteria\n- automation detects and reports zero-PR / zero-ready-issue queue states against repo policy\n- PR creation flow adds the required `@codex please review` comment automatically\n- queue status is persisted somewhere actionable, not only an ephemeral job summary\n- autonomy docs match the implemented behavior\n\n## Notes\nThis is adjacent to `#96`, but it is better treated as queue-governance tooling rather than generic CI truthfulness.\n",
-  "agent": "observability-sre",
-  "branch": "autonomy/observability-sre/issue-112-enforce-queue-health-and-codex-review-handoff-in",
-  "issue": 112,
+  "acceptance": "## Summary\n`GET /agents/{agent_id}/status` currently has no auth dependency, which means anyone with a UUID can read agent status, heartbeat timing, and uptime data.\n\n## Why This Matters\n- runtime/status endpoints should follow the same ownership and auth story as the rest of the control plane\n- exposing agent health by UUID is an avoidable information leak\n- the endpoint is also lightly documented and lightly tested, so regressions are easy to miss\n\n## Evidence\n- `src/api/routes/agent_runtime.py:358`\n- `docs/api/index.md:19`\n- `docs/api/agents.md:16`\n- `tests/api/test_ingest.py:64`\n\n## Acceptance Criteria\n- decide whether the endpoint should remain public, require agent auth, or require user auth plus ownership checks\n- implement the chosen auth policy consistently\n- document the endpoint and its intended audience clearly\n- add auth/ownership tests and one happy-path test for the allowed caller\n\n## Notes\nThis may touch adjacent auth-hardening work, but it looks like a specific endpoint-level gap that deserves explicit tracking.\n",
+  "agent": "control-plane-steward",
+  "branch": "autonomy/control-plane-steward/issue-118-lock-down-or-remove-unauthenticated-agent-status",
+  "issue": 118,
   "labels": [
-    "area:ops",
-    "area:docs",
-    "risk:medium",
+    "area:api",
+    "area:auth",
+    "area:runtime",
+    "risk:high",
     "autonomy:ready",
-    "size:m"
+    "size:s"
   ],
-  "lane": "staging-first",
-  "reviewer": "control-plane-steward",
-  "title": "Enforce queue health and Codex review handoff in autonomy tooling",
-  "url": "https://github.com/fortunexbt/mutx-dev/issues/112"
+  "lane": "human-gated",
+  "reviewer": "qa-reliability-engineer",
+  "title": "Lock down or remove unauthenticated agent status lookup",
+  "url": "https://github.com/mutx-dev/mutx-dev/issues/118"
 }
