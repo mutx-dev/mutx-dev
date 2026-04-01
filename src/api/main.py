@@ -256,6 +256,7 @@ async def root(request: Request):
     user_id = getattr(request.state, "auth_user_id", None)
     if user_id:
         from fastapi.responses import RedirectResponse
+
         return RedirectResponse(url="https://app.mutx.dev", status_code=302)
     return {"message": "mutx.dev API", "version": "1.0.0"}
 

@@ -191,6 +191,7 @@ async def monitor_agent_health(session: AsyncSession):
                 session.add(log)
             except Exception as e:
                 import logging
+
                 logging.getLogger(__name__).warning(f"AgentLog insert skipped: {e}")
 
             deployment = await _get_latest_deployment(session, agent.id)
@@ -258,6 +259,7 @@ async def monitor_agent_health(session: AsyncSession):
                 session.add(heal_log)
             except Exception as e:
                 import logging
+
                 logging.getLogger(__name__).warning(f"AgentLog recovery insert skipped: {e}")
 
             deployment = await _get_latest_deployment(session, agent.id)
