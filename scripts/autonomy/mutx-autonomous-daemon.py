@@ -13,6 +13,11 @@ LOG       = "/Users/fortune/.openclaw/logs/autonomous-daemon.log"
 PID_FILE  = "/Users/fortune/.openclaw/autonomous-daemon.pid"
 WT_BACK   = "/Users/fortune/mutx-worktrees/factory/backend"
 WT_FRONT  = "/Users/fortune/mutx-worktrees/factory/frontend"
+# Get GitHub token (for authenticated pushes/prs)
+try:
+    GH_TOKEN = subprocess.check_output(["gh", "auth", "token"], text=True).strip()
+except:
+    GH_TOKEN = os.environ.get("GH_TOKEN", "")
 GH_REPO   = "mutx-dev/mutx-dev"
 
 WORKTREES = {"backend": WT_BACK, "frontend": WT_FRONT}
@@ -55,9 +60,17 @@ def worktree_for(area=""):
     return WT_BACK
 
 def ensure_on_main(wt):
-    """Make sure worktree is on main with latest."""
-    sh(f"git checkout main && git fetch origin && git reset --hard origin/main", cwd=wt)
-    log(f"  Reset {os.path.basename(wt)} to origin/main")
+    """Reset worktree to GitHub's current main — local origin/main may be stale.
+    Worktree main is ahead of protected remote main, so we must use GitHub's actual main.
+    We fetch GitHub's main into a dedicated ref, then reset to it."""
+    # Ensure authenticated remote URL (worktrees may lose token on recreation)
+    if GH_TOKEN:
+        sh(f"git remote set-url origin https://{GH_TOKEN}@github.com/{GH_REPO}.git", cwd=wt)
+    # Fetch GitHub's current main into a dedicated ref
+    sh(f"git fetch origin main:github-main", cwd=wt)
+    # Detach at GitHub's current main
+    sh(f"git checkout --detach github-main", cwd=wt)
+    log(f"  Detached HEAD at GitHub main ({sh('git rev-parse --short github-main', cwd=wt)[1].strip()})")
 
 def implement_item(item):
     """Implement a single queue item. Returns True on success."""
@@ -74,7 +87,7 @@ def implement_item(item):
 
     branch = f"autonomy/{id_}"
     sh(f"git checkout -b {shlex.quote(branch)}", cwd=wt)
-    sh(f"git push -u origin {shlex.quote(branch)}", cwd=wt)
+    sh(f"git push origin HEAD:refs/heads/{shlex.quote(branch)} --force", cwd=wt)
 
     # Try to implement based on area
     ok = implement_by_area(item, wt, area)
@@ -83,16 +96,20 @@ def implement_item(item):
         # Commit + PR
         msg = f"autonomy: {title[:60]}\n\nid: {id_}\narea: {area}\nautonomous: yes"
         sh(f"git add -A && git commit -m {shlex.quote(msg)}", cwd=wt, check=True)
-        rc, out = sh(f"git push origin {shlex.quote(branch)}", cwd=wt)
+        rc, out = sh(f"git push origin HEAD:refs/heads/{shlex.quote(branch)} --force 2>&1", cwd=wt)
         if rc == 0:
             pr_title = f"[autonomy] {title[:100]}"
             pr_body = f"Autonomous implementation. ID: {id_}. Area: {area}."
-            sh(f"gh pr create --title {shlex.quote(pr_title)} --body {shlex.quote(pr_body)} --base main --repo {GH_REPO}", cwd=wt)
-            log(f"<<< [{id_}] PR opened ✓")
-            return True
+            prc, pro = sh(f"gh pr create --title {shlex.quote(pr_title)} --body {shlex.quote(pr_body)} --base main --repo {GH_REPO} --head {shlex.quote(branch)} 2>&1", cwd=wt)
+            if prc == 0:
+                log(f"<<< [{id_}] PR opened ✓")
+                return True
+            else:
+                log(f"<<< [{id_}] gh pr create failed (rc={prc}): {pro[:200]}")
+                return False
         else:
-            log(f"<<< [{id_}] push failed — may need review")
-            return True  # still a success if it committed
+            log(f"<<< [{id_}] push failed (rc={rc}): {out[:300]}")
+            return False
 
     log(f"<<< [{id_}] no-op (no implementation for this area type)")
     return True
@@ -194,7 +211,7 @@ def prune_merged_branches():
 
 def heartbeat():
     """Run make dev, return True if healthy."""
-    rc, out = sh(f"make dev 2>&1 | tail -5", cwd=REPO, timeout=180)
+    rc, out = sh(f"make dev 2>&1 | tail -5", cwd=REPO, timeout=60)
     ok = rc == 0
     log(f"Heartbeat: {'✓' if ok else '✗'}")
     if not ok:
@@ -212,7 +229,7 @@ def pull_worktrees():
             log(f"  Pull failed ({name}): {e}")
 
 def main_loop():
-    last_heartbeat = 0
+    last_heartbeat = time.time()  # Don't fire heartbeat immediately on startup
     last_prune     = 0
     last_pull      = 0
     cycle          = 0
@@ -261,17 +278,30 @@ def main_loop():
             prune_merged_branches()
             last_prune = now
 
-def daemon():
-    importdaemonize = os.fork()
-    if importdaemonize:
-        sys.exit(0)
-    with open(PID_FILE, "w") as f:
-        f.write(str(os.getpid()))
-    signal.signal(signal.SIGTERM, lambda *a: sys.exit(0))
-    signal.signal(signal.SIGINT,  lambda *a: sys.exit(0))
-    main_loop()
+def daemon(no_fork=False):
+    if no_fork or os.environ.get("LAUNCHD_SOCKET"):
+        # launchd manages the process lifecycle - don't fork
+        with open(PID_FILE, "w") as f:
+            f.write(str(os.getpid()))
+        signal.signal(signal.SIGTERM, lambda *a: sys.exit(0))
+        signal.signal(signal.SIGINT,  lambda *a: sys.exit(0))
+        main_loop()
+    else:
+        importdaemonize = os.fork()
+        if importdaemonize:
+            sys.exit(0)
+        with open(PID_FILE, "w") as f:
+            f.write(str(os.getpid()))
+        signal.signal(signal.SIGTERM, lambda *a: sys.exit(0))
+        signal.signal(signal.SIGINT,  lambda *a: sys.exit(0))
+        main_loop()
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--no-daemonize", action="store_true")
+    args = parser.parse_args()
+    no_fork = args.no_daemonize or bool(os.environ.get("LAUNCHD_SOCKET"))
     # If already running, exit
     if os.path.exists(PID_FILE):
         try:
@@ -282,4 +312,4 @@ if __name__ == "__main__":
                 sys.exit(0)
         except:
             pass
-    daemon()
+    daemon(no_fork=no_fork)
