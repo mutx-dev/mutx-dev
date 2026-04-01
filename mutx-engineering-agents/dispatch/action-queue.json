@@ -1,25 +1,7 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T01:02:52.233767",
+  "generated": "2026-04-02T01:07:56.059723",
   "items": [
-    {
-      "id": "coverage-agent_runtime",
-      "title": "test: add coverage for SDK module `agent_runtime`",
-      "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "failed",
-      "source": "gap-scanner:coverage"
-    },
-    {
-      "id": "coverage-api_keys",
-      "title": "test: add coverage for SDK module `api_keys`",
-      "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "failed",
-      "source": "gap-scanner:coverage"
-    },
     {
       "id": "todo-next-env.d.ts-4",
       "title": "[NOTE] This file should not be edited",
@@ -237,18 +219,36 @@
       "source": "gap-scanner:todos"
     },
     {
+      "id": "coverage-agent_runtime",
+      "title": "test: add coverage for SDK module `agent_runtime`",
+      "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "queued",
+      "source": "gap-scanner:coverage"
+    },
+    {
       "id": "coverage-agents",
       "title": "test: add coverage for SDK module `agents`",
       "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
       "area": "backend",
       "priority": "p1",
-      "status": "in_progress",
+      "status": "queued",
       "source": "gap-scanner:coverage"
     },
     {
       "id": "coverage-analytics",
       "title": "test: add coverage for SDK module `analytics`",
       "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "queued",
+      "source": "gap-scanner:coverage"
+    },
+    {
+      "id": "coverage-api_keys",
+      "title": "test: add coverage for SDK module `api_keys`",
+      "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
       "area": "backend",
       "priority": "p1",
       "status": "queued",
