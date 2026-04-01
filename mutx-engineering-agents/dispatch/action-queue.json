@@ -8,7 +8,7 @@
       "description": "## Summary\n`GET /agents/{agent_id}/status` currently has no auth dependency, which means anyone with a UUID can read agent status, heartbeat timing, and uptime data.\n\n## Why This Matters\n- runtime/sta",
       "area": "github",
       "priority": "p2",
-      "status": "queued",
+      "status": "in_progress",
       "source": "gap-scanner:autonomy:ready"
     },
     {
@@ -17,7 +17,7 @@
       "description": "## Summary\nThe repo contract says queue health must stay non-empty and every PR should get an `@codex please review` comment, but the current autonomy tooling mostly summarizes state instead of enforc",
       "area": "github",
       "priority": "p2",
-      "status": "queued",
+      "status": "in_progress",
       "source": "gap-scanner:autonomy:ready"
     },
     {
@@ -44,7 +44,7 @@
       "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
       "area": "backend",
       "priority": "p1",
-      "status": "queued",
+      "status": "in_progress",
       "source": "gap-scanner:coverage"
     },
     {
@@ -53,7 +53,7 @@
       "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
       "area": "backend",
       "priority": "p1",
-      "status": "queued",
+      "status": "in_progress",
       "source": "gap-scanner:coverage"
     },
     {
@@ -62,7 +62,7 @@
       "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
       "area": "backend",
       "priority": "p1",
-      "status": "queued",
+      "status": "in_progress",
       "source": "gap-scanner:coverage"
     }
   ]
