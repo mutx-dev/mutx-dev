@@ -3,7 +3,7 @@
 import json, os, subprocess, time, glob
 from datetime import datetime
 
-GH      = "/usr/local/bin/gh/Contents/MacOS/gh"
+GH      = "/opt/homebrew/bin/gh"
 QUEUE   = "/Users/fortune/MUTX/mutx-engineering-agents/dispatch/action-queue.json"
 LOG     = "/Users/fortune/.openclaw/logs/gap-scanner.log"
 REPO    = "/Users/fortune/MUTX"
@@ -108,27 +108,10 @@ def main():
                  "area": "backend", "priority": "p1", "status": "queued",
                  "source": "gap-scanner:coverage"})
 
-    # 5. Stale un-pushed local branches (>7d old)
-    out, _ = git(["branch", "--list", "autonomy/*", "codex/*", "copilot/*"])
-    now_ts = time.time()
-    for line in out.strip().split("\n"):
-        branch = line.strip().lstrip("* ").strip()
-        if not branch:
-            continue
-        ts_out, _ = git(["log", branch, "-1", "--format=%ct"])
-        try:
-            age_s = now_ts - float(ts_out.strip())
-        except:
-            age_s = 0
-        ahead_out, _ = git(["log", f"origin/main..{branch}", "--oneline"])
-        ahead = len(ahead_out.strip().split("\n")) if ahead_out.strip() else 0
-        push_out, _ = git(["rev-parse", "--verify", f"origin/{branch}"])
-        if age_s > 7*86400 and ahead > 0 and push_out.strip() == "":
-            add(q, {"id": f"branch-cleanup-{branch.replace('/','-')}",
-                     "title": f"cleanup: push or close `{branch}` ({ahead} commits, {int(age_s//86400)}d old)",
-                     "description": f"Stale branch: {ahead} commits ahead, never pushed. Push or close.",
-                     "area": "ops", "priority": "p2", "status": "queued",
-                     "source": "gap-scanner:stale-branches"})
+    # 5. Stale un-pushed local branches (>7d old) — SKIP cleanup items, they flood the queue
+    # Branch cleanup is handled by the daemon directly via git automation, not via queue
+    # This section is disabled to prevent queue flooding with un-actionable stale branch items
+    pass
 
     save(q)
     log(f"=== Gap scanner done — {len(q.get('items',[]))} items queued ===")
