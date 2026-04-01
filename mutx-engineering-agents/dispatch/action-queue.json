@@ -1,20 +1,11 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T01:13:00.603761",
+  "generated": "2026-04-02T01:18:05.320318",
   "items": [
     {
-      "id": "coverage-agents",
-      "title": "test: add coverage for SDK module `agents`",
-      "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "failed",
-      "source": "gap-scanner:coverage"
-    },
-    {
-      "id": "coverage-assistant",
-      "title": "test: add coverage for SDK module `assistant`",
-      "description": "No test found for SDK module `assistant`. Create tests/sdk/test_assistant.py",
+      "id": "coverage-analytics",
+      "title": "test: add coverage for SDK module `analytics`",
+      "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
       "area": "backend",
       "priority": "p1",
       "status": "failed",
@@ -46,15 +37,6 @@
       "priority": "p2",
       "status": "failed",
       "source": "gap-scanner:todos"
-    },
-    {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:deps"
     },
     {
       "id": "todo-sdk-mutx-scheduler.py-31",
@@ -206,7 +188,7 @@
       "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
       "area": "infra",
       "priority": "p3",
-      "status": "queued",
+      "status": "failed",
       "source": "gap-scanner:deps"
     },
     {
@@ -246,6 +228,15 @@
       "source": "gap-scanner:todos"
     },
     {
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
+      "priority": "p3",
+      "status": "queued",
+      "source": "gap-scanner:deps"
+    },
+    {
       "id": "coverage-agent_runtime",
       "title": "test: add coverage for SDK module `agent_runtime`",
       "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
@@ -255,9 +246,9 @@
       "source": "gap-scanner:coverage"
     },
     {
-      "id": "coverage-analytics",
-      "title": "test: add coverage for SDK module `analytics`",
-      "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
+      "id": "coverage-agents",
+      "title": "test: add coverage for SDK module `agents`",
+      "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
       "area": "backend",
       "priority": "p1",
       "status": "queued",
@@ -267,6 +258,15 @@
       "id": "coverage-api_keys",
       "title": "test: add coverage for SDK module `api_keys`",
       "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "queued",
+      "source": "gap-scanner:coverage"
+    },
+    {
+      "id": "coverage-assistant",
+      "title": "test: add coverage for SDK module `assistant`",
+      "description": "No test found for SDK module `assistant`. Create tests/sdk/test_assistant.py",
       "area": "backend",
       "priority": "p1",
       "status": "queued",
