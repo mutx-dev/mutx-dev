@@ -3,39 +3,12 @@
   "generated": "2026-04-01T15:45:00Z",
   "items": [
     {
-      "id": "scan-gh-118",
-      "title": "Lock down or remove unauthenticated agent status lookup",
-      "description": "## Summary\n`GET /agents/{agent_id}/status` currently has no auth dependency, which means anyone with a UUID can read agent status, heartbeat timing, and uptime data.\n\n## Why This Matters\n- runtime/sta",
-      "area": "github",
-      "priority": "p2",
-      "status": "in_progress",
-      "source": "gap-scanner:autonomy:ready"
-    },
-    {
-      "id": "scan-gh-112",
-      "title": "Enforce queue health and Codex review handoff in autonomy tooling",
-      "description": "## Summary\nThe repo contract says queue health must stay non-empty and every PR should get an `@codex please review` comment, but the current autonomy tooling mostly summarizes state instead of enforc",
-      "area": "github",
-      "priority": "p2",
-      "status": "in_progress",
-      "source": "gap-scanner:autonomy:ready"
-    },
-    {
-      "id": "coverage-assistant",
-      "title": "test: add coverage for SDK module `assistant`",
-      "description": "No test found for SDK module `assistant`. Create tests/sdk/test_assistant.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "in_progress",
-      "source": "gap-scanner:coverage"
-    },
-    {
       "id": "coverage-agent_runtime",
       "title": "test: add coverage for SDK module `agent_runtime`",
       "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
       "area": "backend",
       "priority": "p1",
-      "status": "in_progress",
+      "status": "queued",
       "source": "gap-scanner:coverage"
     },
     {
@@ -44,7 +17,7 @@
       "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
       "area": "backend",
       "priority": "p1",
-      "status": "in_progress",
+      "status": "queued",
       "source": "gap-scanner:coverage"
     },
     {
@@ -53,7 +26,7 @@
       "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
       "area": "backend",
       "priority": "p1",
-      "status": "in_progress",
+      "status": "queued",
       "source": "gap-scanner:coverage"
     },
     {
@@ -62,7 +35,16 @@
       "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
       "area": "backend",
       "priority": "p1",
-      "status": "in_progress",
+      "status": "queued",
+      "source": "gap-scanner:coverage"
+    },
+    {
+      "id": "coverage-assistant",
+      "title": "test: add coverage for SDK module `assistant`",
+      "description": "No test found for SDK module `assistant`. Create tests/sdk/test_assistant.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "queued",
       "source": "gap-scanner:coverage"
     }
   ]
