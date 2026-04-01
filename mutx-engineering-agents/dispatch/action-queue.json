@@ -1,7 +1,34 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T00:52:43.106633",
+  "generated": "2026-04-02T00:57:47.637616",
   "items": [
+    {
+      "id": "coverage-agents",
+      "title": "test: add coverage for SDK module `agents`",
+      "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "failed",
+      "source": "gap-scanner:coverage"
+    },
+    {
+      "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
+      "title": "[TODO] implement full test coverage\\n\")",
+      "description": "File: scripts/autonomy/mutx-autonomous-daemon.py:144\n\nTODO: implement full test coverage\\n\")",
+      "area": "backend",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "todo-next-env.d.ts-4",
+      "title": "[NOTE] This file should not be edited",
+      "description": "File: next-env.d.ts:5\n\nTODO: This file should not be edited",
+      "area": "frontend",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:todos"
+    },
     {
       "id": "todo-app-types-api.ts-1768",
       "title": "[Note] Full implementation requires pgvector and a document store.",
@@ -21,18 +48,9 @@
       "source": "gap-scanner:todos"
     },
     {
-      "id": "coverage-governance_credentials",
-      "title": "Add coverage for SDK module `governance_credentials`",
-      "description": "No test file found: tests/test_governance_credentials.py\n\nModule: sdk/mutx/governance_credentials.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "failed",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "coverage-governance_supervision",
-      "title": "Add coverage for SDK module `governance_supervision`",
-      "description": "No test file found: tests/test_governance_supervision.py\n\nModule: sdk/mutx/governance_supervision.py\n\nAdd pytest coverage.",
+      "id": "coverage-deployments",
+      "title": "Add coverage for SDK module `deployments`",
+      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "failed",
@@ -183,6 +201,15 @@
       "source": "gap-scanner:deps"
     },
     {
+      "id": "todo-sdk-mutx-scheduler.py-2",
+      "title": "[Note] Scheduler feature is planned for v1.3 and returns 503.",
+      "description": "File: sdk/mutx/scheduler.py:3\n\nTODO: Scheduler feature is planned for v1.3 and returns 503.",
+      "area": "backend",
+      "priority": "p3",
+      "status": "queued",
+      "source": "gap-scanner:todos"
+    },
+    {
       "id": "todo-src-security-compliance.py-477",
       "title": "[Note] This is a SHOULD requirement - non-conformance is a warning, not a failure.",
       "description": "File: src/security/compliance.py:478\n\nTODO: This is a SHOULD requirement - non-conformance is a warning, not a failure.",
@@ -210,15 +237,6 @@
       "source": "gap-scanner:todos"
     },
     {
-      "id": "coverage-agents",
-      "title": "test: add coverage for SDK module `agents`",
-      "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "queued",
-      "source": "gap-scanner:coverage"
-    },
-    {
       "id": "coverage-analytics",
       "title": "test: add coverage for SDK module `analytics`",
       "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
@@ -243,6 +261,15 @@
       "area": "backend",
       "priority": "p1",
       "status": "queued",
+      "source": "gap-scanner:coverage"
+    },
+    {
+      "id": "coverage-agent_runtime",
+      "title": "test: add coverage for SDK module `agent_runtime`",
+      "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "failed",
       "source": "gap-scanner:coverage"
     }
   ]
