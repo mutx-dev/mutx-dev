@@ -4,7 +4,7 @@ MUTX Autonomous Shipping Daemon v2
 Implements queue items directly via shell — no external session spawning.
 Supervises itself: keeps running, auto-restarts, logs everything.
 """
-import json, os, sys, time, subprocess, signal, random
+import json, os, sys, time, subprocess, signal, random, shlex
 from datetime import datetime
 
 REPO      = "/Users/fortune/MUTX"
@@ -73,8 +73,8 @@ def implement_item(item):
     ensure_on_main(wt)
 
     branch = f"autonomy/{id_}"
-    sh(f"git checkout -b {branch}", cwd=wt)
-    sh(f"git push -u origin {branch}", cwd=wt)
+    sh(f"git checkout -b {shlex.quote(branch)}", cwd=wt)
+    sh(f"git push -u origin {shlex.quote(branch)}", cwd=wt)
 
     # Try to implement based on area
     ok = implement_by_area(item, wt, area)
@@ -82,10 +82,12 @@ def implement_item(item):
     if ok:
         # Commit + PR
         msg = f"autonomy: {title[:60]}\n\nid: {id_}\narea: {area}\nautonomous: yes"
-        sh(f"git add -A && git commit -m {repr(msg)}", cwd=wt, check=True)
-        rc, out = sh(f"git push origin {branch}", cwd=wt)
+        sh(f"git add -A && git commit -m {shlex.quote(msg)}", cwd=wt, check=True)
+        rc, out = sh(f"git push origin {shlex.quote(branch)}", cwd=wt)
         if rc == 0:
-            sh(f"gh pr create --title {repr('[autonomy] ' + title[:100])} --body {repr(f'Autonomous implementation. ID: {id_}. Area: {area}.')} --base main --repo {GH_REPO}", cwd=wt)
+            pr_title = f"[autonomy] {title[:100]}"
+            pr_body = f"Autonomous implementation. ID: {id_}. Area: {area}."
+            sh(f"gh pr create --title {shlex.quote(pr_title)} --body {shlex.quote(pr_body)} --base main --repo {GH_REPO}", cwd=wt)
             log(f"<<< [{id_}] PR opened ✓")
             return True
         else:
@@ -116,18 +118,19 @@ def implement_by_area(item, wt, area):
         import re
         m = re.search(r'`([^`]+)`', desc)
         if m:
-            mod = m.group(1)
-            test_file = f"{WT_BACK}/tests/sdk/test_{mod}.py"
-            os.makedirs(os.path.dirname(test_file), exist_ok=True)
-            with open(test_file, "w") as f:
-                f.write(f"# Auto-generated test stub for SDK module `{mod}`\n")
-                f.write(f"# TODO: implement full test coverage\n")
-                f.write("import pytest\n\n")
-                f.write(f"def test_{mod}_exists():\n")
-                f.write(f"    import sdk.{mod}  # noqa\n")
-                f.write(f"    assert True  # TODO\n")
-            log(f"  Created test stub: tests/sdk/test_{mod}.py")
-            return True
+            mod = re.sub(r'[^a-zA-Z0-9_]', '', m.group(1))
+            if mod:
+                test_file = f"{WT_BACK}/tests/sdk/test_{mod}.py"
+                os.makedirs(os.path.dirname(test_file), exist_ok=True)
+                with open(test_file, "w") as f:
+                    f.write(f"# Auto-generated test stub for SDK module `{mod}`\n")
+                    f.write(f"# TODO: implement full test coverage\n")
+                    f.write("import pytest\n\n")
+                    f.write(f"def test_{mod}_exists():\n")
+                    f.write(f"    import sdk.{mod}  # noqa\n")
+                    f.write(f"    assert True  # TODO\n")
+                log(f"  Created test stub: tests/sdk/test_{mod}.py")
+                return True
 
     # Stale branch cleanup
     if "cleanup" in title.lower() and "branch" in title.lower():
@@ -137,7 +140,7 @@ def implement_by_area(item, wt, area):
         if br:
             branch_name = br.group(1)
             # Check if it exists locally
-            rc, out = sh(f"git branch -D {branch_name}", cwd=WT_BACK)
+            rc, out = sh(f"git branch -D {shlex.quote(branch_name)}", cwd=WT_BACK)
             if rc != 0:
                 log(f"  Branch {branch_name} already gone or not local")
             else:
@@ -166,7 +169,8 @@ def implement_by_area(item, wt, area):
         return True
 
     # For unhandled areas, add a meaningful stub
-    safe_id = id_.replace("-","_")
+    import re
+    safe_id = re.sub(r'[^a-zA-Z0-9_]', '', id_.replace("-","_"))
     stub = f"{WT_BACK}/autonomy_stubs/{safe_id}.md"
     os.makedirs(os.path.dirname(stub), exist_ok=True)
     with open(stub, "w") as f:
