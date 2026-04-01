@@ -1,39 +1,40 @@
 # Runtime Protocol Engineer — Lane Diagnosis
 
-Date: 2026-03-30 06:54 UTC
+Date: 2026-04-01 06:54 AM Europe/Rome (04:54 UTC)
 Worktree: `/Users/fortune/mutx-worktrees/engineering/runtime-protocol-engineer`
-Dispatch: inactive (last confirmed: 2026-03-30T00:05:00+02:00)
+Branch: `eng/runtime-protocol-engineer` (clean)
+
+---
 
 ## Lane utility verdict
 - Status: IDLE
 - Recommendation: REWIRE
 
 ## What I actually did since the last meaningful checkpoint
-- Re-checked `dispatch/runtime-protocol-engineer.md`: no active dispatch.
-- Re-checked `dispatch/review-queue.json` and `dispatch/merge-queue.json`: both empty (unchanged since 2026-03-30T00:05:00+02:00).
-- Inspected GitHub for open PRs with review requested for this lane: none.
-- Verified worktree is clean (`eng/runtime-protocol-engineer` branch, no uncommitted changes).
-- Confirmed owned files (`src/api/routes/agent_runtime.py`, `sdk/mutx/agent_runtime.py`) are stable.
+- Dispatch updated: `review-queue.json` now has PR #1230 (fortunexbt, `fix(sdk): use explicit re-exports to satisfy F401 lint`) and PR #1229 (dependabot) added since prior cycle.
+- `merge-queue.json` now has PR #1230: CONFLICTING, CI GREEN.
+- PR #1230 files: `sdk/mutx/__init__.py`, `.github/workflows/autonomous-dispatch.yml` — **does NOT touch `sdk/mutx/agent_runtime.py`** (my owned file).
+- No review assigned to `runtime-protocol-engineer` lane identity.
+- Worktree: clean, no diff, no owned-file signal.
+- Owned files (`src/api/routes/agent_runtime.py`, `sdk/mutx/agent_runtime.py`): no changes.
 
 ## Exact evidence
-- `dispatch/runtime-protocol-engineer.md`: `"No active dispatch right now."`
-- `dispatch/review-queue.json`: `{"updated":"2026-03-30T00:05:00+02:00","items":[]}`
-- `dispatch/merge-queue.json`: `{"updated":"2026-03-30T00:05:00+02:00","items":[]}`
-- GitHub PR review request for this lane: `[]`
-- Worktree: clean, `## eng/runtime-protocol-engineer`, no diff
+- `dispatch/runtime-protocol-engineer.md`: "No active dispatch right now." (updated 2026-04-01T06:46:00+02:00)
+- `dispatch/review-queue.json`: PR #1230 reviewers=`[]`, PR #1229 reviewers=`[]`, PR #1219 reviewers=`[]` — none assigned to `runtime-protocol-engineer`.
+- `dispatch/merge-queue.json`: PR #1230 CONFLICTING, CI GREEN, action=`watch_ci_resolve_conflict`.
+- Worktree `git status --short`: empty.
+- PR #1230 diff: `sdk/mutx/__init__.py` (+5/-5) — does not touch any owned file.
 
 ## If idle or blocked, why exactly
-- This lane is dispatch-driven and review-bound by design.
-- No review is currently assigned in `review-queue.json`.
-- No runtime-owned dispatch task exists in the dispatch file.
-- Owned files have no pending changes or reported regressions.
-- Vacant lane — no blocker, just no signal to act on.
+- Lane is dispatch-driven by design — no dispatch signal exists.
+- PR #1230 is the active merge-queue item but it does not touch `sdk/mutx/agent_runtime.py` (my owned SDK file).
+- No review assigned to `runtime-protocol-engineer` lane identity.
+- No owned-file regression or signal.
+- No blocker — this lane is correctly idle.
 
-## What Fortune can do with this today
-- If a runtime protocol regression or SDK contract drift exists, surface it explicitly so this lane can act.
-- If the lane is not needed between dispatches, consider marking it dormant or consolidating ownership into `mission-control-orchestrator`.
-- No action available to this lane right now.
+## What Fortune can do with this lane today
+- Dispatch a bounded runtime task (e.g., protocol alignment check between `src/api/routes/agent_runtime.py` and `sdk/mutx/agent_runtime.py`), or fold this lane's dispatch into `mission-control-orchestrator`'s pool.
+- No action available right now.
 
 ## What should change in this lane next
-- REWIRE: either (a) dispatch a concrete runtime fix/review to trigger this lane, or (b) consolidate runtime protocol ownership into a shared dispatch pool to avoid idle polling between tasks.
-- If a runtime issue surfaces mid-sprint, this lane is ready to receive a bounded dispatch and act within `agent_runtime.py` / `sdk/mutx/agent_runtime.py`.
+- REWIRE: either assign the lane a concrete runtime task, or consolidate dispatch into a shared pool. This lane is correct for runtime protocol work — the gap is dispatched volume, not capability.

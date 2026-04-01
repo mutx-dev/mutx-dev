@@ -1,38 +1,45 @@
 # Control Plane Steward — Backend Truth Report
 
-Date: 2026-03-30T04:24 UTC
+Date: 2026-04-01T06:27 UTC
 Status: IDLE — dispatch-bound, no owned-area signal
 
 ## Lane utility verdict
 - **Status:** IDLE
-- **Recommendation:** KEEP — lane is correctly gated on dispatch; backend truth is stable; no noise-needed.
+- **Recommendation:** KEEP — lane is correctly gated on dispatch; no backend API truth mismatches; no invented work warranted.
 
 ## What I actually did since the last meaningful checkpoint
-- Bootstrapped: read dispatch artifact, review queue, merge queue, GH open PRs.
-- Verified worktree is clean (branch `eng/control-plane-steward`, no uncommitted changes).
-- Confirmed review queue and merge queue are both empty.
-- Confirmed no open PRs with `control-plane-steward` as requested reviewer on `mutx-dev/mutx-dev`.
+- Ran full bootstrap: read dispatch artifact, review queue, merge queue, GH assigned PRs.
+- Confirmed via GH API: no open PR has `fortuneadegbite` as a requested reviewer.
+- PR #1219 (dependabot/pygments) is the only review-queue item; second reviewer is `qa-reliability-engineer` (lane identity, not a GitHub user) — that routing gap is for humans to fix.
+- Inspected worktree: branch `eng/control-plane-steward`, clean working tree.
 - Confirmed no active dispatch in `control-plane-steward.md`.
-- Previous checkpoint (PR #1206) was fully handled: browser-verified, PR comment left, blocked on self-approval.
+- Confirmed no owned-area API drift or service mismatch signal.
+- Previous checkpoint (PR #1206) was fully handled; no follow-on issue flagged.
 
 ## Exact evidence
 ```
-gh pr list (mutx-dev/mutx-dev): 0 open PRs
-review-queue.json items: 0
+gh api requested_reviewers (fortuneadegbite): empty result
+review-queue.json items: 1 (PR #1219) — reviewers=[], secondReviewer=qa-reliability-engineer (lane, not GH user)
 merge-queue.json items: 0
 dispatch/control-plane-steward.md: no active dispatch
-worktree git status: clean
-worktree branch: eng/control-plane-steward
+worktree: eng/control-plane-steward, clean
 ```
 
 ## If idle or blocked, why exactly
-Idle because the dispatch layer has no backend API task assigned to this lane. No browser-worthy dispatch, no backend truth mismatch, no review request. The lane correctly has nothing to do until a new signal arrives.
+Idle because:
+1. No PR has `control-plane-steward` or `fortuneadegbite` as an assigned GitHub reviewer.
+2. PR #1219's second-reviewer field is a lane identity that requires human intervention to route to a real GitHub handle.
+3. No dispatch item exists in `control-plane-steward.md`.
+4. No owned-area signal (no API route drift, service mismatch, or model conflict detected).
+
+This is clean idle, not blocked. The queue is functioning as designed.
 
 ## What Fortune can do with this today
-- If a new backend API bug or feature lands, assign it to this lane via dispatch.
-- If PR #1206 needs re-review (reviewer unblocked), trigger a re-dispatch.
-- Otherwise this lane will remain idle until the next dispatch cycle.
+- **Actionable**: manually assign a GitHub user as second reviewer to PR #1219 (dependabot/pygments) to unblock auto-merge; currently blocked because `qa-reliability-engineer` is a lane identity, not a GitHub user.
+- No new backend dispatch needed right now; the API truth is stable.
+- If a new backend bug or API feature lands, route it via `control-plane-steward.md` dispatch.
 
 ## What should change in this lane next
-- Next concrete signal: a new dispatch item in `control-plane-steward.md` or a GH review request.
-- No code, no PR, no process change needed in this lane right now.
+- A concrete dispatch item in `control-plane-steward.md`, a GitHub review request assigned to `fortuneadegbite`, or a bounded backend API task — none exists now.
+- The PR #1219 reviewer gap is the only live queue issue; it's a human-routing problem, not an agent problem.
+- No code, PR, or process change warranted in this lane.

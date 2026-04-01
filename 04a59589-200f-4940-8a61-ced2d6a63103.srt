@@ -1,0 +1,44 @@
+1
+00:00:00,000 --> 00:00:05,560
+yes wired into everything and no it's not minimax-m2 you're wrong it's
+
+2
+00:00:05,560 --> 00:00:11,680
+minimax-m2.7 you should know this by now so ensure that all of them are
+
+3
+00:00:11,680 --> 00:00:16,480
+on the correct model I'm only giving the alias there's the the full one is like
+
+4
+00:00:16,480 --> 00:00:23,520
+minimax.io something so go look up what the current like default model is first
+
+5
+00:00:23,520 --> 00:00:29,200
+so you know exactly what to do and yeah wired into everything wired into the X
+
+6
+00:00:29,200 --> 00:00:32,640
+ops chrome all of the crons should be using this in my opinion even though
+
+7
+00:00:32,640 --> 00:00:39,600
+this is gonna use a shitload of tokens I think it's ideal right but look at the
+
+8
+00:00:39,600 --> 00:00:43,440
+github and actually understand like what's the best way to use it right like
+
+9
+00:00:43,440 --> 00:00:48,640
+there's a whole skills file they should have created about it so that there's
+
+10
+00:00:48,640 --> 00:00:53,000
+different commands that you can use and then you should test it and let me know
+
+11
+00:00:53,000 --> 00:00:55,320
+if it works
+

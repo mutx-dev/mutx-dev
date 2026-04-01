@@ -1,4 +1,20 @@
 {
-  "updated": "2026-03-30T00:05:00+02:00",
-  "items": []
+  "updated": "2026-04-01T06:25:00+02:00",
+  "items": [
+    {
+      "number": 1230,
+      "title": "fix(sdk): use explicit re-exports to satisfy F401 lint",
+      "author": "fortunexbt",
+      "openedAt": "2026-04-01T06:08:00Z",
+      "ci": "IN_PROGRESS",
+      "mergeState": "CONFLICTING",
+      "reviewDecision": "",
+      "mergeEligible": false,
+      "mergeBlockedReason": "merge conflict + CI in progress",
+      "risk": "low",
+      "autoMergeEligible": false,
+      "blocks": ["PR #1229", "PR #1219"],
+      "action": "watch_ci_resolve_conflict"
+    }
+  ]
 }

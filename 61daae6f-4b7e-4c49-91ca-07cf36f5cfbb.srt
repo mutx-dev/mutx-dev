@@ -1,0 +1,44 @@
+1
+00:00:00,000 --> 00:00:02,840
+Lower the cadence of X posting.
+
+2
+00:00:02,840 --> 00:00:05,300
+I just had to delete two posts where you're basically
+
+3
+00:00:05,300 --> 00:00:07,600
+narrating what's happening behind the scenes
+
+4
+00:00:07,600 --> 00:00:09,420
+and that's totally not okay.
+
+5
+00:00:09,420 --> 00:00:13,260
+Something about MUTX, like production fleet,
+
+6
+00:00:13,260 --> 00:00:16,460
+checking CI failures and then these green check marks.
+
+7
+00:00:16,460 --> 00:00:18,200
+Like don't fucking do that, dude.
+
+8
+00:00:18,200 --> 00:00:19,560
+That's our business profile.
+
+9
+00:00:19,560 --> 00:00:21,240
+Do not be posting that shit, please.
+
+10
+00:00:21,240 --> 00:00:22,300
+Thank you.
+
+11
+00:00:22,300 --> 00:00:24,800
+I'm going to sleep now, so you better not fuck up.
+

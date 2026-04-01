@@ -1,0 +1,11 @@
+yes wired into everything and no it's not minimax-m2 you're wrong it's
+minimax-m2.7 you should know this by now so ensure that all of them are
+on the correct model I'm only giving the alias there's the the full one is like
+minimax.io something so go look up what the current like default model is first
+so you know exactly what to do and yeah wired into everything wired into the X
+ops chrome all of the crons should be using this in my opinion even though
+this is gonna use a shitload of tokens I think it's ideal right but look at the
+github and actually understand like what's the best way to use it right like
+there's a whole skills file they should have created about it so that there's
+different commands that you can use and then you should test it and let me know
+if it works

@@ -1,243 +1,212 @@
 {
-  "updated": "2026-03-28T16:05:00+01:00",
-  "queue": [
-    {
-      "id": "audit-117-parity-truth",
-      "url": "https://github.com/fortunexbt/mutx-dev/issues/117",
-      "title": "Audit post-close deployment parity truth across API, CLI, SDK, and docs",
-      "priority": 1,
-      "status": "ready",
-      "labels": [
-        "area:api",
-        "area:cli-sdk",
-        "area:docs",
-        "autonomy:ready",
-        "post-close-audit"
-      ],
-      "notes": "Run in a clean recovery worktree. Verify the closed issue actually matches live repo truth, docs truth, and operator truth. If gaps remain, leave a bounded implementation plan or reopen recommendation."
-    },
-    {
-      "id": "audit-39-runtime-truth",
-      "url": "https://github.com/fortunexbt/mutx-dev/issues/39",
-      "title": "Audit post-close runtime truth for monitoring, executors, and self-heal claims",
-      "priority": 2,
-      "status": "ready",
-      "labels": [
-        "area:ops",
-        "area:api",
-        "autonomy:ready",
-        "post-close-audit"
-      ],
-      "notes": "Run in a clean recovery worktree. Validate closed issue state against live executor health, monitoring behavior, and self-heal reality. Prioritize truthful state over optimistic closure."
-    },
-    {
-      "id": "issue-117",
-      "url": "https://github.com/fortunexbt/mutx-dev/issues/117",
-      "title": "Close deployment surface parity drift across API, CLI, SDK, and docs",
-      "priority": 10,
-      "status": "closed-live",
-      "labels": [
-        "area:api",
-        "area:cli-sdk",
-        "area:docs",
-        "autonomy:ready"
-      ],
-      "notes": "Closed on GitHub as of 2026-03-28. Do not treat as open delivery work. Use post-close parity audit lane to verify live API/CLI/SDK/docs truth and surface any reopen-worthy gaps."
-    },
-    {
-      "id": "issue-39",
-      "url": "https://github.com/fortunexbt/mutx-dev/issues/39",
-      "title": "Wire monitoring and self-healing into actual runtime behavior",
-      "priority": 11,
-      "status": "closed-live",
-      "labels": [
-        "area:ops",
-        "area:api",
-        "autonomy:ready"
-      ],
-      "notes": "Closed on GitHub as of 2026-03-28. Do not treat as open runtime work. Use post-close runtime-truth audit lane to verify executor/recovery claims against live system state."
-    },
-    {
-      "id": "issue-114",
-      "url": "https://github.com/fortunexbt/mutx-dev/issues/114",
-      "title": "Make MutxAsyncClient truthful or deprecate it",
-      "priority": 12,
-      "status": "closed-live",
-      "labels": [
-        "area:cli-sdk",
-        "autonomy:ready"
-      ],
-      "notes": "Closed on GitHub as of 2026-03-28. Keep as historical reference only; do not drive active planning from it unless new async truth gaps appear."
-    },
-    {
-      "id": "issue-115",
-      "url": "https://github.com/fortunexbt/mutx-dev/issues/115",
-      "title": "Fix local bootstrap scripts after Docker Compose relocation",
-      "priority": 4,
-      "status": "ready",
-      "labels": [
-        "area:infra",
-        "area:docs",
-        "autonomy:ready"
-      ],
-      "notes": "scripts/dev.sh and scripts/setup.sh still reference root-level Compose files. Real files moved to infrastructure/docker/. Need: one canonical local bootstrap command from repo root, scripts reference real paths, docs match scripts."
-    },
-    {
-      "id": "issue-112",
-      "url": "https://github.com/fortunexbt/mutx-dev/issues/112",
-      "title": "Enforce queue health and Codex review handoff in autonomy tooling",
-      "priority": 5,
-      "status": "ready",
-      "labels": [
-        "area:ops",
-        "area:docs",
-        "autonomy:ready"
-      ],
-      "notes": "AGENTS.md and autonomous-shipping.yml say: queue must never be empty AND every PR needs @codex please review comment. Current tooling mostly summarizes state instead of enforcing. Needs: queue-zero detection/report, auto @codex comment on PR creation, persistent queue status (not just ephemeral job summary)."
-    },
-    {
-      "id": "x-reenable",
-      "title": "Re-enable X cron workers (2 max, with monitoring)",
-      "priority": 6,
-      "status": "blocked",
-      "notes": "DISABLED since March 17-18 cascade. Legacy cron shape errors (delivery failures, path mismatches). Needs: rewrite of legacy cron shape, delivery.mode=none set, absolute workspace paths, rate limit backoff built in, one clean manual pass before auto-scheduling."
-    },
-    {
-      "id": "heal-pr-1153",
-      "title": "Heal PR #1153 \u2014 resolve anthropic.py + test_deployments.py conflicts",
-      "priority": 7,
-      "status": "dirty",
-      "notes": "Still DIRTY with semantic conflicts. Not safe for blind mechanical merge \u2014 requires human/Codex review of the actual content conflict in src/runtime/adapters/anthropic.py and tests/api/test_deployments.py. Skipped twice by healer."
-    },
-    {
-      "id": "heal-pr-1133",
-      "title": "PR #1133 \u2014 infra checks failing post-heal",
-      "priority": 8,
-      "status": "mergeable-but-failing",
-      "notes": "Conflict-healed, MERGEABLE per GitHub, but failing: Validation, Database Migration Check, Docker Validation, Ansible, Dockerfile Lint, Docker Compose, Terraform Validation, Monitoring Config Validation. Need to debug which infra checks are real vs transient."
-    },
-    {
-      "id": "heal-pr-1144",
-      "title": "PR #1144 \u2014 infra checks failing post-heal",
-      "priority": 9,
-      "status": "mergeable-but-failing",
-      "notes": "Conflict-healed, MERGEABLE per GitHub, but failing: Validation, Docker Validation, Ansible, Dockerfile Lint, Docker Compose, Terraform Validation, Monitoring Config Validation. Same pattern as #1133."
-    },
-    {
-      "id": "ui-restore-executor",
-      "title": "Restore MUTX UI Executor v1 \u2014 fix state/paths, one clean pass, then re-enable",
-      "priority": 10,
-      "status": "disabled",
-      "notes": "Absent from scheduler since March 19. Last ran successfully (shipped 4 consecutive commits to main). Pre-patched to use absolute paths + delivery.mode=none. Need: one clean observed pass in isolated session, then re-add to scheduler."
-    },
-    {
-      "id": "memory-system",
-      "title": "Memory system audit + population (DONE 2026-03-24)",
-      "priority": 0,
-      "status": "done",
-      "notes": "MEMORY.md comprehensive update complete. memory/2026-03-24.md created. autonomy-queue.json updated. mutx-fleet-state.md updated. TOOLS.md updated. SOUL.md updated. This task is done."
-    }
-  ],
-  "stale_items_removed": [
-    {
-      "id": "pr-1176",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1159",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1134",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1171",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1150",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1146",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-912",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1152",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1135",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1100",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1035",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1033",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1031",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1028",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-994",
-      "reason": "Closed during backlog surgery 2026-03-18"
-    },
-    {
-      "id": "pr-1088",
-      "reason": "Already merged"
-    },
-    {
-      "id": "pr-1103",
-      "reason": "Already closed / effectively upstream"
-    },
-    {
-      "id": "issue-885",
-      "reason": "Closed during backlog cleanup 2026-03-18"
-    },
-    {
-      "id": "issue-884",
-      "reason": "Closed during backlog cleanup 2026-03-18"
-    },
-    {
-      "id": "issue-886",
-      "reason": "Closed during backlog cleanup 2026-03-18"
-    },
-    {
-      "id": "issue-889",
-      "reason": "Closed during backlog cleanup 2026-03-18"
-    }
-  ],
-  "new_items_added_today": [
-    "issue-112 (queue health enforcement \u2014 was missing from queue)",
-    "x-reenable (X workers blocked on legacy shape rewrite)",
-    "memory-system (marked done \u2014 this audit task)"
-  ],
-  "rate_limit_protocol": {
-    "on_hit": "log to state file with timestamp",
-    "backoff": "5 minutes minimum",
-    "max_retries": 1,
-    "on_still_failing": "fail gracefully, update state, exit"
+  "version": "1.0.0",
+  "generated": "2026-04-01",
+  "auto_commit_rules": {
+    "description": "Safe to commit without second-agent review. CI must pass.",
+    "rules": [
+      {
+        "path": "docs/**",
+        "description": "Docs-only changes, including API reference markdown",
+        "max_files": 10,
+        "requires_ci": true,
+        "requires_review": false
+      },
+      {
+        "path": "tests/**",
+        "description": "Test additions and repairs that don't change product behavior",
+        "max_files": 8,
+        "requires_ci": true,
+        "requires_review": false
+      },
+      {
+        "path": "scripts/autonomy/**",
+        "description": "Autonomy tooling scripts and dispatch logic",
+        "max_files": 5,
+        "requires_ci": false,
+        "requires_review": false,
+        "note": "Autonomy tools are self-hosting; CI may not apply"
+      },
+      {
+        "path": "cli/commands/**",
+        "description": "CLI command additions that mirror existing API routes (no new contracts)",
+        "max_files": 3,
+        "requires_ci": true,
+        "requires_review": false,
+        "conditions": ["no new API routes", "no credential handling changes"]
+      },
+      {
+        "path": "sdk/mutx/**",
+        "description": "SDK method additions that mirror existing API routes",
+        "max_files": 3,
+        "requires_ci": true,
+        "requires_review": false,
+        "conditions": ["method signature matches OpenAPI contract", "no new endpoints"]
+      },
+      {
+        "path": ".github/workflows/**",
+        "description": "CI/workflow changes to existing workflows",
+        "max_files": 3,
+        "requires_ci": false,
+        "requires_review": false
+      },
+      {
+        "path": "infra/monitoring/**",
+        "description": "Monitoring, alerting, and observability config additions",
+        "max_files": 5,
+        "requires_ci": false,
+        "requires_review": false
+      },
+      {
+        "path": "src/api/routes/**",
+        "description": "PATCH-only route fixes that don't add new endpoints or change contracts",
+        "max_files": 3,
+        "requires_ci": true,
+        "requires_review": false,
+        "conditions": ["no new endpoints", "no schema changes", "no auth changes"]
+      }
+    ]
   },
-  "max_concurrent_workers": 3,
-  "worker_config": {
-    "per_repo": 3,
-    "X_max": 2
+  "guardrail_rules": {
+    "description": "Requires a second agent review before commit. Lane B / staging-first.",
+    "rules": [
+      {
+        "description": "New API route endpoints",
+        "paths": ["src/api/routes/**"],
+        "conditions": ["new endpoint added", "new HTTP method on existing path"]
+      },
+      {
+        "description": "Schema changes to existing models",
+        "paths": ["src/api/models/**", "sdk/mutx/**"]
+      },
+      {
+        "description": "CLI changes that introduce new command groups or change auth flow",
+        "paths": ["cli/main.py", "cli/commands/**"]
+      },
+      {
+        "description": "SDK additions for routes not yet in SDK",
+        "paths": ["sdk/mutx/**"],
+        "conditions": ["new SDK file for unmapped API route"]
+      },
+      {
+        "description": "Database migrations",
+        "paths": ["**/migrations/**", "**/alembic/**"]
+      },
+      {
+        "description": "Webhook governance and retry policy changes",
+        "paths": ["src/api/services/webhook_service.py", "src/api/routes/webhooks.py"]
+      },
+      {
+        "description": "Auth middleware and ownership check changes",
+        "paths": ["src/api/middleware/**", "src/api/security/**"]
+      },
+      {
+        "description": "OpenAPI spec generation and contract changes",
+        "paths": ["docs/api/openapi.json", "scripts/generate_openapi.py"]
+      },
+      {
+        "description": "Dashboard pages for previously backend-only routes",
+        "paths": ["app/dashboard/**", "app/api/dashboard/**"]
+      }
+    ]
+  },
+  "human_block_rules": {
+    "description": "Flag these. Do not execute autonomously. Report and halt.",
+    "rules": [
+      {
+        "description": "Credential or secret deletion",
+        "paths": ["**/.env*", "**/secrets/**", "**/credentials/**", "src/api/security.py"]
+      },
+      {
+        "description": "Production infrastructure changes",
+        "paths": ["infrastructure/terraform/**", "infrastructure/ansible/**", "**/prod/**"]
+      },
+      {
+        "description": "Auth-breaking schema migrations",
+        "conditions": ["dropping columns", "renaming user fields", "changing auth schemas"]
+      },
+      {
+        "description": "Third-party API key removal",
+        "conditions": ["removing API key env vars", "deleting provider integrations"]
+      },
+      {
+        "description": "Rate limit or quota removal",
+        "paths": ["src/api/**"]
+      },
+      {
+        "description": "Webhook destination allowlist bypass",
+        "paths": ["src/api/services/webhook_service.py"]
+      },
+      {
+        "description": "Branch protection removal",
+        "paths": [".github/branch-protection/**"]
+      },
+      {
+        "description": "Direct main branch commits bypassing CI",
+        "note": "Never allow; CI is the gate"
+      }
+    ]
+  },
+  "worktree_assignments": {
+    "description": "Which worktree to use per agent/area type",
+    "backend": {
+      "worktree": "~/mutx-worktrees/factory/backend",
+      "branches": "backend/**",
+      "agent_types": [
+        "control-plane-steward",
+        "cli-sdk-contract-keeper",
+        "runtime-protocol-engineer",
+        "infra-delivery-operator",
+        "observability-sre",
+        "auth-identity-guardian"
+      ],
+      "areas": ["area:api", "area:cli-sdk", "area:runtime", "area:infra", "area:auth", "area:ops"]
+    },
+    "frontend": {
+      "worktree": "~/mutx-worktrees/factory/frontend",
+      "branches": "frontend/**",
+      "agent_types": [
+        "operator-surface-builder",
+        "qa-reliability-engineer"
+      ],
+      "areas": ["area:web", "area:test"]
+    },
+    "ship": {
+      "worktree": "~/mutx-worktrees/factory/ship",
+      "branches": "ship/**",
+      "agent_types": [
+        "docs-drift-curator",
+        "mission-control-orchestrator"
+      ],
+      "areas": ["area:docs", "area:ops"]
+    }
+  },
+  "dispatch_rules": {
+    "stale_claim_minutes": 120,
+    "max_patch_bytes": 50000,
+    "max_changed_files": 6,
+    "required_labels_for_dispatch": ["autonomy:ready", "area:*"],
+    "blocking_labels": ["autonomy:blocked", "autonomy:claimed"],
+    "reviewer_enforcement": "required_for_all_lanes"
+  },
+  "lane_definitions": {
+    "lane_a_safe": {
+      "description": "Auto-merge after CI + one reviewer",
+      "labels": ["autonomy:safe", "size:xs", "size:s"],
+      "auto_merge": true,
+      "staging_required": false
+    },
+    "lane_b_staging": {
+      "description": "Staging deploy gate before merge",
+      "labels": ["autonomy:staging", "size:m"],
+      "auto_merge": false,
+      "staging_required": true
+    },
+    "lane_c_human": {
+      "description": "Human approval required",
+      "labels": ["autonomy:blocked", "risk:high"],
+      "auto_merge": false,
+      "staging_required": true,
+      "human_review_required": true
+    }
   }
 }

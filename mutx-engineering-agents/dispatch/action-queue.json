@@ -1,5 +1,43 @@
 {
-  "updated": "2026-03-29T20:21:03+02:00",
-  "items": [],
-  "sharedBlockers": []
+  "updated": "2026-04-01T06:06:00+02:00",
+  "items": [
+    {
+      "id": "dispatch-1229-lint-fix",
+      "description": "Fix pre-existing F401 lint errors in sdk/mutx/__init__.py",
+      "ownedBy": "cli-sdk-contract-keeper",
+      "targetFile": "sdk/mutx/__init__.py",
+      "errorCount": 8,
+      "errorTypes": ["F401 unused imports: Command, MutxAgentClient, MutxAgentSyncClient, create_agent_client, Contacts"],
+      "blocks": ["PR #1229 (@xmldom/xmldom)", "PR #1219 (pygments)", "main branch CI"],
+      "action": "create branch, fix unused imports, submit PR, get CI green",
+      "priority": "high",
+      "created": "2026-04-01T06:06:00+02:00",
+      "dispatchedTo": "cli-sdk-contract-keeper",
+      "sessionKey": "agent:cli-sdk-contract-keeper:subagent:40f6259a-d72f-4e8f-98d9-e976642a9c43",
+      "status": "completed",
+      "pr": {
+        "number": 1230,
+        "url": "https://github.com/mutx-dev/mutx-dev/pull/1230",
+        "branch": "fix/sdk-init-regexports",
+        "commit": "4f770b8eef92bb2ccc70fc5fa81f03ba00b4c437",
+        "ci_status": "passed",
+        "note": "Note: the sdk/ directory did not exist on origin/main; this is a worktree-native SDK. CI Validation job passed (ruff checks). Swift Analyze still running but is unrelated to Python SDK."
+      }
+    }
+  ],
+  "sharedBlockers": [
+    {
+      "blocker": "sdk/mutx/__init__.py lint breakage on main — blocks ALL dependabot PRs and main branch CI",
+      "rootCause": "Pre-existing F401 unused import errors in sdk/mutx/__init__.py (need X as X re-export syntax)",
+      "blocks": ["PR #1229", "PR #1219", "main CI"],
+      "ownedBy": "cli-sdk-contract-keeper",
+      "dispatched": true,
+      "fix": "Change bare imports to explicit re-exports: Command as Command, MutxAgentClient as MutxAgentClient, MutxAgentSyncClient as MutxAgentSyncClient, create_agent_client as create_agent_client, Contacts as Contacts",
+      "resolved": true,
+      "pr": {
+        "number": 1230,
+        "url": "https://github.com/mutx-dev/mutx-dev/pull/1230"
+      }
+    }
+  ]
 }

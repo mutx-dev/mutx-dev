@@ -2,9 +2,11 @@
 
 MUTX is an open-source control plane for operating AI agents with clearer boundaries than a demo app.
 
-Today the repo exposes three distinct public surfaces, and understanding that split is the fastest way to orient yourself.
+Today the repo exposes a supported marketing site, a supported dashboard lane, and a separate preview control demo. Understanding that split is the fastest way to orient yourself.
 
-## The three surfaces
+For a detailed supported-vs-preview matrix, see [Surface Matrix](surfaces.md).
+
+## The public surfaces
 
 ### `mutx.dev`
 
@@ -14,8 +16,8 @@ What it does today:
 
 - explains the product thesis
 - links people to the docs and GitHub repo
-- captures waitlist signups through the Next.js waitlist flow
-- points users toward the app preview
+- publishes the desktop download flow
+- points operators toward the supported dashboard and CLI install lanes
 
 What it is not:
 
@@ -39,28 +41,34 @@ In repo terms, the docs source currently lives under `docs/`.
 
 ### `app.mutx.dev`
 
-`app.mutx.dev` is the operator-facing app shell.
+`app.mutx.dev` is the operator-facing app host.
 
 What exists today:
 
 - login and register browser flows via `app/api/auth/*`
 - current-user lookup via `app/api/auth/me`
-- dashboard-style reads for agents, deployments, API keys, and health via `app/api/dashboard/*` and `app/api/api-keys/*`
-- a catch-all app shell rendered from `app/app/[[...slug]]/page.tsx`
+- supported dashboard pages under `app/dashboard/*` for stable routes like agents, deployments, runs, sessions, budgets, monitoring, and webhooks
+- preview/demo or redirect-backed pages under the same tree for channels, skills, orchestration, memory, spawn, and logs; those are visible in the shell but not stable product truth yet
+- same-origin dashboard and control-plane proxies under `app/api/dashboard/*`, `app/api/agents/*`, `app/api/deployments/*`, `app/api/api-keys/*`, and `app/api/webhooks/*`
+- a catch-all control demo rendered from `app/control/[[...slug]]/page.tsx`
 
 What it is not yet:
 
-- not a complete production dashboard
+- not a complete production dashboard for every backend capability
 - not a full replacement for direct API usage
-- not yet a complete write surface for all control-plane resources
+- not a blanket guarantee that preview-labeled routes are stable
 
 ## Product model right now
 
 MUTX already has real control-plane primitives:
 
 - authentication
+- templates and assistant workflows
 - agents
 - deployments
+- runs and traces
+- sessions
+- budgets and monitoring
 - API keys
 - ingest routes
 - webhook registration and delivery history
@@ -75,7 +83,8 @@ Use these directories when checking claims:
 | Source | Trust it for |
 | --- | --- |
 | `app/page.tsx` | public landing site content and calls-to-action |
-| `app/app/[[...slug]]/page.tsx` | current app shell positioning |
+| `app/dashboard/` | current operator dashboard routes and positioning |
+| `app/control/[[...slug]]/page.tsx` | current demo shell positioning |
 | `app/api/` | browser-facing same-origin proxy routes |
 | `src/api/routes/` | backend route contracts |
 | `docs/api/openapi.json` | generated API contract snapshot |

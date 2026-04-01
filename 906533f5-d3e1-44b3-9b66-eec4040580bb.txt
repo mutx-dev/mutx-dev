@@ -1,0 +1,7 @@
+Okay, are you sure? Do a second check. That sounds too good to be true.
+Then we got the council working, like for real?
+And why don't we wire the council into the decisions that all of the agents take?
+Like before the agents take a decision, they summon the council. Isn't that cool?
+By the way, the council obviously should be wired to the same models that we have access to,
+aka only Minimax slash, or sorry, Minimax dash, or fuck, I don't know what it's called.
+You know what I'm talking about. You know the model I'm talking about, the only model we have access to.

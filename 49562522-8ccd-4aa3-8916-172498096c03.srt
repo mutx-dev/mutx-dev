@@ -1,0 +1,12 @@
+1
+00:00:00,000 --> 00:00:10,000
+Update anything that is outdated and do a full fix of everything.
+
+2
+00:00:10,000 --> 00:00:12,000
+Make sure everything runs smoothly after.
+
+3
+00:00:12,000 --> 00:00:14,000
+So run testing.
+

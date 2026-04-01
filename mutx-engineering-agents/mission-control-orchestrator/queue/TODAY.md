@@ -1,29 +1,43 @@
-# queue/TODAY.md — 2026-03-30
-**Mission Control Orchestrator — 04:05 UTC**
+# queue/TODAY.md — 2026-04-01
+**Mission Control Orchestrator — 06:25 UTC (Rome: 08:25)**
 
 ## State at this control pass
-- PR #1218 `chore: lint fixes 2026-03-29` — merged at 21:34 UTC. main is clean (`81d7ef56`).
-- Review queue: empty.
-- Merge queue: empty.
-- Action queue: empty.
-- Open issues: **#1187** (Cleanup Consolidation Issue, open since 2026-03-23 — 7 days).
 
-## Stale task artifacts
-- task-1702 (in-progress): docker-compose GRAFANA_ADMIN_PASSWORD fix. PR was closed. Fix absorbed into main via PR #1218 commit `433d2d14`. **Should be marked done.**
-- task-1704 (in-progress): lint/format drift fix. PR was closed. Fix absorbed into main via PR #1218 commit `433d2d14`. **Should be marked done.**
+### Open PRs
+- **PR #1230** `fix(sdk): use explicit re-exports to satisfy F401 lint` — **NEW, ~17m old**
+  - CI: IN_PROGRESS (Validation + CodeQL running)
+  - mergeState: CONFLICTING — needs rebase/conflict resolution
+  - author: fortunexbt (via cli-sdk-contract-keeper)
+  - Action: watch CI, resolve merge conflict
 
-## Lane status — all idle
-All 9 owned engineering lanes: `qa-reliability-engineer`, `cli-sdk-contract-keeper`, `control-plane-steward`, `operator-surface-builder`, `auth-identity-guardian`, `observability-sre`, `infra-delivery-operator`, `runtime-protocol-engineer`, `docs-drift-curator` — no active dispatch, no owned-area signal.
+- **PR #1229** `build(deps-dev): bump @xmldom/xmldom from 0.8.11 to 0.8.12` (dependabot) — open ~3h
+  - CI: RED (pre-existing lint on main)
+  - Blocks: main CI + all dependabot PRs
+  - Will auto-rebase when #1230 merges
+
+- **PR #1219** `build(deps): bump pygments from 2.19.2 to 2.20.0` (dependabot) — open ~34h
+  - CI: GREEN, mergeable: MERGEABLE
+  - reviewDecision: empty — `fortunexbt` requested but no review submitted
+  - 2nd reviewer: `qa-reliability-engineer` (lane, not GitHub user) — blocked on human
+
+### Open issues
+- **#1187** (Cleanup Consolidation, 10 days old, unlabeled)
+
+### Queue summary
+- review-queue: #1230 (CI running), #1229 (blocked), #1219 (needs review)
+- merge-queue: #1230 (pending CI + conflict resolution)
+- action-queue: cli-sdk-contract-keeper dispatched, in progress
+
+## Lane status
+- `cli-sdk-contract-keeper`: **ACTIVE** — PR #1230 open, CI running
+- All other lanes: idle
+- `qa-reliability-engineer`: cannot act as GitHub user
 
 ## Lane utility verdict
-- **Status: IDLE**
-- **Recommendation: KEEP** (await real signals)
+- **Status: THIN**
+- **Recommendation: KEEP** — fix is in flight; watch and unblock
 
-## Next required actions
-1. **Fortune decision**: Issue #1187 has been open 7 days. Route to a lane or close it.
-2. **Optional**: Mark task-1702 and task-1704 as done in tasks.json to clear stale state.
-3. No merge or review action needed right now.
-4. No new owned-area signals detected — keep lanes suppressed until signals appear.
-
-## Control brief
-Fleet is idle and clean. Nothing blocked. Awaiting new work.
+## Fortune decisions needed
+1. **Watch PR #1230 CI** — if green, confirm merge conflict is resolved
+2. **PR #1219**: assign a GitHub user as reviewer (only actionable item independently)
+3. **Issue #1187**: close or route

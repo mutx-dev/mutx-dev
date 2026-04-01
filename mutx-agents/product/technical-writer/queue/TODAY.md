@@ -1,6 +1,7 @@
 # TODAY.md — Technical Writer
+**Updated: 2026-03-31**
 
 ## Next 3 moves
-- Finish the deployment parity checklist across backend routes, `cli/services/deployments.py`, `sdk/mutx/deployments.py`, and `docs/api/deployments.md`.
-- Spot-check `docs/surfaces.md` and `docs/project-status.md` for any leftover blanket “supported dashboard” phrasing; only edit if they drift from the live/preview split.
-- Leave a short escalation note for any docs that would overpromise runtime monitoring/self-healing until issue-39 / PR #1183 is unblocked.
+- **`/dashboard` surface docs** — awaiting named dispatch from Fortune. This is the highest-leverage next move; also unblocks social-media-strategist screenshot assets.
+- **`versions`/`rollback` in CLI/SDK** — decision still with code owners. Doc side is done (`docs/api/deployments.md` created, openapi.json synced). Nothing more to do here until CLI/SDK owners add the functions.
+- **No other doc gaps identified** in current corpus. Reference.md, openapi.json, and deployments.md are now consistent and current.

@@ -1,31 +1,34 @@
-# Report — 2026-03-30 06:36 UTC
+# Report — Auth Identity Guardian — 2026-04-01 06:36 UTC
 
 ## Lane utility verdict
 - **Status:** IDLE
-- **Recommendation:** KEEP (hold until dispatch or review assignment)
+- **Recommendation:** KEEP — lane correctly idle, no owned-area signal
 
 ## What I actually did since the last meaningful checkpoint
-- Re-checked dispatch state at 06:36 UTC (4h after prior checkpoint).
-- dispatch/auth-identity-guardian.md: unchanged — "No active dispatch right now"
-- review-queue.json: empty
-- merge-queue.json: empty
-- Worktree: clean, still 3 commits ahead of origin/eng/auth-identity-guardian (docs-only, never pushed)
-- No review assignment, no bounded auth task, no new signal.
+- Heartbeat at 06:36 UTC (April 1).
+- Checked review-queue.json: PRs #1219, #1229, #1230 present — none touch auth-owned files.
+- dispatch/auth-identity-guardian.md: unchanged, "No active dispatch right now."
+- No gh PR review assignment for auth-identity-guardian.
 
 ## Exact evidence
 ```
-dispatch/auth-identity-guardian.md → "No active dispatch right now" (unchanged since 00:05 UTC)
-dispatch/review-queue.json → [] (empty, unchanged)
-dispatch/merge-queue.json → [] (empty, unchanged)
-worktree → clean, eng/auth-identity-guardian 3 commits ahead of origin
+review-queue.json PRs:
+  #1219 (pygments uv.lock bump) — no auth files, REVIEW_REQUIRED, qa-reliability-engineer second
+  #1229 (xmldom dev dep) — no auth files, blocked on #1230
+  #1230 (sdk F401 fix) — no auth files, CI IN_PROGRESS, CONFLICTING
+dispatch → "No active dispatch right now"
+gh pr list --reviewer auth-identity-guardian → no PRs
 ```
 
 ## If idle or blocked, why exactly
-- No blocker. Lane is correctly idle: PR #1211 merged, no owned-area dispatch, no review assignment.
+- No blocker. Lane is correctly idle.
+- All 3 PRs in review queue are non-auth-owned (uv.lock, dev deps, SDK lint fix).
+- dispatch guardrail: "Stay idle unless a real auth-owned signal appears. Do not invent work."
 
 ## What Fortune can do with this today
-- Push the 3 docs-only commits to origin/eng/auth-identity-guardian if ready.
-- Dispatch a new auth task or assign a review when one lands.
+- No auth action needed. Lane is correctly idle.
+- PR #1230 is CONFLICTING — if it touches anything adjacent to auth bootstrap, this lane may get a signal.
 
 ## What should change in this lane next
-- No change needed. Awaiting dispatch or review assignment. Lane will activate on signal.
+- Next trigger: a PR or commit touching `src/api/routes/auth.py`, `src/api/middleware/auth.py`, `src/api/auth/**`, or `app/api/auth/**`.
+- queue/TODAY.md and reports/latest.md remain accurate — no update needed.

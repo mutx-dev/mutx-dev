@@ -1,15 +1,16 @@
 # MUTX Roundtable
 
-**Updated: 2026-03-30 08:10 Europe/Rome**
+**Updated: 2026-04-01 06:15 Europe/Rome**
 **Owner: project-shepherd**
 
 ---
 
 ## Decisions
-- **Queue is CLEAR.** No new PRs opened or merged since PR #1218 (`chore: lint fixes 2026-03-29`) at 21:34 UTC. main is clean at `81d7ef56`.
-- Review queue, merge queue, and action queue all empty.
-- Market signal: **Gartner's $58B governance-shakeup framing** holds. "Runtime path evaluation" is the confirmed permission model language.
-- **Issue #1187** (Cleanup Consolidation Issue) is 7 days old, unassigned, unaddressed — needs owner or close.
+- **PR #1230 open — lint fix in progress.** `cli-sdk-contract-keeper` opened `fix/sdk-init-regexports` at 06:11 UTC. CI running. Mergeable: CONFLICTING (may clear after CI + rebase).
+- **PR #1219: STILL stuck — 34+ hours.** `pygments` bump, CI GREEN, mergeable. Second GitHub reviewer unassigned. `qa-reliability-engineer` cannot act as GitHub identity. **No change from prior run.**
+- **SSH and gateway hardening: STILL ON FORTUNE'S DESK — 48+ hours.** `provision.yml:10` and `inventory.ini:13` remain open.
+- **Issue #1187: 10 days old, unowned.** Still no owner, still unlabeled.
+- **Engineering fleet: PARTIALLY ACTIVE.** PR #1230 dispatched by `cli-sdk-contract-keeper`. All other 9 lanes idle/downshifted.
 
 ---
 
@@ -17,70 +18,80 @@
 
 | # | Priority | Owner | Action needed |
 |---|----------|-------|---------------|
-| 1 | **SSH hardening call** | Fortune | Pick `accept-new` baseline — closes `provision.yml:10` and `inventory.ini:13` gaps |
-| 2 | **Gateway hardening patch decision** | Fortune | Approve or decline `agents.defaults.sandbox.mode="all"`, `tools.fs.workspaceOnly=true`, `tools.exec.security="allowlist"`+ask — 4 passes, no decision |
-| 3 | **Route or close issue #1187** | Fortune / project-shepherd | 7 days open, no assignment — if valid, dispatch; if stale, close |
+| 1 | **PR #1230: resolve conflicts + land** | `cli-sdk-contract-keeper` / Fortune | Fix merge conflicts; once landed, PR #1219 + #1229 unblock |
+| 2 | **PR #1219 second reviewer** | Fortune | Assign a GitHub user identity. `qa-reliability-engineer` cannot review. 34h stuck. |
+| 3 | **Resolve or close issue #1187** | Fortune / project-shepherd | 10 days old — dispatch if valid, close if stale |
 
 ---
 
 ## Blockers
-- **SSH gap** (`provision.yml:10` = `0.0.0.0/0`, `inventory.ini:13` = `StrictHostKeyChecking=no`) — awaiting Fortune's `accept-new` call.
-- **Gateway hardening** — patch on Fortune's desk since 2026-03-29 08:06, unapproved after 4 passes.
-- **Issue #1187** — 7 days old, no owner, no activity.
-- **Next dispatch slice** — unnamed. All 9 engineering specialist lanes are idle.
-- **Social-media-strategist** — needs screenshots from `/dashboard/security`, `/dashboard/monitoring`, `/dashboard/budgets` before proof stack can assemble.
+- **PR #1230 merge conflicts** — CI in progress but CONFLICTING mergeable state. May need rebase or conflict resolution.
+- **PR #1219 second reviewer** — `qa-reliability-engineer` cannot act as GitHub reviewer. **34+ hours stuck.** Human required.
+- **Issue #1187** — 10 days old, no assignment, no label.
+- **SSH gap** (`provision.yml:10` = `0.0.0.0/0`, `inventory.ini:13` = `StrictHostKeyChecking=no`) — awaiting Fortune's `accept-new` call (48+ hours).
+- **Gateway hardening** — patch on Fortune's desk for 48+ hours.
+- **Microsoft Agent 365: 30 days to GA** — competitive clock is running.
+- **social-media-strategist** — needs screenshots from `/dashboard/security`, `/dashboard/monitoring`, `/dashboard/budgets`.
 
 ---
 
 ## Handoffs
-- **Fortune**: two security calls needed now — SSH baseline (`accept-new`) and gateway hardening patch (approve/decline + name operating model if declining).
-- **project-shepherd**: route or close issue #1187.
-- **product-manager / workflow-architect / technical-writer**: `/dashboard` truth strip tied to `#39` remains the right next product move — unblocked, awaiting direction.
-- **social-media-strategist**: needs screenshot assets from `/dashboard` surfaces — blocker is the dashboard, not the lane.
+- **Fortune**: two decisions — (1) assign second reviewer on PR #1219, (2) SSH `accept-new` call.
+- **cli-sdk-contract-keeper**: PR #1230 conflicts need resolution once CI finishes.
+- **project-shepherd**: flag #1187 for routing or closure.
+- **product-manager / workflow-architect / technical-writer**: `/dashboard` truth strip tied to `#39` — memory ownership framing from Saviynt/ambient authority signal should be embedded before next enterprise conversation.
+- **social-media-strategist**: screenshot assets from `/dashboard` surfaces — blocker is the dashboard, not the lane.
 
 ---
 
 ## Fleet utility verdicts
-- **Strongest lanes:** GTM signal / outside-in (Gartner framing live, evidence specific and fresh), GTM outbound/sales/account (Gartner + runtime path evaluation absorbed), product/frontend/technical-writer (queue clear, bounded dispatch ready).
-- **Thin but honest lanes:** workflow-architect (SDK deployment-history parity gap, needs contract decision), developer-advocate (idle, awaiting next dispatch slice).
-- **Idle / blocked lanes:** X distribution (manual-only, unchanged), all 9 engineering specialist lanes (idle, awaiting next dispatch).
+- **Strongest lanes:** GTM signal / outside-in (Saviynt P0 competitive entry + 30-day Microsoft clock; ambient authority framing sharpest MUTX position; Meta $57B governance angle for CMO buyers), GTM outbound/sales/account (signal absorbed; briefs current).
+- **Thin but honest lanes:** `cli-sdk-contract-keeper` (actively fixing lint — bounded, on target), workflow-architect (SDK deployment-history parity gap), developer-advocate (idle, awaiting dispatch).
+- **Idle / blocked lanes:** X distribution (manual-only, unchanged), 9/10 engineering specialist lanes (IDLE), PR #1219 (34h stuck, reviewer-identity gap), social-media-strategist (needs screenshots), PR #1229 (blocked by lint on main).
 
 ---
 
 ## Keep / downshift / rewire / cut calls
-- **Keep:** GTM signal lane — Gartner framing is live and directly usable in enterprise conversations.
-- **Keep:** product/runtime truth work — `/dashboard` truth strip is the right bounded dispatch once named.
-- **Rewire:** infrastructure-maintainer — hardening patch has been on Fortune's desk for 12+ hours across 4 passes. If operating model is single-operator/local-only, say it explicitly so the lane can lock it down without the patch.
-- **Rewire:** developer-advocate — needs next bounded dispatch slice named to move.
-- **Cut:** idle dispatcher loop — engineering fleet has nothing to do. Consider stopping the proactive-coder cycles until next dispatch is named.
-- **Cut:** reviewer-resolution framing — queue is clear, that is no longer the gate.
+- **Keep:** GTM signal lane — Saviynt is a new P0 competitive entry with named enterprise design partners; ambient authority positioning is confirmed and sharpened; Microsoft 30-day clock is a forcing function.
+- **Keep:** product `/dashboard` truth strip — bounded, shippable, Saviynt/ambient authority framing should be embedded now.
+- **Keep:** `cli-sdk-contract-keeper` dispatch — PR #1230 is the right bounded fix, in progress.
+- **Downshift:** 9/10 idle engineering specialist lanes — downshifted, no new dispatch named.
+- **Rewire:** infrastructure-maintainer — gateway patch has been on Fortune's desk for 48+ hours. If the operating model is single-operator/local-only, say it explicitly so the lane can adjust and close.
+- **Cut:** idle dispatcher loop on dormant lanes.
+- **Cut:** reviewer-resolution framing for queue congestion — queue is clear. The only reviewer gap is PR #1219's missing second reviewer.
 
 ---
 
 ## Exact evidence
-- `engineering/mission-control-orchestrator/reports/latest.md` @ 2026-03-30 04:05 UTC: 0 open PRs, all queues empty, main at `81d7ef56`, issue #1187 (7 days old) the only open artifact.
-- `gtm/outside-in-intelligence/reports/signal-brief.md` @ 2026-03-29 18:20 Europe/Rome: Gartner $58B governance-shakeup, runtime path evaluation language confirmed.
-- `reporting/report-distribution-agent/reports/daily-brief.md` @ 2026-03-29 20:45 Europe/Rome: SSH gap confirmed in `provision.yml:10` and `inventory.ini:13`; gateway patch unapproved after 4 passes.
-- `control/project-shepherd/reports/latest.md` @ 2026-03-29 20:10 Europe/Rome: queue clear, fleet unblocked.
+- `engineering/mission-control-orchestrator/reports/latest.md` @ 2026-04-01 04:06 UTC: PR #1230 (lint fix, CI RED on main), PR #1219 (22h stuck), PR #1229 (blocked by lint), fleet DOWNSHIFT.
+- Live `gh pr list --repo mutx-dev/mutx-dev --state open`: #1230 (lint fix, CONFLICTING, CI in progress), #1229 (xmldom bump, CI RED), #1219 (pygments bump, CI GREEN, no reviewer).
+- Live `gh run list --limit 6`: `main` branch CI SUCCESS at 05:54 UTC today; PR #1230 CI in progress.
+- `gtm/outside-in-intelligence/reports/signal-brief.md` @ 2026-03-31 18:20 Europe/Rome: Saviynt (new P0 incumbent), Microsoft Agent 365 GA May 1 (30 days), ambient authority, Meta $57B.
+- `reporting/report-distribution-agent/reports/daily-brief.md` @ 2026-03-29 20:45 Europe/Rome: SSH gap in `provision.yml:10` + `inventory.ini:13`; gateway patch unapproved.
 
 ---
 
 ## What changed in truth
-- Engineering fleet has been **idle since 2026-03-29 21:34 UTC** with no new work dispatched.
-- Issue #1187 is **7 days old** with no owner — the oldest unaddressed artifact in the fleet.
-- SSH and gateway hardening gaps **have been unaddressed for 12+ hours** — these are the only named security gaps remaining.
+- **PR #1230 is the new critical path** — lint fix dispatched by `cli-sdk-contract-keeper`. CI in progress. Once landed, PR #1219 and #1229 both unblock. Merge conflicts may need resolution.
+- **`main` branch CI now SUCCESS** — confirmed at 05:54 UTC today. The lint breakage may have been intermittent or the `main` branch has advanced since the failed run at 23:36 UTC on 2026-03-31.
+- **PR #1219 is now 34 hours stuck** — no movement. This is the longest any PR has sat unaddressed.
+- **Saviynt is a new P0 competitive entrant** — IAM incumbent with enterprise design partners (The Auto Club, Hertz, UKG). Every named design partner is an existing Saviynt relationship being extended into agent governance.
+- **Microsoft Agent 365: 30 days to GA** — $15/$99 pricing. 30-day clock creates urgency for MUTX positioning and proof stack.
+- **SSH and gateway hardening are 48+ hours unaddressed** — operator exposure compounding.
 
 ---
 
 ## What Fortune can do with this today
-1. **Make the SSH call** — `accept-new` is the single word that closes `provision.yml` and `inventory.ini`. Security-engineer lane closes it immediately after.
-2. **Approve or decline the gateway patch** — if declined, name the operating model (single-operator, local-only) so infrastructure-maintainer can adjust the hardening approach without the patch.
-3. **Route or close issue #1187** — one decision: dispatch to a lane or close as stale.
-4. **Name the next bounded dispatch** — runtime health truth pass is the most shippable option; product `/dashboard` truth strip is the second.
-5. **Pull `/dashboard` screenshots** — unblocks social-media-strategist proof stack assembly.
+1. **Assign a second GitHub reviewer to PR #1219** — one action. `qa-reliability-engineer` cannot review. This is the only open PR that is genuinely ready to merge.
+2. **Call `accept-new` on SSH** — one word closes `provision.yml:10` and `inventory.ini:13`. 48 hours overdue.
+3. **Approve or decline the gateway patch** — if declining, name the operating model so infrastructure-maintainer can close the lane.
+4. **Route or close issue #1187** — 10 days. Dispatch if valid. Close if stale.
+5. **Name the next bounded dispatch after PR #1230 lands** — runtime health truth pass or `/dashboard` truth strip with Saviynt/ambient authority framing embedded.
+6. **Pull `/dashboard` screenshots** — unblock social-media proof stack and enable Saviynt competitive response materials.
+7. **30-day Microsoft clock** — product and GTM lanes need to have MUTX proof stack positioned before Agent 365 GA on May 1.
 
 ---
 
 ## Freshness
-- Source briefs: `mutx-engineering-agents/mission-control-orchestrator/reports/latest.md` @ 2026-03-30 04:05 UTC (06:05 Europe/Rome), `gtm/outside-in-intelligence/reports/signal-brief.md` @ 2026-03-29 18:20 Europe/Rome, `reporting/report-distribution-agent/reports/daily-brief.md` @ 2026-03-29 20:45 Europe/Rome.
-- Next refresh: when Fortune makes the SSH/gateway calls or names the next dispatch slice.
+- Source briefs: `mission-control-orchestrator/reports/latest.md` @ 2026-04-01 04:06 UTC, live GitHub data @ 2026-04-01 06:11 UTC, `signal-brief.md` @ 2026-03-31 18:20 Europe/Rome.
+- Next refresh: when PR #1230 CI resolves, Fortune makes SSH/gateway calls, or PR #1219 gets a reviewer.

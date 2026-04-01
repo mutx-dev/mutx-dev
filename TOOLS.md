@@ -24,8 +24,12 @@
 - Gateway mode: local / loopback
 - ACP backend: `acpx`
 - Default coding agent: `codex`
-- Default model lane: `openai-codex/gpt-5.4`
 - Default thinking: `xhigh`
+
+## Model stack
+**Currently active:** `minimax-portal/MiniMax-M2.7`
+**Returning soon (days):** `openai-codex/gpt-5.3-codex-spark`, `openai-codex/gpt-5.4`, `openai-codex/gpt-5.4-mini`
+**Never used:** Anthropic/Claude models — council agent files use `model: opus/sonnet` as tier hints only, irrelevant for our routing.
 
 ## MUTX local dev
 - Full stack: `make dev`

@@ -1,6 +1,6 @@
 # MEMORY.md — Long-Term Memory
 
-> Last updated: 2026-03-28
+> Last updated: 2026-03-30
 
 ## North star
 - Cypher is Fortune's co-founder/operator for MUTX.
@@ -55,6 +55,21 @@
 - Fortune moved this role into co-founder mode on 2026-03-24.
 - Speak in revenue, trust, operations, and pipeline.
 - Fix drift before adding more automation.
+
+## Council of High Intelligence
+Ported from Claude Code to Codex/OpenClaw. Installed at `~/.openclaw/skills/council/`.
+**Hardened** (2026-03-31): Pulled latest upstream, stripped multi-provider routing (Codex/Gemini/Ollama exec dispatch, `--models`/`--dry-route`/`--no-auto-route` flags, provider detect scripts), kept problem restate gate, expanded triad/duo tables, expanded verdict templates. **Wired to MiniMax-M2.7** — all sessions_spawn calls explicitly use `model: "minimax-portal/MiniMax-M2.7"`. No Anthropic/OpenAI minutes consumed.
+Use for major MUTX decisions via structured multi-perspective deliberation.
+See `docs/COUNCIL_PORT_STATUS.md` for MUTX-specific triad recommendations.
+
+## X Ops (as of 2026-03-30)
+- **Browser-only** — XURL tokens CLEARED. All X ops via CDP/browser-use on @mutxdev.
+- **CDP daemon:** `ops/cdp_daemon.py` — polls queue/*.pending.md every 20s. Needs browser tab open. Daemon currently PAUSED.
+- **Strategy:** ENGAGEMENT-FIRST. Max 1 original/day on @mutxdev. Heavy likes/replies/follows to grow account. @mutxdev profile is good — don't change it.
+- **VOICE RULES (non-negotiable):** @mutxdev posts = enterprise PR team voice ($150k/year). Plain language. Buyer-accessible. NO internal content (CI failures, production fleet, internal tooling, repo commits). This caused two deleted posts on 2026-03-30.
+- **Council:** Installed `~/.openclaw/skills/council/` — 18 agents. Deliberation wired into post pipeline but HOLDING until voice rules enforced.
+- **Week cap:** 2/2 originals used. Resets 2026-04-06.
+- **Deprecated xurl scripts:** moved to `scripts/deprecated/`.
 
 ## References
 - Detailed product snapshot: `memory/mutx-reference-2026-03-24.md`

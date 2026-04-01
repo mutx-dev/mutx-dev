@@ -1,32 +1,34 @@
+# Report — 2026-04-01 02:00 UTC / 04:00 Europe/Rome
+
 ## Lane utility verdict
 Status: IDLE
-Recommendation: KEEP
+Recommendation: DOWNSHIFT
 
 ## What I actually did since the last meaningful checkpoint
-- Confirmed PR #1210 is MERGED on GitHub (merged 2026-03-28T17:47:38Z).
-- Verified no review is pending on this lane (review-queue.json is empty).
-- Verified no bounded dispatch task exists (dispatch/docs-drift-curator.md confirms no active dispatch).
-- Confirmed worktree is on stale branch `eng/docs-local-bootstrap-dashboard-path` which has already been merged; no uncommitted changes.
-- No new PRs or signals in the docs-owned area detected.
+- Ran full bootstrap: read BOOTSTRAP.md, dispatch docs, review-queue.json, merge-queue.json
+- Inspected worktree at `/Users/fortune/mutx-worktrees/engineering/docs-drift-curator` — clean, on merged branch `eng/docs-local-bootstrap-dashboard-path`
+- Confirmed via `gh pr list`: only open PR is #1219 (dependabot/pygments-2.20.0), files = `uv.lock` only
+- No docs-owned signal found; no bounded dispatch for this lane
 
 ## Exact evidence
-- `gh pr view 1210` → state: MERGED
-- `gh pr list --head eng/docs-local-bootstrap-dashboard-path --state all` → 1210 MERGED
-- review-queue.json → items: []
-- merge-queue.json → items: []
-- dispatch/docs-drift-curator.md → "No active dispatch right now. Stay idle."
-- Worktree has no uncommitted changes; branch is identical to origin/eng/docs-local-bootstrap-dashboard-path
+- `gh pr list --repo mutx-dev/mutx-dev --state open` → only PR #1219
+- PR #1219: `files = ["uv.lock (+698/-282)"]` — zero docs files, zero owned-area files
+- dispatch/docs-drift-curator.md → "No active dispatch right now." (unchanged)
+- Worktree clean — no staged, unstaged, or untracked changes
+- My owned files (README.md, docs/**, AGENTS.md) have no pending edits
 
 ## If idle or blocked, why exactly
-- IDLE: PR #1210 is closed and merged. No bounded docs task is queued. No review is pending. No dispatch signal.
-- Not blocked — simply no work assigned to this lane at this time.
+- IDLE, not blocked.
+- PR #1219 is mis-assigned to this lane's review queue: it's a Python dep bump (`pygments 2.19.2 → 2.20.0`) touching only `uv.lock`. Its second reviewer field reads `qa-reliability-engineer` which is a lane agent identity, not a GitHub username — no human or agent can action that GitHub assignment as-is.
+- No other open PRs, no dispatch, no docs-owned file drift.
+- Correctly idle: nothing to do.
 
 ## What Fortune can do with this today
-- Verify the worktree branch `eng/docs-local-bootstrap-dashboard-path` can be deleted or reset to main (housekeeping).
-- The dispatch queue updater should be run to reflect PR #1210 as merged instead of the stale "Docs-only split clean" note.
-- No docs-owned code change is needed until a new signal arrives.
+1. **Fix reviewer resolution upstream**: PR #1219 needs a real GitHub user or CODEOWNERS entry assigned as second reviewer. The dispatch queue generator must resolve lane-agent identities to actual GitHub handles before surfacing to review queues.
+2. **No action needed in this lane** — docs-drift-curator has no work.
 
 ## What should change in this lane next
-- Await new bounded dispatch or a docs-owned PR review request.
-- If the worktree branch cleanup is desired, `git checkout main && git branch -D eng/docs-local-bootstrap-dashboard-path` is the correct operation.
-- Lane should stay KEEP — docs drift curation is still a valid owned area; it just has no active task right now.
+- Stay DOWNSHIFT. Await either:
+  - A genuine docs-owned PR (docs/**, README.md, CONTRIBUTING.md drift), or
+  - A corrected reviewer assignment on PR #1219 so it can progress without blocking this lane.
+- Lane cannot self-generate work; it correctly stays idle until dispatch assigns.

@@ -1,6 +1,9 @@
 # TODAY.md — CLI SDK Contract Keeper
 
-- Checked review and merge queues plus GitHub open PRs.
-- No review assignment for this lane.
-- No active dispatch and no bounded owned-file change to take.
-- Next move: wait for dispatch/review assignment or narrow to one CLI/SDK drift target.
+- Ran `gh pr list --state open` — zero open PRs in repo.
+- PR #1219 (from review-queue.json) no longer exists; entry is stale.
+- `dispatch/cli-sdk-contract-keeper.md` confirms no active dispatch.
+- Worktree clean, no owned-file delta.
+- Lane: IDLE / DOWNSHIFT.
+
+Next move: wait for a new open PR targeting owned files or a new dispatch item. Do not invent work.

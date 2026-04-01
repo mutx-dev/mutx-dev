@@ -1,27 +1,32 @@
-# Docs brief — 2026-03-29
+# Report — Technical Writer
+**Control pass: 2026-03-31 20:40 UTC (Europe/Rome: 22:40)**
+**Previous pass: 2026-03-31 16:06 UTC**
+
+---
 
 ## Lane utility verdict
-Status: STRONG
-Recommendation: KEEP
+- **Status: IDLE**
+- **Recommendation: KEEP**
 
 ## What changed in truth
-Review queue cleared — PRs #1211, #1210, and #1209 all merged since last pass. No docs-impacting changes in the newly merged PRs (#1215, #1212, #1191). The dashboard path fix in #1210 is already reflected in `docs/deployment/local-developer-bootstrap.md`. No new docs-truth gaps surfaced.
+Nothing material. Repo state identical to last pass. No new commits, no new PRs, no doc-impacting changes. Fleet remains idle per roundtable and mission-control reports.
 
 ## Exact evidence
-Checked:
-- `git log --oneline -5` in MUTX
-- `gh pr list --state all --limit 10`
-- `gh pr diff 1210 --name-only`
-- `gh pr diff 1209 --name-only`
-- `docs/deployment/local-developer-bootstrap.md` — confirmed `http://localhost:3000/dashboard` is present
+- `git log --oneline -3` — no new commits since last pass
+- `gh pr list --repo mutx-dev/mutx-dev --state open` — PR #1219 still open, CI green, no second reviewer
+- Workspace docs mirror: fully synced at last pass, no new gaps identified
+- Roundtable (`roundtable.md` @ 2026-03-31 20:10 Europe/Rome): fleet idle, PR #1219 still 22h+ stuck on reviewer identity
+- Mission control (`latest.md` @ 2026-03-31 18:45 UTC): IDLE, DOWNSHIFT recommended for engineering fleet
 
 ## If idle or blocked, why exactly
-Idle. No new drift since the last pass. The dashboard/preview split fix is holding and no merged code has introduced new doc misalignments.
+Idle. No dispatch named. No doc-impacting code merged. Nothing to force.
+
+The `/dashboard` surface docs dispatch is still the right bounded next move — but cannot start without Fortune naming it. CLI/SDK `versions`/`rollback` contract still with code owners.
 
 ## What Fortune can do with this today
-No action needed from docs lane. The review queue being clear means other lanes can now advance.
+1. **Name the `/dashboard` surface docs dispatch** — this unblocks social-media-strategist screenshot work and gives this lane its next bounded deliverable.
+2. **Assign second GitHub reviewer to PR #1219** — not a docs action, but the only open PR and it is mergeable.
 
 ## What should change in this lane next
-1. Finish the deployment parity checklist across backend routes, `cli/services/deployments.py`, `sdk/mutx/deployments.py`, and `docs/api/deployments.md`.
-2. Spot-check `docs/surfaces.md` and `docs/project-status.md` for any leftover blanket "supported dashboard" phrasing.
-3. Keep runtime monitoring/self-healing claims gated until issue-39 / PR #1183 is unblocked.
+1. **Named dispatch from Fortune** for `/dashboard` truth strip — most actionable next move. Unblocks social-media-strategist.
+2. No other material gaps in the docs corpus as of this pass.

@@ -1,40 +1,39 @@
-# latest.md
+# reports/latest.md — CLI SDK Contract Keeper
+Generated: 2026-04-01T08:19+02:00
 
 ## Lane utility verdict
-
-- Status: IDLE
-- Recommendation: DOWNSHIFT
+- Status: THIN
+- Recommendation: KEEP
 
 ## What I actually did since the last meaningful checkpoint
-
-- Re-checked `dispatch/cli-sdk-contract-keeper.md`, `dispatch/review-queue.json`, and `dispatch/merge-queue.json`.
-- Re-checked GitHub open PRs for review assignment to this lane.
-- Confirmed the dedicated worktree `/Users/fortune/mutx-worktrees/engineering/cli-sdk-contract-keeper` is still clean on `eng/cli-sdk-contract-keeper`.
-- Refreshed this report with the operator-hardened lane diagnosis.
+- Verified PR #1219 (dependabot/pygments): still OPEN, uv.lock-only, out-of-scope for lane.
+- Ran full open-PR scan — found PR #1230 (`fix/sdk-init-regexports → main`).
+- PR #1230 modifies `sdk/mutx/__init__.py` — **owned file** — and `.github/workflows/autonomous-dispatch.yml`.
+- PR #1230 has `mergeStateStatus: DIRTY` (conflicts with main) and CI Validation: **FAILURE**.
+- No review assignment on #1230 for this lane.
+- dispatch/cli-sdk-contract-keeper.md still says "No active dispatch."
 
 ## Exact evidence
-
-- `dispatch/cli-sdk-contract-keeper.md`: no active dispatch yet.
-- `dispatch/review-queue.json`: no item assigned to `cli-sdk-contract-keeper`.
-- `dispatch/merge-queue.json`: empty.
-- GitHub PR sweep: open PRs exist, but none request this lane as reviewer.
-- Worktree status: clean.
+- `gh pr list --state open` → PRs #1219, #1229, #1230.
+- `gh pr view 1230 --json number,title,files,mergeStateStatus,mergeable,statusCheckRollup`:
+  - files: `sdk/mutx/__init__.py` (+5/-5), `.github/workflows/autonomous-dispatch.yml` (+9/-0)
+  - `mergeStateStatus: DIRTY`, `mergeable: CONFLICTING`
+  - CI Validation check: `conclusion: FAILURE`
+  - Codex left a COMMENTED review (automated).
+- PR #1230 author: `fortunexbt`, branch: `fix/sdk-init-regexports`.
 
 ## If idle or blocked, why exactly
-
-- There is no active dispatch for this lane.
-- There is no review assignment for this lane.
-- The owned worktree has no dirty owned-file change to continue.
-- That means there is no bounded CLI/SDK contract delta to execute without inventing scope.
+- Not blocked — but thin signal: PR #1230 touches an owned file with failing CI + merge conflicts.
+- This lane was not assigned as reviewer on #1230.
+- dispatch still says "No active dispatch" (stale entry from prior cycle).
+- No bounded task from dispatch.
 
 ## What Fortune can do with this today
-
-- Assign a concrete CLI/SDK contract drift slice into `dispatch/cli-sdk-contract-keeper.md`.
-- Or assign this lane a specific PR to review in `dispatch/review-queue.json`.
-- Or leave the lane idle until there is an explicit bounded owned-file target.
+1. **PR #1230 needs rebase + CI fix** before this lane can review it — CI is FAILING and branch is DIRTY.
+2. Assign this lane as reviewer on PR #1230 (or update review-queue.json) so the lane can formally act.
+3. Alternatively: clear dispatch to confirm it was intentionally not assigned here.
 
 ## What should change in this lane next
-
-- Dispatch only one bounded owned-file drift target at a time.
-- If a PR needs review, place it in `review-queue.json` so review happens before new coding.
-- Avoid background “status only” cycles unless they surface a concrete contract mismatch to fix.
+- If #1230 should be reviewed by this lane: assign reviewer, rebase the branch, fix CI.
+- If #1230 is being handled elsewhere: update dispatch to record the handoff.
+- Until assignment or dispatch update: lane is THIN (signal present but no actionable hook).

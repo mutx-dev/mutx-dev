@@ -1,0 +1,3 @@
+Update anything that is outdated and do a full fix of everything.
+Make sure everything runs smoothly after.
+So run testing.

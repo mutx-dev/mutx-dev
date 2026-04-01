@@ -11,59 +11,61 @@ This matrix tracks the current repo state and where contributors can help next.
 
 | Area         | Current state                                                       | Biggest gaps                                                                                                                                     | Contributor-ready work                                                               |
 | ------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| Web          | Strong marketing surface and a clean app-facing teaser              | app surface is still mostly static                                                                                                               | authenticated dashboard basics, app data fetching, contact capture                   |
-| API          | Real auth, agent, deployment, webhook, health, and readiness routes | auth and ownership are not consistently enforced outside `/auth/*`                                                                               | route auth, ownership checks, typed schemas, route tests                             |
-| CLI          | usable for auth, status, listing, and some deploy flows             | create and some deploy commands still reflect older contracts                                                                                    | align command payloads and route paths, improve auth ergonomics                      |
-| SDK          | useful foundation and packaging                                     | defaults and supported methods do not fully match the server; `MutxAsyncClient` is currently deprecated until the async resource surface is real | shrink to supported methods or add missing API routes                                |
-| Infra        | Terraform, Ansible, Docker, and deployment docs exist               | validation and confidence loops are thin                                                                                                         | CI validation, syntax checks, infra docs cleanup                                     |
-| Tests and CI | lint/build commands and a basic GitHub Actions workflow exist       | backend tests are improving, but CI truth still depends on keeping Playwright/test assumptions aligned with supported hosted behavior            | route tests, local-first Playwright, stronger CI coverage, validation ownership docs |
-| Docs         | current-state docs are much more honest than before                 | still need ongoing drift control                                                                                                                 | examples, contribution docs, roadmap-linked issue shaping                            |
+| Web          | landing site, supported dashboard routes, observability dashboard, and control demo all exist in Next.js | dashboard still does not cover every backend capability; some flows remain better in CLI or direct API                                           | fill dashboard gaps, tighten auth/session UX, keep demo vs live boundaries honest    |
+| API          | real `/v1/*` contract with auth, agents, deployments, runs, monitoring, webhooks, budgets, leads, governance, observability, and more | RAG search and scheduler return 503 with feature flags until runtime is configured; preview routes still need live contracts before they return to primary nav | auth hardening, route ownership checks, typed response polish, lifecycle tests       |
+| CLI          | grouped `auth`, `agent`, `deployment`, `assistant`, `runtime`, `setup`, `governance`, and `observability` commands plus compatibility aliases | some older aliases still create duplicate docs burden; setup ergonomics and error recovery still need polish                                    | streamline help/docs, keep setup truthful, tighten command coverage                  |
+| SDK          | sync client is useful and tracks `/v1/*` correctly; observability SDK with `OpenClawObservability` added | `MutxAsyncClient` remains limited and must stay explicitly documented as such                                                                     | async contract coverage, clearer supported-method matrix, docs truth                 |
+| Infra        | Docker, Terraform, Ansible, Railway, and monitoring assets exist    | Vault integration is still a stub and validation confidence loops are thin                                                                       | infra docs cleanup, validation, stub visibility                                      |
+| Tests and CI | API, CLI, frontend, observability, docs, and serial release smoke now exist | hosted-vs-local assumptions still need careful coverage; signed desktop artifact validation depends on real Apple credentials                     | route/openapi drift checks, link checks, local-first validation, signed-artifact CI  |
+| Docs         | docs are now structured for GitBook and GitHub together; v1.3 release notes and launch checklist exist | drift risk remains high whenever routes, app paths, or CLI groups move                                                                           | doc drift guardrails, GitBook sync rules, API reference upkeep                       |
 
 ## Highest-Leverage Next Tasks
 
-* enforce authenticated ownership for agent and deployment routes
-* remove client-supplied `user_id` from the happy path
-* align CLI and SDK behavior with the current FastAPI contract
-* turn `app/app` into a real dashboard instead of a pure teaser
-* add backend route coverage and keep CI honest
-* make local bootstrap easier than manual `curl` flows
+- keep route, CLI, SDK, and docs truth aligned around the live `/v1/*` contract
+- keep the dashboard honest about which flows are live, partial, or still backend-only
+- keep preview and redirect-backed routes out of primary stable navigation until their contracts are real
+- strengthen auth and ownership posture across every user-scoped route
+- keep the signed desktop artifact lane healthy so `mutx.dev/download/macos` and the supported dashboard release stay trustworthy
+- keep SDK async documentation honest until full async support is real
+- finish placeholder-backed areas such as scheduler integration and RAG search
+- keep GitBook sync GitHub-first and stop GitBook-only README drift
 
 ## Contribution Lanes
 
 ### `area:web`
 
-* authenticated agent and deployment list views
-* dashboard polish once real data exists
-* contact persistence or delivery integration
+- dashboard completeness for live routes
+- better browser auth/session handling
+- keep `/dashboard` and `/control` semantics clear
 
 ### `area:api`
 
-* auth dependencies and per-user ownership checks
-* typed config and cleaner schemas
-* deployment lifecycle and event history
+- auth dependencies and per-user ownership checks
+- deeper runtime-backed lifecycle semantics
+- scheduler and RAG completion
 
 ### `area:cli`
 
-* fix `mutx agents create`
-* fix `mutx deploy create`
-* clean up API URL overrides and refresh behavior
+- keep grouped commands and compatibility aliases documented accurately
+- improve auth ergonomics and setup recovery
+- keep runtime import/resync flows honest
 
 ### `area:sdk`
 
-* remove unsupported assumptions
-* align default base URLs and method coverage
-* keep `MutxAsyncClient` deprecation and docs honest until async method coverage is real
-* add a supported-method matrix with tests
+- keep `/v1/*` behavior aligned to the server
+- keep `MutxAsyncClient` deprecation and docs honest until async method coverage is real
+- add a supported-method matrix with tests
 
 ### `area:testing`
 
-* backend route tests
-* CLI and SDK contract tests
-* local-first Playwright configuration
+- docs drift tests against real routes and OpenAPI
+- backend route tests
+- CLI and SDK contract tests
 
 ### `area:docs`
 
 * keep examples aligned with real routes
-* document supported versus aspirational surfaces clearly
+* document supported versus preview surfaces clearly (see [Surface Matrix](../docs/surfaces.md))
+* keep GitBook sidebar and repo docs in sync
 
-For priority and sequencing, see `ROADMAP.md`.
+For priority and sequencing, see `roadmap.md`.

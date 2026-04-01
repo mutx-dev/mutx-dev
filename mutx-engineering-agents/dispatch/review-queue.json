@@ -1,4 +1,56 @@
 {
-  "updated": "2026-03-30T00:05:00+02:00",
-  "items": []
+  "updated": "2026-04-01T06:46:00+02:00",
+  "items": [
+    {
+      "number": 1230,
+      "title": "fix(sdk): use explicit re-exports to satisfy F401 lint",
+      "author": "fortunexbt",
+      "openedAt": "2026-04-01T06:11:32Z",
+      "ci": "GREEN",
+      "mergeState": "CONFLICTING",
+      "reviewDecision": "",
+      "reviewers": [],
+      "secondReviewer": "qa-reliability-engineer",
+      "secondReviewerNote": "per REVIEW-MATRIX, lane qa-reliability-engineer is default second reviewer — not a GitHub user, requires human assignment or CODEOWNERS entry",
+      "risk": "medium",
+      "autoMergeEligible": false,
+      "autoMergeBlockedReason": "CI now GREEN (re-run passed 06:34); still CONFLICTING — must resolve merge conflicts before review/merge",
+      "files": [".github/workflows/autonomous-dispatch.yml (+9/-0)", "sdk/mutx/__init__.py (+5/-5)"],
+      "action": "needs_conflict_resolution_then_review_assignment"
+    },
+    {
+      "number": 1229,
+      "title": "build(deps-dev): bump @xmldom/xmldom from 0.8.11 to 0.8.12",
+      "author": "app/dependabot",
+      "openedAt": "2026-04-01T05:22:32Z",
+      "ci": "RED",
+      "mergeState": "MERGEABLE",
+      "reviewDecision": "",
+      "reviewers": [],
+      "secondReviewer": "qa-reliability-engineer",
+      "secondReviewerNote": "per REVIEW-MATRIX, lane qa-reliability-engineer is default second reviewer — not a GitHub user, requires human assignment or CODEOWNERS entry",
+      "risk": "low",
+      "autoMergeEligible": false,
+      "autoMergeBlockedReason": "CI validation FAILED (×2 from 05:24 run); dependabot dep bump blocked on CI; second reviewer also unassigned",
+      "files": ["package-lock.json (+3/-3)", "pnpm-lock.yaml (+43/-40)"],
+      "action": "needs_ci_pass_and_second_review_assignment"
+    },
+    {
+      "number": 1219,
+      "title": "build(deps): bump pygments from 2.19.2 to 2.20.0",
+      "author": "app/dependabot",
+      "openedAt": "2026-03-30T20:25:44Z",
+      "ci": "GREEN",
+      "mergeState": "MERGEABLE",
+      "reviewDecision": "",
+      "reviewers": [],
+      "secondReviewer": "qa-reliability-engineer",
+      "secondReviewerNote": "per REVIEW-MATRIX, lane qa-reliability-engineer is default second reviewer — not a GitHub user, requires human assignment or CODEOWNERS entry",
+      "risk": "medium",
+      "autoMergeEligible": false,
+      "autoMergeBlockedReason": "no GitHub reviews submitted; second reviewer is a lane identity, not a GitHub user — human must assign a second reviewer",
+      "files": ["uv.lock (+698/-282)"],
+      "action": "needs_second_review_assignment"
+    }
+  ]
 }

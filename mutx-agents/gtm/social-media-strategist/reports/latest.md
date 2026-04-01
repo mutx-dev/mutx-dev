@@ -1,34 +1,77 @@
 # Latest Report — Social Media Strategist
 
+**Refreshed: 2026-03-31 21:10 Europe/Rome**
+
 ## Lane utility verdict
-- **Status:** STRONG
-- **Recommendation:** KEEP
+- **Status:** THIN
+- **Recommendation:** KEEP — sharpest technical positioning language in weeks, lane still blocked on screenshots
 
 ## What changed in truth
-- **Queue is CLEAR.** `#1211`, `#1210`, and `#1209` all merged. The review bottleneck that constrained GTM framing all day is gone.
-- **Gartner $58B governance-shakeup** (March 29): "50% of AI agent deployments will FAIL due to insufficient governance platforms. The bottleneck isn't capability — it's control." This is enterprise-grade validation that was not present in any earlier pass.
-- **Runtime path evaluation** (`@TheRabbitPy`, March 29): "is this action safe given prior path?" via execution-path policies — this is the sharpest permission model articulation yet and directly maps to MUTX's control-plane positioning.
-- **Financial proof line** (`@abdyweb3`): "$470M in agent GDP. Zero accountability. One rogue agent can wipe you out." — the accountability gap now has a dollar figure attached.
-- **Next dispatch slice is unblocked.** Roundtable explicitly calls for Fortune/project-shepherd to name the next bounded dispatch. The specialist lanes are no longer constrained by review queue.
+
+**New since 2026-03-31 16:08 pass:**
+
+1. **Ambient authority is the core authorization problem — and it now has a name.** "Agents inherit permissions from context, not explicit grant. Until 'who authorized this specific action?' has a verifiable runtime answer, the authority envelope collapses under load." (Petrus/@Pete_yes_please). This is the most precise technical framing of the core problem. It makes the abstract concept of "control plane" concrete and auditable.
+
+2. **"Everyone's building the brain. Nobody's building the nervous system."** Petrus's framing is sharp, memorable, and directly maps to MUTX's control plane positioning. MUTX is the nervous system — the layer that makes autonomous agents survivable at scale. This is post-worthy without any product evidence needed.
+
+3. **Execution-time authorization is the missing mechanism.** "Agents get scoped permissions at call time, not at creation time." (Gerardo/@gerardoiornelas). This defines exactly what MUTX's mechanism does differently: authorization verified at execution time, scoped to context, not inherited from creation-time grants.
+
+4. **Saviynt enters agent governance: "Industry's First Identity Control Plane for AI Agents."** Established IAM vendor with enterprise design partners (The Auto Club, Hertz, UKG). 91% stat: "organizations lack visibility into AI identities." This changes the competitive landscape — IAM incumbents are moving upstack into agent governance. Every Saviynt account is already a Saviynt agent governance prospect.
+
+5. **Forrester: three standards gaps blocking agent control plane operationalization.** (1) Incomplete instrumentation. (2) Absent portable agent identity. (3) Missing cross-plane governance schemas. These define what enterprise buyers know they need and what no vendor has fully delivered. MUTX should map itself against all three explicitly.
+
+6. **Meta $57B autonomous ad spend is a governance signal for CMO/brand buyers.** 63% YoY growth, fully autonomous campaigns now dominating volume. "Teams still reporting human KPIs while agents make half the decisions." This is a new angle for buyers who don't think of themselves as "AI governance" buyers.
+
+7. **"Human ON the loop, not IN the loop."** The actual operational model is supervision, not pair programming. MUTX enables the "wake up, review what happened, decide salvage or reset" workflow. Sharper positioning than "human-in-the-loop."
+
+8. **Signal brief: current (2026-03-31 18:20 Europe/Rome). Roundtable: current (2026-03-31 20:10 Europe/Rome).**
+   - PR #1219: still open, 22+ hours stuck on reviewer gap
+   - Engineering fleet: DOWNSHIFT recommended by mission-control, all 10 lanes dormant
+   - SSH/gateway: still 36+ hours on Fortune's desk
+   - Screenshot blocker: unchanged
 
 ## Exact evidence
-- Read `mutx-agents/reports/roundtable.md` (updated 2026-03-29 20:10 Europe/Rome) — queue is clear, all PRs merged.
-- Read `gtm/outside-in-intelligence/reports/signal-brief.md` (updated 2026-03-29 18:20 Europe/Rome) — Gartner framing, runtime path evaluation, $470M figure.
-- `git -C /Users/fortune/MUTX status` — repo state unchanged since morning runs.
-- Prior `reports/latest.md` and `queue/TODAY.md` from 17:11 Europe/Rome confirmed stale before this pass.
-- Verified all files: `roundtable.md` (20:10), `signal-brief.md` (18:21), `reports/latest.md` (17:11, stale), `queue/TODAY.md` (11:10, stale).
+- `gtm/outside-in-intelligence/reports/signal-brief.md` @ 2026-03-31 18:20 Europe/Rome — ambient authority, nervous system, Saviynt, Forrester gaps, Meta $57B
+- `reports/roundtable.md` @ 2026-03-31 20:10 Europe/Rome — PR #1219 stuck, fleet DOWNSHIFT, SSH/gateway 36+ hours
+- `queue/TODAY.md` @ 2026-03-31 16:08 Europe/Rome — prior pass
+- `reports/latest.md` @ 2026-03-31 16:08 Europe/Rome — prior pass
+- `git -C /Users/fortune/MUTX log --oneline origin/main -3` — origin/main=81d7ef56, local HEAD=433d2d14
 
 ## If idle or blocked, why exactly
-- Not blocked.
-- Proof stack is still unassembled — no screenshots from `/dashboard/security`, `/dashboard/monitoring`, or `/dashboard/budgets` have been captured for the founder thread.
-- The founder thread draft has not been written. No draft artifact exists yet in this lane.
+- **Screenshot blocker remains.** No captures from `/dashboard/security`, `/dashboard/monitoring`, or `/dashboard/budgets`. The lane cannot finalize the thread draft.
+- **The "nervous system" / ambient authority framing doesn't need screenshots** — it's a positioning statement that stands alone.
+- **The lane is not blocked by memory, gateway, or ACP issues.**
+
+## Distribution idea — one better move
+
+**Use the "nervous system" framing. It's the sharpest positioning line in weeks.**
+
+"Everyone's building the brain. Nobody's building the nervous system."
+
+This is:
+- Memorable without being clever
+- Directly maps to MUTX's control plane role
+- Postable without product evidence
+- Aligned with ambient authority / execution-time authorization as the technical backing
+
+**Proposed hook for Fortune to post or approve:**
+"Every team is racing to build AI agents that think. Almost no one is building the infrastructure that makes those agents survivable at scale. The agents that run in production without a control plane aren't autonomous — they're ungoverned. MUTX is the nervous system."
+
+**Secondary angle (standalone, no screenshots):**
+"Agents inherit permissions from context. Humans never did. Until your control plane can answer 'who authorized this specific action?' at runtime — with evidence — the authority envelope collapses under load. That's not a future problem. It's happening now."
+
+This is more technical but highly quotable for DevOps/infra audiences.
 
 ## What Fortune can do with this today
-- **Name the next dispatch slice.** Roundtable explicitly calls this out: the specialist lanes are unblocked and waiting. If this does not happen tonight, the queue opens back up tomorrow without a clear target.
-- **Use the Gartner hook in the next enterprise conversation.** Buyers will come in with "governance failure is the #1 risk" already loaded — Fortune should finish the sentence with MUTX.
-- **Pull the proof stack screenshots** from `/dashboard/security`, `/dashboard/monitoring`, `/dashboard/budgets` so the thread draft can be finalized when approved.
+1. **Post the "nervous system" hook** — ready now, no screenshots needed, sharpest positioning line in weeks.
+2. **Post the ambient authority / "who authorized this?" hook** — ready now, no screenshots needed, strongest technical positioning.
+3. **Pull the dashboard screenshots** — unblocks the full thread draft with product evidence.
+4. **Build the Saviynt competitive answer** — IAM incumbent with enterprise design partners moving upstack into agent governance. Not just Sycamore and Microsoft anymore.
+5. **Assign a second GitHub reviewer to PR #1219** — 22+ hours stuck.
+6. **Make the SSH `accept-new` call** — 36+ hours on desk.
 
 ## What should change in this lane next
-- The founder thread draft should use the combined hook: **Gartner $58B framing + "is this action safe given prior path?" + $470M accountability figure + supported `/dashboard` proof**.
-- If Fortune names the dispatch slice tonight, this lane should be ready to package the thread draft for the next review cycle.
-- Do not crawl for more signals — the evening pass has enough specific, dollar-backed, enterprise-validated language to last two full content cycles.
+- The ambient authority / nervous system positioning should anchor all future MUTX brand language going forward — it is the clearest articulation of the core problem.
+- The "human ON the loop, not IN the loop" framing is a strong follow-up post once the nervous system angle lands.
+- Meta $57B / CMO angle is a separate B2B track for account/outbound lanes, not just social.
+- Screenshot blocker is still the gap between strong hooks and compelling thread proof.

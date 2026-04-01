@@ -1,0 +1,28 @@
+1
+00:00:00,000 --> 00:00:06,000
+Okay, are you sure? Do a second check. That sounds too good to be true.
+
+2
+00:00:06,000 --> 00:00:10,000
+Then we got the council working, like for real?
+
+3
+00:00:10,000 --> 00:00:16,000
+And why don't we wire the council into the decisions that all of the agents take?
+
+4
+00:00:16,000 --> 00:00:21,000
+Like before the agents take a decision, they summon the council. Isn't that cool?
+
+5
+00:00:21,000 --> 00:00:26,000
+By the way, the council obviously should be wired to the same models that we have access to,
+
+6
+00:00:26,000 --> 00:00:35,000
+aka only Minimax slash, or sorry, Minimax dash, or fuck, I don't know what it's called.
+
+7
+00:00:35,000 --> 00:00:39,000
+You know what I'm talking about. You know the model I'm talking about, the only model we have access to.
+

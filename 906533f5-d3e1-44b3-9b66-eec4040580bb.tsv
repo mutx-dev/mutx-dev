@@ -1,0 +1,8 @@
+start	end	text
+0	6000	Okay, are you sure? Do a second check. That sounds too good to be true.
+6000	10000	Then we got the council working, like for real?
+10000	16000	And why don't we wire the council into the decisions that all of the agents take?
+16000	21000	Like before the agents take a decision, they summon the council. Isn't that cool?
+21000	26000	By the way, the council obviously should be wired to the same models that we have access to,
+26000	35000	aka only Minimax slash, or sorry, Minimax dash, or fuck, I don't know what it's called.
+35000	39000	You know what I'm talking about. You know the model I'm talking about, the only model we have access to.

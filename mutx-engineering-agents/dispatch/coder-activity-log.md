@@ -6352,3 +6352,193 @@ fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
 fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
 [Mon Mar 30 09:22:15 CEST 2026] Push failed for mutx/auto/1774855335
 [Mon Mar 30 09:22:15 CEST 2026] Lint done
+Preparing worktree (detached HEAD 81d7ef56)
+fatal: '/tmp/mutx-coder-15835' is a missing but already registered worktree;
+use 'add -f' to override, or 'prune' or 'remove' to clear
+tests/api/test_swarms.py: 1 warning
+tests/api/test_webhooks.py: 3 warnings
+  /opt/homebrew/lib/python3.14/site-packages/starlette/_exception_handler.py:59: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    response = await handler(conn, exc)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_auth_route_docs.py::test_backend_auth_docs_use_v1_routes - ...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 337 passed, 11 warnings in 75.75s (0:01:15)
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:25:04 CEST 2026] Rebase conflict, trying ours strategy
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:25:04 CEST 2026] Push failed for mutx/auto/1774855504
+[Mon Mar 30 09:25:04 CEST 2026] Test fix done
+Preparing worktree (detached HEAD 81d7ef56)
+fatal: '/tmp/mutx-coder-15835' is a missing but already registered worktree;
+use 'add -f' to override, or 'prune' or 'remove' to clear
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:25:34 CEST 2026] Rebase conflict, trying ours strategy
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:25:34 CEST 2026] Push failed for mutx/auto/1774855534
+[Mon Mar 30 09:25:34 CEST 2026] Lint done
+Preparing worktree (detached HEAD 81d7ef56)
+fatal: '/tmp/mutx-coder-15835' is a missing but already registered worktree;
+use 'add -f' to override, or 'prune' or 'remove' to clear
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:27:35 CEST 2026] Rebase conflict, trying ours strategy
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:27:35 CEST 2026] Push failed for mutx/auto/1774855655
+[Mon Mar 30 09:27:35 CEST 2026] Lint done
+[Mon Mar 30 09:27:35 CEST 2026] [ITER 1060] heartbeat pending=
+Preparing worktree (detached HEAD 81d7ef56)
+fatal: '/tmp/mutx-coder-15835' is a missing but already registered worktree;
+use 'add -f' to override, or 'prune' or 'remove' to clear
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:29:35 CEST 2026] Rebase conflict, trying ours strategy
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:29:35 CEST 2026] Push failed for mutx/auto/1774855775
+[Mon Mar 30 09:29:35 CEST 2026] Lint done
+Preparing worktree (detached HEAD 81d7ef56)
+fatal: '/tmp/mutx-coder-15835' is a missing but already registered worktree;
+use 'add -f' to override, or 'prune' or 'remove' to clear
+tests/api/test_swarms.py: 1 warning
+tests/api/test_webhooks.py: 3 warnings
+  /opt/homebrew/lib/python3.14/site-packages/starlette/_exception_handler.py:59: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    response = await handler(conn, exc)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_auth_route_docs.py::test_backend_auth_docs_use_v1_routes - ...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 337 passed, 11 warnings in 78.03s (0:01:18)
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:31:27 CEST 2026] Rebase conflict, trying ours strategy
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:31:27 CEST 2026] Push failed for mutx/auto/1774855887
+[Mon Mar 30 09:31:27 CEST 2026] Test fix done
+Preparing worktree (detached HEAD 81d7ef56)
+fatal: '/tmp/mutx-coder-15835' is a missing but already registered worktree;
+use 'add -f' to override, or 'prune' or 'remove' to clear
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:32:57 CEST 2026] Rebase conflict, trying ours strategy
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:32:57 CEST 2026] Push failed for mutx/auto/1774855977
+[Mon Mar 30 09:32:57 CEST 2026] Lint done
+[Mon Mar 30 09:33:58 CEST 2026] [ITER 1070] heartbeat pending=
+Preparing worktree (detached HEAD 81d7ef56)
+fatal: '/tmp/mutx-coder-15835' is a missing but already registered worktree;
+use 'add -f' to override, or 'prune' or 'remove' to clear
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:34:58 CEST 2026] Rebase conflict, trying ours strategy
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:34:58 CEST 2026] Push failed for mutx/auto/1774856098
+[Mon Mar 30 09:34:58 CEST 2026] Lint done
+Preparing worktree (detached HEAD 81d7ef56)
+fatal: '/tmp/mutx-coder-15835' is a missing but already registered worktree;
+use 'add -f' to override, or 'prune' or 'remove' to clear
+tests/api/test_swarms.py: 1 warning
+tests/api/test_webhooks.py: 3 warnings
+  /opt/homebrew/lib/python3.14/site-packages/starlette/_exception_handler.py:59: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    response = await handler(conn, exc)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_auth_route_docs.py::test_backend_auth_docs_use_v1_routes - ...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 337 passed, 11 warnings in 76.25s (0:01:16)
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:37:48 CEST 2026] Rebase conflict, trying ours strategy
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:37:48 CEST 2026] Push failed for mutx/auto/1774856268
+[Mon Mar 30 09:37:48 CEST 2026] Test fix done
+Preparing worktree (detached HEAD 81d7ef56)
+fatal: '/tmp/mutx-coder-15835' is a missing but already registered worktree;
+use 'add -f' to override, or 'prune' or 'remove' to clear
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:38:18 CEST 2026] Rebase conflict, trying ours strategy
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:38:18 CEST 2026] Push failed for mutx/auto/1774856298
+[Mon Mar 30 09:38:18 CEST 2026] Lint done
+Preparing worktree (detached HEAD 81d7ef56)
+fatal: '/tmp/mutx-coder-15835' is a missing but already registered worktree;
+use 'add -f' to override, or 'prune' or 'remove' to clear
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:40:19 CEST 2026] Rebase conflict, trying ours strategy
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:40:19 CEST 2026] Push failed for mutx/auto/1774856419
+[Mon Mar 30 09:40:19 CEST 2026] Lint done
+[Mon Mar 30 09:40:19 CEST 2026] [ITER 1080] heartbeat pending=
+Preparing worktree (detached HEAD 81d7ef56)
+fatal: '/tmp/mutx-coder-15835' is a missing but already registered worktree;
+use 'add -f' to override, or 'prune' or 'remove' to clear
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:42:19 CEST 2026] Rebase conflict, trying ours strategy
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+fatal: cannot change to '/tmp/mutx-coder-15835': No such file or directory
+[Mon Mar 30 09:42:19 CEST 2026] Push failed for mutx/auto/1774856539
+[Mon Mar 30 09:42:19 CEST 2026] Lint done
+Preparing worktree (detached HEAD 81d7ef56)
+fatal: '/tmp/mutx-coder-15835' is a missing but already registered worktree;
+use 'add -f' to override, or 'prune' or 'remove' to clear

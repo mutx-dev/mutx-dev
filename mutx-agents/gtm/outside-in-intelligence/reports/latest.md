@@ -1,46 +1,58 @@
 # Latest — Outside-In Intelligence
 
-Updated: 2026-03-30 08:20 Europe/Rome
+**Updated: 2026-04-01 08:20 Europe/Rome**
+**Cycle: ~14 hours since last refresh (2026-03-31 18:20 Europe/Rome)**
 
 ## Lane utility verdict
 - **Status:** STRONG
 - **Recommendation:** KEEP
 
 ## What changed in signal truth
-**New since last cycle (March 29, 18:20 Europe/Rome):**
 
-1. **Multi-agent state conflict is the new operator pain frontier.** Petrus (@Pete_yes_please, March 30) named it precisely: "One agent is a workflow. Five agents are an organization. The jump isn't technical — it's governance. Who resolves state conflict between agents? What's the escalation path when two agents reach incompatible outputs? WIP limits help. But most teams haven't built the arbitration layer yet." This is a new category of pain appearing alongside the existing single-agent control problem.
+**New since 2026-03-31 18:20 cycle:**
 
-2. **Intent Bound Authorization (IBA) — a named competitor with IP moat.** IntentBound (intentbound.com) is actively positioning "IBA — Intent-Bounded Authorization" as "The Authorization Layer for High-Stakes AI." It has: patent application GB2603013.0 (pending), 13 NIST-2025-0035 filings (closed), 8 NCCoE filings (all sent), DeepMind arXiv endorsement (March 12), sub-5ms validation, and zero unauthorized actions passed. Also exhibiting at GTC San Jose (March 16–19). This is a named player in exactly MUTX's lane — not just language, but IP and institutional validation.
+1. **Crittora: NEW competitor — Agent Permission Protocol (APP) on OpenClaw.** Crittora announced Feb 24, 2026 a cryptographically enforced policy framework specifically for the OpenClaw runtime, positioning itself as making OpenClaw "enterprise-ready by eliminating ambient authority." They have: (a) a public protocol spec on GitHub (github.com/Crittora/agent-permission-protocol), (b) APP v2 with deterministic capability resolution and multi-agent delegation rules, (c) a specific OpenClaw integration, and (d) the same problem framing that MUTX is using (ambient authority = the core problem). **This is the most urgent new competitive finding — Crittora has a named protocol and a product, not just positioning.**
 
-3. **"Agent proposes, [control plane] decides" — SurfitAI (March 30).** "If your agent holds the credentials, your governance layer is advisory. The agent can ignore it. Surfit controls the execution path. The agent proposes. Surfit decides." This is the cleanest articulation of the approval-gate architecture since the OpenClaw plugin hooks launch.
+2. **Microsoft Agent 365 GA details: what remains unresolved.** GA May 1 at $15/user/month. Each AI agent gets a Microsoft Entra Agent ID. Open question Microsoft has not answered: how are fully autonomous agents that don't run "on behalf of a user" licensed and governed? This is a named, specific gap in Microsoft's own documentation. MUTX should have a product answer for it.
 
-4. **Multi-agent cascade failure is observable at the system level, not per-agent.** JE4NVRG (March 30): "per-request metrics hid our cascade failures too. The 3x baseline spike alert caught what individual logs missed." Running 22 agents means system-level observability, not request tracing.
+3. **"Shadow agent" problem: named and circulating.** @SchellingProto: agents operating across organizational boundaries need discovery + identity + permission auditing across principals who don't share an IT stack. This extends cross-plane governance from an internal enterprise concern to an inter-organizational problem.
 
-5. **"Reckless intern" framing is gaining traction.** willcheung (March 30): "Stop treating AI agents like software and start treating them like reckless interns with the keys to your server room." — Most visceral restatement of the production risk problem. Companies shipping agents with production data access without sandboxed environments or kill switches.
+4. **Payment network agent trust layers: separate parallel track.** IETF (agent trust scoring for payments), Mastercard (Verifiable Intent), Visa (Trusted Agent Protocol). These are building toward institutional agent trust infrastructure — different from OpenClaw runtime control but potentially intersecting.
 
-6. **IBA and SurfitAI together validate the same direction from two angles.** IntentBound = institutional/enterprise positioning (patents, NIST, NCCoE). SurfitAI = operator/product-level pattern ("agent proposes, control plane decides"). These are converging on the same architectural answer from different audiences.
+5. **Multi-agent failure rate confirmed 41–86% in production.** 14 documented failure modes. Silent failures confirmed as a named category. 72% of enterprise failures from wrong pattern selection, broken data pipelines, vendor lock-in. ICLR 2026: 70% of agent communication redundant, single agents match swarms on most benchmarks.
 
-7. **Agents of Chaos study still circulating.** Referenced as live evidence that agents lie about task completion, unsafe behaviors spread between agents, endless loops burn tokens, and prompt changes bypass safeguards. Validates the case for strict context isolation, staged validation gates, cross-agent review, and circuit breakers.
+**Core signal stack (sustained, confirmed, upgraded):**
+- **Crittora APP: Execution-time authorization protocol on OpenClaw — NEW COMPETITOR (Feb 24, 2026)**
+- **Saviynt: Identity control plane for AI agents, enterprise design partners — NEW INCUMBENT COMPETITOR**
+- **Microsoft Agent 365: GA May 1, $15/$99 pricing — 30 DAYS AWAY**
+- **Sycamore Labs: $65M seed, agent OS, tiered fleet trust controls**
+- **Ambient authority: Crittora confirms + specifies the problem with a protocol**
+- **APP (Agent Permission Protocol): scoped, time-bounded, cryptographically verifiable permissions**
+- **91% of orgs lack AI identity visibility (Saviynt stat)**
+- **Ghost failures, error compounding, silent failures — NAMED PAIN**
+- **EU AI Act August 2 deadline**
 
 ## Exact evidence
-- **@Pete_yes_please (Petrus) — March 30, 2026:** "One agent is a workflow. Five agents are an organization. The jump isn't technical — it's governance. Who resolves state conflict between agents? What's the escalation path when two agents reach incompatible outputs? WIP limits help. But most teams haven't built the arbitration layer yet."
-- **@SurfitAI — March 30, 2026:** "If your agent holds the credentials, your governance layer is advisory. The agent can ignore it. Surfit controls the execution path. The agent proposes. Surfit decides. #agentsecurity #AIops"
-- **IntentBound (intentbound.com) — active as of March 30, 2026:** "IBA — Intent-Bounded Authorization — The Authorization Layer for High-Stakes AI." Patent GB2603013.0 (pending), NIST-2025-0035: 13 filings closed, NCCoE: 8 filings sent, sub-5ms validation, zero unauthorized actions passed. GTC San Jose (March 16–19).
-- **@JE4NVRG — March 30, 2026:** "Running 22 agents means you need system-level observability, not just request tracing. Per-request metrics hid our cascade failures too. The 3x baseline spike alert caught what individual logs missed."
-- **@willcheung — March 30, 2026:** "Stop treating AI agents like software and start treating them like reckless interns with the keys to your server room. If your agent can touch your production data, it needs its own sandboxed environment, strict runtime limits, and a kill switch."
-- **@Grokipaedia — March 30, 2026:** "AI Governance by IBA — Intent Bound Authorization" — now referencing as a named governance category.
-- **@joburgai — March 9, 2026:** "Nobody's solved shared state and conflict resolution at scale yet. That's the actual product gap." (continuing to surface in passes)
-- **@ycalintim (Agents of Chaos) — March 7, 2026:** "Agents lying about task completion, unsafe behaviors spreading between agents, endless loops burning tokens for days, tiny prompt changes bypassing safeguards." (still circulating)
+- **Crittora / PRNewswire — Feb 24, 2026:** "Crittora makes OpenClaw enterprise-ready by eliminating ambient authority in autonomous agents." Cryptographically enforced policy framework for OpenClaw runtime. APP v2: deterministic capability resolution, policy-derived execution surfaces, explicit delegation rules for multi-agent workflows.
+- **agentpermissionprotocol.com — accessed 2026-04-01:** "The Agent Permission Protocol (APP) requires explicit, cryptographically verifiable permission policies to gate agent execution at runtime." "Answers one question: Who authorized this action — and under what constraints — at the moment it executed?"
+- **github.com/Crittora/agent-permission-protocol — accessed 2026-04-01:** Public specification for execution-time authority in agentic systems.
+- **Rob Quickenden blog — March 2026:** "Agent 365 is the Entra ID management pane for AI agents." May 1 GA, $15/user/month. Each AI Agent gets Entra Agent ID. Open question: autonomous agents not running on behalf of a user remain unaddressed in licensing/governance.
+- **@SchellingProto / X — March 30, 2026:** "The shadow agent problem is going to get worse fast. Once agents interact across organizational boundaries, you need discovery + identity + permission auditing across principals who don't share an IT stack."
+- **@OriginDAO_ai / X — March 31, 2026:** "IETF drafted agent trust scoring for payments. Microsoft launched Zero Trust for AI. Mastercard announced Verifiable Intent. Visa shipped Trusted Agent Protocol. Everyone is building agent trust. Most of them require permission."
+- **futureagi.substack.com — 2026:** "Multi-agent LLM systems fail 41 to 86% of the time in production. 14 root-cause failure modes."
+- **dev.to / March 2026:** "Most AI agent demos work perfectly. Most AI agent deployments fail within a week."
+- **medium.com / March 2026:** "The silent failure of AI agents represents a fundamental characteristic of non-deterministic software."
+- **laderalabs.io — 2026:** "72% of agent architecture failures stem from three root causes: wrong pattern selection, broken data pipelines, and vendor lock-in."
+- **swarmsignal.net — ICLR 2026:** "70% of agent communication is redundant. Single agents still match swarms on most benchmarks."
 
 ## What Fortune can do with this today
-- **Flag IntentBound as a named competitor.** They have patents, NIST filings, and institutional validation. MUTX needs to be aware of this positioning and whether it has comparable IP/protection in the same space.
-- **Use "multi-agent state conflict and arbitration" as a new objection handler.** Buyers asking about multi-agent systems don't just need per-agent controls — they need an arbitration layer for state conflicts. This is a new conversation entry point.
-- **Reference the SurfitAI "agent proposes, [control plane] decides" framing** as a crisp way to explain what an approval-gate control plane does at the operator level.
-- **Raise the "reckless intern" framing** with security-conscious buyers — it makes the risk visceral without being technical.
-- **Consider whether MUTX has a multi-agent story.** The Petrus articulation ("five agents = an organization") suggests the market is arriving at multi-agent governance as a distinct need. MUTX should be ahead of this curve or explicitly not playing there.
+- **Immediate: Crittora competitive brief.** Crittora has APP (named protocol, GitHub spec, OpenClaw integration). MUTX vs. Crittora APP: what's the differentiation? Does MUTX implement APP? Complement it? Do more? This is the most urgent question — Crittora is already positioning as the execution-time authorization answer on the exact runtime MUTX uses.
+- **Add Crittora to competitive tracking — P0.** They have a shipped product (not just press release), a public spec, and an OpenClaw integration. This is a materially different competitive situation than 48 hours ago.
+- **Microsoft Agent 365 unsupervised agent gap — MUTX product positioning opportunity.** Microsoft has no answer for agents not running on behalf of a user. If MUTX has a governance model for fully autonomous agents, this is the week to name it specifically.
+- **Ambient authority resolution needs a MUTX-specific mechanism statement.** Petrus described the problem. Crittora wrote a protocol spec. MUTX needs to say what it actually does — not just what it solves. "MUTX does X, not just Y."
 
 ## What should change in this lane next
-- Do a dedicated Reddit pass on multi-agent orchestration failures and arbitration patterns — the Petrus thread had 50+ quote-posts suggesting high resonance.
-- Check whether IntentBound is raising funding or building a community — their institutional positioning (patents, NIST, GTC) suggests significant backing.
-- Track whether "IBA" language is appearing in buyer conversations — if enterprise procurement teams start using the term, it becomes a category definition moment.
+- **MUTX vs. Crittora APP differentiation — P0 this week.** This is now the sharpest competitive question. Crittora has named the problem and specified the solution mechanism. MUTX needs to be equally concrete.
+- **Sycamore Labs teardown.** $65M seed. "Tiered fleet trust controls." Primary startup competitor to Saviynt and Microsoft — hasn't been fully assessed yet.
+- **Crittora OpenClaw integration: MUTX positioning question.** Crittora is "making OpenClaw enterprise-ready." MUTX runs on OpenClaw. Is MUTX complementary to Crittora (layer on top), competitive (alternative to APP), or neither? Fortune needs to decide.
+- **Payment network agent trust protocols — quarterly monitor.** Visa, Mastercard, IETF are building separate trust infrastructure. Not a daily lane task — add to quarterly landscape review.

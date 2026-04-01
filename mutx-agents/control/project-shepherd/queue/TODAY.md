@@ -1,35 +1,43 @@
 # TODAY.md — Project Shepherd
 
-**Refreshed: 2026-03-30 08:10 Europe/Rome**
+**Refreshed: 2026-04-01 06:15 Europe/Rome**
 
 ## Current operating truth
-- **Engineering fleet is IDLE.** No new PRs since #1218 at 21:34 UTC. All queues empty. 9 specialist lanes are unblocked but not dispatched.
-- **Queue is CLEAR** — all three PRs merged, review queue and merge queue both empty.
-- Issue #1187 is 7 days old with no owner.
-- **Two security decisions are on Fortune's desk for 12+ hours.**
-- Market signal holds: Gartner $58B governance-shakeup framing + runtime path evaluation language.
+- **PR #1230: lint fix IN PROGRESS.** `cli-sdk-contract-keeper` opened `fix/sdk-init-regexports` at 06:11 UTC. CI running. Mergeable: CONFLICTING — may need rebase/conflict resolution once CI finishes. **This is the critical path.**
+- **`main` branch CI: SUCCESS** — confirmed at 05:54 UTC today.
+- **PR #1219: 34 hours stuck.** `pygments` bump, CI GREEN, mergeable, no second GitHub reviewer. `qa-reliability-engineer` cannot act as GitHub identity.
+- **Issue #1187: 10 days old with no owner.**
+- **SSH and gateway hardening: 48+ hours on Fortune's desk.**
+- **New competitive reality:** Saviynt is P0 incumbent (IAM → agent governance). Microsoft Agent 365 GA in 30 days ($15/$99 pricing).
 
 ## Top 3 cross-lane priorities
 
 | # | Priority | Owner | Blocked by |
 |---|----------|-------|------------|
-| 1 | **SSH hardening call** | Fortune | needs `accept-new` decision |
-| 2 | **Gateway hardening patch decision** | Fortune | 4 passes, 12+ hours, needs approve/decline + operating model |
-| 3 | **Route or close issue #1187** | Fortune + project-shepherd | 7 days old, no owner |
+| 1 | **PR #1230: resolve merge conflicts + land** | `cli-sdk-contract-keeper` + Fortune if conflicts are real | CI in progress; merge conflicts may clear post-CI |
+| 2 | **PR #1219 second reviewer** | Fortune | needs GitHub user identity assigned — 34h stuck |
+| 3 | **Route or close issue #1187** | Fortune + project-shepherd | 10 days old, no owner |
 
-## Next bounded dispatch options (pick one)
-- **A. Runtime health truth pass** — bounded, shippable, ai-engineer can run now.
-- **B. `/dashboard` truth strip** — product-manager tied to issue #39, more product-facing.
+## Decision deck for Fortune
+- **PR #1219**: assign second GitHub reviewer — `qa-reliability-engineer` cannot review
+- **SSH `accept-new` call**: closes `provision.yml:10` and `inventory.ini:13` (48h overdue)
+- **Gateway patch**: approve/decline + name operating model if declining
+- **Issue #1187**: dispatch or close — 10 days stale
+
+## Next bounded dispatch (after PR #1230 lands)
+- **A. Runtime health truth pass** — bounded, shippable, `ai-engineer` can run now
+- **B. `/dashboard` truth strip + Saviynt/ambient authority framing** — product-manager, embeds new GTM signal before 30-day Microsoft clock hits
 
 ## Blockers / stale / unowned
-- **Decision needed now:** SSH `accept-new` call.
-- **Decision needed now:** gateway patch approve/decline.
-- **Stale:** issue #1187 (7 days, no owner).
-- **Blocked:** social-media-strategist needs screenshots from `/dashboard/security`, `/dashboard/monitoring`, `/dashboard/budgets`.
-- **Idle:** all 9 engineering specialist lanes, awaiting next dispatch slice.
+- **PR #1230**: merge conflicts may need resolution (CLI in progress)
+- **PR #1219**: second reviewer missing — 34h stuck
+- **Issue #1187**: 10 days, no owner, unlabeled
+- **SSH/gateway**: 48h on Fortune's desk
+- **social-media-strategist**: needs screenshots from `/dashboard`
+- **9/10 engineering lanes**: idle/downshifted, no dispatch named
 
 ## Owner pushes for this window
-- **Fortune**: make the two security calls, route or close #1187, name the next dispatch.
-- **project-shepherd**: close or flag issue #1187.
-- **product-manager**: prepare `/dashboard` truth strip brief.
-- **social-media-strategist**: request screenshot assets from `/dashboard`.
+- **Fortune**: assign second reviewer to PR #1219, make SSH call, decide gateway patch, route/close #1187
+- **cli-sdk-contract-keeper**: PR #1230 — monitor CI, resolve any merge conflicts
+- **product-manager**: `/dashboard` truth strip with Saviynt/ambient authority positioning embedded before May 1 Microsoft GA
+- **social-media-strategist**: screenshot assets from `/dashboard`

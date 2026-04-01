@@ -1,0 +1,9 @@
+Yeah, get those scripts fixed.
+So do the browser automation.
+So go use the browser on X,
+look at where the reply button is.
+Like we need to map exactly where these buttons are
+so that agents stop guessing.
+That's the point of this is we're running these scripts
+so they know exactly where to go.
+They do it quicker and they do it smarter.

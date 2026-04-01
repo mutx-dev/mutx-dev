@@ -1,37 +1,40 @@
 # Infra Delivery Operator Report
 
-Generated: 2026-03-30 06:48 UTC (Europe/Rome)
+Generated: 2026-04-01T06:48 UTC (Europe/Rome)
 
 ## Lane utility verdict
 Status: IDLE
 Recommendation: DOWNSHIFT
 
 ## What I actually did since the last meaningful checkpoint
-- Read dispatch files: `infra-delivery-operator.md`, `review-queue.json`, `merge-queue.json`.
-- Verified worktree `eng/infra-delivery-operator` is clean, no staged/unstaged changes.
-- Confirmed `review-queue.json` and `merge-queue.json` are both empty.
-- Confirmed `gh pr list --state open --search 'review-requested:@me'` returns `[]`.
-- Dispatch directive: stay idle until a real infra-owned signal appears.
+- Ran full bootstrap: read dispatch files, review queue, merge queue.
+- Confirmed worktree `eng/infra-delivery-operator` is clean (no staged/unstaged changes).
+- Reviewed updated `review-queue.json` (updated 2026-04-01T06:46:00+02:00):
+  - PR #1230 (`sdk/mutx/__init__.py` fix): CONFLICTING, CI GREEN, not infra-owned.
+  - PR #1229 (`@xmldom/xmldom` bump): MERGEABLE, CI RED, not infra-owned.
+  - PR #1219 (`pygments` bump): MERGEABLE, CI GREEN, still out of scope.
+- `merge-queue.json` shows PR #1230 watching CI and conflict resolution — not owned by this lane.
+- Dispatch directive unchanged: "No active dispatch right now." / "Stay idle unless a real infra-owned signal appears."
+- No bounded dispatch task; no review acted upon.
+- Stayed idle per dispatch directive; did not invent work.
 
 ## Exact evidence
-- `dispatch/infra-delivery-operator.md`: "No active dispatch right now."
-- `dispatch/review-queue.json`: `{ "items": [] }`
-- `dispatch/merge-queue.json`: `{ "items": [] }`
-- Worktree: on `eng/infra-delivery-operator`, nothing to commit, clean.
-- `gh pr list review-requested:@me`: no results.
-- The only non-empty review target was PR #1209, blocked because it is authored by `fortunexbt` (same identity this lane uses for review), and GitHub rejects self-approval.
+- Worktree `git status --short`: empty (clean).
+- `review-queue.json` items: #1230 (sdk), #1229 (package-lock), #1219 (uv.lock) — none in `infrastructure/**` or `scripts/**`.
+- `dispatch/infra-delivery-operator.md`: no change, still "No active dispatch right now."
+- `merge-queue.json`: PR #1230 watching CI + conflict, blocks #1229 and #1219 — not this lane's concern.
+- All three queue items share the same unresolved issue: second-reviewer `qa-reliability-engineer` is a lane name, not a GitHub user.
 
 ## If idle or blocked, why exactly
-- Not blocked — the lane is simply idle by dispatch directive.
-- No infra-owned signal has been generated since PR #1209 landed.
-- No bounded task is assigned to this lane in `infra-delivery-operator.md`.
-- The PR #1209 self-approval issue is a dispatch-level wiring problem, not something this lane can self-resolve.
+- Not blocked — lane is idle by dispatch directive.
+- No review to act on that falls within bounded ownership (all queue items are sdk/dep-bump territory).
+- No bounded dispatch task assigned.
 
 ## What Fortune can do with this today
-- If infra delivery work should continue: assign a new bounded dispatch task to this lane.
-- If PR #1209 needs to be closed/merged: route it to a distinct GitHub reviewer identity.
-- If this lane should own a follow-on monitoring improvement: dispatch it explicitly with a concrete scope.
+- All three PRs in the queue need a real GitHub user assigned as second reviewer (lane names don't resolve).
+- If infra work should resume: dispatch a bounded task explicitly scoped to `infrastructure/**` or `scripts/**`.
+- The queue conflates infra lane with sdk/dep work — consider routing these to the owning lanes.
 
 ## What should change in this lane next
-- Either a new owned-area signal (infra script, deploy hygiene, monitoring follow-on) or re-dispatch this lane with a different scope.
-- Until then: keep this lane on DOWNSHIFT; do not assign review tasks authored by `fortunexbt`.
+- An owned-area signal (infra script change, deploy hygiene task, monitoring follow-on) or an explicit re-dispatch with bounded scope.
+- Until then: DOWNSHIFT is correct. Out-of-scope PRs should not land in this lane's review queue.
