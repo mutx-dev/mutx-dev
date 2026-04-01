@@ -12,15 +12,6 @@
       "source": "gap-scanner:coverage"
     },
     {
-      "id": "coverage-agent_runtime",
-      "title": "Add coverage for SDK module `agent_runtime`",
-      "description": "No test file found: tests/test_agent_runtime.py\n\nModule: sdk/mutx/agent_runtime.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "in_progress",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
       "id": "coverage-agents",
       "title": "Add coverage for SDK module `agents`",
       "description": "No test file found: tests/test_agents.py\n\nModule: sdk/mutx/agents.py\n\nAdd pytest coverage.",
@@ -210,21 +201,12 @@
       "source": "gap-scanner:todos"
     },
     {
-      "id": "coverage-agent_runtime",
-      "title": "test: add coverage for SDK module `agent_runtime`",
-      "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "queued",
-      "source": "gap-scanner:coverage"
-    },
-    {
       "id": "coverage-analytics",
       "title": "test: add coverage for SDK module `analytics`",
       "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
       "area": "backend",
       "priority": "p1",
-      "status": "queued",
+      "status": "in_progress",
       "source": "gap-scanner:coverage"
     },
     {
@@ -262,6 +244,15 @@
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:todos"
+    },
+    {
+      "id": "coverage-agent_runtime",
+      "title": "test: add coverage for SDK module `agent_runtime`",
+      "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "failed",
+      "source": "gap-scanner:coverage"
     }
   ]
 }
