@@ -1,6 +1,6 @@
 # Control Plane Steward — Backend Truth Report
 
-Date: 2026-04-01T06:27 UTC
+Date: 2026-04-01T08:24 UTC
 Status: IDLE — dispatch-bound, no owned-area signal
 
 ## Lane utility verdict

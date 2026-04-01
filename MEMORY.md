@@ -75,3 +75,4 @@ See `docs/COUNCIL_PORT_STATUS.md` for MUTX-specific triad recommendations.
 - Detailed product snapshot: `memory/mutx-reference-2026-03-24.md`
 - X learnings: `memory/x-ops-learnings-2026-03-24.md`
 - Daily log: `memory/YYYY-MM-DD.md`
+- CC-leak findings (Claude Code harness analysis): `memory/cc-leak-findings-2026-04-01.md`
