@@ -76,7 +76,7 @@ def run_loop():
             continue
         
         id_ = item["id"]
-        title = item["title"][:60]
+        title = item["title"][:60].replace("'''", "\\'\\'\\'")
         area = item.get("area", "area:api")
         
         log(f">>> {id_}: {title} [{area}]")
@@ -97,7 +97,7 @@ Queue file: {QUEUE}
 Item ID: {id_}
 Title: {title}
 Area: {area}
-Description: {item.get('description','')[:300]}
+Description: {item.get('description','')[:300].replace("'''", "\\'\\'\\'")}
 
 Steps:
 1. Read {QUEUE} to understand the item
