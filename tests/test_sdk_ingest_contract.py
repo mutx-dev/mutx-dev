@@ -51,7 +51,7 @@ def test_report_agent_status_minimal() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
         captured["json"] = json.loads(request.content.decode())
-        return httpx.Response(200, json=_agent_status_response())
+        return httpx.Response(200, json=_agent_status_response(agent_id=captured["json"]["agent_id"]))
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     ingest = Ingest(client)

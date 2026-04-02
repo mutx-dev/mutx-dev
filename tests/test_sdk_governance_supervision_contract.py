@@ -98,7 +98,7 @@ def test_launch_profile_parser_maps_fields() -> None:
     assert profile.name == "prod-agent"
     assert profile.command == ["/usr/bin/python", "run.py"]
     assert profile.env_keys == ["API_KEY", "SECRET"]
-    assert profile.faramesh_policy == "strict"
+    assert profile.faram_mesh_policy == "strict"
     assert profile._data == payload
 
 
@@ -150,10 +150,11 @@ def test_list_agents_raises_on_http_error() -> None:
 @pytest.mark.asyncio
 async def test_alist_agents_hits_correct_route() -> None:
     captured: dict[str, Any] = {}
+    expected = _agent_payload()
 
     def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
-        return httpx.Response(200, json=[_agent_payload()])
+        return httpx.Response(200, json=[expected])
 
     async with httpx.AsyncClient(
         base_url="https://api.test", transport=httpx.MockTransport(handler)
@@ -163,7 +164,7 @@ async def test_alist_agents_hits_correct_route() -> None:
 
     assert captured["path"] == "/runtime/governance/supervised/"
     assert len(agents) == 1
-    assert agents[0].agent_id == _agent_payload()["agent_id"]
+    assert agents[0].agent_id == expected["agent_id"]
 
 
 # ---------------------------------------------------------------------------
@@ -196,10 +197,11 @@ def test_list_profiles_hits_correct_route() -> None:
 @pytest.mark.asyncio
 async def test_alist_profiles_hits_correct_route() -> None:
     captured: dict[str, Any] = {}
+    expected = _profile_payload(name="async-profile")
 
     def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
-        return httpx.Response(200, json=[_profile_payload(name="async-profile")])
+        return httpx.Response(200, json=[expected])
 
     async with httpx.AsyncClient(
         base_url="https://api.test", transport=httpx.MockTransport(handler)

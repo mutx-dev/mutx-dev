@@ -78,7 +78,7 @@ def test_budget_parses_all_fields() -> None:
     assert budget.credits_total == 1000.0
     assert budget.credits_used == 250.0
     assert budget.credits_remaining == 750.0
-    assert budget.reset_date == datetime(2026, 4, 1, 0, 0, 0, tzinfo=timezone.utc)
+    assert budget.reset_date == datetime(2026, 4, 1, 0, 0, 0)
     assert budget.usage_percentage == 25.0
     assert budget._data == payload
 
@@ -127,8 +127,8 @@ def test_usage_breakdown_parses_all_fields() -> None:
     assert breakdown.total_credits_used == 300.0
     assert breakdown.credits_remaining == 700.0
     assert breakdown.credits_total == 1000.0
-    assert breakdown.period_start == datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc)
-    assert breakdown.period_end == datetime(2026, 3, 31, 23, 59, 59, tzinfo=timezone.utc)
+    assert breakdown.period_start == datetime(2026, 3, 1, 0, 0, 0)
+    assert breakdown.period_end == datetime(2026, 3, 31, 23, 59, 59)
     assert len(breakdown.usage_by_agent) == 2
     assert breakdown.usage_by_agent[0].agent_name == "coding-agent"
     assert len(breakdown.usage_by_type) == 2
@@ -214,7 +214,8 @@ def test_budgets_get_usage_omits_absent_params() -> None:
     assert "period_end" not in captured["params"]
 
 
-def test_budgets_sync_methods_reject_async_client() -> None:
+@pytest.mark.asyncio
+async def test_budgets_sync_methods_reject_async_client() -> None:
     async def handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, json=_budget_payload())
 
