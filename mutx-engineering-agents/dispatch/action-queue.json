@@ -1,7 +1,25 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T03:38:09.777327",
+  "generated": "2026-04-02T03:43:13.980752",
   "items": [
+    {
+      "id": "coverage-analytics",
+      "title": "test: add coverage for SDK module `analytics`",
+      "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "failed",
+      "source": "gap-scanner:coverage"
+    },
+    {
+      "id": "coverage-api_keys",
+      "title": "test: add coverage for SDK module `api_keys`",
+      "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "failed",
+      "source": "gap-scanner:coverage"
+    },
     {
       "id": "coverage-agent_runtime",
       "title": "Add coverage for SDK module `agent_runtime`",
@@ -64,6 +82,15 @@
       "priority": "p2",
       "status": "failed",
       "source": "gap-scanner:todos"
+    },
+    {
+      "id": "coverage-budgets",
+      "title": "Add coverage for SDK module `budgets`",
+      "description": "No test file found: tests/test_budgets.py\n\nModule: sdk/mutx/budgets.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "failed",
+      "source": "gap-scanner:untested-modules"
     },
     {
       "id": "dep-sqlalchemy",
@@ -165,6 +192,15 @@
       "source": "gap-scanner:deps"
     },
     {
+      "id": "todo-sdk-mutx-scheduler.py-2",
+      "title": "[Note] Scheduler feature is planned for v1.3 and returns 503.",
+      "description": "File: sdk/mutx/scheduler.py:3\n\nTODO: Scheduler feature is planned for v1.3 and returns 503.",
+      "area": "backend",
+      "priority": "p3",
+      "status": "queued",
+      "source": "gap-scanner:todos"
+    },
+    {
       "id": "todo-src-api-routes-newsletter.py-30",
       "title": "[NOTE] For web-based submissions, prefer the Next.js API route",
       "description": "File: src/api/routes/newsletter.py:31\n\nTODO: For web-based submissions, prefer the Next.js API route",
@@ -181,15 +217,6 @@
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "todo-sdk-mutx-scheduler.py-2",
-      "title": "[Note] Scheduler feature is planned for v1.3 and returns 503.",
-      "description": "File: sdk/mutx/scheduler.py:3\n\nTODO: Scheduler feature is planned for v1.3 and returns 503.",
-      "area": "backend",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:todos"
     },
     {
       "id": "todo-next-env.d.ts-4",
@@ -215,31 +242,13 @@
       "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
       "area": "backend",
       "priority": "p1",
-      "status": "in_progress",
+      "status": "queued",
       "source": "gap-scanner:coverage"
     },
     {
       "id": "coverage-agents",
       "title": "test: add coverage for SDK module `agents`",
       "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "queued",
-      "source": "gap-scanner:coverage"
-    },
-    {
-      "id": "coverage-analytics",
-      "title": "test: add coverage for SDK module `analytics`",
-      "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "queued",
-      "source": "gap-scanner:coverage"
-    },
-    {
-      "id": "coverage-api_keys",
-      "title": "test: add coverage for SDK module `api_keys`",
-      "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
       "area": "backend",
       "priority": "p1",
       "status": "queued",
