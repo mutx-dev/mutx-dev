@@ -1,7 +1,34 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T03:53:23.502860",
+  "generated": "2026-04-02T03:58:27.953149",
   "items": [
+    {
+      "id": "todo-app-types-api.ts-1768",
+      "title": "[Note] Full implementation requires pgvector and a document store.",
+      "description": "File: app/types/api.ts:1769\n\nTODO: Full implementation requires pgvector and a document store.",
+      "area": "frontend",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "todo-app-types-api.ts-1768",
+      "title": "[Note] Full implementation requires pgvector and a document store.",
+      "description": "File: app/types/api.ts:1769\n\nTODO: Full implementation requires pgvector and a document store.",
+      "area": "frontend",
+      "priority": "p3",
+      "status": "queued",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "coverage-agent_runtime",
+      "title": "Add coverage for SDK module `agent_runtime`",
+      "description": "No test file found: tests/test_agent_runtime.py\n\nModule: sdk/mutx/agent_runtime.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
     {
       "id": "coverage-agents",
       "title": "Add coverage for SDK module `agents`",
@@ -48,18 +75,9 @@
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "coverage-governance_supervision",
-      "title": "Add coverage for SDK module `governance_supervision`",
-      "description": "No test file found: tests/test_governance_supervision.py\n\nModule: sdk/mutx/governance_supervision.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "todo-sdk-mutx-scheduler.py-31",
-      "title": "[Note] Scheduler is planned for v1.3. These methods currently return 503 errors.",
-      "description": "File: sdk/mutx/scheduler.py:32\n\nTODO: Scheduler is planned for v1.3. These methods currently return 503 errors.",
+      "id": "todo-src-api-routes-rag.py-272",
+      "title": "[Note] Full implementation requires pgvector and a document store.",
+      "description": "File: src/api/routes/rag.py:273\n\nTODO: Full implementation requires pgvector and a document store.",
       "area": "backend",
       "priority": "p3",
       "status": "failed",
@@ -73,24 +91,6 @@
       "priority": "p2",
       "status": "failed",
       "source": "gap-scanner:todos"
-    },
-    {
-      "id": "coverage-clawhub",
-      "title": "Add coverage for SDK module `clawhub`",
-      "description": "No test file found: tests/test_clawhub.py\n\nModule: sdk/mutx/clawhub.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "failed",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:deps"
     },
     {
       "id": "todo-sdk-mutx-scheduler.py-31",
@@ -174,22 +174,22 @@
       "source": "gap-scanner:untested-modules"
     },
     {
+      "id": "coverage-governance_supervision",
+      "title": "Add coverage for SDK module `governance_supervision`",
+      "description": "No test file found: tests/test_governance_supervision.py\n\nModule: sdk/mutx/governance_supervision.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
       "id": "dep-sqlalchemy",
       "title": "Update `sqlalchemy` dependency",
       "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
       "area": "infra",
       "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:deps"
-    },
-    {
-      "id": "todo-next-env.d.ts-4",
-      "title": "[NOTE] This file should not be edited",
-      "description": "File: next-env.d.ts:5\n\nTODO: This file should not be edited",
-      "area": "frontend",
-      "priority": "p3",
       "status": "failed",
-      "source": "gap-scanner:todos"
+      "source": "gap-scanner:deps"
     },
     {
       "id": "todo-sdk-mutx-scheduler.py-2",
@@ -210,31 +210,22 @@
       "source": "gap-scanner:todos"
     },
     {
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
+      "priority": "p3",
+      "status": "queued",
+      "source": "gap-scanner:deps"
+    },
+    {
       "id": "todo-next-env.d.ts-4",
       "title": "[NOTE] This file should not be edited",
       "description": "File: next-env.d.ts:5\n\nTODO: This file should not be edited",
       "area": "frontend",
       "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-app-types-api.ts-1768",
-      "title": "[Note] Full implementation requires pgvector and a document store.",
-      "description": "File: app/types/api.ts:1769\n\nTODO: Full implementation requires pgvector and a document store.",
-      "area": "frontend",
-      "priority": "p3",
       "status": "failed",
       "source": "gap-scanner:todos"
-    },
-    {
-      "id": "coverage-agent_runtime",
-      "title": "Add coverage for SDK module `agent_runtime`",
-      "description": "No test file found: tests/test_agent_runtime.py\n\nModule: sdk/mutx/agent_runtime.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "failed",
-      "source": "gap-scanner:untested-modules"
     },
     {
       "id": "coverage-agent_runtime",
@@ -242,7 +233,7 @@
       "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
       "area": "backend",
       "priority": "p1",
-      "status": "queued",
+      "status": "in_progress",
       "source": "gap-scanner:coverage"
     },
     {
