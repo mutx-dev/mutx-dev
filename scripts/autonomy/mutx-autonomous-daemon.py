@@ -6,8 +6,22 @@ Supervises itself: keeps running, auto-restarts, logs everything.
 """
 import json, os, sys, time, subprocess, signal, random, shlex
 from datetime import datetime
+import os
+_REPO = None
+def _get_repo():
+    global _REPO
+    if _REPO:
+        return _REPO
+    # MUTX_REPO env var takes priority (for CI/cross-clone use)
+    _REPO = os.environ.get("MUTX_REPO")
+    if _REPO and Path(_REPO).exists():
+        return _REPO
+    # Fall back to repo root relative to this file
+    _REPO = str(Path(__file__).resolve().parents[2])
+    return _REPO
+REPO = _get_repo()
 
-REPO      = "/Users/fortune/MUTX"
+REPO      = "REPO"
 QUEUE     = f"{REPO}/mutx-engineering-agents/dispatch/action-queue.json"
 LOG       = "/Users/fortune/.openclaw/logs/autonomous-daemon.log"
 PID_FILE  = "/Users/fortune/.openclaw/autonomous-daemon.pid"

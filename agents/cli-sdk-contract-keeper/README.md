@@ -13,4 +13,4 @@ Owns the Python CLI and SDK path from installed package to live route behavior.
 * CLI ergonomics
 * SDK method coverage and defaults
 
-Read the detailed brief in [CLI SDK Contract Keeper](agent.md).
+Read the detailed brief in [CLI SDK Contract Keeper](AGENT.md).

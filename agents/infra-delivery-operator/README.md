@@ -13,4 +13,4 @@ Owns the deploy path from infrastructure code to validation targets.
 * Docker and monitoring wiring
 * deploy-path correctness
 
-Read the detailed brief in [Infra Delivery Operator](agent.md).
+Read the detailed brief in [Infra Delivery Operator](AGENT.md).

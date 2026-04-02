@@ -5,8 +5,21 @@ Uses sessions_spawn (mode=run) to process queue items sequentially.
 Sessions_spawn is called via subprocess from within a persistent exec loop.
 """
 import json, os, time, subprocess, sys
+from pathlib import Path
 
-QUEUE = "/Users/fortune/MUTX/mutx-engineering-agents/dispatch/action-queue.json"
+_REPO = None
+def _get_repo():
+    global _REPO
+    if _REPO:
+        return _REPO
+    _REPO = os.environ.get("MUTX_REPO")
+    if _REPO and Path(_REPO).exists():
+        return _REPO
+    _REPO = str(Path(__file__).resolve().parents[2])
+    return _REPO
+REPO = _get_repo()
+
+QUEUE = f"{REPO}/mutx-engineering-agents/dispatch/action-queue.json"
 LOG = "/Users/fortune/.openclaw/logs/autonomous-loop.log"
 
 def log(m):
@@ -64,7 +77,7 @@ except Exception as e:
 
 def run_loop():
     log("=== Autonomous loop supervisor starting ===")
-    os.chdir("/Users/fortune/MUTX")
+    os.chdir(REPO)
     
     while True:
         q = read_queue()
@@ -120,7 +133,7 @@ Start now. Read the queue file first."""
         import urllib.request, urllib.error, websocket, threading, json as json2
 
         sock_path = "/var/run/openclaw/gateway.sock"
-       gw_cfg = "/Users/fortune/.openclaw/gateway.json"
+        gw_cfg = "/Users/fortune/.openclaw/gateway.json"
         
         try:
             cfg = json2.load(open(gw_cfg))

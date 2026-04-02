@@ -13,4 +13,4 @@ Owns the Next.js product surface from landing pages to dashboard proxies.
 * same-origin proxy routes
 * generated API type consumption
 
-Read the detailed brief in [Operator Surface Builder](agent.md).
+Read the detailed brief in [Operator Surface Builder](AGENT.md).

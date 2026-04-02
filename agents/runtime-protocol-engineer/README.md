@@ -13,4 +13,4 @@ Owns the protocol used by long-lived agents to talk to the control plane.
 * self-auth semantics
 * heartbeat, metrics, and log payloads
 
-Read the detailed brief in [Runtime Protocol Engineer](agent.md).
+Read the detailed brief in [Runtime Protocol Engineer](AGENT.md).

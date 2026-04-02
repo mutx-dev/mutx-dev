@@ -13,4 +13,4 @@ Owns planning, decomposition, routing, and merge sequencing across the agent tea
 * ownership routing
 * queue health and review flow
 
-Read the detailed brief in [Mission Control Orchestrator](agent.md).
+Read the detailed brief in [Mission Control Orchestrator](AGENT.md).

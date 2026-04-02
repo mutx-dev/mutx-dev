@@ -2,11 +2,25 @@
 """MUTX Gap Scanner v4 — shell=False, proper gh CLI calls."""
 import json, os, subprocess, time, glob
 from datetime import datetime
+import os
+_REPO = None
+def _get_repo():
+    global _REPO
+    if _REPO:
+        return _REPO
+    # MUTX_REPO env var takes priority (for CI/cross-clone use)
+    _REPO = os.environ.get("MUTX_REPO")
+    if _REPO and Path(_REPO).exists():
+        return _REPO
+    # Fall back to repo root relative to this file
+    _REPO = str(Path(__file__).resolve().parents[2])
+    return _REPO
+REPO = _get_repo()
 
 GH      = "/opt/homebrew/bin/gh"
-QUEUE   = "/Users/fortune/MUTX/mutx-engineering-agents/dispatch/action-queue.json"
+QUEUE   = "REPO/mutx-engineering-agents/dispatch/action-queue.json"
 LOG     = "/Users/fortune/.openclaw/logs/gap-scanner.log"
-REPO    = "/Users/fortune/MUTX"
+REPO    = "REPO"
 WT      = "/Users/fortune/mutx-worktrees/factory/backend"
 GH_REPO = "mutx-dev/mutx-dev"
 

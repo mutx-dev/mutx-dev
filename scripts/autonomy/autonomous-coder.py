@@ -6,7 +6,18 @@ Reads queue → MiniMax generates code → git commits → gh PRs → loops
 import json, os, time, subprocess, urllib.request, urllib.error, shlex
 from datetime import datetime
 
-REPO = "/Users/fortune/MUTX"
+import os
+_REPO = None
+def _get_repo():
+    global _REPO
+    if _REPO:
+        return _REPO
+    _REPO = os.environ.get("MUTX_REPO")
+    if _REPO and Path(_REPO).exists():
+        return _REPO
+    _REPO = str(Path(__file__).resolve().parents[2])
+    return _REPO
+REPO = _get_repo()
 WT_BACKEND = "/Users/fortune/mutx-worktrees/factory/backend"
 WT_FRONTEND = "/Users/fortune/mutx-worktrees/factory/frontend"
 QUEUE = f"{REPO}/mutx-engineering-agents/dispatch/action-queue.json"

@@ -4,8 +4,22 @@ MUTX Master Controller — runs gap scanner + daemon watchdog in one supervised 
 Replaces LaunchAgent approach (sandbox issues). Uses simple nohup supervision.
 """
 import os, sys, time, subprocess, json, signal
+import os
+_REPO = None
+def _get_repo():
+    global _REPO
+    if _REPO:
+        return _REPO
+    # MUTX_REPO env var takes priority (for CI/cross-clone use)
+    _REPO = os.environ.get("MUTX_REPO")
+    if _REPO and Path(_REPO).exists():
+        return _REPO
+    # Fall back to repo root relative to this file
+    _REPO = str(Path(__file__).resolve().parents[2])
+    return _REPO
+REPO = _get_repo()
 
-REPO      = "/Users/fortune/MUTX"
+REPO      = "REPO"
 DAEMON    = f"{REPO}/scripts/autonomy/mutx-autonomous-daemon.py"
 GAPSCAN   = f"{REPO}/scripts/autonomy/mutx-gap-scanner-v3.py"
 QUEUE     = f"{REPO}/mutx-engineering-agents/dispatch/action-queue.json"

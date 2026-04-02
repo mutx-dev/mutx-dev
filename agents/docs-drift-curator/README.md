@@ -13,4 +13,4 @@ Owns docs accuracy across examples, setup steps, and generated contract guidance
 * example refreshes
 * setup and contributor guidance
 
-Read the detailed brief in [Docs Drift Curator](agent.md).
+Read the detailed brief in [Docs Drift Curator](AGENT.md).
