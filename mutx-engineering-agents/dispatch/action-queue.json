@@ -1,15 +1,15 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T12:31:31.829891",
+  "generated": "2026-04-02T12:36:34.499069",
   "items": [
     {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:deps"
+      "id": "coverage-agent_runtime",
+      "title": "Add coverage for SDK module `agent_runtime`",
+      "description": "No test file found: tests/test_agent_runtime.py\n\nModule: sdk/mutx/agent_runtime.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
     },
     {
       "id": "coverage-assistant",
@@ -26,7 +26,7 @@
       "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
       "area": "infra",
       "priority": "p3",
-      "status": "queued",
+      "status": "failed",
       "source": "gap-scanner:deps"
     },
     {
@@ -129,6 +129,33 @@
       "source": "gap-scanner:todos"
     },
     {
+      "id": "coverage-agents",
+      "title": "Add coverage for SDK module `agents`",
+      "description": "No test file found: tests/test_agents.py\n\nModule: sdk/mutx/agents.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
+      "id": "coverage-analytics",
+      "title": "Add coverage for SDK module `analytics`",
+      "description": "No test file found: tests/test_analytics.py\n\nModule: sdk/mutx/analytics.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
+      "id": "coverage-api_keys",
+      "title": "Add coverage for SDK module `api_keys`",
+      "description": "No test file found: tests/test_api_keys.py\n\nModule: sdk/mutx/api_keys.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
       "id": "coverage-budgets",
       "title": "Add coverage for SDK module `budgets`",
       "description": "No test file found: tests/test_budgets.py\n\nModule: sdk/mutx/budgets.py\n\nAdd pytest coverage.",
@@ -138,13 +165,13 @@
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "coverage-clawhub",
-      "title": "Add coverage for SDK module `clawhub`",
-      "description": "No test file found: tests/test_clawhub.py\n\nModule: sdk/mutx/clawhub.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
+      "priority": "p3",
       "status": "queued",
-      "source": "gap-scanner:untested-modules"
+      "source": "gap-scanner:deps"
     },
     {
       "id": "coverage-deployments",
@@ -152,35 +179,8 @@
       "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "coverage-governance_credentials",
-      "title": "Add coverage for SDK module `governance_credentials`",
-      "description": "No test file found: tests/test_governance_credentials.py\n\nModule: sdk/mutx/governance_credentials.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "coverage-governance_supervision",
-      "title": "Add coverage for SDK module `governance_supervision`",
-      "description": "No test file found: tests/test_governance_supervision.py\n\nModule: sdk/mutx/governance_supervision.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
-      "title": "[TODO] implement full test coverage\\n\")",
-      "description": "File: scripts/autonomy/mutx-autonomous-daemon.py:144\n\nTODO: implement full test coverage\\n\")",
-      "area": "backend",
-      "priority": "p3",
       "status": "failed",
-      "source": "gap-scanner:todos"
+      "source": "gap-scanner:untested-modules"
     },
     {
       "id": "coverage-agent_runtime",
@@ -188,7 +188,7 @@
       "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
       "area": "backend",
       "priority": "p1",
-      "status": "queued",
+      "status": "in_progress",
       "source": "gap-scanner:coverage"
     },
     {
