@@ -282,15 +282,6 @@
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "coverage-analytics",
-      "title": "Add coverage for SDK module `analytics`",
-      "description": "No test file found: tests/test_analytics.py\n\nModule: sdk/mutx/analytics.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
       "id": "coverage-clawhub",
       "title": "Add coverage for SDK module `clawhub`",
       "description": "No test file found: tests/test_clawhub.py\n\nModule: sdk/mutx/clawhub.py\n\nAdd pytest coverage.",
@@ -321,15 +312,6 @@
       "id": "coverage-agents",
       "title": "test: add coverage for SDK module `agents`",
       "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "queued",
-      "source": "gap-scanner:coverage"
-    },
-    {
-      "id": "coverage-analytics",
-      "title": "test: add coverage for SDK module `analytics`",
-      "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
       "area": "backend",
       "priority": "p1",
       "status": "queued",
