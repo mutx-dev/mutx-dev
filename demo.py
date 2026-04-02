@@ -318,7 +318,7 @@ All MUTX components verified:
    - FarameshRuntimeGateway as AARM backend
 
 ✅ Attribution
-   - MIT licenses credited to original projects
+   - Third-party licenses (MIT) credited to original projects in CREDITS.md
 
 To start the server:
     mutx run-server
