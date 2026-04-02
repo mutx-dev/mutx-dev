@@ -1,74 +1,47 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T11:46:06.285593",
+  "generated": "2026-04-02T11:58:00.111199",
   "items": [
     {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:deps"
-    },
-    {
-      "id": "error-deployments",
-      "title": "Add error handling to `sdk/mutx/deployments.py`",
-      "description": "File has 4 functions but minimal error handling.\n\nReview and add try/except blocks, logging, and graceful degradation.",
-      "area": "backend",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:error-handling"
-    },
-    {
-      "id": "error-budgets",
-      "title": "Add error handling to `sdk/mutx/budgets.py`",
-      "description": "File has 5 functions but minimal error handling.\n\nReview and add try/except blocks, logging, and graceful degradation.",
-      "area": "backend",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:error-handling"
-    },
-    {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:deps"
-    },
-    {
-      "id": "coverage-api_keys",
-      "title": "test: add coverage for SDK module `api_keys`",
-      "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
+      "id": "coverage-agents",
+      "title": "test: add coverage for SDK module `agents`",
+      "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
       "area": "backend",
       "priority": "p1",
       "status": "failed",
       "source": "gap-scanner:coverage"
     },
     {
-      "id": "coverage-api_keys",
-      "title": "Add coverage for SDK module `api_keys`",
-      "description": "No test file found: tests/test_api_keys.py\n\nModule: sdk/mutx/api_keys.py\n\nAdd pytest coverage.",
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:deps"
+    },
+    {
+      "id": "todo-sdk-mutx-scheduler.py-31",
+      "title": "[Note] Scheduler is planned for v1.3. These methods currently return 503 errors.",
+      "description": "File: sdk/mutx/scheduler.py:32\n\nTODO: Scheduler is planned for v1.3. These methods currently return 503 errors.",
+      "area": "backend",
+      "priority": "p3",
+      "status": "queued",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "coverage-agents",
+      "title": "Add coverage for SDK module `agents`",
+      "description": "No test file found: tests/test_agents.py\n\nModule: sdk/mutx/agents.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "error-security",
-      "title": "Add error handling to `sdk/mutx/security.py`",
-      "description": "File has 4 functions but minimal error handling.\n\nReview and add try/except blocks, logging, and graceful degradation.",
-      "area": "backend",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:error-handling"
-    },
-    {
-      "id": "coverage-agent_runtime",
-      "title": "Add coverage for SDK module `agent_runtime`",
-      "description": "No test file found: tests/test_agent_runtime.py\n\nModule: sdk/mutx/agent_runtime.py\n\nAdd pytest coverage.",
+      "id": "coverage-api_keys",
+      "title": "Add coverage for SDK module `api_keys`",
+      "description": "No test file found: tests/test_api_keys.py\n\nModule: sdk/mutx/api_keys.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
@@ -102,39 +75,30 @@
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "error-assistant",
-      "title": "Add error handling to `sdk/mutx/assistant.py`",
-      "description": "File has 7 functions but minimal error handling.\n\nReview and add try/except blocks, logging, and graceful degradation.",
-      "area": "backend",
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
       "priority": "p3",
       "status": "queued",
-      "source": "gap-scanner:error-handling"
+      "source": "gap-scanner:deps"
     },
     {
-      "id": "error-security",
-      "title": "Add error handling to `sdk/mutx/security.py`",
-      "description": "File has 4 functions but minimal error handling.\n\nReview and add try/except blocks, logging, and graceful degradation.",
-      "area": "backend",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:error-handling"
-    },
-    {
-      "id": "error-agents",
-      "title": "Add error handling to `sdk/mutx/agents.py`",
-      "description": "File has 6 functions but minimal error handling.\n\nReview and add try/except blocks, logging, and graceful degradation.",
-      "area": "backend",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:error-handling"
-    },
-    {
-      "id": "todo-sdk-mutx-scheduler.py-31",
-      "title": "[Note] Scheduler is planned for v1.3. These methods currently return 503 errors.",
-      "description": "File: sdk/mutx/scheduler.py:32\n\nTODO: Scheduler is planned for v1.3. These methods currently return 503 errors.",
+      "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
+      "title": "[TODO] implement full test coverage\\n\")",
+      "description": "File: scripts/autonomy/mutx-autonomous-daemon.py:144\n\nTODO: implement full test coverage\\n\")",
       "area": "backend",
       "priority": "p3",
       "status": "failed",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
+      "title": "[TODO] implement full test coverage\\n\")",
+      "description": "File: scripts/autonomy/mutx-autonomous-daemon.py:144\n\nTODO: implement full test coverage\\n\")",
+      "area": "backend",
+      "priority": "p3",
+      "status": "queued",
       "source": "gap-scanner:todos"
     },
     {
@@ -162,51 +126,6 @@
       "area": "frontend",
       "priority": "p2",
       "status": "failed",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "coverage-agents",
-      "title": "Add coverage for SDK module `agents`",
-      "description": "No test file found: tests/test_agents.py\n\nModule: sdk/mutx/agents.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "failed",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "coverage-deployments",
-      "title": "Add coverage for SDK module `deployments`",
-      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "failed",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "todo-sdk-mutx-scheduler.py-2",
-      "title": "[Note] Scheduler feature is planned for v1.3 and returns 503.",
-      "description": "File: sdk/mutx/scheduler.py:3\n\nTODO: Scheduler feature is planned for v1.3 and returns 503.",
-      "area": "backend",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-sdk-mutx-scheduler.py-31",
-      "title": "[Note] Scheduler is planned for v1.3. These methods currently return 503 errors.",
-      "description": "File: sdk/mutx/scheduler.py:32\n\nTODO: Scheduler is planned for v1.3. These methods currently return 503 errors.",
-      "area": "backend",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
-      "title": "[TODO] implement full test coverage\\n\")",
-      "description": "File: scripts/autonomy/mutx-autonomous-daemon.py:144\n\nTODO: implement full test coverage\\n\")",
-      "area": "backend",
-      "priority": "p3",
-      "status": "queued",
       "source": "gap-scanner:todos"
     },
     {
@@ -273,30 +192,12 @@
       "source": "gap-scanner:todos"
     },
     {
-      "id": "coverage-agents",
-      "title": "Add coverage for SDK module `agents`",
-      "description": "No test file found: tests/test_agents.py\n\nModule: sdk/mutx/agents.py\n\nAdd pytest coverage.",
+      "id": "coverage-agent_runtime",
+      "title": "Add coverage for SDK module `agent_runtime`",
+      "description": "No test file found: tests/test_agent_runtime.py\n\nModule: sdk/mutx/agent_runtime.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "coverage-clawhub",
-      "title": "Add coverage for SDK module `clawhub`",
-      "description": "No test file found: tests/test_clawhub.py\n\nModule: sdk/mutx/clawhub.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "coverage-deployments",
-      "title": "Add coverage for SDK module `deployments`",
-      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
+      "status": "failed",
       "source": "gap-scanner:untested-modules"
     },
     {
@@ -309,9 +210,18 @@
       "source": "gap-scanner:coverage"
     },
     {
-      "id": "coverage-agents",
-      "title": "test: add coverage for SDK module `agents`",
-      "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
+      "id": "coverage-analytics",
+      "title": "test: add coverage for SDK module `analytics`",
+      "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "queued",
+      "source": "gap-scanner:coverage"
+    },
+    {
+      "id": "coverage-api_keys",
+      "title": "test: add coverage for SDK module `api_keys`",
+      "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
       "area": "backend",
       "priority": "p1",
       "status": "queued",
@@ -325,15 +235,6 @@
       "priority": "p1",
       "status": "queued",
       "source": "gap-scanner:coverage"
-    },
-    {
-      "id": "coverage-governance_credentials",
-      "title": "Add coverage for SDK module `governance_credentials`",
-      "description": "No test file found: tests/test_governance_credentials.py\n\nModule: sdk/mutx/governance_credentials.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
     }
   ]
 }
