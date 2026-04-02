@@ -14,6 +14,7 @@ SDK     = f"{REPO}/sdk/mutx"
 LOG     = "/Users/fortune/.openclaw/logs/control-plane.log"
 CTL     = f"{REPO}/.autonomy/control-plane.json"
 MUTX    = "/Users/fortune/MUTX"
+GH_REPO = "mutx-dev/mutx-dev"
 CYCLE   = 60
 
 def log(m):
@@ -126,7 +127,7 @@ def commit(module, passed, failed):
     rc, out = sh(f"git commit -m {shlex.quote(msg)}", cwd=REPO, timeout=10)
     if rc != 0:
         if "nothing to commit" in out.lower():
-            return True  # already committed
+            return False  # nothing to commit — retry next cycle
         log(f"  [!] Commit: {out[:150]}")
         return False
     _, h = sh("git rev-parse --short HEAD", cwd=REPO)

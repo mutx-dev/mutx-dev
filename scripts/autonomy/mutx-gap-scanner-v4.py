@@ -95,11 +95,12 @@ def scan_untested():
     """Find SDK modules without test coverage."""
     findings = []
     sdk_path = f"{REPO}/sdk/mutx"
-    test_path = f"{REPO}/tests"
+    test_root = f"{REPO}/tests"
 
     if not os.path.exists(sdk_path):
         return findings
 
+    # Get all SDK modules
     modules = []
     for f in glob.glob(f"{sdk_path}/*.py"):
         name = os.path.basename(f).replace('.py', '')
@@ -107,17 +108,18 @@ def scan_untested():
             continue
         modules.append(name)
 
+    # Find all test files in both tests/ and tests/api/
     tested = set()
-    for f in glob.glob(f"{test_path}/test_*.py"):
-        name = os.path.basename(f).replace('test_', '').replace('.py', '')
-        for variant in [name, name.replace('_contract', '').replace('_async', '').replace('_sdk_', '_')]:
-            tested.add(variant)
-            tested.add(f"{variant}_contract")
-            tested.add(f"{variant}_async")
-            # Also handle sdk/ prefix (test_sdk_agents_contract.py → agents)
-            for strip in ['sdk_', 'test_sdk_', 'api_', 'cli_']:
-                tested.add(variant.replace(strip, ''))
-                tested.add(variant.replace(strip, '') + '_contract')
+    for pattern in [f"{test_root}/test_*.py", f"{test_root}/api/test_*.py"]:
+        for f in glob.glob(pattern):
+            name = os.path.basename(f).replace('.py', '').replace('test_', '')
+            for variant in [name, name.replace('_contract', '').replace('_async', '').replace('_sdk_', '_')]:
+                tested.add(variant)
+                tested.add(f"{variant}_contract")
+                tested.add(f"{variant}_async")
+                for strip in ['sdk_', 'test_sdk_', 'api_', 'cli_']:
+                    tested.add(variant.replace(strip, ''))
+                    tested.add(variant.replace(strip, '') + '_contract')
 
     for module in sorted(modules):
         if module not in tested:
