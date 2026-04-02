@@ -1,24 +1,15 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T07:16:26.019267",
+  "generated": "2026-04-02T07:21:30.631196",
   "items": [
     {
-      "id": "coverage-agent_runtime",
-      "title": "Add coverage for SDK module `agent_runtime`",
-      "description": "No test file found: tests/test_agent_runtime.py\n\nModule: sdk/mutx/agent_runtime.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "coverage-agents",
-      "title": "Add coverage for SDK module `agents`",
-      "description": "No test file found: tests/test_agents.py\n\nModule: sdk/mutx/agents.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:deps"
     },
     {
       "id": "coverage-analytics",
@@ -30,13 +21,22 @@
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "todo-sdk-mutx-scheduler.py-31",
-      "title": "[Note] Scheduler is planned for v1.3. These methods currently return 503 errors.",
-      "description": "File: sdk/mutx/scheduler.py:32\n\nTODO: Scheduler is planned for v1.3. These methods currently return 503 errors.",
+      "id": "coverage-governance_supervision",
+      "title": "Add coverage for SDK module `governance_supervision`",
+      "description": "No test file found: tests/test_governance_supervision.py\n\nModule: sdk/mutx/governance_supervision.py\n\nAdd pytest coverage.",
       "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
       "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:todos"
+      "status": "queued",
+      "source": "gap-scanner:deps"
     },
     {
       "id": "todo-next-env.d.ts-4",
@@ -66,13 +66,13 @@
       "source": "gap-scanner:todos"
     },
     {
-      "id": "coverage-deployments",
-      "title": "Add coverage for SDK module `deployments`",
-      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
+      "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
+      "title": "[TODO] implement full test coverage\\n\")",
+      "description": "File: scripts/autonomy/mutx-autonomous-daemon.py:144\n\nTODO: implement full test coverage\\n\")",
       "area": "backend",
-      "priority": "p2",
+      "priority": "p3",
       "status": "failed",
-      "source": "gap-scanner:untested-modules"
+      "source": "gap-scanner:todos"
     },
     {
       "id": "todo-sdk-mutx-scheduler.py-2",
@@ -87,6 +87,15 @@
       "id": "todo-sdk-mutx-scheduler.py-31",
       "title": "[Note] Scheduler is planned for v1.3. These methods currently return 503 errors.",
       "description": "File: sdk/mutx/scheduler.py:32\n\nTODO: Scheduler is planned for v1.3. These methods currently return 503 errors.",
+      "area": "backend",
+      "priority": "p3",
+      "status": "queued",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
+      "title": "[TODO] implement full test coverage\\n\")",
+      "description": "File: scripts/autonomy/mutx-autonomous-daemon.py:144\n\nTODO: implement full test coverage\\n\")",
       "area": "backend",
       "priority": "p3",
       "status": "queued",
@@ -183,13 +192,13 @@
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
+      "id": "todo-src-security-compliance.py-477",
+      "title": "[Note] This is a SHOULD requirement - non-conformance is a warning, not a failure.",
+      "description": "File: src/security/compliance.py:478\n\nTODO: This is a SHOULD requirement - non-conformance is a warning, not a failure.",
+      "area": "backend",
       "priority": "p3",
       "status": "failed",
-      "source": "gap-scanner:deps"
+      "source": "gap-scanner:todos"
     },
     {
       "id": "coverage-agent_runtime",
@@ -197,7 +206,7 @@
       "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
       "area": "backend",
       "priority": "p1",
-      "status": "queued",
+      "status": "in_progress",
       "source": "gap-scanner:coverage"
     },
     {
