@@ -261,3 +261,65 @@ def test_openapi_snapshot_matches_current_app_routes() -> None:
     assert snapshot["paths"] == generated["paths"]
     assert "/v1/leads/contacts" in snapshot["paths"]
     assert "/v1/contacts" not in snapshot["paths"]
+
+
+# ---------------------------------------------------------------------------
+# Frontend code quality guards — prevent lint-regression of underscore-imports
+# ---------------------------------------------------------------------------
+
+def test_no_invalid_underscore_imports_from_external_modules() -> None:
+    """
+    Fail if any .tsx/.ts file imports a symbol with a leading underscore
+    directly from an external module without using 'as' alias syntax.
+
+    Valid:   import { useEffect }          from "react"
+    Valid:   import { Play as _Play }        from "lucide-react"  (explicit alias)
+    Invalid: import { _useEffect }          from "react"           (invalid)
+    Invalid: import { _Play }               from "lucide-react"   (invalid)
+    """
+    import re
+    from pathlib import Path
+
+    # Pattern: import { or import * as ... from "external"
+    # that has a name starting with _ without being aliased
+    # We look for lines like: import { _Name ... } from "..."
+    # where _Name is NOT preceded by "Name as"
+
+    invalid_pattern = re.compile(r'^import \{\s*([^}]+)\}\s*from\s+"([^"]+)"')
+    alias_pattern = re.compile(r'\b(\w+)\s+as\s+_\w+\b')
+
+    src_files = list(Path("components").rglob("*.tsx")) + list(Path("components").rglob("*.ts"))
+    src_files += list(Path("app").rglob("*.tsx")) + list(Path("app").rglob("*.ts"))
+
+    violations = []
+    for f in src_files:
+        if f.is_file() and not any(p in str(f) for p in ["node_modules", ".next"]):
+            try:
+                content = f.read_text(encoding="utf-8", errors="ignore")
+            except Exception:
+                continue
+            for line_no, line in enumerate(content.splitlines(), 1):
+                m = invalid_pattern.match(line.strip())
+                if not m:
+                    continue
+                imports_str, module = m.group(1), m.group(2)
+                # Skip type-only imports
+                if "type" in imports_str or module.startswith("@types"):
+                    continue
+                # Find all underscore-prefixed names in the import list
+                names = [n.strip().rstrip(",") for n in imports_str.split()]
+                for name in names:
+                    if name.startswith("_") and len(name) > 1:
+                        # Check if this is an alias: "Foo as _Foo"
+                        # In that case the raw name doesn't start with _
+                        if not any(n == name or f"{name.lstrip('_')} as {name}" in imports_str):
+                            # Also skip if it's explicitly aliased the other way: "Foo as _Bar"
+                            if not alias_pattern.search(imports_str):
+                                violations.append(
+                                    f"{f}:{line_no}: '{name}' imported from '{module}' — "
+                                    "invalid underscore-prefix without alias"
+                                )
+
+    if violations:
+        lines = "\n".join(violations[:10])
+        raise AssertionError(f"Invalid underscore imports found:\n{lines}")

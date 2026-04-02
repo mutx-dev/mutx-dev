@@ -292,7 +292,6 @@ function MobileBottomBar({ activeHref }: MobileBottomBarProps) {
 // ─── Mobile Bottom Sheet ──────────────────────────────────────────────────────
 
 function MobileBottomSheet({
-  _open,
   onClose,
   activeHref,
 }: {
