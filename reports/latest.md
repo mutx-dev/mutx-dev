@@ -2,41 +2,40 @@
 
 ## Lane utility verdict
 - **Status:** IDLE
-- **Recommendation:** DOWNSHIFT — lane correctly idle, dispatch signal infrastructure is MISSING for this lane
+- **Recommendation:** DOWNSHIFT — lane correctly idle, dispatch infrastructure MISSING
 
 ## What I actually did since the last meaningful checkpoint
-- Ran heartbeat at 02:36 UTC (April 2, 2026).
-- Checked `dispatch/review-queue.json` — 0 items for auth lane, no active review assignments.
-- Checked `dispatch/auth-identity-guardian.md` — **MISSING** (does not exist).
-- Checked `dispatch/merge-queue.json` — **MISSING** (does not exist).
-- Checked gh for auth-owned open PRs: **none found**.
-- Worktree is clean on `eng/auth-identity-guardian` @ d86ba2ab, ahead of origin by 3 commits (all docs: refresh auth lane report).
-- No bounded dispatch task was found.
-- No review was pending.
+- Heartbeat at 06:36 UTC (April 2, 2026).
+- Checked `dispatch/review-queue.json` — items: [], no review assigned to auth lane.
+- `dispatch/auth-identity-guardian.md` — **MISSING** (not present in dispatch dir).
+- `dispatch/merge-queue.json` — **MISSING** (not present in dispatch dir).
+- Checked gh for auth-owned open PRs: none found.
+- Worktree is clean on `eng/auth-identity-guardian` @ a75a44a1.
+- PR #1971 (lane report refresh) is open — awaiting review/merge.
+- No bounded dispatch task, no review pending. Lane correctly idle.
 
 ## Exact evidence
 ```
-gh pr list --state open --author=fortunexbt → no auth-owned PRs
 dispatch/review-queue.json → items: []
 dispatch/auth-identity-guardian.md → MISSING (enoent)
 dispatch/merge-queue.json → MISSING (enoent)
-worktree: eng/auth-identity-guardian @ d86ba2ab, clean, ahead 3
-queue/TODAY.md → does not exist
+gh pr list --state open --author=fortunexbt → no auth-owned PRs
+worktree: eng/auth-identity-guardian @ a75a44a1, clean
+PR #1971 open: auth-identity-guardian lane report refresh
 ```
 
 ## If idle or blocked, why exactly
-- Lane is correctly idle from its own perspective — no auth-owned PRs, no review assignments, no bounded tasks.
-- **Infrastructure gap**: `dispatch/auth-identity-guardian.md` (the bounded dispatch signal file) and `dispatch/merge-queue.json` do not exist. This lane cannot receive dispatch signals from the routing layer without those files.
-- The 3 ahead commits are all documentation/report refreshes — no code work is stalled.
-- There is no material blocker preventing this lane from operating; the lane simply has no assigned work right now.
+- No auth-owned code is pending.
+- No review assignment exists for this lane.
+- No dispatch signal file (`auth-identity-guardian.md`) is present in the dispatch directory — the routing layer is not sending work here.
+- The lane has nothing to act on and is correctly parked.
 
 ## What Fortune can do with this today
-- The lane is correctly parked. No auth action is pending.
-- If dispatch routing is meant to feed this lane, the missing `dispatch/auth-identity-guardian.md` file needs to be restored or the routing mechanism updated.
-- The 3 ahead commits (report refreshes) are safe to push at any time — they are documentation only.
+- Lane is correctly idle. No immediate action required.
+- If `mission-control-orchestrator` is meant to review PR #1971, the reviewer handle needs to be verified (GitHub couldn't resolve it last run).
+- If dispatch routing should be sending work here, `dispatch/auth-identity-guardian.md` needs to be restored.
 
 ## What should change in this lane next
-- **Immediate**: Confirm where dispatch signals now live. If the dispatch mechanism has been reorganized, update this lane's configuration accordingly.
-- Once dispatch is confirmed, resume normal operation: pick up review assignments and bounded dispatch tasks.
-- Worktree is clean and ready.
-- queue/TODAY.md will be created when next moves actually change.
+- Lane remains correctly DOWNSHIFTED. Re-enter when a bounded task or review is assigned.
+- PR #1971 is a documentation-only PR — safe to merge without deep review.
+- queue/TODAY.md unchanged — no state change to record.
