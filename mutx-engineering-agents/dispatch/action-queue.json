@@ -1,6 +1,6 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T05:47:06.361260",
+  "generated": "2026-04-02T05:52:10.860143",
   "items": [
     {
       "id": "coverage-agent_runtime",
@@ -136,6 +136,15 @@
       "priority": "p2",
       "status": "failed",
       "source": "gap-scanner:todos"
+    },
+    {
+      "id": "coverage-budgets",
+      "title": "Add coverage for SDK module `budgets`",
+      "description": "No test file found: tests/test_budgets.py\n\nModule: sdk/mutx/budgets.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "failed",
+      "source": "gap-scanner:untested-modules"
     },
     {
       "id": "dep-sqlalchemy",
