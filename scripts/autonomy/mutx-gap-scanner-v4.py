@@ -16,7 +16,7 @@ def _get_repo():
     global _REPO
     if _REPO:
         return _REPO
-    _REPO = os.environ.get("MUTX_REPO")
+    _REPO = os.environ.get("MUTX_REPO") or "/Users/fortune/mutx-worktrees/factory/backend"
     if _REPO and Path(_REPO).exists():
         return _REPO
     _REPO = str(Path(__file__).resolve().parents[2])
