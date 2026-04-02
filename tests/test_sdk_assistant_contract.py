@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import uuid
 from typing import Any
 
@@ -689,61 +688,79 @@ class TestAssistantAsyncRejectsSyncClient:
     """Async methods must reject sync httpx.Client."""
 
     def test_aoverview_rejects_sync_client(self) -> None:
+        import asyncio
+
         def handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(200, json=_overview_payload())
 
         with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
             assistant = Assistant(client)
+            loop = asyncio.new_event_loop()
             with pytest.raises(RuntimeError, match="async httpx.AsyncClient"):
-                import asyncio
-                asyncio.get_event_loop().run_until_complete(assistant.aoverview())
+                loop.run_until_complete(assistant.aoverview())
+            loop.close()
 
     def test_askills_rejects_sync_client(self) -> None:
+        import asyncio
+
         def handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(200, json=[])
 
         with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
             assistant = Assistant(client)
+            loop = asyncio.new_event_loop()
             with pytest.raises(RuntimeError, match="async httpx.AsyncClient"):
-                import asyncio
-                asyncio.get_event_loop().run_until_complete(assistant.askills(str(uuid.uuid4())))
+                loop.run_until_complete(assistant.askills(str(uuid.uuid4())))
+            loop.close()
 
     def test_achannels_rejects_sync_client(self) -> None:
+        import asyncio
+
         def handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(200, json=[])
 
         with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
             assistant = Assistant(client)
+            loop = asyncio.new_event_loop()
             with pytest.raises(RuntimeError, match="async httpx.AsyncClient"):
-                import asyncio
-                asyncio.get_event_loop().run_until_complete(assistant.achannels(str(uuid.uuid4())))
+                loop.run_until_complete(assistant.achannels(str(uuid.uuid4())))
+            loop.close()
 
     def test_awakeups_rejects_sync_client(self) -> None:
+        import asyncio
+
         def handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(200, json=[])
 
         with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
             assistant = Assistant(client)
+            loop = asyncio.new_event_loop()
             with pytest.raises(RuntimeError, match="async httpx.AsyncClient"):
-                import asyncio
-                asyncio.get_event_loop().run_until_complete(assistant.awakeups(str(uuid.uuid4())))
+                loop.run_until_complete(assistant.awakeups(str(uuid.uuid4())))
+            loop.close()
 
     def test_ahealth_rejects_sync_client(self) -> None:
+        import asyncio
+
         def handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(200, json=_health_payload())
 
         with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
             assistant = Assistant(client)
+            loop = asyncio.new_event_loop()
             with pytest.raises(RuntimeError, match="async httpx.AsyncClient"):
-                import asyncio
-                asyncio.get_event_loop().run_until_complete(assistant.ahealth(str(uuid.uuid4())))
+                loop.run_until_complete(assistant.ahealth(str(uuid.uuid4())))
+            loop.close()
 
     def test_asessions_rejects_sync_client(self) -> None:
+        import asyncio
+
         def handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(200, json=[])
 
         with httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler)) as client:
             assistant = Assistant(client)
+            loop = asyncio.new_event_loop()
             with pytest.raises(RuntimeError, match="async httpx.AsyncClient"):
-                import asyncio
-                asyncio.get_event_loop().run_until_complete(assistant.asessions(str(uuid.uuid4())))
+                loop.run_until_complete(assistant.asessions(str(uuid.uuid4())))
+            loop.close()
