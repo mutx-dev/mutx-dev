@@ -1,7 +1,25 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T02:17:15.011944",
+  "generated": "2026-04-02T02:22:16.168300",
   "items": [
+    {
+      "id": "coverage-governance_supervision",
+      "title": "Add coverage for SDK module `governance_supervision`",
+      "description": "No test file found: tests/test_governance_supervision.py\n\nModule: sdk/mutx/governance_supervision.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "in_progress",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
+      "id": "coverage-analytics",
+      "title": "test: add coverage for SDK module `analytics`",
+      "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "failed",
+      "source": "gap-scanner:coverage"
+    },
     {
       "id": "dep-sqlalchemy",
       "title": "Update `sqlalchemy` dependency",
@@ -12,13 +30,13 @@
       "source": "gap-scanner:deps"
     },
     {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
+      "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
+      "title": "[TODO] implement full test coverage\\n\")",
+      "description": "File: scripts/autonomy/mutx-autonomous-daemon.py:144\n\nTODO: implement full test coverage\\n\")",
+      "area": "backend",
       "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:deps"
+      "status": "failed",
+      "source": "gap-scanner:todos"
     },
     {
       "id": "todo-sdk-mutx-scheduler.py-2",
@@ -75,15 +93,6 @@
       "source": "gap-scanner:todos"
     },
     {
-      "id": "coverage-agent_runtime",
-      "title": "Add coverage for SDK module `agent_runtime`",
-      "description": "No test file found: tests/test_agent_runtime.py\n\nModule: sdk/mutx/agent_runtime.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
       "id": "coverage-agents",
       "title": "Add coverage for SDK module `agents`",
       "description": "No test file found: tests/test_agents.py\n\nModule: sdk/mutx/agents.py\n\nAdd pytest coverage.",
@@ -138,6 +147,24 @@
       "source": "gap-scanner:untested-modules"
     },
     {
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
+      "priority": "p3",
+      "status": "queued",
+      "source": "gap-scanner:deps"
+    },
+    {
+      "id": "coverage-governance_credentials",
+      "title": "Add coverage for SDK module `governance_credentials`",
+      "description": "No test file found: tests/test_governance_credentials.py\n\nModule: sdk/mutx/governance_credentials.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "failed",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
       "id": "coverage-governance_credentials",
       "title": "Add coverage for SDK module `governance_credentials`",
       "description": "No test file found: tests/test_governance_credentials.py\n\nModule: sdk/mutx/governance_credentials.py\n\nAdd pytest coverage.",
@@ -179,22 +206,13 @@
       "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
       "area": "backend",
       "priority": "p1",
-      "status": "in_progress",
+      "status": "queued",
       "source": "gap-scanner:coverage"
     },
     {
       "id": "coverage-agents",
       "title": "test: add coverage for SDK module `agents`",
       "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "queued",
-      "source": "gap-scanner:coverage"
-    },
-    {
-      "id": "coverage-analytics",
-      "title": "test: add coverage for SDK module `analytics`",
-      "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
       "area": "backend",
       "priority": "p1",
       "status": "queued",
