@@ -1,6 +1,97 @@
 {
   "version": "2.0",
-  "generated": "2026-04-03T00:35:00Z",
-  "items": [],
-  "cleared-at": "2026-04-03T00:50:00Z"
+  "generated": "2026-04-03T00:51:00Z",
+  "items": [
+    {
+      "sig-id": "ab8155224552",
+      "priority": "p2",
+      "effort": "L",
+      "domain": "backend",
+      "desc": "Add coverage for SDK module `analytics`",
+      "path": "sdk/mutx/analytics.py",
+      "queued-at": "2026-04-02T23:05:00Z"
+    },
+    {
+      "sig-id": "6a51566dd56d",
+      "priority": "p2",
+      "effort": "L",
+      "domain": "backend",
+      "desc": "Add coverage for SDK module `assistant`",
+      "path": "sdk/mutx/assistant.py",
+      "queued-at": "2026-04-02T23:05:00Z"
+    },
+    {
+      "sig-id": "7dc821572880",
+      "priority": "p2",
+      "effort": "L",
+      "domain": "backend",
+      "desc": "Add coverage for SDK module `budgets`",
+      "path": "sdk/mutx/budgets.py",
+      "queued-at": "2026-04-02T23:05:00Z"
+    },
+    {
+      "sig-id": "6823dcc1c9be",
+      "priority": "p2",
+      "effort": "L",
+      "domain": "backend",
+      "desc": "Add coverage for SDK module `governance_credentials`",
+      "path": "sdk/mutx/governance_credentials.py",
+      "queued-at": "2026-04-02T23:05:00Z"
+    },
+    {
+      "sig-id": "ce514e19783b",
+      "priority": "p2",
+      "effort": "L",
+      "domain": "backend",
+      "desc": "Add coverage for SDK module `governance_supervision`",
+      "path": "sdk/mutx/governance_supervision.py",
+      "queued-at": "2026-04-02T23:05:00Z"
+    },
+    {
+      "sig-id": "a55fdb9bf2b0",
+      "priority": "p2",
+      "effort": "L",
+      "domain": "backend",
+      "desc": "Add coverage for SDK module `ingest`",
+      "path": "sdk/mutx/ingest.py",
+      "queued-at": "2026-04-02T23:05:00Z"
+    },
+    {
+      "sig-id": "28ca9daf48ba",
+      "priority": "p2",
+      "effort": "L",
+      "domain": "backend",
+      "desc": "Add coverage for SDK module `leads`",
+      "path": "sdk/mutx/leads.py",
+      "queued-at": "2026-04-02T23:05:00Z"
+    },
+    {
+      "sig-id": "b28b5f83f934",
+      "priority": "p2",
+      "effort": "L",
+      "domain": "backend",
+      "desc": "Add coverage for SDK module `newsletter`",
+      "path": "sdk/mutx/newsletter.py",
+      "queued-at": "2026-04-02T23:05:00Z"
+    },
+    {
+      "sig-id": "a2d73821fe80",
+      "priority": "p2",
+      "effort": "L",
+      "domain": "backend",
+      "desc": "Add coverage for SDK module `observability`",
+      "path": "sdk/mutx/observability.py",
+      "queued-at": "2026-04-02T23:05:00Z"
+    },
+    {
+      "sig-id": "bca9dc73237e",
+      "priority": "p2",
+      "effort": "L",
+      "domain": "backend",
+      "desc": "Add coverage for SDK module `onboarding`",
+      "path": "sdk/mutx/onboarding.py",
+      "queued-at": "2026-04-02T23:05:00Z"
+    }
+  ],
+  "cleared-at": null
 }

@@ -71,16 +71,38 @@ def release(module, ctl):
 
 # ── Sync ─────────────────────────────────────────────────────────────────────
 
-def sync():
+def sync(timeout=15):
+    """Sync worktree to GitHub main. Return commit hash or None.
+    If already on a recent main commit, skip re-fetch."""
     token = gh_token()
     if token:
         sh(f"git remote set-url origin https://x-access-token:{token}@github.com/{GH_REPO}.git", cwd=REPO)
-    rc, _ = sh("git fetch origin main:github-main 2>&1", cwd=REPO, timeout=15)
-    if rc == 0:
-        sh("git checkout --detach github-main 2>&1", cwd=REPO, timeout=10)
-        _, h = sh("git rev-parse --short github-main", cwd=REPO)
-        return h.strip()
-    return None
+    
+    # Check if already on a valid commit (not detached on a temp branch)
+    _, head = sh("git rev-parse --short HEAD", cwd=REPO)
+    head = head.strip()
+    
+    # Check if github-main ref exists and matches current HEAD
+    rc2, ref = sh("git rev-parse --verify github-main 2>/dev/null || echo '', cwd=REPO, timeout=5)
+    ref = ref.strip()
+    if ref and ref == head:
+        log(f"  Already on github-main ({head}) — skipping sync")
+        return head
+    
+    # Need to fetch
+    rc, _ = sh(f"timeout {timeout} git fetch origin main:github-main 2>&1", cwd=REPO, timeout=timeout+2)
+    if rc != 0:
+        log(f"  [!] Fetch failed (rc={rc}) — continuing with current HEAD {head}")
+        return head
+    
+    rc3, out3 = sh(f"timeout {timeout} git checkout --detach github-main 2>&1", cwd=REPO, timeout=timeout+2)
+    if rc3 != 0:
+        log(f"  [!] Checkout failed: {out3[:100]}")
+        return head
+    
+    _, new_head = sh("git rev-parse --short github-main", cwd=REPO)
+    log(f"  Synced to {new_head.strip()}")
+    return new_head.strip()
 
 # ── Tiny test writer - minimal first pass ────────────────────────────────────
 
@@ -164,19 +186,30 @@ def run_tests(module):
             if m: failed = int(m.group(1))
     return passed, failed
 
-def push(module, passed, failed):
+def push(module, passed, failed, retries=2):
+    """Commit and push. Returns commit hash or None. Retries on transient errors."""
     token = gh_token()
     if token:
         sh(f"git remote set-url origin https://x-access-token:{token}@github.com/{GH_REPO}.git", cwd=REPO)
     sh(f"git add tests/test_{module}.py", cwd=REPO)
     status = "all" if failed == 0 else f"{passed}p/{failed}f"
     msg = f"test(sdk): {module} [{status}]"
-    rc, out = sh(f"git commit -m {shlex.quote(msg)}", cwd=REPO)
-    if rc != 0: return None
-    rc2, out2 = sh("git push origin github-main:main 2>&1", cwd=REPO, timeout=30)
-    if rc2 != 0: return None
-    _, h = sh("git rev-parse --short HEAD", cwd=REPO)
-    return h.strip()
+    rc, out = sh(f"git commit -m {shlex.quote(msg)}", cwd=REPO, timeout=10)
+    if rc != 0:
+        if "nothing to commit" in out.lower():
+            _, h = sh("git rev-parse --short HEAD", cwd=REPO)
+            log(f"  Already committed: {h.strip()}")
+            return h.strip()
+        log(f"  [!] Commit failed: {out[:200]}")
+        return None
+    for attempt in range(retries):
+        rc2, out2 = sh("git push origin github-main:main 2>&1", cwd=REPO, timeout=30)
+        if rc2 == 0:
+            _, h = sh("git rev-parse --short HEAD", cwd=REPO)
+            return h.strip()
+        log(f"  [!] Push attempt {attempt+1} failed: {out2[:100]}")
+        _time.sleep(2)
+    return None
 
 # ── Next module ──────────────────────────────────────────────────────────────
 
@@ -237,18 +270,22 @@ def main():
         passed, failed = run_tests(module)
         log(f"  {passed} passed, {failed} failed")
 
-        # Only push if at least some tests pass
+        # On failure: if all failed AND we have no passing tests, mark done and skip
+        # (don't let broken modules consume the queue forever)
         if passed == 0 and failed > 0:
-            log("  [!] All failing — skip push, will retry next cycle")
+            log(f"  [!] All tests failed — skipping {module}, marking done")
+            ctl["done"].append(module)
+            ctl["queue"] = [m for m in ctl["queue"] if m != module]
             release(module, ctl); save_ctl(ctl); time.sleep(CYCLE); continue
 
         commit = push(module, passed, failed)
         if commit:
             ctl["done"].append(module)
+            ctl["queue"] = [m for m in ctl["queue"] if m != module]
             ctl["commits_today"] += 1
             log(f"  ✓ {module} → {commit} (today: {ctl['commits_today']})")
         else:
-            log(f"  [!] Push failed")
+            log(f"  [!] Push failed — will retry next cycle")
 
         release(module, ctl); save_ctl(ctl)
         log(f"  Cycle {cycle} done. Sleeping {CYCLE}s...")
