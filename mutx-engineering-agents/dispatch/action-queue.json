@@ -1,11 +1,38 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T08:17:17.379912",
+  "generated": "2026-04-02T08:24:24.217977",
   "items": [
     {
-      "id": "coverage-deployments",
-      "title": "Add coverage for SDK module `deployments`",
-      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
+      "id": "coverage-assistant",
+      "title": "test: add coverage for SDK module `assistant`",
+      "description": "No test found for SDK module `assistant`. Create tests/sdk/test_assistant.py",
+      "area": "backend",
+      "priority": "p1",
+      "status": "failed",
+      "source": "gap-scanner:coverage"
+    },
+    {
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:deps"
+    },
+    {
+      "id": "coverage-assistant",
+      "title": "Add coverage for SDK module `assistant`",
+      "description": "No test file found: tests/test_assistant.py\n\nModule: sdk/mutx/assistant.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
+      "id": "coverage-budgets",
+      "title": "Add coverage for SDK module `budgets`",
+      "description": "No test file found: tests/test_budgets.py\n\nModule: sdk/mutx/budgets.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
@@ -30,110 +57,47 @@
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "todo-sdk-mutx-scheduler.py-31",
-      "title": "[Note] Scheduler is planned for v1.3. These methods currently return 503 errors.",
-      "description": "File: sdk/mutx/scheduler.py:32\n\nTODO: Scheduler is planned for v1.3. These methods currently return 503 errors.",
-      "area": "backend",
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
       "priority": "p3",
       "status": "queued",
-      "source": "gap-scanner:todos"
+      "source": "gap-scanner:deps"
     },
     {
-      "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
-      "title": "[TODO] implement full test coverage\\n\")",
-      "description": "File: scripts/autonomy/mutx-autonomous-daemon.py:144\n\nTODO: implement full test coverage\\n\")",
-      "area": "backend",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-next-env.d.ts-4",
-      "title": "[NOTE] This file should not be edited",
-      "description": "File: next-env.d.ts:5\n\nTODO: This file should not be edited",
-      "area": "frontend",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-app-types-api.ts-1768",
-      "title": "[Note] Full implementation requires pgvector and a document store.",
-      "description": "File: app/types/api.ts:1769\n\nTODO: Full implementation requires pgvector and a document store.",
-      "area": "frontend",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-components-app-LogsMetricsStateClient.tsx-111",
-      "title": "[bug] \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
-      "description": "File: components/app/LogsMetricsStateClient.tsx:112\n\nTODO: \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
-      "area": "frontend",
-      "priority": "p2",
-      "status": "failed",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "coverage-api_keys",
-      "title": "Add coverage for SDK module `api_keys`",
-      "description": "No test file found: tests/test_api_keys.py\n\nModule: sdk/mutx/api_keys.py\n\nAdd pytest coverage.",
+      "id": "coverage-clawhub",
+      "title": "Add coverage for SDK module `clawhub`",
+      "description": "No test file found: tests/test_clawhub.py\n\nModule: sdk/mutx/clawhub.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "failed",
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:deps"
-    },
-    {
-      "id": "todo-scripts-autonomy-mutx-gap-scanner-v3.py-44",
-      "title": "[TODO] {desc.strip()}\",",
-      "description": "File: scripts/autonomy/mutx-gap-scanner-v3.py:45\n\nTODO: {desc.strip()}\",",
+      "id": "todo-sdk-mutx-scheduler.py-2",
+      "title": "[Note] Scheduler feature is planned for v1.3 and returns 503.",
+      "description": "File: sdk/mutx/scheduler.py:3\n\nTODO: Scheduler feature is planned for v1.3 and returns 503.",
       "area": "backend",
       "priority": "p3",
       "status": "queued",
       "source": "gap-scanner:todos"
     },
     {
-      "id": "todo-src-api-routes-newsletter.py-30",
-      "title": "[NOTE] For web-based submissions, prefer the Next.js API route",
-      "description": "File: src/api/routes/newsletter.py:31\n\nTODO: For web-based submissions, prefer the Next.js API route",
+      "id": "todo-src-security-compliance.py-477",
+      "title": "[Note] This is a SHOULD requirement - non-conformance is a warning, not a failure.",
+      "description": "File: src/security/compliance.py:478\n\nTODO: This is a SHOULD requirement - non-conformance is a warning, not a failure.",
       "area": "backend",
       "priority": "p3",
       "status": "queued",
       "source": "gap-scanner:todos"
     },
     {
-      "id": "todo-next-env.d.ts-4",
-      "title": "[NOTE] This file should not be edited",
-      "description": "File: next-env.d.ts:5\n\nTODO: This file should not be edited",
-      "area": "frontend",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-app-types-api.ts-1768",
+      "id": "todo-src-api-routes-rag.py-272",
       "title": "[Note] Full implementation requires pgvector and a document store.",
-      "description": "File: app/types/api.ts:1769\n\nTODO: Full implementation requires pgvector and a document store.",
-      "area": "frontend",
+      "description": "File: src/api/routes/rag.py:273\n\nTODO: Full implementation requires pgvector and a document store.",
+      "area": "backend",
       "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-components-app-LogsMetricsStateClient.tsx-111",
-      "title": "[bug] \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
-      "description": "File: components/app/LogsMetricsStateClient.tsx:112\n\nTODO: \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
-      "area": "frontend",
-      "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:todos"
     },
@@ -141,6 +105,24 @@
       "id": "coverage-agent_runtime",
       "title": "Add coverage for SDK module `agent_runtime`",
       "description": "No test file found: tests/test_agent_runtime.py\n\nModule: sdk/mutx/agent_runtime.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
+      "id": "coverage-clawhub",
+      "title": "Add coverage for SDK module `clawhub`",
+      "description": "No test file found: tests/test_clawhub.py\n\nModule: sdk/mutx/clawhub.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
+      "id": "coverage-deployments",
+      "title": "Add coverage for SDK module `deployments`",
+      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
@@ -165,40 +147,49 @@
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "coverage-api_keys",
-      "title": "Add coverage for SDK module `api_keys`",
-      "description": "No test file found: tests/test_api_keys.py\n\nModule: sdk/mutx/api_keys.py\n\nAdd pytest coverage.",
+      "id": "todo-sdk-mutx-scheduler.py-31",
+      "title": "[Note] Scheduler is planned for v1.3. These methods currently return 503 errors.",
+      "description": "File: sdk/mutx/scheduler.py:32\n\nTODO: Scheduler is planned for v1.3. These methods currently return 503 errors.",
       "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "coverage-assistant",
-      "title": "Add coverage for SDK module `assistant`",
-      "description": "No test file found: tests/test_assistant.py\n\nModule: sdk/mutx/assistant.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "coverage-budgets",
-      "title": "Add coverage for SDK module `budgets`",
-      "description": "No test file found: tests/test_budgets.py\n\nModule: sdk/mutx/budgets.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
       "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:deps"
+      "status": "failed",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "todo-src-api-routes-newsletter.py-30",
+      "title": "[NOTE] For web-based submissions, prefer the Next.js API route",
+      "description": "File: src/api/routes/newsletter.py:31\n\nTODO: For web-based submissions, prefer the Next.js API route",
+      "area": "backend",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "todo-next-env.d.ts-4",
+      "title": "[NOTE] This file should not be edited",
+      "description": "File: next-env.d.ts:5\n\nTODO: This file should not be edited",
+      "area": "frontend",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "todo-app-types-api.ts-1768",
+      "title": "[Note] Full implementation requires pgvector and a document store.",
+      "description": "File: app/types/api.ts:1769\n\nTODO: Full implementation requires pgvector and a document store.",
+      "area": "frontend",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "todo-components-app-LogsMetricsStateClient.tsx-111",
+      "title": "[bug] \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
+      "description": "File: components/app/LogsMetricsStateClient.tsx:112\n\nTODO: \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
+      "area": "frontend",
+      "priority": "p2",
+      "status": "failed",
+      "source": "gap-scanner:todos"
     },
     {
       "id": "coverage-agent_runtime",
@@ -222,24 +213,6 @@
       "id": "coverage-analytics",
       "title": "test: add coverage for SDK module `analytics`",
       "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "queued",
-      "source": "gap-scanner:coverage"
-    },
-    {
-      "id": "coverage-api_keys",
-      "title": "test: add coverage for SDK module `api_keys`",
-      "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "queued",
-      "source": "gap-scanner:coverage"
-    },
-    {
-      "id": "coverage-assistant",
-      "title": "test: add coverage for SDK module `assistant`",
-      "description": "No test found for SDK module `assistant`. Create tests/sdk/test_assistant.py",
       "area": "backend",
       "priority": "p1",
       "status": "queued",
