@@ -1,6 +1,6 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T06:40:52.171272",
+  "generated": "2026-04-02T06:45:57.176903",
   "items": [
     {
       "id": "coverage-agent_runtime",
@@ -21,18 +21,9 @@
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "todo-sdk-mutx-scheduler.py-2",
-      "title": "[Note] Scheduler feature is planned for v1.3 and returns 503.",
-      "description": "File: sdk/mutx/scheduler.py:3\n\nTODO: Scheduler feature is planned for v1.3 and returns 503.",
-      "area": "backend",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
-      "title": "[TODO] implement full test coverage\\n\")",
-      "description": "File: scripts/autonomy/mutx-autonomous-daemon.py:144\n\nTODO: implement full test coverage\\n\")",
+      "id": "todo-src-security-compliance.py-477",
+      "title": "[Note] This is a SHOULD requirement - non-conformance is a warning, not a failure.",
+      "description": "File: src/security/compliance.py:478\n\nTODO: This is a SHOULD requirement - non-conformance is a warning, not a failure.",
       "area": "backend",
       "priority": "p3",
       "status": "failed",
@@ -69,6 +60,15 @@
       "id": "todo-scripts-autonomy-mutx-gap-scanner-v3.py-44",
       "title": "[TODO] {desc.strip()}\",",
       "description": "File: scripts/autonomy/mutx-gap-scanner-v3.py:45\n\nTODO: {desc.strip()}\",",
+      "area": "backend",
+      "priority": "p3",
+      "status": "queued",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "todo-src-security-compliance.py-477",
+      "title": "[Note] This is a SHOULD requirement - non-conformance is a warning, not a failure.",
+      "description": "File: src/security/compliance.py:478\n\nTODO: This is a SHOULD requirement - non-conformance is a warning, not a failure.",
       "area": "backend",
       "priority": "p3",
       "status": "queued",
@@ -156,21 +156,12 @@
       "source": "gap-scanner:todos"
     },
     {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:deps"
-    },
-    {
       "id": "coverage-agent_runtime",
       "title": "test: add coverage for SDK module `agent_runtime`",
       "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
       "area": "backend",
       "priority": "p1",
-      "status": "in_progress",
+      "status": "queued",
       "source": "gap-scanner:coverage"
     },
     {
@@ -208,6 +199,15 @@
       "priority": "p1",
       "status": "queued",
       "source": "gap-scanner:coverage"
+    },
+    {
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:deps"
     }
   ]
 }
