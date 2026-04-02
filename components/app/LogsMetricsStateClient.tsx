@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { _useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Activity,
   BarChart3,
   ChevronDown,
   Clock,
-  Filter,
   Gauge,
   History,
   Layers,
@@ -15,7 +14,6 @@ import {
   Search,
   Server,
   Settings,
-  StopCircle,
   Terminal,
   Zap,
 } from "lucide-react";

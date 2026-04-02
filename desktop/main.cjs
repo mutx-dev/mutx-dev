@@ -110,7 +110,6 @@ function pickString(value, keys) {
       return candidate;
     }
   }
-
   return null;
 }
 

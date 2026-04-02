@@ -13,4 +13,4 @@ Owns the trustworthiness of operator-facing signals.
 * logs, metrics, and alerts
 * monitoring config alignment
 
-Read the detailed brief in [Observability SRE](agent.md).
+Read the detailed brief in [Observability SRE](AGENT.md).

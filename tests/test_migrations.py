@@ -51,9 +51,7 @@ def _run_alembic_upgrade(database_url: str) -> None:
         check=False,
     )
     assert result.returncode == 0, (
-        "alembic upgrade head failed\n"
-        f"stdout:\n{result.stdout}\n"
-        f"stderr:\n{result.stderr}"
+        f"alembic upgrade head failed\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
     )
 
 
@@ -250,11 +248,7 @@ def test_user_settings_migration_uses_uuid_user_foreign_key(monkeypatch):
     module.upgrade()
 
     assert captured["table_name"] == "user_settings"
-    columns = {
-        item.name: item
-        for item in captured["items"]
-        if isinstance(item, sa.Column)
-    }
+    columns = {item.name: item for item in captured["items"] if isinstance(item, sa.Column)}
 
     assert isinstance(columns["id"].type, sa.UUID)
     assert isinstance(columns["user_id"].type, sa.UUID)
@@ -300,12 +294,14 @@ def test_convergence_migration_converts_last_heartbeat_to_utc_aware_on_postgresq
     monkeypatch.setattr(
         module,
         "_get_column",
-        lambda table_name, column_name: {
-            "name": column_name,
-            "type": sa.DateTime(timezone=False),
-        }
-        if (table_name, column_name) == ("agents", "last_heartbeat")
-        else None,
+        lambda table_name, column_name: (
+            {
+                "name": column_name,
+                "type": sa.DateTime(timezone=False),
+            }
+            if (table_name, column_name) == ("agents", "last_heartbeat")
+            else None
+        ),
     )
     monkeypatch.setattr(module, "_is_postgresql", lambda: True)
     monkeypatch.setattr(module.op, "f", lambda name: name)
@@ -433,16 +429,22 @@ def test_openclaw_repair_migration_repairs_postgresql_enum_and_alert_timestamps(
     monkeypatch.setattr(module, "_is_postgresql", lambda: True)
     monkeypatch.setattr(module, "_has_postgresql_enum_value", lambda *_args: False)
     monkeypatch.setattr(module, "_has_table", lambda table_name: table_name == "alerts")
-    monkeypatch.setattr(module, "_has_column", lambda table_name, column_name: (table_name, column_name) == ("alerts", "resolved_at"))
+    monkeypatch.setattr(
+        module,
+        "_has_column",
+        lambda table_name, column_name: (table_name, column_name) == ("alerts", "resolved_at"),
+    )
     monkeypatch.setattr(
         module,
         "_get_column",
-        lambda table_name, column_name: {
-            "name": column_name,
-            "type": sa.DateTime(timezone=False),
-        }
-        if (table_name, column_name) == ("alerts", "resolved_at")
-        else None,
+        lambda table_name, column_name: (
+            {
+                "name": column_name,
+                "type": sa.DateTime(timezone=False),
+            }
+            if (table_name, column_name) == ("alerts", "resolved_at")
+            else None
+        ),
     )
     monkeypatch.setattr(module.op, "execute", lambda statement: executed.append(str(statement)))
 
@@ -523,13 +525,9 @@ def test_alembic_upgrade_repairs_representative_legacy_live_schema(tmp_path):
                 )
             )
             connection.execute(
-                sa.text(
-                    "INSERT INTO alembic_version (version_num) VALUES ('8b3a6f1d2c4e')"
-                )
+                sa.text("INSERT INTO alembic_version (version_num) VALUES ('8b3a6f1d2c4e')")
             )
-            connection.execute(
-                sa.text("CREATE TABLE users (id CHAR(36) NOT NULL PRIMARY KEY)")
-            )
+            connection.execute(sa.text("CREATE TABLE users (id CHAR(36) NOT NULL PRIMARY KEY)"))
             connection.execute(
                 sa.text(
                     "CREATE TABLE agents ("

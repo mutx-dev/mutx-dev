@@ -13,4 +13,4 @@ Owns the control plane as the product source of truth.
 * schema and model alignment
 * service extraction and lifecycle semantics
 
-Read the detailed brief in [Control Plane Steward](agent.md).
+Read the detailed brief in [Control Plane Steward](AGENT.md).

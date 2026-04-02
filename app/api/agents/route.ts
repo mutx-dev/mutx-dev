@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
  * Proxies directly to control plane without user filtering.
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  return withErrorHandling(async (req: Request) => {
+  return withErrorHandling(async (_req: Request) => {
     const token = await getAuthToken(request)
     if (!token) {
       return unauthorized()

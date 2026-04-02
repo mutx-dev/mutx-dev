@@ -19,7 +19,7 @@ const WINDOW_LABELS = {
   settings: "Settings",
 };
 
-function getBaseRouteForRole(role) {
+function _getBaseRouteForRole(role) {
   if (role === "sessions") {
     return "/dashboard/sessions";
   }
@@ -458,8 +458,17 @@ async function createWindow(role) {
     emitStateChange();
   });
 
+  function isSafeExternalUrl(url) {
+    try {
+      const parsedUrl = new URL(url);
+      return parsedUrl.protocol === "https:" || parsedUrl.protocol === "http:";
+    } catch {
+      return false;
+    }
+  }
+
   window.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
-    if (targetUrl.startsWith("http")) {
+    if (isSafeExternalUrl(targetUrl)) {
       require("electron").shell.openExternal(targetUrl);
     }
     return { action: "deny" };

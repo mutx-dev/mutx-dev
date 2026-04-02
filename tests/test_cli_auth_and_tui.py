@@ -482,8 +482,16 @@ def test_build_cockpit_snapshot_ranks_incidents_by_urgency() -> None:
         runtime_snapshot={
             "gateway": {"status": "healthy"},
             "bindings": [
-                {"assistant_id": "alpha", "workspace": "/tmp/workspace-alpha", "tracked_by_mutx": True},
-                {"assistant_id": "beta", "workspace": "/tmp/workspace-beta", "tracked_by_mutx": True},
+                {
+                    "assistant_id": "alpha",
+                    "workspace": "/tmp/workspace-alpha",
+                    "tracked_by_mutx": True,
+                },
+                {
+                    "assistant_id": "beta",
+                    "workspace": "/tmp/workspace-beta",
+                    "tracked_by_mutx": True,
+                },
                 {"assistant_id": "x", "workspace": "/tmp/workspace-x", "tracked_by_mutx": False},
             ],
         },
@@ -757,7 +765,11 @@ def test_render_openclaw_runtime_detail_shows_gateway_binding_and_sessions() -> 
         session_count=2,
         installed_skills=[SimpleNamespace(id="web_search")],
         channels=[SimpleNamespace(id="discord", enabled=False)],
-        deployments=[SimpleNamespace(id="dep-1", status="failed", node_id=None, error_message="heartbeat timeout")],
+        deployments=[
+            SimpleNamespace(
+                id="dep-1", status="failed", node_id=None, error_message="heartbeat timeout"
+            )
+        ],
     )
 
     rendered = _render_openclaw_runtime_detail(
@@ -825,7 +837,9 @@ def test_assistant_service_lists_all_local_sessions_without_agent_id(monkeypatch
         {"id": "session-x", "agent": "x", "channel": "cli"},
         {"id": "session-pa", "agent": "personal-assistant", "channel": "discord"},
     ]
-    monkeypatch.setattr("cli.services.assistant.list_local_sessions", lambda assistant_id=None: sessions)
+    monkeypatch.setattr(
+        "cli.services.assistant.list_local_sessions", lambda assistant_id=None: sessions
+    )
 
     service = AssistantService(config=LoginConfig(), client_factory=lambda _: None)
 

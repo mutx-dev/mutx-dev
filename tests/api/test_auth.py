@@ -113,9 +113,7 @@ class TestAuthEndpoints:
         assert updated_user.is_email_verified is True
 
     @pytest.mark.asyncio
-    async def test_local_bootstrap_rejects_non_loopback_clients(
-        self, db_session: AsyncSession
-    ):
+    async def test_local_bootstrap_rejects_non_loopback_clients(self, db_session: AsyncSession):
         app = create_app(
             enable_lifespan=False,
             background_monitor_enabled=False,
@@ -421,9 +419,7 @@ class TestAuthEndpoints:
         await db_session.execute(
             update(User)
             .where(User.id == user.id)
-            .values(
-                email_verification_expires_at=datetime.now(timezone.utc) - timedelta(minutes=1)
-            )
+            .values(email_verification_expires_at=datetime.now(timezone.utc) - timedelta(minutes=1))
         )
         await db_session.commit()
 

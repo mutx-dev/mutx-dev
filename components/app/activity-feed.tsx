@@ -85,53 +85,6 @@ function groupByDay(events: ActivityEvent[]): Record<string, ActivityEvent[]> {
   return groups
 }
 
-function ActivityRow({ event }: { event: ActivityEvent }) {
-  return (
-    <div className={cn(
-      'rounded-lg p-3 border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors'
-    )}>
-      <div className="flex items-start gap-3">
-        <div className={cn(
-          'flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold font-mono',
-          activityBgColors[event.type],
-          activityColors[event.type]
-        )}>
-          {activityIcons[event.type] || '•'}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <p className="text-sm text-slate-300">
-              <span className="font-medium text-cyan-300">{event.actor}</span>{' '}
-              <span className={activityColors[event.type]}>
-                {event.description}
-              </span>
-            </p>
-            <span className="text-[10px] text-slate-500 font-mono shrink-0">
-              {formatRelativeTime(event.timestamp)}
-            </span>
-          </div>
-          {event.entity && (
-            <div className="mt-1.5 p-2 bg-black/30 rounded-md text-xs border border-white/5">
-              <span className="text-slate-500">{event.entity.type === 'agent' ? 'Agent' : 'Deployment'}</span>
-              <span className="text-slate-300 ml-1">{event.entity.name}</span>
-              {event.entity.status && (
-                <span className={cn(
-                  'ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium',
-                  event.entity.status === 'running' ? 'bg-emerald-500/15 text-emerald-300' :
-                  event.entity.status === 'failed' || event.entity.status === 'error' ? 'bg-red-500/15 text-red-300' :
-                  'bg-amber-500/15 text-amber-300'
-                )}>
-                  {event.entity.status}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 function TimelineRow({ event }: { event: ActivityEvent }) {
   return (
     <div className="flex items-start gap-2.5 pl-3 py-1.5 hover:bg-white/5 rounded-r transition-colors relative">

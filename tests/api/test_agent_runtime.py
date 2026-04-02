@@ -187,9 +187,7 @@ async def test_heartbeat_promotes_latest_deploying_deployment_to_running(client,
 
 
 @pytest.mark.asyncio
-async def test_agent_log_submission_persists_metadata_as_json(
-    client, db_session, test_agent
-):
+async def test_agent_log_submission_persists_metadata_as_json(client, db_session, test_agent):
     from src.api.models.models import AgentLog
 
     api_key = f"mutx_agent_{test_agent.id.hex}_{uuid.uuid4().hex[:24]}"

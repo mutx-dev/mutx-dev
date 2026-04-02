@@ -86,7 +86,9 @@ def sha256_for_url(url: str) -> str:
     return digest.hexdigest()
 
 
-def _run_pip_report(repo_root: Path, optional_extras: str, python_executable: str) -> dict[str, Any]:
+def _run_pip_report(
+    repo_root: Path, optional_extras: str, python_executable: str
+) -> dict[str, Any]:
     requirement = f".[{optional_extras}]" if optional_extras else "."
     with tempfile.TemporaryDirectory(prefix="mutx-homebrew-formula-") as temp_dir:
         report_path = Path(temp_dir) / "pip-report.json"
@@ -116,7 +118,9 @@ def _run_pip_report(repo_root: Path, optional_extras: str, python_executable: st
         return json.loads(report_path.read_text(encoding="utf-8"))
 
 
-def dependency_resources_from_report(report: dict[str, Any], project_name: str) -> list[HomebrewResource]:
+def dependency_resources_from_report(
+    report: dict[str, Any], project_name: str
+) -> list[HomebrewResource]:
     project_key = _normalize_package_name(project_name)
     resources: dict[str, HomebrewResource] = {}
     for item in report.get("install", []):
@@ -133,7 +137,12 @@ def dependency_resources_from_report(report: dict[str, Any], project_name: str) 
         archive_info = download_info.get("archive_info") or {}
         hashes = archive_info.get("hashes") or {}
         sha256 = hashes.get("sha256")
-        if not isinstance(url, str) or not url.strip() or not isinstance(sha256, str) or not sha256.strip():
+        if (
+            not isinstance(url, str)
+            or not url.strip()
+            or not isinstance(sha256, str)
+            or not sha256.strip()
+        ):
             raise ValueError(f"missing download url or sha256 for dependency {name!r}")
 
         resource = HomebrewResource(name=normalized_name, url=url, sha256=sha256)
@@ -177,7 +186,9 @@ def render_formula(
         for resource in resources
     )
     if resource_blocks:
-        resource_section = "\n".join(f"  {line}" if line else "" for line in resource_blocks.splitlines())
+        resource_section = "\n".join(
+            f"  {line}" if line else "" for line in resource_blocks.splitlines()
+        )
         resource_section = f"{resource_section}\n\n"
     else:
         resource_section = ""
@@ -217,7 +228,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--repository", default=DEFAULT_REPOSITORY, help="GitHub owner/repo slug")
     parser.add_argument("--homepage", default=DEFAULT_HOMEPAGE, help="Formula homepage URL")
     parser.add_argument("--tag", help="CLI release tag (defaults to cli-v<project-version>)")
-    parser.add_argument("--optional-extras", default=DEFAULT_OPTIONAL_EXTRAS, help="Extras to include")
+    parser.add_argument(
+        "--optional-extras", default=DEFAULT_OPTIONAL_EXTRAS, help="Extras to include"
+    )
     parser.add_argument(
         "--python-formula",
         default=DEFAULT_PYTHON_FORMULA,

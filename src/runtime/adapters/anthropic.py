@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 from dataclasses import dataclass, field
-from typing import Any, Mapping, Sequence
+from typing import Any, AsyncIterator, Mapping, Sequence
 
 from anthropic import AsyncAnthropic
 
@@ -143,7 +143,6 @@ class AnthropicAdapter(AgentRuntime):
         tool_calls = self._convert_tool_calls(response.content)
 
         # Handle tool execution if needed
-        result_content = None
         while tool_calls and tool_handlers:
             for tc in tool_calls:
                 tool_name = tc["function"]["name"]

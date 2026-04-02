@@ -1,21 +1,45 @@
-import warnings
-
 import httpx
 
 from mutx.agent_runtime import (
-    AgentInfo,
-    AgentMetrics,
-    Command,
-    MutxAgentClient,
-    MutxAgentSyncClient,
-    create_agent_client,
+    AgentInfo as AgentInfo,
+)
+from mutx.agent_runtime import (
+    AgentMetrics as AgentMetrics,
+)
+from mutx.agent_runtime import (
+    Command as Command,
+)
+from mutx.agent_runtime import (
+    MutxAgentClient as MutxAgentClient,
+)
+from mutx.agent_runtime import (
+    MutxAgentSyncClient as MutxAgentSyncClient,
+)
+from mutx.agent_runtime import (
+    create_agent_client as create_agent_client,
 )
 from mutx.agents import Agents
+from mutx.analytics import Analytics
 from mutx.api_keys import APIKeys
+from mutx.assistant import Assistant
+from mutx.budgets import Budgets
 from mutx.clawhub import ClawHub
 from mutx.deployments import Deployments
-from mutx.leads import Contacts, Leads
+from mutx.governance_credentials import GovernanceCredentials
+from mutx.governance_supervision import GovernanceSupervision
+from mutx.ingest import Ingest
+from mutx.leads import Contacts as Contacts
+from mutx.leads import Leads
+from mutx.newsletter import Newsletter
 from mutx.observability import Observability
+from mutx.onboarding import Onboarding
+from mutx.runtime import Runtime
+from mutx.scheduler import Scheduler
+from mutx.security import Security
+from mutx.sessions import Sessions
+from mutx.swarms import Swarms
+from mutx.templates import Templates
+from mutx.usage import UsageEvents
 from mutx.webhooks import Webhooks
 
 
@@ -29,222 +53,99 @@ class MutxClient:
         self.api_key = api_key
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
-
-        self._client = httpx.Client(
+        self.http = httpx.Client(
             base_url=self.base_url,
-            timeout=self.timeout,
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            timeout=timeout,
         )
-
-        self.agents = Agents(self._client)
-        self.api_keys = APIKeys(self._client)
-        self.clawhub = ClawHub(self._client)
-        self.deployments = Deployments(self._client)
-        self.leads = Leads(self._client)
-        self.contacts = Contacts(self._client)
-        self.webhooks = Webhooks(self._client)
-        self.observability = Observability(self._client)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
 
     def close(self):
-        self._client.close()
+        self.http.close()
 
     @property
     def agents(self) -> Agents:
-        return self._agents
+        return Agents(self.http)
 
-    @agents.setter
-    def agents(self, value: Agents):
-        self._agents = value
+    @property
+    def analytics(self) -> Analytics:
+        return Analytics(self.http)
 
     @property
     def api_keys(self) -> APIKeys:
-        return self._api_keys
+        return APIKeys(self.http)
 
-    @api_keys.setter
-    def api_keys(self, value: APIKeys):
-        self._api_keys = value
+    @property
+    def assistant(self) -> Assistant:
+        return Assistant(self.http)
+
+    @property
+    def budgets(self) -> Budgets:
+        return Budgets(self.http)
 
     @property
     def clawhub(self) -> ClawHub:
-        return self._clawhub
-
-    @clawhub.setter
-    def clawhub(self, value: ClawHub):
-        self._clawhub = value
+        return ClawHub(self.http)
 
     @property
     def deployments(self) -> Deployments:
-        return self._deployments
+        return Deployments(self.http)
 
-    @deployments.setter
-    def deployments(self, value: Deployments):
-        self._deployments = value
+    @property
+    def governance_credentials(self) -> GovernanceCredentials:
+        return GovernanceCredentials(self.http)
+
+    @property
+    def governance_supervision(self) -> GovernanceSupervision:
+        return GovernanceSupervision(self.http)
+
+    @property
+    def ingest(self) -> Ingest:
+        return Ingest(self.http)
 
     @property
     def leads(self) -> Leads:
-        return self._leads
-
-    @leads.setter
-    def leads(self, value: Leads):
-        self._leads = value
+        return Leads(self.http)
 
     @property
-    def contacts(self) -> Contacts:
-        return self._contacts
-
-    @contacts.setter
-    def contacts(self, value: Contacts):
-        self._contacts = value
-
-    @property
-    def webhooks(self) -> Webhooks:
-        return self._webhooks
-
-    @webhooks.setter
-    def webhooks(self, value: Webhooks):
-        self._webhooks = value
+    def newsletter(self) -> Newsletter:
+        return Newsletter(self.http)
 
     @property
     def observability(self) -> Observability:
-        return self._observability
-
-    @observability.setter
-    def observability(self, value: Observability):
-        self._observability = value
-
-
-class MutxAsyncClient:
-    def __init__(
-        self,
-        api_key: str,
-        base_url: str = "https://api.mutx.dev",
-        timeout: float = 30.0,
-    ):
-        warnings.warn(
-            "MutxAsyncClient is deprecated for sync-style direct usage; use async-prefixed"
-            " resource methods like acreate, alist, aget, etc. when using async transports.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        self.api_key = api_key
-        self.base_url = base_url.rstrip("/")
-        self.timeout = timeout
-
-        self._client = httpx.AsyncClient(
-            base_url=self.base_url,
-            timeout=self.timeout,
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-        )
-
-        self.agents = Agents(self._client)
-        self.api_keys = APIKeys(self._client)
-        self.clawhub = ClawHub(self._client)
-        self.deployments = Deployments(self._client)
-        self.leads = Leads(self._client)
-        self.contacts = Contacts(self._client)
-        self.webhooks = Webhooks(self._client)
-        self.observability = Observability(self._client)
-
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self.aclose()
-
-    async def aclose(self):
-        await self._client.aclose()
+        return Observability(self.http)
 
     @property
-    def agents(self) -> Agents:
-        return self._agents
-
-    @agents.setter
-    def agents(self, value: Agents):
-        self._agents = value
+    def onboarding(self) -> Onboarding:
+        return Onboarding(self.http)
 
     @property
-    def api_keys(self) -> APIKeys:
-        return self._api_keys
-
-    @api_keys.setter
-    def api_keys(self, value: APIKeys):
-        self._api_keys = value
+    def runtime(self) -> Runtime:
+        return Runtime(self.http)
 
     @property
-    def clawhub(self) -> ClawHub:
-        return self._clawhub
-
-    @clawhub.setter
-    def clawhub(self, value: ClawHub):
-        self._clawhub = value
+    def scheduler(self) -> Scheduler:
+        return Scheduler(self.http)
 
     @property
-    def deployments(self) -> Deployments:
-        return self._deployments
-
-    @deployments.setter
-    def deployments(self, value: Deployments):
-        self._deployments = value
+    def security(self) -> Security:
+        return Security(self.http)
 
     @property
-    def leads(self) -> Leads:
-        return self._leads
-
-    @leads.setter
-    def leads(self, value: Leads):
-        self._leads = value
+    def sessions(self) -> Sessions:
+        return Sessions(self.http)
 
     @property
-    def contacts(self) -> Contacts:
-        return self._contacts
+    def swarms(self) -> Swarms:
+        return Swarms(self.http)
 
-    @contacts.setter
-    def contacts(self, value: Contacts):
-        self._contacts = value
+    @property
+    def templates(self) -> Templates:
+        return Templates(self.http)
+
+    @property
+    def usage(self) -> UsageEvents:
+        return UsageEvents(self.http)
 
     @property
     def webhooks(self) -> Webhooks:
-        return self._webhooks
-
-    @webhooks.setter
-    def webhooks(self, value: Webhooks):
-        self._webhooks = value
-
-    @property
-    def observability(self) -> Observability:
-        return self._observability
-
-    @observability.setter
-    def observability(self, value: Observability):
-        self._observability = value
-
-
-__all__ = [
-    "MutxClient",
-    "MutxAsyncClient",
-    "MutxAgentClient",
-    "MutxAgentSyncClient",
-    "AgentInfo",
-    "Command",
-    "AgentMetrics",
-    "APIKeys",
-    "ClawHub",
-    "Contacts",
-    "Deployments",
-    "Leads",
-    "Webhooks",
-    "Observability",
-    "create_agent_client",
-]
+        return Webhooks(self.http)

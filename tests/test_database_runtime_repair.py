@@ -265,12 +265,14 @@ def test_runtime_schema_repair_repairs_openclaw_enum_and_alert_timestamp_drift(m
     monkeypatch.setattr(
         database,
         "_get_column",
-        lambda _connection, table_name, column_name: {
-            "name": column_name,
-            "type": database.DateTime(timezone=False),
-        }
-        if (table_name, column_name) == ("alerts", "resolved_at")
-        else None,
+        lambda _connection, table_name, column_name: (
+            {
+                "name": column_name,
+                "type": database.DateTime(timezone=False),
+            }
+            if (table_name, column_name) == ("alerts", "resolved_at")
+            else None
+        ),
     )
 
     connection = _FakePostgreSQLConnection()

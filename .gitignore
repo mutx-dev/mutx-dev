@@ -81,3 +81,7 @@ test-results/
 # Capacitor build outputs
 out/
 android/app/src/main/assets/
+next-env.d.ts
+*.mp4
+*.png
+__pycache__/

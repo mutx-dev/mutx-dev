@@ -248,6 +248,25 @@ jobs:
           name: autonomy-queue-health
           path: autonomy-queue-health.json
 
+      - name: Sync with origin/main before commit
+        run: |
+          # Save the local queue health snapshot (captured in this run)
+          cp autonomy-queue-health.json /tmp/autonomy-queue-health.json
+          # Hard reset to origin/main — the gap scanner may have force-pushed during this run
+          git fetch origin main
+          git reset --hard origin/main
+          # Restore the snapshot captured in this workflow run
+          cp /tmp/autonomy-queue-health.json autonomy-queue-health.json
+
+      - name: Commit queue health snapshot to repo
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          file_pattern: autonomy-queue-health.json
+          commit_message: "chore(ops): commit queue health snapshot [skip ci]"
+          skip_dirty_check: false
+          skip_fetch: true
+          quiet: true
+
       - name: Report empty queue (non-fatal)
         if: ${{ steps.queue_health.outputs.empty_violation == 'true' }}
         run: |

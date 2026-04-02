@@ -30,11 +30,15 @@ class RecordingClient:
     def __init__(self) -> None:
         self.calls: list[dict[str, Any]] = []
 
-    def post(self, url: str, json: Any = None, headers: dict[str, str] | None = None) -> DummyResponse:
+    def post(
+        self, url: str, json: Any = None, headers: dict[str, str] | None = None
+    ) -> DummyResponse:
         self.calls.append({"method": "POST", "url": url, "json": json, "headers": headers or {}})
         return DummyResponse()
 
-    def patch(self, url: str, json: Any = None, headers: dict[str, str] | None = None) -> DummyResponse:
+    def patch(
+        self, url: str, json: Any = None, headers: dict[str, str] | None = None
+    ) -> DummyResponse:
         self.calls.append({"method": "PATCH", "url": url, "json": json, "headers": headers or {}})
         return DummyResponse()
 

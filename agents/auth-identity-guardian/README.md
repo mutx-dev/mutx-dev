@@ -13,4 +13,4 @@ Owns login, registration, token handling, and account lifecycle safety.
 * cookie and bearer-token handling
 * ownership checks and session hardening
 
-Read the detailed brief in [Auth Identity Guardian](agent.md).
+Read the detailed brief in [Auth Identity Guardian](AGENT.md).

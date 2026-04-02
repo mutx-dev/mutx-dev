@@ -74,4 +74,3 @@ class TestRuntimeSnapshots:
         assert payload["status"] == "healthy"
         assert payload["binding_count"] == 1
         assert payload["last_synced_at"] is not None
-

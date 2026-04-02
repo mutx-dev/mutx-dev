@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 import { getApiBaseUrl } from "@/app/api/_lib/controlPlane";
 import { proxyJson } from "@/app/api/_lib/proxy";

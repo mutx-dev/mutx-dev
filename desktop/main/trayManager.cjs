@@ -1,9 +1,9 @@
-const { Tray, Menu, nativeImage, app } = require("electron");
+const { Tray, Menu, nativeImage, _app } = require("electron");
 const fs = require("fs");
 const path = require("path");
 
 let tray = null;
-let statusCallback = null;
+let _statusCallback = null;
 let onToggleWindow = null;
 let onOpenDashboard = null;
 let onOpenSetup = null;
@@ -57,7 +57,7 @@ function updateTrayMenu(status = {}) {
     apiHealth = "unknown",
     gatewayHealth = "unknown",
     farameshHealth = "unknown",
-    authenticated = false,
+    _authenticated = false,
     assistantName = null,
   } = status;
 

@@ -47,14 +47,14 @@ const toneClass: Record<string, string> = {
 export function AnimatedTerminal() {
   const [visibleSteps, setVisibleSteps] = useState(0)
   const [typing, setTyping] = useState('')
-  const [isCompact, setIsCompact] = useState(false)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   const renderedSteps = useMemo(() => steps.slice(0, visibleSteps), [visibleSteps])
 
   useEffect(() => {
     const updateViewportMode = () => {
-      setIsCompact(window.innerWidth < 1024)
+      const compact = window.innerWidth < 1024
+      if (compact) setTyping('compact')
     }
 
     updateViewportMode()

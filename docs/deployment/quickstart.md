@@ -128,7 +128,8 @@ mutx tui
 
 Useful URLs:
 
-* site and app shell: `http://localhost:3000`
+* site and dashboard: `http://localhost:3000`
+* Dashboard: `http://localhost:3000/dashboard`
 * API: `http://localhost:8000`
 * API docs: `http://localhost:8000/docs`
 

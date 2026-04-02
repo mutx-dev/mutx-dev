@@ -521,7 +521,6 @@ class TestCreateDeployment:
         assert response.status_code == 400
         assert response.json() == {"detail": "Cannot deploy an agent that is being deleted"}
 
-
     @pytest.mark.asyncio
     async def test_create_deployment_not_found(self, client: AsyncClient):
         """Test creating deployment for non-existent agent returns 404."""

@@ -54,7 +54,9 @@ The app exposes current resource routes such as:
 
 ### Rendered shells
 
-The current dashboard shell is rendered from `app/dashboard/*` and positions the product around:
+The current dashboard shell is split between stable operator pages and preview/demo or redirect-backed pages.
+
+Stable pages:
 
 - overview
 - auth
@@ -65,6 +67,15 @@ The current dashboard shell is rendered from `app/dashboard/*` and positions the
 - budgets and monitoring
 - API keys
 - webhooks
+
+Preview/demo or redirect-backed pages:
+
+- channels
+- skills
+- orchestration
+- memory
+- spawn
+- logs
 
 Release hardening now adds:
 

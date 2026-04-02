@@ -15,7 +15,7 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ runId: string }> }
 ): Promise<NextResponse> {
-  return withErrorHandling(async (req: Request) => {
+  return withErrorHandling(async (_req: Request) => {
     const token = await getAuthToken(request)
     if (!token) {
       return unauthorized()

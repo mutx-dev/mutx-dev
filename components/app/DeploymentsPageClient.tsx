@@ -7,12 +7,10 @@ import {
   Calendar,
   Clock,
   Loader2,
-  Play,
   Plus,
   Power,
   RefreshCcw,
   RotateCcw,
-  Search,
   Server,
   Trash2,
   Copy,
@@ -296,7 +294,7 @@ export function DeploymentsPageClient() {
   const [sortBy, setSortBy] = useState<"date"|"status"|"agent">("date");
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [isMac, setIsMac] = useState(false);
+  const [isMac] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const runningDeployments = deployments.filter(

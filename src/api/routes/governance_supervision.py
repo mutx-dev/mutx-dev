@@ -2,11 +2,12 @@
 Faramesh supervision API routes for production agent deployment.
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from typing import Optional
 
-from src.api.middleware.auth import get_current_internal_user
+from src.api.config import get_settings
+from src.api.middleware.auth import get_current_user
 from src.api.models import User
 from src.api.services.faramesh_supervisor import (
     SupervisionValidationError,
@@ -18,7 +19,7 @@ router = APIRouter(prefix="/runtime/governance/supervised", tags=["governance"])
 
 class SupervisedAgentStartRequest(BaseModel):
     agent_id: str
-    command: Optional[list[str]] = None
+    command: list[str]
     profile: Optional[str] = None
     env: dict[str, str] = Field(default_factory=dict)
     faramesh_policy: Optional[str] = None
@@ -35,18 +36,36 @@ class SupervisedLaunchProfileResponse(BaseModel):
     faramesh_policy: Optional[str] = None
 
 
+def _assert_internal_user(current_user: User) -> None:
+    """Restrict supervision operations to verified internal users."""
+    if not current_user.is_email_verified:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    settings = get_settings()
+    allowed_domains = {
+        domain.strip().lower()
+        for domain in settings.internal_user_email_domains
+        if domain and domain.strip()
+    }
+
+    user_domain = current_user.email.rsplit("@", 1)[-1].lower() if "@" in current_user.email else ""
+    if user_domain not in allowed_domains:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+
 @router.get("/")
 async def list_supervised_agents(
-    _current_user: User = Depends(get_current_internal_user),
+    current_user: User = Depends(get_current_user),
 ):
     """List all supervised agents."""
+    _assert_internal_user(current_user)
     supervisor = get_faramesh_supervisor()
     return supervisor.list_agents()
 
 
 @router.get("/profiles", response_model=list[SupervisedLaunchProfileResponse])
 async def list_supervised_launch_profiles(
-    _current_user: User = Depends(get_current_internal_user),
+    current_user: User = Depends(get_current_user),
 ):
     """List configured launch profiles for supervised agents."""
     supervisor = get_faramesh_supervisor()
@@ -64,9 +83,10 @@ async def list_supervised_launch_profiles(
 @router.get("/{agent_id}")
 async def get_supervised_agent(
     agent_id: str,
-    _current_user: User = Depends(get_current_internal_user),
+    current_user: User = Depends(get_current_user),
 ):
     """Get status of a supervised agent."""
+    _assert_internal_user(current_user)
     supervisor = get_faramesh_supervisor()
     status = supervisor.get_agent_status(agent_id)
 
@@ -79,9 +99,10 @@ async def get_supervised_agent(
 @router.post("/start")
 async def start_supervised_agent(
     request: SupervisedAgentStartRequest,
-    _current_user: User = Depends(get_current_internal_user),
+    current_user: User = Depends(get_current_user),
 ):
     """Start an agent under Faramesh supervision."""
+    _assert_internal_user(current_user)
     supervisor = get_faramesh_supervisor()
     try:
         prepared = supervisor.prepare_launch_request(
@@ -107,9 +128,10 @@ async def start_supervised_agent(
 async def stop_supervised_agent(
     agent_id: str,
     request: SupervisedAgentStopRequest,
-    _current_user: User = Depends(get_current_internal_user),
+    current_user: User = Depends(get_current_user),
 ):
     """Stop a supervised agent."""
+    _assert_internal_user(current_user)
     supervisor = get_faramesh_supervisor()
 
     success = await supervisor.stop_agent(agent_id, timeout=request.timeout)
@@ -123,9 +145,10 @@ async def stop_supervised_agent(
 @router.post("/{agent_id}/restart")
 async def restart_supervised_agent(
     agent_id: str,
-    _current_user: User = Depends(get_current_internal_user),
+    current_user: User = Depends(get_current_user),
 ):
     """Restart a supervised agent."""
+    _assert_internal_user(current_user)
     supervisor = get_faramesh_supervisor()
 
     success = await supervisor.restart_agent(agent_id)

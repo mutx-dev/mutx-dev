@@ -119,13 +119,13 @@ async function verifyTurnstileToken(request: Request, token: string) {
  * Backend python API may eventually proxy here or share the same DB.
  */
 export async function POST(request: Request): Promise<NextResponse> {
-  return withErrorHandling(async (req: Request) => {
+  return withErrorHandling(async (_req: Request) => {
     if (!sql) {
       throw new Error('Database not configured')
     }
     
-    const body = await req.json().catch(() => ({}))
-    const { email, source, captchaToken, honeypot } = body
+    const body = await request.json().catch(() => ({}))
+    const { email: _email, source, captchaToken, honeypot } = body
 
     // 1. Honeypot check
     if (honeypot) {

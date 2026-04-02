@@ -13,4 +13,4 @@ Owns the quality bar for repo-native validation.
 * CI drift cleanup
 * truthful smoke and integration checks
 
-Read the detailed brief in [QA Reliability Engineer](agent.md).
+Read the detailed brief in [QA Reliability Engineer](AGENT.md).

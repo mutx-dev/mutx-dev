@@ -25,7 +25,6 @@ import {
   TerminalSquare,
   Workflow,
   Wrench,
-  Zap,
 } from "lucide-react";
 
 import { DesktopRouteListener } from "@/components/desktop/DesktopRouteListener";

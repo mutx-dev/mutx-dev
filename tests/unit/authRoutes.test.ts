@@ -279,6 +279,78 @@ describe('auth route handlers', () => {
     })
   })
 
+
+  describe('POST /api/auth/refresh', () => {
+    it('returns 401 when refresh cookie is missing', async () => {
+      const { POST } = await import('../../app/api/auth/refresh/route')
+
+      const response = await POST({
+        json: async () => ({ refresh_token: 'body_token' }),
+        cookies: {
+          get: () => undefined,
+        },
+      } as unknown as NextRequest)
+
+      expect(response.status).toBe(401)
+      await expect(response.json()).resolves.toEqual({ detail: 'Unauthorized' })
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('returns 401 when refresh cookie does not match body token', async () => {
+      const { POST } = await import('../../app/api/auth/refresh/route')
+
+      const response = await POST({
+        json: async () => ({ refresh_token: 'body_token' }),
+        cookies: {
+          get: () => ({ value: 'different_cookie_token' }),
+        },
+      } as unknown as NextRequest)
+
+      expect(response.status).toBe(401)
+      await expect(response.json()).resolves.toEqual({ detail: 'Unauthorized' })
+      expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('refreshes tokens when refresh cookie matches body token', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          access_token: 'new_access_token',
+          refresh_token: 'new_refresh_token',
+          expires_in: 1800,
+        }),
+      })
+      getRefreshToken.mockReturnValue('matching_token')
+      const { POST } = await import('../../app/api/auth/refresh/route')
+
+      const response = await POST({
+        json: async () => ({ refresh_token: 'matching_token' }),
+        cookies: {
+          get: () => ({ value: 'matching_token' }),
+        },
+      } as unknown as NextRequest)
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:8000/v1/auth/refresh',
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: 'matching_token' }),
+          cache: 'no-store',
+        }),
+      )
+      expect(response.status).toBe(200)
+      await expect(response.json()).resolves.toEqual({
+        access_token: 'new_access_token',
+        expires_in: 1800,
+      })
+      const setCookieHeader = response.headers.get('set-cookie')
+      expect(setCookieHeader).toContain('access_token=')
+      expect(setCookieHeader).toContain('refresh_token=')
+    })
+  })
+
   describe('POST /api/auth/logout', () => {
     it('returns 200 with success payload', async () => {
       const { POST } = await import('../../app/api/auth/logout/route')

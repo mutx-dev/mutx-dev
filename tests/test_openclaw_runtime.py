@@ -30,7 +30,9 @@ from cli.runtime_registry import (
 def test_get_gateway_health_reports_needs_onboard_when_cli_exists_without_config(
     monkeypatch,
 ) -> None:
-    monkeypatch.setattr("cli.openclaw_runtime.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw")
+    monkeypatch.setattr(
+        "cli.openclaw_runtime.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw"
+    )
     monkeypatch.setattr("cli.openclaw_runtime.detect_openclaw_config_path", lambda: None)
     monkeypatch.setattr("cli.openclaw_runtime.detect_openclaw_state_dir", lambda: None)
     monkeypatch.setattr("cli.openclaw_runtime.detect_gateway_port", lambda: None)
@@ -315,7 +317,9 @@ def test_update_binding_governance_persists_binding(monkeypatch, tmp_path: Path)
     assert saved["governance_policy"] == "/tmp/.mutx/policies/starter.fpl"
 
 
-def test_inspect_importable_openclaw_runtime_succeeds_for_valid_existing_install(monkeypatch) -> None:
+def test_inspect_importable_openclaw_runtime_succeeds_for_valid_existing_install(
+    monkeypatch,
+) -> None:
     health = OpenClawGatewayHealth(
         status="healthy",
         cli_available=True,
@@ -332,13 +336,17 @@ def test_inspect_importable_openclaw_runtime_succeeds_for_valid_existing_install
     )
     monkeypatch.setattr(
         "cli.openclaw_runtime.ensure_openclaw_installed",
-        lambda **_: __import__("cli.openclaw_runtime", fromlist=["OpenClawInstallResolution"]).OpenClawInstallResolution(
+        lambda **_: __import__(
+            "cli.openclaw_runtime", fromlist=["OpenClawInstallResolution"]
+        ).OpenClawInstallResolution(
             binary_path="/opt/homebrew/bin/openclaw",
             install_method="npm",
             disposition="detected_existing",
         ),
     )
-    monkeypatch.setattr("cli.openclaw_runtime.resolve_openclaw_config_file", lambda: "/tmp/.openclaw/openclaw.json")
+    monkeypatch.setattr(
+        "cli.openclaw_runtime.resolve_openclaw_config_file", lambda: "/tmp/.openclaw/openclaw.json"
+    )
     monkeypatch.setattr("cli.openclaw_runtime.validate_openclaw_config", lambda: "Config valid")
     monkeypatch.setattr("cli.openclaw_runtime.get_gateway_health", lambda: health)
 
@@ -366,13 +374,17 @@ def test_inspect_importable_openclaw_runtime_requires_reachable_gateway(monkeypa
     )
     monkeypatch.setattr(
         "cli.openclaw_runtime.ensure_openclaw_installed",
-        lambda **_: __import__("cli.openclaw_runtime", fromlist=["OpenClawInstallResolution"]).OpenClawInstallResolution(
+        lambda **_: __import__(
+            "cli.openclaw_runtime", fromlist=["OpenClawInstallResolution"]
+        ).OpenClawInstallResolution(
             binary_path="/opt/homebrew/bin/openclaw",
             install_method="npm",
             disposition="detected_existing",
         ),
     )
-    monkeypatch.setattr("cli.openclaw_runtime.resolve_openclaw_config_file", lambda: "/tmp/.openclaw/openclaw.json")
+    monkeypatch.setattr(
+        "cli.openclaw_runtime.resolve_openclaw_config_file", lambda: "/tmp/.openclaw/openclaw.json"
+    )
     monkeypatch.setattr("cli.openclaw_runtime.validate_openclaw_config", lambda: "Config valid")
     monkeypatch.setattr("cli.openclaw_runtime.get_gateway_health", lambda: health)
 
@@ -400,7 +412,9 @@ def test_resolve_gateway_auth_argument_reads_token_from_config(monkeypatch, tmp_
     assert resolve_gateway_auth_argument() == ("--token", "gateway-token")
 
 
-def test_resolve_gateway_auth_argument_reads_password_from_config(monkeypatch, tmp_path: Path) -> None:
+def test_resolve_gateway_auth_argument_reads_password_from_config(
+    monkeypatch, tmp_path: Path
+) -> None:
     config_path = tmp_path / "openclaw.json"
     config_path.write_text(
         json.dumps({"gateway": {"auth": {"mode": "password", "password": "gateway-password"}}}),
@@ -416,8 +430,12 @@ def test_resolve_gateway_auth_argument_reads_password_from_config(monkeypatch, t
     assert resolve_gateway_auth_argument() == ("--password", "gateway-password")
 
 
-def test_build_openclaw_surface_command_includes_gateway_url_and_auth_for_override(monkeypatch) -> None:
-    monkeypatch.setattr("cli.openclaw_runtime.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw")
+def test_build_openclaw_surface_command_includes_gateway_url_and_auth_for_override(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        "cli.openclaw_runtime.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw"
+    )
     monkeypatch.setattr("cli.openclaw_runtime.detect_gateway_port", lambda: 18789)
     monkeypatch.setattr(
         "cli.openclaw_runtime.resolve_gateway_auth_argument",
@@ -440,7 +458,9 @@ def test_build_openclaw_surface_command_includes_gateway_url_and_auth_for_overri
 
 
 def test_build_openclaw_surface_command_omits_local_url_override(monkeypatch) -> None:
-    monkeypatch.setattr("cli.openclaw_runtime.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw")
+    monkeypatch.setattr(
+        "cli.openclaw_runtime.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw"
+    )
     monkeypatch.setattr("cli.openclaw_runtime.detect_gateway_port", lambda: 18789)
     monkeypatch.setattr(
         "cli.openclaw_runtime.resolve_gateway_auth_argument",
