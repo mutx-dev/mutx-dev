@@ -1,0 +1,20 @@
+{
+  "name": "MUTX Signal Engine — gap scan to agent dispatch",
+  "description": "Reads signals/gap-scan signal.md every 5 min, queues new items, spawns subagents for high-priority work. Runs as isolated OpenClaw agent.",
+  "enabled": true,
+  "schedule": {
+    "kind": "every",
+    "everyMs": 300000,
+    "anchorMs": 1704067200000
+  },
+  "sessionTarget": "isolated",
+  "payload": {
+    "kind": "agentTurn",
+    "message": "You are the MUTX Signal Engine. Run every 5 minutes via the master controller.\n\nRead the signal file and act on it:\n1. Parse: /Users/fortune/MUTX/signals/gap-scan signal.md\n2. Read existing queue: /Users/fortune/MUTX/mutx-engineering-agents/dispatch/action-queue.json\n3. For each HIGH priority (p1/p2) item with effort L or M:\n   - Spawn a subagent via sessions_spawn(runtime='subagent', mode='run')\n   - Task: implement the work in the signals/gap-scan signal.md item\n   - Worktree: /Users/fortune/mutx-worktrees/factory/backend for backend items, /Users/fortune/mutx-worktrees/factory/frontend for frontend\n   - Branch: autonomy/{sig-id}\n   - Steps: sync to GitHub main, implement, pytest, commit, push, PR\n4. Update the queue with new items\n5. Report DM to 804823236222779413 with: items processed, agents spawned count\n\nImportant: Use sessions_spawn from the openclaw tools to dispatch work. Do NOT try to import openclaw as a Python module — it is not available as a package.\n\nAfter spawning agents, check if any autonomy/coverage-* branches have merged to main and queue cleanup.",
+    "model": "minimax-portal/MiniMax-M2.7",
+    "timeoutSeconds": 180
+  },
+  "delivery": {
+    "mode": "none"
+  }
+}

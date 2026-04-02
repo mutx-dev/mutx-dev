@@ -225,7 +225,7 @@ def prune_merged_branches():
 
 def heartbeat():
     """Run make dev, return True if healthy."""
-    rc, out = sh(f"make dev 2>&1 | tail -5", cwd=REPO, timeout=60)
+    rc, out = sh(f"make dev 2>&1 | tail -5", cwd=REPO, timeout=120)
     ok = rc == 0
     log(f"Heartbeat: {'✓' if ok else '✗'}")
     if not ok:
