@@ -1,7 +1,16 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T05:06:31.598219",
+  "generated": "2026-04-02T05:11:35.931353",
   "items": [
+    {
+      "id": "coverage-agents",
+      "title": "Add coverage for SDK module `agents`",
+      "description": "No test file found: tests/test_agents.py\n\nModule: sdk/mutx/agents.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
     {
       "id": "coverage-analytics",
       "title": "Add coverage for SDK module `analytics`",
@@ -9,24 +18,6 @@
       "area": "backend",
       "priority": "p2",
       "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "coverage-assistant",
-      "title": "Add coverage for SDK module `assistant`",
-      "description": "No test file found: tests/test_assistant.py\n\nModule: sdk/mutx/assistant.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "coverage-api_keys",
-      "title": "Add coverage for SDK module `api_keys`",
-      "description": "No test file found: tests/test_api_keys.py\n\nModule: sdk/mutx/api_keys.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "failed",
       "source": "gap-scanner:untested-modules"
     },
     {
@@ -46,6 +37,15 @@
       "priority": "p3",
       "status": "failed",
       "source": "gap-scanner:todos"
+    },
+    {
+      "id": "coverage-deployments",
+      "title": "Add coverage for SDK module `deployments`",
+      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "failed",
+      "source": "gap-scanner:untested-modules"
     },
     {
       "id": "todo-sdk-mutx-scheduler.py-2",
@@ -84,18 +84,18 @@
       "source": "gap-scanner:todos"
     },
     {
-      "id": "coverage-agents",
-      "title": "Add coverage for SDK module `agents`",
-      "description": "No test file found: tests/test_agents.py\n\nModule: sdk/mutx/agents.py\n\nAdd pytest coverage.",
+      "id": "coverage-api_keys",
+      "title": "Add coverage for SDK module `api_keys`",
+      "description": "No test file found: tests/test_api_keys.py\n\nModule: sdk/mutx/api_keys.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "coverage-api_keys",
-      "title": "Add coverage for SDK module `api_keys`",
-      "description": "No test file found: tests/test_api_keys.py\n\nModule: sdk/mutx/api_keys.py\n\nAdd pytest coverage.",
+      "id": "coverage-assistant",
+      "title": "Add coverage for SDK module `assistant`",
+      "description": "No test file found: tests/test_assistant.py\n\nModule: sdk/mutx/assistant.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
@@ -156,6 +156,15 @@
       "source": "gap-scanner:todos"
     },
     {
+      "id": "todo-scripts-autonomy-mutx-gap-scanner-v3.py-44",
+      "title": "[TODO] {desc.strip()}\",",
+      "description": "File: scripts/autonomy/mutx-gap-scanner-v3.py:45\n\nTODO: {desc.strip()}\",",
+      "area": "backend",
+      "priority": "p3",
+      "status": "queued",
+      "source": "gap-scanner:todos"
+    },
+    {
       "id": "todo-components-app-LogsMetricsStateClient.tsx-111",
       "title": "[bug] \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
       "description": "File: components/app/LogsMetricsStateClient.tsx:112\n\nTODO: \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
@@ -208,15 +217,6 @@
       "priority": "p3",
       "status": "queued",
       "source": "gap-scanner:deps"
-    },
-    {
-      "id": "todo-src-api-routes-newsletter.py-30",
-      "title": "[NOTE] For web-based submissions, prefer the Next.js API route",
-      "description": "File: src/api/routes/newsletter.py:31\n\nTODO: For web-based submissions, prefer the Next.js API route",
-      "area": "backend",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:todos"
     },
     {
       "id": "coverage-agents",
