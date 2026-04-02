@@ -1,42 +1,42 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T02:57:34.873847",
+  "generated": "2026-04-02T03:02:38.672650",
   "items": [
     {
-      "id": "coverage-agent_runtime",
-      "title": "Add coverage for SDK module `agent_runtime`",
-      "description": "No test file found: tests/test_agent_runtime.py\n\nModule: sdk/mutx/agent_runtime.py\n\nAdd pytest coverage.",
+      "id": "coverage-analytics",
+      "title": "Add coverage for SDK module `analytics`",
+      "description": "No test file found: tests/test_analytics.py\n\nModule: sdk/mutx/analytics.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "coverage-agents",
-      "title": "Add coverage for SDK module `agents`",
-      "description": "No test file found: tests/test_agents.py\n\nModule: sdk/mutx/agents.py\n\nAdd pytest coverage.",
+      "id": "coverage-clawhub",
+      "title": "Add coverage for SDK module `clawhub`",
+      "description": "No test file found: tests/test_clawhub.py\n\nModule: sdk/mutx/clawhub.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "coverage-deployments",
-      "title": "Add coverage for SDK module `deployments`",
-      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
+      "id": "coverage-governance_supervision",
+      "title": "Add coverage for SDK module `governance_supervision`",
+      "description": "No test file found: tests/test_governance_supervision.py\n\nModule: sdk/mutx/governance_supervision.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "coverage-governance_credentials",
-      "title": "Add coverage for SDK module `governance_credentials`",
-      "description": "No test file found: tests/test_governance_credentials.py\n\nModule: sdk/mutx/governance_credentials.py\n\nAdd pytest coverage.",
+      "id": "todo-scripts-autonomy-mutx-gap-scanner-v3.py-44",
+      "title": "[TODO] {desc.strip()}\",",
+      "description": "File: scripts/autonomy/mutx-gap-scanner-v3.py:45\n\nTODO: {desc.strip()}\",",
       "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:todos"
     },
     {
       "id": "todo-components-app-LogsMetricsStateClient.tsx-111",
@@ -111,15 +111,6 @@
       "source": "gap-scanner:todos"
     },
     {
-      "id": "coverage-analytics",
-      "title": "Add coverage for SDK module `analytics`",
-      "description": "No test file found: tests/test_analytics.py\n\nModule: sdk/mutx/analytics.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
       "id": "coverage-api_keys",
       "title": "Add coverage for SDK module `api_keys`",
       "description": "No test file found: tests/test_api_keys.py\n\nModule: sdk/mutx/api_keys.py\n\nAdd pytest coverage.",
@@ -132,6 +123,24 @@
       "id": "coverage-assistant",
       "title": "Add coverage for SDK module `assistant`",
       "description": "No test file found: tests/test_assistant.py\n\nModule: sdk/mutx/assistant.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
+      "id": "coverage-deployments",
+      "title": "Add coverage for SDK module `deployments`",
+      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
+      "id": "coverage-governance_credentials",
+      "title": "Add coverage for SDK module `governance_credentials`",
+      "description": "No test file found: tests/test_governance_credentials.py\n\nModule: sdk/mutx/governance_credentials.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
@@ -156,6 +165,15 @@
       "source": "gap-scanner:untested-modules"
     },
     {
+      "id": "todo-src-api-routes-newsletter.py-30",
+      "title": "[NOTE] For web-based submissions, prefer the Next.js API route",
+      "description": "File: src/api/routes/newsletter.py:31\n\nTODO: For web-based submissions, prefer the Next.js API route",
+      "area": "backend",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:todos"
+    },
+    {
       "id": "todo-next-env.d.ts-4",
       "title": "[NOTE] This file should not be edited",
       "description": "File: next-env.d.ts:5\n\nTODO: This file should not be edited",
@@ -177,15 +195,6 @@
       "id": "coverage-agent_runtime",
       "title": "test: add coverage for SDK module `agent_runtime`",
       "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
-      "area": "backend",
-      "priority": "p1",
-      "status": "queued",
-      "source": "gap-scanner:coverage"
-    },
-    {
-      "id": "coverage-agents",
-      "title": "test: add coverage for SDK module `agents`",
-      "description": "No test found for SDK module `agents`. Create tests/sdk/test_agents.py",
       "area": "backend",
       "priority": "p1",
       "status": "queued",
@@ -217,6 +226,15 @@
       "priority": "p1",
       "status": "queued",
       "source": "gap-scanner:coverage"
+    },
+    {
+      "id": "coverage-agents",
+      "title": "Add coverage for SDK module `agents`",
+      "description": "No test file found: tests/test_agents.py\n\nModule: sdk/mutx/agents.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "failed",
+      "source": "gap-scanner:untested-modules"
     }
   ]
 }
