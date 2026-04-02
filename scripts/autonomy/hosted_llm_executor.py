@@ -134,7 +134,25 @@ def build_prompt(agent: str, brief_text: str, work_order: dict[str, object]) -> 
     files = collect_files(work_order)
     file_sections = [read_snippet(file_path) for file_path in files]
     general_context = []
-    for fixed in ["AGENTS.md", f"agents/{agent}/AGENT.md", "package.json", "pyproject.toml"]:
+
+    # Resolve AGENTS.md — prefer canonical name, fall back to legacy agents-1.md
+    agents_paths = ["AGENTS.md", "agents-1.md"]
+    agents_resolved = next((p for p in agents_paths if Path(p).exists()), None)
+    if agents_resolved and agents_resolved not in files:
+        general_context.append(read_snippet(agents_resolved, limit=180))
+
+    # Resolve agent definition — prefer uppercase AGENT.md, fall back to lowercase agent.md
+    agent_def_paths = [f"agents/{agent}/AGENT.md", f"agents/{agent}/agent.md"]
+    agent_def_resolved = next((p for p in agent_def_paths if Path(p).exists()), None)
+    if not agent_def_resolved:
+        raise FileNotFoundError(
+            f"No agent definition found for '{agent}'. Looked in: {agent_def_paths}. "
+            f"Ensure agents/{agent}/AGENT.md exists and is named correctly."
+        )
+    if agent_def_resolved not in files:
+        general_context.append(read_snippet(agent_def_resolved, limit=180))
+
+    for fixed in ["package.json", "pyproject.toml"]:
         if Path(fixed).exists() and fixed not in files:
             general_context.append(read_snippet(fixed, limit=180))
 
