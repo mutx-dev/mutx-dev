@@ -12,7 +12,6 @@ import {
   LivePanel,
   LiveStatCard,
   asDashboardStatus,
-  formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 

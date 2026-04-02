@@ -22,7 +22,7 @@ interface StateTransitionsProps {
   title?: string;
 }
 
-const EVENT_TYPES = [
+const _EVENT_TYPES = [
   "created",
   "starting",
   "running",
@@ -34,16 +34,6 @@ const EVENT_TYPES = [
   "healthy",
   "unhealthy",
 ] as const;
-
-function formatTimestamp(timestamp?: string | null) {
-  if (!timestamp) return "N/A";
-  try {
-    const date = new Date(timestamp);
-    return date.toLocaleString();
-  } catch {
-    return "Invalid timestamp";
-  }
-}
 
 function formatRelativeTime(timestamp?: string | null) {
   if (!timestamp) return "Never";

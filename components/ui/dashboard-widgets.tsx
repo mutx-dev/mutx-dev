@@ -130,7 +130,7 @@ export function getSignalTone(status: 'good' | 'warn' | 'bad' | 'healthy' | 'deg
 }
 
 export function DashboardOverview({
-  isLoading,
+  isLoading: _isLoading,
   agentStats,
   deploymentStats,
   apiHealth,

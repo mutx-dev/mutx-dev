@@ -67,11 +67,9 @@ function formatTimestamp(ts: number) {
 function TaskCard({
   task,
   agent,
-  onStatusChange,
 }: {
   task: Task
   agent?: Agent
-  onStatusChange: (id: string, newStatus: Task['status']) => void
 }) {
   const [isDragging, setIsDragging] = useState(false)
 
@@ -238,7 +236,7 @@ export function TaskBoard({ className, initialTasks = [] }: TaskBoardProps) {
       return
     }
 
-    const previousStatus = draggedTask.status
+    const _previousStatus = draggedTask.status
     setTasks(prev => prev.map(t =>
       t.id === draggedTask.id ? { ...t, status: newStatus as Task['status'], updatedAt: Date.now() } : t
     ))
@@ -332,7 +330,6 @@ export function TaskBoard({ className, initialTasks = [] }: TaskBoardProps) {
                     <TaskCard
                       task={task}
                       agent={task.agentId ? getAgentById(task.agentId) : undefined}
-                      onStatusChange={() => {}}
                     />
                   </div>
                 ))}

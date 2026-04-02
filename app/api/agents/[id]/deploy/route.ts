@@ -11,7 +11,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-  return withErrorHandling(async (req: Request) => {
+  return withErrorHandling(async (_req: Request) => {
     const token = await getAuthToken(request)
     if (!token) {
       return unauthorized()

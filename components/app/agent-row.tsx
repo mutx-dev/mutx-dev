@@ -12,7 +12,7 @@ const STATUS_COLORS: Record<AgentStatus, string> = {
   offline: 'bg-gray-500',
 }
 
-const STATUS_TONE: Record<AgentStatus, 'success' | 'warning' | 'error' | 'neutral'> = {
+const _STATUS_TONE: Record<AgentStatus, 'success' | 'warning' | 'error' | 'neutral'> = {
   online: 'success',
   idle: 'success',
   busy: 'warning',

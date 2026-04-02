@@ -19,7 +19,7 @@ const WINDOW_LABELS = {
   settings: "Settings",
 };
 
-function getBaseRouteForRole(role) {
+function _getBaseRouteForRole(role) {
   if (role === "sessions") {
     return "/dashboard/sessions";
   }

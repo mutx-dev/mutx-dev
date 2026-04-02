@@ -105,7 +105,7 @@ export function MarketingLoader() {
 
     try {
       window.sessionStorage.setItem(SESSION_KEY, "1");
-    } catch (_error) {
+    } catch {
       // Ignore storage failures and still finish the handoff cleanly.
     }
 

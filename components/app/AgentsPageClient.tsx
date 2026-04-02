@@ -10,7 +10,6 @@ import {
   Power,
   RefreshCcw,
   Search,
-  Server,
   X,
   Trash2,
   Loader2,

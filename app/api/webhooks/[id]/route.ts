@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 import { getApiBaseUrl } from "@/app/api/_lib/controlPlane";
 import { proxyJson } from "@/app/api/_lib/proxy";
@@ -12,9 +12,9 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  return withErrorHandling(async (req: Request) => {
+  return withErrorHandling(async (_req: Request) => {
     const { id } = await params;
-    const validation = await validateRequest(schemas.webhookUpdate, req);
+    const validation = await validateRequest(schemas.webhookUpdate, request);
     if (!validation.success) {
       return validation.response;
     }

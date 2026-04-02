@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic'
  * No need to pass user_id or call /auth/me first.
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  return withErrorHandling(async (req: Request) => {
+  return withErrorHandling(async (_req: Request) => {
     if (!hasAuthSession(request)) {
       return unauthorized()
     }

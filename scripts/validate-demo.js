@@ -147,7 +147,7 @@ async function main() {
       } catch {
         try {
           process.kill(devServer.pid, 'SIGTERM');
-        } catch {}
+        } catch { /* ignore cleanup errors */ }
       }
     }
   }

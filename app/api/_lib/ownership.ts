@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getApiBaseUrl, getAuthToken } from './controlPlane'
-import { forbidden, notFound } from './errors'
+import { forbidden } from './errors'
 
 
 // Architectural improvements: timeout + observability

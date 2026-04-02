@@ -362,8 +362,8 @@ export function AppDashboardClient() {
       await Promise.all([
         readJson<User>("/api/auth/me"),
         readJson<Health>("/api/dashboard/health"),
-        readJson<any>("/api/dashboard/agents"),
-        readJson<any>("/api/dashboard/deployments"),
+        readJson<object>("/api/dashboard/agents"),
+        readJson<object>("/api/dashboard/deployments"),
         readJson<unknown>("/api/api-keys"),
       ]);
 
