@@ -1,6 +1,6 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T03:33:05.075441",
+  "generated": "2026-04-02T03:38:09.777327",
   "items": [
     {
       "id": "coverage-agent_runtime",
@@ -183,6 +183,15 @@
       "source": "gap-scanner:untested-modules"
     },
     {
+      "id": "todo-sdk-mutx-scheduler.py-2",
+      "title": "[Note] Scheduler feature is planned for v1.3 and returns 503.",
+      "description": "File: sdk/mutx/scheduler.py:3\n\nTODO: Scheduler feature is planned for v1.3 and returns 503.",
+      "area": "backend",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:todos"
+    },
+    {
       "id": "todo-next-env.d.ts-4",
       "title": "[NOTE] This file should not be edited",
       "description": "File: next-env.d.ts:5\n\nTODO: This file should not be edited",
@@ -206,7 +215,7 @@
       "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
       "area": "backend",
       "priority": "p1",
-      "status": "queued",
+      "status": "in_progress",
       "source": "gap-scanner:coverage"
     },
     {
