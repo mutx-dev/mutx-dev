@@ -1,39 +1,57 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T11:22:21.846266",
+  "generated": "2026-04-02T11:32:33.976913",
   "items": [
     {
-      "id": "error-security",
-      "title": "Add error handling to `sdk/mutx/security.py`",
-      "description": "File has 4 functions but minimal error handling.\n\nReview and add try/except blocks, logging, and graceful degradation.",
+      "id": "error-agents",
+      "title": "Add error handling to `sdk/mutx/agents.py`",
+      "description": "File has 6 functions but minimal error handling.\n\nReview and add try/except blocks, logging, and graceful degradation.",
       "area": "backend",
       "priority": "p3",
-      "status": "queued",
+      "status": "in_progress",
       "source": "gap-scanner:error-handling"
     },
     {
-      "id": "todo-components-app-LogsMetricsStateClient.tsx-111",
-      "title": "[bug] \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
-      "description": "File: components/app/LogsMetricsStateClient.tsx:112\n\nTODO: \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
-      "area": "frontend",
-      "priority": "p2",
-      "status": "failed",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "coverage-budgets",
-      "title": "Add coverage for SDK module `budgets`",
-      "description": "No test file found: tests/test_budgets.py\n\nModule: sdk/mutx/budgets.py\n\nAdd pytest coverage.",
+      "id": "coverage-clawhub",
+      "title": "Add coverage for SDK module `clawhub`",
+      "description": "No test file found: tests/test_clawhub.py\n\nModule: sdk/mutx/clawhub.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "failed",
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
-      "title": "[TODO] implement full test coverage\\n\")",
-      "description": "File: scripts/autonomy/mutx-autonomous-daemon.py:144\n\nTODO: implement full test coverage\\n\")",
+      "id": "coverage-deployments",
+      "title": "Add coverage for SDK module `deployments`",
+      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
       "area": "backend",
+      "priority": "p2",
+      "status": "failed",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:deps"
+    },
+    {
+      "id": "todo-next-env.d.ts-4",
+      "title": "[NOTE] This file should not be edited",
+      "description": "File: next-env.d.ts:5\n\nTODO: This file should not be edited",
+      "area": "frontend",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "todo-app-types-api.ts-1768",
+      "title": "[Note] Full implementation requires pgvector and a document store.",
+      "description": "File: app/types/api.ts:1769\n\nTODO: Full implementation requires pgvector and a document store.",
+      "area": "frontend",
       "priority": "p3",
       "status": "failed",
       "source": "gap-scanner:todos"
@@ -57,76 +75,49 @@
       "source": "gap-scanner:todos"
     },
     {
-      "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
-      "title": "[TODO] implement full test coverage\\n\")",
-      "description": "File: scripts/autonomy/mutx-autonomous-daemon.py:144\n\nTODO: implement full test coverage\\n\")",
+      "id": "todo-src-api-routes-newsletter.py-30",
+      "title": "[NOTE] For web-based submissions, prefer the Next.js API route",
+      "description": "File: src/api/routes/newsletter.py:31\n\nTODO: For web-based submissions, prefer the Next.js API route",
       "area": "backend",
       "priority": "p3",
       "status": "queued",
       "source": "gap-scanner:todos"
     },
     {
-      "id": "todo-scripts-autonomy-mutx-gap-scanner-v3.py-44",
-      "title": "[TODO] {desc.strip()}\",",
-      "description": "File: scripts/autonomy/mutx-gap-scanner-v3.py:45\n\nTODO: {desc.strip()}\",",
-      "area": "backend",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-src-security-compliance.py-477",
-      "title": "[Note] This is a SHOULD requirement - non-conformance is a warning, not a failure.",
-      "description": "File: src/security/compliance.py:478\n\nTODO: This is a SHOULD requirement - non-conformance is a warning, not a failure.",
-      "area": "backend",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-src-api-routes-rag.py-272",
-      "title": "[Note] Full implementation requires pgvector and a document store.",
-      "description": "File: src/api/routes/rag.py:273\n\nTODO: Full implementation requires pgvector and a document store.",
-      "area": "backend",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-components-app-LogsMetricsStateClient.tsx-111",
-      "title": "[bug] \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
-      "description": "File: components/app/LogsMetricsStateClient.tsx:112\n\nTODO: \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
+      "id": "todo-next-env.d.ts-4",
+      "title": "[NOTE] This file should not be edited",
+      "description": "File: next-env.d.ts:5\n\nTODO: This file should not be edited",
       "area": "frontend",
-      "priority": "p2",
+      "priority": "p3",
       "status": "queued",
       "source": "gap-scanner:todos"
     },
     {
-      "id": "coverage-budgets",
-      "title": "Add coverage for SDK module `budgets`",
-      "description": "No test file found: tests/test_budgets.py\n\nModule: sdk/mutx/budgets.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "coverage-governance_supervision",
-      "title": "Add coverage for SDK module `governance_supervision`",
-      "description": "No test file found: tests/test_governance_supervision.py\n\nModule: sdk/mutx/governance_supervision.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "queued",
-      "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "error-agents",
-      "title": "Add error handling to `sdk/mutx/agents.py`",
-      "description": "File has 6 functions but minimal error handling.\n\nReview and add try/except blocks, logging, and graceful degradation.",
-      "area": "backend",
+      "id": "todo-app-types-api.ts-1768",
+      "title": "[Note] Full implementation requires pgvector and a document store.",
+      "description": "File: app/types/api.ts:1769\n\nTODO: Full implementation requires pgvector and a document store.",
+      "area": "frontend",
       "priority": "p3",
       "status": "queued",
-      "source": "gap-scanner:error-handling"
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "coverage-clawhub",
+      "title": "Add coverage for SDK module `clawhub`",
+      "description": "No test file found: tests/test_clawhub.py\n\nModule: sdk/mutx/clawhub.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
+    },
+    {
+      "id": "coverage-deployments",
+      "title": "Add coverage for SDK module `deployments`",
+      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
+      "area": "backend",
+      "priority": "p2",
+      "status": "queued",
+      "source": "gap-scanner:untested-modules"
     },
     {
       "id": "error-deployments",
@@ -147,22 +138,13 @@
       "source": "gap-scanner:error-handling"
     },
     {
-      "id": "todo-src-api-routes-newsletter.py-30",
-      "title": "[NOTE] For web-based submissions, prefer the Next.js API route",
-      "description": "File: src/api/routes/newsletter.py:31\n\nTODO: For web-based submissions, prefer the Next.js API route",
-      "area": "backend",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:todos"
-    },
-    {
-      "id": "todo-src-api-routes-newsletter.py-30",
-      "title": "[NOTE] For web-based submissions, prefer the Next.js API route",
-      "description": "File: src/api/routes/newsletter.py:31\n\nTODO: For web-based submissions, prefer the Next.js API route",
-      "area": "backend",
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
       "priority": "p3",
       "status": "queued",
-      "source": "gap-scanner:todos"
+      "source": "gap-scanner:deps"
     },
     {
       "id": "coverage-agent_runtime",
@@ -172,15 +154,6 @@
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:deps"
     },
     {
       "id": "coverage-agents",
@@ -210,47 +183,38 @@
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "coverage-clawhub",
-      "title": "Add coverage for SDK module `clawhub`",
-      "description": "No test file found: tests/test_clawhub.py\n\nModule: sdk/mutx/clawhub.py\n\nAdd pytest coverage.",
+      "id": "coverage-assistant",
+      "title": "Add coverage for SDK module `assistant`",
+      "description": "No test file found: tests/test_assistant.py\n\nModule: sdk/mutx/assistant.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "coverage-deployments",
-      "title": "Add coverage for SDK module `deployments`",
-      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
+      "id": "coverage-governance_credentials",
+      "title": "Add coverage for SDK module `governance_credentials`",
+      "description": "No test file found: tests/test_governance_credentials.py\n\nModule: sdk/mutx/governance_credentials.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:deps"
-    },
-    {
-      "id": "todo-next-env.d.ts-4",
-      "title": "[NOTE] This file should not be edited",
-      "description": "File: next-env.d.ts:5\n\nTODO: This file should not be edited",
-      "area": "frontend",
+      "id": "error-assistant",
+      "title": "Add error handling to `sdk/mutx/assistant.py`",
+      "description": "File has 7 functions but minimal error handling.\n\nReview and add try/except blocks, logging, and graceful degradation.",
+      "area": "backend",
       "priority": "p3",
       "status": "failed",
-      "source": "gap-scanner:todos"
+      "source": "gap-scanner:error-handling"
     },
     {
-      "id": "todo-app-types-api.ts-1768",
-      "title": "[Note] Full implementation requires pgvector and a document store.",
-      "description": "File: app/types/api.ts:1769\n\nTODO: Full implementation requires pgvector and a document store.",
+      "id": "todo-components-app-LogsMetricsStateClient.tsx-111",
+      "title": "[bug] \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
+      "description": "File: components/app/LogsMetricsStateClient.tsx:112\n\nTODO: \"bg-slate-400/10 text-slate-300 border-slate-400/20\",",
       "area": "frontend",
-      "priority": "p3",
+      "priority": "p2",
       "status": "failed",
       "source": "gap-scanner:todos"
     },
