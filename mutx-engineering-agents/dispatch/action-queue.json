@@ -1,6 +1,6 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T12:21:25.983142",
+  "generated": "2026-04-02T12:26:29.058216",
   "items": [
     {
       "id": "todo-scripts-autonomy-mutx-autonomous-daemon.py-143",
@@ -73,24 +73,6 @@
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:untested-modules"
-    },
-    {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:deps"
-    },
-    {
-      "id": "todo-sdk-mutx-scheduler.py-31",
-      "title": "[Note] Scheduler is planned for v1.3. These methods currently return 503 errors.",
-      "description": "File: sdk/mutx/scheduler.py:32\n\nTODO: Scheduler is planned for v1.3. These methods currently return 503 errors.",
-      "area": "backend",
-      "priority": "p3",
-      "status": "failed",
-      "source": "gap-scanner:todos"
     },
     {
       "id": "todo-next-env.d.ts-4",
@@ -228,15 +210,6 @@
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "dep-sqlalchemy",
-      "title": "Update `sqlalchemy` dependency",
-      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
-      "area": "infra",
-      "priority": "p3",
-      "status": "queued",
-      "source": "gap-scanner:deps"
-    },
-    {
       "id": "coverage-agent_runtime",
       "title": "test: add coverage for SDK module `agent_runtime`",
       "description": "No test found for SDK module `agent_runtime`. Create tests/sdk/test_agent_runtime.py",
@@ -280,6 +253,15 @@
       "priority": "p1",
       "status": "queued",
       "source": "gap-scanner:coverage"
+    },
+    {
+      "id": "dep-sqlalchemy",
+      "title": "Update `sqlalchemy` dependency",
+      "description": "sqlalchemy may be outdated. 2.0+ has async improvements.",
+      "area": "infra",
+      "priority": "p3",
+      "status": "failed",
+      "source": "gap-scanner:deps"
     }
   ]
 }
