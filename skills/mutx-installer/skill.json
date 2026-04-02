@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Install and configure MUTX — the agent control plane",
   "author": "MUTX",
-  "license": "MIT",
+  "license": "BUSL-1.1",
   "tools": ["exec", "fs"],
   "parameters": {
     "deployment_mode": {

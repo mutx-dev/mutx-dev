@@ -104,7 +104,7 @@ export function Sidebar({ className }: SidebarProps) {
       <div className="p-4 border-t border-border">
         <div className="bg-secondary rounded-lg p-3">
           <div className="text-xs text-muted-foreground">
-            MUTX v1.0 — Open Source
+            MUTX v1.0 — Source-Available
           </div>
         </div>
       </div>
