@@ -1,11 +1,11 @@
 {
   "version": "1.1",
-  "generated": "2026-04-02T05:36:57.595113",
+  "generated": "2026-04-02T05:42:02.407284",
   "items": [
     {
-      "id": "coverage-analytics",
-      "title": "test: add coverage for SDK module `analytics`",
-      "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
+      "id": "coverage-assistant",
+      "title": "test: add coverage for SDK module `assistant`",
+      "description": "No test found for SDK module `assistant`. Create tests/sdk/test_assistant.py",
       "area": "backend",
       "priority": "p1",
       "status": "failed",
@@ -21,18 +21,18 @@
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "coverage-analytics",
-      "title": "Add coverage for SDK module `analytics`",
-      "description": "No test file found: tests/test_analytics.py\n\nModule: sdk/mutx/analytics.py\n\nAdd pytest coverage.",
+      "id": "coverage-api_keys",
+      "title": "Add coverage for SDK module `api_keys`",
+      "description": "No test file found: tests/test_api_keys.py\n\nModule: sdk/mutx/api_keys.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
       "source": "gap-scanner:untested-modules"
     },
     {
-      "id": "coverage-api_keys",
-      "title": "Add coverage for SDK module `api_keys`",
-      "description": "No test file found: tests/test_api_keys.py\n\nModule: sdk/mutx/api_keys.py\n\nAdd pytest coverage.",
+      "id": "coverage-assistant",
+      "title": "Add coverage for SDK module `assistant`",
+      "description": "No test file found: tests/test_assistant.py\n\nModule: sdk/mutx/assistant.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
@@ -55,15 +55,6 @@
       "priority": "p3",
       "status": "failed",
       "source": "gap-scanner:todos"
-    },
-    {
-      "id": "coverage-deployments",
-      "title": "Add coverage for SDK module `deployments`",
-      "description": "No test file found: tests/test_deployments.py\n\nModule: sdk/mutx/deployments.py\n\nAdd pytest coverage.",
-      "area": "backend",
-      "priority": "p2",
-      "status": "failed",
-      "source": "gap-scanner:untested-modules"
     },
     {
       "id": "todo-sdk-mutx-scheduler.py-2",
@@ -120,9 +111,9 @@
       "source": "gap-scanner:todos"
     },
     {
-      "id": "coverage-assistant",
-      "title": "Add coverage for SDK module `assistant`",
-      "description": "No test file found: tests/test_assistant.py\n\nModule: sdk/mutx/assistant.py\n\nAdd pytest coverage.",
+      "id": "coverage-analytics",
+      "title": "Add coverage for SDK module `analytics`",
+      "description": "No test file found: tests/test_analytics.py\n\nModule: sdk/mutx/analytics.py\n\nAdd pytest coverage.",
       "area": "backend",
       "priority": "p2",
       "status": "queued",
@@ -168,6 +159,15 @@
       "id": "todo-src-security-compliance.py-477",
       "title": "[Note] This is a SHOULD requirement - non-conformance is a warning, not a failure.",
       "description": "File: src/security/compliance.py:478\n\nTODO: This is a SHOULD requirement - non-conformance is a warning, not a failure.",
+      "area": "backend",
+      "priority": "p3",
+      "status": "queued",
+      "source": "gap-scanner:todos"
+    },
+    {
+      "id": "todo-src-api-routes-newsletter.py-30",
+      "title": "[NOTE] For web-based submissions, prefer the Next.js API route",
+      "description": "File: src/api/routes/newsletter.py:31\n\nTODO: For web-based submissions, prefer the Next.js API route",
       "area": "backend",
       "priority": "p3",
       "status": "queued",
@@ -237,18 +237,18 @@
       "source": "gap-scanner:coverage"
     },
     {
-      "id": "coverage-api_keys",
-      "title": "test: add coverage for SDK module `api_keys`",
-      "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
+      "id": "coverage-analytics",
+      "title": "test: add coverage for SDK module `analytics`",
+      "description": "No test found for SDK module `analytics`. Create tests/sdk/test_analytics.py",
       "area": "backend",
       "priority": "p1",
       "status": "queued",
       "source": "gap-scanner:coverage"
     },
     {
-      "id": "coverage-assistant",
-      "title": "test: add coverage for SDK module `assistant`",
-      "description": "No test found for SDK module `assistant`. Create tests/sdk/test_assistant.py",
+      "id": "coverage-api_keys",
+      "title": "test: add coverage for SDK module `api_keys`",
+      "description": "No test found for SDK module `api_keys`. Create tests/sdk/test_api_keys.py",
       "area": "backend",
       "priority": "p1",
       "status": "queued",
