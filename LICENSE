@@ -1,21 +1,32 @@
-MIT License
+# Business Source License 1.1
 
-Copyright (c) 2026 mutx.dev
+**Licensor:** MUTX
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+**Licensed Work:** The Licensed Work is the software distributed in this repository, except for any file or directory that includes an express alternative license notice.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+**Additional Use Grant:** You may make production use of the Licensed Work for Your own internal business purposes, including use by Your organization and its affiliates, provided that You do not offer the Licensed Work or a substantially similar product or service to third parties as a hosted, managed, white-labeled, OEM, or embedded offering.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+A prohibited offering includes any product or service that gives third parties access to a substantial portion of the Licensed Work's control-plane, orchestration, governance, deployment, observability, administrative, or API functionality.
+
+For clarity, the following are permitted under this Additional Use Grant:
+
+1. Internal use by You and Your affiliates
+2. Evaluation, testing, education, security research, and personal use
+3. Development and distribution of integrations, plugins, providers, adapters, and client libraries that do not embed or repackage the Licensed Work itself
+4. Consulting, support, implementation, and migration services related to the Licensed Work, provided You are not separately monetizing access to the Licensed Work itself as a product or service
+
+**Change Date:** 36 months after the date each version of the Licensed Work is first publicly released
+
+**Change License:** Apache License, Version 2.0
+
+---
+
+Copyright (c) 2026 MUTX. All rights reserved.
+
+The source for the Licensed Work includes all files in this repository except those
+that contain an express alternative license notice in the file header or in a
+LICENSE, NOTICE, or COPYING file alongside the code.
+
+---
+
+SPDX-License-Identifier: BUSL-1.1

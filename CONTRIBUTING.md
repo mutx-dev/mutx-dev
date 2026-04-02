@@ -168,3 +168,11 @@ When behavior is unclear, inspect:
 ## Questions And Support
 
 See `support.md`.
+
+## Licensing
+
+MUTX core is source-available under [BUSL-1.1](LICENSE). The Python SDK is licensed under [Apache-2.0](sdk/LICENSE).
+
+By contributing to this repository, you confirm that your contributions do not conflict with these license terms. If you are contributing significant new code, ensure your employer or legal counsel is aware of the licensing terms.
+
+For commercial licensing questions, contact hello@mutx.dev.

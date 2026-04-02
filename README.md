@@ -1,6 +1,6 @@
 # MUTX
 
-> Open-source control plane for deploying and operating AI agents like systems, not demos.
+> Source-available control plane for deploying and operating AI agents like systems, not demos.
 
 ![MUTX dashboard demo](demo.gif)
 
@@ -283,4 +283,8 @@ GitBook publication guardrails:
 
 ## License
 
-MUTX is licensed under the [MIT License](LICENSE).
+MUTX core is source-available under [BUSL-1.1](LICENSE). Selected ecosystem surfaces — the Python SDK — are licensed separately under [Apache-2.0](sdk/LICENSE).
+
+Each BUSL release converts to Apache-2.0 36 months after its public release date. See [LICENSE-FAQ](LICENSE-FAQ.md) for common questions.
+
+Commercial hosted, managed, white-labeled, OEM, and embedded offerings require a separate license. Contact hello@mutx.dev.

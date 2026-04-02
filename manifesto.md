@@ -55,7 +55,7 @@ That means:
 
 ## What MUTX Is
 
-MUTX is an open-source control plane for AI agents.
+MUTX is a source-available control plane for AI agents.
 
 It is not just an API.
 It is not just a dashboard.
@@ -130,7 +130,7 @@ If you care about:
 - agent systems that survive contact with reality
 - infrastructure that is more than marketing copy
 - honest product architecture
-- open-source platforms with real operational depth
+- source-available platforms with real operational depth
 
 then MUTX is for you.
 

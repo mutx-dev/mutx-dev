@@ -45,4 +45,6 @@ No. Some architecture docs describe the direction of the platform as well as imp
 
 ## What license does this repo use?
 
-MIT. See `LICENSE`.
+MUTX core is source-available under BUSL-1.1. The Python SDK is Apache-2.0. See `LICENSE` and `LICENSE-FAQ.md` for details.
+
+Commercial hosted, managed, white-labeled, OEM, and embedded offerings require a separate license from MUTX.

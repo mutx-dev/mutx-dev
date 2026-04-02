@@ -102,7 +102,7 @@ export const marketingHomepage: MarketingHomepage = {
     body: "MUTX keeps access explicit, release paths visible, and the operator lane public.",
     items: [
       {
-        label: "Open source",
+        label: "Source-available",
         value: "The control layer stays inspectable and yours.",
       },
       {
@@ -174,7 +174,7 @@ export const marketingFooterLinks: MarketingFooterLink[] = [
 ];
 
 export const marketingFooterCallout: MarketingFooterCallout = {
-  title: "OPEN-SOURCE CONTROL FOR AGENTS.",
+  title: "SOURCE-AVAILABLE CONTROL FOR AGENTS.",
   body: "Start with the Mac app. Keep docs, notes, and source aligned.",
   action: {
     label: "Download for Mac",

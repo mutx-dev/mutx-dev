@@ -1,6 +1,6 @@
 # Platform Overview
 
-MUTX is an open-source control plane for operating AI agents with clearer boundaries than a demo app.
+MUTX is a source-available control plane for operating AI agents with clearer boundaries than a demo app.
 
 Today the repo exposes a supported marketing site, a supported dashboard lane, and a separate preview control demo. Understanding that split is the fastest way to orient yourself.
 

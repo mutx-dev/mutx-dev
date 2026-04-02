@@ -9,7 +9,7 @@ icon: file-lines
 
 ## Abstract
 
-MUTX is an open-source control plane for AI agents.
+MUTX is a source-available control plane for AI agents.
 
 Its premise is simple: most teams can already prototype an agent, but very few teams can operate one like production software. The failure mode is not lack of reasoning capability. The failure mode is lack of control-plane rigor: identity, ownership, deployment semantics, keys, webhooks, observability, reproducibility, and honest contracts between every surface that touches the system.
 
@@ -436,7 +436,7 @@ The product direction favors:
 - clearer separation between infrastructure cost and model cost
 - a BYOK-friendly posture rather than opaque token resale
 - operator-visible lifecycle records over hidden background magic
-- open-source leverage instead of closed product mythology
+- source-available leverage instead of closed product mythology
 
 This is strategically important. The companies that win agent infrastructure will not win because they hid one more LLM call behind nicer branding. They will win because they built the layer teams trust to run real systems.
 
@@ -496,7 +496,7 @@ A control plane.
 
 ## 16. Conclusion
 
-MUTX should be understood as an open-source control-plane platform for agent systems.
+MUTX should be understood as a source-available control-plane platform for agent systems.
 
 Its core contribution is not a claim that every piece of the runtime story is finished today. Its core contribution is that it already models the right surfaces:
 

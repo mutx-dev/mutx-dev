@@ -5,7 +5,7 @@ class Mutx < Formula
   homepage "https://mutx.dev"
   url "https://codeload.github.com/mutx-dev/mutx-dev/tar.gz/refs/tags/cli-v1.2.0"
   sha256 "39cbf66ed9d66bda6beed2042ce33b6d82f0e9c8228341a5cbaab6a3f97e1b92"
-  license "MIT"
+  license "BUSL-1.1"
   version "1.2.0"
 
   depends_on "python@3.12"

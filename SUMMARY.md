@@ -65,5 +65,6 @@
 * [Support](support.md)
 * [Contributing](contributing/README.md)
 * [Security Policy](security.md)
+* [Licensing](docs/legal/index.md)
 * [Contributor Covenant Code of Conduct](code_of_conduct.md)
 * [AGENTS.md](agents-1.md)

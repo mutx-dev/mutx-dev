@@ -73,7 +73,7 @@ def test_render_formula_uses_tagged_source_and_non_network_smoke_checks() -> Non
             f"https://codeload.github.com/mutx-dev/mutx-dev/tar.gz/refs/tags/{CURRENT_CLI_TAG}"
         ),
         source_sha256="deadbeef",
-        license_name="MIT",
+        license_name="BUSL-1.1",
         version=CURRENT_CLI_VERSION,
         python_formula="python@3.12",
         resources=[
@@ -106,7 +106,7 @@ def test_main_writes_formula_with_resolved_resources(monkeypatch, tmp_path: Path
 name = "mutx"
 version = "{CURRENT_CLI_VERSION}"
 description = "CLI for mutx.dev"
-license = {{ text = "MIT" }}
+license = {{ text = "BUSL-1.1" }}
 """.strip()
         + "\n",
         encoding="utf-8",
