@@ -1,12 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════════════
    GitBook Dark Theme — extracted from docs.mutx.dev
    CSS sources: 8 static-2v.gitbook.com CSS bundles (Apr 2026)
-   Key variables: --scalar-background-1=#161616, --scalar-color-accent=#50b7e0,
-   --scalar-color-1=#b0b0b8, --scalar-color-2=#8c8c8c
+   Fonts loaded via next/font/google in docs/layout.tsx
    ═══════════════════════════════════════════════════════════════════════ */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600&display=swap');
 
 /* ── GitBook scalar dark theme tokens ──────────────────────────────── */
 :root {
@@ -25,8 +21,8 @@
   --gb-header-h:     56px;
   --gb-radius:       8px;
   --gb-radius-sm:     4px;
-  --gb-font:          'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --gb-font-code:    'Source Code Pro', ui-monospace, monospace;
+  --gb-font:          var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --gb-font-code:    var(--font-source-code), ui-monospace, monospace;
   --gb-code-bg:      #111111;
   --gb-code-border:  rgba(255,255,255,0.08);
 }
