@@ -27,17 +27,17 @@ Each BUSL release converts to Apache-2.0 36 months after that version was first 
 - Competing commercial offerings (hosted, managed, white-labeled, OEM, embedded) require a commercial license
 - The MUTX name and logo are trademarks — see Trademark Policy below
 
-For the full license text, see the [LICENSE](/LICENSE) file at the repository root.
+For the full license text, see the [LICENSE](https://github.com/mutx-dev/mutx-dev/blob/main/LICENSE) file at the repository root.
 
 ## Python SDK — Apache-2.0
 
 The MUTX Python SDK (`sdk/mutx/`) is licensed under Apache-2.0. This license permits broad use including commercial applications, subject to the standard Apache-2.0 terms.
 
-See [sdk/LICENSE](/sdk/LICENSE) for the full license text.
+See [sdk/LICENSE](https://github.com/mutx-dev/mutx-dev/blob/main/sdk/LICENSE) for the full license text.
 
 ## Common Questions
 
-See [LICENSE-FAQ](/LICENSE-FAQ.md) for a practical FAQ covering:
+See [LICENSE-FAQ](https://github.com/mutx-dev/mutx-dev/blob/main/LICENSE-FAQ.md) for a practical FAQ covering:
 - What you can and cannot do with MUTX
 - Self-hosting and internal use
 - Building integrations and plugins
