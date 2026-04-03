@@ -14,7 +14,7 @@ This page covers where to track MUTX changes, release processes, and live status
 
 ## Changelog
 
-The canonical changelog lives at [CHANGELOG.md](../CHANGELOG.md) in the repository root.
+The canonical changelog lives at [CHANGELOG.md](https://github.com/mutx-dev/mutx-dev/blob/main/CHANGELOG.md) in the repository root.
 
 The canonical public release narrative for the current launch lives at [docs/releases/v1.3.md](./releases/v1.3.md), with the public website summary at `mutx.dev/releases`.
 
@@ -106,11 +106,11 @@ This project uses [Semantic Versioning](https://semver.org/):
 | CLI distribution | root `pyproject.toml` |
 | Python SDK | `sdk/pyproject.toml` |
 
-See [CHANGELOG.md](../CHANGELOG.md#versioning) for details on versioning scheme.
+See [CHANGELOG.md](https://github.com/mutx-dev/mutx-dev/blob/main/CHANGELOG.md) for details on versioning scheme.
 
 ## Contract Notes (Current)
 
-- FastAPI routes are mounted under `/v1/*` in [`src/api/main.py`](../src/api/main.py).
+- FastAPI routes are mounted under `/v1/*` in [`src/api/main.py`](https://github.com/mutx-dev/mutx-dev/blob/main/src/api/main.py).
 - Ingestion routes are mounted at `/v1/ingest/*`.
 - Webhook destination management is mounted at `/v1/webhooks/*`.
 - Deployment event history is available at `GET /v1/deployments/{deployment_id}/events`.
@@ -127,8 +127,8 @@ See [CHANGELOG.md](../CHANGELOG.md#versioning) for details on versioning scheme.
 - [v1.3 Release Notes](./releases/v1.3.md)
 - [v1.3 Release Checklist](./releases/v1.3-checklist.md)
 - [Project Status](./project-status.md)
-- [Roadmap](../roadmap.md)
+- [Roadmap](https://github.com/mutx-dev/mutx-dev/blob/main/roadmap.md)
 - [API Reference](./api/reference.md)
-- [Contributing](../CONTRIBUTING.md)
+- [Contributing](https://github.com/mutx-dev/mutx-dev/blob/main/CONTRIBUTING.md)
 - [CLI Reference](./cli.md)
 - [CLI Release Runbook](./deployment/cli-release.md)

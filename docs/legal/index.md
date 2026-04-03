@@ -53,11 +53,11 @@ MUTX incorporates MIT-licensed components:
 - **Faramesh** (Faramesh Technologies) — Governance engine
 - **Mission Control** (builderz-labs) — Dashboard inspiration
 
-All third-party code remains under its original MIT license. See [CREDITS.md](/CREDITS.md) for full attribution and license texts.
+All third-party code remains under its original MIT license. See [CREDITS.md](https://github.com/mutx-dev/mutx-dev/blob/main//CREDITS.md) for full attribution and license texts.
 
 ## Trademark Policy
 
-MUTX and the MUTX logo are registered trademarks. The code license does not grant trademark rights. See [TRADEMARKS.md](/TRADEMARKS.md) for the full policy.
+MUTX and the MUTX logo are registered trademarks. The code license does not grant trademark rights. See [TRADEMARKS.md](https://github.com/mutx-dev/mutx-dev/blob/main//TRADEMARKS.md) for the full policy.
 
 ## Contact
 

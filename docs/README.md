@@ -58,11 +58,11 @@ Use this section when you want the code-accurate view of setup, runtime surfaces
 
 ## Start Here
 
-- [Overview](../README.md)
+- [Overview](https://github.com/mutx-dev/mutx-dev/blob/main/README.md)
 - [Quickstart](./deployment/quickstart.md)
 - [v1.3 Release Notes](./releases/v1.3.md)
 - [Project Status](./project-status.md)
-- [Roadmap](../roadmap.md)
+- [Roadmap](https://github.com/mutx-dev/mutx-dev/blob/main/roadmap.md)
 
 ## By Area
 
@@ -78,8 +78,8 @@ Use this section when you want the code-accurate view of setup, runtime surfaces
 - [API Overview](./api/index.md)
 - [Architecture](./architecture/README.md)
 - [Autonomy](./autonomy/README.md)
-- [MUTX Infrastructure](../infrastructure.md)
-- [Python SDK](../sdk.md)
+- [MUTX Infrastructure](https://github.com/mutx-dev/mutx-dev/blob/main/infrastructure.md)
+- [Python SDK](https://github.com/mutx-dev/mutx-dev/blob/main/sdk.md)
 
 ### Troubleshooting
 
@@ -94,8 +94,8 @@ Use this section when you want the code-accurate view of setup, runtime surfaces
 - [Surface Matrix](./surfaces.md)
 - [App and Dashboard](./app-dashboard.md)
 - [v1.3 Release Checklist](./releases/v1.3-checklist.md)
-- [Manifesto](../manifesto.md)
-- [Technical Whitepaper](../whitepaper.md)
+- [Manifesto](https://github.com/mutx-dev/mutx-dev/blob/main/manifesto.md)
+- [Technical Whitepaper](https://github.com/mutx-dev/mutx-dev/blob/main/whitepaper.md)
 
 ## Truth rules
 

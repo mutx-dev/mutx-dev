@@ -57,7 +57,7 @@ If `mutx` still fails with `ModuleNotFoundError: No module named 'cli'`, your sh
 
 ## Configuration
 
-The CLI stores configuration in `~/.mutx/config.json` and reuses the existing `CLIConfig` shape from [`cli/config.py`](../cli/config.py):
+The CLI stores configuration in `~/.mutx/config.json` and reuses the existing `CLIConfig` shape from [`cli/config.py`](https://github.com/mutx-dev/mutx-dev/blob/main/cli/config.py):
 
 ```json
 {
@@ -238,7 +238,7 @@ pytest tests/test_cli_auth_and_tui.py tests/test_cli_setup_and_doctor.py
 
 ## Release Truth
 
-* The CLI distribution version is the root [`pyproject.toml`](../pyproject.toml) version.
+* The CLI distribution version is the root [`pyproject.toml`](https://github.com/mutx-dev/mutx-dev/blob/main/pyproject.toml) version.
 * The recommended CLI git tag format is `cli-vX.Y.Z`.
 * The Homebrew tap formula should point at the matching `cli-vX.Y.Z` source archive and use `mutx --help` as its non-network test.
-* The SDK has its own package metadata under [`sdk/pyproject.toml`](../sdk/pyproject.toml); do not treat SDK and CLI release tags as the same thing.
+* The SDK has its own package metadata under [`sdk/pyproject.toml`](https://github.com/mutx-dev/mutx-dev/blob/main/sdk/pyproject.toml); do not treat SDK and CLI release tags as the same thing.

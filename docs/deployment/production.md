@@ -349,7 +349,7 @@ docker compose -f infrastructure/docker/docker-compose.production.yml up -d --bu
 
 ## Related Documentation
 
-* [Infrastructure Guide](../../infrastructure.md)
+* [Infrastructure Guide](https://github.com/mutx-dev/mutx-dev/blob/main/infrastructure.md)
 * [Security Architecture](../architecture/security.md)
 * [Docker Guide](docker.md)
 * [DigitalOcean Deployment](digitalocean.md)

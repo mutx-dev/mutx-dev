@@ -17,4 +17,4 @@ Use this section to choose the right path for local, managed, or infra-heavy dep
 * **Production deployment:** [Production Deployment Guide](production.md)
 * **Managed hosting:** [Railway Deployment](railway.md)
 * **CLI distribution release:** [CLI Release Runbook](cli-release.md)
-* **Infra-controlled setup:** [DigitalOcean Deployment](digitalocean.md) and [MUTX Infrastructure](../../infrastructure.md)
+* **Infra-controlled setup:** [DigitalOcean Deployment](digitalocean.md) and [MUTX Infrastructure](https://github.com/mutx-dev/mutx-dev/blob/main/infrastructure.md)
