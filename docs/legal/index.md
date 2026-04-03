@@ -27,17 +27,17 @@ Each BUSL release converts to Apache-2.0 36 months after that version was first 
 - Competing commercial offerings (hosted, managed, white-labeled, OEM, embedded) require a commercial license
 - The MUTX name and logo are trademarks — see Trademark Policy below
 
-For the full license text, see the [LICENSE](https://github.com/mutx-dev/mutx-dev/blob/main/LICENSE) file at the repository root.
+For the full license text, see the [LICENSE](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/LICENSE) file at the repository root.
 
 ## Python SDK — Apache-2.0
 
 The MUTX Python SDK (`sdk/mutx/`) is licensed under Apache-2.0. This license permits broad use including commercial applications, subject to the standard Apache-2.0 terms.
 
-See [sdk/LICENSE](https://github.com/mutx-dev/mutx-dev/blob/main/sdk/LICENSE) for the full license text.
+See [sdk/LICENSE](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/sdk/LICENSE) for the full license text.
 
 ## Common Questions
 
-See [LICENSE-FAQ](https://github.com/mutx-dev/mutx-dev/blob/main/LICENSE-FAQ.md) for a practical FAQ covering:
+See [LICENSE-FAQ](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/LICENSE-FAQ.md) for a practical FAQ covering:
 - What you can and cannot do with MUTX
 - Self-hosting and internal use
 - Building integrations and plugins
@@ -53,11 +53,11 @@ MUTX incorporates MIT-licensed components:
 - **Faramesh** (Faramesh Technologies) — Governance engine
 - **Mission Control** (builderz-labs) — Dashboard inspiration
 
-All third-party code remains under its original MIT license. See [CREDITS.md](https://github.com/mutx-dev/mutx-dev/blob/main//CREDITS.md) for full attribution and license texts.
+All third-party code remains under its original MIT license. See [CREDITS.md](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/CREDITS.md) for full attribution and license texts.
 
 ## Trademark Policy
 
-MUTX and the MUTX logo are registered trademarks. The code license does not grant trademark rights. See [TRADEMARKS.md](https://github.com/mutx-dev/mutx-dev/blob/main//TRADEMARKS.md) for the full policy.
+MUTX and the MUTX logo are registered trademarks. The code license does not grant trademark rights. See [TRADEMARKS.md](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/TRADEMARKS.md) for the full policy.
 
 ## Contact
 
