@@ -61,7 +61,7 @@ export default async function DocPage({
 }: {
   params: Promise<{ slug?: string[] }>;
 }) {
-  const { slug } = await params;
+  const { slug = ["README"] } = await params;
 
   const filePath = resolveSlug(slug);
 
