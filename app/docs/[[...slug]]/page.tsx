@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
@@ -62,11 +62,6 @@ export default async function DocPage({
   params: Promise<{ slug?: string[] }>;
 }) {
   const { slug } = await params;
-
-  // Empty slug → redirect to /docs/README
-  if (!slug || slug.length === 0 || (slug.length === 1 && slug[0] === "")) {
-    redirect("/docs/README");
-  }
 
   const filePath = resolveSlug(slug);
 
