@@ -1218,3 +1218,35 @@
     opacity: 0;
   }
 }
+
+/* ── Docs site (GitBook-style) ─────────────────────────────────── */
+.docs-shell {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.docs-prose h1:first-child,
+.docs-prose > h1:first-of-type {
+  margin-top: 0;
+}
+
+.docs-prose .anchor {
+  text-decoration: none;
+  color: inherit;
+}
+
+.docs-prose .anchor:hover::after {
+  content: ' #';
+  color: #93c5fd;
+  font-weight: normal;
+}
+
+/* GitBook-style table of contents / table cards */
+.docs-prose table[data-view="cards"] {
+  display: block;
+  overflow-x: auto;
+}
+
+/* Callout boxes */
+.docs-prose blockquote p:first-child:has(strong) {
+  margin-top: 0;
+}
