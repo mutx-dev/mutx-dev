@@ -13,16 +13,16 @@ from typing import Any
 import httpx
 import pytest
 
-from mutx.leads import Lead, Leads, Contacts
+from mutx.leads import Contacts, Lead, Leads
 
 
 def _lead_payload(**overrides: Any) -> dict[str, Any]:
     payload = {
         "id": str(uuid.uuid4()),
         "email": "test@example.com",
-        "name": "Test Lead",
+        "name": "Test User",
         "company": "Test Corp",
-        "message": "Hello world",
+        "message": "Hello",
         "source": "web",
         "created_at": "2026-03-12T09:00:00",
     }
@@ -31,7 +31,46 @@ def _lead_payload(**overrides: Any) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
-# Leads – create
+# Lead dataclass
+# ---------------------------------------------------------------------------
+
+
+def test_lead_parses_required_fields() -> None:
+    lead = Lead(_lead_payload())
+
+    assert isinstance(lead.id, uuid.UUID)
+    assert lead.email == "test@example.com"
+    assert lead.name == "Test User"
+    assert lead.company == "Test Corp"
+    assert lead.message == "Hello"
+    assert lead.source == "web"
+    assert isinstance(lead.created_at, datetime)
+
+
+def test_lead_parses_optional_fields() -> None:
+    lead = Lead(
+        _lead_payload(
+            name=None,
+            company=None,
+            message=None,
+            source=None,
+        )
+    )
+
+    assert lead.name is None
+    assert lead.company is None
+    assert lead.message is None
+    assert lead.source is None
+
+
+def test_lead_repr() -> None:
+    lead = Lead(_lead_payload())
+    assert "Lead(id=" in repr(lead)
+    assert "test@example.com" in repr(lead)
+
+
+# ---------------------------------------------------------------------------
+# Leads.create
 # ---------------------------------------------------------------------------
 
 
@@ -47,39 +86,25 @@ def test_leads_create_hits_contract_route_and_maps_payload() -> None:
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     leads = Leads(client)
 
-    leads.create(
-        email="alice@example.com",
-        name="Alice",
-        company="Acme",
-        message="Interested in pro",
-        source="newsletter",
-    )
+    leads.create(email="alice@example.com", name="Alice", company="Acme", source="referral")
 
     assert captured["path"] == "/v1/leads"
     assert captured["method"] == "POST"
     assert captured["json"]["email"] == "alice@example.com"
     assert captured["json"]["name"] == "Alice"
     assert captured["json"]["company"] == "Acme"
-    assert captured["json"]["message"] == "Interested in pro"
-    assert captured["json"]["source"] == "newsletter"
+    assert captured["json"]["source"] == "referral"
 
 
-def test_leads_create_only_includes_provided_fields() -> None:
-    captured: dict[str, Any] = {}
-
+def test_leads_create_email_required() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
-        captured["json"] = json.loads(request.content.decode())
         return httpx.Response(201, json=_lead_payload())
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     leads = Leads(client)
 
-    leads.create(email="bob@example.com")
-
-    # Optional fields should be None and excluded from JSON payload
-    assert captured["json"]["email"] == "bob@example.com"
-    assert captured["json"].get("name") is None
-    assert captured["json"].get("company") is None
+    result = leads.create(email="bob@example.com")
+    assert result.email == "test@example.com"  # from mock payload
 
 
 def test_leads_acreate_hits_contract_route() -> None:
@@ -91,12 +116,14 @@ def test_leads_acreate_hits_contract_route() -> None:
         captured["json"] = json.loads(request.content.decode())
         return httpx.Response(201, json=_lead_payload())
 
-    client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
+    client = httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    )
     leads = Leads(client)
 
     import asyncio
 
-    asyncio.run(leads.acreate(email="carol@example.com"))
+    asyncio.run(leads.acreate(email="carol@example.com", name="Carol"))
 
     assert captured["path"] == "/v1/leads"
     assert captured["method"] == "POST"
@@ -104,7 +131,7 @@ def test_leads_acreate_hits_contract_route() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Leads – list
+# Leads.list
 # ---------------------------------------------------------------------------
 
 
@@ -115,33 +142,19 @@ def test_leads_list_hits_contract_route() -> None:
         captured["path"] = request.url.path
         captured["method"] = request.method
         captured["params"] = dict(request.url.params)
-        return httpx.Response(200, json=[_lead_payload(), _lead_payload()])
+        return httpx.Response(200, json=[_lead_payload(), _lead_payload(email="two@example.com")])
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     leads = Leads(client)
 
-    leads.list(skip=10, limit=25)
+    result = leads.list(skip=10, limit=25)
 
     assert captured["path"] == "/v1/leads"
     assert captured["method"] == "GET"
     assert captured["params"]["skip"] == "10"
     assert captured["params"]["limit"] == "25"
-
-
-def test_leads_list_defaults() -> None:
-    captured: dict[str, Any] = {}
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        captured["params"] = dict(request.url.params)
-        return httpx.Response(200, json=[])
-
-    client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
-    leads = Leads(client)
-
-    leads.list()
-
-    assert captured["params"]["skip"] == "0"
-    assert captured["params"]["limit"] == "50"
+    assert len(result) == 2
+    assert all(isinstance(lead, Lead) for lead in result)
 
 
 def test_leads_alist_hits_contract_route() -> None:
@@ -152,19 +165,22 @@ def test_leads_alist_hits_contract_route() -> None:
         captured["method"] = request.method
         return httpx.Response(200, json=[_lead_payload()])
 
-    client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
+    client = httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    )
     leads = Leads(client)
 
     import asyncio
 
-    asyncio.run(leads.alist())
+    result = asyncio.run(leads.alist(skip=5, limit=10))
 
     assert captured["path"] == "/v1/leads"
     assert captured["method"] == "GET"
+    assert len(result) == 1
 
 
 # ---------------------------------------------------------------------------
-# Leads – get
+# Leads.get
 # ---------------------------------------------------------------------------
 
 
@@ -180,10 +196,12 @@ def test_leads_get_hits_contract_route() -> None:
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     leads = Leads(client)
 
-    leads.get(lead_id)
+    result = leads.get(lead_id)
 
     assert captured["path"] == f"/v1/leads/{lead_id}"
     assert captured["method"] == "GET"
+    assert isinstance(result, Lead)
+    assert result.id == lead_id
 
 
 def test_leads_get_accepts_string_id() -> None:
@@ -211,19 +229,22 @@ def test_leads_aget_hits_contract_route() -> None:
         captured["method"] = request.method
         return httpx.Response(200, json=_lead_payload(id=str(lead_id)))
 
-    client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
+    client = httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    )
     leads = Leads(client)
 
     import asyncio
 
-    asyncio.run(leads.aget(lead_id))
+    result = asyncio.run(leads.aget(lead_id))
 
     assert captured["path"] == f"/v1/leads/{lead_id}"
     assert captured["method"] == "GET"
+    assert isinstance(result, Lead)
 
 
 # ---------------------------------------------------------------------------
-# Leads – update
+# Leads.update
 # ---------------------------------------------------------------------------
 
 
@@ -240,28 +261,32 @@ def test_leads_update_hits_contract_route_and_maps_payload() -> None:
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     leads = Leads(client)
 
-    leads.update(lead_id, name="Updated", company="NewCorp")
+    result = leads.update(lead_id, name="Updated", company="NewCorp")
 
     assert captured["path"] == f"/v1/leads/{lead_id}"
     assert captured["method"] == "PATCH"
     assert captured["json"]["name"] == "Updated"
     assert captured["json"]["company"] == "NewCorp"
-    assert "email" not in captured["json"]
+    assert "email" not in captured["json"]  # email is not sent on update
+    assert isinstance(result, Lead)
 
 
-def test_leads_update_only_includes_provided_fields() -> None:
+def test_leads_update_skips_none_values() -> None:
     captured: dict[str, Any] = {}
+    lead_id = uuid.uuid4()
 
     def handler(request: httpx.Request) -> httpx.Response:
         captured["json"] = json.loads(request.content.decode())
-        return httpx.Response(200, json=_lead_payload())
+        return httpx.Response(200, json=_lead_payload(id=str(lead_id)))
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     leads = Leads(client)
 
-    leads.update(uuid.uuid4(), source="referral")
+    leads.update(lead_id, name="Only Name")
 
-    assert captured["json"] == {"source": "referral"}
+    assert "name" in captured["json"]
+    assert "company" not in captured["json"]
+    assert "message" not in captured["json"]
 
 
 def test_leads_aupdate_hits_contract_route() -> None:
@@ -274,20 +299,22 @@ def test_leads_aupdate_hits_contract_route() -> None:
         captured["json"] = json.loads(request.content.decode())
         return httpx.Response(200, json=_lead_payload(id=str(lead_id)))
 
-    client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
+    client = httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    )
     leads = Leads(client)
 
     import asyncio
 
-    asyncio.run(leads.aupdate(lead_id, message="new message"))
+    asyncio.run(leads.aupdate(lead_id, source="updated-source"))
 
     assert captured["path"] == f"/v1/leads/{lead_id}"
     assert captured["method"] == "PATCH"
-    assert captured["json"]["message"] == "new message"
+    assert captured["json"]["source"] == "updated-source"
 
 
 # ---------------------------------------------------------------------------
-# Leads – delete
+# Leads.delete
 # ---------------------------------------------------------------------------
 
 
@@ -318,7 +345,9 @@ def test_leads_adelete_hits_contract_route() -> None:
         captured["method"] = request.method
         return httpx.Response(204)
 
-    client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
+    client = httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    )
     leads = Leads(client)
 
     import asyncio
@@ -330,7 +359,7 @@ def test_leads_adelete_hits_contract_route() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Client type enforcement
+# Client-type guards (sync vs async)
 # ---------------------------------------------------------------------------
 
 
@@ -374,66 +403,26 @@ def test_leads_delete_rejects_async_client() -> None:
         leads.delete(uuid.uuid4())
 
 
-def test_leads_alist_rejects_sync_client() -> None:
+@pytest.mark.asyncio
+async def test_leads_alist_rejects_sync_client() -> None:
     client = httpx.Client(base_url="https://api.test")
     leads = Leads(client)
 
-    import asyncio
-
-    with pytest.raises(RuntimeError, match="async httpx.AsyncClient"):
-        asyncio.run(leads.alist())
+    with pytest.raises(RuntimeError, match="requires an async httpx.AsyncClient"):
+        await leads.alist()
 
 
-def test_leads_acreate_rejects_sync_client() -> None:
+@pytest.mark.asyncio
+async def test_leads_acreate_rejects_sync_client() -> None:
     client = httpx.Client(base_url="https://api.test")
     leads = Leads(client)
 
-    import asyncio
-
-    with pytest.raises(RuntimeError, match="async httpx.AsyncClient"):
-        asyncio.run(leads.acreate(email="test@example.com"))
+    with pytest.raises(RuntimeError, match="requires an async httpx.AsyncClient"):
+        await leads.acreate(email="test@example.com")
 
 
 # ---------------------------------------------------------------------------
-# Lead model parsing
-# ---------------------------------------------------------------------------
-
-
-def test_lead_parses_required_fields() -> None:
-    lead = Lead(_lead_payload())
-
-    assert isinstance(lead.id, uuid.UUID)
-    assert lead.email == "test@example.com"
-    assert lead.name == "Test Lead"
-    assert lead.company == "Test Corp"
-    assert lead.message == "Hello world"
-    assert lead.source == "web"
-    assert isinstance(lead.created_at, datetime)
-
-
-def test_lead_parses_optional_fields_as_none() -> None:
-    payload = _lead_payload()
-    payload.pop("name", None)
-    payload.pop("company", None)
-    payload.pop("message", None)
-    payload.pop("source", None)
-
-    lead = Lead(payload)
-
-    assert lead.name is None
-    assert lead.company is None
-    assert lead.message is None
-    assert lead.source is None
-
-
-def test_lead_repr() -> None:
-    lead = Lead(_lead_payload())
-    assert "Lead(id=" in repr(lead)
-    assert "test@example.com" in repr(lead)
-
-
-# ---------------------------------------------------------------------------
-# Contacts (extends Leads) – contract route verification
+# Contacts (Leads subclass) — hits /v1/leads/contacts routes
 # ---------------------------------------------------------------------------
 
 
@@ -443,12 +432,35 @@ def test_contacts_create_hits_contacts_route() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
         captured["method"] = request.method
+        captured["json"] = json.loads(request.content.decode())
         return httpx.Response(201, json=_lead_payload())
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     contacts = Contacts(client)
 
-    contacts.create(email="contact@example.com")
+    contacts.create(email="contact@example.com", name="Contact Person")
+
+    assert captured["path"] == "/v1/leads/contacts"
+    assert captured["method"] == "POST"
+    assert captured["json"]["email"] == "contact@example.com"
+
+
+def test_contacts_acreate_hits_contacts_route() -> None:
+    captured: dict[str, Any] = {}
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        captured["method"] = request.method
+        return httpx.Response(201, json=_lead_payload())
+
+    client = httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    )
+    contacts = Contacts(client)
+
+    import asyncio
+
+    asyncio.run(contacts.acreate(email="async-contact@example.com"))
 
     assert captured["path"] == "/v1/leads/contacts"
     assert captured["method"] == "POST"
@@ -459,16 +471,33 @@ def test_contacts_list_hits_contacts_route() -> None:
 
     def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
-        captured["method"] = request.method
         return httpx.Response(200, json=[_lead_payload()])
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
     contacts = Contacts(client)
 
-    contacts.list()
+    contacts.list(skip=0, limit=10)
 
     assert captured["path"] == "/v1/leads/contacts"
-    assert captured["method"] == "GET"
+
+
+def test_contacts_alist_hits_contacts_route() -> None:
+    captured: dict[str, Any] = {}
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        return httpx.Response(200, json=[_lead_payload()])
+
+    client = httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    )
+    contacts = Contacts(client)
+
+    import asyncio
+
+    asyncio.run(contacts.alist())
+
+    assert captured["path"] == "/v1/leads/contacts"
 
 
 def test_contacts_get_hits_contacts_route() -> None:
@@ -477,7 +506,6 @@ def test_contacts_get_hits_contacts_route() -> None:
 
     def handler(request: httpx.Request) -> httpx.Response:
         captured["path"] = request.url.path
-        captured["method"] = request.method
         return httpx.Response(200, json=_lead_payload(id=str(contact_id)))
 
     client = httpx.Client(base_url="https://api.test", transport=httpx.MockTransport(handler))
@@ -486,7 +514,26 @@ def test_contacts_get_hits_contacts_route() -> None:
     contacts.get(contact_id)
 
     assert captured["path"] == f"/v1/leads/contacts/{contact_id}"
-    assert captured["method"] == "GET"
+
+
+def test_contacts_aget_hits_contacts_route() -> None:
+    captured: dict[str, Any] = {}
+    contact_id = uuid.uuid4()
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        return httpx.Response(200, json=_lead_payload(id=str(contact_id)))
+
+    client = httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    )
+    contacts = Contacts(client)
+
+    import asyncio
+
+    asyncio.run(contacts.aget(contact_id))
+
+    assert captured["path"] == f"/v1/leads/contacts/{contact_id}"
 
 
 def test_contacts_update_hits_contacts_route() -> None:
@@ -509,6 +556,28 @@ def test_contacts_update_hits_contacts_route() -> None:
     assert captured["json"]["name"] == "Updated Contact"
 
 
+def test_contacts_aupdate_hits_contacts_route() -> None:
+    captured: dict[str, Any] = {}
+    contact_id = uuid.uuid4()
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        captured["method"] = request.method
+        return httpx.Response(200, json=_lead_payload(id=str(contact_id)))
+
+    client = httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    )
+    contacts = Contacts(client)
+
+    import asyncio
+
+    asyncio.run(contacts.aupdate(contact_id, company="New Company"))
+
+    assert captured["path"] == f"/v1/leads/contacts/{contact_id}"
+    assert captured["method"] == "PATCH"
+
+
 def test_contacts_delete_hits_contacts_route() -> None:
     captured: dict[str, Any] = {}
     contact_id = uuid.uuid4()
@@ -527,84 +596,6 @@ def test_contacts_delete_hits_contacts_route() -> None:
     assert captured["method"] == "DELETE"
 
 
-def test_contacts_acreate_hits_contacts_route() -> None:
-    captured: dict[str, Any] = {}
-
-    async def handler(request: httpx.Request) -> httpx.Response:
-        captured["path"] = request.url.path
-        captured["method"] = request.method
-        return httpx.Response(201, json=_lead_payload())
-
-    client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
-    contacts = Contacts(client)
-
-    import asyncio
-
-    asyncio.run(contacts.acreate(email="async-contact@example.com"))
-
-    assert captured["path"] == "/v1/leads/contacts"
-    assert captured["method"] == "POST"
-
-
-def test_contacts_alist_hits_contacts_route() -> None:
-    captured: dict[str, Any] = {}
-
-    async def handler(request: httpx.Request) -> httpx.Response:
-        captured["path"] = request.url.path
-        captured["method"] = request.method
-        return httpx.Response(200, json=[_lead_payload()])
-
-    client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
-    contacts = Contacts(client)
-
-    import asyncio
-
-    asyncio.run(contacts.alist())
-
-    assert captured["path"] == "/v1/leads/contacts"
-    assert captured["method"] == "GET"
-
-
-def test_contacts_aget_hits_contacts_route() -> None:
-    captured: dict[str, Any] = {}
-    contact_id = uuid.uuid4()
-
-    async def handler(request: httpx.Request) -> httpx.Response:
-        captured["path"] = request.url.path
-        captured["method"] = request.method
-        return httpx.Response(200, json=_lead_payload(id=str(contact_id)))
-
-    client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
-    contacts = Contacts(client)
-
-    import asyncio
-
-    asyncio.run(contacts.aget(contact_id))
-
-    assert captured["path"] == f"/v1/leads/contacts/{contact_id}"
-    assert captured["method"] == "GET"
-
-
-def test_contacts_aupdate_hits_contacts_route() -> None:
-    captured: dict[str, Any] = {}
-    contact_id = uuid.uuid4()
-
-    async def handler(request: httpx.Request) -> httpx.Response:
-        captured["path"] = request.url.path
-        captured["method"] = request.method
-        return httpx.Response(200, json=_lead_payload(id=str(contact_id)))
-
-    client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
-    contacts = Contacts(client)
-
-    import asyncio
-
-    asyncio.run(contacts.aupdate(contact_id, message="async update"))
-
-    assert captured["path"] == f"/v1/leads/contacts/{contact_id}"
-    assert captured["method"] == "PATCH"
-
-
 def test_contacts_adelete_hits_contacts_route() -> None:
     captured: dict[str, Any] = {}
     contact_id = uuid.uuid4()
@@ -614,7 +605,9 @@ def test_contacts_adelete_hits_contacts_route() -> None:
         captured["method"] = request.method
         return httpx.Response(204)
 
-    client = httpx.AsyncClient(base_url="https://api.test", transport=httpx.MockTransport(handler))
+    client = httpx.AsyncClient(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    )
     contacts = Contacts(client)
 
     import asyncio
@@ -623,3 +616,20 @@ def test_contacts_adelete_hits_contacts_route() -> None:
 
     assert captured["path"] == f"/v1/leads/contacts/{contact_id}"
     assert captured["method"] == "DELETE"
+
+
+def test_contacts_list_rejects_async_client() -> None:
+    client = httpx.AsyncClient(base_url="https://api.test")
+    contacts = Contacts(client)
+
+    with pytest.raises(RuntimeError, match="requires a sync httpx.Client"):
+        contacts.list()
+
+
+@pytest.mark.asyncio
+async def test_contacts_alist_rejects_sync_client() -> None:
+    client = httpx.Client(base_url="https://api.test")
+    contacts = Contacts(client)
+
+    with pytest.raises(RuntimeError, match="requires an async httpx.AsyncClient"):
+        await contacts.alist()
