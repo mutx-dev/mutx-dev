@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { DocNavItem } from "@/lib/docs";
+import "@/app/docs/docs.css";
 
 interface DocsLayoutProps {
   nav: DocNavItem[];
@@ -11,20 +12,26 @@ interface DocsLayoutProps {
   title?: string;
 }
 
-function NavItem({ item, pathname }: { item: DocNavItem; pathname: string }) {
-  const isActive = pathname === `/docs/${item.slug}` || pathname === `/docs/${item.slug}/`;
+function NavItem({
+  item,
+  pathname,
+}: {
+  item: DocNavItem;
+  pathname: string;
+}) {
+  const isActive =
+    pathname === `/docs/${item.slug}` ||
+    pathname === `/docs/${item.slug}/`;
   const hasChildren = item.children.length > 0;
 
   return (
-    <div>
+    <div className="docs-nav-section">
       <Link
         href={`/docs/${item.slug}`}
-        className={`docs-nav-link block py-1 text-sm leading-snug transition-colors ${
-          isActive
-            ? "font-semibold text-blue-600"
-            : "text-gray-600 hover:text-gray-900"
+        className={`docs-nav-link${isActive ? " active" : ""}${
+          item.depth > 0 ? " docs-nav-link-nested" : ""
         }`}
-        style={{ paddingLeft: `${item.depth * 12 + 8}px` }}
+        style={{ paddingLeft: `${item.depth * 16 + 16}px` }}
       >
         {item.title}
       </Link>
@@ -44,20 +51,31 @@ export function DocsLayout({ nav, children, title }: DocsLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="docs-shell min-h-screen bg-white font-sans">
-      {/* Top bar */}
-      <header className="docs-header sticky top-0 z-30 flex h-14 items-center border-b border-gray-200 bg-white/95 backdrop-blur px-4 gap-4">
+    <div className="docs-shell">
+      {/* ── Top header ── */}
+      <header className="docs-header">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-900"
-          aria-label="Toggle sidebar"
+          className="lg:hidden p-1.5 -ml-1.5 text-gb-text-2 hover:text-white transition-colors rounded"
+          aria-label="Toggle navigation"
         >
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          <svg
+            width="18"
+            height="18"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
         </button>
 
-        <Link href="/docs" className="font-semibold text-gray-900 text-sm tracking-tight">
+        <Link href="/docs" className="docs-header-logo">
           📖 MUTX Docs
         </Link>
 
@@ -67,50 +85,43 @@ export function DocsLayout({ nav, children, title }: DocsLayoutProps) {
           href="https://github.com/mutx-dev/mutx-dev"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+          className="docs-header-link"
         >
           GitHub
         </a>
-        <span className="text-gray-200">·</span>
-        <a
-          href="https://mutx.dev"
-          className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
-        >
+        <span style={{ color: "var(--gb-text-3)" }}>·</span>
+        <a href="https://mutx.dev" className="docs-header-link">
           mutx.dev
         </a>
       </header>
 
-      <div className="flex relative">
-        {/* Left sidebar overlay (mobile) */}
+      {/* ── Body layout ── */}
+      <div className="docs-layout">
+        {/* Mobile overlay */}
         {sidebarOpen && (
           <div
-            className="fixed inset-0 z-20 bg-black/30 lg:hidden"
+            className="docs-sidebar-overlay lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
-        {/* Left sidebar */}
+        {/* ── Left sidebar ── */}
         <aside
-          className={`
-            docs-sidebar fixed top-14 left-0 z-20 w-64 h-[calc(100vh-3.5rem)] overflow-y-auto
-            border-r border-gray-200 bg-white pb-20
-            transform transition-transform duration-200 ease-in-out
-            lg:sticky lg:top-14 lg:translate-x-0 lg:z-0 lg:block
-            ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-          `}
+          className={`docs-sidebar${sidebarOpen ? " open" : ""}`}
+          aria-label="Documentation navigation"
         >
-          <nav className="py-4 pr-4">
+          <nav aria-label="Docs nav">
             {nav.map((item) => (
               <NavItem key={item.slug} item={item} pathname={pathname} />
             ))}
           </nav>
         </aside>
 
-        {/* Main content */}
-        <main className="docs-content flex-1 min-w-0 px-6 py-8 lg:px-10">
-          <div className="max-w-3xl mx-auto">
+        {/* ── Main content ── */}
+        <main className="docs-content">
+          <article className="docs-content-inner docs-prose">
             {children}
-          </div>
+          </article>
         </main>
       </div>
     </div>
