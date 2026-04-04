@@ -62,6 +62,39 @@ def test_enqueue_generated_tasks_deduplicates_and_sets_defaults(tmp_path: Path) 
 
 
 
+def test_enqueue_generated_tasks_refreshes_stale_terminal_fleet_item(tmp_path: Path) -> None:
+    queue_path = tmp_path / "queue.json"
+    queue_path.write_text(
+        json.dumps(
+            {
+                "items": [
+                    {
+                        "id": "fleet-task",
+                        "status": "completed",
+                        "source": "fleet:todo-scan",
+                        "completed_at": "2024-01-01T00:00:00Z",
+                        "notes": [{"message": "runner completed successfully"}],
+                    }
+                ]
+            }
+        )
+    )
+
+    appended = DAEMON.enqueue_generated_tasks(
+        queue_path,
+        [{"id": "fleet-task", "title": "Refresh me", "source": "fleet:todo-scan"}],
+        cooldown_seconds=60,
+    )
+
+    assert appended == 1
+    payload = json.loads(queue_path.read_text())
+    refreshed = payload["items"][0]
+    assert refreshed["id"] == "fleet-task"
+    assert refreshed["status"] == "queued"
+    assert any("fleet task refreshed after cooldown" in note.get("message", "") for note in refreshed["notes"])
+
+
+
 def test_daemon_lock_prevents_second_instance(tmp_path: Path) -> None:
     lock_path = tmp_path / "daemon.lock"
     first = DAEMON.DaemonLock(lock_path)

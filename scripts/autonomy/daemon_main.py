@@ -27,6 +27,7 @@ MAX_IDLE_SECONDS = 900
 DEFAULT_IDLE_REPORT_INTERVAL = 900
 DEFAULT_FLEET_SCAN_INTERVAL = 900
 DEFAULT_QUEUE_REFILL_THRESHOLD = 2
+DEFAULT_FLEET_REQUEUE_COOLDOWN = 1800
 LOCK_EXIT_CODE = 75
 STOP_SIGNALS = (signal.SIGINT, signal.SIGTERM)
 
@@ -232,24 +233,55 @@ def runner_command(orchestrator_args: argparse.Namespace, *, task_id: str) -> li
     ]
 
 
-def enqueue_generated_tasks(queue_path: str | Path, tasks: list[dict[str, Any]]) -> int:
+TERMINAL_QUEUE_STATUSES = {"completed", "failed", "blocked", "merged", "cancelled"}
+
+
+def _is_stale_terminal_fleet_item(item: dict[str, Any], *, cooldown_seconds: int) -> bool:
+    status = str(item.get("status") or "queued")
+    if status not in TERMINAL_QUEUE_STATUSES:
+        return False
+    source = str(item.get("source") or "")
+    if not source.startswith("fleet"):
+        return False
+    ts = item.get("completed_at") or item.get("updated_at")
+    if not ts:
+        return True
+    try:
+        age_seconds = time.time() - parse_epoch(str(ts))
+    except ValueError:
+        return True
+    return age_seconds >= cooldown_seconds
+
+
+def enqueue_generated_tasks(queue_path: str | Path, tasks: list[dict[str, Any]], *, cooldown_seconds: int = DEFAULT_FLEET_REQUEUE_COOLDOWN) -> int:
     if not tasks:
         return 0
     queue = load_queue(queue_path)
     items = queue.setdefault("items", [])
-    seen = {str(item.get("id")) for item in items}
+    item_index = {str(item.get("id")): index for index, item in enumerate(items)}
     appended = 0
     for task in tasks:
         task_id = str(task.get("id") or "")
-        if not task_id or task_id in seen:
+        if not task_id:
             continue
         payload = dict(task)
         payload.setdefault("status", "queued")
         payload.setdefault("priority", "p2")
         payload.setdefault("source", "fleet")
         payload.setdefault("labels", [])
+        existing_index = item_index.get(task_id)
+        if existing_index is not None:
+            existing = items[existing_index]
+            if not _is_stale_terminal_fleet_item(existing, cooldown_seconds=cooldown_seconds):
+                continue
+            notes = list(existing.get("notes") or [])
+            notes.append({"ts": utc_now_iso(), "message": "fleet task refreshed after cooldown"})
+            payload["notes"] = notes
+            items[existing_index] = payload
+            appended += 1
+            continue
         items.append(payload)
-        seen.add(task_id)
+        item_index[task_id] = len(items) - 1
         appended += 1
     if appended:
         save_queue(queue_path, queue)
