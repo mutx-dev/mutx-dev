@@ -5,6 +5,7 @@ import { Activity, AlertTriangle, Bot, Layers3, Wallet, Webhook } from "lucide-r
 
 import { ApiRequestError, normalizeCollection, readJson } from "@/components/app/http";
 import {
+  BriefingBar,
   LiveAuthRequired,
   LiveEmptyState,
   LiveErrorState,
@@ -281,6 +282,53 @@ export function DashboardOverviewPageClient() {
   );
   const openclawStatus = openclawRuntime?.status ?? openclawOnboarding?.status ?? "unknown";
 
+  const briefingBarEntries = [
+    {
+      label: "Control plane",
+      value: healthStatus === "ok" || healthStatus === "healthy" ? "Healthy" : healthStatus,
+      status: (healthStatus === "ok" || healthStatus === "healthy"
+        ? "healthy"
+        : healthStatus === "degraded"
+          ? "degraded"
+          : "critical") as "healthy" | "degraded" | "critical" | "unknown",
+    },
+    {
+      label: "Fleet",
+      value: `${liveAgents.length}/${agents.length}`,
+      status: (liveAgents.length > 0 ? "healthy" : "unknown") as "healthy" | "degraded" | "critical" | "unknown",
+    },
+    {
+      label: "Runs",
+      value: runHealth.total > 0
+        ? `${runHealth.completed} ok · ${runHealth.failed} failed`
+        : "No runs",
+      status: (runHealth.failed > 0
+        ? "degraded"
+        : runHealth.total > 0
+          ? "healthy"
+          : "unknown") as "healthy" | "degraded" | "critical" | "unknown",
+    },
+    {
+      label: "In flight",
+      value: String(runs.filter((r) => !r.completed_at).length),
+      status: (runs.filter((r) => !r.completed_at).length > 0 ? "healthy" : "unknown") as "healthy" | "degraded" | "critical" | "unknown",
+    },
+    {
+      label: "Alerts",
+      value: String(unresolvedAlerts.length),
+      status: (unresolvedAlerts.length > 0 ? "degraded" : "healthy") as "healthy" | "degraded" | "critical" | "unknown",
+    },
+    {
+      label: "Credits",
+      value: budget ? `${budget.usage_percentage}%` : "N/A",
+      status: (budget && budget.usage_percentage >= 80
+        ? "degraded"
+        : budget
+          ? "healthy"
+          : "unknown") as "healthy" | "degraded" | "critical" | "unknown",
+    },
+  ];
+
   if (loading) {
     return <LiveLoading title="Overview" />;
   }
@@ -308,6 +356,8 @@ export function DashboardOverviewPageClient() {
           </p>
         </div>
       ) : null}
+
+      <BriefingBar entries={briefingBarEntries} />
 
       <LiveKpiGrid>
         <LiveStatCard

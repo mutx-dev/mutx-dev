@@ -114,7 +114,7 @@ export function MonitoringPageClient() {
         <LiveStatCard
           label="Open alerts"
           value={String(unresolvedCount)}
-          detail={`${alerts.length} total alert records returned by monitoring.`}
+          detail={`${alerts.length} total records returned by monitoring.`}
           status={asDashboardStatus(unresolvedCount > 0 ? "warning" : "healthy")}
         />
       </LiveKpiGrid>
@@ -123,8 +123,8 @@ export function MonitoringPageClient() {
         <LivePanel title="Alert rail" meta={`${alerts.length} records`}>
           {alerts.length === 0 ? (
             <LiveEmptyState
-              title="No alerts yet"
-              message="MUTX will stream quota, deployment, and runtime failures here when they exist."
+              title="No open alerts"
+              message="Quota, deployment, and runtime failures will appear here when triggered."
             />
           ) : (
             <div className="space-y-3">
@@ -166,7 +166,7 @@ export function MonitoringPageClient() {
               </div>
             </div>
             <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 text-sm text-slate-400">
-              Operators should land here when they need to decide if an issue is deployment shape, auth posture, or genuine runtime breakage.
+              Land here to assess whether an issue is deployment shape, auth posture, or runtime failure.
             </div>
           </div>
         </LivePanel>

@@ -329,3 +329,81 @@ export function LiveEmptyState({
     />
   );
 }
+
+export type BriefingBarStatus = "healthy" | "degraded" | "critical" | "unknown";
+
+export type BriefingBarEntry = {
+  label: string;
+  value: string;
+  status: BriefingBarStatus;
+};
+
+export function SignalPill({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "success" | "warning" | "info";
+}) {
+  const toneClasses = {
+    success: "bg-emerald-500/15 border-emerald-500/30 text-emerald-300",
+    warning: "bg-amber-500/15 border-amber-500/30 text-amber-300",
+    info: "bg-sky-500/15 border-sky-500/30 text-sky-300",
+  };
+
+  return (
+    <div className={`rounded-lg border px-2.5 py-1.5 ${toneClasses[tone]}`}>
+      <div className="text-[10px] uppercase tracking-wide opacity-70">{label}</div>
+      <div className="text-xs font-semibold font-mono truncate">{value}</div>
+    </div>
+  );
+}
+
+export function BriefingBar({ entries }: { entries: BriefingBarEntry[] }) {
+  const statusDotClasses: Record<BriefingBarStatus, string> = {
+    healthy: "bg-emerald-400",
+    degraded: "bg-amber-400",
+    critical: "bg-rose-400",
+    unknown: "bg-slate-500",
+  };
+
+  const statusTextClasses: Record<BriefingBarStatus, string> = {
+    healthy: "text-emerald-300",
+    degraded: "text-amber-300",
+    critical: "text-rose-300",
+    unknown: "text-slate-400",
+  };
+
+  return (
+    <div
+      className="flex items-center gap-4 rounded-xl border px-4 py-2.5 overflow-x-auto"
+      style={{
+        borderColor: dashboardTokens.borderSubtle,
+        backgroundColor: dashboardTokens.bgInset,
+      }}
+    >
+      {entries.map((entry, index) => (
+        <div key={entry.label} className="flex items-center gap-2 shrink-0">
+          {index > 0 && (
+            <div
+              className="h-4 w-px"
+              style={{ backgroundColor: dashboardTokens.borderSubtle }}
+            />
+          )}
+          <div className={`h-2 w-2 rounded-full ${statusDotClasses[entry.status]}`} />
+          <span
+            className="text-[10px] uppercase tracking-widest"
+            style={{ color: dashboardTokens.textMuted }}
+          >
+            {entry.label}
+          </span>
+          <span className={`text-xs font-semibold ${statusTextClasses[entry.status]}`}>
+            {entry.value}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
