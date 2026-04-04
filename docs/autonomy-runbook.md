@@ -112,6 +112,11 @@ The new autonomy daemon is managed by:
 - `scripts/autonomy/daemon-watchdog.sh`
 - `scripts/autonomy/daemon_main.py`
 
+Lane execution helpers:
+- `scripts/autonomy/run_main_lane.py` — bounded docs/truth work on the `main` lane
+- `scripts/autonomy/run_codex_lane.py` — backend/API/runtime work on the `codex` lane
+- `scripts/autonomy/run_opencode_lane.py` — frontend/product-surface work on the `opencode` lane
+
 Default operational files:
 - pid: `.autonomy/daemon.pid`
 - lock: `.autonomy/daemon.lock`

@@ -227,7 +227,12 @@ def finalize_candidate(candidate: TaskCandidate, roles: list[RoleProfile]) -> Ta
     candidate.owner_role = owner_role
     candidate.role_lane = role_lane
     candidate.lane = _execution_lane(candidate.area, role_lane)
-    candidate.runner = "opencode" if candidate.lane == "opencode" else "codex"
+    if candidate.lane == "main":
+        candidate.runner = "main"
+    elif candidate.lane == "opencode":
+        candidate.runner = "opencode"
+    else:
+        candidate.runner = "codex"
     score = SOURCE_SCORE.get(candidate.source, 12)
     score += 6 if len(candidate.allowed_paths) <= 2 else 0
     score += 5 if len(candidate.constraints) <= 3 else 0

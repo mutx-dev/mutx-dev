@@ -83,6 +83,8 @@ def choose_lane(area: str | None) -> str:
 
 
 def choose_runner(lane: str) -> str:
+    if lane == "main":
+        return "main"
     if lane == "opencode":
         return "opencode"
     return "codex"

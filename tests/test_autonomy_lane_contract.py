@@ -115,7 +115,7 @@ def test_build_work_order_keeps_role_metadata_for_main_lane(tmp_path: Path) -> N
     work_order = LANE.build_work_order(item, paths)
 
     assert work_order.lane == "main"
-    assert work_order.runner == "codex"
+    assert work_order.runner == "main"
     assert work_order.metadata["owner_role"] == "research"
     assert work_order.metadata["score"] == 88
 

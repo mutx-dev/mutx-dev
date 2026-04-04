@@ -27,6 +27,8 @@ def persist_work_order(work_order: WorkOrder, output_dir: Path) -> Path:
 
 
 def runner_script_for(runner: str) -> str:
+    if runner == "main":
+        return "scripts/autonomy/run_main_lane.py"
     if runner == "opencode":
         return "scripts/autonomy/run_opencode_lane.py"
     if runner == "codex":

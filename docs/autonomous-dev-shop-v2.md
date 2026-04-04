@@ -26,9 +26,14 @@ Token-efficient autonomy means:
 
 ## Canonical lanes
 
-- `main` — orchestrator
+- `main` — orchestrator plus low-risk docs/truth worker
 - `codex` — backend worker
 - `opencode` — frontend worker
+
+Professional routing rule:
+- do not route docs/truth tasks through Codex by default
+- reserve Codex for backend/API/runtime work where its lane specialization matters
+- let `main` absorb bounded docs/truth tasks so Codex quota pressure does not stall the whole shop
 
 ## Execution flow
 
