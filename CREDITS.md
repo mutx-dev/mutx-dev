@@ -4,6 +4,18 @@ MUTX is built on the shoulders of giants. This document acknowledges all open-so
 
 ---
 
+## Direct Feature Port Ledger
+
+For direct code, schema, prompt, documentation, or UI reuse from external projects, MUTX keeps a per-port ledger in `docs/legal/oss-attribution-ledger.md`.
+
+Current tracked upstreams for this process:
+
+- Mission Control (`MIT`) - one direct dashboard-pattern reuse entry is recorded in the ledger
+- LACP (`MIT`) - no direct reuse entry is recorded yet
+- Guild AI (`Apache-2.0`) - no direct reuse entry is recorded yet
+
+---
+
 ## Core Dependencies
 
 ### agent-run (Rebranded as MUTX Observability Schema)
@@ -145,15 +157,15 @@ SOFTWARE.
 
 ---
 
-### Mission Control (Inspiration)
+### Mission Control (Inspiration and Direct Reuse)
 
 **Repository:** https://github.com/builderz-labs/mission-control
 
 **License:** MIT
 
-**Contribution:** Dashboard patterns and agent fleet management concepts.
+**Contribution:** Dashboard patterns and agent fleet management concepts, including tracked direct dashboard-pattern reuse.
 
-MUTX's operator surface and agent management patterns are inspired by Mission Control's approach to agent orchestration dashboards.
+MUTX's operator surface and agent management patterns are inspired by Mission Control's approach to agent orchestration dashboards. Repo history also contains direct Mission Control pattern ports tracked in `docs/legal/oss-attribution-ledger.md`.
 
 **MIT License Text:**
 ```
@@ -184,7 +196,7 @@ SOFTWARE.
 
 ## Full License Texts
 
-All incorporated projects use MIT License. See respective repositories for full license texts:
+The incorporated projects listed above currently use the MIT License. See their repositories for full license texts:
 
 - agent-run: https://github.com/builderz-labs/agent-run/blob/main/LICENSE
 - AARM: https://github.com/aarm-dev/docs/blob/main/LICENSE.txt
