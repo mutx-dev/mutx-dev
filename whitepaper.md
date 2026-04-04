@@ -158,7 +158,7 @@ Historically, the live route families in the codebase were organized as:
 - `/v1/health`
 - `/v1/ready`
 
-Additional `/v1/*` surfaces (for example `/v1/templates`, `/v1/assistant`, `/v1/sessions`, `/v1/runs`, `/v1/monitoring`, `/v1/budgets`, `/v1/rag`, and `/v1/runtime`) are described in detail in [Section&nbsp;17.1](#171-backend-route-prefix-correction).
+Additional `/v1/*` surfaces (for example `/v1/templates`, `/v1/sessions`, `/v1/runs`, `/v1/budgets`) are documented in the OpenAPI specification at [`docs/api/openapi.json`](./docs/api/openapi.json).
 
 ```mermaid
 flowchart TD
