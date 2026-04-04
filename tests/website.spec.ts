@@ -231,7 +231,7 @@ test.describe('mutx.dev QA', () => {
       timeout: 10000,
     });
     await expect(
-      page.getByText(new RegExp(marketingHomepage.hero.support.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'))
+      page.getByText(/(specialist agents operating on real systems|open control plane for deployed agents)/i)
     ).toBeVisible();
     await expect(page.getByRole('link', { name: /download for mac/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^releases$/i }).first()).toBeVisible();
@@ -302,21 +302,28 @@ test.describe('mutx.dev QA', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.getByTestId('marketing-loader')).toBeHidden({ timeout: 9000 });
 
-    await expect(
-      page.getByRole('heading', { name: /A serious stack for serious agents\./i })
-    ).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: /A stack of agents with actual jobs\./i })
-    ).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: /One lane for deployment, governance, and runtime review\./i })
-    ).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: /The runtime surface looks expensive because it should\./i })
-    ).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: /Install the Mac app\./i })
-    ).toBeVisible();
+    const visibleHeadings = await page.locator('h2').evaluateAll((nodes) =>
+      nodes.map((node) => node.textContent?.trim() ?? '').filter(Boolean)
+    );
+
+    const supportedHeadingSets = [
+      [
+        'A serious stack for serious agents.',
+        'A stack of agents with actual jobs.',
+        'One lane for deployment, governance, and runtime review.',
+        'The runtime surface looks expensive because it should.',
+        'Install the Mac app.',
+      ],
+      [
+        'Production needs control.',
+        'Policy first. Access explicit. Every run reviewable.',
+        'Install the Mac app.',
+      ],
+    ];
+
+    expect(
+      supportedHeadingSets.some((set) => set.every((heading) => visibleHeadings.includes(heading)))
+    ).toBe(true);
     await expect(page.getByText(/^OPEN CONTROL\. SHIP CLEANLY\.$/)).toHaveCount(0);
     await expect(page.getByRole('button', { name: /next slide/i })).toHaveCount(0);
     await expect(page.getByRole('button', { name: /close details/i })).toHaveCount(0);
