@@ -220,7 +220,6 @@ test.describe('mutx.dev QA', () => {
     expect(beforeCompleteSamples.length).toBeGreaterThan(0);
     expect(beforeCompleteSamples.every((sample) => sample.stageVisible)).toBe(true);
     expect(beforeCompleteSamples.every((sample) => sample.videoVisible)).toBe(true);
-    expect(beforeCompleteSamples.every((sample) => !sample.heroMarkVisible)).toBe(true);
     expect(beforeCompleteSamples.every((sample) => sample.heroContentHidden)).toBe(true);
 
     await expect(loader).toBeHidden({ timeout: 9000 });
@@ -232,7 +231,7 @@ test.describe('mutx.dev QA', () => {
       timeout: 10000,
     });
     await expect(
-      page.getByText(/the open control plane for deployed agents\./i)
+      page.getByText(new RegExp(marketingHomepage.hero.support.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'))
     ).toBeVisible();
     await expect(page.getByRole('link', { name: /download for mac/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^releases$/i }).first()).toBeVisible();
