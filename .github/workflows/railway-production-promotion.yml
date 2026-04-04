@@ -1,4 +1,4 @@
-name: Railway Production Promotion
+name: Production Release Verification
 
 on:
   workflow_call:
@@ -18,17 +18,6 @@ on:
       docs_release_url:
         required: false
         type: string
-    secrets:
-      RAILWAY_TOKEN:
-        required: true
-      RAILWAY_PROJECT_ID:
-        required: true
-      RAILWAY_FRONTEND_SERVICE_ID:
-        required: true
-      RAILWAY_API_SERVICE_ID:
-        required: true
-      RAILWAY_ENVIRONMENT_ID:
-        required: true
   workflow_dispatch:
     inputs:
       release_tag:
@@ -71,9 +60,6 @@ jobs:
           node-version: "24"
           cache: "npm"
 
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
       - name: Determine release tag
         id: release
         env:
@@ -98,16 +84,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release view "${{ steps.release.outputs.tag }}" >/dev/null
-
-      - name: Promote Railway frontend and backend
-        env:
-          RELEASE_TAG: ${{ steps.release.outputs.tag }}
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-          RAILWAY_FRONTEND_SERVICE_ID: ${{ secrets.RAILWAY_FRONTEND_SERVICE_ID }}
-          RAILWAY_API_SERVICE_ID: ${{ secrets.RAILWAY_API_SERVICE_ID }}
-          RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
-        run: bash scripts/promote-railway-production.sh
 
       - name: Verify public release surfaces
         env:
