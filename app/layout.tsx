@@ -1,14 +1,27 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+import {
+  DEFAULT_OG_IMAGE_ALT,
+  DEFAULT_X_HANDLE,
+  getCanonicalUrl,
+  getOgImageUrl,
+  getSiteUrl,
+} from "@/lib/seo";
+
+const siteUrl = getSiteUrl();
+const ogImageUrl = getOgImageUrl();
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   alternates: {
-    canonical: "https://mutx.dev",
+    canonical: getCanonicalUrl(),
   },
-  metadataBase: new URL("https://mutx.dev"),
-  title: "MUTX | Control Plane For Deployed Agents",
+  title: "MUTX | Open Control Plane for AI Agents",
   description:
     "Operate deployed agents with real auth, deployments, traces, webhooks, runtime posture, and operator tooling across web, API, CLI, and docs.",
+  applicationName: "MUTX",
+  category: "developer tools",
   keywords: [
     "agent control plane",
     "agent deployments",
@@ -16,37 +29,56 @@ export const metadata: Metadata = {
     "webhooks",
     "traces",
     "runtime operations",
-    "OpenClaw",
+    "AI agent infrastructure",
     "deployment control plane",
   ],
+  authors: [{ name: "MUTX" }],
+  creator: "MUTX",
+  publisher: "MUTX",
+  manifest: "/manifest.webmanifest",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
     locale: "en_US",
-    title: "MUTX | Control Plane For Deployed Agents",
+    title: "MUTX | Open Control Plane for AI Agents",
     description:
-      "MUTX is the control plane for agents that have to survive real deployments, auth boundaries, webhooks, and runtime operations.",
-    url: "https://mutx.dev",
+      "MUTX is the open control plane for agents that have to survive real deployments, auth boundaries, webhooks, and runtime operations.",
+    url: siteUrl,
     siteName: "MUTX",
     images: [
       {
-        url: "https://mutx.dev/landing/webp/victory-core.webp",
+        url: ogImageUrl,
         width: 1536,
         height: 1024,
-        alt: "MUTX robot holding the MUTX mark aloft",
+        alt: DEFAULT_OG_IMAGE_ALT,
       },
     ],
     type: "website",
   },
   twitter: {
-    creator: "@mutxdev",
+    creator: DEFAULT_X_HANDLE,
     card: "summary_large_image",
-    site: "@mutxdev",
-    title: "MUTX | Control Plane For Deployed Agents",
+    site: DEFAULT_X_HANDLE,
+    title: "MUTX | Open Control Plane for AI Agents",
     description:
       "Operate deployed agents across auth, deployments, traces, webhooks, and runtime posture.",
-    images: ["https://mutx.dev/landing/webp/victory-core.webp"],
+    images: [ogImageUrl],
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
     apple: "/apple-touch-icon.png",
   },
 };

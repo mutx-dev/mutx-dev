@@ -26,6 +26,11 @@ export const metadata: Metadata = {
     canonical: "https://app.mutx.dev/control",
   },
   metadataBase: new URL("https://app.mutx.dev"),
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
   title: "MUTX Control Plane",
   description: "Operator-grade control plane for deploying, observing, and governing agent infrastructure.",
   keywords: [

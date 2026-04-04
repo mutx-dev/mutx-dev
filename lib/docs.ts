@@ -13,17 +13,15 @@ function lineDepth(line: string): number {
   return line.match(/^(\s*)/)?.[0].length ?? 0;
 }
 
+function normalizeSummaryHrefToSlug(href: string): string {
+  return href.replace(/^docs\//, "").replace(/\.md$/, "").replace(/^\//, "");
+}
+
 function parseLine(line: string): { title: string; href: string; slug: string } | null {
   const match = line.match(/^\s*\*\s*\[([^\]]+)\]\(([^)]+)\)/);
   if (!match) return null;
   const [, title, href] = match;
-  // Convert file paths like docs/api/index.md -> api/index
-  // or absolute paths like /manifesto -> manifesto
-  let slug = href
-    .replace(/^docs\//, "")
-    .replace(/\.md$/, "")
-    .replace(/^\//, "");
-  return { title, href, slug };
+  return { title, href, slug: normalizeSummaryHrefToSlug(href) };
 }
 
 export function parseSummary(): DocNavItem[] {
@@ -73,4 +71,30 @@ export function flatNav(items: DocNavItem[]): DocNavItem[] {
     result.push(...flatNav(item.children));
   }
   return result;
+}
+
+export function summaryHrefToDocsRoute(href: string): string | null {
+  if (!href.startsWith("docs/")) {
+    return null;
+  }
+
+  const normalized = normalizeSummaryHrefToSlug(href)
+    .replace(/\/README$/i, "")
+    .replace(/\/index$/i, "")
+    .replace(/^README$/i, "");
+
+  return normalized ? `/docs/${normalized}` : "/docs";
+}
+
+export function getDocSitemapRoutes(): string[] {
+  const seen = new Set<string>(["/docs"]);
+
+  for (const item of flatNav(parseSummary())) {
+    const route = summaryHrefToDocsRoute(item.href);
+    if (route) {
+      seen.add(route);
+    }
+  }
+
+  return Array.from(seen);
 }

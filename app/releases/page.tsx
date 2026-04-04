@@ -18,14 +18,31 @@ import {
   buildReleaseNotesUrl,
   fetchLatestStableDesktopRelease,
 } from "@/lib/desktopRelease";
+import { DEFAULT_X_HANDLE, getCanonicalUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Releases | MUTX",
   description:
     "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.",
+  alternates: {
+    canonical: getCanonicalUrl("/releases"),
+  },
+  openGraph: {
+    title: "Releases | MUTX",
+    description:
+      "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.",
+    url: getCanonicalUrl("/releases"),
+  },
+  twitter: {
+    card: "summary_large_image",
+    creator: DEFAULT_X_HANDLE,
+    title: "Releases | MUTX",
+    description:
+      "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.",
+  },
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900;
 
 type ReleaseCard = {
   title: string;

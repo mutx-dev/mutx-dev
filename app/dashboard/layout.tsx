@@ -13,6 +13,11 @@ export const metadata: Metadata = {
     canonical: "https://app.mutx.dev",
   },
   metadataBase: new URL("https://app.mutx.dev"),
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
   title: "Dashboard - MUTX",
   description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
   keywords: [

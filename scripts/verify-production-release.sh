@@ -51,6 +51,8 @@ require_content "${DOCS_RELEASE_URL}" "MUTX v1.3"
 require_ok "${API_URL}/health"
 require_ok "${API_URL}/ready"
 
+bash "$ROOT_DIR/scripts/verify-production-seo.sh"
+
 dashboard_effective_url="$(normalize_url "$(effective_url "${APP_URL}/dashboard")")"
 expected_dashboard_url="$(normalize_url "${APP_URL}/dashboard")"
 expected_login_url="$(normalize_url "${APP_URL}/login")"

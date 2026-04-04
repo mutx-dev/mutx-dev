@@ -1,4 +1,14 @@
+import type { Metadata } from "next";
+
 import { appFontVariables } from "@/app/fonts/app";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
+};
 
 export default function OnboardingLayout({
   children,

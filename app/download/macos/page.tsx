@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpenText, ShieldCheck } from "lucide-react";
@@ -11,8 +12,24 @@ import {
   buildReleaseNotesUrl,
   fetchLatestStableDesktopRelease,
 } from "@/lib/desktopRelease";
+import { getCanonicalUrl } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900;
+
+export const metadata: Metadata = {
+  title: "Download for macOS | MUTX",
+  description:
+    "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.",
+  alternates: {
+    canonical: getCanonicalUrl("/download"),
+  },
+  openGraph: {
+    title: "Download for macOS | MUTX",
+    description:
+      "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.",
+    url: getCanonicalUrl("/download"),
+  },
+};
 
 export default async function MacDownloadPage() {
   const release = await fetchLatestStableDesktopRelease();

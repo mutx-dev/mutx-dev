@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { DocsRenderer } from "@/components/site/docs/DocsRenderer";
+import { DEFAULT_X_HANDLE, getCanonicalUrl } from "@/lib/seo";
 
 export const dynamicParams = true;
 export const dynamic = "force-dynamic";
@@ -42,7 +44,7 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug?: string[] }>;
-}) {
+}): Promise<Metadata> {
   const { slug = ["README"] } = await params;
   const filePath = resolveSlug(slug);
   if (!filePath) return { title: "Not Found" };
@@ -50,9 +52,26 @@ export async function generateMetadata({
   const source = fs.readFileSync(filePath, "utf-8");
   const { data } = matter(source);
   const title = (data.title as string) || (data.description as string) || "MUTX Docs";
+  const normalizedPath = slug[0] === "README" ? "/docs" : `/docs/${slug.join("/")}`;
+  const description = (data.description as string) || "Documentation for MUTX operators and builders.";
+
   return {
     title: `${title} — MUTX Docs`,
-    description: data.description as string,
+    description,
+    alternates: {
+      canonical: getCanonicalUrl(normalizedPath),
+    },
+    openGraph: {
+      title: `${title} — MUTX Docs`,
+      description,
+      url: getCanonicalUrl(normalizedPath),
+    },
+    twitter: {
+      card: "summary_large_image",
+      creator: DEFAULT_X_HANDLE,
+      title: `${title} — MUTX Docs`,
+      description,
+    },
   };
 }
 

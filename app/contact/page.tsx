@@ -7,18 +7,59 @@ import { CalendlyPopupButton } from "@/components/site/CalendlyPopupButton";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getSiteUrl } from "@/lib/seo";
 
 const CONTACT_EMAIL = "hello@mutx.dev";
+const contactTitle = "Contact | MUTX";
+const contactDescription =
+  "Contact MUTX for evaluation, rollout review, or a concrete operator issue.";
 
 export const metadata: Metadata = {
-  title: "Contact | MUTX",
-  description:
-    "Contact MUTX for evaluation, rollout review, or a concrete operator issue.",
+  title: contactTitle,
+  description: contactDescription,
+  alternates: {
+    canonical: getCanonicalUrl("/contact"),
+  },
+  openGraph: {
+    title: contactTitle,
+    description: contactDescription,
+    url: getCanonicalUrl("/contact"),
+  },
+  twitter: {
+    card: "summary_large_image",
+    creator: DEFAULT_X_HANDLE,
+    title: contactTitle,
+    description: contactDescription,
+  },
+};
+
+const contactStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: contactTitle,
+  description: contactDescription,
+  url: getCanonicalUrl("/contact"),
+  mainEntity: {
+    "@type": "Organization",
+    name: "MUTX",
+    url: getSiteUrl(),
+    email: CONTACT_EMAIL,
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "sales",
+      email: CONTACT_EMAIL,
+      availableLanguage: ["en"],
+    },
+  },
 };
 
 export default function ContactPage() {
   return (
     <PublicSurface className={`${styles.page} ${styles.publicPage}`}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactStructuredData) }}
+      />
       <AuthNav />
 
       <main className={styles.main}>

@@ -4,6 +4,7 @@ export const MUTX_GITHUB_OWNER = "mutx-dev";
 export const MUTX_GITHUB_REPO = "mutx-dev";
 export const MUTX_GITHUB_RELEASES_URL = `https://github.com/${MUTX_GITHUB_OWNER}/${MUTX_GITHUB_REPO}/releases`;
 export const MUTX_DOCS_URL = "https://docs.mutx.dev";
+export const DESKTOP_RELEASE_REVALIDATE_SECONDS = 900;
 
 const MUTX_GITHUB_RELEASES_API_URL = `https://api.github.com/repos/${MUTX_GITHUB_OWNER}/${MUTX_GITHUB_REPO}/releases?per_page=20`;
 
@@ -143,8 +144,8 @@ export async function fetchLatestStableDesktopRelease(
   try {
     const response = await fetchImpl(MUTX_GITHUB_RELEASES_API_URL, {
       headers: getGitHubRequestHeaders(),
-      cache: "no-store",
-    });
+      next: { revalidate: DESKTOP_RELEASE_REVALIDATE_SECONDS },
+    } as RequestInit & { next: { revalidate: number } });
 
     if (!response.ok) {
       console.error(
