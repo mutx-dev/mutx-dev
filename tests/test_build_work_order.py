@@ -42,3 +42,25 @@ def test_normalize_issue_body_leaves_normal_markdown_alone() -> None:
     body = WORK_ORDER.normalize_issue_body(issue)
 
     assert body == issue["body"]
+
+
+def test_choose_issue_skips_non_renderable_local_file_bodies() -> None:
+    issues = [
+        {
+            "number": 1,
+            "title": "bad",
+            "body": "file:///tmp/bad.md",
+            "labels": [{"name": "autonomy:ready"}, {"name": "area:docs"}],
+        },
+        {
+            "number": 2,
+            "title": "good",
+            "body": "## Summary\n\nGood issue body.",
+            "labels": [{"name": "autonomy:ready"}, {"name": "area:docs"}],
+        },
+    ]
+
+    selected = WORK_ORDER.choose_issue(issues)
+
+    assert selected is not None
+    assert selected["number"] == 2

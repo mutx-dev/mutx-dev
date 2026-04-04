@@ -73,6 +73,11 @@ def extract_labels(issue: dict[str, Any]) -> list[str]:
     return labels
 
 
+def issue_is_renderable(issue: dict[str, Any]) -> bool:
+    body = str(issue.get("body", "") or "").strip()
+    return not body.startswith(("file://", "/tmp/"))
+
+
 def choose_issue(issues: list[dict[str, Any]]) -> dict[str, Any] | None:
     eligible = []
     for issue in issues:
@@ -80,6 +85,8 @@ def choose_issue(issues: list[dict[str, Any]]) -> dict[str, Any] | None:
         if any(label in BLOCKING_LABELS for label in labels):
             continue
         if "autonomy:ready" not in labels:
+            continue
+        if not issue_is_renderable(issue):
             continue
         eligible.append((score_issue(labels), issue))
     if not eligible:

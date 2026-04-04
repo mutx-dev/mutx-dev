@@ -10,7 +10,7 @@ from lane_contract import LanePaths, WorkOrder, build_work_order, select_next_it
 from lane_state import is_lane_paused, lane_reason, load_lane_state, pause_lane, save_lane_state
 from queue_state import find_item, load_queue, save_queue, set_status
 from report_status import append_jsonl, build_report
-from worktree_utils import commit_tracked_files, current_branch, is_git_worktree, publish_branch_with_pr
+from worktree_utils import commit_tracked_files, current_branch, is_git_worktree, prepare_task_branch, publish_branch_with_pr
 
 
 SAFE_READY_SIZE_LABELS = {"size:xs", "size:s"}
@@ -252,6 +252,37 @@ def main() -> int:
         print(json.dumps(payload, indent=2, sort_keys=True))
         return 1
 
+    branch_prepare = {"status": "skipped", "reason": "preview_mode"}
+    if args.execute:
+        task_branch_name = f"autonomy/{work_order.id}"
+        branch_prepare = prepare_task_branch(work_order.worktree, task_branch_name)
+        if branch_prepare.get("status") != "ready":
+            set_status(
+                queue,
+                work_order.id,
+                "blocked",
+                lane=work_order.lane,
+                runner=work_order.runner,
+                note=f"Task branch prep failed: {branch_prepare.get('reason', 'unknown')}",
+                work_order_path=str(work_order_path),
+            )
+            save_queue(args.queue, queue)
+            report = build_report(
+                task_id=work_order.id,
+                lane=work_order.lane,
+                status="blocked",
+                summary="Task branch prep failed",
+                worktree=work_order.worktree,
+                blocker_class=str(branch_prepare.get("reason") or "task_branch_prep_failed"),
+                next_action="repair_worktree_branching",
+            )
+            append_jsonl(Path(args.report_log), report)
+            payload["status"] = "blocked"
+            payload["branch_prepare"] = branch_prepare
+            print(json.dumps(payload, indent=2, sort_keys=True))
+            return 1
+        payload["task_branch"] = branch_prepare.get("branch")
+
     set_status(
         queue,
         work_order.id,
@@ -290,7 +321,7 @@ def main() -> int:
     queue = load_queue(args.queue)
     if result.returncode == 0 and verification_passed:
         commit_sha = None
-        branch = current_branch(work_order.worktree)
+        branch = branch_prepare.get("branch") or current_branch(work_order.worktree)
         handoff = None
         if changed_files:
             commit_sha = commit_tracked_files(
