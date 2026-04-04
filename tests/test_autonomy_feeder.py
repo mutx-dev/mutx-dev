@@ -111,6 +111,7 @@ def test_check_codex_resume_dry_run_and_apply_requeues_parked_items(tmp_path: Pa
     dry_payload = json.loads(dry_run.stdout)
     assert dry_payload["eligible"] is True
     assert dry_payload["changed"] is False
+    assert dry_payload["remaining_seconds"] == 0
 
     applied = subprocess.run(
         [
@@ -138,3 +139,37 @@ def test_check_codex_resume_dry_run_and_apply_requeues_parked_items(tmp_path: Pa
     assert lane_payload["lanes"]["codex"]["resumed_by"] == "auto"
     queue_payload = json.loads(queue.read_text())
     assert queue_payload["items"][0]["status"] == "queued"
+
+
+def test_check_codex_resume_reports_remaining_wait_when_backoff_has_not_elapsed(tmp_path: Path) -> None:
+    lane_state = tmp_path / "lane-state.json"
+    queue = tmp_path / "queue.json"
+    lane_state.write_text(
+        json.dumps(
+            {
+                "lanes": {
+                    "codex": {
+                        "paused": True,
+                        "reason": "quota_exceeded",
+                        "paused_at": "2999-01-01T00:00:00Z",
+                        "auto_resume_after_seconds": 3600,
+                        "resume_at": "2999-01-01T01:00:00Z",
+                        "auto_resume_count": 0,
+                    }
+                }
+            }
+        )
+    )
+    queue.write_text(json.dumps({"items": []}))
+
+    result = subprocess.run(
+        ["python3", str(CHECK_RESUME), "--lane-state", str(lane_state), "--queue", str(queue), "--min-pause-seconds", "60"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    payload = json.loads(result.stdout)
+    assert payload["changed"] is False
+    assert payload["resume_at"] == "2999-01-01T01:00:00Z"
+    assert payload["remaining_seconds"] is not None

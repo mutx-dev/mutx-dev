@@ -43,6 +43,10 @@ def pause_lane(
         auto_resume_after_seconds = retry_after_seconds or int(
             lane_state.get("auto_resume_after_seconds") or DEFAULT_QUOTA_RESUME_SECONDS
         )
+    resume_at = None
+    if auto_resume_after_seconds:
+        resume_at = datetime.now(timezone.utc).timestamp() + auto_resume_after_seconds
+        resume_at = datetime.fromtimestamp(resume_at, timezone.utc).isoformat().replace("+00:00", "Z")
     lane_state.update(
         {
             "paused": True,
@@ -54,6 +58,7 @@ def pause_lane(
             "last_pause_reason": reason,
             "last_pause_source": source,
             "auto_resume_after_seconds": auto_resume_after_seconds,
+            "resume_at": resume_at,
         }
     )
     return payload
@@ -72,6 +77,7 @@ def resume_lane(payload: dict[str, Any], lane: str, *, resumed_by: str | None = 
             "last_resume_at": utc_now_iso(),
             "last_resume_reason": previous_reason,
             "resumed_by": resumed_by or "manual",
+            "resume_at": None,
         }
     )
     if previous_reason == "quota_exceeded":

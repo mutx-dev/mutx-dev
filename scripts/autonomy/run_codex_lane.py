@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
-from failure_classifier import classify_failure
+from failure_classifier import classify_failure, extract_retry_after_seconds
 
 
 DEFAULT_MODEL = "gpt-5.4"
@@ -120,7 +120,9 @@ def main() -> int:
 
     result = run_command(command, timeout=args.timeout)
     verification = run_verification(work_order.get("verification", []), work_order["worktree"])
-    blocker_class = classify_failure((result.stdout or "") + "\n" + (result.stderr or ""))
+    combined_output = (result.stdout or "") + "\n" + (result.stderr or "")
+    blocker_class = classify_failure(combined_output)
+    retry_after_seconds = extract_retry_after_seconds(combined_output)
     payload = {
         **preview,
         "exit_code": result.returncode,
@@ -130,6 +132,7 @@ def main() -> int:
         "verification": verification,
         "verification_passed": all(item["exit_code"] == 0 for item in verification) if verification else True,
         "blocker_class": blocker_class,
+        "retry_after_seconds": retry_after_seconds,
     }
     print(json.dumps(payload, indent=2, sort_keys=True))
     return result.returncode if result.returncode != 0 else (0 if payload["verification_passed"] else 2)

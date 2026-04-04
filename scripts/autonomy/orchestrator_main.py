@@ -285,6 +285,7 @@ def main() -> int:
     verification = runner_payload.get("verification", []) if runner_payload else [{"command": "runner_preview", "exit_code": result.returncode}]
     verification_passed = runner_payload.get("verification_passed", result.returncode == 0) if runner_payload else (result.returncode == 0)
     blocker_class = runner_payload.get("blocker_class") if runner_payload else None
+    retry_after_seconds = runner_payload.get("retry_after_seconds") if runner_payload else None
 
     queue = load_queue(args.queue)
     if result.returncode == 0 and verification_passed:
@@ -354,7 +355,13 @@ def main() -> int:
             work_order_path=str(work_order_path),
         )
         if blocker in {"quota_exceeded", "auth_failure", "provider_failure"}:
-            lane_state = pause_lane(lane_state, execution_lane, reason=blocker, source=work_order.id)
+            lane_state = pause_lane(
+                lane_state,
+                execution_lane,
+                reason=blocker,
+                source=work_order.id,
+                retry_after_seconds=retry_after_seconds,
+            )
             save_lane_state(args.lane_state, lane_state)
         report = build_report(
             task_id=work_order.id,

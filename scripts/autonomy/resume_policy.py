@@ -57,12 +57,15 @@ def inspect_lane_resume(
         blocked_by = "backoff_not_elapsed"
     elif resume_count >= max_auto_resumes:
         blocked_by = "max_auto_resumes_reached"
+    remaining_seconds = None if age_seconds is None else max(effective_pause_seconds - age_seconds, 0)
     return {
         "lane": lane,
         "paused": paused,
         "reason": reason,
         "paused_at": paused_at,
+        "resume_at": lane_state.get("resume_at"),
         "age_seconds": age_seconds,
+        "remaining_seconds": remaining_seconds,
         "effective_pause_seconds": effective_pause_seconds,
         "auto_resume_count": resume_count,
         "max_auto_resumes": max_auto_resumes,

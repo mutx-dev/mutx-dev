@@ -162,11 +162,19 @@ def test_failure_classifier_detects_quota_exceeded() -> None:
 
 
 
+def test_failure_classifier_extracts_retry_after_seconds() -> None:
+    text = "Usage limit reached. Try again in 1h 20m 30s."
+    assert FAILURE_CLASSIFIER.extract_retry_after_seconds(text) == 4830
+
+
+
 def test_lane_state_can_pause_lane() -> None:
     payload = {"lanes": {}}
-    updated = LANE_STATE.pause_lane(payload, "codex", reason="quota_exceeded", source="issue-1")
+    updated = LANE_STATE.pause_lane(payload, "codex", reason="quota_exceeded", source="issue-1", retry_after_seconds=4830)
     assert LANE_STATE.is_lane_paused(updated, "codex") is True
     assert LANE_STATE.lane_reason(updated, "codex") == "quota_exceeded"
+    assert updated["lanes"]["codex"]["auto_resume_after_seconds"] == 4830
+    assert updated["lanes"]["codex"]["resume_at"]
 
 
 
