@@ -51,9 +51,11 @@ MUTX incorporates MIT-licensed components:
 - **agent-run** (builderz-labs) — Observability schema
 - **AARM** (aarm-dev) — Security layer specification
 - **Faramesh** (Faramesh Technologies) — Governance engine
-- **Mission Control** (builderz-labs) — Dashboard inspiration
+- **Mission Control** (builderz-labs) — Dashboard inspiration and tracked direct dashboard-pattern reuse
 
-All third-party code remains under its original MIT license. See [CREDITS.md](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/CREDITS.md) for full attribution and license texts.
+All third-party code remains under its original license. See [CREDITS.md](https://raw.githubusercontent.com/mutx-dev/mutx-dev/main/CREDITS.md) for full attribution and license texts.
+
+Direct feature ports from Mission Control (MIT), LACP (MIT), and Guild AI (Apache-2.0) are tracked in the [OSS Attribution Ledger](oss-attribution-ledger.md). The ledger records the upstream source, local MUTX scope, and whether the reuse was direct or still pending.
 
 ## Trademark Policy
 
