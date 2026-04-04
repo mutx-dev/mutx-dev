@@ -298,50 +298,47 @@ test.describe('mutx.dev QA', () => {
     await expect(html).toHaveAttribute('data-loader-state', 'complete', { timeout: 2000 });
   });
 
-  test('landing page exposes the product demo, examples, proof, and final CTA only', async ({ page }) => {
+  test('landing page exposes the current production sections and final CTA only', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await page.evaluate(() => {
-      window.sessionStorage.setItem('mutx-home-loader-played', '1');
-      document.documentElement.setAttribute('data-home-loader-played', '1');
-      document.documentElement.setAttribute('data-loader-state', 'complete');
-    });
-    await page.waitForTimeout(150);
+    await expect(page.getByTestId('marketing-loader')).toBeHidden({ timeout: 9000 });
 
     await expect(
-      page.getByRole('heading', { name: new RegExp(marketingHomepage.salesSections.demo.title, 'i') })
+      page.getByRole('heading', { name: /A serious stack for serious agents\./i })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: new RegExp(marketingHomepage.salesSections.examples.title, 'i') })
+      page.getByRole('heading', { name: /A stack of agents with actual jobs\./i })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: new RegExp(marketingHomepage.salesSections.proof.title, 'i') })
+      page.getByRole('heading', { name: /One lane for deployment, governance, and runtime review\./i })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: new RegExp(marketingHomepage.salesSections.cta.title, 'i') })
+      page.getByRole('heading', { name: /The runtime surface looks expensive because it should\./i })
     ).toBeVisible();
-    await expect(page.locator('[data-testid="homepage-demo-section"] video')).toHaveCount(1);
-    await expect(page.locator('[data-testid="homepage-examples-section"] video')).toHaveCount(2);
-    await expect(page.locator('[data-testid="homepage-examples-section"] img')).toHaveCount(1);
-    await expect(page.getByTestId('homepage-demo-preview').locator('img')).toHaveAttribute('src', /demo\.gif/i);
+    await expect(
+      page.getByRole('heading', { name: /Install the Mac app\./i })
+    ).toBeVisible();
     await expect(page.getByText(/^OPEN CONTROL\. SHIP CLEANLY\.$/)).toHaveCount(0);
     await expect(page.getByRole('button', { name: /next slide/i })).toHaveCount(0);
     await expect(page.getByRole('button', { name: /close details/i })).toHaveCount(0);
     await expect(page.getByText(/the operator surface already ships\./i)).toHaveCount(0);
 
     const lowerSectionVisibility = await page.evaluate(() => {
-      const selectors = [
-        '[data-testid="homepage-demo-section"] h2',
-        '[data-testid="homepage-examples-section"] h2',
-        '[data-testid="homepage-proof-section"] h2',
-        '[data-testid="homepage-final-cta"] h2',
+      const headings = [
+        'A serious stack for serious agents.',
+        'A stack of agents with actual jobs.',
+        'One lane for deployment, governance, and runtime review.',
+        'The runtime surface looks expensive because it should.',
+        'Install the Mac app.',
       ];
 
-      return selectors.map((selector) => {
-        const node = document.querySelector<HTMLElement>(selector);
+      return headings.map((heading) => {
+        const node = Array.from(document.querySelectorAll<HTMLElement>('h2')).find(
+          (candidate) => candidate.textContent?.trim() === heading
+        );
         const style = node ? getComputedStyle(node) : null;
 
         return {
-          selector,
+          heading,
           exists: Boolean(node),
           opacity: style ? Number.parseFloat(style.opacity || '1') : 0,
           visibility: style?.visibility ?? 'hidden',
