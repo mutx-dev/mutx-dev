@@ -153,6 +153,8 @@
   object-fit: cover;
   border-radius: 0.88rem;
   background: transparent;
+  opacity: 0;
+  transition: opacity 180ms ease;
   transform: scale(1.028);
   -webkit-mask-image: radial-gradient(
     circle at center,
@@ -168,6 +170,10 @@
     rgba(0, 0, 0, 0.78) 90%,
     transparent 100%
   );
+}
+
+.loaderMarkVideoVisible {
+  opacity: 1;
 }
 
 .heroSection {

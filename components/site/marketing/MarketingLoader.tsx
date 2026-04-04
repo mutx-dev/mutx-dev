@@ -20,9 +20,9 @@ const STAGE_SETTLE_DURATION_MS = 660;
 const HANDOFF_DURATION_MS = 680;
 const FALLBACK_EXIT_MS = 320;
 const ACTIVE_FALLBACK_DURATION_MS = 2800;
+const VIDEO_REVEAL_AT_MS = 90;
 const LOADER_VIDEO_WEBM_SRC = "/marketing/loader/mutx-logo-loader-60fps-2x.webm";
 const LOADER_VIDEO_MP4_SRC = "/marketing/loader/mutx-logo-loader-60fps-2x.mp4";
-const LOADER_VIDEO_POSTER = "/marketing/loader/mutx-logo-loader-poster.webp";
 
 type LoaderState = "active" | "handoff" | "complete";
 
@@ -30,6 +30,11 @@ type ExitTransform = {
   scale: number;
   x: number;
   y: number;
+};
+
+type FrameAwareVideo = HTMLVideoElement & {
+  requestVideoFrameCallback?: (callback: () => void) => number;
+  cancelVideoFrameCallback?: (handle: number) => void;
 };
 
 const DEFAULT_EXIT_TRANSFORM: ExitTransform = {
@@ -44,15 +49,29 @@ export function MarketingLoader() {
   const [loaderState, setLoaderState] = useState<LoaderState>("active");
   const [canHandoffToTarget, setCanHandoffToTarget] = useState(false);
   const [targetVisible, setTargetVisible] = useState(false);
+  const [videoVisible, setVideoVisible] = useState(false);
   const [exitTransform, setExitTransform] = useState<ExitTransform>(DEFAULT_EXIT_TRANSFORM);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const activeTimerRef = useRef<number | null>(null);
   const handoffFrameRef = useRef<number | null>(null);
+  const videoRevealFrameRef = useRef<number | null>(null);
+  const videoRevealQueuedRef = useRef(false);
   const completeOnceRef = useRef(false);
   const handoffQueuedRef = useRef(false);
   const handoffStartedAtRef = useRef<number>(0);
   const handoffDistanceRef = useRef<number>(0);
+
+  const clearVideoRevealFrame = useCallback(() => {
+    const video = videoRef.current as FrameAwareVideo | null;
+
+    if (videoRevealFrameRef.current !== null && typeof video?.cancelVideoFrameCallback === "function") {
+      video.cancelVideoFrameCallback(videoRevealFrameRef.current);
+    }
+
+    videoRevealFrameRef.current = null;
+    videoRevealQueuedRef.current = false;
+  }, []);
 
   const clearTimers = useCallback(() => {
     if (activeTimerRef.current !== null) {
@@ -64,7 +83,9 @@ export function MarketingLoader() {
       window.cancelAnimationFrame(handoffFrameRef.current);
       handoffFrameRef.current = null;
     }
-  }, []);
+
+    clearVideoRevealFrame();
+  }, [clearVideoRevealFrame]);
 
   const markLoaderPlayed = useCallback(() => {
     document.documentElement.setAttribute(ROOT_PLAYED_ATTRIBUTE, "1");
@@ -201,6 +222,9 @@ export function MarketingLoader() {
     setIsVisible(true);
     setCanHandoffToTarget(false);
     setTargetVisible(false);
+    setVideoVisible(false);
+    videoRevealQueuedRef.current = false;
+    videoRevealFrameRef.current = null;
     setExitTransform(DEFAULT_EXIT_TRANSFORM);
 
     return () => {
@@ -227,6 +251,8 @@ export function MarketingLoader() {
       };
     }
 
+    const frameAwareVideo = video as FrameAwareVideo;
+
     const scheduleFallback = () => {
       if (activeTimerRef.current !== null) {
         window.clearTimeout(activeTimerRef.current);
@@ -242,6 +268,33 @@ export function MarketingLoader() {
       }, durationMs);
     };
 
+    const revealVideo = () => {
+      clearVideoRevealFrame();
+      setVideoVisible(true);
+    };
+
+    const revealVideoIfReady = () => {
+      if (video.currentTime * 1000 >= VIDEO_REVEAL_AT_MS) {
+        revealVideo();
+      }
+    };
+
+    const queueVideoRevealOnFrame = () => {
+      if (videoRevealQueuedRef.current || videoVisible) {
+        return;
+      }
+
+      if (typeof frameAwareVideo.requestVideoFrameCallback === "function") {
+        videoRevealQueuedRef.current = true;
+        videoRevealFrameRef.current = frameAwareVideo.requestVideoFrameCallback(() => {
+          revealVideo();
+        });
+        return;
+      }
+
+      revealVideoIfReady();
+    };
+
     const handleLoadedMetadata = () => {
       scheduleFallback();
     };
@@ -252,11 +305,22 @@ export function MarketingLoader() {
       });
     };
 
+    const handlePlaying = () => {
+      queueVideoRevealOnFrame();
+    };
+
+    const handleTimeUpdate = () => {
+      revealVideoIfReady();
+    };
+
     const handleEnded = () => {
+      revealVideo();
       beginHandoff();
     };
 
     const handleError = () => {
+      clearVideoRevealFrame();
+      setVideoVisible(false);
       beginHandoff();
     };
 
@@ -270,16 +334,23 @@ export function MarketingLoader() {
 
     if (video.readyState >= 3) {
       handleCanPlay();
+      queueVideoRevealOnFrame();
     }
+
+    revealVideoIfReady();
 
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
     video.addEventListener("canplay", handleCanPlay);
+    video.addEventListener("playing", handlePlaying);
+    video.addEventListener("timeupdate", handleTimeUpdate);
     video.addEventListener("ended", handleEnded);
     video.addEventListener("error", handleError);
 
     return () => {
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
       video.removeEventListener("canplay", handleCanPlay);
+      video.removeEventListener("playing", handlePlaying);
+      video.removeEventListener("timeupdate", handleTimeUpdate);
       video.removeEventListener("ended", handleEnded);
       video.removeEventListener("error", handleError);
 
@@ -288,7 +359,7 @@ export function MarketingLoader() {
         activeTimerRef.current = null;
       }
     };
-  }, [beginHandoff, isVisible, loaderState]);
+  }, [beginHandoff, clearVideoRevealFrame, isVisible, loaderState, videoVisible]);
 
   useEffect(() => {
     if (!isVisible || loaderState !== "handoff" || !canHandoffToTarget || targetVisible) {
@@ -412,7 +483,7 @@ export function MarketingLoader() {
           ref={stageRef}
           data-testid="marketing-loader-stage"
           className={`${styles.loaderStage} ${styles.loaderMarkShell}`}
-          initial={{ opacity: 0, scale: 0.82, y: 0 }}
+          initial={{ opacity: 1, scale: 0.82, y: 0 }}
           animate={
             loaderState === "handoff"
               ? canHandoffToTarget
@@ -480,8 +551,7 @@ export function MarketingLoader() {
 
           <video
             ref={videoRef}
-            poster={LOADER_VIDEO_POSTER}
-            className={styles.loaderMarkVideo}
+            className={`${styles.loaderMarkVideo} ${videoVisible ? styles.loaderMarkVideoVisible : ""}`}
             muted
             playsInline
             autoPlay
