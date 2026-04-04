@@ -88,6 +88,21 @@ def choose_issue(issues: list[dict[str, Any]]) -> dict[str, Any] | None:
     return eligible[0][1]
 
 
+def normalize_issue_body(issue: dict[str, Any]) -> str:
+    body = str(issue.get("body", "") or "").strip()
+    if not body:
+        return "No issue body provided."
+    if body.startswith("file://"):
+        url = issue.get("html_url") or ""
+        return (
+            "## Context\n\n"
+            "This issue body was malformed when created and pointed at a local file path that does not render on GitHub.\n\n"
+            f"Original body: `{body}`\n\n"
+            f"Issue URL: {url}\n"
+        )
+    return body
+
+
 def build_work_order(issue: dict[str, Any]) -> dict[str, Any]:
     labels = extract_labels(issue)
     agent = choose_agent(labels)
@@ -104,7 +119,7 @@ def build_work_order(issue: dict[str, Any]) -> dict[str, Any]:
         "reviewer": reviewer,
         "lane": lane,
         "branch": branch,
-        "acceptance": issue.get("body", ""),
+        "acceptance": normalize_issue_body(issue),
     }
 
 

@@ -4,6 +4,14 @@ title: "agent: "
 labels:
   - autonomy:ready
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Keep this issue directly renderable on GitHub.
+
+        - Use repo-relative paths in backticks, for example `docs/claim-to-reality-gap-matrix.md`.
+        - Do not paste `file:///tmp/...` links or local absolute paths.
+        - If a task comes from a doc audit, quote the exact claim and name the real source files.
   - type: dropdown
     id: area
     attributes:
@@ -59,6 +67,11 @@ body:
     id: affected
     attributes:
       label: Likely files or surfaces
+      description: Use repo-relative paths like `docs/api/openapi.json` or `src/api/routes/runtime.py`.
+      placeholder: |
+        docs/claim-to-reality-gap-matrix.md
+        whitepaper.md
+        docs/api/openapi.json
   - type: checkboxes
     id: guardrails
     attributes:
