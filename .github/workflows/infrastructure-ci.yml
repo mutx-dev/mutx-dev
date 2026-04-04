@@ -109,8 +109,9 @@ jobs:
           POSTGRES_PASSWORD: testpass
           REDIS_PASSWORD: testpass
           JWT_SECRET: test-secret-key-that-is-long-enough-32
-          DATABASE_URL: postgresql://mutx:testpass@postgres:5432/mutx
+          DATABASE_URL: postgresql://mutx:***@postgres:5432/mutx
           DATABASE_SSL_MODE: disable
+          GRAFANA_ADMIN_PASSWORD: testpass
         run: |
           docker compose -f infrastructure/docker/docker-compose.yml config --quiet
           docker compose -f infrastructure/docker/docker-compose.prod.yml config --quiet
