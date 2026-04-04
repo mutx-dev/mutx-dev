@@ -298,7 +298,7 @@ test.describe('mutx.dev QA', () => {
     await expect(html).toHaveAttribute('data-loader-state', 'complete', { timeout: 2000 });
   });
 
-  test('landing page exposes the premium feature grid, agent showcase, operator section, and final CTA only', async ({ page }) => {
+  test('landing page exposes the product demo, examples, proof, and final CTA only', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => {
       window.sessionStorage.setItem('mutx-home-loader-played', '1');
@@ -308,22 +308,20 @@ test.describe('mutx.dev QA', () => {
     await page.waitForTimeout(150);
 
     await expect(
-      page.getByRole('heading', { name: new RegExp(marketingHomepage.featureGrid.title, 'i') })
+      page.getByRole('heading', { name: new RegExp(marketingHomepage.salesSections.demo.title, 'i') })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: new RegExp(marketingHomepage.agentShowcase.title, 'i') })
+      page.getByRole('heading', { name: new RegExp(marketingHomepage.salesSections.examples.title, 'i') })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: new RegExp(marketingHomepage.operatorSection.title, 'i') })
+      page.getByRole('heading', { name: new RegExp(marketingHomepage.salesSections.proof.title, 'i') })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: new RegExp(marketingHomepage.finalCta.title, 'i') })
+      page.getByRole('heading', { name: new RegExp(marketingHomepage.salesSections.cta.title, 'i') })
     ).toBeVisible();
-    await expect(page.locator('[data-testid="homepage-proof-strip"] img')).toHaveCount(0);
-    await expect(page.locator('[data-testid="homepage-agent-showcase"] svg')).toHaveCount(9);
-    await expect(page.locator('[data-testid="homepage-agent-marquee"]')).toBeVisible();
-    await expect(page.locator('[data-testid="homepage-depth-section"] video')).toHaveCount(0);
-    await expect(page.getByTestId('homepage-depth-image')).toHaveAttribute('src', /docs-surface\.webp/i);
+    await expect(page.locator('[data-testid="homepage-demo-section"] video')).toHaveCount(1);
+    await expect(page.locator('[data-testid="homepage-examples-section"] video')).toHaveCount(2);
+    await expect(page.locator('[data-testid="homepage-examples-section"] img')).toHaveCount(1);
     await expect(page.getByTestId('homepage-demo-preview').locator('img')).toHaveAttribute('src', /demo\.gif/i);
     await expect(page.getByText(/^OPEN CONTROL\. SHIP CLEANLY\.$/)).toHaveCount(0);
     await expect(page.getByRole('button', { name: /next slide/i })).toHaveCount(0);
@@ -332,9 +330,9 @@ test.describe('mutx.dev QA', () => {
 
     const lowerSectionVisibility = await page.evaluate(() => {
       const selectors = [
-        '[data-testid="homepage-proof-strip"] h2',
-        '[data-testid="homepage-agent-showcase"] h2',
-        '[data-testid="homepage-depth-section"] h2',
+        '[data-testid="homepage-demo-section"] h2',
+        '[data-testid="homepage-examples-section"] h2',
+        '[data-testid="homepage-proof-section"] h2',
         '[data-testid="homepage-final-cta"] h2',
       ];
 
@@ -416,7 +414,7 @@ test.describe('mutx.dev QA', () => {
   test('homepage still assets stay single-use in the content model', async () => {
     const stillAssets = [
       marketingHomepage.hero.backgroundSrc,
-      marketingHomepage.operatorSection.preview.imageSrc,
+      marketingHomepage.salesSections.examples.items[2]?.mediaSrc,
     ];
 
     expect(new Set(stillAssets).size).toBe(stillAssets.length);

@@ -19,16 +19,6 @@ export type MarketingFooterCallout = {
   action: MarketingActionLink
 }
 
-export type MarketingAgentIcon =
-  | 'shield'
-  | 'workflow'
-  | 'plug'
-  | 'siren'
-  | 'database'
-  | 'terminal'
-  | 'search'
-  | 'accessibility'
-
 export type MarketingHomepage = {
   hero: {
     tagline: string
@@ -38,65 +28,53 @@ export type MarketingHomepage = {
     backgroundAlt: string
     actions: MarketingActionLink[]
   }
-  featureGrid: {
-    eyebrow: string
-    title: string
-    body: string
-    stats: Array<{
-      value: string
-      label: string
-    }>
-    cards: Array<{
+  salesSections: {
+    demo: {
       eyebrow: string
       title: string
       body: string
-    }>
-  }
-  agentShowcase: {
-    eyebrow: string
-    title: string
-    body: string
-    marquee: string[]
-    featured: {
-      name: string
-      slug: string
-      icon: MarketingAgentIcon
-      label: string
-      summary: string
-      quote: string
-      capabilities: string[]
+      tabs: Array<{
+        id: string
+        label: string
+        title: string
+        body: string
+        videoSrc: string
+      }>
     }
-    cards: Array<{
-      name: string
-      slug: string
-      icon: MarketingAgentIcon
-      summary: string
-    }>
-  }
-  operatorSection: {
-    eyebrow: string
-    title: string
-    body: string
-    preview: {
+    examples: {
       eyebrow: string
       title: string
       body: string
-      imageSrc: string
-      imageAlt: string
-      items: string[]
+      items: Array<{
+        id: string
+        eyebrow: string
+        title: string
+        scenario: string
+        outcome: string
+        proof: string[]
+        mediaType: 'video' | 'image' | 'gif'
+        mediaSrc: string
+        mediaAlt: string
+      }>
     }
-    pillars: Array<{
-      id: string
-      index: string
+    proof: {
+      eyebrow: string
       title: string
       body: string
-    }>
-  }
-  finalCta: {
-    eyebrow: string
-    title: string
-    body: string
-    actions: MarketingActionLink[]
+      items: Array<{
+        title: string
+        before: string
+        after: string
+      }>
+    }
+    cta: {
+      eyebrow: string
+      title: string
+      body: string
+      mediaSrc: string
+      mediaAlt: string
+      actions: MarketingActionLink[]
+    }
   }
 }
 
@@ -125,57 +103,6 @@ const homepageActions: MarketingActionLink[] = [
   },
 ]
 
-const showcasedAgents = [
-  {
-    name: 'Security Engineer',
-    slug: 'security-engineer',
-    icon: 'shield' as const,
-    summary: 'Models threats, reviews code, and designs security architecture that actually holds.',
-  },
-  {
-    name: 'Workflow Architect',
-    slug: 'workflow-architect',
-    icon: 'workflow' as const,
-    summary: 'Maps every critical path before implementation so automation does not drift into theater.',
-  },
-  {
-    name: 'MCP Builder',
-    slug: 'mcp-builder',
-    icon: 'plug' as const,
-    summary: 'Builds the tool interfaces that make agents useful against real systems and live infrastructure.',
-  },
-  {
-    name: 'Incident Response Commander',
-    slug: 'incident-response-commander',
-    icon: 'siren' as const,
-    summary: 'Turns production chaos into structured resolution with clear escalation and runtime evidence.',
-  },
-  {
-    name: 'Database Optimizer',
-    slug: 'database-optimizer',
-    icon: 'database' as const,
-    summary: 'Tightens indexes, query paths, and schemas before your database decides to ruin the weekend.',
-  },
-  {
-    name: 'Terminal Integration Specialist',
-    slug: 'terminal-integration-specialist',
-    icon: 'terminal' as const,
-    summary: 'Owns the low-level terminal layer where text rendering, emulation, and operator UX converge.',
-  },
-  {
-    name: 'LSP / Index Engineer',
-    slug: 'lsp-index-engineer',
-    icon: 'search' as const,
-    summary: 'Builds code intelligence through indexing, orchestration, and search that developers can actually trust.',
-  },
-  {
-    name: 'Accessibility Auditor',
-    slug: 'accessibility-auditor',
-    icon: 'accessibility' as const,
-    summary: 'Stress-tests interfaces with the standards and assistive realities most teams still pretend are edge cases.',
-  },
-]
-
 export const marketingHomepage: MarketingHomepage = {
   hero: {
     tagline: 'Signed. Notarized. Shipping now.',
@@ -185,100 +112,124 @@ export const marketingHomepage: MarketingHomepage = {
     backgroundAlt: 'MUTX robot raising the MUTX mark inside a blue-lit control chamber',
     actions: homepageActions,
   },
-  featureGrid: {
-    eyebrow: 'Production layer',
-    title: 'A serious stack for serious agents.',
-    body: 'Not one generalist chatbot. A fleet of operators, each with a job, each shipping through one governed surface.',
-    stats: [
-      { value: '8', label: 'specialist agents shown below' },
-      { value: '1', label: 'control plane for deploy, policy, and runtime' },
-      { value: '0', label: 'tolerance for prompt-soup ops' },
-    ],
-    cards: [
-      {
-        eyebrow: 'Identity',
-        title: 'Every actor has a shape.',
-        body: 'Humans, agents, tools, and triggers stay explicit so operators know exactly who touched what.',
-      },
-      {
-        eyebrow: 'Boundaries',
-        title: 'Capabilities stay outside the prompt.',
-        body: 'Secrets, tools, and policies live in the control layer instead of getting smeared into instructions.',
-      },
-      {
-        eyebrow: 'Observability',
-        title: 'Runs come with receipts.',
-        body: 'Inspect prompts, tool calls, outcomes, and release paths without reverse-engineering the mess later.',
-      },
-      {
-        eyebrow: 'Release lane',
-        title: 'From local proof to governed rollout.',
-        body: 'The same surface that deploys the agent is the one that keeps docs, notes, and source aligned.',
-      },
-    ],
-  },
-  agentShowcase: {
-    eyebrow: 'Specialist fleet',
-    title: 'A stack of agents with actual jobs.',
-    body: 'Pulled from the agency roster. Different disciplines. Different iconography. Same governed runtime.',
-    marquee: showcasedAgents.map((agent) => agent.name),
-    featured: {
-      name: 'Incident Response Commander',
-      slug: 'incident-response-commander',
-      icon: 'siren',
-      label: 'Flagship specialist',
-      summary: 'The kind of agent you only trust when the operating surface, runtime evidence, and escalation path all look bulletproof.',
-      quote: 'When prod catches fire, the last thing you want is a toy agent.',
-      capabilities: [
-        'Owns escalation with runtime receipts.',
-        'Coordinates humans, tools, and decisions.',
-        'Turns chaos into a governed sequence.',
+  salesSections: {
+    demo: {
+      eyebrow: 'See MUTX in motion',
+      title: 'Watch the product before we ask you to believe the copy.',
+      body: 'MUTX is easiest to understand when you see the runtime, governance, and release path on screen. Start with the real surfaces.',
+      tabs: [
+        {
+          id: 'runtime',
+          label: 'Runtime',
+          title: 'Inspect what the agent actually did.',
+          body: 'See the runtime surface where runs, tool calls, and outcomes stay visible instead of disappearing into prompt soup.',
+          videoSrc: '/marketing/carousel/runtime.mp4',
+        },
+        {
+          id: 'governance',
+          label: 'Governance',
+          title: 'Keep boundaries explicit.',
+          body: 'Put access, policies, and operator decisions in the control layer where teams can review and enforce them.',
+          videoSrc: '/marketing/carousel/governance.mp4',
+        },
+        {
+          id: 'layers',
+          label: 'Layers',
+          title: 'Deploy without rebuilding the path.',
+          body: 'Move from local proof to a governed runtime through the same product surface instead of stitching together one-off tools.',
+          videoSrc: '/marketing/carousel/managed-layers.mp4',
+        },
+        {
+          id: 'cost',
+          label: 'Cost',
+          title: 'See usage before it becomes a problem.',
+          body: 'Track the cost and operational profile of agent work while it is still controllable, not after spend has already escaped.',
+          videoSrc: '/marketing/carousel/cost-awareness.mp4',
+        },
       ],
     },
-    cards: showcasedAgents,
-  },
-  operatorSection: {
-    eyebrow: 'Operator view',
-    title: 'The runtime surface looks expensive because it should.',
-    body: 'If the product governs deployed agents, the page should feel like precision hardware, not a Notion doc with gradients.',
-    preview: {
-      eyebrow: 'Control surface',
-      title: 'One lane for deployment, governance, and runtime review.',
-      body: 'The visual system stays tight because the operating model stays tight.',
-      imageSrc: '/landing/webp/docs-surface.webp',
-      imageAlt: 'MUTX control surface showing a docs and runtime panel',
+    examples: {
+      eyebrow: 'Use cases teams actually buy',
+      title: 'Three concrete ways to use MUTX on day one.',
+      body: 'No fictional future. No vague “AI transformation.” These are the kinds of operator workflows the product is built to support now.',
       items: [
-        'Policy, identity, and tools stay explicit.',
-        'Specialist agents run with reviewable context.',
-        'Release artifacts and docs stay in sync.',
+        {
+          id: 'incident-response',
+          eyebrow: 'Case study 01',
+          title: 'Incident response that stays reviewable.',
+          scenario: 'An on-call or incident agent helps triage an outage, call tools, and surface what changed under pressure.',
+          outcome: 'MUTX gives the team one place to inspect the run, review tool usage, and keep a human operator in control.',
+          proof: [
+            'See what the agent invoked.',
+            'Keep the escalation path visible.',
+            'Share the same runtime surface across the team.',
+          ],
+          mediaType: 'video',
+          mediaSrc: '/marketing/cards/enterprise.mp4',
+          mediaAlt: 'Enterprise product card showing MUTX runtime and governance surfaces',
+        },
+        {
+          id: 'developer-ops',
+          eyebrow: 'Case study 02',
+          title: 'Internal developer tools without mystery behavior.',
+          scenario: 'A developer agent helps with MCP tooling, runtime setup, or workflow orchestration for the engineering team.',
+          outcome: 'MUTX lets you ship the capability while keeping access, policy, and operator context out of the prompt.',
+          proof: [
+            'Tool boundaries stay explicit.',
+            'Runtime actions stay inspectable.',
+            'Release paths stay aligned with docs and artifacts.',
+          ],
+          mediaType: 'video',
+          mediaSrc: '/marketing/cards/developer.mp4',
+          mediaAlt: 'Developer product card showing MUTX workflow and tooling surfaces',
+        },
+        {
+          id: 'security-review',
+          eyebrow: 'Case study 03',
+          title: 'Security and change review with receipts.',
+          scenario: 'A security or review agent helps inspect changes, summarize risk, and prepare a team to approve or reject the next step.',
+          outcome: 'MUTX keeps prompts, tools, and outputs in a legible lane so the review process does not become blind trust in a model.',
+          proof: [
+            'Review the run before approving action.',
+            'Keep evidence attached to the workflow.',
+            'Expose capability without exposing the whole system.',
+          ],
+          mediaType: 'image',
+          mediaSrc: '/landing/webp/docs-surface.webp',
+          mediaAlt: 'MUTX control surface showing runtime and documentation side by side',
+        },
       ],
     },
-    pillars: [
-      {
-        id: 'deploy-with-boundaries',
-        index: '01',
-        title: 'Deploy with hard boundaries.',
-        body: 'Separate the agent from the keys, tools, and policy it depends on so operators keep control.',
-      },
-      {
-        id: 'govern-the-runtime',
-        index: '02',
-        title: 'Govern what happens at runtime.',
-        body: 'Track the exact run surface: who invoked it, what it called, what changed, and where it should stop next time.',
-      },
-      {
-        id: 'share-the-right-surface',
-        index: '03',
-        title: 'Share capability without losing trust.',
-        body: 'Expose the useful specialist while preserving the controls that made it safe to deploy in the first place.',
-      },
-    ],
-  },
-  finalCta: {
-    eyebrow: 'Start here',
-    title: 'Install the Mac app.',
-    body: 'Open the signed build, load the stack, and ship from a surface that finally looks like it belongs in production.',
-    actions: homepageActions,
+    proof: {
+      eyebrow: 'Why teams switch',
+      title: 'From agent theater to deployable systems.',
+      body: 'Most teams do not need more agent hype. They need a product that makes deployed agents legible, governable, and shareable.',
+      items: [
+        {
+          title: 'Before MUTX',
+          before: 'Agents live inside one-off prompts, hidden scripts, and toolchains nobody wants to audit.',
+          after: 'MUTX gives you a visible operator surface for deployment, runtime inspection, and control.',
+        },
+        {
+          title: 'Without control',
+          before: 'Teams cannot tell which tool was called, what changed, or how to safely hand the workflow to someone else.',
+          after: 'MUTX keeps boundaries, receipts, and sharing paths explicit enough for real teams to use in production.',
+        },
+        {
+          title: 'What buyers get',
+          before: 'Another demo that looks clever for five minutes.',
+          after: 'A signed product, concrete runtime surfaces, and a release lane that feels like software you can actually operate.',
+        },
+      ],
+    },
+    cta: {
+      eyebrow: 'Try the product',
+      title: 'Install the Mac app and start with the real thing.',
+      body: 'Open the signed build, watch the runtime, and decide from the product itself — not from a landing page trying too hard.',
+      mediaSrc: '/demo.gif',
+      mediaAlt: 'MUTX operator demo showing the control plane in motion',
+      actions: homepageActions,
+    },
   },
 }
 
