@@ -158,7 +158,7 @@ Historically, the live route families in the codebase were organized as:
 - `/v1/health`
 - `/v1/ready`
 
-Additional `/v1/*` surfaces (for example `/v1/templates`, `/v1/sessions`, `/v1/runs`, `/v1/budgets`) are documented in the OpenAPI specification at [`docs/api/openapi.json`](./docs/api/openapi.json).
+Additional `/v1/*` surfaces (for example `/v1/templates`, `/v1/sessions`, `/v1/runs`, `/v1/budgets`) are documented in the OpenAPI specification at [`docs/api/openapi.json`](./docs/api/openapi.json); per-route details (e.g. `/v1/monitoring/health`, `/v1/monitoring/alerts`) are listed there as well.
 
 ```mermaid
 flowchart TD
