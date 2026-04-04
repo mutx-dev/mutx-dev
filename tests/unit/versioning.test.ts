@@ -13,7 +13,8 @@ import {
   withVersionedHandler,
   CURRENT_API_VERSION,
   SUPPORTED_API_VERSIONS,
-  DEPRECATED_API_VERSIONS,
+  _setDeprecatedApiVersionsForTesting,
+  _resetDeprecatedApiVersionsForTesting,
 } from '../../app/api/_lib/versioning'
 
 // ---------------------------------------------------------------------------
@@ -103,24 +104,14 @@ describe('addVersionHeaders', () => {
   })
 
   it('adds Deprecation: true for a deprecated version', () => {
-    expect(DEPRECATED_API_VERSIONS).toEqual([])
-     
-    const replaced = jest.replaceProperty(
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      require('../../app/api/_lib/versioning'),
-      'DEPRECATED_API_VERSIONS',
-      ['v1']
-    )
+    _setDeprecatedApiVersionsForTesting(['v1'])
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports -- dynamic re-import after jest.replaceProperty
-      const { addVersionHeaders: addHeaders } = require('../../app/api/_lib/versioning')
-
       const response = NextResponse.json({ ok: true })
-      addHeaders(response, 'v1')
+      addVersionHeaders(response, 'v1')
       expect(response.headers.get('Deprecation')).toBe('true')
     } finally {
-      replaced.restore()
+      _resetDeprecatedApiVersionsForTesting()
     }
   })
 })

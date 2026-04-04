@@ -20,6 +20,16 @@ export const DEPRECATED_API_VERSIONS: ApiVersion[] = []
 /** Backward-compatible alias used by the Jest suite and legacy imports. */
 export let _DEPRECATED_API_VERSIONS: ApiVersion[] = DEPRECATED_API_VERSIONS
 
+/** Test-only hook for overriding deprecated versions in unit tests. */
+export function _setDeprecatedApiVersionsForTesting(versions: ApiVersion[]): void {
+  _DEPRECATED_API_VERSIONS = versions
+}
+
+/** Reset helper paired with `_setDeprecatedApiVersionsForTesting`. */
+export function _resetDeprecatedApiVersionsForTesting(): void {
+  _DEPRECATED_API_VERSIONS = DEPRECATED_API_VERSIONS
+}
+
 /**
  * Extracts the requested API version from an incoming request.
  *
