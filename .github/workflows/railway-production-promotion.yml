@@ -87,8 +87,10 @@ jobs:
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
 
       - name: Require docs release notes page in repo
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
         run: |
-          version="${{ steps.release.outputs.tag#v }}"
+          version="${RELEASE_TAG#v}"
           release_notes_file="docs/releases/v$(echo "${version}" | cut -d. -f1-2).md"
           test -f "${release_notes_file}"
 
