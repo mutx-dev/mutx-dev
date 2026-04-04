@@ -10,7 +10,7 @@ RELEASE_LINE="${RELEASE_VERSION%.*}"
 SITE_URL="${SITE_URL:-https://mutx.dev}"
 APP_URL="${APP_URL:-https://app.mutx.dev}"
 API_URL="${API_URL:-https://api.mutx.dev}"
-DOCS_RELEASE_URL="${DOCS_RELEASE_URL:-https://docs.mutx.dev/docs/releases/v${RELEASE_LINE}}"
+DOCS_RELEASE_URL="${DOCS_RELEASE_URL:-https://docs.mutx.dev/docs/v${RELEASE_LINE}}"
 RELEASE_NOTES_ROUTE="${RELEASE_NOTES_ROUTE:-${SITE_URL}/download/macos/release-notes}"
 
 normalize_url() {
