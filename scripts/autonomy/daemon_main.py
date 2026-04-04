@@ -26,8 +26,10 @@ DEFAULT_MAX_ACTIVE_RUNNERS = 2
 MAX_IDLE_SECONDS = 900
 DEFAULT_IDLE_REPORT_INTERVAL = 900
 DEFAULT_FLEET_SCAN_INTERVAL = 900
+DEFAULT_ISSUE_SYNC_INTERVAL = 900
 DEFAULT_QUEUE_REFILL_THRESHOLD = 2
 DEFAULT_FLEET_REQUEUE_COOLDOWN = 1800
+DEFAULT_PR_RECONCILE_INTERVAL = 300
 LOCK_EXIT_CODE = 75
 STOP_SIGNALS = (signal.SIGINT, signal.SIGTERM)
 
@@ -84,6 +86,8 @@ class StatusTracker:
             "last_idle_report_at": None,
             "last_fleet_scan_at": None,
             "last_fleet_enqueue_at": None,
+            "last_issue_sync_at": None,
+            "last_issue_enqueue_at": None,
             "last_result": None,
             "last_error": None,
             "queue_depth": 0,
@@ -93,6 +97,8 @@ class StatusTracker:
             "queue_refill_threshold": getattr(args, "queue_refill_threshold", DEFAULT_QUEUE_REFILL_THRESHOLD),
             "last_auto_resume_at": None,
             "last_auto_resume_result": None,
+            "last_pr_reconcile_at": None,
+            "last_pr_reconcile_result": None,
             "stop_requested": False,
             "active_runners": [],
         }
@@ -318,6 +324,29 @@ def run_fleet_scan(args: argparse.Namespace) -> list[dict[str, Any]]:
     return payload
 
 
+def run_issue_sync(args: argparse.Namespace) -> list[dict[str, Any]]:
+    output_path = Path(args.github_issue_output)
+    command = [
+        "python3",
+        "scripts/autonomy/sync_github_issues.py",
+        "--repo",
+        args.github_issue_repo,
+        "--limit",
+        str(args.github_issue_limit),
+        "--output",
+        args.github_issue_output,
+    ]
+    result = subprocess.run(command, cwd=args.repo_root, text=True, capture_output=True)
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or result.stdout.strip() or "github issue sync failed")
+    if not output_path.exists():
+        return []
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    if not isinstance(payload, list):
+        raise RuntimeError("github issue sync payload was not a list")
+    return payload
+
+
 def maybe_resume_codex_lane(args: argparse.Namespace, tracker: StatusTracker) -> dict[str, Any]:
     if args.codex_auto_resume_max_attempts <= 0:
         return {"changed": False, "eligible": False, "blocked_by": "auto_resume_disabled", "requeued_items": 0}
@@ -331,6 +360,45 @@ def maybe_resume_codex_lane(args: argparse.Namespace, tracker: StatusTracker) ->
     if result.get("changed"):
         tracker.update(last_auto_resume_at=utc_now_iso(), last_auto_resume_result=result)
     return result
+
+
+def maybe_reconcile_prs(args: argparse.Namespace, tracker: StatusTracker, *, force: bool = False) -> dict[str, Any]:
+    interval = max(0, int(getattr(args, "pr_reconcile_interval", DEFAULT_PR_RECONCILE_INTERVAL)))
+    last_run = tracker.state.get("last_pr_reconcile_at")
+    if not force and interval and last_run:
+        try:
+            elapsed = time.time() - float(last_run)
+        except (TypeError, ValueError):
+            elapsed = interval
+        if elapsed < interval:
+            return {"ran": False, "reason": "cooldown"}
+    command = ["python3", "scripts/autonomy/reconcile_prs.py"]
+    result = subprocess.run(command, cwd=args.repo_root, text=True, capture_output=True)
+    tracker.update(
+        last_pr_reconcile_at=str(time.time()),
+        last_pr_reconcile_result={
+            "exit_code": result.returncode,
+            "stdout": result.stdout[-4000:],
+            "stderr": result.stderr[-4000:],
+        },
+    )
+    return {"ran": True, "exit_code": result.returncode}
+
+
+def maybe_run_issue_sync(args: argparse.Namespace, tracker: StatusTracker, *, queued_items: int, force: bool = False) -> int:
+    if not args.github_issue_sync_enabled:
+        return 0
+    if not force and queued_items > args.queue_refill_threshold:
+        return 0
+    last_sync_at = tracker.state.get("last_issue_sync_at")
+    if not force and last_sync_at and (time.time() - parse_epoch(last_sync_at)) < args.github_issue_sync_interval:
+        return 0
+    tracker.update(last_issue_sync_at=utc_now_iso())
+    tasks = run_issue_sync(args)
+    appended = enqueue_generated_tasks(args.queue, tasks, cooldown_seconds=0)
+    if appended:
+        tracker.update(last_issue_enqueue_at=utc_now_iso())
+    return appended
 
 
 def maybe_run_fleet_scan(args: argparse.Namespace, tracker: StatusTracker, *, queued_items: int, force: bool = False) -> int:
@@ -520,10 +588,16 @@ def main() -> int:
     parser.add_argument("--status-file", default=".autonomy/daemon-status.json")
     parser.add_argument("--lock-file", default=".autonomy/daemon.lock")
     parser.add_argument("--generated-task-output", default=".autonomy/generated-tasks.json")
+    parser.add_argument("--github-issue-output", default=".autonomy/github-issue-tasks.json")
     parser.add_argument("--fleet-config", default=".autonomy/fleet.json")
+    parser.add_argument("--github-issue-repo", default="mutx-dev/mutx-dev")
+    parser.add_argument("--github-issue-limit", type=int, default=100)
+    parser.add_argument("--github-issue-sync-enabled", action="store_true")
     parser.add_argument("--idle-report-interval", type=int, default=DEFAULT_IDLE_REPORT_INTERVAL)
     parser.add_argument("--fleet-scan-interval", type=int, default=DEFAULT_FLEET_SCAN_INTERVAL)
+    parser.add_argument("--github-issue-sync-interval", type=int, default=DEFAULT_ISSUE_SYNC_INTERVAL)
     parser.add_argument("--queue-refill-threshold", type=int, default=DEFAULT_QUEUE_REFILL_THRESHOLD)
+    parser.add_argument("--pr-reconcile-interval", type=int, default=DEFAULT_PR_RECONCILE_INTERVAL)
     parser.add_argument("--codex-auto-resume-pause-seconds", type=int, default=1800)
     parser.add_argument("--codex-auto-resume-max-attempts", type=int, default=3)
     parser.add_argument("--burst-size", type=int, default=DEFAULT_BURST_SIZE)
@@ -556,6 +630,7 @@ def main() -> int:
             refresh_active_runner_state(tracker, active_runners)
 
             auto_resume = maybe_resume_codex_lane(args, tracker)
+            maybe_reconcile_prs(args, tracker)
             queue = load_queue(args.queue)
             queued_items = [item for item in queue.get("items", []) if item.get("status") == "queued"]
             tracker.mark_cycle_start(len(queued_items))
@@ -589,9 +664,11 @@ def main() -> int:
                     consecutive_idle_cycles=int(tracker.state.get("consecutive_idle_cycles", 0)) + 1,
                 )
                 appended = 0
+                issue_appended = 0
                 fleet_error = None
                 try:
-                    appended = maybe_run_fleet_scan(args, tracker, queued_items=0, force=True)
+                    issue_appended = maybe_run_issue_sync(args, tracker, queued_items=0, force=True)
+                    appended = issue_appended or maybe_run_fleet_scan(args, tracker, queued_items=0, force=True)
                 except Exception as exc:
                     fleet_error = str(exc)
                     tracker.update(last_error=fleet_error)
@@ -599,9 +676,10 @@ def main() -> int:
                 if appended:
                     queue = load_queue(args.queue)
                     queued_items = [item for item in queue.get("items", []) if item.get("status") == "queued"]
+                    source = "github_issue_sync" if issue_appended else "fleet_enqueued"
                     tracker.mark_cycle_end(
                         status="active",
-                        last_result={"status": "fleet_enqueued", "count": appended},
+                        last_result={"status": source, "count": appended},
                         last_error=fleet_error,
                         queue_depth=len(queued_items),
                     )
@@ -628,7 +706,8 @@ def main() -> int:
             idle_delay = 0
             tracker.update(status="active", consecutive_idle_cycles=0, last_non_idle_at=utc_now_iso())
             try:
-                appended = maybe_run_fleet_scan(args, tracker, queued_items=len(queued_items))
+                issue_appended = maybe_run_issue_sync(args, tracker, queued_items=len(queued_items))
+                appended = issue_appended or maybe_run_fleet_scan(args, tracker, queued_items=len(queued_items))
             except Exception as exc:
                 tracker.update(last_error=str(exc))
             else:

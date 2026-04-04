@@ -66,6 +66,8 @@ start_daemon() {
     --status-file "$STATUS_FILE" \
     --fleet-config "$REPO_ROOT/.autonomy/fleet.json" \
     --generated-task-output "$REPO_ROOT/.autonomy/generated-tasks.json" \
+    --github-issue-output "$REPO_ROOT/.autonomy/github-issue-tasks.json" \
+    --github-issue-sync-enabled \
     >>"$LOG_FILE" 2>&1 </dev/null &
   local pid=$!
   echo "$pid" > "$PID_FILE"
