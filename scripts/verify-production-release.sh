@@ -43,7 +43,7 @@ effective_url() {
 }
 
 require_content "${SITE_URL}" "Download for Mac"
-require_content "${SITE_URL}" "Open dashboard"
+require_content "${SITE_URL}" "Releases"
 require_content "${SITE_URL}/download/macos" "Download MUTX for macOS"
 require_content "${APP_URL}/login" "Welcome back"
 require_content "${APP_URL}/register" "Create your account"
