@@ -414,7 +414,8 @@ def _build_run_from_steps(
     import uuid
     from datetime import timezone
 
-    run_id = str(uuid.uuid7())
+    run_id_factory = getattr(uuid, "uuid7", uuid.uuid4)
+    run_id = str(run_id_factory())
     started_at = datetime.now(timezone.utc).isoformat()
 
     provenance = {
