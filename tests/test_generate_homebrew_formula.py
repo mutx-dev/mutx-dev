@@ -106,7 +106,7 @@ def test_main_writes_formula_with_resolved_resources(monkeypatch, tmp_path: Path
 name = "mutx-cli"
 version = "{CURRENT_CLI_VERSION}"
 description = "CLI for mutx.dev"
-license = {{ text = "BUSL-1.1" }}
+license = "BUSL-1.1"
 """.strip()
         + "\n",
         encoding="utf-8",

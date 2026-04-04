@@ -17,6 +17,9 @@ export const SUPPORTED_API_VERSIONS: ApiVersion[] = ['v1']
 /** Versions that are still accepted but will be removed in a future release. */
 export const DEPRECATED_API_VERSIONS: ApiVersion[] = []
 
+/** Backward-compatible alias used by the Jest suite and legacy imports. */
+export let _DEPRECATED_API_VERSIONS: ApiVersion[] = DEPRECATED_API_VERSIONS
+
 /**
  * Extracts the requested API version from an incoming request.
  *
@@ -60,7 +63,7 @@ export function addVersionHeaders(
   response.headers.set('X-API-Version', version)
   response.headers.set('X-API-Supported-Versions', SUPPORTED_API_VERSIONS.join(', '))
 
-  if ((DEPRECATED_API_VERSIONS as ApiVersion[]).includes(version)) {
+  if ((_DEPRECATED_API_VERSIONS as ApiVersion[]).includes(version)) {
     response.headers.set('Deprecation', 'true')
   }
 
