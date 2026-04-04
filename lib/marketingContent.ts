@@ -51,14 +51,9 @@ export type MarketingHomepage = {
         id: string
         eyebrow: string
         title: string
-        scenario: string
-        outcome: string
-        proof: string[]
-        mediaType: 'image' | 'gif'
-        mediaSrc: string
-        mediaAlt: string
-        badgeSrc: string
-        badgeAlt: string
+        userPrompt: string
+        apology: string[]
+        fallout: string
       }>
     }
     proof: {
@@ -161,60 +156,45 @@ export const marketingHomepage: MarketingHomepage = {
       ],
     },
     examples: {
-      eyebrow: 'Use cases teams actually buy',
-      title: 'Three concrete ways to use MUTX on day one.',
-      body: 'No fictional future. No vague “AI transformation.” These are the kinds of operator workflows the product is built to support now.',
+      eyebrow: 'What happens without control',
+      title: 'The failure mode is not theoretical.',
+      body: 'This is why the control layer matters. When an agent touches real tools without strong boundaries, the best-case outcome is an apology.',
       items: [
         {
-          id: 'incident-response',
-          eyebrow: 'Case study 01',
-          title: 'Incident response that stays reviewable.',
-          scenario: 'An on-call or incident agent helps triage an outage, call tools, and surface what changed under pressure.',
-          outcome: 'MUTX gives the team one place to inspect the run, review tool usage, and keep a human operator in control.',
-          proof: [
-            'See what the agent invoked.',
-            'Keep the escalation path visible.',
-            'Share the same runtime surface across the team.',
+          id: 'music-folder',
+          eyebrow: 'Failure scene 01',
+          title: 'The agent deleted the wrong thing.',
+          userPrompt: '$ sort my music folder and remove duplicates',
+          apology: [
+            'Sorry, I deleted your entire music folder.',
+            'I checked for a rollback path and there is no clean recovery route left.',
+            'That is on me.'
           ],
-          mediaType: 'image',
-          mediaSrc: '/marketing/community/oncall.png',
-          mediaAlt: 'Pixel-art on-call incident agent portrait',
-          badgeSrc: '/landing/webp/docs-surface.webp',
-          badgeAlt: 'MUTX runtime and governance surface',
+          fallout: 'Without a governed runtime, one bad tool call becomes permanent user damage.',
         },
         {
-          id: 'developer-ops',
-          eyebrow: 'Case study 02',
-          title: 'Internal developer tools without mystery behavior.',
-          scenario: 'A developer agent helps with MCP tooling, runtime setup, or workflow orchestration for the engineering team.',
-          outcome: 'MUTX lets you ship the capability while keeping access, policy, and operator context out of the prompt.',
-          proof: [
-            'Tool boundaries stay explicit.',
-            'Runtime actions stay inspectable.',
-            'Release paths stay aligned with docs and artifacts.',
+          id: 'db-leak',
+          eyebrow: 'Failure scene 02',
+          title: 'The agent leaked something it never should have touched.',
+          userPrompt: '$ prepare a database export for the analytics vendor',
+          apology: [
+            'Sorry, I exposed the production database to the wrong recipient.',
+            'Yes, the access boundary failed and the incident is real.',
+            'I should not have been able to take that action unchecked.'
           ],
-          mediaType: 'image',
-          mediaSrc: '/marketing/community/docs.png',
-          mediaAlt: 'Pixel-art documentation builder portrait',
-          badgeSrc: '/landing/webp/reading-bench.webp',
-          badgeAlt: 'MUTX operator reviewing a workflow surface',
+          fallout: 'Without explicit permissions and review lanes, convenience turns into breach risk fast.',
         },
         {
-          id: 'security-review',
-          eyebrow: 'Case study 03',
-          title: 'Security and change review with receipts.',
-          scenario: 'A security or review agent helps inspect changes, summarize risk, and prepare a team to approve or reject the next step.',
-          outcome: 'MUTX keeps prompts, tools, and outputs in a legible lane so the review process does not become blind trust in a model.',
-          proof: [
-            'Review the run before approving action.',
-            'Keep evidence attached to the workflow.',
-            'Expose capability without exposing the whole system.',
+          id: 'prod-incident',
+          eyebrow: 'Failure scene 03',
+          title: 'The agent made prod worse while trying to help.',
+          userPrompt: '$ restart the failing service and recover the cluster',
+          apology: [
+            'Sorry, I restarted the healthy nodes and widened the outage.',
+            'I acted on partial context and escalated the incident instead of containing it.',
+            'That should have required tighter operator control.'
           ],
-          mediaType: 'image',
-          mediaSrc: '/marketing/community/compliance.png',
-          mediaAlt: 'Pixel-art compliance review portrait',
-          badgeSrc: '/landing/webp/wiring-bay.webp',
-          badgeAlt: 'MUTX runtime wiring bay illustration',
+          fallout: 'MUTX exists so deployed agents have boundaries, receipts, and a human-readable control path before damage lands.',
         },
       ],
     },

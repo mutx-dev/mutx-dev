@@ -234,39 +234,33 @@ export function MarketingHomePage() {
                   delay={index * 0.06}
                   distance={18}
                 >
-                  <div className={home.exampleMedia}>
-                    <Image
-                      src={item.mediaSrc}
-                      alt={item.mediaAlt}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 32rem"
-                      className={home.examplePortrait}
-                    />
-                    <div className={home.exampleBackdrop}>
-                      <Image
-                        src={item.badgeSrc}
-                        alt={item.badgeAlt}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 32rem"
-                        className={home.exampleBackdropImage}
-                      />
+                  <div className={home.terminalWindow}>
+                    <div className={home.terminalChrome}>
+                      <span className={home.terminalDot} data-tone="red" />
+                      <span className={home.terminalDot} data-tone="yellow" />
+                      <span className={home.terminalDot} data-tone="green" />
+                      <span className={home.terminalTitle}>mutx-agent@runtime</span>
                     </div>
-                    <div className={home.exampleMediaShade} aria-hidden="true" />
+                    <div className={home.terminalBody}>
+                      <p className={home.exampleEyebrow}>{item.eyebrow}</p>
+                      <h3 className={home.exampleTitle}>{item.title}</h3>
+                      <p className={home.terminalPromptLine}>
+                        <span className={home.terminalPrompt}>user</span>
+                        <span className={home.terminalCommand}>{item.userPrompt}</span>
+                      </p>
+                      <div className={home.terminalReplyBlock}>
+                        {item.apology.map((line, lineIndex) => (
+                          <p key={lineIndex} className={home.terminalReplyLine}>
+                            <span className={home.terminalAgent}>agent</span>
+                            <span>{line}</span>
+                          </p>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
                   <div className={home.exampleCopy}>
-                    <p className={home.exampleEyebrow}>{item.eyebrow}</p>
-                    <h3 className={home.exampleTitle}>{item.title}</h3>
-                    <p className={home.exampleScenario}>{item.scenario}</p>
-                    <p className={home.exampleOutcome}>{item.outcome}</p>
-                  </div>
-
-                  <div className={home.exampleProofList}>
-                    {item.proof.map((line) => (
-                      <p key={line} className={home.exampleProofItem}>
-                        {line}
-                      </p>
-                    ))}
+                    <p className={home.exampleOutcome}>{item.fallout}</p>
                   </div>
                 </HoverCard>
               ))}
