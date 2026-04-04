@@ -133,6 +133,19 @@ def test_generate_tasks_respects_role_and_lane_caps(tmp_path: Path) -> None:
     assert len(lanes) == len(set(lanes))
 
 
+def test_generate_tasks_can_disable_low_value_sources_and_apply_min_score(tmp_path: Path) -> None:
+    repo = write_repo_fixture(tmp_path)
+    fleet = json.loads(json.dumps(BASE_FLEET))
+    fleet["scanner_policies"]["disabled_sources"] = ["fleet:todo-scan", "fleet:docs-language-scan"]
+    fleet["scanner_policies"]["min_score"] = 40
+
+    tasks = FLEET.generate_tasks(repo, fleet)
+
+    assert tasks
+    assert all(task["source"] not in {"fleet:todo-scan", "fleet:docs-language-scan"} for task in tasks)
+    assert all(int(task["score"]) >= 40 for task in tasks)
+
+
 def test_main_filters_existing_ids_and_writes_output(tmp_path: Path) -> None:
     repo = write_repo_fixture(tmp_path)
     queue = tmp_path / "queue.json"

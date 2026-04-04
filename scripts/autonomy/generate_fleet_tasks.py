@@ -278,9 +278,15 @@ def finalize_candidate(base: Path, candidate: TaskCandidate, roles: list[RolePro
             f"priority:{candidate.priority}",
         ]
     )
+    if candidate.area == "area:web" and len(candidate.allowed_paths) <= 2:
+        candidate.labels.extend(["risk:low", "size:s", "autonomy:safe"])
+    if candidate.area == "area:docs" and len(candidate.allowed_paths) <= 4:
+        candidate.labels.extend(["risk:low", "size:s", "autonomy:safe"])
     candidate.evidence_fingerprint = build_evidence_fingerprint(base, candidate.evidence_paths or candidate.allowed_paths)
     candidate.scheduling_reason = reason
     return candidate
+
+
 
 
 def _route_doc_paths_for_route(route: str) -> list[str]:
@@ -501,13 +507,26 @@ def docs_language_tasks(base: Path, roles: list[RoleProfile]) -> list[TaskCandid
     return tasks
 
 
-def collect_candidates(base: Path, roles: list[RoleProfile]) -> list[TaskCandidate]:
+def source_enabled(policy: dict[str, Any], source: str) -> bool:
+    disabled = policy.get("disabled_sources", [])
+    if not isinstance(disabled, list):
+        return True
+    return source not in {str(item) for item in disabled}
+
+
+def collect_candidates(base: Path, roles: list[RoleProfile], fleet: dict[str, Any]) -> list[TaskCandidate]:
+    policy = fleet.get("scanner_policies", {})
     tasks: list[TaskCandidate] = []
-    tasks.extend(claim_matrix_tasks(base, roles))
-    tasks.extend(route_claim_tasks(base, roles))
-    tasks.extend(repo_todo_tasks(base, roles))
-    tasks.extend(ux_accessibility_tasks(base, roles))
-    tasks.extend(docs_language_tasks(base, roles))
+    if source_enabled(policy, "fleet:claim-matrix"):
+        tasks.extend(claim_matrix_tasks(base, roles))
+    if source_enabled(policy, "fleet:route-claim-scan"):
+        tasks.extend(route_claim_tasks(base, roles))
+    if source_enabled(policy, "fleet:todo-scan"):
+        tasks.extend(repo_todo_tasks(base, roles))
+    if source_enabled(policy, "fleet:ux-scan"):
+        tasks.extend(ux_accessibility_tasks(base, roles))
+    if source_enabled(policy, "fleet:docs-language-scan"):
+        tasks.extend(docs_language_tasks(base, roles))
     return tasks
 
 
@@ -523,6 +542,7 @@ def schedule_tasks(tasks: list[TaskCandidate], fleet: dict[str, Any]) -> list[Ta
     limit = int(policy.get("max_new_tasks_per_cycle", 12))
     per_role_cap = int(policy.get("max_tasks_per_role_per_cycle", limit))
     lane_caps = _lane_caps(policy)
+    min_score = int(policy.get("min_score", 0))
     scheduled: list[TaskCandidate] = []
     role_count: dict[str, int] = {}
     lane_count: dict[str, int] = {}
@@ -535,6 +555,8 @@ def schedule_tasks(tasks: list[TaskCandidate], fleet: dict[str, Any]) -> list[Ta
             item.id,
         ),
     ):
+        if candidate.score < min_score:
+            continue
         if len(scheduled) >= limit:
             break
         if role_count.get(candidate.owner_role, 0) >= per_role_cap:
@@ -549,7 +571,7 @@ def schedule_tasks(tasks: list[TaskCandidate], fleet: dict[str, Any]) -> list[Ta
 
 def generate_tasks(base: Path, fleet: dict[str, Any]) -> list[dict[str, Any]]:
     roles = load_roles(fleet)
-    candidates = collect_candidates(base, roles)
+    candidates = collect_candidates(base, roles, fleet)
     scheduled = schedule_tasks(candidates, fleet)
     return [task.to_dict() for task in scheduled]
 
