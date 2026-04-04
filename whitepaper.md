@@ -528,7 +528,7 @@ The live FastAPI public control-plane contract is mounted under **`/v1/*`**.
 That means the current public backend shape is:
 
 - root probes at `/`, `/health`, `/ready`, and `/metrics`
-- public control-plane routes such as `/v1/auth`, `/v1/agents`, `/v1/deployments`, `/v1/templates`, `/v1/assistant`, `/v1/sessions`, `/v1/runs`, `/v1/api-keys`, `/v1/webhooks`, `/v1/monitoring`, `/v1/budgets`, `/v1/rag`, `/v1/runtime`, and related families
+- public control-plane routes such as `/v1/auth`, `/v1/agents`, `/v1/deployments`, `/v1/templates`, `/v1/assistant/*`, `/v1/sessions`, `/v1/runs`, `/v1/api-keys`, `/v1/webhooks`, `/v1/monitoring`, `/v1/budgets`, `/v1/rag`, `/v1/runtime`, and related families
 
 Earlier parts of this paper (especially Sections 6 and 6.1) that describe top-level public routes without the `/v1` prefix are now outdated for implementation purposes and should be read as superseded by the mounted code in `src/api/main.py` and the generated OpenAPI snapshot in `docs/api/openapi.json`. When in doubt, prefer the `/v1/*` routes and the OpenAPI specification over any earlier prose examples.
 
