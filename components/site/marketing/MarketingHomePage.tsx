@@ -190,7 +190,7 @@ export function MarketingHomePage() {
                 </motion.div>
 
                 <div className={home.demoTabs}>
-                  {marketingHomepage.salesSections.demo.tabs.map((tab, index) => (
+                  {marketingHomepage.salesSections.demo.tabs.map((tab) => (
                     <button
                       key={tab.id}
                       type="button"
