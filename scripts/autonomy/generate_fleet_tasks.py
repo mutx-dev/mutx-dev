@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 from dataclasses import asdict, dataclass, field
@@ -78,6 +79,7 @@ class TaskCandidate:
     verification: list[str]
     constraints: list[str]
     evidence_paths: list[str] = field(default_factory=list)
+    evidence_fingerprint: str = ""
     evidence: list[str] = field(default_factory=list)
     labels: list[str] = field(default_factory=list)
     priority: str = "p3"
@@ -133,6 +135,20 @@ def existing_ids(queue_path: str | Path) -> set[str]:
 
 def read_lines(path: Path) -> list[str]:
     return path.read_text(encoding="utf-8", errors="replace").splitlines()
+
+
+def build_evidence_fingerprint(base: Path, paths: list[str]) -> str:
+    digest = hashlib.sha256()
+    for rel in sorted(dict.fromkeys(paths)):
+        candidate = base / rel
+        digest.update(rel.encode("utf-8"))
+        digest.update(b"\0")
+        if not candidate.exists() or not candidate.is_file():
+            digest.update(b"MISSING\0")
+            continue
+        digest.update(candidate.read_text(encoding="utf-8", errors="replace").encode("utf-8"))
+        digest.update(b"\0")
+    return digest.hexdigest()[:16]
 
 
 def _slug(value: str, *, limit: int = 56) -> str:
@@ -222,7 +238,7 @@ def assign_role(candidate: TaskCandidate, roles: list[RoleProfile]) -> tuple[str
     return (chosen.id, chosen.lane, "; ".join(reason_bits))
 
 
-def finalize_candidate(candidate: TaskCandidate, roles: list[RoleProfile]) -> TaskCandidate:
+def finalize_candidate(base: Path, candidate: TaskCandidate, roles: list[RoleProfile]) -> TaskCandidate:
     owner_role, role_lane, reason = assign_role(candidate, roles)
     candidate.owner_role = owner_role
     candidate.role_lane = role_lane
@@ -262,6 +278,7 @@ def finalize_candidate(candidate: TaskCandidate, roles: list[RoleProfile]) -> Ta
             f"priority:{candidate.priority}",
         ]
     )
+    candidate.evidence_fingerprint = build_evidence_fingerprint(base, candidate.evidence_paths or candidate.allowed_paths)
     candidate.scheduling_reason = reason
     return candidate
 
@@ -323,7 +340,7 @@ def claim_matrix_tasks(base: Path, roles: list[RoleProfile]) -> list[TaskCandida
             evidence=[claim, reality, f"status={status}"],
             labels=[f"status:{status.lower()}", "size:s"],
         )
-        tasks.append(finalize_candidate(candidate, roles))
+        tasks.append(finalize_candidate(base, candidate, roles))
     return tasks
 
 
@@ -363,7 +380,7 @@ def repo_todo_tasks(base: Path, roles: list[RoleProfile]) -> list[TaskCandidate]
                     evidence=[f"{rel}:{lineno}: {snippet}"],
                     labels=[size_label, risk_label],
                 )
-                tasks.append(finalize_candidate(candidate, roles))
+                tasks.append(finalize_candidate(base, candidate, roles))
                 break
     return tasks
 
@@ -395,7 +412,7 @@ def ux_accessibility_tasks(base: Path, roles: list[RoleProfile]) -> list[TaskCan
                 evidence=[f"placeholder-only inputs detected in {rel}"],
                 labels=["size:s", "risk:low"],
             )
-            tasks.append(finalize_candidate(candidate, roles))
+            tasks.append(finalize_candidate(base, candidate, roles))
     return tasks
 
 
@@ -451,7 +468,7 @@ def route_claim_tasks(base: Path, roles: list[RoleProfile]) -> list[TaskCandidat
                     evidence=[f"{rel}:{lineno}: {line.strip()}", f"missing route: {route}"],
                     labels=["status:misleading", "size:s" if rel == "whitepaper.md" else "size:xs"],
                 )
-                tasks.append(finalize_candidate(candidate, roles))
+                tasks.append(finalize_candidate(base, candidate, roles))
     return tasks
 
 
@@ -479,7 +496,7 @@ def docs_language_tasks(base: Path, roles: list[RoleProfile]) -> list[TaskCandid
                 evidence=[f"{rel}:{lineno}: {snippet}"],
                 labels=["size:xs", "risk:low"],
             )
-            tasks.append(finalize_candidate(candidate, roles))
+            tasks.append(finalize_candidate(base, candidate, roles))
             break
     return tasks
 
@@ -556,3 +573,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

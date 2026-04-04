@@ -236,12 +236,16 @@ def runner_command(orchestrator_args: argparse.Namespace, *, task_id: str) -> li
 TERMINAL_QUEUE_STATUSES = {"completed", "failed", "blocked", "merged", "cancelled"}
 
 
-def _is_stale_terminal_fleet_item(item: dict[str, Any], *, cooldown_seconds: int) -> bool:
+def _is_stale_terminal_fleet_item(item: dict[str, Any], task: dict[str, Any], *, cooldown_seconds: int) -> bool:
     status = str(item.get("status") or "queued")
     if status not in TERMINAL_QUEUE_STATUSES:
         return False
     source = str(item.get("source") or "")
     if not source.startswith("fleet"):
+        return False
+    existing_fingerprint = str(item.get("evidence_fingerprint") or "")
+    incoming_fingerprint = str(task.get("evidence_fingerprint") or "")
+    if existing_fingerprint and incoming_fingerprint and existing_fingerprint == incoming_fingerprint:
         return False
     ts = item.get("completed_at") or item.get("updated_at")
     if not ts:
@@ -272,7 +276,7 @@ def enqueue_generated_tasks(queue_path: str | Path, tasks: list[dict[str, Any]],
         existing_index = item_index.get(task_id)
         if existing_index is not None:
             existing = items[existing_index]
-            if not _is_stale_terminal_fleet_item(existing, cooldown_seconds=cooldown_seconds):
+            if not _is_stale_terminal_fleet_item(existing, payload, cooldown_seconds=cooldown_seconds):
                 continue
             notes = list(existing.get("notes") or [])
             notes.append({"ts": utc_now_iso(), "message": "fleet task refreshed after cooldown"})

@@ -103,6 +103,7 @@ def test_generate_tasks_scores_and_assigns_roles_from_repo_signals(tmp_path: Pat
     assert route_task["priority"] in {"p0", "p1"}
     assert route_task["score"] > todo_task["score"]
     assert "docs/api/openapi.json" in route_task["evidence_paths"]
+    assert route_task["evidence_fingerprint"]
 
     assert todo_task["owner_role"] == "backend"
     assert todo_task["lane"] == "codex"

@@ -73,6 +73,7 @@ def test_enqueue_generated_tasks_refreshes_stale_terminal_fleet_item(tmp_path: P
                         "status": "completed",
                         "source": "fleet:todo-scan",
                         "completed_at": "2024-01-01T00:00:00Z",
+                        "evidence_fingerprint": "old-fingerprint",
                         "notes": [{"message": "runner completed successfully"}],
                     }
                 ]
@@ -82,7 +83,7 @@ def test_enqueue_generated_tasks_refreshes_stale_terminal_fleet_item(tmp_path: P
 
     appended = DAEMON.enqueue_generated_tasks(
         queue_path,
-        [{"id": "fleet-task", "title": "Refresh me", "source": "fleet:todo-scan"}],
+        [{"id": "fleet-task", "title": "Refresh me", "source": "fleet:todo-scan", "evidence_fingerprint": "new-fingerprint"}],
         cooldown_seconds=60,
     )
 
@@ -91,7 +92,38 @@ def test_enqueue_generated_tasks_refreshes_stale_terminal_fleet_item(tmp_path: P
     refreshed = payload["items"][0]
     assert refreshed["id"] == "fleet-task"
     assert refreshed["status"] == "queued"
+    assert refreshed["evidence_fingerprint"] == "new-fingerprint"
     assert any("fleet task refreshed after cooldown" in note.get("message", "") for note in refreshed["notes"])
+
+
+
+def test_enqueue_generated_tasks_skips_terminal_fleet_item_when_evidence_is_unchanged(tmp_path: Path) -> None:
+    queue_path = tmp_path / "queue.json"
+    queue_path.write_text(
+        json.dumps(
+            {
+                "items": [
+                    {
+                        "id": "fleet-task",
+                        "status": "completed",
+                        "source": "fleet:todo-scan",
+                        "completed_at": "2024-01-01T00:00:00Z",
+                        "evidence_fingerprint": "same-fingerprint",
+                    }
+                ]
+            }
+        )
+    )
+
+    appended = DAEMON.enqueue_generated_tasks(
+        queue_path,
+        [{"id": "fleet-task", "title": "Skip me", "source": "fleet:todo-scan", "evidence_fingerprint": "same-fingerprint"}],
+        cooldown_seconds=60,
+    )
+
+    assert appended == 0
+    payload = json.loads(queue_path.read_text())
+    assert payload["items"][0]["status"] == "completed"
 
 
 
