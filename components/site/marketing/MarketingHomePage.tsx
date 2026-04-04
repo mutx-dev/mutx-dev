@@ -240,17 +240,18 @@ export function MarketingHomePage() {
                       alt={item.mediaAlt}
                       fill
                       sizes="(max-width: 1024px) 100vw, 32rem"
-                      className={home.exampleImage}
+                      className={home.examplePortrait}
                     />
-                    <div className={home.exampleBadge}>
+                    <div className={home.exampleBackdrop}>
                       <Image
                         src={item.badgeSrc}
                         alt={item.badgeAlt}
-                        width={72}
-                        height={72}
-                        className={home.exampleBadgeImage}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 32rem"
+                        className={home.exampleBackdropImage}
                       />
                     </div>
+                    <div className={home.exampleMediaShade} aria-hidden="true" />
                   </div>
 
                   <div className={home.exampleCopy}>
