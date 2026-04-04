@@ -104,8 +104,10 @@
 }
 
 .loaderMarkShell,
-.heroLockupMark {
-  position: relative;
+.heroLockupTarget,
+.heroLockupMarkFrame {
+  position: absolute;
+  inset: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -207,13 +209,29 @@
 }
 
 .heroLockupMark {
+  position: relative;
   width: clamp(3.45rem, 4.3vw, 4.35rem);
   height: clamp(3.45rem, 4.3vw, 4.35rem);
-  opacity: 0;
+  flex: 0 0 auto;
+}
+
+.heroLockupTarget,
+.heroLockupMarkFrame {
   transition:
-    opacity 150ms ease,
+    opacity 220ms ease,
     filter 260ms ease,
     transform 260ms ease;
+}
+
+.heroLockupTarget {
+  opacity: 0;
+}
+
+.heroLockupMarkFrame {
+  opacity: 0;
+  visibility: hidden;
+  filter: blur(10px);
+  transform: translate3d(0, 0.45rem, 0) scale(0.96);
 }
 
 .heroLockupCopy {
@@ -363,35 +381,23 @@
   transform: translateY(-1px);
 }
 
-.heroLockupMark[data-loader-target-visible="1"] {
+.heroLockupTarget[data-loader-target-visible="1"] {
   opacity: 1;
   filter: blur(0);
   transform: none;
 }
 
-:global(html[data-loader-state="complete"]) .heroLockupMark,
+:global(html[data-loader-state="complete"]) .heroLockupTarget,
+:global(html[data-home-loader-played="1"]) .heroLockupTarget {
+  opacity: 0;
+  filter: blur(0);
+  transform: none;
+}
+
+:global(html[data-loader-state="complete"]) .heroLockupMarkFrame,
 :global(html[data-loader-state="complete"]) .heroLockupCopy,
-:global(html[data-loader-state="complete"]) .heroContent {
-  opacity: 1;
-  visibility: visible;
-  filter: blur(0);
-  transform: none;
-  pointer-events: auto;
-}
-
-:global(html[data-loader-state="complete"]) .heroLockupMark {
-  transition-delay: 0s;
-}
-
-:global(html[data-loader-state="complete"]) .heroLockupCopy {
-  transition-delay: 0s;
-}
-
-:global(html[data-loader-state="complete"]) .heroContent {
-  transition-delay: 0s;
-}
-
-:global(html[data-home-loader-played="1"]) .heroLockupMark,
+:global(html[data-loader-state="complete"]) .heroContent,
+:global(html[data-home-loader-played="1"]) .heroLockupMarkFrame,
 :global(html[data-home-loader-played="1"]) .heroLockupCopy,
 :global(html[data-home-loader-played="1"]) .heroContent {
   opacity: 1;
@@ -400,6 +406,14 @@
   transform: none;
   pointer-events: auto;
   transition-delay: 0s;
+}
+
+.hoverCardShell,
+.agentFeaturedShell,
+.depthPanelShell {
+  height: 100%;
+  will-change: transform;
+  transform-style: preserve-3d;
 }
 
 .heroMarquee {

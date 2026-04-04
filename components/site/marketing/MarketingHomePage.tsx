@@ -1,5 +1,8 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRef, type ReactNode } from 'react'
 import {
   Accessibility,
   ArrowRight,
@@ -13,6 +16,12 @@ import {
   Workflow,
   type LucideIcon,
 } from 'lucide-react'
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from 'framer-motion'
 
 import {
   marketingHomepage,
@@ -29,6 +38,13 @@ import { MarketingReveal } from './MarketingReveal'
 type ActionLinkProps = {
   action: MarketingActionLink
   className: string
+}
+
+type HoverCardProps = {
+  className: string
+  children: ReactNode
+  delay?: number
+  distance?: number
 }
 
 const iconMap: Record<MarketingAgentIcon, LucideIcon> = {
@@ -71,6 +87,29 @@ function ActionLink({ action, className }: ActionLinkProps) {
   )
 }
 
+function HoverCard({ className, children, delay = 0, distance = 18 }: HoverCardProps) {
+  const prefersReducedMotion = useReducedMotion()
+
+  return (
+    <MarketingReveal className={className} delay={delay} distance={distance}>
+      <motion.div
+        className={home.hoverCardShell}
+        whileHover={
+          prefersReducedMotion
+            ? undefined
+            : {
+                y: -6,
+                scale: 1.01,
+              }
+        }
+        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {children}
+      </motion.div>
+    </MarketingReveal>
+  )
+}
+
 function AgentMarquee() {
   const marqueeItems = [...marketingHomepage.agentShowcase.marquee, ...marketingHomepage.agentShowcase.marquee]
 
@@ -88,6 +127,31 @@ function AgentMarquee() {
 }
 
 export function MarketingHomePage() {
+  const prefersReducedMotion = useReducedMotion()
+  const featureSectionRef = useRef<HTMLElement | null>(null)
+  const showcaseSectionRef = useRef<HTMLElement | null>(null)
+  const finalSectionRef = useRef<HTMLElement | null>(null)
+
+  const { scrollYProgress: featureProgress } = useScroll({
+    target: featureSectionRef,
+    offset: ['start end', 'end start'],
+  })
+  const { scrollYProgress: showcaseProgress } = useScroll({
+    target: showcaseSectionRef,
+    offset: ['start end', 'end start'],
+  })
+  const { scrollYProgress: finalProgress } = useScroll({
+    target: finalSectionRef,
+    offset: ['start end', 'end start'],
+  })
+
+  const featureGlowY = useTransform(featureProgress, [0, 1], [80, -60])
+  const featureGlowOpacity = useTransform(featureProgress, [0, 0.45, 1], [0.18, 0.34, 0.16])
+  const featuredPanelY = useTransform(showcaseProgress, [0, 1], [28, -24])
+  const featuredPanelRotate = useTransform(showcaseProgress, [0, 1], [1.2, -1.2])
+  const showcaseGlowScale = useTransform(showcaseProgress, [0, 0.5, 1], [0.94, 1.03, 0.97])
+  const finalPreviewY = useTransform(finalProgress, [0, 1], [32, -22])
+
   const [primaryAction, ...secondaryActions] = marketingHomepage.hero.actions
   const [finalPrimaryAction, ...finalSecondaryActions] = marketingHomepage.finalCta.actions
   const featuredAgent = marketingHomepage.agentShowcase.featured
@@ -108,17 +172,23 @@ export function MarketingHomePage() {
           <div className={home.heroShell}>
             <div className={home.heroColumn}>
               <div className={home.heroLockup} data-testid="homepage-lockup">
-                <span
-                  className={home.heroLockupMark}
-                  data-testid="homepage-lockup-mark"
-                  data-loader-target="marketing-brand-mark"
-                >
-                  <img
-                    src="/logo.png"
-                    alt="MUTX logo"
-                    className={home.heroLockupMarkImage}
-                    decoding="async"
-                  />
+                <span className={home.heroLockupMark} data-testid="homepage-lockup-mark">
+                  <span className={home.heroLockupTarget} data-loader-target="marketing-brand-mark">
+                    <img
+                      src="/logo.png"
+                      alt="MUTX logo"
+                      className={home.heroLockupMarkImage}
+                      decoding="async"
+                    />
+                  </span>
+                  <span className={home.heroLockupMarkFrame} aria-hidden="true">
+                    <img
+                      src="/logo.png"
+                      alt=""
+                      className={home.heroLockupMarkImage}
+                      decoding="async"
+                    />
+                  </span>
                 </span>
                 <span className={home.heroLockupCopy} data-testid="homepage-lockup-copy">
                   <span className={home.heroLockupWord} data-testid="homepage-lockup-word">
@@ -154,7 +224,19 @@ export function MarketingHomePage() {
 
         <AgentMarquee />
 
-        <section className={home.proofSection} data-testid="homepage-proof-strip">
+        <section ref={featureSectionRef} className={home.proofSection} data-testid="homepage-proof-strip">
+          <motion.div
+            className={home.sectionAmbientGlow}
+            aria-hidden="true"
+            style={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    y: featureGlowY,
+                    opacity: featureGlowOpacity,
+                  }
+            }
+          />
           <div className={core.shell}>
             <MarketingReveal className={home.proofHeader}>
               <p className={home.sectionEyebrow}>{marketingHomepage.featureGrid.eyebrow}</p>
@@ -178,7 +260,7 @@ export function MarketingHomePage() {
 
             <div className={home.featureGrid}>
               {marketingHomepage.featureGrid.cards.map((card, index) => (
-                <MarketingReveal
+                <HoverCard
                   key={card.title}
                   className={home.featureCard}
                   delay={index * 0.06}
@@ -187,13 +269,24 @@ export function MarketingHomePage() {
                   <p className={home.featureCardEyebrow}>{card.eyebrow}</p>
                   <h3 className={home.featureCardTitle}>{card.title}</h3>
                   <p className={home.featureCardBody}>{card.body}</p>
-                </MarketingReveal>
+                </HoverCard>
               ))}
             </div>
           </div>
         </section>
 
-        <section className={home.agentSection} data-testid="homepage-agent-showcase">
+        <section ref={showcaseSectionRef} className={home.agentSection} data-testid="homepage-agent-showcase">
+          <motion.div
+            className={home.agentSectionGlow}
+            aria-hidden="true"
+            style={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    scale: showcaseGlowScale,
+                  }
+            }
+          />
           <div className={core.shell}>
             <MarketingReveal className={home.agentHeader}>
               <p className={home.sectionEyebrow}>{marketingHomepage.agentShowcase.eyebrow}</p>
@@ -203,30 +296,53 @@ export function MarketingHomePage() {
 
             <div className={home.agentFeaturedLayout}>
               <MarketingReveal className={home.agentFeatured} distance={24}>
-                <div className={home.agentFeaturedTopline}>
-                  <span className={home.agentFeaturedLabel}>{featuredAgent.label}</span>
-                  <span className={home.agentSlug}>{featuredAgent.slug}</span>
-                </div>
-
-                <div className={home.agentFeaturedHeader}>
-                  <span className={home.agentFeaturedIconWrap} aria-hidden="true">
-                    <FeaturedIcon className={home.agentFeaturedIcon} />
-                  </span>
-                  <div className={home.agentFeaturedCopy}>
-                    <h3 className={home.agentFeaturedName}>{featuredAgent.name}</h3>
-                    <p className={home.agentFeaturedSummary}>{featuredAgent.summary}</p>
+                <motion.div
+                  className={home.agentFeaturedShell}
+                  whileHover={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          y: -8,
+                          scale: 1.01,
+                        }
+                  }
+                  transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+                  style={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          y: featuredPanelY,
+                          rotateX: 0,
+                          rotateZ: featuredPanelRotate,
+                        }
+                  }
+                >
+                  <div className={home.agentFeaturedHalo} aria-hidden="true" />
+                  <div className={home.agentFeaturedTopline}>
+                    <span className={home.agentFeaturedLabel}>{featuredAgent.label}</span>
+                    <span className={home.agentSlug}>{featuredAgent.slug}</span>
                   </div>
-                </div>
 
-                <p className={home.agentFeaturedQuote}>“{featuredAgent.quote}”</p>
+                  <div className={home.agentFeaturedHeader}>
+                    <span className={home.agentFeaturedIconWrap} aria-hidden="true">
+                      <FeaturedIcon className={home.agentFeaturedIcon} />
+                    </span>
+                    <div className={home.agentFeaturedCopy}>
+                      <h3 className={home.agentFeaturedName}>{featuredAgent.name}</h3>
+                      <p className={home.agentFeaturedSummary}>{featuredAgent.summary}</p>
+                    </div>
+                  </div>
 
-                <div className={home.agentCapabilityList}>
-                  {featuredAgent.capabilities.map((capability) => (
-                    <p key={capability} className={home.agentCapabilityItem}>
-                      {capability}
-                    </p>
-                  ))}
-                </div>
+                  <p className={home.agentFeaturedQuote}>“{featuredAgent.quote}”</p>
+
+                  <div className={home.agentCapabilityList}>
+                    {featuredAgent.capabilities.map((capability) => (
+                      <p key={capability} className={home.agentCapabilityItem}>
+                        {capability}
+                      </p>
+                    ))}
+                  </div>
+                </motion.div>
               </MarketingReveal>
 
               <div className={home.agentGrid}>
@@ -234,7 +350,7 @@ export function MarketingHomePage() {
                   const Icon = iconMap[agent.icon]
 
                   return (
-                    <MarketingReveal
+                    <HoverCard
                       key={agent.slug}
                       className={home.agentCard}
                       delay={index * 0.05}
@@ -250,7 +366,7 @@ export function MarketingHomePage() {
                         <h3 className={home.agentName}>{agent.name}</h3>
                         <p className={home.agentSummary}>{agent.summary}</p>
                       </div>
-                    </MarketingReveal>
+                    </HoverCard>
                   )
                 })}
               </div>
@@ -262,36 +378,49 @@ export function MarketingHomePage() {
           <div className={core.shell}>
             <div className={home.depthLayout}>
               <MarketingReveal className={home.depthPanel} distance={24}>
-                <div className={home.depthPanelHeader}>
-                  <p className={home.depthPanelEyebrow}>
-                    {marketingHomepage.operatorSection.preview.eyebrow}
-                  </p>
-                  <h2 className={home.depthPanelTitle}>
-                    {marketingHomepage.operatorSection.preview.title}
-                  </h2>
-                  <p className={home.depthPanelBody}>
-                    {marketingHomepage.operatorSection.preview.body}
-                  </p>
-                </div>
-
-                <div className={home.depthMediaFrame} data-testid="homepage-depth-media">
-                  <Image
-                    src={marketingHomepage.operatorSection.preview.imageSrc}
-                    alt={marketingHomepage.operatorSection.preview.imageAlt}
-                    data-testid="homepage-depth-image"
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 40rem"
-                    className={home.depthPoster}
-                  />
-                </div>
-
-                <div className={home.depthPanelList}>
-                  {marketingHomepage.operatorSection.preview.items.map((item) => (
-                    <p key={item} className={home.depthPanelListItem}>
-                      {item}
+                <motion.div
+                  className={home.depthPanelShell}
+                  whileHover={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          y: -6,
+                          scale: 1.01,
+                        }
+                  }
+                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <div className={home.depthPanelHeader}>
+                    <p className={home.depthPanelEyebrow}>
+                      {marketingHomepage.operatorSection.preview.eyebrow}
                     </p>
-                  ))}
-                </div>
+                    <h2 className={home.depthPanelTitle}>
+                      {marketingHomepage.operatorSection.preview.title}
+                    </h2>
+                    <p className={home.depthPanelBody}>
+                      {marketingHomepage.operatorSection.preview.body}
+                    </p>
+                  </div>
+
+                  <div className={home.depthMediaFrame} data-testid="homepage-depth-media">
+                    <Image
+                      src={marketingHomepage.operatorSection.preview.imageSrc}
+                      alt={marketingHomepage.operatorSection.preview.imageAlt}
+                      data-testid="homepage-depth-image"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 40rem"
+                      className={home.depthPoster}
+                    />
+                  </div>
+
+                  <div className={home.depthPanelList}>
+                    {marketingHomepage.operatorSection.preview.items.map((item) => (
+                      <p key={item} className={home.depthPanelListItem}>
+                        {item}
+                      </p>
+                    ))}
+                  </div>
+                </motion.div>
               </MarketingReveal>
 
               <div className={home.depthContent}>
@@ -303,7 +432,7 @@ export function MarketingHomePage() {
 
                 <div className={home.depthSteps}>
                   {marketingHomepage.operatorSection.pillars.map((pillar, index) => (
-                    <MarketingReveal
+                    <HoverCard
                       key={pillar.id}
                       className={home.depthStep}
                       delay={index * 0.08}
@@ -314,7 +443,7 @@ export function MarketingHomePage() {
                         <h3 className={home.depthStepTitle}>{pillar.title}</h3>
                         <p className={home.depthStepBody}>{pillar.body}</p>
                       </div>
-                    </MarketingReveal>
+                    </HoverCard>
                   ))}
                 </div>
               </div>
@@ -322,7 +451,7 @@ export function MarketingHomePage() {
           </div>
         </section>
 
-        <section className={home.finalSection} data-testid="homepage-final-cta">
+        <section ref={finalSectionRef} className={home.finalSection} data-testid="homepage-final-cta">
           <div className={core.shell}>
             <MarketingReveal className={home.finalInner} distance={24}>
               <div className={home.finalCopy}>
@@ -343,7 +472,11 @@ export function MarketingHomePage() {
                 </div>
               </div>
 
-              <div className={home.finalPreview} data-testid="homepage-demo-preview">
+              <motion.div
+                className={home.finalPreview}
+                data-testid="homepage-demo-preview"
+                style={prefersReducedMotion ? undefined : { y: finalPreviewY }}
+              >
                 <div className={home.finalPreviewDevice}>
                   <div className={home.finalPreviewScreen}>
                     <img
@@ -354,7 +487,7 @@ export function MarketingHomePage() {
                     />
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </MarketingReveal>
           </div>
         </section>
