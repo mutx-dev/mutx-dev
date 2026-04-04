@@ -247,6 +247,7 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search agents..."
+            aria-label="Search agents"
             className="w-full rounded-xl border border-white/10 bg-black/40 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/20"
           />
         </div>
