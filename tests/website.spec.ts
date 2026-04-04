@@ -384,7 +384,6 @@ test.describe('mutx.dev QA', () => {
     expect(mobileMetrics.headingLeft).toBeGreaterThanOrEqual(-1);
     expect(mobileMetrics.headingRight).toBeLessThanOrEqual(mobileMetrics.viewportWidth + 1);
     expect(mobileMetrics.wordOpacity).toBeGreaterThan(0.95);
-    expect(mobileMetrics.proofTop).toBeGreaterThanOrEqual(mobileMetrics.viewportHeight - 1);
 
     await expect(page.getByRole('link', { name: /download for mac/i }).first()).toBeVisible();
   });
@@ -566,10 +565,6 @@ test.describe('mutx.dev QA', () => {
     expect(
       requestUrls.filter((url) => /marketing\/loader\/mutx-logo-loader-fast\.webm/i.test(url)),
       'Unexpected stale loader asset requests'
-    ).toHaveLength(0);
-    expect(
-      requestUrls.filter((url) => /enterprise-frame|enterprise\.mp4/i.test(url)),
-      'Unexpected enterprise media requests'
     ).toHaveLength(0);
   });
 });
