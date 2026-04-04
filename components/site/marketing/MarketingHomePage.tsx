@@ -178,15 +178,24 @@ export function MarketingHomePage() {
                   }
                   transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <video
-                    key={activeDemo.id}
-                    className={home.demoVideo}
-                    src={activeDemo.videoSrc}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  />
+                  {activeDemo.mediaType === 'gif' ? (
+                    <img
+                      key={activeDemo.id}
+                      src={activeDemo.mediaSrc}
+                      alt={activeDemo.mediaAlt}
+                      className={home.demoVideo}
+                      decoding="async"
+                    />
+                  ) : (
+                    <Image
+                      key={activeDemo.id}
+                      src={activeDemo.mediaSrc}
+                      alt={activeDemo.mediaAlt}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 64rem"
+                      className={home.exampleImage}
+                    />
+                  )}
                 </motion.div>
 
                 <div className={home.demoTabs}>
@@ -226,24 +235,22 @@ export function MarketingHomePage() {
                   distance={18}
                 >
                   <div className={home.exampleMedia}>
-                    {item.mediaType === 'video' ? (
-                      <video
-                        className={home.exampleVideo}
-                        src={item.mediaSrc}
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                      />
-                    ) : (
+                    <Image
+                      src={item.mediaSrc}
+                      alt={item.mediaAlt}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 32rem"
+                      className={home.exampleImage}
+                    />
+                    <div className={home.exampleBadge}>
                       <Image
-                        src={item.mediaSrc}
-                        alt={item.mediaAlt}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 32rem"
-                        className={home.exampleImage}
+                        src={item.badgeSrc}
+                        alt={item.badgeAlt}
+                        width={72}
+                        height={72}
+                        className={home.exampleBadgeImage}
                       />
-                    )}
+                    </div>
                   </div>
 
                   <div className={home.exampleCopy}>

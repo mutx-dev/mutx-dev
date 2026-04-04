@@ -38,7 +38,9 @@ export type MarketingHomepage = {
         label: string
         title: string
         body: string
-        videoSrc: string
+        mediaType: 'image' | 'gif'
+        mediaSrc: string
+        mediaAlt: string
       }>
     }
     examples: {
@@ -52,9 +54,11 @@ export type MarketingHomepage = {
         scenario: string
         outcome: string
         proof: string[]
-        mediaType: 'video' | 'image' | 'gif'
+        mediaType: 'image' | 'gif'
         mediaSrc: string
         mediaAlt: string
+        badgeSrc: string
+        badgeAlt: string
       }>
     }
     proof: {
@@ -123,28 +127,36 @@ export const marketingHomepage: MarketingHomepage = {
           label: 'Runtime',
           title: 'Inspect what the agent actually did.',
           body: 'See the runtime surface where runs, tool calls, and outcomes stay visible instead of disappearing into prompt soup.',
-          videoSrc: '/marketing/carousel/runtime.mp4',
+          mediaType: 'gif',
+          mediaSrc: '/demo.gif',
+          mediaAlt: 'MUTX operator demo showing the runtime in motion',
         },
         {
           id: 'governance',
           label: 'Governance',
           title: 'Keep boundaries explicit.',
           body: 'Put access, policies, and operator decisions in the control layer where teams can review and enforce them.',
-          videoSrc: '/marketing/carousel/governance.mp4',
+          mediaType: 'image',
+          mediaSrc: '/landing/webp/docs-surface.webp',
+          mediaAlt: 'MUTX control surface showing runtime and governance views',
         },
         {
           id: 'layers',
           label: 'Layers',
           title: 'Deploy without rebuilding the path.',
           body: 'Move from local proof to a governed runtime through the same product surface instead of stitching together one-off tools.',
-          videoSrc: '/marketing/carousel/managed-layers.mp4',
+          mediaType: 'image',
+          mediaSrc: '/landing/webp/wiring-bay.webp',
+          mediaAlt: 'MUTX runtime wiring bay illustration',
         },
         {
-          id: 'cost',
-          label: 'Cost',
-          title: 'See usage before it becomes a problem.',
-          body: 'Track the cost and operational profile of agent work while it is still controllable, not after spend has already escaped.',
-          videoSrc: '/marketing/carousel/cost-awareness.mp4',
+          id: 'operator',
+          label: 'Operator lane',
+          title: 'Keep the release path readable.',
+          body: 'The same product surface that shows the run is the one that helps operators understand what ships next.',
+          mediaType: 'image',
+          mediaSrc: '/landing/webp/running-agent.webp',
+          mediaAlt: 'MUTX running agent artwork inside the product world',
         },
       ],
     },
@@ -164,9 +176,11 @@ export const marketingHomepage: MarketingHomepage = {
             'Keep the escalation path visible.',
             'Share the same runtime surface across the team.',
           ],
-          mediaType: 'video',
-          mediaSrc: '/marketing/cards/enterprise.mp4',
-          mediaAlt: 'Enterprise product card showing MUTX runtime and governance surfaces',
+          mediaType: 'image',
+          mediaSrc: '/landing/webp/docs-surface.webp',
+          mediaAlt: 'MUTX control surface showing runtime and governance surfaces',
+          badgeSrc: '/marketing/community/oncall.png',
+          badgeAlt: 'On-call incident agent portrait',
         },
         {
           id: 'developer-ops',
@@ -179,9 +193,11 @@ export const marketingHomepage: MarketingHomepage = {
             'Runtime actions stay inspectable.',
             'Release paths stay aligned with docs and artifacts.',
           ],
-          mediaType: 'video',
-          mediaSrc: '/marketing/cards/developer.mp4',
-          mediaAlt: 'Developer product card showing MUTX workflow and tooling surfaces',
+          mediaType: 'image',
+          mediaSrc: '/landing/webp/reading-bench.webp',
+          mediaAlt: 'MUTX operator reviewing a workflow surface',
+          badgeSrc: '/marketing/community/docs.png',
+          badgeAlt: 'Documentation builder agent portrait',
         },
         {
           id: 'security-review',
@@ -197,6 +213,8 @@ export const marketingHomepage: MarketingHomepage = {
           mediaType: 'image',
           mediaSrc: '/landing/webp/docs-surface.webp',
           mediaAlt: 'MUTX control surface showing runtime and documentation side by side',
+          badgeSrc: '/marketing/community/compliance.png',
+          badgeAlt: 'Compliance review agent portrait',
         },
       ],
     },
