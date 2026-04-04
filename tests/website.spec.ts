@@ -373,7 +373,7 @@ test.describe('mutx.dev QA', () => {
   test('homepage still assets stay single-use in the content model', async () => {
     const stillAssets = [
       marketingHomepage.hero.backgroundSrc,
-      marketingHomepage.salesSections.examples.items[2]?.mediaSrc,
+      marketingHomepage.salesSections.demo.tabs[2]?.mediaSrc,
     ];
 
     expect(new Set(stillAssets).size).toBe(stillAssets.length);
@@ -491,6 +491,8 @@ test.describe('mutx.dev QA', () => {
       /favicon/i,
       /Failed to load resource: the server responded with a status of 503 \(Service Unavailable\)/i,
       /Image corrupt or truncated/i,
+      /downloadable font: STAT: Invalid nameID: 17 .*Doto/i,
+      /downloadable font: Table discarded .*Doto/i,
     ];
 
     page.on('console', (msg) => {

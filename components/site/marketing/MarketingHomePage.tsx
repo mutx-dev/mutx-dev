@@ -168,6 +168,10 @@ export function MarketingHomePage() {
               <div className={home.demoStage}>
                 <motion.div
                   className={home.demoFrame}
+                  id={`demo-panel-${activeDemo.id}`}
+                  role="tabpanel"
+                  aria-labelledby={`demo-tab-${activeDemo.id}`}
+                  data-testid="homepage-demo-panel"
                   whileHover={
                     prefersReducedMotion
                       ? undefined
@@ -198,11 +202,15 @@ export function MarketingHomePage() {
                   )}
                 </motion.div>
 
-                <div className={home.demoTabs}>
+                <div className={home.demoTabs} role="tablist" aria-label="MUTX product demo views">
                   {marketingHomepage.salesSections.demo.tabs.map((tab) => (
                     <button
                       key={tab.id}
+                      id={`demo-tab-${tab.id}`}
                       type="button"
+                      role="tab"
+                      aria-selected={tab.id === activeDemo.id}
+                      aria-controls={`demo-panel-${tab.id}`}
                       className={home.demoTab}
                       data-active={tab.id === activeDemo.id ? '1' : '0'}
                       onClick={() => setActiveDemoId(tab.id)}

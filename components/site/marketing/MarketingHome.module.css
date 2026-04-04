@@ -433,7 +433,7 @@
 .proofSection,
 .finalSection {
   position: relative;
-  padding: clamp(3.4rem, 7vw, 5rem) 0;
+  padding: clamp(4.4rem, 8vw, 6.6rem) 0;
   border-top: 1px solid rgba(247, 244, 239, 0.08);
 }
 
@@ -519,12 +519,12 @@
 
 .demoLayout {
   display: grid;
-  gap: 1.4rem;
+  gap: 2rem;
 }
 
 .demoStage {
   display: grid;
-  gap: 1rem;
+  gap: 1.15rem;
 }
 
 .demoFrame,
@@ -594,6 +594,12 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+.demoTab:focus-visible,
+.secondaryAction:focus-visible {
+  outline: 2px solid rgba(125, 211, 252, 0.95);
+  outline-offset: 3px;
+}
+
 .demoTabLabel,
 .exampleEyebrow,
 .proofLaneLabel {
@@ -643,8 +649,8 @@
 .examplesGrid,
 .proofGrid {
   display: grid;
-  gap: 1rem;
-  margin-top: 1.4rem;
+  gap: 1.35rem;
+  margin-top: 2rem;
 }
 
 .exampleCard {
@@ -843,18 +849,12 @@
   .demoLayout {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     align-items: start;
-    gap: 1.4rem;
+    gap: 2rem;
   }
 
   .examplesGrid,
   .proofGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .finalInner {
-    grid-template-columns: minmax(0, 0.9fr) minmax(26rem, 1.1fr);
-    gap: 2.4rem;
-    align-items: center;
   }
 }
 
@@ -865,6 +865,12 @@
 
   .proofGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .finalInner {
+    grid-template-columns: minmax(0, 0.94fr) minmax(24rem, 1.06fr);
+    gap: 2.8rem;
+    align-items: center;
   }
 }
 
@@ -981,7 +987,7 @@
   .examplesSection,
   .proofSection,
   .finalSection {
-    padding: 3rem 0;
+    padding: 3.25rem 0;
   }
 
   .demoFrame,
