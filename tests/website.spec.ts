@@ -159,7 +159,7 @@ test.describe('mutx.dev QA', () => {
     }, { timeout: 5000 });
     await expect(loader).toBeVisible({ timeout: 5000 });
     await expectLoaderStageCentered(page, 'desktop');
-    await expect(page.locator('[data-testid="marketing-loader"] video')).not.toHaveAttribute('poster', /.+/);
+    await expect(page.locator('[data-testid="marketing-loader"] video')).toHaveAttribute('poster', /mutx-logo-loader-poster\.webp/i);
 
     await expect
       .poll(async () => {
@@ -188,11 +188,12 @@ test.describe('mutx.dev QA', () => {
     const visibilitySamples = await page.evaluate(async () => {
       const samples = [];
 
-      for (let index = 0; index < 12; index += 1) {
+      for (let index = 0; index < 16; index += 1) {
         const stage = document.querySelector('[data-testid="marketing-loader-stage"]');
         const video = document.querySelector('[data-testid="marketing-loader"] video');
         const heroMark = document.querySelector('[data-testid="homepage-lockup-mark"]');
         const heroContent = document.querySelector('[data-testid="homepage-hero-content"]');
+        const html = document.documentElement;
         const stageOpacity = stage ? Number.parseFloat(getComputedStyle(stage).opacity || '1') : 0;
         const videoOpacity = video ? Number.parseFloat(getComputedStyle(video).opacity || '1') : 0;
         const heroMarkOpacity = heroMark ? Number.parseFloat(getComputedStyle(heroMark).opacity || '1') : 0;
@@ -201,6 +202,7 @@ test.describe('mutx.dev QA', () => {
           : 1;
 
         samples.push({
+          state: html.dataset.loaderState || null,
           stageVisible: stageOpacity > 0.15,
           videoVisible: videoOpacity > 0.15,
           heroMarkVisible: heroMarkOpacity > 0.08,
@@ -213,16 +215,13 @@ test.describe('mutx.dev QA', () => {
       return samples;
     });
 
-    const firstVideoVisibleFrame = visibilitySamples.findIndex((sample) => sample.videoVisible);
-    const preVideoSamples =
-      firstVideoVisibleFrame === -1 ? visibilitySamples : visibilitySamples.slice(0, firstVideoVisibleFrame);
+    const beforeCompleteSamples = visibilitySamples.filter((sample) => sample.state !== 'complete');
 
-    expect(visibilitySamples.every((sample) => sample.stageVisible || sample.heroMarkVisible)).toBe(true);
-    expect(visibilitySamples.some((sample) => sample.stageVisible)).toBe(true);
-    expect(
-      visibilitySamples.filter((sample) => sample.stageVisible).every((sample) => sample.heroContentHidden),
-    ).toBe(true);
-    expect(preVideoSamples.every((sample) => !sample.heroMarkVisible)).toBe(true);
+    expect(beforeCompleteSamples.length).toBeGreaterThan(0);
+    expect(beforeCompleteSamples.every((sample) => sample.stageVisible)).toBe(true);
+    expect(beforeCompleteSamples.every((sample) => sample.videoVisible)).toBe(true);
+    expect(beforeCompleteSamples.every((sample) => !sample.heroMarkVisible)).toBe(true);
+    expect(beforeCompleteSamples.every((sample) => sample.heroContentHidden)).toBe(true);
 
     await expect(loader).toBeHidden({ timeout: 9000 });
     await expect(html).toHaveAttribute('data-loader-state', 'complete');
