@@ -23,6 +23,7 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}): Promise
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   return withErrorHandling(async (_req: Request) => {
+  return withErrorHandling(async (_req: Request) => {
     const refreshToken = getRefreshToken(request)
     if (!refreshToken) {
       return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 })
