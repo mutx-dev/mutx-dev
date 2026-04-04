@@ -6,6 +6,7 @@ import { Activity, AlertTriangle, Bot, Layers3, Wallet, Webhook } from "lucide-r
 import { ApiRequestError, normalizeCollection, readJson } from "@/components/app/http";
 import {
   BriefingBar,
+  FlowStatusBar,
   LiveAuthRequired,
   LiveEmptyState,
   LiveErrorState,
@@ -298,6 +299,17 @@ export function DashboardOverviewPageClient() {
       status: (liveAgents.length > 0 ? "healthy" : "unknown") as "healthy" | "degraded" | "critical" | "unknown",
     },
     {
+      label: "Queue",
+      value: runHealth.total > 0
+        ? `${runs.filter((r) => !r.completed_at).length} in flight`
+        : "empty",
+      status: (runHealth.failed > 0
+        ? "degraded"
+        : runs.filter((r) => !r.completed_at).length > 0
+          ? "healthy"
+          : "unknown") as "healthy" | "degraded" | "critical" | "unknown",
+    },
+    {
       label: "Runs",
       value: runHealth.total > 0
         ? `${runHealth.completed} ok · ${runHealth.failed} failed`
@@ -307,11 +319,6 @@ export function DashboardOverviewPageClient() {
         : runHealth.total > 0
           ? "healthy"
           : "unknown") as "healthy" | "degraded" | "critical" | "unknown",
-    },
-    {
-      label: "In flight",
-      value: String(runs.filter((r) => !r.completed_at).length),
-      status: (runs.filter((r) => !r.completed_at).length > 0 ? "healthy" : "unknown") as "healthy" | "degraded" | "critical" | "unknown",
     },
     {
       label: "Alerts",
@@ -386,6 +393,19 @@ export function DashboardOverviewPageClient() {
         />
       </LiveKpiGrid>
 
+      {runs.length > 0 && (
+        <LivePanel title="Run flow" meta="queue orchestration">
+          <FlowStatusBar
+            stages={[
+              { status: "pending", count: runs.filter((r) => r.status === "created" || r.status === "queued").length, maxCount: runs.length },
+              { status: "running", count: runs.filter((r) => r.status === "running" && !r.completed_at).length, maxCount: runs.length },
+              { status: "completed", count: runs.filter((r) => r.status === "completed").length, maxCount: runs.length },
+              { status: "failed", count: runs.filter((r) => r.status === "failed").length, maxCount: runs.length },
+            ]}
+          />
+        </LivePanel>
+      )}
+
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.85fr)]">
         <div className="grid gap-4">
           <LivePanel title="Operator posture" meta="first viewport">
@@ -427,27 +447,36 @@ export function DashboardOverviewPageClient() {
                 message="Runs will appear here once an owned agent has executed inside the current session boundary."
               />
             ) : (
-              <div className="grid gap-3">
-                {runs.slice(0, 5).map((run) => (
-                  <div
-                    key={run.id}
-                    className="grid gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-4 md:grid-cols-[minmax(0,1fr)_auto]"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate font-mono text-sm text-white">{run.id}</p>
-                      <p className="mt-1 text-sm text-slate-400">
-                        Agent {run.agent_id.slice(0, 8)} · {run.trace_count} traces · {formatRelativeTime(run.started_at)}
-                      </p>
+              <div className="grid gap-4">
+                <FlowStatusBar
+                  stages={[
+                    { status: "pending", count: runs.filter((r) => r.status === "created" || r.status === "queued").length, maxCount: runs.length },
+                    { status: "running", count: runs.filter((r) => r.status === "running" && !r.completed_at).length, maxCount: runs.length },
+                    { status: "completed", count: runs.filter((r) => r.status === "completed").length, maxCount: runs.length },
+                    { status: "failed", count: runs.filter((r) => r.status === "failed").length, maxCount: runs.length },
+                  ]}
+                />
+                <div className="grid gap-3">
+                  {runs.slice(0, 5).map((run) => (
+                    <div
+                      key={run.id}
+                      className="grid gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-4 md:grid-cols-[minmax(0,1fr)_auto]"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate font-mono text-sm text-white">{run.id}</p>
+                        <p className="mt-1 text-sm text-slate-400">
+                          Agent {run.agent_id.slice(0, 8)} · {run.trace_count} traces · {formatRelativeTime(run.started_at)}
+                        </p>
+                      </div>
+                      <div className="flex items-start justify-between gap-3 md:flex-col md:items-end">
+                        <StatusBadge status={asDashboardStatus(run.status)} label={run.status} />
+                        <span className="text-xs text-slate-500">
+                          {run.completed_at ? formatRelativeTime(run.completed_at) : "in flight"}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-start justify-between gap-3 md:flex-col md:items-end">
-                      <StatusBadge status={asDashboardStatus(run.status)} label={run.status} />
-                      <span className="text-xs text-slate-500">
-                        {run.completed_at ? formatRelativeTime(run.completed_at) : "in flight"}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
             )}
           </LivePanel>
         </div>
