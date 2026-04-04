@@ -77,6 +77,15 @@ for a request with 10 line items.
 
 ## Verifying a Lane Completed Its Work
 
+Successful autonomy substrate runs now attempt the full handoff automatically:
+- commit tracked worktree changes
+- push the active worktree branch to the default remote
+- create a draft PR by default when GitHub CLI is installed and authenticated
+- promote the PR to ready-for-review only when the task is explicitly low-risk (`autonomy:safe` or `risk:low` plus `size:xs|size:s`) and the changed files stay inside low-risk `opencode` or docs-only paths
+- enable GitHub auto-merge only for the same explicitly safe tasks when verification passed and the change is very small (3 files or fewer)
+
+If `gh` is missing or not authenticated, the run still completes locally and records a partial handoff in `reports/autonomy-status.jsonl` so an operator can push or open the PR manually. Any task outside those low-risk guards stays on a draft PR for human review.
+
 1. Check for an open PR linked to the issue:
    - The PR title should include the issue number (e.g., `fix: resolve N+1 in usage #123`).
    - The PR body should reference the issue.
@@ -95,6 +104,59 @@ for a request with 10 line items.
    - Confirm Node version requirement in `package.json` or runtime config matches the declared runtime (Node 22.14+)
 
 5. Merge if all checks pass. The dispatch workflow will close the issue automatically when the PR is merged.
+
+## Local Always-On Autonomy Daemon Operations
+
+The new autonomy daemon is managed by:
+- `scripts/autonomy/daemon-launcher.sh`
+- `scripts/autonomy/daemon-watchdog.sh`
+- `scripts/autonomy/daemon_main.py`
+
+Default operational files:
+- pid: `.autonomy/daemon.pid`
+- lock: `.autonomy/daemon.lock`
+- heartbeat/status: `.autonomy/daemon-status.json`
+- daemon log: `reports/autonomy-daemon.log`
+- watchdog log: `reports/autonomy-watchdog.log`
+- status event stream: `reports/autonomy-status.jsonl`
+
+Basic control:
+
+```bash
+scripts/autonomy/daemon-launcher.sh start
+scripts/autonomy/daemon-launcher.sh status
+scripts/autonomy/daemon-launcher.sh restart
+scripts/autonomy/daemon-launcher.sh stop
+```
+
+Watchdog usage:
+
+```bash
+scripts/autonomy/daemon-watchdog.sh
+```
+
+Recommended cron cadence for the watchdog is every 2-5 minutes. The watchdog only restarts the daemon when the process is gone or the heartbeat in `.autonomy/daemon-status.json` is stale.
+
+Operational notes:
+- The daemon now takes an exclusive lock via `.autonomy/daemon.lock`, so a second launcher invocation will not create a duplicate worker.
+- The daemon can drain a small burst of queued work per cycle with bounded concurrency: by default it launches up to 2 active runners total and never more than 1 active runner per execution lane (`codex`, `opencode`, or `main`).
+- Burst and concurrency are configurable with `--burst-size`, `--max-active-runners`, and `--active-poll-seconds` on `scripts/autonomy/daemon_main.py`.
+- Codex/opencode/main pause semantics remain intact: paused lanes are parked instead of being dispatched, and active lanes are not double-booked.
+- Idle status reports are rate-limited to reduce `reports/autonomy-status.jsonl` noise while the queue is empty.
+- If `.autonomy/fleet.json` exists, the daemon opportunistically runs `generate_fleet_tasks.py` on idle intervals and enqueues bounded generated work.
+- Launcher start rotates oversized daemon logs before boot to keep always-on use low-waste.
+
+Useful checks:
+
+```bash
+python3 -m json.tool .autonomy/daemon-status.json
+python3 - <<'PY'
+import json
+from pathlib import Path
+path = Path('reports/autonomy-status.jsonl')
+print(path.read_text().splitlines()[-5:])
+PY
+```
 
 ## Disable / Enable Always-On Processes
 

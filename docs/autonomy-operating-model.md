@@ -41,6 +41,7 @@ These are implemented as long-running processes or scheduled workflows in `.gith
 All specialist agents except the 4 always-on processes are ephemeral:
 
 - Each agent invocation starts, does one unit of work, and exits.
+- The local autonomy daemon may launch a small burst of these ephemeral workers per polling cycle, but it keeps concurrency bounded: one active worker per execution lane and a small global cap.
 - Agents pull from the backlog independently -- no push, no handoff.
 - If an agent crashes, it leaves its claim on the issue and a reviewer must release it or the stale-claim timeout (default 120 minutes) reclaims it.
 
@@ -48,7 +49,7 @@ All specialist agents except the 4 always-on processes are ephemeral:
 
 1. **No asking questions.** Agents must make a best-effort decision and proceed. If information is missing, the agent must infer from existing code, tests, or documentation. If that is insufficient, the agent closes the issue with a `cannot-reproduce` or `needs-investigation` label rather than asking.
 
-2. **No fake work.** Agents must not create branches, PRs, or comments that do not change behavior. Validation must reflect real functionality.
+2. **No fake work.** Agents must not create branches, PRs, or comments that do not change behavior. Validation must reflect real functionality. The new autonomy worktree substrate may auto-push and open draft PRs, but only after verification passes and a real commit exists.
 
 3. **No report-only automation.** Dashboards, metrics exports, and status reports generated automatically must be accompanied by at least one actionable response loop. A metric that no one acts on is not automation -- it is noise.
 
