@@ -71,8 +71,12 @@ export function FilterBar({
             color: dashboardTokens.textSubtle,
           }}
         >
-          <Search className="h-4 w-4 shrink-0" style={{ color: dashboardTokens.textMuted }} />
+          <Search className="h-4 w-4 shrink-0" style={{ color: dashboardTokens.textMuted }} aria-hidden="true" />
+          <label htmlFor="filterbar-search" className="sr-only">
+            {searchPlaceholder}
+          </label>
           <input
+            id="filterbar-search"
             ref={searchInputRef}
             value={searchValue}
             onChange={(event) => onSearchChange(event.currentTarget.value)}
@@ -80,7 +84,6 @@ export function FilterBar({
             placeholder={searchPlaceholder}
             className="w-full border-0 bg-transparent text-sm outline-none"
             style={{ color: dashboardTokens.textPrimary }}
-            aria-label={searchPlaceholder}
           />
         </div>
 
