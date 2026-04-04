@@ -104,7 +104,7 @@ If an operator cannot answer who owns a resource, what changed, what failed, and
 ### 6. Small Surfaces, Strong Guarantees
 We would rather have a smaller system with real semantics than a larger one full of implied behavior.
 
-## Why Open Source
+## Why Source-Available
 
 Agent infrastructure should be inspectable.
 The control layer around deployment, auth, API keys, and operational workflows should not be magic.
