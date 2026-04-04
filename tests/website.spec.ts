@@ -299,22 +299,32 @@ test.describe('mutx.dev QA', () => {
     await expect(html).toHaveAttribute('data-loader-state', 'complete', { timeout: 2000 });
   });
 
-  test('landing page exposes the stripped proof band, depth narrative, and final CTA only', async ({ page }) => {
+  test('landing page exposes the premium feature grid, agent showcase, operator section, and final CTA only', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByTestId('marketing-loader')).toBeHidden({ timeout: 9000 });
+    await page.evaluate(() => {
+      window.sessionStorage.setItem('mutx-home-loader-played', '1');
+      document.documentElement.setAttribute('data-home-loader-played', '1');
+      document.documentElement.setAttribute('data-loader-state', 'complete');
+    });
+    await page.waitForTimeout(150);
 
     await expect(
-      page.getByRole('heading', { name: new RegExp(marketingHomepage.proofStrip.title, 'i') })
+      page.getByRole('heading', { name: new RegExp(marketingHomepage.featureGrid.title, 'i') })
     ).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: new RegExp(marketingHomepage.depthNarrative.title, 'i') })
+      page.getByRole('heading', { name: new RegExp(marketingHomepage.agentShowcase.title, 'i') })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: new RegExp(marketingHomepage.operatorSection.title, 'i') })
     ).toBeVisible();
     await expect(
       page.getByRole('heading', { name: new RegExp(marketingHomepage.finalCta.title, 'i') })
     ).toBeVisible();
     await expect(page.locator('[data-testid="homepage-proof-strip"] img')).toHaveCount(0);
+    await expect(page.locator('[data-testid="homepage-agent-showcase"] svg')).toHaveCount(9);
+    await expect(page.locator('[data-testid="homepage-agent-marquee"]')).toBeVisible();
     await expect(page.locator('[data-testid="homepage-depth-section"] video')).toHaveCount(0);
-    await expect(page.getByTestId('homepage-depth-image')).toHaveAttribute('src', /wiring-bay\.webp/i);
+    await expect(page.getByTestId('homepage-depth-image')).toHaveAttribute('src', /docs-surface\.webp/i);
     await expect(page.getByTestId('homepage-demo-preview').locator('img')).toHaveAttribute('src', /demo\.gif/i);
     await expect(page.getByText(/^OPEN CONTROL\. SHIP CLEANLY\.$/)).toHaveCount(0);
     await expect(page.getByRole('button', { name: /next slide/i })).toHaveCount(0);
@@ -324,6 +334,7 @@ test.describe('mutx.dev QA', () => {
     const lowerSectionVisibility = await page.evaluate(() => {
       const selectors = [
         '[data-testid="homepage-proof-strip"] h2',
+        '[data-testid="homepage-agent-showcase"] h2',
         '[data-testid="homepage-depth-section"] h2',
         '[data-testid="homepage-final-cta"] h2',
       ];
@@ -406,7 +417,7 @@ test.describe('mutx.dev QA', () => {
   test('homepage still assets stay single-use in the content model', async () => {
     const stillAssets = [
       marketingHomepage.hero.backgroundSrc,
-      marketingHomepage.depthNarrative.media.posterSrc,
+      marketingHomepage.operatorSection.preview.imageSrc,
     ];
 
     expect(new Set(stillAssets).size).toBe(stillAssets.length);

@@ -402,27 +402,87 @@
   transition-delay: 0s;
 }
 
+.heroMarquee {
+  position: relative;
+  overflow: hidden;
+  padding: 0.95rem 0 1.1rem;
+  border-top: 1px solid rgba(247, 244, 239, 0.08);
+  border-bottom: 1px solid rgba(247, 244, 239, 0.08);
+  background:
+    linear-gradient(180deg, rgba(4, 6, 9, 0.96), rgba(7, 9, 13, 0.98));
+}
+
+.heroMarquee::before,
+.heroMarquee::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6rem;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.heroMarquee::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(5, 7, 11, 1), rgba(5, 7, 11, 0));
+}
+
+.heroMarquee::after {
+  right: 0;
+  background: linear-gradient(270deg, rgba(5, 7, 11, 1), rgba(5, 7, 11, 0));
+}
+
+.heroMarqueeTrack {
+  display: flex;
+  gap: 0.85rem;
+  width: max-content;
+  animation: agentMarquee 32s linear infinite;
+}
+
+.heroMarqueePill {
+  min-height: 2.4rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(247, 244, 239, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(247, 244, 239, 0.8);
+  font-family: var(--font-marketing-accent), sans-serif;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .proofSection {
   position: relative;
-  padding: clamp(2.9rem, 6vw, 4.1rem) 0;
+  padding: clamp(3.4rem, 7vw, 5.4rem) 0;
   color: #f7f4ef;
   background:
+    radial-gradient(circle at 80% 16%, rgba(92, 152, 255, 0.18), transparent 20rem),
     linear-gradient(180deg, rgba(8, 10, 14, 0.98), rgba(7, 8, 12, 1));
   border-top: 1px solid rgba(247, 244, 239, 0.08);
 }
 
 .proofHeader,
+.agentHeader,
 .depthIntro,
-.finalInner {
+.finalInner,
+.depthPanelHeader {
   display: grid;
   gap: 0.85rem;
 }
 
-.proofHeader {
-  max-width: 35rem;
+.proofHeader,
+.agentHeader {
+  max-width: 40rem;
 }
 
 .proofSection .sectionEyebrow,
+.agentSection .sectionEyebrow,
 .finalSection .sectionEyebrow {
   border-color: rgba(247, 244, 239, 0.14);
   background: rgba(255, 255, 255, 0.04);
@@ -431,73 +491,280 @@
 .sectionTitle {
   margin: 0;
   font-family: var(--font-marketing-sans), sans-serif;
-  font-size: clamp(2.05rem, 4vw, 3.35rem);
+  font-size: clamp(2.2rem, 4.4vw, 3.8rem);
   font-weight: 500;
-  line-height: 1.02;
-  letter-spacing: -0.055em;
+  line-height: 0.95;
+  letter-spacing: -0.065em;
 }
 
 .sectionBody {
   margin: 0;
   font-size: 1.02rem;
-  line-height: 1.62;
+  line-height: 1.58;
 }
 
 .proofSection .sectionTitle,
 .proofSection .sectionBody,
+.agentSection .sectionTitle,
+.agentSection .sectionBody,
 .finalSection .sectionTitle,
 .finalSection .sectionBody {
   color: #f7f4ef;
 }
 
 .proofSection .sectionBody,
+.agentSection .sectionBody,
 .finalSection .sectionBody {
-  color: rgba(247, 244, 239, 0.74);
+  color: rgba(247, 244, 239, 0.72);
 }
 
-.proofStrip {
+.statRail {
   display: grid;
-  gap: 0.9rem;
-  margin-top: 1.4rem;
+  gap: 0.85rem;
+  margin-top: 1.5rem;
 }
 
-.proofItem {
+.statPill {
   display: grid;
-  gap: 0.45rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid rgba(247, 244, 239, 0.12);
+  gap: 0.28rem;
+  padding: 1rem 1.05rem;
+  border-radius: 1.3rem;
+  border: 1px solid rgba(247, 244, 239, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.proofLabel {
+.statValue {
+  font-size: clamp(1.6rem, 2vw, 2.1rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.statLabel {
+  color: rgba(247, 244, 239, 0.68);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.featureGrid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.featureCard {
+  display: grid;
+  gap: 0.78rem;
+  padding: 1.2rem;
+  border: 1px solid rgba(247, 244, 239, 0.1);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(105, 172, 255, 0.1), transparent 8rem),
+    rgba(255, 255, 255, 0.03);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 18px 40px rgba(1, 7, 18, 0.14);
+}
+
+.featureCardEyebrow,
+.depthPanelEyebrow,
+.depthStepIndex,
+.agentSlug,
+.agentFeaturedLabel {
   margin: 0;
-  color: rgba(247, 244, 239, 0.54);
   font-family: var(--font-marketing-accent), sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-.proofValue {
-  max-width: 19rem;
+.featureCardEyebrow,
+.agentSlug {
+  color: rgba(247, 244, 239, 0.5);
+}
+
+.featureCardTitle,
+.depthPanelTitle,
+.depthStepTitle,
+.agentName,
+.agentFeaturedName {
   margin: 0;
-  color: rgba(247, 244, 239, 0.92);
-  font-size: 1rem;
+  font-size: clamp(1.38rem, 2vw, 1.9rem);
   font-weight: 600;
-  line-height: 1.32;
-  letter-spacing: -0.02em;
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+}
+
+.featureCardTitle,
+.agentName,
+.agentFeaturedName {
+  color: #f7f4ef;
+}
+
+.featureCardBody,
+.depthPanelBody,
+.depthStepBody,
+.depthPanelListItem,
+.agentSummary,
+.agentFeaturedSummary,
+.agentCapabilityItem {
+  margin: 0;
+  line-height: 1.58;
+}
+
+.featureCardBody,
+.agentSummary,
+.agentFeaturedSummary,
+.agentCapabilityItem {
+  color: rgba(247, 244, 239, 0.76);
+}
+
+.agentSection {
+  position: relative;
+  padding: clamp(3.6rem, 7vw, 5.4rem) 0;
+  color: #f7f4ef;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(92, 152, 255, 0.12), transparent 18rem),
+    linear-gradient(180deg, rgba(9, 11, 16, 1), rgba(5, 6, 9, 1));
+  border-top: 1px solid rgba(247, 244, 239, 0.08);
+}
+
+.agentFeaturedLayout {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.6rem;
+}
+
+.agentFeatured {
+  display: grid;
+  gap: 1.1rem;
+  padding: 1.25rem;
+  border-radius: 1.8rem;
+  border: 1px solid rgba(247, 244, 239, 0.12);
+  background:
+    radial-gradient(circle at 78% 18%, rgba(111, 183, 255, 0.22), transparent 16rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 60px rgba(0, 9, 24, 0.2);
+}
+
+.agentFeaturedTopline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
+}
+
+.agentFeaturedLabel {
+  width: fit-content;
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.82rem;
+  border-radius: 999px;
+  border: 1px solid rgba(247, 244, 239, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(247, 244, 239, 0.84);
+}
+
+.agentFeaturedHeader {
+  display: grid;
+  gap: 1rem;
+}
+
+.agentFeaturedIconWrap,
+.agentIconWrap {
+  width: 3rem;
+  height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  border: 1px solid rgba(247, 244, 239, 0.12);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(119, 185, 255, 0.2), transparent 65%),
+    rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.agentFeaturedIconWrap {
+  width: 3.8rem;
+  height: 3.8rem;
+  border-radius: 1.2rem;
+}
+
+.agentFeaturedIcon,
+.agentIcon {
+  color: rgba(247, 244, 239, 0.92);
+}
+
+.agentFeaturedIcon {
+  width: 1.45rem;
+  height: 1.45rem;
+}
+
+.agentIcon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.agentFeaturedCopy,
+.agentCardTopline,
+.agentCardCopy {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.agentFeaturedQuote {
+  margin: 0;
+  color: #f7f4ef;
+  font-family: var(--font-marketing-display), serif;
+  font-size: clamp(1.5rem, 2.2vw, 2.2rem);
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+}
+
+.agentCapabilityList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.agentCapabilityItem {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(247, 244, 239, 0.1);
+  color: rgba(247, 244, 239, 0.86);
+  font-weight: 600;
+}
+
+.agentGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.agentCard {
+  display: grid;
+  gap: 1rem;
+  padding: 1.15rem;
+  border-radius: 1.55rem;
+  border: 1px solid rgba(247, 244, 239, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.025));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 18px 38px rgba(0, 7, 18, 0.18);
 }
 
 .depthSection {
   position: relative;
-  padding: clamp(3.5rem, 7vw, 5.1rem) 0;
+  padding: clamp(3.8rem, 7vw, 5.5rem) 0;
   background: rgba(248, 246, 243, 0.98);
   color: #131a24;
-}
-
-.depthIntro {
-  max-width: 38rem;
 }
 
 .depthSection .sectionEyebrow {
@@ -506,125 +773,59 @@
   color: rgba(19, 26, 36, 0.72);
 }
 
-.depthSection .sectionTitle {
+.depthSection .sectionTitle,
+.depthPanelTitle,
+.depthStepTitle {
   color: #131a24;
 }
 
-.depthSection .sectionBody {
-  color: rgba(19, 26, 36, 0.74);
+.depthSection .sectionBody,
+.depthPanelBody,
+.depthStepBody {
+  color: rgba(19, 26, 36, 0.72);
 }
 
 .depthLayout {
   display: grid;
-  gap: 1.65rem;
-  margin-top: 1.45rem;
+  gap: 1.5rem;
 }
 
-.depthSteps {
+.depthPanel {
   display: grid;
   gap: 1rem;
+  padding: 1.1rem;
+  border-radius: 1.75rem;
+  border: 1px solid rgba(19, 26, 36, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.7));
+  box-shadow: 0 24px 70px rgba(13, 19, 32, 0.08);
 }
 
-.depthStep {
-  display: grid;
-  gap: 0.72rem;
-  padding-top: 0.95rem;
-  border-top: 1px solid rgba(19, 26, 36, 0.12);
-}
-
+.depthPanelEyebrow,
 .depthStepIndex {
-  margin: 0;
-  color: rgba(19, 26, 36, 0.4);
-  font-family: var(--font-marketing-accent), sans-serif;
-  font-size: 0.9rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  color: rgba(19, 26, 36, 0.44);
 }
 
-.depthStepCopy {
+.depthContent {
   display: grid;
-  gap: 0.42rem;
+  gap: 1.6rem;
 }
 
-.depthStepTitle {
-  margin: 0;
-  color: #131a24;
-  font-size: clamp(1.42rem, 2vw, 1.95rem);
-  font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: -0.04em;
-}
-
-.depthStepBody,
-.depthStepDetail {
-  margin: 0;
-  line-height: 1.6;
-}
-
-.depthStepBody {
-  color: rgba(19, 26, 36, 0.8);
-}
-
-.depthStepDetail {
-  color: rgba(19, 26, 36, 0.62);
-  font-weight: 600;
-}
-
-.depthMediaColumn {
-  position: relative;
-}
-
-.depthMediaSticky {
-  position: relative;
+.depthIntro {
+  max-width: 34rem;
 }
 
 .depthMediaFrame {
   position: relative;
   overflow: hidden;
-  min-height: clamp(24rem, 58vw, 38rem);
-  border-radius: 1.8rem;
-  border: 1px solid rgba(19, 26, 36, 0.12);
+  min-height: clamp(21rem, 52vw, 33rem);
+  border-radius: 1.45rem;
+  border: 1px solid rgba(19, 26, 36, 0.08);
   background:
     radial-gradient(circle at 18% 16%, rgba(74, 139, 255, 0.18), transparent 17rem),
     linear-gradient(180deg, rgba(12, 16, 24, 0.98), rgba(8, 10, 14, 1));
-  box-shadow: 0 28px 70px rgba(4, 9, 22, 0.14);
 }
 
-.depthMediaGlow {
-  position: absolute;
-  inset: auto auto 10% 8%;
-  width: 38%;
-  aspect-ratio: 1;
-  border-radius: 999px;
-  background: radial-gradient(circle, rgba(103, 189, 255, 0.3) 0%, rgba(103, 189, 255, 0) 70%);
-  filter: blur(22px);
-  z-index: 1;
-}
-
-.depthMediaLabel {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  z-index: 2;
-  min-height: 2rem;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 0.82rem;
-  border-radius: 999px;
-  border: 1px solid rgba(247, 244, 239, 0.14);
-  background: rgba(6, 8, 12, 0.48);
-  color: rgba(247, 244, 239, 0.9);
-  font-family: var(--font-marketing-accent), sans-serif;
-  font-size: 0.76rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.depthPoster,
 .depthPoster {
   width: 100%;
   height: 100%;
@@ -632,9 +833,38 @@
   display: block;
 }
 
+.depthPanelList {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.depthPanelListItem {
+  padding-top: 0.72rem;
+  border-top: 1px solid rgba(19, 26, 36, 0.1);
+  color: rgba(19, 26, 36, 0.82);
+  font-weight: 600;
+}
+
+.depthSteps {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.depthStep {
+  display: grid;
+  gap: 0.72rem;
+  padding: 1rem 0 0;
+  border-top: 1px solid rgba(19, 26, 36, 0.12);
+}
+
+.depthStepCopy {
+  display: grid;
+  gap: 0.42rem;
+}
+
 .finalSection {
   position: relative;
-  padding: clamp(3.3rem, 7vw, 4.8rem) 0;
+  padding: clamp(3.4rem, 7vw, 4.9rem) 0;
   color: #f7f4ef;
   background:
     radial-gradient(circle at 78% 26%, rgba(90, 151, 255, 0.18), transparent 20rem),
@@ -644,13 +874,28 @@
 
 .finalInner {
   display: grid;
-  gap: 1.2rem;
+  gap: 1.4rem;
 }
 
 .finalCopy {
   display: grid;
   gap: 0.78rem;
   max-width: 31rem;
+}
+
+.finalActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.2rem;
+}
+
+.heroSecondaryActions,
+.finalSecondaryActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.95rem 1.15rem;
+  align-items: center;
 }
 
 .finalPreview {
@@ -662,8 +907,6 @@
 .finalPreviewDevice {
   position: relative;
   display: grid;
-  justify-items: center;
-  gap: 0.85rem;
 }
 
 .finalPreviewScreen {
@@ -682,39 +925,6 @@
     0 34px 90px rgba(0, 7, 20, 0.28);
 }
 
-.finalPreviewLabel {
-  position: absolute;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 2;
-  min-height: 2rem;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 0.82rem;
-  border-radius: 999px;
-  border: 1px solid rgba(247, 244, 239, 0.16);
-  background: rgba(7, 9, 14, 0.54);
-  color: rgba(247, 244, 239, 0.9);
-  font-family: var(--font-marketing-accent), sans-serif;
-  font-size: 0.76rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  opacity: 0;
-  transform: translate3d(0, 0.45rem, 0);
-  transition:
-    opacity 180ms ease,
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-  pointer-events: none;
-}
-
-.finalPreviewDevice:hover .finalPreviewLabel,
-.finalPreviewDevice:focus-within .finalPreviewLabel {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
 .finalPreviewImage {
   display: block;
   width: 100%;
@@ -725,43 +935,19 @@
   background: linear-gradient(180deg, rgba(9, 11, 16, 1), rgba(5, 6, 9, 1));
 }
 
-.finalPreviewStand {
-  position: relative;
-  width: 32%;
-  height: 1rem;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(144, 156, 177, 0.24), rgba(53, 61, 78, 0.18));
-  box-shadow: 0 12px 26px rgba(0, 7, 20, 0.24);
-}
-
-.finalPreviewStand::before {
-  content: "";
-  position: absolute;
-  bottom: calc(100% - 0.1rem);
-  left: 50%;
-  width: 18%;
-  height: 1.8rem;
-  border-radius: 999px 999px 0.8rem 0.8rem;
-  transform: translateX(-50%);
-  background: linear-gradient(180deg, rgba(160, 174, 198, 0.28), rgba(58, 66, 84, 0.22));
-}
-
-.finalPreviewStand::after {
-  content: "";
-  position: absolute;
-  top: -0.2rem;
-  left: 50%;
-  width: 66%;
-  height: 0.55rem;
-  border-radius: 999px;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.1);
-}
-
 @media (min-width: 760px) {
-  .proofStrip {
+  .statRail {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
+  }
+
+  .agentFeaturedHeader {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .featureGrid,
+  .agentGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .finalInner {
@@ -772,13 +958,27 @@
 }
 
 @media (min-width: 980px) {
-  .depthLayout {
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-    gap: 2.15rem;
+  .featureGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .agentFeaturedLayout {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr);
+    gap: 1.2rem;
     align-items: start;
   }
 
-  .depthMediaSticky {
+  .agentGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .depthLayout {
+    grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+    gap: 2.4rem;
+    align-items: start;
+  }
+
+  .depthPanel {
     position: sticky;
     top: 1.5rem;
   }
@@ -894,9 +1094,23 @@
   }
 
   .proofSection,
+  .agentSection,
   .depthSection,
   .finalSection {
     padding: 3rem 0;
+  }
+
+  .heroMarquee::before,
+  .heroMarquee::after {
+    width: 2.5rem;
+  }
+
+  .featureCard,
+  .agentCard,
+  .agentFeatured,
+  .depthPanel,
+  .statPill {
+    padding: 1rem;
   }
 
   .finalPreview {
@@ -906,14 +1120,6 @@
   .finalPreviewScreen {
     aspect-ratio: 1.45;
     padding: 0.72rem;
-  }
-
-  .finalPreviewLabel {
-    display: none;
-  }
-
-  .finalPreviewStand {
-    width: 38%;
   }
 }
 
@@ -928,8 +1134,18 @@
   }
 }
 
+@keyframes agentMarquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .marketingBackdropImage {
+  .marketingBackdropImage,
+  .heroMarqueeTrack {
     animation: none;
   }
 }
