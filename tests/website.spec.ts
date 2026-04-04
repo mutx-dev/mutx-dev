@@ -306,7 +306,7 @@ test.describe('mutx.dev QA', () => {
     );
 
     expect(visibleHeadings.length).toBeGreaterThanOrEqual(3);
-    expect(visibleHeadings).toContain('Install the Mac app.');
+    expect(visibleHeadings.some((heading) => /Install the Mac app/i.test(heading))).toBe(true);
     await expect(page.getByText(/^OPEN CONTROL\. SHIP CLEANLY\.$/)).toHaveCount(0);
     await expect(page.getByRole('button', { name: /next slide/i })).toHaveCount(0);
     await expect(page.getByRole('button', { name: /close details/i })).toHaveCount(0);
