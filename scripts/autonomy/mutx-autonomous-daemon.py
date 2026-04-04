@@ -151,14 +151,19 @@ def implement_by_area(item, wt, area):
         if m:
             mod = re.sub(r'[^a-zA-Z0-9_]', '', m.group(1))
             if mod:
+                module_name = f"mutx.{mod}"
                 test_file = f"{WT_BACK}/tests/sdk/test_{mod}.py"
                 os.makedirs(os.path.dirname(test_file), exist_ok=True)
                 with open(test_file, "w") as f:
-                    f.write(f'"""Auto-generated smoke test for `mutx.{mod}`."""\n\n')
-                    f.write("import importlib\n\n")
-                    f.write(f"def test_{mod}_module_imports():\n")
-                    f.write(f"    module = importlib.import_module('mutx.{mod}')\n")
-                    f.write("    assert module is not None\n")
+                    f.write(
+                        f'"""Auto-generated smoke tests for `{module_name}`."""\n\n'
+                        "import importlib\n\n"
+                        f"MODULE_NAME = '{module_name}'\n\n"
+                        f"def test_{mod}_module_imports():\n"
+                        "    module = importlib.import_module(MODULE_NAME)\n"
+                        "    assert module is not None\n"
+                        "    assert module.__name__ == MODULE_NAME\n"
+                    )
                 log(f"  Created test stub: tests/sdk/test_{mod}.py")
                 return True
 
