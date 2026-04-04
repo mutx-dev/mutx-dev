@@ -334,6 +334,7 @@ export function ApiKeysPageClient() {
                   id="new-api-key-name"
                   value={newKeyName}
                   onChange={(event) => setNewKeyName(event.target.value)}
+                  aria-label="Key name"
                   className="mt-2 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white outline-none transition focus:border-cyan-400/40"
                   placeholder="Operator key"
                 />
