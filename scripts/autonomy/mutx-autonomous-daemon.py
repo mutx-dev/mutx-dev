@@ -154,12 +154,11 @@ def implement_by_area(item, wt, area):
                 test_file = f"{WT_BACK}/tests/sdk/test_{mod}.py"
                 os.makedirs(os.path.dirname(test_file), exist_ok=True)
                 with open(test_file, "w") as f:
-                    f.write(f"# Auto-generated test stub for SDK module `{mod}`\n")
-                    f.write(f"# TODO: implement full test coverage\n")
-                    f.write("import pytest\n\n")
-                    f.write(f"def test_{mod}_exists():\n")
-                    f.write(f"    import sdk.{mod}  # noqa\n")
-                    f.write(f"    assert True  # TODO\n")
+                    f.write(f'"""Auto-generated smoke test for `mutx.{mod}`."""\n\n')
+                    f.write("import importlib\n\n")
+                    f.write(f"def test_{mod}_module_imports():\n")
+                    f.write(f"    module = importlib.import_module('mutx.{mod}')\n")
+                    f.write("    assert module is not None\n")
                 log(f"  Created test stub: tests/sdk/test_{mod}.py")
                 return True
 
