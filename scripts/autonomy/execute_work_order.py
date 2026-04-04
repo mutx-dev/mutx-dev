@@ -5,7 +5,23 @@ import json
 import os
 import shlex
 import subprocess
+import sys
+import time
 from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from run_artifacts import (
+    copy_artifact_to_run,
+    finalize_run,
+    initialize_run_artifact,
+    record_command_finish,
+    record_command_skipped,
+    record_command_start,
+    write_text_artifact,
+)
 
 
 DEFAULT_MAX_CHANGED_FILES = 6
@@ -164,7 +180,11 @@ def maybe_comment_codex_review(pr_ref: str) -> None:
         print("Failed to post Codex review handoff comment.")
 
 
-def run_agent_command(work_order: dict, brief_path: Path) -> int:
+def run_agent_command(
+    work_order: dict,
+    brief_path: Path,
+    run_json_path: Path,
+) -> subprocess.CompletedProcess[str]:
     template = os.environ.get("AUTONOMY_AGENT_CMD_TEMPLATE", "").strip()
     if not template:
         if os.environ.get("GITHUB_MODELS_TOKEN") or os.environ.get("OPENAI_API_KEY"):
@@ -173,8 +193,10 @@ def run_agent_command(work_order: dict, brief_path: Path) -> int:
                 "--brief {brief} --work-order {work_order}"
             )
         else:
-            print("AUTONOMY_AGENT_CMD_TEMPLATE is not set; branch and brief are prepared.")
-            return 0
+            note = "AUTONOMY_AGENT_CMD_TEMPLATE is not set; branch and brief are prepared."
+            print(note)
+            record_command_skipped(run_json_path, note=note)
+            return subprocess.CompletedProcess(args=[], returncode=0, stdout="", stderr="")
 
     command = template.format(
         issue=work_order["issue"],
@@ -187,8 +209,55 @@ def run_agent_command(work_order: dict, brief_path: Path) -> int:
         work_order=os.environ.get("AUTONOMY_WORK_ORDER_PATH", "autonomy-work-order.json"),
     )
     print(f"Running agent command: {command}")
-    result = subprocess.run(shlex.split(command), text=True)
-    return result.returncode
+    argv = shlex.split(command)
+    record_command_start(run_json_path, template=template, argv=argv, cwd=str(Path.cwd()))
+    result = subprocess.run(argv, text=True, capture_output=True)
+
+    stdout_artifact = None
+    stderr_artifact = None
+
+    if result.stdout:
+        stdout_artifact = write_text_artifact(
+            run_json_path,
+            name="agent_command_stdout",
+            kind="log",
+            relative_path="logs/agent-command.stdout.log",
+            content=result.stdout,
+        )["path"]
+        print(result.stdout, end="" if result.stdout.endswith("\n") else "\n")
+
+    if result.stderr:
+        stderr_artifact = write_text_artifact(
+            run_json_path,
+            name="agent_command_stderr",
+            kind="log",
+            relative_path="logs/agent-command.stderr.log",
+            content=result.stderr,
+        )["path"]
+        print(result.stderr, end="" if result.stderr.endswith("\n") else "\n", file=sys.stderr)
+
+    record_command_finish(
+        run_json_path,
+        exit_code=result.returncode,
+        stdout_artifact=stdout_artifact,
+        stderr_artifact=stderr_artifact,
+    )
+    return result
+
+
+def sync_optional_run_artifacts(run_json_path: Path, *, since_epoch: float) -> None:
+    guardrail_path = Path(".autonomy/guardrail-failure.json")
+    if not guardrail_path.exists():
+        return
+    if guardrail_path.stat().st_mtime < since_epoch:
+        return
+    copy_artifact_to_run(
+        run_json_path,
+        guardrail_path,
+        name="guardrail_failure",
+        kind="metadata",
+        relative_path="artifacts/guardrail-failure.json",
+    )
 
 
 def maybe_open_pr(work_order: dict, base_branch: str) -> None:
@@ -283,12 +352,31 @@ def main() -> int:
 
     ensure_branch(work_order["branch"], args.base_branch)
     brief_path = write_brief(work_order, Path(args.brief_dir))
+    run_json_path = initialize_run_artifact(
+        work_order,
+        work_order_path,
+        brief_path,
+        base_branch=args.base_branch,
+    )
+    os.environ["AUTONOMY_RUN_ID"] = run_json_path.parent.name
+    os.environ["AUTONOMY_RUN_DIR"] = str(run_json_path.parent)
+    os.environ["AUTONOMY_RUN_JSON"] = str(run_json_path)
+    run_started_epoch = time.time()
     maybe_comment_issue(work_order, brief_path)
-    exit_code = run_agent_command(work_order, brief_path)
-    if exit_code != 0:
-        return exit_code
-    enforce_repo_guardrails()
-    maybe_open_pr(work_order, args.base_branch)
+    try:
+        result = run_agent_command(work_order, brief_path, run_json_path)
+        sync_optional_run_artifacts(run_json_path, since_epoch=run_started_epoch)
+        if result.returncode != 0:
+            finalize_run(run_json_path, status="failed")
+            return result.returncode
+        enforce_repo_guardrails()
+        sync_optional_run_artifacts(run_json_path, since_epoch=run_started_epoch)
+        maybe_open_pr(work_order, args.base_branch)
+    except Exception:
+        sync_optional_run_artifacts(run_json_path, since_epoch=run_started_epoch)
+        finalize_run(run_json_path, status="failed")
+        raise
+    finalize_run(run_json_path, status="completed")
     return 0
 
 
