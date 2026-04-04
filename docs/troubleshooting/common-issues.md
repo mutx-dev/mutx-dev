@@ -54,11 +54,12 @@ mutx deploy create --agent-id YOUR_AGENT_ID --replicas 1
 
 ## Playwright fails against localhost
 
-Current cause: the checked-in Playwright smoke suite is aligned to the hosted MUTX surface, not the local dev server.
+Current cause: missing build output for the standalone app server. The checked-in Playwright config targets localhost, but it expects `.next/standalone/server.js` to exist.
 
-Use `./scripts/dev.sh` for the canonical local demo path. Use the Playwright suite as part of `./scripts/test.sh` when you want repo validation against the hosted smoke target.
+Build first, then inspect or run the suite:
 
 ```bash
+npm run build
 npx playwright test --list
 ```
 
@@ -83,8 +84,8 @@ If `RESEND_API_KEY` is unset, signups can still be stored in Postgres.
 
 That is expected with the current images.
 
-* `Dockerfile.api` installs `requirements.txt`, not dev extras
-* `package.json` has no `test` script
+* backend images install `requirements.txt`, not the full dev extra set
+* `package.json` now exposes `npm test`, but container images still do not guarantee the full local validation toolchain
 
 Prefer host-side verification:
 

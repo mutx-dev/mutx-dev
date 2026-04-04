@@ -32,11 +32,11 @@ Repo guidance for agentic coding agents working in `/Users/fortune/MUTX`.
 * FastAPI public control-plane routes are mounted under `/v1/*`, with root probes at `/`, `/health`, `/ready`, and `/metrics`.
 * `docs/api/AGENTS.md` is stale: `POST /agents` no longer accepts `user_id` from the request body, and auth dependencies are attached.
 * Parts of older docs still drift; check `src/api/main.py`, `src/api/routes/`, and `docs/api/openapi.json` before copying examples.
-* Frontend linting is currently broken: `next lint` and direct `eslint` both fail with the checked-in ESLint 10 plus `.eslintrc.json` setup.
-* `npm run build` works because it uses `next build --no-lint`.
-* `tests/conftest.py` is stale against `src/api/models/models.py`; pytest collects tests, but runtime execution currently fails because fixtures still pass `username` and `hashed_password` to `User`.
-* `tests/website.spec.ts` hits `https://mutx.dev` directly; treat Playwright as production smoke testing unless you rewrite it.
-* `scripts/test.sh` runs the current trusted validation baseline instead of `npm test`, which does not exist in `package.json`.
+* The repo uses flat-config ESLint via `eslint.config.mjs`; `npm run lint` now checks the repo surface with `eslint . --max-warnings=0`.
+* `npm run build` uses plain `next build`.
+* Recent repo-level fixes covered `/v1/auth/*` docs drift, the email verification expiry migration backfill guard, the CLI/SDK distribution-name split, and the stale versioning unit export name.
+* Playwright runs against the local standalone server from `playwright.config.ts`; build before e2e runs so `.next/standalone` exists.
+* `scripts/test.sh` is still the best repo-native baseline, but `package.json` now exposes `npm test` and `npm run typecheck` as explicit frontend entrypoints.
 
 ## Setup And Environment
 
@@ -67,9 +67,9 @@ npm run build
 npm run generate-types
 ```
 
-* `npm run build` performs a production build and type validation, but skips lint via `--no-lint`.
-* `npm run lint` is the intended lint command, but it currently fails with the checked-in dependency/config combination.
-* There is no reliable single-file frontend lint command until ESLint is migrated to flat config or downgraded.
+* `npm run build` performs a production build.
+* `npm run typecheck` is the explicit frontend TypeScript gate.
+* `npm run lint` is repo-wide via `eslint . --max-warnings=0`.
 
 **Python checks**
 
@@ -93,7 +93,7 @@ python -m compileall src/api cli sdk/mutx
 ```
 
 * Single-test shape: `path/to/test_file.py::TestClass::test_name`.
-* Current reality: collection works, but execution is failing because fixtures do not match the current `User` model.
+* Current reality: collection works; when pytest goes red, check migration head drift and auth docs drift first.
 
 **Playwright smoke tests**
 
@@ -105,8 +105,8 @@ npx playwright test -g "no console errors"
 npx playwright test --list
 ```
 
-* `tests/website.spec.ts` is the only Playwright spec right now.
-* The spec hardcodes `https://mutx.dev`, so it exercises production rather than a local dev server.
+* Playwright targets the local standalone app server configured in `playwright.config.ts`.
+* Build first if `.next/standalone/server.js` is missing.
 
 **Infrastructure**
 
@@ -174,13 +174,13 @@ make -C infrastructure monitor-validate
 * CLI code currently branches on `response.status_code`; follow that local pattern unless you are intentionally refactoring the file.
 * SDK classes are thin wrappers around JSON payloads; keep them small and ergonomic.
 * SDK methods generally call `response.raise_for_status()` and then wrap `response.json()` into typed objects; keep that pattern.
-* Watch for route drift: parts of the SDK still default to `/v1` URLs even though the backend currently exposes unversioned routes.
+* Watch for route drift across the SDK, CLI, and docs; the public backend contract is mounted under `/v1/*`.
 
 **Tests and validation**
 
 * Pytest tests are class-based `pytest-asyncio` tests using `AsyncClient` with `ASGITransport` and in-memory SQLite fixtures.
-* Playwright tests are smoke-style and currently target production.
-* There is no `npm test` script in `package.json`.
+* Playwright tests are smoke-style and run against the local standalone server.
+* `npm test` maps to the Jest unit suite in `tests/unit`.
 * Good backend validation: `ruff check src/api/routes/agents.py`, `./.venv/bin/python -m pytest tests/api/test_agents.py::TestCreateAgent::test_create_agent_success -q`, and `python -m compileall src/api`.
 * Good frontend validation: `npm run build` and `npx playwright test tests/website.spec.ts -g "homepage loads and has working waitlist"`.
 * If you change infra code, use the matching `make -C infrastructure ...` target instead of ad hoc commands when possible.

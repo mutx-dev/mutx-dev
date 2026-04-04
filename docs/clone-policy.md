@@ -26,11 +26,11 @@ rsync -a --exclude='.git' --exclude='node_modules' --exclude='.next' \
 
 MUTX and OpenClaw require different Node versions. PATH must not shadow one with the other.
 
-- **MUTX toolchain** (build/test): Node 20 (CI standard)
+- **MUTX toolchain** (build/test): Node 24 (CI standard)
 - **OpenClaw runtime**: Node 22.14+ (agent execution)
 
 Explicitly qualify `node` paths in scripts and cron jobs. Do not rely on default `node` being correct.
 
 ## Stale Node Backup
 
-`/usr/local/bin/node.v20.15.1.bak` — remove if present. It is a v20 leftover that can cause version confusion.
+`/usr/local/bin/node.v20.15.1.bak` — remove if present. It is an old v20 leftover that can cause version confusion even though MUTX CI now runs on Node 24.

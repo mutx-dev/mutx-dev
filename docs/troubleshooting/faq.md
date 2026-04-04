@@ -37,7 +37,7 @@ Not currently. The contact route validates input and logs the payload, but it do
 
 ## Do the Playwright tests run against localhost?
 
-No. The current Playwright config targets the hosted MUTX surface. Use `./scripts/dev.sh` for the canonical local demo path and `./scripts/test.sh` for the repo's validation path.
+Yes. The checked-in Playwright config starts the local standalone app server and targets localhost. Build first when `.next/standalone` is missing, then use `npx playwright test --list` or `./scripts/test.sh` for the repo validation path. In short: build first when `.next/standalone` is missing.
 
 ## Are the architecture docs purely current-state?
 

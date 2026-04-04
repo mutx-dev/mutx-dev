@@ -4,7 +4,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 FROM base AS deps
 COPY package.json package-lock.json ./
-RUN npm install --force
+RUN npm ci --legacy-peer-deps
 
 FROM base AS development
 ENV NODE_ENV=development

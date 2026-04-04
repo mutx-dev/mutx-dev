@@ -46,7 +46,7 @@ function NavItem({
   );
 }
 
-export function DocsLayout({ nav, children, title }: DocsLayoutProps) {
+export function DocsLayout({ nav, children }: DocsLayoutProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 

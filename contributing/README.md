@@ -74,10 +74,11 @@ python3 -m compileall src/api cli sdk/mutx
 ### Playwright
 
 ```bash
+npm run build
 npx playwright test --list
 ```
 
-Important: current Playwright specs target `https://mutx.dev`, not localhost.
+Important: Playwright targets the local standalone app server from `playwright.config.ts`, so build first when `.next/standalone` is missing.
 
 ## Source Of Truth
 

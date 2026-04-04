@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mutx"
+name = "mutx-cli"
 version = "1.3.0"
 description = "CLI for mutx.dev - Deploy and manage agents"
 readme = "README.md"
@@ -51,6 +51,9 @@ mutx = "cli.main:cli"
 where = ["."]
 include = ["cli*"]
 
+[tool.setuptools.package-data]
+cli = ["policies/*.fpl"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py310"
@@ -83,9 +86,7 @@ exclude_lines = [
 precision = 2
 show_missing = true
 skip_covered = false
+fail_under = 70
 
 [tool.coverage.html]
 directory = "coverage_html"
-
-[tool.coverage.fail_under]
-min_cov_line = 70

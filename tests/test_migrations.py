@@ -11,14 +11,15 @@ import sqlalchemy as sa
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSIONS_DIR = ROOT / "src/api/models/migrations/versions"
-CURRENT_HEAD = "7f3e2c1b4a6d"
 
 
 def test_alembic_has_single_head():
     config = Config(str(ROOT / "alembic.ini"))
     script = ScriptDirectory.from_config(config)
 
-    assert script.get_heads() == [CURRENT_HEAD]
+    heads = script.get_heads()
+    assert len(heads) == 1, f"expected one alembic head, found {heads}"
+    assert script.get_current_head() == heads[0]
 
 
 def _load_migration_module(module_name: str, file_name: str):
@@ -571,6 +572,7 @@ def test_alembic_upgrade_repairs_representative_legacy_live_schema(tmp_path):
     engine = sa.create_engine(f"sqlite:///{db_path}")
     try:
         inspector = sa.inspect(engine)
+        assert {"email_verification_expires_at"} <= _column_names(inspector, "users")
         assert {"meta_data"} <= _column_names(inspector, "agent_logs")
         assert {
             "resource_type",

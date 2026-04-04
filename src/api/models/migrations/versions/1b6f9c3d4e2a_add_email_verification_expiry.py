@@ -33,15 +33,18 @@ def upgrade() -> None:
             sa.Column("email_verification_expires_at", sa.DateTime(timezone=True), nullable=True),
         )
 
-    backfill_expires_at = datetime.now(timezone.utc) + timedelta(hours=72)
-    op.execute(
-        sa.text(
-            "UPDATE users "
-            "SET email_verification_expires_at = :backfill_expires_at "
-            "WHERE email_verification_token IS NOT NULL "
-            "AND email_verification_expires_at IS NULL"
-        ).bindparams(backfill_expires_at=backfill_expires_at)
-    )
+    if _has_column("users", "email_verification_token") and _has_column(
+        "users", "email_verification_expires_at"
+    ):
+        backfill_expires_at = datetime.now(timezone.utc) + timedelta(hours=72)
+        op.execute(
+            sa.text(
+                "UPDATE users "
+                "SET email_verification_expires_at = :backfill_expires_at "
+                "WHERE email_verification_token IS NOT NULL "
+                "AND email_verification_expires_at IS NULL"
+            ).bindparams(backfill_expires_at=backfill_expires_at)
+        )
 
 
 def downgrade() -> None:

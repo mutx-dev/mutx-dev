@@ -23,7 +23,7 @@ export default async function RoadmapPage() {
       <article className="docs-prose">
         <div
           dangerouslySetInnerHTML={{
-            __html: await remark().use(remarkGfm).process(content).then((r) => r.toString()),
+            __html: String(await remark().use(remarkGfm).process(content)),
           }}
         />
       </article>

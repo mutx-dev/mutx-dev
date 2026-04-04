@@ -94,6 +94,7 @@ Use the smallest relevant validation set for your change.
 
 ```bash
 npm run lint
+npm run typecheck
 npm run build
 ```
 
@@ -119,10 +120,11 @@ python -m pytest tests/test_cli_auth_and_tui.py tests/test_cli_agents_contract.p
 ### Playwright
 
 ```bash
+npm run build
 npx playwright test --list
 ```
 
-Important: current Playwright specs target `https://mutx.dev`, not localhost.
+Important: Playwright targets the local standalone app server from `playwright.config.ts`, so build first when `.next/standalone` is missing.
 
 ## Release Process
 

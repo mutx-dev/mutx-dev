@@ -87,8 +87,8 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ## Testing Notes
 
 * The `api` image installs `requirements.txt`, not the root dev extras, so `pytest` is not available in that container by default.
-* `package.json` has no `test` script today.
-* Playwright exists, but its current config targets `https://mutx.dev`, not the local compose stack.
+* `npm test` runs the Jest unit suite in `tests/unit`.
+* Playwright targets the local standalone app server from `playwright.config.ts`; run `npm run build` before e2e checks so `.next/standalone` exists.
 
 For verification, prefer host commands such as:
 

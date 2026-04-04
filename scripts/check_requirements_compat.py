@@ -15,7 +15,7 @@ def parse_pinned_versions(requirements_path: Path) -> dict[str, str]:
     versions: dict[str, str] = {}
     for raw_line in requirements_path.read_text(encoding="utf-8").splitlines():
         line = raw_line.split("#", 1)[0].strip()
-        if not line:
+        if not line or line.startswith("-r "):
             continue
         match = PIN_PATTERN.match(line)
         if not match:
@@ -37,7 +37,35 @@ def version_tuple(version: str) -> tuple[int, ...]:
 def main() -> int:
     repo_root = Path(__file__).resolve().parent.parent
     requirements_path = repo_root / "requirements.txt"
+    test_requirements_path = repo_root / "test-requirements.txt"
     versions = parse_pinned_versions(requirements_path)
+    test_versions = parse_pinned_versions(test_requirements_path)
+    test_requirements_text = test_requirements_path.read_text(encoding="utf-8")
+
+    if "-r requirements.txt" not in test_requirements_text:
+        print(
+            "ERROR: test-requirements drift detected.\n"
+            "test-requirements.txt must include '-r requirements.txt' so test installs start from runtime pins."
+        )
+        return 1
+
+    if "passlib[bcrypt]" in test_requirements_text:
+        print(
+            "ERROR: test-requirements drift detected.\n"
+            "passlib[bcrypt] is legacy auth baggage and should not be present in test-requirements.txt."
+        )
+        return 1
+
+    for package_name in ("httpx", "aiosqlite", "sqlalchemy"):
+        runtime_version = versions.get(package_name)
+        test_version = test_versions.get(package_name)
+        if runtime_version and test_version and runtime_version != test_version:
+            print(
+                "ERROR: test-requirements drift detected.\n"
+                f"{package_name} runtime pin is {runtime_version} but test pin is {test_version}.\n"
+                "Keep overlapping runtime/test pins in lockstep."
+            )
+            return 1
 
     pydantic = versions.get("pydantic")
     pydantic_settings = versions.get("pydantic-settings")

@@ -88,7 +88,7 @@ The API service uses a Dockerfile-based deployment and a liveness health check:
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "DOCKERFILE",
-    "dockerfilePath": "Dockerfile.backend"
+    "dockerfilePath": "infrastructure/docker/Dockerfile.backend"
   },
   "deploy": {
     "numReplicas": 1,
@@ -130,11 +130,11 @@ railway run python -m src.api.seed
 ### 1. Deploy to Railway
 
 ```bash
-# Deploy
+# Deploy the linked service
 railway up
 
 # Or with environment
-railway up --production
+railway up --environment production
 ```
 
 ### 2. View Deployment
@@ -205,20 +205,13 @@ For a more complete setup, create multiple Railway services:
 
 ### Service 2: API (FastAPI)
 
-Create `api/Dockerfile`:
+Use the checked-in backend Dockerfile:
 
-```dockerfile
-FROM python:3.11-slim
-
-WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-COPY . .
-
-CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```text
+infrastructure/docker/Dockerfile.backend
 ```
+
+Railway service configs in this repo already point at the canonical backend and frontend Dockerfiles under `infrastructure/docker/`.
 
 ## Production Promotion
 
@@ -253,6 +246,25 @@ Optional repository variables or workflow inputs:
 bash scripts/promote-railway-production.sh
 bash scripts/verify-production-release.sh
 ```
+
+### Live production note
+
+Live production project: `zooming-youth`.
+
+Live Railway production currently runs the backend without an explicit healthcheckPath/healthcheckTimeout in the deployed service manifest, even though repo-side examples may show those fields. Do not change backend Railway healthcheck behavior casually from repo config alone.
+
+Live Railway production currently serves these custom domains:
+
+- frontend custom domains: `mutx.dev`, `app.mutx.dev`
+- backend custom domain: `api.mutx.dev`
+
+Live Railway production also uses this backend preDeployCommand:
+
+```bash
+python -m pip install -q psycopg2-binary alembic && python -m alembic upgrade head
+```
+
+Treat the backend preDeployCommand as production-critical until Railway and repo config are intentionally reconciled. Use live Railway service manifests as the source of truth before changing production deployment behavior.
 
 The verification step should confirm:
 

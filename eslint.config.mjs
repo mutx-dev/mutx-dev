@@ -16,7 +16,7 @@ export default tseslint.config(
     },
   },
   {
-    ignores: [".next/**", "node_modules/**", "dist/**", "out/**"],
+    ignores: [".next/**", "node_modules/**", "dist/**", "out/**", "tmp/**", "tests/tmp*.spec.ts"],
   },
   {
     languageOptions: {

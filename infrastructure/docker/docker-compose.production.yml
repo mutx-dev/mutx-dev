@@ -48,8 +48,8 @@ services:
 
   api:
     build:
-      context: .
-      dockerfile: Dockerfile.api
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.api
     container_name: mutx-api-prod
     restart: always
     environment:
@@ -82,8 +82,8 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.frontend
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     container_name: mutx-frontend-prod

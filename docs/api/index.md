@@ -20,9 +20,15 @@ When prose and implementation disagree, use this order:
 
 ## Authentication Model
 
-- Interactive user flows use `Authorization: Bearer <access_token>`.
-- Managed API keys can authenticate automation through `Authorization: Bearer <mutx_live_...>` or `X-API-Key: <mutx_live_...>`.
+- Interactive user flows use `Authorization: Bearer ***
+- Managed API keys can authenticate automation through `Authorization: Bearer *** or `X-API-Key: <mutx_live_...>`.
 - `POST /v1/auth/local-bootstrap` is for localhost-only, non-production operator setup.
+
+Canonical auth endpoints:
+
+- `POST /v1/auth/register`
+- `POST /v1/auth/login`
+- `GET /v1/auth/me`
 
 See [authentication.md](./authentication.md) and [api-keys.md](./api-keys.md) for details.
 

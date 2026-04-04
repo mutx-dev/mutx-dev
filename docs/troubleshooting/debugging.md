@@ -87,11 +87,12 @@ Use `npm run test:app` for the current app-level Jest coverage under `tests/unit
 ## Playwright Note
 
 ```bash
+npm run build
 npx playwright test --list
-npx playwright test tests/website.spec.ts -g "waitlist verification failure is surfaced to the user"
+npx playwright test tests/website.spec.ts -g "no console errors or remote Guild asset requests"
 ```
 
-Current Playwright smoke coverage runs locally via the checked-in config. Use `npx playwright test --list` first to confirm discovery and then run the smallest matching spec or grep target.
+Current Playwright smoke coverage runs locally via the checked-in config. Build first when `.next/standalone` is missing, then use `npx playwright test --list` to confirm discovery and run the smallest matching spec or grep target.
 
 ## Trusted Validation Baseline
 

@@ -24,7 +24,7 @@ def test_dependency_resources_from_report_skips_root_package_and_normalizes_name
     report = {
         "install": [
             {
-                "metadata": {"name": "mutx", "version": CURRENT_CLI_VERSION},
+                "metadata": {"name": "mutx-cli", "version": CURRENT_CLI_VERSION},
                 "download_info": {"url": "file:///repo", "dir_info": {}},
             },
             {
@@ -44,7 +44,7 @@ def test_dependency_resources_from_report_skips_root_package_and_normalizes_name
         ]
     }
 
-    resources = dependency_resources_from_report(report, project_name="mutx")
+    resources = dependency_resources_from_report(report, project_name="mutx-cli")
 
     assert resources == [
         HomebrewResource(
@@ -103,7 +103,7 @@ def test_main_writes_formula_with_resolved_resources(monkeypatch, tmp_path: Path
     (repo_root / "pyproject.toml").write_text(
         f"""
 [project]
-name = "mutx"
+name = "mutx-cli"
 version = "{CURRENT_CLI_VERSION}"
 description = "CLI for mutx.dev"
 license = {{ text = "BUSL-1.1" }}

@@ -13,7 +13,7 @@ Install the following on your machine:
 
 * Git
 * Node.js 20 LTS recommended (`18+` minimum)
-* `pnpm` (recommended) or `npm`
+* `pnpm` or `npm` for frontend dependencies and scripts
 * Python `3.10+`
 * Docker + Docker Compose v2
 * `make` and `curl` (recommended for local verification commands)
@@ -44,10 +44,10 @@ npm -v
 git clone https://github.com/mutx-dev/mutx-dev.git
 cd mutx-dev
 
-# Frontend deps (preferred)
+# Frontend deps (pnpm)
 pnpm install
 
-# npm fallback
+# Frontend deps (npm)
 # npm install
 
 # Python deps
@@ -159,6 +159,8 @@ mutx setup local --name "Local Operator" --no-input
 Full repository validation:
 
 ```bash
+npm run lint
+npm run typecheck
 ./scripts/test.sh
 ```
 

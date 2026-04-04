@@ -4,7 +4,6 @@ import matter from "gray-matter";
 import { DocsLayout } from "@/components/site/docs/DocsLayout";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
-import { DocNavItem } from "@/lib/docs";
 
 export async function generateMetadata() {
   const source = fs.readFileSync(path.join(process.cwd(), "manifesto.md"), "utf-8");
@@ -24,7 +23,7 @@ export default async function ManifestoPage() {
       <article className="docs-prose">
         <div
           dangerouslySetInnerHTML={{
-            __html: await remark().use(remarkGfm).process(content).then((r) => r.toString()),
+            __html: String(await remark().use(remarkGfm).process(content)),
           }}
         />
       </article>
