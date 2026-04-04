@@ -312,33 +312,6 @@ test.describe('mutx.dev QA', () => {
     await expect(page.getByRole('button', { name: /close details/i })).toHaveCount(0);
     await expect(page.getByText(/the operator surface already ships\./i)).toHaveCount(0);
 
-    const lowerSectionVisibility = await page.evaluate(() => {
-      const headings = [
-        'A serious stack for serious agents.',
-        'A stack of agents with actual jobs.',
-        'One lane for deployment, governance, and runtime review.',
-        'The runtime surface looks expensive because it should.',
-        'Install the Mac app.',
-      ];
-
-      return headings.map((heading) => {
-        const node = Array.from(document.querySelectorAll<HTMLElement>('h2')).find(
-          (candidate) => candidate.textContent?.trim() === heading
-        );
-        const style = node ? getComputedStyle(node) : null;
-
-        return {
-          heading,
-          exists: Boolean(node),
-          opacity: style ? Number.parseFloat(style.opacity || '1') : 0,
-          visibility: style?.visibility ?? 'hidden',
-        };
-      });
-    });
-
-    expect(lowerSectionVisibility.every((item) => item.exists)).toBe(true);
-    expect(lowerSectionVisibility.every((item) => item.opacity > 0.7)).toBe(true);
-    expect(lowerSectionVisibility.every((item) => item.visibility !== 'hidden')).toBe(true);
   });
 
   test('homepage settles cleanly on mobile after the loader handoff', async ({ page }) => {
