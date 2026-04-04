@@ -122,8 +122,8 @@ export function TracesPageClient() {
   if (runs.length === 0) {
     return (
       <LiveEmptyState
-        title="No traceable runs yet"
-        message="Once owned runs exist, MUTX will surface the event stream here instead of a static placeholder."
+        title="No runs with traces"
+        message="No agent runs have been recorded yet. Traces will appear here once runs are executed."
       />
     );
   }
