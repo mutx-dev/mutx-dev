@@ -414,17 +414,32 @@ def maybe_reconcile_prs(args: argparse.Namespace, tracker: StatusTracker, *, for
             elapsed = interval
         if elapsed < interval:
             return {"ran": False, "reason": "cooldown"}
-    command = ["python3", "scripts/autonomy/reconcile_prs.py"]
-    result = subprocess.run(command, cwd=args.repo_root, text=True, capture_output=True)
+    reconcile_command = ["python3", "scripts/autonomy/reconcile_prs.py", "--repo-root", args.repo_root]
+    reconcile_result = subprocess.run(reconcile_command, cwd=args.repo_root, text=True, capture_output=True)
+    review_command = [
+        "python3",
+        "scripts/autonomy/reconcile_review_threads.py",
+        "--repo-root",
+        args.repo_root,
+        "--execute",
+    ]
+    review_result = subprocess.run(review_command, cwd=args.repo_root, text=True, capture_output=True)
     tracker.update(
         last_pr_reconcile_at=str(time.time()),
         last_pr_reconcile_result={
-            "exit_code": result.returncode,
-            "stdout": result.stdout[-4000:],
-            "stderr": result.stderr[-4000:],
+            "reconcile": {
+                "exit_code": reconcile_result.returncode,
+                "stdout": reconcile_result.stdout[-4000:],
+                "stderr": reconcile_result.stderr[-4000:],
+            },
+            "review_threads": {
+                "exit_code": review_result.returncode,
+                "stdout": review_result.stdout[-4000:],
+                "stderr": review_result.stderr[-4000:],
+            },
         },
     )
-    return {"ran": True, "exit_code": result.returncode}
+    return {"ran": True, "exit_code": reconcile_result.returncode, "review_exit_code": review_result.returncode}
 
 
 def maybe_run_issue_sync(args: argparse.Namespace, tracker: StatusTracker, *, queued_items: int, force: bool = False) -> int:

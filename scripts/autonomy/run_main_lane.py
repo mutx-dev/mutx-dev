@@ -9,7 +9,8 @@ from typing import Any
 
 from failure_classifier import classify_failure, extract_retry_after_seconds
 
-DEFAULT_MODEL = "gpt-5.4"
+DEFAULT_MODEL = "openai/gpt-5.4"
+MODEL_FALLBACKS = ("minimax/MiniMax-M2.7",)
 DOC_PREFIXES = ("docs/", "README.md", "whitepaper.md", "roadmap.md", "AGENTS.md")
 
 
@@ -65,8 +66,31 @@ def build_command(work_order: dict[str, Any], model: str) -> list[str]:
     return ["opencode", "run", "-m", model, build_prompt(work_order)]
 
 
-def run_command(command: list[str], cwd: str, timeout: int) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(command, cwd=cwd, text=True, capture_output=True, timeout=timeout)
+def candidate_models(primary: str) -> list[str]:
+    candidates = [primary.strip()]
+    for fallback in MODEL_FALLBACKS:
+        if fallback not in candidates:
+            candidates.append(fallback)
+    return [candidate for candidate in candidates if candidate]
+
+
+def run_command(work_order: dict[str, Any], model: str, timeout: int) -> tuple[subprocess.CompletedProcess[str], str]:
+    last_result: subprocess.CompletedProcess[str] | None = None
+    last_model = model
+    for candidate in candidate_models(model):
+        result = subprocess.run(
+            build_command(work_order, candidate),
+            cwd=work_order["worktree"],
+            text=True,
+            capture_output=True,
+            timeout=timeout,
+        )
+        last_result = result
+        last_model = candidate
+        if result.returncode == 0:
+            return result, candidate
+    assert last_result is not None
+    return last_result, last_model
 
 
 def changed_files(cwd: str) -> list[str]:
@@ -105,28 +129,29 @@ def main() -> int:
     args = parser.parse_args()
 
     work_order = load_work_order(args.work_order)
-    command = build_command(work_order, args.model)
     preview = {
         "runner": "main",
         "task_id": work_order.get("id"),
         "lane": work_order.get("lane"),
         "worktree": work_order["worktree"],
-        "command": shlex.join(command),
+        "command": shlex.join(build_command(work_order, args.model)),
         "allowed_paths": work_order.get("allowed_paths", []),
         "verification_commands": work_order.get("verification", []),
+        "candidate_models": candidate_models(args.model),
     }
 
     if not args.execute:
         print(json.dumps(preview, indent=2, sort_keys=True))
         return 0
 
-    result = run_command(command, cwd=work_order["worktree"], timeout=args.timeout)
+    result, selected_model = run_command(work_order, args.model, args.timeout)
     verification = run_verification(work_order.get("verification", []), work_order["worktree"])
     combined_output = (result.stdout or "") + "\n" + (result.stderr or "")
     blocker_class = classify_failure(combined_output)
     retry_after_seconds = extract_retry_after_seconds(combined_output)
     payload = {
         **preview,
+        "model": selected_model,
         "exit_code": result.returncode,
         "stdout": result.stdout,
         "stderr": result.stderr,

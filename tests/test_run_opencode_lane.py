@@ -24,6 +24,10 @@ def load_module(name: str, path: Path):
 LANE = load_module('run_opencode_lane', MODULE_PATH)
 
 
+def test_candidate_models_prefers_openai_then_fallback() -> None:
+    assert LANE.candidate_models('openai/gpt-5.4') == ['openai/gpt-5.4', 'minimax/MiniMax-M2.7']
+
+
 def test_verify_changed_ts_syntax_skips_non_js_files(tmp_path: Path) -> None:
     result = LANE.verify_changed_ts_syntax(str(tmp_path), ['docs/readme.md'])
 
