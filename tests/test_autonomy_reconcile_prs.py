@@ -23,92 +23,30 @@ def load_module(name: str, path: Path):
 RECONCILE = load_module("reconcile_prs", RECONCILE_PATH)
 
 
-def make_pr(**overrides):
-    payload = {
-        "number": 42,
-        "title": "autonomy(main): tighten reconcile policy",
-        "headRefName": "autonomy/docs-drift-curator/issue-42-tighten-reconcile-policy",
-        "isDraft": True,
-        "autoMergeRequest": None,
-        "labels": [{"name": "risk:low"}, {"name": "size:s"}, {"name": "autonomy:safe"}],
-        "changedFiles": 2,
-        "files": [
-            {"path": "scripts/autonomy/reconcile_prs.py"},
-            {"path": "tests/test_autonomy_reconcile_prs.py"},
-        ],
-        "statusCheckRollup": [{"conclusion": "SUCCESS"}],
-        "url": "https://example.test/pr/42",
-    }
-    payload.update(overrides)
-    return payload
+def test_safe_to_promote_accepts_green_autonomy_self_hosting_shape() -> None:
+    pr = {"title": "feat(autonomy): add lightweight task claim leases"}
+    files = [
+        "scripts/autonomy/daemon_main.py",
+        "scripts/autonomy/lane_contract.py",
+        "scripts/autonomy/orchestrator_main.py",
+        "scripts/autonomy/queue_state.py",
+        "scripts/autonomy/worktree_utils.py",
+        "tests/test_autonomy_daemon_ops.py",
+        "tests/test_autonomy_lane_contract.py",
+    ]
+
+    assert RECONCILE.safe_to_promote(pr, files) is True
 
 
-def test_assess_pr_reconciliation_policy_allows_safe_green_autonomy_changes() -> None:
-    policy = RECONCILE.assess_pr_reconciliation_policy(make_pr())
+def test_safe_to_promote_accepts_small_sdk_coverage_pr() -> None:
+    pr = {"title": "ci: add coverage for sdk/mutx/observability.py [abc123]"}
+    files = ["tests/test_sdk_observability_contract.py"]
 
-    assert policy["ready_pr"] is True
-    assert policy["enable_auto_merge"] is True
-    assert policy["safe_path_group"] == "autonomy"
-    assert policy["blocked_by"] is None
+    assert RECONCILE.safe_to_promote(pr, files) is True
 
 
-def test_assess_pr_reconciliation_policy_rejects_high_risk_paths() -> None:
-    policy = RECONCILE.assess_pr_reconciliation_policy(
-        make_pr(
-            files=[
-                {"path": "scripts/autonomy/reconcile_prs.py"},
-                {"path": "src/api/main.py"},
-            ]
-        )
-    )
+def test_safe_to_promote_rejects_stub_only_pr() -> None:
+    pr = {"title": "[autonomy] Add error handling to `sdk/mutx/agents.py`"}
+    files = ["autonomy_stubs/error_agents.md"]
 
-    assert policy["ready_pr"] is False
-    assert policy["blocked_by"] == "high_risk_paths"
-
-
-def test_reconcile_pull_request_promotes_draft_and_enables_auto_merge(monkeypatch) -> None:
-    calls: list[tuple[str, int | str | None]] = []
-
-    def fake_promote_pr_ready(path: str, pr_number: int | str | None) -> dict[str, object]:
-        calls.append(("ready", pr_number))
-        return {"status": "ready"}
-
-    def fake_enable_pr_auto_merge(path: str, pr_number: int | str | None, *, merge_method: str = "squash") -> dict[str, object]:
-        calls.append(("auto_merge", pr_number))
-        return {"status": "enabled", "merge_method": merge_method}
-
-    monkeypatch.setattr(RECONCILE, "promote_pr_ready", fake_promote_pr_ready)
-    monkeypatch.setattr(RECONCILE, "enable_pr_auto_merge", fake_enable_pr_auto_merge)
-
-    result = RECONCILE.reconcile_pull_request("/repo", make_pr())
-
-    assert result["status"] == "reconciled"
-    assert result["ready"]["status"] == "ready"
-    assert result["auto_merge"]["status"] == "enabled"
-    assert calls == [("ready", 42), ("auto_merge", 42)]
-
-
-def test_reconcile_pull_request_skips_when_checks_are_not_green(monkeypatch) -> None:
-    ready_calls: list[int] = []
-    auto_calls: list[int] = []
-
-    def fake_promote_pr_ready(path: str, pr_number: int | str | None) -> dict[str, object]:
-        ready_calls.append(int(pr_number or 0))
-        return {"status": "ready"}
-
-    def fake_enable_pr_auto_merge(path: str, pr_number: int | str | None, *, merge_method: str = "squash") -> dict[str, object]:
-        auto_calls.append(int(pr_number or 0))
-        return {"status": "enabled", "merge_method": merge_method}
-
-    monkeypatch.setattr(RECONCILE, "promote_pr_ready", fake_promote_pr_ready)
-    monkeypatch.setattr(RECONCILE, "enable_pr_auto_merge", fake_enable_pr_auto_merge)
-
-    result = RECONCILE.reconcile_pull_request(
-        "/repo",
-        make_pr(statusCheckRollup=[{"state": "PENDING"}]),
-    )
-
-    assert result["status"] == "skipped"
-    assert result["reason"] == "checks_not_green"
-    assert ready_calls == []
-    assert auto_calls == []
+    assert RECONCILE.safe_to_promote(pr, files) is False

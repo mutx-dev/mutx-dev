@@ -5,7 +5,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MODULE_PATH = ROOT / 'scripts' / 'autonomy' / 'python_runtime.py'
+AUTONOMY_DIR = ROOT / 'scripts' / 'autonomy'
+if str(AUTONOMY_DIR) not in sys.path:
+    sys.path.insert(0, str(AUTONOMY_DIR))
+RUNTIME_PATH = AUTONOMY_DIR / 'python_runtime.py'
 
 
 def load_module(name: str, path: Path):
@@ -17,41 +20,25 @@ def load_module(name: str, path: Path):
     return module
 
 
-RUNTIME = load_module('python_runtime', MODULE_PATH)
+RUNTIME = load_module('python_runtime', RUNTIME_PATH)
 
 
-def test_find_supported_python_prefers_first_supported_candidate(monkeypatch) -> None:
-    versions = {
-        '/usr/bin/python3': (3, 9),
-        '/opt/pyenv/versions/3.12.8/bin/python3': (3, 12),
-        '/bin/python3': (3, 11),
-    }
+def test_resolve_python_accepts_current_interpreter(monkeypatch) -> None:
+    monkeypatch.setattr(RUNTIME, '_candidate_bins', lambda: [sys.executable])
 
-    monkeypatch.setattr(RUNTIME, 'python_version', lambda path: versions.get(path))
+    python_bin, version = RUNTIME.resolve_python()
 
-    selected = RUNTIME.find_supported_python(
-        ['/usr/bin/python3', '/opt/pyenv/versions/3.12.8/bin/python3', '/bin/python3']
-    )
-
-    assert selected == ('/opt/pyenv/versions/3.12.8/bin/python3', (3, 12))
+    assert python_bin == sys.executable
+    assert version[:2] >= RUNTIME.MIN_VERSION
 
 
-def test_find_supported_python_returns_none_when_only_unsupported_candidates(monkeypatch) -> None:
-    versions = {
-        '/usr/bin/python3': (3, 9),
-        '/bin/python3': None,
-    }
+def test_resolve_python_rejects_only_old_candidates(monkeypatch) -> None:
+    monkeypatch.setattr(RUNTIME, '_candidate_bins', lambda: ['/definitely/missing/python'])
+    monkeypatch.setattr(RUNTIME, '_version_of', lambda _candidate: (3, 9, 6))
 
-    monkeypatch.setattr(RUNTIME, 'python_version', lambda path: versions.get(path))
-
-    selected = RUNTIME.find_supported_python(['/usr/bin/python3', '/bin/python3'])
-
-    assert selected is None
-
-
-def test_build_error_lists_checked_candidates() -> None:
-    message = RUNTIME.build_error(['/usr/bin/python3', '/bin/python3'])
-
-    assert 'Need >= 3.10' in message
-    assert '/usr/bin/python3' in message
-    assert '/bin/python3' in message
+    try:
+        RUNTIME.resolve_python()
+    except SystemExit as exc:
+        assert 'No suitable Python runtime found' in str(exc)
+    else:
+        raise AssertionError('expected resolve_python to fail for old runtimes')

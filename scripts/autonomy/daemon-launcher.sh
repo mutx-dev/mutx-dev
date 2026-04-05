@@ -15,10 +15,12 @@ COMMAND="${1:-start}"
 mkdir -p "$(dirname "$PID_FILE")" "$(dirname "$LOCK_FILE")" "$(dirname "$STATUS_FILE")" "$(dirname "$LOG_FILE")"
 
 resolve_python_bin() {
-  if ! PYTHON_BIN="$($BOOTSTRAP_PYTHON "$PYTHON_RESOLVER")"; then
-    echo "failed to resolve supported autonomy python runtime" >&2
-    return 1
+  if [[ -n "${MUTX_AUTONOMY_PYTHON:-}" ]]; then
+    PYTHON_BIN="$MUTX_AUTONOMY_PYTHON"
+    return 0
   fi
+  PYTHON_BIN="$($BOOTSTRAP_PYTHON "$PYTHON_RESOLVER")"
+  export MUTX_AUTONOMY_PYTHON="$PYTHON_BIN"
 }
 
 resolve_python_bin
@@ -71,6 +73,7 @@ start_daemon() {
   rm -f "$PID_FILE"
   rotate_log_if_needed
   cd "$REPO_ROOT"
+  printf '%s using python %s (%s)\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" "$PYTHON_BIN" "$($PYTHON_BIN "$PYTHON_RESOLVER" --print-version)" >> "$LOG_FILE"
   nohup "$PYTHON_BIN" scripts/autonomy/daemon_main.py \
     --repo-root "$REPO_ROOT" \
     --lock-file "$LOCK_FILE" \
