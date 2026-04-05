@@ -10,7 +10,7 @@ from typing import Any
 from failure_classifier import classify_failure, extract_retry_after_seconds
 
 
-DEFAULT_MODEL = 'minimax/MiniMax-M2.7'
+DEFAULT_MODEL = 'gpt-5.4'
 TS_SYNTAX_SUFFIXES = {'.ts', '.tsx', '.js', '.jsx'}
 
 
