@@ -20,7 +20,7 @@ from lane_contract import (
     worktree_candidates_for_lane,
 )
 from lane_state import is_lane_paused, lane_reason, load_lane_state
-from queue_state import load_queue, save_queue, set_status
+from queue_state import load_queue, recover_stale_running_items, save_queue, set_status
 from report_status import append_jsonl, build_report, utc_now_iso
 from resume_policy import apply_auto_resume
 from worktree_utils import list_valid_worktrees
@@ -36,6 +36,7 @@ DEFAULT_ISSUE_SYNC_INTERVAL = 900
 DEFAULT_QUEUE_REFILL_THRESHOLD = 2
 DEFAULT_FLEET_REQUEUE_COOLDOWN = 1800
 DEFAULT_PR_RECONCILE_INTERVAL = 300
+DEFAULT_STALE_RUNNING_RECOVERY_SECONDS = 300
 LOCK_EXIT_CODE = 75
 STOP_SIGNALS = (signal.SIGINT, signal.SIGTERM)
 
@@ -267,6 +268,28 @@ def runner_command(
 
 TERMINAL_QUEUE_STATUSES = {"completed", "failed", "blocked", "merged", "cancelled"}
 
+PR_HANDOFF_NOTE_MARKERS = (
+    "draft PR ready",
+    "ready PR updated",
+    "published",
+    "pushed autonomy/",
+    "wait_for_auto_merge",
+    "review_pull_request",
+)
+
+
+def _item_has_pr_handoff(item: dict[str, Any]) -> bool:
+    if item.get("pr_ref") or item.get("pull_request"):
+        return True
+    notes = item.get("notes") or []
+    if not isinstance(notes, list):
+        return False
+    for note in notes:
+        message = str((note or {}).get("message") or "")
+        if any(marker in message for marker in PR_HANDOFF_NOTE_MARKERS):
+            return True
+    return False
+
 
 def _is_stale_terminal_fleet_item(
     item: dict[str, Any], task: dict[str, Any], *, cooldown_seconds: int
@@ -276,6 +299,8 @@ def _is_stale_terminal_fleet_item(
         return False
     source = str(item.get("source") or "")
     if not source.startswith("fleet"):
+        return False
+    if _item_has_pr_handoff(item):
         return False
     existing_fingerprint = str(item.get("evidence_fingerprint") or "")
     incoming_fingerprint = str(task.get("evidence_fingerprint") or "")
@@ -295,12 +320,24 @@ def _is_stale_terminal_fleet_item(
     return age_seconds >= cooldown_seconds
 
 
-def enqueue_generated_tasks(
+def recover_orphaned_running_items(
     queue_path: str | Path,
-    tasks: list[dict[str, Any]],
     *,
-    cooldown_seconds: int = DEFAULT_FLEET_REQUEUE_COOLDOWN,
-) -> int:
+    stale_after_seconds: int = DEFAULT_STALE_RUNNING_RECOVERY_SECONDS,
+    note: str = "daemon restart recovered orphaned running task",
+) -> list[str]:
+    queue = load_queue(queue_path)
+    recovered = recover_stale_running_items(
+        queue,
+        stale_after_seconds=stale_after_seconds,
+        note=note,
+    )
+    if recovered:
+        save_queue(queue_path, queue)
+    return recovered
+
+
+def enqueue_generated_tasks(queue_path: str | Path, tasks: list[dict[str, Any]], *, cooldown_seconds: int = DEFAULT_FLEET_REQUEUE_COOLDOWN) -> int:
     if not tasks:
         return 0
     queue = load_queue(queue_path)
@@ -713,6 +750,21 @@ def main() -> int:
     idle_delay = 0
     active_runners: list[ActiveRunner] = []
     paths = build_lane_paths(args)
+    recovered_at_start = recover_orphaned_running_items(args.queue)
+    if recovered_at_start:
+        append_jsonl(
+            Path(args.report_log),
+            build_report(
+                task_id="daemon",
+                lane="main",
+                status="completed",
+                summary=f"Recovered {len(recovered_at_start)} orphaned running task(s) on daemon start",
+                worktree=args.repo_root,
+                verification=[],
+                next_action="continue",
+            ),
+        )
+        tracker.update(queue_depth=len([item for item in load_queue(args.queue).get("items", []) if item.get("status") == "queued"]))
 
     try:
         while not _STOP_REQUESTED:
@@ -936,8 +988,20 @@ def main() -> int:
                 time.sleep(DEFAULT_SLEEP_SECONDS)
     finally:
         stop_active_runners(active_runners)
+        recovered_on_stop = recover_orphaned_running_items(
+            args.queue,
+            stale_after_seconds=0,
+            note="daemon shutdown recovered in-flight task",
+        )
         refresh_active_runner_state(tracker, [])
-        tracker.update(status="stopped", stop_requested=_STOP_REQUESTED)
+        tracker.update(
+            status="stopped",
+            stop_requested=_STOP_REQUESTED,
+            last_result={
+                "status": "stopped",
+                "recovered_on_stop": len(recovered_on_stop),
+            },
+        )
         lock.release()
 
     return 0

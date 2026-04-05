@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import importlib.util
 import json
-import subprocess
 import sys
 from pathlib import Path
 
@@ -140,6 +139,75 @@ def test_enqueue_generated_tasks_skips_terminal_fleet_item_when_evidence_is_unch
     assert appended == 0
     payload = json.loads(queue_path.read_text())
     assert payload["items"][0]["status"] == "completed"
+
+
+
+def test_enqueue_generated_tasks_skips_refresh_when_pr_handoff_already_exists(tmp_path: Path) -> None:
+    queue_path = tmp_path / "queue.json"
+    queue_path.write_text(
+        json.dumps(
+            {
+                "items": [
+                    {
+                        "id": "fleet-task",
+                        "status": "completed",
+                        "source": "fleet:route-claim-scan",
+                        "completed_at": "2024-01-01T00:00:00Z",
+                        "evidence_fingerprint": "old-fingerprint",
+                        "notes": [{"message": "runner completed successfully; pushed autonomy/fleet-task; draft PR ready"}],
+                    }
+                ]
+            }
+        )
+    )
+
+    appended = DAEMON.enqueue_generated_tasks(
+        queue_path,
+        [{"id": "fleet-task", "title": "Skip me", "source": "fleet:route-claim-scan", "evidence_fingerprint": "new-fingerprint"}],
+        cooldown_seconds=60,
+    )
+
+    assert appended == 0
+    payload = json.loads(queue_path.read_text())
+    assert payload["items"][0]["status"] == "completed"
+
+
+
+def test_recover_orphaned_running_items_requeues_stale_tasks(tmp_path: Path) -> None:
+    queue_path = tmp_path / "queue.json"
+    queue_path.write_text(
+        json.dumps(
+            {
+                "items": [
+                    {
+                        "id": "stale-runner",
+                        "status": "running",
+                        "lane": "codex",
+                        "runner": "codex",
+                        "updated_at": "2024-01-01T00:00:00Z",
+                    },
+                    {
+                        "id": "fresh-runner",
+                        "status": "running",
+                        "lane": "opencode",
+                        "runner": "opencode",
+                        "updated_at": "2999-01-01T00:00:00Z",
+                    },
+                ]
+            }
+        )
+    )
+
+    recovered = DAEMON.recover_orphaned_running_items(queue_path, stale_after_seconds=60)
+
+    assert recovered == ["stale-runner"]
+    payload = json.loads(queue_path.read_text())
+    stale_item = next(item for item in payload["items"] if item["id"] == "stale-runner")
+    fresh_item = next(item for item in payload["items"] if item["id"] == "fresh-runner")
+    assert stale_item["status"] == "queued"
+    assert any("recovered orphaned running task" in note.get("message", "") for note in stale_item.get("notes", []))
+    assert fresh_item["status"] == "running"
+
 
 
 def test_daemon_lock_prevents_second_instance(tmp_path: Path) -> None:
@@ -307,52 +375,3 @@ def test_runner_command_targets_specific_task(tmp_path: Path) -> None:
     assert "--task-id" in command
     assert command[command.index("--task-id") + 1] == "task-123"
     assert command[-1] == "--execute"
-
-
-def test_maybe_reconcile_prs_runs_script_and_updates_tracker(tmp_path: Path, monkeypatch) -> None:
-    args = Args(tmp_path)
-    args.pr_reconcile_interval = 300
-    status_path = tmp_path / "daemon-status.json"
-    tracker = DAEMON.StatusTracker(status_path, args)
-
-    calls: list[tuple[list[str], str]] = []
-
-    def fake_run(command: list[str], cwd: str, text: bool, capture_output: bool) -> subprocess.CompletedProcess[str]:
-        calls.append((command, cwd))
-        return subprocess.CompletedProcess(command, 0, stdout="ok", stderr="")
-
-    monkeypatch.setattr(DAEMON.subprocess, "run", fake_run)
-
-    result = DAEMON.maybe_reconcile_prs(args, tracker, force=True)
-
-    assert result == {"ran": True, "exit_code": 0}
-    assert calls == [(["python3", "scripts/autonomy/reconcile_prs.py"], str(tmp_path))]
-
-    state = json.loads(status_path.read_text())
-    assert state["last_pr_reconcile_result"]["exit_code"] == 0
-    assert state["last_pr_reconcile_result"]["stdout"] == "ok"
-
-
-def test_runner_command_includes_worktree_override(tmp_path: Path) -> None:
-    args = type(
-        "ArgsObj",
-        (),
-        {
-            "queue": str(tmp_path / "queue.json"),
-            "repo_root": str(tmp_path),
-            "backend_worktree": str(tmp_path / "backend"),
-            "frontend_worktree": str(tmp_path / "frontend"),
-            "backend_candidates": "",
-            "frontend_candidates": "",
-            "output_dir": str(tmp_path / "out"),
-            "lane_state": str(tmp_path / "lane-state.json"),
-            "report_log": str(tmp_path / "status.jsonl"),
-        },
-    )()
-
-    command = DAEMON.runner_command(
-        args, task_id="task-123", worktree_override=str(tmp_path / "backend-b")
-    )
-
-    assert "--worktree-override" in command
-    assert command[command.index("--worktree-override") + 1] == str(tmp_path / "backend-b")

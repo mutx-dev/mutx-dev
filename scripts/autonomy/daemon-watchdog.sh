@@ -16,10 +16,11 @@ PYTHON_BIN=""
 mkdir -p "$(dirname "$WATCHDOG_LOG")" "$(dirname "$RESTART_STAMP")"
 
 resolve_python_bin() {
-  if ! PYTHON_BIN="$($BOOTSTRAP_PYTHON "$PYTHON_RESOLVER")"; then
-    echo "failed to resolve supported autonomy python runtime" >&2
-    return 1
+  if [[ -n "${MUTX_AUTONOMY_PYTHON:-}" ]]; then
+    PYTHON_BIN="$MUTX_AUTONOMY_PYTHON"
+    return 0
   fi
+  PYTHON_BIN="$($BOOTSTRAP_PYTHON "$PYTHON_RESOLVER")"
   export MUTX_AUTONOMY_PYTHON="$PYTHON_BIN"
 }
 
