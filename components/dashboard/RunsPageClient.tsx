@@ -164,7 +164,8 @@ export function RunsPageClient() {
               </div>
             ))}
           </div>
-        )}
+        </div>
+      )}
       </LivePanel>
     </div>
   );

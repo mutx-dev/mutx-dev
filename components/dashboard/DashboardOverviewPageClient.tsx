@@ -477,6 +477,7 @@ export function DashboardOverviewPageClient() {
                     </div>
                   ))}
                 </div>
+              </div>
             )}
           </LivePanel>
         </div>

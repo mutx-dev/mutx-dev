@@ -24,6 +24,7 @@ export const dashboardTokens = {
   brand: "var(--mutx-dashboard-brand, #8ad8ff)",
   brandStrong: "var(--mutx-dashboard-brand-strong, #dff5ff)",
   brandSoft: "var(--mutx-dashboard-brand-soft, rgba(118, 208, 255, 0.14))",
+  statusActive: "var(--mutx-dashboard-status-active, var(--mutx-dashboard-status-running-dot, #53c6ff))",
   warn: "var(--mutx-dashboard-warn, #ffbd66)",
   warnSoft: "var(--mutx-dashboard-warn-soft, rgba(255, 189, 102, 0.14))",
   danger: "var(--mutx-dashboard-danger, #ff8ea2)",
