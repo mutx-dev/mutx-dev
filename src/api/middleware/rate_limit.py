@@ -1,5 +1,7 @@
 """Rate limiting middleware for the API."""
 
+import hashlib
+import hmac
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Callable
@@ -55,6 +57,33 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         """Extract client IP from the direct connection."""
         return request.client.host if request.client else "unknown"
 
+    @staticmethod
+    def _fingerprint(value: str) -> str:
+        """Create a stable keyed fingerprint for rate-limit bucket labels."""
+        secret = settings.jwt_secret.encode()
+        return hmac.new(secret, value.encode(), hashlib.sha256).hexdigest()[:24]
+
+    def _extract_api_key_token(self, request: Request) -> str | None:
+        x_api_key = request.headers.get("X-API-Key")
+        if x_api_key:
+            token = x_api_key.strip()
+            if token:
+                return token
+
+        authorization = request.headers.get("Authorization")
+        if not authorization:
+            return None
+
+        parts = authorization.split()
+        if len(parts) != 2 or parts[0].lower() != "bearer":
+            return None
+
+        token = parts[1].strip()
+        if token.startswith("mutx_") or token.startswith("mutx_live_"):
+            return token
+
+        return None
+
     def _get_client_identifier(self, request: Request) -> str:
         """Resolve rate-limit bucket key using authenticated API key context or IP fallback."""
         auth_api_key_identifier = getattr(request.state, "auth_api_key_identifier", None)
@@ -108,12 +137,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         if current_count >= limit:
             retry_after = window_seconds
-            # CodeQL false positive: client_id is already masked/pseudonymized above
-            # _mask_client_for_logging ensures no sensitive data appears in logs
-            logger.warning(  # noqa: S312
-                "Rate limit exceeded | policy=%s | client=%s | count=%s | limit=%s",
+            logger.warning(
+                "Rate limit exceeded | policy=%s | bucket=%s | count=%s | limit=%s",
                 policy_name,
-                self._mask_client_for_logging(client_id),
+                self._fingerprint(bucket_id),
                 current_count,
                 limit,
             )

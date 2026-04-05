@@ -107,7 +107,10 @@ def test_login_reports_unreachable_api_without_traceback(monkeypatch) -> None:
     )
 
     assert result.exit_code == 0
-    assert "https://api.mutx.dev" in result.output
+    assert any(
+        line.strip() == "Error: Could not reach API at https://api.mutx.dev. Check that the control plane is running and reachable."
+        for line in result.output.splitlines()
+    )
     assert "Traceback" not in result.output
 
 

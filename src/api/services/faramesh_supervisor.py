@@ -175,12 +175,25 @@ class FarameshSupervisor:
 
         return normalized_env
 
+    @staticmethod
+    def _normalize_policy_fragment(faramesh_policy: str) -> Path:
+        policy_fragment = faramesh_policy.strip()
+        if not policy_fragment:
+            raise SupervisionValidationError("Faramesh policy must not be empty")
+
+        requested_path = Path(policy_fragment)
+        if requested_path.is_absolute() or "~" in requested_path.parts:
+            raise SupervisionValidationError("Faramesh policy must be a relative path inside the allowlist")
+        if any(part in {"", ".", ".."} for part in requested_path.parts):
+            raise SupervisionValidationError("Faramesh policy path contains invalid traversal segments")
+        return requested_path
+
     def _resolve_trusted_policy_path(self, faramesh_policy: Optional[str]) -> Optional[str]:
         if not faramesh_policy:
             return self.config.policy_path
 
-        configured_path = Path(faramesh_policy).expanduser()
-        if not configured_path.is_absolute() and self.config.allowed_policy_dir:
+        configured_path = self._normalize_policy_fragment(faramesh_policy)
+        if self.config.allowed_policy_dir:
             configured_path = Path(self.config.allowed_policy_dir).expanduser() / configured_path
         configured_path = configured_path.resolve()
 
@@ -226,10 +239,7 @@ class FarameshSupervisor:
             )
 
         allowed_dir = Path(self.config.allowed_policy_dir).expanduser().resolve()
-        requested_path = Path(faramesh_policy).expanduser()
-        if not requested_path.is_absolute():
-            requested_path = allowed_dir / requested_path
-        requested_path = requested_path.resolve()
+        requested_path = (allowed_dir / self._normalize_policy_fragment(faramesh_policy)).resolve()
 
         try:
             requested_path.relative_to(allowed_dir)

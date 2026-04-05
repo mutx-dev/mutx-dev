@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,6 +13,8 @@ from src.api.services.operator_state import (
     get_runtime_provider_snapshot,
     upsert_runtime_provider_snapshot,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/runtime", tags=["runtime"])
 
@@ -54,8 +58,13 @@ async def governance_metrics(
         snapshot = collect_faramesh_snapshot()
         metrics_text = generate_prometheus_metrics(snapshot)
         return Response(content=metrics_text, media_type="text/plain")
-    except Exception as e:
-        return Response(content=f"# Error: {e}\n", status_code=500, media_type="text/plain")
+    except Exception:
+        logger.exception("Failed to generate governance metrics")
+        return Response(
+            content="# Error: governance metrics unavailable\n",
+            status_code=500,
+            media_type="text/plain",
+        )
 
 
 @router.get("/governance/status")
@@ -80,5 +89,6 @@ async def governance_status(
             "pending_approvals": snapshot.pending_approvals,
             "status": snapshot.status,
         }
-    except Exception as e:
-        return {"error": str(e)}
+    except Exception:
+        logger.exception("Failed to collect governance status")
+        return {"error": "governance status unavailable"}
