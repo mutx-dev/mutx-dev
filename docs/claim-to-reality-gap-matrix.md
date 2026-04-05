@@ -51,7 +51,7 @@
 | Claim | Source | Reality | Status |
 |-------|--------|---------|--------|
 | "Governance (Faramesh) — CLI commands for governance inspection and approval actions" | surfaces.md | `mutx governance` CLI exists in `cli/commands/governance.py` | SHIPPED |
-| "Governance — Prometheus metrics export via `/v1/governance/metrics`" | surfaces.md | `/v1/governance/metrics` is NOT in the OpenAPI spec | MISLEADING |
+| "Governance — Prometheus metrics export via `/v1/runtime/governance/metrics`" | surfaces.md | `/v1/runtime/governance/metrics` confirmed in OpenAPI. | SHIPPED |
 | "Governance — Policy enforcement (PERMIT/DENY/DEFER) via FPL" | surfaces.md | Code exists in `src/security/` and `faramesh_supervisor.py` | SHIPPED |
 | "Governance — Credential broker (Vault, AWS, GCP, Azure, 1Password, Infisical)" | surfaces.md | Vault stub + credential broker service exists but is incomplete | PARTIAL |
 | "Dashboard — RAG search and scheduler return 503 with feature flags" | surfaces.md | Confirmed — returns 503 when runtime is not configured | PLACEHOLDER |

@@ -11,7 +11,8 @@ Usage:
     run = client.observability.report_run({...})
 
     # List runs
-    runs = client.observability.list_runs(agent_id="xxx")
+    run_page = client.observability.list_runs(agent_id="agent-123")
+    runs = run_page["items"]
 
     # Submit an eval
     eval_result = client.observability.submit_eval("run-id", {...})

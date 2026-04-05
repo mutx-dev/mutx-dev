@@ -131,7 +131,7 @@ Governance is integrated via [Faramesh](https://faramesh.dev) and provides deter
 - Policy enforcement (PERMIT/DENY/DEFER) via FPL
 - CLI commands for governance inspection and approval actions
 - Governor tab in Textual TUI
-- Prometheus metrics export via `/v1/governance/metrics`
+- Prometheus metrics export via `/v1/runtime/governance/metrics`
 - Bundled policy packs (starter, payment-bot, infra-bot, customer-support)
 - SPIFFE/SPIRE workload identity
 - Governance webhooks with FPL `notify` directive routing
