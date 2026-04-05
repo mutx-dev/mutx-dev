@@ -28,15 +28,25 @@ def is_clean_worktree(path: str | Path) -> bool:
     return result.returncode == 0 and not result.stdout.strip()
 
 
-def first_valid_worktree(candidates: Iterable[str | Path], *, allow_dirty: bool = True) -> str | None:
+def list_valid_worktrees(
+    candidates: Iterable[str | Path], *, allow_dirty: bool = True
+) -> list[str]:
+    valid: list[str] = []
     for candidate in candidates:
         candidate_path = Path(candidate)
         if not is_git_worktree(candidate_path):
             continue
         if not allow_dirty and not is_clean_worktree(candidate_path):
             continue
-        return str(candidate_path)
-    return None
+        valid.append(str(candidate_path))
+    return valid
+
+
+def first_valid_worktree(
+    candidates: Iterable[str | Path], *, allow_dirty: bool = True
+) -> str | None:
+    valid = list_valid_worktrees(candidates, allow_dirty=allow_dirty)
+    return valid[0] if valid else None
 
 
 def current_branch(path: str | Path) -> str | None:
@@ -90,6 +100,63 @@ def summarize_handoff_failure(stderr: str, stdout: str = "") -> str:
     return "handoff_failed"
 
 
+def summarize_branch_prepare_failure(stderr: str, stdout: str = "") -> str:
+    text = f"{stdout}\n{stderr}".lower()
+    if "already checked out at" in text:
+        return "branch_in_use"
+    if "not a git repository" in text:
+        return "invalid_worktree"
+    return "branch_prepare_failed"
+
+
+def local_branch_exists(path: str | Path, branch: str) -> bool:
+    result = run_git(["show-ref", "--verify", "--quiet", f"refs/heads/{branch}"], path)
+    return result.returncode == 0
+
+
+def prepare_task_branch(path: str | Path, branch: str) -> dict[str, Any]:
+    if not branch:
+        return {"status": "blocked", "reason": "missing_branch"}
+    if not is_git_worktree(path):
+        return {"status": "blocked", "reason": "invalid_worktree", "branch": branch}
+    if not is_clean_worktree(path):
+        return {"status": "blocked", "reason": "dirty_worktree", "branch": branch}
+
+    previous_branch = current_branch(path)
+    if previous_branch == branch:
+        return {
+            "status": "ready",
+            "branch": branch,
+            "previous_branch": previous_branch,
+            "created": False,
+        }
+
+    if local_branch_exists(path, branch):
+        result = run_git(["checkout", branch], path)
+        created = False
+    else:
+        result = run_git(["checkout", "-b", branch], path)
+        created = True
+
+    if result.returncode != 0:
+        return {
+            "status": "blocked",
+            "reason": summarize_branch_prepare_failure(result.stderr, result.stdout),
+            "branch": branch,
+            "previous_branch": previous_branch,
+            "stdout": result.stdout[-4000:],
+            "stderr": result.stderr[-4000:],
+        }
+    return {
+        "status": "ready",
+        "branch": branch,
+        "previous_branch": previous_branch,
+        "created": created,
+        "stdout": result.stdout[-4000:],
+        "stderr": result.stderr[-4000:],
+    }
+
+
 def push_branch(path: str | Path, branch: str, *, remote: str | None = None) -> dict[str, Any]:
     selected_remote = remote or default_remote(path)
     if not branch:
@@ -121,7 +188,9 @@ def gh_authenticated(path: str | Path) -> bool:
 
 
 def find_existing_pr(path: str | Path, branch: str) -> dict[str, Any] | None:
-    result = run_gh(["pr", "list", "--head", branch, "--json", "number,url,isDraft,state", "--limit", "1"], path)
+    result = run_gh(
+        ["pr", "list", "--head", branch, "--json", "number,url,isDraft,state", "--limit", "1"], path
+    )
     if result.returncode != 0:
         return None
     try:
@@ -220,7 +289,9 @@ def promote_pr_ready(path: str | Path, pr_number: int | str | None) -> dict[str,
     }
 
 
-def enable_pr_auto_merge(path: str | Path, pr_number: int | str | None, *, merge_method: str = "squash") -> dict[str, Any]:
+def enable_pr_auto_merge(
+    path: str | Path, pr_number: int | str | None, *, merge_method: str = "squash"
+) -> dict[str, Any]:
     if not pr_number:
         return {"status": "skipped", "reason": "missing_pr_number"}
     if not gh_cli_available():
@@ -268,7 +339,9 @@ def publish_branch_with_pr(
             "pr": {"status": "skipped", "reason": f"push_{reason}"},
             "note": f"branch push unavailable ({reason})",
         }
-    pr_result = create_pr(path, branch, title=title, body=body, base_branch=effective_base, draft=draft)
+    pr_result = create_pr(
+        path, branch, title=title, body=body, base_branch=effective_base, draft=draft
+    )
     ready_result: dict[str, Any] | None = None
     auto_merge_result: dict[str, Any] | None = None
     note = f"pushed {branch}"
@@ -290,7 +363,9 @@ def publish_branch_with_pr(
             if auto_merge_result.get("status") == "enabled":
                 note += "; auto-merge enabled"
             else:
-                note += f"; auto-merge skipped ({auto_merge_result.get('reason', 'handoff_failed')})"
+                note += (
+                    f"; auto-merge skipped ({auto_merge_result.get('reason', 'handoff_failed')})"
+                )
     elif pr_result.get("status") == "skipped":
         note = f"pushed {branch}; {'draft' if draft else 'ready'} PR skipped ({pr_result.get('reason')})"
     else:

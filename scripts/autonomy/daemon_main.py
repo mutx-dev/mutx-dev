@@ -13,11 +13,17 @@ import time
 from pathlib import Path
 from typing import Any
 
-from lane_contract import LanePaths, build_work_order, queued_items_in_priority_order
+from lane_contract import (
+    LanePaths,
+    build_work_order,
+    queued_items_in_priority_order,
+    worktree_candidates_for_lane,
+)
 from lane_state import is_lane_paused, lane_reason, load_lane_state
 from queue_state import load_queue, save_queue, set_status
 from report_status import append_jsonl, build_report, utc_now_iso
 from resume_policy import apply_auto_resume
+from worktree_utils import list_valid_worktrees
 
 DEFAULT_SLEEP_SECONDS = 60
 DEFAULT_ACTIVE_POLL_SECONDS = 5
@@ -94,7 +100,9 @@ class StatusTracker:
             "consecutive_idle_cycles": 0,
             "cycle_count": 0,
             "fleet_tasks_enqueued": 0,
-            "queue_refill_threshold": getattr(args, "queue_refill_threshold", DEFAULT_QUEUE_REFILL_THRESHOLD),
+            "queue_refill_threshold": getattr(
+                args, "queue_refill_threshold", DEFAULT_QUEUE_REFILL_THRESHOLD
+            ),
             "last_auto_resume_at": None,
             "last_auto_resume_result": None,
             "last_pr_reconcile_at": None,
@@ -136,10 +144,19 @@ class StatusTracker:
 
 
 class ActiveRunner:
-    def __init__(self, *, task_id: str, lane: str, runner: str, process: subprocess.Popen[str]) -> None:
+    def __init__(
+        self,
+        *,
+        task_id: str,
+        lane: str,
+        runner: str,
+        worktree: str,
+        process: subprocess.Popen[str],
+    ) -> None:
         self.task_id = task_id
         self.lane = lane
         self.runner = runner
+        self.worktree = worktree
         self.process = process
         self.started_at = utc_now_iso()
 
@@ -148,6 +165,7 @@ class ActiveRunner:
             "task_id": self.task_id,
             "lane": self.lane,
             "runner": self.runner,
+            "worktree": self.worktree,
             "pid": self.process.pid,
             "started_at": self.started_at,
         }
@@ -211,8 +229,13 @@ def execution_lane_for(runner: str, lane: str) -> str:
     return runner if runner in {"codex", "opencode", "main"} else lane
 
 
-def runner_command(orchestrator_args: argparse.Namespace, *, task_id: str) -> list[str]:
-    return [
+def runner_command(
+    orchestrator_args: argparse.Namespace,
+    *,
+    task_id: str,
+    worktree_override: str | None = None,
+) -> list[str]:
+    command = [
         "python3",
         "scripts/autonomy/orchestrator_main.py",
         "--queue",
@@ -237,12 +260,17 @@ def runner_command(orchestrator_args: argparse.Namespace, *, task_id: str) -> li
         task_id,
         "--execute",
     ]
+    if worktree_override:
+        command.extend(["--worktree-override", worktree_override])
+    return command
 
 
 TERMINAL_QUEUE_STATUSES = {"completed", "failed", "blocked", "merged", "cancelled"}
 
 
-def _is_stale_terminal_fleet_item(item: dict[str, Any], task: dict[str, Any], *, cooldown_seconds: int) -> bool:
+def _is_stale_terminal_fleet_item(
+    item: dict[str, Any], task: dict[str, Any], *, cooldown_seconds: int
+) -> bool:
     status = str(item.get("status") or "queued")
     if status not in TERMINAL_QUEUE_STATUSES:
         return False
@@ -251,7 +279,11 @@ def _is_stale_terminal_fleet_item(item: dict[str, Any], task: dict[str, Any], *,
         return False
     existing_fingerprint = str(item.get("evidence_fingerprint") or "")
     incoming_fingerprint = str(task.get("evidence_fingerprint") or "")
-    if existing_fingerprint and incoming_fingerprint and existing_fingerprint == incoming_fingerprint:
+    if (
+        existing_fingerprint
+        and incoming_fingerprint
+        and existing_fingerprint == incoming_fingerprint
+    ):
         return False
     ts = item.get("completed_at") or item.get("updated_at")
     if not ts:
@@ -263,7 +295,12 @@ def _is_stale_terminal_fleet_item(item: dict[str, Any], task: dict[str, Any], *,
     return age_seconds >= cooldown_seconds
 
 
-def enqueue_generated_tasks(queue_path: str | Path, tasks: list[dict[str, Any]], *, cooldown_seconds: int = DEFAULT_FLEET_REQUEUE_COOLDOWN) -> int:
+def enqueue_generated_tasks(
+    queue_path: str | Path,
+    tasks: list[dict[str, Any]],
+    *,
+    cooldown_seconds: int = DEFAULT_FLEET_REQUEUE_COOLDOWN,
+) -> int:
     if not tasks:
         return 0
     queue = load_queue(queue_path)
@@ -282,7 +319,9 @@ def enqueue_generated_tasks(queue_path: str | Path, tasks: list[dict[str, Any]],
         existing_index = item_index.get(task_id)
         if existing_index is not None:
             existing = items[existing_index]
-            if not _is_stale_terminal_fleet_item(existing, payload, cooldown_seconds=cooldown_seconds):
+            if not _is_stale_terminal_fleet_item(
+                existing, payload, cooldown_seconds=cooldown_seconds
+            ):
                 continue
             notes = list(existing.get("notes") or [])
             notes.append({"ts": utc_now_iso(), "message": "fleet task refreshed after cooldown"})
@@ -315,7 +354,9 @@ def run_fleet_scan(args: argparse.Namespace) -> list[dict[str, Any]]:
     ]
     result = subprocess.run(command, cwd=args.repo_root, text=True, capture_output=True)
     if result.returncode != 0:
-        raise RuntimeError(result.stderr.strip() or result.stdout.strip() or "fleet generation failed")
+        raise RuntimeError(
+            result.stderr.strip() or result.stdout.strip() or "fleet generation failed"
+        )
     if not output_path.exists():
         return []
     payload = json.loads(output_path.read_text(encoding="utf-8"))
@@ -338,7 +379,9 @@ def run_issue_sync(args: argparse.Namespace) -> list[dict[str, Any]]:
     ]
     result = subprocess.run(command, cwd=args.repo_root, text=True, capture_output=True)
     if result.returncode != 0:
-        raise RuntimeError(result.stderr.strip() or result.stdout.strip() or "github issue sync failed")
+        raise RuntimeError(
+            result.stderr.strip() or result.stdout.strip() or "github issue sync failed"
+        )
     if not output_path.exists():
         return []
     payload = json.loads(output_path.read_text(encoding="utf-8"))
@@ -349,7 +392,12 @@ def run_issue_sync(args: argparse.Namespace) -> list[dict[str, Any]]:
 
 def maybe_resume_codex_lane(args: argparse.Namespace, tracker: StatusTracker) -> dict[str, Any]:
     if args.codex_auto_resume_max_attempts <= 0:
-        return {"changed": False, "eligible": False, "blocked_by": "auto_resume_disabled", "requeued_items": 0}
+        return {
+            "changed": False,
+            "eligible": False,
+            "blocked_by": "auto_resume_disabled",
+            "requeued_items": 0,
+        }
     result = apply_auto_resume(
         args.lane_state,
         args.queue,
@@ -362,7 +410,9 @@ def maybe_resume_codex_lane(args: argparse.Namespace, tracker: StatusTracker) ->
     return result
 
 
-def maybe_reconcile_prs(args: argparse.Namespace, tracker: StatusTracker, *, force: bool = False) -> dict[str, Any]:
+def maybe_reconcile_prs(
+    args: argparse.Namespace, tracker: StatusTracker, *, force: bool = False
+) -> dict[str, Any]:
     interval = max(0, int(getattr(args, "pr_reconcile_interval", DEFAULT_PR_RECONCILE_INTERVAL)))
     last_run = tracker.state.get("last_pr_reconcile_at")
     if not force and interval and last_run:
@@ -385,13 +435,19 @@ def maybe_reconcile_prs(args: argparse.Namespace, tracker: StatusTracker, *, for
     return {"ran": True, "exit_code": result.returncode}
 
 
-def maybe_run_issue_sync(args: argparse.Namespace, tracker: StatusTracker, *, queued_items: int, force: bool = False) -> int:
+def maybe_run_issue_sync(
+    args: argparse.Namespace, tracker: StatusTracker, *, queued_items: int, force: bool = False
+) -> int:
     if not args.github_issue_sync_enabled:
         return 0
     if not force and queued_items > args.queue_refill_threshold:
         return 0
     last_sync_at = tracker.state.get("last_issue_sync_at")
-    if not force and last_sync_at and (time.time() - parse_epoch(last_sync_at)) < args.github_issue_sync_interval:
+    if (
+        not force
+        and last_sync_at
+        and (time.time() - parse_epoch(last_sync_at)) < args.github_issue_sync_interval
+    ):
         return 0
     tracker.update(last_issue_sync_at=utc_now_iso())
     tasks = run_issue_sync(args)
@@ -401,13 +457,19 @@ def maybe_run_issue_sync(args: argparse.Namespace, tracker: StatusTracker, *, qu
     return appended
 
 
-def maybe_run_fleet_scan(args: argparse.Namespace, tracker: StatusTracker, *, queued_items: int, force: bool = False) -> int:
+def maybe_run_fleet_scan(
+    args: argparse.Namespace, tracker: StatusTracker, *, queued_items: int, force: bool = False
+) -> int:
     if not args.fleet_scan_interval or args.fleet_scan_interval < 0:
         return 0
     if not force and queued_items > args.queue_refill_threshold:
         return 0
     last_scan_at = tracker.state.get("last_fleet_scan_at")
-    if not force and last_scan_at and (time.time() - parse_epoch(last_scan_at)) < args.fleet_scan_interval:
+    if (
+        not force
+        and last_scan_at
+        and (time.time() - parse_epoch(last_scan_at)) < args.fleet_scan_interval
+    ):
         return 0
     tracker.update(last_fleet_scan_at=utc_now_iso())
     tasks = run_fleet_scan(args)
@@ -420,7 +482,9 @@ def maybe_run_fleet_scan(args: argparse.Namespace, tracker: StatusTracker, *, qu
     return appended
 
 
-def build_idle_report(args: argparse.Namespace, idle_delay: int, queued_items: int, appended: int = 0) -> dict[str, Any]:
+def build_idle_report(
+    args: argparse.Namespace, idle_delay: int, queued_items: int, appended: int = 0
+) -> dict[str, Any]:
     summary = f"Queue empty ({queued_items} queued items); sleeping for {idle_delay}s"
     next_action = "wait_for_queue_items"
     if appended:
@@ -495,17 +559,29 @@ def park_paused_item(
     )
 
 
+def select_dispatch_worktree(
+    lane: str, paths: LanePaths, reserved_worktrees: set[str]
+) -> str | None:
+    candidates = worktree_candidates_for_lane(lane, paths)
+    for allow_dirty in (False, True):
+        for worktree in list_valid_worktrees(candidates, allow_dirty=allow_dirty):
+            if worktree not in reserved_worktrees:
+                return worktree
+    return None
+
+
 def select_dispatch_candidates(
     queue: dict[str, Any],
     lane_state: dict[str, Any],
     paths: LanePaths,
     *,
-    busy_lanes: set[str],
+    busy_worktrees: set[str],
     limit: int,
 ) -> tuple[list[dict[str, str]], int]:
     selected: list[dict[str, str]] = []
     parked = 0
-    reserved_lanes = set(busy_lanes)
+    dispatch_count = 0
+    reserved_worktrees = set(busy_worktrees)
     for item in queued_items_in_priority_order(queue):
         work_order = build_work_order(item, paths)
         active_lane = execution_lane_for(work_order.runner, work_order.lane)
@@ -524,33 +600,39 @@ def select_dispatch_candidates(
             )
             parked += 1
             continue
-        if active_lane in reserved_lanes:
+        selected_worktree = select_dispatch_worktree(work_order.lane, paths, reserved_worktrees)
+        if not selected_worktree:
             continue
-        reserved_lanes.add(active_lane)
+        reserved_worktrees.add(selected_worktree)
         selected.append(
             {
                 "action": "dispatch",
                 "task_id": work_order.id,
                 "lane": work_order.lane,
                 "runner": work_order.runner,
-                "worktree": work_order.worktree,
+                "worktree": selected_worktree,
                 "active_lane": active_lane,
             }
         )
-        if len([item for item in selected if item["action"] == "dispatch"]) >= limit:
+        dispatch_count += 1
+        if dispatch_count >= limit:
             break
     return selected, parked
 
 
-def launch_runner(args: argparse.Namespace, task_id: str, lane: str, runner: str) -> ActiveRunner:
+def launch_runner(
+    args: argparse.Namespace, task_id: str, lane: str, runner: str, worktree: str
+) -> ActiveRunner:
     process = subprocess.Popen(
-        runner_command(args, task_id=task_id),
+        runner_command(args, task_id=task_id, worktree_override=worktree),
         cwd=args.repo_root,
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
-    return ActiveRunner(task_id=task_id, lane=lane, runner=runner, process=process)
+    return ActiveRunner(
+        task_id=task_id, lane=lane, runner=runner, worktree=worktree, process=process
+    )
 
 
 def stop_active_runners(active_runners: list[ActiveRunner]) -> None:
@@ -572,8 +654,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Run the MUTX autonomous orchestrator daemon")
     parser.add_argument("--queue", default="mutx-engineering-agents/dispatch/action-queue.json")
     parser.add_argument("--repo-root", default="/Users/fortune/MUTX")
-    parser.add_argument("--backend-worktree", default="/Users/fortune/mutx-worktrees/autonomy/codex-main")
-    parser.add_argument("--frontend-worktree", default="/Users/fortune/mutx-worktrees/autonomy/opencode-main")
+    parser.add_argument(
+        "--backend-worktree", default="/Users/fortune/mutx-worktrees/autonomy/codex-main"
+    )
+    parser.add_argument(
+        "--frontend-worktree", default="/Users/fortune/mutx-worktrees/autonomy/opencode-main"
+    )
     parser.add_argument(
         "--backend-candidates",
         default="/Users/fortune/mutx-worktrees/autonomy/codex-main:/Users/fortune/mutx-worktrees/engineering/control-plane-steward:/Users/fortune/mutx-worktrees/factory/backend",
@@ -595,8 +681,12 @@ def main() -> int:
     parser.add_argument("--github-issue-sync-enabled", action="store_true")
     parser.add_argument("--idle-report-interval", type=int, default=DEFAULT_IDLE_REPORT_INTERVAL)
     parser.add_argument("--fleet-scan-interval", type=int, default=DEFAULT_FLEET_SCAN_INTERVAL)
-    parser.add_argument("--github-issue-sync-interval", type=int, default=DEFAULT_ISSUE_SYNC_INTERVAL)
-    parser.add_argument("--queue-refill-threshold", type=int, default=DEFAULT_QUEUE_REFILL_THRESHOLD)
+    parser.add_argument(
+        "--github-issue-sync-interval", type=int, default=DEFAULT_ISSUE_SYNC_INTERVAL
+    )
+    parser.add_argument(
+        "--queue-refill-threshold", type=int, default=DEFAULT_QUEUE_REFILL_THRESHOLD
+    )
     parser.add_argument("--pr-reconcile-interval", type=int, default=DEFAULT_PR_RECONCILE_INTERVAL)
     parser.add_argument("--codex-auto-resume-pause-seconds", type=int, default=1800)
     parser.add_argument("--codex-auto-resume-max-attempts", type=int, default=3)
@@ -632,7 +722,9 @@ def main() -> int:
             auto_resume = maybe_resume_codex_lane(args, tracker)
             maybe_reconcile_prs(args, tracker)
             queue = load_queue(args.queue)
-            queued_items = [item for item in queue.get("items", []) if item.get("status") == "queued"]
+            queued_items = [
+                item for item in queue.get("items", []) if item.get("status") == "queued"
+            ]
             tracker.mark_cycle_start(len(queued_items))
 
             if auto_resume.get("changed"):
@@ -651,31 +743,38 @@ def main() -> int:
                     ),
                 )
                 queue = load_queue(args.queue)
-                queued_items = [item for item in queue.get("items", []) if item.get("status") == "queued"]
+                queued_items = [
+                    item for item in queue.get("items", []) if item.get("status") == "queued"
+                ]
                 tracker.update(queue_depth=len(queued_items))
 
             lane_state = load_lane_state(args.lane_state)
-            busy_lanes = {runner.lane for runner in active_runners}
+            busy_worktrees = {runner.worktree for runner in active_runners}
             dispatch_capacity = max(0, args.max_active_runners - len(active_runners))
 
             if not queued_items and not active_runners:
                 tracker.update(
                     status="idle",
-                    consecutive_idle_cycles=int(tracker.state.get("consecutive_idle_cycles", 0)) + 1,
+                    consecutive_idle_cycles=int(tracker.state.get("consecutive_idle_cycles", 0))
+                    + 1,
                 )
                 appended = 0
                 issue_appended = 0
                 fleet_error = None
                 try:
                     issue_appended = maybe_run_issue_sync(args, tracker, queued_items=0, force=True)
-                    appended = issue_appended or maybe_run_fleet_scan(args, tracker, queued_items=0, force=True)
+                    appended = issue_appended or maybe_run_fleet_scan(
+                        args, tracker, queued_items=0, force=True
+                    )
                 except Exception as exc:
                     fleet_error = str(exc)
                     tracker.update(last_error=fleet_error)
 
                 if appended:
                     queue = load_queue(args.queue)
-                    queued_items = [item for item in queue.get("items", []) if item.get("status") == "queued"]
+                    queued_items = [
+                        item for item in queue.get("items", []) if item.get("status") == "queued"
+                    ]
                     source = "github_issue_sync" if issue_appended else "fleet_enqueued"
                     tracker.mark_cycle_end(
                         status="active",
@@ -683,14 +782,22 @@ def main() -> int:
                         last_error=fleet_error,
                         queue_depth=len(queued_items),
                     )
-                    append_jsonl(Path(args.report_log), build_idle_report(args, 0, len(queued_items), appended))
+                    append_jsonl(
+                        Path(args.report_log),
+                        build_idle_report(args, 0, len(queued_items), appended),
+                    )
                     if args.once:
                         return 0
                     continue
 
                 idle_delay = next_idle_delay(idle_delay)
-                if should_emit_idle_report(tracker.state.get("last_idle_report_at"), args.idle_report_interval):
-                    append_jsonl(Path(args.report_log), build_idle_report(args, idle_delay, len(queued_items)))
+                if should_emit_idle_report(
+                    tracker.state.get("last_idle_report_at"), args.idle_report_interval
+                ):
+                    append_jsonl(
+                        Path(args.report_log),
+                        build_idle_report(args, idle_delay, len(queued_items)),
+                    )
                     tracker.update(last_idle_report_at=utc_now_iso())
                 tracker.mark_cycle_end(
                     status="idle",
@@ -704,16 +811,22 @@ def main() -> int:
                 continue
 
             idle_delay = 0
-            tracker.update(status="active", consecutive_idle_cycles=0, last_non_idle_at=utc_now_iso())
+            tracker.update(
+                status="active", consecutive_idle_cycles=0, last_non_idle_at=utc_now_iso()
+            )
             try:
                 issue_appended = maybe_run_issue_sync(args, tracker, queued_items=len(queued_items))
-                appended = issue_appended or maybe_run_fleet_scan(args, tracker, queued_items=len(queued_items))
+                appended = issue_appended or maybe_run_fleet_scan(
+                    args, tracker, queued_items=len(queued_items)
+                )
             except Exception as exc:
                 tracker.update(last_error=str(exc))
             else:
                 if appended:
                     queue = load_queue(args.queue)
-                    queued_items = [item for item in queue.get("items", []) if item.get("status") == "queued"]
+                    queued_items = [
+                        item for item in queue.get("items", []) if item.get("status") == "queued"
+                    ]
                     tracker.update(queue_depth=len(queued_items))
 
             dispatch_limit = min(args.burst_size, dispatch_capacity)
@@ -727,7 +840,7 @@ def main() -> int:
                     queue,
                     lane_state,
                     paths,
-                    busy_lanes=busy_lanes,
+                    busy_worktrees=busy_worktrees,
                     limit=dispatch_limit,
                 )
                 for selection in selections:
@@ -753,7 +866,13 @@ def main() -> int:
                     save_queue(args.queue, queue)
                     try:
                         active_runners.append(
-                            launch_runner(args, selection["task_id"], selection["active_lane"], selection["runner"])
+                            launch_runner(
+                                args,
+                                selection["task_id"],
+                                selection["active_lane"],
+                                selection["runner"],
+                                selection["worktree"],
+                            )
                         )
                         dispatches += 1
                     except Exception as exc:
@@ -770,9 +889,13 @@ def main() -> int:
 
             refresh_active_runner_state(tracker, active_runners)
             queue = load_queue(args.queue)
-            queued_items = [item for item in queue.get("items", []) if item.get("status") == "queued"]
+            queued_items = [
+                item for item in queue.get("items", []) if item.get("status") == "queued"
+            ]
             if active_runners or dispatches or finished:
-                tracker.update(status="active", consecutive_idle_cycles=0, last_non_idle_at=utc_now_iso())
+                tracker.update(
+                    status="active", consecutive_idle_cycles=0, last_non_idle_at=utc_now_iso()
+                )
                 last_result = {
                     "status": "active",
                     "dispatched": dispatches,
@@ -787,8 +910,13 @@ def main() -> int:
                     queue_depth=len(queued_items),
                 )
             else:
+                waiting_status = (
+                    "waiting_for_runner_capacity"
+                    if dispatch_capacity <= 0
+                    else "waiting_for_worktree_capacity"
+                )
                 last_result = {
-                    "status": "waiting_for_lane_capacity",
+                    "status": waiting_status,
                     "parked": parked,
                     "active_runners": len(active_runners),
                 }
