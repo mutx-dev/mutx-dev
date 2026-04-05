@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
+from queue_state import is_lease_active
 from worktree_utils import first_valid_worktree
 
 
@@ -158,7 +159,11 @@ def build_work_order(item: dict[str, Any], paths: LanePaths) -> WorkOrder:
 
 def queued_items_in_priority_order(queue: dict[str, Any]) -> list[dict[str, Any]]:
     items = queue.get("items", [])
-    queued = [item for item in items if item.get("status", "queued") == "queued"]
+    queued = [
+        item
+        for item in items
+        if item.get("status", "queued") == "queued" and not is_lease_active(item)
+    ]
     queued.sort(
         key=lambda item: (
             PRIORITY_ORDER.get(str(item.get("priority") or "p3").lower(), 99),

@@ -137,6 +137,30 @@ def test_select_next_item_prefers_highest_priority_then_score() -> None:
     assert selected["id"] == "p0-high"
 
 
+def test_select_next_item_ignores_actively_leased_items() -> None:
+    queue = {
+        "items": [
+            {
+                "id": "claimed-top",
+                "status": "queued",
+                "priority": "p0",
+                "score": 100,
+                "lease": {
+                    "lease_id": "lease-1",
+                    "holder": "daemon:test",
+                    "expires_at": "2999-01-01T00:00:00Z",
+                },
+            },
+            {"id": "next-up", "status": "queued", "priority": "p1", "score": 10},
+        ]
+    }
+
+    selected = LANE.select_next_item(queue)
+
+    assert selected is not None
+    assert selected["id"] == "next-up"
+
+
 
 def test_report_status_builds_normalized_payload() -> None:
     payload = REPORT.build_report(
@@ -201,6 +225,39 @@ def test_queue_state_updates_item_status() -> None:
     assert item["lane"] == "opencode"
     assert item["runner"] == "opencode"
     assert item["updated_at"].endswith("Z")
+
+
+def test_queue_state_claim_and_release_round_trip(tmp_path: Path) -> None:
+    queue_path = tmp_path / "queue.json"
+    queue_path.write_text(json.dumps({"items": [{"id": "issue-8", "status": "queued", "title": "demo"}]}))
+
+    claim = QUEUE_STATE.claim_task(
+        queue_path,
+        "issue-8",
+        holder="daemon:test:1",
+        lane="codex",
+        runner="codex",
+        note="claimed",
+    )
+
+    assert claim["status"] == "claimed"
+    lease_id = claim["lease"]["lease_id"]
+    payload = json.loads(queue_path.read_text())
+    item = payload["items"][0]
+    assert item["lease"]["holder"] == "daemon:test:1"
+    assert QUEUE_STATE.lease_matches(item, lease_id=lease_id, holder="daemon:test:1") is True
+
+    released = QUEUE_STATE.release_task_claim(
+        queue_path,
+        "issue-8",
+        lease_id=lease_id,
+        holder="daemon:test:1",
+        note="released",
+    )
+
+    assert released["status"] == "released"
+    payload = json.loads(queue_path.read_text())
+    assert "lease" not in payload["items"][0]
 
 
 
@@ -331,17 +388,17 @@ def test_orchestrator_prepares_preview_command(tmp_path: Path) -> None:
             str(queue_path),
             "--repo-root",
             "/repo",
-                "--backend-worktree",
-                str(backend),
-                "--frontend-worktree",
-                str(frontend),
-                "--backend-candidates",
-                str(backend),
-                "--frontend-candidates",
-                str(frontend),
-                "--output-dir",
-                str(output_dir),
-],
+            "--backend-worktree",
+            str(backend),
+            "--frontend-worktree",
+            str(frontend),
+            "--backend-candidates",
+            str(backend),
+            "--frontend-candidates",
+            str(frontend),
+            "--output-dir",
+            str(output_dir),
+        ],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -356,3 +413,62 @@ def test_orchestrator_prepares_preview_command(tmp_path: Path) -> None:
     work_order = json.loads(work_order_path.read_text())
     assert work_order["worktree"] == str(frontend)
     assert work_order["lane"] == "opencode"
+
+
+def test_orchestrator_rejects_execute_without_matching_claim(tmp_path: Path) -> None:
+    backend = tmp_path / "backend"
+    frontend = tmp_path / "frontend"
+    backend.mkdir()
+    frontend.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=backend, check=True)
+    subprocess.run(["git", "init", "-q"], cwd=frontend, check=True)
+    queue_path = tmp_path / "queue.json"
+    queue_path.write_text(
+        json.dumps(
+            {
+                "items": [
+                    {
+                        "id": "issue-556",
+                        "title": "Refine dashboard filters",
+                        "description": "Frontend cleanup",
+                        "area": "area:web",
+                        "priority": "p1",
+                        "status": "queued",
+                    }
+                ]
+            }
+        )
+    )
+
+    result = subprocess.run(
+        [
+            "python3",
+            str(ORCHESTRATOR_PATH),
+            "--queue",
+            str(queue_path),
+            "--repo-root",
+            "/repo",
+            "--backend-worktree",
+            str(backend),
+            "--frontend-worktree",
+            str(frontend),
+            "--backend-candidates",
+            str(backend),
+            "--frontend-candidates",
+            str(frontend),
+            "--task-id",
+            "issue-556",
+            "--claim-holder",
+            "daemon:test:1",
+            "--lease-id",
+            "lease-missing",
+            "--execute",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 1
+    payload = json.loads(result.stdout)
+    assert payload["status"] == "task_claim_mismatch"

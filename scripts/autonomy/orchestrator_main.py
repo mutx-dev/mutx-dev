@@ -2,13 +2,23 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import socket
 import subprocess
 from pathlib import Path
 from typing import Any
 
 from lane_contract import LanePaths, WorkOrder, build_work_order, select_next_item
 from lane_state import is_lane_paused, lane_reason, load_lane_state, pause_lane, save_lane_state
-from queue_state import find_item, load_queue, save_queue, set_status
+from queue_state import (
+    DEFAULT_LEASE_SECONDS,
+    claim_task,
+    find_item,
+    lease_matches,
+    load_queue,
+    save_queue,
+    set_status,
+)
 from report_status import append_jsonl, build_report
 from worktree_utils import commit_tracked_files, current_branch, is_git_worktree, prepare_task_branch, publish_branch_with_pr
 
@@ -119,6 +129,10 @@ def next_action_for_handoff(commit_sha: str | None, handoff: dict[str, Any] | No
     return "push_branch_manually"
 
 
+def orchestrator_holder() -> str:
+    return f"orchestrator:{socket.gethostname()}:{os.getpid()}"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Pick the next MUTX task and prepare a worker invocation")
     parser.add_argument("--queue", default="mutx-engineering-agents/dispatch/action-queue.json")
@@ -137,6 +151,9 @@ def main() -> int:
     parser.add_argument("--report-log", default="reports/autonomy-status.jsonl")
     parser.add_argument("--lane-state", default=".autonomy/lane-state.json")
     parser.add_argument("--task-id", help="Execute a specific queued or running task by id")
+    parser.add_argument("--claim-holder", help="Expected task-claim holder for this work order")
+    parser.add_argument("--lease-id", help="Expected task-claim lease id for this work order")
+    parser.add_argument("--task-lease-seconds", type=int, default=DEFAULT_LEASE_SECONDS)
     parser.add_argument("--execute", action="store_true", help="Execute the selected lane preview command")
     args = parser.parse_args()
 
@@ -148,6 +165,10 @@ def main() -> int:
         frontend_candidates=split_candidates(args.frontend_candidates),
     )
     lane_state = load_lane_state(args.lane_state)
+
+    args.task_lease_seconds = max(30, args.task_lease_seconds)
+    claim_holder = args.claim_holder or orchestrator_holder()
+    lease_id = args.lease_id
 
     while True:
         queue = load_queue(args.queue)
@@ -168,11 +189,40 @@ def main() -> int:
                     )
                 )
                 return 1
+            if args.execute:
+                if not lease_id or not lease_matches(item, lease_id=lease_id, holder=claim_holder):
+                    print(
+                        json.dumps(
+                            {
+                                "status": "task_claim_mismatch",
+                                "task_id": args.task_id,
+                                "claim_holder": claim_holder,
+                                "lease_id": lease_id,
+                            },
+                            indent=2,
+                        )
+                    )
+                    return 1
         else:
             item = select_next_item(queue)
             if item is None:
                 print(json.dumps({"status": "idle"}, indent=2))
                 return 0
+            if args.execute:
+                claim = claim_task(
+                    args.queue,
+                    str(item.get("id") or ""),
+                    holder=claim_holder,
+                    lease_seconds=args.task_lease_seconds,
+                    lane=item.get("lane"),
+                    runner=item.get("runner"),
+                    note="orchestrator claimed task",
+                )
+                if claim.get("status") != "claimed":
+                    continue
+                lease_id = str((claim.get("lease") or {}).get("lease_id") or "")
+                queue = load_queue(args.queue)
+                item = find_item(queue, str(item.get("id") or "")) or item
 
         work_order = build_work_order(item, paths)
         execution_lane = work_order.runner if work_order.runner in {"codex", "opencode", "main"} else work_order.lane
@@ -225,6 +275,8 @@ def main() -> int:
         "work_order_path": str(work_order_path),
         "command": command,
         "worktree": work_order.worktree,
+        "claim_holder": claim_holder,
+        "lease_id": lease_id,
     }
 
     if not is_git_worktree(work_order.worktree):

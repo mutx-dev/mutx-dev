@@ -15,7 +15,14 @@ from typing import Any
 
 from lane_contract import LanePaths, build_work_order, queued_items_in_priority_order
 from lane_state import is_lane_paused, lane_reason, load_lane_state
-from queue_state import load_queue, save_queue, set_status
+from queue_state import (
+    DEFAULT_LEASE_SECONDS,
+    claim_task,
+    load_queue,
+    renew_task_claim,
+    save_queue,
+    set_status,
+)
 from report_status import append_jsonl, build_report, utc_now_iso
 from resume_policy import apply_auto_resume
 
@@ -30,6 +37,7 @@ DEFAULT_ISSUE_SYNC_INTERVAL = 900
 DEFAULT_QUEUE_REFILL_THRESHOLD = 2
 DEFAULT_FLEET_REQUEUE_COOLDOWN = 1800
 DEFAULT_PR_RECONCILE_INTERVAL = 300
+DEFAULT_TASK_LEASE_SECONDS = DEFAULT_LEASE_SECONDS
 LOCK_EXIT_CODE = 75
 STOP_SIGNALS = (signal.SIGINT, signal.SIGTERM)
 
@@ -136,10 +144,21 @@ class StatusTracker:
 
 
 class ActiveRunner:
-    def __init__(self, *, task_id: str, lane: str, runner: str, process: subprocess.Popen[str]) -> None:
+    def __init__(
+        self,
+        *,
+        task_id: str,
+        lane: str,
+        runner: str,
+        holder: str,
+        lease_id: str,
+        process: subprocess.Popen[str],
+    ) -> None:
         self.task_id = task_id
         self.lane = lane
         self.runner = runner
+        self.holder = holder
+        self.lease_id = lease_id
         self.process = process
         self.started_at = utc_now_iso()
 
@@ -148,6 +167,8 @@ class ActiveRunner:
             "task_id": self.task_id,
             "lane": self.lane,
             "runner": self.runner,
+            "holder": self.holder,
+            "lease_id": self.lease_id,
             "pid": self.process.pid,
             "started_at": self.started_at,
         }
@@ -207,11 +228,21 @@ def build_lane_paths(args: argparse.Namespace) -> LanePaths:
     )
 
 
+def daemon_holder() -> str:
+    return f"daemon:{socket.gethostname()}:{os.getpid()}"
+
+
 def execution_lane_for(runner: str, lane: str) -> str:
     return runner if runner in {"codex", "opencode", "main"} else lane
 
 
-def runner_command(orchestrator_args: argparse.Namespace, *, task_id: str) -> list[str]:
+def runner_command(
+    orchestrator_args: argparse.Namespace,
+    *,
+    task_id: str,
+    claim_holder: str,
+    lease_id: str,
+) -> list[str]:
     return [
         "python3",
         "scripts/autonomy/orchestrator_main.py",
@@ -235,6 +266,10 @@ def runner_command(orchestrator_args: argparse.Namespace, *, task_id: str) -> li
         orchestrator_args.report_log,
         "--task-id",
         task_id,
+        "--claim-holder",
+        claim_holder,
+        "--lease-id",
+        lease_id,
         "--execute",
     ]
 
@@ -441,6 +476,17 @@ def refresh_active_runner_state(tracker: StatusTracker, active_runners: list[Act
     tracker.update(active_runners=[runner.snapshot() for runner in active_runners])
 
 
+def renew_active_claims(args: argparse.Namespace, active_runners: list[ActiveRunner]) -> None:
+    for runner in active_runners:
+        renew_task_claim(
+            args.queue,
+            runner.task_id,
+            lease_id=runner.lease_id,
+            holder=runner.holder,
+            lease_seconds=args.task_lease_seconds,
+        )
+
+
 def reap_finished_runners(active_runners: list[ActiveRunner]) -> list[dict[str, Any]]:
     finished: list[dict[str, Any]] = []
     still_running: list[ActiveRunner] = []
@@ -542,15 +588,30 @@ def select_dispatch_candidates(
     return selected, parked
 
 
-def launch_runner(args: argparse.Namespace, task_id: str, lane: str, runner: str) -> ActiveRunner:
+def launch_runner(
+    args: argparse.Namespace,
+    task_id: str,
+    lane: str,
+    runner: str,
+    *,
+    holder: str,
+    lease_id: str,
+) -> ActiveRunner:
     process = subprocess.Popen(
-        runner_command(args, task_id=task_id),
+        runner_command(args, task_id=task_id, claim_holder=holder, lease_id=lease_id),
         cwd=args.repo_root,
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
-    return ActiveRunner(task_id=task_id, lane=lane, runner=runner, process=process)
+    return ActiveRunner(
+        task_id=task_id,
+        lane=lane,
+        runner=runner,
+        holder=holder,
+        lease_id=lease_id,
+        process=process,
+    )
 
 
 def stop_active_runners(active_runners: list[ActiveRunner]) -> None:
@@ -598,6 +659,7 @@ def main() -> int:
     parser.add_argument("--github-issue-sync-interval", type=int, default=DEFAULT_ISSUE_SYNC_INTERVAL)
     parser.add_argument("--queue-refill-threshold", type=int, default=DEFAULT_QUEUE_REFILL_THRESHOLD)
     parser.add_argument("--pr-reconcile-interval", type=int, default=DEFAULT_PR_RECONCILE_INTERVAL)
+    parser.add_argument("--task-lease-seconds", type=int, default=DEFAULT_TASK_LEASE_SECONDS)
     parser.add_argument("--codex-auto-resume-pause-seconds", type=int, default=1800)
     parser.add_argument("--codex-auto-resume-max-attempts", type=int, default=3)
     parser.add_argument("--burst-size", type=int, default=DEFAULT_BURST_SIZE)
@@ -609,6 +671,7 @@ def main() -> int:
     args.burst_size = max(1, args.burst_size)
     args.max_active_runners = max(1, args.max_active_runners)
     args.active_poll_seconds = max(1, args.active_poll_seconds)
+    args.task_lease_seconds = max(30, args.task_lease_seconds)
 
     install_signal_handlers()
     lock = DaemonLock(Path(args.lock_file))
@@ -627,6 +690,7 @@ def main() -> int:
     try:
         while not _STOP_REQUESTED:
             finished = reap_finished_runners(active_runners)
+            renew_active_claims(args, active_runners)
             refresh_active_runner_state(tracker, active_runners)
 
             auto_resume = maybe_resume_codex_lane(args, tracker)
@@ -730,6 +794,7 @@ def main() -> int:
                     busy_lanes=busy_lanes,
                     limit=dispatch_limit,
                 )
+                holder = daemon_holder()
                 for selection in selections:
                     if selection["action"] == "park":
                         park_paused_item(
@@ -742,6 +807,20 @@ def main() -> int:
                             reason=selection["reason"],
                         )
                         continue
+                    claim = claim_task(
+                        args.queue,
+                        selection["task_id"],
+                        holder=holder,
+                        lease_seconds=args.task_lease_seconds,
+                        lane=selection["lane"],
+                        runner=selection["runner"],
+                        worktree=selection["worktree"],
+                        note="daemon claimed task for dispatch",
+                    )
+                    if claim.get("status") != "claimed":
+                        continue
+                    lease = claim.get("lease") or {}
+                    queue = load_queue(args.queue)
                     set_status(
                         queue,
                         selection["task_id"],
@@ -753,11 +832,19 @@ def main() -> int:
                     save_queue(args.queue, queue)
                     try:
                         active_runners.append(
-                            launch_runner(args, selection["task_id"], selection["active_lane"], selection["runner"])
+                            launch_runner(
+                                args,
+                                selection["task_id"],
+                                selection["active_lane"],
+                                selection["runner"],
+                                holder=holder,
+                                lease_id=str(lease.get("lease_id") or ""),
+                            )
                         )
                         dispatches += 1
                     except Exception as exc:
                         dispatch_error = str(exc)
+                        queue = load_queue(args.queue)
                         set_status(
                             queue,
                             selection["task_id"],
@@ -766,7 +853,8 @@ def main() -> int:
                             runner=selection["runner"],
                             note=f"daemon dispatch failed: {dispatch_error}",
                         )
-                save_queue(args.queue, queue)
+                        save_queue(args.queue, queue)
+                queue = load_queue(args.queue)
 
             refresh_active_runner_state(tracker, active_runners)
             queue = load_queue(args.queue)

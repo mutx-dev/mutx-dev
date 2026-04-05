@@ -90,6 +90,63 @@ def summarize_handoff_failure(stderr: str, stdout: str = "") -> str:
     return "handoff_failed"
 
 
+def summarize_branch_prepare_failure(stderr: str, stdout: str = "") -> str:
+    text = f"{stdout}\n{stderr}".lower()
+    if "not a git repository" in text:
+        return "invalid_worktree"
+    if "pathspec" in text and "did not match any file" in text:
+        return "missing_branch"
+    return "branch_prepare_failed"
+
+
+def local_branch_exists(path: str | Path, branch: str) -> bool:
+    result = run_git(["show-ref", "--verify", "--quiet", f"refs/heads/{branch}"], path)
+    return result.returncode == 0
+
+
+def prepare_task_branch(path: str | Path, branch: str) -> dict[str, Any]:
+    if not branch:
+        return {"status": "blocked", "reason": "missing_branch"}
+    if not is_git_worktree(path):
+        return {"status": "blocked", "reason": "invalid_worktree", "branch": branch}
+    if not is_clean_worktree(path):
+        return {"status": "blocked", "reason": "dirty_worktree", "branch": branch}
+
+    previous_branch = current_branch(path)
+    if previous_branch == branch:
+        return {
+            "status": "ready",
+            "branch": branch,
+            "previous_branch": previous_branch,
+            "created": False,
+        }
+
+    if local_branch_exists(path, branch):
+        result = run_git(["checkout", branch], path)
+        created = False
+    else:
+        result = run_git(["checkout", "-b", branch], path)
+        created = True
+
+    if result.returncode != 0:
+        return {
+            "status": "blocked",
+            "reason": summarize_branch_prepare_failure(result.stderr, result.stdout),
+            "branch": branch,
+            "previous_branch": previous_branch,
+            "stdout": result.stdout[-4000:],
+            "stderr": result.stderr[-4000:],
+        }
+    return {
+        "status": "ready",
+        "branch": branch,
+        "previous_branch": previous_branch,
+        "created": created,
+        "stdout": result.stdout[-4000:],
+        "stderr": result.stderr[-4000:],
+    }
+
+
 def push_branch(path: str | Path, branch: str, *, remote: str | None = None) -> dict[str, Any]:
     selected_remote = remote or default_remote(path)
     if not branch:

@@ -211,10 +211,17 @@ def test_runner_command_targets_specific_task(tmp_path: Path) -> None:
         },
     )()
 
-    command = DAEMON.runner_command(args, task_id="task-123")
+    command = DAEMON.runner_command(
+        args,
+        task_id="task-123",
+        claim_holder="daemon:test:123",
+        lease_id="lease-abc",
+    )
 
     assert "--task-id" in command
     assert command[command.index("--task-id") + 1] == "task-123"
+    assert command[command.index("--claim-holder") + 1] == "daemon:test:123"
+    assert command[command.index("--lease-id") + 1] == "lease-abc"
     assert command[-1] == "--execute"
 
 
@@ -240,3 +247,36 @@ def test_maybe_reconcile_prs_runs_script_and_updates_tracker(tmp_path: Path, mon
     state = json.loads(status_path.read_text())
     assert state["last_pr_reconcile_result"]["exit_code"] == 0
     assert state["last_pr_reconcile_result"]["stdout"] == "ok"
+
+
+def test_renew_active_claims_refreshes_runner_leases(tmp_path: Path) -> None:
+    queue_path = tmp_path / "queue.json"
+    queue_path.write_text(json.dumps({"items": [{"id": "task-1", "status": "queued"}]}))
+
+    claim = DAEMON.claim_task(
+        queue_path,
+        "task-1",
+        holder="daemon:test:1",
+        lease_seconds=30,
+        lane="codex",
+        runner="codex",
+        note="claimed",
+    )
+    lease_id = claim["lease"]["lease_id"]
+
+    args = Args(tmp_path)
+    args.task_lease_seconds = 120
+    runner = DAEMON.ActiveRunner(
+        task_id="task-1",
+        lane="codex",
+        runner="codex",
+        holder="daemon:test:1",
+        lease_id=lease_id,
+        process=type("Proc", (), {"pid": 999})(),
+    )
+
+    before = json.loads(queue_path.read_text())["items"][0]["lease"]["expires_at"]
+    DAEMON.renew_active_claims(args, [runner])
+    after = json.loads(queue_path.read_text())["items"][0]["lease"]["expires_at"]
+
+    assert after > before
