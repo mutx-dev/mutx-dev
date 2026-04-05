@@ -63,7 +63,6 @@ def test_build_work_order_routes_frontend_to_opencode(tmp_path: Path) -> None:
     assert "npm run lint" in work_order.verification
 
 
-
 def test_build_work_order_routes_backend_to_codex(tmp_path: Path) -> None:
     backend = tmp_path / "backend"
     backend.mkdir()
@@ -120,14 +119,25 @@ def test_build_work_order_keeps_role_metadata_for_main_lane(tmp_path: Path) -> N
     assert work_order.metadata["score"] == 88
 
 
-
 def test_select_next_item_prefers_highest_priority_then_score() -> None:
     queue = {
         "items": [
             {"id": "p2-item", "status": "queued", "priority": "p2", "score": 40},
             {"id": "running-item", "status": "running", "priority": "p0", "score": 100},
-            {"id": "p0-low", "status": "queued", "priority": "p0", "score": 10, "owner_role": "backend"},
-            {"id": "p0-high", "status": "queued", "priority": "p0", "score": 90, "owner_role": "research"},
+            {
+                "id": "p0-low",
+                "status": "queued",
+                "priority": "p0",
+                "score": 10,
+                "owner_role": "backend",
+            },
+            {
+                "id": "p0-high",
+                "status": "queued",
+                "priority": "p0",
+                "score": 90,
+                "owner_role": "research",
+            },
         ]
     }
 
@@ -135,7 +145,6 @@ def test_select_next_item_prefers_highest_priority_then_score() -> None:
 
     assert selected is not None
     assert selected["id"] == "p0-high"
-
 
 
 def test_report_status_builds_normalized_payload() -> None:
@@ -156,10 +165,13 @@ def test_report_status_builds_normalized_payload() -> None:
     assert payload["updated_at"].endswith("Z")
 
 
-
 def test_failure_classifier_detects_quota_exceeded() -> None:
-    assert FAILURE_CLASSIFIER.classify_failure("ERROR: Quota exceeded. Check your plan and billing details.") == "quota_exceeded"
-
+    assert (
+        FAILURE_CLASSIFIER.classify_failure(
+            "ERROR: Quota exceeded. Check your plan and billing details."
+        )
+        == "quota_exceeded"
+    )
 
 
 def test_failure_classifier_extracts_retry_after_seconds() -> None:
@@ -167,15 +179,15 @@ def test_failure_classifier_extracts_retry_after_seconds() -> None:
     assert FAILURE_CLASSIFIER.extract_retry_after_seconds(text) == 4830
 
 
-
 def test_lane_state_can_pause_lane() -> None:
     payload = {"lanes": {}}
-    updated = LANE_STATE.pause_lane(payload, "codex", reason="quota_exceeded", source="issue-1", retry_after_seconds=4830)
+    updated = LANE_STATE.pause_lane(
+        payload, "codex", reason="quota_exceeded", source="issue-1", retry_after_seconds=4830
+    )
     assert LANE_STATE.is_lane_paused(updated, "codex") is True
     assert LANE_STATE.lane_reason(updated, "codex") == "quota_exceeded"
     assert updated["lanes"]["codex"]["auto_resume_after_seconds"] == 4830
     assert updated["lanes"]["codex"]["resume_at"]
-
 
 
 def test_worktree_utils_recognizes_git_repo(tmp_path: Path) -> None:
@@ -186,6 +198,29 @@ def test_worktree_utils_recognizes_git_repo(tmp_path: Path) -> None:
     assert WORKTREE_UTILS.is_git_worktree(repo) is True
     assert WORKTREE_UTILS.first_valid_worktree([str(repo)]) == str(repo)
 
+
+def test_worktree_utils_prepare_task_branch_creates_branch(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+
+    result = WORKTREE_UTILS.prepare_task_branch(repo, "autonomy/task-1")
+
+    assert result["status"] == "ready"
+    assert result["branch"] == "autonomy/task-1"
+    assert WORKTREE_UTILS.current_branch(repo) == "autonomy/task-1"
+
+
+def test_worktree_utils_prepare_task_branch_blocks_dirty_worktree(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    (repo / "dirty.txt").write_text("dirty\n")
+
+    result = WORKTREE_UTILS.prepare_task_branch(repo, "autonomy/task-2")
+
+    assert result["status"] == "blocked"
+    assert result["reason"] == "dirty_worktree"
 
 
 def test_queue_state_updates_item_status() -> None:
@@ -201,7 +236,6 @@ def test_queue_state_updates_item_status() -> None:
     assert item["lane"] == "opencode"
     assert item["runner"] == "opencode"
     assert item["updated_at"].endswith("Z")
-
 
 
 def test_assess_pr_handoff_policy_allows_ready_pr_and_auto_merge_for_safe_opencode() -> None:
@@ -231,7 +265,6 @@ def test_assess_pr_handoff_policy_allows_ready_pr_and_auto_merge_for_safe_openco
     assert policy["low_risk_paths"] is True
 
 
-
 def test_assess_pr_handoff_policy_keeps_autonomy_changes_draft() -> None:
     work_order = LANE.WorkOrder(
         id="task-main-script",
@@ -259,7 +292,6 @@ def test_assess_pr_handoff_policy_keeps_autonomy_changes_draft() -> None:
     assert policy["low_risk_paths"] is False
 
 
-
 def test_publish_branch_with_pr_enables_auto_merge_for_ready_pr(monkeypatch) -> None:
     commands: list[list[str]] = []
 
@@ -269,10 +301,25 @@ def test_publish_branch_with_pr_enables_auto_merge_for_ready_pr(monkeypatch) -> 
     def fake_default_base_branch(path: str, remote: str | None = None) -> str:
         return "main"
 
-    def fake_create_pr(path: str, branch: str, *, title: str, body: str, base_branch: str | None = None, draft: bool = True) -> dict[str, object]:
-        return {"status": "created", "number": 42, "url": "https://example/pr/42", "is_draft": draft}
+    def fake_create_pr(
+        path: str,
+        branch: str,
+        *,
+        title: str,
+        body: str,
+        base_branch: str | None = None,
+        draft: bool = True,
+    ) -> dict[str, object]:
+        return {
+            "status": "created",
+            "number": 42,
+            "url": "https://example/pr/42",
+            "is_draft": draft,
+        }
 
-    def fake_enable_pr_auto_merge(path: str, pr_number: int | str | None, *, merge_method: str = "squash") -> dict[str, object]:
+    def fake_enable_pr_auto_merge(
+        path: str, pr_number: int | str | None, *, merge_method: str = "squash"
+    ) -> dict[str, object]:
         commands.append([str(pr_number), merge_method])
         return {"status": "enabled", "merge_method": merge_method}
 
@@ -294,7 +341,6 @@ def test_publish_branch_with_pr_enables_auto_merge_for_ready_pr(monkeypatch) -> 
     assert handoff["pr"]["is_draft"] is False
     assert handoff["auto_merge"]["status"] == "enabled"
     assert commands == [["42", "squash"]]
-
 
 
 def test_orchestrator_prepares_preview_command(tmp_path: Path) -> None:
@@ -331,17 +377,17 @@ def test_orchestrator_prepares_preview_command(tmp_path: Path) -> None:
             str(queue_path),
             "--repo-root",
             "/repo",
-                "--backend-worktree",
-                str(backend),
-                "--frontend-worktree",
-                str(frontend),
-                "--backend-candidates",
-                str(backend),
-                "--frontend-candidates",
-                str(frontend),
-                "--output-dir",
-                str(output_dir),
-],
+            "--backend-worktree",
+            str(backend),
+            "--frontend-worktree",
+            str(frontend),
+            "--backend-candidates",
+            str(backend),
+            "--frontend-candidates",
+            str(frontend),
+            "--output-dir",
+            str(output_dir),
+        ],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -356,3 +402,66 @@ def test_orchestrator_prepares_preview_command(tmp_path: Path) -> None:
     work_order = json.loads(work_order_path.read_text())
     assert work_order["worktree"] == str(frontend)
     assert work_order["lane"] == "opencode"
+
+
+def test_orchestrator_honors_worktree_override(tmp_path: Path) -> None:
+    backend_a = tmp_path / "backend-a"
+    backend_b = tmp_path / "backend-b"
+    frontend = tmp_path / "frontend"
+    backend_a.mkdir()
+    backend_b.mkdir()
+    frontend.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=backend_a, check=True)
+    subprocess.run(["git", "init", "-q"], cwd=backend_b, check=True)
+    subprocess.run(["git", "init", "-q"], cwd=frontend, check=True)
+    queue_path = tmp_path / "queue.json"
+    queue_path.write_text(
+        json.dumps(
+            {
+                "items": [
+                    {
+                        "id": "issue-777",
+                        "title": "Tighten backend dispatch",
+                        "description": "Backend cleanup",
+                        "area": "area:api",
+                        "priority": "p1",
+                        "status": "queued",
+                    }
+                ]
+            }
+        )
+    )
+    output_dir = tmp_path / "out"
+
+    result = subprocess.run(
+        [
+            "python3",
+            str(ORCHESTRATOR_PATH),
+            "--queue",
+            str(queue_path),
+            "--repo-root",
+            "/repo",
+            "--backend-worktree",
+            str(backend_a),
+            "--frontend-worktree",
+            str(frontend),
+            "--backend-candidates",
+            f"{backend_a}:{backend_b}",
+            "--frontend-candidates",
+            str(frontend),
+            "--worktree-override",
+            str(backend_b),
+            "--output-dir",
+            str(output_dir),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    payload = json.loads(result.stdout)
+    assert payload["status"] == "prepared"
+    assert payload["worktree"] == str(backend_b)
+    work_order = json.loads(Path(payload["work_order_path"]).read_text())
+    assert work_order["worktree"] == str(backend_b)

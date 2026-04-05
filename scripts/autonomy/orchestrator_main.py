@@ -10,8 +10,13 @@ from lane_contract import LanePaths, WorkOrder, build_work_order, select_next_it
 from lane_state import is_lane_paused, lane_reason, load_lane_state, pause_lane, save_lane_state
 from queue_state import find_item, load_queue, save_queue, set_status
 from report_status import append_jsonl, build_report
-from worktree_utils import commit_tracked_files, current_branch, is_git_worktree, prepare_task_branch, publish_branch_with_pr
-
+from worktree_utils import (
+    commit_tracked_files,
+    current_branch,
+    is_git_worktree,
+    prepare_task_branch,
+    publish_branch_with_pr,
+)
 
 SAFE_READY_SIZE_LABELS = {"size:xs", "size:s"}
 SAFE_AUTO_MERGE_MAX_CHANGED_FILES = 3
@@ -47,11 +52,19 @@ def split_candidates(raw: str) -> list[str]:
     return [item for item in (part.strip() for part in raw.split(":")) if item]
 
 
-def build_pr_body(work_order: WorkOrder, changed_files: list[str], verification: list[dict[str, Any]]) -> str:
-    changed_block = "\n".join(f"- {path}" for path in changed_files) or "- No tracked file changes recorded"
-    verification_block = "\n".join(
-        f"- `{item.get('command', 'unknown')}` -> exit {item.get('exit_code', 'n/a')}" for item in verification
-    ) or "- Verification not reported"
+def build_pr_body(
+    work_order: WorkOrder, changed_files: list[str], verification: list[dict[str, Any]]
+) -> str:
+    changed_block = (
+        "\n".join(f"- {path}" for path in changed_files) or "- No tracked file changes recorded"
+    )
+    verification_block = (
+        "\n".join(
+            f"- `{item.get('command', 'unknown')}` -> exit {item.get('exit_code', 'n/a')}"
+            for item in verification
+        )
+        or "- Verification not reported"
+    )
     issue = work_order.metadata.get("issue")
     issue_line = f"Issue: #{issue}\n" if issue else ""
     return (
@@ -74,10 +87,14 @@ def _work_order_labels(work_order: WorkOrder) -> set[str]:
 
 
 def _all_paths_within(paths: list[str], prefixes: tuple[str, ...]) -> bool:
-    return bool(paths) and all(any(path == prefix or path.startswith(prefix) for prefix in prefixes) for path in paths)
+    return bool(paths) and all(
+        any(path == prefix or path.startswith(prefix) for prefix in prefixes) for path in paths
+    )
 
 
-def assess_pr_handoff_policy(work_order: WorkOrder, changed_files: list[str], verification_passed: bool) -> dict[str, Any]:
+def assess_pr_handoff_policy(
+    work_order: WorkOrder, changed_files: list[str], verification_passed: bool
+) -> dict[str, Any]:
     labels = _work_order_labels(work_order)
     size_safe = bool(labels & SAFE_READY_SIZE_LABELS)
     risk_low = "risk:low" in labels
@@ -120,11 +137,17 @@ def next_action_for_handoff(commit_sha: str | None, handoff: dict[str, Any] | No
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Pick the next MUTX task and prepare a worker invocation")
+    parser = argparse.ArgumentParser(
+        description="Pick the next MUTX task and prepare a worker invocation"
+    )
     parser.add_argument("--queue", default="mutx-engineering-agents/dispatch/action-queue.json")
     parser.add_argument("--repo-root", default="/Users/fortune/MUTX")
-    parser.add_argument("--backend-worktree", default="/Users/fortune/mutx-worktrees/autonomy/codex-main")
-    parser.add_argument("--frontend-worktree", default="/Users/fortune/mutx-worktrees/autonomy/opencode-main")
+    parser.add_argument(
+        "--backend-worktree", default="/Users/fortune/mutx-worktrees/autonomy/codex-main"
+    )
+    parser.add_argument(
+        "--frontend-worktree", default="/Users/fortune/mutx-worktrees/autonomy/opencode-main"
+    )
     parser.add_argument(
         "--backend-candidates",
         default="/Users/fortune/mutx-worktrees/autonomy/codex-main:/Users/fortune/mutx-worktrees/engineering/control-plane-steward:/Users/fortune/mutx-worktrees/factory/backend",
@@ -137,7 +160,12 @@ def main() -> int:
     parser.add_argument("--report-log", default="reports/autonomy-status.jsonl")
     parser.add_argument("--lane-state", default=".autonomy/lane-state.json")
     parser.add_argument("--task-id", help="Execute a specific queued or running task by id")
-    parser.add_argument("--execute", action="store_true", help="Execute the selected lane preview command")
+    parser.add_argument(
+        "--worktree-override", help="Force a specific worktree for the selected task"
+    )
+    parser.add_argument(
+        "--execute", action="store_true", help="Execute the selected lane preview command"
+    )
     args = parser.parse_args()
 
     paths = LanePaths(
@@ -174,8 +202,12 @@ def main() -> int:
                 print(json.dumps({"status": "idle"}, indent=2))
                 return 0
 
-        work_order = build_work_order(item, paths)
-        execution_lane = work_order.runner if work_order.runner in {"codex", "opencode", "main"} else work_order.lane
+        work_order = build_work_order(item, paths, worktree_override=args.worktree_override)
+        execution_lane = (
+            work_order.runner
+            if work_order.runner in {"codex", "opencode", "main"}
+            else work_order.lane
+        )
         if is_lane_paused(lane_state, execution_lane):
             reason = lane_reason(lane_state, execution_lane) or "lane_paused"
             if args.task_id:
@@ -313,8 +345,16 @@ def main() -> int:
         payload["runner_payload"] = runner_payload
 
     changed_files = runner_payload.get("changed_files", []) if runner_payload else []
-    verification = runner_payload.get("verification", []) if runner_payload else [{"command": "runner_preview", "exit_code": result.returncode}]
-    verification_passed = runner_payload.get("verification_passed", result.returncode == 0) if runner_payload else (result.returncode == 0)
+    verification = (
+        runner_payload.get("verification", [])
+        if runner_payload
+        else [{"command": "runner_preview", "exit_code": result.returncode}]
+    )
+    verification_passed = (
+        runner_payload.get("verification_passed", result.returncode == 0)
+        if runner_payload
+        else (result.returncode == 0)
+    )
     blocker_class = runner_payload.get("blocker_class") if runner_payload else None
     retry_after_seconds = runner_payload.get("retry_after_seconds") if runner_payload else None
 
@@ -330,7 +370,9 @@ def main() -> int:
                 f"autonomy({work_order.lane}): {work_order.title}",
             )
         note = "runner completed successfully"
-        publication_policy = assess_pr_handoff_policy(work_order, changed_files, verification_passed)
+        publication_policy = assess_pr_handoff_policy(
+            work_order, changed_files, verification_passed
+        )
         payload["publication_policy"] = publication_policy
         if commit_sha:
             note += f"; committed {commit_sha[:8]}"
@@ -375,7 +417,11 @@ def main() -> int:
             handoff=handoff,
         )
     else:
-        blocker = blocker_class or ("verification_failed" if result.returncode == 0 and not verification_passed else "runner_failure")
+        blocker = blocker_class or (
+            "verification_failed"
+            if result.returncode == 0 and not verification_passed
+            else "runner_failure"
+        )
         set_status(
             queue,
             work_order.id,

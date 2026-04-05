@@ -8,7 +8,6 @@ from typing import Any
 
 from worktree_utils import first_valid_worktree
 
-
 PRIORITY_ORDER = {"p0": 0, "p1": 1, "p2": 2, "p3": 3, "p4": 4}
 
 BACKEND_AREAS = {"backend", "api", "auth", "runtime", "infra", "ops", "cli-sdk"}
@@ -90,11 +89,18 @@ def choose_runner(lane: str) -> str:
     return "codex"
 
 
-def choose_worktree(lane: str, paths: LanePaths) -> str:
+def worktree_candidates_for_lane(lane: str, paths: LanePaths) -> list[str]:
     if lane == "opencode":
         candidates = paths.frontend_candidates or [paths.frontend_worktree]
+    else:
+        candidates = paths.backend_candidates or [paths.backend_worktree]
+    return [str(candidate) for candidate in candidates if str(candidate).strip()]
+
+
+def choose_worktree(lane: str, paths: LanePaths) -> str:
+    candidates = worktree_candidates_for_lane(lane, paths)
+    if lane == "opencode":
         return first_valid_worktree(candidates) or paths.frontend_worktree
-    candidates = paths.backend_candidates or [paths.backend_worktree]
     return first_valid_worktree(candidates) or paths.backend_worktree
 
 
@@ -127,7 +133,9 @@ def default_constraints(lane: str) -> list[str]:
     return base
 
 
-def build_work_order(item: dict[str, Any], paths: LanePaths) -> WorkOrder:
+def build_work_order(
+    item: dict[str, Any], paths: LanePaths, *, worktree_override: str | None = None
+) -> WorkOrder:
     area = item.get("area")
     lane = item.get("lane") or choose_lane(area)
     runner = item.get("runner") or choose_runner(lane)
@@ -147,7 +155,7 @@ def build_work_order(item: dict[str, Any], paths: LanePaths) -> WorkOrder:
         lane=lane,
         runner=runner,
         priority=str(item.get("priority") or "p2"),
-        worktree=choose_worktree(lane, paths),
+        worktree=worktree_override or choose_worktree(lane, paths),
         allowed_paths=choose_allowed_paths(lane, item),
         verification=choose_verification(lane, item),
         constraints=list(item.get("constraints") or default_constraints(lane)),
@@ -192,11 +200,17 @@ def _paths_from_args(args: argparse.Namespace) -> LanePaths:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Build a normalized work order for a MUTX autonomy lane")
+    parser = argparse.ArgumentParser(
+        description="Build a normalized work order for a MUTX autonomy lane"
+    )
     parser.add_argument("input", help="Path to queue JSON or single task JSON")
     parser.add_argument("--repo-root", default="/Users/fortune/MUTX")
-    parser.add_argument("--backend-worktree", default="/Users/fortune/mutx-worktrees/autonomy/codex-main")
-    parser.add_argument("--frontend-worktree", default="/Users/fortune/mutx-worktrees/autonomy/opencode-main")
+    parser.add_argument(
+        "--backend-worktree", default="/Users/fortune/mutx-worktrees/autonomy/codex-main"
+    )
+    parser.add_argument(
+        "--frontend-worktree", default="/Users/fortune/mutx-worktrees/autonomy/opencode-main"
+    )
     parser.add_argument(
         "--backend-candidates",
         default="/Users/fortune/mutx-worktrees/autonomy/codex-main:/Users/fortune/mutx-worktrees/engineering/control-plane-steward:/Users/fortune/mutx-worktrees/factory/backend",
@@ -205,7 +219,11 @@ def main() -> int:
         "--frontend-candidates",
         default="/Users/fortune/mutx-worktrees/autonomy/opencode-main:/Users/fortune/mutx-worktrees/engineering/operator-surface-builder:/Users/fortune/mutx-worktrees/factory/frontend",
     )
-    parser.add_argument("--pick-next", action="store_true", help="Input file is a queue; select the next queued item")
+    parser.add_argument(
+        "--pick-next",
+        action="store_true",
+        help="Input file is a queue; select the next queued item",
+    )
     args = parser.parse_args()
 
     payload = json.loads(Path(args.input).read_text())
