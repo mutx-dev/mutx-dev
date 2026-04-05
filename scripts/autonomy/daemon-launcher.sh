@@ -7,10 +7,21 @@ LOCK_FILE="${MUTX_AUTONOMY_LOCK:-$REPO_ROOT/.autonomy/daemon.lock}"
 STATUS_FILE="${MUTX_AUTONOMY_STATUS:-$REPO_ROOT/.autonomy/daemon-status.json}"
 LOG_FILE="${MUTX_AUTONOMY_LOG:-$REPO_ROOT/reports/autonomy-daemon.log}"
 MAX_LOG_BYTES="${MUTX_AUTONOMY_MAX_LOG_BYTES:-20971520}"
-PYTHON_BIN="${MUTX_AUTONOMY_PYTHON:-python3}"
+BOOTSTRAP_PYTHON="${MUTX_AUTONOMY_BOOTSTRAP_PYTHON:-python3}"
+PYTHON_RESOLVER="$REPO_ROOT/scripts/autonomy/python_runtime.py"
+PYTHON_BIN=""
 COMMAND="${1:-start}"
 
 mkdir -p "$(dirname "$PID_FILE")" "$(dirname "$LOCK_FILE")" "$(dirname "$STATUS_FILE")" "$(dirname "$LOG_FILE")"
+
+resolve_python_bin() {
+  if ! PYTHON_BIN="$($BOOTSTRAP_PYTHON "$PYTHON_RESOLVER")"; then
+    echo "failed to resolve supported autonomy python runtime" >&2
+    return 1
+  fi
+}
+
+resolve_python_bin
 
 is_running() {
   if [[ ! -f "$PID_FILE" ]]; then
