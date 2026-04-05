@@ -53,6 +53,106 @@ def test_validate_commands_accepts_expected_commands() -> None:
     ]
 
 
+def test_split_validation_commands_reports_rejections() -> None:
+    requested, allowed, rejected = MODULE.split_validation_commands(
+        [
+            "python -m compileall src/api",
+            "git status",
+            "echo harmless",
+            {"unexpected": "shape"},
+        ]
+    )
+
+    assert requested == [
+        "python -m compileall src/api",
+        "git status",
+        "echo harmless",
+    ]
+    assert allowed == [
+        ["python", "-m", "compileall", "src/api"],
+        ["git", "status"],
+    ]
+    assert rejected == ["echo harmless", "{'unexpected': 'shape'}"]
+
+
+def test_enforce_validation_guardrails_rejects_non_allowlisted_commands(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    checkpoint_records = []
+    requested, allowed, rejected = MODULE.split_validation_commands(
+        ["python -m compileall src/api", "echo harmless"]
+    )
+
+    with pytest.raises(RuntimeError) as exc_info:
+        MODULE.enforce_validation_guardrails(
+            requested_commands=requested,
+            validation_commands=allowed,
+            rejected_commands=rejected,
+            checkpoint_records=checkpoint_records,
+            run_json_path=None,
+            agent_id="qa-reliability-engineer",
+            session_id="run-123",
+        )
+
+    assert "outside the executor allowlist" in str(exc_info.value)
+    payload = json.loads((tmp_path / ".autonomy" / "guardrail-failure.json").read_text())
+    assert payload["reason"] == "validation_checkpoint_denied"
+    assert payload["details"]["checkpoint"]["decision"] == "deny"
+
+
+def test_enforce_validation_guardrails_rejects_too_many_commands(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    checkpoint_records = []
+    requested, allowed, rejected = MODULE.split_validation_commands(
+        [
+            "python -m compileall src/api",
+            "git status",
+            "git diff",
+            "python -m compileall src/security",
+        ]
+    )
+
+    with pytest.raises(RuntimeError) as exc_info:
+        MODULE.enforce_validation_guardrails(
+            requested_commands=requested,
+            validation_commands=allowed,
+            rejected_commands=rejected,
+            checkpoint_records=checkpoint_records,
+            run_json_path=None,
+            agent_id="qa-reliability-engineer",
+            session_id="run-124",
+        )
+
+    assert "exceeds the max of 3" in str(exc_info.value)
+    payload = json.loads((tmp_path / ".autonomy" / "guardrail-failure.json").read_text())
+    assert payload["details"]["max_validation_commands"] == 3
+
+
+def test_enforce_patch_guardrails_records_policy_checkpoint(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    checkpoint_records = []
+
+    MODULE.enforce_patch_guardrails(
+        "",
+        checkpoint_records=checkpoint_records,
+        run_json_path=None,
+        agent_id="control-plane-steward",
+        session_id="run-456",
+    )
+
+    checkpoint_payload = json.loads((tmp_path / ".autonomy" / "policy-checkpoints.json").read_text())
+    assert checkpoint_payload[0]["checkpoint"] == "autonomy.patch.apply"
+    assert checkpoint_payload[0]["decision"] == "allow"
+
+
 # ---------------------------------------------------------------------------
 # Agent context file invariants
 # ---------------------------------------------------------------------------

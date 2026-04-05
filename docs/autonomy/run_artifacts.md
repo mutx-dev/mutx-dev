@@ -24,6 +24,7 @@ Typical run bundle:
   artifacts/prompt.md
   artifacts/generated.patch
   artifacts/last-response.json
+  artifacts/policy-checkpoints.json
   artifacts/guardrail-failure.json
 ```
 
@@ -34,6 +35,8 @@ Typical run bundle:
 3. `verification`: repo-native validation commands plus per-command pass/fail results and log artifact references.
 4. `artifacts`: a digest-backed manifest for copied inputs, generated files, and logs stored inside the run directory.
 5. `provenance`: local-first execution context, including executor host details, `git_before`, `git_after`, and SHA-256 digests for copied input artifacts.
+
+When executor checkpoints run, the artifact set may also include `artifacts/policy-checkpoints.json`. It records explicit allow or deny decisions for high-risk execution boundaries such as patch application and validation execution, along with the applied limits and rejected commands.
 
 ## Example
 
@@ -84,3 +87,4 @@ Typical run bundle:
 - The run directory is meant to be durable even when `.autonomy/prompts/latest.md` or `.autonomy/last-response.json` are overwritten by later executions.
 - Provenance is intentionally local-first: it captures the local work order, brief, command, git state, and verification evidence before any optional PR or workflow artifact handoff.
 - Full source-tree snapshots are not part of `v1alpha1`. The schema keeps commit and worktree provenance now and leaves full source capture for a later version if needed.
+- The checkpoint artifact is MUTX-native. It borrows the idea of policy-gated execution checkpoints from the open-source LACP harness model without copying upstream code.
