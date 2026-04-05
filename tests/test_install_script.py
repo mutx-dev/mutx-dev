@@ -796,6 +796,10 @@ def test_install_script_tty_hosted_lane_targets_hosted_api(tmp_path: Path) -> No
     )
 
     assert exit_code == 0
-    assert "https://api.mutx.dev" in transcript
-    assert "Launching MUTX hosted setup against https://api.mutx.dev" in transcript
+    transcript_lines = [line.strip() for line in transcript.splitlines()]
+    assert "Launching MUTX hosted setup against https://api.mutx.dev" in transcript_lines
+    assert any(
+        line == "HOSTED SETUP --api-url https://api.mutx.dev --install-openclaw --open-tui"
+        for line in transcript_lines
+    )
     assert "Error: No such option" not in transcript

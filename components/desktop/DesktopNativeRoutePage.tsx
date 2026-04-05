@@ -186,6 +186,20 @@ function jsonPreview(value: unknown) {
   }
 }
 
+function stableRecordKey(
+  value: Record<string, unknown> | null | undefined,
+  keys: string[],
+  fallbackPrefix: string,
+  index: number,
+) {
+  const primary = pickString(value, keys, "");
+  if (primary) {
+    return primary;
+  }
+
+  return `${fallbackPrefix}-${index}`;
+}
+
 function formatCount(value: number) {
   return value.toLocaleString();
 }
@@ -289,7 +303,7 @@ function RecordStack({
   records: Record<string, unknown>[];
   emptyTitle: string;
   emptyMessage: string;
-  renderRecord: (record: Record<string, unknown>) => ReactNode;
+  renderRecord: (record: Record<string, unknown>, index: number) => ReactNode;
 }) {
   return (
     <LivePanel title={title} meta={meta}>
@@ -2806,8 +2820,8 @@ export function DesktopNativeRoutePage({
                   />
                 ) : (
                   <div className="space-y-3">
-                    {cloudAlerts.map((alert) => {
-                      const id = pickString(alert, ["id"], Math.random().toString());
+                    {cloudAlerts.map((alert, index) => {
+                      const id = stableRecordKey(alert, ["id"], "alert", index);
                       const open = !pickBoolean(alert, ["resolved"], false);
                       return (
                         <SelectionCard
@@ -3141,8 +3155,8 @@ export function DesktopNativeRoutePage({
                   />
                 ) : (
                   <div className="space-y-3">
-                    {cloudObservability.map((event) => {
-                      const id = pickString(event, ["id"], `${Math.random()}`);
+                    {cloudObservability.map((event, index) => {
+                      const id = stableRecordKey(event, ["id"], "observability", index);
                       const statusLabel = pickString(event, ["status", "level"], "unknown");
                       return (
                         <SelectionCard
@@ -3261,8 +3275,8 @@ export function DesktopNativeRoutePage({
                       />
                     ) : (
                       <div className="space-y-2">
-                        {cloudSessions.map((session) => {
-                          const id = pickString(session, ["id", "session_id", "key"], `${Math.random()}`);
+                        {cloudSessions.map((session, index) => {
+                          const id = stableRecordKey(session, ["id", "session_id", "key"], "session", index);
                           const active = pickBoolean(session, ["active"], false);
                           return (
                             <SelectionCard
@@ -3575,9 +3589,9 @@ export function DesktopNativeRoutePage({
               records={cloudUsageEvents}
               emptyTitle="No usage events"
               emptyMessage="Budget event history will appear here once the API emits usage rows."
-              renderRecord={(event) => (
+              renderRecord={(event, index) => (
                 <div
-                  key={pickString(event, ["id"], `${Math.random()}`)}
+                  key={stableRecordKey(event, ["id"], "usage-event", index)}
                   className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
                 >
                   <p className="text-sm font-semibold text-white">
@@ -3697,9 +3711,9 @@ export function DesktopNativeRoutePage({
                 />
               ) : (
                 <div className="space-y-3">
-                  {cloudKeys.slice(0, 6).map((keyRecord) => (
+                  {cloudKeys.slice(0, 6).map((keyRecord, index) => (
                     <div
-                      key={pickString(keyRecord, ["id"], `${Math.random()}`)}
+                      key={stableRecordKey(keyRecord, ["id"], "api-key", index)}
                       className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
                     >
                       <p className="text-sm font-semibold text-white">{pickString(keyRecord, ["name"], "API key")}</p>
@@ -3786,9 +3800,9 @@ export function DesktopNativeRoutePage({
             records={cloudSwarms}
             emptyTitle="No swarms"
             emptyMessage="Grouped agent topology will appear here once the swarm contract has data."
-            renderRecord={(swarm) => (
+            renderRecord={(swarm, index) => (
               <div
-                key={pickString(swarm, ["id"], `${Math.random()}`)}
+                key={stableRecordKey(swarm, ["id"], "swarm", index)}
                 className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
               >
                 <p className="text-sm font-semibold text-white">{pickString(swarm, ["name", "id"], "Swarm")}</p>

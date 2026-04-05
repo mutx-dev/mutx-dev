@@ -1,5 +1,4 @@
 import bcrypt
-import hashlib
 import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -11,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.auth.password import hash_password, verify_password
 from src.api.config import get_settings
 from src.api.models.models import User, APIKey, Plan, Agent, Deployment, RefreshTokenSession
-from src.api.security import hash_token_value
+from src.api.security import hash_token_value, legacy_sha256_hex
 from src.api.services.email.email_service import (
     generate_token,
     PASSWORD_RESET_TOKEN_EXPIRE_HOURS,
@@ -35,12 +34,9 @@ def hash_api_key(key: str) -> str:
 
 
 def verify_api_key(plain_key: str, hashed_key: str) -> bool:
-    # Legacy SHA256 check (for old keys created before bcrypt migration)
-    # SHA256 hashes are 64 hex chars = 64 bytes
-    if len(hashed_key) == 64:
-        sha256_hash = hashlib.sha256(plain_key.encode()).hexdigest()
-        if secrets.compare_digest(sha256_hash, hashed_key):
-            return True
+    # Legacy SHA256 check for pre-bcrypt keys.
+    if len(hashed_key) == 64 and secrets.compare_digest(legacy_sha256_hex(plain_key), hashed_key):
+        return True
     if not hashed_key.startswith("$2"):
         return secrets.compare_digest(plain_key, hashed_key)
     # bcrypt verification - truncate to 72 bytes (bcrypt limitation)

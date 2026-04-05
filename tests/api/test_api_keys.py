@@ -2,7 +2,6 @@
 Tests for /api-keys endpoints.
 """
 
-import hashlib
 import uuid
 
 import pytest
@@ -13,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.auth.jwt import create_access_token
 from src.api.models.models import APIKey
 from src.api.models import get_quota, PlanTier
+from src.api.security import legacy_sha256_hex
 from src.api.services.user_service import verify_api_key
 
 
@@ -385,7 +385,7 @@ class TestVerifyAPIKeyCompatibility:
 
     def test_verify_api_key_accepts_legacy_sha256_hash(self):
         plain_key = "mutx_live_legacy_example"
-        legacy_hash = hashlib.sha256(plain_key.encode()).hexdigest()
+        legacy_hash = legacy_sha256_hex(plain_key)
         assert verify_api_key(plain_key, legacy_hash)
 
 

@@ -1,6 +1,7 @@
 """Rate limiting middleware for the API."""
 
 import hashlib
+import hmac
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Callable
@@ -58,29 +59,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     @staticmethod
     def _fingerprint(value: str) -> str:
-        """Create a truncated pseudonymized fingerprint for rate limiting.
-
-        Uses SHA-256 for one-way hashing of API tokens for rate limit bucketing.
-        This is NOT for password hashing - it's just to prevent rate limit
-        bypass through token enumeration while keeping keys pseudonymous.
-        """
-        # CodeQL alert is a false positive - this is pseudonymization for rate limiting,
-        # not password hashing. SHA-256 is appropriate here because:
-        # 1. We only need one-way hashing for pseudonyms, not password storage
-        # 2. Tokens are high-entropy API keys, not low-entropy passwords
-        # 3. The hash is truncated and not used for authentication
-        return hashlib.sha256(value.encode()).hexdigest()[:24]  # noqa: S303
-
-    @staticmethod
-    def _mask_client_for_logging(client_id: str) -> str:
-        """Mask identifying parts of client_id for safe logging."""
-        if client_id.startswith("ip:"):
-            return "ip:***"
-        if client_id.startswith("api_key:"):
-            parts = client_id.split(":", 2)
-            if len(parts) >= 2:
-                return f"{parts[0]}:{parts[1][:8]}***"
-        return client_id[:16] + "***" if len(client_id) > 16 else "***"
+        """Create a stable keyed fingerprint for rate-limit bucket labels."""
+        secret = settings.jwt_secret.encode()
+        return hmac.new(secret, value.encode(), hashlib.sha256).hexdigest()[:24]
 
     def _extract_api_key_token(self, request: Request) -> str | None:
         x_api_key = request.headers.get("X-API-Key")
@@ -160,12 +141,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         if current_count >= limit:
             retry_after = window_seconds
-            # CodeQL false positive: client_id is already masked/pseudonymized above
-            # _mask_client_for_logging ensures no sensitive data appears in logs
-            logger.warning(  # noqa: S312
-                "Rate limit exceeded | policy=%s | client=%s | count=%s | limit=%s",
+            logger.warning(
+                "Rate limit exceeded | policy=%s | bucket=%s | count=%s | limit=%s",
                 policy_name,
-                self._mask_client_for_logging(client_id),
+                self._fingerprint(bucket_id),
                 current_count,
                 limit,
             )
