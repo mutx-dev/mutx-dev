@@ -32,6 +32,19 @@ Quick route inventory check:
 jq -r '.paths | keys[]' docs/api/openapi.json | sort
 ```
 
+Run the local parity checker to compare the live FastAPI contract against the
+checked-in snapshot and verify `docs/api/*.md` route coverage:
+
+```bash
+python scripts/autonomy/api_contract_parity.py
+```
+
+Use JSON output when you want a machine-readable drift report:
+
+```bash
+python scripts/autonomy/api_contract_parity.py --format json
+```
+
 ## Hosted Surfaces
 
 - Marketing site: `https://mutx.dev`
