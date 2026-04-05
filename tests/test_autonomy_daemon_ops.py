@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -215,3 +216,27 @@ def test_runner_command_targets_specific_task(tmp_path: Path) -> None:
     assert "--task-id" in command
     assert command[command.index("--task-id") + 1] == "task-123"
     assert command[-1] == "--execute"
+
+
+def test_maybe_reconcile_prs_runs_script_and_updates_tracker(tmp_path: Path, monkeypatch) -> None:
+    args = Args(tmp_path)
+    args.pr_reconcile_interval = 300
+    status_path = tmp_path / "daemon-status.json"
+    tracker = DAEMON.StatusTracker(status_path, args)
+
+    calls: list[tuple[list[str], str]] = []
+
+    def fake_run(command: list[str], cwd: str, text: bool, capture_output: bool) -> subprocess.CompletedProcess[str]:
+        calls.append((command, cwd))
+        return subprocess.CompletedProcess(command, 0, stdout="ok", stderr="")
+
+    monkeypatch.setattr(DAEMON.subprocess, "run", fake_run)
+
+    result = DAEMON.maybe_reconcile_prs(args, tracker, force=True)
+
+    assert result == {"ran": True, "exit_code": 0}
+    assert calls == [(["python3", "scripts/autonomy/reconcile_prs.py"], str(tmp_path))]
+
+    state = json.loads(status_path.read_text())
+    assert state["last_pr_reconcile_result"]["exit_code"] == 0
+    assert state["last_pr_reconcile_result"]["stdout"] == "ok"
