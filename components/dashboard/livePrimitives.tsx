@@ -466,26 +466,30 @@ export function QueueDepthBar({ entries }: { entries: QueueDepthEntry[] }) {
 }
 
 export function FlowStatusBar({ stages }: { stages: FlowStage[] }) {
-  const stageConfig: Record<RunFlowStatus, { active: string; pending: string; label: string }> = {
+  const stageConfig: Record<RunFlowStatus, { active: string; pending: string; label: string; dot: string }> = {
     pending: {
       active: "border-slate-500/30 bg-slate-500/10 text-slate-400",
       pending: "border-slate-700/30 bg-[#0a1428] text-slate-600",
       label: "Pending",
+      dot: "bg-slate-400",
     },
     running: {
       active: "border-cyan-500/50 bg-cyan-500/15 text-cyan-300",
       pending: "border-cyan-900/30 bg-[#0a1428] text-slate-600",
       label: "Running",
+      dot: "bg-cyan-400",
     },
     completed: {
       active: "border-emerald-500/50 bg-emerald-500/15 text-emerald-300",
       pending: "border-emerald-900/30 bg-[#0a1428] text-slate-600",
       label: "Completed",
+      dot: "bg-emerald-400",
     },
     failed: {
       active: "border-rose-500/50 bg-rose-500/15 text-rose-300",
       pending: "border-rose-900/30 bg-[#0a1428] text-slate-600",
       label: "Failed",
+      dot: "bg-rose-400",
     },
   };
 
