@@ -20,16 +20,18 @@ LOW_RISK_AUTONOMY_PREFIXES = (
 LOW_RISK_SDK_COVERAGE_PREFIXES = (
     'tests/test_sdk_',
 )
+DEPENDABOT_PREFIX = 'dependabot/'
 SAFE_AUTONOMY_MAX_CHANGED_FILES = 8
 SAFE_SDK_COVERAGE_MAX_CHANGED_FILES = 2
 NON_ACTIONABLE_MERGE_STATES = {'DIRTY', 'UNKNOWN', 'UNSTABLE'}
+YOLO_MERGE_STATES = {'CLEAN', 'BLOCKED', 'HAS_HOOKS', 'UNSTABLE'}
 
 
 def gh(args: list[str], cwd: str | Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(['gh', *args], cwd=str(cwd), text=True, capture_output=True)
 
 
-def load_open_autonomy_prs(repo_root: str | Path) -> list[dict[str, Any]]:
+def load_open_candidate_prs(repo_root: str | Path) -> list[dict[str, Any]]:
     result = gh(
         [
             'pr',
@@ -44,7 +46,12 @@ def load_open_autonomy_prs(repo_root: str | Path) -> list[dict[str, Any]]:
     if result.returncode != 0:
         raise RuntimeError(result.stderr or result.stdout)
     prs = json.loads(result.stdout)
-    return [pr for pr in prs if str(pr.get('headRefName', '')).startswith('autonomy/')]
+    candidates: list[dict[str, Any]] = []
+    for pr in prs:
+        head = str(pr.get('headRefName', ''))
+        if head.startswith('autonomy/') or head.startswith(DEPENDABOT_PREFIX):
+            candidates.append(pr)
+    return candidates
 
 
 def pr_changed_files(pr_number: int, repo_root: str | Path) -> list[str]:
@@ -95,6 +102,11 @@ def sdk_coverage_only(pr: dict[str, Any], files: list[str]) -> bool:
     )
 
 
+def dependabot_safe(pr: dict[str, Any], files: list[str]) -> bool:
+    head = str(pr.get('headRefName') or '')
+    return head.startswith(DEPENDABOT_PREFIX) and bool(files)
+
+
 def small(files: list[str]) -> bool:
     return 0 < len(files) <= 3
 
@@ -105,6 +117,8 @@ def safe_to_promote(pr: dict[str, Any], files: list[str]) -> bool:
     if autonomy_self_hosting(files) and 0 < len(files) <= SAFE_AUTONOMY_MAX_CHANGED_FILES:
         return True
     if sdk_coverage_only(pr, files) and 0 < len(files) <= SAFE_SDK_COVERAGE_MAX_CHANGED_FILES:
+        return True
+    if dependabot_safe(pr, files):
         return True
     return False
 
@@ -119,13 +133,24 @@ def enable_auto_merge(pr_number: int, repo_root: str | Path) -> dict[str, Any]:
     return {'ok': result.returncode == 0, 'stdout': result.stdout[-2000:], 'stderr': result.stderr[-2000:]}
 
 
+def admin_merge(pr_number: int, repo_root: str | Path) -> dict[str, Any]:
+    result = gh(['pr', 'merge', str(pr_number), '--squash', '--delete-branch', '--admin'], repo_root)
+    return {'ok': result.returncode == 0, 'stdout': result.stdout[-2000:], 'stderr': result.stderr[-2000:]}
+
+
+def yolo_merge_allowed(pr: dict[str, Any], *, green: bool, safe: bool) -> bool:
+    merge_state = str(pr.get('mergeStateStatus') or '')
+    return green and safe and merge_state in YOLO_MERGE_STATES
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description='Reconcile safe autonomy PRs into ready/auto-merge state')
+    parser = argparse.ArgumentParser(description='Reconcile safe PRs into ready/auto/admin-merge state')
     parser.add_argument('--repo-root', default=os.environ.get('MUTX_REPO_ROOT', '/Users/fortune/MUTX'))
+    parser.add_argument('--yolo', action='store_true', default=True)
     args = parser.parse_args()
 
     repo_root = Path(args.repo_root)
-    prs = load_open_autonomy_prs(repo_root)
+    prs = load_open_candidate_prs(repo_root)
     actions: list[dict[str, Any]] = []
     for pr in prs:
         number = int(pr['number'])
@@ -145,8 +170,11 @@ def main() -> int:
         if pr.get('isDraft') and safe and actionable:
             entry['ready'] = promote_ready(number, repo_root)
             pr['isDraft'] = False if entry['ready'].get('ok') else pr.get('isDraft')
-        if not pr.get('isDraft') and safe and actionable and green and not pr.get('autoMergeRequest'):
-            entry['auto_merge'] = enable_auto_merge(number, repo_root)
+        if not pr.get('isDraft') and safe and green:
+            if args.yolo and yolo_merge_allowed(pr, green=green, safe=safe):
+                entry['admin_merge'] = admin_merge(number, repo_root)
+            elif actionable and not pr.get('autoMergeRequest'):
+                entry['auto_merge'] = enable_auto_merge(number, repo_root)
         actions.append(entry)
     print(json.dumps(actions, indent=2))
     return 0
