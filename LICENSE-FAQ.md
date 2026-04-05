@@ -65,7 +65,9 @@ No. The license does not grant trademark rights. See `TRADEMARKS.md`.
 
 ## What about the third-party code in the repo?
 
-MUTX incorporates MIT-licensed projects (agent-run, AARM, Faramesh, Mission Control). Those remain MIT-licensed per their original terms. See `CREDITS.md` for full attribution.
+MUTX incorporates MIT-licensed projects (agent-run, AARM, Faramesh, Mission Control). Those remain under their original licenses per their original terms. See `CREDITS.md` for full attribution.
+
+For direct feature ports from Mission Control (MIT), LACP (MIT), and Guild AI (Apache-2.0), MUTX also keeps `docs/legal/oss-attribution-ledger.md` so the upstream source, license, and local file scope stay visible.
 
 ## Who do I contact for commercial licensing?
 

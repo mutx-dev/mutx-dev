@@ -6,11 +6,29 @@ import os
 import re
 import shlex
 import subprocess
+import sys
 import textwrap
 import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from run_artifacts import (
+    copy_artifact_to_run,
+    record_verification_results,
+    utc_now,
+    write_text_artifact,
+)
+from src.security.execution_checkpoints import (
+    ExecutionCheckpointRecord,
+    evaluate_patch_checkpoint,
+    evaluate_validation_checkpoint,
+    serialize_checkpoint_records,
+)
 
 
 AREA_CONTEXT = {
@@ -80,6 +98,7 @@ ALLOWED_GIT_COMMANDS = {
 
 DEFAULT_MAX_PATCH_BYTES = 50000
 DEFAULT_MAX_CHANGED_FILES = 6
+DEFAULT_MAX_VALIDATION_COMMANDS = 3
 SHELL_METACHAR_PATTERN = re.compile(r"[;&|`<>$\n\r]")
 
 
@@ -278,16 +297,47 @@ def write_guardrail_failure(reason: str, details: dict[str, object]) -> None:
     failure_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
 
-def enforce_patch_guardrails(patch_text: str) -> None:
-    if not patch_text:
-        return
+def write_policy_checkpoints(
+    records: list[ExecutionCheckpointRecord],
+    run_json_path: Path | None,
+) -> None:
+    checkpoint_path = Path(".autonomy/policy-checkpoints.json")
+    checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint_path.write_text(serialize_checkpoint_records(records))
+    if run_json_path:
+        copy_artifact_to_run(
+            run_json_path,
+            checkpoint_path,
+            name="policy_checkpoints",
+            kind="metadata",
+            relative_path="artifacts/policy-checkpoints.json",
+        )
 
+
+def enforce_patch_guardrails(
+    patch_text: str,
+    *,
+    checkpoint_records: list[ExecutionCheckpointRecord],
+    run_json_path: Path | None,
+    agent_id: str,
+    session_id: str,
+) -> None:
     max_patch_bytes = int(os.environ.get("AUTONOMY_MAX_PATCH_BYTES", str(DEFAULT_MAX_PATCH_BYTES)))
     max_changed_files = int(
         os.environ.get("AUTONOMY_MAX_CHANGED_FILES", str(DEFAULT_MAX_CHANGED_FILES))
     )
     patch_size = len(patch_text.encode("utf-8"))
     changed_files = count_changed_files_from_patch(patch_text)
+    decision, record = evaluate_patch_checkpoint(
+        patch_size_bytes=patch_size,
+        changed_files=changed_files,
+        max_patch_bytes=max_patch_bytes,
+        max_changed_files=max_changed_files,
+        agent_id=agent_id,
+        session_id=session_id,
+    )
+    checkpoint_records.append(record)
+    write_policy_checkpoints(checkpoint_records, run_json_path)
 
     if patch_size > max_patch_bytes:
         write_guardrail_failure(
@@ -296,11 +346,10 @@ def enforce_patch_guardrails(patch_text: str) -> None:
                 "patch_size_bytes": patch_size,
                 "max_patch_bytes": max_patch_bytes,
                 "changed_files": changed_files,
+                "checkpoint": record.to_dict(),
             },
         )
-        raise RuntimeError(
-            f"Generated patch is {patch_size} bytes, exceeding AUTONOMY_MAX_PATCH_BYTES={max_patch_bytes}"
-        )
+        raise RuntimeError(decision.reason)
 
     if changed_files > max_changed_files:
         write_guardrail_failure(
@@ -309,32 +358,45 @@ def enforce_patch_guardrails(patch_text: str) -> None:
                 "changed_files": changed_files,
                 "max_changed_files": max_changed_files,
                 "patch_size_bytes": patch_size,
+                "checkpoint": record.to_dict(),
             },
         )
-        raise RuntimeError(
-            f"Generated patch touches {changed_files} files, exceeding AUTONOMY_MAX_CHANGED_FILES={max_changed_files}"
-        )
+        raise RuntimeError(decision.reason)
 
 
-def apply_patch_text(patch_text: str) -> None:
+def apply_patch_text(patch_text: str) -> Path | None:
     if not patch_text:
-        return
+        return None
     patch_path = Path(".autonomy/generated.patch")
     patch_path.parent.mkdir(parents=True, exist_ok=True)
     patch_path.write_text(patch_text + "\n")
     run(["git", "apply", str(patch_path)])
+    return patch_path
 
 
-def validate_commands(commands: list[str]) -> list[list[str]]:
+def split_validation_commands(
+    commands: list[object],
+) -> tuple[list[str], list[list[str]], list[str]]:
+    requested: list[str] = []
     allowed: list[list[str]] = []
-    for command in commands[:3]:
+    rejected: list[str] = []
+    for raw_command in commands:
+        if not isinstance(raw_command, str):
+            rejected.append(repr(raw_command))
+            continue
+
+        command = raw_command.strip()
+        requested.append(command)
         if SHELL_METACHAR_PATTERN.search(command):
+            rejected.append(command)
             continue
         try:
             argv = shlex.split(command)
         except ValueError:
+            rejected.append(command)
             continue
         if not argv:
+            rejected.append(command)
             continue
 
         if argv[0] in ALLOWED_EXECUTABLES:
@@ -343,12 +405,105 @@ def validate_commands(commands: list[str]) -> list[list[str]]:
 
         if tuple(argv[:2]) in ALLOWED_GIT_COMMANDS and len(argv) == 2:
             allowed.append(argv)
+            continue
+
+        rejected.append(command)
+    return requested, allowed, rejected
+
+
+def validate_commands(commands: list[str]) -> list[list[str]]:
+    _, allowed, _ = split_validation_commands(list(commands[:DEFAULT_MAX_VALIDATION_COMMANDS]))
     return allowed
 
 
-def run_validation(commands: list[list[str]]) -> None:
-    for command in commands:
-        subprocess.run(command, check=True)
+def enforce_validation_guardrails(
+    *,
+    requested_commands: list[str],
+    validation_commands: list[list[str]],
+    rejected_commands: list[str],
+    checkpoint_records: list[ExecutionCheckpointRecord],
+    run_json_path: Path | None,
+    agent_id: str,
+    session_id: str,
+) -> None:
+    decision, record = evaluate_validation_checkpoint(
+        requested_commands=requested_commands,
+        allowed_commands=validation_commands,
+        rejected_commands=rejected_commands,
+        max_validation_commands=DEFAULT_MAX_VALIDATION_COMMANDS,
+        agent_id=agent_id,
+        session_id=session_id,
+    )
+    checkpoint_records.append(record)
+    write_policy_checkpoints(checkpoint_records, run_json_path)
+    if decision.is_allowed:
+        return
+
+    write_guardrail_failure(
+        "validation_checkpoint_denied",
+        {
+            "requested_commands": requested_commands,
+            "allowed_commands": [" ".join(command) for command in validation_commands],
+            "rejected_commands": rejected_commands,
+            "max_validation_commands": DEFAULT_MAX_VALIDATION_COMMANDS,
+            "checkpoint": record.to_dict(),
+        },
+    )
+    raise RuntimeError(decision.reason)
+
+
+def run_validation(commands: list[list[str]], run_json_path: Path | None) -> list[dict[str, Any]]:
+    results: list[dict[str, Any]] = []
+
+    for index, command in enumerate(commands, start=1):
+        started_at = utc_now()
+        completed = subprocess.run(command, text=True, capture_output=True)
+
+        if completed.stdout:
+            print(completed.stdout, end="" if completed.stdout.endswith("\n") else "\n")
+        if completed.stderr:
+            print(
+                completed.stderr,
+                end="" if completed.stderr.endswith("\n") else "\n",
+                file=sys.stderr,
+            )
+
+        stdout_artifact = None
+        stderr_artifact = None
+        if run_json_path and completed.stdout:
+            stdout_artifact = write_text_artifact(
+                run_json_path,
+                name=f"verification_{index}_stdout",
+                kind="log",
+                relative_path=f"verification/{index:02d}.stdout.log",
+                content=completed.stdout,
+            )["path"]
+        if run_json_path and completed.stderr:
+            stderr_artifact = write_text_artifact(
+                run_json_path,
+                name=f"verification_{index}_stderr",
+                kind="log",
+                relative_path=f"verification/{index:02d}.stderr.log",
+                content=completed.stderr,
+            )["path"]
+
+        result = {
+            "argv": command,
+            "status": "passed" if completed.returncode == 0 else "failed",
+            "exit_code": completed.returncode,
+            "started_at": started_at,
+            "finished_at": utc_now(),
+        }
+        if stdout_artifact:
+            result["stdout_artifact"] = stdout_artifact
+        if stderr_artifact:
+            result["stderr_artifact"] = stderr_artifact
+        results.append(result)
+
+        if completed.returncode != 0:
+            break
+
+    return results
 
 
 def main() -> int:
@@ -365,6 +520,14 @@ def main() -> int:
         help="Optional prompt artifact path",
     )
     args = parser.parse_args()
+    run_json_path = None
+    raw_run_json_path = os.environ.get("AUTONOMY_RUN_JSON", "").strip()
+    if raw_run_json_path:
+        candidate = Path(raw_run_json_path)
+        if candidate.exists():
+            run_json_path = candidate
+    checkpoint_records: list[ExecutionCheckpointRecord] = []
+    session_id = os.environ.get("AUTONOMY_RUN_ID", "autonomy-hosted-llm-executor")
 
     brief_text = Path(args.brief).read_text()
     work_order = json.loads(Path(args.work_order).read_text())
@@ -373,24 +536,71 @@ def main() -> int:
     prompt_output = Path(args.prompt_output)
     prompt_output.parent.mkdir(parents=True, exist_ok=True)
     prompt_output.write_text(prompt)
+    if run_json_path:
+        copy_artifact_to_run(
+            run_json_path,
+            prompt_output,
+            name="prompt",
+            kind="generated",
+            relative_path="artifacts/prompt.md",
+        )
 
     response_text = chat_completion(prompt, args.model)
     payload = parse_json_response(response_text)
 
     patch_text = extract_patch(str(payload.get("patch", "")))
-    enforce_patch_guardrails(patch_text)
-    apply_patch_text(patch_text)
+    enforce_patch_guardrails(
+        patch_text,
+        checkpoint_records=checkpoint_records,
+        run_json_path=run_json_path,
+        agent_id=args.agent,
+        session_id=session_id,
+    )
+    patch_path = apply_patch_text(patch_text)
+    if run_json_path and patch_path:
+        copy_artifact_to_run(
+            run_json_path,
+            patch_path,
+            name="generated_patch",
+            kind="generated",
+            relative_path="artifacts/generated.patch",
+        )
 
     raw_validation_commands: Any = payload.get("validation_commands", [])
-    validation_commands = validate_commands(
+    requested_commands, validation_commands, rejected_commands = split_validation_commands(
         raw_validation_commands if isinstance(raw_validation_commands, list) else []
     )
-    if validation_commands:
-        run_validation(validation_commands)
+    enforce_validation_guardrails(
+        requested_commands=requested_commands,
+        validation_commands=validation_commands,
+        rejected_commands=rejected_commands,
+        checkpoint_records=checkpoint_records,
+        run_json_path=run_json_path,
+        agent_id=args.agent,
+        session_id=session_id,
+    )
+    validation_results = run_validation(validation_commands, run_json_path)
+    if run_json_path:
+        record_verification_results(
+            run_json_path,
+            commands=validation_commands,
+            results=validation_results,
+        )
 
     summary_path = Path(".autonomy/last-response.json")
     summary_path.parent.mkdir(parents=True, exist_ok=True)
     summary_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    if run_json_path:
+        copy_artifact_to_run(
+            run_json_path,
+            summary_path,
+            name="model_response",
+            kind="generated",
+            relative_path="artifacts/last-response.json",
+        )
+    if any(result["exit_code"] != 0 for result in validation_results):
+        print("Validation failed.")
+        return 1
     print(payload.get("summary", "Applied autonomous patch."))
     return 0
 

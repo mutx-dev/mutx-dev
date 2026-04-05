@@ -64,7 +64,7 @@ If `AUTONOMY_AGENT_CMD_TEMPLATE` is unset but `GITHUB_MODELS_TOKEN` or `OPENAI_A
 python scripts/autonomy/hosted_llm_executor.py --agent {agent} --brief {brief} --work-order {work_order}
 ```
 
-If a generated patch exceeds the configured size or file-count guardrails, the executor stops and writes `.autonomy/guardrail-failure.json` for debugging.
+If a generated patch exceeds the configured size or file-count guardrails, or if model-suggested validation commands fall outside the executor allowlist, the executor stops, writes `.autonomy/guardrail-failure.json`, and records the checkpoint decision in `.autonomy/policy-checkpoints.json`.
 
 If `AUTONOMY_REVIEWER_MAP` is set, the executor also assigns the mapped GitHub login to the PR and leaves a reviewer-routing comment.
 
