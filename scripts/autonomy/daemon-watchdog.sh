@@ -9,9 +9,21 @@ WATCHDOG_LOG="${MUTX_AUTONOMY_WATCHDOG_LOG:-$REPO_ROOT/reports/autonomy-watchdog
 RESTART_STAMP="${MUTX_AUTONOMY_RESTART_STAMP:-$REPO_ROOT/.autonomy/watchdog-last-restart.txt}"
 HEARTBEAT_TIMEOUT="${MUTX_AUTONOMY_HEARTBEAT_TIMEOUT:-900}"
 RESTART_COOLDOWN="${MUTX_AUTONOMY_RESTART_COOLDOWN:-180}"
-PYTHON_BIN="${MUTX_AUTONOMY_PYTHON:-python3}"
+BOOTSTRAP_PYTHON="${MUTX_AUTONOMY_BOOTSTRAP_PYTHON:-python3}"
+PYTHON_RESOLVER="$REPO_ROOT/scripts/autonomy/python_runtime.py"
+PYTHON_BIN=""
 
 mkdir -p "$(dirname "$WATCHDOG_LOG")" "$(dirname "$RESTART_STAMP")"
+
+resolve_python_bin() {
+  if ! PYTHON_BIN="$($BOOTSTRAP_PYTHON "$PYTHON_RESOLVER")"; then
+    echo "failed to resolve supported autonomy python runtime" >&2
+    return 1
+  fi
+  export MUTX_AUTONOMY_PYTHON="$PYTHON_BIN"
+}
+
+resolve_python_bin
 
 log_watchdog() {
   printf '%s %s\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" "$*" >> "$WATCHDOG_LOG"
