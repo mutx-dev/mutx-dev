@@ -12,13 +12,13 @@ export default function DashboardMonitoringPage() {
         <div className="space-y-4">
           <RouteHeader
             title="Monitoring"
-            description="Gateway health, live alerts, and honest control-plane status without placeholder observability chrome."
+            description="Live health, open alerts, and control-plane status at a glance."
             icon={Activity}
             iconTone="text-sky-400 bg-sky-400/10"
             badge="monitoring surface"
             stats={[
               { label: "Scope", value: "Health + alerts" },
-              { label: "Data", value: "Live API", tone: "success" },
+              { label: "Source", value: "Live API", tone: "success" },
             ]}
           />
 

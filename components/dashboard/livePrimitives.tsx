@@ -329,3 +329,245 @@ export function LiveEmptyState({
     />
   );
 }
+
+export type BriefingBarStatus = "healthy" | "degraded" | "critical" | "unknown";
+
+export type BriefingBarEntry = {
+  label: string;
+  value: string;
+  status: BriefingBarStatus;
+};
+
+export function SignalPill({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "success" | "warning" | "info";
+}) {
+  const toneClasses = {
+    success: "bg-emerald-500/15 border-emerald-500/30 text-emerald-300",
+    warning: "bg-amber-500/15 border-amber-500/30 text-amber-300",
+    info: "bg-sky-500/15 border-sky-500/30 text-sky-300",
+  };
+
+  return (
+    <div className={`rounded-lg border px-2.5 py-1.5 ${toneClasses[tone]}`}>
+      <div className="text-[10px] uppercase tracking-wide opacity-70">{label}</div>
+      <div className="text-xs font-semibold font-mono truncate">{value}</div>
+    </div>
+  );
+}
+
+export function BriefingBar({ entries }: { entries: BriefingBarEntry[] }) {
+  const statusDotClasses: Record<BriefingBarStatus, string> = {
+    healthy: "bg-emerald-400",
+    degraded: "bg-amber-400",
+    critical: "bg-rose-400",
+    unknown: "bg-slate-500",
+  };
+
+  const statusTextClasses: Record<BriefingBarStatus, string> = {
+    healthy: "text-emerald-300",
+    degraded: "text-amber-300",
+    critical: "text-rose-300",
+    unknown: "text-slate-400",
+  };
+
+  return (
+    <div
+      className="flex items-center gap-4 rounded-xl border px-4 py-2.5 overflow-x-auto"
+      style={{
+        borderColor: dashboardTokens.borderSubtle,
+        backgroundColor: dashboardTokens.bgInset,
+      }}
+    >
+      {entries.map((entry, index) => (
+        <div key={entry.label} className="flex items-center gap-2 shrink-0">
+          {index > 0 && (
+            <div
+              className="h-4 w-px"
+              style={{ backgroundColor: dashboardTokens.borderSubtle }}
+            />
+          )}
+          <div className={`h-2 w-2 rounded-full ${statusDotClasses[entry.status]}`} />
+          <span
+            className="text-[10px] uppercase tracking-widest"
+            style={{ color: dashboardTokens.textMuted }}
+          >
+            {entry.label}
+          </span>
+          <span className={`text-xs font-semibold ${statusTextClasses[entry.status]}`}>
+            {entry.value}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export type RunFlowStatus = "pending" | "running" | "completed" | "failed";
+
+export interface QueueDepthEntry {
+  status: RunFlowStatus;
+  count: number;
+  label: string;
+}
+
+export interface FlowStage {
+  status: RunFlowStatus;
+  count: number;
+  maxCount: number;
+}
+
+export function QueueDepthBar({ entries }: { entries: QueueDepthEntry[] }) {
+  const statusConfig: Record<RunFlowStatus, { bar: string; text: string; dot: string }> = {
+    pending: { bar: "bg-slate-500", text: "text-slate-400", dot: "bg-slate-400" },
+    running: { bar: "bg-cyan-500", text: "text-cyan-300", dot: "bg-cyan-400" },
+    completed: { bar: "bg-emerald-500", text: "text-emerald-300", dot: "bg-emerald-400" },
+    failed: { bar: "bg-rose-500", text: "text-rose-300", dot: "bg-rose-400" },
+  };
+
+  const total = entries.reduce((sum, e) => sum + e.count, 0);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs text-slate-400">Queue depth</span>
+        <span className="text-xs font-semibold text-white">{total} total</span>
+      </div>
+      <div className="flex h-2 overflow-hidden rounded-full bg-[#1a2943]">
+        {entries.map((entry) => {
+          if (entry.count === 0) return null;
+          const width = total > 0 ? (entry.count / total) * 100 : 0;
+          return (
+            <div
+              key={entry.status}
+              className={cn("h-full transition-all", statusConfig[entry.status].bar)}
+              style={{ width: `${width}%` }}
+            />
+          );
+        })}
+      </div>
+      <div className="flex flex-wrap gap-3">
+        {entries.map((entry) => (
+          <div key={entry.status} className="flex items-center gap-1.5">
+            <span className={cn("h-1.5 w-1.5 rounded-full", statusConfig[entry.status].dot)} />
+            <span className={cn("text-[10px]", statusConfig[entry.status].text)}>
+              {entry.label}: {entry.count}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function FlowStatusBar({ stages }: { stages: FlowStage[] }) {
+  const stageConfig: Record<RunFlowStatus, { active: string; pending: string; label: string }> = {
+    pending: {
+      active: "border-slate-500/30 bg-slate-500/10 text-slate-400",
+      pending: "border-slate-700/30 bg-[#0a1428] text-slate-600",
+      label: "Pending",
+    },
+    running: {
+      active: "border-cyan-500/50 bg-cyan-500/15 text-cyan-300",
+      pending: "border-cyan-900/30 bg-[#0a1428] text-slate-600",
+      label: "Running",
+    },
+    completed: {
+      active: "border-emerald-500/50 bg-emerald-500/15 text-emerald-300",
+      pending: "border-emerald-900/30 bg-[#0a1428] text-slate-600",
+      label: "Completed",
+    },
+    failed: {
+      active: "border-rose-500/50 bg-rose-500/15 text-rose-300",
+      pending: "border-rose-900/30 bg-[#0a1428] text-slate-600",
+      label: "Failed",
+    },
+  };
+
+  return (
+    <div className="flex items-center gap-1">
+      {stages.map((stage, index) => {
+        const config = stageConfig[stage.status];
+        const isActive = stage.count > 0;
+        return (
+          <div key={stage.status} className="flex items-center">
+            {index > 0 && (
+              <div
+                className={cn(
+                  "h-px w-4 transition-all",
+                  stages[index - 1].count > 0 ? "bg-cyan-500/50" : "bg-slate-700",
+                )}
+              />
+            )}
+            <div
+              className={cn(
+                "flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 transition-all",
+                isActive ? config.active : config.pending,
+              )}
+            >
+              <span
+                className={cn(
+                  "h-1.5 w-1.5 rounded-full",
+                  isActive ? config.dot || "bg-current" : "bg-slate-700",
+                )}
+              />
+              <span className="text-[10px] font-medium uppercase tracking-wide">
+                {config.label}
+              </span>
+              <span className="text-[10px] font-semibold tabular-nums">
+                {stage.count}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export interface CapacityIndicatorProps {
+  used: number;
+  max: number;
+  label?: string;
+}
+
+export function CapacityIndicator({ used, max, label }: CapacityIndicatorProps) {
+  const percentage = max > 0 ? Math.min((used / max) * 100, 100) : 0;
+  const isOverCapacity = used > max;
+  const isNearCapacity = percentage >= 80 && !isOverCapacity;
+
+  const barColor = isOverCapacity
+    ? "bg-rose-500"
+    : isNearCapacity
+      ? "bg-amber-500"
+      : "bg-emerald-500";
+
+  return (
+    <div className="space-y-1.5">
+      {label && (
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-[10px] uppercase tracking-widest text-slate-500">{label}</span>
+          <span
+            className={cn(
+              "text-[10px] font-semibold tabular-nums",
+              isOverCapacity ? "text-rose-300" : isNearCapacity ? "text-amber-300" : "text-slate-300",
+            )}
+          >
+            {used}/{max}
+          </span>
+        </div>
+      )}
+      <div className="h-1.5 overflow-hidden rounded-full bg-[#1a2943]">
+        <div
+          className={cn("h-full rounded-full transition-all", barColor)}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+    </div>
+  );
+}

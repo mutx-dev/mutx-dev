@@ -101,12 +101,22 @@ export function AgentCard({
       </div>
 
       <div className="mt-4 flex items-center justify-between gap-2">
-        <p
-          className="truncate text-xs"
-          style={{ color: dashboardTokens.textMuted, fontFamily: dashboardTokens.fontMono }}
-        >
-          {updatedAt ? `Updated ${updatedAt}` : "No recent update"}
-        </p>
+        <div className="flex items-center gap-1.5">
+          <span
+            className="h-1.5 w-1.5 shrink-0 rounded-full"
+            style={{
+              backgroundColor: updatedAt
+                ? dashboardTokens.statusActive
+                : dashboardTokens.textMuted,
+            }}
+          />
+          <p
+            className="truncate text-xs"
+            style={{ color: dashboardTokens.textMuted, fontFamily: dashboardTokens.fontMono }}
+          >
+            {updatedAt ? `Updated ${updatedAt}` : "No recent update"}
+          </p>
+        </div>
         {actions ? <div className="shrink-0">{actions}</div> : null}
       </div>
     </article>

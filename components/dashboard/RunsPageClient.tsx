@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { ApiRequestError, readJson } from "@/components/app/http";
 import {
+  FlowStatusBar,
   LiveAuthRequired,
   LiveEmptyState,
   LiveErrorState,
@@ -11,6 +12,7 @@ import {
   LiveLoading,
   LivePanel,
   LiveStatCard,
+  QueueDepthBar,
   asDashboardStatus,
   formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
@@ -65,8 +67,10 @@ export function RunsPageClient() {
   const totals = useMemo(() => {
     const completed = runs.filter((run) => run.status === "completed").length;
     const failed = runs.filter((run) => run.status === "failed").length;
+    const pending = runs.filter((run) => run.status === "created" || run.status === "queued").length;
+    const running = runs.filter((run) => run.status === "running" && !run.completed_at).length;
     const live = runs.filter((run) => !run.completed_at).length;
-    return { completed, failed, live };
+    return { completed, failed, pending, running, live };
   }, [runs]);
 
   if (loading) return <LiveLoading title="Runs" />;
@@ -85,10 +89,16 @@ export function RunsPageClient() {
       <LiveKpiGrid>
         <LiveStatCard label="Total runs" value={String(runs.length)} detail="Recent execution records returned by the runs API." />
         <LiveStatCard
+          label="Pending"
+          value={String(totals.pending)}
+          detail="Runs queued or created, awaiting agent pickup."
+          status={asDashboardStatus(totals.pending > 0 ? "warning" : "idle")}
+        />
+        <LiveStatCard
           label="In flight"
-          value={String(totals.live)}
-          detail="Runs still active or waiting on a terminal state."
-          status={asDashboardStatus(totals.live > 0 ? "running" : "idle")}
+          value={String(totals.running)}
+          detail="Runs actively executing on an agent."
+          status={asDashboardStatus(totals.running > 0 ? "running" : "idle")}
         />
         <LiveStatCard
           label="Completed"
@@ -111,8 +121,17 @@ export function RunsPageClient() {
             message="Run history will show up here once an owned agent has executed inside MUTX."
           />
         ) : (
-          <div className="space-y-3">
-            {runs.map((run) => (
+          <div className="space-y-4">
+            <QueueDepthBar
+              entries={[
+                { status: "pending", count: totals.pending, label: "Pending" },
+                { status: "running", count: totals.running, label: "Running" },
+                { status: "completed", count: totals.completed, label: "Done" },
+                { status: "failed", count: totals.failed, label: "Failed" },
+              ]}
+            />
+            <div className="space-y-3">
+              {runs.map((run) => (
               <div
                 key={run.id}
                 className="grid gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-4 md:grid-cols-[minmax(0,1fr)_auto]"
