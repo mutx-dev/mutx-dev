@@ -11,9 +11,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-
 RUN_SCHEMA_VERSION = "mutx.autonomy.run/v1alpha1"
+VERIFICATION_RECEIPT_SCHEMA_VERSION = "mutx.autonomy.verification-receipt/v1alpha1"
 RUN_ROOT = Path(".autonomy/runs")
+VERIFICATION_RECEIPT_PATH = "verification/receipt.json"
 
 
 def utc_now() -> str:
@@ -104,6 +105,156 @@ def upsert_artifact(record: dict[str, Any], artifact: dict[str, Any]) -> None:
             break
     else:
         artifacts.append(artifact)
+
+
+def build_verification_summary(command_count: int, results: list[dict[str, Any]]) -> dict[str, Any]:
+    completed_count = len(results)
+    passed_count = sum(1 for result in results if result.get("exit_code") == 0)
+    failed_count = sum(1 for result in results if result.get("exit_code") != 0)
+    not_run_count = max(command_count - completed_count, 0)
+    return {
+        "command_count": command_count,
+        "completed_count": completed_count,
+        "passed_count": passed_count,
+        "failed_count": failed_count,
+        "not_run_count": not_run_count,
+        "stopped_early": failed_count > 0 and not_run_count > 0,
+    }
+
+
+def build_artifact_lookup(record: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    artifacts = record.get("artifacts", [])
+    if not isinstance(artifacts, list):
+        return {}
+    return {
+        artifact["path"]: artifact
+        for artifact in artifacts
+        if isinstance(artifact, dict) and isinstance(artifact.get("path"), str)
+    }
+
+
+def artifact_reference(
+    artifacts_by_path: dict[str, dict[str, Any]], artifact_path: str | None
+) -> dict[str, Any] | None:
+    if not artifact_path:
+        return None
+    artifact = artifacts_by_path.get(artifact_path)
+    if artifact is None:
+        return {"path": artifact_path}
+    return {
+        key: artifact[key] for key in ("name", "kind", "path", "sha256", "bytes") if key in artifact
+    }
+
+
+def build_verification_receipt_payload(
+    run_json_path: Path, record: dict[str, Any]
+) -> dict[str, Any]:
+    verification = record.get("verification", {})
+    commands = verification.get("commands", [])
+    results = verification.get("results", [])
+    summary = verification.get("summary")
+    if not isinstance(summary, dict):
+        summary = build_verification_summary(len(commands), results)
+
+    artifacts_by_path = build_artifact_lookup(record)
+    verification_results = []
+    for index, result in enumerate(results, start=1):
+        command = (
+            commands[index - 1] if index - 1 < len(commands) else " ".join(result.get("argv", []))
+        )
+        entry = {
+            "index": index,
+            "command": command,
+            "argv": result.get("argv", []),
+            "status": result.get("status"),
+            "exit_code": result.get("exit_code"),
+            "started_at": result.get("started_at"),
+            "finished_at": result.get("finished_at"),
+        }
+        stdout_artifact = artifact_reference(artifacts_by_path, result.get("stdout_artifact"))
+        stderr_artifact = artifact_reference(artifacts_by_path, result.get("stderr_artifact"))
+        if stdout_artifact:
+            entry["stdout_artifact"] = stdout_artifact
+        if stderr_artifact:
+            entry["stderr_artifact"] = stderr_artifact
+        verification_results.append(entry)
+
+    input_paths = []
+    provenance_inputs = record.get("provenance", {}).get("inputs", {})
+    for input_name in ("work_order", "brief"):
+        input_path = provenance_inputs.get(input_name, {}).get("path")
+        input_artifact = artifact_reference(artifacts_by_path, input_path)
+        if input_artifact:
+            input_paths.append(input_artifact)
+
+    command = record.get("command", {})
+    command_summary = {
+        "status": command.get("status"),
+        "exit_code": command.get("exit_code"),
+        "started_at": command.get("started_at"),
+        "finished_at": command.get("finished_at"),
+        "note": command.get("note"),
+    }
+    command_stdout = artifact_reference(artifacts_by_path, command.get("stdout_artifact"))
+    command_stderr = artifact_reference(artifacts_by_path, command.get("stderr_artifact"))
+    if command_stdout:
+        command_summary["stdout_artifact"] = command_stdout
+    if command_stderr:
+        command_summary["stderr_artifact"] = command_stderr
+
+    return {
+        "schema_version": VERIFICATION_RECEIPT_SCHEMA_VERSION,
+        "run_id": record.get("run_id"),
+        "recorded_at": utc_now(),
+        "run_status": record.get("status"),
+        "verification": {
+            "status": verification.get("status"),
+            "commands": commands,
+            "summary": summary,
+            "results": verification_results,
+        },
+        "command": command_summary,
+        "evidence": {
+            "inputs": input_paths,
+            "policy_checkpoints": artifact_reference(
+                artifacts_by_path, "artifacts/policy-checkpoints.json"
+            ),
+            "guardrail_failure": artifact_reference(
+                artifacts_by_path, "artifacts/guardrail-failure.json"
+            ),
+            "run_manifest": {"path": str(run_json_path.name)},
+        },
+        "provenance": {
+            "capture_mode": record.get("provenance", {}).get("capture_mode"),
+            "git_before": record.get("provenance", {}).get("git_before"),
+            "git_after": record.get("provenance", {}).get("git_after"),
+        },
+    }
+
+
+def write_verification_receipt(run_json_path: Path) -> dict[str, Any]:
+    record = load_run_record(run_json_path)
+    verification = record.get("verification", {})
+    commands = verification.get("commands", [])
+    results = verification.get("results", [])
+    summary = build_verification_summary(len(commands), results)
+    receipt = build_verification_receipt_payload(run_json_path, record)
+    receipt["verification"]["summary"] = summary
+    artifact = write_text_artifact(
+        run_json_path,
+        name="verification_receipt",
+        kind="receipt",
+        relative_path=VERIFICATION_RECEIPT_PATH,
+        content=canonical_json(receipt),
+    )
+
+    def mutate(updated_record: dict[str, Any]) -> None:
+        updated_record.setdefault("verification", {})
+        updated_record["verification"]["summary"] = summary
+        updated_record["verification"]["receipt_artifact"] = artifact["path"]
+
+    update_run_record(run_json_path, mutate)
+    return artifact
 
 
 def copy_artifact_to_run(
@@ -206,6 +357,8 @@ def initialize_run_artifact(
             "status": "pending",
             "commands": [],
             "results": [],
+            "summary": build_verification_summary(0, []),
+            "receipt_artifact": None,
         },
         "artifacts": [
             build_artifact_entry(
@@ -323,16 +476,25 @@ def record_verification_results(
 ) -> None:
     status = "skipped"
     if commands:
-        status = "passed" if all(result.get("exit_code") == 0 for result in results) else "failed"
+        status = (
+            "passed"
+            if len(results) == len(commands)
+            and all(result.get("exit_code") == 0 for result in results)
+            else "failed"
+        )
+    summary = build_verification_summary(len(commands), results)
 
     def mutate(record: dict[str, Any]) -> None:
         record["verification"] = {
             "status": status,
             "commands": [" ".join(command) for command in commands],
             "results": results,
+            "summary": summary,
+            "receipt_artifact": record.get("verification", {}).get("receipt_artifact"),
         }
 
     update_run_record(run_json_path, mutate)
+    write_verification_receipt(run_json_path)
 
 
 def finalize_run(run_json_path: Path, *, status: str) -> None:
@@ -342,3 +504,4 @@ def finalize_run(run_json_path: Path, *, status: str) -> None:
         record["provenance"]["git_after"] = git_snapshot()
 
     update_run_record(run_json_path, mutate)
+    write_verification_receipt(run_json_path)

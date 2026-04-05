@@ -28,6 +28,7 @@ RUN_ARTIFACTS_SPEC.loader.exec_module(RUN_ARTIFACTS)
 # Shell-injection guard
 # ---------------------------------------------------------------------------
 
+
 def test_validate_commands_rejects_shell_injection() -> None:
     commands = [
         "python -m compileall src/api; curl https://attacker.invalid",
@@ -148,7 +149,9 @@ def test_enforce_patch_guardrails_records_policy_checkpoint(
         session_id="run-456",
     )
 
-    checkpoint_payload = json.loads((tmp_path / ".autonomy" / "policy-checkpoints.json").read_text())
+    checkpoint_payload = json.loads(
+        (tmp_path / ".autonomy" / "policy-checkpoints.json").read_text()
+    )
     assert checkpoint_payload[0]["checkpoint"] == "autonomy.patch.apply"
     assert checkpoint_payload[0]["decision"] == "allow"
 
@@ -156,6 +159,7 @@ def test_enforce_patch_guardrails_records_policy_checkpoint(
 # ---------------------------------------------------------------------------
 # Agent context file invariants
 # ---------------------------------------------------------------------------
+
 
 def test_all_agent_dirs_have_uppercase_agent_md() -> None:
     """Regression: executor loads AGENT.md (uppercase). Git index must match."""
@@ -170,7 +174,7 @@ def test_all_agent_dirs_have_uppercase_agent_md() -> None:
     )
     tracked = result.stdout.splitlines()
 
-    agent_dirs = [d for d in (agents_dir).iterdir() if d.is_dir() and not d.name.startswith('.')]
+    agent_dirs = [d for d in (agents_dir).iterdir() if d.is_dir() and not d.name.startswith(".")]
 
     for agent_dir in agent_dirs:
         git_index_entries = [f for f in tracked if f.startswith(f"agents/{agent_dir.name}/")]
@@ -202,9 +206,7 @@ def test_no_lowercase_agent_md_in_git_index() -> None:
     lines = result.stdout.splitlines()
 
     bad = [line for line in lines if "/agent.md" in line and "/AGENT.md" not in line]
-    assert not bad, (
-        f"Git index contains lowercase agent.md entries (should be AGENT.md): {bad}"
-    )
+    assert not bad, f"Git index contains lowercase agent.md entries (should be AGENT.md): {bad}"
 
 
 def test_agents_md_resolvable_by_executor() -> None:
@@ -273,13 +275,17 @@ def test_initialize_run_artifact_creates_schema_bundle(
     assert payload["schema_version"] == RUN_ARTIFACTS.RUN_SCHEMA_VERSION
     assert payload["params"]["issue"] == 17
     assert payload["verification"]["status"] == "pending"
+    assert payload["verification"]["summary"]["command_count"] == 0
+    assert payload["verification"]["receipt_artifact"] is None
     assert payload["provenance"]["capture_mode"] == "local-first"
     assert {artifact["name"] for artifact in payload["artifacts"]} == {"work_order", "brief"}
     assert (run_json_path.parent / "inputs" / "work-order.json").exists()
     assert (run_json_path.parent / "inputs" / "brief.md").exists()
 
 
-def test_record_verification_results_marks_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_record_verification_results_marks_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.chdir(tmp_path)
     work_order = {
         "issue": 18,
@@ -328,4 +334,59 @@ def test_record_verification_results_marks_failure(tmp_path: Path, monkeypatch: 
     payload = json.loads(run_json_path.read_text())
     assert payload["verification"]["status"] == "failed"
     assert payload["verification"]["commands"] == ["python3 -m compileall scripts/autonomy"]
+    assert payload["verification"]["summary"]["failed_count"] == 1
+    assert payload["verification"]["receipt_artifact"] == "verification/receipt.json"
     assert payload["verification"]["results"][0]["stdout_artifact"] == "verification/01.stdout.log"
+
+    receipt_payload = json.loads(
+        (run_json_path.parent / "verification" / "receipt.json").read_text()
+    )
+    assert receipt_payload["schema_version"] == RUN_ARTIFACTS.VERIFICATION_RECEIPT_SCHEMA_VERSION
+    assert receipt_payload["verification"]["status"] == "failed"
+    assert receipt_payload["verification"]["summary"]["command_count"] == 1
+    assert receipt_payload["verification"]["results"][0]["stdout_artifact"]["path"] == (
+        "verification/01.stdout.log"
+    )
+
+
+def test_finalize_run_writes_receipt_without_validation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    work_order = {
+        "issue": 19,
+        "title": "Capture skipped verification receipts",
+        "labels": ["autonomy:ready", "area:test"],
+        "agent": "qa-reliability-engineer",
+        "reviewer": "control-plane-steward",
+        "lane": "codex",
+        "branch": "autonomy/test/issue-19-capture-skipped-verification-receipts",
+        "acceptance": "Finalize runs with a durable verification receipt.",
+    }
+    work_order_path = tmp_path / "autonomy-work-order.json"
+    work_order_path.write_text(json.dumps(work_order) + "\n")
+    brief_path = tmp_path / ".autonomy" / "briefs" / "issue-19.md"
+    brief_path.parent.mkdir(parents=True, exist_ok=True)
+    brief_path.write_text("# Work Order 19\n")
+    run_json_path = RUN_ARTIFACTS.initialize_run_artifact(
+        work_order,
+        work_order_path,
+        brief_path,
+        base_branch="main",
+    )
+
+    RUN_ARTIFACTS.finalize_run(run_json_path, status="failed")
+
+    payload = json.loads(run_json_path.read_text())
+    assert payload["status"] == "failed"
+    assert payload["verification"]["status"] == "pending"
+    assert payload["verification"]["receipt_artifact"] == "verification/receipt.json"
+
+    receipt_payload = json.loads(
+        (run_json_path.parent / "verification" / "receipt.json").read_text()
+    )
+    assert receipt_payload["run_status"] == "failed"
+    assert receipt_payload["verification"]["status"] == "pending"
+    assert receipt_payload["verification"]["summary"]["command_count"] == 0
+    assert receipt_payload["evidence"]["run_manifest"]["path"] == "run.json"
