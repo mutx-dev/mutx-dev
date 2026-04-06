@@ -311,6 +311,56 @@ def publish_branch_with_pr(
     return payload
 
 
+def prepare_task_branch(path: str | Path, branch: str) -> dict[str, Any]:
+    """Create (if needed) and switch to a task branch in the given worktree.
+
+    Returns {"status": "ready", "branch": <branch>} on success.
+    On failure returns {"status": "failed", "reason": <reason>}.
+    """
+    if not branch:
+        return {"status": "failed", "reason": "missing_branch"}
+    if not is_git_worktree(path):
+        return {"status": "failed", "reason": "not_a_worktree"}
+
+    # Check if branch already exists locally
+    existing = run_git(["rev-parse", "--verify", f"refs/heads/{branch}"], path)
+    if existing.returncode == 0:
+        # Branch already exists — just check it out
+        checkout = run_git(["checkout", branch], path)
+        if checkout.returncode != 0:
+            return {
+                "status": "failed",
+                "reason": "checkout_failed",
+                "stderr": checkout.stderr[-2000:],
+            }
+        return {"status": "ready", "branch": branch}
+
+    # Resolve the current ref to branch from (HEAD is safe inside a worktree)
+    head = run_git(["rev-parse", "HEAD"], path)
+    if head.returncode != 0:
+        return {"status": "failed", "reason": "no_head", "stderr": head.stderr[-2000:]}
+
+    # Create the branch from the current HEAD
+    create = run_git(["branch", branch, head.stdout.strip()], path)
+    if create.returncode != 0:
+        return {
+            "status": "failed",
+            "reason": "branch_creation_failed",
+            "stderr": create.stderr[-2000:],
+        }
+
+    # Switch to the new branch
+    checkout = run_git(["checkout", branch], path)
+    if checkout.returncode != 0:
+        return {
+            "status": "failed",
+            "reason": "checkout_after_create_failed",
+            "stderr": checkout.stderr[-2000:],
+        }
+
+    return {"status": "ready", "branch": branch}
+
+
 def commit_tracked_files(path: str | Path, files: list[str], message: str) -> str | None:
     if not files:
         return None
