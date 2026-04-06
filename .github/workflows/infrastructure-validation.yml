@@ -83,6 +83,9 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            infrastructure/ansible/requirements.yml
 
       - name: Install ansible-lint
         run: pip install ansible-lint
