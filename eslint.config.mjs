@@ -16,7 +16,19 @@ export default tseslint.config(
     },
   },
   {
-    ignores: [".next/**", "node_modules/**", "dist/**", "out/**", "tmp/**", "playwright-report/**", "test-results/**", "tests/tmp*.spec.ts"],
+    ignores: [
+      ".next/**",
+      "node_modules/**",
+      "dist/**",
+      "out/**",
+      "tmp/**",
+      "playwright-report/**",
+      "test-results/**",
+      "tests/tmp*.spec.ts",
+      ".venv*/**",
+      ".worktrees/**",
+      "ios/**/*.build/**",
+    ],
   },
   {
     languageOptions: {
