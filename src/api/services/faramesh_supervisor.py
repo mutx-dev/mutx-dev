@@ -183,9 +183,13 @@ class FarameshSupervisor:
 
         requested_path = Path(policy_fragment)
         if requested_path.is_absolute() or "~" in requested_path.parts:
-            raise SupervisionValidationError("Faramesh policy must be a relative path inside the allowlist")
+            raise SupervisionValidationError(
+                "Faramesh policy must be a relative path inside the allowlist"
+            )
         if any(part in {"", ".", ".."} for part in requested_path.parts):
-            raise SupervisionValidationError("Faramesh policy path contains invalid traversal segments")
+            raise SupervisionValidationError(
+                "Faramesh policy path contains invalid traversal segments"
+            )
         return requested_path
 
     def _resolve_trusted_policy_path(self, faramesh_policy: Optional[str]) -> Optional[str]:
