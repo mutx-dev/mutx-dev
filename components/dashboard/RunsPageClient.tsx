@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 
 import { ApiRequestError, readJson } from "@/components/app/http";
 import {
-  FlowStatusBar,
   LiveAuthRequired,
   LiveEmptyState,
   LiveErrorState,
