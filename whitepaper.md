@@ -150,6 +150,7 @@ The control plane is implemented as a FastAPI application with route groups moun
 Historically, the live route families in the codebase were organized as:
 
 - `/v1/agents`
+- `/v1/auth`
 - `/v1/deployments`
 - `/v1/api-keys`
 - `/v1/webhooks`
