@@ -1301,7 +1301,10 @@
   .contactHeroCopy {
     max-width: 34rem;
     text-align: center;
-    align-items: center;
+  }
+
+  .ctaRow {
+    justify-content: center;
   }
 
   .contactHeroImageWrap {
