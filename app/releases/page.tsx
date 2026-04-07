@@ -18,7 +18,7 @@ import {
   buildReleaseNotesUrl,
   fetchLatestStableDesktopRelease,
 } from "@/lib/desktopRelease";
-import { DEFAULT_X_HANDLE, getCanonicalUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Releases | MUTX",
@@ -32,6 +32,7 @@ export const metadata: Metadata = {
     description:
       "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.",
     url: getCanonicalUrl("/releases"),
+    images: [getOgImageUrl()],
   },
   twitter: {
     card: "summary_large_image",
@@ -39,6 +40,7 @@ export const metadata: Metadata = {
     title: "Releases | MUTX",
     description:
       "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.",
+    images: [getOgImageUrl()],
   },
 };
 

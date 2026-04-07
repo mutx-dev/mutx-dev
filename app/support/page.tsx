@@ -1,16 +1,32 @@
 import fs from "fs";
 import path from "path";
+import type { Metadata } from "next";
 import matter from "gray-matter";
 import { DocsLayout } from "@/components/site/docs/DocsLayout";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl } from "@/lib/seo";
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   const source = fs.readFileSync(path.join(process.cwd(), "support.md"), "utf-8");
   const { data } = matter(source);
   return {
     title: `${data.title || "Support"} — MUTX`,
-    description: data.description,
+    description: data.description as string,
+    alternates: { canonical: getCanonicalUrl("/support") },
+    openGraph: {
+      title: `${data.title || "Support"} — MUTX`,
+      description: data.description as string,
+      url: getCanonicalUrl("/support"),
+      images: [getOgImageUrl()],
+    },
+    twitter: {
+      card: "summary_large_image",
+      creator: DEFAULT_X_HANDLE,
+      title: `${data.title || "Support"} — MUTX`,
+      description: data.description as string,
+      images: [getOgImageUrl()],
+    },
   };
 }
 

@@ -5,11 +5,28 @@ import { AuthNav } from "@/components/AuthNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | MUTX",
   description:
     "How MUTX handles data across the site, downloads, docs, and support surfaces.",
+  alternates: { canonical: getCanonicalUrl("/privacy-policy") },
+  openGraph: {
+    title: "Privacy Policy | MUTX",
+    description:
+      "How MUTX handles data across the site, downloads, docs, and support surfaces.",
+    url: getCanonicalUrl("/privacy-policy"),
+    images: [getOgImageUrl()],
+  },
+  twitter: {
+    card: "summary_large_image",
+    creator: DEFAULT_X_HANDLE,
+    title: "Privacy Policy | MUTX",
+    description:
+      "How MUTX handles data across the site, downloads, docs, and support surfaces.",
+    images: [getOgImageUrl()],
+  },
 };
 
 const sections = [
