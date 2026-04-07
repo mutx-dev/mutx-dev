@@ -1299,14 +1299,18 @@
   }
 
   .contactHeroCopy {
-    max-width: 34rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
   }
 
   .ctaRow {
     flex-direction: column;
     align-items: stretch;
+    flex-wrap: nowrap;
     width: 100%;
+    gap: 0.75rem;
   }
 
   .ctaRow > * {
