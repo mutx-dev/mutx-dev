@@ -234,56 +234,6 @@ export function MarketingHomePage() {
           </div>
         </section>
 
-        <section className={home.examplesSection} data-testid="homepage-examples-section">
-          <div className={core.shell}>
-            <MarketingReveal className={home.examplesIntro}>
-              <p className={home.sectionEyebrow}>{marketingHomepage.salesSections.examples.eyebrow}</p>
-              <h2 className={home.sectionTitle}>{marketingHomepage.salesSections.examples.title}</h2>
-              <p className={home.sectionBody}>{marketingHomepage.salesSections.examples.body}</p>
-            </MarketingReveal>
-
-            <div className={home.examplesGrid}>
-              {marketingHomepage.salesSections.examples.items.map((item, index) => (
-                <HoverCard
-                  key={item.id}
-                  className={home.exampleCard}
-                  delay={index * 0.06}
-                  distance={18}
-                >
-                  <div className={home.terminalWindow}>
-                    <div className={home.terminalChrome}>
-                      <span className={home.terminalDot} data-tone="red" />
-                      <span className={home.terminalDot} data-tone="yellow" />
-                      <span className={home.terminalDot} data-tone="green" />
-                      <span className={home.terminalTitle}>mutx-agent@runtime</span>
-                    </div>
-                    <div className={home.terminalBody}>
-                      <p className={home.exampleEyebrow}>{item.eyebrow}</p>
-                      <h3 className={home.exampleTitle}>{item.title}</h3>
-                      <p className={home.terminalPromptLine}>
-                        <span className={home.terminalPrompt}>user</span>
-                        <span className={home.terminalCommand}>{item.userPrompt}</span>
-                      </p>
-                      <div className={home.terminalReplyBlock}>
-                        {item.apology.map((line, lineIndex) => (
-                          <p key={lineIndex} className={home.terminalReplyLine}>
-                            <span className={home.terminalAgent}>agent</span>
-                            <span>{line}</span>
-                          </p>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={home.exampleCopy}>
-                    <p className={home.exampleOutcome}>{item.fallout}</p>
-                  </div>
-                </HoverCard>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section className={home.proofSection} data-testid="homepage-proof-section">
           <div className={core.shell}>
             <MarketingReveal className={home.proofIntro}>

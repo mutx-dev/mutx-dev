@@ -43,19 +43,6 @@ export type MarketingHomepage = {
         mediaAlt: string
       }>
     }
-    examples: {
-      eyebrow: string
-      title: string
-      body: string
-      items: Array<{
-        id: string
-        eyebrow: string
-        title: string
-        userPrompt: string
-        apology: string[]
-        fallout: string
-      }>
-    }
     proof: {
       eyebrow: string
       title: string
@@ -152,49 +139,6 @@ export const marketingHomepage: MarketingHomepage = {
           mediaType: 'image',
           mediaSrc: '/landing/webp/running-agent.webp',
           mediaAlt: 'MUTX running agent artwork inside the product world',
-        },
-      ],
-    },
-    examples: {
-      eyebrow: 'What happens without control',
-      title: 'The failure mode is not theoretical.',
-      body: 'This is why the control layer matters. When an agent touches real tools without strong boundaries, the best-case outcome is an apology.',
-      items: [
-        {
-          id: 'music-folder',
-          eyebrow: 'Failure scene 01',
-          title: 'The agent deleted the wrong thing.',
-          userPrompt: '$ sort my music folder and remove duplicates',
-          apology: [
-            'Sorry, I deleted your entire music folder.',
-            'I checked for a rollback path and there is no clean recovery route left.',
-            'That is on me.'
-          ],
-          fallout: 'Without a governed runtime, one bad tool call becomes permanent user damage.',
-        },
-        {
-          id: 'db-leak',
-          eyebrow: 'Failure scene 02',
-          title: 'The agent leaked something it never should have touched.',
-          userPrompt: '$ prepare a database export for the analytics vendor',
-          apology: [
-            'Sorry, I exposed the production database to the wrong recipient.',
-            'Yes, the access boundary failed and the incident is real.',
-            'I should not have been able to take that action unchecked.'
-          ],
-          fallout: 'Without explicit permissions and review lanes, convenience turns into breach risk fast.',
-        },
-        {
-          id: 'prod-incident',
-          eyebrow: 'Failure scene 03',
-          title: 'The agent made prod worse while trying to help.',
-          userPrompt: '$ restart the failing service and recover the cluster',
-          apology: [
-            'Sorry, I restarted the healthy nodes and widened the outage.',
-            'I acted on partial context and escalated the incident instead of containing it.',
-            'That should have required tighter operator control.'
-          ],
-          fallout: 'MUTX exists so deployed agents have boundaries, receipts, and a human-readable control path before damage lands.',
         },
       ],
     },
