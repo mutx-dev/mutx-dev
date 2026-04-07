@@ -190,6 +190,233 @@
       "priority": "p3",
       "status": "failed",
       "source": "gap-scanner:todos"
+    },
+    {
+      "allowed_paths": [
+        "docs/api/reference.md",
+        "whitepaper.md"
+      ],
+      "area": "area:docs",
+      "constraints": [
+        "max_changed_files=3",
+        "docs-and-truth only",
+        "do not invent missing endpoints"
+      ],
+      "description": "whitepaper.md:531 claims the route /v1/assistant/, but it is absent from docs/api/openapi.json. Tighten the claim or document the real implementation status without expanding scope.",
+      "evidence": [
+        "whitepaper.md:531: - public control-plane routes such as `/v1/auth`, `/v1/agents`, `/v1/deployments`, `/v1/templates`, `/v1/assistant/*`, `/v1/sessions`, `/v1/runs`, `/v1/api-keys`, `/v1/webhooks`, `/v1/monitoring`, `/v1/budgets`, `/v1/rag`, `/v1/runtime`, and related families",
+        "missing route: /v1/assistant/"
+      ],
+      "evidence_fingerprint": "1af39019142c3169",
+      "evidence_paths": [
+        "docs/api/openapi.json",
+        "whitepaper.md"
+      ],
+      "id": "fleet-route-whitepaper-md-v1-assistant",
+      "labels": [
+        "area:docs",
+        "autonomy:safe",
+        "lane:main",
+        "priority:p0",
+        "risk:low",
+        "role-lane:main",
+        "role:research",
+        "size:s",
+        "status:misleading"
+      ],
+      "lane": "main",
+      "owner_role": "research",
+      "priority": "p0",
+      "role_lane": "main",
+      "runner": "main",
+      "scheduling_reason": "source/area matched research; scan_targets=whitepaper.md,docs",
+      "score": 114,
+      "source": "fleet:route-claim-scan",
+      "title": "docs: reconcile undocumented route claim /v1/assistant/",
+      "verification": [
+        "git diff --check -- whitepaper.md docs/surfaces.md README.md docs/api/reference.md"
+      ],
+      "status": "completed",
+      "updated_at": "2026-04-07T05:49:58.716435Z",
+      "notes": [
+        {
+          "ts": "2026-04-07T05:47:32.608280Z",
+          "message": "daemon dispatched work order"
+        },
+        {
+          "ts": "2026-04-07T05:47:32.836537Z",
+          "message": "work order prepared"
+        },
+        {
+          "ts": "2026-04-07T05:49:58.716468Z",
+          "message": "runner completed successfully"
+        }
+      ],
+      "work_order_path": ".autonomy/work-orders/fleet-route-whitepaper-md-v1-assistant.json",
+      "completed_at": "2026-04-07T05:49:58.716471Z"
+    },
+    {
+      "allowed_paths": [
+        "docs/api/reference.md",
+        "whitepaper.md"
+      ],
+      "area": "area:docs",
+      "constraints": [
+        "max_changed_files=3",
+        "docs-and-truth only",
+        "do not invent missing endpoints"
+      ],
+      "description": "whitepaper.md:152 claims the route /v1/auth/, but it is absent from docs/api/openapi.json. Tighten the claim or document the real implementation status without expanding scope.",
+      "evidence": [
+        "whitepaper.md:152: - `/v1/auth/*`",
+        "missing route: /v1/auth/"
+      ],
+      "evidence_fingerprint": "1af39019142c3169",
+      "evidence_paths": [
+        "docs/api/openapi.json",
+        "whitepaper.md"
+      ],
+      "id": "fleet-route-whitepaper-md-v1-auth",
+      "labels": [
+        "area:docs",
+        "autonomy:safe",
+        "lane:main",
+        "priority:p0",
+        "risk:low",
+        "role-lane:main",
+        "role:research",
+        "size:s",
+        "status:misleading"
+      ],
+      "lane": "main",
+      "owner_role": "research",
+      "priority": "p0",
+      "role_lane": "main",
+      "runner": "main",
+      "scheduling_reason": "source/area matched research; scan_targets=whitepaper.md,docs",
+      "score": 114,
+      "source": "fleet:route-claim-scan",
+      "title": "docs: reconcile undocumented route claim /v1/auth/",
+      "verification": [
+        "git diff --check -- whitepaper.md docs/surfaces.md README.md docs/api/reference.md"
+      ],
+      "status": "running",
+      "updated_at": "2026-04-07T05:50:03.900592Z",
+      "notes": [
+        {
+          "ts": "2026-04-07T05:50:03.712682Z",
+          "message": "daemon dispatched work order"
+        },
+        {
+          "ts": "2026-04-07T05:50:03.900709Z",
+          "message": "work order prepared"
+        }
+      ],
+      "work_order_path": ".autonomy/work-orders/fleet-route-whitepaper-md-v1-auth.json"
+    },
+    {
+      "allowed_paths": [
+        "docs/claim-to-reality-gap-matrix.md",
+        "docs/surfaces.md"
+      ],
+      "area": "area:docs",
+      "constraints": [
+        "max_changed_files=3",
+        "docs-and-truth only",
+        "keep claim bounded to cited files"
+      ],
+      "description": "Resolve the placeholder claim in docs/claim-to-reality-gap-matrix.md for '\"Dashboard \u2014 RAG search and scheduler return 503 with feature flags\"'. Compare the source reference (surfaces.md) against current repo reality and make the smallest truthful docs update.",
+      "evidence": [
+        "\"Dashboard \u2014 RAG search and scheduler return 503 with feature flags\"",
+        "Confirmed \u2014 returns 503 when runtime is not configured",
+        "status=PLACEHOLDER"
+      ],
+      "evidence_fingerprint": "52fa860882d0f6d0",
+      "evidence_paths": [
+        "docs/claim-to-reality-gap-matrix.md",
+        "docs/surfaces.md"
+      ],
+      "id": "fleet-docs-dashboard-rag-search-and-scheduler-return-503-with-featu",
+      "labels": [
+        "area:docs",
+        "autonomy:safe",
+        "lane:main",
+        "priority:p0",
+        "risk:low",
+        "role-lane:main",
+        "role:cio",
+        "size:s",
+        "status:placeholder"
+      ],
+      "lane": "main",
+      "owner_role": "cio",
+      "priority": "p0",
+      "role_lane": "main",
+      "runner": "main",
+      "scheduling_reason": "source/area matched cio; scan_targets=docs/surfaces.md,docs/claim-to-reality-gap-matrix.md",
+      "score": 94,
+      "source": "fleet:claim-matrix",
+      "title": "docs: tighten drift around \"Dashboard \u2014 RAG search and scheduler return 503 with feature flags\"",
+      "verification": [
+        "python3 -m compileall scripts/autonomy",
+        "git diff --check -- docs/claim-to-reality-gap-matrix.md"
+      ],
+      "status": "queued"
+    },
+    {
+      "allowed_paths": [
+        "components/dashboard/ApiKeysPageClient.tsx"
+      ],
+      "area": "area:web",
+      "constraints": [
+        "max_changed_files=2",
+        "frontend-only change"
+      ],
+      "description": "Audit components/dashboard/ApiKeysPageClient.tsx for placeholder-only inputs without explicit labels or aria-labels and make the smallest safe accessibility improvement.",
+      "evidence": [
+        "placeholder-only inputs detected in components/dashboard/ApiKeysPageClient.tsx"
+      ],
+      "evidence_fingerprint": "93bdb3f4d75da096",
+      "evidence_paths": [
+        "components/dashboard/ApiKeysPageClient.tsx"
+      ],
+      "id": "fleet-ux-components-dashboard-apikeyspageclient-tsx",
+      "labels": [
+        "area:web",
+        "autonomy:safe",
+        "lane:opencode",
+        "priority:p3",
+        "risk:low",
+        "role-lane:opencode",
+        "role:ux",
+        "size:s"
+      ],
+      "lane": "opencode",
+      "owner_role": "ux",
+      "priority": "p3",
+      "role_lane": "opencode",
+      "runner": "opencode",
+      "scheduling_reason": "source/area matched ux; scan_targets=components/dashboard",
+      "score": 45,
+      "source": "fleet:ux-scan",
+      "title": "ux: label placeholder-only inputs in components/dashboard/ApiKeysPageClient.tsx",
+      "verification": [
+        "git diff --check -- components/dashboard/ApiKeysPageClient.tsx"
+      ],
+      "status": "completed",
+      "updated_at": "2026-04-07T05:48:10.943759Z",
+      "notes": [
+        {
+          "ts": "2026-04-07T05:47:32.610399Z",
+          "message": "daemon dispatched work order"
+        },
+        {
+          "ts": "2026-04-07T05:48:10.943777Z",
+          "message": "runner completed successfully"
+        }
+      ],
+      "work_order_path": ".autonomy/work-orders/fleet-ux-components-dashboard-apikeyspageclient-tsx.json",
+      "completed_at": "2026-04-07T05:48:10.943779Z"
     }
   ]
 }

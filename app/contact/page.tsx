@@ -56,7 +56,7 @@ const contactStructuredData = {
 
 export default function ContactPage() {
   return (
-    <PublicSurface className={`${styles.page} ${styles.publicPage} ${styles.contactPage}`}>
+    <PublicSurface className={`${styles.page} ${styles.publicPage}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(contactStructuredData) }}
@@ -66,8 +66,8 @@ export default function ContactPage() {
       <main className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">
           <div className={`${styles.shell} ${styles.routeHeroNarrow}`}>
-            <div className={`${styles.routeDownloadStage} ${styles.contactHeroMain}`}>
-              <div className={`${styles.routeDownloadCopy} ${styles.contactHeroCopy}`}>
+            <div className={styles.contactHeroStage}>
+              <div className={styles.contactHeroCopy}>
                 <div className={styles.intro}>
                   <p className={`${styles.eyebrow} ${styles.eyebrowOnDark}`}>Contact MUTX</p>
                   <h1 className={`${styles.displayTitle} ${styles.darkText} ${styles.contactHeroTitle}`}>
@@ -90,14 +90,13 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className={styles.routeVisualFrame}>
-                <div className={styles.routeVisualGlow} aria-hidden="true" />
+              <div className={styles.contactHeroImageWrap}>
                 <Image
                   src="/marketing/call-me.png"
                   alt="Contact MUTX"
                   fill
-                  sizes="(max-width: 1024px) 100vw, 42rem"
-                  className={styles.routeVisualImage}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className={styles.contactHeroImage}
                 />
               </div>
             </div>

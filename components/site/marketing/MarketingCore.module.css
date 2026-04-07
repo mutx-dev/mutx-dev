@@ -911,14 +911,6 @@
   margin: 0 auto;
 }
 
-.contactHeroMain {
-  max-width: 39rem;
-}
-
-.contactHeroCopy {
-  max-width: 36rem;
-}
-
 .contactHeroTitle {
   font-size: clamp(3.4rem, 6.2vw, 5.6rem);
   max-width: 8.2ch;
@@ -1245,20 +1237,32 @@
   color: rgba(248, 247, 245, 0.56);
 }
 
-.contactPage .routeDownloadStage {
-  align-items: stretch;
+.contactHeroStage {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
 }
 
-.contactPage .routeVisualFrame {
-  min-height: clamp(14rem, 42vw, 22rem);
-  background: transparent;
-  border-radius: 0;
-  border: none;
-  box-shadow: none;
-  overflow: visible;
+.contactHeroCopy {
+  display: grid;
+  gap: 1.25rem;
+  align-content: start;
+  width: 100%;
 }
 
-.contactPage .routeVisualImage {
+.contactHeroImageWrap {
+  position: relative;
+  width: 100%;
+  min-height: clamp(16rem, 46vw, 22rem);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(248, 247, 245, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 24px 64px rgba(3, 3, 8, 0.28);
+}
+
+.contactHeroImage {
   object-fit: contain;
 }
 
@@ -1288,9 +1292,20 @@
     align-items: stretch;
   }
 
-  .contactPage .routeDownloadStage {
-    grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.9fr);
-    gap: 1.8rem;
+  .contactHeroStage {
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .contactHeroCopy {
+    max-width: 34rem;
+  }
+
+  .contactHeroImageWrap {
+    flex: 1;
+    min-height: clamp(20rem, 32vw, 28rem);
+    max-height: 30rem;
   }
 
   .routeDownloadStrip {
@@ -1384,11 +1399,6 @@
 
   .contactHeroBody {
     max-width: none;
-  }
-
-  .contactPage .routeDownloadCopy {
-    max-width: none;
-    width: 100%;
   }
 
   .routeDarkSection {
