@@ -6,99 +6,82 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Optional, Tuple
 
 MIN_VERSION = (3, 10)
-PYENV_DEFAULT_VERSION = '3.12.8'
+DEFAULT_PYENV_CANDIDATES = (
+    Path.home() / '.pyenv' / 'versions' / '3.12.8' / 'bin' / 'python3',
+    Path.home() / '.pyenv' / 'versions' / '3.12.7' / 'bin' / 'python3',
+    Path.home() / '.pyenv' / 'versions' / '3.11.11' / 'bin' / 'python3',
+)
 
 
-def candidate_paths() -> list[str]:
-    seen: set[str] = set()
-    candidates: list[str] = []
-
-    def add(value: str | None) -> None:
-        if not value:
-            return
-        normalized = value.strip()
-        if not normalized or normalized in seen:
-            return
-        seen.add(normalized)
-        candidates.append(normalized)
-
-    add(os.environ.get('MUTX_AUTONOMY_PYTHON'))
-    add(os.environ.get('PYTHON_BIN'))
-    pyenv_root = Path(os.environ.get('PYENV_ROOT') or Path.home() / '.pyenv')
-    add(str(pyenv_root / 'versions' / PYENV_DEFAULT_VERSION / 'bin' / 'python3'))
-    add(sys.executable)
-
-    for name in ('python3', 'python'):
-        resolved = shutil.which(name)
-        add(resolved)
-
-    add('/usr/bin/python3')
-    return candidates
-
-
-def python_version(path: str) -> tuple[int, int] | None:
+def _version_of(python_bin: str) -> Optional[Tuple[int, int, int]]:
     try:
-        completed = subprocess.run(
-            [path, '-c', 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")'],
-            capture_output=True,
+        result = subprocess.run(
+            [python_bin, '-c', 'import sys; print(".".join(map(str, sys.version_info[:3])))'],
             text=True,
-            check=True,
+            capture_output=True,
+            check=False,
         )
-    except (FileNotFoundError, PermissionError, subprocess.SubprocessError):
+    except OSError:
         return None
-
-    output = completed.stdout.strip()
-    if not output:
+    if result.returncode != 0:
         return None
-    major, _, minor = output.partition('.')
-    if not major or not minor:
-        return None
+    text = result.stdout.strip()
     try:
-        return int(major), int(minor)
+        major, minor, patch = (int(part) for part in text.split('.')[:3])
     except ValueError:
         return None
+    return (major, minor, patch)
 
 
-def find_supported_python(paths: Iterable[str], minimum: tuple[int, int] = MIN_VERSION) -> tuple[str, tuple[int, int]] | None:
-    for path in paths:
-        version = python_version(path)
+def _candidate_bins() -> Iterable[str]:
+    env_candidates = [
+        os.environ.get('MUTX_AUTONOMY_PYTHON'),
+        os.environ.get('PYTHON_BIN'),
+    ]
+    for candidate in env_candidates:
+        if candidate:
+            yield candidate
+    for candidate in DEFAULT_PYENV_CANDIDATES:
+        yield str(candidate)
+    if sys.executable:
+        yield sys.executable
+    for name in ('python3', 'python'):
+        resolved = shutil.which(name)
+        if resolved:
+            yield resolved
+    yield '/usr/bin/python3'
+
+
+def resolve_python(min_version: Tuple[int, int] = MIN_VERSION) -> Tuple[str, Tuple[int, int, int]]:
+    seen = set()
+    for candidate in _candidate_bins():
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        version = _version_of(candidate)
         if version is None:
             continue
-        if version >= minimum:
-            return path, version
-    return None
-
-
-def build_error(paths: Iterable[str], minimum: tuple[int, int] = MIN_VERSION) -> str:
-    rendered = ', '.join(paths) or '<none>'
-    return (
-        f'No supported Python interpreter found. Need >= {minimum[0]}.{minimum[1]}; '
-        f'checked: {rendered}'
+        if version[:2] >= min_version:
+            return candidate, version
+    raise SystemExit(
+        'No suitable Python runtime found for MUTX autonomy; '
+        f'need >= {min_version[0]}.{min_version[1]}'
     )
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description='Resolve a supported Python runtime for autonomy scripts')
-    parser.add_argument('--min-major', type=int, default=MIN_VERSION[0])
-    parser.add_argument('--min-minor', type=int, default=MIN_VERSION[1])
+    parser = argparse.ArgumentParser(description='Resolve a repo-safe Python runtime for MUTX autonomy scripts')
     parser.add_argument('--print-version', action='store_true')
     args = parser.parse_args()
 
-    minimum = (args.min_major, args.min_minor)
-    paths = candidate_paths()
-    selected = find_supported_python(paths, minimum=minimum)
-    if selected is None:
-        print(build_error(paths, minimum=minimum), file=sys.stderr)
-        return 1
-
-    path, version = selected
+    python_bin, version = resolve_python()
     if args.print_version:
-        print(f'{version[0]}.{version[1]}')
+        print('.'.join(map(str, version)))
     else:
-        print(path)
+        print(python_bin)
     return 0
 
 

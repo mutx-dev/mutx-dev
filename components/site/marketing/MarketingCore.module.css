@@ -1251,6 +1251,15 @@
 
 .contactPage .routeVisualFrame {
   min-height: clamp(18rem, 30vw, 26rem);
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.contactPage .routeVisualImage {
+  object-fit: contain;
 }
 
 @media (min-width: 768px) {
