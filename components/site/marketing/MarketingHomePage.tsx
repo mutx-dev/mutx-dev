@@ -210,23 +210,6 @@ export function MarketingHomePage() {
                   )}
                 </motion.div>
 
-                <div className={home.demoTabs} role="tablist" aria-label="MUTX product demo views">
-                  {marketingHomepage.salesSections.demo.tabs.map((tab) => (
-                    <button
-                      key={tab.id}
-                      id={`demo-tab-${tab.id}`}
-                      type="button"
-                      role="tab"
-                      aria-selected={tab.id === activeDemo.id}
-                      aria-controls={`demo-panel-${tab.id}`}
-                      className={home.demoTab}
-                      data-active={tab.id === activeDemo.id ? '1' : '0'}
-                      onClick={() => setActiveDemoId(tab.id)}
-                    >
-                      <span className={home.demoTabLabel}>{tab.label}</span>
-                    </button>
-                  ))}
-                </div>
               </div>
             </div>
           </div>
