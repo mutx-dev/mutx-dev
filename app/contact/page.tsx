@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { ArrowRight, PhoneCall } from "lucide-react";
 
 import { ContactLeadForm } from "@/components/ContactLeadForm";
@@ -55,7 +56,7 @@ const contactStructuredData = {
 
 export default function ContactPage() {
   return (
-    <PublicSurface className={`${styles.page} ${styles.publicPage}`}>
+    <PublicSurface className={`${styles.page} ${styles.publicPage} ${styles.contactPage}`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(contactStructuredData) }}
@@ -65,26 +66,39 @@ export default function ContactPage() {
       <main className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">
           <div className={`${styles.shell} ${styles.routeHeroNarrow}`}>
-            <div className={`${styles.routeHeroMain} ${styles.routeHeroNarrowCopy} ${styles.contactHeroMain}`}>
-              <div className={`${styles.intro} ${styles.contactHeroCopy}`}>
-                <p className={`${styles.eyebrow} ${styles.eyebrowOnDark}`}>Contact MUTX</p>
-                <h1 className={`${styles.displayTitle} ${styles.darkText} ${styles.contactHeroTitle}`}>
-                  Talk to MUTX.
-                </h1>
-                <p className={`${styles.bodyText} ${styles.bodyTextOnDark} ${styles.contactHeroBody}`}>
-                  Use this for evaluation, rollout review, or a concrete operator issue.
-                </p>
+            <div className={`${styles.routeDownloadStage} ${styles.contactHeroMain}`}>
+              <div className={`${styles.routeDownloadCopy} ${styles.contactHeroCopy}`}>
+                <div className={styles.intro}>
+                  <p className={`${styles.eyebrow} ${styles.eyebrowOnDark}`}>Contact MUTX</p>
+                  <h1 className={`${styles.displayTitle} ${styles.darkText} ${styles.contactHeroTitle}`}>
+                    Talk to MUTX.
+                  </h1>
+                  <p className={`${styles.bodyText} ${styles.bodyTextOnDark} ${styles.contactHeroBody}`}>
+                    Use this for evaluation, rollout review, or a concrete operator issue.
+                  </p>
+                </div>
+
+                <div className={styles.ctaRow}>
+                  <CalendlyPopupButton className={styles.buttonPrimary}>
+                    Book a call
+                    <PhoneCall className="h-4 w-4" />
+                  </CalendlyPopupButton>
+                  <a href={`mailto:${CONTACT_EMAIL}`} className={styles.buttonGhost}>
+                    Email MUTX
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                </div>
               </div>
 
-              <div className={styles.ctaRow}>
-                <CalendlyPopupButton className={styles.buttonPrimary}>
-                  Book a call
-                  <PhoneCall className="h-4 w-4" />
-                </CalendlyPopupButton>
-                <a href={`mailto:${CONTACT_EMAIL}`} className={styles.buttonGhost}>
-                  Email MUTX
-                  <ArrowRight className="h-4 w-4" />
-                </a>
+              <div className={styles.routeVisualFrame}>
+                <div className={styles.routeVisualGlow} aria-hidden="true" />
+                <Image
+                  src="/marketing/call-me.png"
+                  alt="Contact MUTX"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 42rem"
+                  className={styles.routeVisualImage}
+                />
               </div>
             </div>
           </div>

@@ -1245,6 +1245,14 @@
   color: rgba(248, 247, 245, 0.56);
 }
 
+.contactPage .routeDownloadStage {
+  align-items: stretch;
+}
+
+.contactPage .routeVisualFrame {
+  min-height: clamp(18rem, 30vw, 26rem);
+}
+
 @media (min-width: 768px) {
   .splitGrid {
     grid-template-columns: minmax(0, 1.1fr) minmax(20rem, 0.9fr);
@@ -1269,6 +1277,11 @@
     grid-template-columns: minmax(0, 0.78fr) minmax(38rem, 1.22fr);
     gap: 2.25rem;
     align-items: stretch;
+  }
+
+  .contactPage .routeDownloadStage {
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.9fr);
+    gap: 1.8rem;
   }
 
   .routeDownloadStrip {
