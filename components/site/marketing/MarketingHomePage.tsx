@@ -238,7 +238,7 @@ export function MarketingHomePage() {
                       <p className={home.proofLaneBody}>{item.before}</p>
                     </div>
                     <div className={home.proofLane}>
-                      <p className={home.proofLaneLabel}>With MUTX</p>
+                      <p className={home.proofLaneLabelMUTX}>With MUTX</p>
                       <p className={home.proofLaneBody}>{item.after}</p>
                     </div>
                   </div>

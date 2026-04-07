@@ -624,6 +624,10 @@
   color: rgba(247, 244, 239, 0.5);
 }
 
+.proofLaneLabelMUTX {
+  color: #3b82f6;
+}
+
 .demoTabTitle,
 .exampleTitle,
 .proofCardTitle {
