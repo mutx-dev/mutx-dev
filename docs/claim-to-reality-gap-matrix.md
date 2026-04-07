@@ -54,7 +54,7 @@
 | "Governance — Prometheus metrics export via `/v1/runtime/governance/metrics`" | surfaces.md | `/v1/runtime/governance/metrics` confirmed in OpenAPI. | SHIPPED |
 | "Governance — Policy enforcement (PERMIT/DENY/DEFER) via FPL" | surfaces.md | Code exists in `src/security/` and `faramesh_supervisor.py` | SHIPPED |
 | "Governance — Credential broker (Vault, AWS, GCP, Azure, 1Password, Infisical)" | surfaces.md | Vault stub + credential broker service exists but is incomplete | PARTIAL |
-| "Dashboard — RAG search and scheduler return 503 with feature flags" | surfaces.md | Confirmed — returns 503 when runtime is not configured | PLACEHOLDER |
+| "Dashboard — RAG search and scheduler return 503 with feature flags" | surfaces.md | PARTIAL — RAG `/rag/search` returns 503 with `X-Feature-Flag: rag.search` when `enable_rag_api=True` (pgvector planned for v1.3); scheduler router is unmounted and returns nothing | PARTIAL |
 | "Desktop download lane at mutx.dev/download/macos" | surfaces.md | Not audited | UNCONFIRMED |
 
 ### 1.5 roadmap.md Claims
