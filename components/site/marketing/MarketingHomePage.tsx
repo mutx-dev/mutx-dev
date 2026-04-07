@@ -239,7 +239,7 @@ export function MarketingHomePage() {
                     </div>
                     <div className={home.proofLane}>
                       <p className={home.proofLaneLabelMUTX}>With MUTX</p>
-                      <p className={home.proofLaneBody}>{item.after}</p>
+                      <p className={home.proofLaneBodyMUTX}>{item.after}</p>
                     </div>
                   </div>
                 </HoverCard>

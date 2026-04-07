@@ -628,6 +628,10 @@
   color: #3b82f6;
 }
 
+.proofLaneBodyMUTX {
+  color: rgba(247, 244, 239, 0.92);
+}
+
 .demoTabTitle,
 .exampleTitle,
 .proofCardTitle {
