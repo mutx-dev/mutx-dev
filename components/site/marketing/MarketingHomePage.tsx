@@ -224,8 +224,6 @@ export function MarketingHomePage() {
                       onClick={() => setActiveDemoId(tab.id)}
                     >
                       <span className={home.demoTabLabel}>{tab.label}</span>
-                      <span className={home.demoTabTitle}>{tab.title}</span>
-                      <span className={home.demoTabBody}>{tab.body}</span>
                     </button>
                   ))}
                 </div>
