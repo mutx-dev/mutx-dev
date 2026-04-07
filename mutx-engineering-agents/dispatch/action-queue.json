@@ -300,8 +300,8 @@
       "verification": [
         "git diff --check -- whitepaper.md docs/surfaces.md README.md docs/api/reference.md"
       ],
-      "status": "running",
-      "updated_at": "2026-04-07T05:50:03.900592Z",
+      "status": "completed",
+      "updated_at": "2026-04-07T05:54:04.161828Z",
       "notes": [
         {
           "ts": "2026-04-07T05:50:03.712682Z",
@@ -310,9 +310,14 @@
         {
           "ts": "2026-04-07T05:50:03.900709Z",
           "message": "work order prepared"
+        },
+        {
+          "ts": "2026-04-07T05:54:04.161908Z",
+          "message": "runner completed successfully; committed fbe364f0; pushed autonomy/fleet-route-whitepaper-md-v1-auth; ready PR ready; auto-merge enabled"
         }
       ],
-      "work_order_path": ".autonomy/work-orders/fleet-route-whitepaper-md-v1-auth.json"
+      "work_order_path": ".autonomy/work-orders/fleet-route-whitepaper-md-v1-auth.json",
+      "completed_at": "2026-04-07T05:54:04.161917Z"
     },
     {
       "allowed_paths": [
@@ -361,7 +366,24 @@
         "python3 -m compileall scripts/autonomy",
         "git diff --check -- docs/claim-to-reality-gap-matrix.md"
       ],
-      "status": "queued"
+      "status": "completed",
+      "updated_at": "2026-04-07T05:57:28.569120Z",
+      "notes": [
+        {
+          "ts": "2026-04-07T05:54:04.701875Z",
+          "message": "daemon dispatched work order"
+        },
+        {
+          "ts": "2026-04-07T05:54:04.930700Z",
+          "message": "work order prepared"
+        },
+        {
+          "ts": "2026-04-07T05:57:28.569195Z",
+          "message": "runner completed successfully; committed ecb82c4b; pushed autonomy/fleet-docs-dashboard-rag-search-and-scheduler-return-503-with-featu; ready PR ready; auto-merge skipped (missing_pr_number)"
+        }
+      ],
+      "work_order_path": ".autonomy/work-orders/fleet-docs-dashboard-rag-search-and-scheduler-return-503-with-featu.json",
+      "completed_at": "2026-04-07T05:57:28.569200Z"
     },
     {
       "allowed_paths": [

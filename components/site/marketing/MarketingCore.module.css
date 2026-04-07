@@ -1300,6 +1300,8 @@
 
   .contactHeroCopy {
     max-width: 34rem;
+    text-align: center;
+    align-items: center;
   }
 
   .contactHeroImageWrap {
