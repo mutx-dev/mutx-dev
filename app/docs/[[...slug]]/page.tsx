@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { DocsRenderer } from "@/components/site/docs/DocsRenderer";
+import { DocsRenderer, extractHeadings } from "@/components/site/docs/DocsRenderer";
+import { JumpNav } from "@/components/site/docs/JumpNav";
 import { DEFAULT_X_HANDLE, getCanonicalUrl } from "@/lib/seo";
 
 export const dynamicParams = true;
@@ -90,9 +91,11 @@ export default async function DocPage({
 
   const source = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(source);
+  const headings = extractHeadings(content);
 
   return (
     <div>
+      <JumpNav headings={headings} />
       <DocsRenderer source={content} />
       {data.icon && (
         <p className="text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">

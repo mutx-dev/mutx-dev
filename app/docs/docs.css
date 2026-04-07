@@ -12,7 +12,7 @@
   --gb-surface:      #222226;
   --gb-text:         #b0b0b8;
   --gb-text-2:       #8c8c8c;
-  --gb-text-3:       #666672;
+  --gb-text-3:       #8787a0;
   --gb-accent:       #50b7e0;
   --gb-accent-soft:  rgba(80, 183, 224, 0.12);
   --gb-border:       rgba(176, 176, 184, 0.12);
@@ -501,4 +501,127 @@
 
   .docs-prose h1 { font-size: 1.5rem; }
   .docs-prose h2 { font-size: 1.2rem; }
+}
+
+/* ── Jump navigation ─────────────────────────────────────────── */
+.jump-nav {
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--gb-border);
+  border-radius: var(--gb-radius);
+  overflow: hidden;
+}
+
+.jump-nav-toggle {
+  display: none;
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  background: var(--gb-bg-2);
+  border: none;
+  color: var(--gb-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+}
+
+.jump-nav-toggle:hover {
+  background: var(--gb-bg-3);
+}
+
+.jump-nav-chevron {
+  transition: transform 150ms ease;
+  flex-shrink: 0;
+}
+
+.jump-nav-chevron.open {
+  transform: rotate(180deg);
+}
+
+.jump-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+  background: var(--gb-bg-2);
+}
+
+.jump-nav-item {
+  margin: 0;
+}
+
+.jump-nav-link {
+  display: block;
+  padding: 0.3rem 0.875rem;
+  font-size: 0.8125rem;
+  color: var(--gb-text-2);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: color 120ms, border-color 120ms;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jump-nav-link:hover {
+  color: var(--gb-text);
+}
+
+.jump-nav-item.active .jump-nav-link {
+  color: var(--gb-accent);
+  border-left-color: var(--gb-accent);
+}
+
+.jump-nav-item.level-3 .jump-nav-link {
+  padding-left: 1.5rem;
+  font-size: 0.75rem;
+}
+
+.jump-nav-item.level-4 .jump-nav-link {
+  padding-left: 2.25rem;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .jump-nav {
+    margin-bottom: 1rem;
+  }
+
+  .jump-nav-toggle {
+    display: flex;
+  }
+
+  .jump-nav-list {
+    display: none;
+    padding: 0.25rem 0;
+  }
+
+  .jump-nav-list.open {
+    display: block;
+  }
+
+  .jump-nav-link {
+    white-space: normal;
+    overflow: visible;
+  }
+}
+
+/* ── Heading anchors ─────────────────────────────────────────── */
+.heading-anchor {
+  margin-right: 0.4em;
+  color: var(--gb-text-3);
+  text-decoration: none;
+  font-size: 0.85em;
+  opacity: 0;
+  transition: opacity 120ms;
+}
+
+.docs-prose h2:hover .heading-anchor,
+.docs-prose h3:hover .heading-anchor,
+.docs-prose h4:hover .heading-anchor {
+  opacity: 1;
+}
+
+.heading-anchor:hover {
+  color: var(--gb-accent);
 }
