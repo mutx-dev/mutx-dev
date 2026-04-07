@@ -23,7 +23,7 @@ export type MarketingHomepage = {
   hero: {
     tagline: string
     title: string
-    support: string
+    support?: string
     backgroundSrc: string
     backgroundAlt: string
     actions: MarketingActionLink[]
@@ -106,7 +106,7 @@ export const marketingHomepage: MarketingHomepage = {
   hero: {
     tagline: 'Signed. Notarized. Shipping now.',
     title: 'Deploy. Govern. Share.',
-    support: 'The open control plane for specialist agents operating on real systems.',
+
     backgroundSrc: '/landing/webp/victory-core.webp',
     backgroundAlt: 'MUTX robot raising the MUTX mark inside a blue-lit control chamber',
     actions: homepageActions,

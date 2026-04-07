@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState, type ReactNode } from 'react'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import { CalendlyPopupButton } from '@/components/site/CalendlyPopupButton'
 import { motion, useReducedMotion } from 'framer-motion'
 
 import {
@@ -137,10 +138,17 @@ export function MarketingHomePage() {
               <div className={home.heroContent} data-testid="homepage-hero-content">
                 <p className={home.heroEyebrow}>{marketingHomepage.hero.tagline}</p>
                 <h1 className={home.heroTitle}>{marketingHomepage.hero.title}</h1>
-                <p className={home.heroSupport}>{marketingHomepage.hero.support}</p>
-
                 <div className={home.heroActions}>
                   <ActionLink action={primaryAction} className={core.buttonPrimary} />
+                  <CalendlyPopupButton
+                    ariaLabel="Book a call with MUTX"
+                    className={core.buttonGhost}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden="true">
+                      <path d="M18.344 16.749a11.0 11.0 0 0 1-6.383-2.1.4.4 0 0 0-.446.038l-2.16 1.087a.47.47 0 0 1-.563-.063l-1.127-1.1a.4.4 0 0 0-.437-.065 7.5 7.5 0 0 1-3.207-2.21.4.4 0 0 0-.5.04l-1.8 1.8a.4.4 0 0 0 .046.595c1.2 1.2 2.4 2.4 3.6 3.6a.4.4 0 0 0 .595.046l1.8-1.8a.4.4 0 0 0 .04-.5 7.5 7.5 0 0 1-2.21-3.207.4.4 0 0 0-.065-.437l-1.1-1.127a.47.47 0 0 1-.063-.563l1.087-2.16a.4.4 0 0 0 .038-.446 11.0 11.0 0 0 1-2.1-6.383.4.4 0 0 0-.5-.341l-3.2 1.2a.4.4 0 0 0-.246.165l-1.4 2.1A19.5 19.5 0 0 0 7.7 16.4a.4.4 0 0 0 .341.5l3.2-1.2a.4.4 0 0 0 .246-.165l1.45-2.175a.4.4 0 0 1 .338-.158c1.55.3 3.2.3 4.75 0a.4.4 0 0 1 .338.158l2.175 1.45a.4.4 0 0 0 .246.165l3.2 1.2a.4.4 0 0 0 .5-.341 19.5 19.5 0 0 0-3.45-8.625l-1.4-2.1a.4.4 0 0 0-.246-.165l-3.2-1.2a.4.4 0 0 0-.5.341z" />
+                    </svg>
+                    Book a Call
+                  </CalendlyPopupButton>
                   <div className={home.heroSecondaryActions}>
                     {secondaryActions.map((action) => (
                       <ActionLink

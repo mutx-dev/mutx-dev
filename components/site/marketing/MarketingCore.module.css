@@ -1304,7 +1304,14 @@
   }
 
   .ctaRow {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .ctaRow > * {
     justify-content: center;
+    text-align: center;
   }
 
   .contactHeroImageWrap {

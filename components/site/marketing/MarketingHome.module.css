@@ -340,14 +340,21 @@
 }
 
 .heroActions {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.9rem;
   align-items: flex-start;
-  justify-items: start;
 }
 
 .heroActions > * {
   justify-self: start;
+}
+
+.heroActions > :first-child,
+.heroActions > :nth-child(2) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .finalActions {
