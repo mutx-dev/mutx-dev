@@ -35,6 +35,15 @@ async def _resolve_user_from_bearer_token(
     return None
 
 
+def _enforce_email_verification_if_required(user: User) -> None:
+    settings = get_settings()
+    if settings.require_email_verification and not user.is_email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email verification is required",
+        )
+
+
 def _extract_bearer_token(authorization: Optional[str]) -> Optional[str]:
     if not authorization:
         return None
@@ -140,6 +149,8 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    _enforce_email_verification_if_required(user)
+
     return user
 
 
@@ -184,7 +195,10 @@ async def get_current_user_optional(
         return None
 
     user_service = UserService(session)
-    return await _resolve_user_from_bearer_token(token, session, user_service=user_service)
+    user = await _resolve_user_from_bearer_token(token, session, user_service=user_service)
+    if user:
+        _enforce_email_verification_if_required(user)
+    return user
 
 
 async def get_api_key_user(
