@@ -207,8 +207,46 @@ export function DocsSearch() {
     return () => obs.disconnect();
   }, []);
 
+  // Fully imperative: MutationObserver owns overlay display.
+  // React never sets inline style on the overlay.
+  // This avoids React's render cycle fighting with the observer.
+  useEffect(() => {
+    function handleOpen() {
+      const overlay = document.querySelector('.docs-search-overlay') as HTMLElement;
+      const input = document.querySelector('.docs-search-input') as HTMLInputElement;
+      if (overlay) overlay.style.display = 'flex';
+      if (input) {
+        input.value = '';
+        setTimeout(() => input.focus(), 20);
+      }
+    }
+
+    function handleClose() {
+      const overlay = document.querySelector('.docs-search-overlay') as HTMLElement;
+      if (overlay) overlay.style.display = 'none';
+    }
+
+    function onAttrChange(mutations: MutationRecord[]) {
+      for (const m of mutations) {
+        if (m.type !== 'attributes' || m.attributeName !== SEARCH_ATTR) continue;
+        if (document.documentElement.hasAttribute(SEARCH_ATTR)) {
+          handleOpen();
+        } else {
+          handleClose();
+        }
+      }
+    }
+
+    const obs = new MutationObserver(onAttrChange);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: [SEARCH_ATTR] });
+    // Sync initial state in case already open (e.g., after hot reload)
+    if (document.documentElement.hasAttribute(SEARCH_ATTR)) handleOpen();
+
+    return () => obs.disconnect();
+  }, []);
+
   return (
-    <div className="docs-search-overlay" style={{ display: 'none' }}>
+    <div className="docs-search-overlay">
       <div className="docs-search-modal" onClick={(e) => e.stopPropagation()}>
         <div className="docs-search-input-row">
           <svg
