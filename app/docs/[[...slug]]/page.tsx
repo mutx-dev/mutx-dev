@@ -27,9 +27,22 @@ function isRootContent(slugSegments: string[]): boolean {
 function resolveRootContentSlug(slugSegments: string[]): string | null {
   if (!isRootContent(slugSegments)) return null;
   const dir = slugSegments[0];
+
+  // 1+ segments: /docs/agents/mission-control-orchestrator
+  // → check docs/agents/mission-control-orchestrator.md first
+  if (slugSegments.length >= 2) {
+    const subFile = path.join(process.cwd(), "docs", dir, slugSegments[1] + ".md");
+    if (fs.existsSync(subFile)) return subFile;
+    // Also try AGENT.md for agent subdirs that mirror from repo root
+    const agentFile = path.join(process.cwd(), dir, slugSegments[1], "AGENT.md");
+    if (fs.existsSync(agentFile)) return agentFile;
+  }
+
+  // Top-level: /docs/agents
   const candidates = [
     path.join(process.cwd(), dir, "README.md"),
     path.join(process.cwd(), dir, "index.md"),
+    path.join(process.cwd(), "docs", dir, "README.md"),
   ];
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) return candidate;

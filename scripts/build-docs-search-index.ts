@@ -11,6 +11,8 @@ import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 
 const DOCS_DIR = path.join(process.cwd(), "docs");
+// Root-level content dirs (mirrored from repo root) also served under /docs/*
+const ROOT_CONTENT_DIRS = ["agents"];
 const OUTPUT_PATH = path.join(process.cwd(), "public", "docs-search-index.json");
 
 interface SearchEntry {
@@ -68,6 +70,23 @@ function slugify(text: string): string {
 
 function resolveDocHref(relativePath: string): string {
   const withoutExt = relativePath.replace(/\.md$/, "");
+
+  // Handle root-level content (e.g. agents/README.md → /docs/agents)
+  const isRootContent = ROOT_CONTENT_DIRS.some((dir) =>
+    withoutExt.startsWith(dir + "/") || withoutExt === dir
+  );
+  if (isRootContent) {
+    // For files named AGENT.md inside a subdir, use parent dir name instead
+    // e.g. agents/mission-control-orchestrator/AGENT.md → agents/mission-control-orchestrator
+    const normalized = withoutExt
+      .replace(/\/AGENT$/i, "")
+      .replace(/\/README$/i, "")
+      .replace(/\/index$/i, "")
+      .replace(/^README$/i, "");
+    return normalized ? `/docs/${normalized}` : "/docs";
+  }
+
+  // Normal docs/ content
   const normalized = withoutExt
     .replace(/^docs\//, "")
     .replace(/\/README$/i, "")
@@ -79,6 +98,15 @@ function resolveDocHref(relativePath: string): string {
 }
 
 function getSection(relativePath: string): string {
+  // Handle root-level content
+  const rootParts = relativePath.split("/");
+  if (ROOT_CONTENT_DIRS.includes(rootParts[0])) {
+    return rootParts[0]
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  // Normal docs/ content
   const parts = relativePath.replace(/^docs\//, "").split("/");
   if (parts.length <= 1) return "Root";
   const top = parts[0];
@@ -107,8 +135,20 @@ async function buildIndex(): Promise<void> {
 
   const files = walkDir(DOCS_DIR);
 
+  // Also include root-level content dirs served under /docs/*
+  for (const rootDir of ROOT_CONTENT_DIRS) {
+    const rootPath = path.join(process.cwd(), rootDir);
+    if (fs.existsSync(rootPath)) {
+      const rootFiles = walkDir(rootPath, rootDir);
+      files.push(...rootFiles);
+    }
+  }
+
   for (const file of files) {
-    const fullPath = path.join(DOCS_DIR, file);
+    const isRootFile = ROOT_CONTENT_DIRS.some((dir) => file.startsWith(dir + "/") || file === dir + ".md" || file === dir);
+    const fullPath = isRootFile
+      ? path.join(process.cwd(), file)
+      : path.join(DOCS_DIR, file);
     const source = fs.readFileSync(fullPath, "utf-8");
     const { data, content } = matter(source);
 

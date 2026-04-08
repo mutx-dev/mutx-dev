@@ -79,7 +79,9 @@ export function DocsRendererClient({ html }: DocsRendererClientProps) {
           cells[1].textContent?.trim() ??
           "";
 
-        // Target cell: first link href
+        // First cell: title (bold or plain)
+        // Second cell: description text
+        // Third cell (data-card-target): link to target doc
         const targetLink = cells[2]?.querySelector("a");
         const targetHref = targetLink?.getAttribute("href") ?? "#";
         const targetLabel =
