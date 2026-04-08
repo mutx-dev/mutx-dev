@@ -48,7 +48,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hostname = getHostname(request)
   const v1ApiAlias = pathname.startsWith('/v1/')
-  const apiPath = v1ApiAlias ? `/api${pathname}` : pathname
+  const apiPath = v1ApiAlias ? pathname.replace(/^\/v1\//, '/api/') : pathname
 
   // Apply rate limiting to API routes and /v1 aliases
   if (apiPath.startsWith('/api/')) {
