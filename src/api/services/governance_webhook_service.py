@@ -251,8 +251,9 @@ class GovernanceWebhookDispatcher:
                     if event_type in GOVERNANCE_EVENT_TYPES:
                         await trigger_webhook_event(
                             db,
-                            event_type,
-                            payload.get("data", {}),
+                            user_id=None,
+                            event=event_type,
+                            payload=payload.get("data", {}),
                         )
             except Exception as e:
                 logger.error(f"Error dispatching governance webhook: {e}")

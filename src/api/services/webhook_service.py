@@ -263,7 +263,6 @@ async def trigger_webhook_event(
     user_id: uuid.UUID,
     event: str,
     payload: dict,
-    user_id: Optional[uuid.UUID] = None,
 ) -> int:
     """
     Trigger a webhook event to all active webhooks subscribed to the event.

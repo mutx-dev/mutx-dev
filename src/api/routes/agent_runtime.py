@@ -258,7 +258,6 @@ async def heartbeat(
                 "hostname": request.hostname,
                 "timestamp": heartbeat_timestamp,
             },
-            user_id=agent.user_id,
         )
     except Exception:
         logger.exception(
@@ -281,7 +280,6 @@ async def heartbeat(
                     "hostname": request.hostname,
                     "timestamp": heartbeat_timestamp,
                 },
-                user_id=agent.user_id,
             )
         except Exception:
             logger.exception(
