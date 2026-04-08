@@ -32,10 +32,7 @@ async def get_telemetry_config(request: Request):
     Returns the OTEL status including whether it's enabled,
     the exporter type, and endpoint if configured.
     """
-    from src.api.telemetry.telemetry import get_exporter_from_env, setup_telemetry
-
-    # Ensure telemetry is initialized
-    setup_telemetry()
+    from src.api.telemetry.telemetry import get_exporter_from_env
 
     exporter = get_exporter_from_env()
     exporter_type = "console"
