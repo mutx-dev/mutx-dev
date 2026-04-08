@@ -552,12 +552,13 @@ class TestSSOAuth:
     @pytest.mark.asyncio
     async def test_sso_provider_enum_values(self):
         """Test SSOProvider enum has correct values."""
-        from src.api.services.auth import SSOProvider
+        from src.api.services.auth import PROVIDER_JWKS_URLS, SSOProvider
         
         assert SSOProvider.OKTA.value == "okta"
         assert SSOProvider.AUTH0.value == "auth0"
         assert SSOProvider.KEYCLOAK.value == "keycloak"
         assert SSOProvider.GOOGLE.value == "google"
+        assert PROVIDER_JWKS_URLS[SSOProvider.OKTA] == "{domain}/oauth2/v1/keys"
 
     @pytest.mark.asyncio
     async def test_role_enum_values(self):
