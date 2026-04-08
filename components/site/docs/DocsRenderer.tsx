@@ -35,7 +35,39 @@ function addHeadingAnchors(html: string, headings: Heading[]): string {
   return result;
 }
 
+function preprocessMarkdown(source: string): string {
+  // ── GitBook Liquid hint blocks → HTML div callouts ─────────────
+  // {% hint style="info" %} ... {% endhint %}
+  // {% hint style="warning" %} ... {% endhint %}
+  // {% hint style="danger" %} ... {% endhint %}
+  // etc.  Direct HTML div replacement avoids remark blockquote quirks.
+  const styleMap: Record<string, string> = {
+    info: "note", tip: "tip", warning: "warning", danger: "danger",
+  };
+  source = source.replace(
+    /\{%\s*hint\s+style="([^"]+)"\s*%\}([\s\S]*?)\{%\s*endhint\s*%/gi,
+    (_match, style, content) => {
+      const type = styleMap[style.toLowerCase()] ?? "note";
+      const body = content.trim();
+      return `<div class="docs-callout" data-type="${type}">${body}</div>`;
+    }
+  );
+
+  // {% hint %} (defaults to NOTE)
+  source = source.replace(
+    /\{%\s*hint\s*%\}([\s\S]*?)\{%\s*endhint\s*%/gi,
+    (_match, content) => {
+      const body = content.trim();
+      return `<div class="docs-callout" data-type="note">${body}</div>`;
+    }
+  );
+
+  return source;
+}
+
 export async function renderDocsHtml(source: string): Promise<string> {
+  source = preprocessMarkdown(source);
+
   const headings = extractHeadings(source);
 
   const result = await remark()
