@@ -74,10 +74,6 @@ export function DocsRendererClient({ html }: DocsRendererClientProps) {
 
         const titleEl = cells[0].querySelector("strong") || cells[0];
         const title = titleEl.textContent?.trim() ?? "";
-        const desc =
-          (cells[1].querySelector("p")?.textContent?.trim() ??
-            cells[1].textContent?.trim() ??
-            "")?.replace(/\.md$/, "") ?? "";
 
         // Title column: first cell
         // Target column: second cell (index 1 — table has 2 columns)
@@ -92,6 +88,16 @@ export function DocsRendererClient({ html }: DocsRendererClientProps) {
           cells[1]?.textContent?.trim() ??
           title;
         const targetLabel = rawLabel.replace(/\.md$/, "").trim();
+
+        // Desc column: only use cells[1] text IF it has meaningful content beyond the target link.
+        // When cells[1] is just "<a>overview.md</a>", cells[1].textContent === "overview.md"
+        // and desc would become "overview" — wrong. Only use it when there's real paragraph text.
+        const cell1Text = cells[1]?.textContent?.trim() ?? "";
+        const cell1HasOnlyLink = cell1Text === targetLink?.textContent?.trim();
+        let desc = "";
+        if (!cell1HasOnlyLink) {
+          desc = cell1Text.replace(/\.md$/, "");
+        }
 
         // Cover cell: third cell (index 2) — first image src
         const coverImg = cells[2]?.querySelector("img");
