@@ -120,7 +120,7 @@ async def test_monitor_emits_webhook_events_for_failure_and_recovery(
 ):
     webhook_calls: list[tuple[str, dict]] = []
 
-    async def fake_trigger_agent_status_event(db, agent_id, old_status, new_status, agent_name):
+    async def fake_trigger_agent_status_event(db, user_id, agent_id, old_status, new_status, agent_name):
         webhook_calls.append(
             (
                 "agent.status",
@@ -133,7 +133,7 @@ async def test_monitor_emits_webhook_events_for_failure_and_recovery(
             )
         )
 
-    async def fake_trigger_deployment_event(db, deployment_id, agent_id, event_type, status=None):
+    async def fake_trigger_deployment_event(db, user_id, deployment_id, agent_id, event_type, status=None):
         webhook_calls.append(
             (
                 "deployment.event",

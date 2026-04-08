@@ -84,7 +84,11 @@ def changed_files(cwd: str) -> list[str]:
 def run_verification(commands: list[str], cwd: str) -> list[dict[str, Any]]:
     results = []
     for command in commands:
-        proc = subprocess.run(command, cwd=cwd, text=True, capture_output=True, shell=True)
+        argv = shlex.split(command)
+        if not argv:
+            results.append({"command": command, "exit_code": 2, "stdout": "", "stderr": "empty command"})
+            continue
+        proc = subprocess.run(argv, cwd=cwd, text=True, capture_output=True, shell=False)
         results.append(
             {
                 "command": command,

@@ -48,7 +48,6 @@ services:
       DATABASE_REQUIRED_ON_STARTUP: "true"
       API_HOST: 0.0.0.0
       API_PORT: 8000
-      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production-123456}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       REDIS_URL: redis://redis:6379/0
@@ -84,7 +83,6 @@ services:
       DATABASE_URL: postgresql://mutx:mutx_password@postgres:5432/mutx
       DATABASE_SSL_MODE: disable
       DATABASE_REQUIRED_ON_STARTUP: "true"
-      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production-123456}
       BACKGROUND_MONITOR_ENABLED: "false"
       ENVIRONMENT: development
     command: ["alembic", "upgrade", "head"]

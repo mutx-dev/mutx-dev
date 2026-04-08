@@ -483,6 +483,7 @@ export function AppDashboardClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: apiKeyName,
+          expires_in_days: 30,
         }),
       });
 

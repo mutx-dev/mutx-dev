@@ -55,13 +55,16 @@ def _record_deployment_event(
 async def _emit_agent_status_webhook(
     session: AsyncSession,
     *,
+    user_id: uuid.UUID,
     agent_id: uuid.UUID,
     old_status: str,
     new_status: str,
     agent_name: str,
 ) -> None:
     try:
-        await trigger_agent_status_event(session, agent_id, old_status, new_status, agent_name)
+        await trigger_agent_status_event(
+            session, user_id, agent_id, old_status, new_status, agent_name
+        )
     except Exception:
         logger.exception(
             "Monitor webhook emission failed for agent.status",
@@ -72,6 +75,7 @@ async def _emit_agent_status_webhook(
 async def _emit_deployment_webhook(
     session: AsyncSession,
     *,
+    user_id: uuid.UUID,
     deployment_id: uuid.UUID,
     agent_id: uuid.UUID,
     event_type: str,
@@ -80,6 +84,7 @@ async def _emit_deployment_webhook(
     try:
         await trigger_deployment_event(
             session,
+            user_id,
             deployment_id,
             agent_id,
             event_type=event_type,
@@ -147,6 +152,7 @@ async def monitor_agent_health(session: AsyncSession):
             if created_deployment:
                 await _emit_deployment_webhook(
                     session,
+                    user_id=agent.user_id,
                     deployment_id=deployment.id,
                     agent_id=agent.id,
                     event_type="monitor_started",
@@ -155,6 +161,7 @@ async def monitor_agent_health(session: AsyncSession):
 
             await _emit_agent_status_webhook(
                 session,
+                user_id=agent.user_id,
                 agent_id=agent.id,
                 old_status=old_status,
                 new_status=agent.status,
@@ -219,6 +226,7 @@ async def monitor_agent_health(session: AsyncSession):
             if deployment is not None:
                 await _emit_deployment_webhook(
                     session,
+                    user_id=agent.user_id,
                     deployment_id=deployment.id,
                     agent_id=agent.id,
                     event_type="monitor_failed",
@@ -227,6 +235,7 @@ async def monitor_agent_health(session: AsyncSession):
 
             await _emit_agent_status_webhook(
                 session,
+                user_id=agent.user_id,
                 agent_id=agent.id,
                 old_status=old_status,
                 new_status=agent.status,
@@ -283,6 +292,7 @@ async def monitor_agent_health(session: AsyncSession):
             if deployment is not None:
                 await _emit_deployment_webhook(
                     session,
+                    user_id=agent.user_id,
                     deployment_id=deployment.id,
                     agent_id=agent.id,
                     event_type="monitor_restarted",
@@ -291,6 +301,7 @@ async def monitor_agent_health(session: AsyncSession):
 
             await _emit_agent_status_webhook(
                 session,
+                user_id=agent.user_id,
                 agent_id=agent.id,
                 old_status=old_status,
                 new_status=agent.status,

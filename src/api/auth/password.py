@@ -2,6 +2,7 @@ import re
 from typing import Optional
 
 import bcrypt
+from passlib.hash import pbkdf2_sha256
 
 # Fallback to pbkdf2_sha256 if bcrypt is acting up with newer python/library versions
 # Using bcrypt directly for password hashing
@@ -14,6 +15,12 @@ def hash_password(password: str) -> str:
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    if hashed_password.startswith("$pbkdf2-sha256$"):
+        try:
+            return pbkdf2_sha256.verify(plain_password, hashed_password)
+        except (ValueError, TypeError):
+            return False
+
     try:
         return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
     except (ValueError, TypeError):

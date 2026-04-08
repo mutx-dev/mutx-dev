@@ -77,6 +77,13 @@ async def _recover_agent_to_running(agent_id: str, metadata):
         if not agent:
             raise ValueError(f"Agent {agent_id} not found for recovery")
 
+        if agent.status == AgentStatus.STOPPED.value:
+            logger.info(
+                "Skipping self-healing recovery for explicitly stopped agent",
+                extra={"agent_id": agent_id, "metadata": metadata},
+            )
+            return
+
         previous_status = agent.status
         agent.status = AgentStatus.RUNNING.value
         agent.last_heartbeat = utc_now()
@@ -103,7 +110,12 @@ async def _recover_agent_to_running(agent_id: str, metadata):
 async def _sync_self_healing_agents(session, self_healing):
     """Register live agents for self-healing checks and prune removed agents."""
     result = await session.execute(
-        select(Agent.id).where(Agent.status != AgentStatus.DELETING.value)
+        select(Agent.id).where(
+            Agent.status.notin_([
+                AgentStatus.DELETING.value,
+                AgentStatus.STOPPED.value,
+            ])
+        )
     )
     active_agents = {str(agent_id) for agent_id in result.scalars().all()}
 

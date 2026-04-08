@@ -104,10 +104,12 @@ https://mutx.dev/releases
 Run the canonical setup flow first:
 
 ```bash
-curl -fsSL https://mutx.dev/install.sh | bash
+brew tap mutx-dev/homebrew-tap
+brew install mutx
+mutx setup hosted
 ```
 
-That path opens the hosted installer in your terminal. Choose `Hosted` unless you explicitly want the private Docker-backed localhost lane. MUTX can install OpenClaw, import an existing OpenClaw runtime, resume onboarding, track it under `~/.mutx/providers/openclaw`, and return you to the CLI or TUI without leaving the MUTX shell story.
+That flow opens the MUTX setup wizard in your terminal after installing the CLI. Choose `Hosted` unless you explicitly want the private Docker-backed localhost lane. MUTX can install OpenClaw, import an existing OpenClaw runtime, resume onboarding, track it under `~/.mutx/providers/openclaw`, and return you to the CLI or TUI without leaving the MUTX shell story.
 
 You can also start directly with the explicit commands:
 

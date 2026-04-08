@@ -95,6 +95,7 @@ export function AgentsListClient({ initialAgents }: AgentsListClientProps) {
       const data = await response.json();
       const agentsData = Array.isArray(data) ? data : data.agents ?? [];
       setAgents(agentsData);
+      setError(null);
     } catch (error) {
       console.error("Failed to fetch agents:", error);
       setError(error instanceof Error ? error.message : "Failed to fetch agents");

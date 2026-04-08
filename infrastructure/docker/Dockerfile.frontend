@@ -34,6 +34,11 @@ COPY --from=builder /app /app
 COPY --from=builder /app/public /app/.next/standalone/public
 COPY --from=builder /app/.next/static /app/.next/standalone/.next/static
 
+# Run the app as a non-root user
+RUN addgroup -S nextjs && adduser -S nextjs -G nextjs
+RUN chown -R nextjs:nextjs /app
+USER nextjs
+
 EXPOSE 3000
 
 CMD ["node", ".next/standalone/server.js"]
