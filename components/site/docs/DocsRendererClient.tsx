@@ -60,6 +60,61 @@ export function DocsRendererClient({ html }: DocsRendererClientProps) {
       bq.innerHTML = icon + content;
     });
 
+    // ── Transform GitBook card tables ──────────────────────────────
+    const cardTables = el.querySelectorAll<HTMLElement>(
+      "table[data-view='cards']"
+    );
+    cardTables.forEach((table) => {
+      const rows = table.querySelectorAll<HTMLElement>("tbody tr");
+      const cards: string[] = [];
+
+      rows.forEach((row) => {
+        const cells = row.querySelectorAll<HTMLElement>("td");
+        if (cells.length < 2) return;
+
+        const titleEl = cells[0].querySelector("strong") || cells[0];
+        const title = titleEl.textContent?.trim() ?? "";
+        const desc =
+          cells[1].querySelector("p")?.textContent?.trim() ??
+          cells[1].textContent?.trim() ??
+          "";
+
+        // Target cell: first link href
+        const targetLink = cells[2]?.querySelector("a");
+        const targetHref = targetLink?.getAttribute("href") ?? "#";
+        const targetLabel =
+          targetLink?.textContent?.trim() ??
+          cells[2]?.textContent?.trim() ??
+          title;
+
+        // Cover cell: first image src
+        const coverImg = cells[3]?.querySelector("img");
+        const coverSrc = coverImg?.getAttribute("src") ?? "";
+
+        const imgHtml = coverSrc
+          ? `<div class="docs-card-img-wrap"><img src="${coverSrc}" alt="${title}" class="docs-card-img" /></div>`
+          : "";
+
+        cards.push(`
+          <a href="${targetHref}" class="docs-card">
+            ${imgHtml}
+            <div class="docs-card-body">
+              <span class="docs-card-title">${title}</span>
+              ${desc ? `<span class="docs-card-desc">${desc}</span>` : ""}
+              ${targetHref !== "#" ? `<span class="docs-card-target">${targetLabel}</span>` : ""}
+            </div>
+          </a>
+        `);
+      });
+
+      if (cards.length > 0) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "docs-cards-grid";
+        wrapper.innerHTML = cards.join("");
+        table.replaceWith(wrapper);
+      }
+    });
+
     // ── Inject copy buttons into code blocks ──────────────────
     const preBlocks = el.querySelectorAll<HTMLElement>("pre");
     preBlocks.forEach((pre) => {
