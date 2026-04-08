@@ -85,13 +85,15 @@ def test_dev_compose_is_project_scoped_without_fixed_container_names() -> None:
 
     assert "name: ${MUTX_COMPOSE_PROJECT:-mutx}" in compose
     assert "container_name:" not in compose
-    assert "dev-secret-change-in-production-123456" in compose
+    assert "dev-secret-change-in-production-123456" not in compose
+    assert "JWT_SECRET:" not in compose
     assert "migrate:" in compose
     assert 'condition: service_completed_successfully' in compose
     assert 'http://localhost:8000/ready' in compose
 
 
-def test_demo_env_example_uses_valid_local_jwt_secret() -> None:
+def test_demo_env_example_does_not_ship_fixed_jwt_secret() -> None:
     env_example = (ROOT / ".env.example").read_text(encoding="utf-8")
 
-    assert "JWT_SECRET=dev-secret-change-in-production-123456" in env_example
+    assert "dev-secret-change-in-production-123456" not in env_example
+    assert "# JWT_SECRET=" in env_example

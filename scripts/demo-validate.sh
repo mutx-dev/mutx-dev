@@ -35,7 +35,7 @@ if [[ ! -f "$ROOT_DIR/.env" && -f "$ROOT_DIR/.env.example" ]]; then
   cp "$ROOT_DIR/.env.example" "$ROOT_DIR/.env"
 fi
 
-export JWT_SECRET="${JWT_SECRET:-dev-secret-change-in-production-123456}"
+export JWT_SECRET="${JWT_SECRET:-$(python3 -c "import secrets; print(secrets.token_urlsafe(32))" 2>/dev/null || openssl rand -base64 24)}"
 echo "Using Docker project: $COMPOSE_PROJECT"
 "${COMPOSE_CMD[@]}" down --remove-orphans >/dev/null 2>&1 || true
 "${COMPOSE_CMD[@]}" up --build -d postgres redis migrate api frontend
