@@ -232,7 +232,10 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
 
         <button
           className="docs-search-trigger"
-          onClick={() => document.documentElement.setAttribute('data-docs-search-open', '1')}
+          onClick={(e) => {
+            e.stopPropagation();
+            document.documentElement.setAttribute('data-docs-search-open', '1');
+          }}
           aria-label="Search docs (Cmd+K)"
         >
           <svg
