@@ -1,0 +1,36 @@
+image:
+  repository: mutx/mutx
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: true
+  className: nginx
+  host: mutx.staging.local
+  tls:
+    enabled: true
+    secretName: mutx-tls-staging
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+
+env:
+  LOG_LEVEL: "DEBUG"
+  ENVIRONMENT: "staging"
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 75

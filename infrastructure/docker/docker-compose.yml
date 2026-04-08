@@ -123,12 +123,98 @@ services:
     networks:
       - mutx-network
 
+  # ==============================================================================
+  # Observability Services (Jaeger, Grafana, Prometheus, OTEL Collector)
+  # ==============================================================================
+
+  # Jaeger Tracing
+  jaeger:
+    image: jaegertracing/all-in-one:1.57
+    container_name: mutx-jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/var/lib/jaeger/data
+      - BADGER_DIRECTORY_KEY=/var/lib/jaeger/index
+    ports:
+      - "16686:16686"     # Jaeger UI
+      - "6831:6831/udp"   # Jaeger agent thrift (compact)
+      - "14250:14250"     # Jaeger gRPC
+    volumes:
+      - jaeger_data:/var/lib/jaeger
+    networks:
+      - otel-network
+    restart: unless-stopped
+
+  # Prometheus Metrics
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: mutx-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - otel-network
+    restart: unless-stopped
+
+  # Grafana Dashboards
+  grafana:
+    image: grafana/grafana:11.2.2
+    container_name: mutx-grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-mutx_admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-mutx_admin_password}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./grafana-provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    networks:
+      - otel-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector:0.102.1
+    container_name: mutx-otel-collector
+    command: ["--config=/etc/otelcol-contrib/otelcol-contrib.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol-contrib/otelcol-contrib.yaml:ro
+    ports:
+      - "4317:4317"       # OTLP gRPC receiver
+      - "4318:4318"       # OTLP HTTP receiver
+      - "8888:8888"       # Prometheus metrics exposed by collector
+      - "8889:8889"       # Prometheus metrics exporter
+    networks:
+      - otel-network
+    depends_on:
+      - jaeger
+      - prometheus
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   redis_data:
   frontend_node_modules:
   frontend_next:
+  prometheus_data:
+  grafana_data:
+  jaeger_data:
 
 networks:
   mutx-network:
+    driver: bridge
+
+  # Observability network for telemetry
+  otel-network:
     driver: bridge

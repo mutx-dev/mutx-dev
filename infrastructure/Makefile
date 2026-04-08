@@ -4,8 +4,9 @@ TF_DIR := terraform
 ANSIBLE_DIR := ansible
 MONITORING_ENV_FILE := ../.env.monitoring
 MONITORING_COMPOSE_FILE := docker/docker-compose.monitoring.yml
+HELM_DIR := helm/mutx
 
-.PHONY: check-tools tf-fmt tf-init tf-init-staging tf-init-production tf-validate tf-plan tf-plan-staging tf-plan-production tf-plan-staging-detailed tf-plan-production-detailed ansible-deps ansible-lint ansible-inventory monitor-up monitor-down monitor-validate
+.PHONY: check-tools tf-fmt tf-init tf-init-staging tf-init-production tf-validate tf-plan tf-plan-staging tf-plan-production tf-plan-staging-detailed tf-plan-production-detailed ansible-deps ansible-lint ansible-inventory monitor-up monitor-down monitor-validate helm-install-staging helm-upgrade-staging helm-install-prod helm-lint
 
 check-tools:
 	@command -v terraform >/dev/null 2>&1 || { echo "terraform not found"; exit 1; }
@@ -70,3 +71,15 @@ monitor-validate:
 		check rules /etc/prometheus/alerts.yml && \
 	docker run --rm --entrypoint amtool -v $(PWD)/monitoring/prometheus:/etc/alertmanager prom/alertmanager:v0.27.0 \
 		check-config /etc/alertmanager/alertmanager.yml
+
+helm-lint:
+	helm lint $(HELM_DIR)
+
+helm-install-staging:
+	helm upgrade --install mutx-staging $(HELM_DIR) -f $(HELM_DIR)/values.staging.yaml --namespace staging --create-namespace
+
+helm-upgrade-staging:
+	helm upgrade --install mutx-staging $(HELM_DIR) -f $(HELM_DIR)/values.staging.yaml --namespace staging --create-namespace
+
+helm-install-prod:
+	helm upgrade --install mutx-prod $(HELM_DIR) -f $(HELM_DIR)/values.prod.yaml --namespace production --create-namespace

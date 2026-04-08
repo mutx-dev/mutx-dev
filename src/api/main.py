@@ -29,6 +29,7 @@ from src.api.metrics import (
 from src.api.middleware.auth import add_authentication_middleware
 from src.api.middleware.rate_limit import add_rate_limiting
 from src.api.middleware.security import add_security_middleware
+from src.api.middleware.tracing import add_tracing_middleware
 from src.api.models.schemas import HealthResponse
 from src.api.routes import (
     agent_runtime,
@@ -36,6 +37,7 @@ from src.api.routes import (
     analytics,
     assistant,
     api_keys,
+    audit,
     auth,
     budgets,
     clawhub,
@@ -47,6 +49,8 @@ from src.api.routes import (
     monitoring,
     observability,
     onboarding,
+    policies,
+    approvals,
     rag,
     runtime,
     runs,
@@ -61,6 +65,10 @@ from src.api.services.monitor import MonitorRuntimeState, start_background_monit
 from src.api.services.governance_webhook_service import (
     start_governance_webhooks,
     stop_governance_webhooks,
+)
+from src.api.services.audit_log import (
+    get_buffered_audit_log,
+    close_buffered_audit_log,
 )
 
 settings = get_settings()
@@ -108,11 +116,19 @@ PUBLIC_ROUTE_REGISTRATIONS: tuple[RouterRegistration, ...] = (
     RouterRegistration("budgets", budgets.router),
     RouterRegistration("governance_credentials", governance_credentials.router),
     RouterRegistration("governance_supervision", governance_supervision.router),
+    RouterRegistration("policies", policies.router),
+    RouterRegistration("approvals", approvals.router),
 )
 PUBLIC_ROUTER_ALLOWLIST: tuple[str, ...] = tuple(
     registration.name for registration in PUBLIC_ROUTE_REGISTRATIONS
 )
 UNMOUNTED_ROUTER_NAMES: tuple[str, ...] = ("newsletter", "scheduler")
+
+# Routes that require authentication - these will be protected with get_current_user
+# Add routes here that should always require authentication regardless of individual route dependencies
+PRIVATE_ROUTE_REGISTRATIONS: tuple[RouterRegistration, ...] = (
+    RouterRegistration("audit", audit.router),
+)
 
 
 def _initialize_app_state(
@@ -258,6 +274,13 @@ def _build_lifespan(
             except Exception as e:
                 logger.warning(f"Failed to start governance webhook dispatcher: {e}")
 
+        # Initialize buffered audit log for high-throughput audit event buffering
+        try:
+            await get_buffered_audit_log()
+            logger.info("Buffered audit log initialized")
+        except Exception as e:
+            logger.warning(f"Failed to initialize buffered audit log: {e}")
+
         try:
             yield
         finally:
@@ -283,16 +306,37 @@ def _build_lifespan(
                     pass
                 await stop_governance_webhooks()
 
+            # Close buffered audit log (flushes remaining events)
+            try:
+                await close_buffered_audit_log()
+                logger.info("Buffered audit log closed")
+            except Exception as e:
+                logger.warning(f"Error closing buffered audit log: {e}")
+
             await dispose_engine()
 
     return lifespan
 
 
 def _register_application_routes(app: FastAPI) -> None:
+    from fastapi import Depends
+    from src.api.dependencies import get_current_user
+    
     app.include_router(metrics_router, tags=["monitoring"])
 
     for registration in PUBLIC_ROUTE_REGISTRATIONS:
         include_kwargs: dict[str, object] = {}
+        if registration.prefix:
+            include_kwargs["prefix"] = registration.prefix
+        if registration.tags:
+            include_kwargs["tags"] = list(registration.tags)
+        app.include_router(registration.router, **include_kwargs)
+
+    # Register private routes with authentication
+    for registration in PRIVATE_ROUTE_REGISTRATIONS:
+        include_kwargs: dict[str, object] = {
+            "dependencies": [Depends(get_current_user)],
+        }
         if registration.prefix:
             include_kwargs["prefix"] = registration.prefix
         if registration.tags:
@@ -420,6 +464,17 @@ def create_app(
     )
     _initialize_app_state(app, background_monitor_enabled=resolved_background_monitor_enabled)
 
+    # Initialize OpenTelemetry tracing at startup (guards against ImportError)
+    try:
+        from src.api.telemetry.telemetry import setup_telemetry
+        setup_telemetry("mutx-api")
+
+        # Auto-instrument FastAPI app to create spans for each request
+        from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+        FastAPIInstrumentor.instrument_app(app)
+    except ImportError:
+        pass  # opentelemetry packages not installed — tracing disabled
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -436,6 +491,7 @@ def create_app(
     add_security_middleware(app, settings.cors_origins)
     add_rate_limiting(app)
     add_authentication_middleware(app)
+    add_tracing_middleware(app)
 
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(ValidationError, pydantic_validation_exception_handler)

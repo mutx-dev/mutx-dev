@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mutx
+  labels:
+    app.kubernetes.io/name: mutx
+    app.kubernetes.io/instance: mutx
+    helm.sh/chart: mutx-0.1.0
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - mutx.example.com
+      secretName: mutx-tls
+  rules:
+    - host: mutx.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mutx
+                port:
+                  number: 8000

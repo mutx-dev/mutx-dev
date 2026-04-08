@@ -120,6 +120,47 @@ make -C infrastructure monitor-validate
 
 * Direct Terraform also works, for example `terraform -chdir=infrastructure/terraform plan ...`.
 
+## Observability
+
+OpenTelemetry is used for distributed tracing across the MUTX platform.
+
+**Span Naming Convention**: All spans should follow the pattern `mutx.<operation>`:
+- `mutx.agent.execute` - Agent execution
+- `mutx.agent.initialize` - Agent initialization
+- `mutx.llm.call` - LLM API calls
+- `mutx.tool.execution` - Tool execution
+- `mutx.session.start` - Session start
+- `mutx.session.end` - Session end
+
+**Standard Attributes**:
+- `agent.id` - Unique identifier for the agent
+- `session.id` - Session identifier for the interaction
+- `trace.id` - Distributed trace identifier
+
+**SDK Usage** (`sdk/mutx/telemetry.py`):
+```python
+from mutx.telemetry import init_telemetry, span, trace_context, get_tracer
+
+# Initialize with OTLP endpoint
+init_telemetry("my-agent", endpoint="http://collector:4317")
+
+# Create spans
+with span("mutx.agent.execute", {"agent.id": agent_id}) as sp:
+    sp.set_attribute("session.id", session_id)
+    # ... work ...
+
+# Propagate trace context
+headers = trace_context()  # Returns {"traceparent": "...", "tracestate": "..."}
+```
+
+**API Routes**:
+- `GET /telemetry/config` - Returns `{otel_enabled, exporter_type, endpoint}`
+
+**Middleware** (`src/api/middleware/tracing.py`):
+- Extracts `TRACEPARENT` and `TRACESTATE` headers
+- Injects `trace_id` and `span_id` into `request.state`
+- Enables distributed trace propagation across services
+
 ## Code Style
 
 * Make minimal, targeted changes; do not do repo-wide cleanup unless asked.

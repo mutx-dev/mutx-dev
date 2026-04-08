@@ -19,6 +19,11 @@ from typing import Any, Callable, Optional
 
 import httpx
 
+from mutx.guardrails import (
+    GuardrailMiddleware,
+)
+from mutx.policy import MutxPolicyClient
+
 logger = logging.getLogger(__name__)
 
 
@@ -87,6 +92,8 @@ class MutxAgentClient:
         api_key: Optional[str] = None,
         agent_id: Optional[str] = None,
         timeout: float = 30.0,
+        guardrail_middleware: Optional[GuardrailMiddleware] = None,
+        policy_client: Optional[MutxPolicyClient] = None,
     ):
         self.mutx_url = mutx_url.rstrip("/")
         self.api_key = api_key
@@ -104,6 +111,10 @@ class MutxAgentClient:
 
         # Callback for handling commands
         self._command_callback: Optional[Callable[[Command], Any]] = None
+
+        # Guardrail middleware
+        self._guardrail_middleware = guardrail_middleware
+        self._policy_client = policy_client
 
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None:
@@ -518,6 +529,44 @@ class MutxAgentClient:
     def increment_errors(self):
         self._errors_count += 1
 
+    def check_input(
+        self,
+        text: str,
+        context: dict[str, Any] | None = None,
+    ) -> None:
+        """Check input text against guardrails before LLM processing.
+
+        Args:
+            text: The input text to check.
+            context: Additional context for guardrail evaluation.
+
+        Raises:
+            GuardrailViolationError: If any guardrail blocks the text.
+        """
+        if self._guardrail_middleware is None:
+            return
+
+        self._guardrail_middleware.check_input_text(text, context)
+
+    def check_output(
+        self,
+        text: str,
+        context: dict[str, Any] | None = None,
+    ) -> None:
+        """Check output text against guardrails before returning.
+
+        Args:
+            text: The output text to check.
+            context: Additional context for guardrail evaluation.
+
+        Raises:
+            GuardrailViolationError: If any guardrail blocks the text.
+        """
+        if self._guardrail_middleware is None:
+            return
+
+        self._guardrail_middleware.check_output_text(text, context)
+
 
 class MutxAgentSyncClient:
     """
@@ -530,6 +579,8 @@ class MutxAgentSyncClient:
         api_key: Optional[str] = None,
         agent_id: Optional[str] = None,
         timeout: float = 30.0,
+        guardrail_middleware: Optional[GuardrailMiddleware] = None,
+        policy_client: Optional[MutxPolicyClient] = None,
     ):
         self.mutx_url = mutx_url.rstrip("/")
         self.api_key = api_key
@@ -539,6 +590,8 @@ class MutxAgentSyncClient:
         self._start_time = time.time()
         self._requests_processed = 0
         self._errors_count = 0
+        self._guardrail_middleware = guardrail_middleware
+        self._policy_client = policy_client
 
     def _get_client(self) -> httpx.Client:
         headers = {
@@ -653,6 +706,44 @@ class MutxAgentSyncClient:
     def is_registered(self) -> bool:
         return self._registered
 
+    def check_input(
+        self,
+        text: str,
+        context: dict[str, Any] | None = None,
+    ) -> None:
+        """Check input text against guardrails before LLM processing.
+
+        Args:
+            text: The input text to check.
+            context: Additional context for guardrail evaluation.
+
+        Raises:
+            GuardrailViolationError: If any guardrail blocks the text.
+        """
+        if self._guardrail_middleware is None:
+            return
+
+        self._guardrail_middleware.check_input_text(text, context)
+
+    def check_output(
+        self,
+        text: str,
+        context: dict[str, Any] | None = None,
+    ) -> None:
+        """Check output text against guardrails before returning.
+
+        Args:
+            text: The output text to check.
+            context: Additional context for guardrail evaluation.
+
+        Raises:
+            GuardrailViolationError: If any guardrail blocks the text.
+        """
+        if self._guardrail_middleware is None:
+            return
+
+        self._guardrail_middleware.check_output_text(text, context)
+
 
 # Convenience function for quick setup
 async def create_agent_client(
@@ -689,4 +780,161 @@ __all__ = [
     "Command",
     "AgentMetrics",
     "create_agent_client",
+    "run_with_approval",
+    "ApprovalRejectedError",
+    "ApprovalTimeoutError",
 ]
+
+
+# ------------------------------------------------------------------
+# Human-in-the-loop approval context manager
+# ------------------------------------------------------------------
+
+
+class ApprovalRejectedError(Exception):
+    """Raised when an approval request is rejected by an approver."""
+
+    def __init__(self, request_id: str, approver: str, comment: Optional[str] = None):
+        self.request_id = request_id
+        self.approver = approver
+        self.comment = comment
+        super().__init__(f"Approval request {request_id} was rejected by {approver}")
+
+
+class ApprovalTimeoutError(Exception):
+    """Raised when an approval request times out before being resolved."""
+
+    def __init__(self, request_id: str, timeout_seconds: int):
+        self.request_id = request_id
+        self.timeout_seconds = timeout_seconds
+        super().__init__(
+            f"Approval request {request_id} timed out after {timeout_seconds}s"
+        )
+
+
+class run_with_approval:  # noqa: N801
+    """
+    Async context manager that submits an approval request and polls until
+    the request is resolved (approved, rejected, or expired).
+
+    Usage::
+
+        async with run_with_approval(
+            api_key="...",
+            base_url="https://api.mutx.dev",
+            approval_request={
+                "agent_id": "agent-123",
+                "session_id": "session-456",
+                "action_type": "deploy",
+                "payload": {"target": "production"},
+            },
+            timeout_seconds=1800,  # 30 minutes
+        ) as approval:
+            # approval.result.status is "APPROVED"
+            pass  # proceed with the approved action
+
+    On ``reject`` the context manager raises ``ApprovalRejectedError``.
+    On timeout it raises ``ApprovalTimeoutError``.
+    """
+
+    DEFAULT_TIMEOUT_SECONDS = 1800  # 30 minutes
+    DEFAULT_POLL_INTERVAL_SECONDS = 5
+
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        base_url: str = "https://api.mutx.dev",
+        approval_request: dict,
+        timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS,
+        poll_interval_seconds: int = DEFAULT_POLL_INTERVAL_SECONDS,
+    ):
+        self.api_key = api_key
+        self.base_url = base_url.rstrip("/")
+        self.request_payload = approval_request
+        self.timeout_seconds = timeout_seconds
+        self.poll_interval = poll_interval_seconds
+        self._client: Optional[httpx.AsyncClient] = None
+        self._request_id: Optional[str] = None
+        self._result: Optional[dict] = None
+
+    async def _get_client(self) -> httpx.AsyncClient:
+        if self._client is None:
+            self._client = httpx.AsyncClient(
+                base_url=self.base_url,
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                timeout=30.0,
+            )
+        return self._client
+
+    async def _submit(self) -> str:
+        """POST to /v1/approvals and return the request ID."""
+        client = await self._get_client()
+        response = await client.post("/v1/approvals", json=self.request_payload)
+        response.raise_for_status()
+        data = response.json()
+        return data["id"]
+
+    async def _poll(self) -> dict:
+        """GET /v1/approvals/{request_id} and return the full approval record."""
+        client = await self._get_client()
+        response = await client.get(f"/v1/approvals/{self._request_id}")
+        response.raise_for_status()
+        return response.json()
+
+    async def __aenter__(self) -> "run_with_approval":
+        # 1. Submit the approval request
+        self._request_id = await self._submit()
+        logger.info(
+            "Approval request submitted: id=%s, timeout=%ds",
+            self._request_id,
+            self.timeout_seconds,
+        )
+
+        # 2. Poll until resolved
+        start = asyncio.get_event_loop().time()
+        while True:
+            await asyncio.sleep(self.poll_interval)
+
+            approval = await self._poll()
+            status = approval.get("status", "").upper()
+
+            if status == "APPROVED":
+                self._result = approval
+                logger.info("Approval request %s approved", self._request_id)
+                return self
+
+            if status == "REJECTED":
+                raise ApprovalRejectedError(
+                    request_id=self._request_id,
+                    approver=approval.get("approver", "unknown"),
+                    comment=approval.get("comment"),
+                )
+
+            if status == "EXPIRED":
+                raise ApprovalTimeoutError(
+                    request_id=self._request_id,
+                    timeout_seconds=self.timeout_seconds,
+                )
+
+            # Still PENDING — check timeout
+            elapsed = asyncio.get_event_loop().time() - start
+            if elapsed >= self.timeout_seconds:
+                raise ApprovalTimeoutError(
+                    request_id=self._request_id,
+                    timeout_seconds=self.timeout_seconds,
+                )
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+        if self._client:
+            await self._client.aclose()
+            self._client = None
+
+    @property
+    def result(self) -> Optional[dict]:
+        """The final approval record (only valid after entering the context)."""
+        return self._result
+
