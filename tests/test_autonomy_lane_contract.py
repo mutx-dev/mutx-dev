@@ -238,6 +238,32 @@ def test_queue_state_updates_item_status() -> None:
     assert item["updated_at"].endswith("Z")
 
 
+
+def test_queue_state_load_queue_defaults_missing_file(tmp_path: Path) -> None:
+    payload = QUEUE_STATE.load_queue(tmp_path / 'missing-queue.json')
+
+    assert payload == {'items': []}
+
+
+
+def test_queue_state_recover_stale_running_items() -> None:
+    queue = {
+        'items': [
+            {'id': 'stale', 'status': 'running', 'lane': 'main', 'runner': 'main', 'updated_at': '2024-01-01T00:00:00Z'},
+            {'id': 'fresh', 'status': 'running', 'lane': 'main', 'runner': 'main', 'updated_at': '2999-01-01T00:00:00Z'},
+        ]
+    }
+
+    recovered = QUEUE_STATE.recover_stale_running_items(queue, stale_after_seconds=60)
+
+    assert recovered == ['stale']
+    stale = QUEUE_STATE.find_item(queue, 'stale')
+    fresh = QUEUE_STATE.find_item(queue, 'fresh')
+    assert stale is not None and stale['status'] == 'queued'
+    assert fresh is not None and fresh['status'] == 'running'
+
+
+
 def test_assess_pr_handoff_policy_allows_ready_pr_and_auto_merge_for_safe_opencode() -> None:
     work_order = LANE.WorkOrder(
         id="task-opencode-safe",
@@ -265,7 +291,40 @@ def test_assess_pr_handoff_policy_allows_ready_pr_and_auto_merge_for_safe_openco
     assert policy["low_risk_paths"] is True
 
 
-def test_assess_pr_handoff_policy_keeps_autonomy_changes_draft() -> None:
+
+def test_assess_pr_handoff_policy_allows_safe_autonomy_self_hosting_changes() -> None:
+    work_order = LANE.WorkOrder(
+        id="task-main-script",
+        title="Update autonomy handoff",
+        description="Keep substrate bounded",
+        lane="main",
+        runner="codex",
+        priority="p2",
+        worktree="/wt/main",
+        allowed_paths=["scripts/autonomy/"],
+        verification=["python -m compileall scripts/autonomy"],
+        constraints=[],
+        source="queue",
+        metadata={"area": "autonomy", "labels": ["risk:low", "size:s", "autonomy:safe"]},
+    )
+
+    policy = ORCHESTRATOR.assess_pr_handoff_policy(
+        work_order,
+        [
+            "scripts/autonomy/orchestrator_main.py",
+            "scripts/autonomy/daemon_main.py",
+            "tests/test_autonomy_lane_contract.py",
+        ],
+        True,
+    )
+
+    assert policy["ready_pr"] is True
+    assert policy["enable_auto_merge"] is True
+    assert policy["low_risk_paths"] is True
+    assert policy["autonomy_self_hosting"] is True
+
+
+def test_assess_pr_handoff_policy_keeps_non_autonomy_main_changes_draft() -> None:
     work_order = LANE.WorkOrder(
         id="task-main-script",
         title="Update autonomy handoff",

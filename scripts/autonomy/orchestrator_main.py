@@ -20,8 +20,10 @@ from worktree_utils import (
 
 SAFE_READY_SIZE_LABELS = {"size:xs", "size:s"}
 SAFE_AUTO_MERGE_MAX_CHANGED_FILES = 3
+SAFE_AUTONOMY_AUTO_MERGE_MAX_CHANGED_FILES = 8
 LOW_RISK_OPENCODE_PREFIXES = ("app/", "components/", "lib/", "public/", "tests/")
 LOW_RISK_DOC_PREFIXES = ("docs/", "whitepaper.md", "roadmap.md")
+LOW_RISK_AUTONOMY_PREFIXES = ("scripts/autonomy/", "tests/test_autonomy_")
 
 
 def persist_work_order(work_order: WorkOrder, output_dir: Path) -> Path:
@@ -100,23 +102,29 @@ def assess_pr_handoff_policy(
     risk_low = "risk:low" in labels
     explicit_safe = "autonomy:safe" in labels or (risk_low and size_safe)
     docs_style = work_order.lane == "main" and work_order.metadata.get("area") == "docs"
-    ready_lane = work_order.lane == "opencode" or docs_style
+    autonomy_self_hosting = work_order.metadata.get("area") == "autonomy"
+    ready_lane = work_order.lane == "opencode" or docs_style or autonomy_self_hosting
     if work_order.lane == "opencode":
         low_risk_paths = _all_paths_within(changed_files, LOW_RISK_OPENCODE_PREFIXES)
     elif docs_style:
         low_risk_paths = _all_paths_within(changed_files, LOW_RISK_DOC_PREFIXES)
+    elif autonomy_self_hosting:
+        low_risk_paths = _all_paths_within(changed_files, LOW_RISK_AUTONOMY_PREFIXES)
     else:
         low_risk_paths = False
     small_change = 0 < len(changed_files) <= SAFE_AUTO_MERGE_MAX_CHANGED_FILES
+    autonomy_small_change = 0 < len(changed_files) <= SAFE_AUTONOMY_AUTO_MERGE_MAX_CHANGED_FILES
     ready_pr = verification_passed and explicit_safe and ready_lane and low_risk_paths
-    auto_merge = ready_pr and small_change
+    auto_merge = ready_pr and (autonomy_small_change if autonomy_self_hosting else small_change)
     return {
         "ready_pr": ready_pr,
         "enable_auto_merge": auto_merge,
         "safe_for_ready_pr": ready_pr,
         "explicit_safe": explicit_safe,
         "small_change": small_change,
+        "autonomy_small_change": autonomy_small_change,
         "low_risk_paths": low_risk_paths,
+        "autonomy_self_hosting": autonomy_self_hosting,
         "docs_style": docs_style,
     }
 
