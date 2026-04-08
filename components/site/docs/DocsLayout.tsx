@@ -47,16 +47,21 @@ function NavItem({ item, pathname }: NavItemProps) {
     } catch {}
   }
 
-  const isActive =
-    pathname === `/docs/${item.slug}` ||
-    pathname === `/docs/${item.slug}/`;
+  // Normalize pathname: strip trailing slash so /docs/api and /docs/api/ both match
+  const normPath = pathname.replace(/\/$/, '');
+  const itemPath = `/docs/${item.slug}`;
+
+  // Active if current pathname starts with this item's path (handles nested slugs)
+  const isActive = normPath === itemPath || normPath.startsWith(itemPath + '/');
 
   // Determine if any descendant is active (for auto-expand)
   function isAncestorActive(items: DocNavItem[]): boolean {
     for (const child of items) {
+      const childPath = `/docs/${child.slug}`;
+      const normChildPath = childPath.replace(/\/$/, '');
       if (
-        pathname === `/docs/${child.slug}` ||
-        pathname === `/docs/${child.slug}/`
+        normPath === normChildPath ||
+        normPath.startsWith(normChildPath + '/')
       )
         return true;
       if (child.children.length > 0 && isAncestorActive(child.children))
