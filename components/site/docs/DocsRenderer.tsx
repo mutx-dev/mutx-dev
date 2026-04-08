@@ -1,5 +1,8 @@
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
+import remarkRehype from "remark-rehype";
+import rehypeStringify from "rehype-stringify";
+import rehypeHighlight from "rehype-highlight";
 
 export interface Heading {
   id: string;
@@ -37,6 +40,9 @@ export async function renderDocsHtml(source: string): Promise<string> {
 
   const result = await remark()
     .use(remarkGfm)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeHighlight, { detect: true })
+    .use(rehypeStringify, { allowDangerousHtml: true })
     .process(source);
 
   return addHeadingAnchors(result.toString(), headings);
