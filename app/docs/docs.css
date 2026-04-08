@@ -4,8 +4,9 @@
    Fonts loaded via next/font/google in docs/layout.tsx
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* ── GitBook scalar dark theme tokens ──────────────────────────────── */
-:root {
+/* ── Theme: Dark (default) ────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
   --gb-bg:           #161616;
   --gb-bg-2:         #1e1e1e;
   --gb-bg-3:         #262626;
@@ -25,8 +26,32 @@
   --gb-font-code:    var(--font-source-code), ui-monospace, monospace;
   --gb-code-bg:      #111111;
   --gb-code-border:  rgba(255,255,255,0.08);
+  color-scheme: dark;
 }
 
+/* ── Theme: Light ─────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --gb-bg:           #ffffff;
+  --gb-bg-2:         #f7f7f8;
+  --gb-bg-3:         #efefef;
+  --gb-surface:      #ffffff;
+  --gb-text:         #374151;
+  --gb-text-2:       #6b7280;
+  --gb-text-3:       #9ca3af;
+  --gb-accent:       #0070b9;
+  --gb-accent-soft:  rgba(0, 112, 185, 0.08);
+  --gb-border:       rgba(0, 0, 0, 0.10);
+  --gb-border-strong:rgba(0, 0, 0, 0.18);
+  --gb-sidebar-w:    272px;
+  --gb-header-h:     56px;
+  --gb-radius:       8px;
+  --gb-radius-sm:     4px;
+  --gb-font:          var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --gb-font-code:    var(--font-source-code), ui-monospace, monospace;
+  --gb-code-bg:      #f3f4f6;
+  --gb-code-border:  rgba(0, 0, 0, 0.08);
+  color-scheme: light;
+}
 /* ── Docs shell (full-page wrapper) ──────────────────────────────── */
 .docs-shell {
   font-family: var(--gb-font);
@@ -152,6 +177,47 @@
 
 .docs-nav-link-nested.active {
   color: var(--gb-accent);
+}
+
+/* ── Sidebar collapse / expand ──────────────────────────────────── */
+.docs-nav-row {
+  display: flex;
+  align-items: center;
+  min-height: 0;
+}
+
+.docs-nav-chevron-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gb-text-3);
+  padding: 0;
+  margin-left: 4px;
+  border-radius: 3px;
+  transition: background 120ms, color 120ms;
+}
+
+.docs-nav-chevron-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--gb-text);
+}
+
+.docs-nav-chevron-icon {
+  transition: transform 150ms ease;
+}
+
+.docs-nav-chevron-btn.open .docs-nav-chevron-icon {
+  transform: rotate(180deg);
+}
+
+.docs-nav-children {
+  overflow: hidden;
 }
 
 /* ── Main content area ────────────────────────────────────────────── */
@@ -773,6 +839,41 @@
   padding: 0.1rem 0.3rem;
   font-family: var(--gb-font);
   color: var(--gb-text-2);
+}
+
+/* ── Theme switcher ─────────────────────────────────────────── */
+.docs-theme-switcher {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--gb-bg-2);
+  border: 1px solid var(--gb-border);
+  border-radius: var(--gb-radius);
+  padding: 2px;
+}
+
+.docs-theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: none;
+  border: none;
+  border-radius: 5px;
+  color: var(--gb-text-3);
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+}
+
+.docs-theme-btn:hover {
+  background: var(--gb-bg-3);
+  color: var(--gb-text);
+}
+
+.docs-theme-btn.active {
+  background: var(--gb-bg-3);
+  color: var(--gb-accent);
 }
 
 /* ── Jump navigation ─────────────────────────────────────────── */
