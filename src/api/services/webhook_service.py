@@ -260,6 +260,7 @@ async def deliver_webhook_with_retry(
 
 async def trigger_webhook_event(
     db: AsyncSession,
+    user_id: uuid.UUID,
     event: str,
     payload: dict,
     user_id: Optional[uuid.UUID] = None,
@@ -270,13 +271,10 @@ async def trigger_webhook_event(
     Returns:
         Number of successful deliveries
     """
-    # Get active webhooks that subscribe to this event.
-    # If a user_id is provided, only deliver within that tenant.
-    query = select(Webhook).where(Webhook.is_active)
-    if user_id is not None:
-        query = query.where(Webhook.user_id == user_id)
-
-    result = await db.execute(query)
+    # Get active webhooks for the owning user only
+    result = await db.execute(
+        select(Webhook).where(Webhook.is_active, Webhook.user_id == user_id)
+    )
     webhooks = result.scalars().all()
 
     # Filter webhooks by event subscription
@@ -328,6 +326,7 @@ async def trigger_webhook_event(
 # Helper function to trigger common events
 async def trigger_agent_status_event(
     db: AsyncSession,
+    user_id: uuid.UUID,
     agent_id: uuid.UUID,
     old_status: str,
     new_status: str,
@@ -336,6 +335,7 @@ async def trigger_agent_status_event(
     """Trigger agent.status event."""
     await trigger_webhook_event(
         db,
+        user_id,
         "agent.status",
         {
             "agent_id": str(agent_id),
@@ -348,6 +348,7 @@ async def trigger_agent_status_event(
 
 async def trigger_deployment_event(
     db: AsyncSession,
+    user_id: uuid.UUID,
     deployment_id: uuid.UUID,
     agent_id: uuid.UUID,
     event_type: str,
@@ -356,6 +357,7 @@ async def trigger_deployment_event(
     """Trigger deployment event."""
     await trigger_webhook_event(
         db,
+        user_id,
         "deployment.event",
         {
             "deployment_id": str(deployment_id),

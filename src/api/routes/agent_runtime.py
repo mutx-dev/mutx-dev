@@ -246,6 +246,7 @@ async def heartbeat(
     try:
         await trigger_webhook_event(
             db,
+            agent.user_id,
             "agent.heartbeat",
             {
                 "agent_id": str(agent.id),
@@ -268,6 +269,7 @@ async def heartbeat(
         try:
             await trigger_webhook_event(
                 db,
+                agent.user_id,
                 "agent.status",
                 {
                     "agent_id": str(agent.id),
