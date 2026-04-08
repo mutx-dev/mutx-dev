@@ -5,6 +5,7 @@ from src.api.config import Settings
 
 
 def test_cors_origins_accepts_comma_separated_env(monkeypatch):
+    monkeypatch.setenv("JWT_SECRET", "abcdefghijklmnopqrstuvwxyz123456")
     monkeypatch.setenv(
         "CORS_ORIGINS",
         "https://app.example.com, https://admin.example.com",
@@ -19,6 +20,7 @@ def test_cors_origins_accepts_comma_separated_env(monkeypatch):
 
 
 def test_cors_origins_accepts_json_array_env(monkeypatch):
+    monkeypatch.setenv("JWT_SECRET", "abcdefghijklmnopqrstuvwxyz123456")
     monkeypatch.setenv(
         "CORS_ORIGINS",
         '["https://app.example.com", "https://admin.example.com"]',
@@ -33,6 +35,7 @@ def test_cors_origins_accepts_json_array_env(monkeypatch):
 
 
 def test_cors_origins_rejects_invalid_json_array_env(monkeypatch):
+    monkeypatch.setenv("JWT_SECRET", "abcdefghijklmnopqrstuvwxyz123456")
     monkeypatch.setenv("CORS_ORIGINS", '["https://app.example.com"')
 
     with pytest.raises(ValidationError):

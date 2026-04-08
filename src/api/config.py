@@ -143,8 +143,8 @@ class Settings(BaseSettings):
         is_production = self.environment.lower() in ("production", "prod")
 
         # Validate JWT_SECRET
-        jwt_env_value = os.environ.get("JWT_SECRET") or os.environ.get("jwt_secret")
-        if jwt_env_value is None:
+        jwt_secret_was_provided = "jwt_secret" in self.model_fields_set
+        if not jwt_secret_was_provided:
             # JWT_SECRET was not set, using auto-generated default
             self._jwt_secret_was_auto_generated = True
             if is_production:
@@ -157,9 +157,9 @@ class Settings(BaseSettings):
                     "JWT_SECRET is not set; using auto-generated secret. "
                     "This is fine for development but should be set in production."
                 )
-        elif len(jwt_env_value) < 32:
+        elif len(self.jwt_secret) < 32:
             errors.append(
-                f"JWT_SECRET must be at least 32 characters long, got {len(jwt_env_value)}"
+                f"JWT_SECRET must be at least 32 characters long, got {len(self.jwt_secret)}"
             )
 
         # Validate DATABASE_URL when database is required on startup
