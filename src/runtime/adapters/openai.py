@@ -312,7 +312,9 @@ class OpenAIAdapter(AgentRuntime):
                 raise RuntimeError("Circuit breaker is open - too many failures")
 
             try:
-                return await self._client.chat.completions.create(**request)
+                response = await self._client.chat.completions.create(**request)
+                self._circuit_breaker.record_success()
+                return response
             except Exception as exc:
                 self._circuit_breaker.record_failure()
                 if attempt < max_retries - 1:
