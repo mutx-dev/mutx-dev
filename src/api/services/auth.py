@@ -45,7 +45,7 @@ PROVIDER_OIDC_CONFIG: dict[SSOProvider, str] = {
 
 # Provider token verification endpoints (JWKS)
 PROVIDER_JWKS_URLS: dict[SSOProvider, str] = {
-    SSOProvider.OKTA: "{domain}/v1/authorize",
+    SSOProvider.OKTA: "{domain}/oauth2/v1/keys",
     SSOProvider.AUTH0: "{domain}/.well-known/jwks.json",
     SSOProvider.KEYCLOAK: "{domain}/realms/{realm}/protocol/openid-connect/certs",
     SSOProvider.GOOGLE: "https://www.googleapis.com/oauth2/v3/certs",
