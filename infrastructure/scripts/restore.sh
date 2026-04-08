@@ -4,6 +4,7 @@
 #   backup_file: Path to the .sql.gz backup file
 
 set -e
+set -o pipefail
 
 if [ -z "$1" ]; then
     echo "Usage: $0 <backup_file>"
