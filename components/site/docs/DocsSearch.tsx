@@ -179,7 +179,9 @@ export function DocsSearch() {
   // When opened via attribute, focus the input and clear it
   useEffect(() => {
     function handleOpen() {
+      const overlay = document.querySelector('.docs-search-overlay') as HTMLElement;
       const input = document.querySelector('.docs-search-input') as HTMLInputElement;
+      if (overlay) overlay.style.display = 'flex';
       if (input) {
         input.value = '';
         setTimeout(() => input.focus(), 10);
@@ -206,7 +208,7 @@ export function DocsSearch() {
   }, []);
 
   return (
-    <div className="docs-search-overlay" data-docs-search-overlay="">
+    <div className="docs-search-overlay" style={{ display: 'none' }}>
       <div className="docs-search-modal" onClick={(e) => e.stopPropagation()}>
         <div className="docs-search-input-row">
           <svg
