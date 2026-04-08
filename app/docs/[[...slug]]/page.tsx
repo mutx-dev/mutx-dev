@@ -7,6 +7,7 @@ import Link from "next/link";
 import { DocsRenderer, extractHeadings } from "@/components/site/docs/DocsRenderer";
 import { TableOfContents } from "@/components/site/docs/TableOfContents";
 import { SectionLanding } from "@/components/site/docs/SectionLanding";
+import { DocsBreadcrumbs } from "@/components/site/docs/DocsBreadcrumbs";
 import { PrevNextNav } from "@/components/site/docs/PrevNextNav";
 import { DEFAULT_X_HANDLE, getCanonicalUrl } from "@/lib/seo";
 import { parseSummary } from "@/lib/docs";
