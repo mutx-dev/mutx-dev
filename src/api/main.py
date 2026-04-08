@@ -468,6 +468,10 @@ def create_app(
     try:
         from src.api.telemetry.telemetry import setup_telemetry
         setup_telemetry("mutx-api")
+
+        # Auto-instrument FastAPI app to create spans for each request
+        from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+        FastAPIInstrumentor.instrument_app(app)
     except ImportError:
         pass  # opentelemetry packages not installed — tracing disabled
 
