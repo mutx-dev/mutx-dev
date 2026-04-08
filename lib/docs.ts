@@ -88,23 +88,27 @@ export function flatNav(items: DocNavItem[]): DocNavItem[] {
 }
 
 export function summaryHrefToDocsRoute(href: string): string | null {
-  if (!href.startsWith("docs/")) {
+  // GitBook maps docs/api/* → /docs/* (api/ prefix is flattened)
+  // e.g. docs/api/reference.md → /docs/reference
+  // e.g. docs/api/authentication.md → /docs/reference/authentication
+  const normalized = href.replace(/^docs\/api\//, "docs/");
+
+  if (!normalized.startsWith("docs/")) {
     // Root-level content (e.g. agents/README.md) → mount under /docs/*
-    const normalized = normalizeSummaryHrefToSlug(href)
+    const slug = normalizeSummaryHrefToSlug(normalized)
       .replace(/\/README$/i, "")
       .replace(/\/index$/i, "")
       .replace(/^README$/i, "");
-    return normalized ? `/docs/${normalized}` : "/docs";
+    return slug ? `/docs/${slug}` : "/docs";
   }
 
   // docs/ prefixed: strip prefix, use rest as the route path
-  // e.g. docs/adr/001-fastapi-for-control-plane → /docs/adr/001-fastapi-for-control-plane
   // e.g. docs/architecture/README → /docs/architecture
-  const normalized = normalizeSummaryHrefToSlug(href)
+  const slug = normalizeSummaryHrefToSlug(normalized)
     .replace(/\/README$/i, "")
     .replace(/\/index$/i, "")
     .replace(/^README$/i, "");
-  return `/docs/${normalized}`;
+  return `/docs/${slug}`;
 }
 
 export function getDocSitemapRoutes(): string[] {

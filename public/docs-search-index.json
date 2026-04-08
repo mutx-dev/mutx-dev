@@ -1004,15 +1004,15 @@
     },
     {
       "title": "Best entry point for setup, platform references, and operator docs.",
-      "href": "/docs/README",
+      "href": "/docs",
       "section": "Root",
       "entries": [
         {
-          "id": "/docs/README",
+          "id": "/docs",
           "title": "Best entry point for setup, platform references, and operator docs.",
           "section": "Root",
           "content": "# MUTX Docs Use this section when you want the code-accurate view of setup, runtime surfaces, and current gaps. Title Description Target Cover Setup and local flow Get from clone to a working stack with the shortest validated path. quickstart.md victory-core.png API and integration reference Read the live `/v1/*` contract, auth model, and public resource docs. api wiring-bay.png Platform architecture Understand the shape behind the app, backend, CLI, SDK, and infrastructure. architecture running-agent.png v1.3 release notes Read the current public release posture, supported surfaces, and download path. v1.3.md docs-surface.png Troubleshooting and support Recover quickly when local setup, auth, or route assumptions drift. troubleshooting docs-surface.png * `mutx.dev` = public marketing site and product narrative * `mutx.dev/releases` = public release summary and signed desktop artifact handoff * `docs.mutx.dev` = canonical documentation and API truth surface * `app.mutx.dev/dashboard` =",
-          "href": "/docs/README",
+          "href": "/docs",
           "headings": [
             "MUTX Docs",
             "Start Here",
@@ -1026,75 +1026,75 @@
           ]
         },
         {
-          "id": "/docs/README#mutx-docs",
+          "id": "/docs#mutx-docs",
           "title": "MUTX Docs",
           "section": "Root",
           "content": "Use this section when you want the code-accurate view of setup, runtime surfaces, and current gaps. Title Description Target <th data-hidden data-ca",
-          "href": "/docs/README#mutx-docs",
+          "href": "/docs#mutx-docs",
           "headings": []
         },
         {
-          "id": "/docs/README#start-here",
+          "id": "/docs#start-here",
           "title": "Start Here",
           "section": "Root",
           "content": "- [Overview](https://github.com/mutx-dev/mutx-dev/blob/main/README.md) - [Quickstart](./deployment/quickstart.md) - [v1.3 Release Notes](./releases/v1.3.md) - [Project Status](./project-status.md) - [Roadmap](https://github.com/mutx-dev/mutx-dev/blob/main/roadmap.md) ## By Area ### Setup And Wor",
-          "href": "/docs/README#start-here",
+          "href": "/docs#start-here",
           "headings": []
         },
         {
-          "id": "/docs/README#by-area",
+          "id": "/docs#by-area",
           "title": "By Area",
           "section": "Root",
           "content": "### Setup And Workflow - [CLI Guide](./cli.md) - [Deployment](./deployment/README.md) - [Local Developer Bootstrap](./deployment/local-developer-bootstrap.md) ### Platform References - [API Reference](./api/reference.md) - [API Overview](./api/index.md) - [Architecture](./architecture/README.md",
-          "href": "/docs/README#by-area",
+          "href": "/docs#by-area",
           "headings": []
         },
         {
-          "id": "/docs/README#setup-and-workflow",
+          "id": "/docs#setup-and-workflow",
           "title": "Setup And Workflow",
           "section": "Root",
           "content": "- [CLI Guide](./cli.md) - [Deployment](./deployment/README.md) - [Local Developer Bootstrap](./deployment/local-developer-bootstrap.md) ### Platform References - [API Reference](./api/reference.md) - [API Overview](./api/index.md) - [Architecture](./architecture/README.md) - [Autonomy](./autonom",
-          "href": "/docs/README#setup-and-workflow",
+          "href": "/docs#setup-and-workflow",
           "headings": []
         },
         {
-          "id": "/docs/README#platform-references",
+          "id": "/docs#platform-references",
           "title": "Platform References",
           "section": "Root",
           "content": "- [API Reference](./api/reference.md) - [API Overview](./api/index.md) - [Architecture](./architecture/README.md) - [Autonomy](./autonomy/README.md) - [MUTX Infrastructure](https://github.com/mutx-dev/mutx-dev/blob/main/infrastructure.md) - [Python SDK](https://github.com/mutx-dev/mutx-dev/blob/ma",
-          "href": "/docs/README#platform-references",
+          "href": "/docs#platform-references",
           "headings": []
         },
         {
-          "id": "/docs/README#troubleshooting",
+          "id": "/docs#troubleshooting",
           "title": "Troubleshooting",
           "section": "Root",
           "content": "- [Troubleshooting](./troubleshooting/README.md) - [Common Issues](./troubleshooting/common-issues.md) - [Debugging](./troubleshooting/debugging.md) - [FAQ](./troubleshooting/faq.md) ### Supporting Context - [Platform Overview](./overview.md) - [Surface Matrix](./surfaces.md) - [App and Dashboar",
-          "href": "/docs/README#troubleshooting",
+          "href": "/docs#troubleshooting",
           "headings": []
         },
         {
-          "id": "/docs/README#supporting-context",
+          "id": "/docs#supporting-context",
           "title": "Supporting Context",
           "section": "Root",
           "content": "- [Platform Overview](./overview.md) - [Surface Matrix](./surfaces.md) - [App and Dashboard](./app-dashboard.md) - [v1.3 Release Checklist](./releases/v1.3-checklist.md) - [Manifesto](https://github.com/mutx-dev/mutx-dev/blob/main/manifesto.md) - [Technical Whitepaper](https://github.com/mutx-dev/",
-          "href": "/docs/README#supporting-context",
+          "href": "/docs#supporting-context",
           "headings": []
         },
         {
-          "id": "/docs/README#truth-rules",
+          "id": "/docs#truth-rules",
           "title": "Truth rules",
           "section": "Root",
           "content": "When docs and code disagree, trust the code: - `src/api/routes/` for backend behavior - `app/api/` for browser-facing proxy behavior - `app/` for site and app surfaces - `cli/` for terminal workflows - `sdk/mutx/` for SDK behavior Current hosted/documented split: - `mutx.dev` is the public land",
-          "href": "/docs/README#truth-rules",
+          "href": "/docs#truth-rules",
           "headings": []
         },
         {
-          "id": "/docs/README#gitbook-sync-rules",
+          "id": "/docs#gitbook-sync-rules",
           "title": "GitBook sync rules",
           "section": "Root",
           "content": "The published docs site is synced from this repository. - GitHub is the canonical source for synced docs content. - `.gitbook.yaml` pins GitBook to the repo root and uses `README.md` plus `SUMMARY.md`. - Do not create or rename README pages from the GitBook UI. - Keep sidebar changes in `SUMMARY.",
-          "href": "/docs/README#gitbook-sync-rules",
+          "href": "/docs#gitbook-sync-rules",
           "headings": []
         }
       ]
@@ -2312,15 +2312,15 @@
     },
     {
       "title": "Agents",
-      "href": "/docs/api/agents",
+      "href": "/docs/reference/agents",
       "section": "Api",
       "entries": [
         {
-          "id": "/docs/api/agents",
+          "id": "/docs/reference/agents",
           "title": "Agents",
           "section": "Api",
           "content": "# Agents The `/v1/agents*` surface has two overlapping responsibilities: * control-plane CRUD for user-owned agents * runtime-compatible endpoints for agent registration, heartbeats, metrics, logs, commands, status, and version history ## Control-Plane Routes | Route | Purpose | | ------------------------------------------- | --------------------------------------------------- | | `POST /v1/agents` | Create an agent owned by the authenticated user | | `GET /v1/agents` | List owned agents | | `GET /v1/agents/{agent_id}` | Get agent detail including deployments | | `GET /v1/agents/{agent_id}/config` | Read normalized config and config version | | `PATCH /v1/agents/{agent_id}/config` | Validate and update config, then bump version | | `DELETE /v1/agents/{agent_id}` | Delete an owned agent | | `POST /v1/agents/{agent_id}/deploy` | Legacy agent-scoped deployment shortcut | | `POST /v1/agents/{agent_id}/stop` | Stop running or deploying deployments for the agent | | `GET /v1/agents/{agent_id",
-          "href": "/docs/api/agents",
+          "href": "/docs/reference/agents",
           "headings": [
             "Agents",
             "Control-Plane Routes",
@@ -2336,106 +2336,106 @@
           ]
         },
         {
-          "id": "/docs/api/agents#agents",
+          "id": "/docs/reference/agents#agents",
           "title": "Agents",
           "section": "Api",
           "content": "The `/v1/agents*` surface has two overlapping responsibilities: - control-plane CRUD for user-owned agents - runtime-compatible endpoints for agent registration, heartbeats, metrics, logs, commands, status, and version history ## Control-Plane Routes | Route | Purpose | | --- | --- | | `POST /v",
-          "href": "/docs/api/agents#agents",
+          "href": "/docs/reference/agents#agents",
           "headings": []
         },
         {
-          "id": "/docs/api/agents#control-plane-routes",
+          "id": "/docs/reference/agents#control-plane-routes",
           "title": "Control-Plane Routes",
           "section": "Api",
           "content": "| Route | Purpose | | --- | --- | | `POST /v1/agents` | Create an agent owned by the authenticated user | | `GET /v1/agents` | List owned agents | | `GET /v1/agents/{agent_id}` | Get agent detail including deployments | | `GET /v1/agents/{agent_id}/config` | Read normalized config and config versi",
-          "href": "/docs/api/agents#control-plane-routes",
+          "href": "/docs/reference/agents#control-plane-routes",
           "headings": []
         },
         {
-          "id": "/docs/api/agents#runtime-compatible-routes",
+          "id": "/docs/reference/agents#runtime-compatible-routes",
           "title": "Runtime-Compatible Routes",
           "section": "Api",
           "content": "| Route | Purpose | | --- | --- | | `POST /v1/agents/register` | Create a runtime-style agent and issue an agent API key | | `POST /v1/agents/heartbeat` | Report status | | `POST /v1/agents/metrics` | Report metrics | | `POST /v1/agents/logs` | Send logs | | `GET /v1/agents/commands` | Poll pendin",
-          "href": "/docs/api/agents#runtime-compatible-routes",
+          "href": "/docs/reference/agents#runtime-compatible-routes",
           "headings": []
         },
         {
-          "id": "/docs/api/agents#create-an-agent",
+          "id": "/docs/reference/agents#create-an-agent",
           "title": "Create An Agent",
           "section": "Api",
           "content": "Ownership comes from the bearer token. Do not send `user_id` in the request body. `config` can be a JSON object or a JSON string. The backend validates it against the selected `type`. ```bash BASE_URL=http://localhost:8000 curl -X POST \"$BASE_URL/v1/agents\" \\ -H \"Authorization: Bearer YOUR_AC",
-          "href": "/docs/api/agents#create-an-agent",
+          "href": "/docs/reference/agents#create-an-agent",
           "headings": []
         },
         {
-          "id": "/docs/api/agents#config-validation",
+          "id": "/docs/reference/agents#config-validation",
           "title": "Config Validation",
           "section": "Api",
           "content": "Current typed config families: - `openai` - `anthropic` - `langchain` - `custom` - `openclaw` Unknown keys are rejected for typed configs. Successful config patches increment `config_version`. ## List And Inspect Agents ```bash curl \"$BASE_URL/v1/agents?skip=0&limit=20\" \\ -H \"Authorization:",
-          "href": "/docs/api/agents#config-validation",
+          "href": "/docs/reference/agents#config-validation",
           "headings": []
         },
         {
-          "id": "/docs/api/agents#list-and-inspect-agents",
+          "id": "/docs/reference/agents#list-and-inspect-agents",
           "title": "List And Inspect Agents",
           "section": "Api",
           "content": "```bash curl \"$BASE_URL/v1/agents?skip=0&limit=20\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl \"$BASE_URL/v1/agents/YOUR_AGENT_ID\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl \"$BASE_URL/v1/agents/YOUR_AGENT_ID/config\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" ``` ## U",
-          "href": "/docs/api/agents#list-and-inspect-agents",
+          "href": "/docs/reference/agents#list-and-inspect-agents",
           "headings": []
         },
         {
-          "id": "/docs/api/agents#update-config",
+          "id": "/docs/reference/agents#update-config",
           "title": "Update Config",
           "section": "Api",
           "content": "```bash curl -X PATCH \"$BASE_URL/v1/agents/YOUR_AGENT_ID/config\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" \\ -H \"Content-Type: application/json\" \\ -d '{ \"config\": { \"runtime\": \"personal_assistant\", \"template\": \"personal_assistant\", \"workspace\": \"default\", \"mo",
-          "href": "/docs/api/agents#update-config",
+          "href": "/docs/reference/agents#update-config",
           "headings": []
         },
         {
-          "id": "/docs/api/agents#deploy-stop-and-delete",
+          "id": "/docs/reference/agents#deploy-stop-and-delete",
           "title": "Deploy, Stop, And Delete",
           "section": "Api",
           "content": "`POST /v1/agents/{agent_id}/deploy` is still mounted, but the canonical full deployment create path is [`POST /v1/deployments`](./deployments.md). ```bash curl -X POST \"$BASE_URL/v1/agents/YOUR_AGENT_ID/deploy\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl -X POST \"$BASE_URL/v1/agents/YO",
-          "href": "/docs/api/agents#deploy-stop-and-delete",
+          "href": "/docs/reference/agents#deploy-stop-and-delete",
           "headings": []
         },
         {
-          "id": "/docs/api/agents#logs-metrics-and-resource-usage",
+          "id": "/docs/reference/agents#logs-metrics-and-resource-usage",
           "title": "Logs, Metrics, And Resource Usage",
           "section": "Api",
           "content": "```bash curl \"$BASE_URL/v1/agents/YOUR_AGENT_ID/logs?limit=100&level=info\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl \"$BASE_URL/v1/agents/YOUR_AGENT_ID/metrics?limit=100\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl \"$BASE_URL/v1/agents/YOUR_AGENT_ID/resource-usage?limit=50\"",
-          "href": "/docs/api/agents#logs-metrics-and-resource-usage",
+          "href": "/docs/reference/agents#logs-metrics-and-resource-usage",
           "headings": []
         },
         {
-          "id": "/docs/api/agents#versions-and-rollback",
+          "id": "/docs/reference/agents#versions-and-rollback",
           "title": "Versions And Rollback",
           "section": "Api",
           "content": "```bash curl \"$BASE_URL/v1/agents/YOUR_AGENT_ID/versions\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl -X POST \"$BASE_URL/v1/agents/YOUR_AGENT_ID/rollback\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" \\ -H \"Content-Type: application/json\" \\ -d '{\"version\":1}' ``` ## Runtime Regi",
-          "href": "/docs/api/agents#versions-and-rollback",
+          "href": "/docs/reference/agents#versions-and-rollback",
           "headings": []
         },
         {
-          "id": "/docs/api/agents#runtime-registration-notes",
+          "id": "/docs/reference/agents#runtime-registration-notes",
           "title": "Runtime Registration Notes",
           "section": "Api",
           "content": "`POST /v1/agents/register` is the runtime-facing registration entrypoint. It returns a runtime payload containing: - `agent_id` - `api_key` - `status` - `message` Use the OpenAPI snapshot for the exact runtime request and response shapes if you are integrating at that layer.",
-          "href": "/docs/api/agents#runtime-registration-notes",
+          "href": "/docs/reference/agents#runtime-registration-notes",
           "headings": []
         }
       ]
     },
     {
       "title": "Api Keys",
-      "href": "/docs/api/api-keys",
+      "href": "/docs/reference/api-keys",
       "section": "Api",
       "entries": [
         {
-          "id": "/docs/api/api-keys",
+          "id": "/docs/reference/api-keys",
           "title": "Api Keys",
           "section": "Api",
           "content": "# API Keys Managed API keys provide user-scoped automation auth without an interactive login flow. New keys are issued with the `mutx_live_` prefix. ## Routes | Route | Purpose | | ----------------------------------- | ------------------------------------------------------- | | `GET /v1/api-keys` | List API keys, including revoked keys for audit history | | `GET /v1/api-keys/{key_id}` | Fetch one API key record | | `POST /v1/api-keys` | Create a new key | | `POST /v1/api-keys/{key_id}/rotate` | Revoke the old key and issue a replacement | | `DELETE /v1/api-keys/{key_id}` | Revoke a key while keeping its record | ## Authentication Management calls use user auth. For interactive docs examples, use a bearer access token: ```bash -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" ``` Issued API keys can then be used against protected routes in either of these forms: ```bash curl -H \"Authorization: Bearer mutx_live_your_key_here\" \\ https://api.mutx.dev/v1/deployments curl -H \"X-API-Key: mutx_live",
-          "href": "/docs/api/api-keys",
+          "href": "/docs/reference/api-keys",
           "headings": [
             "API Keys",
             "Routes",
@@ -2448,82 +2448,82 @@
           ]
         },
         {
-          "id": "/docs/api/api-keys#api-keys",
+          "id": "/docs/reference/api-keys#api-keys",
           "title": "API Keys",
           "section": "Api",
           "content": "Managed API keys provide user-scoped automation auth without an interactive login flow. New keys are issued with the `mutx_live_` prefix. ## Routes | Route | Purpose | | --- | --- | | `GET /v1/api-keys` | List API keys, including revoked keys for audit history | | `GET /v1/api-keys/{key_id}` |",
-          "href": "/docs/api/api-keys#api-keys",
+          "href": "/docs/reference/api-keys#api-keys",
           "headings": []
         },
         {
-          "id": "/docs/api/api-keys#routes",
+          "id": "/docs/reference/api-keys#routes",
           "title": "Routes",
           "section": "Api",
           "content": "| Route | Purpose | | --- | --- | | `GET /v1/api-keys` | List API keys, including revoked keys for audit history | | `GET /v1/api-keys/{key_id}` | Fetch one API key record | | `POST /v1/api-keys` | Create a new key | | `POST /v1/api-keys/{key_id}/rotate` | Revoke the old key and issue a replacemen",
-          "href": "/docs/api/api-keys#routes",
+          "href": "/docs/reference/api-keys#routes",
           "headings": []
         },
         {
-          "id": "/docs/api/api-keys#authentication",
+          "id": "/docs/reference/api-keys#authentication",
           "title": "Authentication",
           "section": "Api",
           "content": "Management calls use user auth. For interactive docs examples, use a bearer access token: ```bash -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" ``` Issued API keys can then be used against protected routes in either of these forms: ```bash curl -H \"Authorization: Bearer mutx_live_your_key_here\"",
-          "href": "/docs/api/api-keys#authentication",
+          "href": "/docs/reference/api-keys#authentication",
           "headings": []
         },
         {
-          "id": "/docs/api/api-keys#list-api-keys",
+          "id": "/docs/reference/api-keys#list-api-keys",
           "title": "List API Keys",
           "section": "Api",
           "content": "```bash BASE_URL=http://localhost:8000 curl \"$BASE_URL/v1/api-keys?skip=0&limit=50\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" ``` Example response: ```json { \"items\": [ { \"id\": \"uuid\", \"name\": \"Dashboard automation\", \"last_used\": null, \"created_at\": \"2026-03",
-          "href": "/docs/api/api-keys#list-api-keys",
+          "href": "/docs/reference/api-keys#list-api-keys",
           "headings": []
         },
         {
-          "id": "/docs/api/api-keys#create-a-key",
+          "id": "/docs/reference/api-keys#create-a-key",
           "title": "Create A Key",
           "section": "Api",
           "content": "```bash curl -X POST \"$BASE_URL/v1/api-keys\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" \\ -H \"Content-Type: application/json\" \\ -d '{ \"name\": \"CI deployer\", \"expires_in_days\": 30 }' ``` Example response: ```json { \"id\": \"uuid\", \"name\": \"CI deployer\", \"key\": \"mutx_live_a",
-          "href": "/docs/api/api-keys#create-a-key",
+          "href": "/docs/reference/api-keys#create-a-key",
           "headings": []
         },
         {
-          "id": "/docs/api/api-keys#rotate-a-key",
+          "id": "/docs/reference/api-keys#rotate-a-key",
           "title": "Rotate A Key",
           "section": "Api",
           "content": "```bash curl -X POST \"$BASE_URL/v1/api-keys/YOUR_KEY_ID/rotate\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" ``` Rotation revokes the current active key and returns a newly issued plaintext key once. Rotating a revoked key returns `409 Conflict`. ## Revoke A Key ```bash curl -X DELETE \"$BA",
-          "href": "/docs/api/api-keys#rotate-a-key",
+          "href": "/docs/reference/api-keys#rotate-a-key",
           "headings": []
         },
         {
-          "id": "/docs/api/api-keys#revoke-a-key",
+          "id": "/docs/reference/api-keys#revoke-a-key",
           "title": "Revoke A Key",
           "section": "Api",
           "content": "```bash curl -X DELETE \"$BASE_URL/v1/api-keys/YOUR_KEY_ID\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" ``` Successful revoke returns `204 No Content`. The record remains visible in list responses for auditability. ## Operational Notes - API key records currently expose `last_used`, `creat",
-          "href": "/docs/api/api-keys#revoke-a-key",
+          "href": "/docs/reference/api-keys#revoke-a-key",
           "headings": []
         },
         {
-          "id": "/docs/api/api-keys#operational-notes",
+          "id": "/docs/reference/api-keys#operational-notes",
           "title": "Operational Notes",
           "section": "Api",
           "content": "- API key records currently expose `last_used`, `created_at`, `expires_at`, and `is_active`. - Expiration is optional. - The dashboard uses the same backend contract through its same-origin proxy routes under `app/api/api-keys/*`.",
-          "href": "/docs/api/api-keys#operational-notes",
+          "href": "/docs/reference/api-keys#operational-notes",
           "headings": []
         }
       ]
     },
     {
       "title": "Authentication",
-      "href": "/docs/api/authentication",
+      "href": "/docs/reference/authentication",
       "section": "Api",
       "entries": [
         {
-          "id": "/docs/api/authentication",
+          "id": "/docs/reference/authentication",
           "title": "Authentication",
           "section": "Api",
           "content": "# Authentication MUTX uses JWT-based user auth for interactive sessions. Successful `register`, `login`, `local-bootstrap`, and `refresh` calls all return a token pair. ## Endpoints | Route | Purpose | | ----------------------------------- | --------------------------------------------------------------------- | | `POST /v1/auth/register` | Create a user and return access + refresh tokens | | `POST /v1/auth/login` | Exchange email and password for a token pair | | `POST /v1/auth/local-bootstrap` | Localhost-only bootstrap for non-production local setups | | `POST /v1/auth/refresh` | Exchange a refresh token for a fresh token pair | | `POST /v1/auth/logout` | Revoke the provided refresh token family or all user refresh sessions | | `GET /v1/auth/me` | Return the authenticated user profile | | `POST /v1/auth/forgot-password` | Start password reset flow | | `POST /v1/auth/reset-password` | Complete password reset and revoke prior refresh sessions | | `POST /v1/auth/verify-email` | Mark an",
-          "href": "/docs/api/authentication",
+          "href": "/docs/reference/authentication",
           "headings": [
             "Authentication",
             "Endpoints",
@@ -2539,106 +2539,106 @@
           ]
         },
         {
-          "id": "/docs/api/authentication#authentication",
+          "id": "/docs/reference/authentication#authentication",
           "title": "Authentication",
           "section": "Api",
           "content": "MUTX uses JWT-based user auth for interactive sessions. Successful `register`, `login`, `local-bootstrap`, and `refresh` calls all return a token pair. ## Endpoints | Route | Purpose | | --- | --- | | `POST /v1/auth/register` | Create a user and return access + refresh tokens | | `POST /v1/auth",
-          "href": "/docs/api/authentication#authentication",
+          "href": "/docs/reference/authentication#authentication",
           "headings": []
         },
         {
-          "id": "/docs/api/authentication#endpoints",
+          "id": "/docs/reference/authentication#endpoints",
           "title": "Endpoints",
           "section": "Api",
           "content": "| Route | Purpose | | --- | --- | | `POST /v1/auth/register` | Create a user and return access + refresh tokens | | `POST /v1/auth/login` | Exchange email and password for a token pair | | `POST /v1/auth/local-bootstrap` | Localhost-only bootstrap for non-production local setups | | `POST /v1/auth",
-          "href": "/docs/api/authentication#endpoints",
+          "href": "/docs/reference/authentication#endpoints",
           "headings": []
         },
         {
-          "id": "/docs/api/authentication#password-policy",
+          "id": "/docs/reference/authentication#password-policy",
           "title": "Password Policy",
           "section": "Api",
           "content": "`register` and `reset-password` enforce the current password validator in `src/api/auth/password.py`: - at least 8 characters - at least one uppercase letter - at least one lowercase letter - at least one number - at least one special character ## Register ```bash BASE_URL=http://localhost:8000",
-          "href": "/docs/api/authentication#password-policy",
+          "href": "/docs/reference/authentication#password-policy",
           "headings": []
         },
         {
-          "id": "/docs/api/authentication#register",
+          "id": "/docs/reference/authentication#register",
           "title": "Register",
           "section": "Api",
           "content": "```bash BASE_URL=http://localhost:8000 curl -X POST \"$BASE_URL/v1/auth/register\" \\ -H \"Content-Type: application/json\" \\ -d '{ \"email\": \"operator@example.com\", \"name\": \"Operator\", \"password\": \"StrongPass1!\" }' ``` Example response: ```json { \"access_token\": \"eyJhbGciOiJIUzI1",
-          "href": "/docs/api/authentication#register",
+          "href": "/docs/reference/authentication#register",
           "headings": []
         },
         {
-          "id": "/docs/api/authentication#login",
+          "id": "/docs/reference/authentication#login",
           "title": "Login",
           "section": "Api",
           "content": "```bash curl -X POST \"$BASE_URL/v1/auth/login\" \\ -H \"Content-Type: application/json\" \\ -d '{ \"email\": \"operator@example.com\", \"password\": \"StrongPass1!\" }' ``` `login` returns the same token payload shape as `register`. ## Local Bootstrap `POST /v1/auth/local-bootstrap` exists for",
-          "href": "/docs/api/authentication#login",
+          "href": "/docs/reference/authentication#login",
           "headings": []
         },
         {
-          "id": "/docs/api/authentication#local-bootstrap",
+          "id": "/docs/reference/authentication#local-bootstrap",
           "title": "Local Bootstrap",
           "section": "Api",
           "content": "`POST /v1/auth/local-bootstrap` exists for localhost operator setup. It is rejected in production and rejected for non-loopback callers. ```bash curl -X POST \"$BASE_URL/v1/auth/local-bootstrap\" \\ -H \"Content-Type: application/json\" \\ -d '{\"name\":\"Local Operator\"}' ``` ## Refresh ```bash cu",
-          "href": "/docs/api/authentication#local-bootstrap",
+          "href": "/docs/reference/authentication#local-bootstrap",
           "headings": []
         },
         {
-          "id": "/docs/api/authentication#refresh",
+          "id": "/docs/reference/authentication#refresh",
           "title": "Refresh",
           "section": "Api",
           "content": "```bash curl -X POST \"$BASE_URL/v1/auth/refresh\" \\ -H \"Content-Type: application/json\" \\ -d '{\"refresh_token\":\"YOUR_REFRESH_TOKEN\"}' ``` The response is another access + refresh token pair. The refresh token family is rotated. ## Logout `logout` supports two patterns: - send `Authorization",
-          "href": "/docs/api/authentication#refresh",
+          "href": "/docs/reference/authentication#refresh",
           "headings": []
         },
         {
-          "id": "/docs/api/authentication#logout",
+          "id": "/docs/reference/authentication#logout",
           "title": "Logout",
           "section": "Api",
           "content": "`logout` supports two patterns: - send `Authorization: Bearer ` to revoke all refresh sessions for the current user - send a `refresh_token` body to revoke that refresh token family directly ```bash curl -X POST \"$BASE_URL/v1/auth/logout\" \\ -H \"Authorization: Bearer YOUR_ACCESS_T",
-          "href": "/docs/api/authentication#logout",
+          "href": "/docs/reference/authentication#logout",
           "headings": []
         },
         {
-          "id": "/docs/api/authentication#current-user",
+          "id": "/docs/reference/authentication#current-user",
           "title": "Current User",
           "section": "Api",
           "content": "```bash curl \"$BASE_URL/v1/auth/me\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" ``` Example response: ```json { \"id\": \"uuid\", \"email\": \"operator@example.com\", \"name\": \"Operator\", \"plan\": \"free\", \"created_at\": \"2026-03-22T12:00:00Z\", \"is_active\": true, \"is_email_verified\": fals",
-          "href": "/docs/api/authentication#current-user",
+          "href": "/docs/reference/authentication#current-user",
           "headings": []
         },
         {
-          "id": "/docs/api/authentication#password-reset-and-email-verification",
+          "id": "/docs/reference/authentication#password-reset-and-email-verification",
           "title": "Password Reset And Email Verification",
           "section": "Api",
           "content": "All four endpoints use small request bodies and message responses: - `POST /v1/auth/forgot-password` - `POST /v1/auth/reset-password` - `POST /v1/auth/verify-email` - `POST /v1/auth/resend-verification` Examples: ```bash curl -X POST \"$BASE_URL/v1/auth/forgot-password\" \\ -H \"Content-Type: app",
-          "href": "/docs/api/authentication#password-reset-and-email-verification",
+          "href": "/docs/reference/authentication#password-reset-and-email-verification",
           "headings": []
         },
         {
-          "id": "/docs/api/authentication#token-lifetimes",
+          "id": "/docs/reference/authentication#token-lifetimes",
           "title": "Token Lifetimes",
           "section": "Api",
           "content": "Access and refresh token lifetimes are server-configured in `src/api/auth/jwt.py` and settings. Use the returned `expires_in` value instead of hardcoding assumptions in clients or docs.",
-          "href": "/docs/api/authentication#token-lifetimes",
+          "href": "/docs/reference/authentication#token-lifetimes",
           "headings": []
         }
       ]
     },
     {
       "title": "Deployments",
-      "href": "/docs/api/deployments",
+      "href": "/docs/reference/deployments",
       "section": "Api",
       "entries": [
         {
-          "id": "/docs/api/deployments",
+          "id": "/docs/reference/deployments",
           "title": "Deployments",
           "section": "Api",
           "content": "# Deployments Deployments track the lifecycle of user-owned agent deployments. The canonical create path is `POST /v1/deployments`. ## Routes | Route | Purpose | | ----------------------------------------------- | ---------------------------------------------- | | `GET /v1/deployments` | List deployments for the current user | | `POST /v1/deployments` | Create a deployment for an owned agent | | `GET /v1/deployments/{deployment_id}` | Fetch one deployment | | `GET /v1/deployments/{deployment_id}/events` | Fetch paginated deployment events | | `POST /v1/deployments/{deployment_id}/scale` | Update replica count | | `POST /v1/deployments/{deployment_id}/restart` | Restart stopped, failed, or killed deployments | | `GET /v1/deployments/{deployment_id}/logs` | Fetch logs | | `GET /v1/deployments/{deployment_id}/metrics` | Fetch metrics | | `GET /v1/deployments/{deployment_id}/versions` | Fetch version history | | `POST /v1/deployments/{deployment_id}/rollback` | Roll back to a prior version",
-          "href": "/docs/api/deployments",
+          "href": "/docs/reference/deployments",
           "headings": [
             "Deployments",
             "Routes",
@@ -2653,98 +2653,98 @@
           ]
         },
         {
-          "id": "/docs/api/deployments#deployments",
+          "id": "/docs/reference/deployments#deployments",
           "title": "Deployments",
           "section": "Api",
           "content": "Deployments track the lifecycle of user-owned agent deployments. The canonical create path is `POST /v1/deployments`. ## Routes | Route | Purpose | | --- | --- | | `GET /v1/deployments` | List deployments for the current user | | `POST /v1/deployments` | Create a deployment for an owned agent |",
-          "href": "/docs/api/deployments#deployments",
+          "href": "/docs/reference/deployments#deployments",
           "headings": []
         },
         {
-          "id": "/docs/api/deployments#routes",
+          "id": "/docs/reference/deployments#routes",
           "title": "Routes",
           "section": "Api",
           "content": "| Route | Purpose | | --- | --- | | `GET /v1/deployments` | List deployments for the current user | | `POST /v1/deployments` | Create a deployment for an owned agent | | `GET /v1/deployments/{deployment_id}` | Fetch one deployment | | `GET /v1/deployments/{deployment_id}/events` | Fetch paginated",
-          "href": "/docs/api/deployments#routes",
+          "href": "/docs/reference/deployments#routes",
           "headings": []
         },
         {
-          "id": "/docs/api/deployments#current-lifecycle-rules",
+          "id": "/docs/reference/deployments#current-lifecycle-rules",
           "title": "Current Lifecycle Rules",
           "section": "Api",
           "content": "- creation requires an owned `agent_id` - scaling only succeeds for deployments in `running` or `ready` - restart only succeeds for deployments in `stopped`, `failed`, or `killed` - delete does not hard-remove the record; it marks the deployment `killed` ## Create A Deployment ```bash BASE_URL=h",
-          "href": "/docs/api/deployments#current-lifecycle-rules",
+          "href": "/docs/reference/deployments#current-lifecycle-rules",
           "headings": []
         },
         {
-          "id": "/docs/api/deployments#create-a-deployment",
+          "id": "/docs/reference/deployments#create-a-deployment",
           "title": "Create A Deployment",
           "section": "Api",
           "content": "```bash BASE_URL=http://localhost:8000 curl -X POST \"$BASE_URL/v1/deployments\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" \\ -H \"Content-Type: application/json\" \\ -d '{ \"agent_id\": \"YOUR_AGENT_ID\", \"replicas\": 1 }' ``` Example response: ```json { \"id\": \"uuid\", \"agent_id\":",
-          "href": "/docs/api/deployments#create-a-deployment",
+          "href": "/docs/reference/deployments#create-a-deployment",
           "headings": []
         },
         {
-          "id": "/docs/api/deployments#legacy-agent-scoped-create",
+          "id": "/docs/reference/deployments#legacy-agent-scoped-create",
           "title": "Legacy Agent-Scoped Create",
           "section": "Api",
           "content": "`POST /v1/agents/{agent_id}/deploy` is still mounted and returns a lightweight payload: ```json { \"deployment_id\": \"uuid\", \"status\": \"deploying\" } ``` Use `POST /v1/deployments` for the canonical full deployment record. ## List And Inspect Deployments ```bash curl \"$BASE_URL/v1/deployments",
-          "href": "/docs/api/deployments#legacy-agent-scoped-create",
+          "href": "/docs/reference/deployments#legacy-agent-scoped-create",
           "headings": []
         },
         {
-          "id": "/docs/api/deployments#list-and-inspect-deployments",
+          "id": "/docs/reference/deployments#list-and-inspect-deployments",
           "title": "List And Inspect Deployments",
           "section": "Api",
           "content": "```bash curl \"$BASE_URL/v1/deployments?skip=0&limit=20\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl \"$BASE_URL/v1/deployments?status=running&agent_id=YOUR_AGENT_ID\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl \"$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID\" \\ -H \"Authorization",
-          "href": "/docs/api/deployments#list-and-inspect-deployments",
+          "href": "/docs/reference/deployments#list-and-inspect-deployments",
           "headings": []
         },
         {
-          "id": "/docs/api/deployments#event-history",
+          "id": "/docs/reference/deployments#event-history",
           "title": "Event History",
           "section": "Api",
           "content": "```bash curl \"$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/events?limit=50\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl \"$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/events?event_type=scale&status=running\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" ``` The paginated response includ",
-          "href": "/docs/api/deployments#event-history",
+          "href": "/docs/reference/deployments#event-history",
           "headings": []
         },
         {
-          "id": "/docs/api/deployments#scale-restart-and-kill",
+          "id": "/docs/reference/deployments#scale-restart-and-kill",
           "title": "Scale, Restart, And Kill",
           "section": "Api",
           "content": "```bash curl -X POST \"$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/scale\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" \\ -H \"Content-Type: application/json\" \\ -d '{\"replicas\":2}' curl -X POST \"$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/restart\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TO",
-          "href": "/docs/api/deployments#scale-restart-and-kill",
+          "href": "/docs/reference/deployments#scale-restart-and-kill",
           "headings": []
         },
         {
-          "id": "/docs/api/deployments#logs-and-metrics",
+          "id": "/docs/reference/deployments#logs-and-metrics",
           "title": "Logs And Metrics",
           "section": "Api",
           "content": "```bash curl \"$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/logs?limit=100&level=info\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl \"$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/metrics?limit=100\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" ``` Deployment log and metric reads currentl",
-          "href": "/docs/api/deployments#logs-and-metrics",
+          "href": "/docs/reference/deployments#logs-and-metrics",
           "headings": []
         },
         {
-          "id": "/docs/api/deployments#versions-and-rollback",
+          "id": "/docs/reference/deployments#versions-and-rollback",
           "title": "Versions And Rollback",
           "section": "Api",
           "content": "```bash curl \"$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/versions\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl -X POST \"$BASE_URL/v1/deployments/YOUR_DEPLOYMENT_ID/rollback\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" \\ -H \"Content-Type: application/json\" \\ -d '{\"version\":1}'",
-          "href": "/docs/api/deployments#versions-and-rollback",
+          "href": "/docs/reference/deployments#versions-and-rollback",
           "headings": []
         }
       ]
     },
     {
       "title": "Index",
-      "href": "/docs/api",
+      "href": "/docs/reference",
       "section": "Api",
       "entries": [
         {
-          "id": "/docs/api",
+          "id": "/docs/reference",
           "title": "Index",
           "section": "Api",
           "content": "# API Overview MUTX public control-plane routes are mounted under `/v1/*`. Root operational probes remain at `/`, `/health`, `/ready`, and `/metrics`. ## Base URLs * Local API: `http://localhost:8000` * Hosted API: `https://api.mutx.dev` * Browser proxy surface: `http://localhost:3000/api/*` locally and `https://app.mutx.dev/api/*` when hosted ## Source Of Truth When prose and implementation disagree, use this order: 1. `src/api/main.py` router registration plus `src/api/routes/*.py` 2. [`openapi.json`](./openapi.json) 3. Markdown pages in `docs/api/*.md` ## Authentication Model * Interactive user flows use \\`Authorization: Bearer \\*\\*\\* * Managed API keys can authenticate automation through `Authorization: Bearer *** or `X-API-Key: \\ \\`. * `POST /v1/auth/local-bootstrap` is for localhost-only, non-production operator setup. Canonical auth endpoints: * `POST /v1/auth/register` * `POST /v1/auth/login` * `GET /v1/auth/me` See [authentication.md](./authentication.md) and [api-keys.md](./a",
-          "href": "/docs/api",
+          "href": "/docs/reference",
           "headings": [
             "API Overview",
             "Base URLs",
@@ -2757,82 +2757,82 @@
           ]
         },
         {
-          "id": "/docs/api#api-overview",
+          "id": "/docs/reference#api-overview",
           "title": "API Overview",
           "section": "Api",
           "content": "MUTX public control-plane routes are mounted under `/v1/*`. Root operational probes remain at `/`, `/health`, `/ready`, and `/metrics`. ## Base URLs - Local API: `http://localhost:8000` - Hosted API: `https://api.mutx.dev` - Browser proxy surface: `http://localhost:3000/api/*` locally and `http",
-          "href": "/docs/api#api-overview",
+          "href": "/docs/reference#api-overview",
           "headings": []
         },
         {
-          "id": "/docs/api#base-urls",
+          "id": "/docs/reference#base-urls",
           "title": "Base URLs",
           "section": "Api",
           "content": "- Local API: `http://localhost:8000` - Hosted API: `https://api.mutx.dev` - Browser proxy surface: `http://localhost:3000/api/*` locally and `https://app.mutx.dev/api/*` when hosted ## Source Of Truth When prose and implementation disagree, use this order: 1. `src/api/main.py` router registrati",
-          "href": "/docs/api#base-urls",
+          "href": "/docs/reference#base-urls",
           "headings": []
         },
         {
-          "id": "/docs/api#source-of-truth",
+          "id": "/docs/reference#source-of-truth",
           "title": "Source Of Truth",
           "section": "Api",
           "content": "When prose and implementation disagree, use this order: 1. `src/api/main.py` router registration plus `src/api/routes/*.py` 2. [`openapi.json`](./openapi.json) 3. Markdown pages in `docs/api/*.md` ## Authentication Model - Interactive user flows use `Authorization: Bearer *** - Managed API keys",
-          "href": "/docs/api#source-of-truth",
+          "href": "/docs/reference#source-of-truth",
           "headings": []
         },
         {
-          "id": "/docs/api#authentication-model",
+          "id": "/docs/reference#authentication-model",
           "title": "Authentication Model",
           "section": "Api",
           "content": "- Interactive user flows use `Authorization: Bearer *** - Managed API keys can authenticate automation through `Authorization: Bearer *** or `X-API-Key: `. - `POST /v1/auth/local-bootstrap` is for localhost-only, non-production operator setup. Canonical auth endpoints: - `POST /v1",
-          "href": "/docs/api#authentication-model",
+          "href": "/docs/reference#authentication-model",
           "headings": []
         },
         {
-          "id": "/docs/api#current-route-groups",
+          "id": "/docs/reference#current-route-groups",
           "title": "Current Route Groups",
           "section": "Api",
           "content": "| Group | Mounted routes | | --- | --- | | Auth | `/v1/auth/*` | | Assistant | `/v1/assistant/*` | | Agents | `/v1/agents`, `/v1/agents/{agent_id}/*`, runtime-compatible `/v1/agents/register`, `/v1/agents/heartbeat`, `/v1/agents/metrics`, `/v1/agents/logs`, `/v1/agents/commands*` | | Deployments |",
-          "href": "/docs/api#current-route-groups",
+          "href": "/docs/reference#current-route-groups",
           "headings": []
         },
         {
-          "id": "/docs/api#browser-and-app-surface",
+          "id": "/docs/reference#browser-and-app-surface",
           "title": "Browser And App Surface",
           "section": "Api",
           "content": "The Next.js app exposes same-origin route handlers under `app/api/*` for browser-facing flows such as auth, dashboard reads and writes, API keys, webhooks, and leads. Use the FastAPI routes directly for server-to-server integrations. Use `app/api/*` when you are operating inside the browser app s",
-          "href": "/docs/api#browser-and-app-surface",
+          "href": "/docs/reference#browser-and-app-surface",
           "headings": []
         },
         {
-          "id": "/docs/api#generated-contract-artifacts",
+          "id": "/docs/reference#generated-contract-artifacts",
           "title": "Generated Contract Artifacts",
           "section": "Api",
           "content": "- OpenAPI snapshot: [`openapi.json`](./openapi.json) - Generated TypeScript types: `app/types/api.ts` - Refresh commands: see [reference.md](./reference.md) ## Related Pages - [Authentication](./authentication.md) - [API Keys](./api-keys.md) - [Agents](./agents.md) - [Deployments](./deployments.",
-          "href": "/docs/api#generated-contract-artifacts",
+          "href": "/docs/reference#generated-contract-artifacts",
           "headings": []
         },
         {
-          "id": "/docs/api#related-pages",
+          "id": "/docs/reference#related-pages",
           "title": "Related Pages",
           "section": "Api",
           "content": "- [Authentication](./authentication.md) - [API Keys](./api-keys.md) - [Agents](./agents.md) - [Deployments](./deployments.md) - [Webhooks And Ingestion](./webhooks.md) - [Leads](./leads.md)",
-          "href": "/docs/api#related-pages",
+          "href": "/docs/reference#related-pages",
           "headings": []
         }
       ]
     },
     {
       "title": "Leads",
-      "href": "/docs/api/leads",
+      "href": "/docs/reference/leads",
       "section": "Api",
       "entries": [
         {
-          "id": "/docs/api/leads",
+          "id": "/docs/reference/leads",
           "title": "Leads",
           "section": "Api",
           "content": "# Leads Lead capture is intentionally split between: * a public create path for landing pages and onboarding * authenticated internal follow-up routes for verified internal users The same handlers are mounted on both `/v1/leads` and `/v1/leads/contacts`. ## Access Rules * `POST /v1/leads` and `POST /v1/leads/contacts` are public * `GET`, `PATCH`, and `DELETE` routes require an authenticated user * internal follow-up access is further restricted to verified users whose email domain is in the configured internal allowlist ## Routes | Route | Purpose | | ------------------------------------- | ----------------------------------------- | | `POST /v1/leads` | Capture a new lead | | `GET /v1/leads` | List leads | | `GET /v1/leads/{lead_id}` | Fetch one lead | | `PATCH /v1/leads/{lead_id}` | Update one lead | | `DELETE /v1/leads/{lead_id}` | Delete one lead | | `POST /v1/leads/contacts` | Compatibility-shaped public capture route | | `GET /v1/leads/contacts` | Compatibility-shaped list route ",
-          "href": "/docs/api/leads",
+          "href": "/docs/reference/leads",
           "headings": [
             "Leads",
             "Access Rules",
@@ -2843,66 +2843,66 @@
           ]
         },
         {
-          "id": "/docs/api/leads#leads",
+          "id": "/docs/reference/leads#leads",
           "title": "Leads",
           "section": "Api",
           "content": "Lead capture is intentionally split between: - a public create path for landing pages and onboarding - authenticated internal follow-up routes for verified internal users The same handlers are mounted on both `/v1/leads` and `/v1/leads/contacts`. ## Access Rules - `POST /v1/leads` and `POST /v",
-          "href": "/docs/api/leads#leads",
+          "href": "/docs/reference/leads#leads",
           "headings": []
         },
         {
-          "id": "/docs/api/leads#access-rules",
+          "id": "/docs/reference/leads#access-rules",
           "title": "Access Rules",
           "section": "Api",
           "content": "- `POST /v1/leads` and `POST /v1/leads/contacts` are public - `GET`, `PATCH`, and `DELETE` routes require an authenticated user - internal follow-up access is further restricted to verified users whose email domain is in the configured internal allowlist ## Routes | Route | Purpose | | --- | ---",
-          "href": "/docs/api/leads#access-rules",
+          "href": "/docs/reference/leads#access-rules",
           "headings": []
         },
         {
-          "id": "/docs/api/leads#routes",
+          "id": "/docs/reference/leads#routes",
           "title": "Routes",
           "section": "Api",
           "content": "| Route | Purpose | | --- | --- | | `POST /v1/leads` | Capture a new lead | | `GET /v1/leads` | List leads | | `GET /v1/leads/{lead_id}` | Fetch one lead | | `PATCH /v1/leads/{lead_id}` | Update one lead | | `DELETE /v1/leads/{lead_id}` | Delete one lead | | `POST /v1/leads/contacts` | Compatibili",
-          "href": "/docs/api/leads#routes",
+          "href": "/docs/reference/leads#routes",
           "headings": []
         },
         {
-          "id": "/docs/api/leads#capture-a-lead",
+          "id": "/docs/reference/leads#capture-a-lead",
           "title": "Capture A Lead",
           "section": "Api",
           "content": "```bash BASE_URL=http://localhost:8000 curl -X POST \"$BASE_URL/v1/leads\" \\ -H \"Content-Type: application/json\" \\ -d '{ \"email\": \"founder@example.com\", \"name\": \"Founder\", \"company\": \"Example Co\", \"message\": \"Interested in migration support.\", \"source\": \"homepage\" }' ```",
-          "href": "/docs/api/leads#capture-a-lead",
+          "href": "/docs/reference/leads#capture-a-lead",
           "headings": []
         },
         {
-          "id": "/docs/api/leads#list-and-fetch-leads",
+          "id": "/docs/reference/leads#list-and-fetch-leads",
           "title": "List And Fetch Leads",
           "section": "Api",
           "content": "```bash curl \"$BASE_URL/v1/leads?skip=0&limit=50\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl \"$BASE_URL/v1/leads/YOUR_LEAD_ID\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" ``` Equivalent compatibility routes are also mounted under `/v1/leads/contacts`. ## Update And Delete ```ba",
-          "href": "/docs/api/leads#list-and-fetch-leads",
+          "href": "/docs/reference/leads#list-and-fetch-leads",
           "headings": []
         },
         {
-          "id": "/docs/api/leads#update-and-delete",
+          "id": "/docs/reference/leads#update-and-delete",
           "title": "Update And Delete",
           "section": "Api",
           "content": "```bash curl -X PATCH \"$BASE_URL/v1/leads/YOUR_LEAD_ID\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" \\ -H \"Content-Type: application/json\" \\ -d '{ \"company\": \"Updated Co\", \"message\": \"Followed up with a live demo.\" }' curl -X DELETE \"$BASE_URL/v1/leads/YOUR_LEAD_ID\" \\ -H \"Auth",
-          "href": "/docs/api/leads#update-and-delete",
+          "href": "/docs/reference/leads#update-and-delete",
           "headings": []
         }
       ]
     },
     {
       "title": "Reference",
-      "href": "/docs/api/reference",
+      "href": "/docs/reference/reference",
       "section": "Api",
       "entries": [
         {
-          "id": "/docs/api/reference",
+          "id": "/docs/reference/reference",
           "title": "Reference",
           "section": "Api",
           "content": "# API Reference This directory is the public API reference for MUTX. It should always match the mounted FastAPI application, not older GitBook prose. ## Source Of Truth Order When docs and implementation disagree, use this order: 1. `src/api/main.py` plus `src/api/routes/*.py` 2. `docs/api/openapi.json` 3. Prose docs in `docs/api/*.md` ## Refresh Generated Artifacts Regenerate the OpenAPI snapshot from the live FastAPI app: ```bash python scripts/generate_openapi.py ``` Regenerate the TypeScript types that power the app surface: ```bash npm run generate-types ``` Quick route inventory check: ```bash jq -r '.paths | keys[]' docs/api/openapi.json | sort ``` ## Hosted Surfaces * Marketing site: `https://mutx.dev` * Docs site: `https://docs.mutx.dev` * Operator app: `https://app.mutx.dev` * Direct API base: `https://api.mutx.dev` ## Reference Artifacts * API overview: [index.md](./index.md) * OpenAPI JSON: [`openapi.json`](./openapi.json) * Authentication: [authentication.md](./authenticat",
-          "href": "/docs/api/reference",
+          "href": "/docs/reference/reference",
           "headings": [
             "API Reference",
             "Source Of Truth Order",
@@ -2913,66 +2913,66 @@
           ]
         },
         {
-          "id": "/docs/api/reference#api-reference",
+          "id": "/docs/reference/reference#api-reference",
           "title": "API Reference",
           "section": "Api",
           "content": "This directory is the public API reference for MUTX. It should always match the mounted FastAPI application, not older GitBook prose. ## Source Of Truth Order When docs and implementation disagree, use this order: 1. `src/api/main.py` plus `src/api/routes/*.py` 2. `docs/api/openapi.json` 3. Pr",
-          "href": "/docs/api/reference#api-reference",
+          "href": "/docs/reference/reference#api-reference",
           "headings": []
         },
         {
-          "id": "/docs/api/reference#source-of-truth-order",
+          "id": "/docs/reference/reference#source-of-truth-order",
           "title": "Source Of Truth Order",
           "section": "Api",
           "content": "When docs and implementation disagree, use this order: 1. `src/api/main.py` plus `src/api/routes/*.py` 2. `docs/api/openapi.json` 3. Prose docs in `docs/api/*.md` ## Refresh Generated Artifacts Regenerate the OpenAPI snapshot from the live FastAPI app: ```bash python scripts/generate_openapi.p",
-          "href": "/docs/api/reference#source-of-truth-order",
+          "href": "/docs/reference/reference#source-of-truth-order",
           "headings": []
         },
         {
-          "id": "/docs/api/reference#refresh-generated-artifacts",
+          "id": "/docs/reference/reference#refresh-generated-artifacts",
           "title": "Refresh Generated Artifacts",
           "section": "Api",
           "content": "Regenerate the OpenAPI snapshot from the live FastAPI app: ```bash python scripts/generate_openapi.py ``` Regenerate the TypeScript types that power the app surface: ```bash npm run generate-types ``` Quick route inventory check: ```bash jq -r '.paths | keys[]' docs/api/openapi.json | sort ``",
-          "href": "/docs/api/reference#refresh-generated-artifacts",
+          "href": "/docs/reference/reference#refresh-generated-artifacts",
           "headings": []
         },
         {
-          "id": "/docs/api/reference#hosted-surfaces",
+          "id": "/docs/reference/reference#hosted-surfaces",
           "title": "Hosted Surfaces",
           "section": "Api",
           "content": "- Marketing site: `https://mutx.dev` - Docs site: `https://docs.mutx.dev` - Operator app: `https://app.mutx.dev` - Direct API base: `https://api.mutx.dev` ## Reference Artifacts - API overview: [index.md](./index.md) - OpenAPI JSON: [`openapi.json`](./openapi.json) - Authentication: [authenticat",
-          "href": "/docs/api/reference#hosted-surfaces",
+          "href": "/docs/reference/reference#hosted-surfaces",
           "headings": []
         },
         {
-          "id": "/docs/api/reference#reference-artifacts",
+          "id": "/docs/reference/reference#reference-artifacts",
           "title": "Reference Artifacts",
           "section": "Api",
           "content": "- API overview: [index.md](./index.md) - OpenAPI JSON: [`openapi.json`](./openapi.json) - Authentication: [authentication.md](./authentication.md) - API keys: [api-keys.md](./api-keys.md) - Agents: [agents.md](./agents.md) - Deployments: [deployments.md](./deployments.md) - Webhooks and ingestion:",
-          "href": "/docs/api/reference#reference-artifacts",
+          "href": "/docs/reference/reference#reference-artifacts",
           "headings": []
         },
         {
-          "id": "/docs/api/reference#publication-rules",
+          "id": "/docs/reference/reference#publication-rules",
           "title": "Publication Rules",
           "section": "Api",
           "content": "- GitHub is the canonical source for `README.md`, `SUMMARY.md`, and `docs/api/*`. - GitBook should import from GitHub first when sync is reconnected. - Do not create replacement README pages from the GitBook UI.",
-          "href": "/docs/api/reference#publication-rules",
+          "href": "/docs/reference/reference#publication-rules",
           "headings": []
         }
       ]
     },
     {
       "title": "Webhooks",
-      "href": "/docs/api/webhooks",
+      "href": "/docs/reference/webhooks",
       "section": "Api",
       "entries": [
         {
-          "id": "/docs/api/webhooks",
+          "id": "/docs/reference/webhooks",
           "title": "Webhooks",
           "section": "Api",
           "content": "# Webhooks And Ingestion MUTX has two adjacent webhook-related surfaces: * outbound webhook management under `/v1/webhooks/*` * runtime ingestion endpoints under `/v1/ingest/*` ## Webhook Management Routes | Route | Purpose | | ------------------------------------------ | ------------------------------------ | | `POST /v1/webhooks/` | Create a webhook destination | | `GET /v1/webhooks/` | List webhook destinations | | `GET /v1/webhooks/{webhook_id}` | Fetch one webhook | | `PATCH /v1/webhooks/{webhook_id}` | Update URL, events, or active status | | `DELETE /v1/webhooks/{webhook_id}` | Delete a webhook | | `POST /v1/webhooks/{webhook_id}/test` | Send a test event | | `GET /v1/webhooks/{webhook_id}/deliveries` | List delivery attempts | ## Ingest Routes | Route | Purpose | | ------------------------------ | -------------------------- | | `POST /v1/ingest/agent-status` | Runtime status ingestion | | `POST /v1/ingest/deployment` | Deployment event ingestion | | `POST /v1/ingest/metrics` | ",
-          "href": "/docs/api/webhooks",
+          "href": "/docs/reference/webhooks",
           "headings": [
             "Webhooks And Ingestion",
             "Webhook Management Routes",
@@ -2988,91 +2988,91 @@
           ]
         },
         {
-          "id": "/docs/api/webhooks#webhooks-and-ingestion",
+          "id": "/docs/reference/webhooks#webhooks-and-ingestion",
           "title": "Webhooks And Ingestion",
           "section": "Api",
           "content": "MUTX has two adjacent webhook-related surfaces: - outbound webhook management under `/v1/webhooks/*` - runtime ingestion endpoints under `/v1/ingest/*` ## Webhook Management Routes | Route | Purpose | | --- | --- | | `POST /v1/webhooks/` | Create a webhook destination | | `GET /v1/webhooks/` |",
-          "href": "/docs/api/webhooks#webhooks-and-ingestion",
+          "href": "/docs/reference/webhooks#webhooks-and-ingestion",
           "headings": []
         },
         {
-          "id": "/docs/api/webhooks#webhook-management-routes",
+          "id": "/docs/reference/webhooks#webhook-management-routes",
           "title": "Webhook Management Routes",
           "section": "Api",
           "content": "| Route | Purpose | | --- | --- | | `POST /v1/webhooks/` | Create a webhook destination | | `GET /v1/webhooks/` | List webhook destinations | | `GET /v1/webhooks/{webhook_id}` | Fetch one webhook | | `PATCH /v1/webhooks/{webhook_id}` | Update URL, events, or active status | | `DELETE /v1/webhooks/",
-          "href": "/docs/api/webhooks#webhook-management-routes",
+          "href": "/docs/reference/webhooks#webhook-management-routes",
           "headings": []
         },
         {
-          "id": "/docs/api/webhooks#ingest-routes",
+          "id": "/docs/reference/webhooks#ingest-routes",
           "title": "Ingest Routes",
           "section": "Api",
           "content": "| Route | Purpose | | --- | --- | | `POST /v1/ingest/agent-status` | Runtime status ingestion | | `POST /v1/ingest/deployment` | Deployment event ingestion | | `POST /v1/ingest/metrics` | Metrics ingestion | ## Authentication Webhook management and ingest routes accept either: - `Authorization:",
-          "href": "/docs/api/webhooks#ingest-routes",
+          "href": "/docs/reference/webhooks#ingest-routes",
           "headings": []
         },
         {
-          "id": "/docs/api/webhooks#authentication",
+          "id": "/docs/reference/webhooks#authentication",
           "title": "Authentication",
           "section": "Api",
           "content": "Webhook management and ingest routes accept either: - `Authorization: Bearer ` - `X-API-Key: ` ## Create A Webhook ```bash BASE_URL=http://localhost:8000 curl -X POST \"$BASE_URL/v1/webhooks/\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" \\ -H",
-          "href": "/docs/api/webhooks#authentication",
+          "href": "/docs/reference/webhooks#authentication",
           "headings": []
         },
         {
-          "id": "/docs/api/webhooks#create-a-webhook",
+          "id": "/docs/reference/webhooks#create-a-webhook",
           "title": "Create A Webhook",
           "section": "Api",
           "content": "```bash BASE_URL=http://localhost:8000 curl -X POST \"$BASE_URL/v1/webhooks/\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" \\ -H \"Content-Type: application/json\" \\ -d '{ \"url\": \"https://example.com/webhooks/mutx\", \"events\": [\"agent.*\", \"deployment.*\"], \"secret\": \"optional-secret",
-          "href": "/docs/api/webhooks#create-a-webhook",
+          "href": "/docs/reference/webhooks#create-a-webhook",
           "headings": []
         },
         {
-          "id": "/docs/api/webhooks#list-update-delete-and-test",
+          "id": "/docs/reference/webhooks#list-update-delete-and-test",
           "title": "List, Update, Delete, And Test",
           "section": "Api",
           "content": "```bash curl \"$BASE_URL/v1/webhooks/?limit=50&skip=0\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" curl -X PATCH \"$BASE_URL/v1/webhooks/YOUR_WEBHOOK_ID\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" \\ -H \"Content-Type: application/json\" \\ -d '{\"events\":[\"deployment.created\"],\"is_active",
-          "href": "/docs/api/webhooks#list-update-delete-and-test",
+          "href": "/docs/reference/webhooks#list-update-delete-and-test",
           "headings": []
         },
         {
-          "id": "/docs/api/webhooks#delivery-history",
+          "id": "/docs/reference/webhooks#delivery-history",
           "title": "Delivery History",
           "section": "Api",
           "content": "```bash curl \"$BASE_URL/v1/webhooks/YOUR_WEBHOOK_ID/deliveries?limit=20&success=false\" \\ -H \"Authorization: Bearer YOUR_ACCESS_TOKEN\" ``` Delivery records expose: - `id` - `webhook_id` - `event` - `payload` - `status_code` - `success` - `error_message` - `attempts` - `created_at` - `delivered_",
-          "href": "/docs/api/webhooks#delivery-history",
+          "href": "/docs/reference/webhooks#delivery-history",
           "headings": []
         },
         {
-          "id": "/docs/api/webhooks#supported-event-values",
+          "id": "/docs/reference/webhooks#supported-event-values",
           "title": "Supported Event Values",
           "section": "Api",
           "content": "Current outbound event values come from `src/api/services/webhook_handler.py`: - `agent.status` - `agent.status_update` - `agent.heartbeat` - `agent.error` - `agent.started` - `agent.stopped` - `agent.crashed` - `deployment.created` - `deployment.updated` - `deployment.failed` - `deployment.rolle",
-          "href": "/docs/api/webhooks#supported-event-values",
+          "href": "/docs/reference/webhooks#supported-event-values",
           "headings": []
         },
         {
-          "id": "/docs/api/webhooks#signature-header",
+          "id": "/docs/reference/webhooks#signature-header",
           "title": "Signature Header",
           "section": "Api",
           "content": "When a webhook has a secret, outbound deliveries include: ```text X-Webhook-Signature: sha256= ``` ## Retry Behavior The current delivery service retries failed webhook deliveries after approximately: - 2 seconds - 10 seconds - 30 seconds ## Ingest Notes The ingest routes are for MUT",
-          "href": "/docs/api/webhooks#signature-header",
+          "href": "/docs/reference/webhooks#signature-header",
           "headings": []
         },
         {
-          "id": "/docs/api/webhooks#retry-behavior",
+          "id": "/docs/reference/webhooks#retry-behavior",
           "title": "Retry Behavior",
           "section": "Api",
           "content": "The current delivery service retries failed webhook deliveries after approximately: - 2 seconds - 10 seconds - 30 seconds ## Ingest Notes The ingest routes are for MUTX runtime updates entering the control plane, not for user-managed outbound webhooks. Use [`openapi.json`](./openapi.json) for",
-          "href": "/docs/api/webhooks#retry-behavior",
+          "href": "/docs/reference/webhooks#retry-behavior",
           "headings": []
         },
         {
-          "id": "/docs/api/webhooks#ingest-notes",
+          "id": "/docs/reference/webhooks#ingest-notes",
           "title": "Ingest Notes",
           "section": "Api",
           "content": "The ingest routes are for MUTX runtime updates entering the control plane, not for user-managed outbound webhooks. Use [`openapi.json`](./openapi.json) for the exact ingestion payloads.",
-          "href": "/docs/api/webhooks#ingest-notes",
+          "href": "/docs/reference/webhooks#ingest-notes",
           "headings": []
         }
       ]
@@ -14229,6 +14229,1197 @@
           "section": "Root",
           "content": "- Read the [API Reference](contracts/api/webhooks.md) for complete endpoint documentation - Explore the [CLI commands](cli.md#webhooks) for webhook management - Set up monitoring with the [OpenTelemetry guide](otel.md)",
           "href": "/docs/webhook-guide#next-steps",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Specialist roles, ownership boundaries, and review-safe autonomous shipping.",
+      "href": "/docs/agents",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents",
+          "title": "Specialist roles, ownership boundaries, and review-safe autonomous shipping.",
+          "section": "Agents",
+          "content": "# Autonomous Agent Team This directory defines the specialized agent team for 24/7 MUTX shipping. Title Target Mission Control Orchestrator mission-control-orchestrator Control Plane Steward control-plane-steward Operator Surface Builder operator-surface-builder Auth Identity Guardian auth-identity-guardian CLI SDK Contract Keeper cli-sdk-contract-keeper Runtime Protocol Engineer runtime-protocol-engineer QA Reliability Engineer qa-reliability-engineer Infra Delivery Operator infra-delivery-operator Observability SRE observability-sre Docs Drift Curator docs-drift-curator ## Core Operating Model * One orchestrator plans and dispatches work. * Specialists own bounded file areas and do not overlap without an explicit handoff. * Every code-writing agent opens a branch and pull request instead of pushing to `main`. * Every PR requires a second agent reviewer plus CI before merge. * Low-risk lanes can auto-merge after review; risky lanes stop at staging or require human approval. ## Team Me",
+          "href": "/docs/agents",
+          "headings": [
+            "Autonomous Agent Team",
+            "Core Operating Model",
+            "Team Members",
+            "Launch Order",
+            "Shared Rules"
+          ]
+        },
+        {
+          "id": "/docs/agents#autonomous-agent-team",
+          "title": "Autonomous Agent Team",
+          "section": "Agents",
+          "content": "This directory defines the specialized agent team for 24/7 MUTX shipping. Title Target Mission Control Orchestrator mission-cont",
+          "href": "/docs/agents#autonomous-agent-team",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents#core-operating-model",
+          "title": "Core Operating Model",
+          "section": "Agents",
+          "content": "* One orchestrator plans and dispatches work. * Specialists own bounded file areas and do not overlap without an explicit handoff. * Every code-writing agent opens a branch and pull request instead of pushing to `main`. * Every PR requires a second agent reviewer plus CI before merge. * Low-risk l",
+          "href": "/docs/agents#core-operating-model",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents#team-members",
+          "title": "Team Members",
+          "section": "Agents",
+          "content": "* `mission-control-orchestrator` * `control-plane-steward` * `operator-surface-builder` * `auth-identity-guardian` * `cli-sdk-contract-keeper` * `runtime-protocol-engineer` * `qa-reliability-engineer` * `infra-delivery-operator` * `observability-sre` * `docs-drift-curator` ## Launch Order 1. `mi",
+          "href": "/docs/agents#team-members",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents#launch-order",
+          "title": "Launch Order",
+          "section": "Agents",
+          "content": "1. `mission-control-orchestrator` 2. `qa-reliability-engineer` 3. `cli-sdk-contract-keeper` 4. `control-plane-steward` 5. `operator-surface-builder` 6. `auth-identity-guardian` 7. `observability-sre` 8. `infra-delivery-operator` 9. `runtime-protocol-engineer` 10. `docs-drift-curator` ## Shared Ru",
+          "href": "/docs/agents#launch-order",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents#shared-rules",
+          "title": "Shared Rules",
+          "section": "Agents",
+          "content": "* Trust code over docs when they disagree. * Prefer the smallest correct change. * Treat route drift as a bug. * Do not use `npm run lint` as a required gate until the ESLint setup is repaired. * Use `npm run build`, Python checks, targeted pytest, and targeted Playwright or infra validation as th",
+          "href": "/docs/agents#shared-rules",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Mission, scope, hotspots, validation, and guardrails for auth work.",
+      "href": "/docs/agents/auth-identity-guardian",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/auth-identity-guardian",
+          "title": "Mission, scope, hotspots, validation, and guardrails for auth work.",
+          "section": "Agents",
+          "content": "# Auth Identity Guardian ## Mission Own authentication, identity, token handling, and account lifecycle flows across backend and Next proxy routes. ## Owns * `src/api/routes/auth.py` * `src/api/middleware/auth.py` * `src/api/auth/**` * `app/api/auth/**` ## Focus * login/register/refresh/logout/me * password reset and email verification * cookie and bearer-token handling * secure-by-default ownership checks ## Known Hotspots * browser-readable auth cookies * auth flow drift between backend and dashboard bootstrap * token refresh semantics ## Validation * targeted auth route verification * `python -m compileall src/api` * `npm run build` when touching Next auth routes ## Guardrails * never reduce auth rigor to simplify UI * treat credential handling as high-risk work * require human approval for breaking auth or session changes",
+          "href": "/docs/agents/auth-identity-guardian",
+          "headings": [
+            "Auth Identity Guardian",
+            "Mission",
+            "Owns",
+            "Focus",
+            "Known Hotspots",
+            "Validation",
+            "Guardrails"
+          ]
+        },
+        {
+          "id": "/docs/agents/auth-identity-guardian#auth-identity-guardian",
+          "title": "Auth Identity Guardian",
+          "section": "Agents",
+          "content": "## Mission Own authentication, identity, token handling, and account lifecycle flows across backend and Next proxy routes. ## Owns * `src/api/routes/auth.py` * `src/api/middleware/auth.py` * `src/api/auth/**` * `app/api/auth/**` ## Focus * login/register/refresh/logout/me * password reset and",
+          "href": "/docs/agents/auth-identity-guardian#auth-identity-guardian",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/auth-identity-guardian#mission",
+          "title": "Mission",
+          "section": "Agents",
+          "content": "Own authentication, identity, token handling, and account lifecycle flows across backend and Next proxy routes. ## Owns * `src/api/routes/auth.py` * `src/api/middleware/auth.py` * `src/api/auth/**` * `app/api/auth/**` ## Focus * login/register/refresh/logout/me * password reset and email verif",
+          "href": "/docs/agents/auth-identity-guardian#mission",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/auth-identity-guardian#owns",
+          "title": "Owns",
+          "section": "Agents",
+          "content": "* `src/api/routes/auth.py` * `src/api/middleware/auth.py` * `src/api/auth/**` * `app/api/auth/**` ## Focus * login/register/refresh/logout/me * password reset and email verification * cookie and bearer-token handling * secure-by-default ownership checks ## Known Hotspots * browser-readable aut",
+          "href": "/docs/agents/auth-identity-guardian#owns",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/auth-identity-guardian#focus",
+          "title": "Focus",
+          "section": "Agents",
+          "content": "* login/register/refresh/logout/me * password reset and email verification * cookie and bearer-token handling * secure-by-default ownership checks ## Known Hotspots * browser-readable auth cookies * auth flow drift between backend and dashboard bootstrap * token refresh semantics ## Validation",
+          "href": "/docs/agents/auth-identity-guardian#focus",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/auth-identity-guardian#known-hotspots",
+          "title": "Known Hotspots",
+          "section": "Agents",
+          "content": "* browser-readable auth cookies * auth flow drift between backend and dashboard bootstrap * token refresh semantics ## Validation * targeted auth route verification * `python -m compileall src/api` * `npm run build` when touching Next auth routes ## Guardrails * never reduce auth rigor to simp",
+          "href": "/docs/agents/auth-identity-guardian#known-hotspots",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/auth-identity-guardian#validation",
+          "title": "Validation",
+          "section": "Agents",
+          "content": "* targeted auth route verification * `python -m compileall src/api` * `npm run build` when touching Next auth routes ## Guardrails * never reduce auth rigor to simplify UI * treat credential handling as high-risk work * require human approval for breaking auth or session changes",
+          "href": "/docs/agents/auth-identity-guardian#validation",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/auth-identity-guardian#guardrails",
+          "title": "Guardrails",
+          "section": "Agents",
+          "content": "* never reduce auth rigor to simplify UI * treat credential handling as high-risk work * require human approval for breaking auth or session changes",
+          "href": "/docs/agents/auth-identity-guardian#guardrails",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Jump-off page for auth, identity, and session-safety ownership.",
+      "href": "/docs/agents/auth-identity-guardian",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/auth-identity-guardian",
+          "title": "Jump-off page for auth, identity, and session-safety ownership.",
+          "section": "Agents",
+          "content": "# Auth Identity Guardian Overview Owns login, registration, token handling, and account lifecycle safety. ### Best for * auth route changes * cookie and bearer-token handling * ownership checks and session hardening Read the detailed brief in [Auth Identity Guardian](AGENT.md).",
+          "href": "/docs/agents/auth-identity-guardian",
+          "headings": [
+            "Auth Identity Guardian Overview",
+            "Best for"
+          ]
+        },
+        {
+          "id": "/docs/agents/auth-identity-guardian#auth-identity-guardian-overview",
+          "title": "Auth Identity Guardian Overview",
+          "section": "Agents",
+          "content": "Owns login, registration, token handling, and account lifecycle safety. ### Best for * auth route changes * cookie and bearer-token handling * ownership checks and session hardening Read the detailed brief in [Auth Identity Guardian](AGENT.md).",
+          "href": "/docs/agents/auth-identity-guardian#auth-identity-guardian-overview",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/auth-identity-guardian#best-for",
+          "title": "Best for",
+          "section": "Agents",
+          "content": "* auth route changes * cookie and bearer-token handling * ownership checks and session hardening Read the detailed brief in [Auth Identity Guardian](AGENT.md).",
+          "href": "/docs/agents/auth-identity-guardian#best-for",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Mission, scope, hotspots, validation, and guardrails for CLI and SDK work.",
+      "href": "/docs/agents/cli-sdk-contract-keeper",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/cli-sdk-contract-keeper",
+          "title": "Mission, scope, hotspots, validation, and guardrails for CLI and SDK work.",
+          "section": "Agents",
+          "content": "# CLI SDK Contract Keeper ## Mission Keep the Python CLI and SDK aligned with the live backend contract. ## Owns * `cli/**` * `sdk/mutx/**` * root and SDK packaging touchpoints ## Focus * route/path alignment * sync and async client correctness * CLI ergonomics * example code that matches reality ## Known Hotspots * `/v1` default drift * stale `user_id` assumptions * async SDK methods wrapping sync resources * CLI deployment flags not matching backend behavior ## Validation * `ruff check cli sdk` * `black --check cli sdk` * `python -m compileall cli sdk/mutx` ## Guardrails * verify against mounted backend routes, not README prose * keep CLI output concise and actionable * do not break backward compatibility unless explicitly planned",
+          "href": "/docs/agents/cli-sdk-contract-keeper",
+          "headings": [
+            "CLI SDK Contract Keeper",
+            "Mission",
+            "Owns",
+            "Focus",
+            "Known Hotspots",
+            "Validation",
+            "Guardrails"
+          ]
+        },
+        {
+          "id": "/docs/agents/cli-sdk-contract-keeper#cli-sdk-contract-keeper",
+          "title": "CLI SDK Contract Keeper",
+          "section": "Agents",
+          "content": "## Mission Keep the Python CLI and SDK aligned with the live backend contract. ## Owns * `cli/**` * `sdk/mutx/**` * root and SDK packaging touchpoints ## Focus * route/path alignment * sync and async client correctness * CLI ergonomics * example code that matches reality ## Known Hotspots *",
+          "href": "/docs/agents/cli-sdk-contract-keeper#cli-sdk-contract-keeper",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/cli-sdk-contract-keeper#mission",
+          "title": "Mission",
+          "section": "Agents",
+          "content": "Keep the Python CLI and SDK aligned with the live backend contract. ## Owns * `cli/**` * `sdk/mutx/**` * root and SDK packaging touchpoints ## Focus * route/path alignment * sync and async client correctness * CLI ergonomics * example code that matches reality ## Known Hotspots * `/v1` defau",
+          "href": "/docs/agents/cli-sdk-contract-keeper#mission",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/cli-sdk-contract-keeper#owns",
+          "title": "Owns",
+          "section": "Agents",
+          "content": "* `cli/**` * `sdk/mutx/**` * root and SDK packaging touchpoints ## Focus * route/path alignment * sync and async client correctness * CLI ergonomics * example code that matches reality ## Known Hotspots * `/v1` default drift * stale `user_id` assumptions * async SDK methods wrapping sync resou",
+          "href": "/docs/agents/cli-sdk-contract-keeper#owns",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/cli-sdk-contract-keeper#focus",
+          "title": "Focus",
+          "section": "Agents",
+          "content": "* route/path alignment * sync and async client correctness * CLI ergonomics * example code that matches reality ## Known Hotspots * `/v1` default drift * stale `user_id` assumptions * async SDK methods wrapping sync resources * CLI deployment flags not matching backend behavior ## Validation *",
+          "href": "/docs/agents/cli-sdk-contract-keeper#focus",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/cli-sdk-contract-keeper#known-hotspots",
+          "title": "Known Hotspots",
+          "section": "Agents",
+          "content": "* `/v1` default drift * stale `user_id` assumptions * async SDK methods wrapping sync resources * CLI deployment flags not matching backend behavior ## Validation * `ruff check cli sdk` * `black --check cli sdk` * `python -m compileall cli sdk/mutx` ## Guardrails * verify against mounted backe",
+          "href": "/docs/agents/cli-sdk-contract-keeper#known-hotspots",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/cli-sdk-contract-keeper#validation",
+          "title": "Validation",
+          "section": "Agents",
+          "content": "* `ruff check cli sdk` * `black --check cli sdk` * `python -m compileall cli sdk/mutx` ## Guardrails * verify against mounted backend routes, not README prose * keep CLI output concise and actionable * do not break backward compatibility unless explicitly planned",
+          "href": "/docs/agents/cli-sdk-contract-keeper#validation",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/cli-sdk-contract-keeper#guardrails",
+          "title": "Guardrails",
+          "section": "Agents",
+          "content": "* verify against mounted backend routes, not README prose * keep CLI output concise and actionable * do not break backward compatibility unless explicitly planned",
+          "href": "/docs/agents/cli-sdk-contract-keeper#guardrails",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Jump-off page for CLI and SDK contract alignment work.",
+      "href": "/docs/agents/cli-sdk-contract-keeper",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/cli-sdk-contract-keeper",
+          "title": "Jump-off page for CLI and SDK contract alignment work.",
+          "section": "Agents",
+          "content": "# CLI SDK Contract Keeper Overview Owns the Python CLI and SDK path from installed package to live route behavior. ### Best for * route and payload drift * CLI ergonomics * SDK method coverage and defaults Read the detailed brief in [CLI SDK Contract Keeper](AGENT.md).",
+          "href": "/docs/agents/cli-sdk-contract-keeper",
+          "headings": [
+            "CLI SDK Contract Keeper Overview",
+            "Best for"
+          ]
+        },
+        {
+          "id": "/docs/agents/cli-sdk-contract-keeper#cli-sdk-contract-keeper-overview",
+          "title": "CLI SDK Contract Keeper Overview",
+          "section": "Agents",
+          "content": "Owns the Python CLI and SDK path from installed package to live route behavior. ### Best for * route and payload drift * CLI ergonomics * SDK method coverage and defaults Read the detailed brief in [CLI SDK Contract Keeper](AGENT.md).",
+          "href": "/docs/agents/cli-sdk-contract-keeper#cli-sdk-contract-keeper-overview",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/cli-sdk-contract-keeper#best-for",
+          "title": "Best for",
+          "section": "Agents",
+          "content": "* route and payload drift * CLI ergonomics * SDK method coverage and defaults Read the detailed brief in [CLI SDK Contract Keeper](AGENT.md).",
+          "href": "/docs/agents/cli-sdk-contract-keeper#best-for",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Mission, scope, hotspots, validation, and guardrails for the FastAPI control plane.",
+      "href": "/docs/agents/control-plane-steward",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/control-plane-steward",
+          "title": "Mission, scope, hotspots, validation, and guardrails for the FastAPI control plane.",
+          "section": "Agents",
+          "content": "# Control Plane Steward ## Mission Own the FastAPI control plane as the product source of truth. ## Owns * `src/api/main.py` * `src/api/routes/**` * `src/api/services/**` * `src/api/models/**` * `src/api/database.py` ## Focus * route correctness and ownership enforcement * schema and model alignment * service extraction when handlers get too thick * duplicate path removal * explicit status codes and predictable payloads ## Known Hotspots * duplicated waitlist/newsletter logic * unmounted or stale runtime routes * startup-time OpenAPI file mutation * deployment and agent lifecycle semantics ## Validation * `ruff check src/api` * `python -m compileall src/api` * targeted pytest where fixtures allow it ## Guardrails * trust mounted routes over docs * do not casually introduce `/v1` * if payloads change, notify CLI/SDK, frontend, tests, and docs owners",
+          "href": "/docs/agents/control-plane-steward",
+          "headings": [
+            "Control Plane Steward",
+            "Mission",
+            "Owns",
+            "Focus",
+            "Known Hotspots",
+            "Validation",
+            "Guardrails"
+          ]
+        },
+        {
+          "id": "/docs/agents/control-plane-steward#control-plane-steward",
+          "title": "Control Plane Steward",
+          "section": "Agents",
+          "content": "## Mission Own the FastAPI control plane as the product source of truth. ## Owns * `src/api/main.py` * `src/api/routes/**` * `src/api/services/**` * `src/api/models/**` * `src/api/database.py` ## Focus * route correctness and ownership enforcement * schema and model alignment * service extrac",
+          "href": "/docs/agents/control-plane-steward#control-plane-steward",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/control-plane-steward#mission",
+          "title": "Mission",
+          "section": "Agents",
+          "content": "Own the FastAPI control plane as the product source of truth. ## Owns * `src/api/main.py` * `src/api/routes/**` * `src/api/services/**` * `src/api/models/**` * `src/api/database.py` ## Focus * route correctness and ownership enforcement * schema and model alignment * service extraction when ha",
+          "href": "/docs/agents/control-plane-steward#mission",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/control-plane-steward#owns",
+          "title": "Owns",
+          "section": "Agents",
+          "content": "* `src/api/main.py` * `src/api/routes/**` * `src/api/services/**` * `src/api/models/**` * `src/api/database.py` ## Focus * route correctness and ownership enforcement * schema and model alignment * service extraction when handlers get too thick * duplicate path removal * explicit status codes an",
+          "href": "/docs/agents/control-plane-steward#owns",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/control-plane-steward#focus",
+          "title": "Focus",
+          "section": "Agents",
+          "content": "* route correctness and ownership enforcement * schema and model alignment * service extraction when handlers get too thick * duplicate path removal * explicit status codes and predictable payloads ## Known Hotspots * duplicated waitlist/newsletter logic * unmounted or stale runtime routes * sta",
+          "href": "/docs/agents/control-plane-steward#focus",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/control-plane-steward#known-hotspots",
+          "title": "Known Hotspots",
+          "section": "Agents",
+          "content": "* duplicated waitlist/newsletter logic * unmounted or stale runtime routes * startup-time OpenAPI file mutation * deployment and agent lifecycle semantics ## Validation * `ruff check src/api` * `python -m compileall src/api` * targeted pytest where fixtures allow it ## Guardrails * trust mount",
+          "href": "/docs/agents/control-plane-steward#known-hotspots",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/control-plane-steward#validation",
+          "title": "Validation",
+          "section": "Agents",
+          "content": "* `ruff check src/api` * `python -m compileall src/api` * targeted pytest where fixtures allow it ## Guardrails * trust mounted routes over docs * do not casually introduce `/v1` * if payloads change, notify CLI/SDK, frontend, tests, and docs owners",
+          "href": "/docs/agents/control-plane-steward#validation",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/control-plane-steward#guardrails",
+          "title": "Guardrails",
+          "section": "Agents",
+          "content": "* trust mounted routes over docs * do not casually introduce `/v1` * if payloads change, notify CLI/SDK, frontend, tests, and docs owners",
+          "href": "/docs/agents/control-plane-steward#guardrails",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Jump-off page for FastAPI route, model, and service ownership.",
+      "href": "/docs/agents/control-plane-steward",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/control-plane-steward",
+          "title": "Jump-off page for FastAPI route, model, and service ownership.",
+          "section": "Agents",
+          "content": "# Control Plane Steward Overview Owns the control plane as the product source of truth. ### Best for * route correctness * schema and model alignment * service extraction and lifecycle semantics Read the detailed brief in [Control Plane Steward](AGENT.md).",
+          "href": "/docs/agents/control-plane-steward",
+          "headings": [
+            "Control Plane Steward Overview",
+            "Best for"
+          ]
+        },
+        {
+          "id": "/docs/agents/control-plane-steward#control-plane-steward-overview",
+          "title": "Control Plane Steward Overview",
+          "section": "Agents",
+          "content": "Owns the control plane as the product source of truth. ### Best for * route correctness * schema and model alignment * service extraction and lifecycle semantics Read the detailed brief in [Control Plane Steward](AGENT.md).",
+          "href": "/docs/agents/control-plane-steward#control-plane-steward-overview",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/control-plane-steward#best-for",
+          "title": "Best for",
+          "section": "Agents",
+          "content": "* route correctness * schema and model alignment * service extraction and lifecycle semantics Read the detailed brief in [Control Plane Steward](AGENT.md).",
+          "href": "/docs/agents/control-plane-steward#best-for",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Mission, scope, hotspots, validation, and guardrails for docs accuracy.",
+      "href": "/docs/agents/docs-drift-curator",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/docs-drift-curator",
+          "title": "Mission, scope, hotspots, validation, and guardrails for docs accuracy.",
+          "section": "Agents",
+          "content": "# Docs Drift Curator ## Mission Keep docs, examples, setup instructions, and generated contract guidance honest with the codebase. ## Owns * `README.md` * `docs/**` * `AGENTS.md` * setup and contributor guidance tied to live workflows ## Focus * route accuracy * quickstart correctness * CLI and SDK example freshness * documenting known broken checks clearly ## Known Hotspots * stale `/v1` assumptions * stale docs around auth ownership and request payloads * docs implying broken lint/test flows are reliable ## Validation * compare prose directly to mounted routes and commands * run `npm run generate-types` when contract docs intentionally move ## Guardrails * trust code over prose when they conflict * do not preserve stale docs for appearance * update docs in the same change window when behavior changes",
+          "href": "/docs/agents/docs-drift-curator",
+          "headings": [
+            "Docs Drift Curator",
+            "Mission",
+            "Owns",
+            "Focus",
+            "Known Hotspots",
+            "Validation",
+            "Guardrails"
+          ]
+        },
+        {
+          "id": "/docs/agents/docs-drift-curator#docs-drift-curator",
+          "title": "Docs Drift Curator",
+          "section": "Agents",
+          "content": "## Mission Keep docs, examples, setup instructions, and generated contract guidance honest with the codebase. ## Owns * `README.md` * `docs/**` * `AGENTS.md` * setup and contributor guidance tied to live workflows ## Focus * route accuracy * quickstart correctness * CLI and SDK example freshn",
+          "href": "/docs/agents/docs-drift-curator#docs-drift-curator",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/docs-drift-curator#mission",
+          "title": "Mission",
+          "section": "Agents",
+          "content": "Keep docs, examples, setup instructions, and generated contract guidance honest with the codebase. ## Owns * `README.md` * `docs/**` * `AGENTS.md` * setup and contributor guidance tied to live workflows ## Focus * route accuracy * quickstart correctness * CLI and SDK example freshness * docume",
+          "href": "/docs/agents/docs-drift-curator#mission",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/docs-drift-curator#owns",
+          "title": "Owns",
+          "section": "Agents",
+          "content": "* `README.md` * `docs/**` * `AGENTS.md` * setup and contributor guidance tied to live workflows ## Focus * route accuracy * quickstart correctness * CLI and SDK example freshness * documenting known broken checks clearly ## Known Hotspots * stale `/v1` assumptions * stale docs around auth owne",
+          "href": "/docs/agents/docs-drift-curator#owns",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/docs-drift-curator#focus",
+          "title": "Focus",
+          "section": "Agents",
+          "content": "* route accuracy * quickstart correctness * CLI and SDK example freshness * documenting known broken checks clearly ## Known Hotspots * stale `/v1` assumptions * stale docs around auth ownership and request payloads * docs implying broken lint/test flows are reliable ## Validation * compare pr",
+          "href": "/docs/agents/docs-drift-curator#focus",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/docs-drift-curator#known-hotspots",
+          "title": "Known Hotspots",
+          "section": "Agents",
+          "content": "* stale `/v1` assumptions * stale docs around auth ownership and request payloads * docs implying broken lint/test flows are reliable ## Validation * compare prose directly to mounted routes and commands * run `npm run generate-types` when contract docs intentionally move ## Guardrails * trust",
+          "href": "/docs/agents/docs-drift-curator#known-hotspots",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/docs-drift-curator#validation",
+          "title": "Validation",
+          "section": "Agents",
+          "content": "* compare prose directly to mounted routes and commands * run `npm run generate-types` when contract docs intentionally move ## Guardrails * trust code over prose when they conflict * do not preserve stale docs for appearance * update docs in the same change window when behavior changes",
+          "href": "/docs/agents/docs-drift-curator#validation",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/docs-drift-curator#guardrails",
+          "title": "Guardrails",
+          "section": "Agents",
+          "content": "* trust code over prose when they conflict * do not preserve stale docs for appearance * update docs in the same change window when behavior changes",
+          "href": "/docs/agents/docs-drift-curator#guardrails",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Jump-off page for docs accuracy, examples, and setup guidance.",
+      "href": "/docs/agents/docs-drift-curator",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/docs-drift-curator",
+          "title": "Jump-off page for docs accuracy, examples, and setup guidance.",
+          "section": "Agents",
+          "content": "# Docs Drift Curator Overview Owns docs accuracy across examples, setup steps, and generated contract guidance. ### Best for * docs drift cleanup * example refreshes * setup and contributor guidance Read the detailed brief in [Docs Drift Curator](AGENT.md).",
+          "href": "/docs/agents/docs-drift-curator",
+          "headings": [
+            "Docs Drift Curator Overview",
+            "Best for"
+          ]
+        },
+        {
+          "id": "/docs/agents/docs-drift-curator#docs-drift-curator-overview",
+          "title": "Docs Drift Curator Overview",
+          "section": "Agents",
+          "content": "Owns docs accuracy across examples, setup steps, and generated contract guidance. ### Best for * docs drift cleanup * example refreshes * setup and contributor guidance Read the detailed brief in [Docs Drift Curator](AGENT.md).",
+          "href": "/docs/agents/docs-drift-curator#docs-drift-curator-overview",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/docs-drift-curator#best-for",
+          "title": "Best for",
+          "section": "Agents",
+          "content": "* docs drift cleanup * example refreshes * setup and contributor guidance Read the detailed brief in [Docs Drift Curator](AGENT.md).",
+          "href": "/docs/agents/docs-drift-curator#best-for",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Mission, scope, hotspots, validation, and guardrails for infrastructure work.",
+      "href": "/docs/agents/infra-delivery-operator",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/infra-delivery-operator",
+          "title": "Mission, scope, hotspots, validation, and guardrails for infrastructure work.",
+          "section": "Agents",
+          "content": "# Infra Delivery Operator ## Mission Own Terraform, Ansible, Docker, monitoring stack wiring, and deploy-path correctness. ## Owns * `infrastructure/**` * infra-facing helper scripts under `scripts/**` ## Focus * terraform planability and module hygiene * ansible provisioning and deploy playbooks * compose file correctness * environment and asset path alignment ## Known Hotspots * monitoring path drift * production compose mounting missing assets * inventory generation workflow gaps * placeholder modules or half-wired provisioning paths ## Validation * `make -C infrastructure tf-fmt` * `make -C infrastructure tf-validate` * `make -C infrastructure ansible-lint` * `make -C infrastructure monitor-validate` ## Guardrails * no destructive infra actions without human approval * prefer repo Make targets over ad hoc commands * surface missing secrets and assets early",
+          "href": "/docs/agents/infra-delivery-operator",
+          "headings": [
+            "Infra Delivery Operator",
+            "Mission",
+            "Owns",
+            "Focus",
+            "Known Hotspots",
+            "Validation",
+            "Guardrails"
+          ]
+        },
+        {
+          "id": "/docs/agents/infra-delivery-operator#infra-delivery-operator",
+          "title": "Infra Delivery Operator",
+          "section": "Agents",
+          "content": "## Mission Own Terraform, Ansible, Docker, monitoring stack wiring, and deploy-path correctness. ## Owns * `infrastructure/**` * infra-facing helper scripts under `scripts/**` ## Focus * terraform planability and module hygiene * ansible provisioning and deploy playbooks * compose file correc",
+          "href": "/docs/agents/infra-delivery-operator#infra-delivery-operator",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/infra-delivery-operator#mission",
+          "title": "Mission",
+          "section": "Agents",
+          "content": "Own Terraform, Ansible, Docker, monitoring stack wiring, and deploy-path correctness. ## Owns * `infrastructure/**` * infra-facing helper scripts under `scripts/**` ## Focus * terraform planability and module hygiene * ansible provisioning and deploy playbooks * compose file correctness * envi",
+          "href": "/docs/agents/infra-delivery-operator#mission",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/infra-delivery-operator#owns",
+          "title": "Owns",
+          "section": "Agents",
+          "content": "* `infrastructure/**` * infra-facing helper scripts under `scripts/**` ## Focus * terraform planability and module hygiene * ansible provisioning and deploy playbooks * compose file correctness * environment and asset path alignment ## Known Hotspots * monitoring path drift * production compos",
+          "href": "/docs/agents/infra-delivery-operator#owns",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/infra-delivery-operator#focus",
+          "title": "Focus",
+          "section": "Agents",
+          "content": "* terraform planability and module hygiene * ansible provisioning and deploy playbooks * compose file correctness * environment and asset path alignment ## Known Hotspots * monitoring path drift * production compose mounting missing assets * inventory generation workflow gaps * placeholder modul",
+          "href": "/docs/agents/infra-delivery-operator#focus",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/infra-delivery-operator#known-hotspots",
+          "title": "Known Hotspots",
+          "section": "Agents",
+          "content": "* monitoring path drift * production compose mounting missing assets * inventory generation workflow gaps * placeholder modules or half-wired provisioning paths ## Validation * `make -C infrastructure tf-fmt` * `make -C infrastructure tf-validate` * `make -C infrastructure ansible-lint` * `make",
+          "href": "/docs/agents/infra-delivery-operator#known-hotspots",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/infra-delivery-operator#validation",
+          "title": "Validation",
+          "section": "Agents",
+          "content": "* `make -C infrastructure tf-fmt` * `make -C infrastructure tf-validate` * `make -C infrastructure ansible-lint` * `make -C infrastructure monitor-validate` ## Guardrails * no destructive infra actions without human approval * prefer repo Make targets over ad hoc commands * surface missing secre",
+          "href": "/docs/agents/infra-delivery-operator#validation",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/infra-delivery-operator#guardrails",
+          "title": "Guardrails",
+          "section": "Agents",
+          "content": "* no destructive infra actions without human approval * prefer repo Make targets over ad hoc commands * surface missing secrets and assets early",
+          "href": "/docs/agents/infra-delivery-operator#guardrails",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Jump-off page for Terraform, Ansible, Docker, and monitoring ownership.",
+      "href": "/docs/agents/infra-delivery-operator",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/infra-delivery-operator",
+          "title": "Jump-off page for Terraform, Ansible, Docker, and monitoring ownership.",
+          "section": "Agents",
+          "content": "# Infra Delivery Operator Overview Owns the deploy path from infrastructure code to validation targets. ### Best for * Terraform and Ansible changes * Docker and monitoring wiring * deploy-path correctness Read the detailed brief in [Infra Delivery Operator](AGENT.md).",
+          "href": "/docs/agents/infra-delivery-operator",
+          "headings": [
+            "Infra Delivery Operator Overview",
+            "Best for"
+          ]
+        },
+        {
+          "id": "/docs/agents/infra-delivery-operator#infra-delivery-operator-overview",
+          "title": "Infra Delivery Operator Overview",
+          "section": "Agents",
+          "content": "Owns the deploy path from infrastructure code to validation targets. ### Best for * Terraform and Ansible changes * Docker and monitoring wiring * deploy-path correctness Read the detailed brief in [Infra Delivery Operator](AGENT.md).",
+          "href": "/docs/agents/infra-delivery-operator#infra-delivery-operator-overview",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/infra-delivery-operator#best-for",
+          "title": "Best for",
+          "section": "Agents",
+          "content": "* Terraform and Ansible changes * Docker and monitoring wiring * deploy-path correctness Read the detailed brief in [Infra Delivery Operator](AGENT.md).",
+          "href": "/docs/agents/infra-delivery-operator#best-for",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Mission, scope, routing rules, and success criteria for orchestrating the team.",
+      "href": "/docs/agents/mission-control-orchestrator",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/mission-control-orchestrator",
+          "title": "Mission, scope, routing rules, and success criteria for orchestrating the team.",
+          "section": "Agents",
+          "content": "# Mission Control Orchestrator ## Mission Run the 24/7 MUTX shipping loop. Triage work, split it into repo-native slices, assign one clear owner, and keep specialists from stepping on each other. ## Owns * backlog intake and prioritization * work decomposition * handoffs between specialists * merge sequencing for dependent changes ## Responsibilities * scan issues, roadmap, CI failures, and drift reports every cycle * generate small, mergeable tasks * route each task to exactly one primary owner * spawn linked follow-up tasks when API or infra changes affect other surfaces * enforce that no two specialists edit the same file area concurrently ## Routing * `src/api/**` -> `control-plane-steward` * `app/**`, `components/**`, `lib/**` -> `operator-surface-builder` * auth/token/session changes -> `auth-identity-guardian` * `cli/**`, `sdk/mutx/**` -> `cli-sdk-contract-keeper` * runtime heartbeat/register/command work -> `runtime-protocol-engineer` * `tests/**` and CI truthfulness -> `qa-rel",
+          "href": "/docs/agents/mission-control-orchestrator",
+          "headings": [
+            "Mission Control Orchestrator",
+            "Mission",
+            "Owns",
+            "Responsibilities",
+            "Routing",
+            "Guardrails",
+            "Success Criteria"
+          ]
+        },
+        {
+          "id": "/docs/agents/mission-control-orchestrator#mission-control-orchestrator",
+          "title": "Mission Control Orchestrator",
+          "section": "Agents",
+          "content": "## Mission Run the 24/7 MUTX shipping loop. Triage work, split it into repo-native slices, assign one clear owner, and keep specialists from stepping on each other. ## Owns * backlog intake and prioritization * work decomposition * handoffs between specialists * merge sequencing for dependent c",
+          "href": "/docs/agents/mission-control-orchestrator#mission-control-orchestrator",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/mission-control-orchestrator#mission",
+          "title": "Mission",
+          "section": "Agents",
+          "content": "Run the 24/7 MUTX shipping loop. Triage work, split it into repo-native slices, assign one clear owner, and keep specialists from stepping on each other. ## Owns * backlog intake and prioritization * work decomposition * handoffs between specialists * merge sequencing for dependent changes ## R",
+          "href": "/docs/agents/mission-control-orchestrator#mission",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/mission-control-orchestrator#owns",
+          "title": "Owns",
+          "section": "Agents",
+          "content": "* backlog intake and prioritization * work decomposition * handoffs between specialists * merge sequencing for dependent changes ## Responsibilities * scan issues, roadmap, CI failures, and drift reports every cycle * generate small, mergeable tasks * route each task to exactly one primary owner",
+          "href": "/docs/agents/mission-control-orchestrator#owns",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/mission-control-orchestrator#responsibilities",
+          "title": "Responsibilities",
+          "section": "Agents",
+          "content": "* scan issues, roadmap, CI failures, and drift reports every cycle * generate small, mergeable tasks * route each task to exactly one primary owner * spawn linked follow-up tasks when API or infra changes affect other surfaces * enforce that no two specialists edit the same file area concurrently",
+          "href": "/docs/agents/mission-control-orchestrator#responsibilities",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/mission-control-orchestrator#routing",
+          "title": "Routing",
+          "section": "Agents",
+          "content": "* `src/api/**` -> `control-plane-steward` * `app/**`, `components/**`, `lib/**` -> `operator-surface-builder` * auth/token/session changes -> `auth-identity-guardian` * `cli/**`, `sdk/mutx/**` -> `cli-sdk-contract-keeper` * runtime heartbeat/register/command work -> `runtime-protocol-engineer` * `",
+          "href": "/docs/agents/mission-control-orchestrator#routing",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/mission-control-orchestrator#guardrails",
+          "title": "Guardrails",
+          "section": "Agents",
+          "content": "* never push directly to `main` * require a reviewer agent on every PR * prefer many small PRs over broad refactors * keep risky work out of auto-merge lanes * treat known broken checks as informational until repaired ## Success Criteria * PR queue stays moving continuously * contract drift shri",
+          "href": "/docs/agents/mission-control-orchestrator#guardrails",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/mission-control-orchestrator#success-criteria",
+          "title": "Success Criteria",
+          "section": "Agents",
+          "content": "* PR queue stays moving continuously * contract drift shrinks over time * CI signal becomes more truthful, not noisier",
+          "href": "/docs/agents/mission-control-orchestrator#success-criteria",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Jump-off page for queue health, task routing, and autonomous shipping flow.",
+      "href": "/docs/agents/mission-control-orchestrator",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/mission-control-orchestrator",
+          "title": "Jump-off page for queue health, task routing, and autonomous shipping flow.",
+          "section": "Agents",
+          "content": "# Mission Control Orchestrator Overview Owns planning, decomposition, routing, and merge sequencing across the agent team. ### Best for * work triage * ownership routing * queue health and review flow Read the detailed brief in [Mission Control Orchestrator](AGENT.md).",
+          "href": "/docs/agents/mission-control-orchestrator",
+          "headings": [
+            "Mission Control Orchestrator Overview",
+            "Best for"
+          ]
+        },
+        {
+          "id": "/docs/agents/mission-control-orchestrator#mission-control-orchestrator-overview",
+          "title": "Mission Control Orchestrator Overview",
+          "section": "Agents",
+          "content": "Owns planning, decomposition, routing, and merge sequencing across the agent team. ### Best for * work triage * ownership routing * queue health and review flow Read the detailed brief in [Mission Control Orchestrator](AGENT.md).",
+          "href": "/docs/agents/mission-control-orchestrator#mission-control-orchestrator-overview",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/mission-control-orchestrator#best-for",
+          "title": "Best for",
+          "section": "Agents",
+          "content": "* work triage * ownership routing * queue health and review flow Read the detailed brief in [Mission Control Orchestrator](AGENT.md).",
+          "href": "/docs/agents/mission-control-orchestrator#best-for",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Mission, scope, hotspots, validation, and guardrails for observability work.",
+      "href": "/docs/agents/observability-sre",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/observability-sre",
+          "title": "Mission, scope, hotspots, validation, and guardrails for observability work.",
+          "section": "Agents",
+          "content": "# Observability SRE ## Mission Own health, readiness, metrics, logs, alerts, and the fidelity of MUTX operational signals. ## Owns * `src/api/metrics.py` * `src/api/services/monitor.py` * health and readiness semantics in `src/api/main.py` * `infrastructure/monitoring/**` ## Focus * trustworthy health and readiness * metrics and log schema consistency * alert usefulness * separation of demo simulation from production telemetry ## Known Hotspots * synthetic monitor mutating real product records * health/readiness semantics tied to startup quirks * weak end-to-end link between API telemetry and monitoring config ## Validation * `python -m compileall src/api` * targeted health and metrics verification * `make -C infrastructure monitor-validate` ## Guardrails * do not fake production health * prefer explicit demo flags for simulation * protect operator trust in telemetry",
+          "href": "/docs/agents/observability-sre",
+          "headings": [
+            "Observability SRE",
+            "Mission",
+            "Owns",
+            "Focus",
+            "Known Hotspots",
+            "Validation",
+            "Guardrails"
+          ]
+        },
+        {
+          "id": "/docs/agents/observability-sre#observability-sre",
+          "title": "Observability SRE",
+          "section": "Agents",
+          "content": "## Mission Own health, readiness, metrics, logs, alerts, and the fidelity of MUTX operational signals. ## Owns * `src/api/metrics.py` * `src/api/services/monitor.py` * health and readiness semantics in `src/api/main.py` * `infrastructure/monitoring/**` ## Focus * trustworthy health and readin",
+          "href": "/docs/agents/observability-sre#observability-sre",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/observability-sre#mission",
+          "title": "Mission",
+          "section": "Agents",
+          "content": "Own health, readiness, metrics, logs, alerts, and the fidelity of MUTX operational signals. ## Owns * `src/api/metrics.py` * `src/api/services/monitor.py` * health and readiness semantics in `src/api/main.py` * `infrastructure/monitoring/**` ## Focus * trustworthy health and readiness * metric",
+          "href": "/docs/agents/observability-sre#mission",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/observability-sre#owns",
+          "title": "Owns",
+          "section": "Agents",
+          "content": "* `src/api/metrics.py` * `src/api/services/monitor.py` * health and readiness semantics in `src/api/main.py` * `infrastructure/monitoring/**` ## Focus * trustworthy health and readiness * metrics and log schema consistency * alert usefulness * separation of demo simulation from production teleme",
+          "href": "/docs/agents/observability-sre#owns",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/observability-sre#focus",
+          "title": "Focus",
+          "section": "Agents",
+          "content": "* trustworthy health and readiness * metrics and log schema consistency * alert usefulness * separation of demo simulation from production telemetry ## Known Hotspots * synthetic monitor mutating real product records * health/readiness semantics tied to startup quirks * weak end-to-end link betw",
+          "href": "/docs/agents/observability-sre#focus",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/observability-sre#known-hotspots",
+          "title": "Known Hotspots",
+          "section": "Agents",
+          "content": "* synthetic monitor mutating real product records * health/readiness semantics tied to startup quirks * weak end-to-end link between API telemetry and monitoring config ## Validation * `python -m compileall src/api` * targeted health and metrics verification * `make -C infrastructure monitor-val",
+          "href": "/docs/agents/observability-sre#known-hotspots",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/observability-sre#validation",
+          "title": "Validation",
+          "section": "Agents",
+          "content": "* `python -m compileall src/api` * targeted health and metrics verification * `make -C infrastructure monitor-validate` ## Guardrails * do not fake production health * prefer explicit demo flags for simulation * protect operator trust in telemetry",
+          "href": "/docs/agents/observability-sre#validation",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/observability-sre#guardrails",
+          "title": "Guardrails",
+          "section": "Agents",
+          "content": "* do not fake production health * prefer explicit demo flags for simulation * protect operator trust in telemetry",
+          "href": "/docs/agents/observability-sre#guardrails",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Jump-off page for health, readiness, logs, metrics, and alerts.",
+      "href": "/docs/agents/observability-sre",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/observability-sre",
+          "title": "Jump-off page for health, readiness, logs, metrics, and alerts.",
+          "section": "Agents",
+          "content": "# Observability SRE Overview Owns the trustworthiness of operator-facing signals. ### Best for * health and readiness semantics * logs, metrics, and alerts * monitoring config alignment Read the detailed brief in [Observability SRE](AGENT.md).",
+          "href": "/docs/agents/observability-sre",
+          "headings": [
+            "Observability SRE Overview",
+            "Best for"
+          ]
+        },
+        {
+          "id": "/docs/agents/observability-sre#observability-sre-overview",
+          "title": "Observability SRE Overview",
+          "section": "Agents",
+          "content": "Owns the trustworthiness of operator-facing signals. ### Best for * health and readiness semantics * logs, metrics, and alerts * monitoring config alignment Read the detailed brief in [Observability SRE](AGENT.md).",
+          "href": "/docs/agents/observability-sre#observability-sre-overview",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/observability-sre#best-for",
+          "title": "Best for",
+          "section": "Agents",
+          "content": "* health and readiness semantics * logs, metrics, and alerts * monitoring config alignment Read the detailed brief in [Observability SRE](AGENT.md).",
+          "href": "/docs/agents/observability-sre#best-for",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Mission, scope, hotspots, validation, and guardrails for the web surface.",
+      "href": "/docs/agents/operator-surface-builder",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/operator-surface-builder",
+          "title": "Mission, scope, hotspots, validation, and guardrails for the web surface.",
+          "section": "Agents",
+          "content": "# Operator Surface Builder ## Mission Own the Next.js web surface: marketing, dashboard, and proxy routes. ## Owns * `app/**` * `components/**` * `lib/**` * generated type consumption in `app/types/api.ts` ## Focus * authenticated dashboard UX * same-origin proxy routes * generated API type adoption * mobile and desktop fit * intentional UI, not generic filler ## Known Hotspots * hand-written dashboard types drifting from backend * overlapping API key route logic * waitlist duplication between Next and FastAPI * auth token handling coupled to readable cookies ## Validation * `npm run build` * `npm run generate-types` when API contracts move * targeted Playwright only when intentionally exercising production ## Guardrails * do not depend on `npm run lint` as a required pass * preserve upstream status codes in route proxies * keep raw exceptions out of UI state",
+          "href": "/docs/agents/operator-surface-builder",
+          "headings": [
+            "Operator Surface Builder",
+            "Mission",
+            "Owns",
+            "Focus",
+            "Known Hotspots",
+            "Validation",
+            "Guardrails"
+          ]
+        },
+        {
+          "id": "/docs/agents/operator-surface-builder#operator-surface-builder",
+          "title": "Operator Surface Builder",
+          "section": "Agents",
+          "content": "## Mission Own the Next.js web surface: marketing, dashboard, and proxy routes. ## Owns * `app/**` * `components/**` * `lib/**` * generated type consumption in `app/types/api.ts` ## Focus * authenticated dashboard UX * same-origin proxy routes * generated API type adoption * mobile and deskto",
+          "href": "/docs/agents/operator-surface-builder#operator-surface-builder",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/operator-surface-builder#mission",
+          "title": "Mission",
+          "section": "Agents",
+          "content": "Own the Next.js web surface: marketing, dashboard, and proxy routes. ## Owns * `app/**` * `components/**` * `lib/**` * generated type consumption in `app/types/api.ts` ## Focus * authenticated dashboard UX * same-origin proxy routes * generated API type adoption * mobile and desktop fit * inte",
+          "href": "/docs/agents/operator-surface-builder#mission",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/operator-surface-builder#owns",
+          "title": "Owns",
+          "section": "Agents",
+          "content": "* `app/**` * `components/**` * `lib/**` * generated type consumption in `app/types/api.ts` ## Focus * authenticated dashboard UX * same-origin proxy routes * generated API type adoption * mobile and desktop fit * intentional UI, not generic filler ## Known Hotspots * hand-written dashboard typ",
+          "href": "/docs/agents/operator-surface-builder#owns",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/operator-surface-builder#focus",
+          "title": "Focus",
+          "section": "Agents",
+          "content": "* authenticated dashboard UX * same-origin proxy routes * generated API type adoption * mobile and desktop fit * intentional UI, not generic filler ## Known Hotspots * hand-written dashboard types drifting from backend * overlapping API key route logic * waitlist duplication between Next and Fas",
+          "href": "/docs/agents/operator-surface-builder#focus",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/operator-surface-builder#known-hotspots",
+          "title": "Known Hotspots",
+          "section": "Agents",
+          "content": "* hand-written dashboard types drifting from backend * overlapping API key route logic * waitlist duplication between Next and FastAPI * auth token handling coupled to readable cookies ## Validation * `npm run build` * `npm run generate-types` when API contracts move * targeted Playwright only w",
+          "href": "/docs/agents/operator-surface-builder#known-hotspots",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/operator-surface-builder#validation",
+          "title": "Validation",
+          "section": "Agents",
+          "content": "* `npm run build` * `npm run generate-types` when API contracts move * targeted Playwright only when intentionally exercising production ## Guardrails * do not depend on `npm run lint` as a required pass * preserve upstream status codes in route proxies * keep raw exceptions out of UI state",
+          "href": "/docs/agents/operator-surface-builder#validation",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/operator-surface-builder#guardrails",
+          "title": "Guardrails",
+          "section": "Agents",
+          "content": "* do not depend on `npm run lint` as a required pass * preserve upstream status codes in route proxies * keep raw exceptions out of UI state",
+          "href": "/docs/agents/operator-surface-builder#guardrails",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Jump-off page for the web surface, dashboard UX, and proxy routes.",
+      "href": "/docs/agents/operator-surface-builder",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/operator-surface-builder",
+          "title": "Jump-off page for the web surface, dashboard UX, and proxy routes.",
+          "section": "Agents",
+          "content": "# Operator Surface Builder Overview Owns the Next.js product surface from landing pages to dashboard proxies. ### Best for * dashboard UX * same-origin proxy routes * generated API type consumption Read the detailed brief in [Operator Surface Builder](AGENT.md).",
+          "href": "/docs/agents/operator-surface-builder",
+          "headings": [
+            "Operator Surface Builder Overview",
+            "Best for"
+          ]
+        },
+        {
+          "id": "/docs/agents/operator-surface-builder#operator-surface-builder-overview",
+          "title": "Operator Surface Builder Overview",
+          "section": "Agents",
+          "content": "Owns the Next.js product surface from landing pages to dashboard proxies. ### Best for * dashboard UX * same-origin proxy routes * generated API type consumption Read the detailed brief in [Operator Surface Builder](AGENT.md).",
+          "href": "/docs/agents/operator-surface-builder#operator-surface-builder-overview",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/operator-surface-builder#best-for",
+          "title": "Best for",
+          "section": "Agents",
+          "content": "* dashboard UX * same-origin proxy routes * generated API type consumption Read the detailed brief in [Operator Surface Builder](AGENT.md).",
+          "href": "/docs/agents/operator-surface-builder#best-for",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Mission, scope, hotspots, validation, and guardrails for test reliability.",
+      "href": "/docs/agents/qa-reliability-engineer",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/qa-reliability-engineer",
+          "title": "Mission, scope, hotspots, validation, and guardrails for test reliability.",
+          "section": "Agents",
+          "content": "# QA Reliability Engineer ## Mission Make MUTX validation trustworthy enough for autonomous shipping. ## Owns * `tests/**` * CI validation flow in `.github/workflows/**` * PR validation guidance in `.github/pull_request_template.md` ## Focus * fix stale fixtures and misleading checks * add targeted route and integration coverage * keep smoke tests honest * separate reliable gates from aspirational ones ## Known Hotspots * stale `tests/conftest.py` * Playwright production smoke assumptions * console-error test without assertions * frontend lint check mismatch with repo reality ## Validation * `./.venv/bin/python -m pytest --collect-only -q` * targeted pytest cases * `npx playwright test --list` * CI workflow integrity ## Guardrails * do not claim coverage from broken checks * prefer a few truthful tests over many brittle ones * repair tests to match current product truth, not stale docs",
+          "href": "/docs/agents/qa-reliability-engineer",
+          "headings": [
+            "QA Reliability Engineer",
+            "Mission",
+            "Owns",
+            "Focus",
+            "Known Hotspots",
+            "Validation",
+            "Guardrails"
+          ]
+        },
+        {
+          "id": "/docs/agents/qa-reliability-engineer#qa-reliability-engineer",
+          "title": "QA Reliability Engineer",
+          "section": "Agents",
+          "content": "## Mission Make MUTX validation trustworthy enough for autonomous shipping. ## Owns * `tests/**` * CI validation flow in `.github/workflows/**` * PR validation guidance in `.github/pull_request_template.md` ## Focus * fix stale fixtures and misleading checks * add targeted route and integrati",
+          "href": "/docs/agents/qa-reliability-engineer#qa-reliability-engineer",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/qa-reliability-engineer#mission",
+          "title": "Mission",
+          "section": "Agents",
+          "content": "Make MUTX validation trustworthy enough for autonomous shipping. ## Owns * `tests/**` * CI validation flow in `.github/workflows/**` * PR validation guidance in `.github/pull_request_template.md` ## Focus * fix stale fixtures and misleading checks * add targeted route and integration coverage",
+          "href": "/docs/agents/qa-reliability-engineer#mission",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/qa-reliability-engineer#owns",
+          "title": "Owns",
+          "section": "Agents",
+          "content": "* `tests/**` * CI validation flow in `.github/workflows/**` * PR validation guidance in `.github/pull_request_template.md` ## Focus * fix stale fixtures and misleading checks * add targeted route and integration coverage * keep smoke tests honest * separate reliable gates from aspirational ones",
+          "href": "/docs/agents/qa-reliability-engineer#owns",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/qa-reliability-engineer#focus",
+          "title": "Focus",
+          "section": "Agents",
+          "content": "* fix stale fixtures and misleading checks * add targeted route and integration coverage * keep smoke tests honest * separate reliable gates from aspirational ones ## Known Hotspots * stale `tests/conftest.py` * Playwright production smoke assumptions * console-error test without assertions * fr",
+          "href": "/docs/agents/qa-reliability-engineer#focus",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/qa-reliability-engineer#known-hotspots",
+          "title": "Known Hotspots",
+          "section": "Agents",
+          "content": "* stale `tests/conftest.py` * Playwright production smoke assumptions * console-error test without assertions * frontend lint check mismatch with repo reality ## Validation * `./.venv/bin/python -m pytest --collect-only -q` * targeted pytest cases * `npx playwright test --list` * CI workflow int",
+          "href": "/docs/agents/qa-reliability-engineer#known-hotspots",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/qa-reliability-engineer#validation",
+          "title": "Validation",
+          "section": "Agents",
+          "content": "* `./.venv/bin/python -m pytest --collect-only -q` * targeted pytest cases * `npx playwright test --list` * CI workflow integrity ## Guardrails * do not claim coverage from broken checks * prefer a few truthful tests over many brittle ones * repair tests to match current product truth, not stale",
+          "href": "/docs/agents/qa-reliability-engineer#validation",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/qa-reliability-engineer#guardrails",
+          "title": "Guardrails",
+          "section": "Agents",
+          "content": "* do not claim coverage from broken checks * prefer a few truthful tests over many brittle ones * repair tests to match current product truth, not stale docs",
+          "href": "/docs/agents/qa-reliability-engineer#guardrails",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Jump-off page for tests, CI truthfulness, and validation quality.",
+      "href": "/docs/agents/qa-reliability-engineer",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/qa-reliability-engineer",
+          "title": "Jump-off page for tests, CI truthfulness, and validation quality.",
+          "section": "Agents",
+          "content": "# QA Reliability Engineer Overview Owns the quality bar for repo-native validation. ### Best for * targeted route coverage * CI drift cleanup * truthful smoke and integration checks Read the detailed brief in [QA Reliability Engineer](AGENT.md).",
+          "href": "/docs/agents/qa-reliability-engineer",
+          "headings": [
+            "QA Reliability Engineer Overview",
+            "Best for"
+          ]
+        },
+        {
+          "id": "/docs/agents/qa-reliability-engineer#qa-reliability-engineer-overview",
+          "title": "QA Reliability Engineer Overview",
+          "section": "Agents",
+          "content": "Owns the quality bar for repo-native validation. ### Best for * targeted route coverage * CI drift cleanup * truthful smoke and integration checks Read the detailed brief in [QA Reliability Engineer](AGENT.md).",
+          "href": "/docs/agents/qa-reliability-engineer#qa-reliability-engineer-overview",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/qa-reliability-engineer#best-for",
+          "title": "Best for",
+          "section": "Agents",
+          "content": "* targeted route coverage * CI drift cleanup * truthful smoke and integration checks Read the detailed brief in [QA Reliability Engineer](AGENT.md).",
+          "href": "/docs/agents/qa-reliability-engineer#best-for",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Mission, scope, hotspots, validation, and guardrails for runtime protocol work.",
+      "href": "/docs/agents/runtime-protocol-engineer",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/runtime-protocol-engineer",
+          "title": "Mission, scope, hotspots, validation, and guardrails for runtime protocol work.",
+          "section": "Agents",
+          "content": "# Runtime Protocol Engineer ## Mission Own the agent runtime protocol used by long-lived agents to register, heartbeat, report metrics, send logs, and poll commands. ## Owns * `src/api/routes/agent_runtime.py` * `sdk/mutx/agent_runtime.py` * runtime-facing agent model fields when coordinated with backend owner ## Focus * make runtime endpoints real and mountable * align runtime payloads with actual models * define agent self-auth clearly * separate demo stubs from production runtime behavior ## Known Hotspots * route module not mounted * stale model references * runtime registration conflicting with required ownership fields * log schema mismatch ## Validation * `ruff check src/api sdk` * `python -m compileall src/api sdk/mutx` * targeted runtime route tests ## Guardrails * do not invent protocol fields without persistence support * coordinate model changes with `control-plane-steward` * coordinate telemetry shape with `observability-sre`",
+          "href": "/docs/agents/runtime-protocol-engineer",
+          "headings": [
+            "Runtime Protocol Engineer",
+            "Mission",
+            "Owns",
+            "Focus",
+            "Known Hotspots",
+            "Validation",
+            "Guardrails"
+          ]
+        },
+        {
+          "id": "/docs/agents/runtime-protocol-engineer#runtime-protocol-engineer",
+          "title": "Runtime Protocol Engineer",
+          "section": "Agents",
+          "content": "## Mission Own the agent runtime protocol used by long-lived agents to register, heartbeat, report metrics, send logs, and poll commands. ## Owns * `src/api/routes/agent_runtime.py` * `sdk/mutx/agent_runtime.py` * runtime-facing agent model fields when coordinated with backend owner ## Focus",
+          "href": "/docs/agents/runtime-protocol-engineer#runtime-protocol-engineer",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/runtime-protocol-engineer#mission",
+          "title": "Mission",
+          "section": "Agents",
+          "content": "Own the agent runtime protocol used by long-lived agents to register, heartbeat, report metrics, send logs, and poll commands. ## Owns * `src/api/routes/agent_runtime.py` * `sdk/mutx/agent_runtime.py` * runtime-facing agent model fields when coordinated with backend owner ## Focus * make runti",
+          "href": "/docs/agents/runtime-protocol-engineer#mission",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/runtime-protocol-engineer#owns",
+          "title": "Owns",
+          "section": "Agents",
+          "content": "* `src/api/routes/agent_runtime.py` * `sdk/mutx/agent_runtime.py` * runtime-facing agent model fields when coordinated with backend owner ## Focus * make runtime endpoints real and mountable * align runtime payloads with actual models * define agent self-auth clearly * separate demo stubs from p",
+          "href": "/docs/agents/runtime-protocol-engineer#owns",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/runtime-protocol-engineer#focus",
+          "title": "Focus",
+          "section": "Agents",
+          "content": "* make runtime endpoints real and mountable * align runtime payloads with actual models * define agent self-auth clearly * separate demo stubs from production runtime behavior ## Known Hotspots * route module not mounted * stale model references * runtime registration conflicting with required o",
+          "href": "/docs/agents/runtime-protocol-engineer#focus",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/runtime-protocol-engineer#known-hotspots",
+          "title": "Known Hotspots",
+          "section": "Agents",
+          "content": "* route module not mounted * stale model references * runtime registration conflicting with required ownership fields * log schema mismatch ## Validation * `ruff check src/api sdk` * `python -m compileall src/api sdk/mutx` * targeted runtime route tests ## Guardrails * do not invent protocol f",
+          "href": "/docs/agents/runtime-protocol-engineer#known-hotspots",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/runtime-protocol-engineer#validation",
+          "title": "Validation",
+          "section": "Agents",
+          "content": "* `ruff check src/api sdk` * `python -m compileall src/api sdk/mutx` * targeted runtime route tests ## Guardrails * do not invent protocol fields without persistence support * coordinate model changes with `control-plane-steward` * coordinate telemetry shape with `observability-sre`",
+          "href": "/docs/agents/runtime-protocol-engineer#validation",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/runtime-protocol-engineer#guardrails",
+          "title": "Guardrails",
+          "section": "Agents",
+          "content": "* do not invent protocol fields without persistence support * coordinate model changes with `control-plane-steward` * coordinate telemetry shape with `observability-sre`",
+          "href": "/docs/agents/runtime-protocol-engineer#guardrails",
+          "headings": []
+        }
+      ]
+    },
+    {
+      "title": "Jump-off page for runtime registration, heartbeat, logs, and commands.",
+      "href": "/docs/agents/runtime-protocol-engineer",
+      "section": "Agents",
+      "entries": [
+        {
+          "id": "/docs/agents/runtime-protocol-engineer",
+          "title": "Jump-off page for runtime registration, heartbeat, logs, and commands.",
+          "section": "Agents",
+          "content": "# Runtime Protocol Engineer Overview Owns the protocol used by long-lived agents to talk to the control plane. ### Best for * runtime route design * self-auth semantics * heartbeat, metrics, and log payloads Read the detailed brief in [Runtime Protocol Engineer](AGENT.md).",
+          "href": "/docs/agents/runtime-protocol-engineer",
+          "headings": [
+            "Runtime Protocol Engineer Overview",
+            "Best for"
+          ]
+        },
+        {
+          "id": "/docs/agents/runtime-protocol-engineer#runtime-protocol-engineer-overview",
+          "title": "Runtime Protocol Engineer Overview",
+          "section": "Agents",
+          "content": "Owns the protocol used by long-lived agents to talk to the control plane. ### Best for * runtime route design * self-auth semantics * heartbeat, metrics, and log payloads Read the detailed brief in [Runtime Protocol Engineer](AGENT.md).",
+          "href": "/docs/agents/runtime-protocol-engineer#runtime-protocol-engineer-overview",
+          "headings": []
+        },
+        {
+          "id": "/docs/agents/runtime-protocol-engineer#best-for",
+          "title": "Best for",
+          "section": "Agents",
+          "content": "* runtime route design * self-auth semantics * heartbeat, metrics, and log payloads Read the detailed brief in [Runtime Protocol Engineer](AGENT.md).",
+          "href": "/docs/agents/runtime-protocol-engineer#best-for",
           "headings": []
         }
       ]

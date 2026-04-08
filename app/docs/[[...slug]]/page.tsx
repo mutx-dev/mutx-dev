@@ -79,6 +79,26 @@ function resolveSlug(slugSegments: string[]): string | null {
       return fullPath;
     }
   }
+
+  // GitBook maps docs/api/* → /docs/* (api/ prefix is flattened)
+  // e.g. /docs/reference → docs/api/reference.md
+  // e.g. /docs/reference/authentication → docs/api/authentication.md
+  // e.g. /docs/reference/index → docs/api/index.md (API Overview)
+  const apiCandidates = [
+    path.join("api", ...slugSegments) + ".md",
+    path.join("api", ...slugSegments, "README.md"),
+    path.join("api", ...slugSegments, "index.md"),
+    // Special case: /docs/X/index → serve docs/api/index.md
+    path.join("api", slugSegments[0], "index.md"),
+  ];
+
+  for (const candidate of apiCandidates) {
+    const fullPath = path.join(docsDir(), candidate);
+    if (fs.existsSync(fullPath)) {
+      return fullPath;
+    }
+  }
+
   return null;
 }
 
@@ -129,7 +149,7 @@ const FEATURED = [
   },
   {
     title: "API Reference",
-    href: "/docs/api",
+    href: "/docs/reference",
     desc: "Read the live /v1/* contract, auth model, and public resource docs.",
   },
   {
@@ -243,7 +263,6 @@ export default async function DocPage({
   return (
     <div className="docs-article-layout">
       <div className="docs-article-main">
-        <TableOfContents sourceHeadings={headings} />
         <DocsRenderer source={content} />
         <PrevNextNav currentRoute={currentRoute} />
         {data.icon && (
@@ -263,6 +282,7 @@ export default async function DocPage({
           </p>
         )}
       </div>
+      <TableOfContents sourceHeadings={headings} />
     </div>
   );
 }

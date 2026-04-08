@@ -667,16 +667,6 @@
 }
 
 /* ── Sidebar TOC (right rail) ─────────────────────────────────────── */
-.docs-toc {
-  width: 220px;
-  flex-shrink: 0;
-  padding: 2.5rem 0 4rem 1.5rem;
-  position: sticky;
-  top: var(--gb-header-h);
-  height: calc(100vh - var(--gb-header-h));
-  overflow-y: auto;
-}
-
 .docs-toc-title {
   font-size: 0.6875rem;
   font-weight: 700;
@@ -863,6 +853,7 @@
 /* ── Three-column article layout ──────────────────────────────────── */
 .docs-article-layout {
   display: flex;
+  align-items: flex-start;
   gap: 0;
   min-height: calc(100vh - var(--gb-header-h));
 }
@@ -871,6 +862,18 @@
   flex: 1;
   min-width: 0;
   padding: 2.5rem 2rem 4rem;
+}
+
+/* Right-side TOC — sibling to main, not nested inside it */
+.docs-toc {
+  position: sticky;
+  top: var(--gb-header-h);
+  width: 220px;
+  flex-shrink: 0;
+  padding: 2.5rem 1.5rem 4rem 0;
+  max-height: calc(100vh - var(--gb-header-h));
+  overflow-y: auto;
+  align-self: flex-start;
 }
 
 .docs-article-main > * + * {

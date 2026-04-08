@@ -71,6 +71,17 @@ function slugify(text: string): string {
 function resolveDocHref(relativePath: string): string {
   const withoutExt = relativePath.replace(/\.md$/, "");
 
+  // GitBook maps docs/api/* → /docs/reference/* (api/ prefix flattened + aliased)
+  // File paths come in relative to docs/ dir: "api/authentication.md" not "docs/api/authentication.md"
+  // e.g. api/reference.md → /docs/reference
+  // e.g. api/authentication.md → /docs/reference/authentication
+  // e.g. api/index.md → /docs/reference (not /docs/reference/index)
+  if (withoutExt.startsWith("api/")) {
+    const inner = withoutExt.replace(/^api\//, ""); // e.g. "reference" or "authentication"
+    if (inner === "index") return "/docs/reference";
+    return `/docs/reference/${inner}`;
+  }
+
   // Handle root-level content (e.g. agents/README.md → /docs/agents)
   const isRootContent = ROOT_CONTENT_DIRS.some((dir) =>
     withoutExt.startsWith(dir + "/") || withoutExt === dir
@@ -93,7 +104,7 @@ function resolveDocHref(relativePath: string): string {
     .replace(/\/index$/i, "")
     .replace(/^README$/i, "");
 
-  if (!normalized) return "/docs/README";
+  if (!normalized) return "/docs";
   return `/docs/${normalized}`;
 }
 
