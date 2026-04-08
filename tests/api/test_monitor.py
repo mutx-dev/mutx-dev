@@ -27,9 +27,17 @@ class _FakeExecuteResult:
 class _FakeSession:
     def __init__(self, result: _FakeExecuteResult):
         self.result = result
+        self.committed = False
+        self.added = []
 
     async def execute(self, _query):
         return self.result
+
+    def add(self, obj):
+        self.added.append(obj)
+
+    async def commit(self):
+        self.committed = True
 
 
 class _FakeSessionManager:
@@ -230,3 +238,47 @@ async def test_sync_self_healing_agents_registers_and_unregisters_delta_agents(m
 
     assert [agent_id for agent_id, _ in fake_self_healing.registered] == [active_agent_ids[0]]
     assert fake_self_healing.unregistered == [stale_agent_id]
+
+
+@pytest.mark.asyncio
+async def test_sync_self_healing_agents_excludes_stopped_agents():
+    running_agent_id = str(uuid.uuid4())
+    session = _FakeSession(
+        _FakeExecuteResult(
+            scalar_values=[uuid.UUID(running_agent_id)],
+        )
+    )
+    fake_self_healing = _FakeSelfHealing({})
+
+    await monitor_module._sync_self_healing_agents(session, fake_self_healing)
+
+    assert [agent_id for agent_id, _ in fake_self_healing.registered] == [running_agent_id]
+
+
+@pytest.mark.asyncio
+async def test_recover_agent_to_running_skips_stopped_agents(monkeypatch):
+    stopped_agent = SimpleNamespace(
+        id=uuid.uuid4(),
+        status=monitor_module.AgentStatus.STOPPED.value,
+        last_heartbeat=None,
+    )
+    fake_session = _FakeSession(_FakeExecuteResult(scalar_value=stopped_agent))
+
+    class _InjectedSessionManager:
+        async def __aenter__(self):
+            return fake_session
+
+        async def __aexit__(self, _exc_type, _exc, _tb):
+            return False
+
+    monkeypatch.setattr(
+        monitor_module.database_module,
+        "async_session_maker",
+        lambda: _InjectedSessionManager(),
+    )
+
+    await monitor_module._recover_agent_to_running(str(stopped_agent.id), {})
+
+    assert stopped_agent.status == monitor_module.AgentStatus.STOPPED.value
+    assert fake_session.committed is False
+    assert fake_session.added == []
