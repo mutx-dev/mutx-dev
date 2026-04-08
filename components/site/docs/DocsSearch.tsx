@@ -166,12 +166,12 @@ export function DocsSearch() {
 
     const overlay = document.querySelector('.docs-search-overlay');
     overlay?.addEventListener('input', handleSearchInput as EventListener);
-    overlay?.addEventListener('keydown', handleKeyDown);
+    overlay?.addEventListener('keydown', handleKeyDown as EventListener);
     overlay?.addEventListener('click', handleClick as EventListener);
 
     return () => {
       overlay?.removeEventListener('input', handleSearchInput as EventListener);
-      overlay?.removeEventListener('keydown', handleKeyDown);
+      overlay?.removeEventListener('keydown', handleKeyDown as EventListener);
       overlay?.removeEventListener('click', handleClick as EventListener);
     };
   }, [entries, router]);

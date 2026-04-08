@@ -8,6 +8,7 @@ export interface DocNavItem {
   route: string; // actual Next.js route (e.g. /agents or /docs/api)
   children: DocNavItem[];
   depth: number;
+  isPage?: boolean; // true = leaf page, false/undefined = section group
 }
 
 function lineDepth(line: string): number {

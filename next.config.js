@@ -17,6 +17,22 @@ const nextConfig = {
     }
     return config;
   },
+  async redirects() {
+    return [
+      // GitBook maps docs/api/* → /docs/reference/*
+      // Keep old /docs/api/* links functional as a fallback
+      {
+        source: '/docs/api',
+        destination: '/docs/reference',
+        permanent: true,
+      },
+      {
+        source: '/docs/api/:slug*',
+        destination: '/docs/reference/:slug*',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     // Prefer a server-only upstream when the frontend and API share a private network.
     const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || '';
