@@ -94,10 +94,11 @@ class UserService:
         return user
 
     async def update_user_plan(self, user_id: uuid.UUID, plan: Plan) -> User:
+        normalized_plan = plan.name if isinstance(plan, Plan) else str(plan).upper()
         await self.session.execute(
             update(User)
             .where(User.id == user_id)
-            .values(plan=plan, updated_at=datetime.now(timezone.utc))
+            .values(plan=normalized_plan, updated_at=datetime.now(timezone.utc))
         )
         await self.session.commit()
         user = await self.get_user_by_id(user_id)
@@ -225,7 +226,7 @@ class UserService:
             "ENTERPRISE": {"agents": -1, "deployments": -1, "api_keys": -1},
         }
 
-        limit = plan_limits.get(user.plan, {}).get(resource, 0)
+        limit = plan_limits.get((user.plan or "").upper(), {}).get(resource, 0)
         if limit == -1:
             return True  # Unlimited
 
