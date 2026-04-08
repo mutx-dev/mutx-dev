@@ -34,6 +34,11 @@ receivers:
       - url: 'http://host.docker.internal:3000/api/heal'
         send_resolved: true
         http_config:
+          # Require a shared bearer token so /api/heal can't be triggered
+          # by unauthenticated requests.
+          authorization:
+            type: Bearer
+            credentials_file: /etc/alertmanager/secrets/self_heal_webhook_token
           timeout: 30s
 
 # Inhibition rules
