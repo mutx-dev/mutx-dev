@@ -8,7 +8,9 @@ The live tap is published from CLI release tags (`cli-vX.Y.Z`) by the release wo
 Fastest macOS path to install MUTX with a guided setup flow:
 
 ```bash
-curl -fsSL https://mutx.dev/install.sh | bash
+brew tap mutx-dev/homebrew-tap
+brew install mutx
+mutx setup hosted
 ```
 
 That handoff now opens the MUTX provider wizard. 🦞 OpenClaw is the first enabled provider, and MUTX can detect an existing local install, track it in `~/.mutx/providers/openclaw`, and keep the upstream home plus local keys in place.

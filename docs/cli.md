@@ -12,10 +12,12 @@ The MUTX CLI distribution lives at repo root and installs the `mutx` entrypoint 
 Fastest macOS path:
 
 ```bash
-curl -fsSL https://mutx.dev/install.sh | bash
+brew tap mutx-dev/homebrew-tap
+brew install mutx
+mutx setup hosted
 ```
 
-That script keeps the package-lane chatter quiet, force-links `mutx` if an older shim is already present, verifies the assistant-first command surface, and then hands onboarding off to the CLI itself. If the packaged CLI is behind the installer, it overlays a fresh runtime into `~/.mutx` before continuing.
+This path installs MUTX through Homebrew, then hands onboarding off to the CLI itself.
 
 🦞 The setup handoff now enters a MUTX-owned wizard. Hosted is the recommended lane, OpenClaw is the default personal assistant runtime, and MUTX tracks the real upstream OpenClaw home rather than relocating it.
 
