@@ -138,6 +138,19 @@ class TestAuthEndpoints:
         assert "localhost" in response.json()["detail"].lower()
 
     @pytest.mark.asyncio
+    async def test_local_bootstrap_rejects_forwarded_headers(
+        self, client_no_auth: AsyncClient
+    ):
+        response = await client_no_auth.post(
+            "/v1/auth/local-bootstrap",
+            json={"name": "Spoofed Operator"},
+            headers={"X-Forwarded-For": "127.0.0.1"},
+        )
+
+        assert response.status_code == 403
+        assert "localhost" in response.json()["detail"].lower()
+
+    @pytest.mark.asyncio
     async def test_me_endpoint(self, client: AsyncClient, test_user):
         """Test the /me endpoint."""
         response = await client.get("/v1/auth/me")

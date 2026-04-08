@@ -95,6 +95,14 @@ def _assert_local_bootstrap_allowed(request: Request) -> None:
             detail="Local bootstrap is disabled in production.",
         )
 
+    forwarded_for = request.headers.get("x-forwarded-for")
+    forwarded = request.headers.get("forwarded")
+    if forwarded_for or forwarded:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Local bootstrap is only available from localhost.",
+        )
+
     client_host = request.client.host if request.client else None
     if not _is_loopback_host(client_host):
         raise HTTPException(
