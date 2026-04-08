@@ -17,6 +17,11 @@ RUN npm run build
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Run the app as a non-root user
+RUN addgroup -S nextjs && adduser -S nextjs -G nextjs
+RUN chown -R nextjs:nextjs /app
+USER nextjs
+
 EXPOSE 3000
 
 CMD ["npm", "run", "start"]
