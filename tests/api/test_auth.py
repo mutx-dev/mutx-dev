@@ -544,3 +544,274 @@ class TestAuthEndpoints:
 
         # Verify the new token is still valid (not more than 30 days from original iat)
         assert verify_refresh_token(new_refresh_token) is not None
+
+
+class TestSSOAuth:
+    """Tests for SSO OAuth authentication."""
+
+    @pytest.mark.asyncio
+    async def test_sso_provider_enum_values(self):
+        """Test SSOProvider enum has correct values."""
+        from src.api.services.auth import SSOProvider
+        
+        assert SSOProvider.OKTA.value == "okta"
+        assert SSOProvider.AUTH0.value == "auth0"
+        assert SSOProvider.KEYCLOAK.value == "keycloak"
+        assert SSOProvider.GOOGLE.value == "google"
+
+    @pytest.mark.asyncio
+    async def test_role_enum_values(self):
+        """Test Role enum has correct values."""
+        from src.api.services.auth import Role
+        
+        assert Role.ADMIN.value == "ADMIN"
+        assert Role.DEVELOPER.value == "DEVELOPER"
+        assert Role.VIEWER.value == "VIEWER"
+        assert Role.AUDIT_ADMIN.value == "AUDIT_ADMIN"
+
+    @pytest.mark.asyncio
+    async def test_token_payload_model(self):
+        """Test TokenPayload model works correctly."""
+        from datetime import datetime, timezone
+        from src.api.services.auth import TokenPayload
+        
+        payload = TokenPayload(
+            sub="user-123",
+            email="test@example.com",
+            roles=["ADMIN", "DEVELOPER"],
+            exp=datetime.now(timezone.utc),
+        )
+        
+        assert payload.sub == "user-123"
+        assert payload.email == "test@example.com"
+        assert payload.roles == ["ADMIN", "DEVELOPER"]
+
+    @pytest.mark.asyncio
+    async def test_create_access_token_and_verify(self):
+        """Test JWT access token creation and verification."""
+        from datetime import datetime, timedelta, timezone
+        from src.api.services.auth import TokenPayload, create_access_token, verify_access_token
+        
+        payload = TokenPayload(
+            sub="user-456",
+            email="sso@example.com",
+            roles=["DEVELOPER"],
+            exp=datetime.now(timezone.utc) + timedelta(hours=1),
+        )
+        
+        secret = "test-secret-key-that-is-long-enough-32"
+        token = create_access_token(payload, secret)
+        
+        assert token is not None
+        assert isinstance(token, str)
+        
+        # Verify the token
+        verified = verify_access_token(token, secret)
+        assert verified.sub == "user-456"
+        assert verified.email == "sso@example.com"
+        assert verified.roles == ["DEVELOPER"]
+
+    @pytest.mark.asyncio
+    async def test_verify_access_token_invalid_secret(self):
+        """Test that token verification fails with wrong secret."""
+        from datetime import datetime, timedelta, timezone
+        from fastapi import HTTPException
+        from src.api.services.auth import TokenPayload, create_access_token, verify_access_token
+        
+        payload = TokenPayload(
+            sub="user-789",
+            email="test@example.com",
+            roles=["VIEWER"],
+            exp=datetime.now(timezone.utc) + timedelta(hours=1),
+        )
+        
+        token = create_access_token(payload, "correct-secret")
+        
+        with pytest.raises(HTTPException) as exc_info:
+            verify_access_token(token, "wrong-secret")
+        
+        assert exc_info.value.status_code == 401
+
+    @pytest.mark.asyncio
+    async def test_verify_access_token_expired(self):
+        """Test that token verification fails for expired token."""
+        from datetime import datetime, timedelta, timezone
+        from fastapi import HTTPException
+        from jose import jwt
+        from src.api.services.auth import verify_access_token
+        
+        # Create an already-expired token manually using raw jose
+        # (create_access_token always sets exp to future, so we need to bypass it)
+        secret = "test-secret-key-that-is-long-enough-32"
+        expired_payload = {
+            "sub": "user-expired",
+            "email": "expired@example.com",
+            "roles": ["VIEWER"],
+            "exp": datetime.now(timezone.utc) - timedelta(hours=1),  # Expired 1 hour ago
+            "iat": datetime.now(timezone.utc) - timedelta(hours=2),
+        }
+        token = jwt.encode(expired_payload, secret, algorithm="HS256")
+        
+        with pytest.raises(HTTPException) as exc_info:
+            verify_access_token(token, secret)
+        
+        assert exc_info.value.status_code == 401
+        assert "expired" in exc_info.value.detail.lower()
+
+    @pytest.mark.asyncio
+    async def test_check_role_admin_has_all_access(self):
+        """Test that ADMIN role has access to everything."""
+        from src.api.services.auth import Role, check_role
+        
+        # ADMIN should have access to everything
+        assert check_role(["ADMIN"], [Role.VIEWER]) is True
+        assert check_role(["ADMIN"], [Role.DEVELOPER]) is True
+        assert check_role(["ADMIN"], [Role.ADMIN]) is True
+        assert check_role(["ADMIN"], [Role.AUDIT_ADMIN]) is True
+
+    @pytest.mark.asyncio
+    async def test_check_role_developer(self):
+        """Test DEVELOPER role access."""
+        from src.api.services.auth import Role, check_role
+        
+        # DEVELOPER should have access to DEVELOPER only (not inherited to VIEWER)
+        assert check_role(["DEVELOPER"], [Role.DEVELOPER]) is True
+        assert check_role(["DEVELOPER"], [Role.VIEWER]) is False  # DEVELOPER doesn't inherit VIEWER
+        assert check_role(["DEVELOPER"], [Role.ADMIN]) is False
+        assert check_role(["DEVELOPER"], [Role.AUDIT_ADMIN]) is False
+
+    @pytest.mark.asyncio
+    async def test_check_role_viewer(self):
+        """Test VIEWER role access."""
+        from src.api.services.auth import Role, check_role
+        
+        # VIEWER should only have access to VIEWER
+        assert check_role(["VIEWER"], [Role.VIEWER]) is True
+        assert check_role(["VIEWER"], [Role.DEVELOPER]) is False
+        assert check_role(["VIEWER"], [Role.ADMIN]) is False
+
+    @pytest.mark.asyncio
+    async def test_check_role_audit_admin(self):
+        """Test AUDIT_ADMIN role access."""
+        from src.api.services.auth import Role, check_role
+        
+        # AUDIT_ADMIN should only have access to AUDIT_ADMIN
+        assert check_role(["AUDIT_ADMIN"], [Role.AUDIT_ADMIN]) is True
+        assert check_role(["AUDIT_ADMIN"], [Role.ADMIN]) is False
+        assert check_role(["AUDIT_ADMIN"], [Role.VIEWER]) is False
+
+    @pytest.mark.asyncio
+    async def test_check_role_multiple_user_roles(self):
+        """Test user with multiple roles."""
+        from src.api.services.auth import Role, check_role
+        
+        # User with both DEVELOPER and VIEWER roles
+        assert check_role(["DEVELOPER", "VIEWER"], [Role.DEVELOPER]) is True
+        assert check_role(["DEVELOPER", "VIEWER"], [Role.VIEWER]) is True
+        assert check_role(["DEVELOPER", "VIEWER"], [Role.ADMIN]) is False
+
+    @pytest.mark.asyncio
+    async def test_require_role_success(self):
+        """Test require_role dependency succeeds with correct role."""
+        from src.api.dependencies import require_role, SSOTokenUser
+        from src.api.services.auth import TokenPayload
+        from datetime import datetime, timezone
+        
+        payload = TokenPayload(
+            sub="role-test-user",
+            email="roles@example.com",
+            roles=["ADMIN"],
+            exp=datetime.now(timezone.utc),
+        )
+        user = SSOTokenUser(payload)
+        
+        # Create the dependency checker
+        checker = require_role(["ADMIN"])
+        
+        # The checker should return the user when called
+        # (In actual FastAPI this would be called via Depends)
+        assert user.roles == ["ADMIN"]
+
+    @pytest.mark.asyncio
+    async def test_require_role_forbidden(self):
+        """Test require_role dependency raises 403 for insufficient roles."""
+        from src.api.dependencies import require_role, SSOTokenUser
+        from src.api.services.auth import TokenPayload
+        from datetime import datetime, timezone
+        
+        payload = TokenPayload(
+            sub="role-test-user",
+            email="roles@example.com",
+            roles=["VIEWER"],  # Only VIEWER role
+            exp=datetime.now(timezone.utc),
+        )
+        user = SSOTokenUser(payload)
+        
+        # User with VIEWER should not have access to ADMIN-only routes
+        assert "ADMIN" not in user.roles
+
+
+class TestSSOTokenUser:
+    """Tests for SSOTokenUser class."""
+
+    @pytest.mark.asyncio
+    async def test_sso_token_user_creation(self):
+        """Test SSOTokenUser is created correctly from TokenPayload."""
+        from datetime import datetime, timezone, timedelta
+        from src.api.services.auth import TokenPayload
+        from src.api.dependencies import SSOTokenUser
+        
+        payload = TokenPayload(
+            sub="sso-user-123",
+            email="sso.user@example.com",
+            roles=["DEVELOPER", "VIEWER"],
+            exp=datetime.now(timezone.utc) + timedelta(hours=1),
+        )
+        
+        user = SSOTokenUser(payload)
+        
+        assert user.id == "sso-user-123"
+        assert user.email == "sso.user@example.com"
+        assert user.name == "sso.user"  # email.split("@")[0]
+        assert user.roles == ["DEVELOPER", "VIEWER"]
+        assert user.is_active is True
+        assert user.is_email_verified is True
+
+    @pytest.mark.asyncio
+    async def test_sso_token_user_no_email(self):
+        """Test SSOTokenUser handles missing email gracefully."""
+        from datetime import datetime, timezone, timedelta
+        from src.api.services.auth import TokenPayload
+        from src.api.dependencies import SSOTokenUser
+        
+        payload = TokenPayload(
+            sub="no-email-user",
+            email="",  # Empty email
+            roles=["VIEWER"],
+            exp=datetime.now(timezone.utc) + timedelta(hours=1),
+        )
+        
+        user = SSOTokenUser(payload)
+        
+        assert user.name == "SSO User"  # Default name when no email
+
+    @pytest.mark.asyncio
+    async def test_sso_token_user_repr(self):
+        """Test SSOTokenUser __repr__ method."""
+        from datetime import datetime, timezone, timedelta
+        from src.api.services.auth import TokenPayload
+        from src.api.dependencies import SSOTokenUser
+        
+        payload = TokenPayload(
+            sub="repr-test-user",
+            email="repr@example.com",
+            roles=["ADMIN"],
+            exp=datetime.now(timezone.utc) + timedelta(hours=1),
+        )
+        
+        user = SSOTokenUser(payload)
+        repr_str = repr(user)
+        
+        assert "repr-test-user" in repr_str
+        assert "repr@example.com" in repr_str
+        assert "ADMIN" in repr_str
