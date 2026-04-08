@@ -11,7 +11,14 @@ export interface DocNavItem {
 }
 
 function lineDepth(line: string): number {
-  return line.match(/^(\s*)/)?.[0].length ?? 0;
+  // Measure indent of the list-marker (*), not the whole line.
+  // "  * [Title]" -> depth 1 (one indent level)
+  // "* [Title]"   -> depth 0 (top-level)
+  const match = line.match(/^(\s*)\*/);
+  if (!match) return 0;
+  const indent = match[1].length;
+  // Each indent level = 2 spaces (standard markdown convention)
+  return Math.floor(indent / 2);
 }
 
 function normalizeSummaryHrefToSlug(href: string): string {
