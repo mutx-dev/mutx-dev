@@ -29,6 +29,7 @@ from src.api.metrics import (
 from src.api.middleware.auth import add_authentication_middleware
 from src.api.middleware.rate_limit import add_rate_limiting
 from src.api.middleware.security import add_security_middleware
+from src.api.middleware.tracing import add_tracing_middleware
 from src.api.models.schemas import HealthResponse
 from src.api.routes import (
     agent_runtime,
@@ -463,6 +464,13 @@ def create_app(
     )
     _initialize_app_state(app, background_monitor_enabled=resolved_background_monitor_enabled)
 
+    # Initialize OpenTelemetry tracing at startup (guards against ImportError)
+    try:
+        from src.api.telemetry.telemetry import setup_telemetry
+        setup_telemetry("mutx-api")
+    except ImportError:
+        pass  # opentelemetry packages not installed — tracing disabled
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -479,6 +487,7 @@ def create_app(
     add_security_middleware(app, settings.cors_origins)
     add_rate_limiting(app)
     add_authentication_middleware(app)
+    add_tracing_middleware(app)
 
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(ValidationError, pydantic_validation_exception_handler)

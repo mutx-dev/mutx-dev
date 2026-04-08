@@ -94,11 +94,11 @@ def setup_telemetry(service_name: str | None = None) -> trace.Tracer:
     else:
         # Parent-based trace ID ratio (default)
         try:
-            from opentelemetry.sdk.trace.sampling import ParentBased
+            from opentelemetry.sdk.trace.sampling import ParentBasedTraceIdRatio
 
             provider = TracerProvider(
                 resource=resource,
-                sampler=ParentBased(TraceIdRatio=float(sampler_arg)),
+                sampler=ParentBasedTraceIdRatio(float(sampler_arg)),
             )
         except ImportError:
             # Fallback if sampling import fails
