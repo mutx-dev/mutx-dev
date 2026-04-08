@@ -69,19 +69,18 @@ def test_get_client_identifier_prefers_authenticated_api_key_context() -> None:
     )
 
 
-def test_get_client_identifier_uses_api_key_fingerprint_without_state() -> None:
+def test_get_client_identifier_uses_ip_without_authenticated_api_key_context() -> None:
     middleware = RateLimitMiddleware(FastAPI(), requests=5, window_seconds=60)
     request = _request_with_headers(
         headers=[(b"x-api-key", b"mutx_live_abc123"), (b"host", b"testserver")],
         client_host="192.0.2.50",
     )
 
-    identifier = middleware._get_client_identifier(request)
-    assert identifier.startswith("api_key:fingerprint:")
+    assert middleware._get_client_identifier(request) == "ip:192.0.2.50"
 
 
 @pytest.mark.asyncio
-async def test_dispatch_rate_limits_per_api_key_not_per_ip() -> None:
+async def test_dispatch_rate_limits_by_ip_without_authenticated_api_key_context() -> None:
     middleware = RateLimitMiddleware(FastAPI(), requests=1, window_seconds=60)
 
     async def call_next(_request: Request):
@@ -95,15 +94,9 @@ async def test_dispatch_rate_limits_per_api_key_not_per_ip() -> None:
         headers=[(b"x-api-key", b"mutx_live_key_two"), (b"host", b"testserver")],
         client_host="192.0.2.50",
     )
-    repeated_key_one_request = _request_with_headers(
-        headers=[(b"x-api-key", b"mutx_live_key_one"), (b"host", b"testserver")],
-        client_host="192.0.2.50",
-    )
 
     first_response = await middleware.dispatch(key_one_request, call_next)
     second_response = await middleware.dispatch(key_two_request, call_next)
-    third_response = await middleware.dispatch(repeated_key_one_request, call_next)
 
     assert first_response.status_code == 200
-    assert second_response.status_code == 200
-    assert third_response.status_code == 429
+    assert second_response.status_code == 429
