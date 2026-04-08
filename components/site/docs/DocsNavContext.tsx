@@ -5,6 +5,7 @@ import { DocNavItem } from "@/lib/docs";
 
 export const DocsNavContext = createContext<{
   nav: DocNavItem[];
+  onNavigate?: () => void;
 }>({ nav: [] });
 
 export function useDocsNav() {

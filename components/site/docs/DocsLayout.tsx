@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { DocNavItem } from '@/lib/docs';
-import { DocsNavContext } from "./DocsNavContext";
+import { DocsNavContext, useDocsNav } from "./DocsNavContext";
 import { DocsSearch } from "./DocsSearch";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { DocsBreadcrumbs } from "./DocsBreadcrumbs";
@@ -28,6 +28,7 @@ function navItemKey(slug: string) {
 function NavItem({ item, pathname }: NavItemProps) {
   const hasChildren = item.children.length > 0;
   const [open, setOpen] = useState(false);
+  const { onNavigate } = useDocsNav();
 
   // Hydrate from localStorage after mount
   useEffect(() => {
@@ -113,6 +114,7 @@ function NavItem({ item, pathname }: NavItemProps) {
             item.depth > 0 ? ' docs-nav-link-nested' : ''
           }`}
           style={{ paddingLeft: hasChildren ? '4px' : `${item.depth * 16 + 16}px` }}
+          onClick={() => onNavigate?.()}
         >
           {item.title}
         </Link>
@@ -131,10 +133,15 @@ function NavItem({ item, pathname }: NavItemProps) {
 
 export function DocsLayout({ nav, children }: DocsLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  function handleNavigate() {
+    setSidebarOpen(false);
+  }
+
   return (
-    <DocsNavContext.Provider value={{ nav }}>
+    <DocsNavContext.Provider value={{ nav, onNavigate: handleNavigate }}>
     <div className="docs-shell">
       {/* ── Top header ── */}
       <header className="docs-header">
