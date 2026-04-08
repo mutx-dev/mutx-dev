@@ -123,7 +123,7 @@
     "three": "^0.169.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.2.0",
+    "@capacitor/cli": "^8.3.0",
     "@electron/notarize": "^3.1.0",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^10.0.1",
@@ -152,5 +152,8 @@
     "typescript": "5.9.3",
     "typescript-eslint": "^8.57.2",
     "zod": "^4.3.6"
+  },
+  "overrides": {
+    "@xmldom/xmldom": "^0.8.12"
   }
 }
