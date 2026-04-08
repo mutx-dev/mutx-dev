@@ -68,3 +68,19 @@ async def test_start_supervised_agent_allowed_for_internal_user(client, monkeypa
 
     assert response.status_code == 200
     assert response.json()["agent_id"] == "agent-1"
+
+
+@pytest.mark.asyncio
+async def test_list_supervised_launch_profiles_forbidden_for_non_internal_user(
+    other_user_client,
+    monkeypatch,
+):
+    from src.api.routes import governance_supervision
+
+    monkeypatch.setattr(
+        governance_supervision, "get_faramesh_supervisor", lambda: _MockSupervisor()
+    )
+
+    response = await other_user_client.get("/v1/runtime/governance/supervised/profiles")
+
+    assert response.status_code == 403
