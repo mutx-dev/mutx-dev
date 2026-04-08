@@ -90,12 +90,14 @@ export function summaryHrefToDocsRoute(href: string): string | null {
     return normalized ? `/docs/${normalized}` : "/docs";
   }
 
+  // docs/ prefixed: strip prefix, use rest as the route path
+  // e.g. docs/adr/001-fastapi-for-control-plane → /docs/adr/001-fastapi-for-control-plane
+  // e.g. docs/architecture/README → /docs/architecture
   const normalized = normalizeSummaryHrefToSlug(href)
     .replace(/\/README$/i, "")
     .replace(/\/index$/i, "")
     .replace(/^README$/i, "");
-
-  return normalized ? `/docs/${normalized}` : "/docs";
+  return `/docs/${normalized}`;
 }
 
 export function getDocSitemapRoutes(): string[] {
