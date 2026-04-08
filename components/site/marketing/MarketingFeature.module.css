@@ -1,0 +1,298 @@
+/* ============================================================
+   FEATURE PAGE — poster-style hero + structured content grid
+   Used by all /ai-agent-* pages
+   ============================================================ */
+
+/* ---- Hero stage ---- */
+.heroSection {
+  position: relative;
+  overflow: clip;
+  background:
+    linear-gradient(168deg, #06080d 0% 62%, #0a0e18 62% 100%);
+  color: #f7f4ef;
+}
+
+.heroStage {
+  position: relative;
+  z-index: 0;
+  min-height: 58vh;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+.heroStage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(75, 141, 255, 0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 92% 8%, rgba(104, 225, 255, 0.09) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Subtle horizontal rule accent */
+.heroStage::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(75, 141, 255, 0.4) 0%, rgba(75, 141, 255, 0.08) 60%, transparent 100%);
+}
+
+.heroShell {
+  position: relative;
+  z-index: 1;
+  width: min(100% - 3rem, 116rem);
+  margin: 0 auto;
+}
+
+.heroColumn {
+  max-width: 44rem;
+}
+
+.heroEyebrow {
+  margin: 0 0 1.4rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(75, 141, 255, 0.35);
+  background: rgba(75, 141, 255, 0.08);
+  font-family: var(--font-marketing-accent), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(141, 203, 255, 0.95);
+}
+
+.heroEyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #4b8dff;
+  flex-shrink: 0;
+}
+
+.heroTitle {
+  margin: 0 0 1.6rem;
+  font-family: var(--font-marketing-display), serif;
+  font-size: clamp(2.8rem, 5.5vw, 5.2rem);
+  font-weight: 300;
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+  color: #f7f4ef;
+}
+
+.heroSupport {
+  margin: 0 0 2.2rem;
+  max-width: 30rem;
+  font-size: clamp(0.98rem, 1.1vw, 1.1rem);
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: rgba(247, 244, 239, 0.72);
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+.heroActions > :first-child,
+.heroActions > :nth-child(2) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ---- Content sections ---- */
+.contentSection {
+  padding: clamp(4rem, 8vw, 7rem) 0;
+}
+
+.contentSection + .contentSection {
+  border-top: 1px solid rgba(19, 26, 36, 0.08);
+}
+
+.contentIntro {
+  max-width: 34rem;
+  margin-bottom: clamp(2.5rem, 4vw, 3.5rem);
+}
+
+.sectionEyebrow {
+  margin: 0 0 0.9rem;
+  font-family: var(--font-marketing-accent), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #4b8dff;
+}
+
+.sectionTitle {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-marketing-display), serif;
+  font-size: clamp(1.65rem, 2.5vw, 2.3rem);
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -0.05em;
+  color: #131a24;
+}
+
+.sectionBody {
+  margin: 0;
+  font-size: clamp(0.95rem, 1vw, 1.02rem);
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  color: rgba(19, 26, 36, 0.72);
+}
+
+/* Feature card grid */
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 1.2rem;
+}
+
+.featureCard {
+  padding: 1.6rem 1.8rem 1.8rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(19, 26, 36, 0.1);
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(10, 18, 38, 0.06);
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+
+.featureCard:hover {
+  box-shadow: 0 6px 28px rgba(10, 18, 38, 0.1);
+  transform: translateY(-2px);
+}
+
+.featureCardTitle {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-marketing-accent), sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #131a24;
+}
+
+.featureCardTitle a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.featureCardTitle a:hover {
+  color: #4b8dff;
+}
+
+.featureCardBody {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.55;
+  color: rgba(19, 26, 36, 0.65);
+}
+
+/* ---- Final CTA section ---- */
+.finalSection {
+  padding: clamp(4.5rem, 9vw, 7.5rem) 0;
+  background:
+    linear-gradient(168deg, #06080d 0% 62%, #0a0e18 62% 100%);
+  color: #f7f4ef;
+}
+
+.finalInner {
+  max-width: 40rem;
+}
+
+.finalEyebrow {
+  margin: 0 0 1rem;
+  font-family: var(--font-marketing-accent), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(141, 203, 255, 0.8);
+}
+
+.finalTitle {
+  margin: 0 0 1.1rem;
+  font-family: var(--font-marketing-display), serif;
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-weight: 300;
+  line-height: 1.0;
+  letter-spacing: -0.06em;
+  color: #f7f4ef;
+}
+
+.finalBody {
+  margin: 0 0 2rem;
+  max-width: 28rem;
+  font-size: clamp(0.95rem, 1vw, 1.02rem);
+  font-weight: 500;
+  line-height: 1.58;
+  letter-spacing: -0.01em;
+  color: rgba(247, 244, 239, 0.68);
+}
+
+.finalActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+.finalActions > :first-child,
+.finalActions > :nth-child(2) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.secondaryAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: rgba(247, 244, 239, 0.85);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 160ms ease;
+}
+
+.secondaryAction:hover {
+  opacity: 0.8;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .heroSection {
+    background: linear-gradient(168deg, #06080d 0% 70%, #0a0e18 70% 100%);
+  }
+
+  .heroStage {
+    min-height: 48vh;
+    align-items: flex-end;
+  }
+
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroShell {
+    width: min(100% - 1.5rem, 116rem);
+  }
+}

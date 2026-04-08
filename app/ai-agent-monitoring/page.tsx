@@ -11,29 +11,26 @@ import {
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
-import home from "@/components/site/marketing/MarketingHome.module.css";
-
-const pageTitle = "AI Agent Monitoring | MUTX";
-const pageDescription =
-  "Monitor AI agent behavior in production. MUTX provides full trace visibility, execution metrics, and actionable alerts so your team can actually understand what agents are doing.";
+import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: pageTitle,
-  description: pageDescription,
-  alternates: {
-    canonical: getCanonicalUrl("/ai-agent-monitoring"),
-  },
+  title: "AI Agent Monitoring — Runtime Traces, Tool Call History, Outcome Records | MUTX",
+  description:
+    "See what agents actually did, not what they said they'd do. MUTX captures execution traces, tool call history, and outcomes so your team can investigate incidents and improve behavior.",
+  alternates: { canonical: getCanonicalUrl("/ai-agent-monitoring") },
   openGraph: {
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Monitoring — Runtime Traces, Tool Call History, Outcome Records | MUTX",
+    description:
+      "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.",
     url: getSiteUrl(),
     images: [getOgImageUrl()],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Monitoring | MUTX",
+    description:
+      "See what agents actually did, not what they said they'd do. Runtime traces and tool call history built into the control plane.",
     images: [getOgImageUrl()],
   },
 };
@@ -46,68 +43,44 @@ const structuredData = {
       "@id": `${getSiteUrl()}/#organization`,
       name: "MUTX",
       url: getSiteUrl(),
-      logo: `${getSiteUrl()}/logo.png`,
-      sameAs: [
-        "https://github.com/mutx-dev/mutx-dev",
-        `https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`,
-      ],
+      sameAs: [`https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`],
     },
     {
       "@type": "SoftwareApplication",
       name: "MUTX",
       applicationCategory: "DeveloperApplication",
-      operatingSystem: "macOS",
-      description: pageDescription,
-      url: getCanonicalUrl("/ai-agent-monitoring"),
+      description:
+        "Source-available control plane for AI agent governance, deployment, and observability.",
       downloadUrl: `${getSiteUrl()}/download`,
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
     {
       "@type": "WebPage",
-      name: pageTitle,
+      name: "AI Agent Monitoring | MUTX",
       url: getCanonicalUrl("/ai-agent-monitoring"),
-      description: pageDescription,
-      isPartOf: {
-        "@type": "WebSite",
-        name: "MUTX",
-        url: getSiteUrl(),
-      },
-    },
-    {
-      "@type": "Article",
-      headline: "AI Agent Monitoring and Observability",
-      description: pageDescription,
-      author: {
-        "@type": "Organization",
-        name: "MUTX",
-      },
-      publisher: {
-        "@id": `${getSiteUrl()}/#organization`,
-      },
+      description:
+        "See what agents actually did. Runtime traces, tool call history, and outcome records — built into the control plane.",
+      isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
 };
 
-const monitoringPoints = [
+const featureCards = [
   {
-    title: "Full trace visibility",
-    body: "Every agent run, every tool call, every context window decision — captured and readable by your whole team, not just the person who built it.",
+    title: "Execution traces",
+    body: "See the full sequence of what the agent did — every model call, every tool invocation, every context window change. Not a summary the model wrote about itself, but the actual trace.",
   },
   {
-    title: "Execution metrics",
-    body: "Latency, token usage, model response quality, and custom metrics. Dashboards that help you spot patterns, not just individual runs.",
+    title: "Tool call history",
+    body: "Which tool was called, with what arguments, in what order, and what came back. The information you need to understand why an agent chose a path — not just that it chose one.",
   },
   {
-    title: "Actionable alerting",
-    body: "Get paged when something actually needs attention — a budget breach, a quality regression, an auth failure — not every time an agent says hello.",
+    title: "Outcome records",
+    body: "What the agent produced, where it wrote state, what external calls it made. Outcome records let you reason backward from results instead of guessing forward from intentions.",
   },
   {
-    title: "Cross-agent correlation",
-    body: "When one agent has issues, see how it relates to others. Shared tools, shared models, shared context — traced together.",
+    title: "Alert routing",
+    body: "When something in the trace looks wrong, alerts route to the right operator — not to a generic monitoring inbox nobody monitors. Alerts are attached to agent records, not floating in a SIEM.",
   },
 ];
 
@@ -121,134 +94,150 @@ export default function AIAgentMonitoringPage() {
       />
       <div className={`${core.page} ${core.publicPage}`}>
         <main className={core.main}>
-          <section className={home.heroSection}>
-            <div className={home.heroShell}>
-              <div className={home.heroColumn}>
-                <p className={home.heroEyebrow}>AI Agent Monitoring</p>
-                <h1 className={home.heroTitle}>
-                  See what your agents
-                  <br />
-                  are actually doing.
-                </h1>
-                <p className={home.heroSupport}>
-                  Production AI without observability is flying blind. MUTX
-                  captures every trace, every metric, and every decision — so
-                  your team can understand and improve agent behavior over time.
-                </p>
-                <div className={home.heroActions}>
-                  <Link href="/download" className={core.buttonPrimary}>
-                    Download for Mac
-                  </Link>
-                  <Link href="/ai-agent-governance" className={core.buttonGhost}>
-                    Explore Governance
-                  </Link>
+          <section className={feat.heroSection}>
+            <div className={feat.heroStage}>
+              <div className={feat.heroShell}>
+                <div className={feat.heroColumn}>
+                  <p className={feat.heroEyebrow}>AI Agent Monitoring</p>
+                  <h1 className={feat.heroTitle}>
+                    See what agents
+                    <br />
+                    actually did.
+                  </h1>
+                  <p className={feat.heroSupport}>
+                    When something breaks in production, you need to reason
+                    backward from what the agent actually did — not forward from
+                    what the model said it would do. MUTX captures execution
+                    traces, tool calls, and outcomes so your team can
+                    investigate incidents and improve agent behavior over time.
+                  </p>
+                  <div className={feat.heroActions}>
+                    <Link href="/download" className={core.buttonPrimary}>
+                      Download for Mac
+                    </Link>
+                    <Link
+                      href="/ai-agent-control-plane"
+                      className={core.buttonGhost}
+                    >
+                      Control Plane
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className={home.proofSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>Observability</p>
-                <h2 className={home.sectionTitle}>
-                  Traces your team can actually use.
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Observability properties</p>
+                <h2 className={feat.sectionTitle}>
+                  Traces, not tail outputs.
                 </h2>
-                <p className={home.sectionBody}>
-                  Most agent platforms give you a raw log dump. MUTX gives you
-                  structured traces that make sense — organized by run,
-                  filterable by outcome, and readable without reverse
-                  engineering prompt chains.
+                <p className={feat.sectionBody}>
+                  Traditional monitoring tells you that something happened.
+                  MUTX traces tell you what the agent actually did — the full
+                  execution path, the tool call chain, the outcome. Information
+                  structured for investigation, not just alerting.
                 </p>
               </div>
-              <div className={home.proofGrid}>
-                {monitoringPoints.map((point) => (
-                  <div key={point.title} className={home.proofCard}>
-                    <h3 className={home.proofCardTitle}>{point.title}</h3>
-                    <p className={home.sectionBody}>{point.body}</p>
+              <div className={feat.featureGrid}>
+                {featureCards.map((card) => (
+                  <div key={card.title} className={feat.featureCard}>
+                    <h3 className={feat.featureCardTitle}>{card.title}</h3>
+                    <p className={feat.featureCardBody}>{card.body}</p>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          <section className={home.proofSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>The control plane advantage</p>
-                <h2 className={home.sectionTitle}>
-                  Monitoring built on the control plane.
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Connected surfaces</p>
+                <h2 className={feat.sectionTitle}>
+                  Monitoring is the
+                  <br />
+                  payoff for good control.
                 </h2>
-                <p className={home.sectionBody}>
-                  MUTX monitoring isn't bolted on after the fact — it's
-                  integrated into the control plane from the start. Every
-                  agent connected to MUTX automatically emits traces through
-                  the same runtime surface.
+                <p className={feat.sectionBody}>
+                  When governance, deployment, and cost are all part of the same
+                  control plane, monitoring traces attach to all of them. You see
+                  the deployment that shipped, the policy that was evaluated,
+                  and the cost that was incurred — in the same trace.
                 </p>
               </div>
-              <div className={home.proofGrid}>
-                <div className={home.proofCard}>
-                  <h3 className={home.proofCardTitle}>
-                    <Link href="/ai-agent-control-plane">Control Plane</Link>
-                  </h3>
-                  <p className={home.sectionBody}>
-                    The foundation. All agent runtimes connect to MUTX, which means traces flow naturally into monitoring.
-                  </p>
-                </div>
-                <div className={home.proofCard}>
-                  <h3 className={home.proofCardTitle}>
-                    <Link href="/ai-agent-deployment">Deployment</Link>
-                  </h3>
-                  <p className={home.sectionBody}>
-                    Monitoring starts at deployment. Every agent ships with the MUTX runtime attached and emitting.
-                  </p>
-                </div>
-                <div className={home.proofCard}>
-                  <h3 className={home.proofCardTitle}>
+              <div className={feat.featureGrid}>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
                     <Link href="/ai-agent-governance">Governance</Link>
                   </h3>
-                  <p className={home.sectionBody}>
-                    Auth failures and permission violations are first-class monitoring events, not afterthoughts.
+                  <p className={feat.featureCardBody}>
+                    Auth failures and policy violations are first-class trace
+                    events. You see when an agent hit a boundary and what it
+                    tried to do — not just the error that appeared in the logs.
                   </p>
                 </div>
-                <div className={home.proofCard}>
-                  <h3 className={home.proofCardTitle}>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-deployment">Deployment</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Traces are attached to deployment records. When you
+                    investigate a production incident, you see which deployment
+                    is running and what changed — not just a timestamp.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
                     <Link href="/ai-agent-cost">Cost Management</Link>
                   </h3>
-                  <p className={home.sectionBody}>
-                    Spend and usage metrics are integrated into the same monitoring surface as quality and latency.
+                  <p className={feat.featureCardBody}>
+                    Cost spikes surface through the monitoring surface with
+                    corresponding traces. You see the spend anomaly and the
+                    execution trace in the same incident view.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-audit-logs">Audit Logs</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Traces feed the audit log. Every action is recorded with
+                    enough context to satisfy a compliance review — not just a
+                    generic &ldquo;agent ran successfully&rdquo; entry.
                   </p>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className={home.finalSection}>
+          <section className={feat.finalSection}>
             <div className={core.shell}>
-              <div className={home.finalInner}>
-                <div className={home.finalCopy}>
-                  <p className={home.sectionEyebrow}>Get started</p>
-                  <h2 className={home.sectionTitle}>
-                    Know what your agents are doing.
-                    <br />
-                    Monitor with MUTX.
-                  </h2>
-                  <p className={home.sectionBody}>
-                    Download the Mac app and connect your first agent runtime.
-                    Traces start flowing immediately — no instrumentation
-                    required beyond the MUTX runtime surface.
-                  </p>
-                  <div className={home.finalActions}>
-                    <Link href="/download" className={core.buttonPrimary}>
-                      Download for Mac
-                    </Link>
-                    <Link
-                      href="https://github.com/mutx-dev/mutx-dev"
-                      className={home.secondaryAction}
-                    >
-                      View on GitHub
-                    </Link>
-                  </div>
+              <div className={feat.finalInner}>
+                <p className={feat.finalEyebrow}>Get started</p>
+                <h2 className={feat.finalTitle}>
+                  Watch the runtime
+                  <br />
+                  do something real.
+                </h2>
+                <p className={feat.finalBody}>
+                  Download the Mac app and run an agent. Open the trace view and
+                  see what it actually did — every tool call, every context
+                  window change, every outcome. Then compare that to what you
+                  thought it would do.
+                </p>
+                <div className={feat.finalActions}>
+                  <Link href="/download" className={core.buttonPrimary}>
+                    Download for Mac
+                  </Link>
+                  <a
+                    href="https://github.com/mutx-dev/mutx-dev"
+                    className={feat.secondaryAction}
+                  >
+                    View on GitHub
+                  </a>
                 </div>
               </div>
             </div>

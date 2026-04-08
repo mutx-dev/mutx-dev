@@ -11,29 +11,26 @@ import {
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
-import home from "@/components/site/marketing/MarketingHome.module.css";
-
-const pageTitle = "AI Agent Infrastructure — Runtime Management, Deployment, and Operational Scale | MUTX";
-const pageDescription =
-  "Manage AI agent infrastructure at scale. MUTX is an open control plane that gives operators a consistent surface for deploying, monitoring, and governing agent runtimes across any environment.";
+import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: pageTitle,
-  description: pageDescription,
-  alternates: {
-    canonical: getCanonicalUrl("/ai-agent-infrastructure"),
-  },
+  title: "AI Agent Infrastructure — Runtime Management, Compute, Secrets, Scale | MUTX",
+  description:
+    "Agent infrastructure that doesn't hide from you. MUTX gives you a consistent surface for compute, secrets, and storage — so your team can own what runs.",
+  alternates: { canonical: getCanonicalUrl("/ai-agent-infrastructure") },
   openGraph: {
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Infrastructure — Runtime Management, Compute, Secrets, Scale | MUTX",
+    description:
+      "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.",
     url: getSiteUrl(),
     images: [getOgImageUrl()],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Infrastructure | MUTX",
+    description:
+      "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.",
     images: [getOgImageUrl()],
   },
 };
@@ -46,74 +43,44 @@ const structuredData = {
       "@id": `${getSiteUrl()}/#organization`,
       name: "MUTX",
       url: getSiteUrl(),
-      logo: `${getSiteUrl()}/logo.png`,
-      sameAs: [
-        "https://github.com/mutx-dev/mutx-dev",
-        `https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`,
-      ],
+      sameAs: [`https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`],
     },
     {
       "@type": "SoftwareApplication",
       name: "MUTX",
       applicationCategory: "DeveloperApplication",
-      operatingSystem: "macOS",
-      description: pageDescription,
-      url: getCanonicalUrl("/ai-agent-infrastructure"),
+      description:
+        "Source-available control plane for AI agent governance, deployment, and observability.",
       downloadUrl: `${getSiteUrl()}/download`,
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
     {
       "@type": "WebPage",
-      name: pageTitle,
+      name: "AI Agent Infrastructure | MUTX",
       url: getCanonicalUrl("/ai-agent-infrastructure"),
-      description: pageDescription,
-      isPartOf: {
-        "@type": "WebSite",
-        name: "MUTX",
-        url: getSiteUrl(),
-      },
-    },
-    {
-      "@type": "Article",
-      headline: "AI Agent Infrastructure: Runtime Management, Deployment, and Operational Scale",
-      description: pageDescription,
-      author: {
-        "@type": "Organization",
-        name: "MUTX",
-      },
-      publisher: {
-        "@id": `${getSiteUrl()}/#organization`,
-      },
-    },
-    {
-      "@type": "DefinitionPage",
-      name: "AI Agent Infrastructure",
       description:
-        "Production infrastructure management for AI agents, covering runtime deployment, operational scaling, governance surfaces, and cross-environment consistency.",
+        "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.",
+      isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
 };
 
-const infraFeatures = [
+const featureCards = [
   {
-    title: "Runtime connection management",
-    body: "Connect agent runtimes from any environment — cloud, on-prem, or local. MUTX provides a consistent management surface across every runtime you have deployed.",
+    title: "Compute management",
+    body: "Where agents run is part of the control plane record. MUTX surfaces compute allocation, scheduling, and scaling as explicit properties — not hidden behind a hosting provider&rsquo;s console.",
   },
   {
-    title: "Deployment consistency",
-    body: "Define agent configurations once and deploy them consistently. What works in staging works in production — because the same control surface is used in both.",
+    title: "Secrets management",
+    body: "API keys, credentials, and secrets are managed through the control plane — not scattered across environment files, .env.local, and a notes app on someone&rsquo;s laptop.",
   },
   {
-    title: "Operator surfaces that scale",
-    body: "Build operator workflows once and use them across every agent. No per-agent custom tooling, no tribal knowledge — just consistent surfaces your whole team can use.",
+    title: "Storage layer",
+    body: "What the agent reads and writes, where it writes state, and how long that state persists — all explicit in the control plane. No state that lives outside the system&rsquo;s awareness.",
   },
   {
-    title: "Multi-environment governance",
-    body: "Manage agents across dev, staging, and production with governance policies that apply consistently. Your team sees the same surface, with the controls they need for each environment.",
+    title: "Network topology",
+    body: "Which services the agent can reach, which endpoints it&rsquo;s allowed to call, and how outbound traffic is routed — defined and enforced through the control plane, not assumed by convention.",
   },
 ];
 
@@ -127,93 +94,156 @@ export default function AIAgentInfrastructurePage() {
       />
       <div className={`${core.page} ${core.publicPage}`}>
         <main className={core.main}>
-          <section className={home.heroSection}>
-            <div className={home.heroShell}>
-              <div className={home.heroColumn}>
-                <p className={home.heroEyebrow}>AI Agent Infrastructure</p>
-                <h1 className={home.heroTitle}>
-                  One surface for
-                  <br />
-                  every agent runtime.
-                </h1>
-                <p className={home.heroSupport}>
-                  MUTX is an open control plane that gives your team a
-                  consistent management surface for AI agents — across every
-                  environment and every runtime you have deployed.
-                </p>
-                <div className={home.heroActions}>
-                  <Link href="/download" className={core.buttonPrimary}>
-                    Download for Mac
-                  </Link>
-                  <Link href="/control-plane" className={core.buttonGhost}>
-                    See the Control Plane
-                  </Link>
+          <section className={feat.heroSection}>
+            <div className={feat.heroStage}>
+              <div className={feat.heroShell}>
+                <div className={feat.heroColumn}>
+                  <p className={feat.heroEyebrow}>AI Agent Infrastructure</p>
+                  <h1 className={feat.heroTitle}>
+                    Infrastructure that
+                    <br />
+                    doesn&rsquo;t hide.
+                  </h1>
+                  <p className={feat.heroSupport}>
+                    Agent infrastructure shouldn&rsquo;t be a collection of
+                    one-off scripts, undocumented assumptions, and secrets nobody
+                    remembers adding. MUTX makes compute, storage, and secrets
+                    legible — so your team can actually own what runs in
+                    production.
+                  </p>
+                  <div className={feat.heroActions}>
+                    <Link href="/download" className={core.buttonPrimary}>
+                      Download for Mac
+                    </Link>
+                    <Link
+                      href="/ai-agent-control-plane"
+                      className={core.buttonGhost}
+                    >
+                      Control Plane
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className={home.proofSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>Why infrastructure matters</p>
-                <h2 className={home.sectionTitle}>
-                  Agent runtimes multiply
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Infrastructure properties</p>
+                <h2 className={feat.sectionTitle}>
+                  Own the stack
                   <br />
-                  faster than your team.
+                  your agents run on.
                 </h2>
-                <p className={home.sectionBody}>
-                  As agent deployments grow, managing them becomes a problem.
-                  MUTX gives your team a single control surface that works
-                  across every runtime. Pair with{" "}
-                  <Link href="/ai-agent-reliability">reliability tooling</Link>{" "}
-                  for observability,{" "}
-                  <Link href="/ai-agent-guardrails">guardrails</Link> for safety
-                  enforcement, and{" "}
-                  <Link href="/ai-agent-approvals">approval workflows</Link> for
-                  human oversight. The infrastructure layer is what makes all
-                  of those controls consistent and scalable.
+                <p className={feat.sectionBody}>
+                  Most agent infrastructure is implicit — it lives in someone&rsquo;s
+                  head, a shared doc that hasn&rsquo;t been updated, or a hosting
+                  console that doesn&rsquo;t connect to the agent definition.
+                  MUTX makes infrastructure explicit and versioned, so it&rsquo;s
+                  auditable and recoverable.
                 </p>
               </div>
-              <div className={home.proofGrid}>
-                {infraFeatures.map((feature) => (
-                  <div key={feature.title} className={home.proofCard}>
-                    <h3 className={home.proofCardTitle}>{feature.title}</h3>
-                    <p className={home.sectionBody}>{feature.body}</p>
+              <div className={feat.featureGrid}>
+                {featureCards.map((card) => (
+                  <div key={card.title} className={feat.featureCard}>
+                    <h3 className={feat.featureCardTitle}>{card.title}</h3>
+                    <p className={feat.featureCardBody}>{card.body}</p>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          <section className={home.finalSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.finalInner}>
-                <div className={home.finalCopy}>
-                  <p className={home.sectionEyebrow}>Open source</p>
-                  <h2 className={home.sectionTitle}>
-                    Infrastructure that
-                    <br />
-                    grows with your agent fleet.
-                  </h2>
-                  <p className={home.sectionBody}>
-                    Add MUTX to your existing agent infrastructure and get
-                    immediate management consistency across every runtime. The
-                    control plane works alongside your current tooling — it
-                    doesn&apos;t replace it. For teams managing multiple agents at
-                    scale, it&apos;s the surface that keeps operations manageable.
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Connected surfaces</p>
+                <h2 className={feat.sectionTitle}>
+                  Infrastructure is where
+                  <br />
+                  everything runs.
+                </h2>
+                <p className={feat.sectionBody}>
+                  When infrastructure is part of the control plane, it connects
+                  cleanly to governance, deployment, and observability. Secrets
+                  attach to agent records. Network policies enforce at the
+                  infrastructure layer. Compute allocation is visible in
+                  cost attribution.
+                </p>
+              </div>
+              <div className={feat.featureGrid}>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-governance">Governance</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Network topology and secrets are part of the governance
+                    surface. What the agent can access is determined by the
+                    infrastructure config, which is governed by the control
+                    plane — not left to convention.
                   </p>
-                  <div className={home.finalActions}>
-                    <Link href="/download" className={core.buttonPrimary}>
-                      Download for Mac
-                    </Link>
-                    <Link
-                      href="https://github.com/mutx-dev/mutx-dev"
-                      className={home.secondaryAction}
-                    >
-                      View on GitHub
-                    </Link>
-                  </div>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-deployment">Deployment</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Compute and storage config travel with the deployment
+                    record. When you promote an agent to production, the
+                    infrastructure config promotes with it — no manual
+                    reconciliation.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-cost">Cost Management</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Compute allocation is visible in cost attribution. When
+                    you see a cost spike, you see which compute resources
+                    were running — not just which API calls were made.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-guardrails">Guardrails</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Safety boundaries and network policies can be enforced at
+                    the infrastructure layer. Guardrail violations that relate
+                    to network access are visible with infrastructure context.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className={feat.finalSection}>
+            <div className={core.shell}>
+              <div className={feat.finalInner}>
+                <p className={feat.finalEyebrow}>Get started</p>
+                <h2 className={feat.finalTitle}>
+                  Own the infrastructure
+                  <br />
+                  your agents run on.
+                </h2>
+                <p className={feat.finalBody}>
+                  Download the Mac app and open the infrastructure surface.
+                  See where your agents run, what secrets they can access, and
+                  what the network topology looks like when it&rsquo;s defined and
+                  legible — not assumed.
+                </p>
+                <div className={feat.finalActions}>
+                  <Link href="/download" className={core.buttonPrimary}>
+                    Download for Mac
+                  </Link>
+                  <a
+                    href="https://github.com/mutx-dev/mutx-dev"
+                    className={feat.secondaryAction}
+                  >
+                    View on GitHub
+                  </a>
                 </div>
               </div>
             </div>

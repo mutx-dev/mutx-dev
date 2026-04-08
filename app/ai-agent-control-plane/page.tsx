@@ -11,29 +11,26 @@ import {
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
-import home from "@/components/site/marketing/MarketingHome.module.css";
-
-const pageTitle = "AI Agent Control Plane | MUTX";
-const pageDescription =
-  "MUTX is an open control plane for AI agents. Govern production runtimes, enforce auth boundaries, keep traces visible, and build operator workflows that feel like software you can actually ship.";
+import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: pageTitle,
-  description: pageDescription,
-  alternates: {
-    canonical: getCanonicalUrl("/ai-agent-control-plane"),
-  },
+  title: "AI Agent Control Plane — Runtime Visibility, Agent Lifecycle, Operator Surface | MUTX",
+  description:
+    "The control plane is the product. MUTX surfaces runtime traces, enforces consistency guarantees, and gives operators a legible surface for every agent in your fleet.",
+  alternates: { canonical: getCanonicalUrl("/ai-agent-control-plane") },
   openGraph: {
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Control Plane — Runtime Visibility, Agent Lifecycle, Operator Surface | MUTX",
+    description:
+      "The control plane is the product. MUTX surfaces runtime traces, enforces consistency guarantees, and gives operators a legible surface.",
     url: getSiteUrl(),
     images: [getOgImageUrl()],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Control Plane | MUTX",
+    description:
+      "The control plane is the product. Runtime traces, consistency guarantees, and operator surfaces — built in.",
     images: [getOgImageUrl()],
   },
 };
@@ -46,74 +43,44 @@ const structuredData = {
       "@id": `${getSiteUrl()}/#organization`,
       name: "MUTX",
       url: getSiteUrl(),
-      logo: `${getSiteUrl()}/logo.png`,
-      sameAs: [
-        "https://github.com/mutx-dev/mutx-dev",
-        `https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`,
-      ],
+      sameAs: [`https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`],
     },
     {
       "@type": "SoftwareApplication",
       name: "MUTX",
       applicationCategory: "DeveloperApplication",
-      operatingSystem: "macOS",
-      description: pageDescription,
-      url: getCanonicalUrl("/ai-agent-control-plane"),
+      description:
+        "Source-available control plane for AI agent governance, deployment, and observability.",
       downloadUrl: `${getSiteUrl()}/download`,
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
     {
       "@type": "WebPage",
-      name: pageTitle,
+      name: "AI Agent Control Plane | MUTX",
       url: getCanonicalUrl("/ai-agent-control-plane"),
-      description: pageDescription,
-      isPartOf: {
-        "@type": "WebSite",
-        name: "MUTX",
-        url: getSiteUrl(),
-      },
-    },
-    {
-      "@type": "Article",
-      headline: "What is an AI Agent Control Plane?",
-      description: pageDescription,
-      author: {
-        "@type": "Organization",
-        name: "MUTX",
-      },
-      publisher: {
-        "@id": `${getSiteUrl()}/#organization`,
-      },
-    },
-    {
-      "@type": "DefinitionPage",
-      name: "AI Agent Control Plane",
       description:
-        "An open control plane for production AI agent runtimes, traces, auth boundaries, and operator workflows.",
+        "The control plane is the product. MUTX surfaces runtime traces, enforces consistency guarantees, and gives operators a legible surface.",
+      isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
 };
 
-const controlPlanePoints = [
+const featureCards = [
   {
     title: "Runtime visibility",
-    body: "See what your agents actually did. Traces, tool calls, context windows, and outcomes — in a surface your whole team can read.",
+    body: "See what your agents actually did — not what the model said they would do. Traces, tool calls, context windows, and outcomes in a surface your whole team can read.",
   },
   {
-    title: "Auth boundaries",
-    body: "Define what agents can access and who can operate them. The control plane enforces boundaries across every connected runtime.",
+    title: "Agent lifecycle",
+    body: "Agents have records. Who created them, what runtime they used, what version of the toolchain was active. Lifecycle state is durable, not stored in someone&rsquo;s head or a Slack thread.",
   },
   {
-    title: "Operator workflows",
-    body: "Build release paths and operator surfaces once. Use them across every agent you deploy — without rebuilding from scratch each time.",
+    title: "Operator surface",
+    body: "The people operating agents shouldn&rsquo;t need to SSH into a server or grep a log file to understand what happened. MUTX gives operators a readable surface for every action.",
   },
   {
-    title: "Sharing with receipts",
-    body: "When agents move between teams, the full trace history, tool definitions, and permissions come with them. No silent knowledge loss.",
+    title: "Consistency guarantees",
+    body: "What runs in staging should behave the same way in production. MUTX enforces environment parity through the control plane — not through convention and hope.",
   },
 ];
 
@@ -127,127 +94,152 @@ export default function AIAgentControlPlanePage() {
       />
       <div className={`${core.page} ${core.publicPage}`}>
         <main className={core.main}>
-          <section className={home.heroSection}>
-            <div className={home.heroShell}>
-              <div className={home.heroColumn}>
-                <p className={home.heroEyebrow}>AI Agent Control Plane</p>
-                <h1 className={home.heroTitle}>
-                  Open control for
-                  <br />
-                  deployed AI agents.
-                </h1>
-                <p className={home.heroSupport}>
-                  MUTX is a production control plane that keeps runtimes
-                  legible, auth boundaries enforced, and operator workflows
-                  consistent — so what you ship actually works.
-                </p>
-                <div className={home.heroActions}>
-                  <Link href="/download" className={core.buttonPrimary}>
-                    Download for Mac
-                  </Link>
-                  <Link href="/ai-agent-deployment" className={core.buttonGhost}>
-                    Explore Deployment
-                  </Link>
+          <section className={feat.heroSection}>
+            <div className={feat.heroStage}>
+              <div className={feat.heroShell}>
+                <div className={feat.heroColumn}>
+                  <p className={feat.heroEyebrow}>AI Agent Control Plane</p>
+                  <h1 className={feat.heroTitle}>
+                    The control plane
+                    <br />
+                    is the product.
+                  </h1>
+                  <p className={feat.heroSupport}>
+                    Most agent tooling treats the control plane as an
+                    afterthought — something bolted on after the demo works.
+                    MUTX makes it the foundation. Runtime visibility, operator
+                    workflows, and consistency guarantees are built in, not
+                    improvised after the first production incident.
+                  </p>
+                  <div className={feat.heroActions}>
+                    <Link href="/download" className={core.buttonPrimary}>
+                      Download for Mac
+                    </Link>
+                    <Link
+                      href="/ai-agent-deployment"
+                      className={core.buttonGhost}
+                    >
+                      Deployment
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className={home.proofSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>What you get</p>
-                <h2 className={home.sectionTitle}>
-                  A control plane that acts like software.
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Control plane properties</p>
+                <h2 className={feat.sectionTitle}>
+                  Legible runtimes,
+                  <br />
+                  not prompt soup.
                 </h2>
-                <p className={home.sectionBody}>
-                  Most agent platforms give you a prompt box and wish you luck.
-                  MUTX gives you a runtime surface, a governance layer, and a
-                  release path — the same surfaces your team will actually use.
+                <p className={feat.sectionBody}>
+                  When something breaks in production, you need to reason
+                  backward from what actually happened — not forward from what
+                  you hoped would happen. MUTX keeps the runtime legible enough
+                  for real operators to use in real incidents.
                 </p>
               </div>
-              <div className={home.proofGrid}>
-                {controlPlanePoints.map((point) => (
-                  <div key={point.title} className={home.proofCard}>
-                    <h3 className={home.proofCardTitle}>{point.title}</h3>
-                    <p className={home.sectionBody}>{point.body}</p>
+              <div className={feat.featureGrid}>
+                {featureCards.map((card) => (
+                  <div key={card.title} className={feat.featureCard}>
+                    <h3 className={feat.featureCardTitle}>{card.title}</h3>
+                    <p className={feat.featureCardBody}>{card.body}</p>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          <section className={home.proofSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>Related topics</p>
-                <h2 className={home.sectionTitle}>
-                  Everything your agents need.
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Cross-cutting concerns</p>
+                <h2 className={feat.sectionTitle}>
+                  Everything connects
+                  <br />
+                  to the control plane.
                 </h2>
+                <p className={feat.sectionBody}>
+                  Governance, cost, deployment, and observability aren&rsquo;t
+                  separate systems that happen to share a logo. They&rsquo;re all
+                  first-class properties of the same control plane — which means
+                  policies and traces stay coherent as agents scale.
+                </p>
               </div>
-              <div className={home.proofGrid}>
-                <div className={home.proofCard}>
-                  <h3 className={home.proofCardTitle}>
-                    <Link href="/ai-agent-deployment">Deployment</Link>
-                  </h3>
-                  <p className={home.sectionBody}>
-                    Ship agents to production with repeatable runtime environments and zero-surprise configurations.
-                  </p>
-                </div>
-                <div className={home.proofCard}>
-                  <h3 className={home.proofCardTitle}>
-                    <Link href="/ai-agent-monitoring">Monitoring</Link>
-                  </h3>
-                  <p className={home.sectionBody}>
-                    Full observability across every agent run. Traces, metrics, and alerts your team can actually act on.
-                  </p>
-                </div>
-                <div className={home.proofCard}>
-                  <h3 className={home.proofCardTitle}>
+              <div className={feat.featureGrid}>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
                     <Link href="/ai-agent-governance">Governance</Link>
                   </h3>
-                  <p className={home.sectionBody}>
-                    Auth boundaries, access controls, and compliance guardrails that travel with your agents.
+                  <p className={feat.featureCardBody}>
+                    Auth boundaries and operator access controls enforced by the
+                    control plane, not by convention. Travel with the agent
+                    everywhere it runs.
                   </p>
                 </div>
-                <div className={home.proofCard}>
-                  <h3 className={home.proofCardTitle}>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
                     <Link href="/ai-agent-cost">Cost Management</Link>
                   </h3>
-                  <p className={home.sectionBody}>
-                    Track spend across models, providers, and agents. Set budgets that actually stop runaway calls.
+                  <p className={feat.featureCardBody}>
+                    Spend limits and rate limits as first-class control plane
+                    properties. Enforced at the control layer, not patched into
+                    individual API calls.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-monitoring">Monitoring</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Traces and metrics surface through the control plane, not
+                    through a separate observability setup that drifts from the
+                    agent definition.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-deployment">Deployment</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Deployment records are control plane records. What ran, when,
+                    with what config — legible and versioned in the same surface
+                    you use to operate the agent.
                   </p>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className={home.finalSection}>
+          <section className={feat.finalSection}>
             <div className={core.shell}>
-              <div className={home.finalInner}>
-                <div className={home.finalCopy}>
-                  <p className={home.sectionEyebrow}>Open source</p>
-                  <h2 className={home.sectionTitle}>
-                    Source-available control.
-                    <br />
-                    Production-grade runtime.
-                  </h2>
-                  <p className={home.sectionBody}>
-                    Download the Mac app and start with the product surface
-                    today. Keep docs, notes, and source aligned — without
-                    rebuilding your workflow to match the tool.
-                  </p>
-                  <div className={home.finalActions}>
-                    <Link href="/download" className={core.buttonPrimary}>
-                      Download for Mac
-                    </Link>
-                    <Link
-                      href="https://github.com/mutx-dev/mutx-dev"
-                      className={home.secondaryAction}
-                    >
-                      View on GitHub
-                    </Link>
-                  </div>
+              <div className={feat.finalInner}>
+                <p className={feat.finalEyebrow}>Get started</p>
+                <h2 className={feat.finalTitle}>
+                  Start with the
+                  <br />
+                  real control plane.
+                </h2>
+                <p className={feat.finalBody}>
+                  Download the Mac app and open the runtime surface. See what
+                  agents actually did, what the control plane is enforcing, and
+                  what the operator surface looks like when it&rsquo;s built around
+                  legibility — not around what was easiest to demo.
+                </p>
+                <div className={feat.finalActions}>
+                  <Link href="/download" className={core.buttonPrimary}>
+                    Download for Mac
+                  </Link>
+                  <a
+                    href="https://github.com/mutx-dev/mutx-dev"
+                    className={feat.secondaryAction}
+                  >
+                    View on GitHub
+                  </a>
                 </div>
               </div>
             </div>

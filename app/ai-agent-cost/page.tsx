@@ -11,29 +11,26 @@ import {
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
-import home from "@/components/site/marketing/MarketingHome.module.css";
-
-const pageTitle = "AI Agent Cost Management | MUTX";
-const pageDescription =
-  "Control AI agent spend. MUTX provides spend tracking across models and providers, budget enforcement, and cost attribution so you know exactly what your agents cost.";
+import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: pageTitle,
-  description: pageDescription,
-  alternates: {
-    canonical: getCanonicalUrl("/ai-agent-cost"),
-  },
+  title: "AI Agent Cost Management — Spend Visibility, Attribution, Budget Enforcement | MUTX",
+  description:
+    "Know what your agents cost and why. MUTX gives you real-time spend attribution per agent and model, so you can enforce budgets before a runaway agent becomes a five-figure surprise.",
+  alternates: { canonical: getCanonicalUrl("/ai-agent-cost") },
   openGraph: {
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Cost Management — Spend Visibility, Attribution, Budget Enforcement | MUTX",
+    description:
+      "Know what your agents cost and why. Real-time spend attribution per agent and model — enforced before it becomes a problem.",
     url: getSiteUrl(),
     images: [getOgImageUrl()],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Cost Management | MUTX",
+    description:
+      "Know what your agents cost and why. Spend attribution per agent and model — enforced before it surprises you.",
     images: [getOgImageUrl()],
   },
 };
@@ -46,68 +43,44 @@ const structuredData = {
       "@id": `${getSiteUrl()}/#organization`,
       name: "MUTX",
       url: getSiteUrl(),
-      logo: `${getSiteUrl()}/logo.png`,
-      sameAs: [
-        "https://github.com/mutx-dev/mutx-dev",
-        `https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`,
-      ],
+      sameAs: [`https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`],
     },
     {
       "@type": "SoftwareApplication",
       name: "MUTX",
       applicationCategory: "DeveloperApplication",
-      operatingSystem: "macOS",
-      description: pageDescription,
-      url: getCanonicalUrl("/ai-agent-cost"),
+      description:
+        "Source-available control plane for AI agent governance, deployment, and observability.",
       downloadUrl: `${getSiteUrl()}/download`,
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
     {
       "@type": "WebPage",
-      name: pageTitle,
+      name: "AI Agent Cost Management | MUTX",
       url: getCanonicalUrl("/ai-agent-cost"),
-      description: pageDescription,
-      isPartOf: {
-        "@type": "WebSite",
-        name: "MUTX",
-        url: getSiteUrl(),
-      },
-    },
-    {
-      "@type": "Article",
-      headline: "AI Agent Cost Management and Budget Control",
-      description: pageDescription,
-      author: {
-        "@type": "Organization",
-        name: "MUTX",
-      },
-      publisher: {
-        "@id": `${getSiteUrl()}/#organization`,
-      },
+      description:
+        "Know what your agents cost and why. Real-time spend attribution per agent and model, enforced before a runaway agent becomes a five-figure surprise.",
+      isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
 };
 
-const costPoints = [
+const featureCards = [
   {
     title: "Spend visibility",
-    body: "Track costs per agent, per model, per provider. Know exactly where your money goes without squinting at raw API bills.",
+    body: "Track costs per agent, per model, per provider. Know exactly where your money goes without squinting at raw API billing dashboards built for a different era.",
+  },
+  {
+    title: "Per-agent attribution",
+    body: "Which agent burned $4,200 last Tuesday? MUTX attributes spend to the agent record — not to the API key that happens to have been used.",
   },
   {
     title: "Budget enforcement",
-    body: "Set hard limits per agent or per team. When a budget is hit, the control plane stops the calls — not your invoice.",
+    body: "Set spend limits per agent or per team. MUTX enforces them at the control plane — not by hoping the application code checks before calling the API.",
   },
   {
-    title: "Cost attribution",
-    body: "Attribute spend to teams, products, or customers. Share cost data with the people who need it without manual reconciliation.",
-  },
-  {
-    title: "Anomaly detection",
-    body: "Get alerted when an agent's spending pattern changes unexpectedly — before a runaway prompt burns through your monthly budget.",
+    title: "Rate limits",
+    body: "Model rate limits are a first-class control plane concern, not a configuration buried in environment variables. Define them alongside the agent definition.",
   },
 ];
 
@@ -121,135 +94,148 @@ export default function AIAgentCostPage() {
       />
       <div className={`${core.page} ${core.publicPage}`}>
         <main className={core.main}>
-          <section className={home.heroSection}>
-            <div className={home.heroShell}>
-              <div className={home.heroColumn}>
-                <p className={home.heroEyebrow}>AI Agent Cost Management</p>
-                <h1 className={home.heroTitle}>
-                  Know what your agents cost.
-                  <br />
-                  Stop surprises before they happen.
-                </h1>
-                <p className={home.heroSupport}>
-                  AI spend is notoriously hard to predict. MUTX gives you
-                  real-time visibility, budget enforcement, and cost
-                  attribution across every agent and model — so you can ship
-                  agents without anxiety about the invoice.
-                </p>
-                <div className={home.heroActions}>
-                  <Link href="/download" className={core.buttonPrimary}>
-                    Download for Mac
-                  </Link>
-                  <Link href="/ai-agent-control-plane" className={core.buttonGhost}>
-                    Back to Control Plane
-                  </Link>
+          <section className={feat.heroSection}>
+            <div className={feat.heroStage}>
+              <div className={feat.heroShell}>
+                <div className={feat.heroColumn}>
+                  <p className={feat.heroEyebrow}>AI Agent Cost Management</p>
+                  <h1 className={feat.heroTitle}>
+                    Know what your
+                    <br />
+                    agents cost.
+                  </h1>
+                  <p className={feat.heroSupport}>
+                    Raw API bills don&rsquo;t tell you which agent ran up $4k last
+                    Tuesday, which model is actually worth what you&rsquo;re paying,
+                    or which workflow is about to surprise you at month end.
+                    MUTX gives you attribution — so cost becomes something you
+                    can reason about, not something you discover after the fact.
+                  </p>
+                  <div className={feat.heroActions}>
+                    <Link href="/download" className={core.buttonPrimary}>
+                      Download for Mac
+                    </Link>
+                    <Link href="/ai-agent-monitoring" className={core.buttonGhost}>
+                      Monitoring
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className={home.proofSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>Cost management</p>
-                <h2 className={home.sectionTitle}>
-                  budgets that actually work.
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Cost properties</p>
+                <h2 className={feat.sectionTitle}>
+                  Cost is a control
+                  <br />
+                  plane property.
                 </h2>
-                <p className={home.sectionBody}>
-                  Most platforms give you a cost dashboard after the fact —
-                  useful for postmortems, useless for control. MUTX enforces
-                  budgets at the control plane level, so you set a limit and
-                  the platform respects it.
+                <p className={feat.sectionBody}>
+                  Most teams find out about cost problems from their API bill,
+                  not from their agent tooling. MUTX treats cost visibility and
+                  enforcement as a first-class control plane concern — not an
+                  afterthought you add to the monitoring dashboard.
                 </p>
               </div>
-              <div className={home.proofGrid}>
-                {costPoints.map((point) => (
-                  <div key={point.title} className={home.proofCard}>
-                    <h3 className={home.proofCardTitle}>{point.title}</h3>
-                    <p className={home.sectionBody}>{point.body}</p>
+              <div className={feat.featureGrid}>
+                {featureCards.map((card) => (
+                  <div key={card.title} className={feat.featureCard}>
+                    <h3 className={feat.featureCardTitle}>{card.title}</h3>
+                    <p className={feat.featureCardBody}>{card.body}</p>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          <section className={home.proofSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>The control plane advantage</p>
-                <h2 className={home.sectionTitle}>
-                  Cost control through the control plane.
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Connected surfaces</p>
+                <h2 className={feat.sectionTitle}>
+                  Cost talks to
+                  <br />
+                  everything else.
                 </h2>
-                <p className={home.sectionBody}>
-                  MUTX cost management isn't a reporting tool — it's enforced
-                  at the runtime level. When an agent tries to make a call
-                  that would exceed its budget, the control plane stops it.
-                  No surprises, no runaway invoices.
+                <p className={feat.sectionBody}>
+                  Spend limits and rate limits are governance controls. When cost
+                  enforcement is part of the same control plane as auth
+                  boundaries and deployment records, you get coherent policies
+                  instead of disconnected feature flags.
                 </p>
               </div>
-              <div className={home.proofGrid}>
-                <div className={home.proofCard}>
-                  <h3 className={home.proofCardTitle}>
-                    <Link href="/ai-agent-control-plane">Control Plane</Link>
-                  </h3>
-                  <p className={home.sectionBody}>
-                    The foundation. All agent runtime calls route through MUTX, which means cost enforcement happens at the source.
-                  </p>
-                </div>
-                <div className={home.proofCard}>
-                  <h3 className={home.proofCardTitle}>
-                    <Link href="/ai-agent-deployment">Deployment</Link>
-                  </h3>
-                  <p className={home.sectionBody}>
-                    Set cost budgets per environment. A staging agent doesn't accidentally consume production budget.
-                  </p>
-                </div>
-                <div className={home.proofCard}>
-                  <h3 className={home.proofCardTitle}>
-                    <Link href="/ai-agent-monitoring">Monitoring</Link>
-                  </h3>
-                  <p className={home.sectionBody}>
-                    Spend metrics are part of the same monitoring surface as quality and latency — one dashboard, everything together.
-                  </p>
-                </div>
-                <div className={home.proofCard}>
-                  <h3 className={home.proofCardTitle}>
+              <div className={feat.featureGrid}>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
                     <Link href="/ai-agent-governance">Governance</Link>
                   </h3>
-                  <p className={home.sectionBody}>
-                    Rate limits and spending limits are governance controls enforced by the same policy layer as auth boundaries.
+                  <p className={feat.featureCardBody}>
+                    Spending limits and rate limits are governance controls
+                    enforced through the same policy layer that handles auth
+                    boundaries and operator access.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-deployment">Deployment</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Cost budgets travel with deployment configs. When you promote
+                    an agent from staging to production, the cost policies promote
+                    with it — no manual re-configuration.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-monitoring">Monitoring</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Cost anomalies surface through the same monitoring surface as
+                    runtime failures. You see the spike in spend and the
+                    corresponding traces in one place.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-reliability">Reliability</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Circuit breakers and spend limits work together. An agent
+                    that hits its spend ceiling can be throttled gracefully
+                    before it becomes a production incident.
                   </p>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className={home.finalSection}>
+          <section className={feat.finalSection}>
             <div className={core.shell}>
-              <div className={home.finalInner}>
-                <div className={home.finalCopy}>
-                  <p className={home.sectionEyebrow}>Get started</p>
-                  <h2 className={home.sectionTitle}>
-                    Set budgets. Stop surprises.
-                    <br />
-                    Manage costs with MUTX.
-                  </h2>
-                  <p className={home.sectionBody}>
-                    Download the Mac app and set your first agent budget.
-                    From day one, you'll have real-time visibility and enforced
-                    limits across every runtime.
-                  </p>
-                  <div className={home.finalActions}>
-                    <Link href="/download" className={core.buttonPrimary}>
-                      Download for Mac
-                    </Link>
-                    <Link
-                      href="https://github.com/mutx-dev/mutx-dev"
-                      className={home.secondaryAction}
-                    >
-                      View on GitHub
-                    </Link>
-                  </div>
+              <div className={feat.finalInner}>
+                <p className={feat.finalEyebrow}>Get started</p>
+                <h2 className={feat.finalTitle}>
+                  Set a budget before
+                  <br />
+                  your agents set one for you.
+                </h2>
+                <p className={feat.finalBody}>
+                  Download the Mac app, define spend limits for your first
+                  agents, and see what cost attribution looks like when it&rsquo;s
+                  built into the control plane from the start.
+                </p>
+                <div className={feat.finalActions}>
+                  <Link href="/download" className={core.buttonPrimary}>
+                    Download for Mac
+                  </Link>
+                  <a
+                    href="https://github.com/mutx-dev/mutx-dev"
+                    className={feat.secondaryAction}
+                  >
+                    View on GitHub
+                  </a>
                 </div>
               </div>
             </div>

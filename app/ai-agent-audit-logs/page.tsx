@@ -11,29 +11,26 @@ import {
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
-import home from "@/components/site/marketing/MarketingHome.module.css";
-
-const pageTitle = "AI Agent Audit Logs — Trace History, Compliance, and Operator Accountability | MUTX";
-const pageDescription =
-  "Keep a complete trace history of every AI agent decision. MUTX is an open control plane that records agent actions, maintains audit logs, and gives compliance teams the records they need.";
+import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: pageTitle,
-  description: pageDescription,
-  alternates: {
-    canonical: getCanonicalUrl("/ai-agent-audit-logs"),
-  },
+  title: "AI Agent Audit Logs — Trace History, Compliance Records, Operator Accountability | MUTX",
+  description:
+    "Complete trace history for every agent decision. MUTX records agent actions, policy evaluations, and operator decisions — so you can answer what happened and why.",
+  alternates: { canonical: getCanonicalUrl("/ai-agent-audit-logs") },
   openGraph: {
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Audit Logs — Trace History, Compliance Records, Operator Accountability | MUTX",
+    description:
+      "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.",
     url: getSiteUrl(),
     images: [getOgImageUrl()],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Audit Logs | MUTX",
+    description:
+      "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.",
     images: [getOgImageUrl()],
   },
 };
@@ -46,74 +43,44 @@ const structuredData = {
       "@id": `${getSiteUrl()}/#organization`,
       name: "MUTX",
       url: getSiteUrl(),
-      logo: `${getSiteUrl()}/logo.png`,
-      sameAs: [
-        "https://github.com/mutx-dev/mutx-dev",
-        `https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`,
-      ],
+      sameAs: [`https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`],
     },
     {
       "@type": "SoftwareApplication",
       name: "MUTX",
       applicationCategory: "DeveloperApplication",
-      operatingSystem: "macOS",
-      description: pageDescription,
-      url: getCanonicalUrl("/ai-agent-audit-logs"),
+      description:
+        "Source-available control plane for AI agent governance, deployment, and observability.",
       downloadUrl: `${getSiteUrl()}/download`,
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
     {
       "@type": "WebPage",
-      name: pageTitle,
+      name: "AI Agent Audit Logs | MUTX",
       url: getCanonicalUrl("/ai-agent-audit-logs"),
-      description: pageDescription,
-      isPartOf: {
-        "@type": "WebSite",
-        name: "MUTX",
-        url: getSiteUrl(),
-      },
-    },
-    {
-      "@type": "Article",
-      headline: "AI Agent Audit Logs: Trace History, Compliance, and Accountability",
-      description: pageDescription,
-      author: {
-        "@type": "Organization",
-        name: "MUTX",
-      },
-      publisher: {
-        "@id": `${getSiteUrl()}/#organization`,
-      },
-    },
-    {
-      "@type": "DefinitionPage",
-      name: "AI Agent Audit Logs",
       description:
-        "Complete audit trails for AI agent runtimes, recording every decision, tool call, and outcome for compliance, debugging, and operator accountability.",
+        "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.",
+      isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
 };
 
-const auditLogFeatures = [
+const featureCards = [
   {
-    title: "Complete trace history",
-    body: "Every agent decision gets recorded — tool calls, context window usage, and outcomes. No gaps, no silent failures. What happened and why is always reconstructable.",
+    title: "Decision records",
+    body: "Every agent decision — what it tried to do, what tool it called, what it read or wrote, what the outcome was — recorded as a durable trace with enough context to reconstruct what happened without asking the agent to explain itself.",
   },
   {
-    title: "Compliance-ready records",
-    body: "Export audit logs in formats your compliance team can use. Structured records that satisfy auditors without requiring custom tooling or manual aggregation.",
+    title: "Policy evaluation traces",
+    body: "When a governance policy is evaluated, that evaluation is in the log — not just whether it passed, but what policy version was active, what the input was, and what the decision was.",
   },
   {
-    title: "Operator attribution",
-    body: "Know which operator triggered a given agent run, and which workflow was active. When something needs review, you know exactly who was involved and what they were doing.",
+    title: "Operator accountability",
+    body: "Who configured an agent, who approved a deployment, who reviewed and overrode a guardrail decision — all in the audit log, attached to the trace they affected.",
   },
   {
-    title: "Retention and access control",
-    body: "Define how long records are kept and who can access them. Audit logs stay available for the people who need them, and protected from people who shouldn&apos;t.",
+    title: "Compliance export",
+    body: "Audit logs structured for compliance review — filterable by policy, operator, time range, and outcome. Export what compliance teams need to see without giving them access to the full operational surface.",
   },
 ];
 
@@ -127,93 +94,151 @@ export default function AIAgentAuditLogsPage() {
       />
       <div className={`${core.page} ${core.publicPage}`}>
         <main className={core.main}>
-          <section className={home.heroSection}>
-            <div className={home.heroShell}>
-              <div className={home.heroColumn}>
-                <p className={home.heroEyebrow}>AI Agent Audit Logs</p>
-                <h1 className={home.heroTitle}>
-                  Every agent decision,
-                  <br />
-                  recorded and searchable.
-                </h1>
-                <p className={home.heroSupport}>
-                  MUTX is an open control plane that maintains a complete audit
-                  trail for your AI agents — so compliance teams, operators, and
-                  auditors can always see what happened.
-                </p>
-                <div className={home.heroActions}>
-                  <Link href="/download" className={core.buttonPrimary}>
-                    Download for Mac
-                  </Link>
-                  <Link href="/control-plane" className={core.buttonGhost}>
-                    See the Control Plane
-                  </Link>
+          <section className={feat.heroSection}>
+            <div className={feat.heroStage}>
+              <div className={feat.heroShell}>
+                <div className={feat.heroColumn}>
+                  <p className={feat.heroEyebrow}>AI Agent Audit Logs</p>
+                  <h1 className={feat.heroTitle}>
+                    A record of what
+                    <br />
+                    your agents did.
+                  </h1>
+                  <p className={feat.heroSupport}>
+                    When compliance asks what the agent decided and why, vague
+                    chat logs and &ldquo;it ran successfully&rdquo; messages
+                    won&rsquo;t cut it. MUTX keeps a complete trace history — so
+                    you can answer that question definitively, with the full
+                    execution context, not just a summary.
+                  </p>
+                  <div className={feat.heroActions}>
+                    <Link href="/download" className={core.buttonPrimary}>
+                      Download for Mac
+                    </Link>
+                    <Link href="/ai-agent-monitoring" className={core.buttonGhost}>
+                      Monitoring
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className={home.proofSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>Why audit logs matter</p>
-                <h2 className={home.sectionTitle}>
-                  Agents make decisions
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Audit log properties</p>
+                <h2 className={feat.sectionTitle}>
+                  Logs built for answers,
                   <br />
-                  your team can&apos;t see.
+                  not just retention.
                 </h2>
-                <p className={home.sectionBody}>
-                  Without an audit trail, agent runs are a black box. MUTX
-                  changes that — recording every decision as a structured log
-                  your team can search, export, and review. Combine with{" "}
-                  <Link href="/ai-agent-reliability">reliability tooling</Link>{" "}
-                  for full observability, or{" "}
-                  <Link href="/ai-agent-guardrails">guardrails</Link> to enforce
-                  policies at runtime. The audit log is the record that makes
-                  everything else verifiable.
+                <p className={feat.sectionBody}>
+                  Most audit logs are written for compliance retention
+                  requirements — not for actual operator use. MUTX audit logs
+                  are structured for investigation: every record has enough
+                  context to reconstruct what happened and understand why, not
+                  just that something occurred.
                 </p>
               </div>
-              <div className={home.proofGrid}>
-                {auditLogFeatures.map((feature) => (
-                  <div key={feature.title} className={home.proofCard}>
-                    <h3 className={home.proofCardTitle}>{feature.title}</h3>
-                    <p className={home.sectionBody}>{feature.body}</p>
+              <div className={feat.featureGrid}>
+                {featureCards.map((card) => (
+                  <div key={card.title} className={feat.featureCard}>
+                    <h3 className={feat.featureCardTitle}>{card.title}</h3>
+                    <p className={feat.featureCardBody}>{card.body}</p>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          <section className={home.finalSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.finalInner}>
-                <div className={home.finalCopy}>
-                  <p className={home.sectionEyebrow}>Open source</p>
-                  <h2 className={home.sectionTitle}>
-                    Compliance records
-                    <br />
-                    that travel with the agent.
-                  </h2>
-                  <p className={home.sectionBody}>
-                    When agents move between teams or environments, their audit
-                    history moves with them. No silent gaps, no missing records.
-                    Your compliance posture stays intact — even as agent
-                    runtimes change. Built on the same control plane that powers{" "}
-                    <Link href="/ai-agent-approvals">approval workflows</Link>{" "}
-                    and{" "}
-                    <Link href="/ai-agent-infrastructure">agent infrastructure</Link>.
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Connected surfaces</p>
+                <h2 className={feat.sectionTitle}>
+                  Everything feeds
+                  <br />
+                  the audit log.
+                </h2>
+                <p className={feat.sectionBody}>
+                  Audit logs aren&rsquo;t a separate system in MUTX — they&rsquo;re
+                  where everything that happens in the control plane ends up.
+                  Governance evaluations, approval decisions, deployment records,
+                  and monitoring traces all attach to the audit log — so a
+                  single record gives you the full picture.
+                </p>
+              </div>
+              <div className={feat.featureGrid}>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-governance">Governance</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Policy evaluations are in the audit log — not just whether
+                    a policy passed or failed, but the full evaluation trace
+                    with the policy version and input context.
                   </p>
-                  <div className={home.finalActions}>
-                    <Link href="/download" className={core.buttonPrimary}>
-                      Download for Mac
-                    </Link>
-                    <Link
-                      href="https://github.com/mutx-dev/mutx-dev"
-                      className={home.secondaryAction}
-                    >
-                      View on GitHub
-                    </Link>
-                  </div>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-monitoring">Monitoring</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Traces feed the audit log. Every tool call, every outcome,
+                    every error — in a record that satisfies compliance
+                    requirements and helps operators reason about incidents.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-approvals">Approvals</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Approval decisions — who approved, what they approved, the
+                    full context — are in the audit log. The complete chain from
+                    request to approval to outcome.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-guardrails">Guardrails</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Guardrail violations are first-class audit events. You see
+                    the policy that was violated, the operation that was
+                    attempted, and the context — not just an error code.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className={feat.finalSection}>
+            <div className={core.shell}>
+              <div className={feat.finalInner}>
+                <p className={feat.finalEyebrow}>Get started</p>
+                <h2 className={feat.finalTitle}>
+                  Answer the question
+                  <br />
+                  before compliance asks it.
+                </h2>
+                <p className={feat.finalBody}>
+                  Download the Mac app and run an agent. Open the audit log and
+                  see the complete record — every decision, every policy
+                  evaluation, every operator action — structured for compliance
+                  review and operator investigation alike.
+                </p>
+                <div className={feat.finalActions}>
+                  <Link href="/download" className={core.buttonPrimary}>
+                    Download for Mac
+                  </Link>
+                  <a
+                    href="https://github.com/mutx-dev/mutx-dev"
+                    className={feat.secondaryAction}
+                  >
+                    View on GitHub
+                  </a>
                 </div>
               </div>
             </div>

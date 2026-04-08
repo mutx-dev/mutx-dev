@@ -11,29 +11,26 @@ import {
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
-import home from "@/components/site/marketing/MarketingHome.module.css";
-
-const pageTitle = "AI Agent Approvals — Human-in-the-Loop Workflows and Operator Authorization | MUTX";
-const pageDescription =
-  "Add human oversight to your AI agent operations. MUTX is an open control plane that lets you define approval workflows, track authorization decisions, and keep human operators in the loop when it matters.";
+import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: pageTitle,
-  description: pageDescription,
-  alternates: {
-    canonical: getCanonicalUrl("/ai-agent-approvals"),
-  },
+  title: "AI Agent Approvals — Human-in-the-Loop Workflows, Operator Authorization | MUTX",
+  description:
+    "Human oversight where it matters. MUTX lets you define approval gates for high-stakes agent operations — so critical actions always pass through a human, and everything is on the record.",
+  alternates: { canonical: getCanonicalUrl("/ai-agent-approvals") },
   openGraph: {
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Approvals — Human-in-the-Loop Workflows, Operator Authorization | MUTX",
+    description:
+      "Human oversight where it matters. Define approval gates for high-stakes agent operations — on the record, enforced by the control plane.",
     url: getSiteUrl(),
     images: [getOgImageUrl()],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Approvals | MUTX",
+    description:
+      "Human oversight where it matters. Approval gates for high-stakes agent operations — on the record, enforced by the control plane.",
     images: [getOgImageUrl()],
   },
 };
@@ -46,74 +43,44 @@ const structuredData = {
       "@id": `${getSiteUrl()}/#organization`,
       name: "MUTX",
       url: getSiteUrl(),
-      logo: `${getSiteUrl()}/logo.png`,
-      sameAs: [
-        "https://github.com/mutx-dev/mutx-dev",
-        `https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`,
-      ],
+      sameAs: [`https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`],
     },
     {
       "@type": "SoftwareApplication",
       name: "MUTX",
       applicationCategory: "DeveloperApplication",
-      operatingSystem: "macOS",
-      description: pageDescription,
-      url: getCanonicalUrl("/ai-agent-approvals"),
+      description:
+        "Source-available control plane for AI agent governance, deployment, and observability.",
       downloadUrl: `${getSiteUrl()}/download`,
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
     {
       "@type": "WebPage",
-      name: pageTitle,
+      name: "AI Agent Approvals | MUTX",
       url: getCanonicalUrl("/ai-agent-approvals"),
-      description: pageDescription,
-      isPartOf: {
-        "@type": "WebSite",
-        name: "MUTX",
-        url: getSiteUrl(),
-      },
-    },
-    {
-      "@type": "Article",
-      headline: "AI Agent Approvals: Human-in-the-Loop Workflows and Operator Authorization",
-      description: pageDescription,
-      author: {
-        "@type": "Organization",
-        name: "MUTX",
-      },
-      publisher: {
-        "@id": `${getSiteUrl()}/#organization`,
-      },
-    },
-    {
-      "@type": "DefinitionPage",
-      name: "AI Agent Approvals",
       description:
-        "Human oversight workflows for AI agents that require operator authorization before sensitive actions, ensuring human-in-the-loop control at critical decision points.",
+        "Human oversight where it matters. Approval gates for high-stakes agent operations — on the record, enforced by the control plane.",
+      isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
 };
 
-const approvalFeatures = [
+const featureCards = [
   {
-    title: "Configurable approval gates",
-    body: "Define where agents need human authorization — per action type, per environment, or per sensitivity level. Approval requirements travel with the agent configuration.",
-  },
-  {
-    title: "Structured request workflows",
-    body: "When an agent hits an approval gate, the operator gets a clear request: what is being requested, what context is available, and what happens if they approve or deny.",
+    title: "Approval workflows",
+    body: "Define which operations require a human to sign off before the agent proceeds. Approval gates are control plane records — not a Slack message that may or may not get answered.",
   },
   {
     title: "Authorization tracking",
-    body: "Every approval decision gets recorded — who approved, when, and why. The audit trail is complete and searchable, even across complex multi-step workflows.",
+    body: "Who approved what, when, and why — recorded in the audit log with the full execution context. Not just &ldquo;approved by jane@&rdquo; but the full chain from request to approval to outcome.",
   },
   {
-    title: "Delegation and escalation paths",
-    body: "Define who can approve what, and what happens when the designated approver is unavailable. Delegation paths are explicit — no silent bypass of human oversight.",
+    title: "Escalation paths",
+    body: "When an approval is pending, the right operator gets notified through the control plane — not through whatever notification channel happens to be monitored that day.",
+  },
+  {
+    title: "Automatic vs. approved",
+    body: "Distinguish between what the agent did autonomously and what required human sign-off. This distinction is a first-class property in MUTX — visible in traces, cost attribution, and audit logs.",
   },
 ];
 
@@ -127,95 +94,156 @@ export default function AIAgentApprovalsPage() {
       />
       <div className={`${core.page} ${core.publicPage}`}>
         <main className={core.main}>
-          <section className={home.heroSection}>
-            <div className={home.heroShell}>
-              <div className={home.heroColumn}>
-                <p className={home.heroEyebrow}>AI Agent Approvals</p>
-                <h1 className={home.heroTitle}>
-                  Human oversight
-                  <br />
-                  where it counts.
-                </h1>
-                <p className={home.heroSupport}>
-                  MUTX is an open control plane that adds structured approval
-                  workflows to your AI agents — so sensitive operations always
-                  have a human in the loop.
-                </p>
-                <div className={home.heroActions}>
-                  <Link href="/download" className={core.buttonPrimary}>
-                    Download for Mac
-                  </Link>
-                  <Link href="/control-plane" className={core.buttonGhost}>
-                    See the Control Plane
-                  </Link>
+          <section className={feat.heroSection}>
+            <div className={feat.heroStage}>
+              <div className={feat.heroShell}>
+                <div className={feat.heroColumn}>
+                  <p className={feat.heroEyebrow}>AI Agent Approvals</p>
+                  <h1 className={feat.heroTitle}>
+                    Human oversight
+                    <br />
+                    where it matters.
+                  </h1>
+                  <p className={feat.heroSupport}>
+                    You can&rsquo;t review every agent action — but you can make
+                    sure the ones that matter pass through a human. MUTX lets
+                    you define approval gates, track authorization decisions,
+                    and keep a complete record of what required oversight and
+                    what didn&rsquo;t.
+                  </p>
+                  <div className={feat.heroActions}>
+                    <Link href="/download" className={core.buttonPrimary}>
+                      Download for Mac
+                    </Link>
+                    <Link
+                      href="/ai-agent-governance"
+                      className={core.buttonGhost}
+                    >
+                      Governance
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className={home.proofSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>Why approvals matter</p>
-                <h2 className={home.sectionTitle}>
-                  Agents make decisions
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Approval properties</p>
+                <h2 className={feat.sectionTitle}>
+                  Approvals that
                   <br />
-                  that need human review.
+                  actually block.
                 </h2>
-                <p className={home.sectionBody}>
-                  Not every agent decision should be automatic. For sensitive
-                  operations, MUTX gives you structured approval workflows that
-                  require explicit operator authorization. Pair with{" "}
-                  <Link href="/ai-agent-guardrails">guardrails</Link> to define
-                  where approval gates are needed, and{" "}
-                  <Link href="/ai-agent-audit-logs">audit logs</Link> to keep a
-                  complete record of every authorization decision. Approvals
-                  are the human-in-the-loop layer that makes agent operations
-                  auditable and accountable.
+                <p className={feat.sectionBody}>
+                  Most approval systems are advisory — they suggest a human
+                  review but don&rsquo;t actually prevent the agent from proceeding.
+                  MUTX approvals are control plane gates — the agent waits until
+                  the approval is recorded, and the approval record travels with
+                  the trace.
                 </p>
               </div>
-              <div className={home.proofGrid}>
-                {approvalFeatures.map((feature) => (
-                  <div key={feature.title} className={home.proofCard}>
-                    <h3 className={home.proofCardTitle}>{feature.title}</h3>
-                    <p className={home.sectionBody}>{feature.body}</p>
+              <div className={feat.featureGrid}>
+                {featureCards.map((card) => (
+                  <div key={card.title} className={feat.featureCard}>
+                    <h3 className={feat.featureCardTitle}>{card.title}</h3>
+                    <p className={feat.featureCardBody}>{card.body}</p>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          <section className={home.finalSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.finalInner}>
-                <div className={home.finalCopy}>
-                  <p className={home.sectionEyebrow}>Open source</p>
-                  <h2 className={home.sectionTitle}>
-                    Authorization that
-                    <br />
-                    scales with your agents.
-                  </h2>
-                  <p className={home.sectionBody}>
-                    Define approval requirements once, apply them across every
-                    agent runtime. MUTX keeps authorization workflows consistent
-                    and auditable — so your team can trust agent operations without
-                    micromanaging every decision. Built on the same control plane
-                    that powers{" "}
-                    <Link href="/ai-agent-infrastructure">agent infrastructure</Link>{" "}
-                    and{" "}
-                    <Link href="/ai-agent-reliability">reliability tooling</Link>.
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Connected surfaces</p>
+                <h2 className={feat.sectionTitle}>
+                  Approvals touch
+                  <br />
+                  everything in the plane.
+                </h2>
+                <p className={feat.sectionBody}>
+                  When approvals are part of the control plane, they integrate
+                  cleanly with audit logs, governance policies, and monitoring
+                  traces. The approval record is attached to the trace, recorded
+                  in the audit log, and visible in the governance surface — not
+                  siloed in a separate workflow tool.
+                </p>
+              </div>
+              <div className={feat.featureGrid}>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-governance">Governance</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Approval requirements are governance policies. Who can
+                    approve what, and under what conditions — defined in the
+                    governance model and enforced by the approval gate.
                   </p>
-                  <div className={home.finalActions}>
-                    <Link href="/download" className={core.buttonPrimary}>
-                      Download for Mac
-                    </Link>
-                    <Link
-                      href="https://github.com/mutx-dev/mutx-dev"
-                      className={home.secondaryAction}
-                    >
-                      View on GitHub
-                    </Link>
-                  </div>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-audit-logs">Audit Logs</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Every approval decision — who approved, what they approved,
+                    the full context — is in the audit log. Compliance reviewers
+                    see the complete chain from request to outcome.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-monitoring">Monitoring</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    The distinction between automated and approved actions is
+                    visible in every trace. When you&rsquo;re investigating an
+                    incident, you see immediately which actions required human
+                    sign-off and which didn&rsquo;t.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-guardrails">Guardrails</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    A guardrail violation can be configured to require approval
+                    before the agent can proceed. The response to a safety
+                    boundary isn&rsquo;t just a log entry — it&rsquo;s a workflow
+                    that brings in a human operator.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className={feat.finalSection}>
+            <div className={core.shell}>
+              <div className={feat.finalInner}>
+                <p className={feat.finalEyebrow}>Get started</p>
+                <h2 className={feat.finalTitle}>
+                  Define an approval gate
+                  <br />
+                  and watch it block.
+                </h2>
+                <p className={feat.finalBody}>
+                  Download the Mac app, define an approval workflow for a
+                  high-stakes agent operation, and trigger it. See the gate
+                  block the operation, notify the right operator, and record
+                  the approval — on the record, in the control plane.
+                </p>
+                <div className={feat.finalActions}>
+                  <Link href="/download" className={core.buttonPrimary}>
+                    Download for Mac
+                  </Link>
+                  <a
+                    href="https://github.com/mutx-dev/mutx-dev"
+                    className={feat.secondaryAction}
+                  >
+                    View on GitHub
+                  </a>
                 </div>
               </div>
             </div>

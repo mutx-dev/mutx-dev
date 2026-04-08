@@ -11,29 +11,26 @@ import {
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
-import home from "@/components/site/marketing/MarketingHome.module.css";
-
-const pageTitle = "AI Agent Reliability — Traces, Observability, and Production Uptime | MUTX";
-const pageDescription =
-  "Keep your AI agents reliable in production. MUTX is an open control plane that surfaces traces, enforces reliability standards, and gives operators the visibility they need to ship with confidence.";
+import feat from "@/components/site/marketing/MarketingFeature.module.css";
 
 export const metadata: Metadata = {
-  title: pageTitle,
-  description: pageDescription,
-  alternates: {
-    canonical: getCanonicalUrl("/ai-agent-reliability"),
-  },
+  title: "AI Agent Reliability — Health Checks, Circuit Breakers, Production Uptime | MUTX",
+  description:
+    "Agents that survive production. MUTX surfaces health checks, enforces reliability standards, and gives operators the visibility to keep agent runtimes healthy.",
+  alternates: { canonical: getCanonicalUrl("/ai-agent-reliability") },
   openGraph: {
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Reliability — Health Checks, Circuit Breakers, Production Uptime | MUTX",
+    description:
+      "Agents that survive production. Health checks, reliability standards, and operator visibility — built into the control plane.",
     url: getSiteUrl(),
     images: [getOgImageUrl()],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
-    title: pageTitle,
-    description: pageDescription,
+    title: "AI Agent Reliability | MUTX",
+    description:
+      "Agents that survive production. Health checks and reliability standards built into the control plane.",
     images: [getOgImageUrl()],
   },
 };
@@ -46,74 +43,44 @@ const structuredData = {
       "@id": `${getSiteUrl()}/#organization`,
       name: "MUTX",
       url: getSiteUrl(),
-      logo: `${getSiteUrl()}/logo.png`,
-      sameAs: [
-        "https://github.com/mutx-dev/mutx-dev",
-        `https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`,
-      ],
+      sameAs: [`https://x.com/${DEFAULT_X_HANDLE.replace("@", "")}`],
     },
     {
       "@type": "SoftwareApplication",
       name: "MUTX",
       applicationCategory: "DeveloperApplication",
-      operatingSystem: "macOS",
-      description: pageDescription,
-      url: getCanonicalUrl("/ai-agent-reliability"),
+      description:
+        "Source-available control plane for AI agent governance, deployment, and observability.",
       downloadUrl: `${getSiteUrl()}/download`,
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
     {
       "@type": "WebPage",
-      name: pageTitle,
+      name: "AI Agent Reliability | MUTX",
       url: getCanonicalUrl("/ai-agent-reliability"),
-      description: pageDescription,
-      isPartOf: {
-        "@type": "WebSite",
-        name: "MUTX",
-        url: getSiteUrl(),
-      },
-    },
-    {
-      "@type": "Article",
-      headline: "AI Agent Reliability: Traces, Observability, and Production Uptime",
-      description: pageDescription,
-      author: {
-        "@type": "Organization",
-        name: "MUTX",
-      },
-      publisher: {
-        "@id": `${getSiteUrl()}/#organization`,
-      },
-    },
-    {
-      "@type": "DefinitionPage",
-      name: "AI Agent Reliability",
       description:
-        "Production-grade reliability for AI agents, including trace visibility, observability standards, and operator workflows that keep agents running reliably at scale.",
+        "Agents that survive production. Health checks, circuit breakers, and operator visibility — built into the control plane.",
+      isPartOf: { "@type": "WebSite", name: "MUTX", url: getSiteUrl() },
     },
   ],
 };
 
-const reliabilityPillars = [
+const featureCards = [
   {
-    title: "Trace visibility",
-    body: "Every tool call, context window decision, and agent outcome gets recorded. When something breaks, you can reconstruct exactly what happened — not guess.",
+    title: "Health checks",
+    body: "Agents have a health surface — not just &ldquo;is the process running&rdquo; but &ldquo;is the agent responsive, is the control plane reachable, is the toolchain intact.&rdquo; MUTX confirms health before declaring an agent operational.",
   },
   {
-    title: "Outcome tracking",
-    body: "Set success criteria per agent type. MUTX tracks whether outcomes meet those criteria and surfaces patterns that indicate degradation before they become incidents.",
+    title: "Readiness probes",
+    body: "An agent that just started isn&rsquo;t necessarily ready. MUTX defines readiness as an explicit state — the agent has warmed its context, loaded its tools, and confirmed it can handle requests.",
   },
   {
-    title: "Runtime health surfaces",
-    body: "Operator dashboards show agent health, latency trends, and error rates across your deployed runtimes. Your team sees the same surface — no tribal knowledge required.",
+    title: "Circuit breakers",
+    body: "When an agent hits persistent errors or a downstream service degrades, MUTX trips the circuit breaker before cascading failures take down the rest of your system.",
   },
   {
-    title: "Failover and recovery",
-    body: "When an agent runtime degrades, MUTX gives operators a clear path to recover — with the full trace history preserved so nothing gets lost in translation.",
+    title: "Failover paths",
+    body: "When an agent instance fails, the control plane can route requests to a healthy instance — without requiring a human operator to notice and intervene.",
   },
 ];
 
@@ -127,91 +94,152 @@ export default function AIAgentReliabilityPage() {
       />
       <div className={`${core.page} ${core.publicPage}`}>
         <main className={core.main}>
-          <section className={home.heroSection}>
-            <div className={home.heroShell}>
-              <div className={home.heroColumn}>
-                <p className={home.heroEyebrow}>AI Agent Reliability</p>
-                <h1 className={home.heroTitle}>
-                  Know what your agents
-                  <br />
-                  are actually doing.
-                </h1>
-                <p className={home.heroSupport}>
-                  MUTX is an open control plane that keeps AI agent runtimes
-                  legible — so your team can ship production agents that work,
-                  and fix them when they don&apos;t.
-                </p>
-                <div className={home.heroActions}>
-                  <Link href="/download" className={core.buttonPrimary}>
-                    Download for Mac
-                  </Link>
-                  <Link href="/control-plane" className={core.buttonGhost}>
-                    See the Control Plane
-                  </Link>
+          <section className={feat.heroSection}>
+            <div className={feat.heroStage}>
+              <div className={feat.heroShell}>
+                <div className={feat.heroColumn}>
+                  <p className={feat.heroEyebrow}>AI Agent Reliability</p>
+                  <h1 className={feat.heroTitle}>
+                    Agents that
+                    <br />
+                    survive production.
+                  </h1>
+                  <p className={feat.heroSupport}>
+                    Pushing an agent to production and hoping for the best
+                    isn&rsquo;t a reliability strategy. MUTX surfaces health checks,
+                    enforces circuit breakers, and gives operators the
+                    visibility to catch degradation before it becomes an
+                    incident — not after.
+                  </p>
+                  <div className={feat.heroActions}>
+                    <Link href="/download" className={core.buttonPrimary}>
+                      Download for Mac
+                    </Link>
+                    <Link href="/ai-agent-monitoring" className={core.buttonGhost}>
+                      Monitoring
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className={home.proofSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>Why reliability matters</p>
-                <h2 className={home.sectionTitle}>
-                  Agents break in ways
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Reliability properties</p>
+                <h2 className={feat.sectionTitle}>
+                  Reliability is a
                   <br />
-                  your team will notice.
+                  control plane property.
                 </h2>
-                <p className={home.sectionBody}>
-                  When an AI agent runs in production, it makes hundreds of
-                  decisions your team can&apos;t see. MUTX surfaces those decisions
-                  as traces — so when something goes wrong, you have a record
-                  instead of a mystery. Built on the same control plane philosophy
-                  behind{" "}
-                  <Link href="/ai-agent-audit-logs">audit logs</Link>,{" "}
-                  <Link href="/ai-agent-guardrails">guardrails</Link>, and{" "}
-                  <Link href="/ai-agent-approvals">approval workflows</Link>.
+                <p className={feat.sectionBody}>
+                  Most agent tooling treats reliability as something that
+                  happens if the model behaves. MUTX treats it as something
+                  the control plane enforces — through health checks, circuit
+                  breakers, and explicit operational state that operators can
+                  read and act on.
                 </p>
               </div>
-              <div className={home.proofGrid}>
-                {reliabilityPillars.map((pillar) => (
-                  <div key={pillar.title} className={home.proofCard}>
-                    <h3 className={home.proofCardTitle}>{pillar.title}</h3>
-                    <p className={home.sectionBody}>{pillar.body}</p>
+              <div className={feat.featureGrid}>
+                {featureCards.map((card) => (
+                  <div key={card.title} className={feat.featureCard}>
+                    <h3 className={feat.featureCardTitle}>{card.title}</h3>
+                    <p className={feat.featureCardBody}>{card.body}</p>
                   </div>
                 ))}
               </div>
             </div>
           </section>
 
-          <section className={home.finalSection}>
+          <section className={feat.contentSection}>
             <div className={core.shell}>
-              <div className={home.finalInner}>
-                <div className={home.finalCopy}>
-                  <p className={home.sectionEyebrow}>Open source</p>
-                  <h2 className={home.sectionTitle}>
-                    Reliability that scales
-                    <br />
-                    with your agent fleet.
-                  </h2>
-                  <p className={home.sectionBody}>
-                    Add MUTX to any agent runtime. Get trace visibility,
-                    outcome tracking, and operator surfaces — without
-                    rebuilding your observability stack from scratch. Works
-                    alongside your existing{" "}
-                    <Link href="/ai-agent-infrastructure">agent infrastructure</Link>.
+              <div className={feat.contentIntro}>
+                <p className={feat.sectionEyebrow}>Connected surfaces</p>
+                <h2 className={feat.sectionTitle}>
+                  Reliability talks to
+                  <br />
+                  the rest of the plane.
+                </h2>
+                <p className={feat.sectionBody}>
+                  When reliability standards are part of the control plane,
+                  circuit breakers can integrate with cost enforcement, failover
+                  can route based on deployment records, and health checks can
+                  feed the audit log — without stitching together separate
+                  monitoring tools.
+                </p>
+              </div>
+              <div className={feat.featureGrid}>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-cost">Cost Management</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Circuit breakers and spend limits work together. When an
+                    agent hits its cost ceiling, the control plane can throttle
+                    it gracefully — before it becomes a runaway API bill.
                   </p>
-                  <div className={home.finalActions}>
-                    <Link href="/download" className={core.buttonPrimary}>
-                      Download for Mac
-                    </Link>
-                    <Link
-                      href="https://github.com/mutx-dev/mutx-dev"
-                      className={home.secondaryAction}
-                    >
-                      View on GitHub
-                    </Link>
-                  </div>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-deployment">Deployment</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Health checks are part of the deployment record. The agent
+                    isn&rsquo;t &ldquo;deployed&rdquo; in MUTX until it passes its health
+                    probe — not just until the deployment command exits.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-monitoring">Monitoring</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    Circuit breaker trips and health check failures surface
+                    through the monitoring surface. Operators see the
+                    degradation event with full context before customers report
+                    it.
+                  </p>
+                </div>
+                <div className={feat.featureCard}>
+                  <h3 className={feat.featureCardTitle}>
+                    <Link href="/ai-agent-guardrails">Guardrails</Link>
+                  </h3>
+                  <p className={feat.featureCardBody}>
+                    When a guardrail violation triggers a circuit breaker, the
+                    response is coordinated by the control plane — not handled
+                    by two separate systems that may not agree on what happened.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className={feat.finalSection}>
+            <div className={core.shell}>
+              <div className={feat.finalInner}>
+                <p className={feat.finalEyebrow}>Get started</p>
+                <h2 className={feat.finalTitle}>
+                  Ship an agent and
+                  <br />
+                  watch the health surface.
+                </h2>
+                <p className={feat.finalBody}>
+                  Download the Mac app, deploy an agent, and open the reliability
+                  surface. See what the health probe reports, what happens when
+                  you trigger a circuit breaker, and what the operator sees before
+                  the incident reaches your users.
+                </p>
+                <div className={feat.finalActions}>
+                  <Link href="/download" className={core.buttonPrimary}>
+                    Download for Mac
+                  </Link>
+                  <a
+                    href="https://github.com/mutx-dev/mutx-dev"
+                    className={feat.secondaryAction}
+                  >
+                    View on GitHub
+                  </a>
                 </div>
               </div>
             </div>
