@@ -60,6 +60,7 @@ export function parseSummary(): DocNavItem[] {
       route: summaryHrefToDocsRoute(parsed.href) ?? `/docs/${parsed.slug}`,
       children: [],
       depth,
+      isPage: true, // optimistic — will flip to false if children are added below
     };
 
     // Find where to insert
@@ -70,7 +71,9 @@ export function parseSummary(): DocNavItem[] {
     if (stack.length === 0) {
       root.push(item);
     } else {
+      // Parent gets a child → parent is a section, not a page
       stack[stack.length - 1].item.children.push(item);
+      stack[stack.length - 1].item.isPage = false;
     }
 
     stack.push({ item, depth });
