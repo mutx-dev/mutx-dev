@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface SearchEntry {
@@ -23,11 +23,17 @@ interface SearchIndex {
 }
 
 interface AllDocEntry extends SearchEntry {
-  _score?: never; // prevent misuse — allDocs doesn't use _score
+  _score?: never;
 }
 
 interface SearchResult extends SearchEntry {
   _score: number;
+}
+
+// Module-level event bus so the always-mounted trigger can open the modal
+const listeners: Set<() => void> = new Set();
+export function openSearchModal() {
+  listeners.forEach((fn) => fn());
 }
 
 export function DocsSearch() {
@@ -38,6 +44,17 @@ export function DocsSearch() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  // Register this instance's open setter with the module-level bus
+  useEffect(() => {
+    function handler() {
+      setOpen(true);
+    }
+    listeners.add(handler);
+    return () => {
+      listeners.delete(handler);
+    };
+  }, []);
 
   // Load index once
   useEffect(() => {

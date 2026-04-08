@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { DocNavItem } from '@/lib/docs';
 import { DocsNavContext, useDocsNav } from "./DocsNavContext";
-import { DocsSearch } from "./DocsSearch";
+import { DocsSearch, openSearchModal } from "./DocsSearch";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { DocsBreadcrumbs } from "./DocsBreadcrumbs";
 import "@/app/docs/docs.css";
@@ -131,6 +131,20 @@ function NavItem({ item, pathname }: NavItemProps) {
   );
 }
 
+function loadOpenState(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem('docs-nav-open') ?? '[]');
+  } catch {
+    return [];
+  }
+}
+
+function saveOpenState(sections: Set<string>) {
+  try {
+    localStorage.setItem('docs-nav-open', JSON.stringify([...sections]));
+  } catch {}
+}
+
 export function DocsLayout({ nav, children }: DocsLayoutProps) {
   const pathname = usePathname();
   const [openSections, setOpenSections] = useState<Set<string>>(() => {
@@ -148,6 +162,11 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
     }
     return initial;
   });
+
+  // Persist open sections to localStorage
+  useEffect(() => {
+    saveOpenState(openSections);
+  }, [openSections]);
 
   function handleNavigate() {
     document.documentElement.removeAttribute('data-mobile-nav-open');
@@ -210,14 +229,7 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
 
         <button
           className="docs-search-trigger"
-          onClick={() => {
-            const event = new KeyboardEvent('keydown', {
-              key: 'k',
-              metaKey: true,
-              bubbles: true,
-            });
-            window.dispatchEvent(event);
-          }}
+          onClick={openSearchModal}
           aria-label="Search docs (Cmd+K)"
         >
           <svg
