@@ -210,7 +210,8 @@ export default async function DocPage({
   const { slug = [] } = await params;
 
   // Empty slug → render the homepage
-  if (slug.length === 0) {
+  // Also handle /docs/README which Next.js serves for docs/README.md
+  if (slug.length === 0 || (slug.length === 1 && slug[0] === "README")) {
     return <DocsHomePage />;
   }
 
