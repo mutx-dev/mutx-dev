@@ -18,6 +18,16 @@ export const PUBLIC_MARKETING_ROUTES = [
   '/support',
   '/roadmap',
   '/privacy-policy',
+  '/ai-agent-approvals',
+  '/ai-agent-audit-logs',
+  '/ai-agent-control-plane',
+  '/ai-agent-cost',
+  '/ai-agent-deployment',
+  '/ai-agent-governance',
+  '/ai-agent-guardrails',
+  '/ai-agent-infrastructure',
+  '/ai-agent-monitoring',
+  '/ai-agent-reliability',
 ] as const
 
 export const BLOCKED_CRAWL_PREFIXES = [

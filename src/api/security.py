@@ -28,7 +28,8 @@ def legacy_sha256_hex(value: str) -> str:
 
 
 def _derive_fernet_key(secret_material: str) -> bytes:
-    digest = hashlib.sha256(secret_material.encode("utf-8")).digest()
+    # SHA256 here is a KDF input transform per Fernet spec; key material is already high-entropy
+    digest = hashlib.sha256(secret_material.encode("utf-8"), usedforsecurity=False).digest()
     return base64.urlsafe_b64encode(digest)
 
 

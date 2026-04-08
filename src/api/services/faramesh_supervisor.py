@@ -14,6 +14,7 @@ import asyncio
 import logging
 import os
 import subprocess
+import tempfile
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -245,6 +246,8 @@ class FarameshSupervisor:
         allowed_dir = Path(self.config.allowed_policy_dir).expanduser().resolve()
         requested_path = (allowed_dir / self._normalize_policy_fragment(faramesh_policy)).resolve()
 
+        # Canonicalise and validate the path is within allowed_dir.
+        # resolve() was already called above; relative_to() confirms the final location.
         try:
             requested_path.relative_to(allowed_dir)
         except ValueError as exc:
@@ -252,10 +255,14 @@ class FarameshSupervisor:
                 f"Faramesh policy must stay within {allowed_dir}"
             ) from exc
 
-        if not requested_path.is_file():
-            raise SupervisionValidationError(f"Faramesh policy does not exist: {requested_path}")
-
-        return str(requested_path)
+        # Read content while the path is validated so the subprocess never sees a raw path.
+        try:
+            with open(requested_path) as f:
+                return f.read()
+        except FileNotFoundError as exc:
+            raise SupervisionValidationError(
+                f"Faramesh policy does not exist: {requested_path}"
+            ) from exc
 
     def sanitize_launch_request(
         self,
@@ -375,11 +382,23 @@ class FarameshSupervisor:
             logger.error("Faramesh binary not found")
             return False
 
-        policy = faramesh_policy or self.config.policy_path
+        # faramesh_policy is either a policy content string (from _normalize_policy_path)
+        # or None (uses config default path on disk).
+        # When it is content, atomically write to a mode-0600 temp file so the subprocess
+        # sees a real path on disk without us having exposed a user-controlled path to the shell.
+        policy_tmp_path: Optional[str] = None
+        if isinstance(faramesh_policy, str):
+            fd, policy_tmp_path = tempfile.mkstemp(suffix=".json", prefix="faramesh_policy.")
+            os.chmod(policy_tmp_path, 0o600)
+            os.write(fd, faramesh_policy.encode("utf-8"))
+            os.close(fd)
+            policy_to_use: Optional[str] = policy_tmp_path
+        else:
+            policy_to_use = faramesh_policy or self.config.policy_path
 
         supervised_command = [faramesh_bin, "run"]
-        if policy:
-            supervised_command.extend(["--policy", policy])
+        if policy_to_use:
+            supervised_command.extend(["--policy", policy_to_use])
         supervised_command.extend(["--", *command])
 
         full_env = os.environ.copy()
@@ -403,7 +422,7 @@ class FarameshSupervisor:
                 state=SupervisionState.STARTING,
                 process=process,
                 pid=process.pid,
-                faramesh_policy=policy,
+                faramesh_policy=policy_tmp_path or policy_to_use,
                 started_at=datetime.now(timezone.utc),
                 last_start_at=datetime.now(timezone.utc),
             )
@@ -419,6 +438,12 @@ class FarameshSupervisor:
                 )
                 agent.state = SupervisionState.FAILED
                 agent.last_exit_code = process.returncode
+                # Clean up temp policy file — agent was never fully started.
+                if policy_tmp_path:
+                    try:
+                        os.unlink(policy_tmp_path)
+                    except OSError:
+                        pass
                 return False
 
             agent.state = SupervisionState.RUNNING
@@ -495,6 +520,12 @@ class FarameshSupervisor:
         agent.state = SupervisionState.STOPPED
         agent.last_stop_at = datetime.now(timezone.utc)
         agent.pid = None
+        # Clean up the temp policy file created by _normalize_policy_path if applicable.
+        if agent.faramesh_policy and "/faramesh_policy." in agent.faramesh_policy:
+            try:
+                os.unlink(agent.faramesh_policy)
+            except OSError:
+                pass
         logger.info(f"Agent {agent_id} stopped")
         return True
 

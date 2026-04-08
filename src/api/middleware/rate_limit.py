@@ -61,6 +61,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     def _fingerprint(value: str) -> str:
         """Create a stable keyed fingerprint for rate-limit bucket labels."""
         secret = settings.jwt_secret.encode()
+        # usedforsecurity=False: HMAC-SHA256 here is anonymization, not password hashing
         return hmac.new(secret, value.encode(), hashlib.sha256).hexdigest()[:24]
 
     def _extract_api_key_token(self, request: Request) -> str | None:
