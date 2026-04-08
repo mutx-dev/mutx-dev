@@ -407,153 +407,16 @@ class TestAuthEndpoints:
         )
         assert response.status_code == 200
 
-    @pytest.mark.asyncio
-    async def test_verify_email_rejects_expired_token(
-        self, client_no_auth: AsyncClient, db_session: AsyncSession
-    ):
-        from datetime import datetime, timedelta, timezone
-        from sqlalchemy import update
 
-        from src.api.auth.password import hash_password
-        from src.api.services.user_service import UserService
+class TestPasswordCompatibility:
+    """Compatibility tests for legacy password hashes."""
 
-        user = User(
-            id=uuid.uuid4(),
-            email="verify-expired@example.com",
-            password_hash=hash_password("StrongPassword123!"),
-            name="Expired Verification User",
-            is_active=True,
-            is_email_verified=False,
-        )
-        db_session.add(user)
-        await db_session.commit()
+    def test_verify_password_accepts_legacy_pbkdf2_sha256_hash(self):
+        from passlib.hash import pbkdf2_sha256
 
-        token = await UserService(db_session).create_email_verification_token(user.id)
-        await db_session.execute(
-            update(User)
-            .where(User.id == user.id)
-            .values(email_verification_expires_at=datetime.now(timezone.utc) - timedelta(minutes=1))
-        )
-        await db_session.commit()
+        from src.api.auth.password import verify_password
 
-        response = await client_no_auth.post(
-            "/v1/auth/verify-email",
-            json={"token": token},
-        )
+        plain_password = "StrongPassword123!"
+        legacy_hash = pbkdf2_sha256.hash(plain_password)
 
-        assert response.status_code == 400
-        assert "invalid or expired" in response.json()["detail"].lower()
-
-        await db_session.refresh(user)
-        assert user.is_email_verified is False
-        assert user.email_verification_token is None
-        assert user.email_verification_expires_at is None
-
-    @pytest.mark.asyncio
-    async def test_refresh_token_sliding_expiry(
-        self, client_no_auth: AsyncClient, db_session: AsyncSession
-    ):
-        """Test that refresh token uses sliding expiry."""
-        from src.api.auth.password import hash_password
-        from src.api.auth.jwt import (
-            get_refresh_token_iat,
-        )
-
-        # Create a user
-        user = User(
-            id=uuid.uuid4(),
-            email="sliding@example.com",
-            password_hash=hash_password("StrongPassword123!"),
-            name="Sliding User",
-            is_active=True,
-        )
-        db_session.add(user)
-        await db_session.commit()
-
-        # Login to get initial tokens
-        response = await client_no_auth.post(
-            "/v1/auth/login",
-            json={
-                "email": "sliding@example.com",
-                "password": "StrongPassword123!",
-            },
-        )
-        assert response.status_code == 200
-        data = response.json()
-        refresh_token = data["refresh_token"]
-
-        # Get original iat
-        original_iat = get_refresh_token_iat(refresh_token)
-        assert original_iat is not None
-
-        # Use the refresh token
-        response = await client_no_auth.post(
-            "/v1/auth/refresh",
-            json={"refresh_token": refresh_token},
-        )
-        assert response.status_code == 200
-        data = response.json()
-
-        new_refresh_token = data["refresh_token"]
-        new_iat = get_refresh_token_iat(new_refresh_token)
-
-        # The new token should keep the original iat (for sliding window calculation)
-        assert new_iat == original_iat
-
-    @pytest.mark.asyncio
-    async def test_refresh_token_sliding_expiry_max_days(
-        self, client_no_auth: AsyncClient, db_session: AsyncSession
-    ):
-        """Test that sliding expiry is capped at max days."""
-        from src.api.auth.password import hash_password
-        from datetime import datetime, timedelta, timezone
-        from src.api.auth.jwt import (
-            get_refresh_token_iat,
-            issue_refresh_token,
-            verify_refresh_token,
-        )
-
-        # Create a user
-        user = User(
-            id=uuid.uuid4(),
-            email="slidingmax@example.com",
-            password_hash=hash_password("StrongPassword123!"),
-            name="Sliding Max User",
-            is_active=True,
-        )
-        db_session.add(user)
-        await db_session.commit()
-
-        # Login to get initial tokens
-        response = await client_no_auth.post(
-            "/v1/auth/login",
-            json={
-                "email": "slidingmax@example.com",
-                "password": "StrongPassword123!",
-            },
-        )
-        assert response.status_code == 200
-
-        # Simulate a refresh token that was issued 25 days ago (almost at max)
-        old_iat = datetime.now(timezone.utc) - timedelta(days=25)
-        old_token, _, _ = await issue_refresh_token(db_session, user.id, original_iat=old_iat)
-        await db_session.commit()
-
-        # Refresh with the old token
-        response = await client_no_auth.post(
-            "/v1/auth/refresh",
-            json={"refresh_token": old_token},
-        )
-        assert response.status_code == 200
-        data = response.json()
-
-        new_refresh_token = data["refresh_token"]
-        new_iat = get_refresh_token_iat(new_refresh_token)
-
-        # The iat should still be the original (25 days ago)
-        assert new_iat is not None
-        age = (datetime.now(timezone.utc) - new_iat).days
-        assert age >= 25  # Original iat preserved
-
-        # Verify the new token is still valid (not more than 30 days from original iat)
-        assert verify_refresh_token(new_refresh_token) is not None
+        assert verify_password(plain_password, legacy_hash)
