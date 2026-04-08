@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { CalendlyPopupButton } from '@/components/site/CalendlyPopupButton'
 import { motion, useReducedMotion } from 'framer-motion'
@@ -84,7 +84,7 @@ function HoverCard({ className, children, delay = 0, distance = 18 }: HoverCardP
 
 export function MarketingHomePage() {
   const prefersReducedMotion = useReducedMotion()
-  const [activeDemoId, setActiveDemoId] = useState(marketingHomepage.salesSections.demo.tabs[0]?.id)
+  const activeDemoId = marketingHomepage.salesSections.demo.tabs[0]?.id
   const [primaryAction, ...secondaryActions] = marketingHomepage.hero.actions
   const [finalPrimaryAction, ...finalSecondaryActions] = marketingHomepage.salesSections.cta.actions
 
