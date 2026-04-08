@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mutx-env
+  labels:
+    app.kubernetes.io/name: mutx
+    app.kubernetes.io/instance: mutx
+    helm.sh/chart: mutx-0.1.0
+data:
+  LOG_LEVEL: "INFO"
+  # Add your environment variables here

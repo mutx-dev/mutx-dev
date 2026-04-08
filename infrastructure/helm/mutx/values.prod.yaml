@@ -1,0 +1,36 @@
+image:
+  repository: mutx/mutx
+  tag: latest
+  pullPolicy: Always
+
+replicaCount: 3
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: true
+  className: nginx
+  host: mutx.example.com
+  tls:
+    enabled: true
+    secretName: mutx-tls-prod
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+env:
+  LOG_LEVEL: "WARNING"
+  ENVIRONMENT: "production"
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70

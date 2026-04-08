@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mutx
+  labels:
+    app.kubernetes.io/name: mutx
+    app.kubernetes.io/instance: mutx
+    helm.sh/chart: mutx-0.1.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mutx
+      app.kubernetes.io/instance: mutx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mutx
+        app.kubernetes.io/instance: mutx
+    spec:
+      containers:
+        - name: mutx
+          image: mutx/mutx:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: mutx-env
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: 1Gi
+            requests:
+              cpu: "100m"
+              memory: 256Mi
