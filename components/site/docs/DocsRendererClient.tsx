@@ -75,9 +75,9 @@ export function DocsRendererClient({ html }: DocsRendererClientProps) {
         const titleEl = cells[0].querySelector("strong") || cells[0];
         const title = titleEl.textContent?.trim() ?? "";
         const desc =
-          cells[1].querySelector("p")?.textContent?.trim() ??
-          cells[1].textContent?.trim() ??
-          "";
+          (cells[1].querySelector("p")?.textContent?.trim() ??
+            cells[1].textContent?.trim() ??
+            "")?.replace(/\.md$/, "") ?? "";
 
         // Title column: first cell
         // Target column: second cell (index 1 — table has 2 columns)
