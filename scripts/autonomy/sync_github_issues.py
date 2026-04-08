@@ -13,6 +13,7 @@ PATH_TOKEN = re.compile(r"`([^`]+)`")
 REPO_PATH_HINT = re.compile(r"^(docs/|src/|app/|components/|lib/|sdk/|cli/|scripts/|tests/|infrastructure/|README\.md|roadmap\.md|whitepaper\.md|AGENTS\.md)")
 
 AREA_LABELS = {"api", "web", "auth", "cli-sdk", "runtime", "test", "infra", "ops", "docs"}
+UNSAFE_VERIFICATION_CHARS = {";", "&", "|", "`", "$", ">", "<"}
 
 
 def run_gh(args: list[str]) -> subprocess.CompletedProcess[str]:
@@ -119,6 +120,8 @@ def infer_verification(sections: dict[str, str], area: str) -> list[str]:
     for line in sections.get("acceptance criteria", "").splitlines():
         line = line.strip().lstrip("-*")
         if not line:
+            continue
+        if any(char in line for char in UNSAFE_VERIFICATION_CHARS):
             continue
         if any(cmd in line for cmd in ["pytest", "npm run", "git diff --check", "python3 ", "make "]):
             verification.append(line)
