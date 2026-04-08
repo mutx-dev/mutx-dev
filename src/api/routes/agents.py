@@ -96,6 +96,37 @@ def _deserialize_agent_config(config: Any) -> dict[str, Any] | None:
     return config_dict
 
 
+def _deserialize_extra_metadata(extra_metadata: Any) -> dict[str, Any] | None:
+    if not extra_metadata:
+        return None
+
+    if isinstance(extra_metadata, str):
+        try:
+            parsed = json.loads(extra_metadata)
+        except json.JSONDecodeError:
+            return None
+        return parsed if isinstance(parsed, dict) else None
+
+    return extra_metadata if isinstance(extra_metadata, dict) else None
+
+
+def _to_agent_resource_usage_response(usage: AgentResourceUsage) -> AgentResourceUsageResponse:
+    return AgentResourceUsageResponse(
+        id=usage.id,
+        agent_id=usage.agent_id,
+        prompt_tokens=usage.prompt_tokens,
+        completion_tokens=usage.completion_tokens,
+        total_tokens=usage.total_tokens,
+        api_calls=usage.api_calls,
+        cost_usd=usage.cost_usd,
+        model=usage.model,
+        extra_metadata=_deserialize_extra_metadata(usage.extra_metadata),
+        period_start=usage.period_start,
+        period_end=usage.period_end,
+        created_at=usage.created_at,
+    )
+
+
 def _extract_config_version(config: dict[str, Any] | None) -> int:
     if not isinstance(config, dict):
         return 1
@@ -524,9 +555,6 @@ async def get_agent_metrics(
 
 # --- Resource Usage Routes ---
 
-from src.api.models import AgentResourceUsage
-from src.api.models.schemas import AgentResourceUsageCreate, AgentResourceUsageResponse
-
 
 @router.post(
     "/{agent_id}/resource-usage",
@@ -563,7 +591,7 @@ async def create_agent_resource_usage(
     await db.commit()
     await db.refresh(usage)
     logger.info(f"Recorded resource usage for agent: {agent_id}")
-    return usage
+    return _to_agent_resource_usage_response(usage)
 
 
 @router.get(
@@ -594,4 +622,4 @@ async def list_agent_resource_usage(
     )
     result = await db.execute(query)
     usages = result.scalars().all()
-    return usages
+    return [_to_agent_resource_usage_response(usage) for usage in usages]
