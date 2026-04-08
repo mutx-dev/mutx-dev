@@ -79,18 +79,18 @@ export function DocsRendererClient({ html }: DocsRendererClientProps) {
           cells[1].textContent?.trim() ??
           "";
 
-        // First cell: title (bold or plain)
-        // Second cell: description text
-        // Third cell (data-card-target): link to target doc
-        const targetLink = cells[2]?.querySelector("a");
+        // Title column: first cell
+        // Target column: second cell (index 1 — table has 2 columns)
+        // Cover column: third cell (index 2) — optional
+        const targetLink = cells[1]?.querySelector("a");
         const targetHref = targetLink?.getAttribute("href") ?? "#";
         const targetLabel =
           targetLink?.textContent?.trim() ??
-          cells[2]?.textContent?.trim() ??
+          cells[1]?.textContent?.trim() ??
           title;
 
-        // Cover cell: first image src
-        const coverImg = cells[3]?.querySelector("img");
+        // Cover cell: third cell (index 2) — first image src
+        const coverImg = cells[2]?.querySelector("img");
         const coverSrc = coverImg?.getAttribute("src") ?? "";
 
         const imgHtml = coverSrc
