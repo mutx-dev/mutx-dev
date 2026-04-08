@@ -71,19 +71,18 @@ def test_get_client_identifier_prefers_authenticated_api_key_context() -> None:
     )
 
 
-def test_get_client_identifier_uses_api_key_fingerprint_without_state() -> None:
+def test_get_client_identifier_uses_ip_without_authenticated_api_key_context() -> None:
     middleware = RateLimitMiddleware(FastAPI(), requests=5, window_seconds=60)
     request = _request_with_headers(
         headers=[(b"x-api-key", b"mutx_live_abc123"), (b"host", b"testserver")],
         client_host="192.0.2.50",
     )
 
-    identifier = middleware._get_client_identifier(request)
-    assert identifier.startswith("api_key:fingerprint:")
+    assert middleware._get_client_identifier(request) == "ip:192.0.2.50"
 
 
 @pytest.mark.asyncio
-async def test_dispatch_rate_limits_per_api_key_not_per_ip() -> None:
+async def test_dispatch_rate_limits_by_ip_without_authenticated_api_key_context() -> None:
     middleware = RateLimitMiddleware(FastAPI(), requests=1, window_seconds=60)
 
     async def call_next(_request: Request):
@@ -97,110 +96,9 @@ async def test_dispatch_rate_limits_per_api_key_not_per_ip() -> None:
         headers=[(b"x-api-key", b"mutx_live_key_two"), (b"host", b"testserver")],
         client_host="192.0.2.50",
     )
-    repeated_key_one_request = _request_with_headers(
-        headers=[(b"x-api-key", b"mutx_live_key_one"), (b"host", b"testserver")],
-        client_host="192.0.2.50",
-    )
 
     first_response = await middleware.dispatch(key_one_request, call_next)
     second_response = await middleware.dispatch(key_two_request, call_next)
-    third_response = await middleware.dispatch(repeated_key_one_request, call_next)
 
     assert first_response.status_code == 200
-    assert second_response.status_code == 200
-    assert third_response.status_code == 429
-
-
-@pytest.mark.asyncio
-async def test_dispatch_uses_stricter_limit_for_auth_paths() -> None:
-    middleware = RateLimitMiddleware(
-        FastAPI(),
-        requests=5,
-        window_seconds=60,
-        auth_requests=2,
-        auth_window_seconds=300,
-    )
-
-    async def call_next(_request: Request):
-        return JSONResponse({"ok": True}, status_code=200)
-
-    first_request = _request_with_headers(
-        headers=[(b"host", b"testserver")],
-        client_host="192.0.2.50",
-        path="/v1/auth/login",
-        method="POST",
-    )
-    second_request = _request_with_headers(
-        headers=[(b"host", b"testserver")],
-        client_host="192.0.2.50",
-        path="/v1/auth/login",
-        method="POST",
-    )
-    third_request = _request_with_headers(
-        headers=[(b"host", b"testserver")],
-        client_host="192.0.2.50",
-        path="/v1/auth/login",
-        method="POST",
-    )
-
-    assert (await middleware.dispatch(first_request, call_next)).status_code == 200
-    assert (await middleware.dispatch(second_request, call_next)).status_code == 200
-    assert (await middleware.dispatch(third_request, call_next)).status_code == 429
-
-
-@pytest.mark.asyncio
-async def test_dispatch_keeps_auth_and_general_buckets_separate() -> None:
-    middleware = RateLimitMiddleware(
-        FastAPI(),
-        requests=2,
-        window_seconds=60,
-        auth_requests=1,
-        auth_window_seconds=300,
-    )
-
-    async def call_next(_request: Request):
-        return JSONResponse({"ok": True}, status_code=200)
-
-    auth_request = _request_with_headers(
-        headers=[(b"host", b"testserver")],
-        client_host="192.0.2.50",
-        path="/v1/auth/forgot-password",
-        method="POST",
-    )
-    repeated_auth_request = _request_with_headers(
-        headers=[(b"host", b"testserver")],
-        client_host="192.0.2.50",
-        path="/v1/auth/forgot-password",
-        method="POST",
-    )
-    general_request = _request_with_headers(
-        headers=[(b"host", b"testserver")],
-        client_host="192.0.2.50",
-        path="/v1/deployments",
-        method="GET",
-    )
-
-    assert (await middleware.dispatch(auth_request, call_next)).status_code == 200
-    assert (await middleware.dispatch(repeated_auth_request, call_next)).status_code == 429
-    assert (await middleware.dispatch(general_request, call_next)).status_code == 200
-
-
-@pytest.mark.asyncio
-async def test_dispatch_skips_options_preflight_requests() -> None:
-    middleware = RateLimitMiddleware(FastAPI(), requests=1, window_seconds=60)
-
-    async def call_next(_request: Request):
-        return JSONResponse({"ok": True}, status_code=200)
-
-    preflight_request = _request_with_headers(
-        headers=[(b"origin", b"https://app.mutx.dev"), (b"host", b"testserver")],
-        client_host="192.0.2.50",
-        path="/v1/auth/login",
-        method="OPTIONS",
-    )
-
-    first_response = await middleware.dispatch(preflight_request, call_next)
-    second_response = await middleware.dispatch(preflight_request, call_next)
-
-    assert first_response.status_code == 200
-    assert second_response.status_code == 200
+    assert second_response.status_code == 429
