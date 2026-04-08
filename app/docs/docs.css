@@ -3,6 +3,7 @@
    CSS sources: 8 static-2v.gitbook.com CSS bundles (Apr 2026)
    Fonts loaded via next/font/google in docs/layout.tsx
    ═══════════════════════════════════════════════════════════════════════ */
+@import "highlight.js/styles/github-dark-dimmed.css";
 
 /* ── Theme: Dark (default) ────────────────────────────────────────── */
 :root,

@@ -48,6 +48,9 @@ function NavItem({ item, pathname }: NavItemProps) {
     } catch {}
   }
 
+  // Show expand chevron for ANY item with children (depth 0 or deeper)
+  const showChevron = hasChildren;
+
   // Normalize pathname: strip trailing slash so /docs/api and /docs/api/ both match
   const normPath = pathname.replace(/\/$/, '');
   const itemPath = item.route;
@@ -83,7 +86,7 @@ function NavItem({ item, pathname }: NavItemProps) {
   return (
     <div className="docs-nav-section">
       <div className={`docs-nav-row${hasChildren ? ' has-children' : ''}`}>
-        {hasChildren && (
+        {showChevron && (
           <button
             className={`docs-nav-chevron-btn${open ? ' open' : ''}`}
             onClick={toggle}
@@ -113,7 +116,7 @@ function NavItem({ item, pathname }: NavItemProps) {
           className={`docs-nav-link${isActive ? ' active' : ''}${
             item.depth > 0 ? ' docs-nav-link-nested' : ''
           }`}
-          style={{ paddingLeft: hasChildren ? '4px' : `${item.depth * 16 + 16}px` }}
+          style={{ paddingLeft: showChevron ? '4px' : `${item.depth * 16 + 16}px` }}
           onClick={() => onNavigate?.()}
         >
           {item.title}
