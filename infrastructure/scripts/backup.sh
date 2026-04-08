@@ -3,6 +3,7 @@
 # Usage: ./backup.sh [backup_name]
 
 set -e
+set -o pipefail
 
 BACKUP_DIR="${BACKUP_DIR:-./backups}"
 DB_HOST="${DB_HOST:-localhost}"
