@@ -828,8 +828,21 @@
     width: 280px;
   }
 
-  .docs-sidebar.open {
+  /* Mobile overlay — hidden by default on mobile, shown when nav open.
+     Must be ABOVE sidebar (z-35 > z-25) so clicks register on overlay, not sidebar */
+  .docs-mobile-overlay {
+    display: none;
+    pointer-events: none;
+    z-index: 35;
+  }
+
+  [data-mobile-nav-open="1"] .docs-mobile-sidebar {
     transform: translateX(0);
+  }
+
+  [data-mobile-nav-open="1"] .docs-mobile-overlay {
+    display: block;
+    pointer-events: auto;
   }
 
   .docs-content {

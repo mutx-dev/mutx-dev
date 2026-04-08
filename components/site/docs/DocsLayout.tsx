@@ -133,11 +133,24 @@ function NavItem({ item, pathname }: NavItemProps) {
 
 export function DocsLayout({ nav, children }: DocsLayoutProps) {
   const pathname = usePathname();
-  const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [openSections, setOpenSections] = useState<Set<string>>(() => {
+    // Start with all section roots open by default
+    const initial = new Set<string>();
+    for (const item of nav) {
+      if (item.children.length > 0 && !item.isPage) {
+        initial.add(item.slug);
+      }
+    }
+    // Merge with localStorage state
+    const saved = loadOpenState();
+    for (const s of saved) {
+      initial.add(s);
+    }
+    return initial;
+  });
 
   function handleNavigate() {
-    setSidebarOpen(false);
+    document.documentElement.removeAttribute('data-mobile-nav-open');
   }
 
   return (
@@ -146,7 +159,6 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
       {/* ── Top header ── */}
       <header className="docs-header">
         <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
           className="lg:hidden p-1.5 -ml-1.5 text-gb-text-2 hover:text-white transition-colors rounded"
           aria-label="Toggle navigation"
         >
@@ -165,6 +177,30 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
             />
           </svg>
         </button>
+        {/* Mobile nav toggle — inline script bypasses React event system failures */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(function() {
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('button[aria-label="Toggle navigation"]');
+    var overlay = e.target.closest('.docs-mobile-overlay');
+    if (btn) {
+      var isOpen = document.documentElement.dataset.mobileNavOpen === '1';
+      if (isOpen) {
+        delete document.documentElement.dataset.mobileNavOpen;
+      } else {
+        document.documentElement.dataset.mobileNavOpen = '1';
+      }
+    }
+    if (overlay) {
+      delete document.documentElement.dataset.mobileNavOpen;
+    }
+  });
+})();
+            `,
+          }}
+        />
 
         <Link href="/docs" className="docs-header-logo">
           📖 MUTX Docs
@@ -229,17 +265,12 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
 
       {/* ── Body layout ── */}
       <div className="docs-layout">
-        {/* Mobile overlay */}
-        {sidebarOpen && (
-          <div
-            className="docs-sidebar-overlay lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
+        {/* Mobile overlay — controlled by data-mobile-nav-open on <html> */}
+        <div className="docs-sidebar-overlay lg:hidden docs-mobile-overlay" />
 
         {/* ── Left sidebar ── */}
         <aside
-          className={`docs-sidebar${sidebarOpen ? ' open' : ''}`}
+          className="docs-sidebar docs-mobile-sidebar"
           aria-label="Documentation navigation"
         >
           <nav aria-label="Docs nav">
