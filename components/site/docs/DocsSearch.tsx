@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+
+const SEARCH_ATTR = 'data-docs-search-open';
 
 interface SearchEntry {
   id: string;
@@ -22,114 +24,189 @@ interface SearchIndex {
   documents: SearchDocument[];
 }
 
-interface AllDocEntry extends SearchEntry {
-  _score?: never;
-}
-
-interface SearchResult extends SearchEntry {
-  _score: number;
-}
-
-// Module-level event bus so the always-mounted trigger can open the modal
-const listeners: Set<() => void> = new Set();
 export function openSearchModal() {
-  listeners.forEach((fn) => fn());
+  document.documentElement.setAttribute(SEARCH_ATTR, '1');
+}
+
+export function closeSearchModal() {
+  document.documentElement.removeAttribute(SEARCH_ATTR);
+}
+
+function scoreEntry(entry: SearchEntry, q: string): number {
+  const title = entry.title.toLowerCase();
+  const section = entry.section.toLowerCase();
+  const content = entry.content.toLowerCase();
+  if (title === q) return 100;
+  if (title.startsWith(q)) return 80;
+  if (title.includes(q)) return 60;
+  if (section === q) return 50;
+  if (section.includes(q)) return 30;
+  if (content.includes(q)) return 10;
+  return 0;
+}
+
+function renderResults(results: SearchEntry[], selectedIndex: number): string {
+  if (!results.length) return '';
+  const items = results
+    .map(
+      (r, i) => `
+    <li role="option" aria-selected="${i === selectedIndex}"
+        class="docs-search-result${i === selectedIndex ? ' selected' : ''}"
+        data-href="${r.href}">
+      <div class="docs-search-result-top">
+        <span class="docs-search-result-title">${r.title}</span>
+        <span class="docs-search-result-section">${r.section}</span>
+      </div>
+      ${r.content ? `<div class="docs-search-result-content">${r.content.slice(0, 120)}…</div>` : ''}
+    </li>`
+    )
+    .join('');
+  return `<ul class="docs-search-results" role="listbox">${items}</ul>`;
 }
 
 export function DocsSearch() {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [allDocs, setAllDocs] = useState<AllDocEntry[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [entries, setEntries] = useState<SearchEntry[]>([]);
+  const selectedRef = useRef(0);
   const router = useRouter();
 
-  // Register this instance's open setter with the module-level bus
-  useEffect(() => {
-    function handler() {
-      setOpen(true);
-    }
-    listeners.add(handler);
-    return () => {
-      listeners.delete(handler);
-    };
-  }, []);
-
-  // Load index once
+  // Load search index once
   useEffect(() => {
     fetch('/docs-search-index.json')
       .then((r) => r.json())
       .then((data: SearchIndex) => {
         const flat = data.documents.flatMap((doc) =>
-          doc.entries.map((e) => ({ ...e, section: doc.section } as AllDocEntry))
+          doc.entries.map((e) => ({ ...e, section: doc.section }))
         );
-        setAllDocs(flat);
+        setEntries(flat);
       })
       .catch(() => {});
   }, []);
 
-  // Global keyboard shortcut Cmd+K / Ctrl+K
+  // Set up event delegation for the search UI — runs once when component mounts
   useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setOpen((v) => !v);
+    function handleSearchInput(e: Event) {
+      const input = e.target as HTMLInputElement;
+      const q = input.value.toLowerCase().trim();
+      const modal = input.closest('.docs-search-modal');
+      if (!modal) return;
+
+      // Remove old results / empty
+      const old = modal.querySelector('.docs-search-results, .docs-search-empty');
+      if (old) old.remove();
+
+      if (!q) return;
+
+      const scored = entries
+        .map((entry) => ({ entry, score: scoreEntry(entry, q) }))
+        .filter((s) => s.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 12)
+        .map((s) => s.entry);
+
+      if (scored.length > 0) {
+        modal.insertAdjacentHTML('beforeend', renderResults(scored, 0));
+      } else {
+        const empty = document.createElement('div');
+        empty.className = 'docs-search-empty';
+        empty.textContent = `No results for "${q}"`;
+        modal.appendChild(empty);
       }
-      if (e.key === 'Escape') setOpen(false);
+      selectedRef.current = 0;
     }
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+
+    function handleKeyDown(e: KeyboardEvent) {
+      const active = document.activeElement;
+      if (!active?.classList.contains('docs-search-input')) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const items = [...document.querySelectorAll('.docs-search-result')];
+        if (!items.length) return;
+        selectedRef.current = Math.min(selectedRef.current + 1, items.length - 1);
+        updateSelection(items);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const items = [...document.querySelectorAll('.docs-search-result')];
+        if (!items.length) return;
+        selectedRef.current = Math.max(selectedRef.current - 1, 0);
+        updateSelection(items);
+      } else if (e.key === 'Enter') {
+        const items = document.querySelectorAll('.docs-search-result');
+        const el = items[selectedRef.current] as HTMLElement;
+        if (el?.dataset.href) {
+          router.push(el.dataset.href);
+          document.documentElement.removeAttribute(SEARCH_ATTR);
+        }
+      } else if (e.key === 'Escape') {
+        document.documentElement.removeAttribute(SEARCH_ATTR);
+      }
+    }
+
+    function handleClick(e: MouseEvent) {
+      const target = e.target as HTMLElement;
+      // Close on backdrop click
+      if (!target.closest('.docs-search-modal')) {
+        document.documentElement.removeAttribute(SEARCH_ATTR);
+        return;
+      }
+      // Navigate on result click
+      const item = target.closest('.docs-search-result') as HTMLElement;
+      if (item?.dataset.href) {
+        router.push(item.dataset.href);
+        document.documentElement.removeAttribute(SEARCH_ATTR);
+      }
+    }
+
+    function updateSelection(items: Element[]) {
+      items.forEach((el, i) => {
+        el.classList.toggle('selected', i === selectedRef.current);
+        if (i === selectedRef.current) el.scrollIntoView({ block: 'nearest' });
+      });
+    }
+
+    const overlay = document.querySelector('.docs-search-overlay');
+    overlay?.addEventListener('input', handleSearchInput as EventListener);
+    overlay?.addEventListener('keydown', handleKeyDown);
+    overlay?.addEventListener('click', handleClick as EventListener);
+
+    return () => {
+      overlay?.removeEventListener('input', handleSearchInput as EventListener);
+      overlay?.removeEventListener('keydown', handleKeyDown);
+      overlay?.removeEventListener('click', handleClick as EventListener);
+    };
+  }, [entries, router]);
+
+  // When opened via attribute, focus the input and clear it
+  useEffect(() => {
+    function handleOpen() {
+      const input = document.querySelector('.docs-search-input') as HTMLInputElement;
+      if (input) {
+        input.value = '';
+        setTimeout(() => input.focus(), 10);
+      }
+    }
+
+    const obs = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (
+          m.type === 'attributes' &&
+          m.attributeName === SEARCH_ATTR &&
+          document.documentElement.hasAttribute(SEARCH_ATTR)
+        ) {
+          handleOpen();
+        }
+      }
+    });
+
+    const el = document.documentElement;
+    obs.observe(el, { attributes: true, attributeFilter: [SEARCH_ATTR] });
+    if (el.hasAttribute(SEARCH_ATTR)) handleOpen();
+
+    return () => obs.disconnect();
   }, []);
 
-  // Focus + reset when opened
-  useEffect(() => {
-    if (open) {
-      setTimeout(() => inputRef.current?.focus(), 10);
-      setQuery('');
-      setResults([]);
-      setSelectedIndex(0);
-    }
-  }, [open]);
-
-  // Search on query change
-  useEffect(() => {
-    if (!query.trim()) {
-      setResults([]);
-      return;
-    }
-    const q = query.toLowerCase();
-    const filtered = allDocs
-      .map((r) => {
-        const title = r.title.toLowerCase();
-        const section = r.section.toLowerCase();
-        const content = r.content.toLowerCase();
-        let score = 0;
-        if (title === q) score = 100;
-        else if (title.startsWith(q)) score = 80;
-        else if (title.includes(q)) score = 60;
-        else if (section === q) score = 50;
-        else if (section.includes(q)) score = 30;
-        else if (content.includes(q)) score = 10;
-        else return null;
-        return { ...r, _score: score };
-      })
-      .filter((r): r is SearchResult => r !== null)
-      .sort((a, b) => b._score - a._score)
-      .slice(0, 12);
-    setResults(filtered);
-    setSelectedIndex(0);
-  }, [query, allDocs]);
-
-  function navigate(href: string) {
-    router.push(href);
-    setOpen(false);
-  }
-
-  if (!open) return null;
-
   return (
-    <div className="docs-search-overlay" onClick={() => setOpen(false)}>
+    <div className="docs-search-overlay" data-docs-search-overlay="">
       <div className="docs-search-modal" onClick={(e) => e.stopPropagation()}>
         <div className="docs-search-input-row">
           <svg
@@ -144,58 +221,13 @@ export function DocsSearch() {
             <path d="M10 10L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
           <input
-            ref={inputRef}
             className="docs-search-input"
             placeholder="Search docs..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                setSelectedIndex((i) => Math.min(i + 1, results.length - 1));
-              } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                setSelectedIndex((i) => Math.max(i - 1, 0));
-              } else if (e.key === 'Enter' && results[selectedIndex]) {
-                navigate(results[selectedIndex].href);
-              }
-            }}
+            autoComplete="off"
+            spellCheck="false"
           />
-          <kbd className="docs-search-kbd" onClick={() => setOpen(false)}>
-            Esc
-          </kbd>
+          <kbd className="docs-search-kbd">Esc</kbd>
         </div>
-
-        {results.length > 0 && (
-          <ul className="docs-search-results" role="listbox">
-            {results.map((r, i) => (
-              <li
-                key={r.id}
-                role="option"
-                aria-selected={i === selectedIndex}
-                className={`docs-search-result${i === selectedIndex ? ' selected' : ''}`}
-                onClick={() => navigate(r.href)}
-                onMouseEnter={() => setSelectedIndex(i)}
-              >
-                <div className="docs-search-result-top">
-                  <span className="docs-search-result-title">{r.title}</span>
-                  <span className="docs-search-result-section">{r.section}</span>
-                </div>
-                {r.content && (
-                  <div className="docs-search-result-content">
-                    {r.content.slice(0, 120)}…
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {query && results.length === 0 && (
-          <div className="docs-search-empty">
-            No results for &ldquo;{query}&rdquo;
-          </div>
-        )}
       </div>
     </div>
   );

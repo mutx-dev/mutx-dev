@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { DocNavItem } from '@/lib/docs';
 import { DocsNavContext, useDocsNav } from "./DocsNavContext";
-import { DocsSearch, openSearchModal } from "./DocsSearch";
+import { DocsSearch } from "./DocsSearch";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { DocsBreadcrumbs } from "./DocsBreadcrumbs";
 import "@/app/docs/docs.css";
@@ -229,7 +229,7 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
 
         <button
           className="docs-search-trigger"
-          onClick={openSearchModal}
+          onClick={() => document.documentElement.setAttribute('data-docs-search-open', '1')}
           aria-label="Search docs (Cmd+K)"
         >
           <svg

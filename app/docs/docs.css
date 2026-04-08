@@ -965,11 +965,16 @@
   inset: 0;
   z-index: 200;
   background: rgba(0, 0, 0, 0.6);
-  display: flex;
+  display: none;
   align-items: flex-start;
   justify-content: center;
   padding-top: 10vh;
   backdrop-filter: blur(2px);
+}
+
+/* Show when the search-open attribute is on <html> */
+[data-docs-search-open] .docs-search-overlay {
+  display: flex;
 }
 
 /* ── Search modal ───────────────────────────────────────────── */
