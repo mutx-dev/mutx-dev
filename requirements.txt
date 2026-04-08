@@ -16,7 +16,6 @@ boto3==1.34.25
 botocore==1.34.25
 # Security
 python-jose[cryptography]==3.5.0
-Authlib>=2.0.0
 #passlib removed - using bcrypt directly
 python-multipart==0.0.22
 email-validator==2.1.0
