@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { DocNavItem } from '@/lib/docs';
-import { DocsSearch } from './DocsSearch';
-import { ThemeSwitcher } from './ThemeSwitcher';
-import '@/app/docs/docs.css';
+import { DocsNavContext } from "./DocsNavContext";
+import { DocsSearch } from "./DocsSearch";
+import { ThemeSwitcher } from "./ThemeSwitcher";
+import { DocsBreadcrumbs } from "./DocsBreadcrumbs";
+import "@/app/docs/docs.css";
 
 interface NavItemProps {
   item: DocNavItem;
@@ -127,6 +129,7 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
+    <DocsNavContext.Provider value={{ nav }}>
     <div className="docs-shell">
       {/* ── Top header ── */}
       <header className="docs-header">
@@ -235,8 +238,12 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
         </aside>
 
         {/* ── Main content ── */}
-        <main className="docs-content">{children}</main>
+        <main className="docs-content">
+          <DocsBreadcrumbs />
+          {children}
+        </main>
       </div>
     </div>
+    </DocsNavContext.Provider>
   );
 }

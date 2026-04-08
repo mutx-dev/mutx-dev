@@ -4,7 +4,8 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { DocsRenderer, extractHeadings } from "@/components/site/docs/DocsRenderer";
-import { JumpNav } from "@/components/site/docs/JumpNav";
+import { TableOfContents } from "@/components/site/docs/TableOfContents";
+import { DocsBreadcrumbs } from "@/components/site/docs/DocsBreadcrumbs";
 import { DEFAULT_X_HANDLE, getCanonicalUrl } from "@/lib/seo";
 
 export const dynamicParams = true;
@@ -15,7 +16,6 @@ function docsDir() {
 }
 
 function resolveSlug(slugSegments: string[]): string | null {
-  // Special case: /docs/README -> docs/README.md (the index)
   if (slugSegments.length === 1 && slugSegments[0] === "README") {
     const rootReadme = path.join(docsDir(), "README.md");
     if (fs.existsSync(rootReadme)) return rootReadme;
@@ -94,22 +94,25 @@ export default async function DocPage({
   const headings = extractHeadings(content);
 
   return (
-    <div>
-      <JumpNav headings={headings} />
-      <DocsRenderer source={content} />
-      {data.icon && (
-        <p className="text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">
-          Last updated via GitBook sync — source at{" "}
-          <a
-            href={`https://github.com/mutx-dev/mutx-dev/blob/main/${path.relative(process.cwd(), filePath)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-gray-600"
-          >
-            GitHub
-          </a>
-        </p>
-      )}
+    <div className="docs-article-layout">
+      <div className="docs-article-main">
+        <DocsBreadcrumbs />
+        <TableOfContents sourceHeadings={headings} />
+        <DocsRenderer source={content} />
+        {data.icon && (
+          <p className="text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">
+            Last updated via GitBook sync — source at{" "}
+            <a
+              href={`https://github.com/mutx-dev/mutx-dev/blob/main/${path.relative(process.cwd(), filePath)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-gray-600"
+            >
+              GitHub
+            </a>
+          </p>
+        )}
+      </div>
     </div>
   );
 }

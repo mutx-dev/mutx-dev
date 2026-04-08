@@ -1,10 +1,6 @@
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 
-interface DocsRendererProps {
-  source: string;
-}
-
 export interface Heading {
   id: string;
   text: string;
@@ -36,21 +32,22 @@ function addHeadingAnchors(html: string, headings: Heading[]): string {
   return result;
 }
 
-export async function DocsRenderer({ source }: DocsRendererProps) {
+export async function renderDocsHtml(source: string): Promise<string> {
   const headings = extractHeadings(source);
 
   const result = await remark()
     .use(remarkGfm)
     .process(source);
 
-  const htmlWithAnchors = addHeadingAnchors(result.toString(), headings);
+  return addHeadingAnchors(result.toString(), headings);
+}
 
-  return (
-    <article
-      className="docs-prose"
-      dangerouslySetInnerHTML={{ __html: htmlWithAnchors }}
-    />
-  );
+export async function DocsRenderer({ source }: { source: string }) {
+  const html = await renderDocsHtml(source);
+
+  // Dynamic import of client component to avoid SSR issues with DOM APIs
+  const { DocsRendererClient } = await import("./DocsRendererClient");
+  return <DocsRendererClient html={html} />;
 }
 
 export function extractHeadings(source: string): Heading[] {
