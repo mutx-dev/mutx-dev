@@ -83,11 +83,15 @@ export function DocsRendererClient({ html }: DocsRendererClientProps) {
         // Target column: second cell (index 1 — table has 2 columns)
         // Cover column: third cell (index 2) — optional
         const targetLink = cells[1]?.querySelector("a");
-        const targetHref = targetLink?.getAttribute("href") ?? "#";
-        const targetLabel =
+        const rawHref = targetLink?.getAttribute("href") ?? "#";
+        // stripMdLinks rewrites .md in hrefs, but raw HTML from remark may still have it
+        const targetHref = rawHref.replace(/\.md$/, "");
+        // Link text may include .md suffix from markdown source; strip it for clean labels
+        const rawLabel =
           targetLink?.textContent?.trim() ??
           cells[1]?.textContent?.trim() ??
           title;
+        const targetLabel = rawLabel.replace(/\.md$/, "").trim();
 
         // Cover cell: third cell (index 2) — first image src
         const coverImg = cells[2]?.querySelector("img");
