@@ -261,6 +261,35 @@ class TestAuthEndpoints:
         assert "verification is required" in response.json()["detail"].lower()
 
     @pytest.mark.asyncio
+    async def test_register_token_cannot_access_me_when_email_verification_required(
+        self, client_no_auth: AsyncClient, monkeypatch
+    ):
+        from src.api.routes import auth as auth_routes
+
+        monkeypatch.setattr(auth_routes.settings, "require_email_verification", True)
+        try:
+            register_response = await client_no_auth.post(
+                "/v1/auth/register",
+                json={
+                    "email": "unverified-register@example.com",
+                    "password": "StrongPassword123!",
+                    "name": "Unverified Register User",
+                },
+            )
+            assert register_response.status_code == 201
+
+            token = register_response.json()["access_token"]
+            me_response = await client_no_auth.get(
+                "/v1/auth/me",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+        finally:
+            monkeypatch.setattr(auth_routes.settings, "require_email_verification", False)
+
+        assert me_response.status_code == 403
+        assert "verification is required" in me_response.json()["detail"].lower()
+
+    @pytest.mark.asyncio
     async def test_register_weak_password(self, client_no_auth: AsyncClient):
         """Test registration with weak password fails."""
         response = await client_no_auth.post(
