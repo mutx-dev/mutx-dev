@@ -1,8 +1,12 @@
-import { remark } from "remark";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
-import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeStringify from "rehype-stringify";
+import { preprocessHints } from "@/lib/docs/hints";
 
 export interface Heading {
   id: string;
@@ -19,77 +23,10 @@ function slugify(text: string): string {
     .trim();
 }
 
-function addHeadingAnchors(html: string, headings: Heading[]): string {
-  let result = html;
-  for (const heading of headings) {
-    const escaped = heading.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const regex = new RegExp(
-      `(<h${heading.level}([^>]*)>)(.{0,5}?)(${escaped})(</h${heading.level}>)`,
-      "i"
-    );
-    result = result.replace(
-      regex,
-      `$1<a id="${heading.id}" href="#${heading.id}" class="heading-anchor" aria-hidden="true">#</a>$3$4$5`
-    );
-  }
-  return result;
-}
-
-function preprocessMarkdown(source: string): string {
-  // ── GitBook Liquid hint blocks → HTML div callouts ─────────────
-  // {% hint style="info" %} ... {% endhint %}
-  // {% hint style="warning" %} ... {% endhint %}
-  // {% hint style="danger" %} ... {% endhint %}
-  // etc.  Direct HTML div replacement avoids remark blockquote quirks.
-  const styleMap: Record<string, string> = {
-    info: "note", tip: "tip", warning: "warning", danger: "danger",
-  };
-  source = source.replace(
-    /\{%\s*hint\s+style="([^"]+)"\s*%\}([\s\S]*?)\{%\s*endhint\s*%/gi,
-    (_match, style, content) => {
-      const type = styleMap[style.toLowerCase()] ?? "note";
-      const body = content.trim();
-      return `<div class="docs-callout" data-type="${type}">${body}</div>`;
-    }
-  );
-
-  // {% hint %} (defaults to NOTE)
-  source = source.replace(
-    /\{%\s*hint\s*%\}([\s\S]*?)\{%\s*endhint\s*%/gi,
-    (_match, content) => {
-      const body = content.trim();
-      return `<div class="docs-callout" data-type="note">${body}</div>`;
-    }
-  );
-
+function stripMdLinks(source: string): string {
   // Fix relative .md links: [Text](foo.md) → [Text](foo)
   // These are markdown links to other doc pages that would otherwise 404
-  source = source.replace(/\]\(([^)#\s]*)\.md\)/g, "]($1)");
-
-  return source;
-}
-
-export async function renderDocsHtml(source: string): Promise<string> {
-  source = preprocessMarkdown(source);
-
-  const headings = extractHeadings(source);
-
-  const result = await remark()
-    .use(remarkGfm)
-    .use(remarkRehype, { allowDangerousHtml: true })
-    .use(rehypeHighlight, { detect: true })
-    .use(rehypeStringify, { allowDangerousHtml: true })
-    .process(source);
-
-  return addHeadingAnchors(result.toString(), headings);
-}
-
-export async function DocsRenderer({ source }: { source: string }) {
-  const html = await renderDocsHtml(source);
-
-  // Dynamic import of client component to avoid SSR issues with DOM APIs
-  const { DocsRendererClient } = await import("./DocsRendererClient");
-  return <DocsRendererClient html={html} />;
+  return source.replace(/\]\(([^)#\s]*)\.md\)/g, "]($1)");
 }
 
 export function extractHeadings(source: string): Heading[] {
@@ -99,12 +36,55 @@ export function extractHeadings(source: string): Heading[] {
     const m = line.match(/^(#{2,4})\s+(.+)/);
     if (m) {
       const text = m[2].replace(/[*_`]/g, "").trim();
-      headings.push({
-        id: slugify(text),
-        text,
-        level: m[1].length,
-      });
+      headings.push({ id: slugify(text), text, level: m[1].length });
     }
   }
   return headings;
+}
+
+export async function DocsRenderer({ source }: { source: string }) {
+  // Preprocess: strip .md links + convert hint blocks
+  const preprocessed = stripMdLinks(preprocessHints(source));
+  const headings = extractHeadings(preprocessed);
+
+  const result = await unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeSlug)
+    .use(rehypeAutolinkHeadings, {
+      behavior: "append",
+      properties: {
+        className: ["heading-anchor"],
+        ariaHidden: "true",
+        tabIndex: -1,
+      },
+      content: {
+        type: "element",
+        tagName: "span",
+        properties: {},
+        children: [{ type: "text", value: "#" }],
+      },
+    })
+    .use(rehypeHighlight, { detect: true })
+    .use(rehypeStringify, { allowDangerousHtml: true })
+    .process(preprocessed);
+
+  // Re-attach IDs from our extracted headings to match slugify behavior
+  let html = result.toString();
+  for (const heading of headings) {
+    const escaped = heading.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(
+      `(<h${heading.level}([^>]*)>)(.{0,5}?)(${escaped})(</h${heading.level}>)`,
+      "i"
+    );
+    html = html.replace(
+      regex,
+      `$1<a id="${heading.id}" href="#${heading.id}" class="heading-anchor" aria-hidden="true">#</a>$3$4$5`
+    );
+  }
+
+  // Dynamic import of client component to avoid SSR issues with DOM APIs
+  const { DocsRendererClient } = await import("./DocsRendererClient");
+  return <DocsRendererClient html={html} />;
 }

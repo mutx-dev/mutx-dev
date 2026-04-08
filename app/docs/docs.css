@@ -728,6 +728,71 @@
   background: rgba(0,0,0,0.5);
 }
 
+/* ── Callout blocks ─────────────────────────────────────────────── */
+.docs-callout {
+  display: flex;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--gb-radius);
+  border-left: 3px solid;
+  margin: 1.25rem 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.docs-callout-icon {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.docs-callout-body > *:first-child {
+  margin-top: 0;
+}
+
+.docs-callout-body > *:last-child {
+  margin-bottom: 0;
+}
+
+.docs-callout-info {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: #3b82f6;
+  color: var(--gb-text);
+}
+
+.docs-callout-info .docs-callout-icon {
+  color: #3b82f6;
+}
+
+.docs-callout-warning {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: #f59e0b;
+  color: var(--gb-text);
+}
+
+.docs-callout-warning .docs-callout-icon {
+  color: #f59e0b;
+}
+
+.docs-callout-danger {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: #ef4444;
+  color: var(--gb-text);
+}
+
+.docs-callout-danger .docs-callout-icon {
+  color: #ef4444;
+}
+
+.docs-callout-tip {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: #10b981;
+  color: var(--gb-text);
+}
+
+.docs-callout-tip .docs-callout-icon {
+  color: #10b981;
+}
+
 /* ── Code block copy button ───────────────────────────────────────── */
 .docs-code-wrapper {
   position: relative;
