@@ -1,6 +1,5 @@
 """Rate limiting middleware for the API."""
 
-import hashlib
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Callable
@@ -56,62 +55,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         """Extract client IP from the direct connection."""
         return request.client.host if request.client else "unknown"
 
-    @staticmethod
-    def _fingerprint(value: str) -> str:
-        """Create a truncated pseudonymized fingerprint for rate limiting.
-
-        Uses SHA-256 for one-way hashing of API tokens for rate limit bucketing.
-        This is NOT for password hashing - it's just to prevent rate limit
-        bypass through token enumeration while keeping keys pseudonymous.
-        """
-        # CodeQL alert is a false positive - this is pseudonymization for rate limiting,
-        # not password hashing. SHA-256 is appropriate here because:
-        # 1. We only need one-way hashing for pseudonyms, not password storage
-        # 2. Tokens are high-entropy API keys, not low-entropy passwords
-        # 3. The hash is truncated and not used for authentication
-        return hashlib.sha256(value.encode()).hexdigest()[:24]  # noqa: S303
-
-    @staticmethod
-    def _mask_client_for_logging(client_id: str) -> str:
-        """Mask identifying parts of client_id for safe logging."""
-        if client_id.startswith("ip:"):
-            return "ip:***"
-        if client_id.startswith("api_key:"):
-            parts = client_id.split(":", 2)
-            if len(parts) >= 2:
-                return f"{parts[0]}:{parts[1][:8]}***"
-        return client_id[:16] + "***" if len(client_id) > 16 else "***"
-
-    def _extract_api_key_token(self, request: Request) -> str | None:
-        x_api_key = request.headers.get("X-API-Key")
-        if x_api_key:
-            token = x_api_key.strip()
-            if token:
-                return token
-
-        authorization = request.headers.get("Authorization")
-        if not authorization:
-            return None
-
-        parts = authorization.split()
-        if len(parts) != 2 or parts[0].lower() != "bearer":
-            return None
-
-        token = parts[1].strip()
-        if token.startswith("mutx_") or token.startswith("mutx_live_"):
-            return token
-
-        return None
-
     def _get_client_identifier(self, request: Request) -> str:
-        """Resolve rate-limit bucket key (API key first, IP fallback)."""
+        """Resolve rate-limit bucket key using authenticated API key context or IP fallback."""
         auth_api_key_identifier = getattr(request.state, "auth_api_key_identifier", None)
         if auth_api_key_identifier:
             return f"api_key:{auth_api_key_identifier}"
-
-        key_token = self._extract_api_key_token(request)
-        if key_token:
-            return f"api_key:fingerprint:{self._fingerprint(key_token)}"
 
         return f"ip:{self._get_client_ip(request)}"
 
