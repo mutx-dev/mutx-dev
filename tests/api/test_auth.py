@@ -269,3 +269,17 @@ class TestAuthEndpoints:
             json={"email": "nonexistent@example.com"},
         )
         assert response.status_code == 200
+
+
+class TestPasswordCompatibility:
+    """Compatibility tests for legacy password hashes."""
+
+    def test_verify_password_accepts_legacy_pbkdf2_sha256_hash(self):
+        from passlib.hash import pbkdf2_sha256
+
+        from src.api.auth.password import verify_password
+
+        plain_password = "StrongPassword123!"
+        legacy_hash = pbkdf2_sha256.hash(plain_password)
+
+        assert verify_password(plain_password, legacy_hash)
