@@ -17,7 +17,34 @@ function docsDir() {
   return path.join(process.cwd(), "docs");
 }
 
+// Root-level content directories (mirrored from repo root, not inside docs/)
+const ROOT_CONTENT_DIRS = ["agents"];
+
+function isRootContent(slugSegments: string[]): boolean {
+  return (
+    slugSegments.length === 1 && ROOT_CONTENT_DIRS.includes(slugSegments[0])
+  );
+}
+
+function resolveRootContentSlug(slugSegments: string[]): string | null {
+  if (!isRootContent(slugSegments)) return null;
+  const dir = slugSegments[0];
+  const candidates = [
+    path.join(process.cwd(), dir, "README.md"),
+    path.join(process.cwd(), dir, "index.md"),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
 function resolveSlug(slugSegments: string[]): string | null {
+  // Root-level content (e.g. agents/README.md lives at /agents not /docs/agents)
+  if (isRootContent(slugSegments)) {
+    return resolveRootContentSlug(slugSegments);
+  }
+
   if (slugSegments.length === 1 && slugSegments[0] === "README") {
     const rootReadme = path.join(docsDir(), "README.md");
     if (fs.existsSync(rootReadme)) return rootReadme;

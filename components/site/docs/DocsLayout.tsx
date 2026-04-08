@@ -50,7 +50,7 @@ function NavItem({ item, pathname }: NavItemProps) {
 
   // Normalize pathname: strip trailing slash so /docs/api and /docs/api/ both match
   const normPath = pathname.replace(/\/$/, '');
-  const itemPath = `/docs/${item.slug}`;
+  const itemPath = item.route;
 
   // Active if current pathname starts with this item's path (handles nested slugs)
   const isActive = normPath === itemPath || normPath.startsWith(itemPath + '/');
@@ -58,7 +58,7 @@ function NavItem({ item, pathname }: NavItemProps) {
   // Determine if any descendant is active (for auto-expand)
   function isAncestorActive(items: DocNavItem[]): boolean {
     for (const child of items) {
-      const childPath = `/docs/${child.slug}`;
+      const childPath = child.route;
       const normChildPath = childPath.replace(/\/$/, '');
       if (
         normPath === normChildPath ||
@@ -109,7 +109,7 @@ function NavItem({ item, pathname }: NavItemProps) {
           </button>
         )}
         <Link
-          href={`/docs/${item.slug}`}
+          href={item.route}
           className={`docs-nav-link${isActive ? ' active' : ''}${
             item.depth > 0 ? ' docs-nav-link-nested' : ''
           }`}

@@ -5,6 +5,7 @@ export interface DocNavItem {
   title: string;
   href: string;
   slug: string;
+  route: string; // actual Next.js route (e.g. /agents or /docs/api)
   children: DocNavItem[];
   depth: number;
 }
@@ -43,6 +44,7 @@ export function parseSummary(): DocNavItem[] {
       title: parsed.title,
       href: parsed.href,
       slug: parsed.slug,
+      route: summaryHrefToDocsRoute(parsed.href) ?? `/docs/${parsed.slug}`,
       children: [],
       depth,
     };

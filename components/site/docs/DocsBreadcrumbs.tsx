@@ -22,7 +22,7 @@ function findAncestors(
 export function DocsBreadcrumbs() {
   const { nav } = useDocsNav();
   const pathname = usePathname() ?? "";
-  const currentSlug = pathname.replace(/^\/docs\//, "").replace(/\/$/, "");
+  const currentSlug = pathname.replace(/^\/docs\//, "").replace(/^\//, "").replace(/\/$/, "");
 
   if (!currentSlug || !nav.length) return null;
 
@@ -34,7 +34,7 @@ export function DocsBreadcrumbs() {
     { title: "Docs", href: "/docs" },
     ...ancestors.map((item) => ({
       title: item.title,
-      href: `/docs/${item.slug}`,
+      href: item.route,
     })),
   ];
 
