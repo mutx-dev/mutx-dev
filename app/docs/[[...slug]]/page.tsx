@@ -21,9 +21,7 @@ function docsDir() {
 const ROOT_CONTENT_DIRS = ["agents"];
 
 function isRootContent(slugSegments: string[]): boolean {
-  return (
-    slugSegments.length === 1 && ROOT_CONTENT_DIRS.includes(slugSegments[0])
-  );
+  return slugSegments.length >= 1 && ROOT_CONTENT_DIRS.includes(slugSegments[0]);
 }
 
 function resolveRootContentSlug(slugSegments: string[]): string | null {

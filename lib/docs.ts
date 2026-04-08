@@ -15,7 +15,12 @@ function lineDepth(line: string): number {
 }
 
 function normalizeSummaryHrefToSlug(href: string): string {
-  return href.replace(/^docs\//, "").replace(/\.md$/, "").replace(/^\//, "");
+  const stripped = href.replace(/^docs\//, "").replace(/\.md$/, "").replace(/^\//, "");
+  // Root-level content dirs (agents/) should route to / not /docs
+  if (!href.startsWith("docs/")) {
+    return stripped.replace(/\/README$/i, "").replace(/\/index$/i, "") || stripped;
+  }
+  return stripped;
 }
 
 function parseLine(line: string): { title: string; href: string; slug: string } | null {
@@ -77,7 +82,12 @@ export function flatNav(items: DocNavItem[]): DocNavItem[] {
 
 export function summaryHrefToDocsRoute(href: string): string | null {
   if (!href.startsWith("docs/")) {
-    return null;
+    // Root-level content (e.g. agents/README.md) → mount under /docs/*
+    const normalized = normalizeSummaryHrefToSlug(href)
+      .replace(/\/README$/i, "")
+      .replace(/\/index$/i, "")
+      .replace(/^README$/i, "");
+    return normalized ? `/docs/${normalized}` : "/docs";
   }
 
   const normalized = normalizeSummaryHrefToSlug(href)
