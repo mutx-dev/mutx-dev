@@ -6,13 +6,16 @@ import { DocNavItem } from "@/lib/docs";
 import { useDocsNav } from "./DocsNavContext";
 
 function findAncestors(
-  slug: string,
+  pathname: string,
   items: DocNavItem[]
 ): DocNavItem[] | null {
   for (const item of items) {
-    if (item.slug === slug) return [item];
+    if (
+      pathname === item.route ||
+      pathname.startsWith(item.route + "/")
+    ) return [item];
     if (item.children.length > 0) {
-      const found = findAncestors(slug, item.children);
+      const found = findAncestors(pathname, item.children);
       if (found) return [item, ...found];
     }
   }
@@ -22,12 +25,11 @@ function findAncestors(
 export function DocsBreadcrumbs() {
   const { nav } = useDocsNav();
   const pathname = usePathname() ?? "";
-  const currentSlug = pathname.replace(/^\/docs\//, "").replace(/^\//, "").replace(/\/$/, "");
 
-  if (!currentSlug || !nav.length) return null;
+  if (!pathname || !nav.length) return null;
 
-  // Build ancestor chain from the nav tree
-  const ancestors = findAncestors(currentSlug, nav);
+  // Build ancestor chain from the nav tree using actual pathname
+  const ancestors = findAncestors(pathname, nav);
   if (!ancestors || ancestors.length === 0) return null;
 
   const items = [
