@@ -136,16 +136,26 @@ async function buildIndex(): Promise<void> {
   const files = walkDir(DOCS_DIR);
 
   // Also include root-level content dirs served under /docs/*
+  // Deduplicate: skip files already returned by the docs walk
   for (const rootDir of ROOT_CONTENT_DIRS) {
     const rootPath = path.join(process.cwd(), rootDir);
     if (fs.existsSync(rootPath)) {
       const rootFiles = walkDir(rootPath, rootDir);
-      files.push(...rootFiles);
+      for (const rf of rootFiles) {
+        if (!files.includes(rf)) files.push(rf);
+      }
     }
   }
 
   for (const file of files) {
-    const isRootFile = ROOT_CONTENT_DIRS.some((dir) => file.startsWith(dir + "/") || file === dir + ".md" || file === dir);
+    // file is root content only if dir starts at the very beginning
+    // AND the file actually exists at the repo-root path.
+    // If the docs walk returned 'agents/foo.md' it lives at docs/agents/foo.md
+    // (the root version doesn't exist), so treat it as docs content.
+    const isRootFile = ROOT_CONTENT_DIRS.some((dir) => {
+      if (file !== dir && !file.startsWith(dir + "/")) return false;
+      return fs.existsSync(path.join(process.cwd(), file));
+    });
     const fullPath = isRootFile
       ? path.join(process.cwd(), file)
       : path.join(DOCS_DIR, file);
