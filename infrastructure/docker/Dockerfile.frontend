@@ -21,7 +21,7 @@ ARG NEXT_PUBLIC_API_URL=https://api.mutx.dev
 ARG NEXT_PUBLIC_SITE_URL=https://mutx.dev
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
-RUN npm run build
+RUN npm run build:docs-search && npm run build
 
 FROM base AS production
 ENV NODE_ENV=production

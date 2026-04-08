@@ -158,7 +158,6 @@
 .docs-content {
   flex: 1;
   min-width: 0;
-  padding: 2.5rem 2rem 4rem;
 }
 
 .docs-content-inner {
@@ -428,6 +427,11 @@
   color: var(--gb-accent);
 }
 
+.docs-toc-link-nested {
+  padding-left: 1rem;
+  font-size: 0.75rem;
+}
+
 /* ── Scrollbar for main content ───────────────────────────────────── */
 .docs-content::-webkit-scrollbar,
 .docs-content pre::-webkit-scrollbar {
@@ -474,6 +478,23 @@
   color: #ffffff;
 }
 
+/* ── Three-column article layout ──────────────────────────────────── */
+.docs-article-layout {
+  display: flex;
+  gap: 0;
+  min-height: calc(100vh - var(--gb-header-h));
+}
+
+.docs-article-main {
+  flex: 1;
+  min-width: 0;
+  padding: 2.5rem 2rem 4rem;
+}
+
+.docs-article-main > * + * {
+  margin-top: 2rem;
+}
+
 /* ── Responsive ───────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .docs-toc { display: none; }
@@ -496,11 +517,262 @@
   }
 
   .docs-content {
+    /* padding handled by .docs-article-main on mobile */
+  }
+
+  .docs-article-main {
     padding: 1.5rem 1.25rem 4rem;
   }
 
   .docs-prose h1 { font-size: 1.5rem; }
   .docs-prose h2 { font-size: 1.2rem; }
+}
+
+/* ── Search trigger (in header) ─────────────────────────────── */
+.docs-search-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--gb-text-2);
+  background: var(--gb-bg-2);
+  border: 1px solid var(--gb-border);
+  border-radius: var(--gb-radius);
+  padding: 0.3125rem 0.625rem 0.3125rem 0.5rem;
+  cursor: pointer;
+  transition: background 120ms, border-color 120ms, color 120ms;
+  font-family: var(--gb-font);
+  white-space: nowrap;
+}
+
+.docs-search-trigger:hover {
+  background: var(--gb-bg-3);
+  color: var(--gb-text);
+  border-color: var(--gb-border-strong);
+}
+
+.docs-search-kbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  font-size: 0.6875rem;
+  color: var(--gb-text-3);
+  background: var(--gb-bg-3);
+  border: 1px solid var(--gb-border-strong);
+  border-radius: 3px;
+  padding: 0.1rem 0.2rem;
+  font-family: var(--gb-font);
+  line-height: 1;
+}
+
+/* ── Search modal overlay ─────────────────────────────────────── */
+.docs-search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+  backdrop-filter: blur(2px);
+}
+
+/* ── Search modal ───────────────────────────────────────────── */
+.docs-search-modal {
+  width: 100%;
+  max-width: 600px;
+  background: var(--gb-surface);
+  border: 1px solid var(--gb-border-strong);
+  border-radius: var(--gb-radius);
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  margin: 0 1rem;
+}
+
+/* ── Search input row ────────────────────────────────────────── */
+.docs-search-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--gb-border);
+}
+
+.docs-search-icon {
+  color: var(--gb-text-3);
+  flex-shrink: 0;
+}
+
+.docs-search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 0.9375rem;
+  color: #ffffff;
+  font-family: var(--gb-font);
+  caret-color: var(--gb-accent);
+}
+
+.docs-search-input::placeholder {
+  color: var(--gb-text-3);
+}
+
+.docs-search-clear {
+  background: none;
+  border: none;
+  color: var(--gb-text-3);
+  cursor: pointer;
+  padding: 0.125rem;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  transition: color 120ms;
+}
+
+.docs-search-clear:hover {
+  color: var(--gb-text);
+}
+
+.docs-search-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.docs-search-close kbd {
+  font-size: 0.6875rem;
+  color: var(--gb-text-3);
+  background: var(--gb-bg-3);
+  border: 1px solid var(--gb-border);
+  border-radius: 3px;
+  padding: 0.125rem 0.35rem;
+  font-family: var(--gb-font);
+  cursor: pointer;
+}
+
+/* ── Search body ─────────────────────────────────────────────── */
+.docs-search-body {
+  max-height: 420px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gb-border) transparent;
+}
+
+.docs-search-status {
+  padding: 2rem 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--gb-text-2);
+}
+
+.docs-search-status strong {
+  color: var(--gb-text);
+}
+
+/* ── Search results list ─────────────────────────────────────── */
+.docs-search-results {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.docs-search-result {
+  margin: 0;
+}
+
+.docs-search-result-link {
+  display: block;
+  padding: 0.625rem 1rem;
+  text-decoration: none;
+  transition: background 80ms;
+  border-left: 2px solid transparent;
+}
+
+.docs-search-result.active .docs-search-result-link,
+.docs-search-result-link:hover {
+  background: var(--gb-accent-soft);
+  border-left-color: var(--gb-accent);
+}
+
+.docs-search-result-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.2rem;
+}
+
+.docs-search-result-section {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gb-accent);
+}
+
+.docs-search-result-sep {
+  color: var(--gb-text-3);
+  font-size: 0.75rem;
+}
+
+.docs-search-result-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 0.2rem;
+  line-height: 1.4;
+}
+
+.docs-search-result-title mark {
+  background: rgba(80, 183, 224, 0.25);
+  color: var(--gb-accent);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.docs-search-result-snippet {
+  font-size: 0.8125rem;
+  color: var(--gb-text-2);
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.docs-search-result-snippet mark {
+  background: rgba(80, 183, 224, 0.15);
+  color: var(--gb-text);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* ── Search hint footer ──────────────────────────────────────── */
+.docs-search-hint {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.625rem 1rem;
+  border-top: 1px solid var(--gb-border);
+  font-size: 0.75rem;
+  color: var(--gb-text-3);
+}
+
+.docs-search-hint span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.docs-search-hint kbd {
+  font-size: 0.6875rem;
+  background: var(--gb-bg-3);
+  border: 1px solid var(--gb-border);
+  border-radius: 3px;
+  padding: 0.1rem 0.3rem;
+  font-family: var(--gb-font);
+  color: var(--gb-text-2);
 }
 
 /* ── Jump navigation ─────────────────────────────────────────── */

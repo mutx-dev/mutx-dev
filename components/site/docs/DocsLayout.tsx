@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { DocNavItem } from "@/lib/docs";
+import { DocsSearch } from "./DocsSearch";
 import "@/app/docs/docs.css";
 
 interface DocsLayoutProps {
@@ -81,6 +82,8 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
 
         <div className="flex-1" />
 
+        <DocsSearch />
+
         <a
           href="https://github.com/mutx-dev/mutx-dev"
           target="_blank"
@@ -119,9 +122,7 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
 
         {/* ── Main content ── */}
         <main className="docs-content">
-          <article className="docs-content-inner docs-prose">
-            {children}
-          </article>
+          {children}
         </main>
       </div>
     </div>

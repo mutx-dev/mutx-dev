@@ -36,7 +36,8 @@
     "demo:validate": "bash scripts/demo-validate.sh",
     "release:promote:railway": "bash scripts/promote-railway-production.sh",
     "release:verify:production": "bash scripts/verify-production-release.sh",
-    "release:check": "bash scripts/release-check.sh"
+    "release:check": "bash scripts/release-check.sh",
+    "build:docs-search": "npx tsx scripts/build-docs-search-index.ts"
   },
   "build": {
     "appId": "dev.mutx.desktop",
@@ -100,6 +101,7 @@
     "@react-three/fiber": "^8.17.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.35.2",
     "gray-matter": "^4.0.3",
@@ -138,6 +140,7 @@
     "electron-builder": "^26.0.12",
     "eslint": "^10.1.0",
     "eslint-config-next": "16.2.1",
+    "fuse.js": "^7.3.0",
     "globals": "^17.4.0",
     "jest": "^30.2.0",
     "openapi-typescript": "^7.13.0",

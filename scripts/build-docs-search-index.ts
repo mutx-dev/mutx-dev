@@ -1,0 +1,169 @@
+#!/usr/bin/env npx tsx
+/**
+ * Build MUTX docs search index.
+ * Run: npx tsx scripts/build-docs-search-index.ts
+ * Output: public/docs-search-index.json
+ */
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+import { remark } from "remark";
+import remarkGfm from "remark-gfm";
+
+const DOCS_DIR = path.join(process.cwd(), "docs");
+const OUTPUT_PATH = path.join(process.cwd(), "public", "docs-search-index.json");
+
+interface SearchEntry {
+  id: string;
+  title: string;
+  section: string;
+  content: string;
+  href: string;
+  headings: string[];
+}
+
+interface SearchDocument {
+  title: string;
+  href: string;
+  section: string;
+  entries: SearchEntry[];
+}
+
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function markdownToPlainText(md: string): Promise<string> {
+  const result = await remark().use(remarkGfm).process(md);
+  return stripHtml(result.toString());
+}
+
+function extractHeadings(md: string): string[] {
+  const headings: string[] = [];
+  const lines = md.split("\n");
+  for (const line of lines) {
+    const m = line.match(/^#{1,4}\s+(.+)/);
+    if (m) headings.push(m[1].replace(/[*_`]/g, "").trim());
+  }
+  return headings;
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .trim();
+}
+
+function resolveDocHref(relativePath: string): string {
+  const withoutExt = relativePath.replace(/\.md$/, "");
+  const normalized = withoutExt
+    .replace(/^docs\//, "")
+    .replace(/\/README$/i, "")
+    .replace(/\/index$/i, "")
+    .replace(/^README$/i, "");
+
+  if (!normalized) return "/docs/README";
+  return `/docs/${normalized}`;
+}
+
+function getSection(relativePath: string): string {
+  const parts = relativePath.replace(/^docs\//, "").split("/");
+  if (parts.length <= 1) return "Root";
+  const top = parts[0];
+  return top
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+async function buildIndex(): Promise<void> {
+  const documents: SearchDocument[] = [];
+
+  function walkDir(dir: string, base: string = ""): string[] {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    const files: string[] = [];
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      const rel = path.join(base, entry.name);
+      if (entry.isDirectory()) {
+        files.push(...walkDir(full, rel));
+      } else if (entry.isFile() && entry.name.endsWith(".md")) {
+        files.push(rel);
+      }
+    }
+    return files;
+  }
+
+  const files = walkDir(DOCS_DIR);
+
+  for (const file of files) {
+    const fullPath = path.join(DOCS_DIR, file);
+    const source = fs.readFileSync(fullPath, "utf-8");
+    const { data, content } = matter(source);
+
+    const title =
+      (data.title as string) ||
+      (data.description as string) ||
+      path.basename(file, ".md")
+        .replace(/[-_]/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+
+    const plainText = await markdownToPlainText(content);
+    const headings = extractHeadings(content);
+    const href = resolveDocHref(file);
+    const section = getSection(file);
+
+    // Per-heading entries for precise navigation
+    const entries: SearchEntry[] = [];
+    const headingMatches = content.matchAll(/^#{1,4}\s+(.+)$/gm);
+    for (const match of headingMatches) {
+      const headingText = match[1].replace(/[*_`#]/g, "").trim();
+      const headingSlug = slugify(headingText);
+      const afterHeading = content.slice(match.index! + match[0].length);
+      const sectionText = afterHeading.slice(0, 300);
+
+      entries.push({
+        id: `${href}#${headingSlug}`,
+        title: headingText,
+        section,
+        content: stripHtml(sectionText).slice(0, 500),
+        href: `${href}#${headingSlug}`,
+        headings: [],
+      });
+    }
+
+    // Main document entry
+    entries.unshift({
+      id: href,
+      title,
+      section,
+      content: plainText.slice(0, 1000),
+      href,
+      headings,
+    });
+
+    documents.push({ title, href, section, entries });
+  }
+
+  fs.mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
+  fs.writeFileSync(OUTPUT_PATH, JSON.stringify({ documents }, null, 2));
+  console.log(
+    `Search index written to ${OUTPUT_PATH} (${documents.length} docs, ${documents.reduce((s, d) => s + d.entries.length, 0)} entries)`
+  );
+}
+
+buildIndex().catch((err) => {
+  console.error("Failed to build search index:", err);
+  process.exit(1);
+});
