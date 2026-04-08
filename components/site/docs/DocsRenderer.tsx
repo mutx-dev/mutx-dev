@@ -62,6 +62,10 @@ function preprocessMarkdown(source: string): string {
     }
   );
 
+  // Fix relative .md links: [Text](foo.md) → [Text](foo)
+  // These are markdown links to other doc pages that would otherwise 404
+  source = source.replace(/\]\(([^)#\s]*)\.md\)/g, "]($1)");
+
   return source;
 }
 
