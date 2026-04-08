@@ -58,6 +58,12 @@ def test_yolo_merge_allowed_for_blocked_green_safe_pr() -> None:
     assert RECONCILE.yolo_merge_allowed(pr, green=True, safe=True) is True
 
 
+def test_has_approved_review_requires_approved_state() -> None:
+    assert RECONCILE.has_approved_review({'reviewDecision': 'APPROVED'}) is True
+    assert RECONCILE.has_approved_review({'reviewDecision': 'REVIEW_REQUIRED'}) is False
+    assert RECONCILE.has_approved_review({}) is False
+
+
 def test_safe_to_promote_rejects_stub_only_pr() -> None:
     pr = {'title': '[autonomy] Add error handling to `sdk/mutx/agents.py`', 'headRefName': 'autonomy/stub-agents'}
     files = ['autonomy_stubs/error_agents.md']

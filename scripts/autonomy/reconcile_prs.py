@@ -39,7 +39,7 @@ def load_open_candidate_prs(repo_root: str | Path) -> list[dict[str, Any]]:
             '--limit',
             '100',
             '--json',
-            'number,title,isDraft,mergeStateStatus,headRefName,baseRefName,autoMergeRequest,statusCheckRollup',
+            'number,title,isDraft,mergeStateStatus,headRefName,baseRefName,autoMergeRequest,statusCheckRollup,reviewDecision',
         ],
         repo_root,
     )
@@ -143,6 +143,10 @@ def yolo_merge_allowed(pr: dict[str, Any], *, green: bool, safe: bool) -> bool:
     return green and safe and merge_state in YOLO_MERGE_STATES
 
 
+def has_approved_review(pr: dict[str, Any]) -> bool:
+    return str(pr.get('reviewDecision') or '').upper() == 'APPROVED'
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description='Reconcile safe PRs into ready/auto/admin-merge state')
     parser.add_argument('--repo-root', default=os.environ.get('MUTX_REPO_ROOT', '/Users/fortune/MUTX'))
@@ -157,12 +161,14 @@ def main() -> int:
         files = pr_changed_files(number, repo_root)
         green = checks_green(pr.get('statusCheckRollup') or [])
         safe = safe_to_promote(pr, files)
+        approved = has_approved_review(pr)
         actionable = str(pr.get('mergeStateStatus') or '') not in NON_ACTIONABLE_MERGE_STATES
         entry: dict[str, Any] = {
             'number': number,
             'title': pr.get('title'),
             'green': green,
             'safe': safe,
+            'approved': approved,
             'actionable': actionable,
             'merge_state': pr.get('mergeStateStatus'),
             'files': files,
@@ -170,7 +176,7 @@ def main() -> int:
         if pr.get('isDraft') and safe and actionable:
             entry['ready'] = promote_ready(number, repo_root)
             pr['isDraft'] = False if entry['ready'].get('ok') else pr.get('isDraft')
-        if not pr.get('isDraft') and safe and green:
+        if not pr.get('isDraft') and safe and green and approved:
             if args.yolo and yolo_merge_allowed(pr, green=green, safe=safe):
                 entry['admin_merge'] = admin_merge(number, repo_root)
             elif actionable and not pr.get('autoMergeRequest'):
