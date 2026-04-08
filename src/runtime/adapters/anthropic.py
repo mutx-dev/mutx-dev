@@ -83,10 +83,12 @@ class AnthropicAdapter(AgentRuntime):
 
         # Handle tool calls
         tool_calls = self._convert_tool_calls(response.content)
+        max_roundtrips = int(kwargs.pop("max_tool_roundtrips", self.config.max_tool_roundtrips))
+        tool_roundtrips = 0
 
         # Handle tool execution if needed
         result_content = None
-        while tool_calls and tool_handlers:
+        while tool_calls and tool_handlers and tool_roundtrips < max_roundtrips:
             for tc in tool_calls:
                 tool_name = tc["function"]["name"]
                 tool_args = json.loads(tc["function"]["arguments"])
@@ -115,6 +117,9 @@ class AnthropicAdapter(AgentRuntime):
                     request_kwargs["messages"] = anthropic_messages
                     response = await self._client.messages.create(**request_kwargs)
                     tool_calls = self._convert_tool_calls(response.content)
+                    tool_roundtrips += 1
+                    if tool_roundtrips >= max_roundtrips:
+                        break
 
         return RuntimeResult(
             message={
