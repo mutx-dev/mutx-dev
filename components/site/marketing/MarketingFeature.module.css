@@ -1,109 +1,109 @@
 /* ============================================================
-   FEATURE PAGE — poster-style hero + structured content grid
+   FEATURE PAGE — editorial poster style
+   Bold headline, breathing room, clean hierarchy
    Used by all /ai-agent-* pages
    ============================================================ */
 
-/* ---- Hero stage ---- */
+/* ---- Hero ---- */
 .heroSection {
   position: relative;
-  overflow: clip;
-  background:
-    linear-gradient(168deg, #06080d 0% 62%, #0a0e18 62% 100%);
+  overflow: hidden;
+  background: #07090e;
   color: #f7f4ef;
+}
+
+/* Geometric accent — top left corner */
+.heroSection::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 65%;
+  height: 120%;
+  background: radial-gradient(
+    ellipse at 30% 50%,
+    rgba(75, 141, 255, 0.13) 0%,
+    rgba(75, 141, 255, 0.04) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
 .heroStage {
   position: relative;
-  z-index: 0;
-  min-height: 58vh;
+  z-index: 1;
+  min-height: 72vh;
   display: flex;
-  align-items: flex-end;
-  padding-bottom: clamp(3rem, 6vw, 5rem);
-}
-
-.heroStage::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(75, 141, 255, 0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 40% at 92% 8%, rgba(104, 225, 255, 0.09) 0%, transparent 60%);
-  pointer-events: none;
-}
-
-/* Subtle horizontal rule accent */
-.heroStage::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(75, 141, 255, 0.4) 0%, rgba(75, 141, 255, 0.08) 60%, transparent 100%);
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(5rem, 10vw, 8rem) 0 clamp(3.5rem, 7vw, 6rem);
 }
 
 .heroShell {
-  position: relative;
-  z-index: 1;
-  width: min(100% - 3rem, 116rem);
+  width: min(100% - 3rem, 112rem);
   margin: 0 auto;
 }
 
 .heroColumn {
-  max-width: 44rem;
+  max-width: 48rem;
 }
 
+/* Large, tracked eyebrow pill */
 .heroEyebrow {
-  margin: 0 0 1.4rem;
+  margin: 0 0 2rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.3rem 0.85rem;
+  gap: 0.6rem;
+  padding: 0.35rem 1rem;
   border-radius: 999px;
-  border: 1px solid rgba(75, 141, 255, 0.35);
-  background: rgba(75, 141, 255, 0.08);
+  border: 1px solid rgba(75, 141, 255, 0.4);
+  background: rgba(75, 141, 255, 0.1);
   font-family: var(--font-marketing-accent), sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(141, 203, 255, 0.95);
+  flex-shrink: 0;
 }
 
 .heroEyebrow::before {
   content: "";
   display: inline-block;
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: #4b8dff;
   flex-shrink: 0;
 }
 
+/* Display headline — tight, bold, editorial */
 .heroTitle {
-  margin: 0 0 1.6rem;
+  margin: 0 0 1.8rem;
   font-family: var(--font-marketing-display), serif;
-  font-size: clamp(2.8rem, 5.5vw, 5.2rem);
+  font-size: clamp(3rem, 6.5vw, 6.5rem);
   font-weight: 300;
-  line-height: 0.92;
-  letter-spacing: -0.06em;
+  line-height: 0.9;
+  letter-spacing: -0.065em;
   color: #f7f4ef;
 }
 
+/* Support line — one punchy sentence */
 .heroSupport {
-  margin: 0 0 2.2rem;
-  max-width: 30rem;
-  font-size: clamp(0.98rem, 1.1vw, 1.1rem);
+  margin: 0 0 2.5rem;
+  max-width: 26rem;
+  font-size: clamp(0.9rem, 1vw, 1.05rem);
   font-weight: 500;
-  line-height: 1.55;
+  line-height: 1.6;
   letter-spacing: -0.01em;
-  color: rgba(247, 244, 239, 0.72);
+  color: rgba(247, 244, 239, 0.62);
 }
 
 .heroActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.85rem;
+  gap: 0.9rem;
   align-items: center;
 }
 
@@ -114,76 +114,78 @@
   gap: 0.5rem;
 }
 
-/* ---- Content sections ---- */
+/* ---- Content sections — light background ---- */
 .contentSection {
-  padding: clamp(4rem, 8vw, 7rem) 0;
+  padding: clamp(5rem, 9vw, 8rem) 0;
 }
 
 .contentSection + .contentSection {
-  border-top: 1px solid rgba(19, 26, 36, 0.08);
+  border-top: 1px solid rgba(19, 26, 36, 0.09);
 }
 
+/* Intro block — strong title, readable body */
 .contentIntro {
-  max-width: 34rem;
-  margin-bottom: clamp(2.5rem, 4vw, 3.5rem);
+  max-width: 36rem;
+  margin-bottom: clamp(3rem, 5vw, 4.5rem);
 }
 
 .sectionEyebrow {
-  margin: 0 0 0.9rem;
+  margin: 0 0 1.1rem;
   font-family: var(--font-marketing-accent), sans-serif;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: #4b8dff;
 }
 
 .sectionTitle {
-  margin: 0 0 0.85rem;
+  margin: 0 0 1rem;
   font-family: var(--font-marketing-display), serif;
-  font-size: clamp(1.65rem, 2.5vw, 2.3rem);
+  font-size: clamp(1.75rem, 2.8vw, 2.75rem);
   font-weight: 300;
-  line-height: 1.08;
-  letter-spacing: -0.05em;
+  line-height: 1.05;
+  letter-spacing: -0.055em;
   color: #131a24;
 }
 
 .sectionBody {
   margin: 0;
-  font-size: clamp(0.95rem, 1vw, 1.02rem);
+  font-size: clamp(0.95rem, 1vw, 1.05rem);
   font-weight: 500;
-  line-height: 1.6;
+  line-height: 1.65;
   letter-spacing: -0.01em;
-  color: rgba(19, 26, 36, 0.72);
+  color: rgba(19, 26, 36, 0.68);
 }
 
-/* Feature card grid */
+/* Feature cards — editorial, not a grid of pills */
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
-  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: 1.4rem;
 }
 
 .featureCard {
-  padding: 1.6rem 1.8rem 1.8rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(19, 26, 36, 0.1);
+  padding: 2rem 2.2rem 2.2rem;
+  border-radius: 1.1rem;
+  border: 1px solid rgba(19, 26, 36, 0.09);
   background: #ffffff;
-  box-shadow: 0 2px 12px rgba(10, 18, 38, 0.06);
-  transition: box-shadow 200ms ease, transform 200ms ease;
+  box-shadow: 0 1px 4px rgba(10, 18, 38, 0.05);
+  transition: box-shadow 220ms ease, transform 220ms ease;
 }
 
 .featureCard:hover {
-  box-shadow: 0 6px 28px rgba(10, 18, 38, 0.1);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(10, 18, 38, 0.1);
+  transform: translateY(-3px);
 }
 
 .featureCardTitle {
-  margin: 0 0 0.65rem;
+  margin: 0 0 0.75rem;
   font-family: var(--font-marketing-accent), sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: #131a24;
 }
 
@@ -198,58 +200,77 @@
 
 .featureCardBody {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: clamp(0.9rem, 0.95vw, 0.97rem);
   font-weight: 500;
-  line-height: 1.55;
-  color: rgba(19, 26, 36, 0.65);
+  line-height: 1.62;
+  color: rgba(19, 26, 36, 0.6);
 }
 
-/* ---- Final CTA section ---- */
+/* ---- Final CTA section — dark ---- */
 .finalSection {
-  padding: clamp(4.5rem, 9vw, 7.5rem) 0;
-  background:
-    linear-gradient(168deg, #06080d 0% 62%, #0a0e18 62% 100%);
+  padding: clamp(6rem, 11vw, 9rem) 0;
+  background: #07090e;
   color: #f7f4ef;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle glow from right */
+.finalSection::before {
+  content: "";
+  position: absolute;
+  top: -30%;
+  right: -15%;
+  width: 60%;
+  height: 160%;
+  background: radial-gradient(
+    ellipse at 70% 50%,
+    rgba(75, 141, 255, 0.1) 0%,
+    transparent 65%
+  );
+  pointer-events: none;
 }
 
 .finalInner {
-  max-width: 40rem;
+  position: relative;
+  z-index: 1;
+  max-width: 38rem;
 }
 
 .finalEyebrow {
-  margin: 0 0 1rem;
+  margin: 0 0 1.2rem;
   font-family: var(--font-marketing-accent), sans-serif;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(141, 203, 255, 0.8);
+  color: rgba(141, 203, 255, 0.75);
 }
 
 .finalTitle {
-  margin: 0 0 1.1rem;
+  margin: 0 0 1.2rem;
   font-family: var(--font-marketing-display), serif;
-  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-size: clamp(2.2rem, 4vw, 3.8rem);
   font-weight: 300;
-  line-height: 1.0;
+  line-height: 0.95;
   letter-spacing: -0.06em;
   color: #f7f4ef;
 }
 
 .finalBody {
-  margin: 0 0 2rem;
-  max-width: 28rem;
-  font-size: clamp(0.95rem, 1vw, 1.02rem);
+  margin: 0 0 2.2rem;
+  max-width: 26rem;
+  font-size: clamp(0.9rem, 1vw, 1.02rem);
   font-weight: 500;
-  line-height: 1.58;
+  line-height: 1.62;
   letter-spacing: -0.01em;
-  color: rgba(247, 244, 239, 0.68);
+  color: rgba(247, 244, 239, 0.62);
 }
 
 .finalActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.85rem;
+  gap: 0.9rem;
   align-items: center;
 }
 
@@ -264,26 +285,38 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: rgba(247, 244, 239, 0.85);
-  font-size: 0.92rem;
+  color: rgba(247, 244, 239, 0.82);
+  font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
   transition: opacity 160ms ease;
 }
 
 .secondaryAction:hover {
-  opacity: 0.8;
+  opacity: 0.75;
 }
 
 /* ---- Responsive ---- */
+@media (max-width: 900px) {
+  .heroStage {
+    min-height: 60vh;
+  }
+
+  .featureGrid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    gap: 1.1rem;
+  }
+}
+
 @media (max-width: 768px) {
   .heroSection {
-    background: linear-gradient(168deg, #06080d 0% 70%, #0a0e18 70% 100%);
+    background: linear-gradient(168deg, #07090e 0%, #0a0e18 100%);
   }
 
   .heroStage {
-    min-height: 48vh;
-    align-items: flex-end;
+    min-height: 52vh;
+    padding-top: 4rem;
+    justify-content: flex-end;
   }
 
   .featureGrid {
@@ -293,6 +326,10 @@
 
 @media (max-width: 480px) {
   .heroShell {
-    width: min(100% - 1.5rem, 116rem);
+    width: min(100% - 1.5rem, 112rem);
+  }
+
+  .heroTitle {
+    letter-spacing: -0.05em;
   }
 }
