@@ -89,7 +89,9 @@ async def agent_status_update(
     await db.commit()
 
     # Trigger webhook
-    await trigger_agent_status_event(db, agent.id, old_status, agent.status, agent.name)
+    await trigger_agent_status_event(
+        db, current_user.id, agent.id, old_status, agent.status, agent.name
+    )
 
     logger.info(f"Agent {agent.id} status updated to {status_data.status.value}")
     return {"status": "updated"}
@@ -154,7 +156,9 @@ async def deployment_event(
     await db.commit()
 
     # Trigger webhook
-    await trigger_deployment_event(db, deployment.id, agent.id, event_data.event, deployment.status)
+    await trigger_deployment_event(
+        db, current_user.id, deployment.id, agent.id, event_data.event, deployment.status
+    )
 
     logger.info(f"Deployment {deployment.id} event: {event_data.event}")
     return {"status": "processed"}
@@ -190,6 +194,7 @@ async def receive_metrics(
     # Trigger metrics webhook
     await trigger_webhook_event(
         db,
+        current_user.id,
         "metrics.report",
         {
             "agent_id": str(metrics_data.agent_id),

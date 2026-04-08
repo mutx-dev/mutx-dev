@@ -141,8 +141,8 @@ async def test_heartbeat_event_payload_shape_and_timing_contract(client: AsyncCl
     emitted_events = []
 
     async def fake_trigger_webhook_event(*args, **kwargs):
-        # Preserve call shape: (db, event, payload)
-        emitted_events.append((args[1], args[2]))
+        # Preserve call shape: (db, user_id, event, payload)
+        emitted_events.append((args[2], args[3]))
         return 1
 
     monkeypatch.setattr(
@@ -238,8 +238,8 @@ async def test_heartbeat_webhook_failure_does_not_fail_heartbeat_response(client
     }
 
     async def flaky_trigger_webhook_event(*args, **kwargs):
-        # Preserve call shape: (db, event, payload)
-        event_name = args[1]
+        # Preserve call shape: (db, user_id, event, payload)
+        event_name = args[2]
         call_log[event_name] = call_log.get(event_name, 0) + 1
 
         if event_name == "agent.heartbeat":
