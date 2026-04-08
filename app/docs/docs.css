@@ -982,20 +982,12 @@
 
 /* ── Search modal overlay ─────────────────────────────────────── */
 .docs-search-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
+  /* position, z-index, background, padding handled by inline style */
   background: rgba(0, 0, 0, 0.6);
-  display: none;
   align-items: flex-start;
   justify-content: center;
   padding-top: 10vh;
   backdrop-filter: blur(2px);
-}
-
-/* Show when the search-open attribute is on <html> */
-[data-docs-search-open] .docs-search-overlay {
-  display: flex;
 }
 
 /* ── Search modal ───────────────────────────────────────────── */

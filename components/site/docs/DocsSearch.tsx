@@ -246,7 +246,11 @@ export function DocsSearch() {
   }, []);
 
   return (
-    <div className="docs-search-overlay">
+    <div
+      className="docs-search-overlay"
+      style={{ display: 'none', position: 'fixed', inset: '0', zIndex: '200' }}
+      onClick={() => document.documentElement.removeAttribute(SEARCH_ATTR)}
+    >
       <div className="docs-search-modal" onClick={(e) => e.stopPropagation()}>
         <div className="docs-search-input-row">
           <svg

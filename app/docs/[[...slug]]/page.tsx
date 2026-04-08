@@ -263,6 +263,8 @@ export default async function DocPage({
   return (
     <div className="docs-article-layout">
       <div className="docs-article-main">
+        <TableOfContents sourceHeadings={headings} />
+        <DocsBreadcrumbs />
         <DocsRenderer source={content} />
         <PrevNextNav currentRoute={currentRoute} />
         {data.icon && (
