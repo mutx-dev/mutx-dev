@@ -25,7 +25,7 @@ export function SectionLanding({
       <div className="docs-section-grid">
         {children.map((child) => (
           <Link
-            key={child.slug}
+            key={child.route}
             href={`/docs/${child.slug}`}
             className="docs-section-card"
           >

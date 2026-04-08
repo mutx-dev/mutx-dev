@@ -123,7 +123,7 @@ function NavItem({ item, pathname }: NavItemProps) {
       {hasChildren && open && (
         <div className="docs-nav-children">
           {item.children.map((child) => (
-            <NavItem key={child.slug} item={child} pathname={pathname} />
+            <NavItem key={child.route} item={child} pathname={pathname} />
           ))}
         </div>
       )}
@@ -287,7 +287,7 @@ export function DocsLayout({ nav, children }: DocsLayoutProps) {
         >
           <nav aria-label="Docs nav">
             {nav.map((item) => (
-              <NavItem key={item.slug} item={item} pathname={pathname} />
+              <NavItem key={item.route} item={item} pathname={pathname} />
             ))}
           </nav>
         </aside>
