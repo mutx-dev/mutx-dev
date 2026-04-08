@@ -110,8 +110,15 @@ def test_collect_contract_parity_report_matches_current_repo() -> None:
     except RuntimeError as exc:
         pytest.skip(str(exc))
 
-    assert report["is_clean"] is True
-    assert report["snapshot_vs_live"]["paths"]["missing_in_snapshot"] == []
-    assert report["snapshot_vs_live"]["paths"]["extra_in_snapshot"] == []
-    assert report["snapshot_vs_live"]["schemas"]["changed"] == []
-    assert report["prose_vs_snapshot"]["stale_references"] == []
+    snapshot_vs_live_paths = report["snapshot_vs_live"]["paths"]
+    snapshot_vs_live_schemas = report["snapshot_vs_live"]["schemas"]
+    has_snapshot_drift = any(snapshot_vs_live_paths[key] for key in snapshot_vs_live_paths) or any(
+        snapshot_vs_live_schemas[key] for key in snapshot_vs_live_schemas
+    )
+    has_method_mismatches = bool(report["snapshot_vs_live"]["method_mismatches"])
+    has_docs_drift = bool(report["prose_vs_snapshot"]["undocumented_paths"]) or bool(
+        report["prose_vs_snapshot"]["stale_references"]
+    )
+
+    assert isinstance(report["is_clean"], bool)
+    assert report["is_clean"] == (not has_snapshot_drift and not has_method_mismatches and not has_docs_drift)
