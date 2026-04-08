@@ -3,7 +3,7 @@ import Image from "next/image";
 import { ArrowRight, PhoneCall } from "lucide-react";
 
 import { ContactLeadForm } from "@/components/ContactLeadForm";
-import { AuthNav } from "@/components/AuthNav";
+import { PublicNav } from "@/components/site/PublicNav";
 import { CalendlyPopupButton } from "@/components/site/CalendlyPopupButton";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
@@ -63,7 +63,7 @@ export default function ContactPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(contactStructuredData) }}
       />
-      <AuthNav />
+      <PublicNav />
 
       <main className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">

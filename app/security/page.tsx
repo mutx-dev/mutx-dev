@@ -6,6 +6,8 @@ import { DocsLayout } from "@/components/site/docs/DocsLayout";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl } from "@/lib/seo";
+import { PublicNav } from "@/components/site/PublicNav";
+import { PublicSurface } from "@/components/site/PublicSurface";
 
 export async function generateMetadata(): Promise<Metadata> {
   const source = fs.readFileSync(path.join(process.cwd(), "security.md"), "utf-8");

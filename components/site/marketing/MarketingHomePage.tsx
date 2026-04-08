@@ -130,7 +130,7 @@ export function MarketingHomePage() {
                     MUTX
                   </span>
                   <span className={home.heroLockupMeta} data-testid="homepage-lockup-meta">
-                    open control for deployed agents
+                    runtime · traces · operator control
                   </span>
                 </span>
               </div>

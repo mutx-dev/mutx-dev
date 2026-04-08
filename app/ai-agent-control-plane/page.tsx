@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PublicFooter } from "@/components/site/PublicFooter";
+import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
@@ -119,6 +120,7 @@ const controlPlanePoints = [
 export default function AIAgentControlPlanePage() {
   return (
     <PublicSurface>
+      <PublicNav />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

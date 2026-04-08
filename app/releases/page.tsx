@@ -8,7 +8,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-import { AuthNav } from "@/components/AuthNav";
+import { PublicNav } from "@/components/site/PublicNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
@@ -128,7 +128,7 @@ export default async function ReleasesPage() {
 
   return (
     <PublicSurface className={`${styles.page} ${styles.publicPage} ${styles.releasesPage}`}>
-      <AuthNav />
+      <PublicNav />
 
       <main className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">

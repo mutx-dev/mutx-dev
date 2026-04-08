@@ -7,6 +7,7 @@ export const DEFAULT_OG_IMAGE_ALT = 'MUTX robot holding the MUTX mark aloft'
 export const PUBLIC_MARKETING_ROUTES = [
   '/',
   '/download',
+  '/download/macos',
   '/releases',
   '/contact',
   '/docs',
@@ -18,6 +19,16 @@ export const PUBLIC_MARKETING_ROUTES = [
   '/support',
   '/roadmap',
   '/privacy-policy',
+  '/ai-agent-governance',
+  '/ai-agent-approvals',
+  '/ai-agent-audit-logs',
+  '/ai-agent-control-plane',
+  '/ai-agent-cost',
+  '/ai-agent-deployment',
+  '/ai-agent-guardrails',
+  '/ai-agent-infrastructure',
+  '/ai-agent-monitoring',
+  '/ai-agent-reliability',
 ] as const
 
 export const BLOCKED_CRAWL_PREFIXES = [

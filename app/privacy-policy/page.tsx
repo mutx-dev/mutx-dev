@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { AuthNav } from "@/components/AuthNav";
+import { PublicNav } from "@/components/site/PublicNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
@@ -103,7 +103,7 @@ const sections = [
 export default function PrivacyPolicyPage() {
   return (
     <PublicSurface className={`${styles.page} ${styles.publicPage}`}>
-      <AuthNav />
+      <PublicNav />
 
       <main className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">
