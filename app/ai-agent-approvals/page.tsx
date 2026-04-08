@@ -12,15 +12,15 @@ import {
 import core from "@/components/site/marketing/MarketingCore.module.css";
 import home from "@/components/site/marketing/MarketingHome.module.css";
 
-const pageTitle = "Govern AI Agents | MUTX";
+const pageTitle = "AI Agent Approvals — Human-in-the-Loop Workflows and Operator Authorization | MUTX";
 const pageDescription =
-  "Govern AI agent behavior with explicit policies, audit trails, and operator approval workflows. Make agent governance visible, enforceable, and something your security team can actually audit.";
+  "Add human oversight to your AI agent operations. MUTX is an open control plane that lets you define approval workflows, track authorization decisions, and keep human operators in the loop when it matters.";
 
 export const metadata: Metadata = {
   title: pageTitle,
   description: pageDescription,
   alternates: {
-    canonical: getCanonicalUrl("/govern-ai-agents"),
+    canonical: getCanonicalUrl("/ai-agent-approvals"),
   },
   openGraph: {
     title: pageTitle,
@@ -57,7 +57,8 @@ const structuredData = {
       applicationCategory: "DeveloperApplication",
       operatingSystem: "macOS",
       description: pageDescription,
-      url: getCanonicalUrl("/govern-ai-agents"),
+      url: getCanonicalUrl("/ai-agent-approvals"),
+      downloadUrl: `${getSiteUrl()}/download`,
       offers: {
         "@type": "Offer",
         price: "0",
@@ -67,7 +68,7 @@ const structuredData = {
     {
       "@type": "WebPage",
       name: pageTitle,
-      url: getCanonicalUrl("/govern-ai-agents"),
+      url: getCanonicalUrl("/ai-agent-approvals"),
       description: pageDescription,
       isPartOf: {
         "@type": "WebSite",
@@ -77,7 +78,7 @@ const structuredData = {
     },
     {
       "@type": "Article",
-      headline: "Governing AI Agent Behavior in Production",
+      headline: "AI Agent Approvals: Human-in-the-Loop Workflows and Operator Authorization",
       description: pageDescription,
       author: {
         "@type": "Organization",
@@ -87,29 +88,35 @@ const structuredData = {
         "@id": `${getSiteUrl()}/#organization`,
       },
     },
+    {
+      "@type": "DefinitionPage",
+      name: "AI Agent Approvals",
+      description:
+        "Human oversight workflows for AI agents that require operator authorization before sensitive actions, ensuring human-in-the-loop control at critical decision points.",
+    },
   ],
 };
 
-const governancePoints = [
+const approvalFeatures = [
   {
-    title: "Policies that agents actually follow",
-    body: "Write governance policies in the control plane. They are enforced across every connected runtime — not just documented and hoped for.",
+    title: "Configurable approval gates",
+    body: "Define where agents need human authorization — per action type, per environment, or per sensitivity level. Approval requirements travel with the agent configuration.",
   },
   {
-    title: "Audit trails that prove compliance",
-    body: "Every decision, every boundary crossed, every operator action — logged with trace context your compliance team can actually use.",
+    title: "Structured request workflows",
+    body: "When an agent hits an approval gate, the operator gets a clear request: what is being requested, what context is available, and what happens if they approve or deny.",
   },
   {
-    title: "Approval workflows for sensitive operations",
-    body: "Define what requires a human in the loop. The control plane holds the operation until approval is given — no bypasses, no workarounds.",
+    title: "Authorization tracking",
+    body: "Every approval decision gets recorded — who approved, when, and why. The audit trail is complete and searchable, even across complex multi-step workflows.",
   },
   {
-    title: "Governance that travels with the agent",
-    body: "When you share an agent, the policies come with it. Teams inheriting your workflow get the governance, not just the code.",
+    title: "Delegation and escalation paths",
+    body: "Define who can approve what, and what happens when the designated approver is unavailable. Delegation paths are explicit — no silent bypass of human oversight.",
   },
 ];
 
-export default function GovernAIAgentsPage() {
+export default function AIAgentApprovalsPage() {
   return (
     <PublicSurface>
       <script
@@ -121,23 +128,23 @@ export default function GovernAIAgentsPage() {
           <section className={home.heroSection}>
             <div className={home.heroShell}>
               <div className={home.heroColumn}>
-                <p className={home.heroEyebrow}>Governance</p>
+                <p className={home.heroEyebrow}>AI Agent Approvals</p>
                 <h1 className={home.heroTitle}>
-                  Governance that
+                  Human oversight
                   <br />
-                  agents actually follow.
+                  where it counts.
                 </h1>
                 <p className={home.heroSupport}>
-                  Explicit policies, audit trails, and approval workflows —
-                  defined in the control plane so your security team can
-                  actually audit what agents do, not just what they say they do.
+                  MUTX is an open control plane that adds structured approval
+                  workflows to your AI agents — so sensitive operations always
+                  have a human in the loop.
                 </p>
                 <div className={home.heroActions}>
                   <Link href="/download" className={core.buttonPrimary}>
                     Download for Mac
                   </Link>
-                  <Link href="/download" className={core.buttonGhost}>
-                    See Governance Model
+                  <Link href="/control-plane" className={core.buttonGhost}>
+                    See the Control Plane
                   </Link>
                 </div>
               </div>
@@ -147,23 +154,29 @@ export default function GovernAIAgentsPage() {
           <section className={home.proofSection}>
             <div className={core.shell}>
               <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>What you get</p>
+                <p className={home.sectionEyebrow}>Why approvals matter</p>
                 <h2 className={home.sectionTitle}>
-                  Policy as control.
+                  Agents make decisions
                   <br />
-                  Not policy as suggestion.
+                  that need human review.
                 </h2>
                 <p className={home.sectionBody}>
-                  Most agent platforms have governance in their docs. MUTX has
-                  governance in the control layer — enforced, logged, and
-                  auditable by the people who need to sign off on production AI.
+                  Not every agent decision should be automatic. For sensitive
+                  operations, MUTX gives you structured approval workflows that
+                  require explicit operator authorization. Pair with{" "}
+                  <Link href="/ai-agent-guardrails">guardrails</Link> to define
+                  where approval gates are needed, and{" "}
+                  <Link href="/ai-agent-audit-logs">audit logs</Link> to keep a
+                  complete record of every authorization decision. Approvals
+                  are the human-in-the-loop layer that makes agent operations
+                  auditable and accountable.
                 </p>
               </div>
               <div className={home.proofGrid}>
-                {governancePoints.map((point) => (
-                  <div key={point.title} className={home.proofCard}>
-                    <h3 className={home.proofCardTitle}>{point.title}</h3>
-                    <p className={home.sectionBody}>{point.body}</p>
+                {approvalFeatures.map((feature) => (
+                  <div key={feature.title} className={home.proofCard}>
+                    <h3 className={home.proofCardTitle}>{feature.title}</h3>
+                    <p className={home.sectionBody}>{feature.body}</p>
                   </div>
                 ))}
               </div>
@@ -174,18 +187,21 @@ export default function GovernAIAgentsPage() {
             <div className={core.shell}>
               <div className={home.finalInner}>
                 <div className={home.finalCopy}>
-                  <p className={home.sectionEyebrow}>Compliance-ready</p>
+                  <p className={home.sectionEyebrow}>Open source</p>
                   <h2 className={home.sectionTitle}>
-                    Write the policy.
+                    Authorization that
                     <br />
-                    Enforce it everywhere.
-                    <br />
-                    Audit it any time.
+                    scales with your agents.
                   </h2>
                   <p className={home.sectionBody}>
-                    Download the Mac app, define your first governance policy,
-                    and see how the control plane makes agent behavior something
-                    you can actually govern.
+                    Define approval requirements once, apply them across every
+                    agent runtime. MUTX keeps authorization workflows consistent
+                    and auditable — so your team can trust agent operations without
+                    micromanaging every decision. Built on the same control plane
+                    that powers{" "}
+                    <Link href="/ai-agent-infrastructure">agent infrastructure</Link>{" "}
+                    and{" "}
+                    <Link href="/ai-agent-reliability">reliability tooling</Link>.
                   </p>
                   <div className={home.finalActions}>
                     <Link href="/download" className={core.buttonPrimary}>

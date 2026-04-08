@@ -12,15 +12,15 @@ import {
 import core from "@/components/site/marketing/MarketingCore.module.css";
 import home from "@/components/site/marketing/MarketingHome.module.css";
 
-const pageTitle = "Control Plane for AI Agents | MUTX";
+const pageTitle = "AI Agent Infrastructure — Runtime Management, Deployment, and Operational Scale | MUTX";
 const pageDescription =
-  "MUTX is an open control plane for AI agents. Govern production runtimes, enforce auth boundaries, keep traces visible, and build operator workflows that feel like software you can actually ship.";
+  "Manage AI agent infrastructure at scale. MUTX is an open control plane that gives operators a consistent surface for deploying, monitoring, and governing agent runtimes across any environment.";
 
 export const metadata: Metadata = {
   title: pageTitle,
   description: pageDescription,
   alternates: {
-    canonical: getCanonicalUrl("/control-plane"),
+    canonical: getCanonicalUrl("/ai-agent-infrastructure"),
   },
   openGraph: {
     title: pageTitle,
@@ -57,7 +57,7 @@ const structuredData = {
       applicationCategory: "DeveloperApplication",
       operatingSystem: "macOS",
       description: pageDescription,
-      url: getCanonicalUrl("/control-plane"),
+      url: getCanonicalUrl("/ai-agent-infrastructure"),
       downloadUrl: `${getSiteUrl()}/download`,
       offers: {
         "@type": "Offer",
@@ -68,7 +68,7 @@ const structuredData = {
     {
       "@type": "WebPage",
       name: pageTitle,
-      url: getCanonicalUrl("/control-plane"),
+      url: getCanonicalUrl("/ai-agent-infrastructure"),
       description: pageDescription,
       isPartOf: {
         "@type": "WebSite",
@@ -78,7 +78,7 @@ const structuredData = {
     },
     {
       "@type": "Article",
-      headline: "What is a Control Plane for AI Agents?",
+      headline: "AI Agent Infrastructure: Runtime Management, Deployment, and Operational Scale",
       description: pageDescription,
       author: {
         "@type": "Organization",
@@ -90,33 +90,33 @@ const structuredData = {
     },
     {
       "@type": "DefinitionPage",
-      name: "AI Agent Control Plane",
+      name: "AI Agent Infrastructure",
       description:
-        "An open control plane for production AI agent runtimes, traces, auth boundaries, and operator workflows.",
+        "Production infrastructure management for AI agents, covering runtime deployment, operational scaling, governance surfaces, and cross-environment consistency.",
     },
   ],
 };
 
-const controlPlanePoints = [
+const infraFeatures = [
   {
-    title: "Runtime visibility",
-    body: "See what your agents actually did. Traces, tool calls, context windows, and outcomes — in a surface your whole team can read.",
+    title: "Runtime connection management",
+    body: "Connect agent runtimes from any environment — cloud, on-prem, or local. MUTX provides a consistent management surface across every runtime you have deployed.",
   },
   {
-    title: "Auth boundaries",
-    body: "Define what agents can access and who can operate them. The control plane enforces boundaries across every connected runtime.",
+    title: "Deployment consistency",
+    body: "Define agent configurations once and deploy them consistently. What works in staging works in production — because the same control surface is used in both.",
   },
   {
-    title: "Operator workflows",
-    body: "Build release paths and operator surfaces once. Use them across every agent you deploy — without rebuilding from scratch each time.",
+    title: "Operator surfaces that scale",
+    body: "Build operator workflows once and use them across every agent. No per-agent custom tooling, no tribal knowledge — just consistent surfaces your whole team can use.",
   },
   {
-    title: "Sharing with receipts",
-    body: "When agents move between teams, the full trace history, tool definitions, and permissions come with them. No silent knowledge loss.",
+    title: "Multi-environment governance",
+    body: "Manage agents across dev, staging, and production with governance policies that apply consistently. Your team sees the same surface, with the controls they need for each environment.",
   },
 ];
 
-export default function ControlPlanePage() {
+export default function AIAgentInfrastructurePage() {
   return (
     <PublicSurface>
       <script
@@ -128,23 +128,23 @@ export default function ControlPlanePage() {
           <section className={home.heroSection}>
             <div className={home.heroShell}>
               <div className={home.heroColumn}>
-                <p className={home.heroEyebrow}>Control Plane</p>
+                <p className={home.heroEyebrow}>AI Agent Infrastructure</p>
                 <h1 className={home.heroTitle}>
-                  Open control for
+                  One surface for
                   <br />
-                  deployed agents.
+                  every agent runtime.
                 </h1>
                 <p className={home.heroSupport}>
-                  MUTX is a production control plane that keeps runtimes
-                  legible, auth boundaries enforced, and operator workflows
-                  consistent — so what you ship actually works.
+                  MUTX is an open control plane that gives your team a
+                  consistent management surface for AI agents — across every
+                  environment and every runtime you have deployed.
                 </p>
                 <div className={home.heroActions}>
                   <Link href="/download" className={core.buttonPrimary}>
                     Download for Mac
                   </Link>
-                  <Link href="/download" className={core.buttonGhost}>
-                    See the Product
+                  <Link href="/control-plane" className={core.buttonGhost}>
+                    See the Control Plane
                   </Link>
                 </div>
               </div>
@@ -154,21 +154,30 @@ export default function ControlPlanePage() {
           <section className={home.proofSection}>
             <div className={core.shell}>
               <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>What you get</p>
+                <p className={home.sectionEyebrow}>Why infrastructure matters</p>
                 <h2 className={home.sectionTitle}>
-                  A control plane that acts like software.
+                  Agent runtimes multiply
+                  <br />
+                  faster than your team.
                 </h2>
                 <p className={home.sectionBody}>
-                  Most agent platforms give you a prompt box and wish you luck.
-                  MUTX gives you a runtime surface, a governance layer, and a
-                  release path — the same surfaces your team will actually use.
+                  As agent deployments grow, managing them becomes a problem.
+                  MUTX gives your team a single control surface that works
+                  across every runtime. Pair with{" "}
+                  <Link href="/ai-agent-reliability">reliability tooling</Link>{" "}
+                  for observability,{" "}
+                  <Link href="/ai-agent-guardrails">guardrails</Link> for safety
+                  enforcement, and{" "}
+                  <Link href="/ai-agent-approvals">approval workflows</Link> for
+                  human oversight. The infrastructure layer is what makes all
+                  of those controls consistent and scalable.
                 </p>
               </div>
               <div className={home.proofGrid}>
-                {controlPlanePoints.map((point) => (
-                  <div key={point.title} className={home.proofCard}>
-                    <h3 className={home.proofCardTitle}>{point.title}</h3>
-                    <p className={home.sectionBody}>{point.body}</p>
+                {infraFeatures.map((feature) => (
+                  <div key={feature.title} className={home.proofCard}>
+                    <h3 className={home.proofCardTitle}>{feature.title}</h3>
+                    <p className={home.sectionBody}>{feature.body}</p>
                   </div>
                 ))}
               </div>
@@ -181,14 +190,16 @@ export default function ControlPlanePage() {
                 <div className={home.finalCopy}>
                   <p className={home.sectionEyebrow}>Open source</p>
                   <h2 className={home.sectionTitle}>
-                    Source-available control.
+                    Infrastructure that
                     <br />
-                    Production-grade runtime.
+                    grows with your agent fleet.
                   </h2>
                   <p className={home.sectionBody}>
-                    Download the Mac app and start with the product surface
-                    today. Keep docs, notes, and source aligned — without
-                    rebuilding your workflow to match the tool.
+                    Add MUTX to your existing agent infrastructure and get
+                    immediate management consistency across every runtime. The
+                    control plane works alongside your current tooling — it
+                    doesn&apos;t replace it. For teams managing multiple agents at
+                    scale, it&apos;s the surface that keeps operations manageable.
                   </p>
                   <div className={home.finalActions}>
                     <Link href="/download" className={core.buttonPrimary}>

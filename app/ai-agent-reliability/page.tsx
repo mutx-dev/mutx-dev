@@ -12,15 +12,15 @@ import {
 import core from "@/components/site/marketing/MarketingCore.module.css";
 import home from "@/components/site/marketing/MarketingHome.module.css";
 
-const pageTitle = "API Management for AI Agents | MUTX";
+const pageTitle = "AI Agent Reliability — Traces, Observability, and Production Uptime | MUTX";
 const pageDescription =
-  "Manage AI agent API keys, rate limits, and access controls from a single control plane. Define per-agent permissions, track API usage, and enforce boundaries without scattered configuration.";
+  "Keep your AI agents reliable in production. MUTX is an open control plane that surfaces traces, enforces reliability standards, and gives operators the visibility they need to ship with confidence.";
 
 export const metadata: Metadata = {
   title: pageTitle,
   description: pageDescription,
   alternates: {
-    canonical: getCanonicalUrl("/api-management-ai-agents"),
+    canonical: getCanonicalUrl("/ai-agent-reliability"),
   },
   openGraph: {
     title: pageTitle,
@@ -57,7 +57,8 @@ const structuredData = {
       applicationCategory: "DeveloperApplication",
       operatingSystem: "macOS",
       description: pageDescription,
-      url: getCanonicalUrl("/api-management-ai-agents"),
+      url: getCanonicalUrl("/ai-agent-reliability"),
+      downloadUrl: `${getSiteUrl()}/download`,
       offers: {
         "@type": "Offer",
         price: "0",
@@ -67,7 +68,7 @@ const structuredData = {
     {
       "@type": "WebPage",
       name: pageTitle,
-      url: getCanonicalUrl("/api-management-ai-agents"),
+      url: getCanonicalUrl("/ai-agent-reliability"),
       description: pageDescription,
       isPartOf: {
         "@type": "WebSite",
@@ -77,7 +78,7 @@ const structuredData = {
     },
     {
       "@type": "Article",
-      headline: "Managing API Access for AI Agents",
+      headline: "AI Agent Reliability: Traces, Observability, and Production Uptime",
       description: pageDescription,
       author: {
         "@type": "Organization",
@@ -87,29 +88,35 @@ const structuredData = {
         "@id": `${getSiteUrl()}/#organization`,
       },
     },
+    {
+      "@type": "DefinitionPage",
+      name: "AI Agent Reliability",
+      description:
+        "Production-grade reliability for AI agents, including trace visibility, observability standards, and operator workflows that keep agents running reliably at scale.",
+    },
   ],
 };
 
-const apiManagementPoints = [
+const reliabilityPillars = [
   {
-    title: "Per-agent API keys",
-    body: "Give each agent its own identity and key. Rotate without touching other agents. Revoke when an agent retires or moves to a different team.",
+    title: "Trace visibility",
+    body: "Every tool call, context window decision, and agent outcome gets recorded. When something breaks, you can reconstruct exactly what happened — not guess.",
   },
   {
-    title: "Rate limits that enforce",
-    body: "Set per-agent or per-tool rate limits at the control plane level. When limits are hit, the control plane throttles — not the provider.",
+    title: "Outcome tracking",
+    body: "Set success criteria per agent type. MUTX tracks whether outcomes meet those criteria and surfaces patterns that indicate degradation before they become incidents.",
   },
   {
-    title: "Usage tracking per agent",
-    body: "See API calls, token counts, and error rates per agent. Surface this in the traces your team already reads, not in a separate billing dashboard.",
+    title: "Runtime health surfaces",
+    body: "Operator dashboards show agent health, latency trends, and error rates across your deployed runtimes. Your team sees the same surface — no tribal knowledge required.",
   },
   {
-    title: "Permissions that travel",
-    body: "Define what an agent can call once, and the control plane enforces it everywhere. Share the agent; the permissions come with it.",
+    title: "Failover and recovery",
+    body: "When an agent runtime degrades, MUTX gives operators a clear path to recover — with the full trace history preserved so nothing gets lost in translation.",
   },
 ];
 
-export default function APIManagementAIAgentsPage() {
+export default function AIAgentReliabilityPage() {
   return (
     <PublicSurface>
       <script
@@ -121,23 +128,23 @@ export default function APIManagementAIAgentsPage() {
           <section className={home.heroSection}>
             <div className={home.heroShell}>
               <div className={home.heroColumn}>
-                <p className={home.heroEyebrow}>API Management</p>
+                <p className={home.heroEyebrow}>AI Agent Reliability</p>
                 <h1 className={home.heroTitle}>
-                  Control what your agents
+                  Know what your agents
                   <br />
-                  can call.
+                  are actually doing.
                 </h1>
                 <p className={home.heroSupport}>
-                  Per-agent keys, rate limits, and access controls — managed from
-                  the control plane so permissions are explicit and enforced,
-                  not implied.
+                  MUTX is an open control plane that keeps AI agent runtimes
+                  legible — so your team can ship production agents that work,
+                  and fix them when they don&apos;t.
                 </p>
                 <div className={home.heroActions}>
                   <Link href="/download" className={core.buttonPrimary}>
                     Download for Mac
                   </Link>
-                  <Link href="/download" className={core.buttonGhost}>
-                    See API Controls
+                  <Link href="/control-plane" className={core.buttonGhost}>
+                    See the Control Plane
                   </Link>
                 </div>
               </div>
@@ -147,24 +154,28 @@ export default function APIManagementAIAgentsPage() {
           <section className={home.proofSection}>
             <div className={core.shell}>
               <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>What you get</p>
+                <p className={home.sectionEyebrow}>Why reliability matters</p>
                 <h2 className={home.sectionTitle}>
-                  One place to manage
+                  Agents break in ways
                   <br />
-                  every agent&apos;s API surface.
+                  your team will notice.
                 </h2>
                 <p className={home.sectionBody}>
-                  API keys scattered across agents, rate limits enforced by
-                  providers, permissions that exist only in documentation — that
-                  is not a control plane. MUTX gives you centralized API
-                  management that enforces.
+                  When an AI agent runs in production, it makes hundreds of
+                  decisions your team can&apos;t see. MUTX surfaces those decisions
+                  as traces — so when something goes wrong, you have a record
+                  instead of a mystery. Built on the same control plane philosophy
+                  behind{" "}
+                  <Link href="/ai-agent-audit-logs">audit logs</Link>,{" "}
+                  <Link href="/ai-agent-guardrails">guardrails</Link>, and{" "}
+                  <Link href="/ai-agent-approvals">approval workflows</Link>.
                 </p>
               </div>
               <div className={home.proofGrid}>
-                {apiManagementPoints.map((point) => (
-                  <div key={point.title} className={home.proofCard}>
-                    <h3 className={home.proofCardTitle}>{point.title}</h3>
-                    <p className={home.sectionBody}>{point.body}</p>
+                {reliabilityPillars.map((pillar) => (
+                  <div key={pillar.title} className={home.proofCard}>
+                    <h3 className={home.proofCardTitle}>{pillar.title}</h3>
+                    <p className={home.sectionBody}>{pillar.body}</p>
                   </div>
                 ))}
               </div>
@@ -175,18 +186,18 @@ export default function APIManagementAIAgentsPage() {
             <div className={core.shell}>
               <div className={home.finalInner}>
                 <div className={home.finalCopy}>
-                  <p className={home.sectionEyebrow}>Centralized control</p>
+                  <p className={home.sectionEyebrow}>Open source</p>
                   <h2 className={home.sectionTitle}>
-                    Define the key.
+                    Reliability that scales
                     <br />
-                    Set the limit.
-                    <br />
-                    Enforce everywhere.
+                    with your agent fleet.
                   </h2>
                   <p className={home.sectionBody}>
-                    Download the Mac app, create your first agent identity, and
-                    see how the control plane keeps API access consistent across
-                    every runtime you connect.
+                    Add MUTX to any agent runtime. Get trace visibility,
+                    outcome tracking, and operator surfaces — without
+                    rebuilding your observability stack from scratch. Works
+                    alongside your existing{" "}
+                    <Link href="/ai-agent-infrastructure">agent infrastructure</Link>.
                   </p>
                   <div className={home.finalActions}>
                     <Link href="/download" className={core.buttonPrimary}>

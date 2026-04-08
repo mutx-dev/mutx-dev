@@ -12,15 +12,15 @@ import {
 import core from "@/components/site/marketing/MarketingCore.module.css";
 import home from "@/components/site/marketing/MarketingHome.module.css";
 
-const pageTitle = "Debug AI Agents | MUTX";
+const pageTitle = "AI Agent Audit Logs — Trace History, Compliance, and Operator Accountability | MUTX";
 const pageDescription =
-  "Debug AI agents with full trace visibility, step-by-step execution replay, and tool call inspection. The control plane that makes agent failures something you can actually fix.";
+  "Keep a complete trace history of every AI agent decision. MUTX is an open control plane that records agent actions, maintains audit logs, and gives compliance teams the records they need.";
 
 export const metadata: Metadata = {
   title: pageTitle,
   description: pageDescription,
   alternates: {
-    canonical: getCanonicalUrl("/debug-ai-agents"),
+    canonical: getCanonicalUrl("/ai-agent-audit-logs"),
   },
   openGraph: {
     title: pageTitle,
@@ -57,7 +57,8 @@ const structuredData = {
       applicationCategory: "DeveloperApplication",
       operatingSystem: "macOS",
       description: pageDescription,
-      url: getCanonicalUrl("/debug-ai-agents"),
+      url: getCanonicalUrl("/ai-agent-audit-logs"),
+      downloadUrl: `${getSiteUrl()}/download`,
       offers: {
         "@type": "Offer",
         price: "0",
@@ -67,7 +68,7 @@ const structuredData = {
     {
       "@type": "WebPage",
       name: pageTitle,
-      url: getCanonicalUrl("/debug-ai-agents"),
+      url: getCanonicalUrl("/ai-agent-audit-logs"),
       description: pageDescription,
       isPartOf: {
         "@type": "WebSite",
@@ -77,7 +78,7 @@ const structuredData = {
     },
     {
       "@type": "Article",
-      headline: "Debugging AI Agents in Production",
+      headline: "AI Agent Audit Logs: Trace History, Compliance, and Accountability",
       description: pageDescription,
       author: {
         "@type": "Organization",
@@ -87,29 +88,35 @@ const structuredData = {
         "@id": `${getSiteUrl()}/#organization`,
       },
     },
+    {
+      "@type": "DefinitionPage",
+      name: "AI Agent Audit Logs",
+      description:
+        "Complete audit trails for AI agent runtimes, recording every decision, tool call, and outcome for compliance, debugging, and operator accountability.",
+    },
   ],
 };
 
-const debugPoints = [
+const auditLogFeatures = [
   {
-    title: "Full trace visibility",
-    body: "Every agent run produces a trace: tool calls, context windows, decisions, and outcomes. See what happened without guessing at the prompt.",
+    title: "Complete trace history",
+    body: "Every agent decision gets recorded — tool calls, context window usage, and outcomes. No gaps, no silent failures. What happened and why is always reconstructable.",
   },
   {
-    title: "Step-by-step execution",
-    body: "Replay agent runs step by step. Find where it diverged from expected behavior, what tool call failed, or where context was lost.",
+    title: "Compliance-ready records",
+    body: "Export audit logs in formats your compliance team can use. Structured records that satisfy auditors without requiring custom tooling or manual aggregation.",
   },
   {
-    title: "Tool call inspection",
-    body: "Inspect every tool call in isolation. See inputs, outputs, latency, and error states. Know whether the tool failed or the agent mishandled the result.",
+    title: "Operator attribution",
+    body: "Know which operator triggered a given agent run, and which workflow was active. When something needs review, you know exactly who was involved and what they were doing.",
   },
   {
-    title: "Failure context that stays",
-    body: "When an agent fails, the trace captures the full context. Share it with your team, file a bug, or use it to write a regression test.",
+    title: "Retention and access control",
+    body: "Define how long records are kept and who can access them. Audit logs stay available for the people who need them, and protected from people who shouldn&apos;t.",
   },
 ];
 
-export default function DebugAIAgentsPage() {
+export default function AIAgentAuditLogsPage() {
   return (
     <PublicSurface>
       <script
@@ -121,23 +128,23 @@ export default function DebugAIAgentsPage() {
           <section className={home.heroSection}>
             <div className={home.heroShell}>
               <div className={home.heroColumn}>
-                <p className={home.heroEyebrow}>Debugging</p>
+                <p className={home.heroEyebrow}>AI Agent Audit Logs</p>
                 <h1 className={home.heroTitle}>
-                  See exactly where
+                  Every agent decision,
                   <br />
-                  your agent went wrong.
+                  recorded and searchable.
                 </h1>
                 <p className={home.heroSupport}>
-                  Full trace visibility, step-by-step replay, and tool call
-                  inspection — so debugging an agent feels like debugging
-                  software, not prompting in circles.
+                  MUTX is an open control plane that maintains a complete audit
+                  trail for your AI agents — so compliance teams, operators, and
+                  auditors can always see what happened.
                 </p>
                 <div className={home.heroActions}>
                   <Link href="/download" className={core.buttonPrimary}>
                     Download for Mac
                   </Link>
-                  <Link href="/download" className={core.buttonGhost}>
-                    See Trace Viewer
+                  <Link href="/control-plane" className={core.buttonGhost}>
+                    See the Control Plane
                   </Link>
                 </div>
               </div>
@@ -147,23 +154,28 @@ export default function DebugAIAgentsPage() {
           <section className={home.proofSection}>
             <div className={core.shell}>
               <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>What you get</p>
+                <p className={home.sectionEyebrow}>Why audit logs matter</p>
                 <h2 className={home.sectionTitle}>
-                  Traces that tell the story.
+                  Agents make decisions
                   <br />
-                  Not logs that bury it.
+                  your team can&apos;t see.
                 </h2>
                 <p className={home.sectionBody}>
-                  Most agent platforms give you a completion and a token count.
-                  MUTX gives you the full execution trace — every step, every
-                  call, every decision — in a surface your whole team can read.
+                  Without an audit trail, agent runs are a black box. MUTX
+                  changes that — recording every decision as a structured log
+                  your team can search, export, and review. Combine with{" "}
+                  <Link href="/ai-agent-reliability">reliability tooling</Link>{" "}
+                  for full observability, or{" "}
+                  <Link href="/ai-agent-guardrails">guardrails</Link> to enforce
+                  policies at runtime. The audit log is the record that makes
+                  everything else verifiable.
                 </p>
               </div>
               <div className={home.proofGrid}>
-                {debugPoints.map((point) => (
-                  <div key={point.title} className={home.proofCard}>
-                    <h3 className={home.proofCardTitle}>{point.title}</h3>
-                    <p className={home.sectionBody}>{point.body}</p>
+                {auditLogFeatures.map((feature) => (
+                  <div key={feature.title} className={home.proofCard}>
+                    <h3 className={home.proofCardTitle}>{feature.title}</h3>
+                    <p className={home.sectionBody}>{feature.body}</p>
                   </div>
                 ))}
               </div>
@@ -174,18 +186,20 @@ export default function DebugAIAgentsPage() {
             <div className={core.shell}>
               <div className={home.finalInner}>
                 <div className={home.finalCopy}>
-                  <p className={home.sectionEyebrow}>Built for developers</p>
+                  <p className={home.sectionEyebrow}>Open source</p>
                   <h2 className={home.sectionTitle}>
-                    Run the agent.
+                    Compliance records
                     <br />
-                    Read the trace.
-                    <br />
-                    Fix the bug.
+                    that travel with the agent.
                   </h2>
                   <p className={home.sectionBody}>
-                    Download the Mac app, run your first agent, and see how
-                    MUTX makes debugging feel like something you can actually do
-                    — not a mystery wrapped in a completion.
+                    When agents move between teams or environments, their audit
+                    history moves with them. No silent gaps, no missing records.
+                    Your compliance posture stays intact — even as agent
+                    runtimes change. Built on the same control plane that powers{" "}
+                    <Link href="/ai-agent-approvals">approval workflows</Link>{" "}
+                    and{" "}
+                    <Link href="/ai-agent-infrastructure">agent infrastructure</Link>.
                   </p>
                   <div className={home.finalActions}>
                     <Link href="/download" className={core.buttonPrimary}>

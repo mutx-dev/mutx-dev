@@ -12,15 +12,15 @@ import {
 import core from "@/components/site/marketing/MarketingCore.module.css";
 import home from "@/components/site/marketing/MarketingHome.module.css";
 
-const pageTitle = "Reliability for AI Agents | MUTX";
+const pageTitle = "AI Agent Guardrails — Policy Enforcement, Safety Bounds, and Runtime Controls | MUTX";
 const pageDescription =
-  "Build reliable AI agents with retry logic, timeout controls, fallback paths, and traceable failures. The control plane that makes production agent behavior predictable.";
+  "Enforce safety policies and operational boundaries across your AI agent fleet. MUTX is an open control plane that lets you define guardrails, audit policy violations, and keep agents operating within defined bounds.";
 
 export const metadata: Metadata = {
   title: pageTitle,
   description: pageDescription,
   alternates: {
-    canonical: getCanonicalUrl("/reliability-ai-agents"),
+    canonical: getCanonicalUrl("/ai-agent-guardrails"),
   },
   openGraph: {
     title: pageTitle,
@@ -57,7 +57,8 @@ const structuredData = {
       applicationCategory: "DeveloperApplication",
       operatingSystem: "macOS",
       description: pageDescription,
-      url: getCanonicalUrl("/reliability-ai-agents"),
+      url: getCanonicalUrl("/ai-agent-guardrails"),
+      downloadUrl: `${getSiteUrl()}/download`,
       offers: {
         "@type": "Offer",
         price: "0",
@@ -67,7 +68,7 @@ const structuredData = {
     {
       "@type": "WebPage",
       name: pageTitle,
-      url: getCanonicalUrl("/reliability-ai-agents"),
+      url: getCanonicalUrl("/ai-agent-guardrails"),
       description: pageDescription,
       isPartOf: {
         "@type": "WebSite",
@@ -77,7 +78,7 @@ const structuredData = {
     },
     {
       "@type": "Article",
-      headline: "Building Reliable AI Agents for Production",
+      headline: "AI Agent Guardrails: Policy Enforcement, Safety Bounds, and Runtime Controls",
       description: pageDescription,
       author: {
         "@type": "Organization",
@@ -87,29 +88,35 @@ const structuredData = {
         "@id": `${getSiteUrl()}/#organization`,
       },
     },
+    {
+      "@type": "DefinitionPage",
+      name: "AI Agent Guardrails",
+      description:
+        "Runtime safety controls for AI agents that enforce policies, define operational boundaries, and prevent agents from operating outside defined safety parameters.",
+    },
   ],
 };
 
-const reliabilityPoints = [
+const guardrailFeatures = [
   {
-    title: "Timeout controls that actually fire",
-    body: "Define how long a step runs before it fails. Not a best-effort timeout — one that the control plane enforces and can trigger a fallback path when it fires.",
+    title: "Policy-defined boundaries",
+    body: "Define what agents can and cannot do — per environment, per agent type, or per operator. Policies are enforced at runtime, not encoded in prompts.",
   },
   {
-    title: "Retry with receipts",
-    body: "Configure retry behavior per step, per tool, or globally. Traces show what was retried, what changed, and whether the retry succeeded — no guessing.",
+    title: "Violation detection and alerting",
+    body: "When an agent approaches a policy boundary, MUTX detects it and alerts the relevant operator. No silent policy violations — your team knows before it becomes a problem.",
   },
   {
-    title: "Fallback paths you define",
-    body: "When an agent hits a failure, it should do something predictable — not retry indefinitely or return an error message. Build the path before you need it.",
+    title: "Safety bounds per runtime",
+    body: "Every connected agent runtime gets its own safety configuration. Bounds are defined once, enforced consistently, and visible to anyone who needs to audit them.",
   },
   {
-    title: "Failure modes that trace",
-    body: "Every failure produces a trace with context: what was tried, what failed, and what the agent did next. Debug time goes down; confidence goes up.",
+    title: "Override workflows",
+    body: "When an agent needs to operate outside normal bounds, there&apos;s a defined path: request override, get approval, log the exception. Nothing happens silently.",
   },
 ];
 
-export default function ReliabilityAIAgentsPage() {
+export default function AIAgentGuardrailsPage() {
   return (
     <PublicSurface>
       <script
@@ -121,23 +128,23 @@ export default function ReliabilityAIAgentsPage() {
           <section className={home.heroSection}>
             <div className={home.heroShell}>
               <div className={home.heroColumn}>
-                <p className={home.heroEyebrow}>Reliability</p>
+                <p className={home.heroEyebrow}>AI Agent Guardrails</p>
                 <h1 className={home.heroTitle}>
-                  Make agent behavior
+                  Agents that stay
                   <br />
-                  something you can count on.
+                  inside the lines.
                 </h1>
                 <p className={home.heroSupport}>
-                  Timeout controls, retry logic, and fallback paths — defined in
-                  the control plane so your agents fail predictably, not
-                  spectacularly.
+                  MUTX is an open control plane that defines safety policies for
+                  AI agents — and enforces them at runtime so your team doesn&apos;t
+                  have to watch every decision manually.
                 </p>
                 <div className={home.heroActions}>
                   <Link href="/download" className={core.buttonPrimary}>
                     Download for Mac
                   </Link>
-                  <Link href="/download" className={core.buttonGhost}>
-                    See Reliability Features
+                  <Link href="/control-plane" className={core.buttonGhost}>
+                    See the Control Plane
                   </Link>
                 </div>
               </div>
@@ -147,25 +154,28 @@ export default function ReliabilityAIAgentsPage() {
           <section className={home.proofSection}>
             <div className={core.shell}>
               <div className={home.proofIntro}>
-                <p className={home.sectionEyebrow}>What you get</p>
+                <p className={home.sectionEyebrow}>Why guardrails matter</p>
                 <h2 className={home.sectionTitle}>
-                  Failures that trace.
+                  Prompt instructions
                   <br />
-                  Fallbacks that work.
-                  <br />
-                  Timeouts that fire.
+                  aren&apos;t enough.
                 </h2>
                 <p className={home.sectionBody}>
-                  Unreliable agents are a production liability. MUTX gives you
-                  controls that enforce — not just settings that suggest — so
-                  what runs in production behaves like software.
+                  Telling an agent what not to do in a prompt isn&apos;t a safety
+                  boundary — it&apos;s a suggestion. MUTX enforces actual policy
+                  controls that agents cannot bypass. Combine guardrails with{" "}
+                  <Link href="/ai-agent-audit-logs">audit logs</Link> to see
+                  exactly when policies were tested, and{" "}
+                  <Link href="/ai-agent-approvals">approval workflows</Link> for
+                  cases where override is needed. Guardrails are the enforcement
+                  layer that makes policy real.
                 </p>
               </div>
               <div className={home.proofGrid}>
-                {reliabilityPoints.map((point) => (
-                  <div key={point.title} className={home.proofCard}>
-                    <h3 className={home.proofCardTitle}>{point.title}</h3>
-                    <p className={home.sectionBody}>{point.body}</p>
+                {guardrailFeatures.map((feature) => (
+                  <div key={feature.title} className={home.proofCard}>
+                    <h3 className={home.proofCardTitle}>{feature.title}</h3>
+                    <p className={home.sectionBody}>{feature.body}</p>
                   </div>
                 ))}
               </div>
@@ -176,18 +186,21 @@ export default function ReliabilityAIAgentsPage() {
             <div className={core.shell}>
               <div className={home.finalInner}>
                 <div className={home.finalCopy}>
-                  <p className={home.sectionEyebrow}>Production-ready</p>
+                  <p className={home.sectionEyebrow}>Open source</p>
                   <h2 className={home.sectionTitle}>
-                    Define the failure mode.
+                    Safety policies that
                     <br />
-                    Build the fallback.
-                    <br />
-                    Ship with confidence.
+                    travel with your agents.
                   </h2>
                   <p className={home.sectionBody}>
-                    Download the Mac app, configure your first retry policy, and
-                    see how MUTX makes agent failures something your team can
-                    actually debug.
+                    Define bounds once, enforce everywhere. MUTX keeps agent
+                    safety policies consistent across every runtime — so what
+                    you define in development actually holds in production.
+                    Works alongside your existing{" "}
+                    <Link href="/ai-agent-infrastructure">agent infrastructure</Link>{" "}
+                    and pairs with{" "}
+                    <Link href="/ai-agent-reliability">reliability tooling</Link>{" "}
+                    for complete runtime visibility.
                   </p>
                   <div className={home.finalActions}>
                     <Link href="/download" className={core.buttonPrimary}>
