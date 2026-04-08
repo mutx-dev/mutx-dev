@@ -1,0 +1,14 @@
+apiVersion: 1
+
+providers:
+  - name: 'MUTX Dashboards'
+    orgId: 1
+    folder: 'MUTX'
+    folderUid: 'mutx'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/dashboards
+      foldersFromFilesStructure: true
