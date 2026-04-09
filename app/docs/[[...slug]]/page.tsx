@@ -209,6 +209,8 @@ function DocsHomePage() {
             const label =
               AREA_LABELS[section.slug] ?? section.title;
             if (section.children.length === 0) return null;
+            // Skip the Documentation Hub section — we're already on it
+            if (section.route === '/docs') return null;
 
             return (
               <div key={section.slug} className="docs-home-section">
