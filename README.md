@@ -52,6 +52,26 @@ See [CREDITS.md](CREDITS.md) for full attribution and license texts.
 
 > Start with [Quickstart](docs/deployment/quickstart.md) if you want proof, not theory.
 
+## Quick Start
+
+```bash
+curl -fsSL https://mutx.dev/install.sh | bash
+```
+
+```bash
+mutx setup hosted       # connect to MUTX Cloud
+mutx setup local        # run everything on your machine
+mutx doctor             # verify your install
+```
+
+Deploy your first agent (personal_assistant template):
+
+```bash
+mutx deploy --template personal_assistant
+```
+
+OpenClaw is the open-source agent runtime that powers MUTX agents.
+
 ## Choose Your Path
 
 <table data-view="cards">

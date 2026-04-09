@@ -118,7 +118,7 @@ def infer_allowed_paths(issue: dict[str, Any], sections: dict[str, str]) -> list
 def infer_verification(sections: dict[str, str], area: str) -> list[str]:
     verification = []
     for line in sections.get("acceptance criteria", "").splitlines():
-        line = line.strip().lstrip("-*")
+        line = line.strip().lstrip("-*").strip()
         if not line:
             continue
         if any(char in line for char in UNSAFE_VERIFICATION_CHARS):

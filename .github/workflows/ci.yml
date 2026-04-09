@@ -185,7 +185,7 @@ jobs:
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
         with:
           scan-type: image
-          scan-ref: mutx-frontend:latest
+          scan-ref: 'mutx-frontend:latest'
           format: sarif
           output: trivy-results.sarif
 

@@ -85,3 +85,4 @@ next-env.d.ts
 *.mp4
 *.png
 __pycache__/
+.worktrees/

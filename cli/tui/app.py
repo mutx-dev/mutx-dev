@@ -5,12 +5,26 @@ import threading
 import time
 import webbrowser
 
-from textual import on, work
-from textual.app import App, ComposeResult
-from textual.binding import Binding
-from textual.css.query import NoMatches
-from textual.containers import Horizontal, Vertical, VerticalScroll
-from textual.widgets import Button, DataTable, Footer, Static, TabbedContent, TabPane
+try:
+    from textual import on, work
+    from textual.app import App, ComposeResult
+    from textual.binding import Binding
+    from textual.css.query import NoMatches
+    from textual.containers import Horizontal, Vertical, VerticalScroll
+    from textual.widgets import Button, DataTable, Footer, Static, TabbedContent, TabPane
+    _TEXTUAL_AVAILABLE = True
+except ImportError:
+    _TEXTUAL_AVAILABLE = False
+    # Stubs so the module can be imported for introspection without textual installed
+    App = object
+    ComposeResult = None
+    Binding = None
+    Horizontal = Vertical = VerticalScroll = object
+    Button = DataTable = Footer = Static = TabbedContent = TabPane = object
+    def on(*a, **kw): pass
+    def work(*a, **kw):
+        def decorator(fn): return fn
+        return decorator
 
 from cli.config import current_config
 from cli.faramesh_runtime import get_pending_defers, get_recent_decisions

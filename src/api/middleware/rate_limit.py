@@ -67,6 +67,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         """Return a shorthand identifier for logging — client_id is already pseudonymized."""
         return client_id[:16] if len(client_id) > 16 else client_id
 
+    def _mask_client_for_logging(self, client_id: str) -> str:
+        """Alias for _fingerprint — masks client identifiers in log output."""
+        return self._fingerprint(client_id)
+
     def _prune_all_buckets(self) -> None:
         """Remove timestamps outside the largest configured window."""
         max_window_seconds = max(self.window_seconds, self.auth_window_seconds)

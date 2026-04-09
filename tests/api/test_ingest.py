@@ -3,6 +3,7 @@ Tests for /ingest endpoints.
 """
 
 import uuid
+from datetime import datetime
 
 import pytest
 from httpx import AsyncClient
@@ -123,7 +124,7 @@ async def test_agent_runtime_heartbeat_triggers_heartbeat_webhook_without_status
     client.app.dependency_overrides[get_current_agent] = lambda: test_agent
 
     response = await client.post(
-        "/v1/heartbeat",
+        "/v1/agents/heartbeat",
         json={
             "agent_id": str(test_agent.id),
             "status": "running",
@@ -169,7 +170,7 @@ async def test_agent_runtime_heartbeat_returns_ok_when_webhook_dispatch_fails(
     client.app.dependency_overrides[get_current_agent] = lambda: test_agent
 
     response = await client.post(
-        "/v1/heartbeat",
+        "/v1/agents/heartbeat",
         json={
             "agent_id": str(test_agent.id),
             "status": "running",

@@ -62,6 +62,7 @@ def test_app_factory_mounts_expected_public_routes():
         "/v1/sessions",
         "/v1/swarms",
         "/v1/templates",
+        "/v1/telemetry",
         "/v1/usage",
         "/v1/webhooks",
         "/v1/analytics",

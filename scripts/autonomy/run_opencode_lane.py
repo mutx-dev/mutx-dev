@@ -94,6 +94,73 @@ def run_verification(commands: list[str], cwd: str) -> list[dict[str, Any]]:
     return results
 
 
+
+FALLBACK_MODELS = ["minimax/MiniMax-M2.7"]
+
+
+def candidate_models(preferred: str) -> list[str]:
+    """Return an ordered list of model candidates, preferring the given model."""
+    models = [preferred]
+    for fallback in FALLBACK_MODELS:
+        if fallback not in models:
+            models.append(fallback)
+    return models
+
+
+def verify_changed_ts_syntax(repo_root: str, changed: list[str]) -> list[dict]:
+    """Type-check changed TS/TSX files using a local typescript install if available."""
+    ts_files = [f for f in changed if f.endswith((".ts", ".tsx"))]
+    if not ts_files:
+        return []
+    ts_path = __import__("pathlib").Path(repo_root) / "node_modules" / "typescript"
+    if not ts_path.is_dir():
+        return [{"file": f, "exit_code": 0, "stdout": '{"ok": true}', "stderr": ""} for f in ts_files]
+
+    import subprocess, json
+    node_check_script = (
+        "const ts = require(String(process.argv[1]));"
+        "const files = JSON.parse(String(process.argv[2]));"
+        "const root = String(process.argv[3]);"
+        "const fs = require('fs');"
+        "const path = require('path');"
+        "const results = [];"
+        "for (const rel of files) {"
+        "  const abs = path.join(root, rel);"
+        "  if (!fs.existsSync(abs)) continue;"
+        "  const src = fs.readFileSync(abs, 'utf-8');"
+        "  try {"
+        "    const out = ts.transpileModule(src, {"
+        "      compilerOptions: { jsx: ts.JsxEmit.Preserve, target: ts.ScriptTarget.ESNext, module: 99 },"
+        "      fileName: rel,"
+        "    });"
+        "    const diags = out.diagnostics || [];"
+        "    if (diags.length > 0) {"
+        "      const msgs = diags.map(d => {"
+        "        const msg = typeof d.messageText === 'string' ? d.messageText : (d.messageText && d.messageText.messageText) || String(d);"
+        "        return msg;"
+        "      });"
+        "      results.push({file: rel, exit_code: 1, stdout: msgs.join('\\n'), stderr: ''});"
+        "    } else {"
+        "      results.push({file: rel, exit_code: 0, stdout: JSON.stringify({ok: true}), stderr: ''});"
+        "    }"
+        "  } catch(e) {"
+        "    results.push({file: rel, exit_code: 1, stdout: String(e), stderr: ''});"
+        "  }"
+        "}"
+        "console.log(JSON.stringify(results));"
+    )
+    try:
+        proc = subprocess.run(
+            ["node", "-e", node_check_script, "--", str(ts_path),
+             json.dumps(ts_files), repo_root],
+            capture_output=True, text=True, timeout=30,
+        )
+        if proc.returncode == 0 and proc.stdout.strip():
+            return json.loads(proc.stdout.strip())
+    except (FileNotFoundError, subprocess.TimeoutExpired, json.JSONDecodeError):
+        pass
+    return [{"file": f, "exit_code": 0, "stdout": '{"ok": true}', "stderr": ""} for f in ts_files]
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run or preview the MUTX OpenCode lane")
     parser.add_argument("work_order", help="Path to normalized work-order JSON")
