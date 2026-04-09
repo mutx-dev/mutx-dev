@@ -282,15 +282,6 @@ export function proxy(request: NextRequest) {
   const normalizedPath = normalizePathname(pathname)
   const host = getRequestHost(request)
 
-  // Redirect /docs -> /docs/README
-  if (normalizedPath === '/docs' || normalizedPath === '/docs/') {
-    return finalizeResponse(
-      redirectWithinHost(request, '/docs/README'),
-      host,
-      normalizedPath,
-    )
-  }
-
   if (
     normalizedPath.startsWith('/api') &&
     !SAFE_HTTP_METHODS.has(request.method.toUpperCase()) &&
