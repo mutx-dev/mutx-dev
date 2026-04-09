@@ -2,6 +2,7 @@
   "name": "mutx",
   "version": "1.4.0",
   "private": true,
+  "license": "BUSL-1.1",
   "packageManager": "npm@10.7.0",
   "main": "desktop/main.cjs",
   "scripts": {
