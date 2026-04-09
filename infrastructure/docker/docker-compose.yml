@@ -52,6 +52,10 @@ services:
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       REDIS_URL: redis://redis:6379/0
       ENVIRONMENT: development
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://otel-collector:4317}
+      OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME:-mutx-api}
+      OTEL_TRACES_EXPORTER: ${OTEL_TRACES_EXPORTER:-otlp}
+      OTEL_METRICS_EXPORTER: ${OTEL_METRICS_EXPORTER:-otlp}
     ports:
       - "8000:8000"
     volumes:

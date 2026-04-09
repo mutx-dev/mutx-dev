@@ -21,6 +21,7 @@ from mutx.agent_runtime import (
 from mutx.agents import Agents
 from mutx.analytics import Analytics
 from mutx.api_keys import APIKeys
+from mutx.approvals import Approvals
 from mutx.assistant import Assistant
 from mutx.budgets import Budgets
 from mutx.clawhub import ClawHub
@@ -73,6 +74,10 @@ class MutxClient:
     @property
     def api_keys(self) -> APIKeys:
         return APIKeys(self.http)
+
+    @property
+    def approvals(self) -> Approvals:
+        return Approvals(self.http)
 
     @property
     def assistant(self) -> Assistant:

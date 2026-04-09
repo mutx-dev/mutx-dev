@@ -128,6 +128,7 @@ show_summary() {
   echo -e "  ${BLUE}Jaeger UI:${NC}    http://localhost:16686"
   echo -e "  ${BLUE}Prometheus:${NC}   http://localhost:9090"
   echo -e "  ${BLUE}Grafana:${NC}      http://localhost:3001"
+  echo -e "  ${BLUE}OTEL Collector:${NC}  localhost:4317 (gRPC), localhost:4318 (HTTP)"
   echo ""
   echo "Next operator steps:"
   echo "  mutx setup local"

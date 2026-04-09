@@ -9,7 +9,7 @@ import json
 import tempfile
 import uuid
 from datetime import datetime, timedelta, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 import pytest_asyncio
@@ -448,7 +448,7 @@ class TestAuditLogGlobalInstance:
         audit_module._audit_log = None
         audit_module._audit_log_lock = asyncio.Lock()
 
-        log = await get_audit_log()
+        await get_audit_log()
         await close_audit_log()
         
         # Should be None after close
@@ -530,6 +530,173 @@ class TestAuditEventPayload:
             assert len(results) == 1
             assert "quotes" in results[0].payload["query"]
             assert "\n" in results[0].payload["newlines"]
+        finally:
+            await log.close()
+            import os
+            os.unlink(db_path)
+
+
+class TestOTelIntegration:
+    """Tests for OpenTelemetry span context integration."""
+
+    @pytest.mark.asyncio
+    async def test_log_with_otel_context_auto_captures_trace_and_span(self):
+        """Test that log_with_otel_context captures trace_id and span_id from OTel."""
+        with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
+            db_path = f.name
+
+        log = AuditLog(db_path=db_path)
+        await log.initialize()
+
+        try:
+            # Create an event without trace_id/span_id
+            event = AuditEvent(
+                event_id=uuid.uuid4(),
+                agent_id="agent-otel",
+                session_id="session-otel",
+                event_type=AuditEventType.AGENT_START,
+                payload={"message": "test"},
+                timestamp=datetime.now(timezone.utc),
+            )
+            assert event.trace_id is None
+            assert event.span_id is None
+
+            # Mock OTel span context
+            from unittest.mock import MagicMock
+
+            mock_span = MagicMock()
+            mock_span.get_span_context.return_value = MagicMock(
+                is_valid=True,
+                trace_id=0x0123456789ABCDEF0123456789ABCDEF,
+                span_id=0xFEDCBA9876543210,
+            )
+
+            with patch("opentelemetry.trace.get_current_span", return_value=mock_span):
+                await log.log_with_otel_context(event)
+
+            # The event should now have trace_id and span_id populated
+            assert event.trace_id == "0123456789abcdef0123456789abcdef"
+            assert event.span_id == "fedcba9876543210"
+
+            # Verify it was stored in the database
+            query = AuditQuery(agent_id="agent-otel")
+            results = await log.query(query)
+            assert len(results) == 1
+            assert results[0].trace_id == "0123456789abcdef0123456789abcdef"
+            assert results[0].span_id == "fedcba9876543210"
+        finally:
+            await log.close()
+            import os
+            os.unlink(db_path)
+
+    @pytest.mark.asyncio
+    async def test_log_with_otel_context_does_not_override_existing_trace_id(self):
+        """Test that existing trace_id is not overridden by OTel context."""
+        with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
+            db_path = f.name
+
+        log = AuditLog(db_path=db_path)
+        await log.initialize()
+
+        try:
+            # Create an event WITH trace_id already set
+            event = AuditEvent(
+                event_id=uuid.uuid4(),
+                agent_id="agent-otel-preserve",
+                session_id="session-otel-preserve",
+                event_type=AuditEventType.LLM_CALL,
+                payload={"message": "test"},
+                timestamp=datetime.now(timezone.utc),
+                trace_id="existing-trace-123",
+            )
+
+            # Mock OTel span context
+            from unittest.mock import MagicMock
+
+            mock_span = MagicMock()
+            mock_span.get_span_context.return_value = MagicMock(
+                is_valid=True,
+                trace_id=0x0123456789ABCDEF0123456789ABCDEF,
+                span_id=0xFEDCBA9876543210,
+            )
+
+            with patch("opentelemetry.trace.get_current_span", return_value=mock_span):
+                await log.log_with_otel_context(event)
+
+            # trace_id should NOT have been overridden
+            assert event.trace_id == "existing-trace-123"
+            # span_id SHOULD have been captured (was None)
+            assert event.span_id == "fedcba9876543210"
+        finally:
+            await log.close()
+            import os
+            os.unlink(db_path)
+
+    @pytest.mark.asyncio
+    async def test_log_with_otel_context_disabled_capture(self):
+        """Test that auto_capture can be disabled."""
+        with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
+            db_path = f.name
+
+        log = AuditLog(db_path=db_path)
+        await log.initialize()
+
+        try:
+            event = AuditEvent(
+                event_id=uuid.uuid4(),
+                agent_id="agent-otel-disabled",
+                session_id="session-otel-disabled",
+                event_type=AuditEventType.TOOL_CALL,
+                payload={"message": "test"},
+                timestamp=datetime.now(timezone.utc),
+            )
+
+            # Mock OTel span context
+            from unittest.mock import MagicMock
+
+            mock_span = MagicMock()
+            mock_span.get_span_context.return_value = MagicMock(
+                is_valid=True,
+                trace_id=0x0123456789ABCDEF0123456789ABCDEF,
+                span_id=0xFEDCBA9876543210,
+            )
+
+            with patch("opentelemetry.trace.get_current_span", return_value=mock_span):
+                await log.log_with_otel_context(event, auto_capture_trace=False, auto_capture_span=False)
+
+            # Neither should be captured since auto-capture is disabled
+            assert event.trace_id is None
+            assert event.span_id is None
+        finally:
+            await log.close()
+            import os
+            os.unlink(db_path)
+
+    @pytest.mark.asyncio
+    async def test_log_with_otel_context_no_span_returns_none(self):
+        """Test that missing OTel span results in None values."""
+        with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
+            db_path = f.name
+
+        log = AuditLog(db_path=db_path)
+        await log.initialize()
+
+        try:
+            event = AuditEvent(
+                event_id=uuid.uuid4(),
+                agent_id="agent-otel-none",
+                session_id="session-otel-none",
+                event_type=AuditEventType.POLICY_CHECK,
+                payload={"message": "test"},
+                timestamp=datetime.now(timezone.utc),
+            )
+
+            # No OTel span available
+            with patch("opentelemetry.trace.get_current_span", return_value=None):
+                await log.log_with_otel_context(event)
+
+            assert event.trace_id is None
+            assert event.span_id is None
         finally:
             await log.close()
             import os

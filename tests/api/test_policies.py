@@ -2,7 +2,6 @@
 Tests for /policies endpoints.
 """
 
-import asyncio
 import uuid
 from datetime import datetime, timezone
 
