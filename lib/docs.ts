@@ -127,26 +127,24 @@ export function summaryHrefToDocsRoute(href: string): string | null {
   // GitBook maps docs/api/* → /docs/* (api/ prefix is flattened)
   // e.g. docs/api/reference.md → /docs/reference
   // e.g. docs/api/authentication.md → /docs/reference/authentication
-  const normalized = href.replace(/^docs\/api\//, "docs/");
 
-  if (!normalized.startsWith("docs/")) {
-    // Root-level content (e.g. agents/README.md) → mount under /docs/*
-    const slug = normalizeSummaryHrefToSlug(normalized)
-      .replace(/\/README$/i, "")
-      .replace(/\/index$/i, "")
-      .replace(/^README$/i, "");
-    return slug ? `/docs/${slug}` : "/docs";
-  }
+  let working = href;
 
-  // docs/ prefixed: strip prefix, use rest as the route path
-  // Strip README/index suffixes so section landing pages route correctly
-  // e.g. docs/architecture/README → /docs/architecture
-  // e.g. docs/autonomy/index    → /docs/autonomy
-  const slug = normalizeSummaryHrefToSlug(normalized)
+  // 1. Flatten docs/api/ prefix
+  working = working.replace(/^docs\/api\//, "docs/");
+
+  // 2. Strip docs/ prefix to get the slug path
+  const slug = working.replace(/^docs\//, "");
+
+  // 3. Strip .md, /README, /index suffixes
+  const clean = slug
+    .replace(/\.md$/, "")
     .replace(/\/README$/i, "")
     .replace(/\/index$/i, "")
     .replace(/^README$/i, "");
-  return `/docs/${slug}`;
+
+  if (!clean) return "/docs";
+  return `/docs/${clean}`;
 }
 
 export function getDocSitemapRoutes(): string[] {
