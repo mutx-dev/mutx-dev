@@ -5,9 +5,9 @@ import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl, getSiteUrl } from "@/lib/seo";
 
-const homeTitle = "MUTX | Open Control Plane for AI Agents";
+const homeTitle = "MUTX | See What Your AI Agents Are Doing";
 const homeDescription =
-  "Deploy, govern, and share AI agents with an open control plane for production runtimes, traces, auth boundaries, and operator workflows.";
+  "MUTX gives you clear visibility, real control, and safe team sharing for every AI agent you run. Download the Mac app.";
 
 export const metadata: Metadata = {
   title: homeTitle,

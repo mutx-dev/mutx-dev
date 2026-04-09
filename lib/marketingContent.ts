@@ -43,6 +43,18 @@ export type MarketingHomepage = {
         mediaAlt: string
       }>
     }
+    examples: {
+      eyebrow: string
+      title: string
+      body: string
+      items: Array<{
+        eyebrow: string
+        title: string
+        userPrompt: string
+        apology: string[]
+        fallout: string
+      }>
+    }
     proof: {
       eyebrow: string
       title: string
@@ -91,85 +103,127 @@ const homepageActions: MarketingActionLink[] = [
 
 export const marketingHomepage: MarketingHomepage = {
   hero: {
-    tagline: 'Signed. Notarized. Shipping now.',
-    title: 'Deploy. Govern. Share.',
-
+    tagline: 'Your AI agents are already working. Do you know what they\'re doing?',
+    title: 'See it. Control it. Share it with your team.',
     backgroundSrc: '/landing/webp/victory-core.webp',
     backgroundAlt: 'MUTX robot raising the MUTX mark inside a blue-lit control chamber',
     actions: homepageActions,
   },
   salesSections: {
     demo: {
-      eyebrow: 'See MUTX in motion',
-      title: 'Watch the product before we ask you to believe the copy.',
-      body: 'MUTX is easiest to understand when you see the runtime, governance, and release path on screen. Start with the real surfaces.',
+      eyebrow: 'See MUTX in action',
+      title: 'Watch what happens when you can actually see your agents work.',
+      body: 'MUTX gives you a clear view of every run, every decision, and every outcome. No more guessing.',
       tabs: [
         {
           id: 'runtime',
-          label: 'Runtime',
-          title: 'Inspect what the agent actually did.',
-          body: 'See the runtime surface where runs, tool calls, and outcomes stay visible instead of disappearing into prompt soup.',
+          label: 'Activity log',
+          title: 'Know exactly what your agent did.',
+          body: 'Every step, every tool call, every result — all in one place. No more digging through chat logs.',
           mediaType: 'gif',
           mediaSrc: '/demo.gif',
-          mediaAlt: 'MUTX operator demo showing the runtime in motion',
+          mediaAlt: 'MUTX showing agent activity in real time',
         },
         {
           id: 'governance',
-          label: 'Governance',
-          title: 'Keep boundaries explicit.',
-          body: 'Put access, policies, and operator decisions in the control layer where teams can review and enforce them.',
+          label: 'Permissions',
+          title: 'Decide what your agents can and cannot do.',
+          body: 'Set clear boundaries so agents stay productive without overstepping. Your rules, enforced automatically.',
           mediaType: 'image',
           mediaSrc: '/landing/webp/docs-surface.webp',
-          mediaAlt: 'MUTX control surface showing runtime and governance views',
+          mediaAlt: 'MUTX permission settings for AI agents',
         },
         {
           id: 'layers',
-          label: 'Layers',
-          title: 'Deploy without rebuilding the path.',
-          body: 'Move from local proof to a governed runtime through the same product surface instead of stitching together one-off tools.',
+          label: 'Team sharing',
+          title: 'Share agents across your team, safely.',
+          body: 'Your team gets the same visibility and control — no more copy-pasting prompts in Slack.',
           mediaType: 'image',
           mediaSrc: '/landing/webp/wiring-bay.webp',
-          mediaAlt: 'MUTX runtime wiring bay illustration',
+          mediaAlt: 'MUTX team sharing interface',
         },
         {
           id: 'operator',
-          label: 'Operator lane',
-          title: 'Keep the release path readable.',
-          body: 'The same product surface that shows the run is the one that helps operators understand what ships next.',
+          label: 'Peace of mind',
+          title: 'Sleep well knowing your agents are working as intended.',
+          body: 'Audit trails, run history, and clear logs mean you always know what happened and why.',
           mediaType: 'image',
           mediaSrc: '/landing/webp/running-agent.webp',
-          mediaAlt: 'MUTX running agent artwork inside the product world',
+          mediaAlt: 'MUTX agent run history and audit trail',
+        },
+      ],
+    },
+    examples: {
+      eyebrow: 'Why this matters',
+      title: 'When AI agents go wrong, the damage is silent.',
+      body: 'Without oversight, a helpful agent can cause real harm. MUTX makes sure you catch it before it spreads.',
+      items: [
+        {
+          eyebrow: 'File deletion',
+          title: 'Agent deleted important files',
+          userPrompt: 'Clean up my Downloads folder',
+          apology: [
+            'I removed 847 files from ~/Downloads.',
+            'I also emptied the Trash to save space.',
+            'I noticed some files looked like work documents,',
+            'but I assumed you wanted everything removed.',
+          ],
+          fallout: 'With MUTX, you see every file action before it sticks. Set a boundary once, protect every run.',
+        },
+        {
+          eyebrow: 'Data leak',
+          title: 'Agent sent data to the wrong person',
+          userPrompt: 'Share the Q3 report with the team',
+          apology: [
+            'I sent the Q3 financials to your Slack workspace.',
+            'The channel includes 23 external contractors.',
+            'I also attached the raw database export',
+            'because it was in the same folder.',
+          ],
+          fallout: 'MUTX keeps sharing boundaries explicit. Agents only reach who you approve, nothing more.',
+        },
+        {
+          eyebrow: 'Production incident',
+          title: 'Agent made an outage worse',
+          userPrompt: 'Fix the slow database query',
+          apology: [
+            'I restarted the database server to apply optimizations.',
+            'This caused a 12-minute outage for all users.',
+            'I also dropped the query cache to free memory.',
+            'The cache rebuild will take approximately 4 hours.',
+          ],
+          fallout: 'MUTX shows you what the agent plans to do. Review, approve, or stop it — before the damage hits.',
         },
       ],
     },
     proof: {
       eyebrow: 'Why teams switch',
-      title: 'From agent theater to deployable systems.',
-      body: 'Most teams do not need more agent hype. They need a product that makes deployed agents legible, governable, and shareable.',
+      title: 'From "I hope it works" to "I know it works."',
+      body: 'Most teams are flying blind with AI agents. MUTX gives you the visibility and control you need to use AI confidently.',
       items: [
         {
-          title: 'Before MUTX',
-          before: 'Agents live inside one-off prompts, hidden scripts, and toolchains nobody wants to audit.',
-          after: 'MUTX gives you a visible operator surface for deployment, runtime inspection, and control.',
+          title: 'Visibility',
+          before: 'An agent ran for an hour and you have no idea what it did, what it accessed, or what it changed.',
+          after: 'MUTX shows you every step, every decision, and every result in a clear timeline you can actually read.',
         },
         {
-          title: 'Without control',
-          before: 'Teams cannot tell which tool was called, what changed, or how to safely hand the workflow to someone else.',
-          after: 'MUTX keeps boundaries, receipts, and sharing paths explicit enough for real teams to use in production.',
+          title: 'Control',
+          before: 'You share agent access by copying prompts into Slack and hoping nobody tweaks them in a bad way.',
+          after: 'MUTX lets you set clear permissions and share agents with your team through a proper, auditable workspace.',
         },
         {
-          title: 'What buyers get',
-          before: 'Another demo that looks clever for five minutes.',
-          after: 'A signed product, concrete runtime surfaces, and a release lane that feels like software you can actually operate.',
+          title: 'Trust',
+          before: 'Another AI demo that looks impressive for five minutes but falls apart the first time something goes wrong.',
+          after: 'A real product with audit trails, run history, and clear boundaries — so you can trust AI in production.',
         },
       ],
     },
     cta: {
-      eyebrow: 'Try the product',
-      title: 'Install the Mac app and start with the real thing.',
-      body: 'Open the signed build, watch the runtime, and decide from the product itself — not from a landing page trying too hard.',
+      eyebrow: 'Try it yourself',
+      title: 'See it for yourself — in under two minutes.',
+      body: 'Download the Mac app, watch your first agent run, and decide from the product. No signup required.',
       mediaSrc: '/demo.gif',
-      mediaAlt: 'MUTX operator demo showing the control plane in motion',
+      mediaAlt: 'MUTX agent control in action',
       actions: homepageActions,
     },
   },
@@ -193,8 +247,8 @@ export const marketingFooterLinks: MarketingFooterLink[] = [
 ]
 
 export const marketingFooterCallout: MarketingFooterCallout = {
-  title: 'SOURCE-AVAILABLE CONTROL FOR AGENTS.',
-  body: 'Start with the Mac app. Keep docs, notes, and source aligned.',
+  title: 'YOUR AI AGENTS, UNDER CONTROL.',
+  body: 'Start with the Mac app. See what your agents are really doing.',
   action: {
     label: 'Download for Mac',
     href: '/download',

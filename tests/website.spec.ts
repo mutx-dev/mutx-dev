@@ -227,11 +227,11 @@ test.describe('mutx.dev QA', () => {
 
     await expect(page.getByTestId('homepage-lockup')).toBeVisible();
     await expect(page.getByTestId('homepage-lockup-mark')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /deploy\. govern\. share\./i })).toBeVisible({
+    await expect(page.getByRole('heading', { name: /see it\. control it\. share it/i })).toBeVisible({
       timeout: 10000,
     });
     await expect(
-      page.getByText(/Signed\. Notarized\. Shipping now\./i)
+      page.getByText(/your ai agents are already working/i)
     ).toBeVisible();
     await expect(page.getByRole('link', { name: /download for mac/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^releases$/i }).first()).toBeVisible();
@@ -306,7 +306,7 @@ test.describe('mutx.dev QA', () => {
     );
 
     expect(visibleHeadings.length).toBeGreaterThanOrEqual(3);
-    expect(visibleHeadings.some((heading) => /Install the Mac app/i.test(heading))).toBe(true);
+    expect(visibleHeadings.some((heading) => /see it for yourself/i.test(heading))).toBe(true);
     await expect(page.getByText(/^OPEN CONTROL\. SHIP CLEANLY\.$/)).toHaveCount(0);
     await expect(page.getByRole('button', { name: /next slide/i })).toHaveCount(0);
     await expect(page.getByRole('button', { name: /close details/i })).toHaveCount(0);

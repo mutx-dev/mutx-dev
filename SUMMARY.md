@@ -84,7 +84,7 @@
 * [Overview](overview.md)
 * [Quickstart](quickstart.md)
 * [Surface Matrix](surface-matrix.md)
-* [Technical Whitepaper](technical-whitepaper.md)
+* [Technical Whitepaper](docs/whitepaper.md)
 * [Webhook Governance](WEBHOOK-GOVERNANCE.md)
   * [ADR: FastAPI for Control Plane](docs/adr/001-fastapi-for-control-plane.md)
   * [ADR: Multi-Tenant VPC Isolation](docs/adr/002-multi-tenant-vpc-isolation.md)

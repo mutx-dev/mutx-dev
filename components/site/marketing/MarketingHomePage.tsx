@@ -129,9 +129,9 @@ export function MarketingHomePage() {
                   <span className={home.heroLockupWord} data-testid="homepage-lockup-word">
                     MUTX
                   </span>
-                  <span className={home.heroLockupMeta} data-testid="homepage-lockup-meta">
-                    runtime · traces · operator control
-                  </span>
+                <span className={home.heroLockupMeta} data-testid="homepage-lockup-meta">
+                  see · control · share
+                </span>
                 </span>
               </div>
 
@@ -211,6 +211,55 @@ export function MarketingHomePage() {
                 </motion.div>
 
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className={home.examplesSection} data-testid="homepage-examples-section">
+          <div className={core.shell}>
+            <MarketingReveal className={home.examplesIntro}>
+              <p className={home.sectionEyebrow}>{marketingHomepage.salesSections.examples.eyebrow}</p>
+              <h2 className={home.sectionTitle}>{marketingHomepage.salesSections.examples.title}</h2>
+              <p className={home.sectionBody}>{marketingHomepage.salesSections.examples.body}</p>
+            </MarketingReveal>
+
+            <div className={home.examplesGrid}>
+              {marketingHomepage.salesSections.examples.items.map((item, index) => (
+                <HoverCard
+                  key={item.title}
+                  className={home.exampleCard}
+                  delay={index * 0.07}
+                  distance={18}
+                >
+                  <div className={home.terminalWindow}>
+                    <div className={home.terminalChrome}>
+                      <span className={home.terminalDot} data-tone="red" />
+                      <span className={home.terminalDot} data-tone="yellow" />
+                      <span className={home.terminalDot} data-tone="green" />
+                      <span className={home.terminalTitle}>{item.eyebrow}</span>
+                    </div>
+                    <div className={home.terminalBody}>
+                      <p className={home.terminalPromptLine}>
+                        <span className={home.terminalPrompt}>{'>'}</span>
+                        <span className={home.terminalCommand}>{item.userPrompt}</span>
+                      </p>
+                      <div className={home.terminalReplyBlock}>
+                        {item.apology.map((line, lineIndex) => (
+                          <p key={lineIndex} className={home.terminalReplyLine}>
+                            <span className={home.terminalAgent}>agent</span>
+                            <span>{line}</span>
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={home.exampleCopy}>
+                    <h3 className={home.exampleTitle}>{item.title}</h3>
+                    <p className={home.exampleOutcome}>{item.fallout}</p>
+                  </div>
+                </HoverCard>
+              ))}
             </div>
           </div>
         </section>
