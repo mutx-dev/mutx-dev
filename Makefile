@@ -151,3 +151,38 @@ mutation-test:
 	@echo ""
 	@echo "Mutation testing results:"
 	@python -m mutmut show
+
+# Helm deployment targets
+HELM_DIR := infrastructure/helm/mutx
+
+.PHONY: helm-lint helm-install-staging helm-install-prod helm-template-staging helm-template-prod
+helm-lint:
+	@echo "Linting Helm chart..."
+	@helm lint $(HELM_DIR)
+
+helm-template-staging:
+	@echo "Rendering staging template..."
+	@helm template mutx-staging $(HELM_DIR) -f $(HELM_DIR)/values.staging.yaml
+
+helm-template-prod:
+	@echo "Rendering production template..."
+	@helm template mutx-prod $(HELM_DIR) -f $(HELM_DIR)/values.prod.yaml
+
+helm-install-staging:
+	@echo "Installing/upgrading staging release..."
+	@helm upgrade --install mutx-staging $(HELM_DIR) -f $(HELM_DIR)/values.staging.yaml --namespace staging --create-namespace
+
+helm-upgrade-staging:
+	@helm upgrade --install mutx-staging $(HELM_DIR) -f $(HELM_DIR)/values.staging.yaml --namespace staging --create-namespace
+
+helm-install-prod:
+	@echo "Installing/upgrading production release..."
+	@helm upgrade --install mutx-prod $(HELM_DIR) -f $(HELM_DIR)/values.prod.yaml --namespace production --create-namespace
+
+helm-uninstall-staging:
+	@echo "Uninstalling staging release..."
+	@helm uninstall mutx-staging --namespace staging || true
+
+helm-uninstall-prod:
+	@echo "Uninstalling production release..."
+	@helm uninstall mutx-prod --namespace production || true
