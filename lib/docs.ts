@@ -124,24 +124,29 @@ export function flatNav(items: DocNavItem[]): DocNavItem[] {
 }
 
 export function summaryHrefToDocsRoute(href: string): string | null {
-  // GitBook maps docs/api/* → /docs/* (api/ prefix is flattened)
+  // GitBook maps docs/api/* → /docs/reference/* (api/ dir → /reference URL path)
   // e.g. docs/api/reference.md → /docs/reference
   // e.g. docs/api/authentication.md → /docs/reference/authentication
+  // e.g. docs/api/index.md → /docs/reference
 
   let working = href;
 
-  // 1. Flatten docs/api/ prefix
-  working = working.replace(/^docs\/api\//, "docs/");
+  // 1. Remap docs/api/ → docs/reference/
+  working = working.replace(/^docs\/api\//, "docs/reference/");
 
   // 2. Strip docs/ prefix to get the slug path
   const slug = working.replace(/^docs\//, "");
 
   // 3. Strip .md, /README, /index suffixes
-  const clean = slug
+  let clean = slug
     .replace(/\.md$/, "")
     .replace(/\/README$/i, "")
     .replace(/\/index$/i, "")
-    .replace(/^README$/i, "");
+    .replace(/^README$/i, "")
+    .replace(/^index$/i, "");
+
+  // 4. docs/api/reference.md → docs/reference/reference → strip redundant segment
+  clean = clean.replace(/^reference\/reference$/, "reference");
 
   if (!clean) return "/docs";
   return `/docs/${clean}`;

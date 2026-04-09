@@ -228,13 +228,8 @@ function saveOpenState(sections: Set<string>) {
 export function DocsLayout({ nav, children }: DocsLayoutProps) {
   const pathname = usePathname();
   const [openSections, setOpenSections] = useState<Set<string>>(() => {
-    // Start with all section roots open by default
+    // Start collapsed (GitBook default) — NavItem auto-expands ancestor of current page
     const initial = new Set<string>();
-    for (const item of nav) {
-      if (item.children.length > 0 && !item.isPage) {
-        initial.add(item.slug);
-      }
-    }
     // Merge with localStorage state
     const saved = loadOpenState();
     for (const s of saved) {

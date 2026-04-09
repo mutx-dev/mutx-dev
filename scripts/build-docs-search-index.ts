@@ -78,7 +78,7 @@ function resolveDocHref(relativePath: string): string {
   // e.g. api/index.md → /docs/reference (not /docs/reference/index)
   if (withoutExt.startsWith("api/")) {
     const inner = withoutExt.replace(/^api\//, ""); // e.g. "reference" or "authentication"
-    if (inner === "index") return "/docs/reference";
+    if (inner === "index" || inner === "reference") return "/docs/reference";
     return `/docs/reference/${inner}`;
   }
 
