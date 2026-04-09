@@ -194,7 +194,7 @@ def test_v13_release_notes_page_keeps_soft_launch_truth() -> None:
 
 
 def test_public_agents_guidance_mentions_v1_contract() -> None:
-    agents_md = read_text("agents-1.md")
+    agents_md = read_text("AGENTS.md")
 
     assert "/v1/*" in agents_md
     assert "there is no global `/v1` backend prefix" not in agents_md
