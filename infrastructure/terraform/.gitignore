@@ -2,8 +2,8 @@
 *.tfstate.*
 *.tfvars
 *.tfvars.json
-!.terraform/
-!.terraform.lock.hcl
+.terraform/
+.terraform.lock.hcl
 terraform.tfplan
 terraform.tfstate.backup
 .env
