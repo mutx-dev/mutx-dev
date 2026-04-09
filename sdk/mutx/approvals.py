@@ -4,15 +4,30 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import Any, Optional
+from uuid import UUID
 
 import httpx
 
 
 class ApprovalRequest:
-    """Represents an approval request from the /v1/approvals API."""
+    """Represents an approval request returned by the API.
+
+    Attributes:
+        id: Unique identifier for the approval request.
+        agent_id: ID of the agent that triggered the approval.
+        session_id: ID of the session during which the approval was requested.
+        action_type: Type of action requiring approval (e.g. "deploy", "delete").
+        payload: Arbitrary context payload passed when creating the request.
+        status: Current status — PENDING, APPROVED, REJECTED, or EXPIRED.
+        requester: Email of the user who submitted the request.
+        approver: Email of the user who approved or rejected (None if pending).
+        created_at: Timestamp when the request was created.
+        resolved_at: Timestamp when the request was resolved (None if pending).
+        comment: Optional comment from the approver.
+    """
 
     def __init__(self, data: dict[str, Any]):
-        self.id: str = data["id"]
+        self.id: UUID = UUID(data["id"])
         self.agent_id: str = data["agent_id"]
         self.session_id: str = data["session_id"]
         self.action_type: str = data["action_type"]
@@ -30,11 +45,44 @@ class ApprovalRequest:
         self._data = data
 
     def __repr__(self) -> str:
-        return f"ApprovalRequest(id={self.id}, status={self.status})"
+        return (
+            f"ApprovalRequest(id={self.id}, agent_id={self.agent_id!r}, "
+            f"action_type={self.action_type!r}, status={self.status!r})"
+        )
 
 
 class Approvals:
-    """SDK resource for /v1/approvals endpoints."""
+    """SDK resource for /v1/approvals endpoints.
+
+    Supports both sync and async clients. Async methods are prefixed with ``a``.
+
+    Example (sync)::
+
+        >>> client = MutxClient(api_key="...")
+        >>> req = client.approvals.create(
+        ...     agent_id="agent-123",
+        ...     session_id="session-456",
+        ...     action_type="deploy",
+        ...     payload={"target": "production"},
+        ... )
+        >>> print(req.status)
+        PENDING
+
+    Example (async)::
+
+        >>> import httpx
+        >>> async_client = httpx.AsyncClient(
+        ...     base_url="https://api.mutx.dev",
+        ...     headers={"Authorization": "Bearer ..."},
+        ... )
+        >>> approvals = Approvals(async_client)
+        >>> req = await approvals.acreate(
+        ...     agent_id="agent-123",
+        ...     session_id="session-456",
+        ...     action_type="deploy",
+        ...     payload={"target": "production"},
+        ... )
+    """
 
     def __init__(self, client: httpx.Client | httpx.AsyncClient):
         self._client = client
@@ -62,13 +110,10 @@ class Approvals:
         action_type: str,
         payload: Optional[dict[str, Any]] = None,
     ) -> ApprovalRequest:
-        """Create a new approval request.
+        """
+        Submit a new approval request (sync).
 
-        Args:
-            agent_id: ID of the agent requesting approval.
-            session_id: ID of the session.
-            action_type: Type of action being approved (e.g. "deploy").
-            payload: Optional additional context as key-value pairs.
+        Returns the created ``ApprovalRequest`` in ``PENDING`` status.
         """
         self._require_sync_client()
         response = self._client.post(
@@ -83,15 +128,23 @@ class Approvals:
         response.raise_for_status()
         return ApprovalRequest(response.json())
 
+    def get(self, request_id: str) -> ApprovalRequest:
+        """Fetch a single approval request by ID."""
+        self._require_sync_client()
+        response = self._client.get(f"/v1/approvals/{request_id}")
+        response.raise_for_status()
+        return ApprovalRequest(response.json())
+
     def list(
         self,
         status: Optional[str] = None,
         agent_id: Optional[str] = None,
     ) -> list[ApprovalRequest]:
-        """List approval requests.
+        """
+        List approval requests.
 
         Args:
-            status: Filter by status (e.g. "PENDING", "APPROVED", "REJECTED").
+            status: Filter by status (e.g. "PENDING", "APPROVED").
             agent_id: Filter by agent ID.
         """
         self._require_sync_client()
@@ -100,32 +153,25 @@ class Approvals:
             params["status"] = status
         if agent_id is not None:
             params["agent_id"] = agent_id
+
         response = self._client.get("/v1/approvals", params=params)
         response.raise_for_status()
         return [ApprovalRequest(r) for r in response.json()]
-
-    def get(self, request_id: str) -> ApprovalRequest:
-        """Fetch a single approval request by ID."""
-        self._require_sync_client()
-        response = self._client.get(f"/v1/approvals/{request_id}")
-        response.raise_for_status()
-        return ApprovalRequest(response.json())
 
     def approve(
         self,
         request_id: str,
         comment: Optional[str] = None,
     ) -> ApprovalRequest:
-        """Approve a pending request.
+        """
+        Approve a pending request (sync).
 
-        Args:
-            request_id: ID of the approval request to approve.
-            comment: Optional comment from the approver.
+        Requires the authenticated user to have DEVELOPER or ADMIN role.
         """
         self._require_sync_client()
         response = self._client.post(
             f"/v1/approvals/{request_id}/approve",
-            json={"comment": comment} if comment else {},
+            json={"comment": comment},
         )
         response.raise_for_status()
         return ApprovalRequest(response.json())
@@ -135,16 +181,15 @@ class Approvals:
         request_id: str,
         comment: Optional[str] = None,
     ) -> ApprovalRequest:
-        """Reject a pending request.
+        """
+        Reject a pending request (sync).
 
-        Args:
-            request_id: ID of the approval request to reject.
-            comment: Optional comment from the approver.
+        Requires the authenticated user to have DEVELOPER or ADMIN role.
         """
         self._require_sync_client()
         response = self._client.post(
             f"/v1/approvals/{request_id}/reject",
-            json={"comment": comment} if comment else {},
+            json={"comment": comment},
         )
         response.raise_for_status()
         return ApprovalRequest(response.json())
@@ -160,7 +205,7 @@ class Approvals:
         action_type: str,
         payload: Optional[dict[str, Any]] = None,
     ) -> ApprovalRequest:
-        """Create a new approval request (async)."""
+        """Submit a new approval request (async)."""
         self._require_async_client()
         response = await self._client.post(
             "/v1/approvals",
@@ -171,6 +216,13 @@ class Approvals:
                 "payload": payload or {},
             },
         )
+        response.raise_for_status()
+        return ApprovalRequest(response.json())
+
+    async def aget(self, request_id: str) -> ApprovalRequest:
+        """Fetch a single approval request by ID (async)."""
+        self._require_async_client()
+        response = await self._client.get(f"/v1/approvals/{request_id}")
         response.raise_for_status()
         return ApprovalRequest(response.json())
 
@@ -186,16 +238,10 @@ class Approvals:
             params["status"] = status
         if agent_id is not None:
             params["agent_id"] = agent_id
+
         response = await self._client.get("/v1/approvals", params=params)
         response.raise_for_status()
         return [ApprovalRequest(r) for r in response.json()]
-
-    async def aget(self, request_id: str) -> ApprovalRequest:
-        """Fetch a single approval request by ID (async)."""
-        self._require_async_client()
-        response = await self._client.get(f"/v1/approvals/{request_id}")
-        response.raise_for_status()
-        return ApprovalRequest(response.json())
 
     async def aapprove(
         self,
@@ -206,7 +252,7 @@ class Approvals:
         self._require_async_client()
         response = await self._client.post(
             f"/v1/approvals/{request_id}/approve",
-            json={"comment": comment} if comment else {},
+            json={"comment": comment},
         )
         response.raise_for_status()
         return ApprovalRequest(response.json())
@@ -220,7 +266,7 @@ class Approvals:
         self._require_async_client()
         response = await self._client.post(
             f"/v1/approvals/{request_id}/reject",
-            json={"comment": comment} if comment else {},
+            json={"comment": comment},
         )
         response.raise_for_status()
         return ApprovalRequest(response.json())
