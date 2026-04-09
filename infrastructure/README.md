@@ -6,6 +6,7 @@ Production-readiness baseline for Terraform, Ansible, Docker Compose, and monito
 
 - `terraform/` – DigitalOcean VPC + droplet + firewall provisioning
 - `ansible/` – host hardening and container deployment playbooks
+- `helm/` – Kubernetes Helm chart for MUTX deployment
 - `monitoring/` – Prometheus + Grafana config
 
 ## Terraform (DigitalOcean)
@@ -59,6 +60,9 @@ Required environment variables before running playbooks:
 - `ADMIN_CIDR` (recommended, defaults to `0.0.0.0/0`)
 - `PRIVATE_CIDR` (optional, defaults to `10.0.0.0/8`)
 - `TAILSCALE_AUTH_KEY` (optional)
+- `OIDC_ISSUER` (required for OIDC token validation)
+- `OIDC_CLIENT_ID` (required for OIDC token validation)
+- `OIDC_JWKS_URI` (required for OIDC token validation)
 
 ## Monitoring Stack
 

@@ -32,6 +32,13 @@ MUTX integrates [Faramesh](https://faramesh.dev) by [Faramesh Technologies](http
 
 See the [Governance Guide](docs/governance.md) for CLI commands and policy reference.
 
+## Authentication and Access Control
+
+MUTX enforces role-based access control (RBAC) and supports OIDC token validation:
+
+- **RBAC** — `require_role()` gates on approvals (DEVELOPER/ADMIN), security (ADMIN), policies (ADMIN), and audit (ADMIN/AUDIT_ADMIN) routes
+- **OIDC Token Validation** — JWKS fetcher with TTL cache, JWT signature validation, iss/aud/exp claim checks; configured via `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_JWKS_URI` environment variables; compatible with Okta, Auth0, Azure AD, and Keycloak
+
 ## Built On
 
 MUTX acknowledges the open-source projects that form its foundation:
@@ -221,6 +228,7 @@ Use these pages when you need more than the shortest path:
 - installer at [mutx.dev/install.sh](https://mutx.dev/install.sh)
 - local dev stack with `make dev-up`
 - infrastructure references in Docker, Terraform, Ansible, and monitoring assets
+- **Kubernetes/Helm** — production-grade Helm chart at `infrastructure/helm/mutx/` with `values.yaml` (dev), `values.prod.yaml` (HA), and `values.staging.yaml` overlays; component templates for API, Web, OTel Collector, Redis, Postgres, Ingress, HPA, and auto-generated secrets
 
 ![MUTX architecture at a glance](docs/assets/architecture%20overview.png)
 
@@ -272,6 +280,7 @@ pytest tests/test_cli_auth_and_tui.py tests/test_cli_setup_and_doctor.py tests/t
 
 - [Documentation Hub](docs/README.md) for the full docs index
 - [v1.3 Release Notes](docs/releases/v1.3.md) for the current public launch posture
+- [v1.4 Release Notes](docs/releases/v1.4.md) for the substrate release (RBAC, OIDC, Kubernetes, self-hosted docs, SDK contract tests)
 - [Troubleshooting](docs/troubleshooting/README.md) for common breakpoints and recovery steps
 - [Support](support.md) for escalation paths
 - [Security Policy](security.md) for private disclosure

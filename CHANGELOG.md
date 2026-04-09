@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-04-09
+
+### Added
+- **RBAC Enforcement** — `require_role()` on approvals (DEVELOPER/ADMIN), security (ADMIN), policies (ADMIN), and audit (ADMIN/AUDIT_ADMIN) routes; removed permissive authenticated-user bypass
+- **OIDC Token Validation** — JWKS fetcher with 1-hour TTL cache, JWT signature validation, iss/aud/exp claim checks; configured via `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_JWKS_URI` environment variables; ready for Okta, Auth0, Azure AD, Keycloak
+- **Kubernetes/Helm Chart** — 23-file production-grade Helm chart at `infrastructure/helm/mutx/` with component templates (API, Web, OTel Collector, Redis, Postgres, Ingress, HPA, Secrets, ServiceAccount), `values.yaml` dev defaults, `values.prod.yaml` HA overlay, `values.staging.yaml` middle ground, templated OTel Collector config, auto-generated secrets, Helm test pod
+- **Self-Hosted Docs Platform** — replaced GitBook with a complete `/docs` system in the Next.js app: remark→rehype Markdown rendering, sidebar navigation, breadcrumbs, prev/next navigation, full-text search with Cmd+K, right-rail TOC, GitBook hint blocks, card-grid tables, code copy buttons, light/dark theme, mobile sidebar, WCAG contrast fixes (58 commits)
+- **Autonomous Dev Lane** — GitHub issue → worktree → PR reconciliation subsystem with issue-fed autonomy queue, worktree task dispatching, auto-reconciliation of safe PRs, auto-resume on usage-limit reset, fleet task prioritization, stale task recycling, guild-style run artifact schema, OSS attribution ledger, daemon runtime hardening
+- **SDK Adapter Hardening** — CrewAI `run_crew()` now uses `MUTX_API_KEY` env var with `ValueError` guard (was hardcoded empty string); LangChain `stream_events()` replaced stub with real async generator using deque buffer, callback monkey-patching, and background asyncio task
+- **Landing Page + Contact Page Redesign** — below-hero landing redesign with refined motion, recomposed example cards, terminal failure scenes, responsive audit; new dedicated contact page hero layout with 2-col desktop grid and mobile-first stacking
+
+### Changed
+- **CI/CD Improvements** — parallelized validation pipeline, Node 24 GitHub Actions
+- security routes now require verified email on authenticated token access
+- local bootstrap hardened against forwarded header spoofing
+- frontend container runs as non-root user
+- enforced TLS for PostgreSQL connections
+
+### Fixed
+- restored legacy pbkdf2 password verification
+- honored env-file JWT secret in startup validation
+- removed fixed JWT secret defaults from demo config
+- prevented rate limit bypass via spoofed API key headers
+- required auth for self-heal webhook
+- removed third-party Calendly widget injection
+
+### Security
+- enforced verified email on authenticated token access
+- Okta JWKS keys endpoint for token verification
+- removed fixed JWT secret defaults from demo config
+- hardened local bootstrap against forwarded header spoofing
+- required auth for self-heal webhook
+- prevented rate limit bypass via spoofed API key headers
+- enforced TLS for PostgreSQL connections
+- frontend container runs as non-root user
+
+### Testing
+- 20 SDK contract test modules covering every SDK surface: agents, analytics, assistant, budgets, deployments, governance_credentials, governance_supervision, ingest, leads, newsletter, observability, onboarding, runtime, scheduler, security, sessions, swarm, templates, usage, approvals
+- gap scanner signals and homepage smoke test stabilization
+
 ## [1.3.0] - 2026-03-27
 
 ### Added
@@ -173,9 +213,9 @@ This project uses [Semantic Versioning](https://semver.org/). Given a version nu
 
 | Component | Current Version | Location |
 |-----------|-----------------|----------|
-| Frontend/App | 1.3.0 | `package.json` |
-| CLI distribution | 1.3.0 | root `pyproject.toml` |
-| Python SDK | 1.3.0 | `sdk/pyproject.toml` |
+| Frontend/App | 1.4.0 | `package.json` |
+| CLI distribution | 1.4.0 | root `pyproject.toml` |
+| Python SDK | 1.4.0 | `sdk/pyproject.toml` |
 | API | Matches frontend | `package.json` |
 
 ## How We Release

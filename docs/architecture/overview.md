@@ -103,6 +103,10 @@ icon: sitemap
 | **Monitoring Service**   | Python         | Metrics, alerting, uptime tracking               |
 | **Auth Service**         | JWT + bcrypt   | Token management, OAuth2                         |
 
+### Autonomous Dev Lane
+
+MUTX v1.4 ships an autonomous dev lane for agentic workflows. This enables coding agents to operate against the MUTX platform with role-scoped credentials, RBAC-enforced boundaries, and OIDC-validated identity — allowing safe autonomous execution, PR creation, and deployment workflows.
+
 ### 2. Agent Runtime
 
 The `AgentRuntime` class (`src/api/services/agent_runtime.py:98`) manages:
@@ -167,6 +171,18 @@ The `AgentRuntime` class (`src/api/services/agent_runtime.py:98`) manages:
                                         └──────────────┘   └─────────────────┘
 ```
 
+### Kubernetes/Helm Deployment
+
+For Kubernetes environments, MUTX ships a Helm chart in `infrastructure/helm/mutx/`:
+
+```bash
+helm install mutx infrastructure/helm/mutx \
+  --set secrets.databaseUrl=$DATABASE_URL \
+  --set secrets.oidcIssuer=$OIDC_ISSUER
+```
+
+See `infrastructure/helm/mutx/README.md` for full configuration options.
+
 ***
 
 ## Security Model
@@ -197,7 +213,7 @@ The `AgentRuntime` class (`src/api/services/agent_runtime.py:98`) manages:
 | Layer           | Technology                | Protection                          |
 | --------------- | ------------------------- | ----------------------------------- |
 | **Network**     | Tailscale, UFW, VPC       | Port isolation, encrypted tunnels   |
-| **Application** | JWT, OAuth2               | Authentication, authorization       |
+| **Application** | JWT, OAuth2, RBAC, OIDC   | Authentication, authorization       |
 | **Data**        | Vault, encryption at rest | Secret management, key protection   |
 | **Runtime**     | EvalView, containers      | Input/output validation, sandboxing |
 | **Monitoring**  | Auditd, fail2ban          | Intrusion detection, logging        |
@@ -247,12 +263,13 @@ The `AgentRuntime` class (`src/api/services/agent_runtime.py:98`) manages:
 
 | Layer          | Technology                                     |
 | -------------- | ---------------------------------------------- |
-| **Frontend**   | Next.js 14, React 18, TypeScript, Tailwind CSS |
+| **Frontend**   | Next.js 16, React 18, TypeScript, Tailwind CSS |
 | **Backend**    | FastAPI, Python, SQLAlchemy, AsyncIO           |
 | **Database**   | PostgreSQL 15, Redis, pgvector                 |
 | **Agents**     | LangChain, OpenClaw, n8n, LangGraph            |
 | **IaC**        | Terraform, Ansible                             |
 | **Cloud**      | DigitalOcean                                   |
+| **Orchestration** | Kubernetes, Helm                            |
 | **Networking** | Tailscale ZTNA                                 |
 | **Security**   | HashiCorp Vault, UFW, fail2ban                 |
 | **Deploy**     | Railway, Vercel                                |

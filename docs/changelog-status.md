@@ -16,7 +16,7 @@ This page covers where to track MUTX changes, release processes, and live status
 
 The canonical changelog lives at [CHANGELOG.md](https://github.com/mutx-dev/mutx-dev/blob/main/CHANGELOG.md) in the repository root.
 
-The canonical public release narrative for the current launch lives at [docs/releases/v1.3.md](./releases/v1.3.md), with the public website summary at `mutx.dev/releases`.
+The canonical public release narrative for the current launch lives at [docs/releases/v1.4.md](./releases/v1.4.md), with the public website summary at `mutx.dev/releases`.
 
 ### Changelog Sources
 
@@ -41,13 +41,13 @@ When preparing a release:
    - Use appropriate version type (Major/Minor/Patch)
 
 3. **Create GitHub Release**:
-   - Tag format: `v1.3.0` (web/app/desktop) and `cli-v1.3.0` (CLI distribution)
+   - Tag format: `v1.4.0` (web/app/desktop) and `cli-v1.4.0` (CLI distribution)
    - Use the matching `docs/releases/vX.Y.md` page as the release notes body when available
    - Keep the attached desktop assets plus checksums on GitHub Releases
 
 4. **Publish the docs-backed release narrative**:
-   - Merge `docs/releases/v1.3.md`
-   - Verify GitBook sync publishes `https://docs.mutx.dev/docs/v1.3`
+   - Merge `docs/releases/v1.4.md`
+   - Verify GitBook sync publishes `https://docs.mutx.dev/docs/v1.4`
    - Keep `mutx.dev/releases` aligned with the same version and download contract
    - Keep `mutx.dev/download/macos/release-notes` resolving to that synced page
 
@@ -88,7 +88,7 @@ python -m build
 Then push the matching `cli-vX.Y.Z` tag. The release workflow updates the published Homebrew tap automatically; use the manual formula flow only if that automation fails:
 
 ```bash
-python scripts/generate_homebrew_formula.py --tag cli-v1.3.0 --output homebrew-tap/Formula/mutx.rb
+python scripts/generate_homebrew_formula.py --tag cli-v1.4.0 --output homebrew-tap/Formula/mutx.rb
 brew tap mutx-dev/homebrew-tap
 brew install mutx
 mutx --help
@@ -120,12 +120,12 @@ See [CHANGELOG.md](https://github.com/mutx-dev/mutx-dev/blob/main/CHANGELOG.md) 
 - GitHub is the canonical source for synced docs content.
 - GitBook publication is rooted at the repo root through `.gitbook.yaml`.
 - `README.md` and `SUMMARY.md` are repo-owned docs entrypoints and should not be recreated from the GitBook UI.
-- Release notes for the public launch should live in repo-owned docs pages such as `docs/releases/v1.3.md`, not only in GitHub release prose.
+- Release notes for the public launch should live in repo-owned docs pages such as `docs/releases/v1.4.md`, not only in GitHub release prose.
 
 ## Related Planning Docs
 
-- [v1.3 Release Notes](./releases/v1.3.md)
-- [v1.3 Release Checklist](./releases/v1.3-checklist.md)
+- [v1.4 Release Notes](./releases/v1.4.md)
+- [v1.4 Release Checklist](./releases/v1.4-checklist.md)
 - [Project Status](./project-status.md)
 - [Roadmap](https://github.com/mutx-dev/mutx-dev/blob/main/roadmap.md)
 - [API Reference](./api/reference.md)

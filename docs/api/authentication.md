@@ -153,6 +153,60 @@ curl -X POST "$BASE_URL/v1/auth/reset-password" \
 
 `forgot-password` and some verification flows intentionally return generic success messages to reduce account enumeration.
 
+## OIDC Token Validation
+
+MUTX v1.4.0 adds OpenID Connect (OIDC) token validation for SSO integrations. When configured, bearer tokens issued by an external OIDC provider (Okta, Auth0, Keycloak, Google) are validated and mapped to the internal `SSOTokenUser` model.
+
+### Configuration
+
+Set the following environment variables to enable OIDC validation:
+
+| Variable | Description | Example |
+| --- | --- | --- |
+| `OIDC_ISSUER` | Token issuer URL (your IdP domain) | `https://your-org.okta.com` |
+| `OIDC_CLIENT_ID` | Expected `aud` claim for your MUTX client | `0oa1abc2def3ghi4jkl5` |
+| `OIDC_JWKS_URI` | JWKS endpoint for public key retrieval | `https://your-org.okta.com/oauth2/v1/keys` |
+
+These map to the provider configuration resolved in `src/api/services/auth.py`. Each supported provider has a well-known OIDC config and JWKS URL template built in:
+
+```python
+PROVIDER_OIDC_CONFIG = {
+    SSOProvider.OKTA:      "{domain}/.well-known/openid-configuration",
+    SSOProvider.AUTH0:     "{domain}/.well-known/openid-configuration",
+    SSOProvider.KEYCLOAK:  "{domain}/realms/{realm}/.well-known/openid-configuration",
+    SSOProvider.GOOGLE:    "https://accounts.google.com/.well-known/openid-configuration",
+}
+```
+
+### Validation Flow
+
+1. **JWKS fetch** -- The server fetches the provider's JWKS from the configured URI and caches matching public keys.
+2. **Signature check** -- The token's RS256/ES256 signature is verified against the matching JWKS key (by `kid`).
+3. **Claims validation** -- The `iss` (issuer) and `exp` (expiry) claims are validated. If `OIDC_CLIENT_ID` is set, the `aud` (audience) claim is also checked.
+4. **Fallback** -- If the token cannot be verified as a JWT (opaque access tokens), the server falls back to the provider's `/userinfo` endpoint.
+
+### OIDC-to-SSOTokenUser Mapping
+
+After verification, the OIDC token claims are mapped to an `SSOTokenUser` instance:
+
+| OIDC Claim | SSOTokenUser Field | Notes |
+| --- | --- | --- |
+| `sub` | `id` | Unique subject identifier |
+| `email` | `email` | Falls back to `preferred_username` |
+| `roles` / `groups` | `roles` | Extracted from multiple claim locations (see below) |
+| - | `is_active` | Always `True` for valid tokens |
+| - | `is_email_verified` | Always `True` for valid OIDC tokens |
+
+Role extraction checks multiple claim locations in order:
+
+- `roles`
+- `groups`
+- `custom:roles`
+- `realm_access.roles` (Keycloak)
+- `resource_access.roles` (Keycloak)
+
+See `src/api/services/auth.py` (`_extract_roles_from_payload`) and `src/api/dependencies.py` (`SSOTokenUser`) for the full implementation.
+
 ## Token Lifetimes
 
 Access and refresh token lifetimes are server-configured in `src/api/auth/jwt.py` and settings.
