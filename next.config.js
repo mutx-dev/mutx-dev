@@ -19,12 +19,6 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      // /docs/README -> /docs (canonical homepage)
-      {
-        source: '/docs/README',
-        destination: '/docs',
-        permanent: true,
-      },
       // GitBook maps docs/api/* → /docs/reference/*
       // Keep old /docs/api/* links functional as a fallback
       {
