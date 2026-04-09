@@ -108,6 +108,74 @@ See [DigitalOcean Deployment](digitalocean.md) for full instructions.
 
 See [Railway Deployment](railway.md) for full instructions.
 
+### Option 4: Kubernetes with Helm
+
+For container-orchestrated environments, deploy MUTX using the Helm chart at `infrastructure/helm/mutx/`.
+
+```bash
+# Install the production release
+helm upgrade --install mutx-prod infrastructure/helm/mutx \
+  -f infrastructure/helm/mutx/values.prod.yaml \
+  --namespace production --create-namespace
+```
+
+Key production values overrides (set in `values.prod.yaml` or via `--set`):
+
+```yaml
+# values.prod.yaml highlights
+image:
+  repository: mutx/mutx
+  tag: "1.4.0"
+  pullPolicy: Always
+
+replicaCount: 3
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+
+env:
+  DATABASE_URL: "postgresql://user:***@postgres-host:5432/mutx"
+  REDIS_URL: "redis://redis-host:6379/0"
+  JWT_SECRET: "<your-jwt-secret>"
+  LOG_LEVEL: "WARNING"
+  ENVIRONMENT: "production"
+```
+
+#### RBAC Configuration
+
+Set the following environment variables to enable RBAC role enforcement:
+
+```yaml
+env:
+  OIDC_ISSUER: "https://your-org.okta.com"
+  OIDC_CLIENT_ID: "your-client-id"
+  OIDC_JWKS_URI: "https://your-org.okta.com/oauth2/v1/keys"
+```
+
+Tokens validated against the OIDC provider will include role claims that are checked by `require_role` dependencies. See [Security Architecture](../architecture/security.md#rbac-enforcement) for role definitions.
+
+#### OIDC Environment Variables
+
+```yaml
+env:
+  OIDC_ISSUER: "https://your-idp.example.com"
+  OIDC_CLIENT_ID: "mutx-production"
+  OIDC_JWKS_URI: "https://your-idp.example.com/.well-known/jwks.json"
+```
+
+See [Authentication](../api/authentication.md#oidc-token-validation) for the full OIDC validation flow.
+
 ---
 
 ## SSL/TLS Configuration

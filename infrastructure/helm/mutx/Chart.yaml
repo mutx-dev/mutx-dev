@@ -1,5 +1,6 @@
 apiVersion: v2
 name: mutx
 version: 0.1.0
+appVersion: "1.4.0"
 description: MUTX agentic development platform
 type: application

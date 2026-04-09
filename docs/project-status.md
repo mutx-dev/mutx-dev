@@ -12,23 +12,24 @@ This matrix tracks the current repo state and where contributors can help next.
 | Area         | Current state                                                       | Biggest gaps                                                                                                                                     | Contributor-ready work                                                               |
 | ------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
 | Web          | landing site, supported dashboard routes, observability dashboard, and control demo all exist in Next.js | dashboard still does not cover every backend capability; some flows remain better in CLI or direct API                                           | fill dashboard gaps, tighten auth/session UX, keep demo vs live boundaries honest    |
-| API          | real `/v1/*` contract with auth, agents, deployments, runs, monitoring, webhooks, budgets, leads, governance, observability, and more | RAG search and scheduler return 503 with feature flags until runtime is configured; preview routes still need live contracts before they return to primary nav | auth hardening, route ownership checks, typed response polish, lifecycle tests       |
+| API          | real `/v1/*` contract with auth, agents, deployments, runs, monitoring, webhooks, budgets, leads, governance, observability, RBAC enforcement, and OIDC token validation | RAG search and scheduler return 503 with feature flags until runtime is configured; preview routes still need live contracts before they return to primary nav | typed response polish, lifecycle tests, deeper RBAC coverage                         |
 | CLI          | grouped `auth`, `agent`, `deployment`, `assistant`, `runtime`, `setup`, `governance`, and `observability` commands plus compatibility aliases | some older aliases still create duplicate docs burden; setup ergonomics and error recovery still need polish                                    | streamline help/docs, keep setup truthful, tighten command coverage                  |
 | SDK          | sync client is useful and tracks `/v1/*` correctly; observability SDK with `OpenClawObservability` added | `MutxAsyncClient` remains limited and must stay explicitly documented as such                                                                     | async contract coverage, clearer supported-method matrix, docs truth                 |
-| Infra        | Docker, Terraform, Ansible, Railway, and monitoring assets exist    | Vault integration is still a stub and validation confidence loops are thin                                                                       | infra docs cleanup, validation, stub visibility                                      |
+| Infra        | Docker, Terraform, Ansible, Railway, Kubernetes/Helm chart, and monitoring assets exist    | Vault integration is still a stub and validation confidence loops are thin                                                                       | infra docs cleanup, validation, stub visibility, Helm chart hardening                |
 | Tests and CI | API, CLI, frontend, observability, docs, and serial release smoke now exist | hosted-vs-local assumptions still need careful coverage; signed desktop artifact validation depends on real Apple credentials                     | route/openapi drift checks, link checks, local-first validation, signed-artifact CI  |
 | Docs         | docs are now structured for GitBook and GitHub together; v1.3 release notes and launch checklist exist | drift risk remains high whenever routes, app paths, or CLI groups move                                                                           | doc drift guardrails, GitBook sync rules, API reference upkeep                       |
+| Autonomous   | autonomous dev lane shipped for agentic workflows | still early; coverage and reliability need real-world validation | autonomous flow coverage, reliability, docs alignment |
 
 ## Highest-Leverage Next Tasks
 
 - keep route, CLI, SDK, and docs truth aligned around the live `/v1/*` contract
 - keep the dashboard honest about which flows are live, partial, or still backend-only
 - keep preview and redirect-backed routes out of primary stable navigation until their contracts are real
-- strengthen auth and ownership posture across every user-scoped route
 - keep the signed desktop artifact lane healthy so `mutx.dev/download/macos` and the supported dashboard release stay trustworthy
 - keep SDK async documentation honest until full async support is real
 - finish placeholder-backed areas such as scheduler integration and RAG search
 - keep GitBook sync GitHub-first and stop GitBook-only README drift
+- deepen RBAC role coverage and OIDC provider support
 
 ## Contribution Lanes
 

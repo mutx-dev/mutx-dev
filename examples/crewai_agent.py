@@ -81,10 +81,12 @@ def create_tasks(researcher: Agent, writer: Agent, topic: str) -> list[Task]:
 def main():
     """Run the example demonstrating MUTX CrewAI integration."""
 
-    # Configuration - replace with your actual values
-    MUTX_API_URL = "https://api.mutx.dev"
-    MUTX_API_KEY = "***"  # Get from mutx.dev/dashboard
-    SERP_API_KEY = "your-serp-api-key"  # For web search
+    # Configuration - replace with your actual values or set environment variables
+    import os
+
+    MUTX_API_URL = os.environ.get("MUTX_API_URL", "https://api.mutx.dev")
+    MUTX_API_KEY = os.environ.get("MUTX_API_KEY", "***")  # Get from mutx.dev/dashboard
+    SERP_API_KEY = os.environ.get("SERP_API_KEY", "***")  # For web search
 
     # ============================================================
     # Example 1: Basic crew with MUTX callback handler

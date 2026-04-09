@@ -407,8 +407,8 @@ fail2ban is configured to protect against brute force:
 │                                            ┌─────────────────┐                   │
 │                                            │  Auth Service  │                   │
 │                                            │                 │                   │
-│                                            │  JWT + bcrypt  │                   │
-│                                            │  OAuth2 ready  │                   │
+│                                            │  JWT + OIDC    │                   │
+│                                            │  RBAC roles    │                   │
 │                                            └────────┬────────┘                   │
 │                                                     │                            │
 │                                                     ▼                            │
@@ -432,6 +432,83 @@ fail2ban is configured to protect against brute force:
 * **Role-Based Access Control (RBAC)**
 * **API Key scopes**: `read`, `write`, `admin`
 * **Resource-level permissions**: Tenant → Agent → Tool
+
+***
+
+## RBAC Enforcement
+
+MUTX v1.4.0 enforces role-based access control (RBAC) across protected API routes. The RBAC system is implemented in `src/api/services/auth.py` (Role enum, `check_role`) and `src/api/dependencies.py` (`require_role`, `SSOTokenUser`).
+
+### Roles
+
+| Role | Description | Scope |
+| --- | --- | --- |
+| `ADMIN` | Full access to all resources and operations | All endpoints; implicitly satisfies every role check |
+| `AUDIT_ADMIN` | Read-only access to audit logs and traces | `/v1/audit/*` endpoints |
+| `DEVELOPER` | Read/write access to agents and approval workflows | `/v1/agents/*`, `/v1/approvals/*` |
+| `VIEWER` | Read-only access to owned resources | Agent listing, config reads |
+
+The `ADMIN` role is a super-role: `check_role` returns `True` for any required role when the user holds `ADMIN`.
+
+### Route-Level Enforcement
+
+RBAC is enforced via FastAPI dependencies:
+
+```python
+from src.api.dependencies import require_role
+
+# Example: restrict an endpoint to ADMIN and DEVELOPER
+@router.get("/admin", dependencies=[Depends(require_role(["ADMIN", "DEVELOPER"]))])
+async def admin_endpoint():
+    ...
+```
+
+Key protected routes:
+
+| Route Pattern | Required Roles | Notes |
+| --- | --- | --- |
+| `GET /v1/audit/events` | Any authenticated user (SSOTokenUser) | Results scoped to user |
+| `GET /v1/audit/traces/{id}` | Any authenticated user (SSOTokenUser) | Results scoped to user |
+| `POST /v1/approvals/*/approve` | `DEVELOPER` or `ADMIN` | `APPROVER_ROLES` check |
+| `POST /v1/approvals/*/reject` | `DEVELOPER` or `ADMIN` | `APPROVER_ROLES` check |
+
+***
+
+## OIDC / OAuth2 Provider Integration
+
+MUTX v1.4.0 supports OIDC token validation for SSO integrations with the following providers:
+
+| Provider | OIDC Discovery | JWKS Endpoint |
+| --- | --- | --- |
+| **Okta** | `{domain}/.well-known/openid-configuration` | `{domain}/oauth2/v1/keys` |
+| **Auth0** | `{domain}/.well-known/openid-configuration` | `{domain}/.well-known/jwks.json` |
+| **Keycloak** | `{domain}/realms/{realm}/.well-known/openid-configuration` | `{domain}/realms/{realm}/protocol/openid-connect/certs` |
+| **Google** | `https://accounts.google.com/.well-known/openid-configuration` | `https://www.googleapis.com/oauth2/v3/certs` |
+
+### Configuration
+
+Set these environment variables to enable OIDC:
+
+```
+OIDC_ISSUER=https://your-org.okta.com
+OIDC_CLIENT_ID=your-client-id
+OIDC_JWKS_URI=https://your-org.okta.com/oauth2/v1/keys
+```
+
+The OIDC module (`src/api/services/auth.py`) resolves provider config from these env vars, fetches JWKS, verifies signatures, and maps the token to `SSOTokenUser` with roles extracted from the token claims. See [Authentication docs](../api/authentication.md#oidc-token-validation) for full details.
+
+***
+
+## v1.4.0 Hardening Findings
+
+| Area | Finding | Status |
+| --- | --- | --- |
+| RBAC | Role enforcement now active on approval and audit routes | Deployed |
+| OIDC | Token validation with JWKS verification and userinfo fallback | Deployed |
+| Auth middleware | Bearer token resolution now tries JWT first, then API key | Deployed |
+| Token roles | Role claims extracted from `roles`, `groups`, `realm_access.roles`, `resource_access.roles` | Deployed |
+| Secrets | `SECRET_ENCRYPTION_KEY` added for encrypting stored API keys | Deployed |
+| Rate limiting | Separate auth rate limit (`AUTH_RATE_LIMIT_REQUESTS`, `AUTH_RATE_LIMIT_WINDOW_SECONDS`) | Deployed |
 
 ***
 
@@ -464,7 +541,7 @@ All security-relevant events are logged:
 | ------------ | -------------------- | --------------------- |
 | **Network**  | VPC, Tailscale ZTNA  | Isolation, encryption |
 | **Firewall** | UFW, security groups | Port filtering        |
-| **Auth**     | JWT, OAuth2          | Identity verification |
+| **Auth**     | JWT, OAuth2/OIDC     | Identity verification |
 | **Secrets**  | HashiCorp Vault      | Key protection        |
 | **Runtime**  | EvalView Guardrails  | I/O validation        |
 | **Monitor**  | fail2ban, auditd     | Intrusion detection   |

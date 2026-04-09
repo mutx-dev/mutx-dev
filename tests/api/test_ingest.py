@@ -123,7 +123,7 @@ async def test_agent_runtime_heartbeat_triggers_heartbeat_webhook_without_status
     client.app.dependency_overrides[get_current_agent] = lambda: test_agent
 
     response = await client.post(
-        "/agents/heartbeat",
+        "/v1/heartbeat",
         json={
             "agent_id": str(test_agent.id),
             "status": "running",
@@ -147,40 +147,6 @@ async def test_agent_runtime_heartbeat_triggers_heartbeat_webhook_without_status
     client.app.dependency_overrides.pop(get_current_agent, None)
 
 
-from httpx import AsyncClient  # noqa: E402
-from sqlalchemy.ext.asyncio import AsyncSession  # noqa: E402
-
-    test_agent.status = AgentStatus.RUNNING.value
-    await db_session.commit()
-
-    test_agent.status = AgentStatus.CREATING.value
-    await db_session.commit()
-
-    delivered: list[tuple[str, dict]] = []
-
-    async def mock_trigger_webhook_event(db, user_id, event, payload):
-        delivered.append((event, payload))
-        return 1
-
-    monkeypatch.setattr(agent_runtime_routes, "trigger_webhook_event", mock_trigger_webhook_event)
-    client.app.dependency_overrides[get_current_agent] = lambda: test_agent
-
-    response = await client.post(
-        "/agents/heartbeat",
-        json={
-            "agent_id": str(test_agent.id),
-            "status": "running",
-            "timestamp": datetime.utcnow().isoformat(),
-        },
-    )
-
-    assert response.status_code == 200
-    assert [event for event, _ in delivered] == ["agent.heartbeat", "agent.status"]
-    assert delivered[1][1]["old_status"] == "creating"
-    assert delivered[1][1]["new_status"] == "running"
-
-    client.app.dependency_overrides.pop(get_current_agent, None)
-
 
 @pytest.mark.asyncio
 async def test_agent_runtime_heartbeat_returns_ok_when_webhook_dispatch_fails(
@@ -203,7 +169,7 @@ async def test_agent_runtime_heartbeat_returns_ok_when_webhook_dispatch_fails(
     client.app.dependency_overrides[get_current_agent] = lambda: test_agent
 
     response = await client.post(
-        "/agents/heartbeat",
+        "/v1/heartbeat",
         json={
             "agent_id": str(test_agent.id),
             "status": "running",

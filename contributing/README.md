@@ -89,6 +89,7 @@ When behavior is unclear, inspect:
 * `sdk/mutx/`
 * `docker-compose.yml`
 * `docker-compose.production.yml`
+* `infrastructure/helm/mutx/` (Kubernetes Helm chart and K8s manifests)
 
 ## Questions And Support
 

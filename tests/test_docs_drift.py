@@ -13,6 +13,7 @@ HTML_HREF_RE = re.compile(r'href="([^"]+)"')
 SKIP_PARTS = {
     ".git",
     ".next",
+    ".terraform",
     ".venv",
     ".venv-sdktest",
     "__pycache__",

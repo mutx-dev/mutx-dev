@@ -126,6 +126,13 @@ npx playwright test --list
 
 Important: Playwright targets the local standalone app server from `playwright.config.ts`, so build first when `.next/standalone` is missing.
 
+### Helm Chart / Kubernetes
+
+```bash
+helm lint infrastructure/helm/mutx
+helm template mutx infrastructure/helm/mutx
+```
+
 ## Release Process
 
 For maintainers releasing new versions:
@@ -146,8 +153,8 @@ For maintainers releasing new versions:
    ```
 
 4. **Tag and publish**:
-   - Frontend: `git tag v1.0.0 && git push origin v1.0.0`
-   - CLI: `git tag cli-v0.2.0 && git push origin cli-v0.2.0`
+   - Frontend: `git tag v1.4.0 && git push origin v1.4.0`
+   - CLI: `git tag cli-v0.2.1 && git push origin cli-v0.2.1`
 
 5. **Publish the third-party tap**:
    - Push the matching `cli-vX.Y.Z` tag
@@ -166,6 +173,7 @@ When behavior is unclear, inspect:
 - `sdk/mutx/`
 - `docker-compose.yml`
 - `docker-compose.production.yml`
+- `infrastructure/helm/mutx/` (Kubernetes/Helm chart and K8s manifests)
 
 ## Questions And Support
 

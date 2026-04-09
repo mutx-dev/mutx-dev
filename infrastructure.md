@@ -11,6 +11,7 @@ Production-readiness baseline for Terraform, Ansible, Docker Compose, and monito
 
 * `terraform/` – DigitalOcean VPC + droplet + firewall provisioning
 * `ansible/` – host hardening and container deployment playbooks
+* `helm/` – Kubernetes Helm chart for MUTX deployment
 * `monitoring/` – Prometheus + Grafana config
 
 ## Terraform (DigitalOcean)
