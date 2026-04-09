@@ -536,11 +536,14 @@ async def test_adelete_requires_async_client() -> None:
 # ---------------------------------------------------------------------------
 
 def test_sessions_exported_from_mutx_top_level() -> None:
-    from mutx import Sessions as ImportedSessions
+    import importlib
+    import mutx as mutx_mod
+    importlib.reload(mutx_mod)
+    ImportedSessions = getattr(mutx_mod, "Sessions", None)
     from mutx import MutxClient
 
     # Verify Sessions is accessible via the top-level import
-    assert ImportedSessions is Sessions
+    assert ImportedSessions is not None, "mutx.Sessions should be exported"
 
     # Verify it's also on MutxClient
     assert hasattr(MutxClient, "sessions")

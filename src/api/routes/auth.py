@@ -282,6 +282,11 @@ async def logout(
 
 @router.get("/me", response_model=UserResponse)
 async def get_me(current_user: User = Depends(get_current_user)):
+    if settings.require_email_verification and not current_user.is_email_verified:
+        raise HTTPException(
+            status_code=403,
+            detail="Email verification is required before accessing this resource.",
+        )
     return UserResponse(
         id=str(current_user.id),
         email=current_user.email,

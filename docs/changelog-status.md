@@ -124,6 +124,7 @@ See [CHANGELOG.md](https://github.com/mutx-dev/mutx-dev/blob/main/CHANGELOG.md) 
 
 ## Related Planning Docs
 
+- [v1.3 Release Notes](./releases/v1.3.md)
 - [v1.4 Release Notes](./releases/v1.4.md)
 - [v1.4 Release Checklist](./releases/v1.4-checklist.md)
 - [Project Status](./project-status.md)

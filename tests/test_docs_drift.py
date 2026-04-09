@@ -16,6 +16,7 @@ SKIP_PARTS = {
     ".terraform",
     ".venv",
     ".venv-sdktest",
+    ".worktrees",
     "__pycache__",
     "archive",
     "build",

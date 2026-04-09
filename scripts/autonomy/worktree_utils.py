@@ -441,6 +441,10 @@ def prepare_task_branch(path: str | Path, branch: str) -> dict[str, Any]:
     if not is_git_worktree(path):
         return {"status": "failed", "reason": "not_a_worktree"}
 
+    # Block if the working tree has uncommitted changes
+    if not is_clean_worktree(path):
+        return {"status": "blocked", "reason": "dirty_worktree"}
+
     # Check if branch already exists locally
     existing = run_git(["rev-parse", "--verify", f"refs/heads/{branch}"], path)
     if existing.returncode == 0:
@@ -457,7 +461,15 @@ def prepare_task_branch(path: str | Path, branch: str) -> dict[str, Any]:
     # Resolve the current ref to branch from (HEAD is safe inside a worktree)
     head = run_git(["rev-parse", "HEAD"], path)
     if head.returncode != 0:
-        return {"status": "failed", "reason": "no_head", "stderr": head.stderr[-2000:]}
+        # No commits yet — create an empty initial commit so we have a HEAD
+        cfg = run_git(["config", "user.email", "autonomy@mutx.dev"], path)
+        cfg = run_git(["config", "user.name", "MUTX Autonomy"], path)
+        empty = run_git(["commit", "--allow-empty", "-m", "Initial empty commit"], path)
+        if empty.returncode != 0:
+            return {"status": "failed", "reason": "no_head", "stderr": empty.stderr[-2000:]}
+        head = run_git(["rev-parse", "HEAD"], path)
+        if head.returncode != 0:
+            return {"status": "failed", "reason": "no_head", "stderr": head.stderr[-2000:]}
 
     # Create the branch from the current HEAD
     create = run_git(["branch", branch, head.stdout.strip()], path)

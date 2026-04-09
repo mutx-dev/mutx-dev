@@ -134,7 +134,6 @@ services:
   # Jaeger Tracing
   jaeger:
     image: jaegertracing/all-in-one:1.57
-    container_name: mutx-jaeger
     environment:
       - COLLECTOR_OTLP_ENABLED=true
       - SPAN_STORAGE_TYPE=badger
@@ -154,7 +153,6 @@ services:
   # Prometheus Metrics
   prometheus:
     image: prom/prometheus:v2.54.1
-    container_name: mutx-prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -171,7 +169,6 @@ services:
   # Grafana Dashboards
   grafana:
     image: grafana/grafana:11.2.2
-    container_name: mutx-grafana
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-mutx_admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-mutx_admin_password}
@@ -190,7 +187,6 @@ services:
   # OpenTelemetry Collector
   otel-collector:
     image: otel/opentelemetry-collector:0.102.1
-    container_name: mutx-otel-collector
     command: ["--config=/etc/otelcol-contrib/otelcol-contrib.yaml"]
     volumes:
       - ./otel-collector-config.yaml:/etc/otelcol-contrib/otelcol-contrib.yaml:ro
