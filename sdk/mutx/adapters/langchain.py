@@ -106,15 +106,9 @@ class MutxLangChainCallbackHandler(BaseCallbackHandler):
             token_usage = response.llm_output["token_usage"]
 
         attributes = {
-            "llm.output_tokens": (
-                token_usage.get("completion_tokens", 0) if token_usage else 0
-            ),
-            "llm.prompt_tokens": (
-                token_usage.get("prompt_tokens", 0) if token_usage else 0
-            ),
-            "llm.total_tokens": (
-                token_usage.get("total_tokens", 0) if token_usage else 0
-            ),
+            "llm.output_tokens": (token_usage.get("completion_tokens", 0) if token_usage else 0),
+            "llm.prompt_tokens": (token_usage.get("prompt_tokens", 0) if token_usage else 0),
+            "llm.total_tokens": (token_usage.get("total_tokens", 0) if token_usage else 0),
         }
 
         # Record the span via telemetry
@@ -391,9 +385,7 @@ class MutxAgentKit:
             self._guardrail_middleware.check_input_text(input)
 
         if not self._agent_executor:
-            raise RuntimeError(
-                "No agent executor set. Call set_agent_executor() first."
-            )
+            raise RuntimeError("No agent executor set. Call set_agent_executor() first.")
 
         result = self._agent_executor.invoke(
             {"input": input},
@@ -423,9 +415,7 @@ class MutxAgentKit:
             self._guardrail_middleware.check_input_text(input)
 
         if not self._agent_executor:
-            raise RuntimeError(
-                "No agent executor set. Call set_agent_executor() first."
-            )
+            raise RuntimeError("No agent executor set. Call set_agent_executor() first.")
 
         result = await self._agent_executor.ainvoke(
             {"input": input},

@@ -1,6 +1,7 @@
 """
 Approval workflow REST endpoints.
 """
+
 import logging
 from typing import Annotated, Optional
 
@@ -104,8 +105,7 @@ async def list_approvals(
             results = [
                 req
                 for req in service._store.values()
-                if req.status == status_filter
-                and (agent_id is None or req.agent_id == agent_id)
+                if req.status == status_filter and (agent_id is None or req.agent_id == agent_id)
             ]
             return results
 
@@ -124,7 +124,9 @@ async def get_approval(
         req = service._store.get(request_id)
 
     if req is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Approval request not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Approval request not found"
+        )
     return req
 
 

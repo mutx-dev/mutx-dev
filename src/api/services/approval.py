@@ -4,6 +4,7 @@ Approval service for human-in-the-loop workflows.
 Provides async storage and state management for approval requests,
 with optional webhook notifications on new pending requests.
 """
+
 import asyncio
 import logging
 import uuid
@@ -98,9 +99,7 @@ class ApprovalService:
             if req is None:
                 raise ValueError(f"Approval request '{request_id}' not found")
             if req.status != ApprovalStatus.PENDING:
-                raise ValueError(
-                    f"Cannot approve request in '{req.status}' state"
-                )
+                raise ValueError(f"Cannot approve request in '{req.status}' state")
 
             req.status = ApprovalStatus.APPROVED
             req.approver = approver
@@ -131,9 +130,7 @@ class ApprovalService:
             if req is None:
                 raise ValueError(f"Approval request '{request_id}' not found")
             if req.status != ApprovalStatus.PENDING:
-                raise ValueError(
-                    f"Cannot reject request in '{req.status}' state"
-                )
+                raise ValueError(f"Cannot reject request in '{req.status}' state")
 
             req.status = ApprovalStatus.REJECTED
             req.approver = approver

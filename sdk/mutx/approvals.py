@@ -37,9 +37,7 @@ class ApprovalRequest:
         self.approver: Optional[str] = data.get("approver")
         self.created_at: datetime = datetime.fromisoformat(data["created_at"])
         self.resolved_at: Optional[datetime] = (
-            datetime.fromisoformat(data["resolved_at"])
-            if data.get("resolved_at")
-            else None
+            datetime.fromisoformat(data["resolved_at"]) if data.get("resolved_at") else None
         )
         self.comment: Optional[str] = data.get("comment")
         self._data = data

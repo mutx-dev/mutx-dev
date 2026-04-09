@@ -43,6 +43,7 @@ def _get_otel_trace_context() -> tuple[str | None, str | None]:
         # OTel may not be installed or configured
         return None, None
 
+
 DATABASE_PATH = "audit.db"
 AUDIT_TABLE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS audit_events (

@@ -38,6 +38,7 @@ def _check_instrumentation() -> bool:
     if _instrumentation_available is None:
         try:
             from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor  # noqa: F401
+
             _instrumentation_available = True
         except ImportError:
             _instrumentation_available = False
@@ -73,6 +74,7 @@ def init_telemetry(agent_name: str, endpoint: str | None = None) -> None:
     if _check_instrumentation():
         try:
             from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+
             HTTPXClientInstrumentor().instrument()
         except Exception:
             pass
@@ -95,9 +97,7 @@ def get_tracer(name: str) -> Tracer:
 
 
 @contextmanager
-def span(
-    name: str, attributes: dict[str, Any] | None = None
-) -> Generator[Any, None, None]:
+def span(name: str, attributes: dict[str, Any] | None = None) -> Generator[Any, None, None]:
     """Context manager for creating a span with attributes and exception recording.
 
     Args:

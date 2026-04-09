@@ -49,7 +49,6 @@ from src.api.models.observability import (
     compute_run_hash,
 )
 
-
 router = APIRouter(prefix="/observability", tags=["observability"])
 
 

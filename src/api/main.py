@@ -323,7 +323,7 @@ def _build_lifespan(
 def _register_application_routes(app: FastAPI) -> None:
     from fastapi import Depends
     from src.api.dependencies import get_current_user
-    
+
     app.include_router(metrics_router, tags=["monitoring"])
 
     for registration in PUBLIC_ROUTE_REGISTRATIONS:
@@ -469,10 +469,12 @@ def create_app(
     # Initialize OpenTelemetry tracing at startup (guards against ImportError)
     try:
         from src.api.telemetry.telemetry import setup_telemetry
+
         setup_telemetry("mutx-api")
 
         # Auto-instrument FastAPI app to create spans for each request
         from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+
         FastAPIInstrumentor.instrument_app(app)
     except ImportError:
         pass  # opentelemetry packages not installed — tracing disabled

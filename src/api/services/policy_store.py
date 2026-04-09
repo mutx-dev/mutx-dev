@@ -1,6 +1,7 @@
 """
 Policy store service — in-memory policy repository with hot-reload support.
 """
+
 import asyncio
 from datetime import datetime, timezone
 from typing import Literal
@@ -10,6 +11,7 @@ from pydantic import BaseModel
 
 class Rule(BaseModel):
     """A policy rule matching mechanism and enforcement action."""
+
     type: Literal["block", "allow", "warn"]
     pattern: str
     action: str
@@ -18,6 +20,7 @@ class Rule(BaseModel):
 
 class Policy(BaseModel):
     """A named collection of rules with versioning and enablement."""
+
     id: str
     name: str
     rules: list[Rule]
@@ -115,6 +118,7 @@ class PolicyStore:
     async def _notify_reload(self, policy_name: str) -> None:
         """Send a minimal SSE payload to all registered clients."""
         import json
+
         data = json.dumps({"policy": policy_name, "event": "reload"})
         payload = f"data: {data}\n\n"
         dead: set[object] = set()

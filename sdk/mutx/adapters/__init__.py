@@ -7,6 +7,7 @@ with various agent frameworks:
 - AutoGen: mutx.adapters.autogen
 """
 
+
 def __getattr__(name: str):
     """Lazy import to avoid hard dependencies on optional packages."""
     if name in ("MutxLangChainCallbackHandler", "MutxAgentKit"):

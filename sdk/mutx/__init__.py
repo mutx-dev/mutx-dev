@@ -158,4 +158,3 @@ class MutxClient:
     @property
     def webhooks(self) -> Webhooks:
         return Webhooks(self.http)
-

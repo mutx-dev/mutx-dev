@@ -404,8 +404,10 @@ async def resend_verification(
 
 # SSO OAuth Routes
 
+
 class SSOCallbackResponse(BaseModel):
     """Response model for SSO callback."""
+
     access_token: str
     token_type: str = "bearer"
     expires_in: int = 86400
@@ -413,6 +415,7 @@ class SSOCallbackResponse(BaseModel):
 
 class SSOUserInfo(BaseModel):
     """SSO user information from token."""
+
     sub: str
     email: str
     roles: list[str]
@@ -429,11 +432,11 @@ def _build_sso_authorization_url(
 ) -> tuple[str, str]:
     """
     Build the SSO provider authorization URL.
-    
+
     Returns tuple of (authorization_url, state)
     """
     from src.api.services.auth import SSOProvider
-    
+
     # Provider-specific authorization endpoints
     auth_urls = {
         SSOProvider.OKTA.value: "{domain}/oauth2/v1/authorize",
@@ -441,7 +444,7 @@ def _build_sso_authorization_url(
         SSOProvider.KEYCLOAK.value: "{domain}/realms/{realm}/protocol/openid-connect/auth",
         SSOProvider.GOOGLE.value: "https://accounts.google.com/o/oauth2/v2/auth",
     }
-    
+
     # Build scopes per provider
     scopes = {
         SSOProvider.OKTA.value: "openid email profile groups",
@@ -449,37 +452,39 @@ def _build_sso_authorization_url(
         SSOProvider.KEYCLOAK.value: "openid email profile roles",
         SSOProvider.GOOGLE.value: "openid email profile",
     }
-    
+
     provider_lower = provider.lower()
-    
+
     if provider_lower not in auth_urls:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unsupported SSO provider: {provider}",
         )
-    
+
     # Get domain config
     domain_attr = f"{provider_lower}_domain"
     domain = getattr(settings, domain_attr, None)
-    realm = getattr(settings, f"{provider_lower}_realm", None) if provider_lower == "keycloak" else None
-    
+    realm = (
+        getattr(settings, f"{provider_lower}_realm", None) if provider_lower == "keycloak" else None
+    )
+
     if not domain:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"No domain configured for SSO provider: {provider}",
         )
-    
+
     auth_url_template = auth_urls[provider_lower]
     scope = scopes[provider_lower]
-    
+
     if provider_lower == SSOProvider.KEYCLOAK.value and realm:
         auth_url = auth_url_template.format(domain=domain, realm=realm)
     else:
         auth_url = auth_url_template.format(domain=domain)
-    
+
     # Build authorization URL with query parameters
     from urllib.parse import urlencode
-    
+
     params = {
         "client_id": client_id,
         "redirect_uri": redirect_uri,
@@ -487,14 +492,14 @@ def _build_sso_authorization_url(
         "scope": scope,
         "state": state,
     }
-    
+
     if provider_lower == SSOProvider.GOOGLE.value:
         params["redirect_uri"] = redirect_uri
         params["access_type"] = "offline"
         params["prompt"] = "consent"
-    
+
     auth_url = f"{auth_url}?{urlencode(params)}"
-    
+
     return auth_url, state
 
 
@@ -507,12 +512,12 @@ async def _exchange_code_for_token(
 ) -> dict:
     """
     Exchange authorization code for access token.
-    
+
     Returns the token response from the SSO provider.
     """
     import httpx
     from src.api.services.auth import SSOProvider
-    
+
     # Provider token endpoints
     token_urls = {
         SSOProvider.OKTA.value: "{domain}/oauth2/v1/token",
@@ -520,24 +525,26 @@ async def _exchange_code_for_token(
         SSOProvider.KEYCLOAK.value: "{domain}/realms/{realm}/protocol/openid-connect/token",
         SSOProvider.GOOGLE.value: "https://oauth2.googleapis.com/token",
     }
-    
+
     provider_lower = provider.lower()
     domain_attr = f"{provider_lower}_domain"
     domain = getattr(settings, domain_attr, None)
-    realm = getattr(settings, f"{provider_lower}_realm", None) if provider_lower == "keycloak" else None
-    
+    realm = (
+        getattr(settings, f"{provider_lower}_realm", None) if provider_lower == "keycloak" else None
+    )
+
     if not domain:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"No domain configured for SSO provider: {provider}",
         )
-    
+
     token_url_template = token_urls[provider_lower]
     if provider_lower == SSOProvider.KEYCLOAK.value and realm:
         token_url = token_url_template.format(domain=domain, realm=realm)
     else:
         token_url = token_url_template.format(domain=domain)
-    
+
     # Build token request
     data = {
         "grant_type": "authorization_code",
@@ -545,10 +552,10 @@ async def _exchange_code_for_token(
         "redirect_uri": redirect_uri,
         "client_id": client_id,
     }
-    
+
     if client_secret:
         data["client_secret"] = client_secret
-    
+
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.post(
             token_url,
@@ -566,14 +573,15 @@ async def sso_redirect(
 ):
     """
     Initiate SSO authentication by redirecting to the provider's authorization endpoint.
-    
+
     Returns a redirect to the SSO provider's authorization URL with appropriate
     client_id, redirect_uri, scope, and state parameters.
     """
     import secrets
-    
+
     # Validate provider
     from src.api.services.auth import SSOProvider
+
     try:
         SSOProvider(provider.lower())
     except ValueError:
@@ -581,7 +589,7 @@ async def sso_redirect(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unsupported SSO provider: {provider}",
         )
-    
+
     # Get client configuration
     client_id = getattr(settings, f"{provider.lower()}_client_id", None)
     if not client_id:
@@ -589,14 +597,14 @@ async def sso_redirect(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"No client_id configured for SSO provider: {provider}",
         )
-    
+
     # Build redirect URI (callback URL)
     callback_base = str(request.base_url).rstrip("/")
     redirect_uri = f"{callback_base}/v1/auth/sso/{provider}/callback"
-    
+
     # Generate state for CSRF protection
     state = secrets.token_urlsafe(32)
-    
+
     # Build authorization URL
     auth_url, _ = _build_sso_authorization_url(
         provider=provider,
@@ -604,9 +612,10 @@ async def sso_redirect(
         redirect_uri=redirect_uri,
         state=state,
     )
-    
+
     # Redirect to provider
     from fastapi import RedirectResponse
+
     return RedirectResponse(url=auth_url, status_code=status.HTTP_302_FOUND)
 
 
@@ -621,7 +630,7 @@ async def sso_callback(
 ):
     """
     Handle SSO callback from the identity provider.
-    
+
     Exchanges the authorization code for an access token from the SSO provider,
     verifies the token, and issues a MUTX JWT access token.
     """
@@ -630,14 +639,14 @@ async def sso_callback(
         create_access_token,
         verify_oauth_token,
     )
-    
+
     # Check for error from provider
     if error:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"SSO error: {error_description or error}",
         )
-    
+
     # Validate provider
     try:
         sso_provider = SSOProvider(provider.lower())
@@ -646,21 +655,21 @@ async def sso_callback(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unsupported SSO provider: {provider}",
         )
-    
+
     # Get client configuration
     client_id = getattr(settings, f"{provider.lower()}_client_id", None)
     client_secret = getattr(settings, f"{provider.lower()}_client_secret", None)
-    
+
     if not client_id:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"No client_id configured for SSO provider: {provider}",
         )
-    
+
     # Build redirect URI (must match the one used in initial request)
     # For production, this would typically come from config
     redirect_uri = f"http://localhost:3000/v1/auth/sso/{provider}/callback"
-    
+
     try:
         # Exchange code for token with SSO provider
         token_response = await _exchange_code_for_token(
@@ -670,7 +679,7 @@ async def sso_callback(
             client_id=client_id,
             client_secret=client_secret,
         )
-        
+
         # Get the access token
         access_token = token_response.get("access_token")
         if not access_token:
@@ -678,25 +687,25 @@ async def sso_callback(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No access token returned from SSO provider",
             )
-        
+
         # Verify the OAuth token and extract user info
         token_payload = await verify_oauth_token(
             token=access_token,
             provider=sso_provider,
         )
-        
+
         # Issue MUTX JWT access token
         mutx_access_token = create_access_token(
             payload=token_payload,
             secret=settings.jwt_secret,
         )
-        
+
         return SSOCallbackResponse(
             access_token=mutx_access_token,
             token_type="bearer",
             expires_in=86400,
         )
-        
+
     except HTTPException:
         raise
     except Exception as e:
