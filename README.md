@@ -2,7 +2,7 @@
 
 > Source-available control plane for deploying and operating AI agents like systems, not demos.
 
-![MUTX dashboard demo](demo.gif)
+![MUTX dashboard demo](public/demo.gif)
 
 Most teams can prototype an agent. Very few can run one in production with durable identity, deployment semantics, sessions, health, access control, and honest operator contracts.
 

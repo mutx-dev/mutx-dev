@@ -147,9 +147,8 @@ def build_prompt(agent: str, brief_text: str, work_order: dict[str, object]) -> 
     file_sections = [read_snippet(file_path) for file_path in files]
     general_context = []
 
-    # Resolve AGENTS.md — prefer canonical name, fall back to legacy agents-1.md
-    agents_paths = ["AGENTS.md", "agents-1.md"]
-    agents_resolved = next((p for p in agents_paths if Path(p).exists()), None)
+    # Resolve AGENTS.md
+    agents_resolved = "AGENTS.md" if Path("AGENTS.md").exists() else None
     if agents_resolved and agents_resolved not in files:
         general_context.append(read_snippet(agents_resolved, limit=180))
 

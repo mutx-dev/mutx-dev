@@ -94,6 +94,11 @@ docs/archive/
 signals/
 reports/
 tmp/
+audit.db
+autonomy-queue.json
+autonomy-queue-health.json
+autonomy-work-order.json
+ui-worker-state.json
 
 # Agent runtime state
 mutx-engineering-agents/dispatch/

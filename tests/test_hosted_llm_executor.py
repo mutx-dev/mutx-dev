@@ -108,12 +108,9 @@ def test_no_lowercase_agent_md_in_git_index() -> None:
 
 
 def test_agents_md_resolvable_by_executor() -> None:
-    """Verify the executor can resolve AGENTS.md and agents-1.md fallback."""
+    """Verify the executor can resolve AGENTS.md."""
     # AGENTS.md must exist at root
     assert (ROOT / "AGENTS.md").exists(), "AGENTS.md not found at repo root"
-
-    # agents-1.md must exist (stub or real — executor falls back to it)
-    assert (ROOT / "agents-1.md").exists(), "agents-1.md not found (executor fallback)"
 
 
 def test_build_prompt_raises_for_missing_agent() -> None:

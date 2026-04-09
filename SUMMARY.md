@@ -72,7 +72,7 @@
 * [Security Policy](security.md)
 * [Licensing](docs/legal/index.md)
 * [Contributor Covenant Code of Conduct](code_of_conduct.md)
-* [AGENTS.md](agents-1.md)
+* [AGENTS.md](AGENTS.md)
 * [App Dashboard](app-dashboard.md)
 * [Changelog Status](changelog-status.md)
 * [Claim to Reality Gap Matrix](claim-to-reality-gap-matrix.md)
