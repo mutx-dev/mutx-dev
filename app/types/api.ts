@@ -774,6 +774,52 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/sso/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sso Redirect
+         * @description Initiate SSO authentication by redirecting to the provider's authorization endpoint.
+         *
+         *     Returns a redirect to the SSO provider's authorization URL with appropriate
+         *     client_id, redirect_uri, scope, and state parameters.
+         */
+        get: operations["sso_redirect_v1_auth_sso__provider__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/sso/{provider}/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sso Callback
+         * @description Handle SSO callback from the identity provider.
+         *
+         *     Exchanges the authorization code for an access token from the SSO provider,
+         *     verifies the token, and issues a MUTX JWT access token.
+         */
+        get: operations["sso_callback_v1_auth_sso__provider__callback_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/clawhub/skills": {
         parameters: {
             query?: never;
@@ -2414,6 +2460,235 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/policies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Policies
+         * @description List all stored policies.
+         */
+        get: operations["list_policies_v1_policies_get"];
+        put?: never;
+        /**
+         * Create Policy
+         * @description Create a new policy.
+         */
+        post: operations["create_policy_v1_policies_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/policies/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Policy
+         * @description Fetch a single policy by name.
+         */
+        get: operations["get_policy_v1_policies__name__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Policy
+         * @description Delete a policy by name.
+         */
+        delete: operations["delete_policy_v1_policies__name__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/policies/{name}/reload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reload Policy
+         * @description SSE endpoint that pushes a 'reload' event when the named policy is
+         *     updated (version increments) or deleted.
+         *
+         *     The stream stays open and monitors the policy version, exiting when
+         *     a change is detected so clients can re-fetch the policy.
+         */
+        post: operations["reload_policy_v1_policies__name__reload_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/approvals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Approvals
+         * @description List approval requests visible to the authenticated user.
+         *
+         *     - ``status``: filter by status (e.g. PENDING)
+         *     - ``agent_id``: filter by agent
+         */
+        get: operations["list_approvals_v1_approvals_get"];
+        put?: never;
+        /**
+         * Create Approval
+         * @description Submit a new approval request.
+         *
+         *     The requesting user's email is recorded as the ``requester``.
+         */
+        post: operations["create_approval_v1_approvals_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/approvals/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Approval
+         * @description Fetch a single approval request by ID.
+         */
+        get: operations["get_approval_v1_approvals__request_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/approvals/{request_id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve Request
+         * @description Approve a pending request.
+         *
+         *     Requires DEVELOPER or ADMIN role (enforced when RBAC is active).
+         */
+        post: operations["approve_request_v1_approvals__request_id__approve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/approvals/{request_id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reject Request
+         * @description Reject a pending request.
+         *
+         *     Requires DEVELOPER or ADMIN role (enforced when RBAC is active).
+         */
+        post: operations["reject_request_v1_approvals__request_id__reject_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/audit/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Query Audit Events
+         * @description Query audit events with filters.
+         *
+         *     Requires authentication. Results are ordered by timestamp descending.
+         *
+         *     Args:
+         *         current_user: The authenticated user.
+         *         agent_id: Optional agent ID filter.
+         *         session_id: Optional session ID filter.
+         *         time_range_start: Optional start time filter.
+         *         time_range_end: Optional end time filter.
+         *         event_type: Optional event type filter.
+         *         limit: Maximum number of events to return (1-1000, default 100).
+         *         skip: Number of events to skip for pagination.
+         *
+         *     Returns:
+         *         AuditEventsResponse containing list of matching events.
+         */
+        get: operations["query_audit_events_v1_audit_events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/audit/traces/{trace_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Trace Events
+         * @description Get all events for a specific trace.
+         *
+         *     Requires authentication. Results are ordered by timestamp ascending.
+         *
+         *     Args:
+         *         trace_id: The trace ID to look up.
+         *         current_user: The authenticated user.
+         *
+         *     Returns:
+         *         AuditEventsResponse containing all events for the trace.
+         */
+        get: operations["get_trace_events_v1_audit_traces__trace_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -2547,7 +2822,9 @@ export interface components {
              * Tool Args
              * @description Tool arguments
              */
-            tool_args?: Record<string, never>;
+            tool_args?: {
+                [key: string]: unknown;
+            };
             /**
              * Agent Id
              * @description Agent ID
@@ -2608,7 +2885,9 @@ export interface components {
             agent_id: string;
             type: components["schemas"]["AgentType"];
             /** Config */
-            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | Record<string, never>;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            };
             /** Config Version */
             config_version: number;
             /**
@@ -2623,7 +2902,9 @@ export interface components {
              * Config
              * @description Updated agent configuration payload. Can be a JSON object or JSON string.
              */
-            config: Record<string, never> | string;
+            config: {
+                [key: string]: unknown;
+            } | string;
         };
         /** AgentCreate */
         AgentCreate: {
@@ -2634,7 +2915,9 @@ export interface components {
             /** @default openai */
             type: components["schemas"]["AgentType"];
             /** Config */
-            config?: Record<string, never> | string | null;
+            config?: {
+                [key: string]: unknown;
+            } | string | null;
         };
         /** AgentDetailResponse */
         AgentDetailResponse: {
@@ -2651,7 +2934,9 @@ export interface components {
             /** Status */
             status: string;
             /** Config */
-            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | Record<string, never> | null;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            } | null;
             /**
              * Config Version
              * @default 1
@@ -2768,7 +3053,9 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Capabilities
              * @default []
@@ -2819,7 +3106,9 @@ export interface components {
             /** Model */
             model?: string | null;
             /** Extra Metadata */
-            extra_metadata?: Record<string, never> | null;
+            extra_metadata?: {
+                [key: string]: unknown;
+            } | null;
             /**
              * Period Start
              * Format: date-time
@@ -2868,7 +3157,9 @@ export interface components {
             /** Model */
             model?: string | null;
             /** Extra Metadata */
-            extra_metadata?: Record<string, never> | null;
+            extra_metadata?: {
+                [key: string]: unknown;
+            } | null;
             /**
              * Period Start
              * Format: date-time
@@ -2897,7 +3188,9 @@ export interface components {
             /** Status */
             status: string;
             /** Config */
-            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | Record<string, never> | null;
+            config: components["schemas"]["OpenAIAgentConfig"] | components["schemas"]["AnthropicAgentConfig"] | components["schemas"]["LangChainAgentConfig"] | components["schemas"]["CustomAgentConfig"] | components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            } | null;
             /**
              * Config Version
              * @default 1
@@ -3142,6 +3435,61 @@ export interface components {
             comment: string;
         };
         /**
+         * ApprovalCreate
+         * @description Payload for creating a new approval request.
+         */
+        ApprovalCreate: {
+            /** Agent Id */
+            agent_id: string;
+            /** Session Id */
+            session_id: string;
+            /** Action Type */
+            action_type: string;
+            /**
+             * Payload
+             * @default {}
+             */
+            payload: {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * ApprovalRequest
+         * @description In-memory approval request record.
+         */
+        ApprovalRequest: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id?: string;
+            /** Agent Id */
+            agent_id: string;
+            /** Session Id */
+            session_id: string;
+            /** Action Type */
+            action_type: string;
+            /** Payload */
+            payload?: {
+                [key: string]: unknown;
+            };
+            /** @default PENDING */
+            status: components["schemas"]["ApprovalStatus"];
+            /** Requester */
+            requester: string;
+            /** Approver */
+            approver?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at?: string;
+            /** Resolved At */
+            resolved_at?: string | null;
+            /** Comment */
+            comment?: string | null;
+        };
+        /**
          * ApprovalRequestCreate
          * @description Request human approval for an action.
          */
@@ -3155,7 +3503,9 @@ export interface components {
              * Tool Args
              * @description Tool arguments
              */
-            tool_args?: Record<string, never>;
+            tool_args?: {
+                [key: string]: unknown;
+            };
             /**
              * Agent Id
              * @description Agent ID
@@ -3206,6 +3556,20 @@ export interface components {
             /** Remaining Seconds */
             remaining_seconds: number;
         };
+        /**
+         * ApprovalResolve
+         * @description Optional comment when approving or rejecting.
+         */
+        ApprovalResolve: {
+            /** Comment */
+            comment?: string | null;
+        };
+        /**
+         * ApprovalStatus
+         * @description Possible states for an approval request.
+         * @enum {string}
+         */
+        ApprovalStatus: "PENDING" | "APPROVED" | "REJECTED" | "EXPIRED";
         /** AssistantChannelResponse */
         AssistantChannelResponse: {
             /** Id */
@@ -3296,7 +3660,9 @@ export interface components {
             /** Deployments */
             deployments?: components["schemas"]["DeploymentResponse"][];
             /** Config */
-            config: components["schemas"]["OpenClawAgentConfig"] | Record<string, never>;
+            config: components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            };
         };
         /** AssistantSessionResponse */
         AssistantSessionResponse: {
@@ -3370,7 +3736,9 @@ export interface components {
             /** Starter Prompt */
             starter_prompt: string;
             /** Default Config */
-            default_config: components["schemas"]["OpenClawAgentConfig"] | Record<string, never>;
+            default_config: components["schemas"]["OpenClawAgentConfig"] | {
+                [key: string]: unknown;
+            };
         };
         /** AssistantWakeupResponse */
         AssistantWakeupResponse: {
@@ -3382,6 +3750,49 @@ export interface components {
             timezone?: string | null;
             /** Label */
             label?: string | null;
+        };
+        /**
+         * AuditEventResponse
+         * @description Response model for an audit event.
+         */
+        AuditEventResponse: {
+            /** Event Id */
+            event_id: string;
+            /** Agent Id */
+            agent_id: string;
+            /** Session Id */
+            session_id: string;
+            /** Span Id */
+            span_id?: string | null;
+            /** Event Type */
+            event_type: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+            /**
+             * Timestamp
+             * Format: date-time
+             */
+            timestamp: string;
+            /** Trace Id */
+            trace_id?: string | null;
+        };
+        /**
+         * AuditEventType
+         * @description Types of audit events that can be logged.
+         * @enum {string}
+         */
+        AuditEventType: "AGENT_START" | "LLM_CALL" | "TOOL_CALL" | "POLICY_CHECK" | "GUARDRAIL_TRIGGER" | "AGENT_END";
+        /**
+         * AuditEventsResponse
+         * @description Response model for a list of audit events.
+         */
+        AuditEventsResponse: {
+            /** Events */
+            events: components["schemas"]["AuditEventResponse"][];
+            /** Total */
+            total?: number | null;
         };
         /** BackendHealthResponse */
         BackendHealthResponse: {
@@ -3455,7 +3866,9 @@ export interface components {
             /** Success */
             success: boolean;
             /** Result */
-            result?: Record<string, never> | null;
+            result?: {
+                [key: string]: unknown;
+            } | null;
             /** Error */
             error?: string | null;
             /** Completed At */
@@ -3468,7 +3881,9 @@ export interface components {
             /** Action */
             action: string;
             /** Parameters */
-            parameters: Record<string, never>;
+            parameters: {
+                [key: string]: unknown;
+            };
             /** Received At */
             received_at: string;
         };
@@ -3489,9 +3904,13 @@ export interface components {
             /** Checked At */
             checked_at: string;
             /** Summary */
-            summary: Record<string, never>;
+            summary: {
+                [key: string]: unknown;
+            };
             /** Results */
-            results: Record<string, never>[];
+            results: {
+                [key: string]: unknown;
+            }[];
         };
         /** CostSummaryResponse */
         CostSummaryResponse: {
@@ -3534,7 +3953,9 @@ export interface components {
              */
             ttl: number | null;
             /** Config */
-            config?: Record<string, never>;
+            config?: {
+                [key: string]: unknown;
+            };
         };
         /** CredentialResponse */
         CredentialResponse: {
@@ -3554,7 +3975,9 @@ export interface components {
             /** Expires At */
             expires_at?: string | null;
             /** Metadata */
-            metadata?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
         };
         /** CustomAgentConfig */
         CustomAgentConfig: {
@@ -3864,7 +4287,9 @@ export interface components {
             uptime_seconds?: number | null;
             /** Components */
             components?: {
-                [key: string]: Record<string, never>;
+                [key: string]: {
+                    [key: string]: unknown;
+                };
             };
             /** Schema Repairs Applied */
             schema_repairs_applied?: string[];
@@ -3927,7 +4352,9 @@ export interface components {
             /** Chain Id */
             chain_id: string;
             /** Parameters */
-            parameters?: Record<string, never>;
+            parameters?: {
+                [key: string]: unknown;
+            };
         };
         /** LeadCreate */
         LeadCreate: {
@@ -4004,7 +4431,9 @@ export interface components {
              * Metadata
              * @default {}
              */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: unknown;
+            };
             /** Timestamp */
             timestamp: string;
         };
@@ -4082,7 +4511,9 @@ export interface components {
              * Custom
              * @default {}
              */
-            custom: Record<string, never>;
+            custom: {
+                [key: string]: unknown;
+            };
             /** Timestamp */
             timestamp: string;
         };
@@ -4454,7 +4885,9 @@ export interface components {
              * Run Metadata
              * @description Additional metadata
              */
-            run_metadata?: Record<string, never>;
+            run_metadata?: {
+                [key: string]: unknown;
+            };
         };
         /**
          * MutxRunDetailResponse
@@ -4521,7 +4954,9 @@ export interface components {
              * Run Metadata
              * @default {}
              */
-            run_metadata: Record<string, never>;
+            run_metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Created At
              * Format: date-time
@@ -4616,7 +5051,9 @@ export interface components {
              * Run Metadata
              * @default {}
              */
-            run_metadata: Record<string, never>;
+            run_metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Created At
              * Format: date-time
@@ -4704,7 +5141,9 @@ export interface components {
              * Step Metadata
              * @description Extension point for step-specific data
              */
-            step_metadata?: Record<string, never>;
+            step_metadata?: {
+                [key: string]: unknown;
+            };
         };
         /**
          * MutxStepCreate
@@ -4772,7 +5211,9 @@ export interface components {
              * Step Metadata
              * @description Additional metadata
              */
-            step_metadata?: Record<string, never>;
+            step_metadata?: {
+                [key: string]: unknown;
+            };
         };
         /**
          * MutxStepType
@@ -4792,7 +5233,9 @@ export interface components {
             /** Action Type */
             action_type?: string | null;
             /** Import Source */
-            import_source?: Record<string, never>;
+            import_source?: {
+                [key: string]: unknown;
+            };
             /** Current Step */
             current_step: string;
             /** Completed Steps */
@@ -4845,7 +5288,9 @@ export interface components {
             /** Step */
             step?: string | null;
             /** Payload */
-            payload?: Record<string, never>;
+            payload?: {
+                [key: string]: unknown;
+            };
         };
         /** OpenAIAgentConfig */
         OpenAIAgentConfig: {
@@ -4918,7 +5363,9 @@ export interface components {
             /** Wakeups */
             wakeups?: components["schemas"]["OpenClawWakeupConfig"][];
             /** Metadata */
-            metadata?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
             gateway?: components["schemas"]["OpenClawGatewayConfig"];
         };
         /** OpenClawChannelConfig */
@@ -4966,6 +5413,26 @@ export interface components {
             timezone?: string | null;
             /** Label */
             label?: string | null;
+        };
+        /**
+         * Policy
+         * @description A named collection of rules with versioning and enablement.
+         */
+        Policy: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Rules */
+            rules: components["schemas"]["Rule"][];
+            /** Enabled */
+            enabled: boolean;
+            /** Version */
+            version: number;
+            /** Created At */
+            created_at?: string | null;
+            /** Updated At */
+            updated_at?: string | null;
         };
         /** ProviderOptionResponse */
         ProviderOptionResponse: {
@@ -5015,6 +5482,26 @@ export interface components {
             /** New Password */
             new_password: string;
         };
+        /**
+         * Rule
+         * @description A policy rule matching mechanism and enforcement action.
+         */
+        Rule: {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "block" | "allow" | "warn";
+            /** Pattern */
+            pattern: string;
+            /** Action */
+            action: string;
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "input" | "output" | "tool";
+        };
         /** RunCreate */
         RunCreate: {
             /**
@@ -5034,7 +5521,9 @@ export interface components {
             /** Error Message */
             error_message?: string | null;
             /** Metadata */
-            metadata?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
             /** Started At */
             started_at?: string | null;
             /** Completed At */
@@ -5063,7 +5552,9 @@ export interface components {
             /** Error Message */
             error_message: string | null;
             /** Metadata */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Started At
              * Format: date-time
@@ -5120,7 +5611,9 @@ export interface components {
             /** Error Message */
             error_message: string | null;
             /** Metadata */
-            metadata: Record<string, never>;
+            metadata: {
+                [key: string]: unknown;
+            };
             /**
              * Started At
              * Format: date-time
@@ -5146,7 +5639,9 @@ export interface components {
             /** Message */
             message?: string | null;
             /** Payload */
-            payload?: Record<string, never>;
+            payload?: {
+                [key: string]: unknown;
+            };
             /** Timestamp */
             timestamp?: string | null;
         };
@@ -5185,7 +5680,9 @@ export interface components {
             /** Message */
             message: string | null;
             /** Payload */
-            payload: Record<string, never>;
+            payload: {
+                [key: string]: unknown;
+            };
             /** Sequence */
             sequence: number;
             /**
@@ -5260,7 +5757,9 @@ export interface components {
             /** Last Action Type */
             last_action_type?: string | null;
             /** Import Source */
-            import_source?: Record<string, never>;
+            import_source?: {
+                [key: string]: unknown;
+            };
             /** Version */
             version?: string | null;
             /**
@@ -5269,7 +5768,9 @@ export interface components {
              */
             status: string;
             /** Gateway */
-            gateway?: Record<string, never>;
+            gateway?: {
+                [key: string]: unknown;
+            };
             /** Gateway Url */
             gateway_url?: string | null;
             /** Gateway Port */
@@ -5284,9 +5785,13 @@ export interface components {
              */
             binding_count: number;
             /** Current Binding */
-            current_binding?: Record<string, never> | null;
+            current_binding?: {
+                [key: string]: unknown;
+            } | null;
             /** Bindings */
-            bindings?: Record<string, never>[];
+            bindings?: {
+                [key: string]: unknown;
+            }[];
             /**
              * Observed Source
              * @default local
@@ -5369,7 +5874,9 @@ export interface components {
             /** Last Action Type */
             last_action_type?: string | null;
             /** Import Source */
-            import_source?: Record<string, never>;
+            import_source?: {
+                [key: string]: unknown;
+            };
             /** Version */
             version?: string | null;
             /**
@@ -5378,7 +5885,9 @@ export interface components {
              */
             status: string;
             /** Gateway */
-            gateway?: Record<string, never>;
+            gateway?: {
+                [key: string]: unknown;
+            };
             /** Gateway Url */
             gateway_url?: string | null;
             /** Gateway Port */
@@ -5393,14 +5902,36 @@ export interface components {
              */
             binding_count: number;
             /** Current Binding */
-            current_binding?: Record<string, never> | null;
+            current_binding?: {
+                [key: string]: unknown;
+            } | null;
             /** Bindings */
-            bindings?: Record<string, never>[];
+            bindings?: {
+                [key: string]: unknown;
+            }[];
             /**
              * Observed Source
              * @default local
              */
             observed_source: string;
+        };
+        /**
+         * SSOCallbackResponse
+         * @description Response model for SSO callback.
+         */
+        SSOCallbackResponse: {
+            /** Access Token */
+            access_token: string;
+            /**
+             * Token Type
+             * @default bearer
+             */
+            token_type: string;
+            /**
+             * Expires In
+             * @default 86400
+             */
+            expires_in: number;
         };
         /**
          * SearchRequest
@@ -5442,7 +5973,9 @@ export interface components {
         /** SessionListResponse */
         SessionListResponse: {
             /** Sessions */
-            sessions: Record<string, never>[];
+            sessions: {
+                [key: string]: unknown;
+            }[];
         };
         /** Skill */
         Skill: {
@@ -5491,7 +6024,9 @@ export interface components {
                 [key: string]: components["schemas"]["OpenClawChannelConfig"];
             };
             /** Runtime Metadata */
-            runtime_metadata?: Record<string, never>;
+            runtime_metadata?: {
+                [key: string]: unknown;
+            };
         };
         /** StarterDeploymentResponse */
         StarterDeploymentResponse: {
@@ -5705,7 +6240,9 @@ export interface components {
              * Metadata
              * @description Additional event metadata
              */
-            metadata?: Record<string, never> | null;
+            metadata?: {
+                [key: string]: unknown;
+            } | null;
         };
         /**
          * UsageEventListResponse
@@ -5755,7 +6292,9 @@ export interface components {
              * Metadata
              * @description Deserialize event_metadata JSON string to dict
              */
-            readonly metadata: Record<string, never> | null;
+            readonly metadata: {
+                [key: string]: unknown;
+            } | null;
         };
         /** UserResponse */
         UserResponse: {
@@ -5788,6 +6327,10 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
         };
         /** VerifyEmailRequest */
         VerifyEmailRequest: {
@@ -6150,7 +6693,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -6183,7 +6728,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -7631,6 +8178,73 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MessageResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sso_redirect_v1_auth_sso__provider__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sso_callback_v1_auth_sso__provider__callback_get: {
+        parameters: {
+            query: {
+                code: string;
+                state?: string | null;
+                error?: string | null;
+                error_description?: string | null;
+            };
+            header?: never;
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SSOCallbackResponse"];
                 };
             };
             /** @description Validation Error */
@@ -9106,7 +9720,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": Record<string, never>;
+                "application/json": {
+                    [key: string]: unknown;
+                };
             };
         };
         responses: {
@@ -10369,7 +10985,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -10404,7 +11022,9 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */
@@ -11005,6 +11625,424 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_policies_v1_policies_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Policy"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_policy_v1_policies_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Policy"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Policy"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_policy_v1_policies__name__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Policy"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_policy_v1_policies__name__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reload_policy_v1_policies__name__reload_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_approvals_v1_approvals_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["ApprovalStatus"] | null;
+                agent_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRequest"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_approval_v1_approvals_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRequest"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_approval_v1_approvals__request_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRequest"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approve_request_v1_approvals__request_id__approve_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalResolve"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRequest"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reject_request_v1_approvals__request_id__reject_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalResolve"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalRequest"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    query_audit_events_v1_audit_events_get: {
+        parameters: {
+            query?: {
+                /** @description Filter by agent ID */
+                agent_id?: string | null;
+                /** @description Filter by session ID */
+                session_id?: string | null;
+                /** @description Filter events after this timestamp (ISO 8601 format) */
+                time_range_start?: string | null;
+                /** @description Filter events before this timestamp (ISO 8601 format) */
+                time_range_end?: string | null;
+                /** @description Filter by event type */
+                event_type?: components["schemas"]["AuditEventType"] | null;
+                /** @description Maximum events to return */
+                limit?: number;
+                /** @description Number of events to skip */
+                skip?: number;
+            };
+            header?: {
+                Authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditEventsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_trace_events_v1_audit_traces__trace_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                Authorization?: string | null;
+            };
+            path: {
+                trace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditEventsResponse"];
                 };
             };
             /** @description Validation Error */

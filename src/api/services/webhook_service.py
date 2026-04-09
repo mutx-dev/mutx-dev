@@ -271,9 +271,7 @@ async def trigger_webhook_event(
         Number of successful deliveries
     """
     # Get active webhooks for the owning user only
-    result = await db.execute(
-        select(Webhook).where(Webhook.is_active, Webhook.user_id == user_id)
-    )
+    result = await db.execute(select(Webhook).where(Webhook.is_active, Webhook.user_id == user_id))
     webhooks = result.scalars().all()
 
     # Filter webhooks by event subscription
