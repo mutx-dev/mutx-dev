@@ -7,18 +7,27 @@ interface SectionLandingProps {
   title: string;
   description?: string;
   children: DocNavItem[];
+  headingLevel?: 1 | 2 | 3;
 }
 
 export function SectionLanding({
   title,
   description,
   children,
+  headingLevel = 2,
 }: SectionLandingProps) {
   if (children.length === 0) return null;
 
   return (
     <div className="docs-section-landing">
-      {title && <h1 className="docs-section-landing-title">{title}</h1>}
+      {title &&
+        (headingLevel === 1 ? (
+          <h1 className="docs-section-landing-title">{title}</h1>
+        ) : headingLevel === 3 ? (
+          <h3 className="docs-section-landing-title">{title}</h3>
+        ) : (
+          <h2 className="docs-section-landing-title">{title}</h2>
+        ))}
       {description && (
         <p className="docs-section-landing-desc">{description}</p>
       )}
