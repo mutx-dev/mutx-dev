@@ -1,6 +1,7 @@
 """
 Policy management routes — CRUD + SSE hot-reload endpoint.
 """
+
 import asyncio
 import json
 import logging
@@ -21,6 +22,7 @@ logger = logging.getLogger(__name__)
 # Helpers
 # ------------------------------------------------------------------
 
+
 async def _require_store() -> PolicyStore:
     return await get_policy_store()
 
@@ -28,6 +30,7 @@ async def _require_store() -> PolicyStore:
 # ------------------------------------------------------------------
 # CRUD
 # ------------------------------------------------------------------
+
 
 @router.get("", response_model=list[Policy])
 async def list_policies(
@@ -83,6 +86,7 @@ async def delete_policy(
 # SSE hot-reload
 # ------------------------------------------------------------------
 
+
 class _SSEClient:
     """Async send-capable stand-in for EventSourceResponse (used for tracking)."""
 
@@ -102,13 +106,13 @@ async def _sse_reload_generator(
     """
     try:
         # Send initial connected comment
-        yield "data: {\"event\":\"connected\",\"policy\":\"" + policy_name + "\"}\n\n"
+        yield 'data: {"event":"connected","policy":"' + policy_name + '"}\n\n'
         while True:
             await asyncio.sleep(5)
             current = await store.get_policy(policy_name)
             if current is None:
                 # Policy was deleted — send end signal and exit
-                yield "data: {\"event\":\"deleted\",\"policy\":\"" + policy_name + "\"}\n\n"
+                yield 'data: {"event":"deleted","policy":"' + policy_name + '"}\n\n'
                 break
             if current.version != initial_version:
                 # Version changed — send reload event and exit

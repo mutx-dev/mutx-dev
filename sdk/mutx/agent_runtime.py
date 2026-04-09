@@ -807,9 +807,7 @@ class ApprovalTimeoutError(Exception):
     def __init__(self, request_id: str, timeout_seconds: int):
         self.request_id = request_id
         self.timeout_seconds = timeout_seconds
-        super().__init__(
-            f"Approval request {request_id} timed out after {timeout_seconds}s"
-        )
+        super().__init__(f"Approval request {request_id} timed out after {timeout_seconds}s")
 
 
 class run_with_approval:  # noqa: N801
@@ -937,4 +935,3 @@ class run_with_approval:  # noqa: N801
     def result(self) -> Optional[dict]:
         """The final approval record (only valid after entering the context)."""
         return self._result
-

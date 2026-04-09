@@ -273,9 +273,7 @@ class GuardrailViolationError(Exception):
             result: The GuardrailResult that triggered the violation.
         """
         self.result = result
-        super().__init__(
-            f"Guardrail violation: {result.triggered_rule} - {result.message}"
-        )
+        super().__init__(f"Guardrail violation: {result.triggered_rule} - {result.message}")
 
 
 class GuardrailMiddleware:

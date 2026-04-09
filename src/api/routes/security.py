@@ -39,7 +39,6 @@ from src.security import (
 )
 from src.security.telemetry import TelemetryEventType
 
-
 router = APIRouter(prefix="/security", tags=["security"])
 
 

@@ -261,9 +261,7 @@ class TestMutxLangChainCallbackHandler:
 
         import httpx
 
-        handler._http.post = MagicMock(
-            side_effect=httpx.HTTPError("Connection failed")
-        )
+        handler._http.post = MagicMock(side_effect=httpx.HTTPError("Connection failed"))
 
         mock_action = MagicMock()
         mock_action.tool = "test_tool"

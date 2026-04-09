@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.models import User, UserSetting
 
-
 STALE_AFTER_SECONDS = 900
 
 ONBOARDING_STEPS: tuple[dict[str, str], ...] = (

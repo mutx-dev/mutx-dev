@@ -68,6 +68,10 @@ class MutxClient:
         return Agents(self.http)
 
     @property
+    def approvals(self) -> Approvals:
+        return Approvals(self.http)
+
+    @property
     def analytics(self) -> Analytics:
         return Analytics(self.http)
 

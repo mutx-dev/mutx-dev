@@ -111,10 +111,12 @@ async def _sync_self_healing_agents(session, self_healing):
     """Register live agents for self-healing checks and prune removed agents."""
     result = await session.execute(
         select(Agent.id).where(
-            Agent.status.notin_([
-                AgentStatus.DELETING.value,
-                AgentStatus.STOPPED.value,
-            ])
+            Agent.status.notin_(
+                [
+                    AgentStatus.DELETING.value,
+                    AgentStatus.STOPPED.value,
+                ]
+            )
         )
     )
     active_agents = {str(agent_id) for agent_id in result.scalars().all()}
