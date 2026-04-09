@@ -8,7 +8,7 @@ import remarkGfm from "remark-gfm";
 import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const source = fs.readFileSync(path.join(process.cwd(), "manifesto.md"), "utf-8");
+  const source = fs.readFileSync(path.join(process.cwd(), "docs/manifesto.md"), "utf-8");
   const { data } = matter(source);
   return {
     title: `${data.title || "Manifesto"} — MUTX`,
@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ManifestoPage() {
-  const source = fs.readFileSync(path.join(process.cwd(), "manifesto.md"), "utf-8");
+  const source = fs.readFileSync(path.join(process.cwd(), "docs/manifesto.md"), "utf-8");
   const { data, content } = matter(source);
 
   return (

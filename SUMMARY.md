@@ -1,9 +1,9 @@
 # Table of contents
 
 * [Welcome](README.md)
-* [Manifesto](manifesto.md)
-* [Whitepaper](whitepaper.md)
-* [Roadmap](roadmap.md)
+* [Manifesto](docs/manifesto.md)
+* [Whitepaper](docs/whitepaper.md)
+* [Roadmap](docs/roadmap.md)
 * [Documentation Hub](docs/README.md)
   * [API Source of Truth](docs/api/reference.md)
     * [API Overview](docs/api/index.md)
@@ -65,8 +65,8 @@
     * [QA Reliability Engineer](agents/qa-reliability-engineer/AGENT.md)
   * [Runtime Protocol Engineer Overview](agents/runtime-protocol-engineer/README.md)
     * [Runtime Protocol Engineer](agents/runtime-protocol-engineer/AGENT.md)
-* [MUTX Infrastructure](infrastructure.md)
-* [Python SDK](sdk.md)
+* [MUTX Infrastructure](docs/infrastructure.md)
+* [Python SDK](docs/sdk.md)
 * [Support](support.md)
 * [Contributing](contributing/README.md)
 * [Security Policy](security.md)

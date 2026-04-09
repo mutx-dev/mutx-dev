@@ -10,7 +10,7 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const source = fs.readFileSync(path.join(process.cwd(), "roadmap.md"), "utf-8");
+  const source = fs.readFileSync(path.join(process.cwd(), "docs/roadmap.md"), "utf-8");
   const { data } = matter(source);
   return {
     title: `${data.title || "Roadmap"} — MUTX`,
@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RoadmapPage() {
-  const source = fs.readFileSync(path.join(process.cwd(), "roadmap.md"), "utf-8");
+  const source = fs.readFileSync(path.join(process.cwd(), "docs/roadmap.md"), "utf-8");
   const { data, content } = matter(source);
 
   return (

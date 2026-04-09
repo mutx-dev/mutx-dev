@@ -40,7 +40,7 @@ function normalizeSummaryHrefToSlug(href: string): string {
 function getDocIcon(href: string): string | undefined {
   // Build the file path from the SUMMARY href
   // e.g. "manifesto.md"         → docs/manifesto.md
-  // e.g. "whitepaper.md"        → whitepaper.md (root-level)
+  // e.g. "whitepaper.md"        → docs/whitepaper.md
   // e.g. "docs/api/reference.md" → docs/api/reference.md
   // e.g. "agents/README.md"     → agents/README.md
   const candidates: string[] = [];
