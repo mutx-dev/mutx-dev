@@ -7,7 +7,6 @@ import Link from "next/link";
 import { DocsRenderer, extractHeadings } from "@/components/site/docs/DocsRenderer";
 import { TableOfContents } from "@/components/site/docs/TableOfContents";
 import { SectionLanding } from "@/components/site/docs/SectionLanding";
-import { DocsBreadcrumbs } from "@/components/site/docs/DocsBreadcrumbs";
 import { PrevNextNav } from "@/components/site/docs/PrevNextNav";
 import { DEFAULT_X_HANDLE, getCanonicalUrl } from "@/lib/seo";
 import { parseSummary } from "@/lib/docs";
@@ -264,9 +263,7 @@ export default async function DocPage({
   return (
     <div className="docs-article-layout">
       <div className="docs-article-main">
-        <TableOfContents sourceHeadings={headings} />
-        <DocsBreadcrumbs />
-        <DocsRenderer source={content} />
+        <DocsRenderer source={content} currentSlug={slug} />
         <PrevNextNav currentRoute={currentRoute} />
         {data.icon && (
           <p className="text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">

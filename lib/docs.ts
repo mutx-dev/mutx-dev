@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import matter from "gray-matter";
 
 export interface DocNavItem {
   title: string;
@@ -8,7 +9,8 @@ export interface DocNavItem {
   route: string; // actual Next.js route (e.g. /agents or /docs/api)
   children: DocNavItem[];
   depth: number;
-  isPage: boolean; // true = leaf page, false = section header (used by DocsLayout sidebar logic)
+  isPage?: boolean; // true = leaf page, false/undefined = section group
+  icon?: string; // GitBook icon name from frontmatter (e.g. "bullseye", "book")
 }
 
 function lineDepth(line: string): number {
@@ -29,6 +31,33 @@ function normalizeSummaryHrefToSlug(href: string): string {
     return stripped.replace(/\/README$/i, "").replace(/\/index$/i, "") || stripped;
   }
   return stripped;
+}
+
+/**
+ * Read frontmatter from a doc file to extract the `icon` field.
+ * Returns undefined if the file doesn't exist or has no icon.
+ */
+function getDocIcon(href: string): string | undefined {
+  // Build the file path from the SUMMARY href
+  // e.g. "manifesto.md"        → docs/manifesto.md
+  // e.g. "docs/api/reference.md" → docs/api/reference.md
+  // e.g. "agents/README.md"    → agents/README.md
+  let filePath: string;
+  if (href.startsWith("docs/")) {
+    filePath = path.join(process.cwd(), href);
+  } else if (href.startsWith("agents/") || href.startsWith("contributing/")) {
+    filePath = path.join(process.cwd(), href);
+  } else {
+    filePath = path.join(process.cwd(), "docs", href);
+  }
+
+  try {
+    const raw = fs.readFileSync(filePath, "utf-8");
+    const { data } = matter(raw);
+    return typeof data.icon === "string" ? data.icon : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function parseLine(line: string): { title: string; href: string; slug: string } | null {
@@ -60,7 +89,7 @@ export function parseSummary(): DocNavItem[] {
       route: summaryHrefToDocsRoute(parsed.href) ?? `/docs/${parsed.slug}`,
       children: [],
       depth,
-      isPage: true, // optimistic — will flip to false if children are added below
+      icon: getDocIcon(parsed.href),
     };
 
     // Find where to insert
@@ -71,9 +100,7 @@ export function parseSummary(): DocNavItem[] {
     if (stack.length === 0) {
       root.push(item);
     } else {
-      // Parent gets a child → parent is a section, not a page
       stack[stack.length - 1].item.children.push(item);
-      stack[stack.length - 1].item.isPage = false;
     }
 
     stack.push({ item, depth });

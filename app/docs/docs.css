@@ -145,7 +145,9 @@
 }
 
 .docs-nav-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
   font-size: 0.875rem;
   color: var(--gb-text);
   text-decoration: none;
@@ -153,6 +155,16 @@
   border-radius: 0;
   transition: background-color 120ms ease, color 120ms ease;
   line-height: 1.5;
+}
+
+.docs-nav-icon {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.docs-nav-link.active .docs-nav-icon {
+  opacity: 1;
+  color: var(--gb-accent);
 }
 
 .docs-nav-link:hover {
@@ -728,7 +740,6 @@
   inset: 0;
   z-index: 20;
   background: rgba(0,0,0,0.5);
-  pointer-events: none;
 }
 
 /* ── Callout blocks ─────────────────────────────────────────────── */
@@ -983,12 +994,20 @@
 
 /* ── Search modal overlay ─────────────────────────────────────── */
 .docs-search-overlay {
-  /* position, z-index, background, padding handled by inline style */
+  position: fixed;
+  inset: 0;
+  z-index: 200;
   background: rgba(0, 0, 0, 0.6);
+  display: none;
   align-items: flex-start;
   justify-content: center;
   padding-top: 10vh;
   backdrop-filter: blur(2px);
+}
+
+/* Show when the search-open attribute is on <html> */
+[data-docs-search-open] .docs-search-overlay {
+  display: flex;
 }
 
 /* ── Search modal ───────────────────────────────────────────── */
