@@ -130,7 +130,7 @@ def infer_verification(sections: dict[str, str], area: str) -> list[str]:
     if area == "area:web":
         return ["npm run lint"]
     if area == "area:docs":
-        return ["git diff --check -- README.md docs whitepaper.md"]
+        return ["git diff --check -- README.md docs"]
     return ["pytest tests/api -q"]
 
 

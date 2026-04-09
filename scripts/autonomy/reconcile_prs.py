@@ -9,7 +9,7 @@ LOW_RISK_PREFIXES = (
     "components/",
     "app/",
     "docs/",
-    "whitepaper.md",
+    "docs/whitepaper.md",
 )
 LOW_RISK_AUTONOMY_PREFIXES = (
     "scripts/autonomy/",

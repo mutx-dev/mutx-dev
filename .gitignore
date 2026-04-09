@@ -112,3 +112,5 @@
 
 # Worktrees
 .worktrees/
+public/docs-search-index.json
+*.bak

@@ -59,6 +59,13 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 ## Shipped (Last 30 Days)
 
+- `2026-04-09` RBAC enforcement on all routes
+- `2026-04-09` OIDC token validation at `src/api/auth/oidc.py`
+- `2026-04-09` Kubernetes/Helm chart in `infrastructure/helm/`
+- `2026-04-09` Self-hosted docs platform (alternative to docs.mutx.dev)
+- `2026-04-09` Autonomous dev lane for agentic workflows
+- `2026-04-09` Adapter hardening across SDK adapters
+- `2026-04-09` Security hardening across auth and API layers
 - `2026-03-22` Prepare `v1.1` and CLI `0.2.1` release
 - `2026-03-22` Fix local demo bootstrap and migration flow
 - `2026-03-21` Simplify quickstart and bootstrap the localhost lane from docs truth
@@ -91,4 +98,4 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 - Current capability matrix: `project-status.md`
 - Setup and workflows: `README.md`
-- Contribution process: `../CONTRIBUTING.md`
+- Contribution process: `CONTRIBUTING.md`

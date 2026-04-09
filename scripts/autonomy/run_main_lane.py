@@ -10,7 +10,7 @@ from typing import Any
 from failure_classifier import classify_failure, extract_retry_after_seconds
 
 DEFAULT_MODEL = "minimax/MiniMax-M2.7"
-DOC_PREFIXES = ("docs/", "README.md", "whitepaper.md", "roadmap.md", "AGENTS.md")
+DOC_PREFIXES = ("docs/", "README.md", "docs/whitepaper.md", "docs/roadmap.md", "AGENTS.md")
 
 
 def load_work_order(path: str) -> dict[str, Any]:

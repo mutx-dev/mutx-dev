@@ -79,6 +79,8 @@ with MutxClient(api_key="your-api-key") as client:
 ### Get Agent Details
 
 ```python
+from mutx import MutxClient
+
 with MutxClient(api_key="your-api-key") as client:
     agent = client.agents.get("550e8400-e29b-41d4-a716-446655440000")
     print(f"Agent: {agent.name}, Status: {agent.status}")
@@ -365,14 +367,14 @@ with MutxClient(api_key="your-api-key") as client:
 
 ## Good Use Cases
 
-- Backend services calling MUTX directly
-- Scripts for agent and deployment automation
-- CI jobs that should avoid browser auth flows
-- Monitoring agent health and metrics
+* Backend services calling MUTX directly
+* Scripts for agent and deployment automation
+* CI jobs that should avoid browser auth flows
+* Monitoring agent health and metrics
 
 ---
 
 ## Related Docs
 
-- [API Overview](api/index.md)
-- [CLI Guide](cli.md)
+* [API Overview](docs/api/index.md)
+* [CLI Guide](docs/cli.md)

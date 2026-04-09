@@ -22,7 +22,7 @@ SAFE_READY_SIZE_LABELS = {"size:xs", "size:s"}
 SAFE_AUTO_MERGE_MAX_CHANGED_FILES = 3
 SAFE_AUTONOMY_AUTO_MERGE_MAX_CHANGED_FILES = 8
 LOW_RISK_OPENCODE_PREFIXES = ("app/", "components/", "lib/", "public/", "tests/")
-LOW_RISK_DOC_PREFIXES = ("docs/", "whitepaper.md", "roadmap.md")
+LOW_RISK_DOC_PREFIXES = ("docs/", "docs/whitepaper.md", "docs/roadmap.md")
 LOW_RISK_AUTONOMY_PREFIXES = ("scripts/autonomy/", "tests/test_autonomy_")
 
 

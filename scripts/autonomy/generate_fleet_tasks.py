@@ -252,7 +252,7 @@ def finalize_candidate(base: Path, candidate: TaskCandidate, roles: list[RolePro
     score = SOURCE_SCORE.get(candidate.source, 12)
     score += 6 if len(candidate.allowed_paths) <= 2 else 0
     score += 5 if len(candidate.constraints) <= 3 else 0
-    score += 6 if any(path.endswith("whitepaper.md") for path in candidate.evidence_paths) else 0
+    score += 6 if any(path.endswith("docs/whitepaper.md") for path in candidate.evidence_paths) else 0
     score += 6 if any(path.endswith("README.md") for path in candidate.evidence_paths) else 0
     score += 7 if any(RISK_PATTERN.search(line) for line in candidate.evidence) else 0
     score += 4 if candidate.area == "area:docs" else 0
@@ -295,7 +295,7 @@ def _route_doc_paths_for_route(route: str) -> list[str]:
         "docs/api/reference.md",
         f"docs/api/{last}.md",
         "docs/surfaces.md",
-        "whitepaper.md",
+        "docs/whitepaper.md",
         "README.md",
     ]
 
@@ -319,11 +319,11 @@ def claim_matrix_tasks(base: Path, roles: list[RoleProfile]) -> list[TaskCandida
         evidence_paths = ["docs/claim-to-reality-gap-matrix.md"]
         allowed_paths = ["docs/claim-to-reality-gap-matrix.md"]
         if "whitepaper" in source_ref.lower() or "whitepaper" in claim.lower() or "whitepaper" in reality.lower():
-            evidence_paths.append("whitepaper.md")
-            allowed_paths.append("whitepaper.md")
+            evidence_paths.append("docs/whitepaper.md")
+            allowed_paths.append("docs/whitepaper.md")
         if "roadmap" in source_ref.lower() or "roadmap" in reality.lower():
-            evidence_paths.append("roadmap.md")
-            allowed_paths.append("roadmap.md")
+            evidence_paths.append("docs/roadmap.md")
+            allowed_paths.append("docs/roadmap.md")
         if "project-status" in source_ref.lower() or "project-status" in reality.lower():
             evidence_paths.append("docs/project-status.md")
             allowed_paths.append("docs/project-status.md")
@@ -440,7 +440,7 @@ def route_claim_tasks(base: Path, roles: list[RoleProfile]) -> list[TaskCandidat
     openapi_routes = load_openapi_routes(base)
     if not openapi_routes:
         return []
-    doc_candidates = [base / "whitepaper.md", base / "README.md", base / "docs" / "surfaces.md"]
+    doc_candidates = [base / "docs/whitepaper.md", base / "README.md", base / "docs" / "surfaces.md"]
     tasks: list[TaskCandidate] = []
     seen: set[tuple[str, str]] = set()
     for doc in doc_candidates:
@@ -468,18 +468,18 @@ def route_claim_tasks(base: Path, roles: list[RoleProfile]) -> list[TaskCandidat
                     area="area:docs",
                     source="fleet:route-claim-scan",
                     allowed_paths=allowed_paths[:3],
-                    verification=["git diff --check -- whitepaper.md docs/surfaces.md README.md docs/api/reference.md"],
+                    verification=["git diff --check -- docs/whitepaper.md docs/surfaces.md README.md docs/api/reference.md"],
                     constraints=["max_changed_files=3", "docs-and-truth only", "do not invent missing endpoints"],
                     evidence_paths=[rel, "docs/api/openapi.json"],
                     evidence=[f"{rel}:{lineno}: {line.strip()}", f"missing route: {route}"],
-                    labels=["status:misleading", "size:s" if rel == "whitepaper.md" else "size:xs"],
+                    labels=["status:misleading", "size:s" if rel == "docs/whitepaper.md" else "size:xs"],
                 )
                 tasks.append(finalize_candidate(base, candidate, roles))
     return tasks
 
 
 def docs_language_tasks(base: Path, roles: list[RoleProfile]) -> list[TaskCandidate]:
-    targets = [base / "whitepaper.md", base / "README.md", base / "docs" / "project-status.md", base / "docs" / "roadmap.md"]
+    targets = [base / "docs/whitepaper.md", base / "README.md", base / "docs" / "project-status.md", base / "docs" / "docs/roadmap.md"]
     tasks: list[TaskCandidate] = []
     for path in targets:
         if not path.exists():

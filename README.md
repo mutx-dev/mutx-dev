@@ -1,68 +1,61 @@
 # MUTX
 
-> Source-available control plane for deploying and operating AI agents like systems, not demos.
+> Source-available control plane for running AI agents in production.
 
 ![MUTX dashboard demo](public/demo.gif)
 
-Most teams can prototype an agent. Very few can run one in production with durable identity, deployment semantics, sessions, health, access control, and honest operator contracts.
-
-MUTX is the layer around the agent system that makes those concerns explicit — not in a whitepaper, in running code.
+Prototype an agent in an afternoon. Run one in production for a year — that's the hard part. Identity, deployments, sessions, health, access control, operator contracts. MUTX makes those explicit in running code, not whitepapers.
 
 ## What's in the Box
 
 | Component | What it does |
 |-----------|-------------|
-| **Control Plane API** | FastAPI backend with public routes under `/v1/*` — auth, agents, deployments, sessions, runs, webhooks, budgets, swarms, RAG, and more |
-| **Operator Dashboard** | Authenticated browser dashboard at `app.mutx.dev/dashboard` |
-| **Landing Site** | `mutx.dev` — product narrative, quickstart, install paths |
-| **macOS App** | Signed & notarized desktop operator app via `mutx.dev/download/macos` |
-| **CLI + TUI** | `mutx` CLI and `mutx tui` Textual shell — terminal-first operator workflows |
-| **Python SDK** | `pip install mutx` — programmatic access to the full control plane |
-| **Infrastructure** | Docker Compose for local dev, Terraform + Ansible for cloud, Helm chart for Kubernetes |
+| **Control Plane API** | FastAPI backend — `/v1/*` routes for auth, agents, deployments, sessions, runs, webhooks, budgets, swarms, RAG |
+| **Operator Dashboard** | Authenticated dashboard at `app.mutx.dev/dashboard` |
+| **Landing Site** | `mutx.dev` — narrative, quickstart, downloads |
+| **macOS App** | Signed & notarized desktop app via `mutx.dev/download/macos` |
+| **CLI + TUI** | `mutx` CLI and `mutx tui` — terminal-first workflows |
+| **Python SDK** | `pip install mutx` — full control plane access |
+| **Infrastructure** | Docker Compose (local), Terraform + Ansible (cloud), Helm (k8s) |
 
-## 60-Second Setup
+## Quick Start
 
 ```bash
-brew tap mutx-dev/homebrew-tap
-brew install mutx
+brew tap mutx-dev/homebrew-tap && brew install mutx
 mutx setup hosted
 ```
 
-That installs the CLI, opens the setup wizard, and deploys your first agent. Choose `Hosted` unless you want the private Docker-backed localhost lane.
+Hosted is the default. For the local Docker stack:
 
 ```bash
-mutx setup local    # Docker-backed local stack
-mutx doctor         # Verify everything is wired
+mutx setup local    # Docker-backed
+mutx doctor         # Verify everything's wired
 ```
 
 ## Development
 
 ```bash
-# Local stack (frontend + backend + Postgres + Redis)
-make dev-up
-
-# Or run them separately
-uvicorn src.api.main:app --reload --port 8000   # backend
-npm run dev                                       # frontend
+make dev-up                                  # full stack (frontend + backend + Postgres + Redis)
+uvicorn src.api.main:app --reload --port 8000  # backend only
+npm run dev                                    # frontend only
 ```
 
 | URL | What |
 |-----|------|
 | `localhost:3000` | Landing site |
 | `localhost:3000/dashboard` | Operator dashboard |
-| `localhost:3000/control` | Control demo |
 | `localhost:8000` | API |
 | `localhost:8000/docs` | Swagger UI |
 
 ### Validation
 
 ```bash
-./scripts/test.sh          # full validation suite
-npm run build              # frontend build check
-npm run typecheck          # TypeScript gate
+./scripts/test.sh          # full suite
+npm run build              # frontend build
+npm run typecheck          # TS gate
 ruff check src/api cli sdk # Python lint
 pytest                     # API tests
-npx playwright test        # e2e smoke tests
+npx playwright test        # e2e
 ```
 
 ## Architecture
@@ -77,34 +70,30 @@ infrastructure/ ───── Docker, Terraform, Ansible, Helm, monitoring
 agents/ ───────────── Autonomous specialist agent definitions
 ```
 
-Governance is powered by [Faramesh](https://faramesh.dev) — deterministic policy enforcement, session budgets, phase workflows, credential brokering, and ambient rate limiting. See the [Governance Guide](docs/governance.md).
-
-Auth is RBAC + OIDC. Role-based gates on all routes, JWKS-cached token validation compatible with Okta, Auth0, Azure AD, and Keycloak. See [Authentication](docs/api/authentication.md).
+Governance via [Faramesh](https://faramesh.dev) — policy enforcement, session budgets, phase workflows, credential brokering, rate limiting. Auth is RBAC + OIDC (Okta, Auth0, Azure AD, Keycloak).
 
 ## Go Deeper
 
-- [Manifesto](manifesto.md) — why we build control planes, not demos
-- [Technical Whitepaper](whitepaper.md) — long-form architecture framing
-- [Roadmap](roadmap.md) — what's next
-- [API Reference](docs/api/reference.md) — the public `/v1/*` contract
+- [Manifesto](docs/manifesto.md) — why control planes, not demos
+- [Technical Whitepaper](docs/whitepaper.md) — architecture deep-dive
+- [Roadmap](docs/roadmap.md) — what's next
+- [API Reference](docs/api/reference.md) — `/v1/*` contract
 - [CLI Guide](docs/cli.md) — terminal workflows
-- [Python SDK](sdk.md) — programmatic access
-- [Contributing](CONTRIBUTING.md) — repo workflow and review guardrails
-- [Project Status](docs/project-status.md) — honest current-state tracking
+- [Python SDK](docs/sdk.md) — programmatic access
+- [Contributing](CONTRIBUTING.md) — repo conventions
+- [Infrastructure](docs/infrastructure.md) — deploy guide
 
 ## Built On
 
-MUTX stands on open shoulders:
-
-- **[agent-run](https://github.com/builderz-labs/agent-run)** — agent observability standard (MutxRun, MutxStep, MutxCost)
-- **[AARM](https://github.com/aarm-dev/docs)** — Autonomous Action Runtime Management spec (policy engine, approval service, telemetry)
-- **[Faramesh](https://github.com/faramesh/faramesh-core)** — pre-execution governance engine
-- **[Mission Control](https://github.com/builderz-labs/mission-control)** — dashboard and fleet management concepts
+- [agent-run](https://github.com/builderz-labs/agent-run) — observability standard
+- [AARM](https://github.com/aarm-dev/docs) — Autonomous Action Runtime Management
+- [Faramesh](https://github.com/faramesh/faramesh-core) — governance engine
+- [Mission Control](https://github.com/builderz-labs/mission-control) — fleet management
 
 Full attribution in [CREDITS.md](CREDITS.md).
 
 ## License
 
-MUTX core is source-available under [BUSL-1.1](LICENSE). Each release converts to Apache-2.0 36 months after publication. The Python SDK is [Apache-2.0](sdk/LICENSE). See [LICENSE-FAQ](LICENSE-FAQ.md) for details.
+Source-available under [BUSL-1.1](LICENSE). Each release converts to Apache-2.0 after 36 months. Python SDK is [Apache-2.0](sdk/LICENSE). See [LICENSE-FAQ](LICENSE-FAQ.md).
 
-Commercial hosted, managed, white-labeled, OEM, and embedded use requires a separate license — [hello@mutx.dev](mailto:hello@mutx.dev).
+Commercial use (hosted, managed, OEM) requires a license — [hello@mutx.dev](mailto:hello@mutx.dev).

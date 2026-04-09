@@ -26,12 +26,12 @@ FLEET = load_module("generate_fleet_tasks", FLEET_GEN_PATH)
 
 BASE_FLEET = {
     "roles": [
-        {"id": "cto", "lane": "main", "scan_targets": ["roadmap.md", "docs/project-status.md"]},
-        {"id": "cio", "lane": "main", "scan_targets": ["whitepaper.md", "docs/surfaces.md", "docs/claim-to-reality-gap-matrix.md"]},
+        {"id": "cto", "lane": "main", "scan_targets": ["docs/roadmap.md", "docs/project-status.md"]},
+        {"id": "cio", "lane": "main", "scan_targets": ["docs/whitepaper.md", "docs/surfaces.md", "docs/claim-to-reality-gap-matrix.md"]},
         {"id": "backend", "lane": "codex", "scan_targets": ["src/api", "src/security", "sdk/mutx", "cli"]},
         {"id": "frontend", "lane": "opencode", "scan_targets": ["app", "components", "lib"]},
         {"id": "ux", "lane": "opencode", "scan_targets": ["app/dashboard", "components/dashboard", "components/site"]},
-        {"id": "research", "lane": "main", "scan_targets": ["whitepaper.md", "docs", "README.md"]},
+        {"id": "research", "lane": "main", "scan_targets": ["docs/whitepaper.md", "docs", "README.md"]},
     ],
     "scanner_policies": {
         "max_new_tasks_per_cycle": 6,
@@ -57,7 +57,7 @@ def write_repo_fixture(tmp_path: Path) -> Path:
         + "\n",
         encoding="utf-8",
     )
-    (repo / "whitepaper.md").write_text(
+    (repo / "docs/whitepaper.md").write_text(
         """
 The control plane exposes /v1/newsletter and /v1/leads today.
 This section is TODO before launch.
@@ -66,7 +66,7 @@ This section is TODO before launch.
         encoding="utf-8",
     )
     (repo / "README.md").write_text("See /v1/leads for lead capture.\n", encoding="utf-8")
-    (repo / "roadmap.md").write_text("Vault integration is still a STUB.\n", encoding="utf-8")
+    (repo / "docs/roadmap.md").write_text("Vault integration is still a STUB.\n", encoding="utf-8")
     (repo / "docs" / "project-status.md").write_text("Monitoring is planned.\n", encoding="utf-8")
     (repo / "docs" / "surfaces.md").write_text("Surface list includes /v1/governance/metrics.\n", encoding="utf-8")
     (repo / "docs" / "api" / "reference.md").write_text("# API reference\n", encoding="utf-8")
