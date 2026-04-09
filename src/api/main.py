@@ -58,6 +58,7 @@ from src.api.routes import (
     sessions,
     swarms,
     templates,
+    telemetry,
     usage,
     webhooks,
 )
@@ -113,6 +114,7 @@ PUBLIC_ROUTE_REGISTRATIONS: tuple[RouterRegistration, ...] = (
     RouterRegistration("runtime", runtime.router),
     RouterRegistration("sessions", sessions.router),
     RouterRegistration("swarms", swarms.router),
+    RouterRegistration("telemetry", telemetry.router),
     RouterRegistration("budgets", budgets.router),
     RouterRegistration("governance_credentials", governance_credentials.router),
     RouterRegistration("governance_supervision", governance_supervision.router),
