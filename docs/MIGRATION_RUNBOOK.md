@@ -246,6 +246,66 @@ For large tables, consider:
 | `DATABASE_URL` | PostgreSQL connection string |
 | `DATABASE_SSL_MODE` | SSL mode for connection (disable, require, verify-full) |
 
+## Migration: v1.3 → v1.4
+
+### RBAC Enforcement
+
+v1.4 enforces RBAC on all routes. All routes now require role-based authorization:
+
+- Routes previously accessible with any valid JWT now check the user's role.
+- If you have scripts or integrations using service tokens, ensure those tokens carry the required roles.
+- Review `src/api/security.py` for the enforcement layer and role mappings.
+
+### OIDC Token Validation
+
+v1.4 introduces OIDC token validation. New required environment variables:
+
+```
+OIDC_ISSUER=https://your-idp.example.com
+OIDC_CLIENT_ID=your-client-id
+OIDC_JWKS_URI=https://your-idp.example.com/.well-known/jwks.json
+```
+
+If OIDC is not configured, JWT-based auth continues to work. OIDC is additive.
+
+### API Key Changes (CrewAI / SDK)
+
+The `MUTX_API_KEY` environment variable is now required for SDK and adapter usage. Previously some flows accepted inline keys. Update your setup:
+
+```python
+import os
+from mutx import MutxClient
+
+client = MutxClient(
+    api_url=os.environ["MUTX_API_URL"],
+    api_key=os.environ["MUTX_API_KEY"],
+)
+```
+
+Set `MUTX_API_KEY` in your environment or `.env` file. Get the key from `mutx.dev/dashboard` under API keys.
+
+### Helm Deployment Option
+
+v1.4 ships a Kubernetes Helm chart. To deploy with Helm:
+
+```bash
+helm install mutx infrastructure/helm/mutx \
+  --set secrets.databaseUrl=$DATABASE_URL \
+  --set secrets.oidcIssuer=$OIDC_ISSUER \
+  --set secrets.oidcClientId=$OIDC_CLIENT_ID \
+  --set secrets.oidcJwksUri=$OIDC_JWKS_URI
+```
+
+See `infrastructure/helm/mutx/README.md` for full configuration.
+
+### Database Migrations
+
+Run the standard migration after upgrading:
+
+```bash
+alembic upgrade head
+```
+
 ## Related Files
 
 - `alembic.ini` - Alembic configuration

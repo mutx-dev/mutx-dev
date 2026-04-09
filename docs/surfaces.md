@@ -15,6 +15,7 @@ This document maps MUTX's public surfaces and their maturity level so users can 
 | Release summary | [mutx.dev/releases](https://mutx.dev/releases) | Current release summary, asset map, and release-note handoff | **Supported** |
 | Desktop download lane | [mutx.dev/download/macos](https://mutx.dev/download/macos) | First-party signed and notarized macOS release handoff | **Supported** |
 | Documentation | [docs.mutx.dev](https://docs.mutx.dev) | Canonical docs, API reference, and operator guides | **Supported** |
+| Self-hosted docs | `/docs` | Self-hosted alternative to docs.mutx.dev for on-prem deployments | **Supported** |
 | Operator dashboard | [app.mutx.dev/dashboard](https://app.mutx.dev/dashboard) | Authenticated operator shell for stable dashboard routes | **Supported** |
 | Control demo | [app.mutx.dev/control](https://app.mutx.dev/control) | Browser demo for the control-plane story and preview paths | **Preview** |
 
@@ -117,6 +118,7 @@ Surfaces marked **Preview** are:
 | See the current release and artifact set | mutx.dev/releases | Supported |
 | Download the Mac app | mutx.dev/download/macos | Supported |
 | Understand APIs and integration | docs.mutx.dev | Supported |
+| Understand APIs and integration (self-hosted) | /docs | Supported |
 | Build on MUTX programmatically | docs.mutx.dev + API | Supported |
 | UI-based operator workflows | app.mutx.dev/dashboard | Supported |
 | Agent run observability | app.mutx.dev/dashboard/observability | Supported for stable routes |
