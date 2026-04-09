@@ -39,25 +39,30 @@ function normalizeSummaryHrefToSlug(href: string): string {
  */
 function getDocIcon(href: string): string | undefined {
   // Build the file path from the SUMMARY href
-  // e.g. "manifesto.md"        → docs/manifesto.md
+  // e.g. "manifesto.md"         → docs/manifesto.md
+  // e.g. "whitepaper.md"        → whitepaper.md (root-level)
   // e.g. "docs/api/reference.md" → docs/api/reference.md
-  // e.g. "agents/README.md"    → agents/README.md
-  let filePath: string;
+  // e.g. "agents/README.md"     → agents/README.md
+  const candidates: string[] = [];
   if (href.startsWith("docs/")) {
-    filePath = path.join(process.cwd(), href);
+    candidates.push(path.join(process.cwd(), href));
   } else if (href.startsWith("agents/") || href.startsWith("contributing/")) {
-    filePath = path.join(process.cwd(), href);
+    candidates.push(path.join(process.cwd(), href));
   } else {
-    filePath = path.join(process.cwd(), "docs", href);
+    candidates.push(path.join(process.cwd(), "docs", href));
+    candidates.push(path.join(process.cwd(), href)); // root-level fallback
   }
 
-  try {
-    const raw = fs.readFileSync(filePath, "utf-8");
-    const { data } = matter(raw);
-    return typeof data.icon === "string" ? data.icon : undefined;
-  } catch {
-    return undefined;
+  for (const filePath of candidates) {
+    try {
+      const raw = fs.readFileSync(filePath, "utf-8");
+      const { data } = matter(raw);
+      if (typeof data.icon === "string") return data.icon;
+    } catch {
+      // try next candidate
+    }
   }
+  return undefined;
 }
 
 function parseLine(line: string): { title: string; href: string; slug: string } | null {
@@ -134,7 +139,9 @@ export function summaryHrefToDocsRoute(href: string): string | null {
   }
 
   // docs/ prefixed: strip prefix, use rest as the route path
+  // Strip README/index suffixes so section landing pages route correctly
   // e.g. docs/architecture/README → /docs/architecture
+  // e.g. docs/autonomy/index    → /docs/autonomy
   const slug = normalizeSummaryHrefToSlug(normalized)
     .replace(/\/README$/i, "")
     .replace(/\/index$/i, "")

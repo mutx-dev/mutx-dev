@@ -26,7 +26,7 @@ export function SectionLanding({
         {children.map((child) => (
           <Link
             key={child.route}
-            href={`/docs/${child.slug}`}
+            href={child.route}
             className="docs-section-card"
           >
             <span className="docs-section-card-title">{child.title}</span>
