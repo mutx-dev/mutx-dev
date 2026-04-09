@@ -45,10 +45,11 @@ async def get_telemetry_config(request: Request):
         elif "Jaeger" in exporter_name:
             exporter_type = "jaeger"
 
+    config = get_current_config()
     return {
         "otel_enabled": True,
-        "exporter_type": exporter_type,
-        "endpoint": None,  # Endpoint is set via environment variable
+        "exporter_type": config.get("exporter_type", exporter_type),
+        "endpoint": config.get("endpoint"),
     }
 
 
