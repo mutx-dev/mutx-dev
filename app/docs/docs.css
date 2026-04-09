@@ -1123,8 +1123,8 @@
   border-left: 2px solid transparent;
 }
 
-.docs-search-result.active .docs-search-result-link,
-.docs-search-result-link:hover {
+.docs-search-result.selected .docs-search-result-link,
+.docs-search-result:hover .docs-search-result-link {
   background: var(--gb-accent-soft);
   border-left-color: var(--gb-accent);
 }
