@@ -448,13 +448,7 @@ class TestPasswordCompatibility:
         plain_password = "StrongPassword123!"
         legacy_hash = pbkdf2_sha256.hash(plain_password)
 
-        assert response.status_code == 400
-        assert "invalid or expired" in response.json()["detail"].lower()
-
-        await db_session.refresh(user)
-        assert user.is_email_verified is False
-        assert user.email_verification_token is None
-        assert user.email_verification_expires_at is None
+        assert verify_password(plain_password, legacy_hash) is True
 
     @pytest.mark.asyncio
     async def test_refresh_token_sliding_expiry(

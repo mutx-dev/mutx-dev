@@ -1,0 +1,21 @@
+{{- if .Values.redis.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mutx.fullname" . }}-redis
+  labels:
+    {{- include "mutx-redis.labels" . | nindent 4 }}
+  {{- with .Values.redis.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.redis.service.type }}
+  ports:
+    - port: {{ .Values.redis.service.port }}
+      targetPort: redis
+      protocol: TCP
+      name: redis
+  selector:
+    {{- include "mutx-redis.selectorLabels" . | nindent 4 }}
+{{- end }}

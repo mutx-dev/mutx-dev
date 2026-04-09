@@ -113,11 +113,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if current_count >= limit:
             retry_after = window_seconds
             # CodeQL false positive: client_id is already masked/pseudonymized above
-            # _mask_client_for_logging ensures no sensitive data appears in logs
+            # _fingerprint ensures no sensitive data appears in logs
             logger.warning(  # noqa: S312
                 "Rate limit exceeded | policy=%s | client=%s | count=%s | limit=%s",
                 policy_name,
-                self._mask_client_for_logging(client_id),
+                self._fingerprint(client_id),
                 current_count,
                 limit,
             )

@@ -440,6 +440,8 @@ def prepare_task_branch(path: str | Path, branch: str) -> dict[str, Any]:
         return {"status": "failed", "reason": "missing_branch"}
     if not is_git_worktree(path):
         return {"status": "failed", "reason": "not_a_worktree"}
+    if not is_clean_worktree(path):
+        return {"status": "blocked", "reason": "dirty_worktree", "branch": branch}
 
     # Check if branch already exists locally
     existing = run_git(["rev-parse", "--verify", f"refs/heads/{branch}"], path)

@@ -1,5 +1,18 @@
 apiVersion: v2
 name: mutx
-version: 0.1.0
-description: MUTX agentic development platform
+version: 0.2.0
+appVersion: "1.0.0"
+description: MUTX agentic development platform - FastAPI backend, Next.js frontend, observability stack
 type: application
+keywords:
+  - mutx
+  - agents
+  - ai
+  - fastapi
+  - nextjs
+home: https://mutx.dev
+sources:
+  - https://github.com/mutx/mutx
+maintainers:
+  - name: MUTX Team
+    email: engineering@mutx.dev

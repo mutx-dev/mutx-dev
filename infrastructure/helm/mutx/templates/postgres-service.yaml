@@ -1,0 +1,21 @@
+{{- if .Values.postgres.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mutx.fullname" . }}-postgres
+  labels:
+    {{- include "mutx-postgres.labels" . | nindent 4 }}
+  {{- with .Values.postgres.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.postgres.service.type }}
+  ports:
+    - port: {{ .Values.postgres.service.port }}
+      targetPort: postgres
+      protocol: TCP
+      name: postgres
+  selector:
+    {{- include "mutx-postgres.selectorLabels" . | nindent 4 }}
+{{- end }}

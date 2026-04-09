@@ -1,36 +1,75 @@
-image:
-  repository: mutx/mutx
-  tag: latest
-  pullPolicy: IfNotPresent
+# =============================================================================
+# MUTX Staging Values Overlay
+# Usage: helm install mutx ./infrastructure/helm/mutx -f ./infrastructure/helm/mutx/values.staging.yaml
+# =============================================================================
 
-replicaCount: 2
+global:
+  imageTag: ""  # Set via --set global.imageTag=<version> or CI/CD
 
-service:
-  type: ClusterIP
-  port: 8000
+api:
+  replicaCount: 2
+  image:
+    pullPolicy: Always
+  webConcurrency: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 75
+  env:
+    ENVIRONMENT: staging
+    LOG_LEVEL: DEBUG
+    JSON_LOGGING: "true"
+    DATABASE_REQUIRED_ON_STARTUP: "true"
+    BACKGROUND_MONITOR_ENABLED: "false"
+
+web:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  buildArgs:
+    NEXT_PUBLIC_API_URL: "https://api.staging.mutx.dev"
+    NEXT_PUBLIC_SITE_URL: "https://staging.mutx.dev"
+
+redis:
+  persistence:
+    size: 2Gi
+
+postgres:
+  enabled: true
+  persistence:
+    size: 10Gi
+
+otelCollector:
+  enabled: true
 
 ingress:
   enabled: true
   className: nginx
-  host: mutx.staging.local
+  hosts:
+    - apiHost: api.staging.mutx.dev
+      webHost: staging.mutx.dev
+      paths:
+        - path: /
+          pathType: Prefix
   tls:
     enabled: true
     secretName: mutx-tls-staging
 
-resources:
-  limits:
-    cpu: 500m
-    memory: 512Mi
-  requests:
-    cpu: 50m
-    memory: 128Mi
-
-env:
-  LOG_LEVEL: "DEBUG"
-  ENVIRONMENT: "staging"
-
-autoscaling:
-  enabled: true
-  minReplicas: 2
-  maxReplicas: 5
-  targetCPUUtilizationPercentage: 75
+otel:
+  tracesExporter: otlp
+  exporterOtlpEndpoint: "http://mutx-otel-collector:4317"
+  tracesSampler: parentbased_traceidratio
+  tracesSamplerArg: "0.25"

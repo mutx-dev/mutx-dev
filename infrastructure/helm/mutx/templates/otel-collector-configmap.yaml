@@ -1,0 +1,41 @@
+{{- if .Values.otelCollector.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mutx.fullname" . }}-otel-collector
+  labels:
+    {{- include "mutx-otel-collector.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    {{- if .Values.otelCollector.configOverride }}
+    {{ .Values.otelCollector.configOverride | nindent 4 }}
+    {{- else }}
+    receivers:
+      otlp:
+        protocols:
+          http:
+            endpoint: 0.0.0.0:{{ .Values.otelCollector.service.ports.otlpHttp }}
+          grpc:
+            endpoint: 0.0.0.0:{{ .Values.otelCollector.service.ports.otlpGrpc }}
+      zipkin:
+        endpoint: 0.0.0.0:{{ .Values.otelCollector.service.ports.zipkin }}
+
+    processors:
+      batch:
+        timeout: {{ .Values.otelCollector.config.processors.batch.timeout }}
+        send_batch_size: {{ .Values.otelCollector.config.processors.batch.send_batch_size }}
+      memory_limiter:
+        check_interval: {{ .Values.otelCollector.config.processors.memory_limiter.check_interval }}
+        limit_mib: {{ .Values.otelCollector.config.processors.memory_limiter.limit_mib }}
+      attributes:
+        actions:
+          {{- toYaml .Values.otelCollector.config.processors.attributes.actions | nindent 10 }}
+
+    exporters:
+      {{- toYaml .Values.otelCollector.config.exporters | nindent 6 }}
+
+    service:
+      pipelines:
+        {{- toYaml .Values.otelCollector.config.service.pipelines | nindent 8 }}
+    {{- end }}
+{{- end }}

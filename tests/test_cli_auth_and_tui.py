@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -731,6 +732,10 @@ def test_tui_dashboard_button_opens_hosted_dashboard(monkeypatch) -> None:
     assert opened == [HOSTED_LOGIN_URL]
 
 
+@pytest.mark.skipif(
+    importlib.util.find_spec("textual") is None,
+    reason="textual not installed",
+)
 def test_render_openclaw_runtime_detail_shows_gateway_binding_and_sessions() -> None:
     from cli.tui.app import _render_openclaw_runtime_detail
 

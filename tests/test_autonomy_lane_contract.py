@@ -203,6 +203,8 @@ def test_worktree_utils_prepare_task_branch_creates_branch(tmp_path: Path) -> No
     repo = tmp_path / "repo"
     repo.mkdir()
     subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "--allow-empty", "-m", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(["git", "branch", "-M", "main"], cwd=repo, check=True)
 
     result = WORKTREE_UTILS.prepare_task_branch(repo, "autonomy/task-1")
 
@@ -215,6 +217,8 @@ def test_worktree_utils_prepare_task_branch_blocks_dirty_worktree(tmp_path: Path
     repo = tmp_path / "repo"
     repo.mkdir()
     subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(["git", "commit", "--allow-empty", "-m", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(["git", "branch", "-M", "main"], cwd=repo, check=True)
     (repo / "dirty.txt").write_text("dirty\n")
 
     result = WORKTREE_UTILS.prepare_task_branch(repo, "autonomy/task-2")

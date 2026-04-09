@@ -19,6 +19,7 @@ Example:
 
 from __future__ import annotations
 
+import os
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
@@ -188,18 +189,21 @@ class MutxCrewAICallbackHandler:
             pass
 
 
-def run_crew(crew: Any, inputs: dict[str, Any]) -> Any:
+def run_crew(crew: Any, inputs: dict[str, Any], api_key: str | None = None) -> Any:
     """Execute a CrewAI crew with MUTX callback attached.
 
     Args:
         crew: A CrewAI Crew instance.
         inputs: Dictionary of inputs to pass to the crew kickoff.
+        api_key: MUTX API key. Falls back to the MUTX_API_KEY environment
+                 variable if not provided.
 
     Returns:
         The result of the crew execution.
 
     Raises:
         ImportError: If crewai is not installed.
+        ValueError: If no API key is available.
 
     Example:
         >>> crew = Crew(agents=[researcher, writer], tasks=[...])
@@ -213,12 +217,20 @@ def run_crew(crew: Any, inputs: dict[str, Any]) -> Any:
             "crewai is required for run_crew(). Install with: pip install mutx[crewai]"
         ) from e
 
+    # Resolve API key from parameter or environment variable
+    resolved_key = api_key or os.environ.get("MUTX_API_KEY", "")
+    if not resolved_key:
+        raise ValueError(
+            "MUTX API key is required. Pass api_key parameter or set MUTX_API_KEY "
+            "environment variable."
+        )
+
     # Access crew attributes safely
     crew_name = getattr(crew, "name", "crewai-crew") or "crewai-crew"
 
     handler = MutxCrewAICallbackHandler(
         api_url="https://api.mutx.dev",
-        api_key="",  # Will be replaced when actually used
+        api_key=resolved_key,
         crew_name=crew_name,
     )
 

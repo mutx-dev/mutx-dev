@@ -438,16 +438,21 @@ class MutxAgentKit:
 
         return result.get("output", "")
 
-    def stream_events(self):
+    async def astream_events(self, input: str):
         """Yield events for streaming back to the MUTX backend.
 
-        This is a generator that yields agent execution events
-        for real-time streaming to the backend.
+        Runs the agent asynchronously and yields events captured by the
+        callback handler's internal buffer as an async generator.
+
+        Args:
+            input: The user input/question for the agent.
 
         Yields:
             dict: Event dictionaries with type and data.
         """
-        # Always yield stream start event
+        import asyncio
+        from collections import deque
+
         yield {
             "event_type": "stream_start",
             "agent_name": self.agent_name,
@@ -457,14 +462,143 @@ class MutxAgentKit:
         if not self._agent_executor:
             return
 
-        # Note: This is a stub implementation. In practice, you would
-        # use LangChain's streaming callbacks to capture events.
-        # The actual implementation would depend on the streaming architecture.
-        yield {
-            "event_type": "stream_start",
-            "agent_name": self.agent_name,
-            "timestamp": datetime.now().isoformat(),
-        }
+        # Internal buffer and done signal for the callback adapter
+        _buffer: deque[dict] = deque()
+        _done = asyncio.Event()
+
+        class _StreamAdapter:
+            """Collects events from the callback handler into a buffer."""
+
+            def __init__(self, buffer: deque, done_event: asyncio.Event):
+                self._buffer = buffer
+                self._done = done_event
+
+            def push(self, event: dict) -> None:
+                self._buffer.append(event)
+
+            def finish(self) -> None:
+                self._done.set()
+
+        adapter = _StreamAdapter(_buffer, _done)
+
+        # Monkey-patch callback handler methods to push events into buffer
+        _orig_on_agent_action = self._callback_handler.on_agent_action
+        _orig_on_agent_finish = self._callback_handler.on_agent_finish
+        _orig_on_tool_start = self._callback_handler.on_tool_start
+        _orig_on_tool_end = self._callback_handler.on_tool_end
+        _orig_on_llm_start = self._callback_handler.on_llm_start
+        _orig_on_llm_end = self._callback_handler.on_llm_end
+
+        def _wrapped_on_agent_action(action, **kwargs):
+            adapter.push({
+                "event_type": "agent_action",
+                "agent_name": self.agent_name,
+                "tool": action.tool,
+                "tool_input": str(action.tool_input),
+                "log": action.log,
+                "timestamp": datetime.now().isoformat(),
+            })
+            return _orig_on_agent_action(action, **kwargs)
+
+        def _wrapped_on_agent_finish(finish, **kwargs):
+            adapter.push({
+                "event_type": "agent_finish",
+                "agent_name": self.agent_name,
+                "output": finish.log,
+                "return_values": finish.return_values,
+                "timestamp": datetime.now().isoformat(),
+            })
+            return _orig_on_agent_finish(finish, **kwargs)
+
+        def _wrapped_on_tool_start(serialized, input_str, **kwargs):
+            adapter.push({
+                "event_type": "tool_start",
+                "agent_name": self.agent_name,
+                "tool": serialized.get("name", "unknown"),
+                "timestamp": datetime.now().isoformat(),
+            })
+            return _orig_on_tool_start(serialized, input_str, **kwargs)
+
+        def _wrapped_on_tool_end(output, **kwargs):
+            adapter.push({
+                "event_type": "tool_end",
+                "agent_name": self.agent_name,
+                "output": str(output),
+                "timestamp": datetime.now().isoformat(),
+            })
+            return _orig_on_tool_end(output, **kwargs)
+
+        def _wrapped_on_llm_start(serialized, prompts, **kwargs):
+            adapter.push({
+                "event_type": "llm_start",
+                "agent_name": self.agent_name,
+                "model": serialized.get("name", "unknown"),
+                "timestamp": datetime.now().isoformat(),
+            })
+            return _orig_on_llm_start(serialized, prompts, **kwargs)
+
+        def _wrapped_on_llm_end(response, **kwargs):
+            token_usage = None
+            if response.llm_output and "token_usage" in response.llm_output:
+                token_usage = response.llm_output["token_usage"]
+            adapter.push({
+                "event_type": "llm_end",
+                "agent_name": self.agent_name,
+                "total_tokens": token_usage.get("total_tokens", 0) if token_usage else 0,
+                "timestamp": datetime.now().isoformat(),
+            })
+            return _orig_on_llm_end(response, **kwargs)
+
+        # Apply wrappers
+        self._callback_handler.on_agent_action = _wrapped_on_agent_action
+        self._callback_handler.on_agent_finish = _wrapped_on_agent_finish
+        self._callback_handler.on_tool_start = _wrapped_on_tool_start
+        self._callback_handler.on_tool_end = _wrapped_on_tool_end
+        self._callback_handler.on_llm_start = _wrapped_on_llm_start
+        self._callback_handler.on_llm_end = _wrapped_on_llm_end
+
+        async def _run_and_signal():
+            """Run the agent executor and signal completion."""
+            try:
+                result = await self._agent_executor.ainvoke(
+                    {"input": input},
+                    {"callbacks": [self._callback_handler]},
+                )
+                adapter.push({
+                    "event_type": "stream_end",
+                    "agent_name": self.agent_name,
+                    "output": result.get("output", ""),
+                    "timestamp": datetime.now().isoformat(),
+                })
+            except Exception as exc:
+                adapter.push({
+                    "event_type": "stream_error",
+                    "agent_name": self.agent_name,
+                    "error": str(exc),
+                    "timestamp": datetime.now().isoformat(),
+                })
+            finally:
+                adapter.finish()
+
+        # Run the agent in the background
+        task = asyncio.create_task(_run_and_signal())
+
+        try:
+            while not _done.is_set() or _buffer:
+                if _buffer:
+                    yield _buffer.popleft()
+                else:
+                    await asyncio.sleep(0.05)
+        finally:
+            # Restore original methods
+            self._callback_handler.on_agent_action = _orig_on_agent_action
+            self._callback_handler.on_agent_finish = _orig_on_agent_finish
+            self._callback_handler.on_tool_start = _orig_on_tool_start
+            self._callback_handler.on_tool_end = _orig_on_tool_end
+            self._callback_handler.on_llm_start = _orig_on_llm_start
+            self._callback_handler.on_llm_end = _orig_on_llm_end
+            if not task.done():
+                task.cancel()
 
 
 __all__ = [

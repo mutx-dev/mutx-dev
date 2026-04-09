@@ -1,0 +1,240 @@
+/* ══════════════════════════════════════════════════════════════════════
+   MarketingProse — styled markdown prose for SEO pages
+   Used on: manifesto, roadmap, whitepaper, sdk, infrastructure, security
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Light section prose (routeLightSection context) ───────────────── */
+.prosePanel {
+  display: grid;
+  gap: 2rem;
+  padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.prosePanel h1 {
+  margin: 0 0 1.5rem;
+  font-family: var(--font-marketing-display), sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+  color: var(--marketing-text);
+}
+
+.prosePanel h2 {
+  margin: 2.5rem 0 1rem;
+  font-family: var(--font-marketing-sans), sans-serif;
+  font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  color: var(--marketing-text);
+}
+
+.prosePanel h3 {
+  margin: 2rem 0 0.75rem;
+  font-family: var(--font-marketing-sans), sans-serif;
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--marketing-text);
+}
+
+.prosePanel h4 {
+  margin: 1.5rem 0 0.5rem;
+  font-family: var(--font-marketing-sans), sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--marketing-text-muted);
+}
+
+.prosePanel p {
+  margin: 0;
+  font-size: clamp(0.97rem, 1.5vw, 1.05rem);
+  line-height: 1.75;
+  color: var(--marketing-text-soft);
+}
+
+.prosePanel ul,
+.prosePanel ol {
+  margin: 0;
+  padding-left: 1.5rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.prosePanel ul {
+  list-style-type: disc;
+}
+
+.prosePanel li {
+  font-size: clamp(0.97rem, 1.5vw, 1.05rem);
+  line-height: 1.7;
+  color: var(--marketing-text-soft);
+}
+
+.prosePanel li::marker {
+  color: var(--marketing-accent);
+}
+
+.prosePanel strong {
+  font-weight: 700;
+  color: var(--marketing-text);
+}
+
+.prosePanel em {
+  font-style: italic;
+  color: var(--marketing-text-soft);
+}
+
+/* Blockquotes / callouts */
+.prosePanel blockquote {
+  margin: 1.5rem 0;
+  padding: 1.1rem 1.4rem;
+  border-radius: 0.95rem;
+  border: 1px solid var(--marketing-border);
+  border-left: 3px solid var(--marketing-accent);
+  background: rgba(75, 141, 255, 0.05);
+  color: var(--marketing-text-soft);
+  font-style: italic;
+}
+
+.prosePanel blockquote p {
+  margin: 0;
+  font-size: clamp(0.97rem, 1.5vw, 1.05rem);
+  line-height: 1.75;
+  color: inherit;
+}
+
+/* Inline code */
+.prosePanel code:not(pre code) {
+  font-family: var(--font-marketing-code, ui-monospace, monospace);
+  font-size: 0.84em;
+  background: rgba(19, 26, 36, 0.07);
+  color: var(--marketing-accent);
+  padding: 0.15em 0.4em;
+  border-radius: 0.4em;
+  border: 1px solid var(--marketing-border);
+}
+
+/* Code blocks */
+.prosePanel pre {
+  margin: 1.5rem 0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.95rem;
+  background: #0f1420;
+  border: 1px solid rgba(248, 247, 245, 0.1);
+  overflow-x: auto;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+
+.prosePanel pre code {
+  background: none;
+  color: #c9d1d9;
+  padding: 0;
+  border: none;
+  font-size: inherit;
+}
+
+/* Tables */
+.prosePanel table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.92rem;
+  overflow-x: auto;
+  display: block;
+}
+
+.prosePanel thead {
+  border-bottom: 2px solid var(--marketing-border-strong);
+}
+
+.prosePanel th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-marketing-accent), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--marketing-text-muted);
+  white-space: nowrap;
+}
+
+.prosePanel td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--marketing-border);
+  color: var(--marketing-text-soft);
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.prosePanel tr:last-child td {
+  border-bottom: none;
+}
+
+.prosePanel tr:hover td {
+  background: rgba(75, 141, 255, 0.03);
+}
+
+/* HR */
+.prosePanel hr {
+  border: none;
+  border-top: 1px solid var(--marketing-border);
+  margin: 2.5rem 0;
+}
+
+/* Images */
+.prosePanel img {
+  max-width: 100%;
+  border-radius: 0.8rem;
+  margin: 1.5rem 0;
+  border: 1px solid var(--marketing-border);
+}
+
+/* Links */
+.prosePanel a {
+  color: var(--marketing-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 120ms ease;
+}
+
+.prosePanel a:hover {
+  opacity: 0.8;
+}
+
+/* First child no top margin */
+.prosePanel > *:first-child {
+  margin-top: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   Responsive
+   ══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .prosePanel {
+    padding: 1.5rem 1.25rem;
+    gap: 1.5rem;
+  }
+
+  .prosePanel pre {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .prosePanel table {
+    font-size: 0.88rem;
+  }
+
+  .prosePanel th,
+  .prosePanel td {
+    padding: 0.6rem 0.75rem;
+  }
+}

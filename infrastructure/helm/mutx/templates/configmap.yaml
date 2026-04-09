@@ -1,8 +1,10 @@
+{{- if .Values.configmap.data }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "mutx.fullname" . }}-env
+  name: {{ include "mutx.fullname" . }}-config
   labels:
     {{- include "mutx.labels" . | nindent 4 }}
 data:
-  {{- toYaml .Values.env | nindent 2 }}
+  {{- toYaml .Values.configmap.data | nindent 2 }}
+{{- end }}

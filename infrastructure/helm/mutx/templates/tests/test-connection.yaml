@@ -1,24 +1,25 @@
 apiVersion: v1
-kind: Service
+kind: Pod
 metadata:
-  name: {{ include "mutx.fullname" . }}-test
+  name: "{{ include "mutx.fullname" . }}-test-connection"
   labels:
     {{- include "mutx.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
-  backoffLimit: 0
-  template:
-    metadata:
-      labels:
-        {{- include "mutx.selectorLabels" . | nindent 8 }}
-    spec:
-      containers:
-        - name: curl
-          image: curlimages/curl:latest
-          command:
-            - sh
-            - -c
-            - |
-              echo "Waiting for service..." && \
-              sleep 5 && \
-              curl -v http://{{ include "mutx.fullname" . }}:{{ .Values.service.port }}/health || exit 1
-      restartPolicy: Never
+  containers:
+    - name: curl
+      image: curlimages/curl:latest
+      command:
+        - sh
+        - -c
+        - |
+          echo "Testing API health endpoint..." &&
+          curl -sf http://{{ include "mutx.fullname" . }}-api:{{ .Values.api.service.port }}/health &&
+          echo "" &&
+          echo "Testing API ready endpoint..." &&
+          curl -sf http://{{ include "mutx.fullname" . }}-api:{{ .Values.api.service.port }}/ready &&
+          echo "" &&
+          echo "All tests passed!"
+  restartPolicy: Never

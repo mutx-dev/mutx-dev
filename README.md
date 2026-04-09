@@ -218,7 +218,7 @@ Use these pages when you need more than the shortest path:
 
 ### Delivery And Operations
 
-- installer at [mutx.dev/install.sh](https://mutx.dev/install.sh)
+- installer at [mutx.dev/install.sh](https://mutx.dev/install.sh) — `curl -fsSL https://mutx.dev/install.sh | bash`
 - local dev stack with `make dev-up`
 - infrastructure references in Docker, Terraform, Ansible, and monitoring assets
 

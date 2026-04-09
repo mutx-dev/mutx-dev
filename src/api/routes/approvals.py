@@ -25,17 +25,14 @@ APPROVER_ROLES = {"DEVELOPER", "ADMIN"}
 
 def _check_approver_role(user: User) -> None:
     """
-    Verify the authenticated user has an approver role.
-
-    When the RBAC system (Prompt 6) is live, user.role will be populated.
-    Until then we allow any authenticated user through and rely on the
-    RBAC integration to enforce restrictions retroactively.
+    Verify the authenticated user has an approver role (DEVELOPER or ADMIN).
     """
     role: Optional[str] = getattr(user, "role", None)
-    if role is not None and role not in APPROVER_ROLES:
+    if role is None or role not in APPROVER_ROLES:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Role '{role}' is not authorized to manage approvals",
+            detail=f"Role '{role}' is not authorized to manage approvals. "
+                   f"Required: one of {sorted(APPROVER_ROLES)}",
         )
 
 

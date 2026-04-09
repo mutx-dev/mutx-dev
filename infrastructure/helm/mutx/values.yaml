@@ -1,39 +1,505 @@
-image:
-  repository: mutx/mutx
-  tag: latest
-  pullPolicy: IfNotPresent
+# =============================================================================
+# MUTX Helm Chart - values.yaml
+# Default values tuned for development; override for staging/production.
+# =============================================================================
 
-replicaCount: 2
+# -- Global override for image tag (applies to all components if set)
+global:
+  imageTag: ""
+  # -- Image pull secret for private registries
+  imagePullSecrets: []
+  # -- Override the release namespace
+  namespaceOverride: ""
 
-service:
-  type: ClusterIP
-  port: 8000
+# -- Name override for the release
+nameOverride: ""
+fullnameOverride: ""
 
+# -- Service account configuration
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# =============================================================================
+# API (FastAPI Backend)
+# =============================================================================
+api:
+  enabled: true
+  image:
+    repository: mutx/api
+    tag: ""  # defaults to .Chart.AppVersion
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+
+  service:
+    type: ClusterIP
+    port: 8000
+    annotations: {}
+
+  # -- Uvicorn workers per pod
+  webConcurrency: 1
+
+  # -- Probes mirror the actual code paths: /health, /ready, /metrics
+  startupProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    failureThreshold: 12
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: http
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 5
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: http
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+
+  # -- API environment variables (non-secret)
+  env:
+    ENVIRONMENT: development
+    API_HOST: "0.0.0.0"
+    API_PORT: "8000"
+    LOG_LEVEL: INFO
+    JSON_LOGGING: "false"
+    DATABASE_REQUIRED_ON_STARTUP: "false"
+    BACKGROUND_MONITOR_ENABLED: "true"
+    ENABLE_RAG_API: "false"
+    EXPOSE_API_DOCS_IN_PRODUCTION: "false"
+    FORWARDED_ALLOW_IPS: "*"
+    WEB_CONCURRENCY: "1"
+    CORS_ORIGINS: "http://localhost:3000,http://app.localhost:3000"
+
+  # -- Secret environment variables (populated from .Values.secrets)
+  # Each key maps to an env var injected from the created Secret.
+  secretEnv: {}
+
+  # -- Extra environment variables (key: value)
+  extraEnv: {}
+
+  # -- Extra volumes
+  extraVolumes: []
+
+  # -- Extra volume mounts
+  extraVolumeMounts: []
+
+  # -- Pod annotations
+  podAnnotations: {}
+
+  # -- Pod security context
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    fsGroup: 1001
+
+  # -- Container security context
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+
+  # -- Node selector
+  nodeSelector: {}
+
+  # -- Tolerations
+  tolerations: []
+
+  # -- Affinity rules
+  affinity: {}
+
+  # -- Topology spread constraints for HA
+  topologySpreadConstraints: []
+
+  # -- Pod disruption budget
+  pdb:
+    enabled: false
+    minAvailable: 1
+
+# =============================================================================
+# Web (Next.js Frontend)
+# =============================================================================
+web:
+  enabled: true
+  image:
+    repository: mutx/web
+    tag: ""  # defaults to .Chart.AppVersion
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+
+  service:
+    type: ClusterIP
+    port: 3000
+    annotations: {}
+
+  startupProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    failureThreshold: 12
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 5
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 75
+
+  env:
+    NODE_ENV: production
+    PORT: "3000"
+    HOSTNAME: "0.0.0.0"
+
+  # -- Build-time args (set as env vars in the pod)
+  buildArgs:
+    NEXT_PUBLIC_API_URL: "http://localhost:8000"
+    NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: ""
+
+  extraEnv: {}
+  extraVolumes: []
+  extraVolumeMounts: []
+  podAnnotations: {}
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    fsGroup: 1001
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: false
+    capabilities:
+      drop:
+        - ALL
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  pdb:
+    enabled: false
+    minAvailable: 1
+
+# =============================================================================
+# OpenTelemetry Collector
+# =============================================================================
+otelCollector:
+  enabled: true
+  image:
+    repository: otel/opentelemetry-collector
+    tag: 0.102.1
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+
+  service:
+    type: ClusterIP
+    ports:
+      otlpGrpc: 4317
+      otlpHttp: 4318
+      zipkin: 9411
+      metrics: 8888
+      prometheusExporter: 8889
+    annotations: {}
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+  # -- Collector configuration (rendered as ConfigMap)
+  # This provides sensible defaults. Override the entire config for your backend.
+  config:
+    receivers:
+      otlp:
+        protocols:
+          http:
+            endpoint: 0.0.0.0:4318
+          grpc:
+            endpoint: 0.0.0.0:4317
+      zipkin:
+        endpoint: 0.0.0.0:9411
+
+    processors:
+      batch:
+        timeout: 10s
+        send_batch_size: 1000
+      memory_limiter:
+        check_interval: 1s
+        limit_mib: 400
+      attributes:
+        actions:
+          - key: password
+            action: delete
+          - key: token
+            action: delete
+          - key: authorization
+            action: delete
+          - key: api_key
+            action: delete
+          - key: secret
+            action: delete
+
+    exporters:
+      prometheus:
+        endpoint: 0.0.0.0:8889
+        namespace: otel
+        const_labels:
+          service: mutx
+      # -- Configure your trace backend here.
+      # Options: jaeger, otlp (Tempo/Datadog/etc), zipkin, logging
+      jaeger:
+        endpoint: "jaeger:14250"
+        tls:
+          insecure: true
+      otlp:
+        endpoint: "tempo:4317"
+        tls:
+          insecure: true
+      logging:
+        loglevel: warn
+
+    service:
+      pipelines:
+        traces:
+          receivers:
+            - otlp
+            - zipkin
+          processors:
+            - memory_limiter
+            - batch
+            - attributes
+          exporters:
+            - jaeger
+            - otlp
+            - logging
+        metrics:
+          receivers:
+            - otlp
+          processors:
+            - memory_limiter
+            - batch
+          exporters:
+            - prometheus
+            - logging
+
+  # -- Override the entire collector config with a raw string
+  configOverride: ""
+
+  podAnnotations: {}
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    fsGroup: 10001
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# =============================================================================
+# Redis
+# =============================================================================
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: "7-alpine"
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+
+  service:
+    type: ClusterIP
+    port: 6379
+    annotations: {}
+
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 25m
+      memory: 64Mi
+
+  # -- Redis custom command-line args
+  commandArgs: >-
+    redis-server
+    --appendonly yes
+    --maxmemory 192mb
+    --maxmemory-policy allkeys-lru
+
+  persistence:
+    enabled: true
+    storageClassName: ""
+    size: 1Gi
+
+  podAnnotations: {}
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    fsGroup: 999
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# =============================================================================
+# PostgreSQL
+# -- NOTE: For production, use a managed database (RDS, Cloud SQL, etc.)
+#    and set postgres.enabled=false with the external connection in secrets.
+# =============================================================================
+postgres:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "16-alpine"
+    pullPolicy: IfNotPresent
+
+  replicaCount: 1
+
+  service:
+    type: ClusterIP
+    port: 5432
+    annotations: {}
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+  persistence:
+    enabled: true
+    storageClassName: ""
+    size: 10Gi
+
+  podAnnotations: {}
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 70
+    fsGroup: 70
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# =============================================================================
+# Secrets
+# -- All sensitive values. Leave empty for development; populate for production.
+# =============================================================================
+secrets:
+  databaseUrl: ""
+  databaseSslMode: ""
+  jwtSecret: ""
+  secretEncryptionKey: ""
+  redisUrl: ""
+  smtpHost: ""
+  smtpPort: ""
+  smtpUser: ""
+  smtpPassword: ""
+  smtpFromEmail: ""
+  resendApiKey: ""
+  telegramBotToken: ""
+  turnstileSecretKey: ""
+
+# =============================================================================
+# Ingress
+# =============================================================================
 ingress:
   enabled: false
   className: nginx
-  host: mutx.local
+  annotations: {}
+  # -- Host-based routing. Each entry creates a rule in the Ingress resource.
+  # apiHost routes to the API service; webHost routes to the web service.
+  # If only one host is set, both /api and / routes go to the same host.
+  hosts:
+    - apiHost: api.mutx.local
+      webHost: app.mutx.local
+      paths:
+        - path: /
+          pathType: Prefix
   tls:
     enabled: true
     secretName: mutx-tls
+    # -- Per-host TLS secrets (overrides the single secretName)
+    hosts: []
 
-resources:
-  limits:
-    cpu: 1000m
-    memory: 1Gi
-  requests:
-    cpu: 100m
-    memory: 256Mi
+# =============================================================================
+# ConfigMap (generic application-level settings)
+# =============================================================================
+configmap:
+  data: {}
 
-env:
-  {}
-  # Example:
-  # DATABASE_URL: "postgresql://user:pass@localhost:5432/mutx"
-  # REDIS_URL: "redis://localhost:6379/0"
-  # LOG_LEVEL: "INFO"
-
-autoscaling:
-  enabled: false
-  minReplicas: 2
-  maxReplicas: 10
-  targetCPUUtilizationPercentage: 75
+# =============================================================================
+# OpenTelemetry exporter env vars injected into the API pod
+# These map directly to what telemetry.py reads.
+# =============================================================================
+otel:
+  tracesExporter: console  # otlp | zipkin | console
+  exporterOtlpEndpoint: "http://mutx-otel-collector:4317"
+  serviceName: "mutx-api"
+  tracesSampler: parentbased_traceidratio
+  tracesSamplerArg: "0.1"

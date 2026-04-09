@@ -1,0 +1,79 @@
+{{- if .Values.otelCollector.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mutx.fullname" . }}-otel-collector
+  labels:
+    {{- include "mutx-otel-collector.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.otelCollector.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mutx-otel-collector.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "mutx-otel-collector.selectorLabels" . | nindent 8 }}
+      {{- with .Values.otelCollector.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/otel-collector-configmap.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ include "mutx.serviceAccountName" . }}
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.otelCollector.podSecurityContext | nindent 8 }}
+      containers:
+        - name: otel-collector
+          image: "{{ .Values.otelCollector.image.repository }}:{{ .Values.otelCollector.image.tag }}"
+          imagePullPolicy: {{ .Values.otelCollector.image.pullPolicy }}
+          command:
+            - "/otelcol-contrib"
+            - "--config=/etc/otelcol/config.yaml"
+          ports:
+            - name: otlp-grpc
+              containerPort: {{ .Values.otelCollector.service.ports.otlpGrpc }}
+              protocol: TCP
+            - name: otlp-http
+              containerPort: {{ .Values.otelCollector.service.ports.otlpHttp }}
+              protocol: TCP
+            - name: zipkin
+              containerPort: {{ .Values.otelCollector.service.ports.zipkin }}
+              protocol: TCP
+            - name: metrics
+              containerPort: {{ .Values.otelCollector.service.ports.metrics }}
+              protocol: TCP
+            - name: prom-exp
+              containerPort: {{ .Values.otelCollector.service.ports.prometheusExporter }}
+              protocol: TCP
+          env:
+            - name: GOGC
+              value: "80"
+          resources:
+            {{- toYaml .Values.otelCollector.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/otelcol
+          securityContext:
+            {{- toYaml .Values.otelCollector.securityContext | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "mutx.fullname" . }}-otel-collector
+      {{- with .Values.otelCollector.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.otelCollector.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.otelCollector.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

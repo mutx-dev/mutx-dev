@@ -12,7 +12,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict
 
-from src.api.dependencies import get_current_user, SSOTokenUser
+from src.api.dependencies import get_current_user, require_role, SSOTokenUser
 from src.api.services.audit_log import (
     AuditEvent,
     AuditEventType,
@@ -22,7 +22,11 @@ from src.api.services.audit_log import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/audit", tags=["audit"])
+router = APIRouter(
+    prefix="/audit",
+    tags=["audit"],
+    dependencies=[Depends(require_role(["ADMIN", "AUDIT_ADMIN"]))],
+)
 
 
 class AuditEventResponse(BaseModel):

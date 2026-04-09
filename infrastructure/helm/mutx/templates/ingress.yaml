@@ -13,19 +13,85 @@ spec:
   ingressClassName: {{ .Values.ingress.className }}
   {{- if .Values.ingress.tls.enabled }}
   tls:
+    {{- if .Values.ingress.tls.hosts }}
+    {{- range .Values.ingress.tls.hosts }}
     - hosts:
-        - {{ .Values.ingress.host }}
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+    {{- else }}
+    - hosts:
+      {{- range .Values.ingress.hosts }}
+        - {{ .apiHost | quote }}
+        - {{ .webHost | quote }}
+      {{- end }}
       secretName: {{ .Values.ingress.tls.secretName }}
+    {{- end }}
   {{- end }}
   rules:
-    - host: {{ .Values.ingress.host }}
+    {{- range .Values.ingress.hosts }}
+    {{- if $.Values.api.enabled }}
+    - host: {{ .apiHost }}
       http:
         paths:
-          - path: /
+          - path: /v1
             pathType: Prefix
             backend:
               service:
-                name: {{ include "mutx.fullname" . }}
+                name: {{ include "mutx.fullname" $ }}-api
                 port:
-                  number: {{ .Values.service.port }}
+                  number: {{ $.Values.api.service.port }}
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: {{ include "mutx.fullname" $ }}-api
+                port:
+                  number: {{ $.Values.api.service.port }}
+          - path: /ready
+            pathType: Exact
+            backend:
+              service:
+                name: {{ include "mutx.fullname" $ }}-api
+                port:
+                  number: {{ $.Values.api.service.port }}
+          - path: /metrics
+            pathType: Exact
+            backend:
+              service:
+                name: {{ include "mutx.fullname" $ }}-api
+                port:
+                  number: {{ $.Values.api.service.port }}
+          - path: /docs
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "mutx.fullname" $ }}-api
+                port:
+                  number: {{ $.Values.api.service.port }}
+          - path: /openapi.json
+            pathType: Exact
+            backend:
+              service:
+                name: {{ include "mutx.fullname" $ }}-api
+                port:
+                  number: {{ $.Values.api.service.port }}
+    {{- end }}
+    {{- if $.Values.web.enabled }}
+    - host: {{ .webHost }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ include "mutx.fullname" $ }}-web
+                port:
+                  number: {{ $.Values.web.service.port }}
+          {{- end }}
+    {{- end }}
+    {{- end }}
 {{- end }}

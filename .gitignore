@@ -85,3 +85,5 @@ next-env.d.ts
 *.mp4
 *.png
 __pycache__/
+audit.db
+=0.3.0

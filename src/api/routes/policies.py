@@ -13,7 +13,23 @@ from src.api.middleware.auth import get_current_user
 from src.api.models import User
 from src.api.services.policy_store import Policy, PolicyStore, get_policy_store
 
-router = APIRouter(prefix="/policies", tags=["policies"])
+
+async def _require_admin(user: User = Depends(get_current_user)) -> User:
+    """Require ADMIN role for policy management endpoints."""
+    role = getattr(user, "role", None)
+    if role != "ADMIN":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin role required for policy management",
+        )
+    return user
+
+
+router = APIRouter(
+    prefix="/policies",
+    tags=["policies"],
+    dependencies=[Depends(_require_admin)],
+)
 logger = logging.getLogger(__name__)
 
 

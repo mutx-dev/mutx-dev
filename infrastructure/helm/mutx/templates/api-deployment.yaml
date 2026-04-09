@@ -1,0 +1,199 @@
+{{- if .Values.api.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mutx.fullname" . }}-api
+  labels:
+    {{- include "mutx-api.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mutx-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "mutx-api.selectorLabels" . | nindent 8 }}
+      {{- with .Values.api.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "mutx.serviceAccountName" . }}
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.api.podSecurityContext | nindent 8 }}
+      containers:
+        - name: api
+          image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default (include "mutx.imageTag" .) }}"
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          {{- with .Values.api.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.api.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.api.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            # -- Application config from values
+            {{- range $key, $val := .Values.api.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+            # -- OTel environment variables (mirrors telemetry.py)
+            - name: OTEL_TRACES_EXPORTER
+              value: {{ .Values.otel.tracesExporter | quote }}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: {{ .Values.otel.exporterOtlpEndpoint | quote }}
+            - name: OTEL_SERVICE_NAME
+              value: {{ .Values.otel.serviceName | quote }}
+            - name: OTEL_TRACES_SAMPLER
+              value: {{ .Values.otel.tracesSampler | quote }}
+            - name: OTEL_TRACES_SAMPLER_ARG
+              value: {{ .Values.otel.tracesSamplerArg | quote }}
+            # -- Secret-backed environment variables
+            {{- range $key, $val := .Values.api.secretEnv }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" $ }}-secrets
+                  key: {{ $val }}
+            {{- end }}
+            # -- Auto-injected secret refs when secrets are provided
+            {{- if .Values.secrets.databaseUrl }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: databaseUrl
+            {{- end }}
+            {{- if .Values.secrets.databaseSslMode }}
+            - name: DATABASE_SSL_MODE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: databaseSslMode
+            {{- end }}
+            {{- if .Values.secrets.jwtSecret }}
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: jwtSecret
+            {{- end }}
+            {{- if .Values.secrets.secretEncryptionKey }}
+            - name: SECRET_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: secretEncryptionKey
+            {{- end }}
+            {{- if .Values.secrets.redisUrl }}
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: redisUrl
+            {{- end }}
+            {{- if .Values.secrets.smtpHost }}
+            - name: SMTP_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: smtpHost
+            {{- end }}
+            {{- if .Values.secrets.smtpPort }}
+            - name: SMTP_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: smtpPort
+            {{- end }}
+            {{- if .Values.secrets.smtpUser }}
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: smtpUser
+            {{- end }}
+            {{- if .Values.secrets.smtpPassword }}
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: smtpPassword
+            {{- end }}
+            {{- if .Values.secrets.smtpFromEmail }}
+            - name: SMTP_FROM_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: smtpFromEmail
+            {{- end }}
+            {{- if .Values.secrets.resendApiKey }}
+            - name: RESEND_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: resendApiKey
+            {{- end }}
+            {{- if .Values.secrets.telegramBotToken }}
+            - name: TELEGRAM_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: telegramBotToken
+            {{- end }}
+            {{- if .Values.secrets.turnstileSecretKey }}
+            - name: TURNSTILE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mutx.fullname" . }}-secrets
+                  key: turnstileSecretKey
+            {{- end }}
+            # -- Extra env vars
+            {{- range $key, $val := .Values.api.extraEnv }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.api.resources | nindent 12 }}
+          {{- with .Values.api.extraVolumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            {{- toYaml .Values.api.securityContext | nindent 12 }}
+      {{- with .Values.api.extraVolumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

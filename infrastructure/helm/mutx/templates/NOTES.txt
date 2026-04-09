@@ -1,0 +1,57 @@
+MUTX Platform has been deployed!
+
+{{- if .Values.api.enabled }}
+API (FastAPI Backend):
+  Service: {{ include "mutx.fullname" . }}-api.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.api.service.port }}
+  Health:  http://{{ include "mutx.fullname" . }}-api:{{ .Values.api.service.port }}/health
+  Ready:   http://{{ include "mutx.fullname" . }}-api:{{ .Values.api.service.port }}/ready
+  Metrics: http://{{ include "mutx.fullname" . }}-api:{{ .Values.api.service.port }}/metrics
+{{- end }}
+
+{{- if .Values.web.enabled }}
+Web (Next.js Frontend):
+  Service: {{ include "mutx.fullname" . }}-web.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.web.service.port }}
+{{- end }}
+
+{{- if .Values.redis.enabled }}
+Redis:
+  Service: {{ include "mutx.fullname" . }}-redis.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.redis.service.port }}
+{{- end }}
+
+{{- if .Values.postgres.enabled }}
+PostgreSQL:
+  Service: {{ include "mutx.fullname" . }}-postgres.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.postgres.service.port }}
+  NOTE: For production, use a managed database and set postgres.enabled=false
+{{- end }}
+
+{{- if .Values.otelCollector.enabled }}
+OpenTelemetry Collector:
+  Service:  {{ include "mutx.fullname" . }}-otel-collector.{{ .Release.Namespace }}.svc.cluster.local
+  OTLP gRPC: {{ .Values.otelCollector.service.ports.otlpGrpc }}
+  OTLP HTTP: {{ .Values.otelCollector.service.ports.otlpHttp }}
+{{- end }}
+
+{{- if .Values.ingress.enabled }}
+Ingress:
+{{- range .Values.ingress.hosts }}
+  API Host:  {{ .apiHost }}
+  Web Host:  {{ .webHost }}
+{{- end }}
+{{- if .Values.ingress.tls.enabled }}
+  TLS: enabled (secret: {{ .Values.ingress.tls.secretName }})
+{{- end }}
+{{- end }}
+
+{{- if .Values.api.autoscaling.enabled }}
+HPA (API): {{ .Values.api.autoscaling.minReplicas }}-{{ .Values.api.autoscaling.maxReplicas }} replicas (target CPU: {{ .Values.api.autoscaling.targetCPUUtilizationPercentage }}%)
+{{- end }}
+{{- if .Values.web.autoscaling.enabled }}
+HPA (Web): {{ .Values.web.autoscaling.minReplicas }}-{{ .Values.web.autoscaling.maxReplicas }} replicas (target CPU: {{ .Values.web.autoscaling.targetCPUUtilizationPercentage }}%)
+{{- end }}
+
+Get the API health status:
+  kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/component=api
+  kubectl port-forward svc/{{ include "mutx.fullname" . }}-api {{ .Values.api.service.port }}:{{ .Values.api.service.port }} -n {{ .Release.Namespace }}
+
+IMPORTANT: Ensure secrets are properly configured for production.
+  JWT_SECRET, DATABASE_URL, and REDIS_URL must be set via --set or values overlay.

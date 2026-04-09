@@ -40,7 +40,22 @@ from src.security import (
 from src.security.telemetry import TelemetryEventType
 
 
-router = APIRouter(prefix="/security", tags=["security"])
+async def _require_admin(current_user: User = Depends(get_current_user)) -> User:
+    """Require ADMIN role for security management endpoints."""
+    role = getattr(current_user, "role", None)
+    if role != "ADMIN":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin role required for security management",
+        )
+    return current_user
+
+
+router = APIRouter(
+    prefix="/security",
+    tags=["security"],
+    dependencies=[Depends(_require_admin)],
+)
 
 
 _mediator = ActionMediator()

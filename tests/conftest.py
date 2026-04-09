@@ -242,6 +242,8 @@ async def test_user(db_session: AsyncSession):
     )
     db_session.add(user)
     await db_session.commit()
+    # RBAC: attach role for routes that gate on user.role
+    user.role = "ADMIN"  # type: ignore[attr-defined]
     return user
 
 
