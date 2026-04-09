@@ -3,6 +3,7 @@ Audit Logging Service.
 
 Provides structured audit logging for agent operations including
 AGENT_START, LLM_CALL, TOOL_CALL, POLICY_CHECK, GUARDRAIL_TRIGGER, and AGENT_END events.
+Integrates with OpenTelemetry spans for automatic trace_id and span_id capture.
 """
 
 import asyncio
@@ -16,6 +17,31 @@ from typing import Any
 import aiosqlite
 
 logger = logging.getLogger(__name__)
+
+
+def _get_otel_trace_context() -> tuple[str | None, str | None]:
+    """Extract trace_id and span_id from the current OTel span context.
+
+    Returns:
+        Tuple of (trace_id, span_id) from the active span, or (None, None) if no span.
+    """
+    try:
+        from opentelemetry import trace
+
+        span = trace.get_current_span()
+        if span is None:
+            return None, None
+
+        ctx = span.get_span_context()
+        if ctx is None or not ctx.is_valid:
+            return None, None
+
+        trace_id = format(ctx.trace_id, "032x")
+        span_id = format(ctx.span_id, "016x")
+        return trace_id, span_id
+    except Exception:
+        # OTel may not be installed or configured
+        return None, None
 
 DATABASE_PATH = "audit.db"
 AUDIT_TABLE_SCHEMA = """
@@ -186,6 +212,33 @@ class AuditLog:
                 ),
             )
             await self._db.commit()
+
+    async def log_with_otel_context(
+        self,
+        event: AuditEvent,
+        auto_capture_trace: bool = True,
+        auto_capture_span: bool = True,
+    ) -> None:
+        """Append an audit event, optionally auto-populating trace_id and span_id from OTel.
+
+        If auto_capture_trace is True and the event's trace_id is None,
+        the current OTel span context will be used to populate it.
+        Similarly for auto_capture_span and span_id.
+
+        Args:
+            event: The audit event to log.
+            auto_capture_trace: Whether to auto-capture trace_id from OTel context.
+            auto_capture_span: Whether to auto-capture span_id from OTel context.
+        """
+        if auto_capture_trace or auto_capture_span:
+            otel_trace_id, otel_span_id = _get_otel_trace_context()
+
+            if auto_capture_trace and event.trace_id is None and otel_trace_id is not None:
+                event.trace_id = otel_trace_id
+            if auto_capture_span and event.span_id is None and otel_span_id is not None:
+                event.span_id = otel_span_id
+
+        await self.log(event)
 
     async def query(self, filters: AuditQuery) -> list[AuditEvent]:
         """Query audit events with filters and pagination.
