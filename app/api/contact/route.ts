@@ -53,15 +53,19 @@ async function sendNotificationEmail(data: {
   return result
 }
 
-async function sendConfirmationEmail(to: string) {
+async function sendConfirmationEmail(
+  to: string,
+  name?: string,
+  company?: string,
+) {
   if (!resend) return
 
   try {
     await resend.emails.send({
       from: resendFromEmail,
       to: [to],
-      subject: 'We got your request — PicoMUTX',
-      text: `Thanks for reaching out. We read every message and will get back to you within 24 hours.\n\n— The MUTX team`,
+      template: { id: '76afba66-9948-419d-9df2-ae9414006859' },
+      headers: { 'X-Entity-Ref-ID': `pico-waitlist-${Date.now()}` },
     })
   } catch {
     // non-fatal — notification already sent
@@ -109,8 +113,8 @@ export async function POST(request: Request): Promise<NextResponse> {
       console.warn('Contact form: Resend not configured, skipping email')
     }
 
-    // Send confirmation to user
-    await sendConfirmationEmail(normalizedEmail)
+    // Send confirmation to user (uses waitlist template)
+    await sendConfirmationEmail(normalizedEmail, name?.trim(), company?.trim())
 
     return NextResponse.json({
       success: true,
