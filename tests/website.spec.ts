@@ -273,7 +273,7 @@ test.describe('mutx.dev QA', () => {
         });
       })
       .toBeGreaterThan(0.95);
-    expect(heroActions).toEqual(['Download for Mac', 'Releases', 'Docs']);
+    expect(heroActions).toEqual(['Go to PicoMUTX', 'View GitHub', 'View GitHub']);
     expect(strayLargeLogos).toBe(0);
     await expect(page.getByTestId('marketing-loader-stage')).toHaveCount(0);
 
