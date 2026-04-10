@@ -80,10 +80,6 @@ class MutxClient:
         return APIKeys(self.http)
 
     @property
-    def approvals(self) -> Approvals:
-        return Approvals(self.http)
-
-    @property
     def assistant(self) -> Assistant:
         return Assistant(self.http)
 
