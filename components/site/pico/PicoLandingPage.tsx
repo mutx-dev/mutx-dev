@@ -133,7 +133,7 @@ export function PicoLandingPage() {
       {/* Navigation */}
       <nav className={s.nav}>
         <div className={s.navInner}>
-          <Link href="/pico" className={s.navBrand}>
+          <Link href="https://pico.mutx.dev" className={s.navBrand}>
             <span className={s.navLogo}>
               <Image src="/logo.png" alt="MUTX" width={20} height={20} />
             </span>
@@ -142,7 +142,7 @@ export function PicoLandingPage() {
               <span className={s.navTag}> by MUTX</span>
             </span>
           </Link>
-          <Link href="/contact" className={s.navCta}>
+          <Link href="https://mutx.dev/contact" className={s.navCta}>
             Get early access
           </Link>
         </div>
@@ -174,11 +174,11 @@ export function PicoLandingPage() {
 
             <SiteReveal delay={0.19}>
               <div className={s.heroActions}>
-                <Link href="/contact" className={s.btnPrimary}>
+                <Link href="https://mutx.dev/contact" className={s.btnPrimary}>
                   Get early access
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link href="/" className={s.btnSecondary}>
+                <Link href="https://mutx.dev" className={s.btnSecondary}>
                   MUTX for enterprise
                 </Link>
               </div>
@@ -308,7 +308,7 @@ export function PicoLandingPage() {
                       ))}
                     </ul>
                     <Link
-                      href="/contact"
+                      href="https://mutx.dev/contact"
                       className={`${s.pricingCta} ${
                         tier.recommended ? s.pricingCtaPrimary : ''
                       }`}
@@ -321,7 +321,7 @@ export function PicoLandingPage() {
             </div>
             <p className={s.pricingUpsell}>
               Need more? When you outgrow 20 agents, that&apos;s{' '}
-              <Link href="/">MUTX enterprise</Link> at €18k–€50k+.
+              <Link href="https://mutx.dev">MUTX enterprise</Link> at €18k–€50k+.
             </p>
           </div>
         </section>
@@ -366,15 +366,15 @@ export function PicoLandingPage() {
                 </h2>
               </SiteReveal>
               <SiteReveal delay={0.12}>
-                <Link href="/contact" className={s.btnPrimary}>
+                <Link href="https://mutx.dev/contact" className={s.btnPrimary}>
                   Get early access
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </SiteReveal>
               <p className={s.ctaMeta}>
                 Questions?{' '}
-                <Link href="/contact">Talk to us</Link> or{' '}
-                <Link href="/">explore MUTX for enterprise</Link>
+                <Link href="https://mutx.dev/contact">Talk to us</Link> or{' '}
+                <Link href="https://mutx.dev">explore MUTX for enterprise</Link>
               </p>
             </div>
           </div>
