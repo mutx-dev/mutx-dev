@@ -106,7 +106,7 @@ def scan_untested():
 def scan_error_handling():
     """Find functions without try/except or error handling."""
     items = []
-    for pattern in f"{REPO}/sdk/mutx/*.py":
+    for pattern in [f"{REPO}/sdk/mutx/*.py"]:
         for path in glob.glob(pattern):
             name = os.path.basename(path).replace('.py', '')
             if name.startswith('_'):
