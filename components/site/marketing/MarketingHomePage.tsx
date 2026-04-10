@@ -138,6 +138,9 @@ export function MarketingHomePage() {
               <div className={home.heroContent} data-testid="homepage-hero-content">
                 <p className={home.heroEyebrow}>{marketingHomepage.hero.tagline}</p>
                 <h1 className={home.heroTitle}>{marketingHomepage.hero.title}</h1>
+                {marketingHomepage.hero.support && (
+                  <p className={home.heroSupport}>{marketingHomepage.hero.support}</p>
+                )}
                 <div className={home.heroActions}>
                   <ActionLink action={primaryAction} className={core.buttonPrimary} />
                   <CalendlyPopupButton
@@ -158,6 +161,32 @@ export function MarketingHomePage() {
                       />
                     ))}
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className={home.socialProofStrip} data-testid="homepage-social-proof">
+          <div className={core.shell}>
+            <div className={home.socialProofInner}>
+              <p className={home.socialProofTagline}>Trusted by teams running AI agents in production</p>
+              <div className={home.socialProofMetrics}>
+                <div className={home.socialProofMetric}>
+                  <p className={home.socialProofValue}>100%</p>
+                  <p className={home.socialProofLabel}>Audit Coverage</p>
+                </div>
+                <div className={home.socialProofMetric}>
+                  <p className={home.socialProofValue}>&lt;2 min</p>
+                  <p className={home.socialProofLabel}>Time to First Run</p>
+                </div>
+                <div className={home.socialProofMetric}>
+                  <p className={home.socialProofValue}>0</p>
+                  <p className={home.socialProofLabel}>Config Required</p>
+                </div>
+                <div className={home.socialProofMetric}>
+                  <p className={home.socialProofValue}>macOS</p>
+                  <p className={home.socialProofLabel}>Native Desktop</p>
                 </div>
               </div>
             </div>
