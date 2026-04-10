@@ -171,6 +171,9 @@ async def test_health_includes_component_status(client: AsyncClient):
     assert payload["schema_repairs_applied"] == []
     assert payload["components"]["database"]["status"] == "healthy"
     assert payload["components"]["background_monitor"]["status"] == "disabled"
+    assert "error" not in payload["components"]["background_monitor"]
+    assert "last_error_at" not in payload["components"]["background_monitor"]
+    assert "started_at" not in payload["components"]["background_monitor"]
 
 
 @pytest.mark.asyncio
@@ -189,6 +192,8 @@ async def test_health_degrades_for_background_monitor_failures_while_ready_stays
     assert health_response.status_code == 200
     assert health_response.json()["status"] == "degraded"
     assert health_response.json()["components"]["background_monitor"]["status"] == "degraded"
+    assert "error" not in health_response.json()["components"]["background_monitor"]
+    assert "last_error_at" not in health_response.json()["components"]["background_monitor"]
 
     assert ready_response.status_code == 200
     assert ready_response.json()["status"] == "ready"

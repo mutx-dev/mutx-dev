@@ -364,10 +364,6 @@ def _serialize_background_monitor_component(app: FastAPI) -> dict[str, object]:
 
     return {
         "status": component_status,
-        "started_at": monitor_state.started_at,
-        "last_success_at": monitor_state.last_success_at,
-        "last_error_at": monitor_state.last_error_at,
-        "error": monitor_state.last_error,
         "consecutive_failures": monitor_state.consecutive_failures,
     }
 
@@ -405,7 +401,6 @@ def _register_system_routes(app: FastAPI) -> None:
                 },
                 "background_monitor": background_monitor,
             },
-            schema_repairs_applied=list(request.app.state.schema_repairs_applied),
         )
 
     @app.get("/ready")
