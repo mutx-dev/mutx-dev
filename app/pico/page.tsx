@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { PicoLandingPage } from "@/components/site/pico/PicoLandingPage";
-import { PublicFooter } from "@/components/site/PublicFooter";
+import { PicoFooter } from "@/components/site/pico/PicoFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import { getCanonicalUrl, getOgImageUrl, getSiteUrl } from "@/lib/seo";
 
@@ -27,7 +27,7 @@ export default function PicoPage() {
   return (
     <PublicSurface>
       <PicoLandingPage />
-      <PublicFooter showCallout={false} />
+      <PicoFooter />
     </PublicSurface>
   );
 }
