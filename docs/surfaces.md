@@ -91,7 +91,7 @@ Surfaces marked **Preview** are:
 
 **Known gaps:**
 - Some flows remain CLI-first or API-first
-- RAG search and scheduler return 503 with feature flags until runtime is configured
+- RAG search and scheduler are real implementations (no longer 503 stubs); RAG has embed/search/ingest, scheduler has full CRUD
 - Preview or redirect-backed shell pages are now hidden from primary stable navigation until their live contracts are real
 - Dashboard maturity still trails the full backend route surface
 - Preview-labeled routes remain visible only through direct navigation and in-shell preview markers

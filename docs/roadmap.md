@@ -35,8 +35,8 @@ It is a guide for contributors, not a promise of exact delivery order.
   - continue tightening ownership and auth enforcement across user-scoped resources
   - keep deployment lifecycle history, versions, and rollback semantics honest and tested
 - Placeholder-backed subsystems
-  - replace the scheduler stub with a real implementation or keep it clearly unmounted and documented
-  - turn RAG search into real vector-backed behavior instead of placeholder responses
+  - ~~replace the scheduler stub with a real implementation~~ **DONE** (2026-04-10: real 374-line asyncio task engine with CRUD)
+  - ~~turn RAG search into real vector-backed behavior~~ **DONE** (2026-04-10: real embed/search/ingest endpoints with OpenAI embeddings)
   - keep Vault integration explicitly documented as an infrastructure stub until it is real
 
 ## Next
@@ -59,6 +59,12 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 ## Shipped (Last 30 Days)
 
+- `2026-04-10` Swarms real DB persistence with PATCH/DELETE endpoints
+- `2026-04-10` RAG `/v1/rag/ingest` for document ingestion into vector store
+- `2026-04-10` Sessions local discovery (Claude/Codex/Hermes auto-detection)
+- `2026-04-10` Scheduler upgraded from stub to real asyncio task engine (374 lines)
+- `2026-04-10` RAG upgraded from stub to real embed/search with OpenAI embeddings
+- `2026-04-10` OpenAPI spec: 28 route prefixes, 179 endpoint-method pairs
 - `2026-04-09` RBAC enforcement on all routes
 - `2026-04-09` OIDC token validation at `src/api/auth/oidc.py`
 - `2026-04-09` Kubernetes/Helm chart in `infrastructure/helm/`

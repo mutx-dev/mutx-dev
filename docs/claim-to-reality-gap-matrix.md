@@ -1,8 +1,8 @@
 # MUTX Claim-to-Reality Gap Matrix
-**Audit Date:** 2026-04-10  
+**Audit Date:** 2026-04-11  
 **Repo:** `/Users/fortune/MUTX`  
 **Scope:** Phase A/B Autonomy Operating Model  
-**Previous Audit:** 2026-04-02 (254 commits since)
+**Previous Audit:** 2026-04-10
 
 ---
 
@@ -12,7 +12,7 @@
 
 | Claim | Source | Reality | Status |
 |-------|--------|---------|--------|
-| "FastAPI control plane with public routes mounted under `/v1/*`" | README.md | TRUE — 31 mounted router prefixes, 170 endpoint-method pairs in OpenAPI | SHIPPED |
+| "FastAPI control plane with public routes mounted under `/v1/*`\" | README.md | TRUE — 28 mounted route prefixes, 179 endpoint-method pairs in OpenAPI | SHIPPED |
 | "route groups for auth, agents, deployments, API keys, webhooks, newsletter, health, and readiness" | README.md | Auth ✓, Agents ✓, Deployments ✓, API Keys ✓, Webhooks ✓. Newsletter is UNMOUNTED (code exists but not served). Health probes at `/`, `/health`, `/ready` | PARTIAL |
 | "route groups for templates, sessions, runs, usage, api-keys, webhooks, monitoring, budgets, rag, clawhub, runtime, analytics, onboarding, swarms, and leads" | README.md | ALL confirmed in OpenAPI as of v1.4+: templates ✓, sessions ✓, runs ✓, usage ✓, api-keys ✓, webhooks ✓, monitoring ✓, budgets ✓, rag ✓, clawhub ✓, runtime ✓, analytics ✓, onboarding ✓, swarms ✓, leads ✓ | SHIPPED |
 | "a Python CLI and first-party Textual TUI" | README.md | `cli/` exists with Click-based commands. `mutx tui` referenced in docs. TUI shell exists. | SHIPPED |
@@ -71,9 +71,9 @@
 
 ## 2. OpenAPI `/v1/*` Route Inventory
 
-**Audit Date:** 2026-04-10  
-**Total unique route prefixes in OpenAPI:** 27  
-**Total endpoint-method pairs:** 170
+**Audit Date:** 2026-04-11  
+**Total unique route prefixes in OpenAPI:** 28  
+**Total endpoint-method pairs:** 179
 
 | Route Prefix | Auth (Depends) | Methods | Notes |
 |---|---|---|---|
@@ -95,13 +95,13 @@
 | `/v1/observability` | `get_current_user` | POST, GET | runs, eval, provenance, status, steps |
 | `/v1/onboarding` | `get_current_user` | GET, POST | state management |
 | `/v1/policies` | `get_current_user` | GET, POST, DELETE | CRUD + reload |
-| `/v1/rag` | `get_current_user` | POST, GET | embed, embed/batch, search, health |
+| `/v1/rag` | `get_current_user` | POST, GET | embed, embed/batch, search, health, **ingest** |
 | `/v1/runs` | `get_current_user` | POST, GET | runs, traces |
 | `/v1/runtime` | `get_current_user` | GET, PUT | providers, governance metrics/status/supervised |
 | `/v1/scheduler` | `get_current_user` + admin | GET, POST, DELETE, PATCH | real asyncio task engine with CRUD |
 | `/v1/security` | `get_current_user` | POST, GET, DELETE | actions, approvals, compliance, metrics, prometheus, receipts, sessions |
-| `/v1/sessions` | `get_current_user` | POST, GET, DELETE | wired to OpenClaw gateway HTTP API |
-| `/v1/swarms` | `get_current_user` | GET, POST | list, create, get, scale |
+| `/v1/sessions` | `get_current_user` | POST, GET, DELETE | wired to OpenClaw gateway HTTP API; **local session discovery for Claude/Codex/Hermes** |
+| `/v1/swarms` | `get_current_user` | GET, POST, PATCH, DELETE | list, create, get, update, delete, scale; **real DB persistence** |
 | `/v1/telemetry` | `get_current_user` | GET, POST | config, health |
 | `/v1/templates` | `get_current_user` | GET, POST | list, deploy |
 | `/v1/usage` | `get_current_user` | POST, GET | events |
@@ -112,14 +112,11 @@
 **Unmounted routes (code exists, not served):**
 - `/v1/newsletter` — waitlist signup code exists but router is in `UNMOUNTED_ROUTER_NAMES`
 
-**Key Changes Since April 2 Audit:**
-- Routes previously marked MISSING are now in OpenAPI: sessions ✓, runs ✓, usage ✓, monitoring ✓, budgets ✓, rag ✓, runtime ✓, analytics ✓, onboarding ✓, swarms ✓
-- NEW route families: approvals, audit, governance/credentials, governance/supervised, ingest, observability, policies, security, telemetry
-- `/v1/runtime/governance/metrics` — now confirmed in OpenAPI (was previously marked MISLEADING)
-- Auth enforcement: `get_current_user` dependency on 146+ endpoint-method pairs; RBAC role checks on admin routes
-- Scheduler upgraded from 503 stub to real 374-line implementation
-- RAG upgraded from 503 stub to real endpoints with OpenAI embedding support
-- Sessions wired to OpenClaw gateway HTTP API
+**Key Changes Since April 10 Audit:**
+- **NEW:** `POST /v1/rag/ingest` — document ingestion into vector store
+- **NEW:** Swarms PATCH/DELETE on `/{swarm_id}` with real DB persistence
+- **NEW:** Sessions local discovery — auto-discovers Claude, Codex, and Hermes sessions from local filesystem
+- Route prefix count: 27 → 28; endpoint-method pairs: 170 → 179
 
 ---
 
@@ -218,7 +215,7 @@ These scripts have hardcoded absolute paths that will break if the repo moves:
 | Runtime | PLACEHOLDER | SHIPPED | Provider snapshots + full governance routes |
 | Analytics | PLACEHOLDER | SHIPPED | Summary, timeseries, costs, budget |
 | Onboarding | PLACEHOLDER | SHIPPED | State management |
-| Swarms | PLACEHOLDER | SHIPPED | List, create, get, scale |
+| Swarms | PLACEHOLDER | SHIPPED | List, create, get, update, delete, scale; **real DB persistence** |
 | Governance metrics | MISLEADING | SHIPPED | `/v1/runtime/governance/metrics` + status + supervised |
 | Governance credentials | PARTIAL | SHIPPED | Full CRUD for backends, health checks, secret retrieval |
 | Security | — | SHIPPED | NEW: actions, approvals, compliance, metrics, receipts, sessions |
@@ -235,11 +232,11 @@ These scripts have hardcoded absolute paths that will break if the repo moves:
 
 | Classification | Count | Previous |
 |---------------|-------|----------|
-| SHIPPED | 30 | 14 |
-| PARTIAL | 2 | 8 |
-| STUB | 1 | 2 |
-| PLACEHOLDER | 0 | 9 |
-| MISLEADING | 0 | 2 |
+| SHIPPED | 30 | 30 |
+| PARTIAL | 2 | 2 |
+| STUB | 1 | 1 |
+| PLACEHOLDER | 0 | 0 |
+| MISLEADING | 0 | 0 |
 
 ---
 

@@ -240,7 +240,7 @@ def _register_application_routes(app: FastAPI) -> None:
 | `/assistant` | `routes/assistant.py` | Assistant integration |
 | `/ingest` | `routes/ingest.py` | Data ingestion |
 | `/clawhub` | `routes/clawhub.py` | ClawHub integration |
-| `/newsletter` | `routes/newsletter.py` | Newsletter signup |
+| `/newsletter` | `routes/newsletter.py` | Newsletter signup (UNMOUNTED — code exists but not served; `/v1/leads` is the active replacement) |
 | `/onboarding` | `routes/onboarding.py` | User onboarding |
 | `/leads` | `routes/leads.py` | Lead/contact management |
 | `/agents` (agent-runtime) | `routes/agent_runtime.py` | Agent-side heartbeat, commands |
