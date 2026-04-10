@@ -140,9 +140,10 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
                   />
 
                   <div className={s.row}>
-                    <label className={s.label}>
+                    <label className={s.label} htmlFor="pico-email">
                       <span className={s.labelText}>Work email</span>
                       <input
+                        id="pico-email"
                         name="email"
                         type="email"
                         required
@@ -154,9 +155,10 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
                   </div>
 
                   <div className={s.row2}>
-                    <label className={s.label}>
+                    <label className={s.label} htmlFor="pico-name">
                       <span className={s.labelText}>Name</span>
                       <input
+                        id="pico-name"
                         name="name"
                         type="text"
                         placeholder="Jane Smith"
@@ -164,9 +166,10 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
                         autoComplete="name"
                       />
                     </label>
-                    <label className={s.label}>
+                    <label className={s.label} htmlFor="pico-company">
                       <span className={s.labelText}>Company</span>
                       <input
+                        id="pico-company"
                         name="company"
                         type="text"
                         placeholder="Acme Inc."
@@ -231,11 +234,12 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
                     </Select.Root>
                   </div>
 
-                  <label className={s.label}>
+                  <label className={s.label} htmlFor="pico-message">
                     <span className={s.labelText}>
                       Anything we should know? <span className={s.optional}>(optional)</span>
                     </span>
                     <textarea
+                      id="pico-message"
                       name="message"
                       rows={3}
                       placeholder="E.g. I run a small SaaS and want to automate customer support..."
