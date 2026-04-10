@@ -7470,6 +7470,66 @@
         }
       }
     },
+    "/v1/rag/ingest": {
+      "post": {
+        "tags": [
+          "rag"
+        ],
+        "summary": "Ingest Documents",
+        "description": "Ingest documents into the vector store for later retrieval via /search.\n\nDocuments are chunked, embedded, and stored in the configured PostgreSQL\nvector store. Requires OPENAI_API_KEY and DATABASE_URL (PostgreSQL).",
+        "operationId": "ingest_documents_v1_rag_ingest_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IngestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/usage/events": {
       "post": {
         "tags": [
@@ -14843,6 +14903,88 @@
           "timestamp"
         ],
         "title": "HeartbeatRequest"
+      },
+      "IngestRequest": {
+        "properties": {
+          "texts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Texts"
+          },
+          "collection_name": {
+            "type": "string",
+            "title": "Collection Name",
+            "default": "default"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "default": "text-embedding-3-small"
+          },
+          "metadatas": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadatas"
+          },
+          "ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "texts"
+        ],
+        "title": "IngestRequest",
+        "description": "Request model for document ingestion."
+      },
+      "IngestResponse": {
+        "properties": {
+          "document_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Document Ids"
+          },
+          "collection_name": {
+            "type": "string",
+            "title": "Collection Name"
+          },
+          "document_count": {
+            "type": "integer",
+            "title": "Document Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document_ids",
+          "collection_name",
+          "document_count"
+        ],
+        "title": "IngestResponse",
+        "description": "Response model for document ingestion."
       },
       "InstallSkillRequest": {
         "properties": {

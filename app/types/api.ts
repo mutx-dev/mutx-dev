@@ -1844,6 +1844,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/rag/ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ingest Documents
+         * @description Ingest documents into the vector store for later retrieval via /search.
+         *
+         *     Documents are chunked, embedded, and stored in the configured PostgreSQL
+         *     vector store. Requires OPENAI_API_KEY and DATABASE_URL (PostgreSQL).
+         */
+        post: operations["ingest_documents_v1_rag_ingest_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/usage/events": {
         parameters: {
             query?: never;
@@ -4424,6 +4447,40 @@ export interface components {
             platform?: string | null;
             /** Hostname */
             hostname?: string | null;
+        };
+        /**
+         * IngestRequest
+         * @description Request model for document ingestion.
+         */
+        IngestRequest: {
+            /** Texts */
+            texts: string[];
+            /**
+             * Collection Name
+             * @default default
+             */
+            collection_name: string;
+            /**
+             * Model
+             * @default text-embedding-3-small
+             */
+            model: string;
+            /** Metadatas */
+            metadatas?: Record<string, never>[] | null;
+            /** Ids */
+            ids?: string[] | null;
+        };
+        /**
+         * IngestResponse
+         * @description Response model for document ingestion.
+         */
+        IngestResponse: {
+            /** Document Ids */
+            document_ids: string[];
+            /** Collection Name */
+            collection_name: string;
+            /** Document Count */
+            document_count: number;
         };
         /** InstallSkillRequest */
         InstallSkillRequest: {
@@ -10491,6 +10548,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ingest_documents_v1_rag_ingest_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IngestRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IngestResponse"];
                 };
             };
             /** @description Validation Error */
