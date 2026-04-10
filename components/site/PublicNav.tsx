@@ -5,7 +5,7 @@ import styles from "@/components/site/marketing/MarketingCore.module.css";
 export function PublicNav() {
   return (
     <div className={styles.publicRail}>
-      <nav className={styles.publicRailInner} aria-label="Public navigation">
+      <nav data-testid="public-auth-nav" className={styles.publicRailInner} aria-label="Public navigation">
         <Link href="/" className={styles.publicRailBrand}>
           <div className={styles.publicRailMark}>
             <img src="/logo.webp" alt="" aria-hidden="true" className={styles.brandMark} />
