@@ -1,0 +1,842 @@
+/* ===================================================================
+   PicoMUTX Landing Page — Premium Design System
+   =================================================================== */
+
+/* --- Design tokens ------------------------------------------------ */
+:root {
+  --pico-bg: #07080c;
+  --pico-bg-raised: #0d0f15;
+  --pico-bg-surface: rgba(255, 255, 255, 0.03);
+  --pico-bg-surface-hover: rgba(255, 255, 255, 0.06);
+  --pico-text: #eef0f6;
+  --pico-text-secondary: rgba(238, 240, 246, 0.68);
+  --pico-text-muted: rgba(238, 240, 246, 0.38);
+  --pico-border: rgba(238, 240, 246, 0.08);
+  --pico-border-hover: rgba(238, 240, 246, 0.16);
+  --pico-accent: #4ade80;
+  --pico-accent-soft: rgba(74, 222, 128, 0.12);
+  --pico-accent-glow: rgba(74, 222, 128, 0.06);
+  --pico-blue: #4b8dff;
+  --pico-blue-soft: rgba(75, 141, 255, 0.12);
+  --pico-blue-glow: rgba(75, 141, 255, 0.06);
+  --pico-red: #ef4444;
+  --pico-red-soft: rgba(239, 68, 68, 0.1);
+  --pico-font-accent: var(--font-marketing-accent), sans-serif;
+  --pico-font-display: var(--font-marketing-display), serif;
+  --pico-font-body: var(--font-marketing-sans), sans-serif;
+  --pico-radius-sm: 0.75rem;
+  --pico-radius: 1.2rem;
+  --pico-radius-lg: 1.6rem;
+  --pico-radius-full: 999px;
+  --pico-shell: min(100% - 2.5rem, 72rem);
+}
+
+/* --- Page shell --------------------------------------------------- */
+.page {
+  position: relative;
+  min-height: 100vh;
+  background: var(--pico-bg);
+  color: var(--pico-text);
+  font-family: var(--pico-font-body);
+  overflow-x: hidden;
+}
+
+.page *,
+.page *::before,
+.page *::after {
+  box-sizing: border-box;
+}
+
+.page a {
+  color: inherit;
+}
+
+.shell {
+  width: var(--pico-shell);
+  margin: 0 auto;
+}
+
+.main {
+  display: block;
+  position: relative;
+}
+
+/* --- Navigation --------------------------------------------------- */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  padding: 0;
+  background: rgba(7, 8, 12, 0.72);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border-bottom: 1px solid var(--pico-border);
+}
+
+.navInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: var(--pico-shell);
+  margin: 0 auto;
+  min-height: 3.6rem;
+}
+
+.navBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+}
+
+.navLogo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.16), rgba(75, 141, 255, 0.16));
+  border: 1px solid var(--pico-border);
+}
+
+.navLogo img {
+  width: 1.2rem;
+  height: 1.2rem;
+  object-fit: contain;
+}
+
+.navName {
+  font-family: var(--pico-font-accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pico-text);
+}
+
+.navTag {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .navTag {
+    display: inline;
+    font-family: var(--pico-font-body);
+    font-size: 0.82rem;
+    color: var(--pico-text-muted);
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    margin-left: 0.2rem;
+  }
+}
+
+.navCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.2rem;
+  padding: 0 1rem;
+  border-radius: var(--pico-radius-full);
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #052e16;
+  font-family: var(--pico-font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  box-shadow: 0 8px 24px rgba(74, 222, 128, 0.18);
+}
+
+.navCta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px rgba(74, 222, 128, 0.24);
+}
+
+/* --- Hero --------------------------------------------------------- */
+.hero {
+  position: relative;
+  min-height: max(100dvh, 48rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: 5rem;
+  overflow: clip;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 20%, rgba(74, 222, 128, 0.08), transparent),
+    radial-gradient(ellipse 60% 50% at 70% 10%, rgba(75, 141, 255, 0.06), transparent),
+    var(--pico-bg);
+}
+
+.heroGrid {
+  position: relative;
+  z-index: 1;
+  width: var(--pico-shell);
+  margin: 0 auto;
+  padding: clamp(5rem, 10vh, 8rem) 0 clamp(4rem, 8vh, 6rem);
+  display: grid;
+  gap: 1.4rem;
+  justify-items: center;
+  max-width: 42rem;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2rem;
+  padding: 0 1rem;
+  border-radius: var(--pico-radius-full);
+  border: 1px solid var(--pico-border);
+  background: var(--pico-bg-surface);
+  font-family: var(--pico-font-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pico-accent);
+}
+
+.heroBadgeDot {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--pico-accent);
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+
+.heroTitle {
+  margin: 0;
+  font-family: var(--pico-font-display);
+  font-size: clamp(2.8rem, 7vw, 4.8rem);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  max-width: 14ch;
+}
+
+.heroTitleAccent {
+  color: var(--pico-accent);
+}
+
+.heroSub {
+  margin: 0;
+  color: var(--pico-text-secondary);
+  font-size: clamp(1.02rem, 1rem + 0.3vw, 1.18rem);
+  line-height: 1.55;
+  max-width: 32rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0.4rem;
+}
+
+.heroMeta {
+  margin: 0;
+  color: var(--pico-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  max-width: 26rem;
+}
+
+/* --- Buttons ------------------------------------------------------ */
+.btnPrimary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3.1rem;
+  padding: 0 1.6rem;
+  border-radius: var(--pico-radius-sm);
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #052e16;
+  font-family: var(--pico-font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  box-shadow:
+    0 0 0 1px rgba(74, 222, 128, 0.2),
+    0 12px 32px rgba(74, 222, 128, 0.18);
+}
+
+.btnPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px rgba(74, 222, 128, 0.3),
+    0 18px 42px rgba(74, 222, 128, 0.24);
+}
+
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3.1rem;
+  padding: 0 1.6rem;
+  border-radius: var(--pico-radius-sm);
+  background: var(--pico-bg-surface);
+  color: var(--pico-text);
+  font-family: var(--pico-font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  border: 1px solid var(--pico-border);
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.btnSecondary:hover {
+  transform: translateY(-1px);
+  background: var(--pico-bg-surface-hover);
+  border-color: var(--pico-border-hover);
+}
+
+/* --- Section shared ---------------------------------------------- */
+.section {
+  padding: clamp(5.5rem, 10vw, 8rem) 0;
+  position: relative;
+}
+
+.sectionDark {
+  background:
+    radial-gradient(ellipse 50% 40% at 20% 30%, rgba(74, 222, 128, 0.04), transparent),
+    var(--pico-bg);
+}
+
+.sectionAlt {
+  background: var(--pico-bg-raised);
+  border-top: 1px solid var(--pico-border);
+  border-bottom: 1px solid var(--pico-border);
+}
+
+.sectionHeader {
+  display: grid;
+  gap: 0.7rem;
+  max-width: 36rem;
+  margin-bottom: clamp(2.5rem, 4vw, 3.5rem);
+}
+
+.sectionHeaderCenter {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--pico-font-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pico-accent);
+}
+
+.eyebrowBlue {
+  color: var(--pico-blue);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--pico-font-display);
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  color: var(--pico-text);
+}
+
+.sectionBody {
+  margin: 0;
+  font-size: clamp(0.98rem, 0.96rem + 0.2vw, 1.1rem);
+  line-height: 1.55;
+  color: var(--pico-text-secondary);
+}
+
+/* --- Before/After cards ------------------------------------------ */
+.baGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.baCard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-radius: var(--pico-radius);
+  border: 1px solid var(--pico-border);
+  background: var(--pico-bg-surface);
+  overflow: hidden;
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+
+.baCard:hover {
+  border-color: var(--pico-border-hover);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 639px) {
+  .baCard {
+    grid-template-columns: 1fr;
+  }
+}
+
+.baSide {
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+}
+
+.baBefore {
+  border-right: 1px solid var(--pico-border);
+}
+
+@media (max-width: 639px) {
+  .baBefore {
+    border-right: none;
+    border-bottom: 1px solid var(--pico-border);
+  }
+}
+
+.baLabel {
+  margin: 0;
+  font-family: var(--pico-font-accent);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.baLabelBefore {
+  color: var(--pico-red);
+}
+
+.baLabelAfter {
+  color: var(--pico-accent);
+}
+
+.baText {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.52;
+  color: var(--pico-text-secondary);
+}
+
+.baTextAfter {
+  color: var(--pico-text);
+  font-weight: 600;
+}
+
+/* --- Feature grid ------------------------------------------------ */
+.featureGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+@media (min-width: 768px) {
+  .featureGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.featureCard {
+  display: grid;
+  gap: 0.6rem;
+  padding: clamp(1.3rem, 3vw, 1.8rem);
+  border-radius: var(--pico-radius);
+  border: 1px solid var(--pico-border);
+  background: var(--pico-bg-surface);
+  transition: border-color 200ms ease, background 200ms ease, transform 200ms ease;
+}
+
+.featureCard:hover {
+  border-color: var(--pico-border-hover);
+  background: var(--pico-bg-surface-hover);
+  transform: translateY(-2px);
+}
+
+.featureNum {
+  margin: 0;
+  font-family: var(--pico-font-accent);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pico-accent);
+  opacity: 0.7;
+}
+
+.featureTitle {
+  margin: 0;
+  font-family: var(--pico-font-body);
+  font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--pico-text);
+}
+
+.featureBody {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--pico-text-secondary);
+}
+
+/* --- Pricing ----------------------------------------------------- */
+.pricingGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+@media (min-width: 768px) {
+  .pricingGrid {
+    grid-template-columns: repeat(3, 1fr);
+    align-items: start;
+  }
+}
+
+.pricingCard {
+  display: grid;
+  gap: 0.85rem;
+  padding: clamp(1.4rem, 3vw, 2rem);
+  border-radius: var(--pico-radius-lg);
+  border: 1px solid var(--pico-border);
+  background: var(--pico-bg-surface);
+  position: relative;
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+
+.pricingCard:hover {
+  border-color: var(--pico-border-hover);
+  transform: translateY(-2px);
+}
+
+.pricingCardRecommended {
+  border-color: rgba(74, 222, 128, 0.3);
+  background:
+    linear-gradient(180deg, rgba(74, 222, 128, 0.04), var(--pico-bg-surface));
+  box-shadow:
+    0 0 0 1px rgba(74, 222, 128, 0.08),
+    0 20px 50px rgba(74, 222, 128, 0.06);
+}
+
+.pricingBadge {
+  position: absolute;
+  top: -0.7rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  padding: 0 0.8rem;
+  border-radius: var(--pico-radius-full);
+  background: var(--pico-accent);
+  color: #052e16;
+  font-family: var(--pico-font-accent);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.pricingName {
+  margin: 0;
+  font-family: var(--pico-font-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pico-text-muted);
+}
+
+.pricingPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+}
+
+.pricingAmount {
+  font-family: var(--pico-font-display);
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--pico-text);
+}
+
+.pricingPeriod {
+  font-size: 0.88rem;
+  color: var(--pico-text-muted);
+}
+
+.pricingAgents {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--pico-text-secondary);
+}
+
+.pricingFeatures {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.pricingFeature {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.88rem;
+  line-height: 1.42;
+  color: var(--pico-text-secondary);
+}
+
+.pricingFeatureCheck {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--pico-accent-soft);
+  color: var(--pico-accent);
+  font-size: 0.65rem;
+  font-weight: 800;
+  margin-top: 0.1rem;
+}
+
+.pricingCta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.8rem;
+  padding: 0 1.2rem;
+  border-radius: var(--pico-radius-sm);
+  font-family: var(--pico-font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+  border: 1px solid var(--pico-border);
+  background: var(--pico-bg-surface-hover);
+  color: var(--pico-text);
+}
+
+.pricingCta:hover {
+  transform: translateY(-1px);
+  border-color: var(--pico-border-hover);
+}
+
+.pricingCtaPrimary {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #052e16;
+  border-color: transparent;
+  box-shadow: 0 8px 24px rgba(74, 222, 128, 0.16);
+}
+
+.pricingCtaPrimary:hover {
+  box-shadow: 0 12px 32px rgba(74, 222, 128, 0.22);
+}
+
+.pricingUpsell {
+  margin: clamp(1.4rem, 2vw, 2rem) 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--pico-text-muted);
+  text-align: center;
+}
+
+.pricingUpsell a {
+  color: var(--pico-blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* --- Setup timeline ---------------------------------------------- */
+.setupGrid {
+  display: grid;
+  gap: 0;
+  max-width: 36rem;
+  margin: 0 auto;
+  position: relative;
+}
+
+.setupGrid::before {
+  content: "";
+  position: absolute;
+  left: 1.3rem;
+  top: 2.5rem;
+  bottom: 2.5rem;
+  width: 1px;
+  background: linear-gradient(180deg, var(--pico-accent), var(--pico-border));
+  opacity: 0.3;
+}
+
+.setupStep {
+  display: grid;
+  grid-template-columns: 2.6rem 1fr;
+  gap: 1rem;
+  padding: 1.2rem 0;
+}
+
+.setupMarker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.setupDot {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  border: 1px solid var(--pico-accent);
+  background: var(--pico-accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--pico-font-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--pico-accent);
+  flex-shrink: 0;
+}
+
+.setupContent {
+  display: grid;
+  gap: 0.35rem;
+  padding-top: 0.15rem;
+}
+
+.setupTime {
+  font-family: var(--pico-font-accent);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pico-accent);
+  opacity: 0.6;
+}
+
+.setupTitle {
+  margin: 0;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--pico-text);
+}
+
+.setupBody {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--pico-text-secondary);
+}
+
+/* --- Final CTA --------------------------------------------------- */
+.ctaSection {
+  padding: clamp(5.5rem, 10vw, 8rem) 0;
+  position: relative;
+  text-align: center;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(74, 222, 128, 0.06), transparent),
+    var(--pico-bg);
+}
+
+.ctaSection::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(74, 222, 128, 0.2),
+    transparent
+  );
+}
+
+.ctaStack {
+  display: grid;
+  gap: 1.2rem;
+  justify-items: center;
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.ctaTitle {
+  margin: 0;
+  font-family: var(--pico-font-display);
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  color: var(--pico-text);
+}
+
+.ctaBody {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--pico-text-secondary);
+}
+
+.ctaMeta {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--pico-text-muted);
+}
+
+.ctaMeta a {
+  color: var(--pico-blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* --- Animations -------------------------------------------------- */
+@keyframes ambientShift {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes fadeUpIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
