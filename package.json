@@ -38,7 +38,8 @@
     "release:promote:railway": "bash scripts/promote-railway-production.sh",
     "release:verify:production": "bash scripts/verify-production-release.sh",
     "release:check": "bash scripts/release-check.sh",
-    "build:docs-search": "npx tsx scripts/build-docs-search-index.ts"
+    "build:docs-search": "npx tsx scripts/build-docs-search-index.ts",
+    "docs:watch": "npx tsx scripts/docs-watcher.ts"
   },
   "build": {
     "appId": "dev.mutx.desktop",
