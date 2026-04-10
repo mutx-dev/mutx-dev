@@ -3,54 +3,31 @@ Swarm routes for multi-agent swarm management.
 A swarm is a collection of agent deployments that work together.
 """
 
+from __future__ import annotations
+
 import logging
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, Field
-from sqlalchemy import select
+from pydantic import BaseModel, Field, ConfigDict
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
-from src.api.models import Agent, Deployment, User
+from src.api.models import Agent, Deployment, Swarm, User
 
 router = APIRouter(prefix="/swarms", tags=["swarms"])
 logger = logging.getLogger(__name__)
 
 
-# Swarm models (stored in memory for now, could be extended to DB)
-class Swarm:
-    """In-memory swarm representation."""
-
-    def __init__(
-        self,
-        id: uuid.UUID,
-        name: str,
-        description: str,
-        agent_ids: list[uuid.UUID],
-        user_id: uuid.UUID,
-        min_replicas: int = 1,
-        max_replicas: int = 10,
-    ):
-        self.id = id
-        self.name = name
-        self.description = description
-        self.agent_ids = agent_ids
-        self.user_id = user_id
-        self.min_replicas = min_replicas
-        self.max_replicas = max_replicas
-        self.created_at = datetime.now(timezone.utc)
-        self.updated_at = datetime.now(timezone.utc)
+# ------------------------------------------------------------------
+# Schemas
+# ------------------------------------------------------------------
 
 
-# In-memory storage (replace with DB in production)
-_swarms: dict[uuid.UUID, Swarm] = {}
-
-
-# Request/Response schemas
 class SwarmCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=1000)
@@ -78,6 +55,8 @@ class SwarmAgentResponse(BaseModel):
 
 
 class SwarmResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID
     name: str
     description: Optional[str]
@@ -94,10 +73,19 @@ class SwarmListResponse(BaseModel):
     total: int
 
 
+# ------------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------------
+
+
 async def _serialize_swarm(swarm: Swarm, db: AsyncSession) -> SwarmResponse:
     """Serialize swarm with agent details."""
     agents = []
-    for agent_id in swarm.agent_ids:
+    for agent_id_str in swarm.agent_ids:
+        try:
+            agent_id = uuid.UUID(agent_id_str)
+        except ValueError:
+            continue
         agent_result = await db.execute(
             select(Agent).where(Agent.id == agent_id, Agent.user_id == swarm.user_id)
         )
@@ -123,13 +111,18 @@ async def _serialize_swarm(swarm: Swarm, db: AsyncSession) -> SwarmResponse:
         id=swarm.id,
         name=swarm.name,
         description=swarm.description,
-        agent_ids=swarm.agent_ids,
+        agent_ids=[uuid.UUID(aid) for aid in swarm.agent_ids],
         min_replicas=swarm.min_replicas,
         max_replicas=swarm.max_replicas,
         created_at=swarm.created_at,
         updated_at=swarm.updated_at,
         agents=agents,
     )
+
+
+# ------------------------------------------------------------------
+# CRUD
+# ------------------------------------------------------------------
 
 
 @router.get("", response_model=SwarmListResponse)
@@ -140,11 +133,24 @@ async def list_swarms(
     current_user: User = Depends(get_current_user),
 ):
     """List all swarms for the current user."""
-    user_swarms = [s for s in _swarms.values() if s.user_id == current_user.id]
-    total = len(user_swarms)
-    paginated = user_swarms[skip : skip + limit]
+    # Count total
+    count_result = await db.execute(
+        select(func.count()).select_from(Swarm).where(Swarm.user_id == current_user.id)
+    )
+    total = count_result.scalar_one() or 0
+
+    # Paginated query
+    result = await db.execute(
+        select(Swarm)
+        .where(Swarm.user_id == current_user.id)
+        .order_by(Swarm.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    swarms = result.scalars().all()
+
     return SwarmListResponse(
-        items=[await _serialize_swarm(s, db) for s in paginated],
+        items=[await _serialize_swarm(s, db) for s in swarms],
         total=total,
     )
 
@@ -156,6 +162,7 @@ async def create_swarm(
     current_user: User = Depends(get_current_user),
 ):
     """Create a new swarm."""
+    # Validate all agents exist and are owned by the user
     for agent_id in swarm_data.agent_ids:
         agent_result = await db.execute(
             select(Agent).where(Agent.id == agent_id, Agent.user_id == current_user.id)
@@ -167,15 +174,16 @@ async def create_swarm(
             )
 
     swarm = Swarm(
-        id=uuid.uuid4(),
         name=swarm_data.name,
-        description=swarm_data.description or "",
-        agent_ids=swarm_data.agent_ids,
+        description=swarm_data.description,
+        agent_ids=[str(aid) for aid in swarm_data.agent_ids],
         user_id=current_user.id,
         min_replicas=swarm_data.min_replicas,
         max_replicas=swarm_data.max_replicas,
     )
-    _swarms[swarm.id] = swarm
+    db.add(swarm)
+    await db.commit()
+    await db.refresh(swarm)
     logger.info(f"Created swarm: {swarm.id}")
     return await _serialize_swarm(swarm, db)
 
@@ -187,10 +195,63 @@ async def get_swarm(
     current_user: User = Depends(get_current_user),
 ):
     """Get swarm details."""
-    swarm = _swarms.get(swarm_id)
-    if not swarm or swarm.user_id != current_user.id:
+    result = await db.execute(
+        select(Swarm).where(Swarm.id == swarm_id, Swarm.user_id == current_user.id)
+    )
+    swarm = result.scalar_one_or_none()
+    if not swarm:
         raise HTTPException(status_code=404, detail="Swarm not found")
     return await _serialize_swarm(swarm, db)
+
+
+@router.patch("/{swarm_id}", response_model=SwarmResponse)
+async def update_swarm(
+    swarm_id: uuid.UUID,
+    update_data: SwarmUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update swarm metadata."""
+    result = await db.execute(
+        select(Swarm).where(Swarm.id == swarm_id, Swarm.user_id == current_user.id)
+    )
+    swarm = result.scalar_one_or_none()
+    if not swarm:
+        raise HTTPException(status_code=404, detail="Swarm not found")
+
+    updates = update_data.model_dump(exclude_unset=True)
+    if "name" in updates:
+        swarm.name = updates["name"]
+    if "description" in updates:
+        swarm.description = updates["description"]
+    if "min_replicas" in updates:
+        swarm.min_replicas = updates["min_replicas"]
+    if "max_replicas" in updates:
+        swarm.max_replicas = updates["max_replicas"]
+
+    await db.commit()
+    await db.refresh(swarm)
+    logger.info(f"Updated swarm: {swarm.id}")
+    return await _serialize_swarm(swarm, db)
+
+
+@router.delete("/{swarm_id}", status_code=204)
+async def delete_swarm(
+    swarm_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Delete a swarm."""
+    result = await db.execute(
+        select(Swarm).where(Swarm.id == swarm_id, Swarm.user_id == current_user.id)
+    )
+    swarm = result.scalar_one_or_none()
+    if not swarm:
+        raise HTTPException(status_code=404, detail="Swarm not found")
+
+    await db.delete(swarm)
+    await db.commit()
+    logger.info(f"Deleted swarm: {swarm_id}")
 
 
 @router.post("/{swarm_id}/scale", response_model=SwarmResponse)
@@ -201,8 +262,11 @@ async def scale_swarm(
     current_user: User = Depends(get_current_user),
 ):
     """Scale all agents in a swarm to the specified replicas."""
-    swarm = _swarms.get(swarm_id)
-    if not swarm or swarm.user_id != current_user.id:
+    result = await db.execute(
+        select(Swarm).where(Swarm.id == swarm_id, Swarm.user_id == current_user.id)
+    )
+    swarm = result.scalar_one_or_none()
+    if not swarm:
         raise HTTPException(status_code=404, detail="Swarm not found")
 
     if scale_data.replicas < swarm.min_replicas or scale_data.replicas > swarm.max_replicas:
@@ -211,7 +275,11 @@ async def scale_swarm(
             detail=f"Replicas must be between {swarm.min_replicas} and {swarm.max_replicas}",
         )
 
-    for agent_id in swarm.agent_ids:
+    for agent_id_str in swarm.agent_ids:
+        try:
+            agent_id = uuid.UUID(agent_id_str)
+        except ValueError:
+            continue
         deploy_result = await db.execute(
             select(Deployment).where(
                 Deployment.agent_id == agent_id, Deployment.status.in_(["running", "ready"])
@@ -222,6 +290,6 @@ async def scale_swarm(
             deployment.replicas = scale_data.replicas
 
     await db.commit()
-    swarm.updated_at = datetime.now(timezone.utc)
+    await db.refresh(swarm)
     logger.info(f"Scaled swarm {swarm_id} to {scale_data.replicas} replicas")
     return await _serialize_swarm(swarm, db)

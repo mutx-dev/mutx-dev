@@ -24,6 +24,7 @@ from src.api.models.models import (
     Command,
     UsageEvent,
     AnalyticsEvent,
+    Swarm,
 )
 
 from src.api.models.observability_models import (
@@ -75,6 +76,7 @@ __all__ = [
     "Command",
     "UsageEvent",
     "AnalyticsEvent",
+    "Swarm",
     "MutxRun",
     "MutxStep",
     "MutxCost",

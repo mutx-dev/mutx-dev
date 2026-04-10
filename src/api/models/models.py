@@ -160,6 +160,9 @@ class User(Base):
     runs: Mapped[list["AgentRun"]] = relationship(
         "AgentRun", back_populates="user", cascade="all, delete-orphan"
     )
+    swarms: Mapped[list["Swarm"]] = relationship(
+        "Swarm", back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class UserSetting(Base):
@@ -631,3 +634,29 @@ class AgentResourceUsage(Base):
     )
 
     agent: Mapped["Agent"] = relationship("Agent")
+
+
+class Swarm(Base):
+    """Multi-agent swarm — a collection of agent deployments that work together."""
+
+    __tablename__ = "swarms"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    agent_ids: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
+    min_replicas: Mapped[int] = mapped_column(Integer, default=1)
+    max_replicas: Mapped[int] = mapped_column(Integer, default=10)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+    user: Mapped["User"] = relationship("User", back_populates="swarms")
