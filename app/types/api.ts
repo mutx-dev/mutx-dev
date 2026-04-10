@@ -2268,10 +2268,18 @@ export interface paths {
         get: operations["get_swarm_v1_swarms__swarm_id__get"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete Swarm
+         * @description Delete a swarm.
+         */
+        delete: operations["delete_swarm_v1_swarms__swarm_id__delete"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Update Swarm
+         * @description Update swarm metadata.
+         */
+        patch: operations["update_swarm_v1_swarms__swarm_id__patch"];
         trace?: never;
     };
     "/v1/swarms/{swarm_id}/scale": {
@@ -6338,6 +6346,17 @@ export interface components {
              * @description Target replicas per agent
              */
             replicas: number;
+        };
+        /** SwarmUpdate */
+        SwarmUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Min Replicas */
+            min_replicas?: number | null;
+            /** Max Replicas */
+            max_replicas?: number | null;
         };
         /**
          * TelemetryConfigRequest
@@ -11552,6 +11571,74 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwarmResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_swarm_v1_swarms__swarm_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                swarm_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_swarm_v1_swarms__swarm_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                swarm_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SwarmUpdate"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
