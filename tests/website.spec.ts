@@ -383,7 +383,7 @@ test.describe('mutx.dev QA', () => {
     await page.goto('/download/macos', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByTestId('public-auth-nav')).toBeVisible();
-    await expect(page.getByTestId('public-auth-nav').getByRole('link')).toHaveCount(3);
+    await expect(page.getByTestId('public-auth-nav').getByRole('link')).toHaveCount(5);
     await expect(
       page.getByRole('heading', { name: /download mutx for macos\./i })
     ).toBeVisible();
@@ -427,7 +427,7 @@ test.describe('mutx.dev QA', () => {
     await page.goto('/contact', { waitUntil: 'domcontentloaded' });
     await expectRouteSurfaceSplit(page);
     await expect(page.getByTestId('public-auth-nav')).toBeVisible();
-    await expect(page.getByTestId('public-auth-nav').getByRole('link')).toHaveCount(3);
+    await expect(page.getByTestId('public-auth-nav').getByRole('link')).toHaveCount(5);
     await expect(
       page.getByRole('heading', { name: /talk to mutx\./i })
     ).toBeVisible();
