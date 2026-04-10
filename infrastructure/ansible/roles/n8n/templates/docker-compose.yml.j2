@@ -29,8 +29,8 @@ services:
       {% if n8n_webhook_url %}
       - WEBHOOK_URL={{ n8n_webhook_url }}
       {% endif %}
-      {% if n8n_log_LEVEL %}
-      - N8N_LOG_LEVEL={{ n8n_log_LEVEL }}
+      {% if (n8n_log_level | default(n8n_log_LEVEL | default(""))) %}
+      - N8N_LOG_LEVEL={{ n8n_log_level | default(n8n_log_LEVEL | default("info")) }}
       {% endif %}
     volumes:
       - {{ n8n_data_path }}:/home/node/.n8n
