@@ -227,7 +227,7 @@ test.describe('mutx.dev QA', () => {
 
     await expect(page.getByTestId('homepage-lockup')).toBeVisible();
     await expect(page.getByTestId('homepage-lockup-mark')).toBeVisible();
-    await expect(page.getByRole('heading', { name: /see it\. control it\. share it/i })).toBeVisible({
+    await expect(page.getByRole('heading', { name: /see it\. control it\. prove it\./i })).toBeVisible({
       timeout: 10000,
     });
     await expect(
