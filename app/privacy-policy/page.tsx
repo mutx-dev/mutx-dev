@@ -5,7 +5,7 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl, getPageOgImageUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | MUTX",

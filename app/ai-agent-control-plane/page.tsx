@@ -7,7 +7,6 @@ import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
-  getOgImageUrl,
   getPageOgImageUrl,
   getSiteUrl,
 } from "@/lib/seo";

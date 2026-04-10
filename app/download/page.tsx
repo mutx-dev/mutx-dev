@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import MacDownloadPage from "./macos/page";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, getCanonicalUrl } from "@/lib/seo";
 
 export const revalidate = 900;
 

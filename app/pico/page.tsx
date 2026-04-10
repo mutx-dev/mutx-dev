@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { PicoLandingPage } from "@/components/site/pico/PicoLandingPage";
 import { PicoFooter } from "@/components/site/pico/PicoFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
-import { getCanonicalUrl, getOgImageUrl, getPageOgImageUrl, getSiteUrl } from "@/lib/seo";
+import { getCanonicalUrl, getPageOgImageUrl, getSiteUrl } from "@/lib/seo";
 
 const pageTitle = "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer";
 const pageDescription =
