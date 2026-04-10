@@ -11,6 +11,7 @@ const resendFromEmail =
 const notifyEmail =
   process.env.CONTACT_NOTIFY_EMAIL?.trim() || 'hello@mutx.dev'
 const resendAudienceId = process.env.RESEND_AUDIENCE_ID?.trim()
+const discordWebhookUrl = process.env.LEAD_DISCORD_WEBHOOK_URL?.trim() || process.env.DISCORD_LEAD_WEBHOOK_URL?.trim()
 const resend = resendApiKey ? new Resend(resendApiKey) : null
 
 async function sendNotificationEmail(data: {
@@ -95,6 +96,45 @@ async function syncResendAudienceContact(data: {
   }
 }
 
+async function notifyDiscord(data: {
+  email: string
+  name?: string
+  company?: string
+  message?: string
+  tier?: string
+  source: string
+}) {
+  if (!discordWebhookUrl) return
+
+  const fields = [{ name: 'Email', value: data.email, inline: true }]
+  if (data.name) fields.push({ name: 'Name', value: data.name, inline: true })
+  if (data.company) fields.push({ name: 'Company', value: data.company, inline: true })
+  if (data.source) fields.push({ name: 'Source', value: data.source, inline: true })
+  if (data.tier) fields.push({ name: 'Interest', value: data.tier, inline: true })
+  if (data.message) fields.push({ name: 'Message', value: data.message.slice(0, 1024), inline: false })
+
+  try {
+    await fetch(discordWebhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: 'MUTX Leads',
+        avatar_url: 'https://mutx.dev/logo.png',
+        embeds: [{
+          title: 'New PicoMUTX Lead',
+          description: `**${data.email}** just signed up.`,
+          color: 0x06b6d4,
+          fields,
+          footer: { text: 'MUTX Lead Pipeline' },
+          timestamp: new Date().toISOString(),
+        }],
+      }),
+    })
+  } catch (err) {
+    console.error('Discord webhook failed:', err)
+  }
+}
+
 export async function POST(request: Request): Promise<NextResponse> {
   return withErrorHandling(async () => {
     const body = await request.json().catch(() => ({}))
@@ -141,6 +181,14 @@ export async function POST(request: Request): Promise<NextResponse> {
       email: normalizedEmail,
       name: name?.trim(),
       company: company?.trim(),
+      source: normalizedSource,
+    })
+    await notifyDiscord({
+      email: normalizedEmail,
+      name: name?.trim(),
+      company: company?.trim(),
+      message: message?.trim(),
+      tier: normalizedTier,
       source: normalizedSource,
     })
 

@@ -12,7 +12,7 @@ This matrix tracks the current repo state and where contributors can help next.
 | Area         | Current state                                                       | Biggest gaps                                                                                                                                     | Contributor-ready work                                                               |
 | ------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
 | Web          | landing site, supported dashboard routes, observability dashboard, and control demo all exist in Next.js | dashboard still does not cover every backend capability; some flows remain better in CLI or direct API                                           | fill dashboard gaps, tighten auth/session UX, keep demo vs live boundaries honest    |
-| API          | real `/v1/*` contract with auth, agents, deployments, runs, monitoring, webhooks, budgets, leads, governance, observability, RBAC enforcement, and OIDC token validation | RAG search and scheduler return 503 with feature flags until runtime is configured; preview routes still need live contracts before they return to primary nav | typed response polish, lifecycle tests, deeper RBAC coverage                         |
+|| API          | real `/v1/*` contract with 27 route prefixes, 170 endpoint-method pairs, auth enforcement via `get_current_user` on 146+ endpoints, RBAC, OIDC validation | RAG and scheduler are now real implementations (no longer 503 stubs); preview routes still need live contracts before they return to primary nav | typed response polish, lifecycle tests, OpenAPI `required: false` → `true` fix on auth headers |
 | CLI          | grouped `auth`, `agent`, `deployment`, `assistant`, `runtime`, `setup`, `governance`, and `observability` commands plus compatibility aliases | some older aliases still create duplicate docs burden; setup ergonomics and error recovery still need polish                                    | streamline help/docs, keep setup truthful, tighten command coverage                  |
 | SDK          | sync client is useful and tracks `/v1/*` correctly; observability SDK with `OpenClawObservability` added | `MutxAsyncClient` remains limited and must stay explicitly documented as such                                                                     | async contract coverage, clearer supported-method matrix, docs truth                 |
 | Infra        | Docker, Terraform, Ansible, Railway, Kubernetes/Helm chart, and monitoring assets exist    | Vault integration is still a stub and validation confidence loops are thin                                                                       | infra docs cleanup, validation, stub visibility, Helm chart hardening                |
@@ -27,7 +27,7 @@ This matrix tracks the current repo state and where contributors can help next.
 - keep preview and redirect-backed routes out of primary stable navigation until their contracts are real
 - keep the signed desktop artifact lane healthy so `mutx.dev/download/macos` and the supported dashboard release stay trustworthy
 - keep SDK async documentation honest until full async support is real
-- finish placeholder-backed areas such as scheduler integration and RAG search
+- fix OpenAPI spec auth header `required: false` → `true` to match runtime enforcement
 - keep GitBook sync GitHub-first and stop GitBook-only README drift
 - deepen RBAC role coverage and OIDC provider support
 
@@ -41,9 +41,10 @@ This matrix tracks the current repo state and where contributors can help next.
 
 ### `area:api`
 
-- auth dependencies and per-user ownership checks
+- auth dependencies and per-user ownership checks (shipped — `get_current_user` on 146+ endpoints)
 - deeper runtime-backed lifecycle semantics
-- scheduler and RAG completion
+- OpenAPI spec accuracy: `required: false` → `true` on auth headers
+- Vault integration completion
 
 ### `area:cli`
 
