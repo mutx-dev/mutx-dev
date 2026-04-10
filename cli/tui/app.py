@@ -12,6 +12,7 @@ try:
     from textual.css.query import NoMatches
     from textual.containers import Horizontal, Vertical, VerticalScroll
     from textual.widgets import Button, DataTable, Footer, Static, TabbedContent, TabPane
+
     _TEXTUAL_AVAILABLE = True
 except ImportError:
     _TEXTUAL_AVAILABLE = False
@@ -21,10 +22,16 @@ except ImportError:
     Binding = None
     Horizontal = Vertical = VerticalScroll = object
     Button = DataTable = Footer = Static = TabbedContent = TabPane = object
-    def on(*a, **kw): pass
+
+    def on(*a, **kw):
+        pass
+
     def work(*a, **kw):
-        def decorator(fn): return fn
+        def decorator(fn):
+            return fn
+
         return decorator
+
 
 from cli.config import current_config
 from cli.faramesh_runtime import get_pending_defers, get_recent_decisions

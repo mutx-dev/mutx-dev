@@ -12,13 +12,21 @@ except ImportError:
     _TEXTUAL_AVAILABLE = False
     ComposeResult = None
     Horizontal = Vertical = object
+
     class ModalScreen:  # type: ignore[misc]
         """Stub for ModalScreen when textual is not installed."""
-        def __init_subclass__(cls, **kw): pass
+
+        def __init_subclass__(cls, **kw):
+            pass
+
         @classmethod
-        def __class_getitem__(cls, item): return cls
+        def __class_getitem__(cls, item):
+            return cls
+
     Button = DataTable = Input = Label = Static = object
-    def on(*a, **kw): pass
+
+    def on(*a, **kw):
+        pass
 
 
 def _safe_row_key(event: DataTable.RowSelected) -> str | None:

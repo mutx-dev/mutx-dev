@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { DocNavItem } from '@/lib/docs';
 import { DocsNavContext, useDocsNav } from "./DocsNavContext";
@@ -35,7 +35,9 @@ function NavItem({ item, pathname }: NavItemProps) {
     try {
       const stored = localStorage.getItem(navItemKey(item.slug));
       if (stored !== null) setOpen(stored === 'true');
-    } catch {}
+    } catch {
+      // localStorage may be unavailable in SSR or restricted environments
+    }
   }, [item.slug]);
 
   function toggle(e: React.MouseEvent) {
@@ -45,7 +47,9 @@ function NavItem({ item, pathname }: NavItemProps) {
     setOpen(next);
     try {
       localStorage.setItem(navItemKey(item.slug), String(next));
-    } catch {}
+    } catch {
+      // localStorage unavailable in SSR or restricted environments
+    }
   }
 
   // Show expand chevron for ANY item with children (depth 0 or deeper)
@@ -79,7 +83,9 @@ function NavItem({ item, pathname }: NavItemProps) {
       setOpen(true);
       try {
         localStorage.setItem(navItemKey(item.slug), 'true');
-      } catch {}
+      } catch {
+        // localStorage unavailable in SSR or restricted environments
+      }
     }
   }, [pathname, hasChildren, item.children, item.slug]);
 
@@ -246,12 +252,14 @@ function loadOpenState(): string[] {
 function saveOpenState(sections: Set<string>) {
   try {
     localStorage.setItem('docs-nav-open', JSON.stringify([...sections]));
-  } catch {}
+  } catch {
+    // localStorage unavailable in SSR or restricted environments
+  }
 }
 
 export function DocsLayout({ nav, children }: DocsLayoutProps) {
   const pathname = usePathname();
-  const [openSections, setOpenSections] = useState<Set<string>>(() => {
+  const [openSections, _setOpenSections] = useState<Set<string>>(() => {
     // Start collapsed (GitBook default) — NavItem auto-expands ancestor of current page
     const initial = new Set<string>();
     // Merge with localStorage state
