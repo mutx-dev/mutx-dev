@@ -1201,6 +1201,37 @@
   margin-top: 0.1rem;
 }
 
+/* --- Split column for merged who-for / not-for section ------------ */
+.whoSplit {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 0 2rem;
+  align-items: start;
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.whoDivider {
+  background: var(--pico-border);
+  align-self: stretch;
+  min-height: 100%;
+}
+
+.whoCol {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.whoColTitle {
+  margin: 0 0 0.25rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: var(--pico-font-accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pico-text-muted);
+}
+
 .notList {
   margin: 0;
   padding: 0;

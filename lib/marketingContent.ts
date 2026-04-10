@@ -90,8 +90,8 @@ const homepageActions: MarketingActionLink[] = [
     tone: 'secondary',
   },
   {
-    label: 'Releases',
-    href: '/releases',
+    label: 'Download for macOS',
+    href: '/download',
     tone: 'utility',
   },
   {

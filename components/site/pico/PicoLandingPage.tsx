@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Check } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
@@ -26,11 +26,11 @@ const PROBLEMS = [
   },
   {
     label: '"I already tried — and got stuck."',
-    body: 'You made progress, hit a wall, and had nobody to ask who could actually help. So the project stalled, and now the idea is sitting in your backlog instead of creating value.',
+    body: 'You made progress, hit a wall, and had nobody to ask who could actually help. The idea is sitting in your backlog instead of creating value.',
   },
   {
     label: '"I spent money, and it still isn\'t working properly."',
-    body: 'Maybe you hired someone. Maybe you paid for tools. Maybe you built something half-functional that breaks under real conditions. Now you are not just uncertain — you are skeptical.',
+    body: 'Maybe you hired someone. Maybe you paid for tools. Now you are not just uncertain — you are skeptical.',
   },
   {
     label: '"I don\'t want to deploy something I can\'t trust."',
@@ -42,27 +42,22 @@ const HOW_IT_WORKS = [
   {
     icon: 'path',
     title: 'Step-by-step implementation paths',
-    body: 'Follow structured paths based on what you are actually trying to build — from customer support agents to internal automations and workflow assistants. No generic theory. No endless searching.',
+    body: 'Follow structured paths based on what you are trying to build — from customer support agents to internal automations. No generic theory. No endless searching.',
   },
   {
     icon: 'support',
     title: 'Guided support when you get stuck',
-    body: 'When something breaks, becomes unclear, or feels risky, you don\'t have to figure it out alone. PicoMUTX is designed to keep momentum alive instead of letting projects die in confusion.',
+    body: 'When something breaks or becomes unclear, you do not have to figure it out alone. PicoMUTX keeps momentum alive instead of letting projects die in confusion.',
   },
   {
     icon: 'shield',
     title: 'Built-in safety from day one',
-    body: 'Cost awareness, visibility, and guardrails matter. You should know what your agent is doing, what it is costing, and when something needs attention.',
-  },
-  {
-    icon: 'community',
-    title: 'Community that improves the process',
-    body: 'You are not building in a vacuum. You are inside an environment where questions, obstacles, and practical solutions become part of a shared learning system.',
+    body: 'Cost awareness, visibility, and guardrails matter. You always know what your agent is doing, what it is costing, and when something needs attention.',
   },
   {
     icon: 'expert',
     title: 'Live expert touchpoints',
-    body: 'Some things are too nuanced for static documentation. PicoMUTX includes live guidance moments designed to help you unblock faster and make better decisions as you build.',
+    body: 'Some things are too nuanced for static documentation. Real guidance moments designed to help you unblock faster and make better decisions.',
   },
 ]
 
@@ -71,7 +66,6 @@ const WHO_IT_S_FOR = [
   'You\'ve tried before and got stuck halfway',
   'You already spent money on tools or implementation and still don\'t trust the outcome',
   'You want a practical path, not more theory',
-  'You care about building something useful, safe, and real',
   'You want support while building, not only after something goes wrong',
 ]
 
@@ -79,7 +73,6 @@ const WHO_IT_S_NOT_FOR = [
   'You are looking for a shortcut with zero learning',
   'You already run a mature enterprise agent stack and need complex governance infrastructure',
   'You want entertainment, trends, or hype more than execution',
-  'You want a one-off fix, not a system',
   'You are not ready to change how the business actually operates',
   'You expect AI to replace judgment, leadership, or accountability',
 ]
@@ -94,16 +87,8 @@ const BEFORE_AFTER = [
     after: 'You follow guided implementation paths',
   },
   {
-    before: 'You are unsure what\'s safe, stable, or worth deploying',
-    after: 'You build with safeguards and visibility',
-  },
-  {
     before: 'You get stuck and lose momentum',
     after: 'You get support before the project dies',
-  },
-  {
-    before: 'You spend money without confidence',
-    after: 'You move with more control and less waste',
   },
   {
     before: 'Your agent stays in theory',
@@ -114,15 +99,11 @@ const BEFORE_AFTER = [
 const FAQS = [
   {
     q: 'Do I need to know how to code?',
-    a: 'No. PicoMUTX is built for people who want to build useful AI agents without needing deep technical expertise. You do not need to be an engineer to get started.',
+    a: 'No. PicoMUTX is built for people who want to build useful AI agents without needing deep technical expertise.',
   },
   {
     q: 'What if I\'ve already tried and failed?',
     a: 'That is exactly one of the people this is for. PicoMUTX is designed to reduce the confusion and fragmentation that usually cause people to stop halfway.',
-  },
-  {
-    q: 'What if I already spent money on tools or freelancers?',
-    a: 'Then you already know the real problem: access to tools is not the same as having a reliable path. PicoMUTX is meant to give you more structure, more confidence, and fewer expensive mistakes.',
   },
   {
     q: 'What kind of agents can I build?',
@@ -130,15 +111,11 @@ const FAQS = [
   },
   {
     q: 'Is pre-registration free?',
-    a: 'Yes. Pre-registration is free and does not require payment.',
-  },
-  {
-    q: 'What happens after I pre-register?',
-    a: 'You will be added to the early access list and be among the first to hear when access opens, founding spots become available, and rollout details are released.',
+    a: 'Yes. Pre-registration is free and does not require payment. You will be among the first to hear when access opens and when founding spots become available.',
   },
   {
     q: 'Is this for enterprises?',
-    a: 'PicoMUTX is better suited to founders, operators, and small teams who want a guided way to build and deploy AI agents. Larger enterprise governance needs belong more to the broader MUTX ecosystem.',
+    a: 'PicoMUTX is better suited to founders, operators, and small teams who want a guided way to build and deploy AI agents. Larger enterprise governance needs belong to the broader MUTX ecosystem.',
   },
 ]
 
@@ -147,8 +124,7 @@ const PREREGE_BENEFITS = [
   'Priority consideration for founding member spots',
   'Early onboarding and launch updates',
   'The ability to influence early use cases and rollout priorities',
-  'First visibility into pricing, availability, and access terms',
-  'Access to founding-member incentives when available',
+  'First visibility into pricing and access terms',
 ]
 
 /* ------------------------------------------------------------------ */
@@ -177,15 +153,6 @@ function HowItWorksIcon({ kind }: { kind: string }) {
         <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={clr} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
           <path d="M9 12l2 2 4-4" />
-        </svg>
-      )
-    case 'community':
-      return (
-        <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={clr} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
       )
     case 'expert':
@@ -293,7 +260,7 @@ export function PicoLandingPage() {
               <div className={s.trustBar}>
                 {TRUST_BAR_ITEMS.map((item, i) => (
                   <span key={item} className={s.trustItem}>
-                    {i > 0 && <span className={s.trustSep} aria-hidden="true">路</span>}
+                    {i > 0 && <span className={s.trustSep} aria-hidden="true">|</span>}
                     {item}
                   </span>
                 ))}
@@ -312,7 +279,7 @@ export function PicoLandingPage() {
                 It is everything that happens after it.
               </h2>
               <p className={s.sectionBody}>
-                Most people don&apos;t get stuck because they lack ambition. They get stuck
+                Most people do not get stuck because they lack ambition. They get stuck
                 because building an AI agent still feels like entering a world designed
                 by engineers, for engineers.
               </p>
@@ -333,43 +300,22 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Platform Intro (Section 3) ---- */}
+        {/* ---- Platform Intro + What You Get (Sections 3+4 combined) ---- */}
         <section className={`${s.section} ${s.sectionAlt}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
               <span className={s.eyebrow}>What PicoMUTX Is</span>
               <h2 className={s.sectionTitle}>
-                PicoMUTX is where AI agents go from &ldquo;interesting idea&rdquo; to
-                &ldquo;working system.&rdquo;
+                Where AI agents go from &ldquo;interesting idea&rdquo; to &ldquo;working system.&rdquo;
               </h2>
               <p className={s.sectionBody}>
                 PicoMUTX is a guided platform for people who want to build and run AI
                 agents safely — without needing to become full-time engineers. It gives
                 you the structure, support, and safeguards that are usually missing when
-                people try to do this alone.
+                people try to do this alone. Instead of assembling everything from scratch,
+                you move step by step: from idea to implementation, from confusion to
+                clarity, from prototype to something you can actually use.
               </p>
-              <p className={s.sectionBody}>
-                Instead of forcing you to assemble everything from scratch, PicoMUTX
-                helps you move step by step: from idea to implementation, from confusion
-                to clarity, from prototype to something you can actually use.
-              </p>
-              <p className={`${s.sectionBody} ${s.sectionBodyAccent}`}>
-                This is not just content. Not just a tool. Not just a community.
-                It&apos;s a practical environment designed to help you build, deploy, and
-                run AI agents with confidence.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* ---- How It Works (Section 4) ---- */}
-        <section className={`${s.section} ${s.sectionDark}`}>
-          <div className={s.shell}>
-            <div className={s.sectionHeader}>
-              <span className={s.eyebrow}>How It Works</span>
-              <h2 className={s.sectionTitle}>
-                What you get inside PicoMUTX
-              </h2>
             </div>
             <div className={s.howGrid}>
               {HOW_IT_WORKS.map((item, i) => (
@@ -393,47 +339,43 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Who It&apos;s For (Section 5) ---- */}
-        <section className={`${s.section} ${s.sectionAlt}`}>
-          <div className={s.shell}>
-            <div className={s.sectionHeader}>
-              <span className={s.eyebrow}>Who It&apos;s For</span>
-              <h2 className={s.sectionTitle}>
-                PicoMUTX is for you if&hellip;
-              </h2>
-            </div>
-            <ul className={s.whoList}>
-              {WHO_IT_S_FOR.map((item) => (
-                <li key={item} className={s.whoItem}>
-                  <Check className={s.whoCheck} />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* ---- Who It&apos;s Not For (Section 6) ---- */}
+        {/* ---- Who It&apos;s For / Not For (Sections 5+6 merged) ---- */}
         <section className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
-              <span className={s.eyebrow}>Who It&apos;s Not For</span>
+              <span className={s.eyebrow}>Is PicoMUTX for You?</span>
               <h2 className={s.sectionTitle}>
                 PicoMUTX is not for everyone.
               </h2>
-              <p className={s.sectionBody}>
-                PicoMUTX is for people who want to build properly — with support,
-                structure, and a safer path forward.
-              </p>
             </div>
-            <ul className={s.notList}>
-              {WHO_IT_S_NOT_FOR.map((item) => (
-                <li key={item} className={s.notItem}>
-                  <span className={s.notDash} aria-hidden="true">—</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+
+            <div className={s.whoSplit}>
+              <div className={s.whoCol}>
+                <h3 className={s.whoColTitle}>This is for you if&hellip;</h3>
+                <ul className={s.whoList}>
+                  {WHO_IT_S_FOR.map((item) => (
+                    <li key={item} className={s.whoItem}>
+                      <Check className={s.whoCheck} />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className={s.whoDivider} aria-hidden="true" />
+
+              <div className={s.whoCol}>
+                <h3 className={s.whoColTitle}>This is not for you if&hellip;</h3>
+                <ul className={s.notList}>
+                  {WHO_IT_S_NOT_FOR.map((item) => (
+                    <li key={item} className={s.notItem}>
+                      <span className={s.notDash} aria-hidden="true">—</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -443,7 +385,7 @@ export function PicoLandingPage() {
             <div className={s.sectionHeader}>
               <span className={s.eyebrow}>The Shift</span>
               <h2 className={s.sectionTitle}>
-                What changes when you stop trying to figure it out alone
+                What changes when you stop figuring it out alone
               </h2>
             </div>
             <div className={s.baGrid}>
@@ -475,19 +417,18 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Why Pre-Register (Section 8 + 9) ---- */}
+        {/* ---- Why Pre-Register + Founding (Sections 8+9 merged) ---- */}
         <section className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
-              <span className={s.eyebrow}>Why Pre-Register</span>
+              <span className={s.eyebrow}>Early Access</span>
               <h2 className={s.sectionTitle}>
-                PicoMUTX is opening access in stages.
+                PicoMUTX is opening in stages. Founding access won&apos;t stay open forever.
               </h2>
               <p className={s.sectionBody}>
                 Pre-registering now puts you ahead of the public rollout and inside the
-                group that will help shape the platform early. Early users do not just
-                get access — they get a closer line to the product, earlier onboarding,
-                and more influence over what gets prioritized first.
+                group that helps shape the platform early. Early users get a closer line to
+                the product, earlier onboarding, and more influence over what gets prioritized.
               </p>
             </div>
             <div className={s.benefitsGrid}>
@@ -498,26 +439,10 @@ export function PicoLandingPage() {
                 </div>
               ))}
             </div>
-
-            <div className={s.foundingBlock}>
-              <h3 className={s.foundingTitle}>
-                Founding access won&apos;t stay open forever
-              </h3>
-              <p className={s.foundingBody}>
-                The first wave of users matters more than the rest. These are the people
-                closest to the build — the ones who arrive early, give feedback early,
-                and have exclusive benefits. That&apos;s why founding access will be limited.
-              </p>
-              <p className={s.foundingBody}>
-                If you know you want a safer, more guided path to building AI agents,
-                pre-register now and secure your place before public launch changes the
-                terms.
-              </p>
-            </div>
           </div>
         </section>
 
-        {/* ---- FAQ / Objection Handling (Section 10) ---- */}
+        {/* ---- FAQ (Section 10) ---- */}
         <section className={`${s.section} ${s.sectionAlt}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
@@ -537,7 +462,7 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Pre-Register CTA (Section 11) ---- */}
+        {/* ---- Final CTA (Section 11) ---- */}
         <section id="pre-register" className={`${s.section} ${s.sectionCta}`}>
           <div className={s.shell}>
             <div className={s.ctaStack}>
@@ -550,11 +475,9 @@ export function PicoLandingPage() {
 
               <SiteReveal delay={0.12}>
                 <p className={s.ctaBody}>
-                  You do not need more tabs open. You do not need another tutorial. You
-                  do not need another expensive detour. What you need is a clearer path
-                  to something that works. PicoMUTX is built for that moment — the one
-                  where you decide to stop circling the idea and finally build it
-                  properly.
+                  You do not need more tabs open. You do not need another tutorial.
+                  You need a clearer path to something that works.
+                  PicoMUTX is built for that moment.
                 </p>
               </SiteReveal>
 
