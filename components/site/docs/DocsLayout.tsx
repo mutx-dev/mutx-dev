@@ -8,6 +8,7 @@ import { DocsNavContext, useDocsNav } from "./DocsNavContext";
 import { DocsSearch } from "./DocsSearch";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { DocsBreadcrumbs } from "./DocsBreadcrumbs";
+import { useDocsLiveReload } from "./useDocsLiveReload";
 import "@/app/docs/docs.css";
 
 interface NavItemProps {
@@ -258,6 +259,7 @@ function saveOpenState(sections: Set<string>) {
 }
 
 export function DocsLayout({ nav, children }: DocsLayoutProps) {
+  useDocsLiveReload();
   const pathname = usePathname();
   const [openSections, _setOpenSections] = useState<Set<string>>(() => {
     // Start collapsed (GitBook default) — NavItem auto-expands ancestor of current page
