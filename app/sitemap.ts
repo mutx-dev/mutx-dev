@@ -24,7 +24,7 @@ const monthlyRoutes = new Set<string>([
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()
-  const routes = [...PUBLIC_MARKETING_ROUTES, ...getDocSitemapRoutes()].filter(
+  const routes = [...PUBLIC_MARKETING_ROUTES, '/pico', ...getDocSitemapRoutes()].filter(
     (route, index, allRoutes) => allRoutes.indexOf(route) === index,
   )
 

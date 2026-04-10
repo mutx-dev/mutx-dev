@@ -5,7 +5,7 @@ import matter from "gray-matter";
 import { DocsLayout } from "@/components/site/docs/DocsLayout";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, buildWebPageStructuredData, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
 
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,14 +19,14 @@ export async function generateMetadata(): Promise<Metadata> {
       title: `${data.title || "Whitepaper"} — MUTX`,
       description: data.description as string,
       url: getCanonicalUrl("/whitepaper"),
-      images: [getOgImageUrl()],
+      images: [getPageOgImageUrl(`${data.title || "Whitepaper"} — MUTX`, data.description as string, { path: "/whitepaper" })],
     },
     twitter: {
       card: "summary_large_image",
       creator: DEFAULT_X_HANDLE,
       title: `${data.title || "Whitepaper"} — MUTX`,
       description: data.description as string,
-      images: [getOgImageUrl()],
+      images: [getPageOgImageUrl(`${data.title || "Whitepaper"} — MUTX`, data.description as string, { path: "/whitepaper" })],
     },
   };
 }
@@ -37,6 +37,10 @@ export default async function WhitepaperPage() {
 
   return (
     <DocsLayout nav={[]} title={(data.title as string) || "Whitepaper"}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildWebPageStructuredData({ name: `${data.title || "Whitepaper"} | MUTX`, path: "/whitepaper", description: (data.description as string) || "" })) }}
+      />
       <article className="docs-prose">
         <div
           dangerouslySetInnerHTML={{

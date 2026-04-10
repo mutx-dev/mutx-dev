@@ -14,7 +14,7 @@ export function AuthNav() {
           >
             <span className={styles.publicRailMark}>
               <Image
-                src="/logo.png"
+                src="/logo.webp"
                 alt="MUTX"
                 width={32}
                 height={32}

@@ -41,7 +41,7 @@ function ActionLink({ action, className }: ActionLinkProps) {
       <a
         href={action.href}
         target="_blank"
-        rel="noreferrer"
+        rel="noopener noreferrer"
         className={className}
       >
         {action.label}
@@ -109,7 +109,7 @@ export function MarketingHomePage() {
                 <span className={home.heroLockupMark} data-testid="homepage-lockup-mark">
                   <span className={home.heroLockupTarget} data-loader-target="marketing-brand-mark">
                     <img
-                      src="/logo.png"
+                      src="/logo.webp"
                       alt="MUTX logo"
                       className={home.heroLockupMarkImage}
                       decoding="async"
@@ -117,7 +117,7 @@ export function MarketingHomePage() {
                   </span>
                   <span className={home.heroLockupMarkFrame} aria-hidden="true">
                     <img
-                      src="/logo.png"
+                      src="/logo.webp"
                       alt=""
                       className={home.heroLockupMarkImage}
                       decoding="async"
@@ -145,7 +145,7 @@ export function MarketingHomePage() {
                   <a
                     href="https://github.com/mutx-dev/mutx-dev"
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className={core.buttonGhost}
                   >
                     <svg

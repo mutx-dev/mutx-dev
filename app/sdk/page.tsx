@@ -5,7 +5,7 @@ import matter from "gray-matter";
 import { DocsLayout } from "@/components/site/docs/DocsLayout";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, buildWebPageStructuredData, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
 
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,14 +19,14 @@ export async function generateMetadata(): Promise<Metadata> {
       title: `${data.title || "SDK"} — MUTX`,
       description: data.description as string,
       url: getCanonicalUrl("/sdk"),
-      images: [getOgImageUrl()],
+      images: [getPageOgImageUrl(`${data.title || "SDK"} — MUTX`, data.description as string, { path: "/sdk" })],
     },
     twitter: {
       card: "summary_large_image",
       creator: DEFAULT_X_HANDLE,
       title: `${data.title || "SDK"} — MUTX`,
       description: data.description as string,
-      images: [getOgImageUrl()],
+      images: [getPageOgImageUrl(`${data.title || "SDK"} — MUTX`, data.description as string, { path: "/sdk" })],
     },
   };
 }
@@ -37,6 +37,10 @@ export default async function SDKPage() {
 
   return (
     <DocsLayout nav={[]} title={(data.title as string) || "SDK"}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildWebPageStructuredData({ name: `${data.title || "SDK"} | MUTX`, path: "/sdk", description: (data.description as string) || "" })) }}
+      />
       <article className="docs-prose">
         <div
           dangerouslySetInnerHTML={{

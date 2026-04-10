@@ -1,31 +1,31 @@
 import type { Metadata } from "next";
 
 import MacDownloadPage from "./macos/page";
-import { DEFAULT_X_HANDLE, getCanonicalUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
 
 export const revalidate = 900;
 
 export const metadata: Metadata = {
-  title: "Download for macOS | MUTX",
+  title: "Download MUTX | MUTX",
   description:
-    "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.",
+    "Download the latest MUTX desktop release for your platform. Signed builds, checksums, and release notes.",
   alternates: {
     canonical: getCanonicalUrl("/download"),
   },
   openGraph: {
-    title: "Download for macOS | MUTX",
+    title: "Download MUTX | MUTX",
     description:
-      "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.",
+      "Download the latest MUTX desktop release for your platform. Signed builds, checksums, and release notes.",
     url: getCanonicalUrl("/download"),
-    images: [getPageOgImageUrl("Download for macOS | MUTX", "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.", { path: "/download" })],
+    images: [getPageOgImageUrl("Download MUTX | MUTX", "Download the latest MUTX desktop release for your platform. Signed builds, checksums, and release notes.", { path: "/download" })],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
-    title: "Download for macOS | MUTX",
+    title: "Download MUTX | MUTX",
     description:
-      "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.",
-    images: [getPageOgImageUrl("Download for macOS | MUTX", "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.", { path: "/download" })],
+      "Download the latest MUTX desktop release for your platform. Signed builds, checksums, and release notes.",
+    images: [getPageOgImageUrl("Download MUTX | MUTX", "Download the latest MUTX desktop release for your platform. Signed builds, checksums, and release notes.", { path: "/download" })],
   },
 };
 

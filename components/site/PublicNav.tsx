@@ -8,7 +8,7 @@ export function PublicNav() {
       <nav className={styles.publicRailInner} aria-label="Public navigation">
         <Link href="/" className={styles.publicRailBrand}>
           <div className={styles.publicRailMark}>
-            <img src="/logo.png" alt="" aria-hidden="true" className={styles.brandMark} />
+            <img src="/logo.webp" alt="" aria-hidden="true" className={styles.brandMark} />
           </div>
           <div className={styles.publicRailCopy}>
             <span className={styles.publicRailTitle}>MUTX</span>
@@ -21,7 +21,7 @@ export function PublicNav() {
                 key={link.href}
                 href={link.href}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className={styles.publicRailLink}
               >
                 {link.label}

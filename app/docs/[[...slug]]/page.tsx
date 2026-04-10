@@ -8,7 +8,7 @@ import { DocsRenderer, extractHeadings } from "@/components/site/docs/DocsRender
 import { TableOfContents } from "@/components/site/docs/TableOfContents";
 import { SectionLanding } from "@/components/site/docs/SectionLanding";
 import { PrevNextNav } from "@/components/site/docs/PrevNextNav";
-import { DEFAULT_X_HANDLE, getCanonicalUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
 import { parseSummary } from "@/lib/docs";
 
 export const dynamicParams = true;
@@ -131,12 +131,14 @@ export async function generateMetadata({
       title: `${title} — MUTX Docs`,
       description,
       url: getCanonicalUrl(normalizedPath),
+      images: [getPageOgImageUrl(`${title} — MUTX Docs`, description)],
     },
     twitter: {
       card: "summary_large_image",
       creator: DEFAULT_X_HANDLE,
       title: `${title} — MUTX Docs`,
       description,
+      images: [getPageOgImageUrl(`${title} — MUTX Docs`, description)],
     },
   };
 }

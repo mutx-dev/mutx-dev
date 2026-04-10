@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "AI Agent Audit Logs — Trace History, Compliance Records, Operator Accountability | MUTX",
     description:
       "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.",
-    url: getSiteUrl(),
+    url: getCanonicalUrl("/ai-agent-audit-logs"),
     images: [getPageOgImageUrl("AI Agent Audit Logs — Trace History, Compliance Records, Operator Accountability | MUTX", "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.", { path: "/ai-agent-audit-logs" })],
   },
   twitter: {

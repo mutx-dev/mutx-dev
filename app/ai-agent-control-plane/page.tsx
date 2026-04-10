@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "AI Agent Control Plane — Runtime Visibility, Agent Lifecycle, Operator Surface | MUTX",
     description:
       "The control plane is the product. MUTX surfaces runtime traces, enforces consistency guarantees, and gives operators a legible surface.",
-    url: getSiteUrl(),
+    url: getCanonicalUrl("/ai-agent-control-plane"),
     images: [getPageOgImageUrl("AI Agent Control Plane — Runtime Visibility, Agent Lifecycle, Operator Surface | MUTX", "The control plane is the product. MUTX surfaces runtime traces, enforces consistency guarantees, and gives operators a legible surface.", { path: "/ai-agent-control-plane" })],
   },
   twitter: {

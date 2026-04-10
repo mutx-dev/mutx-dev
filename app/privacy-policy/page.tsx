@@ -5,7 +5,7 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, buildWebPageStructuredData, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | MUTX",
@@ -100,10 +100,20 @@ const sections = [
   },
 ] as const;
 
+const structuredData = buildWebPageStructuredData({
+  name: "Privacy Policy | MUTX",
+  path: "/privacy-policy",
+  description: "How MUTX handles data across the site, downloads, docs, and support surfaces.",
+});
+
 export default function PrivacyPolicyPage() {
   return (
     <PublicSurface className={`${styles.page} ${styles.publicPage}`}>
       <PublicNav />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
 
       <main className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">
@@ -161,7 +171,7 @@ export default function PrivacyPolicyPage() {
                     <a
                       href="https://docs.mutx.dev"
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       className={styles.inlineLink}
                     >
                       docs.mutx.dev

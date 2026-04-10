@@ -75,7 +75,7 @@ export function Sidebar({ className }: SidebarProps) {
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 rounded-lg overflow-hidden bg-background border border-border/50 flex items-center justify-center">
             <Image
-              src="/logo.png"
+              src="/logo.webp"
               alt="MUTX logo"
               width={32}
               height={32}

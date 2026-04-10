@@ -18,7 +18,7 @@ import {
   buildReleaseNotesUrl,
   fetchLatestStableDesktopRelease,
 } from "@/lib/desktopRelease";
-import { DEFAULT_X_HANDLE, getCanonicalUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, buildWebPageStructuredData, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Releases | MUTX",
@@ -54,6 +54,12 @@ type ReleaseCard = {
   icon: typeof AppWindow;
   external?: boolean;
 };
+
+const structuredData = buildWebPageStructuredData({
+  name: "Releases | MUTX",
+  path: "/releases",
+  description: "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.",
+});
 
 export default async function ReleasesPage() {
   const release = await fetchLatestStableDesktopRelease();
@@ -129,6 +135,10 @@ export default async function ReleasesPage() {
   return (
     <PublicSurface className={`${styles.page} ${styles.publicPage} ${styles.releasesPage}`}>
       <PublicNav />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
 
       <main className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">
@@ -151,7 +161,7 @@ export default async function ReleasesPage() {
                     Open Mac downloads
                     <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <a href={releaseHref} target="_blank" rel="noreferrer" className={styles.buttonGhost}>
+                  <a href={releaseHref} target="_blank" rel="noopener noreferrer" className={styles.buttonGhost}>
                     GitHub release
                   </a>
                 </div>
@@ -163,10 +173,10 @@ export default async function ReleasesPage() {
                   <Link href="/download" className={styles.inlineLink}>
                     Download lane
                   </Link>
-                  <a href={docsReleaseNotesHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                  <a href={docsReleaseNotesHref} target="_blank" rel="noopener noreferrer" className={styles.inlineLink}>
                     Docs notes
                   </a>
-                  <a href={releaseHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                  <a href={releaseHref} target="_blank" rel="noopener noreferrer" className={styles.inlineLink}>
                     GitHub release
                   </a>
                 </div>
@@ -207,13 +217,13 @@ export default async function ReleasesPage() {
                 <Link href="/dashboard" className={styles.inlineLink}>
                   Open dashboard
                 </Link>
-                <a href={docsReleaseNotesHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                <a href={docsReleaseNotesHref} target="_blank" rel="noopener noreferrer" className={styles.inlineLink}>
                   Docs notes
                 </a>
-                <a href={releaseHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                <a href={releaseHref} target="_blank" rel="noopener noreferrer" className={styles.inlineLink}>
                   GitHub release
                 </a>
-                <a href={MUTX_GITHUB_RELEASES_URL} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                <a href={MUTX_GITHUB_RELEASES_URL} target="_blank" rel="noopener noreferrer" className={styles.inlineLink}>
                   All releases
                 </a>
               </div>

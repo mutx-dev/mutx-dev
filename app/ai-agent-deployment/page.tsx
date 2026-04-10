@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "AI Agent Deployment — Repeatable Environments, Deployment Records, Rollback | MUTX",
     description:
       "Agents that deploy like services, not demos. Repeatable environments, deployment records, and rollback paths.",
-    url: getSiteUrl(),
+    url: getCanonicalUrl("/ai-agent-deployment"),
     images: [getPageOgImageUrl("AI Agent Deployment — Repeatable Environments, Deployment Records, Rollback | MUTX", "Agents that deploy like services, not demos. Repeatable environments, deployment records, and rollback paths.", { path: "/ai-agent-deployment" })],
   },
   twitter: {

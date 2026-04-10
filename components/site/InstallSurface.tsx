@@ -115,7 +115,7 @@ export function InstallSurface() {
               <a
                 href={GITHUB_RELEASES_URL}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="site-inline-link"
               >
                 GitHub releases

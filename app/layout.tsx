@@ -12,6 +12,13 @@ import {
 const siteUrl = getSiteUrl();
 const ogImageUrl = getOgImageUrl();
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#060810",
+} as const
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   alternates: {

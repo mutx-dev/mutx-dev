@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "AI Agent Infrastructure — Runtime Management, Compute, Secrets, Scale | MUTX",
     description:
       "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.",
-    url: getSiteUrl(),
+    url: getCanonicalUrl("/ai-agent-infrastructure"),
     images: [getPageOgImageUrl("AI Agent Infrastructure — Runtime Management, Compute, Secrets, Scale | MUTX", "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.", { path: "/ai-agent-infrastructure" })],
   },
   twitter: {

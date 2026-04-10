@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "AI Agent Approvals — Human-in-the-Loop Workflows, Operator Authorization | MUTX",
     description:
       "Human oversight where it matters. Define approval gates for high-stakes agent operations — on the record, enforced by the control plane.",
-    url: getSiteUrl(),
+    url: getCanonicalUrl("/ai-agent-approvals"),
     images: [getPageOgImageUrl("AI Agent Approvals — Human-in-the-Loop Workflows, Operator Authorization | MUTX", "Human oversight where it matters. Define approval gates for high-stakes agent operations — on the record, enforced by the control plane.", { path: "/ai-agent-approvals" })],
   },
   twitter: {

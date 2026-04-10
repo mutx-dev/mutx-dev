@@ -29,7 +29,7 @@ export function PublicFooter({
                 <a
                   href={marketingFooterCallout.action.href}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className={styles.buttonPrimary}
                 >
                   {marketingFooterCallout.action.label}
@@ -50,7 +50,7 @@ export function PublicFooter({
                   key={link.label}
                   href={link.href}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className={styles.footerLink}
                 >
                   {link.label}
@@ -68,7 +68,7 @@ export function PublicFooter({
                 <span className={styles.brand}>
                   <span className={styles.brandMarkWrap}>
                     <Image
-                      src="/logo.png"
+                      src="/logo.webp"
                       alt="MUTX"
                       width={32}
                       height={32}

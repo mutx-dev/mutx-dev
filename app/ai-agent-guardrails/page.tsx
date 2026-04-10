@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "AI Agent Guardrails — Policy Enforcement, Safety Bounds, Runtime Controls | MUTX",
     description:
       "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.",
-    url: getSiteUrl(),
+    url: getCanonicalUrl("/ai-agent-guardrails"),
     images: [getPageOgImageUrl("AI Agent Guardrails — Policy Enforcement, Safety Bounds, Runtime Controls | MUTX", "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.", { path: "/ai-agent-guardrails" })],
   },
   twitter: {

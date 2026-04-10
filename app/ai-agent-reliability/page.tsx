@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "AI Agent Reliability — Health Checks, Circuit Breakers, Production Uptime | MUTX",
     description:
       "Agents that survive production. Health checks, reliability standards, and operator visibility — built into the control plane.",
-    url: getSiteUrl(),
+    url: getCanonicalUrl("/ai-agent-reliability"),
     images: [getPageOgImageUrl("AI Agent Reliability — Health Checks, Circuit Breakers, Production Uptime | MUTX", "Agents that survive production. Health checks, reliability standards, and operator visibility — built into the control plane.", { path: "/ai-agent-reliability" })],
   },
   twitter: {

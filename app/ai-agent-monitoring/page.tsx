@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "AI Agent Monitoring — Runtime Traces, Tool Call History, Outcome Records | MUTX",
     description:
       "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.",
-    url: getSiteUrl(),
+    url: getCanonicalUrl("/ai-agent-monitoring"),
     images: [getPageOgImageUrl("AI Agent Monitoring — Runtime Traces, Tool Call History, Outcome Records | MUTX", "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.", { path: "/ai-agent-monitoring" })],
   },
   twitter: {

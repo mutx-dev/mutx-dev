@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "AI Agent Cost Management — Spend Visibility, Attribution, Budget Enforcement | MUTX",
     description:
       "Know what your agents cost and why. Real-time spend attribution per agent and model — enforced before it becomes a problem.",
-    url: getSiteUrl(),
+    url: getCanonicalUrl("/ai-agent-cost"),
     images: [getPageOgImageUrl("AI Agent Cost Management — Spend Visibility, Attribution, Budget Enforcement | MUTX", "Know what your agents cost and why. Real-time spend attribution per agent and model — enforced before it becomes a problem.", { path: "/ai-agent-cost" })],
   },
   twitter: {

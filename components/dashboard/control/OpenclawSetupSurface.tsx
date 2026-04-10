@@ -445,7 +445,7 @@ export function OpenclawSetupSurface() {
             <a
               href="https://github.com/openclaw/openclaw"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="mt-4 inline-flex items-center gap-2 text-sm text-sky-300"
             >
               OpenClaw upstream

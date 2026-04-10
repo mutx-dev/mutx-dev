@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     title: "AI Agent Governance — Auth Boundaries, Access Control, Compliance | MUTX",
     description:
       "Keep agent access explicit and auditable. MUTX bakes auth boundaries, operator access controls, and compliance guardrails into the control plane.",
-    url: getSiteUrl(),
+    url: getCanonicalUrl("/ai-agent-governance"),
     images: [getPageOgImageUrl("AI Agent Governance — Auth Boundaries, Access Control, Compliance | MUTX", "Keep agent access explicit and auditable. MUTX bakes auth boundaries, operator access controls, and compliance guardrails into the control plane.", { path: "/ai-agent-governance" })],
   },
   twitter: {

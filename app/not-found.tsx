@@ -1,6 +1,11 @@
 import Link from 'next/link'
 import { ArrowLeft, BookOpen, Compass, Home } from 'lucide-react'
 
+export const metadata = {
+  title: '404 - Page Not Found | MUTX',
+  robots: { index: false, follow: false },
+}
+
 export default function NotFound() {
   return (
     <main className="min-h-screen bg-black px-6 py-24 text-white">
@@ -30,7 +35,7 @@ export default function NotFound() {
           <a
             href="https://docs.mutx.dev"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/10"
           >
             <BookOpen className="h-4 w-4" />

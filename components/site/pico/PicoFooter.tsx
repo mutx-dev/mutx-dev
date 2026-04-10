@@ -35,7 +35,7 @@ export function PicoFooter({ className }: { className?: string }) {
                 key={link.label}
                 href={link.href}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 style={{ fontSize: '0.85rem', color: 'inherit', textDecoration: 'none' }}
               >
                 {link.label}
@@ -65,7 +65,7 @@ export function PicoFooter({ className }: { className?: string }) {
                 border: '1px solid rgba(255,255,255,0.08)',
               }}
             >
-              <Image src="/logo.png" alt="MUTX" width={14} height={14} />
+              <Image src="/logo.webp" alt="MUTX" width={14} height={14} />
             </span>
             &copy; MUTX 2026. Open control for deployed agents.
           </span>
