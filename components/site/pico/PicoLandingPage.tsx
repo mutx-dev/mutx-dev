@@ -1,12 +1,13 @@
 'use client'
 
+import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Check } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 
 import s from './PicoLanding.module.css'
 import { SiteReveal } from '../SiteReveal'
-import { PicoPreRegForm } from './PicoPreRegForm'
+import { PicoContactForm } from './PicoContactForm'
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -204,9 +205,22 @@ function HowItWorksIcon({ kind }: { kind: string }) {
 
 export function PicoLandingPage() {
   const prefersReducedMotion = useReducedMotion()
+  const [formOpen, setFormOpen] = useState(false)
+  const [formInterest, setFormInterest] = useState<string | undefined>()
+
+  const openForm = useCallback((interest?: string) => {
+    setFormInterest(interest)
+    setFormOpen(true)
+  }, [])
 
   return (
     <div className={s.page}>
+      <PicoContactForm
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        defaultInterest={formInterest}
+      />
+
       {/* Navigation */}
       <nav className={s.nav}>
         <div className={s.navInner}>
@@ -228,9 +242,9 @@ export function PicoLandingPage() {
               <span className={s.navTag}> by MUTX</span>
             </span>
           </Link>
-          <Link href="#pre-register" className={s.navCta}>
+          <button className={s.navCta} onClick={() => openForm()} type="button">
             Pre-register
-          </Link>
+          </button>
         </div>
       </nav>
 
@@ -262,10 +276,10 @@ export function PicoLandingPage() {
 
             <SiteReveal delay={0.19}>
               <div className={s.heroActions}>
-                <Link href="#pre-register" className={s.btnPrimary}>
+                <button onClick={() => openForm()} className={s.btnPrimary} type="button">
                   Pre-Register for Early Access
                   <ArrowRight className="h-4 w-4" />
-                </Link>
+                </button>
               </div>
             </SiteReveal>
 
@@ -523,7 +537,7 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Pre-Register CTA + Form (Section 11 + Form) ---- */}
+        {/* ---- Pre-Register CTA (Section 11) ---- */}
         <section id="pre-register" className={`${s.section} ${s.sectionCta}`}>
           <div className={s.shell}>
             <div className={s.ctaStack}>
@@ -550,7 +564,14 @@ export function PicoLandingPage() {
                   <p className={s.formSubline}>
                     Join the early access list and be first to know when PicoMUTX opens.
                   </p>
-                  <PicoPreRegForm />
+                  <button
+                    onClick={() => openForm()}
+                    className={s.btnPrimary}
+                    type="button"
+                  >
+                    Join the early access list
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
                   <p className={s.formCtaMeta}>
                     Free to pre-register &middot; No credit card required &middot; Early
                     users get priority access

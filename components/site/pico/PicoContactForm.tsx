@@ -9,10 +9,10 @@ import s from './PicoContactForm.module.css'
 type PicoContactFormProps = {
   open: boolean
   onClose: () => void
-  defaultTier?: string
+  defaultInterest?: string
 }
 
-export function PicoContactForm({ open, onClose, defaultTier }: PicoContactFormProps) {
+export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactFormProps) {
   const prefersReducedMotion = useReducedMotion()
   const [state, setState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -23,7 +23,6 @@ export function PicoContactForm({ open, onClose, defaultTier }: PicoContactFormP
       e.preventDefault()
       if (state === 'submitting') return
 
-      // Honeypot
       if (honeypotRef.current?.value) return
 
       setState('submitting')
@@ -35,7 +34,7 @@ export function PicoContactForm({ open, onClose, defaultTier }: PicoContactFormP
         name: form.get('name') as string,
         company: form.get('company') as string,
         message: form.get('message') as string,
-        tier: form.get('tier') as string,
+        interest: form.get('interest') as string,
         source: 'pico-landing',
         honeypot: honeypotRef.current?.value || '',
       }
@@ -109,9 +108,9 @@ export function PicoContactForm({ open, onClose, defaultTier }: PicoContactFormP
                 <span className={s.successIcon}>
                   <Check className="h-6 w-6" />
                 </span>
-                <h2 className={s.successTitle}>You&apos;re in.</h2>
+                <h2 className={s.successTitle}>You&apos;re on the list.</h2>
                 <p className={s.successBody}>
-                  We read every message. Expect a reply within 24 hours.
+                  We read every message. Expect a personal reply within 24 hours.
                 </p>
                 <button className={s.successBtn} onClick={handleClose} type="button">
                   Back to the page
@@ -120,9 +119,9 @@ export function PicoContactForm({ open, onClose, defaultTier }: PicoContactFormP
             ) : (
               <>
                 <div className={s.header}>
-                  <h2 className={s.title}>Get early access</h2>
+                  <h2 className={s.title}>Pre-register for early access</h2>
                   <p className={s.subtitle}>
-                    Tell us about your setup. We&apos;ll get you running.
+                    Tell us where you are. We&apos;ll get you in.
                   </p>
                 </div>
 
@@ -176,13 +175,13 @@ export function PicoContactForm({ open, onClose, defaultTier }: PicoContactFormP
                   </div>
 
                   <label className={s.label}>
-                    <span className={s.labelText}>Interested in</span>
-                    <select name="tier" className={s.select} defaultValue={defaultTier || 'pro'}>
-                      <option value="starter">Starter — €49/mo (1 agent)</option>
-                      <option value="pro">Pro — €149/mo (5 agents)</option>
-                      <option value="team">Team — €399/mo (20 agents)</option>
-                      <option value="enterprise">Enterprise — custom</option>
-                      <option value="unsure">Not sure yet</option>
+                    <span className={s.labelText}>What brings you here?</span>
+                    <select name="interest" className={s.select} defaultValue={defaultInterest || 'building-first'}>
+                      <option value="building-first">Building my first AI agent</option>
+                      <option value="fixing-existing">Fixing an agent that isn&apos;t working</option>
+                      <option value="evaluating">Evaluating platforms or tools</option>
+                      <option value="spent-money">Already spent money — still not working</option>
+                      <option value="other">Something else</option>
                     </select>
                   </label>
 
@@ -193,7 +192,7 @@ export function PicoContactForm({ open, onClose, defaultTier }: PicoContactFormP
                     <textarea
                       name="message"
                       rows={3}
-                      placeholder="E.g. I have 3 LangChain agents running in production..."
+                      placeholder="E.g. I run a small SaaS and want to automate customer support..."
                       className={s.textarea}
                     />
                   </label>
@@ -209,7 +208,7 @@ export function PicoContactForm({ open, onClose, defaultTier }: PicoContactFormP
                       'Sending...'
                     ) : (
                       <>
-                        Send request
+                        Join the early access list
                         <ArrowRight className="h-4 w-4" />
                       </>
                     )}
