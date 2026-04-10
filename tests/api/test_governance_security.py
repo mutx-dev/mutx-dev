@@ -131,3 +131,64 @@ async def test_governance_supervision_start_returns_400_for_rejected_launch(
 
     assert response.status_code == 400
     assert "launch profile" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_governance_runtime_metrics_require_internal_user(
+    client: AsyncClient, other_user_client: AsyncClient, monkeypatch
+):
+    import cli.faramesh_runtime as faramesh_runtime
+
+    class FakeSnapshot:
+        decisions_total = 4
+        permits_today = 2
+        denies_today = 1
+        defers_today = 1
+        pending_approvals = 3
+        status = "running"
+
+    monkeypatch.setattr(faramesh_runtime, "collect_faramesh_snapshot", lambda: FakeSnapshot())
+    monkeypatch.setattr(
+        faramesh_runtime,
+        "generate_prometheus_metrics",
+        lambda _snapshot: "mutx_governance_decisions_total 4\n",
+    )
+
+    allowed_response = await client.get("/v1/runtime/governance/metrics")
+    assert allowed_response.status_code == 200
+    assert "mutx_governance_decisions_total" in allowed_response.text
+
+    forbidden_response = await other_user_client.get("/v1/runtime/governance/metrics")
+    assert forbidden_response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_governance_runtime_status_require_internal_user(
+    client: AsyncClient, other_user_client: AsyncClient, monkeypatch
+):
+    import cli.faramesh_runtime as faramesh_runtime
+
+    class FakeHealth:
+        daemon_reachable = True
+        socket_reachable = True
+        policy_loaded = True
+        version = "1.2.3"
+        policy_name = "starter"
+
+    class FakeSnapshot:
+        decisions_total = 4
+        permits_today = 2
+        denies_today = 1
+        defers_today = 1
+        pending_approvals = 3
+        status = "running"
+
+    monkeypatch.setattr(faramesh_runtime, "get_faramesh_health", lambda: FakeHealth())
+    monkeypatch.setattr(faramesh_runtime, "collect_faramesh_snapshot", lambda: FakeSnapshot())
+
+    allowed_response = await client.get("/v1/runtime/governance/status")
+    assert allowed_response.status_code == 200
+    assert allowed_response.json()["policy_name"] == "starter"
+
+    forbidden_response = await other_user_client.get("/v1/runtime/governance/status")
+    assert forbidden_response.status_code == 403

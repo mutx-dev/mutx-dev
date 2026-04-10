@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.database import get_db
-from src.api.middleware.auth import get_current_user
+from src.api.middleware.auth import get_current_internal_user, get_current_user
 from src.api.models import User
 from src.api.models.schemas import RuntimeProviderSnapshotResponse, RuntimeProviderSnapshotUpsert
 from src.api.services.operator_state import (
@@ -43,7 +43,7 @@ async def upsert_runtime_provider_state(
 
 @router.get("/governance/metrics")
 async def governance_metrics(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ):
     try:
         from cli.faramesh_runtime import (
@@ -60,7 +60,7 @@ async def governance_metrics(
 
 @router.get("/governance/status")
 async def governance_status(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ):
     try:
         from cli.faramesh_runtime import collect_faramesh_snapshot, get_faramesh_health
