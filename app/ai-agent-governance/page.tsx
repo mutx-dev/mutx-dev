@@ -8,6 +8,7 @@ import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
   getOgImageUrl,
+  getPageOgImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     description:
       "Keep agent access explicit and auditable. MUTX bakes auth boundaries, operator access controls, and compliance guardrails into the control plane.",
     url: getSiteUrl(),
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Governance — Auth Boundaries, Access Control, Compliance | MUTX", "Keep agent access explicit and auditable. MUTX bakes auth boundaries, operator access controls, and compliance guardrails into the control plane.", { path: "/ai-agent-governance" })],
   },
   twitter: {
     card: "summary_large_image",
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     title: "AI Agent Governance | MUTX",
     description:
       "Keep agent access explicit and auditable. MUTX bakes auth boundaries and compliance guardrails into the control plane.",
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Governance — Auth Boundaries, Access Control, Compliance | MUTX", "Keep agent access explicit and auditable. MUTX bakes auth boundaries, operator access controls, and compliance guardrails into the control plane.", { path: "/ai-agent-governance" })],
   },
 };
 

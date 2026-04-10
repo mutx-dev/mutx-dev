@@ -8,6 +8,7 @@ import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
   getOgImageUrl,
+  getPageOgImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     description:
       "The control plane is the product. MUTX surfaces runtime traces, enforces consistency guarantees, and gives operators a legible surface.",
     url: getSiteUrl(),
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Control Plane — Runtime Visibility, Agent Lifecycle, Operator Surface | MUTX", "The control plane is the product. MUTX surfaces runtime traces, enforces consistency guarantees, and gives operators a legible surface.", { path: "/ai-agent-control-plane" })],
   },
   twitter: {
     card: "summary_large_image",
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     title: "AI Agent Control Plane | MUTX",
     description:
       "The control plane is the product. Runtime traces, consistency guarantees, and operator surfaces — built in.",
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Control Plane — Runtime Visibility, Agent Lifecycle, Operator Surface | MUTX", "The control plane is the product. MUTX surfaces runtime traces, enforces consistency guarantees, and gives operators a legible surface.", { path: "/ai-agent-control-plane" })],
   },
 };
 

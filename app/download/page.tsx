@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     description:
       "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.",
     url: getCanonicalUrl("/download"),
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("Download for macOS | MUTX", "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.", { path: "/download" })],
   },
   twitter: {
     card: "summary_large_image",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: "Download for macOS | MUTX",
     description:
       "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.",
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("Download for macOS | MUTX", "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.", { path: "/download" })],
   },
 };
 

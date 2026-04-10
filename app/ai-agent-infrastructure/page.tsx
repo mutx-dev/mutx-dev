@@ -8,6 +8,7 @@ import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
   getOgImageUrl,
+  getPageOgImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     description:
       "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.",
     url: getSiteUrl(),
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Infrastructure — Runtime Management, Compute, Secrets, Scale | MUTX", "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.", { path: "/ai-agent-infrastructure" })],
   },
   twitter: {
     card: "summary_large_image",
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     title: "AI Agent Infrastructure | MUTX",
     description:
       "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.",
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Infrastructure — Runtime Management, Compute, Secrets, Scale | MUTX", "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.", { path: "/ai-agent-infrastructure" })],
   },
 };
 

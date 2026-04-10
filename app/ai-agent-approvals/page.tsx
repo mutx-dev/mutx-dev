@@ -8,6 +8,7 @@ import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
   getOgImageUrl,
+  getPageOgImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     description:
       "Human oversight where it matters. Define approval gates for high-stakes agent operations — on the record, enforced by the control plane.",
     url: getSiteUrl(),
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Approvals — Human-in-the-Loop Workflows, Operator Authorization | MUTX", "Human oversight where it matters. Define approval gates for high-stakes agent operations — on the record, enforced by the control plane.", { path: "/ai-agent-approvals" })],
   },
   twitter: {
     card: "summary_large_image",
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     title: "AI Agent Approvals | MUTX",
     description:
       "Human oversight where it matters. Approval gates for high-stakes agent operations — on the record, enforced by the control plane.",
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Approvals — Human-in-the-Loop Workflows, Operator Authorization | MUTX", "Human oversight where it matters. Define approval gates for high-stakes agent operations — on the record, enforced by the control plane.", { path: "/ai-agent-approvals" })],
   },
 };
 

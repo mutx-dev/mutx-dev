@@ -59,13 +59,13 @@ async def test_session_action_set_thinking_invalid_level(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_session_action_set_thinking_valid_returns_501(client: AsyncClient):
-    """Valid set-thinking request returns 501 (not wired yet)."""
+async def test_session_action_set_thinking_valid_returns_200(client: AsyncClient):
+    """Valid set-thinking request returns 200."""
     response = await client.post(
         "/v1/sessions?action=set-thinking",
         json={"session_key": "test-session", "level": "high"},
     )
-    assert response.status_code == 501
+    assert response.status_code == 200
 
 
 @pytest.mark.asyncio

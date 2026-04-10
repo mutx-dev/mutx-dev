@@ -8,6 +8,7 @@ import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
   getOgImageUrl,
+  getPageOgImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     description:
       "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.",
     url: getSiteUrl(),
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Monitoring — Runtime Traces, Tool Call History, Outcome Records | MUTX", "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.", { path: "/ai-agent-monitoring" })],
   },
   twitter: {
     card: "summary_large_image",
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     title: "AI Agent Monitoring | MUTX",
     description:
       "See what agents actually did, not what they said they'd do. Runtime traces and tool call history built into the control plane.",
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Monitoring — Runtime Traces, Tool Call History, Outcome Records | MUTX", "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.", { path: "/ai-agent-monitoring" })],
   },
 };
 

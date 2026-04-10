@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     description:
       "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.",
     url: getCanonicalUrl("/releases"),
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("Releases | MUTX", "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.", { path: "/releases" })],
   },
   twitter: {
     card: "summary_large_image",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     title: "Releases | MUTX",
     description:
       "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.",
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("Releases | MUTX", "Current MUTX desktop release, signed macOS downloads, checksums, GitHub tag, and docs-backed release notes.", { path: "/releases" })],
   },
 };
 

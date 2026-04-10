@@ -5,7 +5,7 @@ import { PublicNav } from "@/components/site/PublicNav";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl, getPageOgImageUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | MUTX",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     description:
       "How MUTX handles data across the site, downloads, docs, and support surfaces.",
     url: getCanonicalUrl("/privacy-policy"),
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("Privacy Policy | MUTX", undefined, { path: "/privacy-policy" })],
   },
   twitter: {
     card: "summary_large_image",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: "Privacy Policy | MUTX",
     description:
       "How MUTX handles data across the site, downloads, docs, and support surfaces.",
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("Privacy Policy | MUTX", undefined, { path: "/privacy-policy" })],
   },
 };
 

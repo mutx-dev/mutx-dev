@@ -8,7 +8,7 @@ import { CalendlyPopupButton } from "@/components/site/CalendlyPopupButton";
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import styles from "@/components/site/marketing/MarketingCore.module.css";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl, getSiteUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl, getPageOgImageUrl, getSiteUrl } from "@/lib/seo";
 
 const CONTACT_EMAIL = "hello@mutx.dev";
 const contactTitle = "Contact | MUTX";
@@ -25,14 +25,14 @@ export const metadata: Metadata = {
     title: contactTitle,
     description: contactDescription,
     url: getCanonicalUrl("/contact"),
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl(contactTitle, contactDescription, { path: "/contact" })],
   },
   twitter: {
     card: "summary_large_image",
     creator: DEFAULT_X_HANDLE,
     title: contactTitle,
     description: contactDescription,
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl(contactTitle, contactDescription, { path: "/contact" })],
   },
 };
 

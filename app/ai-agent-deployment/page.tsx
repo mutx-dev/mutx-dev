@@ -8,6 +8,7 @@ import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
   getOgImageUrl,
+  getPageOgImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     description:
       "Agents that deploy like services, not demos. Repeatable environments, deployment records, and rollback paths.",
     url: getSiteUrl(),
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Deployment — Repeatable Environments, Deployment Records, Rollback | MUTX", "Agents that deploy like services, not demos. Repeatable environments, deployment records, and rollback paths.", { path: "/ai-agent-deployment" })],
   },
   twitter: {
     card: "summary_large_image",
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     title: "AI Agent Deployment | MUTX",
     description:
       "Agents that deploy like services, not demos. Repeatable environments and deployment records built into the control plane.",
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Deployment — Repeatable Environments, Deployment Records, Rollback | MUTX", "Agents that deploy like services, not demos. Repeatable environments, deployment records, and rollback paths.", { path: "/ai-agent-deployment" })],
   },
 };
 

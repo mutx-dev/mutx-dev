@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { PicoLandingPage } from "@/components/site/pico/PicoLandingPage";
 import { PicoFooter } from "@/components/site/pico/PicoFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
-import { getCanonicalUrl, getOgImageUrl, getSiteUrl } from "@/lib/seo";
+import { getCanonicalUrl, getOgImageUrl, getPageOgImageUrl, getSiteUrl } from "@/lib/seo";
 
 const pageTitle = "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer";
 const pageDescription =
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: pageTitle,
     description: pageDescription,
     url: `${getSiteUrl()}/pico`,
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl(pageTitle, pageDescription, { path: "/pico" })],
   },
 };
 

@@ -8,6 +8,7 @@ import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
   getOgImageUrl,
+  getPageOgImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     description:
       "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.",
     url: getSiteUrl(),
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Guardrails — Policy Enforcement, Safety Bounds, Runtime Controls | MUTX", "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.", { path: "/ai-agent-guardrails" })],
   },
   twitter: {
     card: "summary_large_image",
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     title: "AI Agent Guardrails | MUTX",
     description:
       "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.",
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Guardrails — Policy Enforcement, Safety Bounds, Runtime Controls | MUTX", "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.", { path: "/ai-agent-guardrails" })],
   },
 };
 

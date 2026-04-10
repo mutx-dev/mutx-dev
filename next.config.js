@@ -6,7 +6,7 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
   output: 'standalone',
-  serverExternalPackages: ['@resvg/resvg-js'],
+  serverExternalPackages: ['@resvg/resvg-js', 'sharp'],
   turbopack: {},
   webpack(config, { webpack, dev }) {
     if (dev) {

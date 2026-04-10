@@ -8,6 +8,7 @@ import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
   getOgImageUrl,
+  getPageOgImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     description:
       "Agents that survive production. Health checks, reliability standards, and operator visibility — built into the control plane.",
     url: getSiteUrl(),
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Reliability — Health Checks, Circuit Breakers, Production Uptime | MUTX", "Agents that survive production. Health checks, reliability standards, and operator visibility — built into the control plane.", { path: "/ai-agent-reliability" })],
   },
   twitter: {
     card: "summary_large_image",
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     title: "AI Agent Reliability | MUTX",
     description:
       "Agents that survive production. Health checks and reliability standards built into the control plane.",
-    images: [getOgImageUrl()],
+    images: [getPageOgImageUrl("AI Agent Reliability — Health Checks, Circuit Breakers, Production Uptime | MUTX", "Agents that survive production. Health checks, reliability standards, and operator visibility — built into the control plane.", { path: "/ai-agent-reliability" })],
   },
 };
 
