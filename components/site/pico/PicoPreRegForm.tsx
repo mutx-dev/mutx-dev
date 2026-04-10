@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { type FormEvent, useState } from 'react'
 import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react'
 
@@ -11,6 +12,7 @@ type PicoPreRegFormProps = {
 }
 
 export function PicoPreRegForm({ className }: PicoPreRegFormProps) {
+  const t = useTranslations('pico.preRegForm')
   const [email, setEmail] = useState('')
   const [honeypot, setHoneypot] = useState('')
   const [loading, setLoading] = useState(false)
@@ -39,19 +41,16 @@ export function PicoPreRegForm({ className }: PicoPreRegFormProps) {
         payload?.error?.message ||
         payload?.detail ||
         (typeof payload?.error === 'string' ? payload.error : null) ||
-        'Something went wrong. Please try again.'
+        t('errorFallback')
 
       if (!response.ok) {
         throw new Error(errorMessage)
       }
 
       setEmail('')
-      setSuccess(
-        payload?.message ||
-          "You're on the list. We'll be in touch when access opens.",
-      )
+      setSuccess(t('successBody'))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      setError(err instanceof Error ? err.message : t('errorFallback'))
     } finally {
       setLoading(false)
     }
@@ -63,11 +62,8 @@ export function PicoPreRegForm({ className }: PicoPreRegFormProps) {
         <div className={s.formSuccess}>
           <CheckCircle2 className={s.formSuccessIcon} />
           <div>
-            <p className={s.formSuccessTitle}>You are on the list.</p>
-            <p className={s.formSuccessBody}>
-              We will be in touch when PicoMUTX access opens. No spam, no payment
-              required.
-            </p>
+            <p className={s.formSuccessTitle}>{t('successTitle')}</p>
+            <p className={s.formSuccessBody}>{t('successBody')}</p>
           </div>
         </div>
       ) : (
@@ -85,7 +81,7 @@ export function PicoPreRegForm({ className }: PicoPreRegFormProps) {
 
           <div className={s.formRow}>
             <label htmlFor="pico-email" className={s.formLabel}>
-              Work email
+              {t('emailLabel')}
             </label>
             <input
               id="pico-email"
@@ -93,7 +89,7 @@ export function PicoPreRegForm({ className }: PicoPreRegFormProps) {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@company.com"
+              placeholder={t('emailPlaceholder')}
               className={s.formInput}
               disabled={loading}
               autoComplete="email"
@@ -115,17 +111,14 @@ export function PicoPreRegForm({ className }: PicoPreRegFormProps) {
             {loading ? (
               <>
                 <Loader2 className={s.formButtonSpinner} />
-                Joining…
+                {t('submitting')}
               </>
             ) : (
-              'Pre-Register Now'
+              t('submit')
             )}
           </button>
 
-          <p className={s.formPrivacy}>
-            No spam. No payment required. Just early access updates and launch
-            details.
-          </p>
+          <p className={s.formPrivacy}>{t('privacy')}</p>
         </form>
       )}
     </div>
