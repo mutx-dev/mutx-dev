@@ -47,7 +47,7 @@ export function PicoLangSwitcher() {
   const handleSelect = useCallback((code: string) => {
     document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
     setOpen(false)
-    window.location.href = window.location.href
+    window.location.reload()
   }, [])
 
   return (
