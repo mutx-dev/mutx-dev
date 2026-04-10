@@ -70,9 +70,9 @@ def test_app_factory_mounts_expected_public_routes():
         "/v1/approvals",
         "/v1/policies",
         "/v1/audit",
+        "/v1/scheduler",
     }
     assert "/v1/newsletter" not in mounted_prefixes
-    assert "/v1/scheduler" not in mounted_prefixes
 
 
 def test_app_factory_disables_docs_in_production_by_default(monkeypatch):
