@@ -1,14 +1,13 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useCallback, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Check } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 
 import s from './PicoLanding.module.css'
+import { usePicoPath } from '@/components/pico/PicoPathProvider'
 import { SiteReveal } from '../SiteReveal'
-import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
 
 /* ------------------------------------------------------------------ */
@@ -59,21 +58,11 @@ function HowItWorksIcon({ kind }: { kind: string }) {
 export function PicoLandingPage() {
   const t = useTranslations('pico')
   const prefersReducedMotion = useReducedMotion()
-  const [formOpen, setFormOpen] = useState(false)
-  const [formInterest, setFormInterest] = useState<string | undefined>()
-
-  const openForm = useCallback((interest?: string) => {
-    setFormInterest(interest)
-    setFormOpen(true)
-  }, [])
+  const academyHref = usePicoPath('/academy')
+  const registerHref = usePicoPath('/register')
 
   return (
     <div className={s.page}>
-      <PicoContactForm
-        open={formOpen}
-        onClose={() => setFormOpen(false)}
-        defaultInterest={formInterest}
-      />
 
       {/* Navigation */}
       <nav className={s.nav}>
@@ -97,9 +86,7 @@ export function PicoLandingPage() {
             </span>
           </Link>
           <PicoLangSwitcher />
-          <button className={s.navCta} onClick={() => openForm()} type="button">
-            {t('nav.cta')}
-          </button>
+          <Link className={s.navCta} href={academyHref}>Open academy</Link>
         </div>
       </nav>
 
@@ -126,10 +113,10 @@ export function PicoLandingPage() {
 
             <SiteReveal delay={0.22}>
               <div className={s.heroActions}>
-                <button onClick={() => openForm()} className={s.btnPrimary} type="button">
-                  {t('hero.cta')}
+                <Link href={academyHref} className={s.btnPrimary}>
+                  Open academy
                   <ArrowRight className="h-4 w-4" />
-                </button>
+                </Link>
               </div>
             </SiteReveal>
 
@@ -335,14 +322,10 @@ export function PicoLandingPage() {
                   <div className={s.ctaFormWrap}>
                     <p className={s.formHeadline}>{t('finalCta.formHeadline')}</p>
                     <p className={s.formSubline}>{t('finalCta.formSubline')}</p>
-                    <button
-                      onClick={() => openForm()}
-                      className={s.btnPrimary}
-                      type="button"
-                    >
-                      {t('finalCta.ctaButton')}
+                    <Link href={registerHref} className={s.btnPrimary}>
+                      Create Pico account
                       <ArrowRight className="h-4 w-4" />
-                    </button>
+                    </Link>
                     <p className={s.formCtaMeta}>{t('finalCta.formCtaMeta')}</p>
                   </div>
                 </SiteReveal>

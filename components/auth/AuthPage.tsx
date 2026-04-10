@@ -11,9 +11,29 @@ import styles from "@/components/site/marketing/MarketingCore.module.css";
 
 type AuthMode = "login" | "register";
 
+type AuthContent = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  asideEyebrow: string;
+  asideTitle: string;
+  asideBody: string;
+  mediaSrc: string;
+  mediaAlt: string;
+  mediaWidth: number;
+  mediaHeight: number;
+  highlights: readonly string[];
+  heading: string;
+  subheading: string;
+  submitLabel: string;
+  loadingLabel: string;
+};
+
 type AuthPageProps = {
   mode: AuthMode;
   nextPath?: string | null;
+  routePrefix?: string;
+  contentOverride?: Partial<AuthContent>;
 };
 
 const authContent = {
@@ -81,11 +101,18 @@ function resolveRedirectPath(nextPath?: string | null) {
   return nextPath;
 }
 
-export function AuthPage({ mode, nextPath }: AuthPageProps) {
+export function AuthPage({
+  mode,
+  nextPath,
+  routePrefix = "",
+  contentOverride,
+}: AuthPageProps) {
   const router = useRouter();
-  const content = authContent[mode];
+  const content = { ...authContent[mode], ...contentOverride } as AuthContent;
   const isRegister = mode === "register";
   const redirectPath = resolveRedirectPath(nextPath);
+  const loginHref = routePrefix ? `${routePrefix}/login` : "/login";
+  const registerHref = routePrefix ? `${routePrefix}/register` : "/register";
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -267,7 +294,7 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
               </Link>
               <p className={styles.bodyText}>
                 Need access?{" "}
-                <Link href="/register" className={styles.inlineLink}>
+                <Link href={registerHref} className={styles.inlineLink}>
                   Create one
                 </Link>
               </p>
@@ -275,7 +302,7 @@ export function AuthPage({ mode, nextPath }: AuthPageProps) {
           ) : (
             <p className={styles.bodyText}>
               Already have an operator account?{" "}
-              <Link href="/login" className={styles.inlineLink}>
+              <Link href={loginHref} className={styles.inlineLink}>
                 Sign in
               </Link>
             </p>

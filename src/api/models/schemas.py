@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Optional
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
+from pydantic import AliasChoices, BaseModel, ConfigDict, EmailStr, Field, computed_field
 import uuid
 
 from src.api.models.models import AgentStatus, AgentType
@@ -573,6 +573,64 @@ class OnboardingUpdateRequest(BaseModel):
     provider: str = Field(default="openclaw", min_length=1, max_length=64)
     step: str | None = Field(default=None, max_length=64)
     payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class PicoRecentEventResponse(BaseModel):
+    event: str
+    xp_awarded: int = Field(default=0, ge=0)
+    lesson_id: str | None = None
+    track_id: str | None = None
+    badge_id: str | None = None
+    milestone_id: str | None = None
+    tutor_sessions: int = Field(default=0, ge=0)
+    created_at: datetime | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class PicoStateResponse(BaseModel):
+    plan: str
+    xp_total: int = Field(default=0, ge=0)
+    current_level: int = Field(default=1, ge=1)
+    completed_lessons: list[str] = Field(default_factory=list)
+    completed_tracks: list[str] = Field(default_factory=list)
+    badges: list[str] = Field(default_factory=list)
+    milestones: list[str] = Field(default_factory=list)
+    event_counts: dict[str, int] = Field(default_factory=dict)
+    recent_events: list[PicoRecentEventResponse] = Field(default_factory=list)
+    tutor_sessions_used: int = Field(default=0, ge=0)
+    updated_at: datetime | None = None
+
+
+class PicoEventRequest(BaseModel):
+    event: str = Field(..., min_length=1, max_length=64)
+    lesson_id: str | None = Field(
+        default=None,
+        max_length=120,
+        validation_alias=AliasChoices("lesson_id", "lesson", "lesson_slug", "lessonSlug"),
+    )
+    track_id: str | None = Field(
+        default=None,
+        max_length=120,
+        validation_alias=AliasChoices("track_id", "track", "track_slug", "trackSlug"),
+    )
+    badge_id: str | None = Field(
+        default=None,
+        max_length=120,
+        validation_alias=AliasChoices("badge_id", "badge"),
+    )
+    milestone_id: str | None = Field(
+        default=None,
+        max_length=120,
+        validation_alias=AliasChoices("milestone_id", "milestone"),
+    )
+    tutor_sessions: int = Field(
+        default=0,
+        ge=0,
+        le=100,
+        validation_alias=AliasChoices("tutor_sessions", "sessions", "count"),
+    )
+    xp: int | None = Field(default=None, ge=0, le=10000)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class RuntimeProviderSnapshotUpsert(BaseModel):

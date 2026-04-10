@@ -12,7 +12,7 @@ import {
 
 const pageTitle = "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer";
 const pageDescription =
-  "PicoMUTX helps founders, operators, and small teams build, deploy, and run AI agents safely — with step-by-step guidance, built-in safeguards, and real support. Pre-register now for early access.";
+  "PicoMUTX helps founders, operators, and small teams build, deploy, and run AI agents safely with a real academy, a live control surface, and grounded support.";
 
 export const metadata: Metadata = {
   title: pageTitle,
