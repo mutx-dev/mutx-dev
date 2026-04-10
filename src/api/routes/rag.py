@@ -308,7 +308,14 @@ async def similarity_search(
             VectorStoreRegistry,
             VectorStoreManager,
         )
+    except ImportError as imp_err:
+        logger.warning(f"RAG vector store dependencies unavailable: {imp_err}")
+        raise HTTPException(
+            status_code=503,
+            detail="RAG search is not available in this environment.",
+        ) from imp_err
 
+    try:
         store: VectorStoreManager | None = VectorStoreRegistry.get_store("default")
 
         if store is None:
