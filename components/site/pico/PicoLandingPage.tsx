@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useCallback, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Check } from 'lucide-react'
@@ -10,126 +11,10 @@ import { SiteReveal } from '../SiteReveal'
 import { PicoContactForm } from './PicoContactForm'
 
 /* ------------------------------------------------------------------ */
-/*  Data                                                               */
-/* ------------------------------------------------------------------ */
-
-const TRUST_BAR_ITEMS = [
-  'For founders, operators, and small teams',
-  'Step-by-step guidance',
-  'Built-in safeguards from day one',
-]
-
-const PROBLEMS = [
-  {
-    label: '"I want an AI agent, but I don\'t know where to start."',
-    body: 'There are too many tools, too many opinions, and too many people assuming you already know the basics. The gap between "I have an idea" and "I have something working" feels larger than it should.',
-  },
-  {
-    label: '"I already tried — and got stuck."',
-    body: 'You made progress, hit a wall, and had nobody to ask who could actually help. The idea is sitting in your backlog instead of creating value.',
-  },
-  {
-    label: '"I spent money, and it still isn\'t working properly."',
-    body: 'Maybe you hired someone. Maybe you paid for tools. Now you are not just uncertain — you are skeptical.',
-  },
-  {
-    label: '"I don\'t want to deploy something I can\'t trust."',
-    body: 'An agent that gives the wrong answer, behaves unpredictably, or creates hidden costs is not an asset. It is a liability.',
-  },
-]
-
-const HOW_IT_WORKS = [
-  {
-    icon: 'path',
-    title: 'Step-by-step implementation paths',
-    body: 'Follow structured paths based on what you are trying to build — from customer support agents to internal automations. No generic theory. No endless searching.',
-  },
-  {
-    icon: 'support',
-    title: 'Guided support when you get stuck',
-    body: 'When something breaks or becomes unclear, you do not have to figure it out alone. PicoMUTX keeps momentum alive instead of letting projects die in confusion.',
-  },
-  {
-    icon: 'shield',
-    title: 'Built-in safety from day one',
-    body: 'Cost awareness, visibility, and guardrails matter. You always know what your agent is doing, what it is costing, and when something needs attention.',
-  },
-  {
-    icon: 'expert',
-    title: 'Live expert touchpoints',
-    body: 'Some things are too nuanced for static documentation. Real guidance moments designed to help you unblock faster and make better decisions.',
-  },
-]
-
-const WHO_IT_S_FOR = [
-  'You want to build an AI agent but don\'t want to depend entirely on developers',
-  'You\'ve tried before and got stuck halfway',
-  'You already spent money on tools or implementation and still don\'t trust the outcome',
-  'You want a practical path, not more theory',
-  'You want support while building, not only after something goes wrong',
-]
-
-const WHO_IT_S_NOT_FOR = [
-  'You are looking for a shortcut with zero learning',
-  'You already run a mature enterprise agent stack and need complex governance infrastructure',
-  'You want entertainment, trends, or hype more than execution',
-  'You are not ready to change how the business actually operates',
-  'You expect AI to replace judgment, leadership, or accountability',
-]
-
-const BEFORE_AFTER = [
-  {
-    before: 'You have an idea, but no clear path',
-    after: 'You have a structured way forward',
-  },
-  {
-    before: 'You waste time jumping between tools, docs, and tutorials',
-    after: 'You follow guided implementation paths',
-  },
-  {
-    before: 'You get stuck and lose momentum',
-    after: 'You get support before the project dies',
-  },
-  {
-    before: 'Your agent stays in theory',
-    after: 'Your agent gets built and put to work',
-  },
-]
-
-const FAQS = [
-  {
-    q: 'Do I need to know how to code?',
-    a: 'No. PicoMUTX is built for people who want to build useful AI agents without needing deep technical expertise.',
-  },
-  {
-    q: 'What if I\'ve already tried and failed?',
-    a: 'That is exactly one of the people this is for. PicoMUTX is designed to reduce the confusion and fragmentation that usually cause people to stop halfway.',
-  },
-  {
-    q: 'What kind of agents can I build?',
-    a: 'Practical ones — the kind that save time, support operations, improve workflows, and help businesses run better. The focus is usefulness, not toy demos.',
-  },
-  {
-    q: 'Is pre-registration free?',
-    a: 'Yes. Pre-registration is free and does not require payment. You will be among the first to hear when access opens and when founding spots become available.',
-  },
-  {
-    q: 'Is this for enterprises?',
-    a: 'PicoMUTX is better suited to founders, operators, and small teams who want a guided way to build and deploy AI agents. Larger enterprise governance needs belong to the broader MUTX ecosystem.',
-  },
-]
-
-const PREREGE_BENEFITS = [
-  'Early access before public release',
-  'Priority consideration for founding member spots',
-  'Early onboarding and launch updates',
-  'The ability to influence early use cases and rollout priorities',
-  'First visibility into pricing and access terms',
-]
-
-/* ------------------------------------------------------------------ */
 /*  Icon helper                                                        */
 /* ------------------------------------------------------------------ */
+
+const HOW_ICONS = ['path', 'support', 'shield', 'expert'] as const
 
 function HowItWorksIcon({ kind }: { kind: string }) {
   const sz = 20
@@ -171,6 +56,7 @@ function HowItWorksIcon({ kind }: { kind: string }) {
 /* ------------------------------------------------------------------ */
 
 export function PicoLandingPage() {
+  const t = useTranslations('pico')
   const prefersReducedMotion = useReducedMotion()
   const [formOpen, setFormOpen] = useState(false)
   const [formInterest, setFormInterest] = useState<string | undefined>()
@@ -205,12 +91,12 @@ export function PicoLandingPage() {
               </svg>
             </span>
             <span className={s.navName}>
-              PicoMUTX
-              <span className={s.navTag}> by MUTX</span>
+              {t('nav.brand')}
+              <span className={s.navTag}>{t('nav.brandTag')}</span>
             </span>
           </Link>
           <button className={s.navCta} onClick={() => openForm()} type="button">
-            Pre-register
+            {t('nav.cta')}
           </button>
         </div>
       </nav>
@@ -222,47 +108,39 @@ export function PicoLandingPage() {
           <div className={s.heroAmbient} aria-hidden="true" />
           <div className={s.heroGrid}>
             <SiteReveal delay={0.05}>
-              <span className={s.heroBadge}>
-                Early Access &middot; Limited Spots
-              </span>
+              <span className={s.heroBadge}>{t('hero.badge')}</span>
             </SiteReveal>
 
             <SiteReveal delay={0.1}>
               <h1 className={s.heroTitle}>
-                Build and deploy AI agents{' '}
-                <span className={s.heroTitleAccent}>without hiring a developer.</span>
+                {t('hero.title')}
+                <span className={s.heroTitleAccent}>{t('hero.titleAccent')}</span>
               </h1>
             </SiteReveal>
 
             <SiteReveal delay={0.16}>
-              <p className={s.heroSub}>
-                PicoMUTX gives you a safe, guided path to a working AI agent — whether
-                you are starting from scratch, fixing an agent that is not working, or
-                trying to avoid another expensive mistake.
-              </p>
+              <p className={s.heroSub}>{t('hero.subtitle')}</p>
             </SiteReveal>
 
             <SiteReveal delay={0.22}>
               <div className={s.heroActions}>
                 <button onClick={() => openForm()} className={s.btnPrimary} type="button">
-                  Pre-Register for Early Access
+                  {t('hero.cta')}
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </SiteReveal>
 
             <SiteReveal delay={0.26}>
-              <p className={s.heroMeta}>
-                Free to pre-register &middot; No credit card required &middot; Founding spots limited
-              </p>
+              <p className={s.heroMeta}>{t('hero.meta')}</p>
             </SiteReveal>
 
             <SiteReveal delay={0.3}>
               <div className={s.trustBar}>
-                {TRUST_BAR_ITEMS.map((item, i) => (
-                  <span key={item} className={s.trustItem}>
+                {Array.from({ length: 3 }, (_, i) => (
+                  <span key={i} className={s.trustItem}>
                     {i > 0 && <span className={s.trustSep} aria-hidden="true">|</span>}
-                    {item}
+                    {t(`trustBar.items.${i}`)}
                   </span>
                 ))}
               </div>
@@ -274,30 +152,24 @@ export function PicoLandingPage() {
         <section className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
-              <span className={s.eyebrow}>The Problem</span>
+              <span className={s.eyebrow}>{t('problem.eyebrow')}</span>
               <h2 className={s.sectionTitle}>
-                The problem is not the idea.<br />
-                It is everything that happens after it.
+                {t('problem.title')}<br />
+                {t('problem.titleLine2')}
               </h2>
-              <p className={s.sectionBody}>
-                Most people do not get stuck because they lack ambition. They get stuck
-                because building an AI agent still feels like entering a world designed
-                by engineers, for engineers.
-              </p>
+              <p className={s.sectionBody}>{t('problem.body')}</p>
             </div>
 
             <div className={s.problemScenarios}>
-              {PROBLEMS.map((p) => (
-                <div key={p.label} className={s.problemCard}>
-                  <div className={s.problemLabel}>{p.label}</div>
-                  <p className={s.problemBody}>{p.body}</p>
+              {Array.from({ length: 4 }, (_, i) => (
+                <div key={i} className={s.problemCard}>
+                  <div className={s.problemLabel}>{t(`problem.scenarios.${i}.label`)}</div>
+                  <p className={s.problemBody}>{t(`problem.scenarios.${i}.body`)}</p>
                 </div>
               ))}
             </div>
 
-            <p className={s.problemClose}>
-              That&apos;s exactly why PicoMUTX exists.
-            </p>
+            <p className={s.problemClose}>{t('problem.close')}</p>
           </div>
         </section>
 
@@ -305,22 +177,13 @@ export function PicoLandingPage() {
         <section className={`${s.section} ${s.sectionAlt}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
-              <span className={s.eyebrow}>What PicoMUTX Is</span>
-              <h2 className={s.sectionTitle}>
-                Where AI agents go from &ldquo;interesting idea&rdquo; to &ldquo;working system.&rdquo;
-              </h2>
-              <p className={s.sectionBody}>
-                PicoMUTX is a guided platform for people who want to build and run AI
-                agents safely — without needing to become full-time engineers. It gives
-                you the structure, support, and safeguards that are usually missing when
-                people try to do this alone. Instead of assembling everything from scratch,
-                you move step by step: from idea to implementation, from confusion to
-                clarity, from prototype to something you can actually use.
-              </p>
+              <span className={s.eyebrow}>{t('platform.eyebrow')}</span>
+              <h2 className={s.sectionTitle}>{t('platform.title')}</h2>
+              <p className={s.sectionBody}>{t('platform.body')}</p>
             </div>
             <div className={s.howGrid}>
-              {HOW_IT_WORKS.map((item, i) => (
-                <SiteReveal key={item.title} delay={i * 0.06}>
+              {Array.from({ length: 4 }, (_, i) => (
+                <SiteReveal key={i} delay={i * 0.06}>
                   <motion.div
                     whileHover={
                       prefersReducedMotion ? undefined : { y: -3 }
@@ -329,10 +192,10 @@ export function PicoLandingPage() {
                     className={s.howCard}
                   >
                     <span className={s.howIconWrap}>
-                      <HowItWorksIcon kind={item.icon} />
+                      <HowItWorksIcon kind={HOW_ICONS[i]} />
                     </span>
-                    <h3 className={s.howTitle}>{item.title}</h3>
-                    <p className={s.howBody}>{item.body}</p>
+                    <h3 className={s.howTitle}>{t(`platform.howItWorks.${i}.title`)}</h3>
+                    <p className={s.howBody}>{t(`platform.howItWorks.${i}.body`)}</p>
                   </motion.div>
                 </SiteReveal>
               ))}
@@ -344,20 +207,18 @@ export function PicoLandingPage() {
         <section className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
-              <span className={s.eyebrow}>Is PicoMUTX for You?</span>
-              <h2 className={s.sectionTitle}>
-                PicoMUTX is not for everyone.
-              </h2>
+              <span className={s.eyebrow}>{t('who.eyebrow')}</span>
+              <h2 className={s.sectionTitle}>{t('who.title')}</h2>
             </div>
 
             <div className={s.whoSplit}>
               <div className={s.whoCol}>
-                <h3 className={s.whoColTitle}>This is for you if&hellip;</h3>
+                <h3 className={s.whoColTitle}>{t('who.forYouTitle')}</h3>
                 <ul className={s.whoList}>
-                  {WHO_IT_S_FOR.map((item) => (
-                    <li key={item} className={s.whoItem}>
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <li key={i} className={s.whoItem}>
                       <Check className={s.whoCheck} />
-                      <span>{item}</span>
+                      <span>{t(`who.forYou.${i}`)}</span>
                     </li>
                   ))}
                 </ul>
@@ -366,12 +227,12 @@ export function PicoLandingPage() {
               <div className={s.whoDivider} aria-hidden="true" />
 
               <div className={s.whoCol}>
-                <h3 className={s.whoColTitle}>This is not for you if&hellip;</h3>
+                <h3 className={s.whoColTitle}>{t('who.notForYouTitle')}</h3>
                 <ul className={s.notList}>
-                  {WHO_IT_S_NOT_FOR.map((item) => (
-                    <li key={item} className={s.notItem}>
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <li key={i} className={s.notItem}>
                       <span className={s.notDash} aria-hidden="true">—</span>
-                      <span>{item}</span>
+                      <span>{t(`who.notForYou.${i}`)}</span>
                     </li>
                   ))}
                 </ul>
@@ -384,13 +245,11 @@ export function PicoLandingPage() {
         <section className={`${s.section} ${s.sectionAlt}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
-              <span className={s.eyebrow}>The Shift</span>
-              <h2 className={s.sectionTitle}>
-                What changes when you stop figuring it out alone
-              </h2>
+              <span className={s.eyebrow}>{t('beforeAfter.eyebrow')}</span>
+              <h2 className={s.sectionTitle}>{t('beforeAfter.title')}</h2>
             </div>
             <div className={s.baGrid}>
-              {BEFORE_AFTER.map((item, i) => (
+              {Array.from({ length: 4 }, (_, i) => (
                 <SiteReveal key={i} delay={i * 0.05}>
                   <motion.div
                     whileHover={
@@ -400,21 +259,18 @@ export function PicoLandingPage() {
                     className={s.baCard}
                   >
                     <div className={`${s.baSide} ${s.baBefore}`}>
-                      <p className={`${s.baLabel} ${s.baLabelBefore}`}>Before</p>
-                      <p className={s.baText}>{item.before}</p>
+                      <p className={`${s.baLabel} ${s.baLabelBefore}`}>{t('beforeAfter.beforeLabel')}</p>
+                      <p className={s.baText}>{t(`beforeAfter.items.${i}.before`)}</p>
                     </div>
                     <div className={s.baSide}>
-                      <p className={`${s.baLabel} ${s.baLabelAfter}`}>After</p>
-                      <p className={`${s.baText} ${s.baTextAfter}`}>{item.after}</p>
+                      <p className={`${s.baLabel} ${s.baLabelAfter}`}>{t('beforeAfter.afterLabel')}</p>
+                      <p className={`${s.baText} ${s.baTextAfter}`}>{t(`beforeAfter.items.${i}.after`)}</p>
                     </div>
                   </motion.div>
                 </SiteReveal>
               ))}
             </div>
-            <p className={s.baClose}>
-              The goal is not to &ldquo;learn AI someday.&rdquo; The goal is to get your
-              agent live — safely, clearly, and with less friction.
-            </p>
+            <p className={s.baClose}>{t('beforeAfter.close')}</p>
           </div>
         </section>
 
@@ -422,21 +278,15 @@ export function PicoLandingPage() {
         <section className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
-              <span className={s.eyebrow}>Early Access</span>
-              <h2 className={s.sectionTitle}>
-                PicoMUTX is opening in stages. Founding access won&apos;t stay open forever.
-              </h2>
-              <p className={s.sectionBody}>
-                Pre-registering now puts you ahead of the public rollout and inside the
-                group that helps shape the platform early. Early users get a closer line to
-                the product, earlier onboarding, and more influence over what gets prioritized.
-              </p>
+              <span className={s.eyebrow}>{t('earlyAccess.eyebrow')}</span>
+              <h2 className={s.sectionTitle}>{t('earlyAccess.title')}</h2>
+              <p className={s.sectionBody}>{t('earlyAccess.body')}</p>
             </div>
             <div className={s.benefitsGrid}>
-              {PREREGE_BENEFITS.map((benefit) => (
-                <div key={benefit} className={s.benefitItem}>
+              {Array.from({ length: 5 }, (_, i) => (
+                <div key={i} className={s.benefitItem}>
                   <Check className={s.benefitCheck} />
-                  <span>{benefit}</span>
+                  <span>{t(`earlyAccess.benefits.${i}`)}</span>
                 </div>
               ))}
             </div>
@@ -447,16 +297,14 @@ export function PicoLandingPage() {
         <section className={`${s.section} ${s.sectionAlt}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
-              <span className={s.eyebrow}>Questions</span>
-              <h2 className={s.sectionTitle}>
-                Questions people usually have before joining
-              </h2>
+              <span className={s.eyebrow}>{t('faq.eyebrow')}</span>
+              <h2 className={s.sectionTitle}>{t('faq.title')}</h2>
             </div>
             <div className={s.faqGrid}>
-              {FAQS.map((faq) => (
-                <div key={faq.q} className={s.faqCard}>
-                  <h3 className={s.faqQ}>{faq.q}</h3>
-                  <p className={s.faqA}>{faq.a}</p>
+              {Array.from({ length: 5 }, (_, i) => (
+                <div key={i} className={s.faqCard}>
+                  <h3 className={s.faqQ}>{t(`faq.items.${i}.q`)}</h3>
+                  <p className={s.faqA}>{t(`faq.items.${i}.a`)}</p>
                 </div>
               ))}
             </div>
@@ -472,38 +320,28 @@ export function PicoLandingPage() {
                 <SiteReveal delay={0.05}>
                   <span className={s.ctaEyebrow}>
                     <span className={s.ctaEyebrowDot} />
-                    Early Access · Limited Spots
+                    {t('finalCta.eyebrow')}
                   </span>
-                  <h2 className={s.ctaTitle}>
-                    Your agent does not need to stay an unfinished idea.
-                  </h2>
+                  <h2 className={s.ctaTitle}>{t('finalCta.title')}</h2>
                 </SiteReveal>
 
                 <SiteReveal delay={0.12}>
-                  <p className={s.ctaBody}>
-                    You do not need more tabs open. You do not need another tutorial.
-                    You need a clearer path to something that works.
-                    PicoMUTX is built for that moment.
-                  </p>
+                  <p className={s.ctaBody}>{t('finalCta.body')}</p>
                 </SiteReveal>
 
                 <SiteReveal delay={0.19}>
                   <div className={s.ctaFormWrap}>
-                    <p className={s.formHeadline}>Pre-register for PicoMUTX</p>
-                    <p className={s.formSubline}>
-                      Join the early access list. Be first when we open.
-                    </p>
+                    <p className={s.formHeadline}>{t('finalCta.formHeadline')}</p>
+                    <p className={s.formSubline}>{t('finalCta.formSubline')}</p>
                     <button
                       onClick={() => openForm()}
                       className={s.btnPrimary}
                       type="button"
                     >
-                      Pre-Register Now
+                      {t('finalCta.ctaButton')}
                       <ArrowRight className="h-4 w-4" />
                     </button>
-                    <p className={s.formCtaMeta}>
-                      Free to pre-register &middot; No credit card required &middot; Early users get priority access
-                    </p>
+                    <p className={s.formCtaMeta}>{t('finalCta.formCtaMeta')}</p>
                   </div>
                 </SiteReveal>
               </div>
