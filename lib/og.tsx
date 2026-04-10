@@ -1,5 +1,5 @@
 import satori from 'satori'
-import { Resvg } from '@resvg/resvg-js'
+import sharp from 'sharp'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
@@ -24,7 +24,9 @@ export interface OgImageProps {
 // Font loading (lazy, cached)
 // ---------------------------------------------------------------------------
 
-let _fonts: Array<{ name: string; data: ArrayBuffer; weight: number }> | null =
+type FontWeight = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900
+
+let _fonts: Array<{ name: string; data: ArrayBuffer; weight: FontWeight }> | null =
   null
 
 function loadFonts() {
@@ -34,11 +36,9 @@ function loadFonts() {
     join(process.cwd(), 'app/fonts/Geist-Regular.ttf'),
   )
 
-  // Geist doesn't ship a bold TTF in the Next bundle, so we synthesize bold
-  // by reusing the regular font with weight 700 — Satori handles it fine.
   _fonts = [
-    { name: 'Geist', data: geistRegular.buffer as ArrayBuffer, weight: 400 },
-    { name: 'Geist', data: geistRegular.buffer as ArrayBuffer, weight: 700 },
+    { name: 'Geist', data: geistRegular.buffer as ArrayBuffer, weight: 400 as FontWeight },
+    { name: 'Geist', data: geistRegular.buffer as ArrayBuffer, weight: 700 as FontWeight },
   ]
   return _fonts
 }
@@ -213,7 +213,7 @@ function OgCard({ title, description, tag, domain }: OgImageProps) {
               fontWeight: 400,
               lineHeight: 1.45,
               marginTop: 24,
-              marginBotom: 0,
+              marginBottom: 0,
               maxWidth: 900,
             }}
           >
@@ -286,9 +286,6 @@ export async function renderOgImage(props: OgImageProps): Promise<Buffer> {
     fonts,
   })
 
-  const resvg = new Resvg(svg, {
-    fitTo: { mode: 'width', value: 1200 },
-  })
-  const pngData = resvg.render()
-  return pngData.asPng()
+  const png = await sharp(Buffer.from(svg)).png().toBuffer()
+  return png
 }
