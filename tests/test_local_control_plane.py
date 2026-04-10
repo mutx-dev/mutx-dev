@@ -1,9 +1,15 @@
 from __future__ import annotations
 
 import json
+import tarfile
+from io import BytesIO
 from pathlib import Path
 
+import pytest
+
 from cli.local_control_plane import (
+    LocalControlPlaneError,
+    _extract_archive,
     ensure_local_container_runtime,
     ensure_local_control_plane,
     ensure_managed_local_control_checkout,
@@ -140,3 +146,38 @@ def test_ensure_local_container_runtime_can_install_docker_desktop_on_macos(
     assert ["brew", "install", "--cask", "docker"] in commands
     assert ["open", "-a", "Docker"] in commands
     assert any("Installing Docker Desktop" in message for message in progress)
+
+
+def test_extract_archive_rejects_path_traversal(tmp_path: Path) -> None:
+    archive_path = tmp_path / "malicious.tar"
+    destination = tmp_path / "destination"
+    destination.mkdir(parents=True, exist_ok=True)
+
+    escaped_target = tmp_path / "escaped.txt"
+    with tarfile.open(archive_path, "w") as archive:
+        payload = b"owned"
+        info = tarfile.TarInfo(name="../escaped.txt")
+        info.size = len(payload)
+        archive.addfile(info, fileobj=BytesIO(payload))
+
+    with pytest.raises(LocalControlPlaneError) as error:
+        _extract_archive(archive_path, destination)
+    assert "unsafe paths" in str(error.value)
+
+    assert not escaped_target.exists()
+
+
+def test_extract_archive_rejects_symlink_entries(tmp_path: Path) -> None:
+    archive_path = tmp_path / "symlink.tar"
+    destination = tmp_path / "destination"
+    destination.mkdir(parents=True, exist_ok=True)
+
+    with tarfile.open(archive_path, "w") as archive:
+        info = tarfile.TarInfo(name="link")
+        info.type = tarfile.SYMTYPE
+        info.linkname = "/etc/passwd"
+        archive.addfile(info)
+
+    with pytest.raises(LocalControlPlaneError) as error:
+        _extract_archive(archive_path, destination)
+    assert "unsupported link entries" in str(error.value)
