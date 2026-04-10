@@ -27,11 +27,6 @@ LOG       = "/Users/fortune/.openclaw/logs/autonomous-daemon.log"
 PID_FILE  = "/Users/fortune/.openclaw/autonomous-daemon.pid"
 WT_BACK   = "/Users/fortune/mutx-worktrees/factory/backend"
 WT_FRONT  = "/Users/fortune/mutx-worktrees/factory/frontend"
-# Get GitHub token (for authenticated pushes/prs)
-try:
-    GH_TOKEN = subprocess.check_output(["gh", "auth", "token"], text=True).strip()
-except:
-    GH_TOKEN = os.environ.get("GH_TOKEN", "")
 GH_REPO   = "mutx-dev/mutx-dev"
 
 WORKTREES = {"backend": WT_BACK, "frontend": WT_FRONT}
@@ -42,6 +37,11 @@ def log(m):
     print(line, flush=True)
     with open(LOG, "a") as f:
         f.write(line + "\n")
+
+def _redact_output(s):
+    if not s:
+        return s
+    return s.replace("https://github.com/", "https://[redacted]@github.com/")
 
 def sh(cmd, cwd=None, timeout=300, check=False):
     r = subprocess.run(cmd, shell=True, capture_output=True, text=True,
@@ -77,9 +77,6 @@ def ensure_on_main(wt):
     """Reset worktree to GitHub's current main — local origin/main may be stale.
     Worktree main is ahead of protected remote main, so we must use GitHub's actual main.
     We fetch GitHub's main into a dedicated ref, then reset to it."""
-    # Ensure authenticated remote URL (worktrees may lose token on recreation)
-    if GH_TOKEN:
-        sh(f"git remote set-url origin https://{GH_TOKEN}@github.com/{GH_REPO}.git", cwd=wt)
     # Fetch GitHub's current main into a dedicated ref
     sh(f"git fetch origin main:github-main", cwd=wt)
     # Detach at GitHub's current main
@@ -119,10 +116,10 @@ def implement_item(item):
                 log(f"<<< [{id_}] PR opened ✓")
                 return True
             else:
-                log(f"<<< [{id_}] gh pr create failed (rc={prc}): {pro[:200]}")
+                log(f"<<< [{id_}] gh pr create failed (rc={prc}): {_redact_output(pro)[:200]}")
                 return False
         else:
-            log(f"<<< [{id_}] push failed (rc={rc}): {out[:300]}")
+            log(f"<<< [{id_}] push failed (rc={rc}): {_redact_output(out)[:300]}")
             return False
 
     log(f"<<< [{id_}] no-op (no implementation for this area type)")
