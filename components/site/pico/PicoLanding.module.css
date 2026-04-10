@@ -1232,6 +1232,16 @@
   color: var(--pico-text-muted);
 }
 
+@media (max-width: 639px) {
+  .whoSplit {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .whoDivider {
+    display: none;
+  }
+}
+
 .notList {
   margin: 0;
   padding: 0;
