@@ -24,6 +24,7 @@ def save_lane_state(path: str | Path, payload: dict[str, Any]) -> None:
 
 
 DEFAULT_QUOTA_RESUME_SECONDS = 1800
+MAX_QUOTA_RESUME_SECONDS = 86400
 
 
 def pause_lane(
@@ -40,13 +41,17 @@ def pause_lane(
     paused_at = utc_now_iso()
     auto_resume_after_seconds = None
     if reason == "quota_exceeded":
-        auto_resume_after_seconds = retry_after_seconds or int(
+        requested_resume_seconds = retry_after_seconds or int(
             lane_state.get("auto_resume_after_seconds") or DEFAULT_QUOTA_RESUME_SECONDS
         )
+        auto_resume_after_seconds = max(1, min(requested_resume_seconds, MAX_QUOTA_RESUME_SECONDS))
     resume_at = None
     if auto_resume_after_seconds:
-        resume_at = datetime.now(timezone.utc).timestamp() + auto_resume_after_seconds
-        resume_at = datetime.fromtimestamp(resume_at, timezone.utc).isoformat().replace("+00:00", "Z")
+        try:
+            resume_at_ts = datetime.now(timezone.utc).timestamp() + auto_resume_after_seconds
+            resume_at = datetime.fromtimestamp(resume_at_ts, timezone.utc).isoformat().replace("+00:00", "Z")
+        except (OverflowError, OSError, ValueError):
+            resume_at = None
     lane_state.update(
         {
             "paused": True,

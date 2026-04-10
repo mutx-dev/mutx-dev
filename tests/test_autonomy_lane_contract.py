@@ -190,6 +190,21 @@ def test_lane_state_can_pause_lane() -> None:
     assert updated["lanes"]["codex"]["resume_at"]
 
 
+def test_lane_state_caps_extreme_retry_after_values() -> None:
+    payload = {"lanes": {}}
+    updated = LANE_STATE.pause_lane(
+        payload,
+        "codex",
+        reason="quota_exceeded",
+        source="issue-2",
+        retry_after_seconds=10**12,
+    )
+
+    assert LANE_STATE.is_lane_paused(updated, "codex") is True
+    assert updated["lanes"]["codex"]["auto_resume_after_seconds"] == LANE_STATE.MAX_QUOTA_RESUME_SECONDS
+    assert updated["lanes"]["codex"]["resume_at"]
+
+
 def test_worktree_utils_recognizes_git_repo(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()
