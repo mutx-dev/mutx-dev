@@ -221,7 +221,6 @@ export const marketingHomepage: MarketingHomepage = {
 }
 
 export const marketingPublicRailLinks: MarketingActionLink[] = [
-  { label: 'PicoMUTX', href: '/pico' },
   { label: 'Download', href: '/download' },
   { label: 'Releases', href: '/releases' },
   { label: 'Docs', href: 'https://docs.mutx.dev', external: true },
@@ -229,7 +228,6 @@ export const marketingPublicRailLinks: MarketingActionLink[] = [
 ]
 
 export const marketingFooterLinks: MarketingFooterLink[] = [
-  { label: 'PicoMUTX', href: '/pico' },
   { label: 'Releases', href: '/releases' },
   { label: 'Docs', href: 'https://docs.mutx.dev', external: true },
   { label: 'GitHub', href: 'https://github.com/mutx-dev/mutx-dev', external: true },

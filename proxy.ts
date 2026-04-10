@@ -16,6 +16,7 @@ const CSRF_FAILURE_DETAIL = 'CSRF validation failed: origin is not allowed'
 const APP_HOST = 'app.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
+const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.localhost'])
 const UI_CACHE_CONTROL = 'private, no-cache, no-store, max-age=0, must-revalidate'
 const API_CACHE_CONTROL = 'no-store'
 const APP_PUBLIC_PATHS = new Set([
@@ -295,7 +296,26 @@ export function proxy(request: NextRequest) {
     )
   }
 
+  if (PICO_HOSTS.has(host)) {
+    // pico.mutx.dev/* -> /pico/*
+    const picoPath = `/pico${normalizedPath === '/' ? '' : normalizedPath}`
+    return finalizeResponse(
+      rewriteWithinHost(request, picoPath),
+      host,
+      normalizedPath,
+    )
+  }
+
   if (MARKETING_HOSTS.has(host)) {
+    // Block direct /pico access on the main domain
+    if (normalizedPath.startsWith('/pico')) {
+      return finalizeResponse(
+        redirectWithinHost(request, '/'),
+        host,
+        normalizedPath,
+      )
+    }
+
     const publicDemoPath = internalDemoPathToPublicPath(normalizedPath)
     if (publicDemoPath !== normalizedPath) {
       return finalizeResponse(
