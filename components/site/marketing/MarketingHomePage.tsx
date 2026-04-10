@@ -130,7 +130,7 @@ export function MarketingHomePage() {
                     MUTX
                   </span>
                 <span className={home.heroLockupMeta} data-testid="homepage-lockup-meta">
-                  see · control · share
+                  see · control · prove
                 </span>
                 </span>
               </div>

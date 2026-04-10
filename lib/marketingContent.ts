@@ -104,7 +104,7 @@ const homepageActions: MarketingActionLink[] = [
 export const marketingHomepage: MarketingHomepage = {
   hero: {
     tagline: 'Your AI agents are already working. Do you know what they\'re doing?',
-    title: 'See it. Control it. Share it with your team.',
+    title: 'See it. Control it. Prove it.',
     backgroundSrc: '/landing/webp/victory-core.webp',
     backgroundAlt: 'MUTX robot raising the MUTX mark inside a blue-lit control chamber',
     actions: homepageActions,
@@ -132,15 +132,6 @@ export const marketingHomepage: MarketingHomepage = {
           mediaType: 'image',
           mediaSrc: '/landing/webp/docs-surface.webp',
           mediaAlt: 'MUTX permission settings for AI agents',
-        },
-        {
-          id: 'layers',
-          label: 'Team sharing',
-          title: 'Share agents across your team, safely.',
-          body: 'Your team gets the same visibility and control — no more copy-pasting prompts in Slack.',
-          mediaType: 'image',
-          mediaSrc: '/landing/webp/wiring-bay.webp',
-          mediaAlt: 'MUTX team sharing interface',
         },
         {
           id: 'operator',
@@ -208,8 +199,8 @@ export const marketingHomepage: MarketingHomepage = {
         },
         {
           title: 'Control',
-          before: 'You share agent access by copying prompts into Slack and hoping nobody tweaks them in a bad way.',
-          after: 'MUTX lets you set clear permissions and share agents with your team through a proper, auditable workspace.',
+          before: 'Your agents run with full permissions and you have no way to limit what they can access or change.',
+          after: 'MUTX lets you set clear permissions and guardrails — so agents stay productive without overstepping.',
         },
         {
           title: 'Trust',
@@ -230,6 +221,7 @@ export const marketingHomepage: MarketingHomepage = {
 }
 
 export const marketingPublicRailLinks: MarketingActionLink[] = [
+  { label: 'PicoMUTX', href: '/pico' },
   { label: 'Download', href: '/download' },
   { label: 'Releases', href: '/releases' },
   { label: 'Docs', href: 'https://docs.mutx.dev', external: true },
@@ -237,6 +229,7 @@ export const marketingPublicRailLinks: MarketingActionLink[] = [
 ]
 
 export const marketingFooterLinks: MarketingFooterLink[] = [
+  { label: 'PicoMUTX', href: '/pico' },
   { label: 'Releases', href: '/releases' },
   { label: 'Docs', href: 'https://docs.mutx.dev', external: true },
   { label: 'GitHub', href: 'https://github.com/mutx-dev/mutx-dev', external: true },

@@ -7,7 +7,7 @@ import { DEFAULT_X_HANDLE, getCanonicalUrl, getOgImageUrl, getSiteUrl } from "@/
 
 const homeTitle = "MUTX | See What Your AI Agents Are Doing";
 const homeDescription =
-  "MUTX gives you clear visibility, real control, and safe team sharing for every AI agent you run. Download the Mac app.";
+  "MUTX gives you clear visibility, real control, and full audit trails for every AI agent you run. Download the Mac app.";
 
 export const metadata: Metadata = {
   title: homeTitle,
