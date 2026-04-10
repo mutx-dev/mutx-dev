@@ -8,7 +8,6 @@ import {
   buildWebPageStructuredData,
   getCanonicalUrl,
   getPageOgImageUrl,
-  getSiteUrl,
 } from "@/lib/seo";
 
 const pageTitle = "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer";
