@@ -8,7 +8,6 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeStringify from "rehype-stringify";
 import { preprocessHints } from "@/lib/docs/hints";
 import type { Root } from "mdast";
-import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
 
 export interface Heading {
@@ -59,7 +58,8 @@ function remarkResolveDocLinks(currentSlug: string[]): Plugin<[], Root> {
       // Also rewrite the link text if it matches the filename
       // [foo.md](foo.md) → [Foo](resolved_href) — better UX
       const filename = href.replace(/\.md$/, "");
-      const linkText = node.children?.[0]?.value || "";
+      const firstChild = node.children?.[0];
+      const linkText = (firstChild && "value" in firstChild ? firstChild.value : "") || "";
       if (linkText === href || linkText === filename) {
         // Capitalize first letter for readability
         const displayText = filename
