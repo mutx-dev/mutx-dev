@@ -9,6 +9,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import s from './PicoLanding.module.css'
 import { SiteReveal } from '../SiteReveal'
 import { PicoContactForm } from './PicoContactForm'
+import { PicoLangSwitcher } from './PicoLangSwitcher'
 
 /* ------------------------------------------------------------------ */
 /*  Icon helper                                                        */
@@ -95,6 +96,7 @@ export function PicoLandingPage() {
               <span className={s.navTag}>{t('nav.brandTag')}</span>
             </span>
           </Link>
+          <PicoLangSwitcher />
           <button className={s.navCta} onClick={() => openForm()} type="button">
             {t('nav.cta')}
           </button>
