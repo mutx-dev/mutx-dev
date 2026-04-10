@@ -56,6 +56,9 @@ function resolveSlug(slugSegments: string[]): string | null {
   if (isRootContent(slugSegments)) {
     return resolveRootContentSlug(slugSegments);
   }
+  if (hasUnsafeSlugSegment(slugSegments)) {
+    return null;
+  }
 
   if (slugSegments.length === 1 && slugSegments[0] === "README") {
     const rootReadme = path.join(docsDir(), "README.md");
@@ -100,6 +103,18 @@ function resolveSlug(slugSegments: string[]): string | null {
   }
 
   return null;
+}
+
+function hasUnsafeSlugSegment(slugSegments: string[]): boolean {
+  return slugSegments.some(
+    (segment) =>
+      segment.length === 0 ||
+      segment === "." ||
+      segment === ".." ||
+      segment.includes("/") ||
+      segment.includes("\\") ||
+      segment.includes("\0")
+  );
 }
 
 export async function generateMetadata({
