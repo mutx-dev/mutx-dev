@@ -26,6 +26,10 @@ const LOGO_RED = "#FF4E4E";
 
 let geistRegular: ArrayBuffer | undefined;
 let geistBold: ArrayBuffer | undefined;
+const IMAGE_CACHE_TTL_MS = 60 * 60 * 1000;
+const IMAGE_CACHE_MAX_ENTRIES = 200;
+const imageCache = new Map<string, { png: Uint8Array; expiresAt: number }>();
+const inflightImageRenders = new Map<string, Promise<Uint8Array>>();
 
 async function loadFont(weight: "regular" | "bold" = "regular"): Promise<ArrayBuffer> {
   if (weight === "bold" && geistBold) return geistBold;
@@ -295,6 +299,43 @@ function buildCard({
   };
 }
 
+function getCacheKey({
+  title,
+  description,
+  badge,
+}: {
+  title: string;
+  description?: string;
+  badge?: string;
+}): string {
+  return JSON.stringify({
+    title: title.trim(),
+    description: description?.trim() ?? "",
+    badge: badge?.trim() ?? "",
+  });
+}
+
+function getCachedImage(cacheKey: string): Uint8Array | undefined {
+  const cached = imageCache.get(cacheKey);
+  if (!cached) return undefined;
+  if (cached.expiresAt <= Date.now()) {
+    imageCache.delete(cacheKey);
+    return undefined;
+  }
+  return cached.png;
+}
+
+function setCachedImage(cacheKey: string, png: Uint8Array): void {
+  if (imageCache.size >= IMAGE_CACHE_MAX_ENTRIES) {
+    const oldestKey = imageCache.keys().next().value;
+    if (oldestKey) imageCache.delete(oldestKey);
+  }
+  imageCache.set(cacheKey, {
+    png,
+    expiresAt: Date.now() + IMAGE_CACHE_TTL_MS,
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Route handler
 // ---------------------------------------------------------------------------
@@ -305,57 +346,84 @@ export async function GET(request: NextRequest) {
   const title = searchParams.get("title") || "MUTX";
   const description = searchParams.get("description") || undefined;
   const badge = searchParams.get("badge") || undefined;
+  const cacheKey = getCacheKey({ title, description, badge });
+
+  const cachedPng = getCachedImage(cacheKey);
+  if (cachedPng) {
+    return new NextResponse(cachedPng, {
+      status: 200,
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control":
+          "public, s-maxage=3600, stale-while-revalidate=86400, immutable",
+        "CDN-Cache-Control":
+          "public, s-maxage=3600, stale-while-revalidate=86400",
+      },
+    });
+  }
 
   try {
-    const [regularFontData, boldFontData] = await Promise.all([
-      loadFont("regular"),
-      loadFont("bold"),
-    ]);
+    let renderPromise = inflightImageRenders.get(cacheKey);
+    if (!renderPromise) {
+      renderPromise = (async () => {
+        const [regularFontData, boldFontData] = await Promise.all([
+          loadFont("regular"),
+          loadFont("bold"),
+        ]);
 
-    // 1. Render React tree → SVG via Satori
-    const element = buildCard({ title, description, badge }) as unknown as ReactNode;
-    const svg = await satori(element, {
-      width: WIDTH,
-      height: HEIGHT,
-      fonts: [
-        {
-          name: "Geist",
-          data: regularFontData,
-          style: "normal",
-          weight: 400,
-        },
-        {
-          name: "Geist",
-          data: boldFontData,
-          style: "normal",
-          weight: 700,
-        },
-      ],
-    });
+        // 1. Render React tree → SVG via Satori
+        const element = buildCard({ title, description, badge }) as unknown as ReactNode;
+        const svg = await satori(element, {
+          width: WIDTH,
+          height: HEIGHT,
+          fonts: [
+            {
+              name: "Geist",
+              data: regularFontData,
+              style: "normal",
+              weight: 400,
+            },
+            {
+              name: "Geist",
+              data: boldFontData,
+              style: "normal",
+              weight: 700,
+            },
+          ],
+        });
 
-    // 2. SVG → PNG via sharp
-    const png = await sharp({
-      create: {
-        width: WIDTH,
-        height: HEIGHT,
-        channels: 4,
-        background: { r: 6, g: 8, b: 16, alpha: 1 },
-      },
-    })
-      .composite([
-        {
-          input: Buffer.from(svg),
-          density: 150,
-        },
-      ])
-      .png({
-        quality: 90,
-        compressionLevel: 6,
-      })
-      .toBuffer();
+        // 2. SVG → PNG via sharp
+        const png = await sharp({
+          create: {
+            width: WIDTH,
+            height: HEIGHT,
+            channels: 4,
+            background: { r: 6, g: 8, b: 16, alpha: 1 },
+          },
+        })
+          .composite([
+            {
+              input: Buffer.from(svg),
+              density: 150,
+            },
+          ])
+          .png({
+            quality: 90,
+            compressionLevel: 6,
+          })
+          .toBuffer();
+
+        return new Uint8Array(png);
+      })();
+      inflightImageRenders.set(cacheKey, renderPromise);
+    }
+
+    const png = await renderPromise;
+    setCachedImage(cacheKey, png);
+    inflightImageRenders.delete(cacheKey);
 
     // 3. Return PNG with cache headers
-    return new NextResponse(new Uint8Array(png), {
+    return new NextResponse(png, {
       status: 200,
       headers: {
         "Content-Type": "image/png",
@@ -366,6 +434,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
+    inflightImageRenders.delete(cacheKey);
     console.error("[og-image] Error generating image:", error);
     return new NextResponse("Failed to generate OG image", { status: 500 });
   }
