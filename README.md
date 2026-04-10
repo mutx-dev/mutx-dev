@@ -80,6 +80,7 @@ Governance via [Faramesh](https://faramesh.dev) — policy enforcement, session 
 - [API Reference](docs/api/reference.md) — `/v1/*` contract
 - [CLI Guide](docs/cli.md) — terminal workflows
 - [Python SDK](docs/sdk.md) — programmatic access
+- [v1.3 Release Notes](docs/releases/v1.3.md) — latest release
 - [Contributing](CONTRIBUTING.md) — repo conventions
 - [Infrastructure](docs/infrastructure.md) — deploy guide
 
