@@ -19,6 +19,6 @@ describe('Pico tutor', () => {
   it('points workflow questions at the scheduling lesson', () => {
     const answer = answerTutorQuestion('How do I schedule a cron workflow for my agent?', createInitialWorkspaceState())
 
-    expect(answer.recommendedLessonIds).toContain('create-scheduled-workflow')
+    expect(answer.recommendedLessonIds).toContain('create-a-scheduled-workflow')
   })
 })

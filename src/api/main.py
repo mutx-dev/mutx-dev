@@ -49,7 +49,9 @@ from src.api.routes import (
     monitoring,
     observability,
     onboarding,
+    pico,
     policies,
+
     approvals,
     rag,
     runtime,
@@ -112,6 +114,7 @@ PUBLIC_ROUTE_REGISTRATIONS: tuple[RouterRegistration, ...] = (
     RouterRegistration("analytics", analytics.router),
     RouterRegistration("monitoring", monitoring.router),
     RouterRegistration("onboarding", onboarding.router),
+    RouterRegistration("pico", pico.router),
     RouterRegistration("runtime", runtime.router),
     RouterRegistration("scheduler", scheduler.router),
     RouterRegistration("sessions", sessions.router),

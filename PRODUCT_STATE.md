@@ -91,3 +91,28 @@ What is next
 - Add optional auth-backed sync into existing onboarding/observability/usage routes.
 - Replace manual telemetry with live agent ingestion.
 - Tighten landing copy so the public story matches the shipped beta exactly.
+
+### 2026-04-11 01:54:00 CEST — cycle end
+What changed
+- Added a new Pico academy shell under `app/pico/academy`, `app/pico/onboarding`, `app/pico/tutor`, `app/pico/autopilot`, and `app/pico/support`.
+- Added typed lesson, level, track, XP, badge, plan, and release-note data under `lib/pico/academy.ts`.
+- Added browser-local progress with authenticated sync via `/api/pico/progress` and backend `/v1/pico/progress` backed by `user_settings`.
+- Added a grounded tutor route that returns lesson-matched next actions and compatibility payloads for the older Pico beta surfaces.
+- Added approval proxy routes and wired the autopilot page to live runs, alerts, budgets, and approvals.
+- Redirected the older workspace beta path to the new onboarding entry.
+
+What was tested
+- `npm run typecheck`
+- `npm run build`
+- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `python3 -m compileall src/api`
+- `./.venv/bin/python -m pytest tests/api/test_pico_progress_route.py -q`
+
+What failed
+- No product-blocking failures remained after the final pass.
+- Existing unrelated test suites still emit their usual console noise, but the build and targeted validations are green.
+
+What is next
+- Decide whether to absorb or delete the older untracked Pico beta artifacts instead of leaving parallel shadows around.
+- Move the landing CTA and copy fully onto the new shell so the product entrance is obvious.
+- Add an admin/content-ops lane only if editing lessons in source files becomes a bottleneck.
