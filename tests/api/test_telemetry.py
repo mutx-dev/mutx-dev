@@ -14,8 +14,13 @@ import importlib.util
 
 def import_telemetry_module():
     """Import telemetry module directly without going through mutx/__init__.py."""
+    import os
+    telemetry_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "sdk", "mutx", "telemetry.py"
+    )
     spec = importlib.util.spec_from_file_location(
-        "telemetry", "/Users/fortune/MUTX/sdk/mutx/telemetry.py"
+        "telemetry", telemetry_path
     )
     module = importlib.util.module_from_spec(spec)
     sys.modules["telemetry"] = module

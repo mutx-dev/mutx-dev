@@ -24,7 +24,6 @@ function slugify(text: string): string {
 
 export function TableOfContents({ sourceHeadings }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('');
-  const [isOpen, setIsOpen] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   // Map raw markdown headings to the IDs used in the rendered HTML.

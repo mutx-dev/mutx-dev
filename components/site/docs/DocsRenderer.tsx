@@ -8,7 +8,8 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeStringify from "rehype-stringify";
 import { preprocessHints } from "@/lib/docs/hints";
 import type { Root } from "mdast";
-import type { visit } from "unist-util-visit";
+import type { Plugin } from "unified";
+import { visit } from "unist-util-visit";
 
 export interface Heading {
   id: string;
@@ -31,11 +32,7 @@ function slugify(text: string): string {
  */
 function remarkResolveDocLinks(currentSlug: string[]): Plugin<[], Root> {
   return () => (tree: Root) => {
-    // Dynamic import to keep this server-only
-    const { visit: visitUnist } = require("unist-util-visit") as {
-      visit: typeof visit;
-    };
-    visitUnist(tree, "link", (node: any) => {
+    visit(tree, "link", (node) => {
       const href = node.url || "";
       // Only handle relative links (not anchors, not absolute, not external)
       if (!href || href.startsWith("#") || href.startsWith("/") || href.startsWith("http")) return;
