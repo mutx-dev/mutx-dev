@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Check } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 
 import s from './PicoLanding.module.css'
@@ -11,6 +11,13 @@ import { SiteReveal } from '../SiteReveal'
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
 /* ------------------------------------------------------------------ */
+
+const stats = [
+  { value: '30 min', label: 'Average setup time' },
+  { value: '<2s', label: 'Alert latency' },
+  { value: '0', label: 'Code changes required' },
+  { value: '100%', label: 'Audit coverage' },
+] as const
 
 const beforeAfter = [
   {
@@ -35,22 +42,22 @@ const beforeAfter = [
 
 const features = [
   {
-    num: '01',
+    icon: 'eye',
     title: 'Live visibility dashboard',
     body: 'See what your agent is doing, what it called, what it returned, and what failed — in real time. No log archaeology.',
   },
   {
-    num: '02',
+    icon: 'shield',
     title: 'Cost watchdog',
     body: 'Real-time token spend per agent, per workflow, per day. Budget caps and alerts so you never get a surprise bill.',
   },
   {
-    num: '03',
+    icon: 'gate',
     title: 'Smart approval gates',
     body: 'Define what your agent can do autonomously vs what needs your sign-off. Approve via Slack, email, or dashboard — one click.',
   },
   {
-    num: '04',
+    icon: 'trail',
     title: 'Failure alerts + audit trail',
     body: 'Instant alert when something breaks. Full history of every action the agent took — you always know what happened and when.',
   },
@@ -63,6 +70,7 @@ const tiers = [
     period: '/mo',
     agents: '1 agent',
     recommended: false,
+    cta: 'Start free trial',
     features: [
       'Dashboard',
       'Cost alerts',
@@ -76,6 +84,7 @@ const tiers = [
     period: '/mo',
     agents: 'Up to 5 agents',
     recommended: true,
+    cta: 'Get started',
     features: [
       'Full observability',
       'Cost caps + budget governance',
@@ -90,6 +99,7 @@ const tiers = [
     period: '/mo',
     agents: 'Up to 20 agents',
     recommended: false,
+    cta: 'Contact sales',
     features: [
       'Everything in Pro',
       'Multi-user access',
@@ -116,10 +126,52 @@ const setupSteps = [
   {
     num: '3',
     time: '15 min',
-    title: 'You\'re live.',
+    title: "You're live.",
     body: 'Dashboard is running. Your agent works. You only get alerted when it actually needs you.',
   },
 ] as const
+
+/* ------------------------------------------------------------------ */
+/*  Icon helper                                                        */
+/* ------------------------------------------------------------------ */
+
+function FeatureIcon({ kind }: { kind: string }) {
+  const sz = 20
+  const clr = 'currentColor'
+  switch (kind) {
+    case 'eye':
+      return (
+        <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={clr} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      )
+    case 'shield':
+      return (
+        <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={clr} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+          <path d="M9 12l2 2 4-4" />
+        </svg>
+      )
+    case 'gate':
+      return (
+        <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={clr} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          <circle cx="12" cy="16" r="1" />
+        </svg>
+      )
+    case 'trail':
+      return (
+        <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={clr} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" />
+          <path d="M3 22l1-4" />
+        </svg>
+      )
+    default:
+      return null
+  }
+}
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -142,6 +194,11 @@ export function PicoLandingPage() {
               <span className={s.navTag}> by MUTX</span>
             </span>
           </Link>
+          <div className={s.navLinks}>
+            <a href="#features" className={s.navLink}>Features</a>
+            <a href="#pricing" className={s.navLink}>Pricing</a>
+            <a href="#setup" className={s.navLink}>Setup</a>
+          </div>
           <Link href="https://mutx.dev/contact" className={s.navCta}>
             Get early access
           </Link>
@@ -151,6 +208,7 @@ export function PicoLandingPage() {
       <main className={s.main}>
         {/* ---- Hero ---- */}
         <section className={s.hero}>
+          <div className={s.heroAmbient} aria-hidden="true" />
           <div className={s.heroGrid}>
             <span className={s.heroBadge}>
               <span className={s.heroBadgeDot} />
@@ -188,6 +246,87 @@ export function PicoLandingPage() {
               Live in 30 minutes. Works on top of whatever you already built.
               No new infrastructure required.
             </p>
+
+            {/* Mock dashboard terminal */}
+            <SiteReveal delay={0.28} distance={36}>
+              <div className={s.heroVisual}>
+                <div className={s.terminal}>
+                  <div className={s.terminalBar}>
+                    <span className={s.terminalDot} style={{ background: '#ef4444' }} />
+                    <span className={s.terminalDot} style={{ background: '#eab308' }} />
+                    <span className={s.terminalDot} style={{ background: '#22c55e' }} />
+                    <span className={s.terminalTitle}>pico.mutx.dev — agent dashboard</span>
+                  </div>
+                  <div className={s.terminalBody}>
+                    <div className={s.terminalLine}>
+                      <span className={s.tGreen}>agent-01</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tWhite}>process_emails</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tGreen}>completed</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tMuted}>142 tokens</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tMuted}>$0.04</span>
+                    </div>
+                    <div className={s.terminalLine}>
+                      <span className={s.tGreen}>agent-01</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tWhite}>sync_calendar</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tYellow}>awaiting approval</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tMuted}>89 tokens</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tMuted}>$0.02</span>
+                    </div>
+                    <div className={s.terminalLine}>
+                      <span className={s.tGreen}>agent-02</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tWhite}>generate_report</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tGreen}>completed</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tMuted}>1.2k tokens</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tMuted}>$0.38</span>
+                    </div>
+                    <div className={s.terminalLine}>
+                      <span className={s.tGreen}>agent-02</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tWhite}>send_slack digest</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tRed}>failed</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tMuted}>54 tokens</span>
+                      <span className={s.tDim}>|</span>
+                      <span className={s.tMuted}>$0.01</span>
+                    </div>
+                    <div className={s.terminalStatusBar}>
+                      <span>4 agents running</span>
+                      <span>Budget: <span className={s.tGreen}>$127.40 / $500.00</span></span>
+                      <span>Uptime: <span className={s.tGreen}>99.97%</span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </SiteReveal>
+          </div>
+        </section>
+
+        {/* ---- Stats bar ---- */}
+        <section className={s.statsBar}>
+          <div className={s.shell}>
+            <div className={s.statsGrid}>
+              {stats.map((stat, i) => (
+                <SiteReveal key={stat.label} delay={i * 0.05}>
+                  <div className={s.statItem}>
+                    <span className={s.statValue}>{stat.value}</span>
+                    <span className={s.statLabel}>{stat.label}</span>
+                  </div>
+                </SiteReveal>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -232,7 +371,7 @@ export function PicoLandingPage() {
         </section>
 
         {/* ---- Features ---- */}
-        <section className={`${s.section} ${s.sectionDark}`}>
+        <section id="features" className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
               <span className={s.eyebrow}>How it works</span>
@@ -242,7 +381,7 @@ export function PicoLandingPage() {
             </div>
             <div className={s.featureGrid}>
               {features.map((f, i) => (
-                <SiteReveal key={f.num} delay={i * 0.06}>
+                <SiteReveal key={f.title} delay={i * 0.06}>
                   <motion.div
                     whileHover={
                       prefersReducedMotion ? undefined : { y: -3 }
@@ -250,7 +389,9 @@ export function PicoLandingPage() {
                     transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                     className={s.featureCard}
                   >
-                    <p className={s.featureNum}>{f.num}</p>
+                    <span className={s.featureIconWrap}>
+                      <FeatureIcon kind={f.icon} />
+                    </span>
                     <h3 className={s.featureTitle}>{f.title}</h3>
                     <p className={s.featureBody}>{f.body}</p>
                   </motion.div>
@@ -261,7 +402,7 @@ export function PicoLandingPage() {
         </section>
 
         {/* ---- Pricing ---- */}
-        <section className={`${s.section} ${s.sectionAlt}`}>
+        <section id="pricing" className={`${s.section} ${s.sectionAlt}`}>
           <div className={s.shell}>
             <div
               className={`${s.sectionHeader} ${s.sectionHeaderCenter}`}
@@ -289,7 +430,7 @@ export function PicoLandingPage() {
                     }`}
                   >
                     {tier.recommended && (
-                      <span className={s.pricingBadge}>Recommended</span>
+                      <span className={s.pricingBadge}>Most popular</span>
                     )}
                     <p className={s.pricingName}>{tier.name}</p>
                     <div className={s.pricingPrice}>
@@ -301,7 +442,7 @@ export function PicoLandingPage() {
                       {tier.features.map((f) => (
                         <li key={f} className={s.pricingFeature}>
                           <span className={s.pricingFeatureCheck}>
-                            +
+                            <Check className="h-3 w-3" />
                           </span>
                           {f}
                         </li>
@@ -313,7 +454,7 @@ export function PicoLandingPage() {
                         tier.recommended ? s.pricingCtaPrimary : ''
                       }`}
                     >
-                      {tier.recommended ? 'Get started' : 'Get started'}
+                      {tier.cta}
                     </Link>
                   </motion.div>
                 </SiteReveal>
@@ -327,7 +468,7 @@ export function PicoLandingPage() {
         </section>
 
         {/* ---- Setup timeline ---- */}
-        <section className={`${s.section} ${s.sectionDark}`}>
+        <section id="setup" className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div
               className={`${s.sectionHeader} ${s.sectionHeaderCenter}`}
@@ -362,14 +503,22 @@ export function PicoLandingPage() {
             <div className={s.ctaStack}>
               <SiteReveal delay={0.05}>
                 <h2 className={s.ctaTitle}>
-                  Your AI should work for you. Not the other way around.
+                  Your AI should work for you.<br />Not the other way around.
                 </h2>
               </SiteReveal>
               <SiteReveal delay={0.12}>
-                <Link href="https://mutx.dev/contact" className={s.btnPrimary}>
-                  Get early access
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
+                <p className={s.ctaBody}>
+                  Join the teams already running autonomous agents with confidence.
+                  Setup takes 30 minutes. No credit card required.
+                </p>
+              </SiteReveal>
+              <SiteReveal delay={0.18}>
+                <div className={s.ctaActions}>
+                  <Link href="https://mutx.dev/contact" className={s.btnPrimary}>
+                    Get early access
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
               </SiteReveal>
               <p className={s.ctaMeta}>
                 Questions?{' '}
