@@ -12,7 +12,7 @@ import {
   buildReleaseNotesUrl,
   fetchLatestStableDesktopRelease,
 } from "@/lib/desktopRelease";
-import { DEFAULT_X_HANDLE, getCanonicalUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, buildWebPageStructuredData, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
 
 export const revalidate = 900;
 
@@ -21,13 +21,13 @@ export const metadata: Metadata = {
   description:
     "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.",
   alternates: {
-    canonical: getCanonicalUrl("/download"),
+    canonical: getCanonicalUrl("/download/macos"),
   },
   openGraph: {
     title: "Download for macOS | MUTX",
     description:
       "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.",
-    url: getCanonicalUrl("/download"),
+    url: getCanonicalUrl("/download/macos"),
     images: [getPageOgImageUrl("Download for macOS | MUTX", "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.", { path: "/download/macos" })],
   },
   twitter: {
@@ -39,6 +39,12 @@ export const metadata: Metadata = {
     images: [getPageOgImageUrl("Download for macOS | MUTX", "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.", { path: "/download/macos" })],
   },
 };
+
+const structuredData = buildWebPageStructuredData({
+  name: "Download for macOS | MUTX",
+  path: "/download/macos",
+  description: "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.",
+});
 
 export default async function MacDownloadPage() {
   const release = await fetchLatestStableDesktopRelease();
@@ -84,6 +90,10 @@ export default async function MacDownloadPage() {
   return (
     <PublicSurface className={`${styles.page} ${styles.publicPage} ${styles.downloadPage}`}>
       <PublicNav />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
 
       <main className={styles.main}>
         <section className={styles.routeDarkSection} data-route-surface="dark">
@@ -128,13 +138,13 @@ export default async function MacDownloadPage() {
                   <Link href="/releases" className={styles.inlineLink}>
                     Release summary
                   </Link>
-                  <a href={docsReleaseNotesHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                  <a href={docsReleaseNotesHref} target="_blank" rel="noopener noreferrer" className={styles.inlineLink}>
                     Docs notes
                   </a>
-                  <a href={checksumsHref} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                  <a href={checksumsHref} target="_blank" rel="noopener noreferrer" className={styles.inlineLink}>
                     Checksums
                   </a>
-                  <a href={release?.htmlUrl ?? MUTX_GITHUB_RELEASES_URL} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                  <a href={release?.htmlUrl ?? MUTX_GITHUB_RELEASES_URL} target="_blank" rel="noopener noreferrer" className={styles.inlineLink}>
                     GitHub release
                   </a>
                 </div>
@@ -182,7 +192,7 @@ export default async function MacDownloadPage() {
                 <Link href="/login" className={styles.inlineLink}>
                   Sign in
                 </Link>
-                <a href={release?.htmlUrl ?? MUTX_GITHUB_RELEASES_URL} target="_blank" rel="noreferrer" className={styles.inlineLink}>
+                <a href={release?.htmlUrl ?? MUTX_GITHUB_RELEASES_URL} target="_blank" rel="noopener noreferrer" className={styles.inlineLink}>
                   GitHub release
                 </a>
               </div>

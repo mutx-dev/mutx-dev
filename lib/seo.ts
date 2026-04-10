@@ -95,3 +95,43 @@ export function getPageOgImageUrl(
   if (options?.badge) params.set('badge', options.badge)
   return `${getSiteUrl()}/api/og-image?${params.toString()}`
 }
+
+/**
+ * Build a JSON-LD WebPage schema object for a given route.
+ * Includes Organization and WebSite references.
+ */
+export function buildWebPageStructuredData(options: {
+  name: string
+  path: string
+  description: string
+}) {
+  const siteUrl = getSiteUrl()
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${siteUrl}/#organization`,
+        name: 'MUTX',
+        url: siteUrl,
+        sameAs: [`https://x.com/${DEFAULT_X_HANDLE.replace('@', '')}`],
+      },
+      {
+        '@type': 'SoftwareApplication',
+        name: 'MUTX',
+        applicationCategory: 'DeveloperApplication',
+        description:
+          'Source-available control plane for AI agent governance, deployment, and observability.',
+        downloadUrl: `${siteUrl}/download`,
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      },
+      {
+        '@type': 'WebPage',
+        name: options.name,
+        url: getCanonicalUrl(options.path),
+        description: options.description,
+        isPartOf: { '@type': 'WebSite', name: 'MUTX', url: siteUrl },
+      },
+    ],
+  }
+}
