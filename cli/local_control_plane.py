@@ -329,8 +329,24 @@ def _materialize_source_ref(source_ref: str, destination: Path) -> Path:
 
 
 def _extract_archive(archive_path: Path, destination: Path) -> None:
+    destination_root = destination.resolve()
     with tarfile.open(archive_path, "r:*") as archive:
-        archive.extractall(destination)
+        members = archive.getmembers()
+        for member in members:
+            if member.issym() or member.islnk():
+                raise LocalControlPlaneError(
+                    "MUTX could not provision the local control plane source. "
+                    "Archive contains unsupported link entries."
+                )
+
+            extraction_target = (destination_root / member.name).resolve()
+            if extraction_target != destination_root and destination_root not in extraction_target.parents:
+                raise LocalControlPlaneError(
+                    "MUTX could not provision the local control plane source. "
+                    "Archive contains unsafe paths."
+                )
+
+        archive.extractall(destination_root, members=members)
 
 
 def _resolve_checkout_root(path: Path) -> Path:
