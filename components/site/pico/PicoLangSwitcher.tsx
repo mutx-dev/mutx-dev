@@ -1,7 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { useCallback, useRef } from 'react'
 import { useLocale } from 'next-intl'
 
 const LOCALES = [
@@ -19,21 +18,24 @@ const LOCALES = [
 
 export function PicoLangSwitcher() {
   const locale = useLocale()
-  const router = useRouter()
+  const detailsRef = useRef<HTMLDetailsElement>(null)
 
-  const handleSelect = useCallback(
-    (code: string) => {
-      document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
-      router.refresh()
-    },
-    [router],
-  )
+  const handleSelect = useCallback((code: string) => {
+    document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
+    // close the dropdown
+    if (detailsRef.current) {
+      detailsRef.current.open = false
+    }
+    // force a full page reload so server components re-read the cookie
+    window.location.href = window.location.href
+  }, [])
 
   const current = LOCALES.find((l) => l.code === locale) ?? LOCALES[0]
 
   return (
     <div style={{ position: 'relative', display: 'inline-block' }}>
       <details
+        ref={detailsRef}
         style={{
           position: 'relative',
           borderRadius: '8px',
@@ -76,7 +78,18 @@ export function PicoLangSwitcher() {
           {LOCALES.map((l) => (
             <button
               key={l.code}
-              onClick={() => handleSelect(l.code)}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleSelect(l.code)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  handleSelect(l.code)
+                }
+              }}
               style={{
                 background: l.code === locale ? 'rgba(74,222,128,0.1)' : 'transparent',
                 border: 'none',
@@ -93,12 +106,12 @@ export function PicoLangSwitcher() {
               }}
               onMouseEnter={(e) => {
                 if (l.code !== locale) {
-                  (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)'
+                  ;(e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)'
                 }
               }}
               onMouseLeave={(e) => {
                 if (l.code !== locale) {
-                  (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
+                  ;(e.currentTarget as HTMLButtonElement).style.background = 'transparent'
                 }
               }}
             >
