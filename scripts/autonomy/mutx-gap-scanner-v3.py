@@ -21,8 +21,6 @@ def _get_repo():
     _REPO = str(Path(__file__).resolve().parents[2])
     return _REPO
 REPO = _get_repo()
-
-REPO     = "REPO"
 QUEUE    = f"{REPO}/mutx-engineering-agents/dispatch/action-queue.json"
 GH_REPO  = "mutx-dev/mutx-dev"
 
