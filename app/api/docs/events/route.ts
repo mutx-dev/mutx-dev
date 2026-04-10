@@ -1,26 +1,41 @@
 import { NextResponse } from "next/server";
 import { setBroadcaster } from "@/lib/docs-sync";
 
-// In-process client registry for SSE
-const clients = new Set<ReadableStreamDefaultController>();
+// ── SSE client registry ────────────────────────────────
+// Track each client with its heartbeat timer for clean teardown.
 
-// Register our broadcaster so docs-sync can push events
-setBroadcaster((files: string[]) => {
-  const data = `data: ${JSON.stringify({ type: "docs-changed", files })}\n\n`;
-  for (const client of clients) {
-    try {
-      client.enqueue(data);
-    } catch {
-      clients.delete(client);
+interface SSEClient {
+  controller: ReadableStreamDefaultController;
+  heartbeat: ReturnType<typeof setInterval>;
+}
+
+const clients = new Set<SSEClient>();
+
+// Lazy broadcaster init — only register when this module loads (dev only)
+let broadcasterRegistered = false;
+
+function ensureBroadcaster() {
+  if (broadcasterRegistered) return;
+  broadcasterRegistered = true;
+
+  setBroadcaster((files: string[]) => {
+    const data = `data: ${JSON.stringify({ type: "docs-changed", files })}\n\n`;
+    for (const client of clients) {
+      try {
+        client.controller.enqueue(data);
+      } catch {
+        // Dead client — clean up
+        clearInterval(client.heartbeat);
+        clients.delete(client);
+      }
     }
-  }
-});
+  });
+}
 
 // GET /api/docs/events — SSE stream for dev live reload
 export async function GET() {
   const isDev = process.env.NODE_ENV === "development";
 
-  // Only available in dev — production doesn't need live reload
   if (!isDev) {
     return NextResponse.json(
       { error: "SSE only available in development" },
@@ -28,9 +43,12 @@ export async function GET() {
     );
   }
 
+  ensureBroadcaster();
+
+  let clientRef: SSEClient | null = null;
+
   const stream = new ReadableStream({
     start(controller) {
-      clients.add(controller);
       // Send initial connection event
       controller.enqueue(
         `data: ${JSON.stringify({ type: "connected" })}\n\n`
@@ -43,20 +61,20 @@ export async function GET() {
             `data: ${JSON.stringify({ type: "heartbeat" })}\n\n`
           );
         } catch {
+          // Enqueue failed — client is dead
           clearInterval(heartbeat);
-          clients.delete(controller);
+          clients.delete(clientRef!);
         }
       }, 30_000);
 
-      // Cleanup on close
-      // @ts-expect-error - ReadableStream controller doesn't have close callback in types
-      controller._close = () => {
-        clearInterval(heartbeat);
-        clients.delete(controller);
-      };
+      clientRef = { controller, heartbeat };
+      clients.add(clientRef);
     },
-    cancel(controller) {
-      clients.delete(controller);
+    cancel() {
+      if (clientRef) {
+        clearInterval(clientRef.heartbeat);
+        clients.delete(clientRef);
+      }
     },
   });
 
@@ -71,4 +89,3 @@ export async function GET() {
 }
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 300; // 5 min max for SSE

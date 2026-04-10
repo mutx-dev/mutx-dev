@@ -1,4 +1,4 @@
-import { execSync } from "child_process";
+import { execSync, execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import { getDocSitemapRoutes } from "./docs";
@@ -26,6 +26,40 @@ export interface SyncLogEntry {
   error?: string;
 }
 
+// ── Git availability check ─────────────────────────────
+
+let _hasGit: boolean | null = null;
+
+export function hasGit(): boolean {
+  if (_hasGit !== null) return _hasGit;
+  try {
+    execSync("git --version", { stdio: "ignore", timeout: 3000 });
+    _hasGit = true;
+  } catch {
+    _hasGit = false;
+  }
+  return _hasGit;
+}
+
+// ── Rate limiting ──────────────────────────────────────
+
+const SYNC_RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+const SYNC_RATE_LIMIT_MAX = 10; // 10 syncs per minute
+const syncTimestamps: number[] = [];
+
+function checkRateLimit(): boolean {
+  const now = Date.now();
+  // Prune timestamps outside the window
+  while (syncTimestamps.length > 0 && syncTimestamps[0] < now - SYNC_RATE_LIMIT_WINDOW_MS) {
+    syncTimestamps.shift();
+  }
+  if (syncTimestamps.length >= SYNC_RATE_LIMIT_MAX) {
+    return false; // rate limited
+  }
+  syncTimestamps.push(now);
+  return true;
+}
+
 // ── Mutex + Dedup ──────────────────────────────────────
 
 let syncLock = false;
@@ -37,7 +71,7 @@ const MAX_CONSECUTIVE_FAILURES = 3;
 const syncLog: SyncLogEntry[] = [];
 const MAX_LOG_ENTRIES = 50;
 
-// SSE broadcaster — set by the events route
+// SSE broadcaster — set lazily by the events route
 let broadcastFn: ((files: string[]) => void) | null = null;
 
 export function setBroadcaster(fn: (files: string[]) => void) {
@@ -45,10 +79,16 @@ export function setBroadcaster(fn: (files: string[]) => void) {
 }
 
 // ── Git helpers ────────────────────────────────────────
+// Uses execFileSync for commands with arguments to avoid shell injection.
+// execFileSync passes args as an array — no shell parsing, no interpolation.
 
 function getHeadCommit(): string | null {
   try {
-    return execSync("git rev-parse HEAD", { encoding: "utf-8" }).trim();
+    const out = execFileSync("git", ["rev-parse", "HEAD"], {
+      encoding: "utf-8",
+      timeout: 5_000,
+    }).trim();
+    return out || null;
   } catch {
     return null;
   }
@@ -56,9 +96,11 @@ function getHeadCommit(): string | null {
 
 function getBranch(): string | null {
   try {
-    return execSync("git rev-parse --abbrev-ref HEAD", {
+    const out = execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
       encoding: "utf-8",
+      timeout: 5_000,
     }).trim();
+    return out || null;
   } catch {
     return null;
   }
@@ -72,7 +114,7 @@ function gitPull(): {
   const before = getHeadCommit();
 
   try {
-    const output = execSync("git pull --ff-only", {
+    const output = execFileSync("git", ["pull", "--ff-only"], {
       encoding: "utf-8",
       timeout: 30_000,
     }).trim();
@@ -84,15 +126,16 @@ function gitPull(): {
     const after = getHeadCommit();
 
     if (before && after && before !== after) {
-      const diffOutput = execSync(
-        `git diff --name-only ${before}..${after}`,
+      // Safe: before and after are verified 40-char hex from git rev-parse
+      const diffOutput = execFileSync(
+        "git",
+        ["diff", "--name-only", `${before}..${after}`],
         { encoding: "utf-8", timeout: 10_000 }
       ).trim();
       const changedFiles = diffOutput.split("\n").filter(Boolean);
       return { pulled: true, changedFiles };
     }
 
-    // Pull succeeded but diff unclear — treat as changed
     return { pulled: true, changedFiles: ["unknown"] };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -102,11 +145,15 @@ function gitPull(): {
 
 // ── Change detection ───────────────────────────────────
 
+const DOC_PREFIXES = ["docs/", "agents/"];
+const DOC_EXACT_FILES = ["SUMMARY.md"];
+
 function filterDocChanges(files: string[]): string[] {
   return files.filter((f) => {
-    if (f.startsWith("docs/")) return true;
-    if (f === "SUMMARY.md") return true;
-    if (f.startsWith("agents/")) return true;
+    if (DOC_EXACT_FILES.includes(f)) return true;
+    for (const prefix of DOC_PREFIXES) {
+      if (f.startsWith(prefix)) return true;
+    }
     return false;
   });
 }
@@ -117,7 +164,6 @@ function log(entry: SyncLogEntry) {
   syncLog.push(entry);
   if (syncLog.length > MAX_LOG_ENTRIES) syncLog.shift();
 
-  // Structured log to stdout (Railway captures this)
   const level = entry.error ? "ERROR" : entry.pulled ? "INFO" : "DEBUG";
   console.log(
     `[docs-sync] ${level} trigger=${entry.trigger} ` +
@@ -130,6 +176,7 @@ function log(entry: SyncLogEntry) {
 }
 
 // ── Alerting ───────────────────────────────────────────
+// Uses Node's built-in https module instead of shelling out to curl.
 
 async function alertFailure(entry: SyncLogEntry) {
   const webhookUrl = process.env.DOCS_SYNC_ALERT_WEBHOOK;
@@ -139,15 +186,38 @@ async function alertFailure(entry: SyncLogEntry) {
     const message = {
       content:
         `[docs-sync] ${consecutiveFailures} consecutive failures. ` +
-        `Last error: ${entry.error}. ` +
+        `Last error: ${entry.error ?? "unknown"}. ` +
         `Commit: ${entry.afterCommit?.slice(0, 7) ?? "unknown"}`,
     };
-    execSync(
-      `curl -sfS -X POST -H 'Content-Type: application/json' ` +
-        `-d '${JSON.stringify(message).replace(/'/g, "'\\''")}' ` +
-        `'${webhookUrl}'`,
-      { timeout: 5_000 }
-    );
+
+    const body = JSON.stringify(message);
+
+    const url = new URL(webhookUrl);
+    const options = {
+      hostname: url.hostname,
+      port: url.port || 443,
+      path: url.pathname + url.search,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(body),
+      },
+    };
+
+    await new Promise<void>((resolve, reject) => {
+      const httpModule = url.protocol === "https:" ? require("https") : require("http");
+      const req = httpModule.request(options, (res: any) => {
+        res.on("data", () => {}); // drain
+        res.on("end", resolve);
+      });
+      req.on("error", reject);
+      req.setTimeout(5_000, () => {
+        req.destroy();
+        reject(new Error("timeout"));
+      });
+      req.write(body);
+      req.end();
+    });
   } catch {
     // Alert delivery is best-effort
   }
@@ -157,7 +227,7 @@ async function alertFailure(entry: SyncLogEntry) {
 
 function rebuildSearchIndex() {
   try {
-    execSync("npx tsx scripts/build-docs-search-index.ts", {
+    execFileSync("npx", ["tsx", "scripts/build-docs-search-index.ts"], {
       encoding: "utf-8",
       timeout: 60_000,
       cwd: process.cwd(),
@@ -173,6 +243,18 @@ function rebuildSearchIndex() {
 export async function syncDocsFromGit(
   trigger: "webhook" | "cron" | "manual" = "manual"
 ): Promise<SyncResult> {
+  // Rate limit check
+  if (!checkRateLimit()) {
+    return {
+      success: false,
+      pulled: false,
+      commit: getHeadCommit(),
+      changedFiles: [],
+      docRoutes: [],
+      error: "rate limited",
+    };
+  }
+
   // Mutex — prevent concurrent syncs
   if (syncLock) {
     return {
@@ -281,7 +363,6 @@ export async function syncDocsFromGit(
 
     // Async rebuild search index if docs changed
     if (docChanges.length > 0) {
-      // Fire and forget — don't block the response
       setTimeout(() => rebuildSearchIndex(), 100);
 
       // Notify SSE clients (dev mode)
@@ -303,23 +384,6 @@ export async function syncDocsFromGit(
 }
 
 // ── Status ─────────────────────────────────────────────
-
-export function getDocLastModified(filePath: string): string | null {
-  try {
-    const relative = path.relative(process.cwd(), filePath);
-    const output = execSync(`git log -1 --format=%cI -- "${relative}"`, {
-      encoding: "utf-8",
-    }).trim();
-    return output || null;
-  } catch {
-    try {
-      const stat = fs.statSync(filePath);
-      return stat.mtime.toISOString();
-    } catch {
-      return null;
-    }
-  }
-}
 
 export function getSyncStatus(): {
   branch: string | null;

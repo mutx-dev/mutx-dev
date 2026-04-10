@@ -1,25 +1,34 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Dev-only hook: connects to /api/docs/events SSE stream.
  * When docs files change on disk, triggers router.refresh()
  * so the page re-reads from disk (force-dynamic).
+ *
+ * Uses isMounted state to avoid conditional hook calls.
+ * In production, the SSE endpoint returns 404 so this is a no-op.
  */
 export function useDocsLiveReload() {
-  if (process.env.NODE_ENV !== "development") return;
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // Only connect in browser after mount — SSE endpoint 404s in production
+    if (!isMounted) return;
+
     let es: EventSource | null = null;
     let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let alive = true;
 
     function connect() {
+      if (!alive) return;
       es = new EventSource("/api/docs/events");
 
       es.addEventListener("message", (e) => {
@@ -35,16 +44,19 @@ export function useDocsLiveReload() {
 
       es.addEventListener("error", () => {
         es?.close();
-        // Reconnect after 3s
-        reconnectTimer = setTimeout(connect, 3000);
+        es = null;
+        if (alive) {
+          reconnectTimer = setTimeout(connect, 3000);
+        }
       });
     }
 
     connect();
 
     return () => {
+      alive = false;
       es?.close();
       if (reconnectTimer) clearTimeout(reconnectTimer);
     };
-  }, [router]);
+  }, [router, isMounted]);
 }

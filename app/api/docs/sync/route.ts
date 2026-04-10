@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { syncDocsFromGit, getSyncStatus, getSyncLog } from "@/lib/docs-sync";
+import {
+  syncDocsFromGit,
+  getSyncStatus,
+  getSyncLog,
+  hasGit,
+} from "@/lib/docs-sync";
 import * as crypto from "crypto";
 
 function verifySignature(
@@ -19,24 +24,6 @@ function verifySignature(
   } catch {
     return false;
   }
-}
-
-/**
- * Detect if we're running in an environment with git available.
- * Railway Docker builds won't have git, so sync falls back to
- * "content is baked at deploy time" mode.
- */
-let _hasGit: boolean | null = null;
-function hasGit(): boolean {
-  if (_hasGit !== null) return _hasGit;
-  try {
-    const { execSync } = require("child_process") as typeof import("child_process");
-    execSync("git --version", { stdio: "ignore", timeout: 3000 });
-    _hasGit = true;
-  } catch {
-    _hasGit = false;
-  }
-  return _hasGit;
 }
 
 // POST /api/docs/sync — trigger a git pull + revalidation
@@ -71,7 +58,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // If no git in container, signal that a redeploy is needed instead
+    // No git in container — content is baked at deploy time
     if (!hasGit()) {
       return NextResponse.json({
         success: true,
@@ -100,7 +87,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // No git — nothing to pull
   if (!hasGit()) {
     return NextResponse.json({
       success: true,
