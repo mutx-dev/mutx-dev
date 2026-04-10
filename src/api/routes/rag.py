@@ -2,6 +2,7 @@
 
 import os
 import logging
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -372,9 +373,147 @@ async def rag_health(current_user: User = Depends(get_current_user)):
     """Health check for RAG service."""
     require_enabled_rag_api()
     api_key_present = bool(os.getenv("OPENAI_API_KEY"))
+
+    # Check vector store status
+    store_status = "not_configured"
+    try:
+        from src.api.integrations.vector_store import VectorStoreRegistry
+
+        stores = VectorStoreRegistry.list_stores()
+        if stores:
+            store_status = f"active ({len(stores)} store(s))"
+    except ImportError:
+        store_status = "unavailable"
+
     return {
         "status": "available",
-        "feature": "embeddings, search",
+        "feature": "embeddings, search, ingest",
         "openai_configured": api_key_present,
+        "vector_store": store_status,
         "supported_models": list(EMBEDDING_MODELS.keys()),
     }
+
+
+class IngestRequest(BaseModel):
+    """Request model for document ingestion."""
+
+    texts: list[str]
+    collection_name: str = "default"
+    model: str = "text-embedding-3-small"
+    metadatas: Optional[list[dict[str, Any]]] = None
+    ids: Optional[list[str]] = None
+
+
+class IngestResponse(BaseModel):
+    """Response model for document ingestion."""
+
+    document_ids: list[str]
+    collection_name: str
+    document_count: int
+
+
+@router.post("/ingest", response_model=IngestResponse)
+async def ingest_documents(
+    request: IngestRequest,
+    current_user: User = Depends(get_current_user),
+) -> IngestResponse:
+    """
+    Ingest documents into the vector store for later retrieval via /search.
+
+    Documents are chunked, embedded, and stored in the configured PostgreSQL
+    vector store. Requires OPENAI_API_KEY and DATABASE_URL (PostgreSQL).
+    """
+    require_enabled_rag_api()
+
+    if not request.texts:
+        raise HTTPException(status_code=400, detail="texts must not be empty")
+    if len(request.texts) > 100:
+        raise HTTPException(status_code=400, detail="texts exceeds maximum of 100 documents")
+
+    total_length = sum(len(t) for t in request.texts)
+    for i, text in enumerate(request.texts):
+        validate_text_payload(text, field_name=f"texts[{i}]", max_length=MAX_EMBED_TEXT_LENGTH)
+
+    if request.model not in EMBEDDING_MODELS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported model. Supported: {list(EMBEDDING_MODELS.keys())}",
+        )
+
+    logger.info(
+        "RAG document ingestion requested",
+        extra={
+            "user_id": str(current_user.id),
+            "collection": request.collection_name,
+            "document_count": len(request.texts),
+            "total_length": total_length,
+        },
+    )
+
+    # Resolve vector store
+    try:
+        from src.api.integrations.vector_store import (
+            EmbeddingProvider,
+            VectorStoreConfig,
+            VectorStoreRegistry,
+            VectorStoreManager,
+        )
+    except ImportError as imp_err:
+        raise HTTPException(
+            status_code=503,
+            detail="RAG ingestion is not available — vector store dependencies missing.",
+        ) from imp_err
+
+    try:
+        store: VectorStoreManager | None = VectorStoreRegistry.get_store(request.collection_name)
+
+        if store is None:
+            # Auto-initialize from DATABASE_URL
+            db_url = os.environ.get("DATABASE_URL") or settings.database_url
+            if not db_url or not db_url.startswith("postgresql"):
+                raise HTTPException(
+                    status_code=503,
+                    detail="RAG ingestion requires a PostgreSQL database. Configure DATABASE_URL.",
+                )
+
+            config = VectorStoreConfig(
+                database_url=db_url,
+                embedding_provider=EmbeddingProvider.OPENAI,
+                embedding_model=request.model,
+                embedding_dimensions=EMBEDDING_MODELS[request.model],
+                collection_name=request.collection_name,
+            )
+            store = VectorStoreRegistry.create_store(request.collection_name, config)
+
+        doc_ids = store.add_documents(
+            texts=request.texts,
+            metadatas=request.metadatas,
+            ids=request.ids,
+        )
+
+        await track_usage_best_effort(
+            user_id=current_user.id,
+            event_type="rag.ingest",
+            resource_type="rag",
+            resource_id=request.collection_name,
+            metadata={
+                "document_count": len(request.texts),
+                "total_length": total_length,
+                "collection": request.collection_name,
+            },
+        )
+
+        return IngestResponse(
+            document_ids=doc_ids,
+            collection_name=request.collection_name,
+            document_count=len(doc_ids),
+        )
+
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("RAG ingestion failed: %s", exc)
+        raise HTTPException(
+            status_code=500,
+            detail=f"RAG ingestion failed: {str(exc)}",
+        ) from exc
