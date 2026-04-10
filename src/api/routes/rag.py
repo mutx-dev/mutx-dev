@@ -290,6 +290,7 @@ async def similarity_search(
             "query_length": len(request.query),
         },
     )
+
     await track_usage_best_effort(
         user_id=current_user.id,
         event_type="rag.search",
@@ -297,12 +298,63 @@ async def similarity_search(
         resource_id=request.model,
         metadata={"top_k": request.top_k, "query_length": len(request.query)},
     )
-    # pgvector-based similarity search is planned for v1.3
-    raise HTTPException(
-        status_code=503,
-        detail="RAG similarity search is not yet implemented. This feature requires pgvector extension which is planned for v1.3.",
-        headers={"X-Feature-Flag": "rag.search", "X-Available-In": "v1.3"},
-    )
+
+    # Resolve vector store: try registry first, auto-init from DATABASE_URL if needed
+    try:
+        from src.api.config import get_settings
+        from src.api.integrations.vector_store import (
+            EmbeddingProvider,
+            VectorStoreConfig,
+            VectorStoreRegistry,
+            VectorStoreManager,
+        )
+
+        store: VectorStoreManager | None = VectorStoreRegistry.get_store("default")
+
+        if store is None:
+            # Auto-initialize a default store from DATABASE_URL
+            settings_cfg = get_settings()
+            db_url = os.environ.get("DATABASE_URL") or settings_cfg.database_url
+            if db_url and not db_url.startswith("postgresql"):
+                logger.warning("RAG search: DATABASE_URL is not PostgreSQL — search unavailable")
+                raise HTTPException(
+                    status_code=503,
+                    detail="RAG search requires a PostgreSQL database. Please configure DATABASE_URL with a PostgreSQL connection string.",
+                )
+            if db_url:
+                config = VectorStoreConfig(
+                    database_url=db_url,
+                    embedding_provider=EmbeddingProvider.OPENAI,
+                    embedding_model=request.model,
+                    collection_name="default",
+                )
+                store = VectorStoreRegistry.create_store("default", config)
+
+        if store is None:
+            raise HTTPException(
+                status_code=503,
+                detail="No vector store configured. Set DATABASE_URL to a PostgreSQL database to enable RAG search.",
+            )
+
+        # Execute similarity search
+        results = store.similarity_search_with_score(
+            query=request.query,
+            k=request.top_k,
+        )
+
+        return [
+            SearchResult(text=doc.page_content, score=round(score, 4))
+            for doc, score in results
+        ]
+
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception(f"RAG search failed: {exc}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"RAG search failed: {str(exc)}",
+        ) from exc
 
 
 @router.get("/health")
@@ -312,7 +364,7 @@ async def rag_health(current_user: User = Depends(get_current_user)):
     api_key_present = bool(os.getenv("OPENAI_API_KEY"))
     return {
         "status": "available",
-        "feature": "embeddings",
+        "feature": "embeddings, search",
         "openai_configured": api_key_present,
         "supported_models": list(EMBEDDING_MODELS.keys()),
     }

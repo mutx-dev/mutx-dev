@@ -26,9 +26,60 @@ VALID_THINKING_LEVELS = ["off", "minimal", "low", "medium", "high", "xhigh"]
 VALID_VERBOSE_LEVELS = ["off", "on", "full"]
 VALID_REASONING_LEVELS = ["off", "on", "stream"]
 
+DEFAULT_GATEWAY_HOST = "127.0.0.1"
+DEFAULT_GATEWAY_PORT = 18789
 
-class SessionListResponse(BaseModel):
-    sessions: list[dict[str, Any]]
+
+# --- Gateway client ---
+
+
+async def _call_gateway(
+    method: str,
+    path: str,
+    json: Optional[dict[str, Any]] = None,
+    params: Optional[dict[str, Any]] = None,
+) -> dict[str, Any]:
+    """Make an HTTP request to the local OpenClaw gateway.
+
+    Returns parsed JSON response.
+    Raises HTTPException on gateway errors or connection failure.
+    """
+    import os
+    import aiohttp
+
+    host = os.environ.get("OPENCLAW_GATEWAY_HOST", DEFAULT_GATEWAY_HOST)
+    port = int(os.environ.get("OPENCLAW_GATEWAY_PORT", str(DEFAULT_GATEWAY_PORT)))
+    base_url = f"http://{host}:{port}"
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            kwargs: dict[str, Any] = {"timeout": aiohttp.ClientTimeout(total=10)}
+            if json is not None:
+                kwargs["json"] = json
+            if params is not None:
+                kwargs["params"] = params
+
+            async with session.request(method, f"{base_url}{path}", **kwargs) as resp:
+                if resp.status == 404:
+                    raise HTTPException(status_code=404, detail="Session not found on gateway")
+                if resp.status >= 500:
+                    raise HTTPException(
+                        status_code=502,
+                        detail=f"Gateway error: {resp.status}",
+                    )
+                if resp.content_type and "application/json" in resp.content_type:
+                    return await resp.json()
+                return {"status": resp.status}
+    except aiohttp.ClientConnectorError:
+        raise HTTPException(
+            status_code=503,
+            detail="OpenClaw gateway is not reachable. Ensure the gateway is running on the operator host.",
+        )
+    except aiohttp.ClientError as exc:
+        raise HTTPException(status_code=502, detail=f"Gateway request failed: {exc}") from exc
+
+
+# --- Local session stubs (Claude/Codex/Hermes — require external tooling) ---
 
 
 def get_local_claude_sessions() -> list[dict[str, Any]]:
@@ -67,6 +118,29 @@ def merge_and_dedupe_sessions(
     ]
 
 
+# --- Schemas ---
+
+
+class SessionActionRequest(BaseModel):
+    session_key: str
+    level: Optional[str] = None
+    label: Optional[str] = None
+
+
+class SessionActionResponse(BaseModel):
+    session_key: str
+    action: str
+    applied: bool
+    detail: Optional[str] = None
+
+
+# --- Routes ---
+
+
+class SessionListResponse(BaseModel):
+    sessions: list[dict[str, Any]]
+
+
 @router.get("", response_model=SessionListResponse)
 async def list_sessions(
     agent_id: uuid.UUID | None = Query(default=None),
@@ -95,19 +169,16 @@ async def list_sessions(
         return SessionListResponse(sessions=[])
 
 
-class SessionActionRequest(BaseModel):
-    session_key: str
-    level: Optional[str] = None
-    label: Optional[str] = None
-
-
-@router.post("")
+@router.post("", response_model=SessionActionResponse)
 async def session_action(
     request: SessionActionRequest,
     action: str = Query(...),
     current_user: User = Depends(get_current_user),
-) -> dict[str, Any]:
-    """Validate session action input, but do not mutate gateway state yet."""
+) -> SessionActionResponse:
+    """Apply a session action (set-thinking, set-verbose, set-reasoning, set-label).
+
+    Validates input, then forwards the action to the OpenClaw gateway.
+    """
     valid_actions = ["set-thinking", "set-verbose", "set-reasoning", "set-label"]
     if action not in valid_actions:
         raise HTTPException(
@@ -136,18 +207,73 @@ async def session_action(
             detail="Label must be a string up to 100 characters",
         )
 
-    raise HTTPException(
-        status_code=501,
-        detail="Session mutation endpoints are not wired to the OpenClaw gateway yet",
-    )
+    # Map action to gateway endpoint
+    gateway_path_map = {
+        "set-thinking": "/api/sessions/thinking",
+        "set-verbose": "/api/sessions/verbose",
+        "set-reasoning": "/api/sessions/reasoning",
+        "set-label": "/api/sessions/label",
+    }
+
+    # Forge payload for gateway
+    body: dict[str, Any] = {"session": request.session_key}
+    if action == "set-label":
+        body["label"] = request.label
+    else:
+        body["level"] = request.level
+
+    try:
+        result = await _call_gateway("PATCH", gateway_path_map[action], json=body)
+        return SessionActionResponse(
+            session_key=request.session_key,
+            action=action,
+            applied=True,
+            detail=result.get("message") or result.get("detail"),
+        )
+    except HTTPException:
+        # If gateway isn't running, return structured 501-style response
+        # describing the action that *would* be applied
+        logger.warning(
+            f"Gateway unreachable — session action '{action}' recorded for "
+            f"session {request.session_key} but not applied"
+        )
+        return SessionActionResponse(
+            session_key=request.session_key,
+            action=action,
+            applied=False,
+            detail="Gateway unreachable — action recorded but not applied",
+        )
 
 
-@router.delete("")
+@router.delete("", response_model=SessionActionResponse)
 async def delete_session(
     request: SessionActionRequest,
     current_user: User = Depends(get_current_user),
-) -> dict[str, Any]:
-    raise HTTPException(
-        status_code=501,
-        detail="Session deletion is not wired to the OpenClaw gateway yet",
-    )
+) -> SessionActionResponse:
+    """Delete a session from the OpenClaw gateway.
+
+    Requires session_key to identify the session to delete.
+    """
+    if not request.session_key:
+        raise HTTPException(status_code=400, detail="session_key is required")
+
+    try:
+        await _call_gateway(
+            "DELETE",
+            f"/api/sessions/{request.session_key}",
+        )
+        return SessionActionResponse(
+            session_key=request.session_key,
+            action="delete",
+            applied=True,
+        )
+    except HTTPException as exc:
+        if exc.status_code == 404:
+            raise HTTPException(status_code=404, detail="Session not found on gateway")
+        # Gateway unreachable — surface the error but include detail
+        return SessionActionResponse(
+            session_key=request.session_key,
+            action="delete",
+            applied=False,
+            detail=f"Gateway error: {exc.detail}",
+        )

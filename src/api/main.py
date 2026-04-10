@@ -54,6 +54,7 @@ from src.api.routes import (
     rag,
     runtime,
     runs,
+    scheduler,
     security,
     sessions,
     swarms,
@@ -112,6 +113,7 @@ PUBLIC_ROUTE_REGISTRATIONS: tuple[RouterRegistration, ...] = (
     RouterRegistration("monitoring", monitoring.router),
     RouterRegistration("onboarding", onboarding.router),
     RouterRegistration("runtime", runtime.router),
+    RouterRegistration("scheduler", scheduler.router),
     RouterRegistration("sessions", sessions.router),
     RouterRegistration("swarms", swarms.router),
     RouterRegistration("telemetry", telemetry.router),
@@ -124,7 +126,7 @@ PUBLIC_ROUTE_REGISTRATIONS: tuple[RouterRegistration, ...] = (
 PUBLIC_ROUTER_ALLOWLIST: tuple[str, ...] = tuple(
     registration.name for registration in PUBLIC_ROUTE_REGISTRATIONS
 )
-UNMOUNTED_ROUTER_NAMES: tuple[str, ...] = ("newsletter", "scheduler")
+UNMOUNTED_ROUTER_NAMES: tuple[str, ...] = ("newsletter",)
 
 # Routes that require authentication - these will be protected with get_current_user
 # Add routes here that should always require authentication regardless of individual route dependencies
