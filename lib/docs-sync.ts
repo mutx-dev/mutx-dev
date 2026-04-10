@@ -208,7 +208,7 @@ async function alertFailure(entry: SyncLogEntry) {
 
     await new Promise<void>((resolve, reject) => {
       const httpModule = url.protocol === "https:" ? https : http;
-      const req = httpModule.request(options, (res: any) => {
+      const req = httpModule.request(options, (res: http.IncomingMessage) => {
         res.on("data", () => {}); // drain
         res.on("end", resolve);
       });
