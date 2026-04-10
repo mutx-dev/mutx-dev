@@ -1,30 +1,23 @@
 import type { ReactNode } from 'react'
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
+import { getMessages, getLocale } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 
 type Props = {
   children: ReactNode
-  params: Promise<{ locale?: string }>
 }
 
-export default async function PicoLayout({ children, params }: Props) {
-  const { locale } = await params
-
-  // Validate locale
-  const validLocale = locale && routing.locales.includes(locale as (typeof routing.locales)[number])
-    ? locale
+export default async function PicoLayout({ children }: Props) {
+  // getLocale() reads NEXT_LOCALE cookie — matches what proxy.ts sets
+  const locale = routing.locales.includes(await getLocale() as (typeof routing.locales)[number])
+    ? await getLocale()
     : 'en'
 
   const messages = await getMessages()
 
   return (
-    <NextIntlClientProvider locale={validLocale} messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       {children}
     </NextIntlClientProvider>
   )
-}
-
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }))
 }
