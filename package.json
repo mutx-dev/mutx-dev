@@ -110,7 +110,7 @@
     "highlight.js": "^11.11.1",
     "lenis": "^1.1.9",
     "lucide-react": "^0.323.0",
-    "next": "16.2.1",
+    "next": "16.2.3",
     "next-intl": "^4.9.0",
     "pg": "^8.20.0",
     "postgres": "^3.4.8",
