@@ -1468,24 +1468,6 @@
   color: var(--pico-text-secondary);
 }
 
-/* --- CTA section ------------------------------------------------- */
-.sectionCta {
-  background: var(--pico-bg);
-  padding: clamp(6rem, 12vw, 9rem) 0;
-}
-
-.ctaEyebrow {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--pico-font-accent);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--pico-accent);
-  margin-bottom: 0.5rem;
-}
-
 /* --- Form -------------------------------------------------------- */
 .formWrap {
   width: 100%;

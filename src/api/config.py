@@ -212,6 +212,32 @@ class Settings(BaseSettings):
         ),
     )
 
+    # Lead pipeline notifications
+    lead_discord_webhook_url: Optional[str] = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "LEAD_DISCORD_WEBHOOK_URL",
+            "DISCORD_LEAD_WEBHOOK_URL",
+        ),
+        description="Discord webhook URL for lead capture notifications.",
+    )
+    resend_api_key: Optional[str] = Field(
+        default=None,
+        validation_alias=AliasChoices("RESEND_API_KEY", "RESEND_API_KEY"),
+    )
+    resend_from_email: Optional[str] = Field(
+        default=None,
+        validation_alias=AliasChoices("RESEND_FROM_EMAIL"),
+    )
+    resend_lead_alert_email: Optional[str] = Field(
+        default=None,
+        validation_alias=AliasChoices("RESEND_LEAD_ALERT_EMAIL"),
+    )
+    resend_audience_id: Optional[str] = Field(
+        default=None,
+        validation_alias=AliasChoices("RESEND_AUDIENCE_ID"),
+    )
+
     # Store whether JWT_SECRET was user-provided or auto-generated
     _jwt_secret_was_auto_generated: bool = False
 

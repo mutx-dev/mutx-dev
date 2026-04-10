@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 from typing import List
 
@@ -35,6 +36,7 @@ async def capture_lead(
     """
     Capture a new contact lead.
     Public endpoint for landing pages and onboarding.
+    Writes to the DB then fires async notifications (Discord, Resend).
     """
     lead = Lead(
         email=payload.email.lower().strip(),
@@ -46,6 +48,20 @@ async def capture_lead(
     db.add(lead)
     await db.commit()
     await db.refresh(lead)
+
+    # Fire notifications asynchronously — best-effort, never blocks response
+    from src.api.services.leads_service import notify_new_lead
+
+    asyncio.create_task(
+        notify_new_lead(
+            email=lead.email,
+            source=lead.source,
+            name=lead.name,
+            company=lead.company,
+            message=lead.message,
+        )
+    )
+
     return lead
 
 
