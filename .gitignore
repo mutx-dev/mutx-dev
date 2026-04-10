@@ -113,3 +113,4 @@ pnpm-lock.yaml
 .worktrees/
 public/docs-search-index.json
 *.bak
+ALL_MUTX_PDFs_Extracted.txt
