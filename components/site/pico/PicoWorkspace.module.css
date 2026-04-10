@@ -1,0 +1,382 @@
+.page {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2rem clamp(1rem, 3vw, 2rem) 4rem;
+  max-width: 88rem;
+  margin: 0 auto;
+  color: #e5f7ea;
+}
+
+.loading {
+  min-height: 60vh;
+  display: grid;
+  place-items: center;
+  color: #d4f5dd;
+}
+
+.header,
+.panel,
+.heroCard,
+.levelCard,
+.trackCard,
+.lessonCard,
+.metricCard,
+.listCard,
+.planCard,
+.recommendationCard {
+  border: 1px solid rgba(74, 222, 128, 0.14);
+  background: rgba(5, 20, 12, 0.9);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+}
+
+.header,
+.panel {
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.headerActions,
+.inlineActions,
+.badgeRow,
+.tabRow,
+.statsRow,
+.metaList,
+.trackHeader,
+.panelHeader,
+.planHeader,
+.toggleRow,
+.eventMeta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.headerActions,
+.inlineActions,
+.planHeader {
+  align-items: center;
+}
+
+.panelHeader {
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.kicker,
+.statLabel,
+.note,
+.levelIndex {
+  color: #9bc9aa;
+}
+
+.kicker,
+.levelIndex {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+}
+
+.title {
+  margin: 0.15rem 0 0.5rem;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+}
+
+.subtitle,
+.note,
+.muted,
+.panel p,
+.lessonCard p,
+.trackCard p,
+.levelCard p,
+.recommendationCard p {
+  color: #cfe8d6;
+  line-height: 1.6;
+}
+
+.heroGrid,
+.levelGrid,
+.trackGrid,
+.planGrid,
+.metricsGrid,
+.twoColumnGrid,
+.recommendationGrid,
+.formGrid,
+.controlGrid,
+.lessonMetaGrid,
+.lessonBodyGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.heroGrid,
+.metricsGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.levelGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.trackGrid,
+.planGrid,
+.recommendationGrid,
+.controlGrid,
+.formGrid,
+.lessonMetaGrid,
+.lessonBodyGrid,
+.twoColumnGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.heroCard,
+.levelCard,
+.trackCard,
+.metricCard,
+.listCard,
+.planCard,
+.recommendationCard {
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.trackCard,
+.planCard {
+  text-align: left;
+}
+
+.planCard {
+  color: inherit;
+  cursor: pointer;
+}
+
+.planCardActive {
+  border-color: rgba(74, 222, 128, 0.5);
+  box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.22), 0 18px 50px rgba(0, 0, 0, 0.22);
+}
+
+.heroCard h2,
+.panel h2,
+.levelCard h3,
+.trackCard h3,
+.lessonCard h3,
+.metricCard strong,
+.listCard h3,
+.recommendationCard h3,
+.planCard h3 {
+  margin: 0;
+}
+
+.statsRow {
+  margin-top: 1rem;
+}
+
+.statValue {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.28rem 0.65rem;
+  background: rgba(74, 222, 128, 0.14);
+  color: #d7ffe1;
+  font-size: 0.78rem;
+}
+
+.metaList {
+  margin-top: 1rem;
+  color: #d7ffe1;
+}
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.field span {
+  color: #d7ffe1;
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(74, 222, 128, 0.18);
+  background: rgba(7, 28, 16, 0.95);
+  color: #effaf2;
+  padding: 0.8rem 0.9rem;
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.primaryButton,
+.secondaryButton,
+.ghostButton,
+.tab {
+  border-radius: 999px;
+  padding: 0.75rem 1rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #04260f;
+}
+
+.secondaryButton {
+  background: rgba(74, 222, 128, 0.12);
+  color: #d7ffe1;
+  border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.ghostButton,
+.tab {
+  background: rgba(255, 255, 255, 0.04);
+  color: #d7ffe1;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tabRow {
+  gap: 0.65rem;
+}
+
+.tabActive {
+  background: rgba(74, 222, 128, 0.16);
+  border-color: rgba(74, 222, 128, 0.3);
+}
+
+.stack,
+.lessonList,
+.timeline,
+.supportList {
+  display: grid;
+  gap: 1rem;
+}
+
+.lessonCard {
+  border-radius: 1rem;
+  padding: 1.15rem;
+}
+
+.lessonHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.8rem;
+}
+
+.lessonMetaGrid h4,
+.lessonBodyGrid h4 {
+  margin: 0 0 0.4rem;
+  color: #d7ffe1;
+}
+
+.lessonCard ol,
+.lessonCard ul,
+.trackCard ul,
+.levelCard ul,
+.planCard ul,
+.supportList {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: #d7ffe1;
+  line-height: 1.7;
+}
+
+.toggleRow {
+  align-items: center;
+  font-weight: 600;
+  color: #d7ffe1;
+}
+
+.toggleRow input {
+  width: 1rem;
+  height: 1rem;
+}
+
+.timeline {
+  max-height: 36rem;
+  overflow: auto;
+}
+
+.timelineItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.timelineItem:last-child {
+  border-bottom: none;
+}
+
+.eventMeta {
+  justify-content: flex-end;
+  color: #9bc9aa;
+  min-width: 10rem;
+}
+
+.supportList {
+  padding-left: 1.1rem;
+}
+
+@media (max-width: 1024px) {
+  .heroGrid,
+  .metricsGrid,
+  .levelGrid,
+  .trackGrid,
+  .planGrid,
+  .twoColumnGrid,
+  .recommendationGrid,
+  .formGrid,
+  .controlGrid,
+  .lessonMetaGrid,
+  .lessonBodyGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 1rem 0.85rem 3rem;
+  }
+
+  .header,
+  .lessonHeader,
+  .timelineItem,
+  .panelHeader {
+    flex-direction: column;
+  }
+
+  .eventMeta {
+    justify-content: flex-start;
+    min-width: auto;
+  }
+}
