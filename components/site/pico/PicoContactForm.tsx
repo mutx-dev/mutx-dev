@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useState, useCallback, useRef, type FormEvent } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import * as Select from '@radix-ui/react-select'
@@ -14,6 +15,7 @@ type PicoContactFormProps = {
 }
 
 export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactFormProps) {
+  const t = useTranslations('pico.contactForm')
   const prefersReducedMotion = useReducedMotion()
   const [state, setState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -51,7 +53,7 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
         const data = await res.json()
 
         if (!res.ok || data.status === 'error') {
-          const msg = data.error?.message || 'Something went wrong. Please try again.'
+          const msg = data.error?.message || t('errorFallback')
           setErrorMsg(msg)
           setState('error')
           return
@@ -59,11 +61,11 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
 
         setState('success')
       } catch {
-        setErrorMsg('Network error. Please try again.')
+        setErrorMsg(t('networkError'))
         setState('error')
       }
     },
-    [state],
+    [state, interest, t],
   )
 
   const handleClose = useCallback(() => {
@@ -94,12 +96,12 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             role="dialog"
             aria-modal="true"
-            aria-label="Contact form"
+            aria-label={t('dialogLabel')}
           >
             <button
               className={s.closeBtn}
               onClick={handleClose}
-              aria-label="Close"
+              aria-label={t('closeLabel')}
               type="button"
             >
               <X className="h-4 w-4" />
@@ -110,21 +112,17 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
                 <span className={s.successIcon}>
                   <Check className="h-6 w-6" />
                 </span>
-                <h2 className={s.successTitle}>You&apos;re on the list.</h2>
-                <p className={s.successBody}>
-                  We read every message. Expect a personal reply within 24 hours.
-                </p>
+                <h2 className={s.successTitle}>{t('successTitle')}</h2>
+                <p className={s.successBody}>{t('successBody')}</p>
                 <button className={s.successBtn} onClick={handleClose} type="button">
-                  Back to the page
+                  {t('successBack')}
                 </button>
               </div>
             ) : (
               <>
                 <div className={s.header}>
-                  <h2 className={s.title}>Pre-register for early access</h2>
-                  <p className={s.subtitle}>
-                    Tell us where you are. We&apos;ll get you in.
-                  </p>
+                  <h2 className={s.title}>{t('title')}</h2>
+                  <p className={s.subtitle}>{t('subtitle')}</p>
                 </div>
 
                 <form className={s.form} onSubmit={handleSubmit}>
@@ -141,13 +139,13 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
 
                   <div className={s.row}>
                     <label className={s.label} htmlFor="pico-email">
-                      <span className={s.labelText}>Work email</span>
+                      <span className={s.labelText}>{t('emailLabel')}</span>
                       <input
                         id="pico-email"
                         name="email"
                         type="email"
                         required
-                        placeholder="you@company.com"
+                        placeholder={t('emailPlaceholder')}
                         className={s.input}
                         autoComplete="email"
                       />
@@ -156,23 +154,23 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
 
                   <div className={s.row2}>
                     <label className={s.label} htmlFor="pico-name">
-                      <span className={s.labelText}>Name</span>
+                      <span className={s.labelText}>{t('nameLabel')}</span>
                       <input
                         id="pico-name"
                         name="name"
                         type="text"
-                        placeholder="Jane Smith"
+                        placeholder={t('namePlaceholder')}
                         className={s.input}
                         autoComplete="name"
                       />
                     </label>
                     <label className={s.label} htmlFor="pico-company">
-                      <span className={s.labelText}>Company</span>
+                      <span className={s.labelText}>{t('companyLabel')}</span>
                       <input
                         id="pico-company"
                         name="company"
                         type="text"
-                        placeholder="Acme Inc."
+                        placeholder={t('companyPlaceholder')}
                         className={s.input}
                         autoComplete="organization"
                       />
@@ -180,7 +178,7 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
                   </div>
 
                   <div className={s.label}>
-                    <span className={s.labelText}>What brings you here?</span>
+                    <span className={s.labelText}>{t('interestLabel')}</span>
                     <Select.Root value={interest} onValueChange={setInterest}>
                       <Select.Trigger className={s.selectTrigger}>
                         <Select.Value />
@@ -198,31 +196,31 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
                           <Select.ScrollUpButton className={s.selectScroll} />
                           <Select.Viewport className={s.selectViewport}>
                             <Select.Item value="building-first" className={s.selectItem}>
-                              <Select.ItemText>Building my first AI agent</Select.ItemText>
+                              <Select.ItemText>{t('interestOptions.building-first')}</Select.ItemText>
                               <Select.ItemIndicator className={s.selectIndicator}>
                                 <Check className="h-3 w-3" />
                               </Select.ItemIndicator>
                             </Select.Item>
                             <Select.Item value="fixing-existing" className={s.selectItem}>
-                              <Select.ItemText>Fixing an agent that isn&apos;t working</Select.ItemText>
+                              <Select.ItemText>{t('interestOptions.fixing-existing')}</Select.ItemText>
                               <Select.ItemIndicator className={s.selectIndicator}>
                                 <Check className="h-3 w-3" />
                               </Select.ItemIndicator>
                             </Select.Item>
                             <Select.Item value="evaluating" className={s.selectItem}>
-                              <Select.ItemText>Evaluating platforms or tools</Select.ItemText>
+                              <Select.ItemText>{t('interestOptions.evaluating')}</Select.ItemText>
                               <Select.ItemIndicator className={s.selectIndicator}>
                                 <Check className="h-3 w-3" />
                               </Select.ItemIndicator>
                             </Select.Item>
                             <Select.Item value="spent-money" className={s.selectItem}>
-                              <Select.ItemText>Already spent money — still not working</Select.ItemText>
+                              <Select.ItemText>{t('interestOptions.spent-money')}</Select.ItemText>
                               <Select.ItemIndicator className={s.selectIndicator}>
                                 <Check className="h-3 w-3" />
                               </Select.ItemIndicator>
                             </Select.Item>
                             <Select.Item value="other" className={s.selectItem}>
-                              <Select.ItemText>Something else</Select.ItemText>
+                              <Select.ItemText>{t('interestOptions.other')}</Select.ItemText>
                               <Select.ItemIndicator className={s.selectIndicator}>
                                 <Check className="h-3 w-3" />
                               </Select.ItemIndicator>
@@ -236,13 +234,13 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
 
                   <label className={s.label} htmlFor="pico-message">
                     <span className={s.labelText}>
-                      Anything we should know? <span className={s.optional}>(optional)</span>
+                      {t('messageLabel')} <span className={s.optional}>{t('messageOptional')}</span>
                     </span>
                     <textarea
                       id="pico-message"
                       name="message"
                       rows={3}
-                      placeholder="E.g. I run a small SaaS and want to automate customer support..."
+                      placeholder={t('messagePlaceholder')}
                       className={s.textarea}
                     />
                   </label>
@@ -255,18 +253,16 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
                     disabled={state === 'submitting'}
                   >
                     {state === 'submitting' ? (
-                      'Sending...'
+                      t('submitting')
                     ) : (
                       <>
-                        Join the early access list
+                        {t('submit')}
                         <ArrowRight className="h-4 w-4" />
                       </>
                     )}
                   </button>
 
-                  <p className={s.disclaimer}>
-                    No spam. No sales calls. Just a human reply.
-                  </p>
+                  <p className={s.disclaimer}>{t('disclaimer')}</p>
                 </form>
               </>
             )}
