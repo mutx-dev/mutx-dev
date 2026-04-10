@@ -5,6 +5,8 @@
  * and a smoke test that SUMMARY.md is well-formed.
  */
 
+import { parseSummary, flatNav, getDocSitemapRoutes } from '../../lib/docs'
+
 // -----------------------------------------------------------------------------
 // Helper constants (replicate lib/docs.ts internals for isolation)
 // ---------------------------------------------------------------------------
@@ -107,12 +109,7 @@ describe('summaryHrefToDocsRoute', () => {
 
 // ---------------------------------------------------------------------------
 // Integration: parseSummary + flatNav + getDocSitemapRoutes
-// ---------------------------------------------------------------------------
 describe('parseSummary integration', () => {
-  // These import the real implementations
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { parseSummary, flatNav, getDocSitemapRoutes } = require('../../lib/docs')
-
   it('parseSummary returns a non-empty array', () => {
     const items = parseSummary()
     expect(Array.isArray(items)).toBe(true)
