@@ -86,6 +86,13 @@ export function extractHeadings(source: string): Heading[] {
   return headings;
 }
 
+function sanitizeHtml(html: string): string {
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/\son\w+=(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/\s(href|src)\s*=\s*(['"])\s*javascript:[^'"]*\2/gi, ' $1="#"')
+}
+
 export async function DocsRenderer({ source, currentSlug = [] }: { source: string; currentSlug?: string[] }) {
   // Preprocess: convert GitBook liquid hints → HTML callouts
   const preprocessed = preprocessHints(source);
@@ -128,6 +135,8 @@ export async function DocsRenderer({ source, currentSlug = [] }: { source: strin
       `$1<a id="${heading.id}" href="#${heading.id}" class="heading-anchor" aria-hidden="true">#</a>$3$4$5`
     );
   }
+
+  html = sanitizeHtml(html)
 
   // Dynamic import of client component to avoid SSR issues with DOM APIs
   const { DocsRendererClient } = await import("./DocsRendererClient");
