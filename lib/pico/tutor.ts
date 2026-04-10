@@ -1,8 +1,23 @@
-import { PICO_LESSON_MAP, PICO_LESSONS, PICO_TRACKS } from '@/lib/pico/content'
-import { type PicoWorkspaceState } from '@/lib/pico/state'
+import { getLessonBySlug, searchLessonCorpus, type PicoProgressState } from '@/lib/pico/academy'
 
-export type TutorAnswer = {
+const RISKY_KEYWORDS = ['delete', 'production', 'billing', 'payment', 'credential', 'token', 'secret', 'gdpr', 'legal', 'contract', 'security']
+
+export type PicoTutorReply = {
+  title: string
+  confidence: 'grounded' | 'escalate'
+  summary: string
   answer: string
+  nextActions: string[]
+  lessons: Array<{
+    id: string
+    title: string
+    href: string
+  }>
+  docs: Array<{
+    label: string
+    href: string
+    sourcePath: string
+  }>
   recommendedLessonIds: string[]
   escalate: boolean
   escalationReason?: string
@@ -22,202 +37,105 @@ export type PicoTutorAnswer = {
   escalationReason: string | null
 }
 
-const ESCALATION_KEYWORDS = [
-  'billing',
-  'invoice',
-  'payment',
-  'delete production',
-  'delete database',
-  'legal',
-  'security breach',
-  'leak',
-  'lost key',
-  'compromised',
-  'refund',
-  'token',
-  'secret',
-]
-
-const COMMON_INTENTS: Array<{
-  keywords: string[]
-  answer: string
-  lessonIds: string[]
-}> = [
-  {
-    keywords: ['install', 'setup', 'path', 'binary', 'local'],
-    answer:
-      'Start with the install path. Confirm the hermes binary resolves cleanly before touching providers or prompts. Then run one short prompt and save the exact working command. Do not debug three layers at once.',
-    lessonIds: ['install-hermes-locally', 'run-first-agent'],
-  },
-  {
-    keywords: ['vps', 'deploy', 'server', 'persistent', 'ssh'],
-    answer:
-      'Treat deployment as a copy of the local-good path, not a reinvention. Install the same way, wrap it in a process manager, then verify it survives disconnect or restart.',
-    lessonIds: ['deploy-hermes-vps', 'keep-agent-alive'],
-  },
-  {
-    keywords: ['telegram', 'discord', 'slack', 'webhook', 'interface', 'channel'],
-    answer:
-      'Pick one interface only. Get one live message through end to end. If credentials fail, validate the integration outside Hermes first and then wire it back in.',
-    lessonIds: ['connect-interface-layer'],
-  },
-  {
-    keywords: ['skill', 'tool', 'capability', 'mcp'],
-    answer:
-      'Narrow the capability to one job with one success condition. Add the skill, write a task that clearly requires it, and save the first successful run so you have proof instead of vibes.',
-    lessonIds: ['add-first-skill-tool'],
-  },
-  {
-    keywords: ['cron', 'schedule', 'automation', 'workflow'],
-    answer:
-      'Scheduled prompts must be fully self-contained. Run the exact command manually before cron. If it only works interactively, the schedule is not the problem.',
-    lessonIds: ['create-scheduled-workflow'],
-  },
-  {
-    keywords: ['logs', 'activity', 'monitor', 'observability', 'history'],
-    answer:
-      'Log run start, run finish, and errors in plain English first. Fancy telemetry can come later. If you cannot tell the last good run from the last bad one, the trail is still useless.',
-    lessonIds: ['see-agent-activity'],
-  },
-  {
-    keywords: ['budget', 'cost', 'threshold', 'credits'],
-    answer:
-      'Set a ceiling you are actually willing to pay, then add a warning before you hit it. Exact accounting can improve later. Silent cost drift is the real enemy.',
-    lessonIds: ['set-cost-threshold'],
-  },
-  {
-    keywords: ['approval', 'gate', 'risky', 'human'],
-    answer:
-      'Gate the action class that would hurt if it ran wrong: outbound messages, deletions, purchases, or credential changes. Test approve and deny paths immediately so the queue is not decorative.',
-    lessonIds: ['add-approval-gate'],
-  },
-  {
-    keywords: ['lead', 'sales', 'response'],
-    answer:
-      'Keep the lead-response agent narrow: capture, triage, draft, approve. If you let it send messages before the triage and approval logic is stable, you are just automating regret.',
-    lessonIds: ['build-lead-response-agent'],
-  },
-  {
-    keywords: ['document', 'invoice', 'resume', 'contract', 'ocr'],
-    answer:
-      'Document agents only behave once the input type and output schema are painfully clear. Pick one document family, one field set, and one fallback for uncertainty.',
-    lessonIds: ['build-document-processing-agent'],
-  },
-]
-
-function normalize(text: string) {
-  return text.toLowerCase().trim()
-}
-
-function includesEscalationKeyword(query: string) {
-  const normalized = normalize(query)
-  return ESCALATION_KEYWORDS.find((keyword) => normalized.includes(keyword))
-}
-
-function searchLessons(query: string) {
-  const terms = normalize(query).split(/\W+/).filter(Boolean)
-
-  const scored = PICO_LESSONS.map((lesson) => {
-    const haystack = normalize(
-      [lesson.title, lesson.objective, lesson.expectedResult, lesson.validationStep, ...lesson.troubleshooting].join(' '),
-    )
-
-    const score = terms.reduce((acc, term) => acc + (haystack.includes(term) ? 1 : 0), 0)
-    return { lesson, score }
-  })
-    .filter((item) => item.score > 0)
-    .sort((a, b) => b.score - a.score)
-
-  return scored
-}
-
-function intentMatch(query: string) {
-  const normalized = normalize(query)
-  return COMMON_INTENTS.find((intent) => intent.keywords.some((keyword) => normalized.includes(keyword)))
-}
-
-export function answerTutorQuestion(query: string, state: PicoWorkspaceState): TutorAnswer {
-  const trimmed = query.trim()
-  if (!trimmed) {
-    return {
-      answer: 'Ask one concrete question. Good: “Why does my VPS run die after disconnect?” Bad: “agent help pls.”',
-      recommendedLessonIds: [],
-      escalate: false,
-    }
-  }
-
-  const escalationKeyword = includesEscalationKeyword(trimmed)
-  if (escalationKeyword) {
-    return {
-      answer:
-        'This needs a human, not a breezy autogenerated guess. Freeze the risky action, capture what changed, and escalate through the support lane with the exact error, environment, and last known good state.',
-      recommendedLessonIds: [],
-      escalate: true,
-      escalationReason: `Detected a risk-sensitive topic: ${escalationKeyword}.`,
-    }
-  }
-
-  const intent = intentMatch(trimmed)
-  const lessonMatches = searchLessons(trimmed).slice(0, 3)
-  const recommendedLessonIds = intent?.lessonIds || lessonMatches.map((item) => item.lesson.id)
-
-  const currentTrack = PICO_TRACKS.find((track) => track.id === state.focusTrackId)
-  const nextIncomplete = lessonMatches.find((item) => !state.completedLessonIds.includes(item.lesson.id))?.lesson
-
-  const answerParts = [
-    intent?.answer ||
-      'Use the next lesson that matches the block. Follow the validation step exactly. If the validation fails, step back to the previous layer instead of piling on more moving parts.',
-  ]
-
-  if (nextIncomplete) {
-    answerParts.push(`Best next move: work lesson "${nextIncomplete.title}" and stop once its validation step passes.`)
-  }
-
-  if (currentTrack) {
-    answerParts.push(`You are currently focused on ${currentTrack.title}. Stay on that lane until you have a working artifact.`)
-  }
-
-  if (recommendedLessonIds.length === 0) {
-    answerParts.push('If none of the academy lessons fit, use the human escalation lane and include the exact command, output, and what you already tried.')
-  }
-
-  return {
-    answer: answerParts.join(' '),
-    recommendedLessonIds,
-    escalate: false,
-  }
-}
-
 export function answerPicoTutorQuestion(
   question: string,
-  options?: { lessonSlug?: string | null; progress?: Partial<PicoWorkspaceState> | null },
+  options?: { lessonSlug?: string | null; progress?: Partial<PicoProgressState> | null }
 ): PicoTutorAnswer {
-  const state = {
-    focusTrackId: 'track-a',
-    completedLessonIds: [],
-    ...(options?.progress ?? {}),
-  } as PicoWorkspaceState
+  const normalizedQuestion = question.trim()
+  const lowerQuestion = normalizedQuestion.toLowerCase()
+  const directLesson = options?.lessonSlug ? getLessonBySlug(options.lessonSlug) : null
+  const matches = searchLessonCorpus(`${options?.lessonSlug ?? ''} ${normalizedQuestion}`)
+  const best = directLesson ?? matches[0]?.lesson ?? null
 
-  const base = answerTutorQuestion(question, state)
-  const matches = searchLessons(question).slice(0, 3).map((item) => ({
-    slug: item.lesson.id,
-    title: item.lesson.title,
-    score: item.score,
-    reason: `Matched lesson objective, validation, and troubleshooting for ${item.lesson.title}.`,
-  }))
+  const riskyTopic = RISKY_KEYWORDS.find((keyword) => lowerQuestion.includes(keyword))
+  if (!best) {
+    return {
+      answer:
+        'I cannot ground that in the shipped Pico lesson corpus yet. Use the support lane and include the exact command, error, and what you expected to happen.',
+      lessonSlug: null,
+      lessonTitle: null,
+      matches: [],
+      nextActions: [
+        'Open the support lane and paste the exact command or stack trace.',
+        'State which lesson you were following.',
+        'Include the last step that actually worked.',
+      ],
+      escalationReason: 'No grounded lesson match found.',
+    }
+  }
 
-  const primaryLesson = options?.lessonSlug && PICO_LESSON_MAP[options.lessonSlug]
-    ? PICO_LESSON_MAP[options.lessonSlug]
-    : base.recommendedLessonIds[0]
-      ? PICO_LESSON_MAP[base.recommendedLessonIds[0]]
-      : null
+  if (riskyTopic) {
+    return {
+      answer: `This question touches ${riskyTopic}, which is exactly where the tutor should stop bluffing. Follow the grounded steps below, but escalate before doing anything irreversible.`,
+      lessonSlug: best.slug,
+      lessonTitle: best.title,
+      matches: matches.map((match) => ({
+        slug: match.lesson.slug,
+        title: match.lesson.title,
+        score: match.score,
+        reason: `Matched lesson objective and troubleshooting notes for ${match.lesson.title}.`,
+      })),
+      nextActions: [
+        best.steps[0]?.body ?? 'Re-read the first step in the matched lesson.',
+        best.validation,
+        'Escalate with the exact command, environment, and intended action before executing the risky part.',
+      ],
+      escalationReason: 'Security or irreversible action detected. Escalate before executing the risky step.',
+    }
+  }
+
+  const nextActions = best.steps.slice(0, 3).map((step) => `${step.title}: ${step.body}`)
+  const troubleshooting = best.troubleshooting[0]
+  const answer = [
+    `Best match: ${best.title}.`,
+    best.objective,
+    `Do this next: ${nextActions[0] ?? best.validation}`,
+    troubleshooting ? `Watch for this failure mode: ${troubleshooting}` : '',
+    `Validation: ${best.validation}`,
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return {
-    answer: base.answer,
-    lessonSlug: primaryLesson?.id ?? null,
-    lessonTitle: primaryLesson?.title ?? null,
-    matches,
-    nextActions: primaryLesson?.steps.slice(0, 3) ?? [],
-    escalationReason: base.escalate ? base.escalationReason ?? 'Escalation recommended.' : null,
+    answer,
+    lessonSlug: best.slug,
+    lessonTitle: best.title,
+    matches: matches.map((match) => ({
+      slug: match.lesson.slug,
+      title: match.lesson.title,
+      score: match.score,
+      reason: `Matched lesson body, troubleshooting, and validation steps for ${match.lesson.title}.`,
+    })),
+    nextActions,
+    escalationReason: matches[0]?.score && matches[0].score >= 4 ? null : 'Low-confidence match. Escalate if the first next action does not fix it.',
+  }
+}
+
+export function answerTutorQuestion(
+  question: string,
+  _state?: Partial<PicoProgressState> | null | Record<string, unknown>
+): PicoTutorReply {
+  const answer = answerPicoTutorQuestion(question)
+  const lessons = answer.matches.map((match) => ({
+    id: match.slug,
+    title: match.title,
+    href: `/academy/${match.slug}`,
+  }))
+
+  return {
+    title: answer.lessonTitle ?? 'Pico tutor answer',
+    confidence: answer.escalationReason ? 'escalate' : 'grounded',
+    summary: answer.answer,
+    answer: answer.answer,
+    nextActions: answer.nextActions,
+    lessons,
+    docs: lessons.map((lesson) => ({
+      label: lesson.title,
+      href: lesson.href,
+      sourcePath: `academy/${lesson.id}`,
+    })),
+    recommendedLessonIds: lessons.map((lesson) => lesson.id),
+    escalate: Boolean(answer.escalationReason),
+    escalationReason: answer.escalationReason ?? undefined,
   }
 }
