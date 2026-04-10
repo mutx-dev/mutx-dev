@@ -84,6 +84,7 @@ async function syncResendAudienceContact(data: {
 
   try {
     await resend.contacts.create({
+      audienceId: resendAudienceId,
       email: data.email,
       firstName: data.name || undefined,
       lastName: data.company || undefined,

@@ -50,6 +50,7 @@ const POLICY_BY_PATH: Array<[string, RateLimitPolicy]> = [
   ['/api/auth/register', AUTH_POLICY],
   ['/api/auth/forgot-password', AUTH_POLICY],
   ['/api/auth/reset-password', AUTH_POLICY],
+  ['/api/contact', DEFAULT_POLICY],
   ['/api/leads', DEFAULT_POLICY],
   ['/api/newsletter', DEFAULT_POLICY],
 ]
@@ -297,6 +298,10 @@ export function proxy(request: NextRequest) {
   }
 
   if (PICO_HOSTS.has(host)) {
+    // API routes must hit the real /api/* handlers, not /pico/api/*
+    if (normalizedPath.startsWith('/api')) {
+      return finalizeResponse(NextResponse.next(), host, normalizedPath)
+    }
     // pico.mutx.dev/* -> /pico/*
     const picoPath = `/pico${normalizedPath === '/' ? '' : normalizedPath}`
     return finalizeResponse(
