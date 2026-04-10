@@ -90,8 +90,8 @@ const homepageActions: MarketingActionLink[] = [
     tone: 'secondary',
   },
   {
-    label: 'macOS App (Beta)',
-    href: '/download',
+    label: 'Releases',
+    href: '/releases',
     tone: 'utility',
   },
   {

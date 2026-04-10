@@ -2,6 +2,7 @@ from functools import lru_cache
 from json import JSONDecodeError, loads
 import os
 import secrets
+from typing import Optional
 
 from pydantic import AliasChoices, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
