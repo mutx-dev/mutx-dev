@@ -6,7 +6,7 @@ Supervises itself: keeps running, auto-restarts, logs everything.
 """
 import json, os, sys, time, subprocess, signal, random, shlex
 from datetime import datetime
-import os
+from pathlib import Path
 _REPO = None
 def _get_repo():
     global _REPO
@@ -20,8 +20,6 @@ def _get_repo():
     _REPO = str(Path(__file__).resolve().parents[2])
     return _REPO
 REPO = _get_repo()
-
-REPO      = "REPO"
 QUEUE     = f"{REPO}/mutx-engineering-agents/dispatch/action-queue.json"
 LOG       = "/Users/fortune/.openclaw/logs/autonomous-daemon.log"
 PID_FILE  = "/Users/fortune/.openclaw/autonomous-daemon.pid"

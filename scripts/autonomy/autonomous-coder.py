@@ -5,8 +5,7 @@ Reads queue → MiniMax generates code → git commits → gh PRs → loops
 """
 import json, os, time, subprocess, urllib.request, urllib.error, shlex
 from datetime import datetime
-
-import os
+from pathlib import Path
 _REPO = None
 def _get_repo():
     global _REPO
