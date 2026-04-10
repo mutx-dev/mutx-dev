@@ -1,0 +1,194 @@
+{
+  "pico": {
+    "meta": {
+      "title": "PicoMUTX — Construa e implemente agentes de IA com seguranca sem contratar um desenvolvedor",
+      "description": "PicoMUTX ajuda fundadores, operadores e pequenas equipes a construir, implementar e executar agentes de IA com seguranca — com orientacao passo a passo, salvaguadas integradas e suporte real. Pré-cadastre-se agora para acesso antecipado."
+    },
+    "nav": {
+      "brand": "PicoMUTX",
+      "brandTag": " da MUTX",
+      "cta": "Pré-cadastrar"
+    },
+    "hero": {
+      "badge": "Acesso Antecipado · Vagas Limitadas",
+      "title": "Construa e implemente agentes de IA ",
+      "titleAccent": "sem contratar um desenvolvedor.",
+      "subtitle": "PicoMUTX oferece um caminho seguro e orientado para um agente de IA funcionando — seja você começando do zero, consertando um agente que nao funciona ou tentando evitar outro erro caro.",
+      "cta": "Pré-cadastrar para Acesso Antecipado",
+      "meta": "Pré-cadastro gratuito · Sem cartao de crédito · Vagas para fundadores limitadas"
+    },
+    "trustBar": {
+      "items": {
+        "0": "Para fundadores, operadores e pequenas equipes",
+        "1": "Orientacao passo a passo",
+        "2": "Salvaguadas integradas desde o primeiro dia"
+      }
+    },
+    "problem": {
+      "eyebrow": "O Problema",
+      "title": "O problema nao é a ideia.",
+      "titleLine2": "É tudo o que acontece depois dela.",
+      "body": "A maioria das pessoas nao fica presa por falta de ambicao. Fica porque construir um agente de IA ainda parece entrar num mundo projetado por engenheiros, para engenheiros.",
+      "scenarios": {
+        "0": {
+          "label": "\"Quero um agente de IA, mas nao sei por onde começar.\"",
+          "body": "Ha tropa ferramentas, tropa opinioes e tropa gente assumindo que você já sabe o basico. O gap entre \"tenho uma ideia\" e \"tenho algo funcionando\" parece maior do que deveria."
+        },
+        "1": {
+          "label": "\"Já tentei — e fiquei preso.\"",
+          "body": "Você fez progresso, bateu numa parede e nao tinha ninguem para perguntar que pudesse realmente ajudar. A ideia esta no seu backlog em vez de criar valor."
+        },
+        "2": {
+          "label": "\"Gastei dinheiro, e ainda nao funciona direito.\"",
+          "body": "Talvez você tenha contratado alguém. Talvez tenha pago por ferramentas. Agora você nao esta apenas incerto — esta cético."
+        },
+        "3": {
+          "label": "\"Nao quero implementar algo em que nao posso confiar.\"",
+          "body": "Um agente que da resposta errada, se comporta de forma imprevisivel ou cria custos escondidos nao é um ativo. É um passivo."
+        }
+      },
+      "close": "Exatamente por isso que o PicoMUTX existe."
+    },
+    "platform": {
+      "eyebrow": "O que é o PicoMUTX",
+      "title": "Onde agentes de IA passam de \"ideia interessante\" para \"sistema funcionando.\"",
+      "body": "PicoMUTX é uma plataforma guiada para quem quer construir e executar agentes de IA com seguranca — sem precisar se tornar um engenheiro em tempo integral. Oferece a estrutura, suporte e salvaguadas que normalmente faltam quando pessoas tentam fazer isso sozinhas. Em vez de montar tudo do zero, você avança passo a passo: da ideia à implementacao, da confusao à clareza, do prototipo para algo que você realmente pode usar.",
+      "howItWorks": {
+        "0": {
+          "title": "Caminhos de implementacao passo a passo",
+          "body": "Siga caminhos estruturados baseados no que você esta tentando construir — de agentes de suporte ao cliente ate automacoes internas. Sem teoria genérica. Sem pesquisa infinita."
+        },
+        "1": {
+          "title": "Suporte guiada quando você fica preso",
+          "body": "Quando algo quebra ou fica confuso, você nao precisa descobrir sozinho. PicoMUTX mantém o momento vivo em vez de deixar projetos morrerem na confusao."
+        },
+        "2": {
+          "title": "Seguranca integrada desde o primeiro dia",
+          "body": "Consciencia de custos, visibilidade e guardrails importam. Você sempre sabe o que seu agente esta fazendo, o que esta custando e quando algo precisa de atencao."
+        },
+        "3": {
+          "title": "Pontos de contato com especialistas ao vivo",
+          "body": "Algumas coisas sao muito nuançadas para documentacao estática. Momentos reais de orientacao projetados para ajudar você a se desbloquear mais rapido e tomar melhores decisoes."
+        }
+      }
+    },
+    "who": {
+      "eyebrow": "PicoMUTX é para Você?",
+      "title": "PicoMUTX nao é para todos.",
+      "forYouTitle": "É para você se…",
+      "notForYouTitle": "Nao é para você se…",
+      "forYou": {
+        "0": "Quer construir um agente de IA mas nao quer depender inteiramente de desenvolvedores",
+        "1": "Ja tentou antes e ficou preso no meio do caminho",
+        "2": "Ja gastou dinheiro em ferramentas ou implementacao e ainda nao confia no resultado",
+        "3": "Quer um caminho prático, nao mais teoria",
+        "4": "Quer suporte enquanto constrói, nao só depois que algo da errado"
+      },
+      "notForYou": {
+        "0": "Esta procurando um atalho sem aprender nada",
+        "1": "Ja gerencia uma stack enterprise madura de agentes e precisa de infraestrutura de governance compleja",
+        "2": "Quer entretenimento, tendências ou hype mais do que execucao",
+        "3": "Nao esta pronto para mudar como o negócio realmente opera",
+        "4": "Espera que a IA substitua julgamento, lideranca ou responsabilidade"
+      }
+    },
+    "beforeAfter": {
+      "eyebrow": "A Mudança",
+      "title": "O que muda quando você para de tentar descobrir sozinho",
+      "beforeLabel": "Antes",
+      "afterLabel": "Depois",
+      "items": {
+        "0": { "before": "Você tem uma ideia, mas nenhum caminho claro", "after": "Você tem uma manera estruturada de seguir" },
+        "1": { "before": "Você perde tempo pulando entre ferramentas, docs e tutoriais", "after": "Você segue caminhos de implementacao guiados" },
+        "2": { "before": "Você fica preso e perde momento", "after": "Você obtem suporte antes que o projeto morra" },
+        "3": { "before": "Seu agente fica na teoria", "after": "Seu agente é construído e posto para trabalhar" }
+      },
+      "close": "O objetivo nao é \"aprender IA um dia.\" O objetivo é colocar seu agente em producao — com seguranca, clareza e menos atrito."
+    },
+    "earlyAccess": {
+      "eyebrow": "Acesso Antecipado",
+      "title": "PicoMUTX esta abrindo em etapas. O acesso fundador nao ficara aberto para sempre.",
+      "body": "Pré-cadastrar agora coloca você a frente do lancamento público e dentro do grupo que ajuda a moldar a plataforma cedo. Usuarios antecipados obtêm uma linha mais direta com o produto, onboarding mais cedo e mais influencia sobre o que é priorizado.",
+      "benefits": {
+        "0": "Acesso antecipado antes do lancamento público",
+        "1": "Consideracao prioritária para vagas de membro fundador",
+        "2": "Onboarding antecipado e atualizacoes de lancamento",
+        "3": "A capacidade de influenciar primeiros casos de uso e priorizados de rollout",
+        "4": "Primeira visibilidade em precos e termos de acesso"
+      }
+    },
+    "faq": {
+      "eyebrow": "Perguntas",
+      "title": "Perguntas que as pessoas geralmente tem antes de se juntar",
+      "items": {
+        "0": { "q": "Preciso saber programar?", "a": "Nao. PicoMUTX é construído para pessoas que querem construir agentes de IA úteis sem precisar de profunda expertise técnica." },
+        "1": { "q": "E se já tentei e falhei?", "a": "Esse é exatamente um dos públicos para quem isso é feito. PicoMUTX é projetado para reduzir a confusao e fragmentacao que geralmente fazem as pessoas pararem no meio do caminho." },
+        "2": { "q": "Que tipo de agentes posso construir?", "a": "Agentes prácticos — o tipo que economiza tempo, suporta operações, melhora fluxos de trabalho e ajuda negócios a funcionar melhor. O foco é utilidade, nao demos de Brinquedo." },
+        "3": { "q": "Pré-cadastro é gratuito?", "a": "Sim. Pré-cadastro é gratuito e nao requer pagamento. Você será um dos primeiros a saber quando o acesso abrir e quando vagas de fundadores estiverem disponíveis." },
+        "4": { "q": "É para empresas?", "a": "PicoMUTX é mais adequado para fundadores, operadores e pequenas equipes que querem uma manera guiada de construir e implementar agentes de IA. Necessidades de governance enterprise mais complejas pertencem ao ecossistema MUTX mais amplo." }
+      }
+    },
+    "finalCta": {
+      "eyebrow": "Acesso Antecipado · Vagas Limitadas",
+      "title": "Seu agente nao precisa ficar uma ideia inacabada.",
+      "body": "Você nao precisa de mais abas abertas. Você nao precisa de outro tutorial. Você precisa de um caminho mais claro para algo que funciona. PicoMUTX é construído para esse momento.",
+      "formHeadline": "Pré-cadastre-se para o PicoMUTX",
+      "formSubline": "Junte-se à lista de acesso antecipado. Seja o primeiro quando abrirmos.",
+      "ctaButton": "Pré-cadastrar Agora",
+      "formCtaMeta": "Pré-cadastro gratuito · Sem cartao de crédito · Usuários antecipados obtêm acesso prioritário"
+    },
+    "contactForm": {
+      "dialogLabel": "Formulario de contato",
+      "closeLabel": "Fechar",
+      "title": "Pré-cadastre-se para acesso antecipado",
+      "subtitle": "Nos conte onde você esta. Vamos te colocar dentro.",
+      "emailLabel": "Email de trabalho",
+      "emailPlaceholder": "voce@empresa.com",
+      "nameLabel": "Nome",
+      "namePlaceholder": "João Silva",
+      "companyLabel": "Empresa",
+      "companyPlaceholder": "Acme Ltda.",
+      "interestLabel": "O que te traz aqui?",
+      "interestOptions": {
+        "building-first": "Construindo meu primeiro agente de IA",
+        "fixing-existing": "Consertando um agente que nao funciona",
+        "evaluating": "Avaliando plataformas ou ferramentas",
+        "spent-money": "Ja gastei dinheiro — ainda nao funciona",
+        "other": "Algo outro"
+      },
+      "messageLabel": "Algo que devemos saber?",
+      "messageOptional": "(opcional)",
+      "messagePlaceholder": "Ex. Eu gerencio um pequeno SaaS e quero automatizar suporte ao cliente...",
+      "submitting": "Enviando...",
+      "submit": "Junte-se à lista de acesso antecipado",
+      "disclaimer": "Sem spam. Sem ligações de venda. Só uma resposta humana.",
+      "successTitle": "Você esta na lista.",
+      "successBody": "Lemos cada mensagem. Espere uma resposta pessoal em 24 horas.",
+      "successBack": "Voltar para a página",
+      "errorFallback": "Algo deu errado. Tente novamente.",
+      "networkError": "Erro de rede. Tente novamente."
+    },
+    "preRegForm": {
+      "emailLabel": "Email de trabalho",
+      "emailPlaceholder": "voce@empresa.com",
+      "submitting": "Cadastrando…",
+      "submit": "Pré-cadastrar Agora",
+      "privacy": "Sem spam. Sem pagamento necessário. Só atualizacoes de acesso antecipado e detalhes de lancamento.",
+      "successTitle": "Você esta na lista.",
+      "successBody": "Entraremos em contato quando o acesso PicoMUTX abrir. Sem spam, sem pagamento necessário.",
+      "errorFallback": "Algo deu errado. Tente novamente."
+    },
+    "footer": {
+      "links": {
+        "releases": "Lançamentos",
+        "docs": "Docs",
+        "github": "GitHub",
+        "download": "Download",
+        "dashboard": "Dashboard",
+        "contact": "Contato",
+        "privacy": "Privacidade"
+      },
+      "copyright": "© MUTX 2026. Controle aberto para agentes implementados."
+    }
+  }
+}

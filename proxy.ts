@@ -17,6 +17,7 @@ const APP_HOST = 'app.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
 const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.localhost'])
+const PICO_LOCALES = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh', 'ar'] as const
 const UI_CACHE_CONTROL = 'private, no-cache, no-store, max-age=0, must-revalidate'
 const API_CACHE_CONTROL = 'no-store'
 const APP_PUBLIC_PATHS = new Set([
@@ -54,6 +55,41 @@ const POLICY_BY_PATH: Array<[string, RateLimitPolicy]> = [
   ['/api/leads', DEFAULT_POLICY],
   ['/api/newsletter', DEFAULT_POLICY],
 ]
+
+function getLocaleFromRequest(request: NextRequest): string {
+  // 1. Explicit cookie (highest priority)
+  const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value
+  if (cookieLocale && PICO_LOCALES.includes(cookieLocale as (typeof PICO_LOCALES)[number])) {
+    return cookieLocale
+  }
+  // 2. Cloudflare / Vercel geo headers
+  const cfCountry = request.headers.get('CF-IPCountry') ||
+                    request.headers.get('X-Vercel-IP-Country')
+  if (cfCountry) {
+    const lang = cfCountry.toLowerCase()
+    if (lang === 'zh') return 'zh'
+    if (['ja'].includes(lang)) return lang
+    if (['ko'].includes(lang)) return lang
+    if (['ar', 'sa', 'ae', 'eg'].includes(lang)) return 'ar'
+    if (['en', 'gb', 'au', 'ca', 'us'].includes(lang)) return 'en'
+    if (['es', 'mx', 'ar', 'co', 'cl'].includes(lang)) return 'es'
+    if (['fr', 'be', 'ca', 'ch'].includes(lang)) return 'fr'
+    if (['de', 'at', 'ch'].includes(lang)) return 'de'
+    if (['it'].includes(lang)) return 'it'
+    if (['pt', 'br'].includes(lang)) return 'pt'
+  }
+  // 3. Accept-Language header
+  const acceptLang = request.headers.get('accept-language')
+  if (acceptLang) {
+    const langs = acceptLang.split(',').map(l => l.split(';')[0].trim().toLowerCase())
+    for (const lang of langs) {
+      if (PICO_LOCALES.includes(lang as (typeof PICO_LOCALES)[number])) return lang
+      const base = lang.split('-')[0]
+      if (PICO_LOCALES.includes(base as (typeof PICO_LOCALES)[number])) return base
+    }
+  }
+  return 'en'
+}
 
 function getClientIp(request: NextRequest): string {
   return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
@@ -302,13 +338,13 @@ export function proxy(request: NextRequest) {
     if (normalizedPath.startsWith('/api')) {
       return finalizeResponse(NextResponse.next(), host, normalizedPath)
     }
-    // pico.mutx.dev/* -> /pico/*
+    // pico.mutx.dev/* -> /pico/* with locale detection
+    const locale = getLocaleFromRequest(request)
     const picoPath = `/pico${normalizedPath === '/' ? '' : normalizedPath}`
-    return finalizeResponse(
-      rewriteWithinHost(request, picoPath),
-      host,
-      normalizedPath,
-    )
+    const rewrite = rewriteWithinHost(request, picoPath)
+    // Pass locale to the app via cookie so next-intl can read it server-side
+    rewrite.cookies.set('NEXT_LOCALE', locale, { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 })
+    return finalizeResponse(rewrite, host, normalizedPath)
   }
 
   if (MARKETING_HOSTS.has(host)) {
