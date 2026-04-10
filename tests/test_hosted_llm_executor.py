@@ -179,6 +179,23 @@ def test_initialize_run_artifact_creates_schema_bundle(
     assert (run_json_path.parent / "inputs" / "brief.md").exists()
 
 
+def test_sanitize_git_remote_url_redacts_credentials() -> None:
+    assert (
+        RUN_ARTIFACTS.sanitize_git_remote_url("https://token123@github.com/example/repo.git")
+        == "https://github.com/example/repo.git"
+    )
+    assert (
+        RUN_ARTIFACTS.sanitize_git_remote_url(
+            "https://oauth:secret@github.com/example/repo.git"
+        )
+        == "https://github.com/example/repo.git"
+    )
+    assert (
+        RUN_ARTIFACTS.sanitize_git_remote_url("git@github.com:example/repo.git")
+        == "git@github.com:example/repo.git"
+    )
+
+
 def test_record_verification_results_marks_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(tmp_path)
     work_order = {

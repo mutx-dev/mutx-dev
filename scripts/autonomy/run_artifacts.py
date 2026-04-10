@@ -10,6 +10,7 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
+from urllib.parse import urlsplit, urlunsplit
 
 
 RUN_SCHEMA_VERSION = "mutx.autonomy.run/v1alpha1"
@@ -52,10 +53,22 @@ def git_snapshot() -> dict[str, Any]:
     return {
         "head": git_output(["rev-parse", "HEAD"]),
         "branch": git_output(["branch", "--show-current"]),
-        "origin_url": git_output(["remote", "get-url", "origin"]),
+        "origin_url": sanitize_git_remote_url(git_output(["remote", "get-url", "origin"])),
         "dirty": bool(status),
         "status_lines": [line for line in status.splitlines() if line],
     }
+
+
+def sanitize_git_remote_url(url: str | None) -> str | None:
+    if not url:
+        return url
+    split_url = urlsplit(url)
+    if not split_url.scheme or not split_url.netloc or "@" not in split_url.netloc:
+        return url
+    sanitized_netloc = split_url.netloc.rsplit("@", maxsplit=1)[-1]
+    return urlunsplit(
+        (split_url.scheme, sanitized_netloc, split_url.path, split_url.query, split_url.fragment)
+    )
 
 
 def load_run_record(run_json_path: Path) -> dict[str, Any]:
