@@ -430,17 +430,13 @@ def test_resolve_gateway_auth_argument_reads_password_from_config(
     assert resolve_gateway_auth_argument() == ("--password", "gateway-password")
 
 
-def test_build_openclaw_surface_command_includes_gateway_url_and_auth_for_override(
+def test_build_openclaw_surface_command_includes_gateway_url_without_auth_for_override(
     monkeypatch,
 ) -> None:
     monkeypatch.setattr(
         "cli.openclaw_runtime.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw"
     )
     monkeypatch.setattr("cli.openclaw_runtime.detect_gateway_port", lambda: 18789)
-    monkeypatch.setattr(
-        "cli.openclaw_runtime.resolve_gateway_auth_argument",
-        lambda: ("--token", "gateway-token"),
-    )
 
     command = build_openclaw_surface_command(
         surface="tui",
@@ -452,8 +448,6 @@ def test_build_openclaw_surface_command_includes_gateway_url_and_auth_for_overri
         "tui",
         "--url",
         "ws://remote.example.test:18789",
-        "--token",
-        "gateway-token",
     ]
 
 
@@ -462,10 +456,6 @@ def test_build_openclaw_surface_command_omits_local_url_override(monkeypatch) ->
         "cli.openclaw_runtime.find_openclaw_bin", lambda: "/opt/homebrew/bin/openclaw"
     )
     monkeypatch.setattr("cli.openclaw_runtime.detect_gateway_port", lambda: 18789)
-    monkeypatch.setattr(
-        "cli.openclaw_runtime.resolve_gateway_auth_argument",
-        lambda: ("--token", "gateway-token"),
-    )
 
     command = build_openclaw_surface_command(
         surface="tui",

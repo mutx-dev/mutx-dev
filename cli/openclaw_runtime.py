@@ -709,9 +709,6 @@ def build_openclaw_surface_command(
     if normalized == "tui":
         if gateway_url and not _is_default_gateway_url(gateway_url):
             command.extend(["--url", gateway_url])
-            auth_arg = resolve_gateway_auth_argument()
-            if auth_arg is not None:
-                command.extend(list(auth_arg))
         if session_key:
             command.extend(["--session", session_key])
     return command
