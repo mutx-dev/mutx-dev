@@ -1,4 +1,6 @@
 import { execSync, execFileSync } from "child_process";
+import http from "http";
+import https from "https";
 import fs from "fs";
 import path from "path";
 import { getDocSitemapRoutes } from "./docs";
@@ -205,7 +207,7 @@ async function alertFailure(entry: SyncLogEntry) {
     };
 
     await new Promise<void>((resolve, reject) => {
-      const httpModule = url.protocol === "https:" ? require("https") : require("http");
+      const httpModule = url.protocol === "https:" ? https : http;
       const req = httpModule.request(options, (res: any) => {
         res.on("data", () => {}); // drain
         res.on("end", resolve);
