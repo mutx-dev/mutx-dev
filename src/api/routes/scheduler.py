@@ -32,8 +32,12 @@ class SchedulerTaskCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=1000)
     enabled: bool = True
-    schedule: Optional[str] = Field(None, max_length=255, description="Cron expression, e.g. '*/5 * * * *'")
-    interval_seconds: Optional[int] = Field(None, ge=1, le=604800, description="Interval in seconds (alternative to cron)")
+    schedule: Optional[str] = Field(
+        None, max_length=255, description="Cron expression, e.g. '*/5 * * * *'"
+    )
+    interval_seconds: Optional[int] = Field(
+        None, ge=1, le=604800, description="Interval in seconds (alternative to cron)"
+    )
     task_type: str = Field(default="log", description="Task type: log, webhook, agent_heartbeat")
     payload: dict[str, Any] = Field(default_factory=dict)
 
@@ -81,7 +85,9 @@ def _parse_schedule_next(task: dict[str, Any]) -> datetime | None:
     """Calculate next run time from cron expression or interval."""
     if task.get("interval_seconds"):
         last = task.get("last_run")
-        base = datetime.fromtimestamp(last, tz=timezone.utc) if last else datetime.now(tz=timezone.utc)
+        base = (
+            datetime.fromtimestamp(last, tz=timezone.utc) if last else datetime.now(tz=timezone.utc)
+        )
         return base.replace(microsecond=0)
     schedule = task.get("schedule")
     if not schedule:
@@ -109,17 +115,23 @@ async def _execute_task(task: dict[str, Any]) -> None:
                 return
             try:
                 import aiohttp
+
                 method = payload.get("method", "POST").upper()
                 headers = payload.get("headers", {})
                 body = payload.get("body", {})
                 async with aiohttp.ClientSession() as session:
                     async with session.request(
-                        method, url, json=body, headers=headers,
-                        timeout=aiohttp.ClientTimeout(total=10)
+                        method,
+                        url,
+                        json=body,
+                        headers=headers,
+                        timeout=aiohttp.ClientTimeout(total=10),
                     ) as resp:
                         logger.info(f"[scheduler] Webhook task {task_id} → {resp.status}")
             except ImportError:
-                logger.warning(f"[scheduler] aiohttp not installed, skipping webhook task {task_id}")
+                logger.warning(
+                    f"[scheduler] aiohttp not installed, skipping webhook task {task_id}"
+                )
             except Exception as exc:
                 logger.warning(f"[scheduler] Webhook task {task_id} failed: {exc}")
 
@@ -128,6 +140,7 @@ async def _execute_task(task: dict[str, Any]) -> None:
             if agent_id:
                 try:
                     from src.api.services.agent_runtime import AgentRuntimeService
+
                     svc = AgentRuntimeService.get_instance()
                     if svc:
                         await svc.send_agent_heartbeat(uuid.UUID(agent_id))
@@ -245,7 +258,7 @@ async def create_scheduled_task(
     if not task_data.schedule and not task_data.interval_seconds:
         raise HTTPException(
             status_code=400,
-            detail="Either 'schedule' (cron expression) or 'interval_seconds' is required"
+            detail="Either 'schedule' (cron expression) or 'interval_seconds' is required",
         )
 
     now_ts = int(datetime.now(tz=timezone.utc).timestamp())
@@ -317,7 +330,9 @@ async def update_scheduled_task(
             try:
                 croniter.croniter(new_schedule, datetime.now(tz=timezone.utc))
             except (croniter.CroniterBadCronError, ValueError) as exc:
-                raise HTTPException(status_code=400, detail=f"Invalid cron expression: {exc}") from exc
+                raise HTTPException(
+                    status_code=400, detail=f"Invalid cron expression: {exc}"
+                ) from exc
 
         for key, value in update_data.items():
             task[key] = value

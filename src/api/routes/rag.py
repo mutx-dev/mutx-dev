@@ -343,8 +343,7 @@ async def similarity_search(
         )
 
         return [
-            SearchResult(text=doc.page_content, score=round(score, 4))
-            for doc, score in results
+            SearchResult(text=doc.page_content, score=round(score, 4)) for doc, score in results
         ]
 
     except HTTPException:

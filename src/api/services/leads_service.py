@@ -80,9 +80,7 @@ async def _notify_discord_lead(
                     logger.info(f"Discord lead notification sent for {email}")
                     return True
                 body = await resp.text()
-                logger.warning(
-                    f"Discord webhook returned {resp.status}: {body[:200]}"
-                )
+                logger.warning(f"Discord webhook returned {resp.status}: {body[:200]}")
                 return False
     except Exception as e:
         logger.error(f"Failed to send Discord lead notification: {e}")
@@ -92,6 +90,7 @@ async def _notify_discord_lead(
 # ---------------------------------------------------------------------------
 # Resend — transactional lead alert email to us
 # ---------------------------------------------------------------------------
+
 
 async def _notify_resend_lead(
     email: str,
@@ -122,9 +121,9 @@ async def _notify_resend_lead(
                     <td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 13px; color: rgba(19,26,36,0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Email</td>
                     <td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 15px; color: #131a24; font-weight: 600;">{email}</td>
                 </tr>
-                {f'<tr><td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 13px; color: rgba(19,26,36,0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Name</td><td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 15px; color: #131a24;">{name}</td></tr>' if name else ''}
-                {f'<tr><td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 13px; color: rgba(19,26,36,0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Company</td><td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 15px; color: #131a24;">{company}</td></tr>' if company else ''}
-                {f'<tr><td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 13px; color: rgba(19,26,36,0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Source</td><td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 15px; color: #131a24;">{source}</td></tr>' if source else ''}
+                {f'<tr><td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 13px; color: rgba(19,26,36,0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Name</td><td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 15px; color: #131a24;">{name}</td></tr>' if name else ""}
+                {f'<tr><td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 13px; color: rgba(19,26,36,0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Company</td><td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 15px; color: #131a24;">{company}</td></tr>' if company else ""}
+                {f'<tr><td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 13px; color: rgba(19,26,36,0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Source</td><td style="padding: 8px 0; border-bottom: 1px solid rgba(19,26,36,0.08); font-size: 15px; color: #131a24;">{source}</td></tr>' if source else ""}
                 <tr>
                     <td style="padding: 8px 0; font-size: 13px; color: rgba(19,26,36,0.6); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Captured</td>
                     <td style="padding: 8px 0; font-size: 15px; color: #131a24;">{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")}</td>
@@ -177,6 +176,7 @@ Captured: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")}
 # Resend audience sync — add to a contact list for blast campaigns
 # ---------------------------------------------------------------------------
 
+
 async def _sync_resend_audience(
     email: str,
     name: Optional[str] = None,
@@ -190,9 +190,7 @@ async def _sync_resend_audience(
     if not settings.resend_api_key or not settings.resend_audience_id:
         return False
 
-    contacts_url = (
-        f"https://api.resend.com/audiences/{settings.resend_audience_id}/contacts"
-    )
+    contacts_url = f"https://api.resend.com/audiences/{settings.resend_audience_id}/contacts"
 
     payload: dict[str, str] = {"email": email}
     if name:
@@ -219,9 +217,7 @@ async def _sync_resend_audience(
                     logger.debug(f"Resend contact already exists: {email}")
                     return True
                 body = await resp.text()
-                logger.warning(
-                    f"Resend audience sync failed {resp.status}: {body[:200]}"
-                )
+                logger.warning(f"Resend audience sync failed {resp.status}: {body[:200]}")
                 return False
     except Exception as e:
         logger.error(f"Failed to sync Resend audience: {e}")
@@ -231,6 +227,7 @@ async def _sync_resend_audience(
 # ---------------------------------------------------------------------------
 # Public entry point — call after lead is successfully captured
 # ---------------------------------------------------------------------------
+
 
 async def notify_new_lead(
     email: str,
@@ -264,11 +261,7 @@ async def notify_new_lead(
 
     # Resend alert email
     if settings.resend_api_key:
-        tasks.append(
-            asyncio.create_task(
-                _notify_resend_lead(email, source, name, company)
-            )
-        )
+        tasks.append(asyncio.create_task(_notify_resend_lead(email, source, name, company)))
 
     # Resend audience sync
     if tasks:

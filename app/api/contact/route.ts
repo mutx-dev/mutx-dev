@@ -57,8 +57,8 @@ async function sendNotificationEmail(data: {
 
 async function sendConfirmationEmail(
   to: string,
-  name?: string,
-  company?: string,
+  _name?: string,
+  _company?: string,
 ) {
   if (!resend) return
 
