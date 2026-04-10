@@ -79,19 +79,157 @@ async def _call_gateway(
         raise HTTPException(status_code=502, detail=f"Gateway request failed: {exc}") from exc
 
 
-# --- Local session stubs (Claude/Codex/Hermes — require external tooling) ---
+# --- Local session discovery (Claude/Codex/Hermes) ---
+
+
+def _parse_timestamp(ts: str | int | float) -> float:
+    """Parse various timestamp formats to epoch float for sorting."""
+    if isinstance(ts, (int, float)):
+        return float(ts)
+    try:
+        from datetime import datetime
+
+        for fmt in (
+            "%Y-%m-%dT%H:%M:%S.%f",
+            "%Y-%m-%dT%H:%M:%S",
+            "%Y-%m-%d %H:%M:%S",
+        ):
+            try:
+                return datetime.strptime(ts[:26], fmt).timestamp()
+            except ValueError:
+                continue
+        # ISO format with timezone
+        return datetime.fromisoformat(ts).timestamp()
+    except Exception:
+        return 0.0
 
 
 def get_local_claude_sessions() -> list[dict[str, Any]]:
-    return []
+    """Discover Claude sessions from ~/.claude/projects/."""
+    from pathlib import Path
+
+    sessions: list[dict[str, Any]] = []
+    claude_dir = Path.home() / ".claude" / "projects"
+    if not claude_dir.is_dir():
+        return sessions
+
+    try:
+        for project_dir in claude_dir.iterdir():
+            if not project_dir.is_dir():
+                continue
+            project_name = project_dir.name.lstrip("-").replace("-", "/")
+            # Strip leading path segments to get a readable project name
+            parts = project_name.split("/")
+            if len(parts) > 2:
+                project_name = "/".join(parts[-2:])
+
+            for session_file in project_dir.glob("*.jsonl"):
+                try:
+                    stat = session_file.stat()
+                    session_id = session_file.stem
+                    sessions.append(
+                        {
+                            "id": f"claude:{session_id}",
+                            "source": "claude",
+                            "project": project_name,
+                            "status": "available",
+                            "last_activity": stat.st_mtime,
+                            "created_at": stat.st_ctime,
+                            "size_bytes": stat.st_size,
+                            "file_path": str(session_file),
+                        }
+                    )
+                except OSError:
+                    continue
+    except Exception as exc:
+        logger.warning("Failed to scan Claude sessions: %s", exc)
+
+    return sessions
 
 
 def get_local_codex_sessions() -> list[dict[str, Any]]:
-    return []
+    """Discover Codex sessions from ~/.codex/session_index.jsonl."""
+    import json
+    from pathlib import Path
+
+    sessions: list[dict[str, Any]] = []
+    codex_index = Path.home() / ".codex" / "session_index.jsonl"
+    if not codex_index.is_file():
+        return sessions
+
+    try:
+        with open(codex_index) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                    session_id = entry.get("id", "")
+                    thread_name = entry.get("thread_name", "Untitled")
+                    updated_at = entry.get("updated_at", "")
+                    sessions.append(
+                        {
+                            "id": f"codex:{session_id}",
+                            "source": "codex",
+                            "name": thread_name,
+                            "status": "available",
+                            "last_activity": _parse_timestamp(updated_at),
+                            "created_at": _parse_timestamp(
+                                entry.get("created_at", updated_at)
+                            ),
+                        }
+                    )
+                except (json.JSONDecodeError, KeyError):
+                    continue
+    except Exception as exc:
+        logger.warning("Failed to scan Codex sessions: %s", exc)
+
+    return sessions
 
 
 def get_local_hermes_sessions() -> list[dict[str, Any]]:
-    return []
+    """Discover Hermes sessions from ~/.hermes/sessions/sessions.json."""
+    import json
+    from pathlib import Path
+
+    sessions: list[dict[str, Any]] = []
+    sessions_file = Path.home() / ".hermes" / "sessions" / "sessions.json"
+    if not sessions_file.is_file():
+        return sessions
+
+    try:
+        with open(sessions_file) as f:
+            data = json.load(f)
+
+        if not isinstance(data, dict):
+            return sessions
+
+        for key, entry in data.items():
+            if not isinstance(entry, dict):
+                continue
+            session_id = entry.get("session_id", key)
+            updated_at = entry.get("updated_at", "")
+            sessions.append(
+                {
+                    "id": f"hermes:{session_id}",
+                    "source": "hermes",
+                    "session_key": key,
+                    "display_name": entry.get("display_name", "Untitled"),
+                    "platform": entry.get("platform", "unknown"),
+                    "chat_type": entry.get("chat_type", "unknown"),
+                    "status": "available",
+                    "last_activity": _parse_timestamp(updated_at),
+                    "created_at": _parse_timestamp(entry.get("created_at", updated_at)),
+                    "input_tokens": entry.get("input_tokens", 0),
+                    "output_tokens": entry.get("output_tokens", 0),
+                    "estimated_cost_usd": entry.get("estimated_cost_usd", 0.0),
+                }
+            )
+    except Exception as exc:
+        logger.warning("Failed to scan Hermes sessions: %s", exc)
+
+    return sessions
 
 
 def merge_and_dedupe_sessions(

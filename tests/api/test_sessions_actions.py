@@ -10,13 +10,16 @@ from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_list_sessions_returns_empty(client: AsyncClient):
-    """Sessions list returns 200 with empty list by default."""
+async def test_list_sessions_returns_valid_structure(client: AsyncClient):
+    """Sessions list returns 200 with a sessions list."""
     response = await client.get("/v1/sessions")
     assert response.status_code == 200
     data = response.json()
     assert "sessions" in data
     assert isinstance(data["sessions"], list)
+    for session in data["sessions"]:
+        assert "id" in session
+        assert "source" in session
 
 
 @pytest.mark.asyncio
@@ -60,12 +63,15 @@ async def test_session_action_set_thinking_invalid_level(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_session_action_set_thinking_valid_returns_200(client: AsyncClient):
-    """Valid set-thinking request returns 200."""
+    """Valid set-thinking request returns 200 with applied status."""
     response = await client.post(
         "/v1/sessions?action=set-thinking",
         json={"session_key": "test-session", "level": "high"},
     )
     assert response.status_code == 200
+    data = response.json()
+    assert "applied" in data
+    assert "action" in data
 
 
 @pytest.mark.asyncio
@@ -80,13 +86,15 @@ async def test_session_action_set_verbose_invalid_level(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_session_action_set_verbose_valid_returns_501(client: AsyncClient):
-    """Valid set-verbose returns 501."""
+async def test_session_action_set_verbose_valid(client: AsyncClient):
+    """Valid set-verbose returns 200 with applied status."""
     response = await client.post(
         "/v1/sessions?action=set-verbose",
         json={"session_key": "test-session", "level": "on"},
     )
-    assert response.status_code == 501
+    assert response.status_code == 200
+    data = response.json()
+    assert "applied" in data
 
 
 @pytest.mark.asyncio
@@ -101,13 +109,15 @@ async def test_session_action_set_reasoning_invalid_level(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_session_action_set_reasoning_valid_returns_501(client: AsyncClient):
-    """Valid set-reasoning returns 501."""
+async def test_session_action_set_reasoning_valid(client: AsyncClient):
+    """Valid set-reasoning returns 200 with applied status."""
     response = await client.post(
         "/v1/sessions?action=set-reasoning",
         json={"session_key": "test-session", "level": "stream"},
     )
-    assert response.status_code == 501
+    assert response.status_code == 200
+    data = response.json()
+    assert "applied" in data
 
 
 @pytest.mark.asyncio
@@ -132,13 +142,15 @@ async def test_session_action_set_label_missing(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_session_action_set_label_valid_returns_501(client: AsyncClient):
-    """Valid set-label returns 501."""
+async def test_session_action_set_label_valid(client: AsyncClient):
+    """Valid set-label returns 200 with applied status."""
     response = await client.post(
         "/v1/sessions?action=set-label",
         json={"session_key": "test-session", "label": "My Session"},
     )
-    assert response.status_code == 501
+    assert response.status_code == 200
+    data = response.json()
+    assert "applied" in data
 
 
 # ---------------------------------------------------------------------------
@@ -147,11 +159,14 @@ async def test_session_action_set_label_valid_returns_501(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_delete_session_returns_501(client: AsyncClient):
-    """Delete session returns 501 (not wired yet)."""
+async def test_delete_session_returns_applied_status(client: AsyncClient):
+    """Delete session returns 200 with applied status."""
     response = await client.request(
         "DELETE",
         "/v1/sessions",
         json={"session_key": "test-session"},
     )
-    assert response.status_code == 501
+    assert response.status_code == 200
+    data = response.json()
+    assert "applied" in data
+    assert "action" in data
