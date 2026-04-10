@@ -78,24 +78,25 @@ export type MarketingHomepage = {
 
 const homepageActions: MarketingActionLink[] = [
   {
-    label: 'Download for Mac',
-    href: '/download',
+    label: 'Go to PicoMUTX',
+    href: 'https://pico.mutx.dev',
+    external: true,
     tone: 'primary',
+  },
+  {
+    label: 'View GitHub',
+    href: 'https://github.com/mutx-dev/mutx-dev',
+    external: true,
+    tone: 'secondary',
   },
   {
     label: 'Releases',
     href: '/releases',
-    tone: 'secondary',
+    tone: 'utility',
   },
   {
     label: 'Docs',
     href: 'https://docs.mutx.dev',
-    external: true,
-    tone: 'ghost',
-  },
-  {
-    label: 'GitHub',
-    href: 'https://github.com/mutx-dev/mutx-dev',
     external: true,
     tone: 'utility',
   },

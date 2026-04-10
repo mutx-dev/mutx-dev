@@ -1045,3 +1045,522 @@
     transform: translateY(0);
   }
 }
+
+/* --- Trust bar ---------------------------------------------------- */
+.trustBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--pico-text-muted);
+  max-width: 30rem;
+}
+
+.trustItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.trustSep {
+  color: var(--pico-text-muted);
+  opacity: 0.4;
+  margin: 0 0.5rem;
+}
+
+/* --- Problem section --------------------------------------------- */
+.problemScenarios {
+  display: grid;
+  gap: 1rem;
+  max-width: 44rem;
+  margin: clamp(2rem, 3.5vw, 3rem) auto 0;
+}
+
+.problemCard {
+  padding: clamp(1.1rem, 2.5vw, 1.5rem) clamp(1.2rem, 3vw, 1.8rem);
+  border-radius: var(--pico-radius);
+  border: 1px solid var(--pico-border);
+  background: var(--pico-bg-surface);
+  display: grid;
+  gap: 0.55rem;
+  transition: border-color 200ms ease, background 200ms ease;
+}
+
+.problemCard:hover {
+  border-color: rgba(234, 179, 8, 0.25);
+  background: rgba(234, 179, 8, 0.04);
+}
+
+.problemLabel {
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--pico-yellow);
+  line-height: 1.3;
+}
+
+.problemBody {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--pico-text-secondary);
+}
+
+.problemClose {
+  margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-family: var(--pico-font-display);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  color: var(--pico-text);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* --- How it works grid ------------------------------------------- */
+.howGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+}
+
+.howCard {
+  display: grid;
+  gap: 0.7rem;
+  padding: clamp(1.3rem, 3vw, 1.8rem);
+  border-radius: var(--pico-radius);
+  border: 1px solid var(--pico-border);
+  background: var(--pico-bg-surface);
+  transition: border-color 200ms ease, background 200ms ease, transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.howCard:hover {
+  border-color: var(--pico-border-hover);
+  background: var(--pico-bg-surface-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+.howIconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.65rem;
+  background: var(--pico-accent-soft);
+  color: var(--pico-accent);
+  border: 1px solid rgba(74, 222, 128, 0.1);
+  margin-bottom: 0.2rem;
+}
+
+.howTitle {
+  margin: 0;
+  font-family: var(--pico-font-body);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--pico-text);
+}
+
+.howBody {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--pico-text-secondary);
+}
+
+/* --- Who it's for / not for -------------------------------------- */
+.whoList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.9rem;
+  max-width: 38rem;
+}
+
+.whoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--pico-text-secondary);
+}
+
+.whoCheck {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--pico-accent);
+  margin-top: 0.1rem;
+}
+
+.notList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.85rem;
+  max-width: 38rem;
+}
+
+.notItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--pico-text-muted);
+}
+
+.notDash {
+  color: var(--pico-text-muted);
+  opacity: 0.5;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+/* --- Before/After close text -------------------------------------- */
+.baClose {
+  margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--pico-text-secondary);
+  text-align: center;
+  max-width: 34rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --- Benefits grid ----------------------------------------------- */
+.benefitsGrid {
+  display: grid;
+  gap: 0.9rem;
+  max-width: 36rem;
+  margin: 0 auto;
+}
+
+.benefitItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--pico-text-secondary);
+}
+
+.benefitCheck {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  color: var(--pico-accent);
+  margin-top: 0.1rem;
+}
+
+/* --- Founding block ---------------------------------------------- */
+.foundingBlock {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  padding: clamp(1.4rem, 3vw, 2rem);
+  border-radius: var(--pico-radius-lg);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+  background: rgba(74, 222, 128, 0.04);
+  display: grid;
+  gap: 0.75rem;
+  max-width: 36rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.foundingTitle {
+  margin: 0;
+  font-family: var(--pico-font-body);
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--pico-text);
+}
+
+.foundingBody {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--pico-text-secondary);
+}
+
+/* --- FAQ --------------------------------------------------------- */
+.faqGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.faqCard {
+  padding: clamp(1.2rem, 2.5vw, 1.6rem);
+  border-radius: var(--pico-radius);
+  border: 1px solid var(--pico-border);
+  background: var(--pico-bg-surface);
+  display: grid;
+  gap: 0.6rem;
+  transition: border-color 200ms ease;
+}
+
+.faqCard:hover {
+  border-color: var(--pico-border-hover);
+}
+
+.faqQ {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--pico-text);
+}
+
+.faqA {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--pico-text-secondary);
+}
+
+/* --- CTA section ------------------------------------------------- */
+.sectionCta {
+  background: var(--pico-bg);
+  padding: clamp(6rem, 12vw, 9rem) 0;
+}
+
+.ctaStack {
+  display: grid;
+  gap: 1.6rem;
+  justify-items: center;
+  max-width: 34rem;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.ctaEyebrow {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--pico-font-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pico-accent);
+  margin-bottom: 0.5rem;
+}
+
+/* --- Form -------------------------------------------------------- */
+.formWrap {
+  width: 100%;
+  max-width: 26rem;
+}
+
+.form {
+  display: grid;
+  gap: 0.9rem;
+  width: 100%;
+}
+
+.formHoneypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.formRow {
+  display: grid;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.formLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--pico-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.formInput {
+  width: 100%;
+  min-height: 2.8rem;
+  padding: 0 0.9rem;
+  border-radius: var(--pico-radius-sm);
+  border: 1px solid var(--pico-border);
+  background: var(--pico-bg-surface);
+  color: var(--pico-text);
+  font-family: var(--pico-font-body);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+  box-sizing: border-box;
+}
+
+.formInput::placeholder {
+  color: var(--pico-text-muted);
+}
+
+.formInput:focus {
+  border-color: var(--pico-accent);
+  background: rgba(74, 222, 128, 0.04);
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.08);
+}
+
+.formInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.formError {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--pico-radius-sm);
+  background: var(--pico-red-soft);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  font-size: 0.85rem;
+  color: var(--pico-red);
+  line-height: 1.45;
+}
+
+.formErrorIcon {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.05rem;
+}
+
+.formButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.6rem;
+  border-radius: var(--pico-radius-sm);
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #052e16;
+  font-family: var(--pico-font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+  box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.2), 0 8px 24px rgba(74, 222, 128, 0.18);
+  width: 100%;
+}
+
+.formButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.3), 0 14px 36px rgba(74, 222, 128, 0.22);
+}
+
+.formButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.formButtonSpinner {
+  width: 1rem;
+  height: 1rem;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.formPrivacy {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--pico-text-muted);
+  text-align: center;
+}
+
+.ctaFormWrap {
+  display: grid;
+  gap: 1.2rem;
+  width: 100%;
+  align-items: center;
+}
+
+.formHeadline {
+  margin: 0;
+  font-family: var(--pico-font-display);
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  color: var(--pico-text);
+  line-height: 1.1;
+}
+
+.formSubline {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--pico-text-secondary);
+}
+
+.formCtaMeta {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--pico-text-muted);
+  text-align: center;
+}
+
+.formSuccess {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1.2rem 1.4rem;
+  border-radius: var(--pico-radius);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  background: rgba(74, 222, 128, 0.06);
+  text-align: left;
+}
+
+.formSuccessIcon {
+  flex-shrink: 0;
+  width: 1.3rem;
+  height: 1.3rem;
+  color: var(--pico-accent);
+  margin-top: 0.05rem;
+}
+
+.formSuccessTitle {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--pico-text);
+  line-height: 1.3;
+}
+
+.formSuccessBody {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--pico-text-secondary);
+}

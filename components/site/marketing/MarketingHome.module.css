@@ -14,8 +14,8 @@
   height: 118%;
   object-fit: cover;
   object-position: var(--marketing-backdrop-position);
-  opacity: 0.48;
-  filter: saturate(1.06) contrast(1.06) brightness(0.68);
+  opacity: 0.42;
+  filter: saturate(1.04) contrast(1.08) brightness(0.84);
   transform: translate3d(var(--marketing-backdrop-shift-x), 0, 0)
     scale(var(--marketing-backdrop-scale));
   transform-origin: 58% center;
@@ -27,10 +27,10 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 80% 22%, rgba(118, 188, 255, 0.28), transparent 19rem),
-    radial-gradient(circle at 92% 28%, rgba(26, 54, 112, 0.46), transparent 28rem),
-    linear-gradient(90deg, rgba(4, 6, 9, 1) 0%, rgba(4, 6, 9, 0.98) 20%, rgba(4, 6, 9, 0.89) 38%, rgba(4, 6, 9, 0.56) 62%, rgba(4, 6, 9, 0.18) 88%, rgba(4, 6, 9, 0.08) 100%),
-    linear-gradient(180deg, rgba(4, 6, 9, 0.2) 0%, rgba(4, 6, 9, 0.04) 24%, rgba(4, 6, 9, 0.36) 100%);
+    radial-gradient(circle at 82% 18%, rgba(118, 188, 255, 0.22), transparent 22rem),
+    radial-gradient(circle at 94% 24%, rgba(36, 70, 124, 0.32), transparent 30rem),
+    linear-gradient(90deg, rgba(4, 6, 9, 0.96) 0%, rgba(4, 6, 9, 0.88) 18%, rgba(4, 6, 9, 0.72) 42%, rgba(4, 6, 9, 0.48) 62%, rgba(4, 6, 9, 0.24) 82%, rgba(4, 6, 9, 0.12) 100%),
+    linear-gradient(180deg, rgba(4, 6, 9, 0.14) 0%, rgba(4, 6, 9, 0.04) 28%, rgba(4, 6, 9, 0.28) 100%);
 }
 
 .marketingBackdropGrid {
@@ -204,7 +204,7 @@
 .heroLockup {
   display: flex;
   align-items: center;
-  gap: 0.82rem;
+  gap: 0.72rem;
   width: fit-content;
 }
 
@@ -269,20 +269,20 @@
 }
 
 .heroColumn {
-  width: min(100%, 42rem);
+  width: min(100%, 46rem);
   min-height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  gap: clamp(1.4rem, 2.6vw, 2rem);
-  padding-block: clamp(1.4rem, 3.5vh, 2.2rem) clamp(4.2rem, 10vh, 6.5rem);
+  gap: clamp(1.6rem, 2.8vw, 2.2rem);
+  padding-block: clamp(1.6rem, 3.8vh, 2.4rem) clamp(4.4rem, 10vh, 6.5rem);
 }
 
 .heroContent {
-  max-width: 36rem;
+  max-width: 40rem;
   display: grid;
-  gap: 1.4rem;
+  gap: 1.6rem;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -300,18 +300,18 @@
 .sectionEyebrow {
   margin: 0;
   width: fit-content;
-  min-height: 2.2rem;
+  min-height: 2rem;
   display: inline-flex;
   align-items: center;
-  padding: 0 0.92rem;
+  padding: 0 0.82rem;
   border-radius: 999px;
-  border: 1px solid rgba(247, 244, 239, 0.16);
+  border: 1px solid rgba(247, 244, 239, 0.14);
   background: rgba(255, 255, 255, 0.04);
   font-family: var(--font-marketing-accent), sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 800;
   line-height: 1;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -320,23 +320,23 @@
 }
 
 .heroTitle {
-  max-width: 4.6ch;
+  max-width: 12ch;
   margin: 0;
   font-family: var(--font-marketing-display), serif;
   font-size: clamp(4.1rem, 6.5vw, 6.45rem);
   font-weight: 300;
-  line-height: 0.88;
-  letter-spacing: -0.082em;
+  line-height: 0.92;
+  letter-spacing: -0.08em;
 }
 
 .heroSupport {
-  max-width: 24rem;
+  max-width: 28rem;
   margin: 0;
   color: rgba(247, 244, 239, 0.84);
   font-size: clamp(1.06rem, 1rem + 0.22vw, 1.22rem);
   font-weight: 500;
-  line-height: 1.28;
-  letter-spacing: -0.026em;
+  line-height: 1.38;
+  letter-spacing: -0.022em;
 }
 
 .heroActions {
@@ -1001,6 +1001,7 @@
 
   .heroTitle {
     font-size: clamp(3.7rem, 11.8vw, 5.3rem);
+    max-width: 12ch;
   }
 
   .demoSection,
@@ -1020,10 +1021,10 @@
 
   .marketingBackdropShade {
     background:
-      radial-gradient(circle at 76% 18%, rgba(118, 188, 255, 0.2), transparent 14rem),
-      radial-gradient(circle at 58% 56%, rgba(36, 70, 124, 0.16), transparent 16rem),
-      linear-gradient(90deg, rgba(4, 6, 9, 0.985) 0%, rgba(4, 6, 9, 0.95) 30%, rgba(4, 6, 9, 0.74) 56%, rgba(4, 6, 9, 0.32) 78%, rgba(4, 6, 9, 0.1) 100%),
-      linear-gradient(180deg, rgba(4, 6, 9, 0.14) 0%, rgba(4, 6, 9, 0.03) 26%, rgba(4, 6, 9, 0.3) 100%);
+      radial-gradient(circle at 78% 16%, rgba(118, 188, 255, 0.18), transparent 16rem),
+      radial-gradient(circle at 60% 54%, rgba(36, 70, 124, 0.12), transparent 18rem),
+      linear-gradient(90deg, rgba(4, 6, 9, 0.98) 0%, rgba(4, 6, 9, 0.92) 32%, rgba(4, 6, 9, 0.76) 58%, rgba(4, 6, 9, 0.4) 80%, rgba(4, 6, 9, 0.16) 100%),
+      linear-gradient(180deg, rgba(4, 6, 9, 0.12) 0%, rgba(4, 6, 9, 0.03) 28%, rgba(4, 6, 9, 0.24) 100%);
   }
 
   .heroSection {
@@ -1079,7 +1080,7 @@
 
   .heroTitle {
     font-size: clamp(3.28rem, 14.6vw, 4.12rem);
-    max-width: 4.95ch;
+    max-width: 12ch;
   }
 
   .heroSupport {

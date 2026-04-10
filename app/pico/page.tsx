@@ -5,9 +5,9 @@ import { PicoFooter } from "@/components/site/pico/PicoFooter";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import { getCanonicalUrl, getOgImageUrl, getSiteUrl } from "@/lib/seo";
 
-const pageTitle = "PicoMUTX | Stop Babysitting Your AI Agents";
+const pageTitle = "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer";
 const pageDescription =
-  "PicoMUTX gives you live visibility, cost control, and smart approval gates for every AI agent — live in 30 minutes, no rearchitecting required.";
+  "PicoMUTX helps founders, operators, and small teams build, deploy, and run AI agents safely — with step-by-step guidance, built-in safeguards, and real support. Pre-register now for early access.";
 
 export const metadata: Metadata = {
   title: pageTitle,
