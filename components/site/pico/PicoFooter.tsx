@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 
 import { cn } from '@/lib/utils'
@@ -5,17 +6,9 @@ import core from '@/components/site/marketing/MarketingCore.module.css'
 
 const SITE = 'https://mutx.dev'
 
-const footerLinks = [
-  { label: 'Releases', href: `${SITE}/releases` },
-  { label: 'Docs', href: 'https://docs.mutx.dev', external: true },
-  { label: 'GitHub', href: 'https://github.com/mutx-dev/mutx-dev', external: true },
-  { label: 'Download', href: `${SITE}/download` },
-  { label: 'Dashboard', href: `${SITE}/dashboard` },
-  { label: 'Contact', href: `${SITE}/contact` },
-  { label: 'Privacy', href: `${SITE}/privacy-policy` },
-]
-
 export function PicoFooter({ className }: { className?: string }) {
+  const t = useTranslations('pico.footer')
+
   return (
     <footer
       className={cn(className)}
@@ -29,27 +22,52 @@ export function PicoFooter({ className }: { className?: string }) {
     >
       <div className={core.shell}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem 1.4rem', alignItems: 'center' }}>
-          {footerLinks.map((link) =>
-            link.external ? (
-              <a
-                key={link.label}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ fontSize: '0.85rem', color: 'inherit', textDecoration: 'none' }}
-              >
-                {link.label}
-              </a>
-            ) : (
-              <a
-                key={link.label}
-                href={link.href}
-                style={{ fontSize: '0.85rem', color: 'inherit', textDecoration: 'none' }}
-              >
-                {link.label}
-              </a>
-            ),
-          )}
+          <a
+            href={`${SITE}/releases`}
+            style={{ fontSize: '0.85rem', color: 'inherit', textDecoration: 'none' }}
+          >
+            {t('links.releases')}
+          </a>
+          <a
+            href="https://docs.mutx.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: '0.85rem', color: 'inherit', textDecoration: 'none' }}
+          >
+            {t('links.docs')}
+          </a>
+          <a
+            href="https://github.com/mutx-dev/mutx-dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: '0.85rem', color: 'inherit', textDecoration: 'none' }}
+          >
+            {t('links.github')}
+          </a>
+          <a
+            href={`${SITE}/download`}
+            style={{ fontSize: '0.85rem', color: 'inherit', textDecoration: 'none' }}
+          >
+            {t('links.download')}
+          </a>
+          <a
+            href={`${SITE}/dashboard`}
+            style={{ fontSize: '0.85rem', color: 'inherit', textDecoration: 'none' }}
+          >
+            {t('links.dashboard')}
+          </a>
+          <a
+            href={`${SITE}/contact`}
+            style={{ fontSize: '0.85rem', color: 'inherit', textDecoration: 'none' }}
+          >
+            {t('links.contact')}
+          </a>
+          <a
+            href={`${SITE}/privacy-policy`}
+            style={{ fontSize: '0.85rem', color: 'inherit', textDecoration: 'none' }}
+          >
+            {t('links.privacy')}
+          </a>
         </div>
         <p style={{ margin: '1.2rem 0 0', fontSize: '0.82rem', lineHeight: 1.5, color: 'rgba(238, 240, 246, 0.35)' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem' }}>
@@ -67,7 +85,7 @@ export function PicoFooter({ className }: { className?: string }) {
             >
               <Image src="/logo.webp" alt="MUTX" width={14} height={14} />
             </span>
-            &copy; MUTX 2026. Open control for deployed agents.
+            {t('copyright')}
           </span>
         </p>
       </div>
