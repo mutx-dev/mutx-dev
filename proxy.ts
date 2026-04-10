@@ -234,7 +234,7 @@ function shouldDisableUiCaching(host: string, pathname: string): boolean {
     return false
   }
 
-  return MARKETING_HOSTS.has(host) || APP_HOSTS.has(host)
+  return MARKETING_HOSTS.has(host) || APP_HOSTS.has(host) || PICO_HOSTS.has(host)
 }
 
 function applyUiCacheHeaders(response: NextResponse, host: string, pathname: string) {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useLocale } from 'next-intl'
 
 const LOCALES = [
@@ -18,47 +18,65 @@ const LOCALES = [
 
 export function PicoLangSwitcher() {
   const locale = useLocale()
-  const detailsRef = useRef<HTMLDetailsElement>(null)
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const current = LOCALES.find((l) => l.code === locale) ?? LOCALES[0]
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [open])
+
+  // Close on Escape
+  useEffect(() => {
+    if (!open) return
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [open])
 
   const handleSelect = useCallback((code: string) => {
     document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
-    // close the dropdown
-    if (detailsRef.current) {
-      detailsRef.current.open = false
-    }
-    // force a full page reload so server components re-read the cookie
+    setOpen(false)
     window.location.href = window.location.href
   }, [])
 
-  const current = LOCALES.find((l) => l.code === locale) ?? LOCALES[0]
-
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
-      <details
-        ref={detailsRef}
+    <div ref={containerRef} style={{ position: 'relative', display: 'inline-block' }}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
         style={{
-          position: 'relative',
           borderRadius: '8px',
           background: 'rgba(255,255,255,0.05)',
           border: '1px solid rgba(255,255,255,0.08)',
+          cursor: 'pointer',
+          padding: '6px 10px',
+          fontSize: '0.9rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+          color: 'inherit',
         }}
       >
-        <summary
-          style={{
-            listStyle: 'none',
-            cursor: 'pointer',
-            padding: '6px 10px',
-            fontSize: '0.9rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            userSelect: 'none',
-          }}
-        >
-          <span aria-hidden="true">{current.flag}</span>
-          <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>▾</span>
-        </summary>
+        <span aria-hidden="true">{current.flag}</span>
+        <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>▾</span>
+      </button>
+
+      {open && (
         <div
+          role="listbox"
           style={{
             position: 'absolute',
             top: 'calc(100% + 6px)',
@@ -79,17 +97,9 @@ export function PicoLangSwitcher() {
             <button
               key={l.code}
               type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                handleSelect(l.code)
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  handleSelect(l.code)
-                }
-              }}
+              role="option"
+              aria-selected={l.code === locale}
+              onClick={() => handleSelect(l.code)}
               style={{
                 background: l.code === locale ? 'rgba(74,222,128,0.1)' : 'transparent',
                 border: 'none',
@@ -120,7 +130,7 @@ export function PicoLangSwitcher() {
             </button>
           ))}
         </div>
-      </details>
+      )}
     </div>
   )
 }
