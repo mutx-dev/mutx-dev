@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
 import core from '@/components/site/marketing/MarketingCore.module.css'
