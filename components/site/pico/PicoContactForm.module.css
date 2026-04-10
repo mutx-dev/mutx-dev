@@ -128,7 +128,6 @@
 
 /* --- Input -------------------------------------------------------- */
 .input,
-.select,
 .textarea {
   width: 100%;
   min-height: 2.6rem;
@@ -150,18 +149,122 @@
 }
 
 .input:focus,
-.select:focus,
 .textarea:focus {
   border-color: rgba(74, 222, 128, 0.4);
   box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.08);
 }
 
-.select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.6rem center;
+/* --- Radix Select ------------------------------------------------- */
+.selectTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 2.6rem;
+  padding: 0 0.75rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--pico-border);
+  background: var(--pico-bg-surface);
+  color: var(--pico-text);
+  font-family: var(--pico-font-body);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 160ms, box-shadow 160ms;
+}
+
+.selectTrigger:hover {
+  border-color: var(--pico-border-hover);
+}
+
+.selectTrigger[data-state="open"],
+.selectTrigger:focus {
+  border-color: rgba(74, 222, 128, 0.4);
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.08);
+}
+
+.selectIcon {
+  display: flex;
+  align-items: center;
+  color: var(--pico-text-muted);
+  transition: color 160ms, transform 160ms;
+}
+
+.selectTrigger[data-state="open"] .selectIcon {
+  transform: rotate(180deg);
+  color: var(--pico-accent);
+}
+
+.selectContent {
+  z-index: 200;
+  overflow: hidden;
+  border-radius: 0.6rem;
+  border: 1px solid var(--pico-border);
+  background: #12141c;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 20px 44px rgba(0, 0, 0, 0.55);
+  animation: selectIn 150ms ease-out;
+}
+
+.selectViewport {
+  padding: 0.25rem;
+}
+
+.selectItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.7rem;
   padding-right: 2rem;
+  border-radius: 0.4rem;
+  font-family: var(--pico-font-body);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--pico-text-secondary);
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  transition: background 120ms, color 120ms;
+}
+
+.selectItem[data-highlighted] {
+  background: rgba(74, 222, 128, 0.08);
+  color: var(--pico-text);
+}
+
+.selectItem[data-state="checked"] {
+  color: var(--pico-text);
+  font-weight: 600;
+}
+
+.selectIndicator {
+  position: absolute;
+  right: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pico-accent);
+}
+
+.selectScroll {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.2rem;
+  color: var(--pico-text-muted);
+}
+
+@keyframes selectIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .textarea {

@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useRef, type FormEvent } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { X, ArrowRight, Check } from 'lucide-react'
+import * as Select from '@radix-ui/react-select'
+import { X, ArrowRight, Check, ChevronDown } from 'lucide-react'
 
 import s from './PicoContactForm.module.css'
 
@@ -16,6 +17,7 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
   const prefersReducedMotion = useReducedMotion()
   const [state, setState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [interest, setInterest] = useState(defaultInterest || 'building-first')
   const honeypotRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = useCallback(
@@ -34,7 +36,7 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
         name: form.get('name') as string,
         company: form.get('company') as string,
         message: form.get('message') as string,
-        interest: form.get('interest') as string,
+        interest,
         source: 'pico-landing',
         honeypot: honeypotRef.current?.value || '',
       }
@@ -174,16 +176,60 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
                     </label>
                   </div>
 
-                  <label className={s.label}>
+                  <div className={s.label}>
                     <span className={s.labelText}>What brings you here?</span>
-                    <select name="interest" className={s.select} defaultValue={defaultInterest || 'building-first'}>
-                      <option value="building-first">Building my first AI agent</option>
-                      <option value="fixing-existing">Fixing an agent that isn&apos;t working</option>
-                      <option value="evaluating">Evaluating platforms or tools</option>
-                      <option value="spent-money">Already spent money — still not working</option>
-                      <option value="other">Something else</option>
-                    </select>
-                  </label>
+                    <Select.Root value={interest} onValueChange={setInterest}>
+                      <Select.Trigger className={s.selectTrigger}>
+                        <Select.Value />
+                        <Select.Icon className={s.selectIcon}>
+                          <ChevronDown className="h-3.5 w-3.5" />
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Content
+                          className={s.selectContent}
+                          position="popper"
+                          sideOffset={4}
+                          align="start"
+                        >
+                          <Select.ScrollUpButton className={s.selectScroll} />
+                          <Select.Viewport className={s.selectViewport}>
+                            <Select.Item value="building-first" className={s.selectItem}>
+                              <Select.ItemText>Building my first AI agent</Select.ItemText>
+                              <Select.ItemIndicator className={s.selectIndicator}>
+                                <Check className="h-3 w-3" />
+                              </Select.ItemIndicator>
+                            </Select.Item>
+                            <Select.Item value="fixing-existing" className={s.selectItem}>
+                              <Select.ItemText>Fixing an agent that isn&apos;t working</Select.ItemText>
+                              <Select.ItemIndicator className={s.selectIndicator}>
+                                <Check className="h-3 w-3" />
+                              </Select.ItemIndicator>
+                            </Select.Item>
+                            <Select.Item value="evaluating" className={s.selectItem}>
+                              <Select.ItemText>Evaluating platforms or tools</Select.ItemText>
+                              <Select.ItemIndicator className={s.selectIndicator}>
+                                <Check className="h-3 w-3" />
+                              </Select.ItemIndicator>
+                            </Select.Item>
+                            <Select.Item value="spent-money" className={s.selectItem}>
+                              <Select.ItemText>Already spent money — still not working</Select.ItemText>
+                              <Select.ItemIndicator className={s.selectIndicator}>
+                                <Check className="h-3 w-3" />
+                              </Select.ItemIndicator>
+                            </Select.Item>
+                            <Select.Item value="other" className={s.selectItem}>
+                              <Select.ItemText>Something else</Select.ItemText>
+                              <Select.ItemIndicator className={s.selectIndicator}>
+                                <Check className="h-3 w-3" />
+                              </Select.ItemIndicator>
+                            </Select.Item>
+                          </Select.Viewport>
+                          <Select.ScrollDownButton className={s.selectScroll} />
+                        </Select.Content>
+                      </Select.Portal>
+                    </Select.Root>
+                  </div>
 
                   <label className={s.label}>
                     <span className={s.labelText}>
