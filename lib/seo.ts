@@ -73,87 +73,25 @@ export function getCanonicalUrl(path = '/') {
 }
 
 /**
- * Legacy static OG image (the robot victory pose).
- * Kept as fallback for pages that haven't migrated.
+ * Legacy: static default OG image (the robot).
+ * Use getPageOgImageUrl() for per-page unique images.
  */
 export function getOgImageUrl() {
   return toAbsoluteSiteUrl(DEFAULT_OG_IMAGE)
 }
 
-// ---------------------------------------------------------------------------
-// Dynamic OG image generation
-// ---------------------------------------------------------------------------
-
-export interface DynamicOgImageOptions {
-  /** Page headline */
-  title: string
-  /** One-line description */
-  description?: string
-  /** Optional pill label – e.g. "Docs", "PicoMUTX", "Security" */
-  tag?: string
-  /** Domain override (default: "mutx.dev") */
-  domain?: string
-}
-
 /**
- * Build the URL for a dynamically rendered OG image.
- * Points to /api/og-image which renders a branded PNG on the fly.
- *
- * @example
- * ```ts
- * getDynamicOgImageUrl({
- *   title: 'AI Agent Approvals — Human-in-the-Loop Workflows',
- *   description: 'Define approval gates for high-stakes agent operations.',
- *   tag: 'Approvals',
- * })
- * ```
+ * Generate a unique OG image URL per page.
+ * Renders a branded card with the page title + description via /api/og-image.
  */
-export function getDynamicOgImageUrl(opts: DynamicOgImageOptions): string {
-  const params = new URLSearchParams()
-  params.set('title', opts.title)
-  if (opts.description) params.set('description', opts.description)
-  if (opts.tag) params.set('tag', opts.tag)
-  if (opts.domain) params.set('domain', opts.domain)
-
-  // Use the site URL as base so crawlers resolve it absolutely
+export function getPageOgImageUrl(
+  title: string,
+  description?: string,
+  options?: { path?: string; badge?: string },
+): string {
+  const params = new URLSearchParams({ title })
+  if (description) params.set('description', description)
+  if (options?.path) params.set('path', options.path)
+  if (options?.badge) params.set('badge', options.badge)
   return `${getSiteUrl()}/api/og-image?${params.toString()}`
-}
-
-// ---------------------------------------------------------------------------
-// Page-type tag auto-detection from path
-// ---------------------------------------------------------------------------
-
-const PATH_TAG_MAP: Record<string, string> = {
-  '/docs': 'Docs',
-  '/security': 'Security',
-  '/releases': 'Releases',
-  '/roadmap': 'Roadmap',
-  '/contact': 'Contact',
-  '/support': 'Support',
-  '/whitepaper': 'Whitepaper',
-  '/privacy-policy': 'Privacy',
-  '/pico': 'PicoMUTX',
-  '/manifesto': 'Manifesto',
-  '/infrastructure': 'Infrastructure',
-  '/sdk': 'SDK',
-  '/download': 'Download',
-  '/download/macos': 'macOS',
-  '/ai-agent-governance': 'Governance',
-  '/ai-agent-approvals': 'Approvals',
-  '/ai-agent-audit-logs': 'Audit Logs',
-  '/ai-agent-control-plane': 'Control Plane',
-  '/ai-agent-cost': 'Cost',
-  '/ai-agent-deployment': 'Deployment',
-  '/ai-agent-guardrails': 'Guardrails',
-  '/ai-agent-infrastructure': 'Infrastructure',
-  '/ai-agent-monitoring': 'Monitoring',
-  '/ai-agent-reliability': 'Reliability',
-}
-
-/**
- * Auto-detect a tag label from the page path.
- * Returns undefined for the homepage and unknown paths.
- */
-export function getTagForPath(path: string): string | undefined {
-  return PATH_TAG_MAP[path]
 }

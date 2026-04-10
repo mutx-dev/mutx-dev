@@ -229,7 +229,7 @@ async def get_scheduler(
     current_user: User = Depends(get_current_user),
 ) -> dict:
     """List all scheduled tasks for the admin user."""
-    if current_user.role != "admin":
+    if getattr(current_user, "role", None) != "admin":
         raise HTTPException(status_code=403, detail="Admin role required")
 
     _ensure_scheduler_running()
@@ -246,7 +246,7 @@ async def create_scheduled_task(
     current_user: User = Depends(get_current_user),
 ) -> SchedulerTaskResponse:
     """Create a new scheduled task."""
-    if current_user.role != "admin":
+    if getattr(current_user, "role", None) != "admin":
         raise HTTPException(status_code=403, detail="Admin role required")
 
     if task_data.schedule:
@@ -295,7 +295,7 @@ async def get_task(
     current_user: User = Depends(get_current_user),
 ) -> SchedulerTaskResponse:
     """Get a specific scheduled task."""
-    if current_user.role != "admin":
+    if getattr(current_user, "role", None) != "admin":
         raise HTTPException(status_code=403, detail="Admin role required")
 
     async with _scheduler_lock:
@@ -314,7 +314,7 @@ async def update_scheduled_task(
     current_user: User = Depends(get_current_user),
 ) -> SchedulerTaskResponse:
     """Update an existing scheduled task."""
-    if current_user.role != "admin":
+    if getattr(current_user, "role", None) != "admin":
         raise HTTPException(status_code=403, detail="Admin role required")
 
     async with _scheduler_lock:
@@ -348,7 +348,7 @@ async def delete_scheduled_task(
     current_user: User = Depends(get_current_user),
 ) -> None:
     """Delete a scheduled task."""
-    if current_user.role != "admin":
+    if getattr(current_user, "role", None) != "admin":
         raise HTTPException(status_code=403, detail="Admin role required")
 
     async with _scheduler_lock:
@@ -365,7 +365,7 @@ async def trigger_scheduled_task(
     current_user: User = Depends(get_current_user),
 ) -> TriggerTaskResponse:
     """Manually trigger a scheduled task immediately (fire-and-forget)."""
-    if current_user.role != "admin":
+    if getattr(current_user, "role", None) != "admin":
         raise HTTPException(status_code=403, detail="Admin role required")
 
     async with _scheduler_lock:
