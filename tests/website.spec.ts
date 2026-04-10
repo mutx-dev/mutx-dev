@@ -233,10 +233,10 @@ test.describe('mutx.dev QA', () => {
     await expect(
       page.getByText(/your ai agents are already working/i)
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: /choose a build/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /pico\.?mutx/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^releases$/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^docs$/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /^github$/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /github/i }).first()).toBeVisible();
     await expect(page.getByTestId('homepage-hero-proof-line')).toHaveCount(0);
     await expect(page.getByLabel(/hero proof points/i)).toHaveCount(0);
     await expect(page.getByLabel(/platform feature slides/i)).toHaveCount(0);
@@ -348,7 +348,7 @@ test.describe('mutx.dev QA', () => {
     expect(mobileMetrics.headingRight).toBeLessThanOrEqual(mobileMetrics.viewportWidth + 1);
     expect(mobileMetrics.wordOpacity).toBeGreaterThan(0.95);
 
-    await expect(page.getByRole('link', { name: /choose a build/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /pico\.?mutx/i }).first()).toBeVisible();
   });
 
   test('homepage scrolls after the loader settles', async ({ page }) => {
