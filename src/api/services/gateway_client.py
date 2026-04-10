@@ -168,10 +168,10 @@ async def call_gateway_method_governed(
                 tool_id=method,
                 params=params or {},
             )
-            if decision.outcome == "HALT":
+            if decision.outcome == "HALT" or decision.effect == "DEFER":
                 raise GovernanceError(
                     tool_id=method,
-                    reason=decision.reason or "denied by policy",
+                    reason=decision.reason or "denied or deferred by policy",
                     reason_code=decision.reason_code,
                 )
 
