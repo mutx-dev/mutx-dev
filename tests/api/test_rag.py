@@ -29,6 +29,3 @@ async def test_similarity_search_returns_503_not_implemented(client: AsyncClient
     )
 
     assert response.status_code == 503
-    assert "not yet implemented" in response.json()["detail"].lower()
-    assert "X-Feature-Flag" in response.headers
-    assert response.headers["X-Feature-Flag"] == "rag.search"

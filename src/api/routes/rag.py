@@ -328,7 +328,11 @@ async def similarity_search(
                     embedding_model=request.model,
                     collection_name="default",
                 )
-                store = VectorStoreRegistry.create_store("default", config)
+                try:
+                    store = VectorStoreRegistry.create_store("default", config)
+                except Exception as init_err:
+                    logger.warning(f"RAG auto-init failed: {init_err}")
+                    store = None
 
         if store is None:
             raise HTTPException(
