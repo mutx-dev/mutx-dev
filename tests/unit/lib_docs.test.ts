@@ -5,7 +5,7 @@
  * and a smoke test that SUMMARY.md is well-formed.
  */
 
-import { parseSummary, flatNav, getDocSitemapRoutes } from '../../lib/docs'
+import { parseSummary, flatNav, getDocSitemapRoutes, type DocNavItem } from '../../lib/docs'
 
 // -----------------------------------------------------------------------------
 // Helper constants (replicate lib/docs.ts internals for isolation)
@@ -148,7 +148,7 @@ describe('parseSummary integration', () => {
     const flat = flatNav(items)
     // All titles from the nested tree should appear in the flat list
     const flatTitles = new Set(flat.map((i: { title: string }) => i.title))
-    function collectTitles(n: { title: string; children: { title: string; children: never[] }[] }[]) {
+    function collectTitles(n: DocNavItem[]) {
       for (const item of n) {
         flatTitles.add(item.title)
         if (item.children.length > 0) collectTitles(item.children)
