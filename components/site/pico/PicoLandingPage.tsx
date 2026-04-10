@@ -221,19 +221,20 @@ export function PicoLandingPage() {
         <section className={s.hero}>
           <div className={s.heroAmbient} aria-hidden="true" />
           <div className={s.heroGrid}>
-            <span className={s.heroBadge}>
-              <span className={s.heroBadgeDot} />
-              Early Access &middot; Limited Spots
-            </span>
-
             <SiteReveal delay={0.05}>
+              <span className={s.heroBadge}>
+                Early Access &middot; Limited Spots
+              </span>
+            </SiteReveal>
+
+            <SiteReveal delay={0.1}>
               <h1 className={s.heroTitle}>
                 Build and deploy AI agents{' '}
                 <span className={s.heroTitleAccent}>without hiring a developer.</span>
               </h1>
             </SiteReveal>
 
-            <SiteReveal delay={0.12}>
+            <SiteReveal delay={0.16}>
               <p className={s.heroSub}>
                 PicoMUTX gives you a safe, guided path to a working AI agent — whether
                 you are starting from scratch, fixing an agent that is not working, or
@@ -241,7 +242,7 @@ export function PicoLandingPage() {
               </p>
             </SiteReveal>
 
-            <SiteReveal delay={0.19}>
+            <SiteReveal delay={0.22}>
               <div className={s.heroActions}>
                 <button onClick={() => openForm()} className={s.btnPrimary} type="button">
                   Pre-Register for Early Access
@@ -250,13 +251,13 @@ export function PicoLandingPage() {
               </div>
             </SiteReveal>
 
-            <SiteReveal delay={0.22}>
+            <SiteReveal delay={0.26}>
               <p className={s.heroMeta}>
                 Free to pre-register &middot; No credit card required &middot; Founding spots limited
               </p>
             </SiteReveal>
 
-            <SiteReveal delay={0.26}>
+            <SiteReveal delay={0.3}>
               <div className={s.trustBar}>
                 {TRUST_BAR_ITEMS.map((item, i) => (
                   <span key={item} className={s.trustItem}>
@@ -465,42 +466,47 @@ export function PicoLandingPage() {
         {/* ---- Final CTA (Section 11) ---- */}
         <section id="pre-register" className={`${s.section} ${s.sectionCta}`}>
           <div className={s.shell}>
-            <div className={s.ctaStack}>
-              <SiteReveal delay={0.05}>
-                <span className={s.ctaEyebrow}>Early Access</span>
-                <h2 className={s.ctaTitle}>
-                  Your agent does not need to stay an unfinished idea.
-                </h2>
-              </SiteReveal>
+            <div className={s.ctaPanel}>
+              <div className={s.ctaPanelGlow} aria-hidden="true" />
+              <div className={s.ctaStack}>
+                <SiteReveal delay={0.05}>
+                  <span className={s.ctaEyebrow}>
+                    <span className={s.ctaEyebrowDot} />
+                    Early Access · Limited Spots
+                  </span>
+                  <h2 className={s.ctaTitle}>
+                    Your agent does not need to stay an unfinished idea.
+                  </h2>
+                </SiteReveal>
 
-              <SiteReveal delay={0.12}>
-                <p className={s.ctaBody}>
-                  You do not need more tabs open. You do not need another tutorial.
-                  You need a clearer path to something that works.
-                  PicoMUTX is built for that moment.
-                </p>
-              </SiteReveal>
+                <SiteReveal delay={0.12}>
+                  <p className={s.ctaBody}>
+                    You do not need more tabs open. You do not need another tutorial.
+                    You need a clearer path to something that works.
+                    PicoMUTX is built for that moment.
+                  </p>
+                </SiteReveal>
 
-              <SiteReveal delay={0.19}>
-                <div className={s.ctaFormWrap}>
-                  <h3 className={s.formHeadline}>Pre-register for PicoMUTX</h3>
-                  <p className={s.formSubline}>
-                    Join the early access list and be first to know when PicoMUTX opens.
-                  </p>
-                  <button
-                    onClick={() => openForm()}
-                    className={s.btnPrimary}
-                    type="button"
-                  >
-                    Join the early access list
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                  <p className={s.formCtaMeta}>
-                    Free to pre-register &middot; No credit card required &middot; Early
-                    users get priority access
-                  </p>
-                </div>
-              </SiteReveal>
+                <SiteReveal delay={0.19}>
+                  <div className={s.ctaFormWrap}>
+                    <p className={s.formHeadline}>Pre-register for PicoMUTX</p>
+                    <p className={s.formSubline}>
+                      Join the early access list. Be first when we open.
+                    </p>
+                    <button
+                      onClick={() => openForm()}
+                      className={s.btnPrimary}
+                      type="button"
+                    >
+                      Pre-Register Now
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                    <p className={s.formCtaMeta}>
+                      Free to pre-register &middot; No credit card required &middot; Early users get priority access
+                    </p>
+                  </div>
+                </SiteReveal>
+              </div>
             </div>
           </div>
         </section>

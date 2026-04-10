@@ -565,8 +565,13 @@
 
 .baCard:hover {
   border-color: var(--pico-border-hover);
-  transform: translateY(-2px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+@media (hover: hover) {
+  .baCard:hover {
+    transform: translateY(-2px);
+  }
 }
 
 @media (max-width: 639px) {
@@ -948,16 +953,25 @@
   color: var(--pico-text-secondary);
 }
 
-/* --- Final CTA --------------------------------------------------- */
-.ctaSection {
-  padding: clamp(5.5rem, 10vw, 8rem) 0;
-  position: relative;
-  text-align: center;
+/* --- CTA section ------------------------------------------------- */
+.sectionCta {
   background: var(--pico-bg);
+  padding: clamp(6rem, 12vw, 9rem) 0;
+  position: relative;
+  overflow: hidden;
 }
 
-.ctaSection::before {
-  content: "";
+.sectionCta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(74, 222, 128, 0.07), transparent 65%);
+  pointer-events: none;
+}
+
+.sectionCta::after {
+  content: '';
   position: absolute;
   inset: auto 0 0;
   height: 1px;
@@ -969,41 +983,84 @@
   );
 }
 
-.ctaSection::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+.ctaPanel {
+  position: relative;
+  border-radius: var(--pico-radius-xl);
+  border: 1px solid rgba(74, 222, 128, 0.14);
   background:
-    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(74, 222, 128, 0.06), transparent);
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(74, 222, 128, 0.08), transparent 60%),
+    linear-gradient(180deg, rgba(13, 15, 21, 0.92), rgba(9, 12, 18, 0.96));
+  box-shadow:
+    0 0 0 1px rgba(74, 222, 128, 0.04),
+    0 40px 80px rgba(0, 0, 0, 0.4),
+    0 0 100px rgba(74, 222, 128, 0.06);
+  padding: clamp(2.5rem, 5vw, 4rem);
+  overflow: hidden;
+}
+
+.ctaPanelGlow {
+  position: absolute;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(ellipse, rgba(74, 222, 128, 0.08), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .ctaStack {
   display: grid;
-  gap: 1.2rem;
+  gap: 1.6rem;
   justify-items: center;
   max-width: 34rem;
   margin: 0 auto;
   position: relative;
   z-index: 1;
+  text-align: center;
+}
+
+.ctaEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--pico-font-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pico-accent);
+  margin-bottom: 0.5rem;
+}
+
+.ctaEyebrowDot {
+  display: inline-block;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--pico-accent);
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.5);
+  animation: pulseDot 2s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
 .ctaTitle {
   margin: 0;
   font-family: var(--pico-font-display);
-  font-size: clamp(2rem, 4.5vw, 3.2rem);
-  font-weight: 300;
-  line-height: 1.08;
+  font-size: clamp(2rem, 4.5vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1.06;
   letter-spacing: -0.045em;
   color: var(--pico-text);
 }
 
 .ctaBody {
   margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: clamp(0.95rem, 0.9rem + 0.25vw, 1.1rem);
+  line-height: 1.6;
   color: var(--pico-text-secondary);
-  max-width: 26rem;
+  max-width: 28rem;
 }
 
 .ctaActions {
@@ -1107,8 +1164,13 @@
   border-color: rgba(234, 179, 8, 0.35);
   border-left-color: var(--pico-yellow);
   background: rgba(234, 179, 8, 0.04);
-  transform: translateX(3px);
   box-shadow: -4px 0 20px rgba(234, 179, 8, 0.06);
+}
+
+@media (hover: hover) {
+  .problemCard:hover {
+    transform: translateX(3px);
+  }
 }
 
 .problemLabel {
@@ -1140,7 +1202,13 @@
 .howGrid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 639px) {
+  .howGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .howCard {
@@ -1149,16 +1217,23 @@
   padding: clamp(1.3rem, 3vw, 1.8rem);
   border-radius: var(--pico-radius);
   border: 1px solid var(--pico-border);
+  border-left: 3px solid var(--pico-accent);
   background: var(--pico-bg-surface);
   transition: border-color 200ms ease, background 200ms ease, transform 200ms ease,
     box-shadow 200ms ease;
 }
 
 .howCard:hover {
-  border-color: var(--pico-border-hover);
-  background: var(--pico-bg-surface-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(74, 222, 128, 0.3);
+  border-left-color: var(--pico-accent);
+  background: rgba(74, 222, 128, 0.04);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), -3px 0 20px rgba(74, 222, 128, 0.06);
+}
+
+@media (hover: hover) {
+  .howCard:hover {
+    transform: translateY(-2px);
+  }
 }
 
 .howIconWrap {
@@ -1355,7 +1430,13 @@
 .faqGrid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .faqGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .faqCard {
@@ -1391,17 +1472,6 @@
 .sectionCta {
   background: var(--pico-bg);
   padding: clamp(6rem, 12vw, 9rem) 0;
-}
-
-.ctaStack {
-  display: grid;
-  gap: 1.6rem;
-  justify-items: center;
-  max-width: 34rem;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-  text-align: center;
 }
 
 .ctaEyebrow {
