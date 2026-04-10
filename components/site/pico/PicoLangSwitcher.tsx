@@ -20,7 +20,6 @@ const LOCALES = [
 export function PicoLangSwitcher() {
   const locale = useLocale()
   const router = useRouter()
-  const pathname = usePathname()
 
   const handleSelect = useCallback(
     (code: string) => {
