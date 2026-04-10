@@ -269,7 +269,7 @@
 }
 
 .heroColumn {
-  width: min(100%, 35rem);
+  width: min(100%, 42rem);
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -280,9 +280,9 @@
 }
 
 .heroContent {
-  max-width: 25rem;
+  max-width: 36rem;
   display: grid;
-  gap: 1.3rem;
+  gap: 1.4rem;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -330,13 +330,13 @@
 }
 
 .heroSupport {
-  max-width: 18.8rem;
+  max-width: 24rem;
   margin: 0;
-  color: rgba(247, 244, 239, 0.88);
-  font-size: clamp(1.02rem, 0.97rem + 0.2vw, 1.16rem);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.036em;
+  color: rgba(247, 244, 239, 0.84);
+  font-size: clamp(1.06rem, 1rem + 0.22vw, 1.22rem);
+  font-weight: 500;
+  line-height: 1.28;
+  letter-spacing: -0.026em;
 }
 
 .heroActions {
@@ -440,11 +440,12 @@
 .proofSection,
 .finalSection {
   position: relative;
-  padding: clamp(4.4rem, 8vw, 6.6rem) 0;
-  border-top: 1px solid rgba(247, 244, 239, 0.08);
+  padding: clamp(5.5rem, 9vw, 8rem) 0;
+  border-top: 1px solid rgba(247, 244, 239, 0.06);
 }
 
 .demoSection,
+.examplesSection,
 .proofSection,
 .finalSection {
   color: #f7f4ef;
@@ -457,9 +458,10 @@
 }
 
 .examplesSection {
-  color: #131a24;
+  color: #f7f4ef;
   background:
-    linear-gradient(180deg, rgba(248, 246, 243, 0.98), rgba(244, 241, 236, 1));
+    radial-gradient(circle at 28% 12%, rgba(75, 141, 255, 0.1), transparent 24rem),
+    linear-gradient(180deg, rgba(7, 9, 14, 0.98), rgba(5, 7, 11, 1));
 }
 
 .proofSection {
@@ -496,9 +498,9 @@
 }
 
 .examplesSection .sectionEyebrow {
-  border-color: rgba(19, 26, 36, 0.12);
-  background: rgba(19, 26, 36, 0.04);
-  color: rgba(19, 26, 36, 0.72);
+  border-color: rgba(247, 244, 239, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(247, 244, 239, 0.72);
 }
 
 .demoSection .sectionTitle,
@@ -517,11 +519,11 @@
 }
 
 .examplesSection .sectionTitle {
-  color: #131a24;
+  color: #f7f4ef;
 }
 
 .examplesSection .sectionBody {
-  color: rgba(19, 26, 36, 0.72);
+  color: rgba(247, 244, 239, 0.68);
 }
 
 .demoLayout {
@@ -673,12 +675,12 @@
   gap: 1rem;
   padding: 1rem;
   border-radius: 1.7rem;
-  border-color: rgba(19, 26, 36, 0.1);
+  border-color: rgba(247, 244, 239, 0.08);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.68));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 24px 60px rgba(13, 19, 32, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 24px 60px rgba(0, 7, 18, 0.18);
 }
 
 .terminalWindow {
@@ -786,7 +788,7 @@
 }
 
 .exampleOutcome {
-  color: rgba(19, 26, 36, 0.78);
+  color: rgba(247, 244, 239, 0.78);
   font-weight: 600;
 }
 
@@ -795,8 +797,32 @@
   gap: 1rem;
   padding: 1.15rem;
   border-radius: 1.75rem;
+  border: 1px solid rgba(247, 244, 239, 0.08);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 18px 50px rgba(0, 7, 18, 0.14);
+}
+
+.proofLane:first-child {
+  position: relative;
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.9rem;
+  background: rgba(255, 87, 87, 0.04);
+  border: 1px solid rgba(255, 87, 87, 0.08);
+}
+
+.proofLane:first-child .proofLaneLabel {
+  color: rgba(255, 120, 120, 0.8);
+}
+
+.proofLane:last-child {
+  position: relative;
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.9rem;
+  background: rgba(75, 141, 255, 0.06);
+  border: 1px solid rgba(75, 141, 255, 0.12);
 }
 
 .proofCompare {
@@ -804,8 +830,8 @@
 }
 
 .proofLane {
-  padding-top: 0.8rem;
-  border-top: 1px solid rgba(247, 244, 239, 0.08);
+  padding-top: 0;
+  border-top: none;
 }
 
 .finalInner {
@@ -860,6 +886,74 @@
   background: linear-gradient(180deg, rgba(9, 11, 16, 1), rgba(5, 6, 9, 1));
 }
 
+.socialProofStrip {
+  position: relative;
+  padding: clamp(2.5rem, 4vw, 3.5rem) 0;
+  border-top: 1px solid rgba(247, 244, 239, 0.06);
+  border-bottom: 1px solid rgba(247, 244, 239, 0.06);
+  background:
+    linear-gradient(180deg, rgba(6, 8, 12, 0.98), rgba(5, 7, 10, 1));
+  color: #f7f4ef;
+  overflow: hidden;
+}
+
+.socialProofStrip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.6;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(75, 141, 255, 0.06), transparent 40rem);
+  pointer-events: none;
+}
+
+.socialProofInner {
+  position: relative;
+  z-index: 1;
+}
+
+.socialProofMetrics {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(2rem, 5vw, 4.5rem);
+}
+
+.socialProofMetric {
+  display: grid;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.socialProofValue {
+  margin: 0;
+  font-family: var(--font-marketing-display), serif;
+  font-size: clamp(2.2rem, 3.5vw, 3rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: #f7f4ef;
+}
+
+.socialProofLabel {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(247, 244, 239, 0.48);
+}
+
+.socialProofTagline {
+  margin: 0;
+  text-align: center;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: rgba(247, 244, 239, 0.52);
+  margin-bottom: 1.2rem;
+}
+
 @media (min-width: 760px) {
   .demoLayout {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -907,6 +1001,13 @@
 
   .heroTitle {
     font-size: clamp(3.7rem, 11.8vw, 5.3rem);
+  }
+
+  .demoSection,
+  .examplesSection,
+  .proofSection,
+  .finalSection {
+    padding: 4rem 0;
   }
 }
 

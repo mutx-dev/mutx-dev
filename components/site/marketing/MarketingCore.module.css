@@ -34,9 +34,9 @@
 
 .homePage {
   background:
-    radial-gradient(circle at 24% 0%, rgba(75, 141, 255, 0.18), transparent 26rem),
-    radial-gradient(circle at 80% 10%, rgba(104, 225, 255, 0.1), transparent 30rem),
-    linear-gradient(180deg, #060607 0 44rem, #0f1015 44rem 50rem, var(--marketing-bg) 50rem 100%);
+    radial-gradient(circle at 24% 0%, rgba(75, 141, 255, 0.14), transparent 28rem),
+    radial-gradient(circle at 80% 10%, rgba(104, 225, 255, 0.08), transparent 32rem),
+    linear-gradient(180deg, #050608 0%, #0a0c12 100%);
 }
 
 .publicPage {

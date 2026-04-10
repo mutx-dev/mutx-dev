@@ -103,8 +103,9 @@ const homepageActions: MarketingActionLink[] = [
 
 export const marketingHomepage: MarketingHomepage = {
   hero: {
-    tagline: 'Your AI agents are already working. Do you know what they\'re doing?',
+    tagline: 'AI Agent Infrastructure',
     title: 'See it. Control it. Prove it.',
+    support: 'Your AI agents are already working. Do you know what they\'re doing? MUTX gives you full visibility, real guardrails, and audit trails for every agent you run.',
     backgroundSrc: '/landing/webp/victory-core.webp',
     backgroundAlt: 'MUTX robot raising the MUTX mark inside a blue-lit control chamber',
     actions: homepageActions,
