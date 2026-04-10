@@ -233,7 +233,7 @@ test.describe('mutx.dev QA', () => {
     await expect(
       page.getByText(/your ai agents are already working/i)
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: /download for mac/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /choose a build/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^releases$/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^docs$/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^github$/i }).first()).toBeVisible();
@@ -348,7 +348,7 @@ test.describe('mutx.dev QA', () => {
     expect(mobileMetrics.headingRight).toBeLessThanOrEqual(mobileMetrics.viewportWidth + 1);
     expect(mobileMetrics.wordOpacity).toBeGreaterThan(0.95);
 
-    await expect(page.getByRole('link', { name: /download for mac/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /choose a build/i }).first()).toBeVisible();
   });
 
   test('homepage scrolls after the loader settles', async ({ page }) => {
