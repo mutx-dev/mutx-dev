@@ -175,9 +175,7 @@ def get_local_codex_sessions() -> list[dict[str, Any]]:
                             "name": thread_name,
                             "status": "available",
                             "last_activity": _parse_timestamp(updated_at),
-                            "created_at": _parse_timestamp(
-                                entry.get("created_at", updated_at)
-                            ),
+                            "created_at": _parse_timestamp(entry.get("created_at", updated_at)),
                         }
                     )
                 except (json.JSONDecodeError, KeyError):
