@@ -17,9 +17,8 @@ type QueueItem = {
   notes?: Array<{ ts?: string; message?: string }>
 }
 
-function isLocalRequest(request: NextRequest) {
-  const host = request.nextUrl.hostname
-  return process.env.NODE_ENV === 'development' || host === 'localhost' || host === '127.0.0.1' || host === '::1'
+function isLocalRequest() {
+  return process.env.NODE_ENV === 'development'
 }
 
 async function readJsonFile<T>(filePath: string, fallback: T): Promise<T> {
@@ -49,7 +48,7 @@ async function readJsonlTail(filePath: string, limit: number) {
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   return withErrorHandling(async () => {
-    if (!isLocalRequest(request)) {
+    if (!isLocalRequest()) {
       return notFound('Autonomy dashboard')
     }
 
