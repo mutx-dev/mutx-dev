@@ -14,7 +14,7 @@ import numpy as np
 from mlx_embeddings import load as load_embed_model
 from mlx_embeddings import generate as mlx_generate
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel
 import uvicorn
@@ -25,6 +25,7 @@ MODEL_ID  = os.getenv("EMBED_MODEL", "mlx-community/mxbai-embed-large-v1")
 PORT      = int(os.getenv("PORT", "18792"))
 TOP_K     = int(os.getenv("TOP_K", "8"))
 DIM       = 1024  # mxbai-embed-large-v1 output dim
+API_KEY   = os.getenv("MLX_RAG_API_KEY")
 
 # ── Model (loaded once, stays in M4 GPU memory) ───────────────────────────────
 _model_lock = threading.Lock()
@@ -95,6 +96,23 @@ def init_db():
 # ── FastAPI ───────────────────────────────────────────────────────────────────
 app = FastAPI(title="MUTX MLX RAG", version="1.0.0", default_response_class=ORJSONResponse)
 
+def require_api_key(
+    x_api_key: Optional[str] = Header(default=None),
+    authorization: Optional[str] = Header(default=None),
+) -> None:
+    if not API_KEY:
+        raise HTTPException(503, "MLX_RAG_API_KEY is not configured")
+
+    bearer_token = None
+    if authorization:
+        scheme, _, token = authorization.partition(" ")
+        if scheme.lower() == "bearer" and token:
+            bearer_token = token
+
+    provided_key = x_api_key or bearer_token
+    if provided_key != API_KEY:
+        raise HTTPException(401, "unauthorized")
+
 # ── Health ────────────────────────────────────────────────────────────────────
 @app.get("/health")
 def health():
@@ -106,7 +124,7 @@ def health():
 
 # ── Embed ─────────────────────────────────────────────────────────────────────
 @app.post("/embed")
-def embed(texts: list[str]):
+def embed(texts: list[str], _auth: None = Depends(require_api_key)):
     if not texts or len(texts) > 100:
         raise HTTPException(400, "texts must be 1–100 items")
     try:
@@ -117,7 +135,7 @@ def embed(texts: list[str]):
 
 # ── Index ─────────────────────────────────────────────────────────────────────
 @app.post("/index")
-def index_docs(docs: list[dict]):
+def index_docs(docs: list[dict], _auth: None = Depends(require_api_key)):
     """
     Index documents. Each: {id, content, metadata: {source, title, tags}}
     Re-indexing same doc_id replaces content + vector.
@@ -153,7 +171,7 @@ class QueryReq(BaseModel):
 
 # ── Query ─────────────────────────────────────────────────────────────────────
 @app.post("/query")
-def query_req(req: QueryReq):
+def query_req(req: QueryReq, _auth: None = Depends(require_api_key)):
     """
     Semantic similarity search. Returns top-k docs ranked by cosine similarity.
     Set hybrid=true for MLX semantic + keyword boost.
@@ -213,14 +231,14 @@ def query_req(req: QueryReq):
 
 # ── Stats ─────────────────────────────────────────────────────────────────────
 @app.get("/stats")
-def stats():
+def stats(_auth: None = Depends(require_api_key)):
     conn = get_db()
     count = conn.execute("SELECT COUNT(*) FROM docs").fetchone()[0]
     return {"docs": count, "dim": DIM, "model": MODEL_ID, "db": DB_PATH}
 
 # ── Clear ─────────────────────────────────────────────────────────────────────
 @app.post("/clear")
-def clear():
+def clear(_auth: None = Depends(require_api_key)):
     conn = get_db()
     conn.execute("DELETE FROM docs")
     conn.execute("DELETE FROM doc_vecs")
