@@ -3977,7 +3977,7 @@
           "contacts"
         ],
         "summary": "Capture Lead",
-        "description": "Capture a new contact lead.\nPublic endpoint for landing pages and onboarding.",
+        "description": "Capture a new contact lead.\nPublic endpoint for landing pages and onboarding.\nWrites to the DB then fires async notifications (Discord, Resend).",
         "operationId": "capture_lead_v1_leads_contacts_post",
         "requestBody": {
           "required": true,
@@ -4273,7 +4273,7 @@
           "leads"
         ],
         "summary": "Capture Lead",
-        "description": "Capture a new contact lead.\nPublic endpoint for landing pages and onboarding.",
+        "description": "Capture a new contact lead.\nPublic endpoint for landing pages and onboarding.\nWrites to the DB then fires async notifications (Discord, Resend).",
         "operationId": "capture_lead_v1_leads_post",
         "requestBody": {
           "required": true,
@@ -8660,6 +8660,350 @@
         }
       }
     },
+    "/v1/scheduler": {
+      "get": {
+        "tags": [
+          "scheduler"
+        ],
+        "summary": "Get Scheduler",
+        "description": "List all scheduled tasks for the admin user.",
+        "operationId": "get_scheduler_v1_scheduler_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Get Scheduler V1 Scheduler Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "scheduler"
+        ],
+        "summary": "Create Scheduled Task",
+        "description": "Create a new scheduled task.",
+        "operationId": "create_scheduled_task_v1_scheduler_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchedulerTaskCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulerTaskResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scheduler/{task_id}": {
+      "get": {
+        "tags": [
+          "scheduler"
+        ],
+        "summary": "Get Task",
+        "description": "Get a specific scheduled task.",
+        "operationId": "get_task_v1_scheduler__task_id__get",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulerTaskResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "scheduler"
+        ],
+        "summary": "Update Scheduled Task",
+        "description": "Update an existing scheduled task.",
+        "operationId": "update_scheduled_task_v1_scheduler__task_id__patch",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SchedulerTaskUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SchedulerTaskResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "scheduler"
+        ],
+        "summary": "Delete Scheduled Task",
+        "description": "Delete a scheduled task.",
+        "operationId": "delete_scheduled_task_v1_scheduler__task_id__delete",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/scheduler/{task_id}/trigger": {
+      "post": {
+        "tags": [
+          "scheduler"
+        ],
+        "summary": "Trigger Scheduled Task",
+        "description": "Manually trigger a scheduled task immediately (fire-and-forget).",
+        "operationId": "trigger_scheduled_task_v1_scheduler__task_id__trigger_post",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TriggerTaskResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/sessions": {
       "get": {
         "tags": [
@@ -8731,7 +9075,7 @@
           "sessions"
         ],
         "summary": "Session Action",
-        "description": "Validate session action input, but do not mutate gateway state yet.",
+        "description": "Apply a session action (set-thinking, set-verbose, set-reasoning, set-label).\n\nValidates input, then forwards the action to the OpenClaw gateway.",
         "operationId": "session_action_v1_sessions_post",
         "parameters": [
           {
@@ -8776,8 +9120,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "title": "Response Session Action V1 Sessions Post"
+                  "$ref": "#/components/schemas/SessionActionResponse"
                 }
               }
             }
@@ -8799,6 +9142,7 @@
           "sessions"
         ],
         "summary": "Delete Session",
+        "description": "Delete a session from the OpenClaw gateway.\n\nRequires session_key to identify the session to delete.",
         "operationId": "delete_session_v1_sessions_delete",
         "parameters": [
           {
@@ -8834,8 +9178,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "title": "Response Delete Session V1 Sessions Delete"
+                  "$ref": "#/components/schemas/SessionActionResponse"
                 }
               }
             }
@@ -18606,6 +18949,272 @@
         "title": "SSOCallbackResponse",
         "description": "Response model for SSO callback."
       },
+      "SchedulerTaskCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
+          "schedule": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule",
+            "description": "Cron expression, e.g. '*/5 * * * *'"
+          },
+          "interval_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 604800.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interval Seconds",
+            "description": "Interval in seconds (alternative to cron)"
+          },
+          "task_type": {
+            "type": "string",
+            "title": "Task Type",
+            "description": "Task type: log, webhook, agent_heartbeat",
+            "default": "log"
+          },
+          "payload": {
+            "type": "object",
+            "title": "Payload"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "SchedulerTaskCreate"
+      },
+      "SchedulerTaskResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "schedule": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule"
+          },
+          "interval_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interval Seconds"
+          },
+          "task_type": {
+            "type": "string",
+            "title": "Task Type"
+          },
+          "payload": {
+            "type": "object",
+            "title": "Payload"
+          },
+          "last_run": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run"
+          },
+          "next_run": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Run"
+          },
+          "run_count": {
+            "type": "integer",
+            "title": "Run Count"
+          },
+          "created_at": {
+            "type": "integer",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "integer",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "enabled",
+          "schedule",
+          "interval_seconds",
+          "task_type",
+          "payload",
+          "last_run",
+          "next_run",
+          "run_count",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "SchedulerTaskResponse"
+      },
+      "SchedulerTaskUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled"
+          },
+          "schedule": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule"
+          },
+          "interval_seconds": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 604800.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interval Seconds"
+          },
+          "task_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Type"
+          },
+          "payload": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payload"
+          }
+        },
+        "type": "object",
+        "title": "SchedulerTaskUpdate"
+      },
       "SearchRequest": {
         "properties": {
           "query": {
@@ -18683,6 +19292,40 @@
           "session_key"
         ],
         "title": "SessionActionRequest"
+      },
+      "SessionActionResponse": {
+        "properties": {
+          "session_key": {
+            "type": "string",
+            "title": "Session Key"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "applied": {
+            "type": "boolean",
+            "title": "Applied"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_key",
+          "action",
+          "applied"
+        ],
+        "title": "SessionActionResponse"
       },
       "SessionListResponse": {
         "properties": {
@@ -19198,6 +19841,29 @@
           "expires_in"
         ],
         "title": "TokenResponse"
+      },
+      "TriggerTaskResponse": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "triggered_at": {
+            "type": "integer",
+            "title": "Triggered At"
+          },
+          "execution_id": {
+            "type": "string",
+            "title": "Execution Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id",
+          "triggered_at",
+          "execution_id"
+        ],
+        "title": "TriggerTaskResponse"
       },
       "UsageBreakdownResponse": {
         "properties": {

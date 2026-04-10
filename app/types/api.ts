@@ -966,6 +966,7 @@ export interface paths {
          * Capture Lead
          * @description Capture a new contact lead.
          *     Public endpoint for landing pages and onboarding.
+         *     Writes to the DB then fires async notifications (Discord, Resend).
          */
         post: operations["capture_lead_v1_leads_contacts_post"];
         delete?: never;
@@ -1020,6 +1021,7 @@ export interface paths {
          * Capture Lead
          * @description Capture a new contact lead.
          *     Public endpoint for landing pages and onboarding.
+         *     Writes to the DB then fires async notifications (Discord, Resend).
          */
         post: operations["capture_lead_v1_leads_post"];
         delete?: never;
@@ -2101,6 +2103,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/scheduler": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Scheduler
+         * @description List all scheduled tasks for the admin user.
+         */
+        get: operations["get_scheduler_v1_scheduler_get"];
+        put?: never;
+        /**
+         * Create Scheduled Task
+         * @description Create a new scheduled task.
+         */
+        post: operations["create_scheduled_task_v1_scheduler_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/scheduler/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Task
+         * @description Get a specific scheduled task.
+         */
+        get: operations["get_task_v1_scheduler__task_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Scheduled Task
+         * @description Delete a scheduled task.
+         */
+        delete: operations["delete_scheduled_task_v1_scheduler__task_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Scheduled Task
+         * @description Update an existing scheduled task.
+         */
+        patch: operations["update_scheduled_task_v1_scheduler__task_id__patch"];
+        trace?: never;
+    };
+    "/v1/scheduler/{task_id}/trigger": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Trigger Scheduled Task
+         * @description Manually trigger a scheduled task immediately (fire-and-forget).
+         */
+        post: operations["trigger_scheduled_task_v1_scheduler__task_id__trigger_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/sessions": {
         parameters: {
             query?: never;
@@ -2116,10 +2190,17 @@ export interface paths {
         put?: never;
         /**
          * Session Action
-         * @description Validate session action input, but do not mutate gateway state yet.
+         * @description Apply a session action (set-thinking, set-verbose, set-reasoning, set-label).
+         *
+         *     Validates input, then forwards the action to the OpenClaw gateway.
          */
         post: operations["session_action_v1_sessions_post"];
-        /** Delete Session */
+        /**
+         * Delete Session
+         * @description Delete a session from the OpenClaw gateway.
+         *
+         *     Requires session_key to identify the session to delete.
+         */
         delete: operations["delete_session_v1_sessions_delete"];
         options?: never;
         head?: never;
@@ -5901,6 +5982,82 @@ export interface components {
              */
             expires_in: number;
         };
+        /** SchedulerTaskCreate */
+        SchedulerTaskCreate: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled: boolean;
+            /**
+             * Schedule
+             * @description Cron expression, e.g. '*\/5 * * * *'
+             */
+            schedule?: string | null;
+            /**
+             * Interval Seconds
+             * @description Interval in seconds (alternative to cron)
+             */
+            interval_seconds?: number | null;
+            /**
+             * Task Type
+             * @description Task type: log, webhook, agent_heartbeat
+             * @default log
+             */
+            task_type: string;
+            /** Payload */
+            payload?: Record<string, never>;
+        };
+        /** SchedulerTaskResponse */
+        SchedulerTaskResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Enabled */
+            enabled: boolean;
+            /** Schedule */
+            schedule: string | null;
+            /** Interval Seconds */
+            interval_seconds: number | null;
+            /** Task Type */
+            task_type: string;
+            /** Payload */
+            payload: Record<string, never>;
+            /** Last Run */
+            last_run: number | null;
+            /** Next Run */
+            next_run: number | null;
+            /** Run Count */
+            run_count: number;
+            /** Created At */
+            created_at: number;
+            /** Updated At */
+            updated_at: number;
+        };
+        /** SchedulerTaskUpdate */
+        SchedulerTaskUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Enabled */
+            enabled?: boolean | null;
+            /** Schedule */
+            schedule?: string | null;
+            /** Interval Seconds */
+            interval_seconds?: number | null;
+            /** Task Type */
+            task_type?: string | null;
+            /** Payload */
+            payload?: Record<string, never> | null;
+        };
         /**
          * SearchRequest
          * @description Request model for similarity search.
@@ -5937,6 +6094,17 @@ export interface components {
             level?: string | null;
             /** Label */
             label?: string | null;
+        };
+        /** SessionActionResponse */
+        SessionActionResponse: {
+            /** Session Key */
+            session_key: string;
+            /** Action */
+            action: string;
+            /** Applied */
+            applied: boolean;
+            /** Detail */
+            detail?: string | null;
         };
         /** SessionListResponse */
         SessionListResponse: {
@@ -6141,6 +6309,15 @@ export interface components {
             token_type: string;
             /** Expires In */
             expires_in: number;
+        };
+        /** TriggerTaskResponse */
+        TriggerTaskResponse: {
+            /** Task Id */
+            task_id: string;
+            /** Triggered At */
+            triggered_at: number;
+            /** Execution Id */
+            execution_id: string;
         };
         /** UsageBreakdownResponse */
         UsageBreakdownResponse: {
@@ -10897,6 +11074,206 @@ export interface operations {
             };
         };
     };
+    get_scheduler_v1_scheduler_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_scheduled_task_v1_scheduler_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SchedulerTaskCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SchedulerTaskResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_task_v1_scheduler__task_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SchedulerTaskResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_scheduled_task_v1_scheduler__task_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_scheduled_task_v1_scheduler__task_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SchedulerTaskUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SchedulerTaskResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    trigger_scheduled_task_v1_scheduler__task_id__trigger_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TriggerTaskResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_sessions_v1_sessions_get: {
         parameters: {
             query?: {
@@ -10953,7 +11330,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["SessionActionResponse"];
                 };
             };
             /** @description Validation Error */
@@ -10988,7 +11365,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": components["schemas"]["SessionActionResponse"];
                 };
             };
             /** @description Validation Error */

@@ -139,9 +139,9 @@ async def _notify_resend_lead(
     text_body = f"""New lead captured
 
 Email: {email}
-{f"Name: " + name if name else ""}
-{f"Company: " + company if company else ""}
-{f"Source: " + source if source else ""}
+{"Name: " + name if name else ""}
+{"Company: " + company if company else ""}
+{"Source: " + source if source else ""}
 Captured: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")}
 """
 
