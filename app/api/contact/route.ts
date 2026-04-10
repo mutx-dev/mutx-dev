@@ -10,6 +10,7 @@ const resendFromEmail =
   process.env.RESEND_FROM_EMAIL?.trim() || 'MUTX <hello@mutx.dev>'
 const notifyEmail =
   process.env.CONTACT_NOTIFY_EMAIL?.trim() || 'hello@mutx.dev'
+const resendAudienceId = process.env.RESEND_AUDIENCE_ID?.trim()
 const resend = resendApiKey ? new Resend(resendApiKey) : null
 
 async function sendNotificationEmail(data: {
@@ -73,6 +74,26 @@ async function sendConfirmationEmail(
   }
 }
 
+async function syncResendAudienceContact(data: {
+  email: string
+  name?: string
+  company?: string
+  source: string
+}) {
+  if (!resend || !resendAudienceId) return
+
+  try {
+    await resend.contacts.create({
+      email: data.email,
+      firstName: data.name || undefined,
+      lastName: data.company || undefined,
+    })
+  } catch (err) {
+    // Non-fatal — contact may already exist (409) or audience not configured
+    console.error('Resend audience sync failed:', err)
+  }
+}
+
 export async function POST(request: Request): Promise<NextResponse> {
   return withErrorHandling(async () => {
     const body = await request.json().catch(() => ({}))
@@ -113,8 +134,14 @@ export async function POST(request: Request): Promise<NextResponse> {
       console.warn('Contact form: Resend not configured, skipping email')
     }
 
-    // Send confirmation to user (uses waitlist template)
+    // Send confirmation to user (uses waitlist template) and add to Resend audience
     await sendConfirmationEmail(normalizedEmail, name?.trim(), company?.trim())
+    await syncResendAudienceContact({
+      email: normalizedEmail,
+      name: name?.trim(),
+      company: company?.trim(),
+      source: normalizedSource,
+    })
 
     return NextResponse.json({
       success: true,
