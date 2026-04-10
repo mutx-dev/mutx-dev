@@ -60,13 +60,15 @@ function resolveSlug(slugSegments: string[]): string | null {
     return null;
   }
 
+  const docsRoot = path.resolve(docsDir());
+
   if (slugSegments.length === 1 && slugSegments[0] === "README") {
-    const rootReadme = path.join(docsDir(), "README.md");
+    const rootReadme = path.join(docsRoot, "README.md");
     if (fs.existsSync(rootReadme)) return rootReadme;
   }
 
   if (slugSegments.length === 0) {
-    const rootReadme = path.join(docsDir(), "README.md");
+    const rootReadme = path.join(docsRoot, "README.md");
     if (fs.existsSync(rootReadme)) return rootReadme;
   }
 
@@ -77,7 +79,11 @@ function resolveSlug(slugSegments: string[]): string | null {
   ];
 
   for (const candidate of candidates) {
-    const fullPath = path.join(docsDir(), candidate);
+    const fullPath = path.resolve(docsRoot, candidate);
+    if (!fullPath.startsWith(`${docsRoot}${path.sep}`)) {
+      continue;
+    }
+
     if (fs.existsSync(fullPath)) {
       return fullPath;
     }
@@ -96,7 +102,10 @@ function resolveSlug(slugSegments: string[]): string | null {
   ];
 
   for (const candidate of apiCandidates) {
-    const fullPath = path.join(docsDir(), candidate);
+    const fullPath = path.resolve(docsRoot, candidate);
+    if (!fullPath.startsWith(`${docsRoot}${path.sep}`)) {
+      continue;
+    }
     if (fs.existsSync(fullPath)) {
       return fullPath;
     }
