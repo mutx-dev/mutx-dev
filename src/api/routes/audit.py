@@ -12,7 +12,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict
 
-from src.api.dependencies import get_current_user, SSOTokenUser
+from src.api.dependencies import get_current_user, require_roles, SSOTokenUser
 from src.api.services.audit_log import (
     AuditEvent,
     AuditEventType,
@@ -61,7 +61,11 @@ class AuditEventsResponse(BaseModel):
     total: int | None = None
 
 
-@router.get("/events", response_model=AuditEventsResponse)
+@router.get(
+    "/events",
+    response_model=AuditEventsResponse,
+    dependencies=[Depends(require_roles("ADMIN", "AUDIT_ADMIN"))],
+)
 async def query_audit_events(
     current_user: Annotated[SSOTokenUser, Depends(get_current_user)],
     agent_id: Annotated[str | None, Query(description="Filter by agent ID")] = None,
@@ -125,7 +129,11 @@ async def query_audit_events(
         )
 
 
-@router.get("/traces/{trace_id}", response_model=AuditEventsResponse)
+@router.get(
+    "/traces/{trace_id}",
+    response_model=AuditEventsResponse,
+    dependencies=[Depends(require_roles("ADMIN", "AUDIT_ADMIN"))],
+)
 async def get_trace_events(
     trace_id: str,
     current_user: Annotated[SSOTokenUser, Depends(get_current_user)],
