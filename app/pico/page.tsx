@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { PicoLandingSurface } from '@/components/pico/PicoLandingSurface'
 import { DEFAULT_X_HANDLE, getPageOgImageUrl } from '@/lib/seo'
 
-const pageTitle = "PicoMUTX — Pre-register for access";
+const pageTitle = "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer";
 const pageDescription =
-  "PicoMUTX is currently closed. Pre-register on the waitlist to get first access when the product reopens.";
+  "PicoMUTX helps founders, operators, and small teams build, deploy, and run AI agents safely — with step-by-step guidance, built-in safeguards, and real support. Pre-register now for early access.";
 
 export const metadata: Metadata = {
   title: pageTitle,

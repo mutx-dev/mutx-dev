@@ -83,7 +83,7 @@ export function PicoFooter({ className }: { className?: string }) {
                 border: '1px solid rgba(255,255,255,0.08)',
               }}
             >
-              <Image src="/logo.webp" alt="MUTX" width={14} height={14} />
+              <Image src="/pico/logo.png" alt="PicoMUTX logo" width={18} height={18} />
             </span>
             {t('copyright')}
           </span>

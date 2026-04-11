@@ -7,6 +7,7 @@ import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoHref } from '@/lib/pico/navigation'
 import {
+  analyzeAutopilotIntegration,
   buildAutopilotTimeline,
   describeRunDetail,
   explainAlertImpact,
@@ -14,12 +15,16 @@ import {
   formatPercent,
   formatRelativeTime,
   formatTimestamp,
+  getAlertsEmptyState,
+  getApprovalsEmptyState,
+  getRunsEmptyState,
   getRunSeverity,
+  getUsageEmptyState,
   humanizeRunStatus,
-  type AutopilotAgentSummary,
   type AutopilotAlertSummary,
   type AutopilotApprovalSummary,
   type AutopilotBudgetSummary,
+  type AutopilotEmptyState,
   type AutopilotRunSummary,
   type AutopilotRunTrace,
   type AutopilotTimelineItem,
@@ -82,12 +87,6 @@ function sectionClasses() {
   return 'rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]'
 }
 
-function getAgentLabel(agentId: string | null | undefined, agents: AutopilotAgentSummary[]) {
-  if (!agentId) return 'unknown'
-  const match = agents.find((agent) => agent.id === agentId)
-  return match?.name?.trim() || agentId
-}
-
 function StatCard({ label, value, hint }: { label: string; value: string; hint: string }) {
   return (
     <div className="rounded-[24px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-5 text-sm text-slate-300 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
@@ -115,10 +114,21 @@ function TimelineItemCard({ item }: { item: AutopilotTimelineItem }) {
   )
 }
 
+function EmptyStatePanel({ state }: { state: AutopilotEmptyState }) {
+  return (
+    <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+      <p className="font-medium text-white">{state.title}</p>
+      <p className="mt-2">{state.body}</p>
+      <Link href={state.nextStep.href} className="mt-4 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+        {state.nextStep.label}
+      </Link>
+    </div>
+  )
+}
+
 export function PicoAutopilotPageClient() {
   const { progress, derived, actions, syncState } = usePicoProgress()
   const toHref = usePicoHref()
-  const [agents, setAgents] = useState<AutopilotAgentSummary[]>([])
   const [runs, setRuns] = useState<AutopilotRunSummary[]>([])
   const [tracesByRunId, setTracesByRunId] = useState<Record<string, AutopilotRunTrace[]>>({})
   const [budget, setBudget] = useState<AutopilotBudgetSummary | null>(null)
@@ -130,6 +140,7 @@ export function PicoAutopilotPageClient() {
   const [error, setError] = useState<string | null>(null)
   const [thresholdDraft, setThresholdDraft] = useState(progress.autopilot.costThresholdPercent)
   const [resolvingApprovalId, setResolvingApprovalId] = useState<string | null>(null)
+  const [, setCreatingApprovalRequest] = useState(false)
 
   const pendingApprovals = useMemo(
     () => approvals.filter((approval) => approval.status === 'PENDING'),
@@ -146,8 +157,7 @@ export function PicoAutopilotPageClient() {
     setError(null)
 
     try {
-      const [agentsResponse, runsResponse, budgetResponse, usageResponse, alertsResponse, pendingResponse, approvedResponse, rejectedResponse] = await Promise.all([
-        fetch('/api/dashboard/agents', { credentials: 'include', cache: 'no-store' }),
+      const [runsResponse, budgetResponse, usageResponse, alertsResponse, pendingResponse, approvedResponse, rejectedResponse] = await Promise.all([
         fetch('/api/dashboard/runs?limit=6', { credentials: 'include', cache: 'no-store' }),
         fetch('/api/dashboard/budgets', { credentials: 'include', cache: 'no-store' }),
         fetch('/api/dashboard/budgets/usage?period_start=30d', { credentials: 'include', cache: 'no-store' }),
@@ -157,10 +167,9 @@ export function PicoAutopilotPageClient() {
         fetch('/api/pico/approvals?status=REJECTED', { credentials: 'include', cache: 'no-store' }),
       ])
 
-      const responses = [agentsResponse, runsResponse, budgetResponse, usageResponse, alertsResponse, pendingResponse, approvedResponse, rejectedResponse]
+      const responses = [runsResponse, budgetResponse, usageResponse, alertsResponse, pendingResponse, approvedResponse, rejectedResponse]
       if (responses.some((response) => response.status === 401)) {
         setAuthRequired(true)
-        setAgents([])
         setRuns([])
         setTracesByRunId({})
         setBudget(null)
@@ -171,12 +180,11 @@ export function PicoAutopilotPageClient() {
         return
       }
 
-      const [agentsPayload, runsPayload, budgetPayload, usagePayload, alertsPayload, pendingPayload, approvedPayload, rejectedPayload] = await Promise.all(
+      const [runsPayload, budgetPayload, usagePayload, alertsPayload, pendingPayload, approvedPayload, rejectedPayload] = await Promise.all(
         responses.map((response) => (response.ok ? readJsonSafely(response) : Promise.resolve(null))),
       )
 
       const partialFailure = responses.some((response) => !response.ok)
-      const nextAgents = Array.isArray(agentsPayload) ? (agentsPayload as AutopilotAgentSummary[]) : []
       const nextRuns = Array.isArray((runsPayload as { items?: unknown[] } | null)?.items)
         ? ((runsPayload as { items: AutopilotRunSummary[] }).items ?? [])
         : Array.isArray(runsPayload)
@@ -192,7 +200,6 @@ export function PicoAutopilotPageClient() {
           return rightTime - leftTime
         })
 
-      setAgents(nextAgents)
       setRuns(nextRuns)
       setBudget((budgetPayload as AutopilotBudgetSummary | null) ?? null)
       setUsage((usagePayload as AutopilotUsageBreakdown | null) ?? null)
@@ -298,41 +305,61 @@ export function PicoAutopilotPageClient() {
     [alerts, approvals, budget, progress.autopilot.approvalGateEnabled, runs, usage],
   )
 
-  const defaultNextStep = useMemo(
-    () =>
-      derived.nextLesson
-        ? {
-            label: `Open ${derived.nextLesson.title}`,
-            href: toHref(`/academy/${derived.nextLesson.slug}`),
-          }
-        : {
-            label: 'Open onboarding',
-            href: toHref('/onboarding'),
-          },
-    [derived.nextLesson, toHref],
-  )
+  const loadStateLabel = authRequired
+    ? 'sign in required'
+    : loadState === 'loading'
+      ? 'loading live data'
+      : loadState === 'partial'
+        ? 'partial signal'
+        : loadState === 'offline'
+          ? 'offline'
+          : 'live'
 
   const runEmptyState = useMemo(
-    () => getRunsEmptyState(integrationStatus, defaultNextStep),
-    [defaultNextStep, integrationStatus],
+    () =>
+      getRunsEmptyState(integrationStatus, {
+        label: derived.nextLesson ? `Open ${derived.nextLesson.title}` : 'Open academy',
+        href: derived.nextLesson ? toHref(`/academy/${derived.nextLesson.slug}`) : toHref('/academy'),
+      }),
+    [derived.nextLesson, integrationStatus, toHref],
   )
 
   const alertsEmptyState = useMemo(
-    () => getAlertsEmptyState(integrationStatus, defaultNextStep),
-    [defaultNextStep, integrationStatus],
+    () =>
+      getAlertsEmptyState(integrationStatus, {
+        label: integrationStatus.hasRuns ? 'Inspect recent runs' : 'Get the first run live',
+        href: integrationStatus.hasRuns
+          ? '#recent-runs'
+          : derived.nextLesson
+            ? toHref(`/academy/${derived.nextLesson.slug}`)
+            : toHref('/academy'),
+      }),
+    [derived.nextLesson, integrationStatus, toHref],
   )
 
   const usageEmptyState = useMemo(
-    () => getUsageEmptyState(integrationStatus, defaultNextStep),
-    [defaultNextStep, integrationStatus],
+    () =>
+      getUsageEmptyState(integrationStatus, {
+        label: integrationStatus.hasBudget ? 'Trigger real usage' : 'Set up budget visibility',
+        href: integrationStatus.hasBudget
+          ? '#recent-runs'
+          : derived.nextLesson
+            ? toHref(`/academy/${derived.nextLesson.slug}`)
+            : toHref('/academy'),
+      }),
+    [derived.nextLesson, integrationStatus, toHref],
   )
 
   const approvalsEmptyState = useMemo(
-    () => getApprovalsEmptyState(integrationStatus, defaultNextStep),
-    [defaultNextStep, integrationStatus],
+    () =>
+      getApprovalsEmptyState(integrationStatus, {
+        label: integrationStatus.approvalGateConfigured ? 'Run a gated action' : 'Configure approval gate',
+        href: integrationStatus.approvalGateConfigured
+          ? '#recent-runs'
+          : toHref('/academy/add-an-approval-gate'),
+      }),
+    [integrationStatus, toHref],
   )
-
-  const loadStateLabel = useMemo(() => loadState.toUpperCase(), [loadState])
 
   function saveThreshold() {
     if (thresholdValidationError) {
@@ -471,7 +498,9 @@ export function PicoAutopilotPageClient() {
           hint={liveHint(
             pendingApprovals.length > 0
               ? 'Pending risky actions are waiting for a human call.'
-              : 'No risky actions are blocked right now.',
+              : integrationStatus.hasApprovalRecords && !integrationStatus.approvalGateConfigured
+                ? 'Approval history exists, but Pico gate is still off locally.'
+                : 'No risky actions are blocked right now.',
             'Sign in to see live approvals.',
           )}
         />
@@ -571,7 +600,7 @@ export function PicoAutopilotPageClient() {
                         </div>
                       </div>
                       <div className="mt-4 flex flex-wrap gap-4 text-sm">
-                        <span className="text-slate-300">Agent: {getAgentLabel(run.agent_id, agents)}</span>
+                        <span className="text-slate-300">Agent: {run.agent_id ?? 'unknown'}</span>
                         <span className="text-slate-300">Trace count: {run.trace_count ?? traces.length}</span>
                         <span className="text-slate-300">
                           {run.started_at ? `Started ${formatTimestamp(run.started_at)}` : 'Start time unavailable'}
@@ -718,7 +747,7 @@ export function PicoAutopilotPageClient() {
                     </div>
                     <p className="mt-4 text-sm leading-6">{alert.message}</p>
                     <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-300">
-                      <span>Agent: {getAgentLabel(alert.agent_id, agents)}</span>
+                      <span>Agent: {alert.agent_id}</span>
                       <span>{alert.resolved ? 'Resolved' : 'Still active'}</span>
                     </div>
                     <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {explainAlertImpact(alert)}</p>
@@ -747,14 +776,11 @@ export function PicoAutopilotPageClient() {
                 <EmptyStatePanel state={approvalsEmptyState} />
               ) : (
                 <>
-                  <div className="rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5 text-sm text-slate-300">
-                    Approval traffic shown here comes from the real MUTX approval API. Pico does not create sample requests or local-only gate states anymore.
-                    <div className="mt-4">
-                      <Link href={approvalLessonHref} className="inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
-                        Open the approval walkthrough
-                      </Link>
+                  {integrationStatus.hasApprovalRecords && !integrationStatus.approvalGateConfigured ? (
+                    <div className="rounded-[24px] border border-amber-400/20 bg-amber-400/10 p-5 text-sm leading-6 text-amber-50">
+                      Approval records already exist in MUTX, but Pico still shows the gate as off locally. Turn on the gate here so the product state matches the control-plane reality.
                     </div>
-                  </div>
+                  ) : null}
                   {pendingApprovals.map((approval) => (
                     <article key={approval.id} className={`rounded-[24px] border p-5 ${severityClasses('warn')}`}>
                       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -770,12 +796,8 @@ export function PicoAutopilotPageClient() {
                       <p className="mt-4 text-sm leading-6">
                         {typeof approval.payload?.summary === 'string'
                           ? approval.payload.summary
-                          : `${approval.requester} requested this action for agent ${getAgentLabel(approval.agent_id, agents)}.`}
+                          : `${approval.requester} requested this action for agent ${approval.agent_id}.`}
                       </p>
-                      <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-300">
-                        <span>Agent: {getAgentLabel(approval.agent_id, agents)}</span>
-                        <span>Requester: {approval.requester}</span>
-                      </div>
                       <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {explainApprovalImpact(approval)}</p>
                       <div className="mt-4 flex flex-wrap gap-3">
                         <button
@@ -813,10 +835,10 @@ export function PicoAutopilotPageClient() {
                       <p className="mt-4 text-sm leading-6">
                         {typeof approval.payload?.summary === 'string'
                           ? approval.payload.summary
-                          : `${approval.requester} requested this action for agent ${getAgentLabel(approval.agent_id, agents)}.`}
+                          : `${approval.requester} requested this action for agent ${approval.agent_id}.`}
                       </p>
                       <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-300">
-                        <span>Agent: {getAgentLabel(approval.agent_id, agents)}</span>
+                        <span>Agent: {approval.agent_id}</span>
                         <span>Requester: {approval.requester}</span>
                         <span>Approver: {approval.approver ?? 'unknown'}</span>
                       </div>

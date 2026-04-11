@@ -1,21 +1,21 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX - De tu primer agente a uno en el que realmente confias",
-      "description": "PicoMUTX es la capa guiada de academia, tutor y autopiloto que te lleva de tu primer agente a un flujo de produccion en el que realmente puedes confiar."
+      "title": "PicoMUTX — Construye y despliega agentes de IA de forma segura sin contratar un desarrollador",
+      "description": "PicoMUTX ayuda a fundadores, operadores y equipos pequenos a construir, desplegar y ejecutar agentes de IA de forma segura — con guia paso a paso, salvaguardas integradas y soporte real. Registrate ahora para acceso anticipado."
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " por MUTX",
-      "cta": "Habla con nosotros"
+      "cta": "Prerregistrarse"
     },
     "hero": {
-      "badge": "Beta activa - Producto real",
-      "title": "Construye un agente util, ",
-      "titleAccent": "y luego aprende a confiar en el.",
-      "subtitle": "PicoMUTX te da una academia guiada, un tutor aterrizado y una capa de autopiloto para que pongas en marcha un agente real sin perderte entre quince pestanas de humo.",
-      "cta": "Habla con el equipo",
-      "meta": "Abre el espacio de trabajo ahora - Lecciones guiadas - Senales reales de operacion"
+      "badge": "Acceso anticipado · Plazas limitadas",
+      "title": "Construye y despliega agentes de IA ",
+      "titleAccent": "sin contratar un desarrollador.",
+      "subtitle": "PicoMUTX te ofrece un camino seguro y guiado hacia un agente de IA funcional — ya sea que empieces de cero, arregles un agente que no funciona o intentes evitar otro error costoso.",
+      "cta": "Prerregistrarse para acceso anticipado",
+      "meta": "Prerregistro gratuito · Sin tarjeta de credito · Plazas fundadores limitadas"
     },
     "trustBar": {
       "items": {
@@ -118,15 +118,15 @@
       "close": "El objetivo no es \"aprender IA algun dia.\" El objetivo es poner tu agente en marcha — de forma segura, clara y con menos friccion."
     },
     "earlyAccess": {
-      "eyebrow": "Acceso beta",
-      "title": "El producto esta en vivo. Los bordes duros son honestos.",
-      "body": "PicoMUTX ya es un producto guiado real, no una fantasia de lista de espera. Abre el workspace, sigue las lecciones, usa el tutor cuando te bloquees y escala cuando el problema sea demasiado ambiguo para una respuesta rapida.",
+      "eyebrow": "Acceso anticipado",
+      "title": "PicoMUTX se abre por etapas. El acceso fundador no estara abierto para siempre.",
+      "body": "Prerregistrarte ahora te pone por delante del lanzamiento publico y dentro del grupo que ayuda a dar forma a la plataforma desde el inicio. Los usuarios anticipados obtienen una linea mas cercana al producto, onboarding mas temprano y mas influencia sobre lo que se prioriza.",
       "benefits": {
-        "0": "Abrir el espacio de trabajo ahora",
-        "1": "Seguir incorporacion guiada y rutas de aprendizaje",
-        "2": "Usar un tutor aterrizado en lugar de adivinar",
-        "3": "Ver senales reales del autopiloto desde la capa de control",
-        "4": "Hablar con el equipo cuando haga falta criterio humano"
+        "0": "Acceso anticipado antes del lanzamiento publico",
+        "1": "Consideracion prioritaria para plazas de miembro fundador",
+        "2": "Onboarding anticipado y actualizaciones de lanzamiento",
+        "3": "La capacidad de influir en los primeros casos de uso y prioridades de despliegue",
+        "4": "Primera visibilidad sobre precios y terminos de acceso"
       }
     },
     "faq": {
@@ -146,8 +146,8 @@
           "a": "Agentes practicos — del tipo que ahorran tiempo, apoyan operaciones, mejoran flujos de trabajo y ayudan a los negocios a funcionar mejor. El enfoque es la utilidad, no demos de juguete."
         },
         "3": {
-          "q": "Puedo usar el espacio de trabajo ahora?",
-          "a": "Si. El producto beta esta en vivo. Usa el espacio de trabajo, sigue las lecciones y contacta al equipo si necesitas una mano humana en un caso complicado."
+          "q": "El prerregistro es gratuito?",
+          "a": "Si. El prerregistro es gratuito y no requiere pago. Estaras entre los primeros en saber cuando se abra el acceso y cuando haya plazas fundadores disponibles."
         },
         "4": {
           "q": "Es esto para empresas?",
@@ -156,23 +156,23 @@
       }
     },
     "finalCta": {
-      "eyebrow": "Espacio de trabajo en vivo",
-      "title": "Tu agente no tiene por que quedarse como una idea a medias.",
-      "body": "No necesitas mas pestanas abiertas. Necesitas una ruta mas clara, un tutor aterrizado y senales reales de operacion. PicoMUTX esta hecho para ese momento.",
-      "formHeadline": "Habla con el equipo de PicoMUTX",
-      "formSubline": "Dinos que estas construyendo o donde duele. Te llevamos a la ruta correcta.",
-      "ctaButton": "Enviar mensaje",
-      "formCtaMeta": "Abre el espacio de trabajo ahora - Respuesta humana cuando haga falta - Nada de teatro falso de incorporacion"
+      "eyebrow": "Acceso anticipado · Plazas limitadas",
+      "title": "Tu agente no necesita quedarse como una idea inconclusa.",
+      "body": "No necesitas mas pestanas abiertas. No necesitas otro tutorial. Necesitas un camino mas claro hacia algo que funcione. PicoMUTX esta construido para ese momento.",
+      "formHeadline": "Prerregistrarse para PicoMUTX",
+      "formSubline": "Unete a la lista de acceso anticipado. Se el primero cuando abramos.",
+      "ctaButton": "Prerregistrarse ahora",
+      "formCtaMeta": "Prerregistro gratuito · Sin tarjeta de credito · Usuarios anticipados obtienen acceso prioritario"
     },
     "contactForm": {
       "dialogLabel": "Formulario de contacto",
       "closeLabel": "Cerrar",
-      "title": "Habla con el equipo de PicoMUTX",
-      "subtitle": "Dinos que estas construyendo o donde se atasco. Te enroutamos rapido.",
+      "title": "Prerregistrarse para acceso anticipado",
+      "subtitle": "Cuentanos donde estas. Te meteremos.",
       "emailLabel": "Email de trabajo",
       "emailPlaceholder": "tu@empresa.com",
       "nameLabel": "Nombre",
-      "namePlaceholder": "Ana Garcia",
+      "namePlaceholder": "Maria Garcia",
       "companyLabel": "Empresa",
       "companyPlaceholder": "Acme S.L.",
       "interestLabel": "Que te trae por aqui?",
@@ -180,30 +180,30 @@
         "building-first": "Construyendo mi primer agente de IA",
         "fixing-existing": "Arreglando un agente que no funciona",
         "evaluating": "Evaluando plataformas o herramientas",
-        "spent-money": "Ya gaste dinero y sigue sin funcionar",
+        "spent-money": "Ya gaste dinero — sigue sin funcionar",
         "other": "Algo mas"
       },
       "messageLabel": "Algo que debamos saber?",
       "messageOptional": "(opcional)",
-      "messagePlaceholder": "Por ejemplo: tengo un pequeno SaaS y quiero automatizar soporte...",
+      "messagePlaceholder": "Ej. Tengo un SaaS pequeno y quiero automatizar la atencion al cliente...",
       "submitting": "Enviando...",
-      "submit": "Enviar mensaje",
+      "submit": "Unete a la lista de acceso anticipado",
       "disclaimer": "Sin spam. Sin llamadas de ventas. Solo una respuesta humana.",
-      "successTitle": "Mensaje enviado.",
+      "successTitle": "Estas en la lista.",
       "successBody": "Leemos cada mensaje. Espera una respuesta personal en 24 horas.",
       "successBack": "Volver a la pagina",
-      "errorFallback": "Algo salio mal. Intentalo de nuevo.",
-      "networkError": "Error de red. Intentalo de nuevo."
+      "errorFallback": "Algo salio mal. Por favor intenta de nuevo.",
+      "networkError": "Error de red. Por favor intenta de nuevo."
     },
     "preRegForm": {
       "emailLabel": "Email de trabajo",
       "emailPlaceholder": "tu@empresa.com",
-      "submitting": "Enviando...",
-      "submit": "Enviar mensaje",
-      "privacy": "Sin spam. Sin llamadas de ventas. Solo una respuesta humana.",
-      "successTitle": "Mensaje enviado.",
-      "successBody": "Leemos cada mensaje. Espera una respuesta personal en 24 horas.",
-      "errorFallback": "Algo salio mal. Intentalo de nuevo."
+      "submitting": "Uniendote…",
+      "submit": "Prerregistrarse ahora",
+      "privacy": "Sin spam. Sin pago requerido. Solo actualizaciones de acceso anticipado y detalles de lanzamiento.",
+      "successTitle": "Estas en la lista.",
+      "successBody": "Nos pondremos en contacto cuando se abra el acceso a PicoMUTX. Sin spam, sin pago requerido.",
+      "errorFallback": "Algo salio mal. Por favor intenta de nuevo."
     },
     "footer": {
       "links": {

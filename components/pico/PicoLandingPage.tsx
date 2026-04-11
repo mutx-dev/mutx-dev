@@ -1,80 +1,348 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+import { useCallback, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
+import { ArrowRight, Check } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
 
-import { WaitlistForm } from '@/components/WaitlistForm'
-import { PicoLangSwitcher } from '@/components/pico/PicoLangSwitcher'
+import s from './PicoLanding.module.css'
+import { SiteReveal } from '@/components/site/SiteReveal'
+import { PicoContactForm } from './PicoContactForm'
+import { PicoLangSwitcher } from './PicoLangSwitcher'
+
+/* ------------------------------------------------------------------ */
+/*  Icon helper                                                        */
+/* ------------------------------------------------------------------ */
+
+const HOW_ICONS = ['path', 'support', 'shield', 'expert'] as const
+
+function HowItWorksIcon({ kind }: { kind: string }) {
+  const sz = 20
+  const clr = 'currentColor'
+  switch (kind) {
+    case 'path':
+      return (
+        <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={clr} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      )
+    case 'support':
+      return (
+        <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={clr} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      )
+    case 'shield':
+      return (
+        <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={clr} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+          <path d="M9 12l2 2 4-4" />
+        </svg>
+      )
+    case 'expert':
+      return (
+        <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={clr} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      )
+    default:
+      return null
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
 
 export function PicoLandingPage() {
+  const t = useTranslations('pico')
+  const prefersReducedMotion = useReducedMotion()
+  const [formOpen, setFormOpen] = useState(false)
+  const [formInterest, setFormInterest] = useState<string | undefined>()
+
+  const openForm = useCallback((interest?: string) => {
+    setFormInterest(interest)
+    setFormOpen(true)
+  }, [])
+
   return (
-    <div className="min-h-screen bg-[#07111f] text-slate-100">
-      <nav className="border-b border-white/10 bg-[rgba(4,10,20,0.72)] backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <Link href="https://pico.mutx.dev" className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-400/15 text-emerald-200">PM</span>
-            <span>
-              PicoMUTX
-              <span className="ml-2 text-[11px] font-medium tracking-[0.18em] text-slate-400">by MUTX</span>
+    <div className={s.page}>
+      <PicoContactForm
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        defaultInterest={formInterest}
+      />
+
+      {/* Navigation */}
+      <nav className={s.nav}>
+        <div className={s.navInner}>
+          <Link href="https://pico.mutx.dev" className={s.navBrand}>
+            <span className={s.navLogo}>
+              <Image src="/pico/logo.png" alt="PicoMUTX logo" width={20} height={20} priority />
+            </span>
+            <span className={s.navName}>
+              {t('nav.brand')}
+              <span className={s.navTag}>{t('nav.brandTag')}</span>
             </span>
           </Link>
-          <div className="flex items-center gap-3">
-            <PicoLangSwitcher />
-            <a
-              href="#waitlist"
-              className="rounded-full border border-emerald-400/25 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-100 transition hover:bg-emerald-400/15"
-            >
-              Pre-register
-            </a>
-          </div>
+          <PicoLangSwitcher />
+          <button className={s.navCta} onClick={() => openForm()} type="button">
+            {t('nav.cta')}
+          </button>
         </div>
       </nav>
 
-      <main>
-        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-          <div className="grid gap-10 lg:grid-cols-[1.1fr,0.9fr] lg:items-start">
-            <div>
-              <div className="inline-flex rounded-full border border-amber-400/20 bg-amber-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-amber-100">
-                Closed for now · Waitlist only
-              </div>
-              <h1 className="mt-6 max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-                PicoMUTX is closed right now.
+      <main className={s.main}>
+
+        {/* ---- Hero (Section 1) ---- */}
+        <section className={s.hero}>
+          <div className={s.heroAmbient} aria-hidden="true" />
+          <div className={s.heroGrid}>
+            <SiteReveal delay={0.05}>
+              <span className={s.heroBadge}>{t('hero.badge')}</span>
+            </SiteReveal>
+
+            <SiteReveal delay={0.1}>
+              <h1 className={s.heroTitle}>
+                {t('hero.title')}
+                <span className={s.heroTitleAccent}>{t('hero.titleAccent')}</span>
               </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
-                We are not accepting product access at the moment. If you want first access when Pico reopens,
-                pre-register here and we will invite people in controlled waves.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  href="#waitlist"
-                  className="rounded-full bg-emerald-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
-                >
-                  Pre-register
-                </a>
-                <a
-                  href="#waitlist"
-                  className="rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10"
-                >
-                  Join the waitlist
-                </a>
+            </SiteReveal>
+
+            <SiteReveal delay={0.16}>
+              <p className={s.heroSub}>{t('hero.subtitle')}</p>
+            </SiteReveal>
+
+            <SiteReveal delay={0.22}>
+              <div className={s.heroActions}>
+                <button onClick={() => openForm()} className={s.btnPrimary} type="button">
+                  {t('hero.cta')}
+                  <ArrowRight className="h-4 w-4" />
+                </button>
               </div>
-              <div className="mt-8 grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-                  No workspace access
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-                  No academy access
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-                  Waitlist is the only entry point
-                </div>
+            </SiteReveal>
+
+            <SiteReveal delay={0.26}>
+              <p className={s.heroMeta}>{t('hero.meta')}</p>
+            </SiteReveal>
+
+            <SiteReveal delay={0.3}>
+              <div className={s.trustBar}>
+                {Array.from({ length: 3 }, (_, i) => (
+                  <span key={i} className={s.trustItem}>
+                    {i > 0 && <span className={s.trustSep} aria-hidden="true">|</span>}
+                    {t(`trustBar.items.${i}`)}
+                  </span>
+                ))}
               </div>
+            </SiteReveal>
+          </div>
+        </section>
+
+        {/* ---- Problem (Section 2) ---- */}
+        <section className={`${s.section} ${s.sectionDark}`}>
+          <div className={s.shell}>
+            <div className={s.sectionHeader}>
+              <span className={s.eyebrow}>{t('problem.eyebrow')}</span>
+              <h2 className={s.sectionTitle}>
+                {t('problem.title')}<br />
+                {t('problem.titleLine2')}
+              </h2>
+              <p className={s.sectionBody}>{t('problem.body')}</p>
             </div>
 
-            <div id="waitlist" className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.35)]">
-              <WaitlistForm source="pico-landing" />
+            <div className={s.problemScenarios}>
+              {Array.from({ length: 4 }, (_, i) => (
+                <div key={i} className={s.problemCard}>
+                  <div className={s.problemLabel}>{t(`problem.scenarios.${i}.label`)}</div>
+                  <p className={s.problemBody}>{t(`problem.scenarios.${i}.body`)}</p>
+                </div>
+              ))}
+            </div>
+
+            <p className={s.problemClose}>{t('problem.close')}</p>
+          </div>
+        </section>
+
+        {/* ---- Platform Intro + What You Get (Sections 3+4 combined) ---- */}
+        <section className={`${s.section} ${s.sectionAlt}`}>
+          <div className={s.shell}>
+            <div className={s.sectionHeader}>
+              <span className={s.eyebrow}>{t('platform.eyebrow')}</span>
+              <h2 className={s.sectionTitle}>{t('platform.title')}</h2>
+              <p className={s.sectionBody}>{t('platform.body')}</p>
+            </div>
+            <div className={s.howGrid}>
+              {Array.from({ length: 4 }, (_, i) => (
+                <SiteReveal key={i} delay={i * 0.06}>
+                  <motion.div
+                    whileHover={
+                      prefersReducedMotion ? undefined : { y: -3 }
+                    }
+                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                    className={s.howCard}
+                  >
+                    <span className={s.howIconWrap}>
+                      <HowItWorksIcon kind={HOW_ICONS[i]} />
+                    </span>
+                    <h3 className={s.howTitle}>{t(`platform.howItWorks.${i}.title`)}</h3>
+                    <p className={s.howBody}>{t(`platform.howItWorks.${i}.body`)}</p>
+                  </motion.div>
+                </SiteReveal>
+              ))}
             </div>
           </div>
         </section>
+
+        {/* ---- Who It&apos;s For / Not For (Sections 5+6 merged) ---- */}
+        <section className={`${s.section} ${s.sectionDark}`}>
+          <div className={s.shell}>
+            <div className={s.sectionHeader}>
+              <span className={s.eyebrow}>{t('who.eyebrow')}</span>
+              <h2 className={s.sectionTitle}>{t('who.title')}</h2>
+            </div>
+
+            <div className={s.whoSplit}>
+              <div className={s.whoCol}>
+                <h3 className={s.whoColTitle}>{t('who.forYouTitle')}</h3>
+                <ul className={s.whoList}>
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <li key={i} className={s.whoItem}>
+                      <Check className={s.whoCheck} />
+                      <span>{t(`who.forYou.${i}`)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className={s.whoDivider} aria-hidden="true" />
+
+              <div className={s.whoCol}>
+                <h3 className={s.whoColTitle}>{t('who.notForYouTitle')}</h3>
+                <ul className={s.notList}>
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <li key={i} className={s.notItem}>
+                      <span className={s.notDash} aria-hidden="true">—</span>
+                      <span>{t(`who.notForYou.${i}`)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ---- Before / After (Section 7) ---- */}
+        <section className={`${s.section} ${s.sectionAlt}`}>
+          <div className={s.shell}>
+            <div className={s.sectionHeader}>
+              <span className={s.eyebrow}>{t('beforeAfter.eyebrow')}</span>
+              <h2 className={s.sectionTitle}>{t('beforeAfter.title')}</h2>
+            </div>
+            <div className={s.baGrid}>
+              {Array.from({ length: 4 }, (_, i) => (
+                <SiteReveal key={i} delay={i * 0.05}>
+                  <motion.div
+                    whileHover={
+                      prefersReducedMotion ? undefined : { y: -2 }
+                    }
+                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                    className={s.baCard}
+                  >
+                    <div className={`${s.baSide} ${s.baBefore}`}>
+                      <p className={`${s.baLabel} ${s.baLabelBefore}`}>{t('beforeAfter.beforeLabel')}</p>
+                      <p className={s.baText}>{t(`beforeAfter.items.${i}.before`)}</p>
+                    </div>
+                    <div className={s.baSide}>
+                      <p className={`${s.baLabel} ${s.baLabelAfter}`}>{t('beforeAfter.afterLabel')}</p>
+                      <p className={`${s.baText} ${s.baTextAfter}`}>{t(`beforeAfter.items.${i}.after`)}</p>
+                    </div>
+                  </motion.div>
+                </SiteReveal>
+              ))}
+            </div>
+            <p className={s.baClose}>{t('beforeAfter.close')}</p>
+          </div>
+        </section>
+
+        {/* ---- Why Pre-Register + Founding (Sections 8+9 merged) ---- */}
+        <section className={`${s.section} ${s.sectionDark}`}>
+          <div className={s.shell}>
+            <div className={s.sectionHeader}>
+              <span className={s.eyebrow}>{t('earlyAccess.eyebrow')}</span>
+              <h2 className={s.sectionTitle}>{t('earlyAccess.title')}</h2>
+              <p className={s.sectionBody}>{t('earlyAccess.body')}</p>
+            </div>
+            <div className={s.benefitsGrid}>
+              {Array.from({ length: 5 }, (_, i) => (
+                <div key={i} className={s.benefitItem}>
+                  <Check className={s.benefitCheck} />
+                  <span>{t(`earlyAccess.benefits.${i}`)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ---- FAQ (Section 10) ---- */}
+        <section className={`${s.section} ${s.sectionAlt}`}>
+          <div className={s.shell}>
+            <div className={s.sectionHeader}>
+              <span className={s.eyebrow}>{t('faq.eyebrow')}</span>
+              <h2 className={s.sectionTitle}>{t('faq.title')}</h2>
+            </div>
+            <div className={s.faqGrid}>
+              {Array.from({ length: 5 }, (_, i) => (
+                <div key={i} className={s.faqCard}>
+                  <h3 className={s.faqQ}>{t(`faq.items.${i}.q`)}</h3>
+                  <p className={s.faqA}>{t(`faq.items.${i}.a`)}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ---- Final CTA (Section 11) ---- */}
+        <section id="pre-register" className={`${s.section} ${s.sectionCta}`}>
+          <div className={s.shell}>
+            <div className={s.ctaPanel}>
+              <div className={s.ctaPanelGlow} aria-hidden="true" />
+              <div className={s.ctaStack}>
+                <SiteReveal delay={0.05}>
+                  <span className={s.ctaEyebrow}>
+                    <span className={s.ctaEyebrowDot} />
+                    {t('finalCta.eyebrow')}
+                  </span>
+                  <h2 className={s.ctaTitle}>{t('finalCta.title')}</h2>
+                </SiteReveal>
+
+                <SiteReveal delay={0.12}>
+                  <p className={s.ctaBody}>{t('finalCta.body')}</p>
+                </SiteReveal>
+
+                <SiteReveal delay={0.19}>
+                  <div className={s.ctaFormWrap}>
+                    <p className={s.formHeadline}>{t('finalCta.formHeadline')}</p>
+                    <p className={s.formSubline}>{t('finalCta.formSubline')}</p>
+                    <button
+                      onClick={() => openForm()}
+                      className={s.btnPrimary}
+                      type="button"
+                    >
+                      {t('finalCta.ctaButton')}
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                    <p className={s.formCtaMeta}>{t('finalCta.formCtaMeta')}</p>
+                  </div>
+                </SiteReveal>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </main>
     </div>
   )
