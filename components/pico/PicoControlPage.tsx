@@ -18,6 +18,15 @@ type SectionResult = {
   error: string | null;
 };
 
+type ActionReceipt = {
+  id: string;
+  title: string;
+  summary: string;
+  detail: string;
+  nextLabel?: string;
+  nextHref?: string;
+};
+
 const endpoints = [
   ["assistant", "/api/dashboard/assistant/overview"],
   ["runs", "/api/dashboard/runs"],
@@ -138,6 +147,7 @@ export function PicoControlPage() {
   const [deploying, setDeploying] = useState(false);
   const [deployError, setDeployError] = useState<string | null>(null);
   const [deployReceipt, setDeployReceipt] = useState<Record<string, unknown> | null>(null);
+  const [actionReceipts, setActionReceipts] = useState<ActionReceipt[]>([]);
   const [thresholdInput, setThresholdInput] = useState("50");
   const [thresholdMessage, setThresholdMessage] = useState<string | null>(null);
   const [approvalMessage, setApprovalMessage] = useState<string | null>(null);
@@ -224,6 +234,10 @@ export function PicoControlPage() {
       ? "Grounded tutor is unmetered for this plan flag in the current build."
       : `${picoState.tutorAccess.used}/${picoState.tutorAccess.limit} grounded tutor lookups used, ${picoState.tutorAccess.remaining} remaining.`;
 
+  function pushReceipt(receipt: ActionReceipt) {
+    setActionReceipts((current) => [receipt, ...current.filter((item) => item.id !== receipt.id)].slice(0, 3));
+  }
+
   async function handleDeployStarter() {
     setDeploying(true);
     setDeployError(null);
@@ -248,6 +262,16 @@ export function PicoControlPage() {
       }
 
       setDeployReceipt(isRecord(payload) ? payload : { receipt: payload });
+      const deploymentId = isRecord(payload) && isRecord(payload.deployment) ? payload.deployment.id : null;
+      const agentId = isRecord(payload) && isRecord(payload.agent) ? payload.agent.id : null;
+      pushReceipt({
+        id: `deploy-${Date.now()}`,
+        title: "Starter assistant deployed",
+        summary: `Launched ${starterName} into ${starterWorkspace}.`,
+        detail: `Agent ${String(agentId ?? "unknown")} · deployment ${String(deploymentId ?? "pending receipt")}. Next: refresh live cards and verify one real runtime signal.`,
+        nextLabel: "Review live control",
+        nextHref: `${buildPicoPath(basePath, "/control")}#assistant-overview`,
+      });
       await fetch("/api/pico/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -286,6 +310,14 @@ export function PicoControlPage() {
 
     await refreshPicoState();
     setThresholdMessage(`Soft threshold saved at ${threshold}. This is a Pico operator guardrail, not hard budget enforcement.`);
+    pushReceipt({
+      id: `threshold-${threshold}`,
+      title: "Threshold updated",
+      summary: `Control threshold saved at ${threshold}.`,
+      detail: "This is a visible Pico guardrail. Next: watch the live budget card and decide whether the current line in the sand is too loose.",
+      nextLabel: "Review budget",
+      nextHref: `${buildPicoPath(basePath, "/control")}#budget-card`,
+    });
   }
 
   async function handleEnableApprovalGate() {
@@ -318,7 +350,16 @@ export function PicoControlPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ event: "approval_gate_enabled", metadata: { action_type: "external_send" } }),
     }).catch(() => null);
+    const approvalId = isRecord(payload) ? payload.id : null;
     setApprovalMessage("Approval gate request created. Review the pending approvals panel below.");
+    pushReceipt({
+      id: `approval-${Date.now()}`,
+      title: "Approval request created",
+      summary: `A risky outbound action is now waiting for a human click.`,
+      detail: `Request ${String(approvalId ?? "pending")} created for external_send. Next: review the pending approvals panel and resolve it deliberately.`,
+      nextLabel: "Review approvals",
+      nextHref: `${buildPicoPath(basePath, "/control")}#approvals-card`,
+    });
     await Promise.all([refresh(), refreshPicoState()]);
   }
 
@@ -445,7 +486,7 @@ export function PicoControlPage() {
               <button
                 type="button"
                 onClick={() => void handleSetThreshold()}
-                className="rounded-full bg-cyan-300 px-4 py-3 text-sm font-semibold text-slate-950"
+                className={`${picoPrimaryButtonClass} px-4 py-3`}
               >
                 Save threshold
               </button>
@@ -463,7 +504,7 @@ export function PicoControlPage() {
             <button
               type="button"
               onClick={() => void handleEnableApprovalGate()}
-              className="mt-4 rounded-full bg-cyan-300 px-4 py-3 text-sm font-semibold text-slate-950"
+              className={`mt-4 ${picoPrimaryButtonClass} px-4 py-3`}
             >
               {approvalGateEnabled ? "Create another pending approval" : "Enable approval gate"}
             </button>
@@ -473,7 +514,34 @@ export function PicoControlPage() {
         </section>
       ) : null}
 
+      {actionReceipts.length > 0 ? (
+        <section className={`${picoSurfaceClass} p-6`}>
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className={picoSectionLabelClass}>Operator receipts</p>
+              <h2 className="mt-2 text-2xl font-semibold text-white">The last few control changes that actually landed</h2>
+            </div>
+            <p className="text-sm text-white/50">If a control action matters, it should leave a receipt.</p>
+          </div>
+          <div className="mt-5 grid gap-4 xl:grid-cols-3">
+            {actionReceipts.map((receipt) => (
+              <div key={receipt.id} className={`${picoSurfaceInsetClass} p-4`}>
+                <p className="text-sm font-semibold text-white">{receipt.title}</p>
+                <p className="mt-2 text-sm text-cyan-100/90">{receipt.summary}</p>
+                <p className="mt-3 text-sm leading-6 text-white/60">{receipt.detail}</p>
+                {receipt.nextHref && receipt.nextLabel ? (
+                  <Link href={receipt.nextHref} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-cyan-100">
+                    {receipt.nextLabel} <RefreshCw className="h-4 w-4" />
+                  </Link>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <div className="grid gap-5 xl:grid-cols-2">
+        <div id="assistant-overview">
         <SectionCard title="Assistant overview" section={sections.assistant}>
           {assistantRuntime ? (
             <div className="space-y-2">
@@ -490,6 +558,7 @@ export function PicoControlPage() {
             <p>No assistant runtime is currently available for this operator session.</p>
           )}
         </SectionCard>
+        </div>
 
         <SectionCard title="Recent runs" section={sections.runs}>
           <p>
@@ -523,6 +592,7 @@ export function PicoControlPage() {
           </ul>
         </SectionCard>
 
+        <div id="budget-card">
         <SectionCard title="Budget" section={sections.budget}>
           <p>Plan: {String(budget?.plan ?? planLabel)}</p>
           <p>
@@ -545,6 +615,7 @@ export function PicoControlPage() {
             )}
           </ul>
         </SectionCard>
+        </div>
 
         <SectionCard title="Runtime" section={sections.runtime}>
           <p>Provider: {String(runtime?.label ?? runtime?.provider ?? "openclaw")}</p>
@@ -554,6 +625,7 @@ export function PicoControlPage() {
           <p>Gateway URL: {String(runtime?.gateway_url ?? "not set")}</p>
         </SectionCard>
 
+        <div id="approvals-card">
         <SectionCard title="Approvals" section={sections.approvals}>
           <p>Pending approvals returned: {approvals.length}</p>
           <ul className="mt-3 space-y-2 text-white/60">
@@ -567,6 +639,7 @@ export function PicoControlPage() {
             })}
           </ul>
         </SectionCard>
+        </div>
 
         <SectionCard title="Health" section={sections.health}>
           <p>Status: {String(health?.status ?? "unknown")}</p>

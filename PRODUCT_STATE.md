@@ -239,3 +239,24 @@ What is next
 - Tighten Pico control receipts further so starter deploy, threshold save, and approval creation all feel equally explicit.
 - Sweep any remaining copy drift between Pico route copy and the underlying authenticated destinations.
 
+### 2026-04-11 03:34:11 CEST — Control receipts hardened
+What changed
+- Added a real operator-receipts strip to Pico Control so deploy, threshold, and approval actions leave explicit visible proof instead of vanishing into the page.
+- Upgraded starter deploy feedback from a generic success line into a receipt with assistant/deployment context and a direct next review link.
+- Upgraded threshold saves into a receipt tied to the saved value and the next budget review step.
+- Upgraded approval creation into a receipt that points straight at the pending approvals panel instead of just saying "something happened below".
+- Kept refresh resilient under partial fetch failure and preserved the existing live control-plane bridge.
+
+What was tested
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
+
+What failed
+- No blocking Pico failures remain in this slice.
+- Existing repo-level Next/Turbopack warnings remain non-blocking.
+
+What is next
+- Tighten the lower live-data cards so Assistant, Budget, and Approvals scan faster under pressure.
+- Sweep any remaining copy that still sounds like framework plumbing instead of operator product language.
+

@@ -32,6 +32,7 @@ Ship the narrowest honest PicoMUTX product loop that gets a user from signup to 
 - [completed] Reduce early churn on Start, Lesson, Support, and Control surfaces.
 - [completed] Tighten Academy hierarchy so the next lesson dominates the page.
 - [completed] Wrap Pico auth routes in the same visual language as the rest of the product.
+- [completed] Add explicit control receipts for deploy, threshold, and approval actions.
 
 ## Architecture direction
 - Keep Pico on pico.mutx.dev and build only inside the existing app/pico/* route family.
