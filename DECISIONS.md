@@ -46,3 +46,9 @@ Decision: Reject parallel locale churn unless it is validated and intentionally 
 Why:
 - Bad translation churn creates a second public truth.
 - English-first truth is better than multilingual nonsense.
+
+## 2026-04-11 03:29:00 CEST
+Decision: Pico milestones must unlock the next capability, and live runs must always point at one concrete improvement move.
+Why:
+- The product loop dies when lessons end in celebration screens instead of action.
+- Habit-forming motion comes from real outputs feeding the next build, control, or troubleshooting step.

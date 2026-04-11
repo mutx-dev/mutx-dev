@@ -72,6 +72,58 @@ export function PicoAcademyDashboard() {
         />
       </div>
 
+      <section className="mt-6 grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
+        <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Capability unlocks</p>
+              <h2 className="mt-2 text-2xl font-semibold text-white">Milestones should open the next real move</h2>
+            </div>
+            <Link href={toHref('/autopilot')} className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
+              Open autopilot
+            </Link>
+          </div>
+          <div className="mt-5 grid gap-4 xl:grid-cols-2">
+            <div className="rounded-[24px] border border-white/10 bg-white/5 p-5">
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Latest unlocks</p>
+              <div className="mt-3 space-y-3">
+                {derived.unlockedCapabilities.length === 0 ? (
+                  <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4 text-sm text-slate-300">
+                    Finish the first real lesson and the next capability will unlock here.
+                  </div>
+                ) : (
+                  derived.unlockedCapabilities.slice(-2).reverse().map((capability) => (
+                    <div key={capability.id} className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4 text-sm text-emerald-50">
+                      <p className="font-medium text-white">{capability.title}</p>
+                      <p className="mt-2">{capability.description}</p>
+                      <Link href={toHref(capability.href)} className="mt-3 inline-flex rounded-full bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950">
+                        {capability.actionLabel}
+                      </Link>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="rounded-[24px] border border-white/10 bg-white/5 p-5">
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Next capability</p>
+              {derived.nextCapability ? (
+                <>
+                  <h3 className="mt-3 text-lg font-semibold text-white">{derived.nextCapability.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">{derived.nextCapability.description}</p>
+                  <Link href={toHref(derived.nextCapability.href)} className="mt-4 inline-flex rounded-full border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-2 text-sm font-medium text-slate-200">
+                    {derived.nextCapability.actionLabel}
+                  </Link>
+                </>
+              ) : (
+                <p className="mt-3 text-sm leading-6 text-slate-300">
+                  All current capabilities are unlocked. Keep shipping deeper patterns instead of collecting badges like Pokemon cards.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="mt-6 grid gap-6 lg:grid-cols-[1.4fr,0.8fr]">
         <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
           <div className="flex items-center justify-between gap-4">

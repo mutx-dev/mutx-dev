@@ -3,6 +3,7 @@ import {
   createDefaultPicoProgress,
   derivePicoProgress,
   getLessonBySlug,
+  getPostLessonAction,
   mergePicoProgress,
   selectTrack,
 } from '../../lib/pico/academy'
@@ -34,6 +35,29 @@ describe('pico academy progress', () => {
     const derived = derivePicoProgress(selected)
 
     expect(derived.nextLesson?.slug).toBe('deploy-hermes-on-a-vps')
+  })
+
+
+  it('unlocks the next capability after real milestones land', () => {
+    let progress = createDefaultPicoProgress()
+    progress = applyLessonCompleted(progress, 'run-your-first-agent')
+
+    const derived = derivePicoProgress(progress)
+
+    expect(derived.unlockedCapabilities.map((capability) => capability.unlockEvent)).toEqual(
+      expect.arrayContaining(['first_tutorial_completed', 'first_agent_run']),
+    )
+    expect(derived.nextCapability?.unlockEvent).toBe('successful_deployment')
+  })
+
+  it('pushes completed lessons into the next real action', () => {
+    let progress = createDefaultPicoProgress()
+    progress = applyLessonCompleted(progress, 'run-your-first-agent')
+
+    const action = getPostLessonAction('run-your-first-agent', progress)
+
+    expect(action.href).toBe('/academy/deploy-hermes-on-a-vps')
+    expect(action.actionLabel).toMatch(/Deploy|Start/)
   })
 
   it('keeps local progress when remote auth state is still empty', () => {

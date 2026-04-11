@@ -32,10 +32,10 @@ Canonical product docs:
 
 PicoMUTX is the narrow honest loop:
 - academy with 7 levels, 5 tracks, and 12 real lessons
-- persistent progress with XP, badges, unlocks, and local-plus-auth sync
+- persistent progress with XP, badges, milestone-driven capability unlocks, and local-plus-auth sync
 - grounded tutor using the shipped lesson corpus
 - support shell with real human escalation
-- autopilot page using real MUTX runs, alerts, budgets, and approvals
+- autopilot page using real MUTX runs, alerts, budgets, approvals, and next-improvement prompts tied to live actions
 - simple plan gating without pretending billing is finished
 
 It is not a fake community clone, not a no-code builder, and not a dashboard full of pretend telemetry.
@@ -221,3 +221,23 @@ What failed
 What is next
 - Commit this truth-alignment slice.
 - If we want multilingual polish instead of English fallbacks on the live CTA/contact paths, do a deliberate locale sweep rather than sneaking in half-translated sludge.
+
+### 2026-04-11 03:29:00 CEST — forward-motion reinforcement
+What changed
+- Added milestone-driven capability unlocks to the academy state model so progress now opens the next real product surface instead of stalling on XP alone.
+- Reworked lesson detail pages to push users into the next concrete action the moment a lesson is done.
+- Reworked live run cards in Autopilot to show the run result and one specific improvement move tied to tutor, dashboard, or the next lesson.
+- Added tutor query-prefill support so run failures can jump straight into a grounded troubleshooting prompt.
+
+What was tested
+- `npm run typecheck`
+- `npx jest --runInBand tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `npm run build`
+
+What failed
+- No Pico-specific blocker failed.
+- Existing Next/Turbopack workspace-root and NFT warnings remain environment noise.
+
+What is next
+- Tighten the run payload itself so successful runs can surface richer output summaries, not just status.
+- Keep translating each new milestone into one sharper capability unlock instead of gamification theater.

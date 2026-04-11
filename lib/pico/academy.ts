@@ -79,6 +79,23 @@ export type PicoProgressState = {
   }
 }
 
+export type PicoCapabilityUnlock = {
+  id: string
+  title: string
+  description: string
+  href: string
+  actionLabel: string
+  unlockEvent: string
+}
+
+export type PicoRealAction = {
+  id: string
+  title: string
+  description: string
+  href: string
+  actionLabel: string
+}
+
 export type PicoDerivedProgress = {
   xp: number
   currentLevel: number
@@ -88,6 +105,8 @@ export type PicoDerivedProgress = {
   badges: string[]
   unlockedLessonSlugs: string[]
   unlockedTrackSlugs: string[]
+  unlockedCapabilities: PicoCapabilityUnlock[]
+  nextCapability: PicoCapabilityUnlock | null
   nextLesson: PicoLesson | null
 }
 
@@ -361,6 +380,81 @@ export const PICO_BADGE_RULES = [
     test: (completedLessons: Set<string>) =>
       completedLessons.has('build-a-lead-response-agent') ||
       completedLessons.has('build-a-document-processing-agent'),
+  },
+] as const
+
+export const PICO_CAPABILITY_UNLOCKS: PicoCapabilityUnlock[] = [
+  {
+    id: 'cap-deploy-runtime',
+    title: 'Persistent runtime unlocked',
+    description:
+      'You proved the local loop. Next move: get the same agent onto a box that stays awake.',
+    href: '/academy/deploy-hermes-on-a-vps',
+    actionLabel: 'Deploy the runtime',
+    unlockEvent: 'first_tutorial_completed',
+  },
+  {
+    id: 'cap-live-runs',
+    title: 'Live run visibility unlocked',
+    description:
+      'A real run exists now. Open Autopilot and inspect the result before you pretend the loop is stable.',
+    href: '/autopilot',
+    actionLabel: 'Inspect live activity',
+    unlockEvent: 'first_agent_run',
+  },
+  {
+    id: 'cap-ingress',
+    title: 'Remote ingress unlocked',
+    description:
+      'The runtime lives somewhere persistent. Give it one real input path so it can do useful work.',
+    href: '/academy/connect-a-messaging-layer',
+    actionLabel: 'Connect a messaging layer',
+    unlockEvent: 'successful_deployment',
+  },
+  {
+    id: 'cap-scheduling',
+    title: 'Scheduling unlocked',
+    description:
+      'One useful skill is in place. Now run it on a cadence so the product becomes a habit.',
+    href: '/academy/create-a-scheduled-workflow',
+    actionLabel: 'Schedule the workflow',
+    unlockEvent: 'first_skill_added',
+  },
+  {
+    id: 'cap-monitoring',
+    title: 'Monitoring unlocked',
+    description:
+      'A workflow runs now. Time to watch the thing instead of hoping it behaves.',
+    href: '/academy/see-your-agent-activity',
+    actionLabel: 'See agent activity',
+    unlockEvent: 'first_workflow_built',
+  },
+  {
+    id: 'cap-cost-controls',
+    title: 'Cost control unlocked',
+    description:
+      'You can see the run history. Set a spend guardrail before volume turns into regret.',
+    href: '/academy/set-a-cost-threshold',
+    actionLabel: 'Set a cost threshold',
+    unlockEvent: 'first_monitoring_event_seen',
+  },
+  {
+    id: 'cap-approvals',
+    title: 'Approval gates unlocked',
+    description:
+      'Budget awareness is live. Add a human stop before risky outbound actions happen for real.',
+    href: '/academy/add-an-approval-gate',
+    actionLabel: 'Add an approval gate',
+    unlockEvent: 'first_alert_configured',
+  },
+  {
+    id: 'cap-production-pattern',
+    title: 'Production pattern unlocked',
+    description:
+      'The guardrail is in place. Ship a workflow that looks like a product, not a prompt trick.',
+    href: '/academy/build-a-document-processing-agent',
+    actionLabel: 'Ship the production pattern',
+    unlockEvent: 'first_approval_gate_enabled',
   },
 ] as const
 
@@ -918,6 +1012,12 @@ export function derivePicoProgress(progressInput: Partial<PicoProgressState> | n
     (rule) => rule.label
   )
 
+  const unlockedCapabilities = PICO_CAPABILITY_UNLOCKS.filter((capability) =>
+    milestoneEvents.has(capability.unlockEvent)
+  )
+  const nextCapability =
+    PICO_CAPABILITY_UNLOCKS.find((capability) => !milestoneEvents.has(capability.unlockEvent)) ?? null
+
   const currentLevel = PICO_LEVELS.reduce((level, item) => {
     const levelComplete = getLessonsForLevel(item.id).every((lesson) => completedLessons.has(lesson.slug))
     return levelComplete ? item.id : level
@@ -943,6 +1043,8 @@ export function derivePicoProgress(progressInput: Partial<PicoProgressState> | n
     badges,
     unlockedLessonSlugs,
     unlockedTrackSlugs,
+    unlockedCapabilities,
+    nextCapability,
     nextLesson,
   }
 }
@@ -1090,6 +1192,52 @@ export function markProjectShared(progressInput: Partial<PicoProgressState>, pro
     updatedAt: new Date().toISOString(),
   })
   return next
+}
+
+export function getCapabilityUnlocksForProgress(
+  progressInput: Partial<PicoProgressState> | null | undefined
+) {
+  return derivePicoProgress(progressInput).unlockedCapabilities
+}
+
+export function getPostLessonAction(
+  lessonSlug: string,
+  progressInput: Partial<PicoProgressState> | null | undefined
+): PicoRealAction {
+  const lesson = getLessonBySlug(lessonSlug)
+  const progress = derivePicoProgress(progressInput)
+
+  if (lesson?.nextLesson) {
+    const nextLesson = getLessonBySlug(lesson.nextLesson)
+    if (nextLesson) {
+      return {
+        id: `lesson-${nextLesson.slug}`,
+        title: nextLesson.title,
+        description: nextLesson.summary,
+        href: `/academy/${nextLesson.slug}`,
+        actionLabel: `Start ${nextLesson.title}`,
+      }
+    }
+  }
+
+  if (progress.nextCapability) {
+    return {
+      id: progress.nextCapability.id,
+      title: progress.nextCapability.title,
+      description: progress.nextCapability.description,
+      href: progress.nextCapability.href,
+      actionLabel: progress.nextCapability.actionLabel,
+    }
+  }
+
+  return {
+    id: 'open-autopilot',
+    title: 'Inspect the live control loop',
+    description:
+      'Open Autopilot and verify the result, budget, and approvals before you call the workflow done.',
+    href: '/autopilot',
+    actionLabel: 'Open Autopilot',
+  }
 }
 
 export function searchLessonCorpus(query: string) {

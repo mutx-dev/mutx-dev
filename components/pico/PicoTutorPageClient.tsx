@@ -1,7 +1,8 @@
 'use client'
 
-import { FormEvent, useMemo, useState } from 'react'
+import { FormEvent, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
@@ -47,6 +48,7 @@ function resolveTutorHref(toHref: ReturnType<typeof usePicoHref>, href: string) 
 export function PicoTutorPageClient() {
   const { progress, actions } = usePicoProgress()
   const toHref = usePicoHref()
+  const searchParams = useSearchParams()
   const [question, setQuestion] = useState('')
   const [lessonSlug, setLessonSlug] = useState(progress.selectedTrack ? PICO_LESSONS.find((lesson) => lesson.track === progress.selectedTrack)?.slug ?? '' : '')
   const [loading, setLoading] = useState(false)
@@ -54,6 +56,19 @@ export function PicoTutorPageClient() {
   const [answer, setAnswer] = useState<PicoTutorAnswer | null>(null)
   const [reply, setReply] = useState<PicoTutorReply | null>(null)
   const availableLessons = useMemo(() => PICO_LESSONS, [])
+
+  useEffect(() => {
+    const presetQuestion = searchParams.get('q')
+    const presetLesson = searchParams.get('lesson')
+
+    if (presetQuestion && !question.trim()) {
+      setQuestion(presetQuestion)
+    }
+
+    if (presetLesson && availableLessons.some((lesson) => lesson.slug === presetLesson) && !lessonSlug) {
+      setLessonSlug(presetLesson)
+    }
+  }, [availableLessons, lessonSlug, question, searchParams])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()

@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
-import { getLessonBySlug, type PicoLesson } from '@/lib/pico/academy'
+import { getLessonBySlug, getPostLessonAction, type PicoLesson } from '@/lib/pico/academy'
 import { usePicoHref } from '@/lib/pico/navigation'
 
 type PicoLessonDetailProps = {
@@ -17,6 +17,10 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
   const completed = progress.completedLessons.includes(lesson.slug)
   const unlocked = derived.unlockedLessonSlugs.includes(lesson.slug)
   const nextLesson = lesson.nextLesson ? getLessonBySlug(lesson.nextLesson) : null
+  const postLessonAction = getPostLessonAction(lesson.slug, progress)
+  const unlockedByThisLesson = derived.unlockedCapabilities.filter((capability) =>
+    (lesson.milestoneEvents ?? []).includes(capability.unlockEvent)
+  )
 
   return (
     <PicoShell
@@ -122,27 +126,53 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
 
           <section className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Next</p>
+            <h2 className="mt-2 text-lg font-semibold text-white">
+              {completed ? 'Do this real action now' : 'When this lesson is done'}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-300">{postLessonAction.description}</p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link
+                href={toHref(postLessonAction.href)}
+                className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
+              >
+                {postLessonAction.actionLabel}
+              </Link>
+              <Link
+                href={toHref('/tutor')}
+                className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200"
+              >
+                Ask tutor
+              </Link>
+            </div>
             {nextLesson ? (
-              <>
-                <h2 className="mt-2 text-lg font-semibold text-white">{nextLesson.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-300">{nextLesson.summary}</p>
-                <div className="mt-4 flex gap-3">
-                  <Link href={toHref(`/academy/${nextLesson.slug}`)} className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
-                    Open next lesson
-                  </Link>
-                  <Link href={toHref('/tutor')} className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
-                    Ask tutor
-                  </Link>
-                </div>
-              </>
+              <p className="mt-4 text-sm leading-6 text-slate-300">
+                Current sequence: this lesson leads into {nextLesson.title}. No fake loop. Just the next useful move.
+              </p>
             ) : (
-              <>
-                <p className="mt-2 text-sm text-slate-300">You are at the end of this branch. Open Autopilot and inspect what the runtime is doing.</p>
-                <Link href={toHref('/autopilot')} className="mt-4 inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
-                  Open autopilot
-                </Link>
-              </>
+              <p className="mt-4 text-sm leading-6 text-slate-300">
+                End of branch means you inspect the live system and improve the workflow, not that you stop moving.
+              </p>
             )}
+            {unlockedByThisLesson.length ? (
+              <div className="mt-5 space-y-3">
+                {unlockedByThisLesson.map((capability) => (
+                  <div
+                    key={capability.id}
+                    className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4 text-sm text-emerald-50"
+                  >
+                    <p className="text-xs uppercase tracking-[0.18em] text-emerald-100">Capability unlocked</p>
+                    <p className="mt-2 font-medium text-white">{capability.title}</p>
+                    <p className="mt-2">{capability.description}</p>
+                    <Link
+                      href={toHref(capability.href)}
+                      className="mt-3 inline-flex rounded-full bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950"
+                    >
+                      {capability.actionLabel}
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </section>
         </aside>
       </div>

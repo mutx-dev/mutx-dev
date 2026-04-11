@@ -5,14 +5,18 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
-import { PICO_PLAN_MATRIX } from '@/lib/pico/academy'
+import { PICO_PLAN_MATRIX, getLessonBySlug } from '@/lib/pico/academy'
+import { usePicoHref } from '@/lib/pico/navigation'
 
 type RunSummary = {
   id: string
   status: string
   started_at?: string
   completed_at?: string
+  created_at?: string
   agent_id?: string
+  error_message?: string | null
+  output_text?: string | null
 }
 
 type BudgetSummary = {
@@ -81,8 +85,76 @@ function formatPercent(value: number) {
   return `${Math.round(value)}%`
 }
 
+function humanizeRunStatus(status: string) {
+  return status.replace(/[_-]+/g, ' ').toLowerCase().replace(/\w/g, (char) => char.toUpperCase())
+}
+
+function describeRunResult(run: RunSummary) {
+  if (run.error_message?.trim()) return run.error_message
+  if (run.output_text?.trim()) return run.output_text
+  if (['FAILED', 'ERROR', 'CANCELLED'].includes(run.status.toUpperCase())) {
+    return 'This run ended badly. Open the failure path and make one deliberate fix.'
+  }
+  if (['RUNNING', 'QUEUED', 'PENDING'].includes(run.status.toUpperCase())) {
+    return 'The run is still moving. Read the live state before you touch config.'
+  }
+  return 'The run completed. Verify the output was useful, not just technically done.'
+}
+
+function getRunImprovement(run: RunSummary, completedLessons: string[]) {
+  const status = run.status.toUpperCase()
+
+  if (['FAILED', 'ERROR', 'CANCELLED'].includes(status)) {
+    const params = new URLSearchParams({
+      q: `Latest run ${run.id} failed. Status: ${run.status}. Result: ${describeRunResult(run)}. What should I do next?`,
+    })
+    return {
+      title: 'Turn the failure into the next fix',
+      description: 'Send the exact failure signal to the tutor, then change one thing on purpose.',
+      href: `/tutor?${params.toString()}`,
+      actionLabel: 'Ask tutor with this failure',
+    }
+  }
+
+  if (['RUNNING', 'QUEUED', 'PENDING'].includes(status)) {
+    return {
+      title: 'Inspect live traces before changing anything',
+      description: 'The run is still active. Read the live execution view first so you improve the real bottleneck.',
+      href: '/dashboard/runs',
+      actionLabel: 'Inspect live runs',
+    }
+  }
+
+  const nextLessonSlug =
+    !completedLessons.includes('see-your-agent-activity')
+      ? 'see-your-agent-activity'
+      : !completedLessons.includes('set-a-cost-threshold')
+        ? 'set-a-cost-threshold'
+        : !completedLessons.includes('add-an-approval-gate')
+          ? 'add-an-approval-gate'
+          : !completedLessons.includes('build-a-document-processing-agent')
+            ? 'build-a-document-processing-agent'
+            : 'build-a-lead-response-agent'
+  const nextLesson = getLessonBySlug(nextLessonSlug)
+
+  return nextLesson
+    ? {
+        title: `Use this run to unlock ${nextLesson.title}`,
+        description: nextLesson.summary,
+        href: `/academy/${nextLesson.slug}`,
+        actionLabel: `Open ${nextLesson.title}`,
+      }
+    : {
+        title: 'Bring the result into support',
+        description: 'The obvious path is exhausted. Review the run with a human and pick the next stronger pattern.',
+        href: '/support',
+        actionLabel: 'Open support lane',
+      }
+}
+
 export function PicoAutopilotPageClient() {
   const { progress, actions } = usePicoProgress()
+  const toHref = usePicoHref()
   const [runs, setRuns] = useState<RunSummary[]>([])
   const [budget, setBudget] = useState<BudgetSummary | null>(null)
   const [alerts, setAlerts] = useState<AlertSummary[]>([])
@@ -130,6 +202,9 @@ export function PicoAutopilotPageClient() {
       setAlerts(Array.isArray(alertsPayload?.items) ? alertsPayload.items : [])
       setApprovals(Array.isArray(approvalsPayload) ? approvalsPayload : [])
       setAuthRequired(false)
+      if (Array.isArray(runsPayload?.items) && runsPayload.items.length > 0) {
+        actions.unlockMilestone('first_agent_run')
+      }
       if ((Array.isArray(runsPayload?.items) && runsPayload.items.length > 0) || (Array.isArray(alertsPayload?.items) && alertsPayload.items.length > 0)) {
         actions.unlockMilestone('first_monitoring_event_seen')
       }
@@ -445,16 +520,41 @@ export function PicoAutopilotPageClient() {
               <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">Loading live MUTX signals...</div>
             ) : (
               <div className="mt-4 space-y-3">
-                {runs.slice(0, 3).map((run) => (
-                  <div key={run.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                    <p className="font-medium text-white">Run {run.id}</p>
-                    <p className="mt-1">Status: {run.status}</p>
-                    <p className="mt-1">Started: {run.started_at ?? 'n/a'}</p>
-                    <Link href="/dashboard/runs" className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
-                      Inspect runs in MUTX dashboard
-                    </Link>
-                  </div>
-                ))}
+                {runs.slice(0, 3).map((run) => {
+                  const improvement = getRunImprovement(run, progress.completedLessons)
+                  const improvementHref = improvement.href.startsWith('/dashboard')
+                    ? improvement.href
+                    : toHref(improvement.href)
+                  return (
+                    <div key={run.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-medium text-white">Run {run.id}</p>
+                          <p className="mt-1">Status: {humanizeRunStatus(run.status)}</p>
+                        </div>
+                        <Link href="/dashboard/runs" className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
+                          Open run history
+                        </Link>
+                      </div>
+                      <div className="mt-3 grid gap-3 md:grid-cols-2">
+                        <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
+                          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Result</p>
+                          <p className="mt-2">{describeRunResult(run)}</p>
+                        </div>
+                        <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4 text-emerald-50">
+                          <p className="text-xs uppercase tracking-[0.18em] text-emerald-100">Improve next</p>
+                          <p className="mt-2">{improvement.description}</p>
+                          <Link href={improvementHref} className="mt-3 inline-flex rounded-full bg-emerald-300 px-4 py-2 text-sm font-semibold text-slate-950">
+                            {improvement.actionLabel}
+                          </Link>
+                        </div>
+                      </div>
+                      <p className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-500">
+                        Started: {run.started_at ?? run.created_at ?? 'n/a'}
+                      </p>
+                    </div>
+                  )
+                })}
                 {alerts.slice(0, 3).map((alert) => (
                   <div key={alert.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
                     <p className="font-medium text-white">{alert.type}</p>
