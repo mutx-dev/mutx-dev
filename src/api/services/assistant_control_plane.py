@@ -590,7 +590,9 @@ def _load_sessions_from_json_store(
             )
             total_tokens = entry.get("totalTokens")
             if total_tokens is None:
-                total_tokens = int(entry.get("inputTokens") or 0) + int(entry.get("outputTokens") or 0)
+                total_tokens = int(entry.get("inputTokens") or 0) + int(
+                    entry.get("outputTokens") or 0
+                )
 
             raw = {
                 "id": entry.get("sessionId") or f"{agent_name}:{key}",

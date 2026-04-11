@@ -328,7 +328,9 @@ async def similarity_search(
 
         if store is None:
             settings_cfg = get_settings()
-            db_url = os.environ.get("DATABASE_URL") or settings_cfg.database_url or "sqlite:///:memory:"
+            db_url = (
+                os.environ.get("DATABASE_URL") or settings_cfg.database_url or "sqlite:///:memory:"
+            )
             config = VectorStoreConfig(
                 database_url=db_url,
                 embedding_provider=EmbeddingProvider.OPENAI,
