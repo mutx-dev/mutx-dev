@@ -198,3 +198,24 @@ What is next
 - Keep tightening Academy hierarchy so the lesson list and next recommended action dominate over secondary progress chrome.
 - Add a cleaner auth wrapper for Pico login/register so trust does not dip at the account boundary.
 
+### 2026-04-11 03:23:12 CEST — Academy hierarchy cleanup
+What changed
+- Rebuilt the Academy page hierarchy around one dominant next action instead of opening with a wall of secondary progress chrome.
+- Moved the lesson list up so the user sees the actual work immediately after the recommended next lesson.
+- Promoted the next lesson into a strong action card with deliverable, why-it-matters, and prerequisites.
+- Demoted tracks, badges, and recent activity into lower supporting sections so the page reads like a path, not an analytics dashboard.
+- Tightened lesson cards so recommended vs completed vs queued states are visually obvious in one scan.
+
+What was tested
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
+
+What failed
+- No blocking Pico failures remain in this slice.
+- Existing repo-level Next/Turbopack warnings remain non-blocking.
+
+What is next
+- Wrap Pico login/register in the same shell so the auth boundary stops feeling like a different product.
+- Keep tightening Control and Academy receipts where real progress happens.
+
