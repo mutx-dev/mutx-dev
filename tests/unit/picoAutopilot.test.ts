@@ -11,6 +11,11 @@ import {
 } from '../../components/pico/picoAutopilot'
 
 describe('pico autopilot helpers', () => {
+  const expectEmptyStateTitle = (state: { title?: string }, pattern: RegExp) => {
+    expect(state.title).toEqual(expect.any(String))
+    expect(state.title).toMatch(pattern)
+  }
+
   it('prefers the stored run error when explaining a failed run', () => {
     const detail = describeRunDetail(
       {
@@ -119,7 +124,10 @@ describe('pico autopilot helpers', () => {
     })
 
     expect(status.hasLiveAgent).toBe(false)
-    expect(getRunsEmptyState(status, { label: 'Deploy next', href: '/pico/academy/deploy-hermes-on-a-vps' }).title).toMatch(/No monitored agent/i)
+    expectEmptyStateTitle(
+      getRunsEmptyState(status, { label: 'Deploy next', href: '/pico/academy/deploy-hermes-on-a-vps' }),
+      /No monitored agent/i,
+    )
   })
 
   it('distinguishes agent-without-runs from true no-agent state', () => {
@@ -143,7 +151,10 @@ describe('pico autopilot helpers', () => {
 
     expect(status.hasLiveAgent).toBe(true)
     expect(status.hasRuns).toBe(false)
-    expect(getRunsEmptyState(status, { label: 'Trigger a run', href: '/pico/academy/create-a-scheduled-workflow' }).title).toMatch(/nothing has run yet/i)
+    expectEmptyStateTitle(
+      getRunsEmptyState(status, { label: 'Trigger a run', href: '/pico/academy/create-a-scheduled-workflow' }),
+      /nothing has run yet/i,
+    )
   })
 
   it('explains no-alerts state differently once runs exist', () => {
