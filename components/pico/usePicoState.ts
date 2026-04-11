@@ -6,6 +6,7 @@ import { picoLessons } from "@/lib/pico/course";
 
 type PicoProgressState = {
   authenticated: boolean;
+  plan: string | null;
   completedLessonSlugs: string[];
   completedCount: number;
   percentComplete: number;
@@ -22,6 +23,7 @@ type PicoStateResult = {
 
 const emptyState: PicoProgressState = {
   authenticated: false,
+  plan: null,
   completedLessonSlugs: [],
   completedCount: 0,
   percentComplete: 0,
@@ -123,9 +125,11 @@ function normalizeState(payload: unknown, authenticated: boolean): PicoProgressS
   const completedLessonSlugs = collectCompletedLessons(payload);
   const completedCount = completedLessonSlugs.length;
   const percentComplete = Math.round((completedCount / picoLessons.length) * 100);
+  const plan = isRecord(payload) && typeof payload.plan === "string" ? payload.plan : null;
 
   return {
     authenticated,
+    plan,
     completedLessonSlugs,
     completedCount,
     percentComplete,

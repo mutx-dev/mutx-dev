@@ -17,6 +17,10 @@ EVENT_XP_MAP: dict[str, int] = {
     "badge_earned": 50,
     "milestone_reached": 75,
     "tutor_session_used": 10,
+    "starter_agent_deployed": 120,
+    "first_agent_run": 80,
+    "cost_threshold_set": 70,
+    "approval_gate_enabled": 90,
     "xp_granted": 0,
 }
 EVENT_ALIASES: dict[str, str] = {
@@ -35,6 +39,9 @@ EVENT_ALIASES: dict[str, str] = {
     "tutor_used": "tutor_session_used",
     "tutor_session": "tutor_session_used",
     "tutor_question_asked": "tutor_session_used",
+    "first_agent_deployed": "starter_agent_deployed",
+    "budget_threshold_set": "cost_threshold_set",
+    "approval_enabled": "approval_gate_enabled",
     "xp_awarded": "xp_granted",
 }
 

@@ -22,12 +22,14 @@ Ship the narrowest honest PicoMUTX product loop that gets a user from signup to 
 - Pico control page backed by assistant, runs, alerts, budget, runtime, and approvals data.
 - Grounded tutor/support page tied to the lesson corpus.
 - Pico auth entry routes for login/register.
+- In-product starter deploy flow via the real personal_assistant template route.
+- Soft plan-flag messaging in Pico control.
 
 ## Active tasks
 - [in_progress] Commit and handoff this foundation slice.
-- [pending] Add in-product starter deploy flow.
-- [pending] Add plan gating and tutor usage limits.
-- [pending] Add admin/content-ops capture for content gaps.
+- [pending] Turn soft plan messaging into simple enforceable limits.
+- [pending] Add admin/content-ops capture for tutor content gaps.
+- [pending] Expand the control page from summary to richer run drill-down where the data is already real.
 
 ## Architecture direction
 - Keep Pico on pico.mutx.dev and build product routes under app/pico/*.

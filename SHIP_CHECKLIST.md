@@ -6,10 +6,10 @@ Updated: 2026-04-11T00:55:00Z
 - [x] Pico has authenticated product routes beyond landing.
 - [x] Progress persists across sessions.
 - [x] 12 tutorials exist in-product.
-- [ ] At least one real deployment path exists in Pico.
+- [x] At least one real deployment path exists in Pico.
 - [x] Control page shows real operational data.
 - [x] Support page returns grounded next steps.
-- [ ] Free vs paid plan flags behave honestly.
+- [x] Free vs paid plan flags behave honestly.
 
 ## Quality checks
 - [x] No preview/demo shell is presented as shipped Pico capability.

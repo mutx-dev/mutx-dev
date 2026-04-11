@@ -72,6 +72,8 @@ What changed
 - Added Pico academy, lesson, control, support, login, and register routes under app/pico/*.
 - Added a 12-tutorial lesson corpus aligned to Levels 0-6 and Tracks A-E.
 - Added same-origin Pico API proxies plus an approvals proxy for the control page.
+- Added an in-product starter deploy card in Pico control that uses the real personal_assistant template deploy route.
+- Added soft plan-flag messaging in Pico control so free vs paid scope is visible without faking billing.
 - Updated the Pico landing CTA so it opens the product instead of dumping users into waitlist-only behavior.
 
 What was tested
@@ -84,8 +86,9 @@ What failed
 - Initial lint errors in AuthPage and PicoLandingPage. Fixed.
 - Initial Pico test expectation drift after XP changes. Fixed.
 - Root-level docs created via write_file landed in the main repo first, so they were copied into the worktree explicitly.
+- Next build still emits the existing workspace-root warning and next.config NFT warning, but the build completes successfully.
 
 What is next
 - Commit this cycle cleanly.
-- Add plan-gating behavior and one in-product deploy action.
-- Improve tutor escalation and admin/content-ops capture without inventing fake community features.
+- Improve tutor escalation and content-gap capture.
+- Tighten plan gating from soft messaging into simple enforceable limits where the underlying behavior already exists.
