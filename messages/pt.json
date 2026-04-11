@@ -15,7 +15,7 @@
       "titleAccent": "depois aprenda a confiar nele.",
       "subtitle": "PicoMUTX te da uma academia guiada, um tutor aterrado e uma camada de autopilot para colocar um agente real no ar sem se perder em quinze abas de enrolacao.",
       "cta": "Fale com o time",
-      "meta": "Abra o workspace agora - Licoes guiadas - Sinais reais de operacao"
+      "meta": "Abra o espaco de trabalho agora - Licoes guiadas - Sinais reais de operacao"
     },
     "trustBar": {
       "items": {
@@ -122,8 +122,8 @@
       "title": "O produto esta no ar. As quinas sao honestas.",
       "body": "PicoMUTX agora e um produto guiado de verdade, nao uma fantasia de lista de espera. Abra o workspace, siga as licoes, use o tutor quando travar e escale quando o problema ficar confuso demais para uma resposta rapida.",
       "benefits": {
-        "0": "Abrir o workspace agora",
-        "1": "Seguir onboarding guiado e trilhas da academia",
+        "0": "Abrir o espaco de trabalho agora",
+        "1": "Seguir introducao guiada e trilhas de aprendizagem",
         "2": "Usar um tutor aterrado em vez de adivinhar",
         "3": "Ver sinais reais de autopilot na camada de controle",
         "4": "Falar com o time quando for preciso julgamento humano"
@@ -146,8 +146,8 @@
           "a": "Agentes prácticos — o tipo que economiza tempo, suporta operações, melhora fluxos de trabalho e ajuda negócios a funcionar melhor. O foco é utilidade, nao demos de Brinquedo."
         },
         "3": {
-          "q": "Posso usar o workspace agora?",
-          "a": "Sim. O produto beta esta no ar. Use o workspace, siga as licoes e fale com o time se precisar de ajuda humana num caso mais baguncado."
+          "q": "Posso usar o espaco de trabalho agora?",
+          "a": "Sim. O produto beta esta no ar. Use o espaco de trabalho, siga as licoes e fale com o time se precisar de ajuda humana num caso mais baguncado."
         },
         "4": {
           "q": "É para empresas?",
@@ -156,13 +156,13 @@
       }
     },
     "finalCta": {
-      "eyebrow": "Workspace no ar",
+      "eyebrow": "Espaco de trabalho no ar",
       "title": "Seu agente nao precisa ficar como uma ideia inacabada.",
       "body": "Voce nao precisa de mais abas abertas. Precisa de um caminho mais claro, um tutor aterrado e sinais reais de operacao. PicoMUTX foi feito para esse momento.",
       "formHeadline": "Fale com o time da PicoMUTX",
       "formSubline": "Conte o que voce esta construindo ou onde esta doendo. A gente aponta o caminho certo.",
       "ctaButton": "Enviar mensagem",
-      "formCtaMeta": "Abra o workspace agora - Resposta humana quando necessario - Nada de teatro de onboarding falso"
+      "formCtaMeta": "Abra o espaco de trabalho agora - Resposta humana quando necessario - Nada de teatro de introducao falsa"
     },
     "contactForm": {
       "dialogLabel": "Formulario de contato",

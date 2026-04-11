@@ -15,7 +15,7 @@
       "titleAccent": "poi impara a fidarti di lui.",
       "subtitle": "PicoMUTX ti da una academy guidata, un tutor ancorato ai contenuti e un livello autopilot per far partire un agente reale senza perderti tra quindici tab di fumo.",
       "cta": "Parla con il team",
-      "meta": "Apri il workspace ora - Lezioni guidate - Segnali operativi reali"
+      "meta": "Apri l area di lavoro ora - Lezioni guidate - Segnali operativi reali"
     },
     "trustBar": {
       "items": {
@@ -122,8 +122,8 @@
       "title": "Il prodotto e live. Gli spigoli sono onesti.",
       "body": "PicoMUTX ora e un prodotto guidato reale, non una fantasia da waitlist. Apri il workspace, segui le lezioni, usa il tutor quando ti blocchi ed escalare quando il problema e troppo sporco per una risposta rapida.",
       "benefits": {
-        "0": "Apri il workspace ora",
-        "1": "Segui onboarding guidato e track dell academy",
+        "0": "Apri l area di lavoro ora",
+        "1": "Segui introduzione guidata e percorsi di apprendimento",
         "2": "Usa un tutor ancorato invece di tirare a indovinare",
         "3": "Vedi segnali autopilot reali dal livello di controllo",
         "4": "Parla con il team quando serve giudizio umano"
@@ -146,8 +146,8 @@
           "a": "Agenti pratici — quelli che fanno risparmiare tempo, supportano le operazioni, migliorano i flussi di lavoro e aiutano le aziende a funzionare meglio. Il focus e l'utilita, non demo di giocattolo."
         },
         "3": {
-          "q": "Posso usare il workspace adesso?",
-          "a": "Si. Il prodotto beta e live. Usa il workspace, segui le lezioni e contatta il team se hai bisogno di una mano umana su un caso sporco."
+          "q": "Posso usare l area di lavoro adesso?",
+          "a": "Si. Il prodotto beta e live. Usa l area di lavoro, segui le lezioni e contatta il team se hai bisogno di una mano umana su un caso sporco."
         },
         "4": {
           "q": "E per le aziende?",
@@ -156,13 +156,13 @@
       }
     },
     "finalCta": {
-      "eyebrow": "Workspace live",
+      "eyebrow": "Area di lavoro attiva",
       "title": "Il tuo agente non deve restare un idea incompleta.",
       "body": "Non ti servono piu tab aperte. Ti serve un percorso piu chiaro, un tutor ancorato e segnali operativi reali. PicoMUTX e costruito per quel momento.",
       "formHeadline": "Parla con il team PicoMUTX",
       "formSubline": "Dicci cosa stai costruendo o dove fa male. Ti portiamo sul percorso giusto.",
       "ctaButton": "Invia messaggio",
-      "formCtaMeta": "Apri il workspace ora - Risposta umana quando serve - Niente teatro di falso onboarding"
+      "formCtaMeta": "Apri l area di lavoro ora - Risposta umana quando serve - Niente teatro di falsa introduzione"
     },
     "contactForm": {
       "dialogLabel": "Modulo di contatto",

@@ -15,7 +15,7 @@
       "titleAccent": "und lernen Sie dann, ihm zu vertrauen.",
       "subtitle": "PicoMUTX gibt Ihnen eine gefuhrte Academy, einen fundierten Tutor und eine Autopilot-Ebene, damit Sie einen echten Agenten ohne fuenfzehn Tabs voller Unsinn zum Laufen bringen.",
       "cta": "Mit dem Team sprechen",
-      "meta": "Workspace jetzt oeffnen - Gefuehrte Lektionen - Echte Operatorsignale"
+      "meta": "Arbeitsbereich jetzt oeffnen - Gefuehrte Lektionen - Echte Operatorsignale"
     },
     "trustBar": {
       "items": {
@@ -122,8 +122,8 @@
       "title": "Das Produkt ist live. Die scharfen Kanten sind ehrlich.",
       "body": "PicoMUTX ist jetzt ein echtes gefuehrtes Produkt, keine Waitlist-Fantasie. Oeffnen Sie den Workspace, folgen Sie den Lektionen, nutzen Sie den Tutor, wenn Sie feststecken, und eskalieren Sie, wenn das Problem zu unordentlich fuer eine schnelle Antwort ist.",
       "benefits": {
-        "0": "Workspace jetzt oeffnen",
-        "1": "Gefuehrtem Onboarding und Academy-Tracks folgen",
+        "0": "Arbeitsbereich jetzt oeffnen",
+        "1": "Gefuehrtem Einstieg und Lernpfaden folgen",
         "2": "Einen fundierten Tutor nutzen statt zu raten",
         "3": "Echte Autopilot-Signale aus der Control-Ebene sehen",
         "4": "Mit dem Team sprechen, wenn menschliches Urteilsvermoegen noetig ist"
@@ -146,8 +146,8 @@
           "a": "Praktische — solche, die Zeit sparen, Ablaeufe unterstuetzen, Workflows verbessern und Unternehmen helfen, besser zu funktionieren. Im Fokus steht Nuetzlichkeit, nicht Spielzeug-Demos."
         },
         "3": {
-          "q": "Kann ich den Workspace jetzt nutzen?",
-          "a": "Ja. Das Beta-Produkt ist live. Nutzen Sie den Workspace, folgen Sie den Lektionen und kontaktieren Sie das Team, wenn Sie bei einem chaotischen Grenzfall menschliche Hilfe brauchen."
+          "q": "Kann ich den Arbeitsbereich jetzt nutzen?",
+          "a": "Ja. Das Beta-Produkt ist live. Nutzen Sie den Arbeitsbereich, folgen Sie den Lektionen und kontaktieren Sie das Team, wenn Sie bei einem chaotischen Grenzfall menschliche Hilfe brauchen."
         },
         "4": {
           "q": "Ist das fuer Unternehmen?",
@@ -156,13 +156,13 @@
       }
     },
     "finalCta": {
-      "eyebrow": "Workspace live",
+      "eyebrow": "Arbeitsbereich live",
       "title": "Ihr Agent muss keine halbfertige Idee bleiben.",
       "body": "Sie brauchen nicht mehr offene Tabs. Sie brauchen einen klareren Pfad, einen fundierten Tutor und echte Operatorsignale. Genau fuer diesen Moment wurde PicoMUTX gebaut.",
       "formHeadline": "Mit dem PicoMUTX-Team sprechen",
       "formSubline": "Sagen Sie uns, was Sie bauen oder wo es schmerzt. Wir zeigen Ihnen den richtigen Pfad.",
       "ctaButton": "Nachricht senden",
-      "formCtaMeta": "Workspace jetzt oeffnen - Menschliche Antwort wenn noetig - Kein falsches Onboarding-Theater"
+      "formCtaMeta": "Arbeitsbereich jetzt oeffnen - Menschliche Antwort wenn noetig - Kein falsches Einfuehrungstheater"
     },
     "contactForm": {
       "dialogLabel": "Kontaktformular",

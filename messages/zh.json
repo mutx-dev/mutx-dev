@@ -15,7 +15,7 @@
       "titleAccent": "再学会如何真正信任它。",
       "subtitle": "PicoMUTX 提供带引导的 academy、grounded tutor 和 autopilot 层，让你不用在十五个标签页的噪音里打转，也能把一个真实智能体跑起来。",
       "cta": "和团队聊聊",
-      "meta": "现在打开 workspace - 引导式课程 - 真实运营信号"
+      "meta": "现在打开工作区 - 引导式课程 - 真实运营信号"
     },
     "trustBar": {
       "items": {
@@ -122,8 +122,8 @@
       "title": "产品已经上线，锋利的边角也很诚实。",
       "body": "PicoMUTX 现在是真正可用的引导式产品，不是等待名单幻想。打开 workspace，跟着课程走，卡住时用 tutor，问题太复杂时就升级给真人。",
       "benefits": {
-        "0": "现在打开 workspace",
-        "1": "跟着引导式 onboarding 和 academy tracks 前进",
+        "0": "现在打开工作区",
+        "1": "跟着引导式起步流程和学习路径前进",
         "2": "使用 grounded tutor，而不是靠猜",
         "3": "从控制层看到真实 autopilot 信号",
         "4": "需要人工判断时和团队聊聊"
@@ -146,8 +146,8 @@
           "a": "实用型的。能省时间、能支撑运营、能改善流程、能让业务更顺的那种。重点是 usefulness，不是玩具 demo。"
         },
         "3": {
-          "q": "我现在可以使用 workspace 吗？",
-          "a": "可以。Beta 产品已经上线。你可以直接进入 workspace、跟着课程走；如果碰到棘手边界情况，就联系团队。"
+          "q": "我现在可以使用工作区吗？",
+          "a": "可以。Beta 产品已经上线。你可以直接进入工作区、跟着课程走；如果碰到棘手边界情况，就联系团队。"
         },
         "4": {
           "q": "这是给企业的吗？",
@@ -156,13 +156,13 @@
       }
     },
     "finalCta": {
-      "eyebrow": "workspace 已上线",
+      "eyebrow": "工作区已上线",
       "title": "你的智能体没必要一直停留在半成品想法阶段。",
       "body": "你不需要更多标签页。你需要更清晰的路径、grounded tutor，以及真实的运营信号。PicoMUTX 就是为这个时刻做的。",
       "formHeadline": "和 PicoMUTX 团队聊聊",
       "formSubline": "告诉我们你在做什么，或者卡在哪里。我们会把你指向正确路径。",
       "ctaButton": "发送消息",
-      "formCtaMeta": "现在打开 workspace - 需要时真人回复 - 没有假装的 onboarding 戏码"
+      "formCtaMeta": "现在打开工作区 - 需要时真人回复 - 没有假装的初始引导戏码"
     },
     "contactForm": {
       "dialogLabel": "联系表单",

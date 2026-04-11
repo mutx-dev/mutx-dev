@@ -15,7 +15,7 @@
       "titleAccent": "puis apprenez a lui faire confiance.",
       "subtitle": "PicoMUTX vous donne une academy guidee, un tuteur ancre dans le reel et une couche d autopilot pour mettre en route un vrai agent sans vous perdre dans quinze onglets de bruit.",
       "cta": "Parler a l equipe",
-      "meta": "Ouvrir le workspace maintenant - Lecons guidees - Signaux operateurs reels"
+      "meta": "Ouvrir l espace de travail maintenant - Lecons guidees - Signaux operateurs reels"
     },
     "trustBar": {
       "items": {
@@ -122,8 +122,8 @@
       "title": "Le produit est en ligne. Les angles vifs sont assumes.",
       "body": "PicoMUTX est maintenant un vrai produit guide, pas une fantaisie de liste d attente. Ouvrez le workspace, suivez les lecons, utilisez le tuteur quand vous bloquez et escaladez quand le probleme est trop flou pour une reponse rapide.",
       "benefits": {
-        "0": "Ouvrir le workspace maintenant",
-        "1": "Suivre l onboarding guide et les parcours de l academy",
+        "0": "Ouvrir l espace de travail maintenant",
+        "1": "Suivre l integration guidee et les parcours d apprentissage",
         "2": "Utiliser un tuteur ancre plutot que deviner",
         "3": "Voir les vrais signaux autopilot depuis la couche de controle",
         "4": "Parler a l equipe quand il faut du jugement humain"
@@ -146,8 +146,8 @@
           "a": "Des agents pratiques — ceux qui font gagner du temps, soutiennent les operations, ameliorent les flux de travail et aident les entreprises a mieux fonctionner. L'accent est mis sur l'utilite, pas les demos."
         },
         "3": {
-          "q": "Puis-je utiliser le workspace maintenant ?",
-          "a": "Oui. Le produit beta est en ligne. Utilisez le workspace, suivez les lecons et contactez l equipe si vous avez besoin d une aide humaine sur un cas limite difficile."
+          "q": "Puis-je utiliser l espace de travail maintenant ?",
+          "a": "Oui. Le produit beta est en ligne. Utilisez l espace de travail, suivez les lecons et contactez l equipe si vous avez besoin d une aide humaine sur un cas limite difficile."
         },
         "4": {
           "q": "Est-ce pour les entreprises ?",
@@ -156,13 +156,13 @@
       }
     },
     "finalCta": {
-      "eyebrow": "Workspace en ligne",
+      "eyebrow": "Espace de travail en ligne",
       "title": "Votre agent n a pas besoin de rester une idee inachevee.",
       "body": "Vous n avez pas besoin de plus d onglets ouverts. Vous avez besoin d un chemin plus clair, d un tuteur ancre et de vrais signaux operateurs. PicoMUTX est fait pour ce moment.",
       "formHeadline": "Parler avec l equipe PicoMUTX",
       "formSubline": "Dites-nous ce que vous construisez ou ou ca fait mal. Nous vous orienterons vers le bon chemin.",
       "ctaButton": "Envoyer un message",
-      "formCtaMeta": "Ouvrir le workspace maintenant - Reponse humaine quand necessaire - Aucun theatre de faux onboarding"
+      "formCtaMeta": "Ouvrir l espace de travail maintenant - Reponse humaine quand necessaire - Aucun theatre de fausse integration"
     },
     "contactForm": {
       "dialogLabel": "Formulaire de contact",
