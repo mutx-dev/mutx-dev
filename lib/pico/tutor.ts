@@ -1,5 +1,4 @@
 import { picoLessons, picoTracks } from '@/lib/pico/catalog'
-import { PICO_LESSON_MAP } from '@/lib/pico/content'
 
 export type PicoTutorAnswer = {
   answer: string
@@ -30,28 +29,8 @@ export type PicoTutorReply = {
 
 const supportEscalation = {
   label: 'Support',
-  href: '/support',
+  href: '/pico/support',
   sourcePath: 'support.md',
-}
-
-const legacyLessonIdBySlug: Record<string, string> = {
-  'install-hermes-locally': 'install-hermes-locally',
-  'run-your-first-agent': 'run-first-agent',
-  'deploy-hermes-on-a-vps': 'deploy-hermes-vps',
-  'keep-your-agent-alive': 'keep-agent-alive',
-  'connect-a-messaging-layer': 'connect-interface-layer',
-  'add-your-first-skill-tool': 'add-first-skill-tool',
-  'create-a-scheduled-workflow': 'create-scheduled-workflow',
-  'see-your-agent-activity': 'see-agent-activity',
-  'set-a-cost-threshold': 'set-cost-threshold',
-  'add-an-approval-gate': 'add-approval-gate',
-  'build-a-lead-response-agent': 'build-lead-response-agent',
-  'build-a-document-processing-agent': 'build-document-processing-agent',
-}
-
-function resolveLegacyLessonId(slug: string, fallbackId: string) {
-  const legacyId = legacyLessonIdBySlug[slug] ?? fallbackId
-  return legacyId in PICO_LESSON_MAP ? legacyId : fallbackId
 }
 
 function tokenize(value: string) {
@@ -63,16 +42,18 @@ function tokenize(value: string) {
 }
 
 function scoreLesson(question: string, lesson: (typeof picoLessons)[number]) {
-  const haystack = tokenize([
-    lesson.title,
-    lesson.summary,
-    lesson.objective,
-    lesson.outcome,
-    ...lesson.prerequisites,
-    ...lesson.validation,
-    ...lesson.troubleshooting,
-    ...lesson.steps.map((step) => `${step.title} ${step.body}`),
-  ].join(' '))
+  const haystack = tokenize(
+    [
+      lesson.title,
+      lesson.summary,
+      lesson.objective,
+      lesson.outcome,
+      ...lesson.prerequisites,
+      ...lesson.validation,
+      ...lesson.troubleshooting,
+      ...lesson.steps.map((step) => `${step.title} ${step.body}`),
+    ].join(' '),
+  )
   const needle = tokenize(question)
   let score = 0
   for (const token of needle) {
@@ -126,10 +107,7 @@ export function answerPicoTutorQuestion(question: string): PicoTutorAnswer {
   }
 
   const primary = topLessons[0]
-  const nextActions = [
-    ...primary.validation.slice(0, 2),
-    ...primary.troubleshooting.slice(0, 1),
-  ]
+  const nextActions = [...primary.validation.slice(0, 2), ...primary.troubleshooting.slice(0, 1)]
 
   if (mentionsInstall) {
     nextActions.unshift('Use the quickstart and CLI docs as ground truth before changing anything else.')
@@ -165,10 +143,7 @@ export function answerPicoTutorQuestion(question: string): PicoTutorAnswer {
   }
 }
 
-export function answerTutorQuestion(
-  question: string,
-  _state?: unknown,
-): PicoTutorReply {
+export function answerTutorQuestion(question: string, _state?: unknown): PicoTutorReply {
   const answer = answerPicoTutorQuestion(question)
   const matchedLessons = answer.matches
     .map((match) => picoLessons.find((lesson) => lesson.slug === match.slug))
@@ -176,17 +151,14 @@ export function answerTutorQuestion(
 
   const docs = Array.from(
     new Map(
-      [
-        ...matchedLessons.flatMap((lesson) => lesson.docLinks),
-        supportEscalation,
-      ].map((entry) => [entry.href, entry]),
+      [supportEscalation, ...matchedLessons.flatMap((lesson) => lesson.docLinks)].map((entry) => [entry.href, entry]),
     ).values(),
   ).slice(0, 4)
 
   const lessons = matchedLessons.map((lesson) => ({
-    id: resolveLegacyLessonId(lesson.slug, lesson.id),
+    id: lesson.id,
     title: lesson.title,
-    href: `/academy/${lesson.slug}`,
+    href: `/pico/academy/${lesson.slug}`,
   }))
 
   const highConfidence = answer.matches[0]?.score ? answer.matches[0].score >= 5 : false
