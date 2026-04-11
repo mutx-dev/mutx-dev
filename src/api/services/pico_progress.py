@@ -507,6 +507,7 @@ async def record_pico_event(
     milestone_id = str(milestone_id).strip() if milestone_id else None
     tutor_sessions = _coerce_nonnegative_int(tutor_sessions, default=0)
     event_metadata = dict(metadata or {})
+    validation_proof = str(event_metadata.get("validation_proof") or "").strip()
     previous_xp_total = _coerce_nonnegative_int(state.get("xp_total"), default=0)
     previous_level = _level_from_xp(previous_xp_total)
     allow_auto_progress = True
@@ -517,14 +518,17 @@ async def record_pico_event(
 
     if canonical_event == "lesson_completed":
         lesson_is_known = bool(lesson_id and lesson_id in PICO_LESSON_CATALOG)
-        if not lesson_is_known:
+        has_validation_proof = len(validation_proof) > 0
+        if not lesson_is_known or not has_validation_proof:
             xp_awarded = 0
             allow_auto_progress = False
-            lesson_id = None
+            lesson_id = None if not lesson_is_known else lesson_id
         elif lesson_id not in completed_lessons:
             completed_lessons.append(lesson_id)
+            event_metadata["validation_proof"] = validation_proof
         else:
             xp_awarded = 0
+            event_metadata["validation_proof"] = validation_proof
     elif canonical_event == "track_completed" and track_id:
         if track_id not in completed_tracks:
             completed_tracks.append(track_id)

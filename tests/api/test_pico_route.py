@@ -47,7 +47,12 @@ async def test_get_pico_state_default(client: AsyncClient):
 async def test_post_pico_lesson_completed_updates_state(client: AsyncClient):
     response = await client.post(
         "/v1/pico/events",
-        json={"event": "lesson_completed", "lesson_id": "install-hermes-locally", "track_id": "track-a"},
+        json={
+            "event": "lesson_completed",
+            "lesson_id": "install-hermes-locally",
+            "track_id": "track-a",
+            "metadata": {"validation_proof": "hermes --help printed successfully"},
+        },
     )
     assert response.status_code == 200
     data = response.json()
@@ -83,6 +88,20 @@ async def test_lesson_completion_without_lesson_id_does_not_grant_progress(clien
 
 
 @pytest.mark.asyncio
+async def test_lesson_completion_without_validation_proof_does_not_grant_progress(client: AsyncClient):
+    response = await client.post(
+        "/v1/pico/events",
+        json={"event": "lesson_completed", "lesson_id": "install-hermes-locally"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["xp_total"] == 0
+    assert data["completed_lessons"] == []
+    assert data["milestones"] == []
+    assert data["recent_events"][-1]["xp_awarded"] == 0
+
+
+@pytest.mark.asyncio
 async def test_unknown_lesson_id_does_not_grant_progress(client: AsyncClient):
     response = await client.post(
         "/v1/pico/events",
@@ -100,11 +119,19 @@ async def test_unknown_lesson_id_does_not_grant_progress(client: AsyncClient):
 async def test_post_duplicate_lesson_event_is_deduped_for_xp(client: AsyncClient):
     await client.post(
         "/v1/pico/events",
-        json={"event": "lesson_completed", "lesson_id": "install-hermes-locally"},
+        json={
+            "event": "lesson_completed",
+            "lesson_id": "install-hermes-locally",
+            "metadata": {"validation_proof": "hermes --help printed successfully"},
+        },
     )
     response = await client.post(
         "/v1/pico/events",
-        json={"event": "lesson_completed", "lesson_id": "install-hermes-locally"},
+        json={
+            "event": "lesson_completed",
+            "lesson_id": "install-hermes-locally",
+            "metadata": {"validation_proof": "hermes --help printed successfully"},
+        },
     )
     assert response.status_code == 200
     data = response.json()
@@ -118,11 +145,19 @@ async def test_post_duplicate_lesson_event_is_deduped_for_xp(client: AsyncClient
 async def test_lesson_completion_auto_unlocks_track_and_badge_without_bonus_xp(client: AsyncClient):
     await client.post(
         "/v1/pico/events",
-        json={"event": "lesson_completed", "lesson_id": "install-hermes-locally"},
+        json={
+            "event": "lesson_completed",
+            "lesson_id": "install-hermes-locally",
+            "metadata": {"validation_proof": "hermes --help printed successfully"},
+        },
     )
     response = await client.post(
         "/v1/pico/events",
-        json={"event": "lesson_completed", "lesson_id": "run-your-first-agent"},
+        json={
+            "event": "lesson_completed",
+            "lesson_id": "run-your-first-agent",
+            "metadata": {"validation_proof": "saved transcript at /tmp/first-run.txt"},
+        },
     )
     assert response.status_code == 200
     data = response.json()

@@ -1,11 +1,12 @@
 # EVENT_MODEL
 
-Updated: 2026-04-11T03:29:44Z
+Updated: 2026-04-11T07:59:00Z
 
 ## Design rules
 - Events are append-friendly.
 - Progress state is a materialized view over user actions.
 - Autopilot views prefer real MUTX telemetry and operational routes over invented records.
+- Lesson completion events must carry explicit validation proof in metadata before they can award progress.
 
 ## Academy events
 - account_created

@@ -1,7 +1,7 @@
 # PRODUCT_STATE
 
 Status: active build
-Last updated: 2026-04-11T03:29:44Z
+Last updated: 2026-04-11T07:59:00Z
 
 ## What exists
 - pico.mutx.dev is a real multilingual landing page with live lead/contact capture.
@@ -368,3 +368,27 @@ What failed
 
 What is next
 - If we keep pushing progression, the next honest gain is attaching lesson completion to stronger in-product proof signals rather than broadening the reward system.
+
+### 2026-04-11 03:31:00 UTC START
+- Continuing Pico progression hardening.
+- Target: tighten lesson-completion proof so progression feels more earned without adding new state schemas.
+
+### 2026-04-11 07:59:00 UTC END
+What changed
+- Tightened lesson completion further: Pico now requires explicit validation proof in event metadata before a lesson can award progress.
+- Added proof capture UI directly in the lesson completion card so the user has to leave a receipt before progress moves.
+- Added backend tests and a lesson-page unit test to keep the proof gate from drifting.
+
+What was tested
+- `/Users/fortune/MUTX/.venv/bin/python -m pytest tests/api/test_pico_route.py -q`
+- `npx jest --runInBand tests/unit/picoState.test.ts tests/unit/picoAcademyPage.test.tsx tests/unit/picoProgressSignals.test.ts tests/unit/picoControlPage.test.ts tests/unit/picoLessonPage.test.tsx`
+- `npm run lint`
+- `npm run typecheck`
+- `npm run build`
+
+What failed
+- No blocking failures.
+- Existing repo-level Next workspace-root/NFT warnings and pytest OpenTelemetry shutdown noise remain non-blocking.
+
+What is next
+- If we keep hardening progression, the next move is reusing real runtime artifacts or logs to prefill proof instead of asking the user to type everything manually.

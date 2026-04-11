@@ -1,7 +1,7 @@
 # EXECUTION_PLAN
 
 Current phase: Pico progression integrity and feedback
-Updated: 2026-04-11T03:29:44Z
+Updated: 2026-04-11T07:59:00Z
 
 ## Goal
 Ship the narrowest honest PicoMUTX product loop that gets a user from signup to first agent launch to visible control.
@@ -36,6 +36,7 @@ Ship the narrowest honest PicoMUTX product loop that gets a user from signup to 
 - [completed] Add explicit control receipts for deploy, threshold, and approval actions.
 - [completed] Lock XP to real outcomes only and block obvious repeat farming or payload inflation.
 - [completed] Surface level-up moments, unlock receipts, and the next missing milestone across Academy, Lesson, and Control.
+- [completed] Require explicit proof before lesson completion can move progression.
 
 ## Architecture direction
 - Keep Pico on pico.mutx.dev and build only inside the existing app/pico/* route family.
@@ -53,4 +54,5 @@ Ship the narrowest honest PicoMUTX product loop that gets a user from signup to 
 - Progress only rewards real outcomes.
 - Academy and Control both show one obvious next move.
 - Progress receipts stay truthful on zero-XP repeat actions.
+- Lesson completion requires explicit proof instead of one-click self-awards.
 - Docs remain current after the next implementation pass.

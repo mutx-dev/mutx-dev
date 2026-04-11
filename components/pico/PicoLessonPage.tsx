@@ -48,9 +48,16 @@ export function PicoLessonPage({ lesson }: PicoLessonPageProps) {
   const track = useMemo(() => picoTracks.find((item) => item.id === lesson.trackId), [lesson.trackId]);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [validationProof, setValidationProof] = useState('');
   const [completionMoment, setCompletionMoment] = useState<PicoProgressMoment | null>(null);
 
   async function handleComplete() {
+    const trimmedProof = validationProof.trim();
+    if (!trimmedProof) {
+      setSubmitError('Paste the exact proof before recording completion.');
+      return;
+    }
+
     setSubmitting(true);
     setSubmitError(null);
     setCompletionMoment(null);
@@ -67,6 +74,7 @@ export function PicoLessonPage({ lesson }: PicoLessonPageProps) {
             level_id: lesson.levelId,
             completed_at: new Date().toISOString(),
             source: "pico-academy",
+            validation_proof: trimmedProof,
           },
         }),
       });
@@ -206,15 +214,29 @@ export function PicoLessonPage({ lesson }: PicoLessonPageProps) {
               </div>
             ) : null}
             {state.authenticated ? (
-              <button
-                type="button"
-                onClick={() => void handleComplete()}
-                disabled={submitting || completed}
-                className={`mt-5 w-full ${picoPrimaryButtonClass} px-4 py-3 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/45`}
-              >
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
-                {completed ? "Completion recorded" : "Record completion"}
-              </button>
+              <div className="mt-5 space-y-3">
+                <div className={`${picoSurfaceInsetClass} p-4`}>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/85">Proof before progress</p>
+                  <p className="mt-2 text-sm leading-6 text-white/65">
+                    Paste the exact command output, artifact path, or operator note that proves this lesson is actually done.
+                  </p>
+                  <textarea
+                    value={validationProof}
+                    onChange={(event) => setValidationProof(event.target.value)}
+                    placeholder="Examples: hermes --help printed successfully, /tmp/first-run.txt, SSH screenshot saved in notes"
+                    className="mt-3 min-h-28 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-cyan-300/30"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void handleComplete()}
+                  disabled={submitting || completed || validationProof.trim().length === 0}
+                  className={`w-full ${picoPrimaryButtonClass} px-4 py-3 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/45`}
+                >
+                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                  {completed ? "Completion recorded" : "Record completion"}
+                </button>
+              </div>
             ) : null}
             {completionMoment ? (
               <div className="mt-4 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.06] p-4 text-sm text-emerald-50">

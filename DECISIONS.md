@@ -92,3 +92,15 @@ Keep the existing state model, but restrict XP to real outcomes only: known less
 
 Why
 Progress should feel earned. If users can farm XP by repeating safe clicks or posting loose event payloads, the whole academy-control trust loop turns to mush.
+
+## 2026-04-11T07:59:00Z - Lesson completion needs a receipt, not just a click
+Status: accepted
+
+Context
+Even after restricting XP to real outcomes, lesson completion was still too close to a one-click self-award.
+
+Decision
+Require explicit validation proof in lesson_completed metadata and expose that requirement directly in the lesson UI before completion can be recorded.
+
+Why
+If the academy says results matter, the product has to ask for a receipt when the user claims they got one.
