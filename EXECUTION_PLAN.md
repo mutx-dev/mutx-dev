@@ -1,48 +1,43 @@
 # EXECUTION_PLAN
 
 ## Current phase
-Phase 7 truth hardening.
-- Phases 1-5 are shipped enough for Pico v1: academy, progress, tutor, support, and the live autopilot bridge all exist.
-- Current implementation focus: canonical route truth, activation speed, public-copy truth, and validation discipline.
+Phase 7 truth hardening through simplification.
+
+The product already has the necessary surfaces.
+The job now is to make them feel inevitable instead of sprawling.
 
 ## Priorities
-1. Get users to the first working agent in the shortest honest path.
-2. Keep Pico workspace coherent and truthful.
-3. Keep the canonical onboarding entry and live autopilot bridge obvious.
+1. Keep the first-time path obvious.
+2. Delete duplicate concepts before adding anything else.
+3. Keep Pico self-contained and readable.
 4. Keep validation green and docs honest.
-5. Hardening next: localized copy cleanup and durable approvals persistence.
 
 ## Active tasks
-- [x] Inspect repo and current Pico surfaces
-- [x] Create mandatory PicoMUTX docs
-- [x] Define academy levels, tracks, and lessons
-- [x] Implement local-first progress with auth-backed sync on the existing Pico progress route
-- [x] Implement XP, badges, milestones, and unlock logic
-- [x] Implement grounded tutor with escalation guardrails
-- [x] Implement live autopilot bridge for runs, budgets, alerts, and approvals on existing MUTX surfaces
-- [x] Re-audit the Autopilot trust surface against real MUTX signals only
-- [x] Remove demo-smelling Autopilot affordances and make approvals durable without adding a new schema or route family
-- [x] Reorder onboarding and the first two lessons around the fastest path to first agent success
-- [ ] Finish truth-alignment cleanup for public copy and legacy compatibility routes
-- [ ] Re-run validation and commit the current slice
-- [ ] Sweep non-English Pico landing copy so localized surfaces stop lying
+- [x] Tighten activation around the first working agent
+- [x] Harden trust-critical Autopilot surfaces
+- [x] Simplify vocabulary across the active Pico UI
+- [x] Collapse support overlap into tutor + human help
+- [ ] Browser-smoke simplified tutor and human-help flows
+- [ ] Sweep remaining copy for unnecessary product nouns
 
-## Architecture direction
-- Frontend: keep Pico isolated under `app/pico/*` and do not route through desktop/operator onboarding.
-- State: local-first browser persistence plus auth-backed sync through the existing `/api/pico/progress` -> `/v1/pico/progress` lane.
-- Tutor: deterministic lesson-grounded answers first; model-backed tutor later.
-- Autopilot: reuse live MUTX runs, budgets, alerts, and approvals when authenticated; say "offline" when that data is unavailable.
-- Billing: internal plan flags only until pricing and payment rails are worth wiring.
+## Current simplification rules
+- Use `track`, never `lane`.
+- Use `Start building` / `Start`, not `workspace`, unless the route name itself requires it.
+- Use `Tutor` for grounded in-product help.
+- Use `Human help` for escalation.
+- If a section duplicates another section's job, merge it or kill it.
 
 ## Risks
-- Active non-English Pico landing truth now falls back to English on the key CTA/contact surfaces, but proper localization is still incomplete.
-- Approval persistence is still backed by the shared in-memory approvals service.
-- Existing dashboard/backend surfaces can confuse future implementation if preview/shell routes are treated like shipped product.
-- Docs drift remains a repo-wide tax and will bite again if left alone too long.
+- Broader `/dashboard/*` pages still look like secondary surfaces, not trustworthy Pico drill-downs.
+- Dirty tree changes outside the simplification slice can reintroduce complexity by accident.
+- Copy drift is still the fastest way to make Pico feel bigger and less clear than it is.
 
-## Next execution wave
-1. Commit the route-truth and public-copy cleanup.
-2. Sweep non-English Pico landing copy so every live locale matches the shipped product.
-3. Replace the shared in-memory approvals backing with durable persistence.
-4. Deepen runtime drill-down and richer control-plane ingestion without adding parallel Pico routes.
-5. Wire real billing only after the control loop is durable enough to charge for.
+## Acceptance gates for the next simplification commit
+- `npm run typecheck`
+- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `npm run build`
+
+## Definition of success
+- A new user can tell where to start in one glance.
+- A blocked user can tell the difference between tutor and human help in one glance.
+- The product sounds like one system, not five overlapping ones.

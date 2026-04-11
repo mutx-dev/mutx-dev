@@ -1,7 +1,8 @@
 'use client'
 
-import { FormEvent, useMemo, useState } from 'react'
+import { FormEvent, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
@@ -45,12 +46,22 @@ function resolveTutorHref(toHref: ReturnType<typeof usePicoHref>, href: string) 
 export function PicoTutorPageClient() {
   const { progress, actions } = usePicoProgress()
   const toHref = usePicoHref()
+  const searchParams = useSearchParams()
+  const lessonFromQuery = searchParams.get('lesson')
+  const defaultLessonSlug =
+    (lessonFromQuery && PICO_LESSONS.some((lesson) => lesson.slug === lessonFromQuery) ? lessonFromQuery : null) ??
+    (progress.selectedTrack ? PICO_LESSONS.find((lesson) => lesson.track === progress.selectedTrack)?.slug ?? '' : '')
   const [question, setQuestion] = useState('')
-  const [lessonSlug, setLessonSlug] = useState(progress.selectedTrack ? PICO_LESSONS.find((lesson) => lesson.track === progress.selectedTrack)?.slug ?? '' : '')
+  const [lessonSlug, setLessonSlug] = useState(defaultLessonSlug)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [reply, setReply] = useState<PicoTutorReply | null>(null)
   const availableLessons = useMemo(() => PICO_LESSONS, [])
+  const selectedLesson = useMemo(() => availableLessons.find((lesson) => lesson.slug === lessonSlug) ?? null, [availableLessons, lessonSlug])
+
+  useEffect(() => {
+    setLessonSlug(defaultLessonSlug)
+  }, [defaultLessonSlug])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -93,16 +104,20 @@ export function PicoTutorPageClient() {
     <PicoShell
       eyebrow="Grounded tutor"
       title="Ask for the exact next step"
-      description="The tutor only answers from the shipped Pico lesson corpus. If confidence is low or the topic is risky, it tells you to escalate instead of pretending to be clever."
-      actions={
-        <Link href={toHref('/support')} className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10">
-          Open support lane
-        </Link>
-      }
+      description="Use this only when the next lesson step is blocked. Ask one concrete question, get one grounded next move, then return to the lesson."
     >
       <section className="grid gap-6 lg:grid-cols-[1fr,0.9fr]">
         <form onSubmit={submit} className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
           <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Question</p>
+          {selectedLesson ? (
+            <div className="mt-4 rounded-[24px] border border-emerald-400/20 bg-emerald-400/10 p-4 text-sm text-slate-200">
+              <p className="font-medium text-white">Where you are</p>
+              <p className="mt-2">You are asking about {selectedLesson.title}. Keep the question tied to the step that is actually blocked.</p>
+              <Link href={toHref(`/academy/${selectedLesson.slug}`)} className="mt-3 inline-flex text-sm font-medium text-emerald-100 hover:text-white">
+                Back to lesson
+              </Link>
+            </div>
+          ) : null}
           <textarea
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
@@ -111,7 +126,7 @@ export function PicoTutorPageClient() {
           />
           <div className="mt-4 grid gap-4 md:grid-cols-[1fr,auto] md:items-end">
             <label className="block text-sm text-slate-300">
-              <span className="mb-2 block text-xs uppercase tracking-[0.24em] text-slate-500">Current lesson</span>
+              <span className="mb-2 block text-xs uppercase tracking-[0.24em] text-slate-500">Blocked lesson</span>
               <select
                 value={lessonSlug}
                 onChange={(event) => setLessonSlug(event.target.value)}
@@ -130,7 +145,7 @@ export function PicoTutorPageClient() {
               disabled={loading}
               className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading ? 'Thinking from the corpus...' : 'Ask tutor'}
+              {loading ? 'Finding the next step...' : 'Get next step'}
             </button>
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
@@ -165,17 +180,14 @@ export function PicoTutorPageClient() {
                 {reply.summary}
               </div>
 
-              {reply.lessons.length ? (
+              {reply.lessons[0] ? (
                 <div className="flex flex-wrap gap-3">
-                  {reply.lessons.map((lesson) => (
-                    <Link
-                      key={`${lesson.id}-${lesson.href}`}
-                      href={resolveTutorHref(toHref, lesson.href)}
-                      className="inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
-                    >
-                      Open {lesson.title}
-                    </Link>
-                  ))}
+                  <Link
+                    href={resolveTutorHref(toHref, reply.lessons[0].href)}
+                    className="inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
+                  >
+                    Open {reply.lessons[0].title}
+                  </Link>
                 </div>
               ) : null}
 
@@ -190,23 +202,6 @@ export function PicoTutorPageClient() {
                 </div>
               </div>
 
-              {reply.docs.length ? (
-                <div className="rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5">
-                  <p className="text-sm font-medium text-white">Docs and help</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {reply.docs.map((doc) => (
-                      <Link
-                        key={`${doc.href}-${doc.sourcePath}`}
-                        href={resolveTutorHref(toHref, doc.href)}
-                        className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-slate-300 transition hover:bg-white/10"
-                      >
-                        {doc.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
               {reply.escalationReason ? (
                 <div className="rounded-[24px] border border-amber-400/20 bg-amber-400/10 p-5 text-sm text-amber-50">
                   Escalation note: {reply.escalationReason}
@@ -215,7 +210,7 @@ export function PicoTutorPageClient() {
                       href={toHref('/support')}
                       className="inline-flex rounded-full bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-950"
                     >
-                      Open support lane
+                      Get human help
                     </Link>
                   </div>
                 </div>

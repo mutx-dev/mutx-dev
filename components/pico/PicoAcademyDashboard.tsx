@@ -113,9 +113,9 @@ export function PicoAcademyDashboard() {
 
         <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
           <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Current path</p>
-          <h2 className="mt-2 text-xl font-semibold text-white">Stay on one lane</h2>
+          <h2 className="mt-2 text-xl font-semibold text-white">Stay on one track</h2>
           <div className="mt-4 space-y-3 text-sm text-slate-300">
-            <p>Active lane: {progress.selectedTrack ?? activationTrack.slug}</p>
+            <p>Active track: {progress.selectedTrack ?? activationTrack.slug}</p>
             <p>Current lesson: {activationLesson?.title ?? 'none'}</p>
             <p>Completed lessons: {derived.completedLessonCount}</p>
             <p>Badges: {derived.badges.length}</p>
@@ -172,7 +172,7 @@ export function PicoAcademyDashboard() {
                         disabled={!unlocked}
                         className="rounded-full border border-white/10 px-3 py-2 text-xs font-medium text-slate-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        {progress.selectedTrack === track.slug ? 'Active lane' : unlocked ? 'Set as lane' : 'Locked'}
+                        {progress.selectedTrack === track.slug ? 'Active track' : unlocked ? 'Set as track' : 'Locked'}
                       </button>
                     </div>
                     <p className="mt-4 text-sm text-emerald-100">Outcome: {track.outcome}</p>

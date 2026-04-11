@@ -7,12 +7,11 @@ import { picoHref } from '@/lib/pico/navigation'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { href: '/', label: 'Landing' },
-  { href: '/onboarding', label: 'Workspace' },
-  { href: '/academy', label: 'Academy' },
+  { href: '/onboarding', label: 'Start' },
+  { href: '/academy', label: 'Lessons' },
   { href: '/tutor', label: 'Tutor' },
   { href: '/autopilot', label: 'Autopilot' },
-  { href: '/support', label: 'Support' },
+  { href: '/support', label: 'Human help' },
 ]
 
 type PicoShellProps = {
@@ -32,7 +31,7 @@ export function PicoShell({ eyebrow, title, description, actions, children }: Pi
         <header className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-5 shadow-[0_24px_80px_rgba(2,8,23,0.35)] backdrop-blur">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-2">
-              <Link href={picoHref(pathname, '/')} className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.24em] text-emerald-300">
+              <Link href={picoHref(pathname, '/onboarding')} className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.24em] text-emerald-300">
                 <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-400/15 text-emerald-200">PM</span>
                 PicoMUTX
               </Link>
@@ -46,7 +45,8 @@ export function PicoShell({ eyebrow, title, description, actions, children }: Pi
           </div>
           <nav className="mt-5 flex flex-wrap gap-2">
             {navItems.map((item) => {
-              const active = pathname === `/pico${item.href === '/' ? '' : item.href}`
+              const absoluteHref = `/pico${item.href}`
+              const active = pathname === absoluteHref || pathname.startsWith(`${absoluteHref}/`)
               return (
                 <Link
                   key={item.href}
