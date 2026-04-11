@@ -6,6 +6,7 @@ import { RefreshCw, Rocket } from "lucide-react";
 
 import { PicoProductShell } from "@/components/pico/PicoProductShell";
 import { usePicoBasePath } from "@/components/pico/PicoPathProvider";
+import { picoFieldClass, picoPrimaryButtonClass, picoSecondaryButtonClass, picoSectionLabelClass, picoSurfaceClass, picoSurfaceInsetClass, picoSurfaceStrongClass } from "@/components/pico/picoUi";
 import { usePicoState } from "@/components/pico/usePicoState";
 import { buildPicoPath } from "@/lib/pico/routing";
 
@@ -143,7 +144,7 @@ export function PicoControlPage() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const responses = await Promise.all(
+    const responses = await Promise.allSettled(
       endpoints.map(async ([key, url]) => {
         const response = await fetch(url, { cache: "no-store" });
         const payload = await response.json().catch(() => null);
@@ -160,7 +161,25 @@ export function PicoControlPage() {
       }),
     );
 
-    setSections(Object.fromEntries(responses));
+    const normalized = responses.map((result, index) => {
+      if (result.status === "fulfilled") {
+        return result.value;
+      }
+
+      const [key] = endpoints[index];
+      return [
+        key,
+        {
+          key,
+          ok: false,
+          status: 0,
+          payload: null,
+          error: result.reason instanceof Error ? result.reason.message : `Failed to load ${key}`,
+        } satisfies SectionResult,
+      ] as const;
+    });
+
+    setSections(Object.fromEntries(normalized));
     setLastUpdated(new Date().toISOString());
     setLoading(false);
   }, []);
@@ -250,7 +269,7 @@ export function PicoControlPage() {
       return;
     }
 
-    await fetch("/api/pico/events", {
+    const response = await fetch("/api/pico/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -258,6 +277,13 @@ export function PicoControlPage() {
         metadata: { threshold_usd: threshold },
       }),
     });
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      setThresholdMessage(extractPicoControlError(payload, "Failed to save the Pico threshold."));
+      return;
+    }
+
     await refreshPicoState();
     setThresholdMessage(`Soft threshold saved at ${threshold}. This is a Pico operator guardrail, not hard budget enforcement.`);
   }
@@ -304,7 +330,7 @@ export function PicoControlPage() {
         <button
           type="button"
           onClick={() => void refresh()}
-          className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white/80"
+          className={picoSecondaryButtonClass}
         >
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh live data
         </button>
@@ -322,29 +348,27 @@ export function PicoControlPage() {
       ) : null}
 
       <div className="grid gap-5 xl:grid-cols-3">
-        <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/50">
+        <div className={`${picoSurfaceClass} px-5 py-4 text-sm text-white/50`}>
           {lastUpdated ? `Last refreshed ${new Date(lastUpdated).toLocaleString()}.` : "Loading live control data..."}
         </div>
-        <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/68">
+        <div className={`${picoSurfaceClass} px-5 py-4 text-sm text-white/68`}>
           <span className="font-semibold text-white">Plan {planLabel}</span>. {planNote}
         </div>
-        <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/68">
+        <div className={`${picoSurfaceClass} px-5 py-4 text-sm text-white/68`}>
           <span className="font-semibold text-white">Tutor access</span>. {tutorAccessLabel}
         </div>
       </div>
 
       {!authRequired && !assistantRuntime ? (
-        <section id="starter-deploy" className="rounded-[1.5rem] border border-cyan-300/20 bg-cyan-300/[0.06] p-6 scroll-mt-24">
+        <section id="starter-deploy" className={`${picoSurfaceStrongClass} p-6 scroll-mt-24`}>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-2xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100/90">
-                Starter deploy
-              </p>
+              <p className={picoSectionLabelClass}>Starter deploy</p>
               <h2 className="mt-2 text-2xl font-semibold text-white">
                 Launch the first real Pico assistant now.
               </h2>
               <p className="mt-3 text-sm leading-7 text-white/70">
-                This uses the real personal_assistant template route. It is the shortest path from lessons into a live monitored runtime.
+                One click gets you the default starter lane. Only open advanced fields if you actually need to change the defaults.
               </p>
             </div>
             <Link href={academyHref} className="text-sm font-semibold text-white/60">
@@ -352,45 +376,48 @@ export function PicoControlPage() {
             </Link>
           </div>
 
-          <div className="mt-5 grid gap-4 lg:grid-cols-3">
-            <label className="space-y-2 text-sm text-white/75">
-              <span>Name</span>
-              <input
-                value={starterName}
-                onChange={(event) => setStarterName(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-[#0a101b] px-4 py-3 text-white outline-none"
-              />
-            </label>
-            <label className="space-y-2 text-sm text-white/75">
-              <span>Workspace</span>
-              <input
-                value={starterWorkspace}
-                onChange={(event) => setStarterWorkspace(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-[#0a101b] px-4 py-3 text-white outline-none"
-              />
-            </label>
-            <label className="space-y-2 text-sm text-white/75">
-              <span>Model</span>
-              <input
-                value={starterModel}
-                onChange={(event) => setStarterModel(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-[#0a101b] px-4 py-3 text-white outline-none"
-              />
-            </label>
-          </div>
-
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={() => void handleDeployStarter()}
               disabled={deploying || !starterName.trim() || !starterWorkspace.trim()}
-              className="inline-flex items-center gap-2 rounded-full bg-cyan-300 px-4 py-3 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
+              className={`${picoPrimaryButtonClass} px-4 py-3 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40`}
             >
               <Rocket className={`h-4 w-4 ${deploying ? "animate-pulse" : ""}`} />
               {deploying ? "Deploying starter assistant" : "Deploy starter assistant"}
             </button>
-            <span className="text-sm text-white/55">Free should stay at one monitored starter lane. More than that is a later plan-gated upgrade.</span>
+            <span className="text-sm text-white/55">Default: {starterName} on {starterWorkspace} using {starterModel}.</span>
           </div>
+
+          <details className={`${picoSurfaceInsetClass} mt-5 p-4`}>
+            <summary className="cursor-pointer text-sm font-semibold text-white">Advanced starter settings</summary>
+            <div className="mt-4 grid gap-4 lg:grid-cols-3">
+              <label className="space-y-2 text-sm text-white/75">
+                <span>Name</span>
+                <input
+                  value={starterName}
+                  onChange={(event) => setStarterName(event.target.value)}
+                  className={picoFieldClass}
+                />
+              </label>
+              <label className="space-y-2 text-sm text-white/75">
+                <span>Workspace</span>
+                <input
+                  value={starterWorkspace}
+                  onChange={(event) => setStarterWorkspace(event.target.value)}
+                  className={picoFieldClass}
+                />
+              </label>
+              <label className="space-y-2 text-sm text-white/75">
+                <span>Model</span>
+                <input
+                  value={starterModel}
+                  onChange={(event) => setStarterModel(event.target.value)}
+                  className={picoFieldClass}
+                />
+              </label>
+            </div>
+          </details>
 
           {deployError ? <p className="mt-4 text-sm text-amber-200">{deployError}</p> : null}
           {deployReceipt ? (
@@ -413,7 +440,7 @@ export function PicoControlPage() {
               <input
                 value={thresholdInput}
                 onChange={(event) => setThresholdInput(event.target.value)}
-                className="w-40 rounded-2xl border border-white/10 bg-[#0a101b] px-4 py-3 text-white outline-none"
+                className={`${picoFieldClass} w-40`}
               />
               <button
                 type="button"

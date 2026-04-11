@@ -1,7 +1,7 @@
 # EXECUTION_PLAN
 
-Current phase: Phase 3 -> Academy shell with foundation in place
-Updated: 2026-04-11T00:55:00Z
+Current phase: Pico UI coherence and churn reduction
+Updated: 2026-04-11T01:19:11Z
 
 ## Goal
 Ship the narrowest honest PicoMUTX product loop that gets a user from signup to first agent launch to visible control.
@@ -28,10 +28,10 @@ Ship the narrowest honest PicoMUTX product loop that gets a user from signup to 
 - Pico-specific unit test coverage for academy, support, control helpers, and state normalization.
 
 ## Active tasks
-- [in_progress] Commit and handoff this foundation slice.
-- [pending] Turn soft plan messaging into stronger enforceable limits where the underlying behavior already exists.
-- [pending] Add admin/content-ops capture for tutor content gaps.
-- [pending] Expand the control page from summary to richer run drill-down where the data is already real.
+- [completed] Unify the shared Pico UI primitives used by the active product shell.
+- [completed] Reduce early churn on Start, Lesson, Support, and Control surfaces.
+- [in_progress] Tighten Academy hierarchy so the next lesson dominates the page.
+- [pending] Wrap Pico auth routes in the same visual language as the rest of the product.
 
 ## Architecture direction
 - Keep Pico on pico.mutx.dev and build only inside the existing app/pico/* route family.

@@ -14,6 +14,7 @@ import {
 
 import { PicoProductShell } from "@/components/pico/PicoProductShell";
 import { usePicoPath } from "@/components/pico/PicoPathProvider";
+import { picoPrimaryButtonClass, picoSecondaryButtonClass, picoSectionLabelClass, picoSurfaceClass, picoSurfaceStrongClass } from "@/components/pico/picoUi";
 import { usePicoState } from "@/components/pico/usePicoState";
 import { picoLessons } from "@/lib/pico/academy";
 
@@ -56,6 +57,7 @@ function StepCard({
   icon,
   primaryAction,
   secondaryAction,
+  featured = false,
 }: {
   title: string;
   description: string;
@@ -65,13 +67,16 @@ function StepCard({
   icon: ReactNode;
   primaryAction: { href: string; label: string };
   secondaryAction?: { href: string; label: string };
+  featured?: boolean;
 }) {
   const toneClass =
     status === "complete"
       ? "border-emerald-300/20 bg-emerald-300/[0.06]"
       : status === "locked"
         ? "border-amber-300/20 bg-amber-300/[0.06]"
-        : "border-white/10 bg-white/[0.03]";
+        : featured
+          ? "border-cyan-300/20 bg-cyan-300/[0.06]"
+          : "border-white/10 bg-white/[0.03]";
   const badgeClass =
     status === "complete"
       ? "border border-emerald-300/20 bg-emerald-300/10 text-emerald-200"
@@ -102,14 +107,14 @@ function StepCard({
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <Link
           href={primaryAction.href}
-          className="inline-flex items-center gap-2 rounded-full bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
+          className={picoPrimaryButtonClass}
         >
           {primaryAction.label} <ArrowRight className="h-4 w-4" />
         </Link>
         {secondaryAction ? (
           <Link
             href={secondaryAction.href}
-            className="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-white/20 hover:bg-white/10 hover:text-white"
+            className={picoSecondaryButtonClass}
           >
             {secondaryAction.label}
           </Link>
@@ -222,38 +227,52 @@ export function PicoStartPage() {
   const academyStarted = state.completedCount > 0;
   const controlReviewed = currentThreshold !== null || approvalGateEnabled;
   const completedSteps = [state.authenticated, academyStarted, assistantState.present, controlReviewed].filter(Boolean).length;
+  const featuredStep = !state.authenticated
+    ? "auth"
+    : !academyStarted
+      ? "academy"
+      : !assistantState.present
+        ? "deploy"
+        : !controlReviewed
+          ? "control"
+          : "done";
 
   return (
     <PicoProductShell
       title="Start"
       description="This is the shortest real path through Pico: create or sign into an operator account, record your first academy lesson, deploy the starter assistant from Control, then set one visible control before you trust it."
       actions={
-        <>
-          <Link
-            href={nextLessonHref}
-            className="inline-flex items-center gap-2 rounded-full bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
-          >
-            Open {academyStarted ? "next lesson" : "first lesson"} <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
-            href={controlHref}
-            className="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-white/20 hover:bg-white/10 hover:text-white"
-          >
-            Open control
-          </Link>
-        </>
+        !state.authenticated ? (
+          <>
+            <Link href={loginWithNextHref} className={picoPrimaryButtonClass}>
+              Sign in <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href={registerWithNextHref} className={picoSecondaryButtonClass}>
+              Create account
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link href={nextLessonHref} className={picoPrimaryButtonClass}>
+              Open {academyStarted ? "next lesson" : "first lesson"} <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href={controlHref} className={picoSecondaryButtonClass}>
+              Open control
+            </Link>
+          </>
+        )
       }
     >
       <section className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100/90">First-run checklist</p>
+        <div className={`${featuredStep === "done" ? picoSurfaceStrongClass : picoSurfaceClass} p-6`}>
+          <p className={picoSectionLabelClass}>First-run checklist</p>
           <h2 className="mt-2 text-2xl font-semibold text-white">{completedSteps} of 4 steps complete</h2>
           <p className="mt-3 text-sm leading-7 text-white/68">
             Pico already ships the lesson corpus, the starter deploy path, and the live control surface. This route keeps the first pass in one place instead of scattering you across public pages.
           </p>
         </div>
 
-        <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-6 text-sm leading-7 text-white/68">
+        <div className={`${picoSurfaceClass} p-6 text-sm leading-7 text-white/68`}>
           <p className="font-semibold text-white">What counts as done</p>
           <ul className="mt-4 space-y-3 text-white/60">
             <li>1. Auth is active for saved progress and same-origin control calls.</li>
@@ -266,6 +285,7 @@ export function PicoStartPage() {
 
       <div className="grid gap-5 xl:grid-cols-2">
         <StepCard
+          featured={featuredStep === "auth"}
           title="Sign in or create an account"
           description="Use the hosted auth flow first. The academy is readable without auth, but saved progress, starter deploys, and Pico control state all depend on a real session."
           detail={
@@ -284,6 +304,7 @@ export function PicoStartPage() {
         />
 
         <StepCard
+          featured={featuredStep === "academy"}
           title="Start the academy"
           description="Open the first incomplete lesson and treat the validation checklist as the finish line. The first recorded lesson is the cleanest proof that your Pico setup is real."
           detail={
@@ -299,6 +320,7 @@ export function PicoStartPage() {
         />
 
         <StepCard
+          featured={featuredStep === "deploy"}
           title="Deploy the starter assistant"
           description="Use the real personal_assistant template deploy already wired into Control. This is the shipped bridge from lessons into a live monitored runtime."
           detail={
@@ -334,6 +356,7 @@ export function PicoStartPage() {
         />
 
         <StepCard
+          featured={featuredStep === "control"}
           title="Review control before trusting the runtime"
           description="Set one threshold or create one pending approval. Pico does not pretend control exists until you touch a real guardrail."
           detail={
@@ -358,8 +381,7 @@ export function PicoStartPage() {
         </section>
       ) : null}
 
-      <section className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      <section className={`${picoSurfaceClass} p-6`}>        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100/90">If you get stuck</p>
             <h2 className="mt-2 text-xl font-semibold text-white">Use grounded support, not guesswork.</h2>
@@ -369,7 +391,7 @@ export function PicoStartPage() {
           </div>
           <Link
             href={supportHref}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-white/20 hover:bg-white/10 hover:text-white"
+            className={picoSecondaryButtonClass}
           >
             Open support <ArrowRight className="h-4 w-4" />
           </Link>

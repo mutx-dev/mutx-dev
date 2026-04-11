@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { ArrowRight, BookOpen, ListChecks, LifeBuoy, ShieldCheck, Sparkles } from "lucide-react";
 
 import { usePicoPath } from "@/components/pico/PicoPathProvider";
+import { picoPrimaryButtonClass, picoSecondaryButtonClass, picoSurfaceClass } from "@/components/pico/picoUi";
 
 type PicoProductShellProps = {
   title: string;
@@ -76,13 +77,13 @@ export function PicoProductShell({ title, description, actions, children }: Pico
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href={loginHref}
-              className="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-white/20 hover:bg-white/10 hover:text-white"
+              className={picoSecondaryButtonClass}
             >
               Sign in
             </Link>
             <Link
               href={registerHref}
-              className="rounded-full bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
+              className={picoPrimaryButtonClass}
             >
               Create account
             </Link>
@@ -108,7 +109,7 @@ export function PicoProductShell({ title, description, actions, children }: Pico
       </main>
 
       <footer className="site-shell pb-10 pt-2 text-sm text-white/45">
-        <div className="flex flex-col gap-3 rounded-[1.5rem] border border-white/10 bg-white/[0.03] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className={`${picoSurfaceClass} flex flex-col gap-3 px-5 py-4 lg:flex-row lg:items-center lg:justify-between`}>
           <p>Pico shows guided lessons, real control-plane data, and grounded help from the lesson corpus. Start keeps the first run in one place.</p>
           <div className="flex flex-wrap items-center gap-4">
             <Link href={startHref} className="inline-flex items-center gap-2 font-semibold text-cyan-100">

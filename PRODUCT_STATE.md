@@ -175,3 +175,26 @@ What failed
 
 What is next
 - Keep all future Pico work inside the existing canonical files and contracts.
+
+### 2026-04-11 03:19:11 CEST — Pico UI coherence upgrade
+What changed
+- Shifted from rebuild talk to a focused UI upgrade pass across Start, Lesson, Support, Control, and the shared Pico shell.
+- Added shared Pico UI class helpers so cards, buttons, fields, and section labels stop drifting page by page.
+- Made Start respect auth in the hero actions and visually feature the next incomplete step instead of treating every step equally.
+- Made Lesson pages show prerequisites earlier, stop baiting logged-out completion clicks, and turn completion into a clearer next-step receipt.
+- Reworked Support so local lesson matches preview immediately, tutor usage is only recorded when relevant, and human escalation can open with context instead of a blank wall.
+- Simplified Control starter deploy into a one-click default path with advanced settings collapsed, hardened refresh against partial fetch failure, and stopped threshold saves from pretending success on failed writes.
+
+What was tested
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
+
+What failed
+- No blocking Pico failures remain in this slice.
+- Existing repo-level Next/Turbopack warnings remain non-blocking.
+
+What is next
+- Keep tightening Academy hierarchy so the lesson list and next recommended action dominate over secondary progress chrome.
+- Add a cleaner auth wrapper for Pico login/register so trust does not dip at the account boundary.
+
