@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { ArrowRight, BookOpen, LifeBuoy, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, ListChecks, LifeBuoy, ShieldCheck, Sparkles } from "lucide-react";
 
 import { usePicoPath } from "@/components/pico/PicoPathProvider";
 
@@ -20,9 +20,14 @@ function navClasses(active: boolean) {
     : "rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/70 transition hover:border-white/20 hover:bg-white/10 hover:text-white";
 }
 
+function pathIsActive(pathname: string, href: string) {
+  return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+}
+
 export function PicoProductShell({ title, description, actions, children }: PicoProductShellProps) {
   const pathname = usePathname();
   const homeHref = usePicoPath("/");
+  const startHref = usePicoPath("/start");
   const academyHref = usePicoPath("/academy");
   const controlHref = usePicoPath("/control");
   const supportHref = usePicoPath("/support");
@@ -46,17 +51,22 @@ export function PicoProductShell({ title, description, actions, children }: Pico
           </div>
 
           <nav className="flex flex-wrap items-center gap-2">
-            <Link href={academyHref} className={navClasses(pathname.startsWith("/pico/academy"))}>
+            <Link href={startHref} className={navClasses(pathIsActive(pathname, startHref))}>
+              <span className="inline-flex items-center gap-2">
+                <ListChecks className="h-4 w-4" /> Start
+              </span>
+            </Link>
+            <Link href={academyHref} className={navClasses(pathIsActive(pathname, academyHref))}>
               <span className="inline-flex items-center gap-2">
                 <BookOpen className="h-4 w-4" /> Academy
               </span>
             </Link>
-            <Link href={controlHref} className={navClasses(pathname.startsWith("/pico/control"))}>
+            <Link href={controlHref} className={navClasses(pathIsActive(pathname, controlHref))}>
               <span className="inline-flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4" /> Control
               </span>
             </Link>
-            <Link href={supportHref} className={navClasses(pathname.startsWith("/pico/support"))}>
+            <Link href={supportHref} className={navClasses(pathIsActive(pathname, supportHref))}>
               <span className="inline-flex items-center gap-2">
                 <LifeBuoy className="h-4 w-4" /> Support
               </span>
@@ -99,10 +109,15 @@ export function PicoProductShell({ title, description, actions, children }: Pico
 
       <footer className="site-shell pb-10 pt-2 text-sm text-white/45">
         <div className="flex flex-col gap-3 rounded-[1.5rem] border border-white/10 bg-white/[0.03] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-          <p>Pico shows guided lessons, real control-plane data, and grounded help from the lesson corpus.</p>
-          <Link href={academyHref} className="inline-flex items-center gap-2 font-semibold text-cyan-100">
-            Continue in academy <ArrowRight className="h-4 w-4" />
-          </Link>
+          <p>Pico shows guided lessons, real control-plane data, and grounded help from the lesson corpus. Start keeps the first run in one place.</p>
+          <div className="flex flex-wrap items-center gap-4">
+            <Link href={startHref} className="inline-flex items-center gap-2 font-semibold text-cyan-100">
+              Open start <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href={academyHref} className="inline-flex items-center gap-2 font-semibold text-white/70">
+              Continue in academy <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </footer>
     </div>

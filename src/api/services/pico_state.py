@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
+from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -44,6 +45,83 @@ EVENT_ALIASES: dict[str, str] = {
     "approval_enabled": "approval_gate_enabled",
     "xp_awarded": "xp_granted",
 }
+TUTOR_SESSION_LIMITS: dict[str, int | None] = {
+    "FREE": 3,
+    "STARTER": 25,
+    "PRO": 100,
+    "ENTERPRISE": None,
+}
+TUTOR_RESET_POLICY = "lifetime"
+PICO_LESSON_CATALOG: dict[str, dict[str, str]] = {
+    "install-hermes-locally": {
+        "level_id": "level-0",
+        "track_id": "track-a",
+        "badge_id": "first-boot",
+    },
+    "run-your-first-agent": {
+        "level_id": "level-0",
+        "track_id": "track-a",
+        "badge_id": "first-boot",
+    },
+    "deploy-hermes-on-a-vps": {
+        "level_id": "level-1",
+        "track_id": "track-b",
+        "badge_id": "deployed",
+    },
+    "keep-your-agent-alive-between-sessions": {
+        "level_id": "level-1",
+        "track_id": "track-b",
+        "badge_id": "deployed",
+    },
+    "connect-a-messaging-or-interface-layer": {
+        "level_id": "level-1",
+        "track_id": "track-b",
+        "badge_id": "interface-online",
+    },
+    "add-your-first-skill-tool": {
+        "level_id": "level-2",
+        "track_id": "track-c",
+        "badge_id": "capable",
+    },
+    "create-a-scheduled-workflow": {
+        "level_id": "level-3",
+        "track_id": "track-c",
+        "badge_id": "automation-online",
+    },
+    "see-your-agent-activity": {
+        "level_id": "level-4",
+        "track_id": "track-d",
+        "badge_id": "operator-aware",
+    },
+    "set-a-cost-threshold": {
+        "level_id": "level-5",
+        "track_id": "track-d",
+        "badge_id": "guarded",
+    },
+    "add-an-approval-gate": {
+        "level_id": "level-5",
+        "track_id": "track-d",
+        "badge_id": "guarded",
+    },
+    "build-a-lead-response-style-agent": {
+        "level_id": "level-6",
+        "track_id": "track-e",
+        "badge_id": "production-ready",
+    },
+    "build-a-document-processing-style-agent": {
+        "level_id": "level-6",
+        "track_id": "track-e",
+        "badge_id": "production-ready",
+    },
+}
+TRACK_REQUIREMENTS: dict[str, tuple[str, ...]] = {}
+BADGE_REQUIREMENTS: dict[str, tuple[str, ...]] = {}
+for lesson_slug, lesson_meta in PICO_LESSON_CATALOG.items():
+    TRACK_REQUIREMENTS.setdefault(lesson_meta["track_id"], tuple())
+    TRACK_REQUIREMENTS[lesson_meta["track_id"]] = (*TRACK_REQUIREMENTS[lesson_meta["track_id"]], lesson_slug)
+    BADGE_REQUIREMENTS.setdefault(lesson_meta["badge_id"], tuple())
+    BADGE_REQUIREMENTS[lesson_meta["badge_id"]] = (*BADGE_REQUIREMENTS[lesson_meta["badge_id"]], lesson_slug)
+TOTAL_PICO_LESSONS = len(PICO_LESSON_CATALOG)
 
 
 def _utcnow() -> datetime:
@@ -78,6 +156,17 @@ def _coerce_nonnegative_int(value: Any, *, default: int = 0) -> int:
 
 
 
+def _coerce_nonnegative_float(value: Any) -> float | None:
+    if value in {None, ""}:
+        return None
+    try:
+        coerced = float(value)
+    except (TypeError, ValueError):
+        return None
+    return max(0.0, coerced)
+
+
+
 def _dedupe_strings(values: Any) -> list[str]:
     deduped: list[str] = []
     for value in values or []:
@@ -85,6 +174,12 @@ def _dedupe_strings(values: Any) -> list[str]:
         if item and item not in deduped:
             deduped.append(item)
     return deduped
+
+
+
+def _normalize_plan(plan: Any) -> str:
+    normalized = str(plan or "FREE").strip().upper()
+    return normalized if normalized in TUTOR_SESSION_LIMITS else "FREE"
 
 
 
@@ -97,6 +192,62 @@ def _level_from_xp(xp_total: int) -> int:
 
 
 
+def _level_floor_xp(level: int) -> int:
+    index = max(0, min(level - 1, len(LEVEL_THRESHOLDS) - 1))
+    return LEVEL_THRESHOLDS[index]
+
+
+
+def _build_level_progress(xp_total: int) -> dict[str, Any]:
+    current_level = _level_from_xp(xp_total)
+    current_level_floor_xp = _level_floor_xp(current_level)
+    next_level = current_level + 1 if current_level < len(LEVEL_THRESHOLDS) else None
+    next_level_target_xp = LEVEL_THRESHOLDS[current_level] if current_level < len(LEVEL_THRESHOLDS) else None
+    xp_into_level = max(0, xp_total - current_level_floor_xp)
+    xp_to_next_level = (
+        max(0, next_level_target_xp - xp_total) if next_level_target_xp is not None else None
+    )
+    if next_level_target_xp is None:
+        progress_percent = 100
+    else:
+        span = max(1, next_level_target_xp - current_level_floor_xp)
+        progress_percent = min(100, round((xp_into_level / span) * 100))
+    return {
+        "current_level": current_level,
+        "current_level_floor_xp": current_level_floor_xp,
+        "next_level": next_level,
+        "next_level_target_xp": next_level_target_xp,
+        "xp_into_level": xp_into_level,
+        "xp_to_next_level": xp_to_next_level,
+        "progress_percent": progress_percent,
+    }
+
+
+
+def _build_tutor_access(plan: str, used: int) -> dict[str, Any]:
+    limit = TUTOR_SESSION_LIMITS.get(plan, TUTOR_SESSION_LIMITS["FREE"])
+    remaining = None if limit is None else max(0, limit - used)
+    limit_reached = limit is not None and used >= limit
+    note = (
+        "Enterprise tutor lookups are currently unmetered because reset windows and billing are not implemented yet."
+        if limit is None
+        else (
+            f"{plan.title()} currently includes {limit} grounded tutor lookups total. "
+            "Counts do not reset automatically yet."
+        )
+    )
+    return {
+        "plan": plan,
+        "limit": limit,
+        "remaining": remaining,
+        "used": used,
+        "limit_reached": limit_reached,
+        "reset_policy": TUTOR_RESET_POLICY,
+        "note": note,
+    }
+
+
+
 def _normalize_event_name(event: str) -> str:
     normalized = str(event).strip().lower().replace("-", "_").replace(" ", "_")
     return EVENT_ALIASES.get(normalized, normalized)
@@ -104,10 +255,12 @@ def _normalize_event_name(event: str) -> str:
 
 
 def _default_pico_state(plan: str) -> dict[str, Any]:
+    normalized_plan = _normalize_plan(plan)
     return {
-        "plan": plan,
+        "plan": normalized_plan,
         "xp_total": 0,
         "current_level": 1,
+        "level_progress": _build_level_progress(0),
         "cost_threshold_usd": None,
         "approval_gate_enabled": False,
         "completed_lessons": [],
@@ -117,6 +270,7 @@ def _default_pico_state(plan: str) -> dict[str, Any]:
         "event_counts": {},
         "recent_events": [],
         "tutor_sessions_used": 0,
+        "tutor_access": _build_tutor_access(normalized_plan, 0),
         "updated_at": _utcnow().isoformat(),
     }
 
@@ -140,7 +294,8 @@ def _normalize_recent_event(payload: dict[str, Any] | None) -> dict[str, Any]:
 
 
 def _normalize_state(payload: dict[str, Any] | None, *, plan: str) -> dict[str, Any]:
-    state = _default_pico_state(plan)
+    normalized_plan = _normalize_plan(plan)
+    state = _default_pico_state(normalized_plan)
     if payload:
         state.update(payload)
 
@@ -155,14 +310,14 @@ def _normalize_state(payload: dict[str, Any] | None, *, plan: str) -> dict[str, 
             name = _normalize_event_name(str(key))
             normalized_counts[name] = _coerce_nonnegative_int(value, default=0)
 
-    state["plan"] = plan
+    tutor_sessions_used = _coerce_nonnegative_int(state.get("tutor_sessions_used"), default=0)
+    level_progress = _build_level_progress(xp_total)
+
+    state["plan"] = normalized_plan
     state["xp_total"] = xp_total
-    state["current_level"] = _level_from_xp(xp_total)
-    state["cost_threshold_usd"] = (
-        float(state["cost_threshold_usd"])
-        if state.get("cost_threshold_usd") not in {None, ""}
-        else None
-    )
+    state["current_level"] = level_progress["current_level"]
+    state["level_progress"] = level_progress
+    state["cost_threshold_usd"] = _coerce_nonnegative_float(state.get("cost_threshold_usd"))
     state["approval_gate_enabled"] = bool(state.get("approval_gate_enabled", False))
     state["completed_lessons"] = _dedupe_strings(state.get("completed_lessons"))
     state["completed_tracks"] = _dedupe_strings(state.get("completed_tracks"))
@@ -173,10 +328,8 @@ def _normalize_state(payload: dict[str, Any] | None, *, plan: str) -> dict[str, 
         _normalize_recent_event(item if isinstance(item, dict) else None)
         for item in recent_events_raw[-RECENT_EVENTS_LIMIT:]
     ]
-    state["tutor_sessions_used"] = _coerce_nonnegative_int(
-        state.get("tutor_sessions_used"),
-        default=0,
-    )
+    state["tutor_sessions_used"] = tutor_sessions_used
+    state["tutor_access"] = _build_tutor_access(normalized_plan, tutor_sessions_used)
     state["updated_at"] = (updated_at or _utcnow()).isoformat()
     return state
 
@@ -208,6 +361,111 @@ async def _upsert_setting(
         existing.value = value
     await db.flush()
     return existing
+
+
+
+def _append_unique(values: list[str], item_id: str | None) -> bool:
+    if item_id and item_id not in values:
+        values.append(item_id)
+        return True
+    return False
+
+
+
+def _award_milestone(
+    state: dict[str, Any],
+    milestone_id: str,
+    auto_progress: dict[str, list[str]],
+) -> int:
+    if _append_unique(state["milestones"], milestone_id):
+        auto_progress["milestones"].append(milestone_id)
+        return EVENT_XP_MAP["milestone_reached"]
+    return 0
+
+
+
+def _award_badge(state: dict[str, Any], badge_id: str, auto_progress: dict[str, list[str]]) -> int:
+    if _append_unique(state["badges"], badge_id):
+        auto_progress["badges"].append(badge_id)
+        return EVENT_XP_MAP["badge_earned"]
+    return 0
+
+
+
+def _award_track(state: dict[str, Any], track_id: str, auto_progress: dict[str, list[str]]) -> int:
+    if _append_unique(state["completed_tracks"], track_id):
+        auto_progress["completed_tracks"].append(track_id)
+        return EVENT_XP_MAP["track_completed"]
+    return 0
+
+
+
+def _apply_auto_progression(
+    state: dict[str, Any],
+    *,
+    canonical_event: str,
+    lesson_id: str | None,
+) -> tuple[int, dict[str, list[str]]]:
+    auto_progress = {
+        "completed_tracks": [],
+        "badges": [],
+        "milestones": [],
+    }
+    bonus_xp = 0
+    completed_lessons = state["completed_lessons"]
+
+    if canonical_event == "lesson_completed":
+        if completed_lessons:
+            bonus_xp += _award_milestone(state, "first_lesson_finished", auto_progress)
+
+        lesson_meta = PICO_LESSON_CATALOG.get(lesson_id or "")
+        if lesson_meta:
+            badge_id = lesson_meta["badge_id"]
+            badge_requirements = BADGE_REQUIREMENTS.get(badge_id, ())
+            if badge_requirements and all(slug in completed_lessons for slug in badge_requirements):
+                bonus_xp += _award_badge(state, badge_id, auto_progress)
+
+            track_id = lesson_meta["track_id"]
+            track_requirements = TRACK_REQUIREMENTS.get(track_id, ())
+            if track_requirements and all(slug in completed_lessons for slug in track_requirements):
+                bonus_xp += _award_track(state, track_id, auto_progress)
+
+        if state["completed_tracks"]:
+            bonus_xp += _award_milestone(state, "first_track_finished", auto_progress)
+
+        if TOTAL_PICO_LESSONS and len(completed_lessons) >= TOTAL_PICO_LESSONS:
+            bonus_xp += _award_milestone(state, "academy_completed", auto_progress)
+    elif canonical_event == "track_completed" and state["completed_tracks"]:
+        bonus_xp += _award_milestone(state, "first_track_finished", auto_progress)
+    elif canonical_event == "tutor_session_used" and state["tutor_sessions_used"] > 0:
+        bonus_xp += _award_milestone(state, "grounded_tutor_used", auto_progress)
+    elif canonical_event == "starter_agent_deployed":
+        bonus_xp += _award_milestone(state, "starter_agent_live", auto_progress)
+    elif canonical_event == "cost_threshold_set":
+        bonus_xp += _award_milestone(state, "budget_guardrail_set", auto_progress)
+    elif canonical_event == "approval_gate_enabled":
+        bonus_xp += _award_milestone(state, "approval_guardrail_live", auto_progress)
+
+    return bonus_xp, auto_progress
+
+
+
+def _enforce_tutor_limit(*, state: dict[str, Any], plan: str, requested_sessions: int) -> None:
+    limit = TUTOR_SESSION_LIMITS.get(plan, TUTOR_SESSION_LIMITS["FREE"])
+    if limit is None:
+        return
+
+    used = _coerce_nonnegative_int(state.get("tutor_sessions_used"), default=0)
+    remaining = max(0, limit - used)
+    if requested_sessions > remaining:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                f"{plan.title()} currently includes {limit} grounded tutor lookups total. "
+                f"You have {remaining} remaining and requested {requested_sessions}. "
+                "Counts do not reset automatically yet."
+            ),
+        )
 
 
 async def get_pico_state(
@@ -246,6 +504,7 @@ async def record_pico_event(
     badge_id = str(badge_id).strip() if badge_id else None
     milestone_id = str(milestone_id).strip() if milestone_id else None
     tutor_sessions = _coerce_nonnegative_int(tutor_sessions, default=0)
+    event_metadata = dict(metadata or {})
 
     xp_awarded = EVENT_XP_MAP.get(canonical_event, 0) if xp is None else _coerce_nonnegative_int(xp)
 
@@ -271,24 +530,28 @@ async def record_pico_event(
             xp_awarded = 0
     elif canonical_event == "tutor_session_used":
         sessions_used = max(1, tutor_sessions or 1)
+        plan = _normalize_plan(user.plan)
+        _enforce_tutor_limit(state=state, plan=plan, requested_sessions=sessions_used)
         state["tutor_sessions_used"] += sessions_used
+        tutor_sessions = sessions_used
         if xp is None:
             xp_awarded = EVENT_XP_MAP[canonical_event] * sessions_used
     elif canonical_event == "cost_threshold_set":
-        threshold = metadata.get("threshold_usd") if isinstance(metadata, dict) else None
-        if threshold is not None:
-            state["cost_threshold_usd"] = float(threshold)
+        threshold = event_metadata.get("threshold_usd")
+        normalized_threshold = _coerce_nonnegative_float(threshold)
+        if normalized_threshold is not None:
+            state["cost_threshold_usd"] = normalized_threshold
     elif canonical_event == "approval_gate_enabled":
         state["approval_gate_enabled"] = True
 
-    if lesson_id and canonical_event != "lesson_completed" and lesson_id not in completed_lessons:
-        completed_lessons.append(lesson_id)
-    if track_id and canonical_event != "track_completed" and track_id not in completed_tracks:
-        completed_tracks.append(track_id)
-    if badge_id and canonical_event != "badge_earned" and badge_id not in badges:
-        badges.append(badge_id)
-    if milestone_id and canonical_event != "milestone_reached" and milestone_id not in milestones:
-        milestones.append(milestone_id)
+    bonus_xp, auto_progress = _apply_auto_progression(
+        state,
+        canonical_event=canonical_event,
+        lesson_id=lesson_id,
+    )
+    if any(auto_progress.values()):
+        event_metadata["auto_progress"] = auto_progress
+    xp_awarded += bonus_xp
 
     state["xp_total"] = _coerce_nonnegative_int(state.get("xp_total"), default=0) + xp_awarded
     state["current_level"] = _level_from_xp(state["xp_total"])
@@ -304,7 +567,7 @@ async def record_pico_event(
             "milestone_id": milestone_id,
             "tutor_sessions": tutor_sessions,
             "created_at": now,
-            "metadata": dict(metadata or {}),
+            "metadata": event_metadata,
         },
     ][-RECENT_EVENTS_LIMIT:]
     state["updated_at"] = now

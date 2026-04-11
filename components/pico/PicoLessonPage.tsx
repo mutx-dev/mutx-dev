@@ -39,7 +39,7 @@ export function PicoLessonPage({ lesson }: PicoLessonPageProps) {
   const basePath = usePicoBasePath();
   const academyHref = buildPicoPath(basePath, "/academy");
   const supportHref = `${buildPicoPath(basePath, "/support")}?q=${encodeURIComponent(lesson.support.prompt)}`;
-  const loginHref = buildPicoPath(basePath, "/login");
+  const startHref = buildPicoPath(basePath, "/start");
   const nextLesson = getNextPicoLesson(lesson.slug);
   const { state, loading, error, refresh, markCompleted } = usePicoState();
   const completed = state.completedLessonSlugs.includes(lesson.slug);
@@ -186,9 +186,9 @@ export function PicoLessonPage({ lesson }: PicoLessonPageProps) {
             </div>
             {!state.authenticated && !loading ? (
               <div className="mt-4 rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] p-4 text-sm text-amber-50">
-                Sign in to save completion and keep your academy progress synced.
+                Open Pico start to sign in, keep academy progress synced, and follow the first-run checklist in one place.
                 <div className="mt-3">
-                  <Link href={loginHref} className="font-semibold text-white">Go to sign in</Link>
+                  <Link href={startHref} className="font-semibold text-white">Open Pico start</Link>
                 </div>
               </div>
             ) : null}
@@ -212,6 +212,10 @@ export function PicoLessonPage({ lesson }: PicoLessonPageProps) {
             <Link href={supportHref} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-cyan-100">
               Open grounded support <ArrowRight className="h-4 w-4" />
             </Link>
+            <p className="mt-3 text-sm text-white/45">
+              Tutor lookups remaining: {state.tutorAccess.remaining ?? "∞"}
+              {state.tutorAccess.limit === null ? " for the current plan flag." : ` of ${state.tutorAccess.limit}.`}
+            </p>
             <p className="mt-3 text-sm text-white/45">Escalate when: {lesson.support.escalation}</p>
           </div>
         </aside>

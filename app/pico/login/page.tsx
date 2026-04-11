@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 
 import { AuthPage } from "@/components/auth/AuthPage";
-import { getPicoBasePath } from "@/lib/pico/routing";
+import { buildPicoPath, getPicoBasePath } from "@/lib/pico/routing";
 
 export default async function PicoLoginPage({
   searchParams,
@@ -13,18 +13,19 @@ export default async function PicoLoginPage({
   const requestHeaders = await headers();
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
   const routePrefix = getPicoBasePath(host);
+  const defaultNextPath = buildPicoPath(routePrefix, "/start");
 
   return (
     <AuthPage
       mode="login"
-      nextPath={nextPath ?? `${routePrefix}/academy`}
+      nextPath={nextPath ?? defaultNextPath}
       routePrefix={routePrefix}
       contentOverride={{
         eyebrow: "Pico sign-in",
-        title: "Sign in and return to the Pico academy.",
+        title: "Sign in and return to Pico start.",
         description:
-          "Use the same hosted auth flow, then continue into Pico lessons, control, and support instead of a waitlist shell.",
-        subheading: "Sign in and keep your Pico lesson progress synced.",
+          "Use the hosted auth flow, then continue through the shipped Pico checklist: academy, starter deploy, control, and grounded support.",
+        subheading: "Sign in and keep your Pico lesson progress and operator state synced.",
       }}
     />
   );

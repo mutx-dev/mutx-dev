@@ -93,3 +93,30 @@ What is next
 - Commit this cycle cleanly.
 - Improve tutor escalation and content-gap capture.
 - Tighten plan gating from soft messaging into simple enforceable limits where the underlying behavior already exists.
+
+### 2026-04-11T00:11:28Z START
+- Executive order received: continue until PicoMUTX is functionally finished, not just sketched.
+- Coordinating three parallel Hermes workstreams: onboarding/public-path cleanup, plan-gating+tutor progression, and QA/test hardening.
+
+### 2026-04-11T00:32:00Z END
+What changed
+- Added a real Pico onboarding entry route at /pico/start with a first-run checklist across auth, academy, starter deploy, and control review.
+- Hardened plan-aware tutor usage and progression state with visible tutor limits, richer XP runway, badges, milestones, and track progress.
+- Added unit coverage for Pico academy, support, control helpers, and frontend state normalization.
+- Fixed Pico frontend state parsing so backend lesson_completed events and lesson_id payloads are recognized correctly.
+- Kept the starter deploy, threshold, and approval flows wired to real existing APIs instead of fake shell state.
+
+What was tested
+- npm run typecheck
+- npm run lint
+- npm run build
+- /Users/fortune/MUTX/.venv/bin/python -m pytest tests/api/test_pico_route.py -q
+- npx jest --runInBand tests/unit/picoState.test.ts tests/unit/picoAcademyPage.test.tsx tests/unit/picoSupportPage.test.tsx tests/unit/picoControlPage.test.ts
+
+What failed
+- No blocking failures remain.
+- Existing non-blocking warnings still appear from Next workspace-root/NFT tracing and OpenTelemetry exporter shutdown noise after pytest.
+
+What is next
+- Merge this coordinated finish-pass.
+- If we keep pushing, the next real gains are billing integration or deeper live run/alert authoring, not more shell paint.

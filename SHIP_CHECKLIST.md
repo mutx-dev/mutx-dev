@@ -20,6 +20,7 @@ Updated: 2026-04-11T00:55:00Z
 - [x] Auth-required pages fail cleanly.
 - [x] Typecheck passes.
 - [x] Backend tests for new state endpoints pass.
+- [x] Pico unit tests cover academy, support, control helpers, and state normalization.
 - [x] Lint passes.
 - [x] Build passes.
 

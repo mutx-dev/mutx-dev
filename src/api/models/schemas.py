@@ -587,10 +587,31 @@ class PicoRecentEventResponse(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+class PicoTutorAccessResponse(BaseModel):
+    plan: str
+    limit: int | None = Field(default=None, ge=0)
+    remaining: int | None = Field(default=None, ge=0)
+    used: int = Field(default=0, ge=0)
+    limit_reached: bool = False
+    reset_policy: str = "lifetime"
+    note: str | None = None
+
+
+class PicoLevelProgressResponse(BaseModel):
+    current_level: int = Field(default=1, ge=1)
+    current_level_floor_xp: int = Field(default=0, ge=0)
+    next_level: int | None = Field(default=None, ge=1)
+    next_level_target_xp: int | None = Field(default=None, ge=0)
+    xp_into_level: int = Field(default=0, ge=0)
+    xp_to_next_level: int | None = Field(default=None, ge=0)
+    progress_percent: int = Field(default=0, ge=0, le=100)
+
+
 class PicoStateResponse(BaseModel):
     plan: str
     xp_total: int = Field(default=0, ge=0)
     current_level: int = Field(default=1, ge=1)
+    level_progress: PicoLevelProgressResponse
     cost_threshold_usd: float | None = Field(default=None, ge=0)
     approval_gate_enabled: bool = False
     completed_lessons: list[str] = Field(default_factory=list)
@@ -600,6 +621,7 @@ class PicoStateResponse(BaseModel):
     event_counts: dict[str, int] = Field(default_factory=dict)
     recent_events: list[PicoRecentEventResponse] = Field(default_factory=list)
     tutor_sessions_used: int = Field(default=0, ge=0)
+    tutor_access: PicoTutorAccessResponse
     updated_at: datetime | None = None
 
 

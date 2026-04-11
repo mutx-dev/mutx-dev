@@ -32,7 +32,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-function extractError(payload: unknown, fallback: string) {
+export function extractPicoControlError(payload: unknown, fallback: string) {
   if (typeof payload === "string") return payload;
   if (isRecord(payload)) {
     if (typeof payload.detail === "string") return payload.detail;
@@ -44,13 +44,50 @@ function extractError(payload: unknown, fallback: string) {
   return fallback;
 }
 
-function slugifyAssistantId(value: string) {
+export function slugifyAssistantId(value: string) {
   return value
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 48) || "pico-assistant";
+}
+
+export function buildStarterDeployPayload({
+  name,
+  workspace,
+  model,
+}: {
+  name: string;
+  workspace: string;
+  model: string;
+}) {
+  return {
+    name,
+    description: "Starter assistant deployed from PicoMUTX",
+    model,
+    assistant_id: slugifyAssistantId(name),
+    workspace,
+    replicas: 1,
+    skills: ["workspace_memory"],
+    runtime_metadata: {
+      launched_from: "pico",
+      academy: true,
+    },
+  };
+}
+
+export function buildStarterDeployEventPayload(payload: unknown) {
+  return {
+    event: "starter_agent_deployed",
+    metadata: isRecord(payload)
+      ? {
+          template_id: payload.template_id,
+          agent_id: isRecord(payload.agent) ? payload.agent.id : null,
+          deployment_id: isRecord(payload.deployment) ? payload.deployment.id : null,
+        }
+      : {},
+  };
 }
 
 function SectionCard({
@@ -88,9 +125,9 @@ function SectionCard({
 
 export function PicoControlPage() {
   const basePath = usePicoBasePath();
-  const loginHref = buildPicoPath(basePath, "/login");
   const academyHref = buildPicoPath(basePath, "/academy");
-  const { state: picoState } = usePicoState();
+  const startHref = buildPicoPath(basePath, "/start");
+  const { state: picoState, refresh: refreshPicoState } = usePicoState();
   const [sections, setSections] = useState<Record<string, SectionResult>>({});
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
@@ -117,7 +154,7 @@ export function PicoControlPage() {
             ok: response.ok,
             status: response.status,
             payload,
-            error: response.ok ? null : extractError(payload, `Failed to load ${key}`),
+            error: response.ok ? null : extractPicoControlError(payload, `Failed to load ${key}`),
           } satisfies SectionResult,
         ] as const;
       }),
@@ -161,9 +198,12 @@ export function PicoControlPage() {
         : planLabel === "PRO"
           ? "Pro assumes multiple monitored agents plus stronger control habits."
           : "Team stays soft-gated until multi-user behavior is actually implemented.";
-  const picoRaw = isRecord(picoState.raw) ? picoState.raw : null;
-  const currentThreshold = typeof picoRaw?.cost_threshold_usd === "number" ? picoRaw.cost_threshold_usd : null;
-  const approvalGateEnabled = picoRaw?.approval_gate_enabled === true;
+  const currentThreshold = picoState.costThresholdUsd;
+  const approvalGateEnabled = picoState.approvalGateEnabled;
+  const tutorAccessLabel =
+    picoState.tutorAccess.limit === null
+      ? "Grounded tutor is unmetered for this plan flag in the current build."
+      : `${picoState.tutorAccess.used}/${picoState.tutorAccess.limit} grounded tutor lookups used, ${picoState.tutorAccess.remaining} remaining.`;
 
   async function handleDeployStarter() {
     setDeploying(true);
@@ -171,46 +211,30 @@ export function PicoControlPage() {
     setDeployReceipt(null);
 
     try {
-      const assistantId = slugifyAssistantId(starterName);
       const response = await fetch("/api/dashboard/templates/personal_assistant/deploy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: starterName,
-          description: "Starter assistant deployed from PicoMUTX",
-          model: starterModel,
-          assistant_id: assistantId,
-          workspace: starterWorkspace,
-          replicas: 1,
-          skills: ["workspace_memory"],
-          runtime_metadata: {
-            launched_from: "pico",
-            academy: true,
-          },
-        }),
+        body: JSON.stringify(
+          buildStarterDeployPayload({
+            name: starterName,
+            workspace: starterWorkspace,
+            model: starterModel,
+          }),
+        ),
       });
       const payload = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(extractError(payload, "Failed to deploy starter assistant"));
+        throw new Error(extractPicoControlError(payload, "Failed to deploy starter assistant"));
       }
 
       setDeployReceipt(isRecord(payload) ? payload : { receipt: payload });
       await fetch("/api/pico/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          event: "starter_agent_deployed",
-          metadata: isRecord(payload)
-            ? {
-                template_id: payload.template_id,
-                agent_id: isRecord(payload.agent) ? payload.agent.id : null,
-                deployment_id: isRecord(payload.deployment) ? payload.deployment.id : null,
-              }
-            : {},
-        }),
+        body: JSON.stringify(buildStarterDeployEventPayload(payload)),
       }).catch(() => null);
-      await refresh();
+      await Promise.all([refresh(), refreshPicoState()]);
     } catch (error) {
       setDeployError(error instanceof Error ? error.message : "Failed to deploy starter assistant");
     } finally {
@@ -234,6 +258,7 @@ export function PicoControlPage() {
         metadata: { threshold_usd: threshold },
       }),
     });
+    await refreshPicoState();
     setThresholdMessage(`Soft threshold saved at ${threshold}. This is a Pico operator guardrail, not hard budget enforcement.`);
   }
 
@@ -258,7 +283,7 @@ export function PicoControlPage() {
     const payload = await response.json().catch(() => null);
 
     if (!response.ok) {
-      setApprovalMessage(extractError(payload, "Failed to create approval gate request."));
+      setApprovalMessage(extractPicoControlError(payload, "Failed to create approval gate request."));
       return;
     }
 
@@ -268,7 +293,7 @@ export function PicoControlPage() {
       body: JSON.stringify({ event: "approval_gate_enabled", metadata: { action_type: "external_send" } }),
     }).catch(() => null);
     setApprovalMessage("Approval gate request created. Review the pending approvals panel below.");
-    await refresh();
+    await Promise.all([refresh(), refreshPicoState()]);
   }
 
   return (
@@ -287,26 +312,29 @@ export function PicoControlPage() {
     >
       {authRequired ? (
         <div className="rounded-[1.5rem] border border-amber-300/20 bg-amber-300/[0.08] p-6 text-sm leading-7 text-amber-50">
-          Sign in first. These panels read authenticated same-origin APIs and stay honest when the session is missing.
+          Open Pico start first. These panels read authenticated same-origin APIs and stay honest when the session is missing.
           <div className="mt-4">
-            <Link href={loginHref} className="font-semibold text-white">
-              Go to sign in
+            <Link href={startHref} className="font-semibold text-white">
+              Open Pico start
             </Link>
           </div>
         </div>
       ) : null}
 
-      <div className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
+      <div className="grid gap-5 xl:grid-cols-3">
         <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/50">
           {lastUpdated ? `Last refreshed ${new Date(lastUpdated).toLocaleString()}.` : "Loading live control data..."}
         </div>
         <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/68">
           <span className="font-semibold text-white">Plan {planLabel}</span>. {planNote}
         </div>
+        <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/68">
+          <span className="font-semibold text-white">Tutor access</span>. {tutorAccessLabel}
+        </div>
       </div>
 
       {!authRequired && !assistantRuntime ? (
-        <section className="rounded-[1.5rem] border border-cyan-300/20 bg-cyan-300/[0.06] p-6">
+        <section id="starter-deploy" className="rounded-[1.5rem] border border-cyan-300/20 bg-cyan-300/[0.06] p-6 scroll-mt-24">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100/90">
@@ -374,7 +402,7 @@ export function PicoControlPage() {
       ) : null}
 
       {!authRequired ? (
-        <section className="grid gap-5 xl:grid-cols-2">
+        <section id="control-review" className="grid gap-5 xl:grid-cols-2 scroll-mt-24">
           <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-6">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100/90">Cost threshold</p>
             <h2 className="mt-2 text-xl font-semibold text-white">Set one visible spending line.</h2>

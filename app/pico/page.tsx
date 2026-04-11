@@ -10,9 +10,9 @@ import {
   getPageOgImageUrl,
 } from "@/lib/seo";
 
-const pageTitle = "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer";
+const pageTitle = "PicoMUTX — Academy, starter deploy, and control for your first agent";
 const pageDescription =
-  "PicoMUTX helps founders, operators, and small teams build, deploy, and run AI agents safely with a real academy, a live control surface, and grounded support.";
+  "Pico gives a small team a shipped lesson corpus, a starter deploy path, a live control surface, and grounded support for first-run agent setup.";
 
 export const metadata: Metadata = {
   title: pageTitle,

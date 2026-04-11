@@ -22,8 +22,10 @@ Ship the narrowest honest PicoMUTX product loop that gets a user from signup to 
 - Pico control page backed by assistant, runs, alerts, budget, runtime, and approvals data.
 - Grounded tutor/support page tied to the lesson corpus.
 - Pico auth entry routes for login/register.
+- Real onboarding/start route tying auth, academy, starter deploy, and control review together.
 - In-product starter deploy flow via the real personal_assistant template route.
-- Soft plan-flag messaging in Pico control.
+- Soft plan-flag messaging plus practical tutor gating in Pico control/support.
+- Pico-specific unit test coverage for academy, support, control helpers, and state normalization.
 
 ## Active tasks
 - [in_progress] Commit and handoff this foundation slice.

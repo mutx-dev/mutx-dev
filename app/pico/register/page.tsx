@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 
 import { AuthPage } from "@/components/auth/AuthPage";
-import { getPicoBasePath } from "@/lib/pico/routing";
+import { buildPicoPath, getPicoBasePath } from "@/lib/pico/routing";
 
 export default async function PicoRegisterPage({
   searchParams,
@@ -13,18 +13,19 @@ export default async function PicoRegisterPage({
   const requestHeaders = await headers();
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
   const routePrefix = getPicoBasePath(host);
+  const defaultNextPath = buildPicoPath(routePrefix, "/start");
 
   return (
     <AuthPage
       mode="register"
-      nextPath={nextPath ?? `${routePrefix}/academy`}
+      nextPath={nextPath ?? defaultNextPath}
       routePrefix={routePrefix}
       contentOverride={{
         eyebrow: "Pico access",
-        title: "Create your Pico account and start the academy.",
+        title: "Create your Pico account and return to Pico start.",
         description:
-          "Registration still uses the hosted auth API, but the first destination is the Pico product surface: academy, control, and grounded support.",
-        subheading: "Create an account and start saving Pico progress.",
+          "Registration still uses the hosted auth API, but the first destination is the shipped Pico checklist: academy, starter deploy, control, and grounded support.",
+        subheading: "Create an account and start saving Pico progress and control state.",
       }}
     />
   );

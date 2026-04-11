@@ -58,8 +58,9 @@ function HowItWorksIcon({ kind }: { kind: string }) {
 export function PicoLandingPage() {
   const t = useTranslations('pico')
   const prefersReducedMotion = useReducedMotion()
+  const homeHref = usePicoPath('/')
   const academyHref = usePicoPath('/academy')
-  const registerHref = usePicoPath('/register')
+  const startHref = usePicoPath('/start')
 
   return (
     <div className={s.page}>
@@ -67,7 +68,7 @@ export function PicoLandingPage() {
       {/* Navigation */}
       <nav className={s.nav}>
         <div className={s.navInner}>
-          <Link href="https://pico.mutx.dev" className={s.navBrand}>
+          <Link href={homeHref} className={s.navBrand}>
             <span className={s.navLogo}>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <rect width="20" height="20" rx="5" fill="url(#grad)" />
@@ -86,7 +87,7 @@ export function PicoLandingPage() {
             </span>
           </Link>
           <PicoLangSwitcher />
-          <Link className={s.navCta} href={academyHref}>Open academy</Link>
+          <Link className={s.navCta} href={startHref}>Open start</Link>
         </div>
       </nav>
 
@@ -113,9 +114,12 @@ export function PicoLandingPage() {
 
             <SiteReveal delay={0.22}>
               <div className={s.heroActions}>
-                <Link href={academyHref} className={s.btnPrimary}>
-                  Open academy
+                <Link href={startHref} className={s.btnPrimary}>
+                  Start Pico
                   <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link href={academyHref} className={s.btnSecondary}>
+                  Browse academy
                 </Link>
               </div>
             </SiteReveal>
@@ -322,8 +326,8 @@ export function PicoLandingPage() {
                   <div className={s.ctaFormWrap}>
                     <p className={s.formHeadline}>{t('finalCta.formHeadline')}</p>
                     <p className={s.formSubline}>{t('finalCta.formSubline')}</p>
-                    <Link href={registerHref} className={s.btnPrimary}>
-                      Create Pico account
+                    <Link href={startHref} className={s.btnPrimary}>
+                      Open start checklist
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                     <p className={s.formCtaMeta}>{t('finalCta.formCtaMeta')}</p>
