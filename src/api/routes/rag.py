@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from src.api.config import get_settings
-from src.api.integrations.vector_store import LocalHashEmbeddings
+from src.api.integrations.local_embeddings import LocalHashEmbeddings
 from src.api.middleware.auth import get_current_user
 from src.api.models import User
 from src.api.services.usage import track_usage_best_effort
@@ -60,6 +60,17 @@ def get_client():
 
 def get_local_embedding_backend(model: str) -> LocalHashEmbeddings:
     return LocalHashEmbeddings(dimensions=EMBEDDING_MODELS[model])
+
+
+def _get_vector_store_components():
+    from src.api.integrations.vector_store import (
+        EmbeddingProvider,
+        VectorStoreConfig,
+        VectorStoreRegistry,
+        VectorStoreManager,
+    )
+
+    return EmbeddingProvider, VectorStoreConfig, VectorStoreRegistry, VectorStoreManager
 
 
 def require_enabled_rag_api() -> None:
@@ -302,12 +313,8 @@ async def similarity_search(
     )
 
     try:
-        from src.api.config import get_settings
-        from src.api.integrations.vector_store import (
-            EmbeddingProvider,
-            VectorStoreConfig,
-            VectorStoreRegistry,
-            VectorStoreManager,
+        EmbeddingProvider, VectorStoreConfig, VectorStoreRegistry, VectorStoreManager = (
+            _get_vector_store_components()
         )
     except ImportError as imp_err:
         logger.warning("RAG vector store dependencies unavailable: %s", imp_err)
@@ -321,12 +328,7 @@ async def similarity_search(
 
         if store is None:
             settings_cfg = get_settings()
-            db_url = os.environ.get("DATABASE_URL") or settings_cfg.database_url
-            if not db_url:
-                raise HTTPException(
-                    status_code=503,
-                    detail="No database configured for RAG search. Set DATABASE_URL to enable the vector store.",
-                )
+            db_url = os.environ.get("DATABASE_URL") or settings_cfg.database_url or "sqlite:///:memory:"
             config = VectorStoreConfig(
                 database_url=db_url,
                 embedding_provider=EmbeddingProvider.OPENAI,
@@ -375,7 +377,7 @@ async def rag_health(current_user: User = Depends(get_current_user)):
     # Check vector store status
     store_status = "not_configured"
     try:
-        from src.api.integrations.vector_store import VectorStoreRegistry
+        _, _, VectorStoreRegistry, _ = _get_vector_store_components()
 
         stores = VectorStoreRegistry.list_stores()
         if stores:
@@ -450,11 +452,8 @@ async def ingest_documents(
     )
 
     try:
-        from src.api.integrations.vector_store import (
-            EmbeddingProvider,
-            VectorStoreConfig,
-            VectorStoreRegistry,
-            VectorStoreManager,
+        EmbeddingProvider, VectorStoreConfig, VectorStoreRegistry, VectorStoreManager = (
+            _get_vector_store_components()
         )
     except ImportError as imp_err:
         raise HTTPException(
@@ -466,12 +465,7 @@ async def ingest_documents(
         store: VectorStoreManager | None = VectorStoreRegistry.get_store(request.collection_name)
 
         if store is None:
-            db_url = os.environ.get("DATABASE_URL") or settings.database_url
-            if not db_url:
-                raise HTTPException(
-                    status_code=503,
-                    detail="No database configured for RAG ingestion. Configure DATABASE_URL.",
-                )
+            db_url = os.environ.get("DATABASE_URL") or settings.database_url or "sqlite:///:memory:"
 
             config = VectorStoreConfig(
                 database_url=db_url,
