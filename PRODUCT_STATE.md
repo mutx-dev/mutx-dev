@@ -54,8 +54,9 @@ It is not a fake community clone, not a no-code builder, and not a dashboard ful
 - Route-prefix navigation behavior from the shadow sessions was preserved so links work both on `pico.mutx.dev/*` and local `/pico/*` paths.
 - Approval request validation helpers were kept under `app/api/pico/approvals/_validation.ts` because they strengthen the canonical approvals bridge without creating a parallel Pico model.
 - Better tutor response handling was folded into `components/pico/PicoTutorPageClient.tsx` and `lib/pico/tutor.ts`.
-- Legacy path compatibility was reduced to redirects only:
-  - `/pico/app` -> redirects to `/pico/onboarding`
+- Legacy path compatibility was reduced to one canonical workspace entry plus redirects:
+  - `/pico/app` -> canonical workspace entry, rendering the onboarding-first workspace shell
+  - `/pico/onboarding` -> redirects to `/pico/app`
   - `/pico/app/lessons/[slug]` -> redirects to `/pico/academy/[slug]`
   - `/pico/workspace` -> redirects to `/pico/onboarding`
 
@@ -79,7 +80,7 @@ Deleted because they duplicated the Pico product, state, or tutor model instead 
 
 ### Honest limitations
 - Billing is still flag-driven, not wired to checkout.
-- Live runtime ingestion is still lighter than the eventual full control-plane bridge.
+- Approval persistence is still backed by the shared in-memory approvals service, now tightened for visibility but not yet durable across restarts.
 - Build still emits the existing repo-wide Turbopack NFT warning around `next.config.js`; not a Pico blocker.
 
 ### Not blocked
@@ -133,3 +134,30 @@ What failed
 What is next
 - Keep shipping inside the canonical Pico files only.
 - If another session produces Pico changes outside that order, absorb the useful parts and delete the shadow immediately.
+
+### 2026-04-11 02:58:00 CEST — finish pass
+What changed
+- Added Pico-specific metadata for academy, tutor, autopilot, support, workspace, and lesson pages.
+- Fixed academy next-step behavior so `Start lesson` actually opens the lesson instead of just toggling local state.
+- Made selected tracks influence the next recommended lesson once the prerequisites are unlocked.
+- Hardened support escalation so the contact form resets its default interest correctly and tags support vs office-hours sources honestly.
+- Added drill-down links from autopilot live signals into the real MUTX dashboard surfaces.
+- Tightened approvals visibility so generic approval requests are no longer listed cross-user by default.
+- Fixed tutor link resolution so lesson and support links no longer double-prefix under `/pico`.
+- Hardened local/remote progress merge so an empty authenticated account does not wipe meaningful local progress on first sync.
+
+What was tested
+- `rm -rf .next && npm run typecheck`
+- `npx jest --runInBand tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `./.venv/bin/python -m pytest tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
+- `npm run build`
+- Browser smoke on `/pico`, `/pico/app`, `/pico/academy`, `/pico/tutor`, and `/pico/autopilot`
+- Interactive tutor smoke for the keepalive question with working lesson/support links
+
+What failed
+- No Pico product blocker remains.
+- Only existing repo-wide warning noise remains.
+
+What is next
+- PicoMUTX v1 is finished enough to ship.
+- Future work is post-v1 hardening: durable approvals, real billing, and deeper runtime ingestion.
