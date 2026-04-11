@@ -20,6 +20,7 @@ import {
   formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import { ReturnLoopPanel } from "@/components/dashboard/ReturnLoopPanel";
 
 import type { components } from "@/app/types/api";
 
@@ -365,6 +366,12 @@ export function DashboardOverviewPageClient() {
       ) : null}
 
       <BriefingBar entries={briefingBarEntries} />
+
+      <ReturnLoopPanel
+        runs={runs}
+        alerts={alerts}
+        liveAgentCount={liveAgents.length}
+      />
 
       <LiveKpiGrid>
         <LiveStatCard

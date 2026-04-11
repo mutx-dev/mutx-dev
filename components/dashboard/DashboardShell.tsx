@@ -4,13 +4,14 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Activity,
   Bell,
   FolderOpen,
   Globe,
   Menu,
+  RotateCcw,
   Server,
   Settings2,
   Shield,
@@ -23,6 +24,8 @@ import { DesktopWindowShell } from "@/components/desktop/DesktopWindowShell";
 import { useDesktopStatus } from "@/components/desktop/useDesktopStatus";
 import { useDesktopWindow } from "@/components/desktop/useDesktopWindow";
 import { cn } from "@/lib/utils";
+import { formatRelativeTime } from "@/components/dashboard/livePrimitives";
+import { getResumeVisit, trackDashboardVisit, type DashboardVisitRecord } from "@/components/dashboard/returnLoopState";
 
 import {
   ALL_DASHBOARD_NAV_ITEMS,
@@ -95,6 +98,7 @@ function DashboardNav({ onNavigate, pathname }: DashboardNavProps) {
 
 export function DashboardShell({ children }: DashboardShellProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const { status, isDesktop, platformReady, refetch } = useDesktopStatus();
   const { currentWindow, openPreferences, updateCurrentWindow } = useDesktopWindow();
@@ -102,6 +106,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
   const [clockLabel, setClockLabel] = useState("--:--");
   const [actionBusy, setActionBusy] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [resumeVisit, setResumeVisit] = useState<DashboardVisitRecord | null>(null);
 
   useEffect(() => {
     const formatter = new Intl.DateTimeFormat(undefined, {
@@ -120,6 +125,16 @@ export function DashboardShell({ children }: DashboardShellProps) {
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!pathname) {
+      return;
+    }
+
+    const query = searchParams?.toString();
+    const nextState = trackDashboardVisit(pathname, query ? `?${query}` : "");
+    setResumeVisit(getResumeVisit(nextState.visits, pathname));
+  }, [pathname, searchParams]);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -334,6 +349,26 @@ export function DashboardShell({ children }: DashboardShellProps) {
           ))}
         </div>
       </div>
+
+      {resumeVisit ? (
+        <div className="rounded-[18px] border border-[#2b3948] bg-[linear-gradient(180deg,#161d26_0%,#0f141a_100%)] px-3.5 py-3.5">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#8b99aa]">Resume Session</p>
+            <RotateCcw className="h-3.5 w-3.5 text-[#8fd8ff]" />
+          </div>
+          <p className="mt-2 text-sm font-medium text-[#edf4fb]">{resumeVisit.title}</p>
+          <p className="mt-1 text-xs leading-5 text-[#9fb0c2]">
+            Last thing you were doing {formatRelativeTime(resumeVisit.visitedAt)}{resumeVisit.context ? ` · ${resumeVisit.context}` : ''}
+          </p>
+          <Link
+            href={resumeVisit.href}
+            className="mt-3 inline-flex items-center gap-2 rounded-[12px] border border-cyan-400/24 bg-cyan-400/10 px-3 py-2 text-xs font-medium text-cyan-100 transition hover:bg-cyan-400/14"
+          >
+            Resume
+            <RotateCcw className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      ) : null}
 
       <div className="rounded-[18px] border border-[#2b3948] bg-[linear-gradient(180deg,#161d26_0%,#0f141a_100%)] px-3.5 py-3.5">
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#8b99aa]">Machine Runtime</p>
