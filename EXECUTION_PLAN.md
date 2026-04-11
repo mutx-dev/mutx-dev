@@ -20,6 +20,7 @@ Phase 7 truth hardening.
 - [x] Implement grounded tutor with escalation guardrails
 - [x] Implement live autopilot bridge for runs, budgets, alerts, and approvals on existing MUTX surfaces
 - [x] Re-audit the Autopilot trust surface against real MUTX signals only
+- [x] Remove demo-smelling Autopilot affordances and make approvals durable without adding a new schema or route family
 - [ ] Finish truth-alignment cleanup for public copy and legacy compatibility routes
 - [ ] Re-run validation and commit the current slice
 - [ ] Sweep non-English Pico landing copy so localized surfaces stop lying

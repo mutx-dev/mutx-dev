@@ -2,6 +2,7 @@
 Budget routes for user credits and usage management.
 """
 
+import json
 import logging
 import uuid
 from datetime import datetime, timezone, timedelta
@@ -71,6 +72,25 @@ def _parse_datetime(dt_str):
         return None
 
 
+def _decode_event_metadata(raw: Optional[str]) -> dict:
+    if not raw:
+        return {}
+    try:
+        parsed = json.loads(raw)
+    except (TypeError, json.JSONDecodeError):
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def _safe_uuid(value: Optional[str]) -> uuid.UUID:
+    if value:
+        try:
+            return uuid.UUID(str(value))
+        except (TypeError, ValueError):
+            pass
+    return uuid.UUID(int=0)
+
+
 @router.get("", response_model=BudgetResponse)
 async def get_budget(
     db: AsyncSession = Depends(get_db),
@@ -86,7 +106,6 @@ async def get_budget(
     credits_remaining = max(0, credits_total - credits_used)
 
     now = datetime.now(timezone.utc)
-    # Reset date is first day of next month
     if now.month == 12:
         reset_date = datetime(now.year + 1, 1, 1, tzinfo=timezone.utc)
     else:
@@ -124,7 +143,6 @@ async def get_usage_breakdown(
 
     period_end_dt = _parse_datetime(period_end) or now
 
-    # Get all usage events in period
     result = await db.execute(
         select(UsageEvent).where(
             and_(
@@ -136,36 +154,47 @@ async def get_usage_breakdown(
     )
     events = result.scalars().all()
 
-    # Aggregate by agent
-    agent_usage = {}
+    agent_usage: dict[str, dict[str, float | int]] = {}
     for event in events:
-        if event.resource_id:
-            if event.resource_id not in agent_usage:
-                agent_usage[event.resource_id] = {"credits": 0, "count": 0}
-            agent_usage[event.resource_id]["credits"] += event.credits_used or 0
-            agent_usage[event.resource_id]["count"] += 1
+        metadata = _decode_event_metadata(event.event_metadata)
+        agent_key = metadata.get("agent_id") if isinstance(metadata.get("agent_id"), str) else None
 
-    # Get agent names
+        if not agent_key and event.resource_type == "agent" and event.resource_id:
+            agent_key = event.resource_id
+
+        if not agent_key and event.event_type.startswith("agent_") and event.resource_id:
+            agent_key = event.resource_id
+
+        if not agent_key:
+            continue
+
+        if agent_key not in agent_usage:
+            agent_usage[agent_key] = {"credits": 0.0, "count": 0}
+        agent_usage[agent_key]["credits"] += event.credits_used or 0
+        agent_usage[agent_key]["count"] += 1
+
     usage_by_agent = []
     for agent_id_str, data in agent_usage.items():
-        try:
-            agent_id = uuid.UUID(agent_id_str)
-            agent_result = await db.execute(select(Agent).where(Agent.id == agent_id))
+        agent_uuid = _safe_uuid(agent_id_str)
+        agent_name = f"Unscoped usage ({str(agent_uuid)[:8]})"
+
+        if agent_uuid.int != 0:
+            agent_result = await db.execute(select(Agent).where(Agent.id == agent_uuid))
             agent = agent_result.scalar_one_or_none()
-            agent_name = agent.name if agent else f"Unknown ({agent_id_str[:8]})"
-        except ValueError:
-            agent_name = f"Unknown ({agent_id_str[:8]})"
+            if agent is not None:
+                agent_name = agent.name
+            else:
+                agent_name = f"Unknown agent ({str(agent_uuid)[:8]})"
 
         usage_by_agent.append(
             UsageByAgent(
-                agent_id=uuid.UUID(agent_id_str) if agent_id_str else uuid.UUID(),
+                agent_id=agent_uuid,
                 agent_name=agent_name,
-                credits_used=round(data["credits"], 2),
-                event_count=data["count"],
+                credits_used=round(float(data["credits"]), 2),
+                event_count=int(data["count"]),
             )
         )
 
-    # Aggregate by event type
     type_usage = {}
     for event in events:
         event_type = event.event_type or "unknown"
@@ -183,8 +212,10 @@ async def get_usage_breakdown(
         for event_type, data in type_usage.items()
     ]
 
-    # Calculate totals
     total_credits = sum(data["credits"] for data in agent_usage.values())
+    if total_credits == 0:
+        total_credits = sum((event.credits_used or 0) for event in events)
+
     credits_total = PLAN_CREDITS.get(current_user.plan, 100)
 
     return UsageBreakdownResponse(

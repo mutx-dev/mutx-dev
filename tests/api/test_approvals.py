@@ -236,6 +236,33 @@ class TestApprovalRoutes:
         assert data["requester"] == test_user.email
 
     @pytest.mark.asyncio
+    async def test_create_approval_persists_beyond_service_reset(
+        self,
+        client: AsyncClient,
+        approval_service,
+    ):
+        create_resp = await client.post(
+            "/v1/approvals",
+            json={
+                "agent_id": "agent-persist",
+                "session_id": "session-persist",
+                "action_type": "deploy",
+                "payload": {"target": "production"},
+            },
+        )
+        assert create_resp.status_code == 201
+        request_id = create_resp.json()["id"]
+
+        import src.api.services.approval as approval_module
+
+        approval_module._approval_service = None
+
+        fetch_resp = await client.get(f"/v1/approvals/{request_id}")
+        assert fetch_resp.status_code == 200
+        assert fetch_resp.json()["id"] == request_id
+        assert fetch_resp.json()["status"] == "PENDING"
+
+    @pytest.mark.asyncio
     async def test_get_approval(
         self,
         client: AsyncClient,

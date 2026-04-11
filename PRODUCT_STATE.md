@@ -98,6 +98,44 @@ Latest validated commands for the current canonical slice:
 
 ## Work cycle log
 
+### 2026-04-11 03:21:00 CEST - trust audit started
+What changed
+- Started a trust-first pass against Pico Autopilot, agent activity, alerts, approvals, and cost tracking.
+- Treated every fake-looking or demo-smelling behavior as a product defect, not a cosmetic nit.
+
+What was tested
+- Source audit and live route checks at cycle start.
+
+What failed
+- Found multiple trust killers: dead drill-down links, fake-looking alert channel options, synthetic budget timeline events, non-durable approvals, and misleading cost attribution by run id instead of agent id.
+
+What is next
+- Remove the fake-looking affordances.
+- Persist approvals through an existing durable MUTX surface.
+- Fix budget attribution so agent spend is actually about agents.
+
+### 2026-04-11 03:45:10 CEST - trust audit hardening complete
+What changed
+- Removed trust-killing Autopilot affordances that looked like demo theater: broken dashboard drill-down links, fake email/webhook alert-channel options, and a synthetic budget timeline event stamped with `now`.
+- Kept the Autopilot drill-down inside Pico with in-page anchor navigation so the user never gets kicked into broken or untrustworthy secondary routes.
+- Made approvals durable on the existing `user_settings` table instead of the old in-memory-only approval store, without adding a new schema or route family.
+- Fixed budget usage attribution so run-scoped usage can still roll up to the real owning agent via usage metadata instead of pretending a run UUID is an agent.
+- Added targeted regression coverage for approval durability and budget attribution.
+
+What was tested
+- `npm run typecheck`
+- `npm test -- tests/unit/picoAutopilot.test.ts tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `./.venv/bin/python -m pytest tests/api/test_approvals.py tests/api/test_budgets.py -q`
+- `npm run build`
+
+What failed
+- The broader `/dashboard/*` browser routes are still not trustworthy enough to be Pico Autopilot drill-down targets. They no longer act as trust-critical dependencies for this surface.
+- Existing repo-wide warning noise remains: Next/Turbopack NFT tracing noise and pytest OpenTelemetry closed-stream logging after shutdown.
+
+What is next
+- Do an authenticated browser pass on `/pico/autopilot` to confirm the live cards read well with real account data.
+- If the broader dashboard routes are meant to become drill-down surfaces later, harden them separately before linking Pico back into them.
+
 ### 2026-04-11 03:06:00 CEST - Autopilot truth audit started
 What changed
 - Re-audited the Pico Autopilot surface strictly against live MUTX signals: runs, run traces, alerts, budgets, usage breakdown, approvals, and the combined activity timeline.

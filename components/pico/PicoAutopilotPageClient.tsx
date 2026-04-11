@@ -5,7 +5,9 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
+import { usePicoHref } from '@/lib/pico/navigation'
 import {
+  analyzeAutopilotIntegration,
   buildAutopilotTimeline,
   describeRunDetail,
   explainAlertImpact,
@@ -13,11 +15,16 @@ import {
   formatPercent,
   formatRelativeTime,
   formatTimestamp,
+  getAlertsEmptyState,
+  getApprovalsEmptyState,
   getRunSeverity,
+  getRunsEmptyState,
+  getUsageEmptyState,
   humanizeRunStatus,
   type AutopilotAlertSummary,
   type AutopilotApprovalSummary,
   type AutopilotBudgetSummary,
+  type AutopilotEmptyState,
   type AutopilotRunSummary,
   type AutopilotRunTrace,
   type AutopilotTimelineItem,
@@ -101,14 +108,27 @@ function TimelineItemCard({ item }: { item: AutopilotTimelineItem }) {
       <p className="mt-2 text-sm leading-6">{item.detail}</p>
       <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {item.impact}</p>
       <Link href={item.href} className="mt-4 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
-        Open source view
+        Jump to detail section
+      </Link>
+    </div>
+  )
+}
+
+function EmptyStatePanel({ state }: { state: AutopilotEmptyState }) {
+  return (
+    <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+      <h3 className="text-base font-semibold text-white">{state.title}</h3>
+      <p className="mt-3">{state.body}</p>
+      <Link href={state.nextStep.href} className="mt-4 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+        {state.nextStep.label}
       </Link>
     </div>
   )
 }
 
 export function PicoAutopilotPageClient() {
-  const { progress, actions, syncState } = usePicoProgress()
+  const { progress, derived, actions, syncState } = usePicoProgress()
+  const toHref = usePicoHref()
   const [runs, setRuns] = useState<AutopilotRunSummary[]>([])
   const [tracesByRunId, setTracesByRunId] = useState<Record<string, AutopilotRunTrace[]>>({})
   const [budget, setBudget] = useState<AutopilotBudgetSummary | null>(null)
@@ -271,6 +291,69 @@ export function PicoAutopilotPageClient() {
     [alerts, approvals, budget, progress.autopilot.costThresholdPercent, runs, tracesByRunId],
   )
 
+  const integrationStatus = useMemo(
+    () =>
+      analyzeAutopilotIntegration({
+        runs,
+        alerts,
+        approvals,
+        budget,
+        usage,
+        approvalGateConfigured: progress.autopilot.approvalGateEnabled,
+      }),
+    [alerts, approvals, budget, progress.autopilot.approvalGateEnabled, runs, usage],
+  )
+
+  const defaultNextStep = useMemo(
+    () =>
+      derived.nextLesson
+        ? {
+            label: `Open ${derived.nextLesson.title}`,
+            href: toHref(`/academy/${derived.nextLesson.slug}`),
+          }
+        : {
+            label: 'Open onboarding',
+            href: toHref('/onboarding'),
+          },
+    [derived.nextLesson, toHref],
+  )
+
+  const approvalNextStep = useMemo(
+    () => ({
+      label: 'Configure the approval gate',
+      href: toHref('/academy/add-an-approval-gate'),
+    }),
+    [toHref],
+  )
+
+  const runEmptyState = useMemo(
+    () => getRunsEmptyState(integrationStatus, defaultNextStep),
+    [defaultNextStep, integrationStatus],
+  )
+
+  const alertsEmptyState = useMemo(
+    () => getAlertsEmptyState(integrationStatus, defaultNextStep),
+    [defaultNextStep, integrationStatus],
+  )
+
+  const usageEmptyState = useMemo(
+    () => getUsageEmptyState(integrationStatus, defaultNextStep),
+    [defaultNextStep, integrationStatus],
+  )
+
+  const approvalsEmptyState = useMemo(
+    () =>
+      getApprovalsEmptyState(
+        integrationStatus,
+        integrationStatus.hasApprovalRecords && !integrationStatus.approvalGateConfigured
+          ? approvalNextStep
+          : defaultNextStep,
+      ),
+    [approvalNextStep, defaultNextStep, integrationStatus],
+  )
+
+  const loadStateLabel = useMemo(() => loadState.toUpperCase(), [loadState])
+
   function saveThreshold() {
     if (thresholdValidationError) {
       return
@@ -319,20 +402,31 @@ export function PicoAutopilotPageClient() {
 
   const liveValue = (value: string) => (authRequired ? '--' : value)
   const liveHint = (readyHint: string, offlineHint: string) => (authRequired ? offlineHint : readyHint)
+  const loadStateLabel = useMemo(() => loadState.toUpperCase(), [loadState])
+  const latestRun = runs[0] ?? null
+  const primaryAutopilotHref = authRequired || !latestRun
+    ? derived.nextLesson
+      ? toHref(`/academy/${derived.nextLesson.slug}`)
+      : toHref('/academy')
+    : '#recent-runs'
+  const primaryAutopilotLabel = authRequired || !latestRun
+    ? derived.nextLesson
+      ? `Finish ${derived.nextLesson.title} first`
+      : 'Go back to academy'
+    : `Inspect run ${latestRun.id.slice(0, 8)}`
 
   return (
     <PicoShell
       eyebrow="Autopilot bridge"
       title="Trust the runtime because the surface tells the truth"
-      description="Everything here comes from live MUTX runs, alerts, budget usage, and approvals. If the control plane is unavailable, Pico says that plainly instead of roleplaying a dashboard."
+      description="First inspect the latest run. Then tighten the threshold. Then decide which risky actions deserve a gate. That is how trust gets earned here."
       actions={
-        <button
-          type="button"
-          onClick={() => void load()}
-          className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10"
+        <Link
+          href={primaryAutopilotHref}
+          className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
         >
-          Refresh live data
-        </button>
+          {primaryAutopilotLabel}
+        </Link>
       }
     >
       {authRequired ? (
@@ -392,14 +486,14 @@ export function PicoAutopilotPageClient() {
 
       <section className="mt-6 grid gap-6 xl:grid-cols-[1.2fr,0.8fr]">
         <div className="space-y-6">
-          <div className={sectionClasses()}>
+          <div id="timeline-section" className={sectionClasses()}>
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Activity timeline</p>
                 <h2 className="mt-2 text-2xl font-semibold text-white">What happened, when, and why it matters</h2>
               </div>
               <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.18em] text-slate-300">
-                {loadState}
+                {loadStateLabel}
               </span>
             </div>
             <div className="mt-5 space-y-4">
@@ -417,24 +511,31 @@ export function PicoAutopilotPageClient() {
             </div>
           </div>
 
-          <div className={sectionClasses()}>
+          <div id="recent-runs" className={sectionClasses()}>
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Runs</p>
                 <h2 className="mt-2 text-2xl font-semibold text-white">Recent execution history</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  Start here. Read the latest run before you touch thresholds or approvals.
+                </p>
               </div>
-              <Link href="/dashboard/runs" className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
-                Open run history
-              </Link>
+              <button
+                type="button"
+                onClick={() => void load()}
+                className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10"
+              >
+                Refresh live data
+              </button>
             </div>
             <div className="mt-5 space-y-4">
               {authRequired ? (
                 <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
-                  Sign in to load recent runs and traces.
+                  Sign in, then come back here to inspect the first real run.
                 </div>
               ) : runs.length === 0 ? (
                 <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
-                  No runs returned from MUTX yet.
+                  No runs returned from MUTX yet. Finish the next lesson, trigger a real run, then use this page to inspect it.
                 </div>
               ) : (
                 runs.map((run) => {
@@ -483,9 +584,9 @@ export function PicoAutopilotPageClient() {
                       <div className="mt-4 flex flex-wrap gap-4 text-sm">
                         <span className="text-slate-300">Agent: {run.agent_id ?? 'unknown'}</span>
                         <span className="text-slate-300">Trace count: {run.trace_count ?? traces.length}</span>
-                        <Link href="/dashboard/runs" className="font-medium text-emerald-200 hover:text-emerald-100">
-                          Inspect in MUTX dashboard
-                        </Link>
+                        <span className="text-slate-300">
+                          {run.started_at ? `Started ${formatTimestamp(run.started_at)}` : 'Start time unavailable'}
+                        </span>
                       </div>
                     </article>
                   )
@@ -496,7 +597,7 @@ export function PicoAutopilotPageClient() {
         </div>
 
         <div className="space-y-6">
-          <div className={sectionClasses()}>
+          <div id="budget-section" className={sectionClasses()}>
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Budget</p>
             <h2 className="mt-2 text-2xl font-semibold text-white">Live spend and your line in the sand</h2>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -542,16 +643,10 @@ export function PicoAutopilotPageClient() {
                 >
                   Save threshold
                 </button>
-                <select
-                  value={progress.autopilot.alertChannel}
-                  onChange={(event) => actions.setAutopilot({ alertChannel: event.target.value as 'in_app' | 'email' | 'webhook' })}
-                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-100 outline-none"
-                >
-                  <option value="in_app">In-app</option>
-                  <option value="email">Email-ready</option>
-                  <option value="webhook">Webhook-ready</option>
-                </select>
               </div>
+              <p className="mt-4 text-sm leading-6 text-slate-300">
+                Pico stores the threshold here. Actual alert delivery still follows the real MUTX monitoring setup, so this surface does not pretend email or webhook routing is active when it is not.
+              </p>
               {thresholdValidationError ? (
                 <div className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-50">
                   {thresholdValidationError}
@@ -602,15 +697,15 @@ export function PicoAutopilotPageClient() {
             </div>
           </div>
 
-          <div className={sectionClasses()}>
+          <div id="alerts-section" className={sectionClasses()}>
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Alerts</p>
                 <h2 className="mt-2 text-2xl font-semibold text-white">Meaningful monitoring events</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  This is the live alert feed. No fake warning badges, no synthetic incidents.
+                </p>
               </div>
-              <Link href="/dashboard/monitoring" className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
-                Open monitoring
-              </Link>
             </div>
             <div className="mt-5 space-y-4">
               {authRequired ? (
@@ -635,6 +730,10 @@ export function PicoAutopilotPageClient() {
                       </div>
                     </div>
                     <p className="mt-4 text-sm leading-6">{alert.message}</p>
+                    <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-300">
+                      <span>Agent: {alert.agent_id}</span>
+                      <span>{alert.resolved ? 'Resolved' : 'Still active'}</span>
+                    </div>
                     <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {explainAlertImpact(alert)}</p>
                   </article>
                 ))
@@ -642,15 +741,15 @@ export function PicoAutopilotPageClient() {
             </div>
           </div>
 
-          <div className={sectionClasses()}>
+          <div id="approvals-section" className={sectionClasses()}>
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Approvals</p>
                 <h2 className="mt-2 text-2xl font-semibold text-white">Risky actions and their decisions</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  This queue is now the approval source of truth for Pico. It should not disappear because a process restarted.
+                </p>
               </div>
-              <Link href="/dashboard/approvals" className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
-                Open approvals
-              </Link>
             </div>
             <div className="mt-5 space-y-4">
               {authRequired ? (
@@ -659,7 +758,7 @@ export function PicoAutopilotPageClient() {
                 </div>
               ) : pendingApprovals.length === 0 && resolvedApprovals.length === 0 ? (
                 <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
-                  No approval events were returned from MUTX.
+                  No approval records are stored for this account yet.
                 </div>
               ) : (
                 <>
@@ -719,6 +818,11 @@ export function PicoAutopilotPageClient() {
                           ? approval.payload.summary
                           : `${approval.requester} requested this action for agent ${approval.agent_id}.`}
                       </p>
+                      <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-300">
+                        <span>Agent: {approval.agent_id}</span>
+                        <span>Requester: {approval.requester}</span>
+                        <span>Approver: {approval.approver ?? 'unknown'}</span>
+                      </div>
                       <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {explainApprovalImpact(approval)}</p>
                     </article>
                   ))}

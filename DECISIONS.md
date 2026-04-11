@@ -36,6 +36,22 @@ Why:
 - A control layer stops being useful the second it starts decorating the truth with fake counters or sandbox theater.
 - If a signal is missing, the surface should say it is missing instead of manufacturing comfort.
 
+## 2026-04-11 03:45:10 CEST
+Decision: Pico Autopilot no longer links trust-critical users into broken or untrusted secondary dashboard pages.
+Why:
+- A dead drill-down link instantly makes the whole surface feel like demo bait.
+- A smaller self-contained truth surface beats a bigger broken one.
+
+Decision: Approval requests now persist on the existing `user_settings` table instead of only living in process memory.
+Why:
+- An approval queue that disappears on restart is fake governance.
+- Durable approval history is table stakes if we want users to trust the gate.
+
+Decision: Budget attribution prefers `event_metadata.agent_id` over raw `resource_id` when usage events came from runs.
+Why:
+- Showing run UUIDs as if they were agents is garbage accounting.
+- Cost tracking must map to the thing the user thinks they are paying for.
+
 ## 2026-04-11 02:51:43 CEST
 Decision: `/pico/onboarding` is the canonical Pico workspace entry.
 Why:

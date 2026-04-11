@@ -2,6 +2,8 @@
 Tests for /budgets endpoints.
 """
 
+import json
+
 import pytest
 from httpx import AsyncClient
 
@@ -49,3 +51,33 @@ class TestGetUsageBreakdown:
         data = response.json()
         assert "period_start" in data
         assert "period_end" in data
+
+    @pytest.mark.asyncio
+    async def test_usage_breakdown_prefers_agent_id_from_metadata(
+        self,
+        client: AsyncClient,
+        db_session,
+        test_user,
+        test_agent,
+    ):
+        """Run-scoped usage should still roll up to the owning agent instead of a run UUID."""
+        from src.api.models.models import UsageEvent
+
+        db_session.add(
+            UsageEvent(
+                user_id=test_user.id,
+                event_type="agent_run_created",
+                resource_id="77777777-7777-4777-a777-777777777777",
+                event_metadata=json.dumps({"agent_id": str(test_agent.id)}),
+                credits_used=12.5,
+            )
+        )
+        await db_session.commit()
+
+        response = await client.get("/v1/budgets/usage?period_start=30d")
+        assert response.status_code == 200
+        data = response.json()
+        usage_by_agent = data["usage_by_agent"]
+        assert usage_by_agent[0]["agent_id"] == str(test_agent.id)
+        assert usage_by_agent[0]["agent_name"] == test_agent.name
+        assert usage_by_agent[0]["credits_used"] == 12.5
