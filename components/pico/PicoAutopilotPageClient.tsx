@@ -81,6 +81,49 @@ function formatPercent(value: number) {
   return `${Math.round(value)}%`
 }
 
+const PLAN_FEATURE_LABELS: Record<string, string> = {
+  academy: 'Learn the system',
+  tutor: 'Get unstuck fast',
+  project_limit: 'How much you can run',
+  monitored_agents: 'What you can watch',
+  alerts: 'Know when something breaks',
+  approvals: 'Prevent bad actions',
+  retention: 'Understand what happened',
+}
+
+const PLAN_CARD_COPY: Record<string, { eyebrow: string; title: string; body: string }> = {
+  free: {
+    eyebrow: 'Free',
+    title: 'See the control loop first',
+    body: 'Good for learning the motion before you trust live automation.',
+  },
+  starter: {
+    eyebrow: 'Starter',
+    title: 'Pay for peace of mind on one live agent',
+    body: 'This tier is about catching cost leaks, stopping bad automation, and keeping enough history to fix the mess fast.',
+  },
+  pro: {
+    eyebrow: 'Pro',
+    title: 'Stay in control when automation gets real',
+    body: 'For teams that need fewer surprises, fewer expensive mistakes, and a longer memory when something goes sideways.',
+  },
+}
+
+const PLAN_RISKS = [
+  {
+    title: 'Cost leaks',
+    body: 'Know when spend is drifting before the invoice lands.',
+  },
+  {
+    title: 'Bad automation',
+    body: 'Put a human in front of risky actions.',
+  },
+  {
+    title: 'Blind execution',
+    body: 'Keep the trail you need when something goes wrong.',
+  },
+]
+
 export function PicoAutopilotPageClient() {
   const { progress, actions } = usePicoProgress()
   const [runs, setRuns] = useState<RunSummary[]>([])
@@ -369,21 +412,40 @@ export function PicoAutopilotPageClient() {
           </div>
 
           <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Plan matrix</p>
-            <div className="mt-4 grid gap-4 md:grid-cols-3">
-              {Object.entries(PICO_PLAN_MATRIX).map(([plan, features]) => (
-                <div key={plan} className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                  <p className="text-lg font-semibold text-white capitalize">{plan}</p>
-                  <div className="mt-3 space-y-2">
-                    {Object.entries(features).map(([feature, value]) => (
-                      <div key={feature}>
-                        <p className="text-xs uppercase tracking-[0.18em] text-slate-500">{feature.replaceAll('_', ' ')}</p>
-                        <p className="mt-1">{value}</p>
-                      </div>
-                    ))}
-                  </div>
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Why people pay</p>
+            <h2 className="mt-2 text-xl font-semibold text-white">Pay for control, not another tool</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-300">
+              The value is simple: catch cost leaks, stop bad automation, and see what happened when a run goes sideways.
+            </p>
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              {PLAN_RISKS.map((risk) => (
+                <div key={risk.title} className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+                  <p className="font-medium text-white">{risk.title}</p>
+                  <p className="mt-2">{risk.body}</p>
                 </div>
               ))}
+            </div>
+            <div className="mt-5 grid gap-4 md:grid-cols-3">
+              {Object.entries(PICO_PLAN_MATRIX).map(([plan, features]) => {
+                const copy = PLAN_CARD_COPY[plan]
+                return (
+                  <div key={plan} className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+                    <p className="text-xs uppercase tracking-[0.18em] text-emerald-200">{copy?.eyebrow ?? plan}</p>
+                    <p className="mt-2 text-lg font-semibold text-white">{copy?.title ?? plan}</p>
+                    <p className="mt-2 leading-6 text-slate-300">{copy?.body}</p>
+                    <div className="mt-4 space-y-3">
+                      {Object.entries(features).map(([feature, value]) => (
+                        <div key={feature}>
+                          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
+                            {PLAN_FEATURE_LABELS[feature] ?? feature.replaceAll('_', ' ')}
+                          </p>
+                          <p className="mt-1">{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </div>
