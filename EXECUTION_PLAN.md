@@ -34,9 +34,10 @@ Ship the narrowest honest PicoMUTX product loop that gets a user from signup to 
 - [pending] Expand the control page from summary to richer run drill-down where the data is already real.
 
 ## Architecture direction
-- Keep Pico on pico.mutx.dev and build product routes under app/pico/*.
-- Reuse existing auth, templates, onboarding, runtime, runs, monitoring, budgets, and assistant routes.
-- Persist Pico-specific learner state in UserSetting records instead of new tables or migrations.
+- Keep Pico on pico.mutx.dev and build only inside the existing app/pico/* route family.
+- Reuse existing auth, templates, onboarding, runtime, runs, monitoring, budgets, assistant, and Pico progress routes.
+- Persist learner state on the existing UserSetting-backed Pico progress model instead of new tables, migrations, or schemas.
+- Do not add new API routes, new entry routes, or a new tutor response shape; extend the canonical contracts only.
 - Keep community/admin/billing lightweight and honest; do not fabricate social systems or payment flows.
 
 ## Risks

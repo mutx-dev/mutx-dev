@@ -71,3 +71,12 @@ Collapse the lesson/progression model into lib/pico/academy.ts, move tutor match
 
 Why
 One Pico truth is cheaper to maintain, harder to misread, and much less likely to drift into contradictory product behavior.
+
+## 2026-04-11 02:51:05Z
+Decision: Pico changes must extend the canonical system only.
+Why:
+- No new state schemas.
+- No new API routes unless extending the existing Pico routes.
+- No new entry routes.
+- Tutor response shape stays frozen; behavior can improve without breaking the envelope.
+- Extend, never fork.

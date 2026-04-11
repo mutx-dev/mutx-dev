@@ -74,6 +74,8 @@ Internal: Pico is the front door and training ground. MUTX is the deeper control
 
 ## Technical strategy
 - Use app/pico/* for Pico product routes.
-- Use existing /api/auth and /api/dashboard proxies where they tell the truth.
-- Add a Pico-specific progress API on the backend using UserSetting persistence.
+- Extend the canonical Pico files only; do not create parallel state, route, or tutor systems.
+- Use existing /api/auth, /api/dashboard, and Pico progress routes where they tell the truth.
+- Keep learner state on the existing UserSetting-backed Pico progress model; no new state schemas.
+- Do not add new entry routes or change the tutor response shape.
 - Keep content as structured data in repo, not hidden in CMS glue.

@@ -1,7 +1,7 @@
 # PRODUCT_STATE
 
 Status: active build
-Last updated: 2026-04-11T00:47:28Z
+Last updated: 2026-04-11T00:51:05Z
 
 ## What exists
 - pico.mutx.dev is a real multilingual landing page with live lead/contact capture.
@@ -57,6 +57,14 @@ Last updated: 2026-04-11T00:47:28Z
 
 ### Ship first
 - A narrow Pico loop: auth -> academy -> deploy first agent -> see runs/alerts/budget -> mark progress -> get support.
+
+## Guardrails now locked
+- Canonical entry remains `/pico/onboarding`; `/pico/app` and `/pico/workspace` stay redirects only.
+- No new state schemas.
+- No new API routes unless extending an existing Pico route.
+- No new entry routes.
+- Tutor response shape stays frozen.
+- Extend the canonical Pico system, never fork it.
 
 ## Work cycle log
 ### 2026-04-10T23:27:50Z START
@@ -151,3 +159,19 @@ What failed
 
 What is next
 - From here on, any Pico change should land only in the canonical academy/tutor/progress files and the app/pico/components/pico surfaces that consume them.
+
+### 2026-04-11 02:51:05 CEST — guardrails locked
+What changed
+- Locked the user guardrails into the canonical Pico docs and execution plan.
+- Froze Pico against new state schemas, new entry routes, route forks, and tutor envelope drift.
+- Corrected the route-truth note so `/pico/onboarding` is the canonical entry and the legacy paths stay redirects only.
+
+What was tested
+- `git diff -- PRODUCT_STATE.md PRD_PICOMUTX.md EXECUTION_PLAN.md DECISIONS.md`
+- Source audit of `app/pico/onboarding/page.tsx`, `app/pico/app/page.tsx`, and `app/pico/workspace/page.tsx`
+
+What failed
+- Nothing. This was a constraint lock and doc correction pass.
+
+What is next
+- Keep all future Pico work inside the existing canonical files and contracts.
