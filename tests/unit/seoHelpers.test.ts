@@ -12,6 +12,9 @@ import {
   toAbsoluteAppUrl,
   getCanonicalUrl,
   getOgImageUrl,
+  getTwitterImageUrl,
+  getPageOgImageUrl,
+  getPageTwitterImageUrl,
 } from '../../lib/seo'
 
 // ---------------------------------------------------------------------------
@@ -236,5 +239,52 @@ describe('getOgImageUrl', () => {
   it('returns an absolute URL to the default OG image', () => {
     delete process.env.NEXT_PUBLIC_SITE_URL
     expect(getOgImageUrl()).toBe(`https://mutx.dev${DEFAULT_OG_IMAGE}`)
+  })
+
+  it('returns an absolute URL to the default Twitter image', () => {
+    delete process.env.NEXT_PUBLIC_SITE_URL
+    expect(getTwitterImageUrl()).toBe('https://mutx.dev/twitter-image')
+  })
+
+  it('builds homepage-level image routes for docs and general marketing pages', () => {
+    delete process.env.NEXT_PUBLIC_SITE_URL
+    expect(
+      getPageOgImageUrl('Docs | MUTX', 'Code-accurate docs.', { path: '/docs/reference' }),
+    ).toBe(
+      'https://mutx.dev/opengraph-image?title=Docs+%7C+MUTX&description=Code-accurate+docs.&path=%2Fdocs%2Freference',
+    )
+    expect(
+      getPageTwitterImageUrl('Download | MUTX', 'Signed builds.', { path: '/download' }),
+    ).toBe(
+      'https://mutx.dev/twitter-image?title=Download+%7C+MUTX&description=Signed+builds.&path=%2Fdownload',
+    )
+  })
+
+  it('builds pico image routes on the pico host path', () => {
+    delete process.env.NEXT_PUBLIC_SITE_URL
+    expect(
+      getPageOgImageUrl('Pico | MUTX', 'Pre-register.', { path: '/pico' }),
+    ).toBe(
+      'https://mutx.dev/pico/opengraph-image?title=Pico+%7C+MUTX&description=Pre-register.&path=%2Fpico',
+    )
+  })
+
+  it('keeps unknown routes on the homepage-level image endpoint', () => {
+    delete process.env.NEXT_PUBLIC_SITE_URL
+    expect(
+      getPageOgImageUrl('Security | MUTX', 'Locked down.', { path: '/security' }),
+    ).toBe(
+      'https://mutx.dev/opengraph-image?title=Security+%7C+MUTX&description=Locked+down.&path=%2Fsecurity',
+    )
+  })
+
+  it('uses root metadata image routes for the homepage', () => {
+    delete process.env.NEXT_PUBLIC_SITE_URL
+    expect(getPageOgImageUrl('Home | MUTX', 'Root route', { path: '/' })).toBe(
+      'https://mutx.dev/opengraph-image?title=Home+%7C+MUTX&description=Root+route&path=%2F',
+    )
+    expect(getPageTwitterImageUrl('Home | MUTX', 'Root route', { path: '/' })).toBe(
+      'https://mutx.dev/twitter-image?title=Home+%7C+MUTX&description=Root+route&path=%2F',
+    )
   })
 })

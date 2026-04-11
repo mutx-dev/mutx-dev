@@ -7,7 +7,7 @@ import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
-  getPageOgImageUrl,
+  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "AI Agent Monitoring | MUTX",
     description:
       "See what agents actually did, not what they said they'd do. Runtime traces and tool call history built into the control plane.",
-    images: [getPageOgImageUrl("AI Agent Monitoring — Runtime Traces, Tool Call History, Outcome Records | MUTX", "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.", { path: "/ai-agent-monitoring" })],
+    images: [getPageTwitterImageUrl("AI Agent Monitoring — Runtime Traces, Tool Call History, Outcome Records | MUTX", "See what agents actually did. Execution traces, tool call history, and outcomes — built into the control plane.", { path: "/ai-agent-monitoring" })],
   },
 };
 

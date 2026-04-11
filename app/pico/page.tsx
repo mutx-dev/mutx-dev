@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { PicoLandingSurface } from '@/components/pico/PicoLandingSurface'
-import { DEFAULT_X_HANDLE, getPageOgImageUrl } from '@/lib/seo'
+import { DEFAULT_X_HANDLE, getPageOgImageUrl, getPageTwitterImageUrl } from '@/lib/seo'
 import { routing } from '@/i18n/routing'
 
 function normalizeLocale(locale: string) {
@@ -35,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
       creator: DEFAULT_X_HANDLE,
       title: pageTitle,
       description: pageDescription,
-      images: [getPageOgImageUrl(pageTitle, pageDescription, { path: '/pico' })],
+      images: [getPageTwitterImageUrl(pageTitle, pageDescription, { path: '/pico' })],
     },
   }
 }

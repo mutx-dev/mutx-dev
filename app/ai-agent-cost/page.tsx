@@ -7,7 +7,7 @@ import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
-  getPageOgImageUrl,
+  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "AI Agent Cost Management | MUTX",
     description:
       "Know what your agents cost and why. Spend attribution per agent and model — enforced before it surprises you.",
-    images: [getPageOgImageUrl("AI Agent Cost Management — Spend Visibility, Attribution, Budget Enforcement | MUTX", "Know what your agents cost and why. Real-time spend attribution per agent and model — enforced before it becomes a problem.", { path: "/ai-agent-cost" })],
+    images: [getPageTwitterImageUrl("AI Agent Cost Management — Spend Visibility, Attribution, Budget Enforcement | MUTX", "Know what your agents cost and why. Real-time spend attribution per agent and model — enforced before it becomes a problem.", { path: "/ai-agent-cost" })],
   },
 };
 

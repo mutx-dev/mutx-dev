@@ -7,7 +7,7 @@ import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
-  getPageOgImageUrl,
+  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "AI Agent Audit Logs | MUTX",
     description:
       "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.",
-    images: [getPageOgImageUrl("AI Agent Audit Logs — Trace History, Compliance Records, Operator Accountability | MUTX", "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.", { path: "/ai-agent-audit-logs" })],
+    images: [getPageTwitterImageUrl("AI Agent Audit Logs — Trace History, Compliance Records, Operator Accountability | MUTX", "Complete trace history for every agent decision. Records that satisfy compliance requirements and help operators reason about what happened.", { path: "/ai-agent-audit-logs" })],
   },
 };
 

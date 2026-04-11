@@ -1,8 +1,8 @@
 export const DEFAULT_SITE_URL = 'https://mutx.dev'
 export const DEFAULT_APP_URL = 'https://app.mutx.dev'
 export const DEFAULT_X_HANDLE = '@mutxdev'
-export const DEFAULT_OG_IMAGE = '/landing/webp/victory-core.webp'
-export const DEFAULT_OG_IMAGE_ALT = 'MUTX robot holding the MUTX mark aloft'
+export const DEFAULT_OG_IMAGE = '/opengraph-image'
+export const DEFAULT_OG_IMAGE_ALT = 'MUTX branded social preview card'
 
 export const PUBLIC_MARKETING_ROUTES = [
   '/',
@@ -80,10 +80,18 @@ export function getOgImageUrl() {
   return toAbsoluteSiteUrl(DEFAULT_OG_IMAGE)
 }
 
+export function getTwitterImageUrl() {
+  return toAbsoluteSiteUrl('/twitter-image')
+}
+
 /**
- * Generate a unique OG image URL per page.
- * Renders a branded card with the page title + description via /api/og-image.
+ * Generate a unique per-page image route backed by Next metadata image routes.
  */
+function getImageRouteBase(path = '/') {
+  if (path === '/pico') return '/pico'
+  return ''
+}
+
 export function getPageOgImageUrl(
   title: string,
   description?: string,
@@ -93,7 +101,19 @@ export function getPageOgImageUrl(
   if (description) params.set('description', description)
   if (options?.path) params.set('path', options.path)
   if (options?.badge) params.set('badge', options.badge)
-  return `${getSiteUrl()}/api/og-image?${params.toString()}`
+  return `${toAbsoluteSiteUrl(getImageRouteBase(options?.path))}/opengraph-image?${params.toString()}`
+}
+
+export function getPageTwitterImageUrl(
+  title: string,
+  description?: string,
+  options?: { path?: string; badge?: string },
+): string {
+  const params = new URLSearchParams({ title })
+  if (description) params.set('description', description)
+  if (options?.path) params.set('path', options.path)
+  if (options?.badge) params.set('badge', options.badge)
+  return `${toAbsoluteSiteUrl(getImageRouteBase(options?.path))}/twitter-image?${params.toString()}`
 }
 
 /**

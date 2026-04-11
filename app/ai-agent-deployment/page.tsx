@@ -7,7 +7,7 @@ import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
-  getPageOgImageUrl,
+  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "AI Agent Deployment | MUTX",
     description:
       "Agents that deploy like services, not demos. Repeatable environments and deployment records built into the control plane.",
-    images: [getPageOgImageUrl("AI Agent Deployment — Repeatable Environments, Deployment Records, Rollback | MUTX", "Agents that deploy like services, not demos. Repeatable environments, deployment records, and rollback paths.", { path: "/ai-agent-deployment" })],
+    images: [getPageTwitterImageUrl("AI Agent Deployment — Repeatable Environments, Deployment Records, Rollback | MUTX", "Agents that deploy like services, not demos. Repeatable environments, deployment records, and rollback paths.", { path: "/ai-agent-deployment" })],
   },
 };
 

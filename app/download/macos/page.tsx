@@ -12,7 +12,7 @@ import {
   buildReleaseNotesUrl,
   fetchLatestStableDesktopRelease,
 } from "@/lib/desktopRelease";
-import { DEFAULT_X_HANDLE, buildWebPageStructuredData, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, buildWebPageStructuredData, getCanonicalUrl, getPageOgImageUrl, getPageTwitterImageUrl } from "@/lib/seo";
 
 export const revalidate = 900;
 
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: "Download for macOS | MUTX",
     description:
       "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.",
-    images: [getPageOgImageUrl("Download for macOS | MUTX", "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.", { path: "/download/macos" })],
+    images: [getPageTwitterImageUrl("Download for macOS | MUTX", "Download the latest signed and notarized MUTX macOS release for Apple Silicon or Intel, with checksums and release notes.", { path: "/download/macos" })],
   },
 };
 

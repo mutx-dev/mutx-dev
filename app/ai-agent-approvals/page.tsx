@@ -7,7 +7,7 @@ import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
-  getPageOgImageUrl,
+  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "AI Agent Approvals | MUTX",
     description:
       "Human oversight where it matters. Approval gates for high-stakes agent operations — on the record, enforced by the control plane.",
-    images: [getPageOgImageUrl("AI Agent Approvals — Human-in-the-Loop Workflows, Operator Authorization | MUTX", "Human oversight where it matters. Define approval gates for high-stakes agent operations — on the record, enforced by the control plane.", { path: "/ai-agent-approvals" })],
+    images: [getPageTwitterImageUrl("AI Agent Approvals — Human-in-the-Loop Workflows, Operator Authorization | MUTX", "Human oversight where it matters. Define approval gates for high-stakes agent operations — on the record, enforced by the control plane.", { path: "/ai-agent-approvals" })],
   },
 };
 

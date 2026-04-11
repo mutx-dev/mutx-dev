@@ -7,10 +7,12 @@ import {
   getCanonicalUrl,
   getOgImageUrl,
   getSiteUrl,
+  getTwitterImageUrl,
 } from "@/lib/seo";
 
 const siteUrl = getSiteUrl();
 const ogImageUrl = getOgImageUrl();
+const twitterImageUrl = getTwitterImageUrl();
 
 export const viewport = {
   width: "device-width",
@@ -78,7 +80,7 @@ export const metadata: Metadata = {
     title: "MUTX | Open Control Plane for AI Agents",
     description:
       "Operate deployed agents across auth, deployments, traces, webhooks, and runtime posture.",
-    images: [ogImageUrl],
+    images: [twitterImageUrl],
   },
   icons: {
     icon: [

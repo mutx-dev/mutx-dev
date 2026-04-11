@@ -7,7 +7,7 @@ import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
-  getPageOgImageUrl,
+  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "AI Agent Control Plane | MUTX",
     description:
       "The control plane is the product. Runtime traces, consistency guarantees, and operator surfaces — built in.",
-    images: [getPageOgImageUrl("AI Agent Control Plane — Runtime Visibility, Agent Lifecycle, Operator Surface | MUTX", "The control plane is the product. MUTX surfaces runtime traces, enforces consistency guarantees, and gives operators a legible surface.", { path: "/ai-agent-control-plane" })],
+    images: [getPageTwitterImageUrl("AI Agent Control Plane — Runtime Visibility, Agent Lifecycle, Operator Surface | MUTX", "The control plane is the product. MUTX surfaces runtime traces, enforces consistency guarantees, and gives operators a legible surface.", { path: "/ai-agent-control-plane" })],
   },
 };
 

@@ -7,7 +7,7 @@ import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
-  getPageOgImageUrl,
+  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "AI Agent Infrastructure | MUTX",
     description:
       "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.",
-    images: [getPageOgImageUrl("AI Agent Infrastructure — Runtime Management, Compute, Secrets, Scale | MUTX", "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.", { path: "/ai-agent-infrastructure" })],
+    images: [getPageTwitterImageUrl("AI Agent Infrastructure — Runtime Management, Compute, Secrets, Scale | MUTX", "Agent infrastructure that doesn't hide from you. Compute, secrets, and storage — consistent and legible.", { path: "/ai-agent-infrastructure" })],
   },
 };
 

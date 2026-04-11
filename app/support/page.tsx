@@ -5,7 +5,7 @@ import matter from "gray-matter";
 import { DocsLayout } from "@/components/site/docs/DocsLayout";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
-import { DEFAULT_X_HANDLE, buildWebPageStructuredData, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, buildWebPageStructuredData, getCanonicalUrl, getPageOgImageUrl, getPageTwitterImageUrl } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const source = fs.readFileSync(path.join(process.cwd(), "support.md"), "utf-8");
@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
       creator: DEFAULT_X_HANDLE,
       title: `${data.title || "Support"} — MUTX`,
       description: data.description as string,
-      images: [getPageOgImageUrl(`${data.title || "Support"} — MUTX`, data.description as string, { path: "/support" })],
+      images: [getPageTwitterImageUrl(`${data.title || "Support"} — MUTX`, data.description as string, { path: "/support" })],
     },
   };
 }

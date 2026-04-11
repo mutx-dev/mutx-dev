@@ -7,7 +7,7 @@ import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
-  getPageOgImageUrl,
+  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "AI Agent Guardrails | MUTX",
     description:
       "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.",
-    images: [getPageOgImageUrl("AI Agent Guardrails — Policy Enforcement, Safety Bounds, Runtime Controls | MUTX", "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.", { path: "/ai-agent-guardrails" })],
+    images: [getPageTwitterImageUrl("AI Agent Guardrails — Policy Enforcement, Safety Bounds, Runtime Controls | MUTX", "Define what agents can and can't do. Safety policies enforced at runtime, violations visible as first-class events.", { path: "/ai-agent-guardrails" })],
   },
 };
 

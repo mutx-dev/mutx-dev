@@ -4,7 +4,7 @@ import { MarketingHomePage } from "@/components/site/marketing/MarketingHomePage
 import { PublicFooter } from "@/components/site/PublicFooter";
 import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl, getSiteUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl, getPageTwitterImageUrl, getSiteUrl } from "@/lib/seo";
 
 const homeTitle = "MUTX | See What Your AI Agents Are Doing";
 const homeDescription =
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     creator: DEFAULT_X_HANDLE,
     title: homeTitle,
     description: homeDescription,
-    images: [getPageOgImageUrl(homeTitle, homeDescription, { path: "/" })],
+    images: [getPageTwitterImageUrl(homeTitle, homeDescription, { path: "/" })],
   },
 };
 

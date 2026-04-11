@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import MacDownloadPage from "./macos/page";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl, getPageTwitterImageUrl } from "@/lib/seo";
 
 export const revalidate = 900;
 
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: "Download MUTX | MUTX",
     description:
       "Download the latest MUTX desktop release for your platform. Signed builds, checksums, and release notes.",
-    images: [getPageOgImageUrl("Download MUTX | MUTX", "Download the latest MUTX desktop release for your platform. Signed builds, checksums, and release notes.", { path: "/download" })],
+    images: [getPageTwitterImageUrl("Download MUTX | MUTX", "Download the latest MUTX desktop release for your platform. Signed builds, checksums, and release notes.", { path: "/download" })],
   },
 };
 

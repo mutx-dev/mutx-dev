@@ -7,7 +7,7 @@ import { PublicSurface } from "@/components/site/PublicSurface";
 import {
   DEFAULT_X_HANDLE,
   getCanonicalUrl,
-  getPageOgImageUrl,
+  getPageOgImageUrl, getPageTwitterImageUrl,
   getSiteUrl,
 } from "@/lib/seo";
 import core from "@/components/site/marketing/MarketingCore.module.css";
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     title: "AI Agent Governance | MUTX",
     description:
       "Keep agent access explicit and auditable. MUTX bakes auth boundaries and compliance guardrails into the control plane.",
-    images: [getPageOgImageUrl("AI Agent Governance — Auth Boundaries, Access Control, Compliance | MUTX", "Keep agent access explicit and auditable. MUTX bakes auth boundaries, operator access controls, and compliance guardrails into the control plane.", { path: "/ai-agent-governance" })],
+    images: [getPageTwitterImageUrl("AI Agent Governance — Auth Boundaries, Access Control, Compliance | MUTX", "Keep agent access explicit and auditable. MUTX bakes auth boundaries, operator access controls, and compliance guardrails into the control plane.", { path: "/ai-agent-governance" })],
   },
 };
 
