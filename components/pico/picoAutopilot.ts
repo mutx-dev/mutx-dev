@@ -88,7 +88,7 @@ export type AutopilotAgentSummary = {
 export type AutopilotTimelineItem = {
   id: string
   kind: 'run' | 'alert' | 'approval' | 'budget'
-  occurredAt: string
+  occurredAt: string | null
   title: string
   detail: string
   impact: string
