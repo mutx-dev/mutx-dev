@@ -6,6 +6,7 @@ import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeStringify from "rehype-stringify";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import { preprocessHints } from "@/lib/docs/hints";
 import type { Root } from "mdast";
 import { visit } from "unist-util-visit";
@@ -25,23 +26,14 @@ function slugify(text: string): string {
     .trim();
 }
 
-/**
- * Remark plugin: resolve relative .md links to absolute /docs/* routes.
- * Handles section-landing pages that link to sibling files as [Title](foo.md).
- */
 function remarkResolveDocLinks(currentSlug: string[]): Plugin<[], Root> {
   return () => (tree: Root) => {
     visit(tree, "link", (node) => {
       const href = node.url || "";
-      // Only handle relative links (not anchors, not absolute, not external)
       if (!href || href.startsWith("#") || href.startsWith("/") || href.startsWith("http")) return;
 
-      // Strip .md and resolve relative to current doc's directory
       let resolved = href.replace(/\.md$/, "");
 
-      // currentSlug = ["architecture", "README"] for /docs/architecture
-      // → directory = "architecture"
-      // → resolved = "overview" → /docs/architecture/overview
       if (currentSlug.length > 0) {
         const dir = currentSlug[currentSlug.length - 1] === "README"
           ? currentSlug.slice(0, -1)
@@ -55,13 +47,10 @@ function remarkResolveDocLinks(currentSlug: string[]): Plugin<[], Root> {
         resolved = `/docs/${resolved}`;
       }
 
-      // Also rewrite the link text if it matches the filename
-      // [foo.md](foo.md) → [Foo](resolved_href) — better UX
       const filename = href.replace(/\.md$/, "");
       const firstChild = node.children?.[0];
       const linkText = (firstChild && "value" in firstChild ? firstChild.value : "") || "";
       if (linkText === href || linkText === filename) {
-        // Capitalize first letter for readability
         const displayText = filename
           .replace(/[-_]/g, " ")
           .replace(/\b\w/g, (c: string) => c.toUpperCase());
@@ -86,15 +75,39 @@ export function extractHeadings(source: string): Heading[] {
   return headings;
 }
 
-function sanitizeHtml(html: string): string {
-  return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/\son\w+=(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
-    .replace(/\s(href|src)\s*=\s*(['"])\s*javascript:[^'"]*\2/gi, ' $1="#"')
-}
+const docsSchema = {
+  ...defaultSchema,
+  tagNames: [
+    ...(defaultSchema.tagNames || []),
+    "article",
+    "section",
+    "table",
+    "thead",
+    "tbody",
+    "tr",
+    "th",
+    "td",
+    "blockquote",
+    "code",
+    "pre",
+  ],
+  attributes: {
+    ...defaultSchema.attributes,
+    a: [...(defaultSchema.attributes?.a || []), "href", "title", "target", "rel", "className", "ariaHidden", "tabIndex"],
+    img: [...(defaultSchema.attributes?.img || []), "src", "alt", "title", "className"],
+    table: [...(defaultSchema.attributes?.table || []), "data-view", "className"],
+    blockquote: [...(defaultSchema.attributes?.blockquote || []), "data-type", "className"],
+    code: [...(defaultSchema.attributes?.code || []), "className"],
+    th: [...(defaultSchema.attributes?.th || []), "align"],
+    td: [...(defaultSchema.attributes?.td || []), "align"],
+    h2: [...(defaultSchema.attributes?.h2 || []), "id"],
+    h3: [...(defaultSchema.attributes?.h3 || []), "id"],
+    h4: [...(defaultSchema.attributes?.h4 || []), "id"],
+    span: [...(defaultSchema.attributes?.span || []), "className"],
+  },
+};
 
 export async function DocsRenderer({ source, currentSlug = [] }: { source: string; currentSlug?: string[] }) {
-  // Preprocess: convert GitBook liquid hints → HTML callouts
   const preprocessed = preprocessHints(source);
   const headings = extractHeadings(preprocessed);
 
@@ -102,7 +115,7 @@ export async function DocsRenderer({ source, currentSlug = [] }: { source: strin
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkResolveDocLinks(currentSlug))
-    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(remarkRehype, { allowDangerousHtml: false })
     .use(rehypeSlug)
     .use(rehypeAutolinkHeadings, {
       behavior: "append",
@@ -119,10 +132,10 @@ export async function DocsRenderer({ source, currentSlug = [] }: { source: strin
       },
     })
     .use(rehypeHighlight, { detect: true })
-    .use(rehypeStringify, { allowDangerousHtml: true })
+    .use(rehypeSanitize, docsSchema)
+    .use(rehypeStringify)
     .process(preprocessed);
 
-  // Re-attach IDs from our extracted headings to match slugify behavior
   let html = result.toString();
   for (const heading of headings) {
     const escaped = heading.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -136,9 +149,6 @@ export async function DocsRenderer({ source, currentSlug = [] }: { source: strin
     );
   }
 
-  html = sanitizeHtml(html)
-
-  // Dynamic import of client component to avoid SSR issues with DOM APIs
   const { DocsRendererClient } = await import("./DocsRendererClient");
   return <DocsRendererClient html={html} />;
 }

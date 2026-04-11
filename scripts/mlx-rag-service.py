@@ -5,8 +5,12 @@ Apple Silicon-native embeddings via mxbai-embed-large-v1 (MLX, M4 GPU).
 Vector storage via pure SQLite + numpy cosine similarity.
 No C extensions needed — fully portable.
 """
-import os, json, time, sqlite3, threading
-from pathlib import Path
+import json
+import logging
+import os
+import sqlite3
+import threading
+import time
 from typing import Optional
 
 import mlx.core as mx
@@ -27,6 +31,8 @@ TOP_K     = int(os.getenv("TOP_K", "8"))
 DIM       = 1024  # mxbai-embed-large-v1 output dim
 API_KEY   = os.getenv("MLX_RAG_API_KEY")
 
+logger = logging.getLogger(__name__)
+
 # ── Model (loaded once, stays in M4 GPU memory) ───────────────────────────────
 _model_lock = threading.Lock()
 _embed_model = None
@@ -39,7 +45,7 @@ def get_model():
             if _embed_model is None:
                 print(f"[mlx-rag] Loading {MODEL_ID} on Apple M4 Metal...", flush=True)
                 _embed_model, _tokenizer = load_embed_model(MODEL_ID)
-                print(f"[mlx-rag] Model loaded — ready on M4 GPU", flush=True)
+                print("[mlx-rag] Model loaded — ready on M4 GPU", flush=True)
     return _embed_model, _tokenizer
 
 def embed_texts(texts: list[str]) -> np.ndarray:
@@ -119,8 +125,9 @@ def health():
     try:
         model, _ = get_model()
         return {"status": "ok", "model": MODEL_ID, "dim": DIM, "gpu": "M4 Metal"}
-    except Exception as e:
-        return {"status": "degraded", "error": str(e)}
+    except Exception:
+        logger.exception("MLX RAG health check failed")
+        return {"status": "degraded", "error": "service unavailable"}
 
 # ── Embed ─────────────────────────────────────────────────────────────────────
 @app.post("/embed")
@@ -130,8 +137,9 @@ def embed(texts: list[str], _auth: None = Depends(require_api_key)):
     try:
         vecs = embed_texts(texts)
         return {"vectors": vecs, "model": MODEL_ID, "count": len(vecs)}
-    except Exception as e:
-        raise HTTPException(500, str(e))
+    except Exception:
+        logger.exception("Embedding request failed")
+        raise HTTPException(500, "Embedding request failed")
 
 # ── Index ─────────────────────────────────────────────────────────────────────
 @app.post("/index")
