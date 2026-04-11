@@ -182,9 +182,9 @@ export function PicoAcademyPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className={picoSectionLabelClass}>Lessons</p>
-            <h2 className="mt-2 text-2xl font-semibold text-white">Work the path, not the whole map.</h2>
+            <h2 className="mt-2 text-2xl font-semibold text-white">Pick one lesson and move.</h2>
           </div>
-          <p className="text-sm text-white/50">The next lesson gets the strongest visual weight. Everything else can wait.</p>
+          <p className="text-sm text-white/50">The recommended next lesson stays heavy; the rest are just quick options.</p>
         </div>
 
         <div className="grid gap-4 xl:grid-cols-2">
@@ -194,6 +194,10 @@ export function PicoAcademyPage() {
             const lessonHref = buildPicoPath(basePath, `/academy/${lesson.slug}`);
             const levelTitle = lesson.levelId.replace("level-", "Level ");
             const trackTitle = picoTracks.find((track) => track.id === lesson.trackId)?.title ?? lesson.trackId;
+            const prerequisiteSummary =
+              lesson.prerequisites.length === 0
+                ? "No prerequisites"
+                : lesson.prerequisites.join(" · ");
 
             return (
               <Link
@@ -222,22 +226,19 @@ export function PicoAcademyPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <div className={`${picoSurfaceInsetClass} p-4`}>
-                    <p className="text-xs uppercase tracking-[0.18em] text-white/45">Outcome</p>
-                    <p className="mt-2 text-sm text-white/80">{lesson.projectOutcome}</p>
+                <div className={`${picoSurfaceInsetClass} mt-4 flex flex-wrap items-start justify-between gap-3 px-4 py-3 text-sm text-white/70`}>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-white/45">Deliverable</p>
+                    <p className="mt-1 text-white/85">{lesson.deliverable}</p>
                   </div>
-                  <div className={`${picoSurfaceInsetClass} p-4`}>
-                    <p className="text-xs uppercase tracking-[0.18em] text-white/45">Prerequisites</p>
-                    <p className="mt-2 text-sm text-white/80">
-                      {lesson.prerequisites.length > 0 ? lesson.prerequisites.join(" · ") : "None"}
-                    </p>
+                  <div className="max-w-sm text-right">
+                    <p className="text-xs uppercase tracking-[0.18em] text-white/45">Needs</p>
+                    <p className="mt-1 text-white/65">{prerequisiteSummary}</p>
                   </div>
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2 text-xs text-white/50">
                   <span className="rounded-full border border-white/10 px-3 py-1">{lesson.durationMinutes} min</span>
-                  <span className="rounded-full border border-white/10 px-3 py-1">{lesson.deliverable}</span>
                   <span className="rounded-full border border-white/10 px-3 py-1">Badge: {lesson.badge}</span>
                 </div>
 

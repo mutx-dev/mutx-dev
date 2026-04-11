@@ -123,7 +123,7 @@ function SectionCard({
                   : "border border-rose-300/20 bg-rose-300/10 text-rose-200"
             }`}
           >
-            {section.ok ? "Live" : section.status === 401 ? "Auth" : `Error ${section.status}`}
+            {section.ok ? "Live" : section.status === 401 ? "Sign in" : `Issue ${section.status}`}
           </span>
         ) : null}
       </div>
@@ -167,7 +167,7 @@ function formatControlValue(value: unknown, fallback = "—") {
   return String(value);
 }
 
-function formatControlTimestamp(value: unknown, fallback = "No timestamp returned") {
+function formatControlTimestamp(value: unknown, fallback = "No recent update yet") {
   if (typeof value !== "string" || value.length === 0) {
     return fallback;
   }
@@ -372,18 +372,20 @@ export function PicoControlPage() {
   const planLabel = picoState.plan ?? (typeof budget?.plan === "string" ? budget.plan : "FREE");
   const planNote =
     planLabel === "FREE"
-      ? "Free gets the academy plus a single monitored starter lane. Billing is not wired yet, so treat this as a soft product flag, not a charge boundary."
+      ? "Free includes Academy and one monitored starter lane. Billing is not enforced yet, so treat this as an access label today."
       : planLabel === "STARTER"
-        ? "Starter is the first real monitored lane: one agent, alerts, and short retention."
+        ? "Starter gives you one monitored assistant with alerts and a short activity history."
         : planLabel === "PRO"
-          ? "Pro assumes multiple monitored agents plus stronger control habits."
-          : "Team stays soft-gated until multi-user behavior is actually implemented.";
+          ? "Pro is built for multiple monitored assistants and tighter operator habits."
+          : "Team access stays limited until shared operator workflows are ready.";
   const currentThreshold = picoState.costThresholdUsd;
   const approvalGateEnabled = picoState.approvalGateEnabled;
   const tutorAccessLabel =
-    picoState.tutorAccess.limit === null
-      ? "Grounded tutor is unmetered for this plan flag in the current build."
-      : `${picoState.tutorAccess.used}/${picoState.tutorAccess.limit} grounded tutor lookups used, ${picoState.tutorAccess.remaining} remaining.`;
+    picoState.plan === null
+      ? "Sign in to load your tutor allowance for this workspace."
+      : picoState.tutorAccess.limit === null
+        ? "Grounded tutor is currently not capped on this plan."
+        : `Grounded tutor used ${picoState.tutorAccess.used} of ${picoState.tutorAccess.limit} lookups, with ${picoState.tutorAccess.remaining} left.`;
 
   function pushReceipt(receipt: ActionReceipt) {
     setActionReceipts((current) => [receipt, ...current.filter((item) => item.id !== receipt.id)].slice(0, 3));
@@ -409,7 +411,7 @@ export function PicoControlPage() {
       const payload = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(extractPicoControlError(payload, "Failed to deploy starter assistant"));
+        throw new Error(extractPicoControlError(payload, "Could not launch the starter assistant."));
       }
 
       setDeployReceipt(isRecord(payload) ? payload : { receipt: payload });
@@ -417,10 +419,10 @@ export function PicoControlPage() {
       const agentId = isRecord(payload) && isRecord(payload.agent) ? payload.agent.id : null;
       pushReceipt({
         id: `deploy-${Date.now()}`,
-        title: "Starter assistant deployed",
-        summary: `Launched ${starterName} into ${starterWorkspace}.`,
-        detail: `Agent ${String(agentId ?? "unknown")} · deployment ${String(deploymentId ?? "pending receipt")}. Next: refresh live cards and verify one real runtime signal.`,
-        nextLabel: "Review live control",
+        title: "Starter assistant launched",
+        summary: `${starterName} is now live in ${starterWorkspace}.`,
+        detail: `Assistant ${String(agentId ?? "unknown")} is on its first lane. Launch receipt ${String(deploymentId ?? "pending")}. Next: refresh the live cards and confirm activity is flowing.`,
+        nextLabel: "Review live controls",
         nextHref: `${buildPicoPath(basePath, "/control")}#assistant-overview`,
       });
       await fetch("/api/pico/events", {
@@ -430,7 +432,7 @@ export function PicoControlPage() {
       }).catch(() => null);
       await Promise.all([refresh(), refreshPicoState()]);
     } catch (error) {
-      setDeployError(error instanceof Error ? error.message : "Failed to deploy starter assistant");
+      setDeployError(error instanceof Error ? error.message : "Could not launch the starter assistant.");
     } finally {
       setDeploying(false);
     }
@@ -440,7 +442,7 @@ export function PicoControlPage() {
     setThresholdMessage(null);
     const threshold = Number(thresholdInput);
     if (!Number.isFinite(threshold) || threshold < 0) {
-      setThresholdMessage("Enter a non-negative threshold.");
+      setThresholdMessage("Enter a USD spend line of 0 or more.");
       return;
     }
 
@@ -455,17 +457,17 @@ export function PicoControlPage() {
     const payload = await response.json().catch(() => null);
 
     if (!response.ok) {
-      setThresholdMessage(extractPicoControlError(payload, "Failed to save the Pico threshold."));
+      setThresholdMessage(extractPicoControlError(payload, "Could not save the USD spend line."));
       return;
     }
 
     await refreshPicoState();
-    setThresholdMessage(`Soft threshold saved at ${threshold}. This is a Pico operator guardrail, not hard budget enforcement.`);
+    setThresholdMessage(`USD spend line saved at ${threshold}. Pico will show this as a visible guardrail, not a hard stop.`);
     pushReceipt({
       id: `threshold-${threshold}`,
-      title: "Threshold updated",
-      summary: `Control threshold saved at ${threshold}.`,
-      detail: "This is a visible Pico guardrail. Next: watch the live budget card and decide whether the current line in the sand is too loose.",
+      title: "Spend line updated",
+      summary: `USD spend line saved at ${threshold}.`,
+      detail: "This is your visible spend guardrail in Pico. Next: check the budget card and decide whether the line still feels right.",
       nextLabel: "Review budget",
       nextHref: `${buildPicoPath(basePath, "/control")}#budget-card`,
     });
@@ -475,7 +477,7 @@ export function PicoControlPage() {
     setApprovalMessage(null);
     const agentId = isRecord(assistantRuntime) ? assistantRuntime.agent_id : null;
     if (typeof agentId !== "string") {
-      setApprovalMessage("Deploy a starter assistant first so there is a real runtime to gate.");
+      setApprovalMessage("Launch a starter assistant first so Pico has something real to hold for review.");
       return;
     }
 
@@ -492,7 +494,7 @@ export function PicoControlPage() {
     const payload = await response.json().catch(() => null);
 
     if (!response.ok) {
-      setApprovalMessage(extractPicoControlError(payload, "Failed to create approval gate request."));
+      setApprovalMessage(extractPicoControlError(payload, "Could not create the approval request."));
       return;
     }
 
@@ -502,12 +504,12 @@ export function PicoControlPage() {
       body: JSON.stringify({ event: "approval_gate_enabled", metadata: { action_type: "external_send" } }),
     }).catch(() => null);
     const approvalId = isRecord(payload) ? payload.id : null;
-    setApprovalMessage("Approval gate request created. Review the pending approvals panel below.");
+    setApprovalMessage("Approval request created. Review it in the pending approvals panel below.");
     pushReceipt({
       id: `approval-${Date.now()}`,
-      title: "Approval request created",
-      summary: `A risky outbound action is now waiting for a human click.`,
-      detail: `Request ${String(approvalId ?? "pending")} created for external_send. Next: review the pending approvals panel and resolve it deliberately.`,
+      title: "Approval request queued",
+      summary: "A higher-risk action is now waiting for an operator decision.",
+      detail: `Request ${String(approvalId ?? "pending")} is now waiting in Approvals. Next: open the queue below and resolve it deliberately.`,
       nextLabel: "Review approvals",
       nextHref: `${buildPicoPath(basePath, "/control")}#approvals-card`,
     });
@@ -517,23 +519,23 @@ export function PicoControlPage() {
   return (
     <PicoProductShell
       title="Control"
-      description="This page surfaces live assistant, run, alert, budget, runtime, health, and approval data from the same-origin API proxies already available in the product."
+      description="Watch your live assistant, activity, alerts, spend, approvals, runtime, and health in one operator view."
       actions={
         <button
           type="button"
           onClick={() => void refresh()}
           className={picoSecondaryButtonClass}
         >
-          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh live data
+          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh control view
         </button>
       }
     >
       {authRequired ? (
         <div className="rounded-[1.5rem] border border-amber-300/20 bg-amber-300/[0.08] p-6 text-sm leading-7 text-amber-50">
-          Open Pico start first. These panels read authenticated same-origin APIs and stay honest when the session is missing.
+          Open Pico Start first. These panels use your signed-in workspace session, so they stay empty until you are authenticated.
           <div className="mt-4">
             <Link href={startHref} className="font-semibold text-white">
-              Open Pico start
+              Open Pico Start
             </Link>
           </div>
         </div>
@@ -541,7 +543,7 @@ export function PicoControlPage() {
 
       <div className="grid gap-5 xl:grid-cols-3">
         <div className={`${picoSurfaceClass} px-5 py-4 text-sm text-white/50`}>
-          {lastUpdated ? `Last refreshed ${new Date(lastUpdated).toLocaleString()}.` : "Loading live control data..."}
+          {lastUpdated ? `Last refreshed ${new Date(lastUpdated).toLocaleString()}.` : "Loading your control view..."}
         </div>
         <div className={`${picoSurfaceClass} px-5 py-4 text-sm text-white/68`}>
           <span className="font-semibold text-white">Plan {planLabel}</span>. {planNote}
@@ -555,16 +557,16 @@ export function PicoControlPage() {
         <section id="starter-deploy" className={`${picoSurfaceStrongClass} p-6 scroll-mt-24`}>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-2xl">
-              <p className={picoSectionLabelClass}>Starter deploy</p>
+              <p className={picoSectionLabelClass}>Quick launch</p>
               <h2 className="mt-2 text-2xl font-semibold text-white">
-                Launch the first real Pico assistant now.
+                Launch your first Pico assistant.
               </h2>
               <p className="mt-3 text-sm leading-7 text-white/70">
-                One click gets you the default starter lane. Only open advanced fields if you actually need to change the defaults.
+                Start the default assistant in one click. Open the extra settings only if you need to rename the assistant, workspace, or model.
               </p>
             </div>
             <Link href={academyHref} className="text-sm font-semibold text-white/60">
-              Review the academy first if you have not finished setup.
+              Need setup first? Review Academy.
             </Link>
           </div>
 
@@ -576,16 +578,16 @@ export function PicoControlPage() {
               className={`${picoPrimaryButtonClass} px-4 py-3 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40`}
             >
               <Rocket className={`h-4 w-4 ${deploying ? "animate-pulse" : ""}`} />
-              {deploying ? "Deploying starter assistant" : "Deploy starter assistant"}
+              {deploying ? "Launching starter assistant" : "Launch starter assistant"}
             </button>
-            <span className="text-sm text-white/55">Default: {starterName} on {starterWorkspace} using {starterModel}.</span>
+            <span className="text-sm text-white/55">Default launch: {starterName} in {starterWorkspace} on {starterModel}.</span>
           </div>
 
           <details className={`${picoSurfaceInsetClass} mt-5 p-4`}>
-            <summary className="cursor-pointer text-sm font-semibold text-white">Advanced starter settings</summary>
+            <summary className="cursor-pointer text-sm font-semibold text-white">Adjust launch settings</summary>
             <div className="mt-4 grid gap-4 lg:grid-cols-3">
               <label className="space-y-2 text-sm text-white/75">
-                <span>Name</span>
+                <span>Assistant name</span>
                 <input
                   value={starterName}
                   onChange={(event) => setStarterName(event.target.value)}
@@ -593,7 +595,7 @@ export function PicoControlPage() {
                 />
               </label>
               <label className="space-y-2 text-sm text-white/75">
-                <span>Workspace</span>
+                <span>Workspace slug</span>
                 <input
                   value={starterWorkspace}
                   onChange={(event) => setStarterWorkspace(event.target.value)}
@@ -614,7 +616,7 @@ export function PicoControlPage() {
           {deployError ? <p className="mt-4 text-sm text-amber-200">{deployError}</p> : null}
           {deployReceipt ? (
             <p className="mt-4 text-sm text-emerald-200">
-              Starter assistant deployed. Refresh the control cards if the new runtime summary does not appear immediately.
+              Starter assistant launched. Refresh the control cards if the live summary does not appear right away.
             </p>
           ) : null}
         </section>
@@ -623,10 +625,10 @@ export function PicoControlPage() {
       {!authRequired ? (
         <section id="control-review" className="grid gap-5 xl:grid-cols-2 scroll-mt-24">
           <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100/90">Cost threshold</p>
-            <h2 className="mt-2 text-xl font-semibold text-white">Set one visible spending line.</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100/90">Spend line</p>
+            <h2 className="mt-2 text-xl font-semibold text-white">Set a visible spend guardrail.</h2>
             <p className="mt-3 text-sm leading-7 text-white/68">
-              This saves a Pico operator threshold in learner state. It is honest soft control, not hidden fake enforcement.
+              Save the amount Pico should flag in this operator view. It is a clear warning line, not an automatic shutdown.
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <input
@@ -639,27 +641,27 @@ export function PicoControlPage() {
                 onClick={() => void handleSetThreshold()}
                 className={`${picoPrimaryButtonClass} px-4 py-3`}
               >
-                Save threshold
+                Save spend line
               </button>
             </div>
-            <p className="mt-4 text-sm text-white/55">Current saved threshold: {currentThreshold ?? "not set"}</p>
+            <p className="mt-4 text-sm text-white/55">Current spend line (USD): {currentThreshold ?? "not set"}</p>
             {thresholdMessage ? <p className="mt-3 text-sm text-emerald-200">{thresholdMessage}</p> : null}
           </div>
 
           <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100/90">Approval gate</p>
-            <h2 className="mt-2 text-xl font-semibold text-white">Create one real pending approval.</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100/90">Manual review</p>
+            <h2 className="mt-2 text-xl font-semibold text-white">Put one real action behind review.</h2>
             <p className="mt-3 text-sm leading-7 text-white/68">
-              This creates a real approval request for a risky outbound action when an assistant exists. It proves the gate path without pretending governance is magic.
+              Create a live approval request for a higher-risk outbound action when an assistant is running. This verifies the review flow with a real queue item.
             </p>
             <button
               type="button"
               onClick={() => void handleEnableApprovalGate()}
               className={`mt-4 ${picoPrimaryButtonClass} px-4 py-3`}
             >
-              {approvalGateEnabled ? "Create another pending approval" : "Enable approval gate"}
+              {approvalGateEnabled ? "Queue another approval" : "Create approval request"}
             </button>
-            <p className="mt-4 text-sm text-white/55">Gate status: {approvalGateEnabled ? "enabled" : "not yet enabled"}</p>
+            <p className="mt-4 text-sm text-white/55">Review gate: {approvalGateEnabled ? "on" : "not active yet"}</p>
             {approvalMessage ? <p className="mt-3 text-sm text-emerald-200">{approvalMessage}</p> : null}
           </div>
         </section>
@@ -670,9 +672,9 @@ export function PicoControlPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className={picoSectionLabelClass}>Operator receipts</p>
-              <h2 className="mt-2 text-2xl font-semibold text-white">The last few control changes that actually landed</h2>
+              <h2 className="mt-2 text-2xl font-semibold text-white">Recent control changes that actually landed</h2>
             </div>
-            <p className="text-sm text-white/50">If a control action matters, it should leave a receipt.</p>
+            <p className="text-sm text-white/50">Every meaningful control change should leave a receipt.</p>
           </div>
           <div className="mt-5 grid gap-4 xl:grid-cols-3">
             {actionReceipts.map((receipt) => (
@@ -714,7 +716,7 @@ export function PicoControlPage() {
                       value: formatControlValue(assistantRuntime.session_count, "0"),
                     },
                     {
-                      label: "Gateway",
+                      label: "Connection",
                       value: formatControlValue(
                         isRecord(assistantRuntime.gateway) ? assistantRuntime.gateway.status : null,
                         "unknown",
@@ -739,16 +741,16 @@ export function PicoControlPage() {
                     },
                     {
                       label: "Assistant ID",
-                      value: formatControlValue(assistantRuntime.assistant_id, "Not returned"),
+                      value: formatControlValue(assistantRuntime.assistant_id, "Unavailable"),
                       mono: true,
                     },
                     {
                       label: "Workspace",
-                      value: formatControlValue(assistantRuntime.workspace, "Not returned"),
+                      value: formatControlValue(assistantRuntime.workspace, "Unavailable"),
                       mono: true,
                     },
                     {
-                      label: "Skills",
+                      label: "Installed skills",
                       value: formatControlValue(
                         Array.isArray(assistantRuntime.installed_skills) ? assistantRuntime.installed_skills.length : 0,
                         "0",
@@ -766,21 +768,21 @@ export function PicoControlPage() {
                 />
               </>
             ) : (
-              <p>No assistant runtime is currently available for this operator session.</p>
+              <p>No live assistant is connected to this operator view yet.</p>
             )}
           </SectionCard>
         </div>
 
-        <SectionCard title="Recent runs" section={sections.runs}>
+        <SectionCard title="Recent activity" section={sections.runs}>
           <p>
-            Total visible runs: {isRecord(sections.runs?.payload) ? String(sections.runs.payload.total ?? runs.length) : runs.length}
+            Visible activity items: {isRecord(sections.runs?.payload) ? String(sections.runs.payload.total ?? runs.length) : runs.length}
           </p>
           <ul className="mt-3 space-y-2 text-white/60">
             {runs.slice(0, 4).map((run, index) => {
               const item = isRecord(run) ? run : {};
               return (
                 <li key={String(item.id ?? index)}>
-                  {String(item.status ?? "unknown")} · {String(item.started_at ?? item.created_at ?? "no timestamp")}
+                  {String(item.status ?? "unknown")} · {String(item.started_at ?? item.created_at ?? "No timestamp yet")}
                 </li>
               );
             })}
@@ -789,14 +791,14 @@ export function PicoControlPage() {
 
         <SectionCard title="Alerts" section={sections.alerts}>
           <p>
-            Unresolved count: {isRecord(sections.alerts?.payload) ? String(sections.alerts.payload.unresolved_count ?? 0) : "0"}
+            Open alerts: {isRecord(sections.alerts?.payload) ? String(sections.alerts.payload.unresolved_count ?? 0) : "0"}
           </p>
           <ul className="mt-3 space-y-2 text-white/60">
             {alerts.slice(0, 4).map((alert, index) => {
               const item = isRecord(alert) ? alert : {};
               return (
                 <li key={String(item.id ?? index)}>
-                  {String(item.type ?? "alert")} · {String(item.message ?? "No message")}
+                  {String(item.type ?? "alert")} · {String(item.message ?? "No message yet")}
                 </li>
               );
             })}
@@ -834,20 +836,20 @@ export function PicoControlPage() {
                 },
                 {
                   label: "Reset date",
-                  value: formatControlTimestamp(budget?.reset_date, "Not returned"),
+                  value: formatControlTimestamp(budget?.reset_date, "Not scheduled yet"),
                 },
                 {
                   label: "Usage window",
                   value:
                     typeof usage?.period_start === "string" && typeof usage?.period_end === "string"
                       ? `${formatControlTimestamp(usage.period_start)} → ${formatControlTimestamp(usage.period_end)}`
-                      : "Last 30d request",
+                      : "Last 30 days",
                 },
               ]}
             />
             <CompactList
-              title="Top usage drivers"
-              emptyLabel="No usage breakdown returned."
+              title="Top spend drivers"
+              emptyLabel="No spend breakdown available yet."
               items={
                 Array.isArray(usage?.usage_by_agent)
                   ? usage.usage_by_agent.slice(0, 3).map((item, index) => {
@@ -856,7 +858,7 @@ export function PicoControlPage() {
                         id: String(agent.agent_id ?? index),
                         primary: formatControlValue(agent.agent_name, "Unknown agent"),
                         secondary:
-                          agent.event_count !== undefined ? `${formatControlValue(agent.event_count, "0")} events in window` : undefined,
+                          agent.event_count !== undefined ? `${formatControlValue(agent.event_count, "0")} events this period` : undefined,
                         meta: `${formatControlValue(agent.credits_used, "0")} cr`,
                       };
                     })
@@ -866,7 +868,7 @@ export function PicoControlPage() {
           </SectionCard>
         </div>
 
-        <SectionCard title="Runtime" section={sections.runtime}>
+        <SectionCard title="Runtime service" section={sections.runtime}>
           <SummaryGrid
             items={[
               {
@@ -886,7 +888,7 @@ export function PicoControlPage() {
                       : "default",
               },
               {
-                label: "Bindings",
+                label: "Connected lanes",
                 value: formatControlValue(runtime?.binding_count, "0"),
               },
             ]}
@@ -899,17 +901,17 @@ export function PicoControlPage() {
                 mono: true,
               },
               {
-                label: "Gateway URL",
+                label: "Gateway address",
                 value: formatControlValue(runtime?.gateway_url, "not set"),
                 mono: true,
               },
               {
                 label: "Tracking mode",
-                value: formatControlValue(runtime?.tracking_mode ?? runtime?.install_method, "Not returned"),
+                value: formatControlValue(runtime?.tracking_mode ?? runtime?.install_method, "Unavailable"),
               },
               {
-                label: "Last seen",
-                value: formatControlTimestamp(runtime?.last_seen_at, "No timestamp returned"),
+                label: "Last heartbeat",
+                value: formatControlTimestamp(runtime?.last_seen_at, "No heartbeat yet"),
               },
             ]}
           />
@@ -920,7 +922,7 @@ export function PicoControlPage() {
             <SummaryGrid
               items={[
                 {
-                  label: "Gate",
+                  label: "Review gate",
                   value: approvalGateEnabled ? "Enabled" : "Not enabled",
                   tone: approvalGateEnabled ? "good" : "warn",
                 },
@@ -931,7 +933,7 @@ export function PicoControlPage() {
                 },
                 {
                   label: "Queue",
-                  value: approvals.length > 0 ? "Needs review" : "Clear",
+                  value: approvals.length > 0 ? "Needs operator review" : "Clear",
                   tone: approvals.length > 0 ? "warn" : "good",
                 },
               ]}
@@ -939,18 +941,18 @@ export function PicoControlPage() {
             <KeyValueList
               items={[
                 {
-                  label: "Control message",
-                  value: approvalGateEnabled ? "New risky outbound actions can be held for review." : "Enable the gate above to create a real review stop.",
+                  label: "Review guidance",
+                  value: approvalGateEnabled ? "Higher-risk outbound actions can be held for review." : "Create a request above to put one real action behind review.",
                 },
                 {
-                  label: "Latest status",
-                  value: approvals.length > 0 && isRecord(approvals[0]) ? formatControlValue(approvals[0].status, "PENDING") : "No pending approvals returned",
+                  label: "Latest request",
+                  value: approvals.length > 0 && isRecord(approvals[0]) ? formatControlValue(approvals[0].status, "PENDING") : "No pending approvals yet",
                 },
               ]}
             />
             <CompactList
-              title="Pending queue"
-              emptyLabel="No pending approvals returned."
+              title="Pending review queue"
+              emptyLabel="No pending approvals yet."
               items={approvals.slice(0, 4).map((approval, index) => {
                 const item = isRecord(approval) ? approval : {};
                 return {
@@ -979,7 +981,7 @@ export function PicoControlPage() {
                       : "default",
               },
               {
-                label: "Database",
+                label: "Data store",
                 value: formatControlValue(health?.database, "unknown"),
                 tone:
                   String(health?.database ?? "").toLowerCase().includes("ok") ||
@@ -1001,20 +1003,20 @@ export function PicoControlPage() {
             items={[
               {
                 label: "Checked at",
-                value: formatControlTimestamp(health?.timestamp, "Not returned"),
+                value: formatControlTimestamp(health?.timestamp, "Unavailable"),
               },
               {
                 label: "Version",
-                value: formatControlValue(health?.version, "Not returned"),
+                value: formatControlValue(health?.version, "Unavailable"),
                 mono: true,
               },
               {
-                label: "Components",
-                value: healthComponents.length > 0 ? healthComponents.join(", ") : "Not returned",
+                label: "Services checked",
+                value: healthComponents.length > 0 ? healthComponents.join(", ") : "Unavailable",
               },
               {
-                label: "Detail",
-                value: formatControlValue(healthDetail, "No extra detail returned"),
+                label: "Operator note",
+                value: formatControlValue(healthDetail, "No extra context yet"),
               },
             ]}
           />

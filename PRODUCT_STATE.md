@@ -1,7 +1,7 @@
 # PRODUCT_STATE
 
 Status: active build
-Last updated: 2026-04-11T00:51:05Z
+Last updated: 2026-04-11T01:57:00Z
 
 ## What exists
 - pico.mutx.dev is a real multilingual landing page with live lead/contact capture.
@@ -285,4 +285,31 @@ What failed
 What is next
 - Sweep remaining control copy so every label sounds like operator product language instead of backend plumbing.
 - Keep tightening any dense panels that still force the user to read too much before spotting the state that matters.
+
+### 2026-04-11 03:57:00 CEST — Multi-lane Pico polish START
+- Orchestrator opened a parallel builder pass for the remaining Pico trust leaks.
+- Lane A: Control copy sweep so labels stop sounding like backend plumbing.
+- Lane B: Dense-panel cleanup outside Control so remaining Pico surfaces scan faster.
+- Next: merge, validate, review, and ship the approved slice.
+
+
+### 2026-04-11 03:57:00 CEST — Multi-lane Pico polish END
+What changed
+- Merged the parallel builder lanes into the live Pico surface.
+- Control now uses clearer operator-facing language instead of backend-flavored labels in the key launch, guardrail, receipt, and status areas.
+- Academy lesson cards got denser without hiding real prerequisites; they stay faster to scan while preserving readiness truth.
+- Review caught three regressions and they were patched before ship: full prerequisite visibility restored, tutor access stopped bluffing when plan state is empty, and spend-line copy now clearly stays USD-denominated.
+
+What was tested
+- `npm run typecheck`
+- `npm run lint`
+- Reviewer pass on the merged Control + Academy slice
+
+What failed
+- No blocking Pico failures remain in this slice.
+- Existing repo-level Next/Turbopack warnings remain non-blocking.
+
+What is next
+- Sweep the remaining Pico waitlist/early-access language leaking from landing/contact surfaces.
+- Make the shared Pico shell session-aware so the header stops looking logged out after auth.
 
