@@ -42,7 +42,8 @@ jest.mock('@/components/pico/usePicoState', () => ({
   usePicoState: mockUsePicoState,
 }))
 
-import { PicoSupportPage, findPicoSupportMatches } from '@/components/pico/PicoSupportPage'
+import { PicoSupportPage } from '@/components/pico/PicoSupportPage'
+import { findPicoSupportMatches } from '@/lib/pico/tutor'
 
 describe('PicoSupportPage', () => {
   beforeEach(() => {

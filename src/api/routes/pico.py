@@ -7,7 +7,7 @@ from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models import User
 from src.api.models.schemas import PicoEventRequest, PicoStateResponse
-from src.api.services.pico_state import get_pico_state, record_pico_event
+from src.api.services.pico_progress import get_pico_state, record_pico_event
 
 router = APIRouter(prefix="/pico", tags=["pico"])
 

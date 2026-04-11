@@ -1,7 +1,7 @@
 # PRODUCT_STATE
 
 Status: active build
-Last updated: 2026-04-10T23:27:50Z
+Last updated: 2026-04-11T00:47:28Z
 
 ## What exists
 - pico.mutx.dev is a real multilingual landing page with live lead/contact capture.
@@ -120,3 +120,34 @@ What failed
 What is next
 - Merge this coordinated finish-pass.
 - If we keep pushing, the next real gains are billing integration or deeper live run/alert authoring, not more shell paint.
+
+### 2026-04-11T00:47:28Z START
+- Canonical Pico order received. Reconciling all shadow implementations into one Pico truth.
+
+### 2026-04-11T00:47:28Z END
+What changed
+- Merged lib/pico/course.ts and lib/pico/progression.ts into the canonical lib/pico/academy.ts.
+- Moved grounded tutor matching into the canonical lib/pico/tutor.ts instead of keeping it embedded inside PicoSupportPage.
+- Renamed backend persistence from src/api/services/pico_state.py to the canonical src/api/services/pico_progress.py.
+- Updated all app/pico/*, components/pico/*, tests, and docs to import the canonical academy/tutor/progress modules.
+
+What was deleted
+- lib/pico/course.ts
+- lib/pico/progression.ts
+- src/api/services/pico_state.py
+
+Why
+- Parallel Pico files were already starting to drift into shadow architecture. Leaving them around would guarantee contradictory product logic and duplicate maintenance.
+
+What was tested
+- npm run typecheck
+- npm run lint
+- npx jest --runInBand tests/unit/picoState.test.ts tests/unit/picoAcademyPage.test.tsx tests/unit/picoSupportPage.test.tsx tests/unit/picoControlPage.test.ts
+- /Users/fortune/MUTX/.venv/bin/python -m pytest tests/api/test_pico_route.py -q
+- npm run build
+
+What failed
+- No blocking failures. Existing Next workspace-root/NFT warnings and pytest OpenTelemetry shutdown noise remain non-blocking.
+
+What is next
+- From here on, any Pico change should land only in the canonical academy/tutor/progress files and the app/pico/components/pico surfaces that consume them.

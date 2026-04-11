@@ -15,7 +15,7 @@ import {
 import { PicoProductShell } from "@/components/pico/PicoProductShell";
 import { usePicoPath } from "@/components/pico/PicoPathProvider";
 import { usePicoState } from "@/components/pico/usePicoState";
-import { picoLessons } from "@/lib/pico/course";
+import { picoLessons } from "@/lib/pico/academy";
 
 type StepStatus = "complete" | "pending" | "locked";
 

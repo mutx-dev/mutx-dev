@@ -49,6 +49,6 @@ Each lesson includes:
 - next recommended lesson
 
 ## Current reality
-- The lesson corpus now exists in lib/pico/course.ts.
+- The lesson corpus now exists in lib/pico/academy.ts.
 - Support is grounded in that same lesson corpus.
 - Billing and admin/content editing are still lightweight and internal-only.

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { picoLessons } from "@/lib/pico/course";
+import { picoLessons } from "@/lib/pico/academy";
 
 export type PicoTutorAccess = {
   plan: string | null;

@@ -59,3 +59,15 @@ Rewrite the lesson corpus so the product uses the exact required 12 tutorials, 7
 
 Why
 If the core academy shape drifts now, every later system will calcify around the wrong structure.
+
+## 2026-04-11T00:47:28Z - Canonical Pico reconciliation
+Status: accepted
+
+Context
+Pico had started accumulating parallel academy/progression/service files with overlapping responsibility.
+
+Decision
+Collapse the lesson/progression model into lib/pico/academy.ts, move tutor matching into lib/pico/tutor.ts, and rename backend persistence to src/api/services/pico_progress.py. Delete the replaced shadow files.
+
+Why
+One Pico truth is cheaper to maintain, harder to misread, and much less likely to drift into contradictory product behavior.

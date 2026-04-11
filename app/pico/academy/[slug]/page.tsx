@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { PicoLessonPage } from "@/components/pico/PicoLessonPage";
-import { getPicoLesson } from "@/lib/pico/course";
+import { getPicoLesson } from "@/lib/pico/academy";
 
 export default async function PicoLessonRoute({
   params,

@@ -7,7 +7,7 @@ import { ArrowRight, CheckCircle2, CircleDashed, Loader2 } from "lucide-react";
 import { PicoProductShell } from "@/components/pico/PicoProductShell";
 import { usePicoBasePath } from "@/components/pico/PicoPathProvider";
 import { usePicoState } from "@/components/pico/usePicoState";
-import { getNextPicoLesson, picoLevels, picoTracks, type PicoLesson } from "@/lib/pico/course";
+import { getNextPicoLesson, picoLevels, picoTracks, type PicoLesson } from "@/lib/pico/academy";
 import { buildPicoPath } from "@/lib/pico/routing";
 
 type PicoLessonPageProps = {

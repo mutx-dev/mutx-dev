@@ -12,12 +12,12 @@ import {
   picoLevels,
   picoLessons,
   picoTracks,
-} from "@/lib/pico/course";
+} from "@/lib/pico/academy";
 import {
   formatPicoEventLabel,
   getPicoBadgeProgress,
   getPicoTrackProgress,
-} from "@/lib/pico/progression";
+} from "@/lib/pico/academy";
 import { buildPicoPath } from "@/lib/pico/routing";
 
 function AutoProgressSummary({ metadata }: { metadata: Record<string, unknown> }) {
