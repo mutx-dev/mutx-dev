@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { MarketingHomePage } from "@/components/site/marketing/MarketingHomePage";
 import { PublicFooter } from "@/components/site/PublicFooter";
+import { PublicNav } from "@/components/site/PublicNav";
 import { PublicSurface } from "@/components/site/PublicSurface";
 import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl, getSiteUrl } from "@/lib/seo";
 
@@ -80,6 +81,7 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageStructuredData) }}
       />
+      <PublicNav />
       <MarketingHomePage />
       <PublicFooter showCallout={false} />
     </PublicSurface>

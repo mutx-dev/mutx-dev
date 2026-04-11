@@ -17,7 +17,6 @@ import tomllib
 from typing import Any
 from urllib.request import urlopen
 
-
 DEFAULT_HOMEPAGE = "https://mutx.dev"
 DEFAULT_REPOSITORY = "mutx-dev/mutx-dev"
 DEFAULT_PYTHON_FORMULA = "python@3.12"
@@ -176,13 +175,11 @@ def render_formula(
     resources: list[HomebrewResource],
 ) -> str:
     resource_blocks = "\n\n".join(
-        textwrap.dedent(
-            f"""\
+        textwrap.dedent(f"""\
               resource "{_escape_ruby(resource.name)}" do
                 url "{_escape_ruby(resource.url)}"
                 sha256 "{resource.sha256}"
-              end"""
-        )
+              end""")
         for resource in resources
     )
     if resource_blocks:
@@ -213,11 +210,13 @@ class {FORMULA_CLASS_NAME} < Formula
 
   test do
     assert_match "Usage: mutx onboard [OPTIONS]", shell_output("#{{bin}}/mutx onboard --help")
+    assert_match "Usage: mutx setup [OPTIONS] COMMAND [ARGS]...", shell_output("#{{bin}}/mutx setup --help")
     assert_match "--install-openclaw", shell_output("#{{bin}}/mutx setup hosted --help")
     assert_match "inspect", shell_output("#{{bin}}/mutx runtime --help")
     system libexec/"bin/python", "-c", "import {imports}"
   end
 end
+
 """
     return body
 

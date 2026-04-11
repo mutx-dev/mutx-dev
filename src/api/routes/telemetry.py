@@ -6,16 +6,21 @@ Provides endpoints for OpenTelemetry configuration status and backend setup.
 
 from typing import Literal
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 
+from src.api.middleware.auth import get_current_internal_user
 from src.api.services.telemetry_backend import (
     configure_telemetry_backend,
     get_telemetry_health,
     get_current_config,
 )
 
-router = APIRouter(prefix="/telemetry", tags=["telemetry"])
+router = APIRouter(
+    prefix="/telemetry",
+    tags=["telemetry"],
+    dependencies=[Depends(get_current_internal_user)],
+)
 
 
 class TelemetryConfigRequest(BaseModel):
@@ -46,6 +51,9 @@ async def get_telemetry_config(request: Request):
             exporter_type = "jaeger"
 
     config = get_current_config()
+    if config.get("endpoint") and exporter_type == "console":
+        exporter_type = "otlp"
+
     return {
         "otel_enabled": True,
         "exporter_type": config.get("exporter_type", exporter_type),

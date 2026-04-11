@@ -1,3 +1,5 @@
+import shutil
+
 import click
 
 from cli.commands.tui import launch_tui
@@ -75,6 +77,20 @@ def _choose_openclaw_action(
         4: "cancel",
     }
     return mapping[selection]
+
+
+def _echo_first_agent_hint() -> None:
+    click.echo("")
+    click.echo("Immediate payoff:")
+    click.echo("  mutx onboard --help")
+    if shutil.which("hermes"):
+        click.echo(
+            "Use onboard to pick your next guided flow, then run mutx runtime inspect to verify your local runtime."
+        )
+    else:
+        click.echo(
+            "Use onboard to pick your next guided flow, then run mutx runtime inspect after your runtime is configured."
+        )
 
 
 def _finish_setup(
@@ -157,6 +173,7 @@ def _finish_setup(
         f"Privacy: {result.runtime_snapshot.get('privacy_summary') or 'Local-only runtime tracking.'}"
     )
 
+    _echo_first_agent_hint()
     _install_faramesh_governance()
 
     if open_tui:
