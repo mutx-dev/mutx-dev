@@ -210,11 +210,12 @@ class {FORMULA_CLASS_NAME} < Formula
 
   test do
     assert_match "Usage: mutx onboard [OPTIONS]", shell_output("#{{bin}}/mutx onboard --help")
-    assert_match "Usage: mutx first-agent [OPTIONS] [TASK]...", shell_output("#{{bin}}/mutx first-agent --help")
+    assert_match "Usage: mutx setup [OPTIONS] COMMAND [ARGS]...", shell_output("#{{bin}}/mutx setup --help")
     assert_match "--install-openclaw", shell_output("#{{bin}}/mutx setup hosted --help")
     assert_match "inspect", shell_output("#{{bin}}/mutx runtime --help")
     system libexec/"bin/python", "-c", "import {imports}"
   end
+end
 
 """
     return body

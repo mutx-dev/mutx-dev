@@ -82,14 +82,14 @@ def _choose_openclaw_action(
 def _echo_first_agent_hint() -> None:
     click.echo("")
     click.echo("Immediate payoff:")
-    click.echo('  mutx first-agent "Turn these rough notes into three next steps"')
+    click.echo("  mutx onboard --help")
     if shutil.which("hermes"):
         click.echo(
-            "Runs Hermes for a real result, cleans up the output, and saves proof under ~/.mutx/first-agent/."
+            "Use onboard to pick your next guided flow, then run mutx runtime inspect to verify your local runtime."
         )
     else:
         click.echo(
-            "This uses Hermes. Install Hermes first, then rerun the command for one real useful output plus proof under ~/.mutx/first-agent/."
+            "Use onboard to pick your next guided flow, then run mutx runtime inspect after your runtime is configured."
         )
 
 
