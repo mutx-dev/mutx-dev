@@ -7,7 +7,7 @@ import { ArrowRight, Check } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
 
 import s from './PicoLanding.module.css'
-import { SiteReveal } from '../SiteReveal'
+import { SiteReveal } from '@/components/site/SiteReveal'
 import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
 import { usePicoHref } from '@/lib/pico/navigation'
@@ -128,13 +128,13 @@ export function PicoLandingPage() {
 
             <SiteReveal delay={0.22}>
               <div className={s.heroActions}>
-                <button onClick={() => openForm()} className={s.btnPrimary} type="button">
+                <Link href={toHref('/onboarding')} className={s.btnPrimary}>
+                  Open workspace
+                </Link>
+                <button onClick={() => openForm()} className={s.btnSecondary} type="button">
                   {t('hero.cta')}
                   <ArrowRight className="h-4 w-4" />
                 </button>
-                <Link href={toHref('/app')} className={s.btnSecondary}>
-                  Open workspace
-                </Link>
               </div>
             </SiteReveal>
 
@@ -281,7 +281,7 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Why Pre-Register + Founding (Sections 8+9 merged) ---- */}
+        {/* ---- Live beta truth (Sections 8+9 merged) ---- */}
         <section className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
@@ -319,7 +319,7 @@ export function PicoLandingPage() {
         </section>
 
         {/* ---- Final CTA (Section 11) ---- */}
-        <section id="pre-register" className={`${s.section} ${s.sectionCta}`}>
+        <section id="contact" className={`${s.section} ${s.sectionCta}`}>
           <div className={s.shell}>
             <div className={s.ctaPanel}>
               <div className={s.ctaPanelGlow} aria-hidden="true" />

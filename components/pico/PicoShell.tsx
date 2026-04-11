@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 
 const navItems = [
   { href: '/', label: 'Landing' },
-  { href: '/app', label: 'Workspace' },
+  { href: '/onboarding', label: 'Workspace' },
   { href: '/academy', label: 'Academy' },
   { href: '/tutor', label: 'Tutor' },
   { href: '/autopilot', label: 'Autopilot' },

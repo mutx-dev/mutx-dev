@@ -23,7 +23,7 @@
 - milestone.project_shared
 
 ### Autopilot events
-- run.logged
+- run.observed
 - budget.updated
 - alert.channel_changed
 - alert.opened
@@ -41,10 +41,10 @@
 - community.project_shared
 
 ## Current storage model
-- Source of truth: browser-local workspace state (`picomutx.workspace.v1`)
-- Event history: append-only event array stored with workspace state
-- Alert history: retained per plan window
-- Approval queue: persisted with status and timestamps
+- Source of truth for progress: browser-local state (`pico.progress.v1`)
+- Auth sync lane: `app/api/pico/progress` proxying to `/v1/pico/progress`
+- Live autopilot signals: existing MUTX runs, budgets, alerts, and Pico approval routes
+- Approval queue: existing Pico approvals bridge, currently backed by the shared in-memory approvals service
 
 ## XP model
 - account created: 25
@@ -84,10 +84,8 @@ Future alerts to add:
 - Approve/deny actions append audit events.
 - Hard external enforcement is not shipped yet; this is a control rehearsal layer until live connectors land.
 
-## Replacement points for live sync
-When auth-backed sync lands, the workspace model should map into:
-- onboarding state -> `/api/dashboard/onboarding`
-- runtime snapshot -> `/api/dashboard/runtime/providers/[provider]`
-- observability runs -> `/api/dashboard/observability`
-- monitoring alerts -> `/api/dashboard/monitoring/alerts`
-- usage events -> `/api/dashboard/usage/events`
+## Deeper integration points still open
+- richer runtime snapshot -> `/api/dashboard/runtime/providers/[provider]`
+- deeper observability drill-down -> `/api/dashboard/observability`
+- monitoring alert expansion -> `/api/dashboard/monitoring/alerts`
+- usage-event enrichment -> `/api/dashboard/usage/events`

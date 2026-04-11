@@ -7,7 +7,7 @@ import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_RELEASE_NOTES, PICO_SHOWCASE_PATTERNS, getLessonBySlug } from '@/lib/pico/academy'
 import { usePicoHref } from '@/lib/pico/navigation'
-import { PicoContactForm } from '@/components/site/pico/PicoContactForm'
+import { PicoContactForm } from '@/components/pico/PicoContactForm'
 
 export function PicoSupportPageClient() {
   const { actions } = usePicoProgress()

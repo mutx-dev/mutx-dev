@@ -9,9 +9,9 @@ icon: question
 
 A Next.js marketing and app surface, a FastAPI backend, a Python CLI, a Python SDK, Docker workflows, and Terraform plus Ansible infrastructure code.
 
-## Is the waitlist real?
+## Is PicoMUTX live?
 
-Yes. Waitlist signups are stored in Postgres through `lib/waitlist.ts` and `lib/db.ts`.
+Yes. `pico.mutx.dev` ships the PicoMUTX landing page, onboarding-first workspace, academy, grounded tutor, support lane, and the current autopilot beta.
 
 ## Is there a `/v1` API prefix?
 

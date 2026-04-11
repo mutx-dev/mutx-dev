@@ -145,7 +145,7 @@ export function PicoAcademyDashboard() {
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Tracks</p>
             <h2 className="mt-2 text-2xl font-semibold text-white">Project-based learning paths</h2>
           </div>
-          <Link href={toHref('/app')} className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
+          <Link href={toHref('/onboarding')} className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
             Open workspace
           </Link>
         </div>
