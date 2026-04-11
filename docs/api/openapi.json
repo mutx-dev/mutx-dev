@@ -9752,12 +9752,40 @@
         "summary": "Get Telemetry Config",
         "description": "Get current telemetry configuration.\n\nReturns the OTEL status including whether it's enabled,\nthe exporter type, and endpoint if configured.",
         "operationId": "get_telemetry_config_v1_telemetry_config_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -9770,15 +9798,33 @@
         "summary": "Configure Telemetry",
         "description": "Configure the telemetry backend OTLP endpoint.\n\nAllows dynamic configuration of the OTLP endpoint and protocol\nfor exporting traces and metrics to Grafana/Jaeger/Tempo.\n\nArgs:\n    request: Contains otlp_endpoint (URL) and protocol (grpc or http).\n\nReturns:\n    The updated telemetry configuration.",
         "operationId": "configure_telemetry_v1_telemetry_config_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/TelemetryConfigRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -9810,12 +9856,40 @@
         "summary": "Get Telemetry Backend Health",
         "description": "Get health status of the configured telemetry backend.\n\nReturns:\n    Health status including whether the backend is configured\n    and reachable.",
         "operationId": "get_telemetry_backend_health_v1_telemetry_health_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
