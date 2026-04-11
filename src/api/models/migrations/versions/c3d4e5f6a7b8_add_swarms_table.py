@@ -18,15 +18,21 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Create swarms table — agent_ids stored as JSON array (text) for SQLite compatibility
-    # PostgreSQL will use native ARRAY
+    bind = op.get_bind()
+    is_postgresql = bind.dialect.name == "postgresql"
+
+    # Keep SQLite-compatible text storage, but use native ARRAY on PostgreSQL
+    agent_ids_type = (
+        sa.dialects.postgresql.ARRAY(sa.String()) if is_postgresql else sa.Text()
+    )
+
     op.create_table(
         "swarms",
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column("user_id", sa.UUID(), nullable=False),
         sa.Column("name", sa.String(length=255), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
-        sa.Column("agent_ids", sa.Text(), nullable=True),  # JSON array serialized as text
+        sa.Column("agent_ids", agent_ids_type, nullable=True),
         sa.Column("min_replicas", sa.Integer(), nullable=False, server_default="1"),
         sa.Column("max_replicas", sa.Integer(), nullable=False, server_default="10"),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
