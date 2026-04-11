@@ -1,4 +1,4 @@
-"""Tests for /v1/pico routes — learner progress state and event ingestion."""
+"""Tests for /v1/pico routes -- learner progress state and event ingestion."""
 
 import pytest
 from httpx import AsyncClient
@@ -47,20 +47,20 @@ async def test_get_pico_state_default(client: AsyncClient):
 async def test_post_pico_lesson_completed_updates_state(client: AsyncClient):
     response = await client.post(
         "/v1/pico/events",
-        json={"event": "lesson_completed", "lesson_id": "lesson-1", "track_id": "track-a"},
+        json={"event": "lesson_completed", "lesson_id": "install-hermes-locally", "track_id": "track-a"},
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["xp_total"] == 125
-    assert data["current_level"] == 2
-    assert data["completed_lessons"] == ["lesson-1"]
+    assert data["xp_total"] == 50
+    assert data["current_level"] == 1
+    assert data["completed_lessons"] == ["install-hermes-locally"]
     assert data["completed_tracks"] == []
     assert data["milestones"] == ["first_lesson_finished"]
     assert data["event_counts"]["lesson_completed"] == 1
     assert data["recent_events"][-1]["event"] == "lesson_completed"
-    assert data["recent_events"][-1]["lesson_id"] == "lesson-1"
+    assert data["recent_events"][-1]["lesson_id"] == "install-hermes-locally"
     assert data["recent_events"][-1]["track_id"] == "track-a"
-    assert data["recent_events"][-1]["xp_awarded"] == 125
+    assert data["recent_events"][-1]["xp_awarded"] == 50
     assert data["recent_events"][-1]["metadata"]["auto_progress"] == {
         "completed_tracks": [],
         "badges": [],
@@ -69,25 +69,53 @@ async def test_post_pico_lesson_completed_updates_state(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_post_duplicate_lesson_event_is_deduped_for_xp(client: AsyncClient):
-    await client.post(
+async def test_lesson_completion_without_lesson_id_does_not_grant_progress(client: AsyncClient):
+    response = await client.post(
         "/v1/pico/events",
-        json={"event": "lesson_completed", "lesson_id": "lesson-1"},
+        json={"event": "lesson_completed"},
     )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["xp_total"] == 0
+    assert data["completed_lessons"] == []
+    assert data["milestones"] == []
+    assert data["recent_events"][-1]["xp_awarded"] == 0
+
+
+@pytest.mark.asyncio
+async def test_unknown_lesson_id_does_not_grant_progress(client: AsyncClient):
     response = await client.post(
         "/v1/pico/events",
         json={"event": "lesson_completed", "lesson_id": "lesson-1"},
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["xp_total"] == 125
-    assert data["completed_lessons"] == ["lesson-1"]
+    assert data["xp_total"] == 0
+    assert data["completed_lessons"] == []
+    assert data["milestones"] == []
+
+
+
+@pytest.mark.asyncio
+async def test_post_duplicate_lesson_event_is_deduped_for_xp(client: AsyncClient):
+    await client.post(
+        "/v1/pico/events",
+        json={"event": "lesson_completed", "lesson_id": "install-hermes-locally"},
+    )
+    response = await client.post(
+        "/v1/pico/events",
+        json={"event": "lesson_completed", "lesson_id": "install-hermes-locally"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["xp_total"] == 50
+    assert data["completed_lessons"] == ["install-hermes-locally"]
     assert data["event_counts"]["lesson_completed"] == 2
     assert data["recent_events"][-1]["xp_awarded"] == 0
 
 
 @pytest.mark.asyncio
-async def test_lesson_completion_auto_awards_track_and_badge_progress(client: AsyncClient):
+async def test_lesson_completion_auto_unlocks_track_and_badge_without_bonus_xp(client: AsyncClient):
     await client.post(
         "/v1/pico/events",
         json={"event": "lesson_completed", "lesson_id": "install-hermes-locally"},
@@ -105,17 +133,18 @@ async def test_lesson_completion_auto_awards_track_and_badge_progress(client: As
     assert data["completed_tracks"] == ["track-a"]
     assert data["badges"] == ["first-boot"]
     assert data["milestones"] == ["first_lesson_finished", "first_track_finished"]
-    assert data["xp_total"] == 400
-    assert data["current_level"] == 3
+    assert data["xp_total"] == 100
+    assert data["current_level"] == 2
     assert data["recent_events"][-1]["metadata"]["auto_progress"] == {
         "completed_tracks": ["track-a"],
         "badges": ["first-boot"],
         "milestones": ["first_track_finished"],
     }
+    assert data["recent_events"][-1]["metadata"]["level_up"] == {"from": 1, "to": 2}
 
 
 @pytest.mark.asyncio
-async def test_post_pico_events_roundtrip_state(client: AsyncClient):
+async def test_non_real_progress_events_update_state_but_not_xp(client: AsyncClient):
     await client.post(
         "/v1/pico/events",
         json={"event": "track_completed", "track_id": "track-1"},
@@ -145,8 +174,8 @@ async def test_post_pico_events_roundtrip_state(client: AsyncClient):
     ]
     assert data["tutor_sessions_used"] == 2
     assert data["tutor_access"]["remaining"] == 1
-    assert data["xp_total"] == 395
-    assert data["current_level"] == 3
+    assert data["xp_total"] == 0
+    assert data["current_level"] == 1
     assert data["event_counts"]["track_completed"] == 1
     assert data["event_counts"]["badge_earned"] == 1
     assert data["event_counts"]["milestone_reached"] == 1
@@ -182,6 +211,7 @@ async def test_free_plan_tutor_limit_blocks_extra_sessions(client: AsyncClient):
     assert state["tutor_sessions_used"] == 2
     assert state["tutor_access"]["remaining"] == 1
     assert state["tutor_access"]["limit_reached"] is False
+    assert state["xp_total"] == 0
 
 
 @pytest.mark.asyncio
@@ -204,45 +234,98 @@ async def test_starter_plan_gets_higher_tutor_limit(
     assert data["tutor_sessions_used"] == 5
     assert data["tutor_access"]["limit"] == 25
     assert data["tutor_access"]["remaining"] == 20
+    assert data["xp_total"] == 0
 
 
 @pytest.mark.asyncio
-async def test_post_pico_threshold_and_gate_flags(client: AsyncClient):
+async def test_first_run_only_awards_xp_once(client: AsyncClient):
+    first = await client.post(
+        "/v1/pico/events",
+        json={"event": "first_agent_run", "metadata": {"transcript_path": "/tmp/first-run.txt"}},
+    )
+    assert first.status_code == 200
+    first_data = first.json()
+    assert first_data["xp_total"] == 80
+    assert first_data["current_level"] == 1
+
+    second = await client.post(
+        "/v1/pico/events",
+        json={"event": "first_agent_run", "metadata": {"transcript_path": "/tmp/first-run.txt"}},
+    )
+    assert second.status_code == 200
+    second_data = second.json()
+    assert second_data["xp_total"] == 80
+    assert second_data["event_counts"]["first_agent_run"] == 2
+    assert second_data["recent_events"][-1]["xp_awarded"] == 0
+
+
+@pytest.mark.asyncio
+async def test_first_alert_threshold_awards_xp_once_and_gate_only_unlocks_milestone(client: AsyncClient):
     threshold_response = await client.post(
         "/v1/pico/events",
         json={"event": "cost_threshold_set", "metadata": {"threshold_usd": 42}},
     )
     assert threshold_response.status_code == 200
+    threshold_data = threshold_response.json()
+    assert threshold_data["xp_total"] == 70
+    assert threshold_data["current_level"] == 1
+    assert threshold_data["milestones"] == ["budget_guardrail_set"]
+
+    repeat_threshold = await client.post(
+        "/v1/pico/events",
+        json={"event": "cost_threshold_set", "metadata": {"threshold_usd": 84}},
+    )
+    assert repeat_threshold.status_code == 200
+    repeat_data = repeat_threshold.json()
+    assert repeat_data["xp_total"] == 70
+    assert repeat_data["cost_threshold_usd"] == 84
+    assert repeat_data["event_counts"]["cost_threshold_set"] == 2
+    assert repeat_data["recent_events"][-1]["xp_awarded"] == 0
+
     approval_response = await client.post(
         "/v1/pico/events",
         json={"event": "approval_gate_enabled"},
     )
     assert approval_response.status_code == 200
-
     data = approval_response.json()
-    assert data["cost_threshold_usd"] == 42
+    assert data["cost_threshold_usd"] == 84
     assert data["approval_gate_enabled"] is True
     assert data["milestones"] == ["budget_guardrail_set", "approval_guardrail_live"]
+    assert data["xp_total"] == 70
+    assert data["recent_events"][-1]["xp_awarded"] == 0
 
 
 @pytest.mark.asyncio
-async def test_post_pico_event_aliases_normalize_to_canonical_counts(client: AsyncClient):
+async def test_first_deployment_alias_normalizes_and_only_awards_once(client: AsyncClient):
     response = await client.post(
         "/v1/pico/events",
-        json={"event": "first_agent_deployed", "metadata": {"template_id": "personal_assistant"}},
+        json={"event": "first_agent_deployed", "metadata": {"template_id": "personal_assistant", "deployment_id": "dep_123", "agent_id": "agent_123"}},
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["xp_total"] == 195
+    assert data["xp_total"] == 120
     assert data["current_level"] == 2
     assert data["event_counts"] == {"starter_agent_deployed": 1}
     assert data["milestones"] == ["starter_agent_live"]
     assert data["recent_events"][-1]["event"] == "starter_agent_deployed"
     assert data["recent_events"][-1]["metadata"] == {
         "template_id": "personal_assistant",
+        "deployment_id": "dep_123",
+        "agent_id": "agent_123",
         "auto_progress": {
             "completed_tracks": [],
             "badges": [],
             "milestones": ["starter_agent_live"],
         },
+        "level_up": {"from": 1, "to": 2},
     }
+
+    duplicate = await client.post(
+        "/v1/pico/events",
+        json={"event": "starter_agent_deployed", "metadata": {"template_id": "personal_assistant", "deployment_id": "dep_456", "agent_id": "agent_123"}},
+    )
+    assert duplicate.status_code == 200
+    duplicate_data = duplicate.json()
+    assert duplicate_data["xp_total"] == 120
+    assert duplicate_data["event_counts"]["starter_agent_deployed"] == 2
+    assert duplicate_data["recent_events"][-1]["xp_awarded"] == 0

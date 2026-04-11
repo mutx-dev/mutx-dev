@@ -1,6 +1,6 @@
 # EVENT_MODEL
 
-Updated: 2026-04-11T00:55:00Z
+Updated: 2026-04-11T03:29:44Z
 
 ## Design rules
 - Events are append-friendly.
@@ -52,11 +52,15 @@ Updated: 2026-04-11T00:55:00Z
 - updated_at
 
 ## Initial XP map
-- tutorial_completed: 50
-- track_completed: 100
-- badge_earned: 50
-- milestone_reached: 75
-- tutor_question_asked: 10
+- lesson_completed: 50
+- starter_agent_deployed: 120
+- first_agent_run: 80
+- cost_threshold_set: 70
+- track_completed: 0
+- badge_earned: 0
+- milestone_reached: 0
+- tutor_question_asked: 0
+- approval_gate_enabled: 0
 
 ## Badge triggers
 - first-boot: complete Level 0

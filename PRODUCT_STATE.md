@@ -1,7 +1,7 @@
 # PRODUCT_STATE
 
 Status: active build
-Last updated: 2026-04-11T01:57:00Z
+Last updated: 2026-04-11T03:29:44Z
 
 ## What exists
 - pico.mutx.dev is a real multilingual landing page with live lead/contact capture.
@@ -343,3 +343,28 @@ What is next
 - If we keep going, the next honest cleanup is a real localization pass for the remaining Pico locales instead of fallback English.
 - After that: dedupe repeated Pico state fetches between the shell and page bodies if the extra request becomes worth caring about.
 
+
+### 2026-04-11 02:51:48 UTC START
+- Progression integrity pass kicked off.
+- Scope locked: XP only from real outcomes, no repeat farming, visible level-up and milestone receipts, and a clearer next step.
+
+### 2026-04-11 03:29:44 UTC END
+What changed
+- Rewired Pico progression so XP only comes from known lesson completions, first deployment, first run proof, and the first alert threshold.
+- Removed client-supplied XP from the Pico event contract and blocked obvious repeat farming or proof-free XP inflation.
+- Added reusable progression signal helpers for latest unlocks, level-up moments, and the next missing milestone.
+- Upgraded Academy, Lesson, and Control to show earned progress receipts instead of generic confirmation copy.
+
+What was tested
+- `/Users/fortune/MUTX/.venv/bin/python -m pytest tests/api/test_pico_route.py -q`
+- `npx jest --runInBand tests/unit/picoState.test.ts tests/unit/picoAcademyPage.test.tsx tests/unit/picoProgressSignals.test.ts tests/unit/picoControlPage.test.ts`
+- `npm run lint`
+- `npm run typecheck`
+- `npm run build`
+
+What failed
+- No blocking failures.
+- Existing repo-level Next workspace-root/NFT warnings and pytest OpenTelemetry shutdown noise remain non-blocking.
+
+What is next
+- If we keep pushing progression, the next honest gain is attaching lesson completion to stronger in-product proof signals rather than broadening the reward system.

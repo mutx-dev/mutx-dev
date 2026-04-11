@@ -7,8 +7,9 @@ import { ArrowRight, CheckCircle2, CircleDashed, Loader2 } from "lucide-react";
 import { PicoProductShell } from "@/components/pico/PicoProductShell";
 import { usePicoBasePath } from "@/components/pico/PicoPathProvider";
 import { picoPrimaryButtonClass, picoSecondaryButtonClass, picoSectionLabelClass, picoSurfaceClass, picoSurfaceInsetClass } from "@/components/pico/picoUi";
-import { usePicoState } from "@/components/pico/usePicoState";
+import { normalizePicoState, usePicoState } from "@/components/pico/usePicoState";
 import { getNextPicoLesson, picoLevels, picoTracks, type PicoLesson } from "@/lib/pico/academy";
+import { describePicoProgressMoment, getLatestMeaningfulPicoEvent, type PicoProgressMoment } from "@/lib/pico/progressionSignals";
 import { buildPicoPath } from "@/lib/pico/routing";
 
 type PicoLessonPageProps = {
@@ -47,12 +48,12 @@ export function PicoLessonPage({ lesson }: PicoLessonPageProps) {
   const track = useMemo(() => picoTracks.find((item) => item.id === lesson.trackId), [lesson.trackId]);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [confirmation, setConfirmation] = useState<string | null>(null);
+  const [completionMoment, setCompletionMoment] = useState<PicoProgressMoment | null>(null);
 
   async function handleComplete() {
     setSubmitting(true);
     setSubmitError(null);
-    setConfirmation(null);
+    setCompletionMoment(null);
 
     try {
       const response = await fetch("/api/pico/events", {
@@ -80,7 +81,9 @@ export function PicoLessonPage({ lesson }: PicoLessonPageProps) {
       }
 
       markCompleted(lesson.slug);
-      setConfirmation(`Completion recorded. Next move: ${nextLesson ? nextLesson.title : "open Control and verify a real runtime signal"}.`);
+      const nextState = normalizePicoState(payload, true);
+      const latestEvent = getLatestMeaningfulPicoEvent(nextState.recentEvents);
+      setCompletionMoment(latestEvent ? describePicoProgressMoment(latestEvent) : null);
       await refresh();
     } catch (requestError) {
       setSubmitError(
@@ -213,7 +216,28 @@ export function PicoLessonPage({ lesson }: PicoLessonPageProps) {
                 {completed ? "Completion recorded" : "Record completion"}
               </button>
             ) : null}
-            {confirmation ? <p className="mt-4 text-sm text-emerald-200">{confirmation}</p> : null}
+            {completionMoment ? (
+              <div className="mt-4 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.06] p-4 text-sm text-emerald-50">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/80">Progress receipt</p>
+                <p className="mt-2 text-base font-semibold text-white">{completionMoment.title}</p>
+                <p className="mt-2 leading-6 text-emerald-50/90">{completionMoment.body}</p>
+                {completionMoment.chips.length > 0 ? (
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                    {completionMoment.chips.map((chip) => (
+                      <span key={chip} className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-emerald-100">
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+                <Link
+                  href={nextLesson ? buildPicoPath(basePath, `/academy/${nextLesson.slug}`) : buildPicoPath(basePath, "/control")}
+                  className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white"
+                >
+                  {nextLesson ? `Open ${nextLesson.title}` : "Open Control"} <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            ) : null}
             {submitError ? <p className="mt-4 text-sm text-amber-200">{submitError}</p> : null}
             {error ? <p className="mt-4 text-sm text-white/50">Progress refresh: {error}</p> : null}
           </div>

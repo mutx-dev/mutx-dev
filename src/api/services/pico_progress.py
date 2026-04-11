@@ -11,18 +11,24 @@ from src.api.models import User, UserSetting
 
 PICO_STATE_KEY = "pico.state"
 RECENT_EVENTS_LIMIT = 20
-LEVEL_THRESHOLDS: tuple[int, ...] = (0, 100, 250, 500, 900, 1400)
+LEVEL_THRESHOLDS: tuple[int, ...] = (0, 100, 220, 380, 560, 760)
 EVENT_XP_MAP: dict[str, int] = {
     "lesson_completed": 50,
-    "track_completed": 100,
-    "badge_earned": 50,
-    "milestone_reached": 75,
-    "tutor_session_used": 10,
+    "track_completed": 0,
+    "badge_earned": 0,
+    "milestone_reached": 0,
+    "tutor_session_used": 0,
     "starter_agent_deployed": 120,
     "first_agent_run": 80,
     "cost_threshold_set": 70,
-    "approval_gate_enabled": 90,
+    "approval_gate_enabled": 0,
     "xp_granted": 0,
+}
+REAL_XP_EVENTS: set[str] = {
+    "lesson_completed",
+    "starter_agent_deployed",
+    "first_agent_run",
+    "cost_threshold_set",
 }
 EVENT_ALIASES: dict[str, str] = {
     "complete_lesson": "lesson_completed",
@@ -379,7 +385,6 @@ def _award_milestone(
 ) -> int:
     if _append_unique(state["milestones"], milestone_id):
         auto_progress["milestones"].append(milestone_id)
-        return EVENT_XP_MAP["milestone_reached"]
     return 0
 
 
@@ -387,7 +392,6 @@ def _award_milestone(
 def _award_badge(state: dict[str, Any], badge_id: str, auto_progress: dict[str, list[str]]) -> int:
     if _append_unique(state["badges"], badge_id):
         auto_progress["badges"].append(badge_id)
-        return EVENT_XP_MAP["badge_earned"]
     return 0
 
 
@@ -395,7 +399,6 @@ def _award_badge(state: dict[str, Any], badge_id: str, auto_progress: dict[str, 
 def _award_track(state: dict[str, Any], track_id: str, auto_progress: dict[str, list[str]]) -> int:
     if _append_unique(state["completed_tracks"], track_id):
         auto_progress["completed_tracks"].append(track_id)
-        return EVENT_XP_MAP["track_completed"]
     return 0
 
 
@@ -487,7 +490,6 @@ async def record_pico_event(
     badge_id: str | None = None,
     milestone_id: str | None = None,
     tutor_sessions: int = 0,
-    xp: int | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     state = await get_pico_state(db, user=user)
@@ -505,56 +507,96 @@ async def record_pico_event(
     milestone_id = str(milestone_id).strip() if milestone_id else None
     tutor_sessions = _coerce_nonnegative_int(tutor_sessions, default=0)
     event_metadata = dict(metadata or {})
+    previous_xp_total = _coerce_nonnegative_int(state.get("xp_total"), default=0)
+    previous_level = _level_from_xp(previous_xp_total)
+    allow_auto_progress = True
 
-    xp_awarded = EVENT_XP_MAP.get(canonical_event, 0) if xp is None else _coerce_nonnegative_int(xp)
+    xp_awarded = EVENT_XP_MAP.get(canonical_event, 0)
+    if canonical_event not in REAL_XP_EVENTS:
+        xp_awarded = 0
 
-    if canonical_event == "lesson_completed" and lesson_id:
-        if lesson_id not in completed_lessons:
+    if canonical_event == "lesson_completed":
+        lesson_is_known = bool(lesson_id and lesson_id in PICO_LESSON_CATALOG)
+        if not lesson_is_known:
+            xp_awarded = 0
+            allow_auto_progress = False
+            lesson_id = None
+        elif lesson_id not in completed_lessons:
             completed_lessons.append(lesson_id)
         else:
             xp_awarded = 0
     elif canonical_event == "track_completed" and track_id:
         if track_id not in completed_tracks:
             completed_tracks.append(track_id)
-        else:
-            xp_awarded = 0
+        xp_awarded = 0
     elif canonical_event == "badge_earned" and badge_id:
         if badge_id not in badges:
             badges.append(badge_id)
-        else:
-            xp_awarded = 0
+        xp_awarded = 0
     elif canonical_event == "milestone_reached" and milestone_id:
         if milestone_id not in milestones:
             milestones.append(milestone_id)
-        else:
-            xp_awarded = 0
+        xp_awarded = 0
     elif canonical_event == "tutor_session_used":
         sessions_used = max(1, tutor_sessions or 1)
         plan = _normalize_plan(user.plan)
         _enforce_tutor_limit(state=state, plan=plan, requested_sessions=sessions_used)
         state["tutor_sessions_used"] += sessions_used
         tutor_sessions = sessions_used
-        if xp is None:
-            xp_awarded = EVENT_XP_MAP[canonical_event] * sessions_used
+        xp_awarded = 0
+    elif canonical_event == "starter_agent_deployed":
+        has_deployment_proof = bool(event_metadata.get("deployment_id") or event_metadata.get("agent_id"))
+        if not has_deployment_proof:
+            xp_awarded = 0
+            allow_auto_progress = False
+        elif state["event_counts"].get(canonical_event, 0) > 0 or "starter_agent_live" in milestones:
+            xp_awarded = 0
+    elif canonical_event == "first_agent_run":
+        has_run_proof = bool(event_metadata.get("run_id") or event_metadata.get("transcript_path"))
+        if not has_run_proof:
+            xp_awarded = 0
+            allow_auto_progress = False
+        elif state["event_counts"].get(canonical_event, 0) > 0:
+            xp_awarded = 0
     elif canonical_event == "cost_threshold_set":
         threshold = event_metadata.get("threshold_usd")
         normalized_threshold = _coerce_nonnegative_float(threshold)
-        if normalized_threshold is not None:
+        threshold_already_set = state.get("cost_threshold_usd") is not None
+        if normalized_threshold is None:
+            xp_awarded = 0
+            allow_auto_progress = False
+        else:
             state["cost_threshold_usd"] = normalized_threshold
+            if threshold_already_set:
+                xp_awarded = 0
     elif canonical_event == "approval_gate_enabled":
+        if state.get("approval_gate_enabled"):
+            xp_awarded = 0
         state["approval_gate_enabled"] = True
 
-    bonus_xp, auto_progress = _apply_auto_progression(
-        state,
-        canonical_event=canonical_event,
-        lesson_id=lesson_id,
-    )
+    bonus_xp = 0
+    auto_progress = {
+        "completed_tracks": [],
+        "badges": [],
+        "milestones": [],
+    }
+    if allow_auto_progress:
+        bonus_xp, auto_progress = _apply_auto_progression(
+            state,
+            canonical_event=canonical_event,
+            lesson_id=lesson_id,
+        )
     if any(auto_progress.values()):
         event_metadata["auto_progress"] = auto_progress
     xp_awarded += bonus_xp
 
-    state["xp_total"] = _coerce_nonnegative_int(state.get("xp_total"), default=0) + xp_awarded
+    state["xp_total"] = previous_xp_total + xp_awarded
     state["current_level"] = _level_from_xp(state["xp_total"])
+    if state["current_level"] > previous_level:
+        event_metadata["level_up"] = {
+            "from": previous_level,
+            "to": state["current_level"],
+        }
     state["event_counts"][canonical_event] = state["event_counts"].get(canonical_event, 0) + 1
     state["recent_events"] = [
         *state["recent_events"],

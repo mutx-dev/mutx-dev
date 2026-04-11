@@ -1,7 +1,7 @@
 # EXECUTION_PLAN
 
-Current phase: Pico UI coherence and churn reduction
-Updated: 2026-04-11T01:19:11Z
+Current phase: Pico progression integrity and feedback
+Updated: 2026-04-11T03:29:44Z
 
 ## Goal
 Ship the narrowest honest PicoMUTX product loop that gets a user from signup to first agent launch to visible control.
@@ -34,6 +34,8 @@ Ship the narrowest honest PicoMUTX product loop that gets a user from signup to 
 - [completed] Tighten Academy hierarchy so the next lesson dominates the page.
 - [completed] Wrap Pico auth routes in the same visual language as the rest of the product.
 - [completed] Add explicit control receipts for deploy, threshold, and approval actions.
+- [completed] Lock XP to real outcomes only and block obvious repeat farming or payload inflation.
+- [completed] Surface level-up moments, unlock receipts, and the next missing milestone across Academy, Lesson, and Control.
 
 ## Architecture direction
 - Keep Pico on pico.mutx.dev and build only inside the existing app/pico/* route family.
@@ -48,7 +50,7 @@ Ship the narrowest honest PicoMUTX product loop that gets a user from signup to 
 - There is no existing tutor API, so grounded support remains deterministic until a real inference path is wired.
 
 ## Acceptance for next loop
-- New files committed.
-- One deploy path added inside Pico.
-- Soft plan gating visible in product.
+- Progress only rewards real outcomes.
+- Academy and Control both show one obvious next move.
+- Progress receipts stay truthful on zero-XP repeat actions.
 - Docs remain current after the next implementation pass.

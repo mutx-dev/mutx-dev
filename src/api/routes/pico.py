@@ -35,6 +35,5 @@ async def pico_event(
         badge_id=request.badge_id,
         milestone_id=request.milestone_id,
         tutor_sessions=request.tutor_sessions,
-        xp=request.xp,
         metadata=request.metadata,
     )

@@ -653,7 +653,6 @@ class PicoEventRequest(BaseModel):
         le=100,
         validation_alias=AliasChoices("tutor_sessions", "sessions", "count"),
     )
-    xp: int | None = Field(default=None, ge=0, le=10000)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 

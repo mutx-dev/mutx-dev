@@ -80,3 +80,15 @@ Why:
 - No new entry routes.
 - Tutor response shape stays frozen; behavior can improve without breaking the envelope.
 - Extend, never fork.
+
+## 2026-04-11T03:29:44Z - Progression must reward proof, not product poking
+Status: accepted
+
+Context
+Pico had XP and unlocks, but too much of the reward path could drift into generic engagement or payload-driven inflation.
+
+Decision
+Keep the existing state model, but restrict XP to real outcomes only: known lesson completion, first deployment, first run proof, and the first alert threshold. Leave badges, milestones, and tracks as visible unlock signals instead of bonus XP faucets.
+
+Why
+Progress should feel earned. If users can farm XP by repeating safe clicks or posting loose event payloads, the whole academy-control trust loop turns to mush.

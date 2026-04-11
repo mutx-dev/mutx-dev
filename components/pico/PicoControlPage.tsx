@@ -7,7 +7,8 @@ import { RefreshCw, Rocket } from "lucide-react";
 import { PicoProductShell } from "@/components/pico/PicoProductShell";
 import { usePicoBasePath } from "@/components/pico/PicoPathProvider";
 import { picoFieldClass, picoPrimaryButtonClass, picoSecondaryButtonClass, picoSectionLabelClass, picoSurfaceClass, picoSurfaceInsetClass, picoSurfaceStrongClass } from "@/components/pico/picoUi";
-import { usePicoState } from "@/components/pico/usePicoState";
+import { normalizePicoState, usePicoState } from "@/components/pico/usePicoState";
+import { describePicoProgressMoment, getNextMissingPicoMilestone } from "@/lib/pico/progressionSignals";
 import { buildPicoPath } from "@/lib/pico/routing";
 
 type SectionResult = {
@@ -391,6 +392,41 @@ export function PicoControlPage() {
     setActionReceipts((current) => [receipt, ...current.filter((item) => item.id !== receipt.id)].slice(0, 3));
   }
 
+  function buildOutcomeReceipt(
+    payload: unknown,
+    fallback: Omit<ActionReceipt, "id">,
+  ): ActionReceipt {
+    const nextState = normalizePicoState(payload, true);
+    const latestEvent = nextState.recentEvents[nextState.recentEvents.length - 1] ?? null;
+    const moment = latestEvent ? describePicoProgressMoment(latestEvent) : null;
+    const missingMilestone = getNextMissingPicoMilestone({
+      completedLessonSlugs: nextState.completedLessonSlugs,
+      completedTrackIds: nextState.completedTrackIds,
+      milestones: nextState.milestones,
+    });
+
+    const hasFreshProgressSignal = Boolean(
+      moment &&
+        (moment.chips.length > 0 ||
+          moment.unlockedBadges.length > 0 ||
+          moment.unlockedMilestones.length > 0 ||
+          moment.unlockedTracks.length > 0 ||
+          moment.levelUp),
+    );
+
+    return {
+      id: `${fallback.title}-${Date.now()}`,
+      title: hasFreshProgressSignal && moment ? moment.title : fallback.title,
+      summary: hasFreshProgressSignal && moment?.chips[0] ? moment.chips[0] : fallback.summary,
+      detail:
+        hasFreshProgressSignal && moment
+          ? `${moment.body} ${missingMilestone ? `Next: ${missingMilestone.title}.` : fallback.detail}`
+          : fallback.detail,
+      nextLabel: missingMilestone?.actionLabel ?? fallback.nextLabel,
+      nextHref: missingMilestone ? buildPicoPath(basePath, missingMilestone.path) : fallback.nextHref,
+    };
+  }
+
   async function handleDeployStarter() {
     setDeploying(true);
     setDeployError(null);
@@ -417,19 +453,21 @@ export function PicoControlPage() {
       setDeployReceipt(isRecord(payload) ? payload : { receipt: payload });
       const deploymentId = isRecord(payload) && isRecord(payload.deployment) ? payload.deployment.id : null;
       const agentId = isRecord(payload) && isRecord(payload.agent) ? payload.agent.id : null;
-      pushReceipt({
-        id: `deploy-${Date.now()}`,
-        title: "Starter assistant launched",
-        summary: `${starterName} is now live in ${starterWorkspace}.`,
-        detail: `Assistant ${String(agentId ?? "unknown")} is on its first lane. Launch receipt ${String(deploymentId ?? "pending")}. Next: refresh the live cards and confirm activity is flowing.`,
-        nextLabel: "Review live controls",
-        nextHref: `${buildPicoPath(basePath, "/control")}#assistant-overview`,
-      });
-      await fetch("/api/pico/events", {
+      const progressResponse = await fetch("/api/pico/events", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(buildStarterDeployEventPayload(payload)),
       }).catch(() => null);
+      const progressPayload = progressResponse ? await progressResponse.json().catch(() => null) : null;
+      pushReceipt(
+        buildOutcomeReceipt(progressPayload, {
+          title: "Starter assistant launched",
+          summary: `${starterName} is now live in ${starterWorkspace}.`,
+          detail: `Assistant ${String(agentId ?? "unknown")} is on its first lane. Launch receipt ${String(deploymentId ?? "pending")}. Next: refresh the live cards and confirm activity is flowing.`,
+          nextLabel: "Review live controls",
+          nextHref: `${buildPicoPath(basePath, "/control")}#assistant-overview`,
+        }),
+      );
       await Promise.all([refresh(), refreshPicoState()]);
     } catch (error) {
       setDeployError(error instanceof Error ? error.message : "Could not launch the starter assistant.");
@@ -462,15 +500,20 @@ export function PicoControlPage() {
     }
 
     await refreshPicoState();
-    setThresholdMessage(`USD spend line saved at ${threshold}. Pico will show this as a visible guardrail, not a hard stop.`);
-    pushReceipt({
-      id: `threshold-${threshold}`,
-      title: "Spend line updated",
-      summary: `USD spend line saved at ${threshold}.`,
-      detail: "This is your visible spend guardrail in Pico. Next: check the budget card and decide whether the line still feels right.",
-      nextLabel: "Review budget",
-      nextHref: `${buildPicoPath(basePath, "/control")}#budget-card`,
-    });
+    setThresholdMessage(
+      currentThreshold === null
+        ? `Alert threshold saved at ${threshold}. Pico now has a real warning line.`
+        : `Alert threshold updated to ${threshold}. Pico will keep showing it as a visible warning line, not a hard stop.`,
+    );
+    pushReceipt(
+      buildOutcomeReceipt(payload, {
+        title: currentThreshold === null ? "Alert threshold configured" : "Alert threshold updated",
+        summary: `USD spend line saved at ${threshold}.`,
+        detail: "This is your visible spend guardrail in Pico. Next: check the budget card and decide whether the line still feels right.",
+        nextLabel: "Review budget",
+        nextHref: `${buildPicoPath(basePath, "/control")}#budget-card`,
+      }),
+    );
   }
 
   async function handleEnableApprovalGate() {
@@ -498,21 +541,23 @@ export function PicoControlPage() {
       return;
     }
 
-    await fetch("/api/pico/events", {
+    const progressResponse = await fetch("/api/pico/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ event: "approval_gate_enabled", metadata: { action_type: "external_send" } }),
     }).catch(() => null);
+    const progressPayload = progressResponse ? await progressResponse.json().catch(() => null) : null;
     const approvalId = isRecord(payload) ? payload.id : null;
     setApprovalMessage("Approval request created. Review it in the pending approvals panel below.");
-    pushReceipt({
-      id: `approval-${Date.now()}`,
-      title: "Approval request queued",
-      summary: "A higher-risk action is now waiting for an operator decision.",
-      detail: `Request ${String(approvalId ?? "pending")} is now waiting in Approvals. Next: open the queue below and resolve it deliberately.`,
-      nextLabel: "Review approvals",
-      nextHref: `${buildPicoPath(basePath, "/control")}#approvals-card`,
-    });
+    pushReceipt(
+      buildOutcomeReceipt(progressPayload, {
+        title: "Approval request queued",
+        summary: "A higher-risk action is now waiting for an operator decision.",
+        detail: `Request ${String(approvalId ?? "pending")} is now waiting in Approvals. Next: open the queue below and resolve it deliberately.`,
+        nextLabel: "Review approvals",
+        nextHref: `${buildPicoPath(basePath, "/control")}#approvals-card`,
+      }),
+    );
     await Promise.all([refresh(), refreshPicoState()]);
   }
 

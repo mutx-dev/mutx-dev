@@ -987,11 +987,11 @@ export function formatPicoEventLabel(event: string) {
     case "tutor_session_used":
       return "Grounded tutor lookup";
     case "starter_agent_deployed":
-      return "Starter agent deployed";
+      return "Deployment recorded";
     case "first_agent_run":
       return "First agent run";
     case "cost_threshold_set":
-      return "Cost threshold saved";
+      return "Alert threshold configured";
     case "approval_gate_enabled":
       return "Approval gate enabled";
     default:

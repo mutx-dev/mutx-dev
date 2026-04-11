@@ -102,31 +102,52 @@ describe('PicoAcademyPage', () => {
 
     const html = renderToStaticMarkup(<PicoAcademyPage />)
 
-    expect(html).toContain('Sign in to save lesson progress.')
+    expect(html).toContain('Progress should come from real outcomes, not fake grind.')
+    expect(html).toContain('Sign in to keep this momentum.')
     expect(html).toContain('href="/pico/login"')
     expect(html).toContain('href="/pico/register"')
     expect(html).toContain('Continue 1. Install Hermes locally')
     expect(html).toContain('href="/pico/academy/install-hermes-locally"')
   })
 
-  it('renders synced learner stats and advances continue CTA to the next incomplete lesson', () => {
+  it('shows the latest unlock, the next lesson, and the next missing milestone for signed-in learners', () => {
     mockUsePicoState.mockReturnValue({
       state: {
         ...basePicoState,
         authenticated: true,
         plan: 'STARTER',
         xpTotal: 120,
-        currentLevel: 3,
+        currentLevel: 2,
         levelProgress: {
-          currentLevel: 3,
+          currentLevel: 2,
           currentLevelFloorXp: 100,
-          nextLevel: 4,
-          nextLevelTargetXp: 250,
+          nextLevel: 3,
+          nextLevelTargetXp: 220,
           xpIntoLevel: 20,
-          xpToNextLevel: 130,
-          progressPercent: 13,
+          xpToNextLevel: 100,
+          progressPercent: 17,
         },
         completedLessonSlugs: ['install-hermes-locally'],
+        milestones: ['first_lesson_finished'],
+        recentEvents: [
+          {
+            event: 'lesson_completed',
+            xpAwarded: 50,
+            lessonId: 'install-hermes-locally',
+            trackId: 'track-a',
+            badgeId: null,
+            milestoneId: null,
+            tutorSessions: 0,
+            createdAt: '2026-04-11T02:40:00Z',
+            metadata: {
+              auto_progress: {
+                completed_tracks: [],
+                badges: [],
+                milestones: ['first_lesson_finished'],
+              },
+            },
+          },
+        ],
         tutorAccess: {
           plan: 'STARTER',
           limit: 25,
@@ -138,7 +159,7 @@ describe('PicoAcademyPage', () => {
         },
         completedCount: 1,
         percentComplete: 8,
-        raw: { current_level: 3, xp_total: 120 },
+        raw: { current_level: 2, xp_total: 120 },
       },
       loading: false,
       error: null,
@@ -147,10 +168,13 @@ describe('PicoAcademyPage', () => {
 
     const html = renderToStaticMarkup(<PicoAcademyPage />)
 
-    expect(html).toContain('Your progression is now explicit.')
+    expect(html).toContain('Progress should feel earned.')
+    expect(html).toContain('Latest unlock')
+    expect(html).toContain('1. Install Hermes locally complete')
+    expect(html).toContain('Missing milestone')
+    expect(html).toContain('Finish Track A - First Agent')
     expect(html).toContain('Continue 2. Run your first agent')
     expect(html).toContain('href="/pico/academy/run-your-first-agent"')
-    expect(html).toContain('>3<')
-    expect(html).toContain('>120<')
+    expect(html).toContain('XP only moves on shipped outcomes')
   })
 })

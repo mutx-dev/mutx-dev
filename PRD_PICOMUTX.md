@@ -2,7 +2,7 @@
 
 Version: v1
 Status: active
-Updated: 2026-04-11T00:55:00Z
+Updated: 2026-04-11T03:29:44Z
 
 ## Product statement
 PicoMUTX is the fastest way to go from zero to a production agent you trust.
@@ -79,3 +79,8 @@ Internal: Pico is the front door and training ground. MUTX is the deeper control
 - Keep learner state on the existing UserSetting-backed Pico progress model; no new state schemas.
 - Do not add new entry routes or change the tutor response shape.
 - Keep content as structured data in repo, not hidden in CMS glue.
+
+## Progression rule
+- XP must come only from real outcomes: known lesson completion, first deployment, first run proof, and the first alert threshold.
+- Badges, milestones, and tracks are unlock signals, not extra XP faucets.
+- Repeat actions can leave receipts, but they do not mint more XP.

@@ -22,6 +22,12 @@ import {
   picoLessons,
   picoTracks,
 } from "@/lib/pico/academy";
+import {
+  describePicoProgressMoment,
+  getLatestMeaningfulPicoEvent,
+  getNextMissingPicoMilestone,
+  getNextPicoLessonFromState,
+} from "@/lib/pico/progressionSignals";
 import { buildPicoPath } from "@/lib/pico/routing";
 
 function AutoProgressSummary({ metadata }: { metadata: Record<string, unknown> }) {
@@ -46,7 +52,7 @@ function AutoProgressSummary({ metadata }: { metadata: Record<string, unknown> }
     return null;
   }
 
-  return <p className="mt-2 text-xs text-cyan-100/70">Auto-awarded: {parts.join(" · ")}</p>;
+  return <p className="mt-2 text-xs text-cyan-100/70">Unlocked: {parts.join(" · ")}</p>;
 }
 
 export function PicoAcademyPage() {
@@ -55,19 +61,30 @@ export function PicoAcademyPage() {
   const supportHref = buildPicoPath(basePath, "/support");
   const loginHref = buildPicoPath(basePath, "/login");
   const registerHref = buildPicoPath(basePath, "/register");
-  const nextLesson =
-    picoLessons.find((lesson) => !state.completedLessonSlugs.includes(lesson.slug)) ?? picoLessons[0];
+  const nextLesson = getNextPicoLessonFromState(state.completedLessonSlugs) ?? picoLessons[0];
   const nextLessonHref = buildPicoPath(basePath, `/academy/${nextLesson.slug}`);
   const trackProgress = getPicoTrackProgress(state.completedLessonSlugs, state.completedTrackIds);
   const badgeProgress = getPicoBadgeProgress(state.completedLessonSlugs, state.badges);
   const earnedBadgeCount = badgeProgress.filter((badge) => badge.earned).length;
   const nextBadge = badgeProgress.find((badge) => !badge.earned) ?? null;
-  const recentEvents = [...state.recentEvents].slice(-4).reverse();
+  const recentEvents = [...state.recentEvents]
+    .filter((event) => getLatestMeaningfulPicoEvent([event]) !== null)
+    .slice(-4)
+    .reverse();
+  const latestProgressMoment = (() => {
+    const latestEvent = getLatestMeaningfulPicoEvent(state.recentEvents);
+    return latestEvent ? describePicoProgressMoment(latestEvent) : null;
+  })();
+  const missingMilestone = getNextMissingPicoMilestone({
+    completedLessonSlugs: state.completedLessonSlugs,
+    completedTrackIds: state.completedTrackIds,
+    milestones: state.milestones,
+  });
 
   return (
     <PicoProductShell
       title="Academy"
-      description="Twelve concrete tutorials that move from first agent to controlled runtime. The page should answer one question fast: what should you do next?"
+      description="Twelve concrete tutorials that move from first agent to controlled runtime. Progress should come from real outcomes, not fake grind."
       actions={
         <>
           <Link href={nextLessonHref} className={picoPrimaryButtonClass}>
@@ -122,7 +139,7 @@ export function PicoAcademyPage() {
           {state.authenticated ? (
             <>
               <p className={picoSectionLabelClass}>Progress snapshot</p>
-              <h2 className="mt-2 text-xl font-semibold text-white">Keep the momentum visible.</h2>
+              <h2 className="mt-2 text-xl font-semibold text-white">Progress should feel earned.</h2>
               <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                 <div className={`${picoSurfaceInsetClass} px-4 py-3`}>
                   <p className="text-white/45">Completion</p>
@@ -149,7 +166,35 @@ export function PicoAcademyPage() {
                   <p className="text-xs text-white/45">{badgeProgress.length} total available</p>
                 </div>
               </div>
-              {nextBadge ? (
+              <p className="mt-4 text-sm leading-7 text-white/55">
+                XP only moves on shipped outcomes: lesson completions, first deployment, the first real run, and the first alert threshold.
+              </p>
+              {latestProgressMoment ? (
+                <div className="mt-4 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.06] p-4 text-sm text-emerald-50">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100/80">Latest unlock</p>
+                  <p className="mt-2 text-base font-semibold text-white">{latestProgressMoment.title}</p>
+                  <p className="mt-2 leading-6 text-emerald-50/90">{latestProgressMoment.body}</p>
+                  {latestProgressMoment.chips.length > 0 ? (
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                      {latestProgressMoment.chips.map((chip) => (
+                        <span key={chip} className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-emerald-100">
+                          {chip}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+              {missingMilestone ? (
+                <div className="mt-4 rounded-2xl border border-amber-300/15 bg-amber-300/[0.06] p-4 text-sm text-amber-50">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-100/80">Missing milestone</p>
+                  <p className="mt-2 text-base font-semibold text-white">{missingMilestone.title}</p>
+                  <p className="mt-2 leading-6 text-amber-50/90">{missingMilestone.body}</p>
+                  <Link href={buildPicoPath(basePath, missingMilestone.path)} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white">
+                    {missingMilestone.actionLabel} <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              ) : nextBadge ? (
                 <div className="mt-4 rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.06] px-4 py-3 text-sm text-cyan-50">
                   Next badge: {nextBadge.title} ({nextBadge.completedLessons}/{nextBadge.totalLessons} lessons complete)
                 </div>
@@ -162,7 +207,7 @@ export function PicoAcademyPage() {
               </div>
               <p className="mt-3 text-lg font-semibold text-white">Sign in to keep this momentum.</p>
               <p className="mt-2 text-sm leading-7 text-white/65">
-                The lesson corpus is open, but saved progress, badge unlocks, and tutor tracking need a real session.
+                The lesson corpus is open, but saved progress, milestone unlocks, and control receipts need a real session.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link href={loginHref} className={picoPrimaryButtonClass}>
@@ -331,9 +376,11 @@ export function PicoAcademyPage() {
                           {event.createdAt ? new Date(event.createdAt).toLocaleString() : "No timestamp returned"}
                         </p>
                       </div>
-                      <div className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100">
-                        +{event.xpAwarded} XP
-                      </div>
+                      {event.xpAwarded > 0 ? (
+                        <div className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100">
+                          +{event.xpAwarded} XP
+                        </div>
+                      ) : null}
                     </div>
                     {event.lessonId ? <p className="mt-3 text-sm text-white/60">Lesson: {event.lessonId}</p> : null}
                     <AutoProgressSummary metadata={event.metadata} />
@@ -342,7 +389,7 @@ export function PicoAcademyPage() {
               </div>
             ) : (
               <p className="mt-5 text-sm leading-7 text-white/60">
-                Finish a lesson, save a threshold, or use grounded support while signed in. That is when the academy starts leaving receipts behind.
+                Finish a lesson, launch the starter assistant, or configure the first alert threshold while signed in. That is when the academy starts leaving real receipts behind.
               </p>
             )}
           </div>
