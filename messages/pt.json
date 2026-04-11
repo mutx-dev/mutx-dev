@@ -11,7 +11,7 @@
     },
     "hero": {
       "badge": "Acesso antecipado · Vagas limitadas",
-      "title": "Crie e implemente agentes de IA ",
+      "title": "Crie e implemente agentes de IA",
       "titleAccent": "sem contratar um desenvolvedor.",
       "subtitle": "O PicoMUTX oferece um caminho seguro e guiado para chegar a um agente de IA funcional — seja para começar do zero, corrigir um agente que não está funcionando ou evitar mais um erro caro.",
       "cta": "Faça o pré-cadastro para acesso antecipado",
@@ -40,7 +40,7 @@
         },
         "2": {
           "label": "\"Gastei dinheiro e ainda não está funcionando direito.\"",
-          "body": "Talvez você tenha contratado alguém. Talvez tenha pago por ferramentas. Agora você não está apenas em dúvida — está cético."
+          "body": "Talvez você tenha contratado alguém. Talvez tenha pago por ferramentas. Agora você não está apenas em dúvida — está desconfiado."
         },
         "3": {
           "label": "\"Não quero implementar algo em que eu não possa confiar.\"",
@@ -51,8 +51,8 @@
     },
     "platform": {
       "eyebrow": "O que é o PicoMUTX",
-      "title": "Onde agentes de IA deixam de ser uma “ideia interessante” e viram um “sistema funcional”.",
-      "body": "O PicoMUTX é uma plataforma guiada para quem quer criar e operar agentes de IA com segurança — sem precisar se tornar engenheiro em tempo integral. Ele oferece a estrutura, o suporte e as proteções que normalmente faltam quando alguém tenta fazer isso sozinho. Em vez de montar tudo do zero, você avança passo a passo: da ideia à implementação, da confusão à clareza, do protótipo a algo que você realmente pode usar.",
+      "title": "Onde agentes de IA deixam de ser uma “ideia interessante” e se tornam um “sistema funcional”.",
+      "body": "O PicoMUTX é uma plataforma guiada para quem quer criar e operar agentes de IA com segurança — sem precisar se tornar engenheiro em tempo integral. Ela oferece a estrutura, o suporte e as proteções que normalmente faltam quando alguém tenta fazer isso sozinho. Em vez de montar tudo do zero, você avança passo a passo: da ideia à implementação, da confusão à clareza, do protótipo a algo que você realmente pode usar.",
       "howItWorks": {
         "0": {
           "title": "Caminhos de implementação passo a passo",
@@ -168,7 +168,7 @@
       "dialogLabel": "Formulário de contato",
       "closeLabel": "Fechar",
       "title": "Faça o pré-cadastro para acesso antecipado",
-      "subtitle": "Conte para nós em que momento você está. Nós vamos colocar você para dentro.",
+      "subtitle": "Conte em que momento você está. Nós vamos incluir você.",
       "emailLabel": "E-mail de trabalho",
       "emailPlaceholder": "voce@empresa.com",
       "nameLabel": "Nome",

@@ -1,8 +1,8 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX — KI-Agenten sicher erstellen und bereitstellen ohne Entwickler einzustellen",
-      "description": "PicoMUTX hilft Grundern, Operatoren und kleinen Teams, KI-Agenten sicher zu erstellen, bereitzustellen und zu betreiben — mit Schritt-fur-Schritt-Anleitung, eingebauten Schutzmechanismen und echtem Support. Jetzt vorregistrieren."
+      "title": "PicoMUTX — KI-Agenten sicher erstellen und bereitstellen, ohne einen Entwickler einstellen zu müssen",
+      "description": "PicoMUTX hilft Gründern, Operatoren und kleinen Teams dabei, KI-Agenten sicher zu erstellen, bereitzustellen und zu betreiben – mit Schritt-für-Schritt-Anleitung, integrierten Schutzmechanismen und echtem Support. Registrieren Sie sich jetzt für den Frühzugang vor."
     },
     "nav": {
       "brand": "PicoMUTX",
@@ -10,199 +10,199 @@
       "cta": "Vorregistrieren"
     },
     "hero": {
-      "badge": "Fruhzugang · Begrenzte Platze",
+      "badge": "Frühzugang · Begrenzte Plätze",
       "title": "KI-Agenten erstellen und bereitstellen ",
-      "titleAccent": "ohne einen Entwickler einzustellen.",
-      "subtitle": "PicoMUTX bietet Ihnen einen sicheren, gefuhrten Weg zu einem funktionierenden KI-Agenten — egal ob Sie bei null anfangen, einen Agenten reparieren der nicht funktioniert oder einen weiteren teuren Fehler vermeiden wollen.",
-      "cta": "Fruhzugang vorregistrieren",
-      "meta": "Kostenlose Vorregistrierung · Keine Kreditkarte erforderlich · Grunderplatze begrenzt"
+      "titleAccent": "ohne einen Entwickler einstellen zu müssen.",
+      "subtitle": "PicoMUTX bietet Ihnen einen sicheren, geführten Weg zu einem funktionierenden KI-Agenten – ganz gleich, ob Sie bei null starten, einen nicht funktionierenden Agenten reparieren oder den nächsten teuren Fehler vermeiden möchten.",
+      "cta": "Für den Frühzugang vorregistrieren",
+      "meta": "Kostenlose Vorregistrierung · Keine Kreditkarte erforderlich · Begrenzte Gründerplätze"
     },
     "trustBar": {
       "items": {
-        "0": "Fur Grunder, Operatoren und kleine Teams",
-        "1": "Schritt-fur-Schritt-Anleitung",
-        "2": "Eingebaute Schutzmechanismen vom ersten Tag an"
+        "0": "Für Gründer, Operatoren und kleine Teams",
+        "1": "Schritt-für-Schritt-Anleitung",
+        "2": "Integrierte Schutzmechanismen ab dem ersten Tag"
       }
     },
     "problem": {
       "eyebrow": "Das Problem",
       "title": "Das Problem ist nicht die Idee.",
-      "titleLine2": "Es ist alles, was danach passiert.",
-      "body": "Die meisten Menschen bleiben nicht wegen mangelndem Ehrgeiz stecken. Sie bleiben stecken, weil der Aufbau eines KI-Agenten sich immer noch anfuhlt wie der Eintritt in eine Welt, die von Ingenieuren fur Ingenieure gestaltet wurde.",
+      "titleLine2": "Sondern alles, was danach kommt.",
+      "body": "Die meisten Menschen bleiben nicht wegen fehlendem Ehrgeiz stecken. Sie bleiben stecken, weil sich der Aufbau eines KI-Agenten noch immer anfühlt wie der Eintritt in eine Welt, die von Ingenieuren für Ingenieure gemacht wurde.",
       "scenarios": {
         "0": {
-          "label": "\"Ich will einen KI-Agenten, aber ich weiss nicht, wo ich anfangen soll.\"",
-          "body": "Es gibt zu viele Tools, zu viele Meinungen und zu viele Leute, die davon ausgehen, dass Sie die Grundlagen bereits kennen. Die Luecke zwischen \"Ich habe eine Idee\" und \"Ich habe etwas Funktionierendes\" fuehlt sich grosser an als sie sollte."
+          "label": "\"Ich möchte einen KI-Agenten, weiß aber nicht, wo ich anfangen soll.\"",
+          "body": "Es gibt zu viele Tools, zu viele Meinungen und zu viele Menschen, die davon ausgehen, dass Sie die Grundlagen bereits kennen. Die Lücke zwischen \"Ich habe eine Idee\" und \"Ich habe etwas, das funktioniert\" wirkt größer, als sie sein sollte."
         },
         "1": {
-          "label": "\"Ich hab's schon probiert — und festgesteckt.\"",
-          "body": "Sie haben Fortschritte gemacht, eine Wand erreicht und niemanden gehabt, den Sie wirklich um Hilfe fragen konnten. Die Idee liegt in Ihrem Backlog statt Wert zu schaffen."
+          "label": "\"Ich habe es schon versucht – und bin steckengeblieben.\"",
+          "body": "Sie haben Fortschritte gemacht, sind an eine Wand gestoßen und hatten niemanden, den Sie um Hilfe bitten konnten, die wirklich weiterhilft. Die Idee liegt weiter in Ihrem Backlog, statt Mehrwert zu schaffen."
         },
         "2": {
-          "label": "\"Ich habe Geld ausgegeben, und es funktioniert immer noch nicht richtig.\"",
-          "body": "Vielleicht haben Sie jemanden eingestellt. Vielleicht haben Sie fur Tools bezahlt. Jetzt sind Sie nicht nur unsicher — Sie sind skeptisch."
+          "label": "\"Ich habe Geld ausgegeben, und trotzdem funktioniert es noch nicht richtig.\"",
+          "body": "Vielleicht haben Sie jemanden beauftragt. Vielleicht haben Sie für Tools bezahlt. Jetzt sind Sie nicht nur unsicher – sondern skeptisch."
         },
         "3": {
-          "label": "\"Ich will nichts bereitstellen, dem ich nicht vertrauen kann.\"",
-          "body": "Ein Agent, der falsche Antworten gibt, unvorhersehbar ist oder versteckte Kosten verursacht, ist kein Asset. Es ist eine Belastung."
+          "label": "\"Ich möchte nichts bereitstellen, dem ich nicht vertrauen kann.\"",
+          "body": "Ein Agent, der falsche Antworten gibt, sich unvorhersehbar verhält oder versteckte Kosten verursacht, ist kein Gewinn. Er ist ein Risiko."
         }
       },
-      "close": "Genau deshalb existiert PicoMUTX."
+      "close": "Genau deshalb gibt es PicoMUTX."
     },
     "platform": {
       "eyebrow": "Was PicoMUTX ist",
-      "title": "Wo KI-Agenten von “interessanter Idee” zu “funktionierendem System” werden.",
-      "body": "PicoMUTX ist eine gefuhrte Plattform fur Menschen, die KI-Agenten sicher erstellen und betreiben mochten — ohne Vollzeit-Ingenieure werden zu mussen. Es bietet Ihnen die Struktur, den Support und die Schutzmechanismen, die meist fehlen, wenn Menschen es allein versuchen. Statt alles von Grund auf zusammenzubauen, gehen Sie Schritt fur Schritt vor: von der Idee zur Implementierung, von Verwirrung zur Klarheit, vom Prototyp zu etwas, das Sie tatsachlich nutzen konnen.",
+      "title": "Wo KI-Agenten von einer \"interessanten Idee\" zu einem \"funktionierenden System\" werden.",
+      "body": "PicoMUTX ist eine geführte Plattform für Menschen, die KI-Agenten sicher erstellen und betreiben möchten, ohne dafür selbst Vollzeit-Ingenieure werden zu müssen. Sie bietet Ihnen die Struktur, den Support und die Schutzmechanismen, die meist fehlen, wenn Menschen es allein versuchen. Statt alles von Grund auf selbst zusammenzubauen, gehen Sie Schritt für Schritt vor: von der Idee zur Implementierung, von Verwirrung zu Klarheit und vom Prototyp zu etwas, das Sie tatsächlich nutzen können.",
       "howItWorks": {
         "0": {
-          "title": "Schritt-fur-Schritt-Implementierungspfade",
-          "body": "Folgen Sie strukturierten Pfaden basierend auf dem, was Sie bauen mochten — von Kundensupport-Agenten bis hin zu internen Automatisierungen. Keine generische Theorie. Kein endloses Suchen."
+          "title": "Schritt-für-Schritt-Implementierungspfade",
+          "body": "Folgen Sie strukturierten Pfaden, je nachdem, was Sie aufbauen möchten – von Kundensupport-Agenten bis zu internen Automatisierungen. Keine generische Theorie. Kein endloses Suchen."
         },
         "1": {
-          "title": "Gefuhrter Support bei Blockaden",
-          "body": "Wenn etwas bricht oder unklar wird, mussen Sie es nicht allein herausfinden. PicoMUTX haelt den Schwung aufrecht, anstatt Projekte in Verwirrung sterben zu lassen."
+          "title": "Geführter Support, wenn Sie nicht weiterkommen",
+          "body": "Wenn etwas kaputtgeht oder unklar wird, müssen Sie es nicht allein herausfinden. PicoMUTX hält den Fortschritt aufrecht, statt Projekte in Verwirrung versanden zu lassen."
         },
         "2": {
-          "title": "Eingebaute Sicherheit vom ersten Tag an",
-          "body": "Kostenbewusstsein, Transparenz und Guardrails zaehlen. Sie wissen immer, was Ihr Agent tut, was er kostet und wann er Aufmerksamkeit braucht."
+          "title": "Integrierte Sicherheit ab dem ersten Tag",
+          "body": "Kostenkontrolle, Transparenz und Guardrails sind entscheidend. Sie wissen jederzeit, was Ihr Agent tut, was er kostet und wann er Aufmerksamkeit braucht."
         },
         "3": {
-          "title": "Live-Expertenkontakte",
-          "body": "Manches ist zu nuanciert fur statische Dokumentation. Echte Beratungsmomente, die Ihnen helfen, sich schneller zu entblockieren und bessere Entscheidungen zu treffen."
+          "title": "Live-Kontakt mit Experten",
+          "body": "Manche Themen sind zu nuanciert für statische Dokumentation. Deshalb gibt es echte Beratungsmomente, die Ihnen helfen, schneller Blockaden zu lösen und bessere Entscheidungen zu treffen."
         }
       }
     },
     "who": {
-      "eyebrow": "Ist PicoMUTX fur Sie?",
-      "title": "PicoMUTX ist nicht fur jeden.",
-      "forYouTitle": "Es ist fur Sie, wenn…",
-      "notForYouTitle": "Es ist nicht fur Sie, wenn…",
+      "eyebrow": "Ist PicoMUTX das Richtige für Sie?",
+      "title": "PicoMUTX ist nicht für alle.",
+      "forYouTitle": "Das ist für Sie, wenn…",
+      "notForYouTitle": "Das ist nichts für Sie, wenn…",
       "forYou": {
-        "0": "Sie einen KI-Agenten bauen wollen, aber nicht vollstandig von Entwicklern abhangig sein mochten",
-        "1": "Sie es schon versucht haben und auf halbem Weg steckenblieben",
-        "2": "Sie bereits Geld fur Tools oder Implementierung ausgegeben haben und dem Ergebnis immer noch nicht vertrauen",
-        "3": "Sie einen praktischen Weg wollen, nicht mehr Theorie",
-        "4": "Sie Unterstutzung beim Bauen wollen, nicht erst nachdem etwas schiefgeht"
+        "0": "Sie einen KI-Agenten entwickeln möchten, aber nicht vollständig von Entwicklern abhängig sein wollen",
+        "1": "Sie es bereits versucht haben und auf halbem Weg steckengeblieben sind",
+        "2": "Sie bereits Geld für Tools oder Implementierung ausgegeben haben und dem Ergebnis trotzdem nicht vertrauen",
+        "3": "Sie einen praktischen Weg suchen und nicht noch mehr Theorie",
+        "4": "Sie Unterstützung beim Aufbau möchten und nicht erst dann, wenn etwas schiefläuft"
       },
       "notForYou": {
-        "0": "Sie einen Abkuerzung ohne Lernaufwand suchen",
-        "1": "Sie bereits einen ausgereiften Enterprise-Agenten-Stack betreiben und komplexe Governance-Infrastruktur brauchen",
-        "2": "Sie Unterhaltung, Trends oder Hype mehr als Ausfuehrung wollen",
-        "3": "Sie nicht bereit sind, zu aendern, wie das Business tatsachlich funktioniert",
-        "4": "Sie erwarten, dass KI Urteilskraft, Fuehrung oder Verantwortung ersetzt"
+        "0": "Sie nach einer Abkürzung ohne jeden Lernaufwand suchen",
+        "1": "Sie bereits einen ausgereiften Enterprise-Agenten-Stack betreiben und komplexe Governance-Infrastruktur benötigen",
+        "2": "Sie eher Unterhaltung, Trends oder Hype suchen als echte Umsetzung",
+        "3": "Sie nicht bereit sind, die tatsächliche Arbeitsweise Ihres Unternehmens zu verändern",
+        "4": "Sie erwarten, dass KI Urteilsvermögen, Führung oder Verantwortung ersetzt"
       }
     },
     "beforeAfter": {
-      "eyebrow": "Der Wendepunkt",
-      "title": "Was sich andert, wenn Sie aufhoeren, es allein zu versuchen",
+      "eyebrow": "Der Wandel",
+      "title": "Was sich verändert, wenn Sie aufhören, alles allein herausfinden zu wollen",
       "beforeLabel": "Vorher",
       "afterLabel": "Nachher",
       "items": {
         "0": {
           "before": "Sie haben eine Idee, aber keinen klaren Weg",
-          "after": "Sie haben einen strukturierten Weg nach vorne"
+          "after": "Sie haben einen strukturierten Weg nach vorn"
         },
         "1": {
-          "before": "Sie verschwenden Zeit mit Springen zwischen Tools, Docs und Tutorials",
-          "after": "Sie folgen gefuhrten Implementierungspfaden"
+          "before": "Sie verlieren Zeit beim Wechseln zwischen Tools, Dokumentation und Tutorials",
+          "after": "Sie folgen geführten Implementierungspfaden"
         },
         "2": {
           "before": "Sie bleiben stecken und verlieren den Schwung",
-          "after": "Sie bekommen Support bevor das Projekt stirbt"
+          "after": "Sie bekommen Unterstützung, bevor das Projekt scheitert"
         },
         "3": {
           "before": "Ihr Agent bleibt Theorie",
-          "after": "Ihr Agent wird gebaut und eingesetzt"
+          "after": "Ihr Agent wird gebaut und produktiv eingesetzt"
         }
       },
-      "close": "Das Ziel ist nicht “KI irgendwann zu lernen.” Das Ziel ist, Ihren Agenten live zu bringen — sicher, klar und mit weniger Reibung."
+      "close": "Das Ziel ist nicht, \"irgendwann einmal KI zu lernen\". Das Ziel ist, Ihren Agenten live zu bringen – sicher, klar und mit weniger Reibung."
     },
     "earlyAccess": {
-      "eyebrow": "Fruhzugang",
-      "title": "PicoMUTX offnet sich in Phasen. Grunderzugang bleibt nicht fur immer offen.",
-      "body": "Sich jetzt vorzuregistrieren bringt Sie vor dem offentlichen Rollout und in die Gruppe, die die Plattform frueh mitgestaltet. Fruhe Nutzer bekommen direkteren Zugang zum Produkt, fruheres Onboarding und mehr Einfluss auf Prioritaeten.",
+      "eyebrow": "Frühzugang",
+      "title": "PicoMUTX öffnet sich schrittweise. Der Gründerzugang bleibt nicht unbegrenzt offen.",
+      "body": "Wenn Sie sich jetzt vorregistrieren, sind Sie dem öffentlichen Rollout voraus und Teil der Gruppe, die hilft, die Plattform früh mitzugestalten. Frühe Nutzer erhalten einen direkteren Draht zum Produkt, früheres Onboarding und mehr Einfluss auf die Prioritäten.",
       "benefits": {
-        "0": "Fruhzugang vor dem offentlichen Release",
-        "1": "Prioritaetsberuecksichtigung fuer Grundermitgliedsplaetze",
-        "2": "Fruehes Onboarding und Launch-Updates",
-        "3": "Die Moeglichkeit, fruehe Use Cases und Rollout-Prioritaeten zu beeinflussen",
-        "4": "Erste Einsicht in Preise und Zugangsbedingungen"
+        "0": "Frühzugang vor dem öffentlichen Start",
+        "1": "Bevorzugte Berücksichtigung für Gründerplätze",
+        "2": "Frühes Onboarding und Updates zum Launch",
+        "3": "Die Möglichkeit, frühe Anwendungsfälle und Rollout-Prioritäten mitzugestalten",
+        "4": "Früher Einblick in Preise und Zugangsbedingungen"
       }
     },
     "faq": {
       "eyebrow": "Fragen",
-      "title": "Fragen, die Leute meistens vor dem Beitreten haben",
+      "title": "Fragen, die sich viele stellen, bevor sie beitreten",
       "items": {
         "0": {
-          "q": "Muss ich programmieren koennen?",
-          "a": "Nein. PicoMUTX ist fuer Menschen gebaut, die nuetzliche KI-Agenten erstellen moechten, ohne tiefgehende technische Expertise zu brauchen."
+          "q": "Muss ich programmieren können?",
+          "a": "Nein. PicoMUTX ist für Menschen gemacht, die nützliche KI-Agenten erstellen möchten, ohne dafür tiefgehende technische Expertise zu brauchen."
         },
         "1": {
-          "q": "Was, wenn ich es schon versucht und gescheitert bin?",
-          "a": "Genau dafuer ist das gemacht. PicoMUTX ist darauf ausgelegt, die Verwirrung und Fragmentierung zu reduzieren, die Leute normalerweise auf halbem Weg aufhalten."
+          "q": "Was ist, wenn ich es schon versucht habe und gescheitert bin?",
+          "a": "Genau dafür ist PicoMUTX gedacht. Die Plattform reduziert die Verwirrung und Fragmentierung, durch die Menschen normalerweise auf halbem Weg aufgeben."
         },
         "2": {
           "q": "Welche Art von Agenten kann ich bauen?",
-          "a": "Praktische — solche, die Zeit sparen, Ablaeufe unterstuetzen, Workflows verbessern und Unternehmen helfen, besser zu funktionieren. Im Fokus steht Nuetzlichkeit, nicht Spielzeug-Demos."
+          "a": "Praktische Agenten – solche, die Zeit sparen, Abläufe unterstützen, Workflows verbessern und Unternehmen helfen, besser zu arbeiten. Im Mittelpunkt steht der Nutzen, nicht die Spielzeug-Demo."
         },
         "3": {
           "q": "Ist die Vorregistrierung kostenlos?",
-          "a": "Ja. Die Vorregistrierung ist kostenlos und erfordert keine Zahlung. Sie werden zu den Ersten gehoeren, die erfahren, wenn der Zugang offnet und Grunderplaetze verfuegbar werden."
+          "a": "Ja. Die Vorregistrierung ist kostenlos und erfordert keine Zahlung. Sie gehören zu den Ersten, die erfahren, wann der Zugang öffnet und wann Gründerplätze verfügbar werden."
         },
         "4": {
-          "q": "Ist das fuer Unternehmen?",
-          "a": "PicoMUTX ist besser geeignet fuer Grunder, Operatoren und kleine Teams, die einen gefuhrten Weg zum Bauen und Bereitstellen von KI-Agenten suchen. Groessere Enterprise-Governance-Beduerfnisse gehoeren zum breiteren MUTX-Okosystem."
+          "q": "Ist das für Unternehmen gedacht?",
+          "a": "PicoMUTX eignet sich besonders für Gründer, Operatoren und kleine Teams, die einen geführten Weg zum Erstellen und Bereitstellen von KI-Agenten suchen. Größere Enterprise-Governance-Anforderungen gehören in das breitere MUTX-Ökosystem."
         }
       }
     },
     "finalCta": {
-      "eyebrow": "Fruhzugang · Begrenzte Platze",
-      "title": "Ihr Agent muss keine unvollendete Idee bleiben.",
-      "body": "Sie brauchen keine weiteren offenen Tabs. Sie brauchen kein weiteres Tutorial. Sie brauchen einen klareren Weg zu etwas, das funktioniert. PicoMUTX ist fuer diesen Moment gebaut.",
-      "formHeadline": "Fur PicoMUTX vorregistrieren",
-      "formSubline": "Treten Sie der Fruhzugangsliste bei. Seien Sie der Erste, wenn wir eroeffnen.",
+      "eyebrow": "Frühzugang · Begrenzte Plätze",
+      "title": "Ihr Agent muss keine unfertige Idee bleiben.",
+      "body": "Sie brauchen nicht noch mehr offene Tabs. Sie brauchen kein weiteres Tutorial. Sie brauchen einen klareren Weg zu etwas, das funktioniert. PicoMUTX ist für genau diesen Moment gemacht.",
+      "formHeadline": "Für PicoMUTX vorregistrieren",
+      "formSubline": "Treten Sie der Frühzugangsliste bei. Seien Sie unter den Ersten, wenn wir öffnen.",
       "ctaButton": "Jetzt vorregistrieren",
-      "formCtaMeta": "Kostenlose Vorregistrierung · Keine Kreditkarte · Fruhe Nutzer bekommen Prioritaetszugang"
+      "formCtaMeta": "Kostenlose Vorregistrierung · Keine Kreditkarte erforderlich · Frühe Nutzer erhalten priorisierten Zugang"
     },
     "contactForm": {
       "dialogLabel": "Kontaktformular",
-      "closeLabel": "Schliessen",
-      "title": "Fruhzugang vorregistrieren",
-      "subtitle": "Erzahlen Sie uns, wo Sie stehen. Wir bringen Sie rein.",
-      "emailLabel": "Geschaefts-E-Mail",
+      "closeLabel": "Schließen",
+      "title": "Für den Frühzugang vorregistrieren",
+      "subtitle": "Erzählen Sie uns, wo Sie stehen. Wir kümmern uns um den Rest.",
+      "emailLabel": "Geschäftliche E-Mail",
       "emailPlaceholder": "sie@unternehmen.de",
       "nameLabel": "Name",
       "namePlaceholder": "Max Mustermann",
       "companyLabel": "Unternehmen",
       "companyPlaceholder": "Acme GmbH",
-      "interestLabel": "Was fuehrt Sie hierher?",
+      "interestLabel": "Was führt Sie hierher?",
       "interestOptions": {
-        "building-first": "Baue meinen ersten KI-Agenten",
-        "fixing-existing": "Repariere einen Agenten der nicht funktioniert",
-        "evaluating": "Bewerte Plattformen oder Tools",
-        "spent-money": "Schon Geld ausgegeben — funktioniert noch nicht",
+        "building-first": "Ich baue meinen ersten KI-Agenten",
+        "fixing-existing": "Ich repariere einen Agenten, der nicht funktioniert",
+        "evaluating": "Ich evaluiere Plattformen oder Tools",
+        "spent-money": "Ich habe bereits Geld ausgegeben – und es funktioniert noch immer nicht",
         "other": "Etwas anderes"
       },
       "messageLabel": "Gibt es etwas, das wir wissen sollten?",
       "messageOptional": "(optional)",
-      "messagePlaceholder": "Z.B. Ich betreibe ein kleines SaaS und moechte den Kundensupport automatisieren...",
+      "messagePlaceholder": "Z. B. Ich betreibe ein kleines SaaS-Unternehmen und möchte den Kundensupport automatisieren...",
       "submitting": "Wird gesendet...",
-      "submit": "Fruhzugangsliste beitreten",
-      "disclaimer": "Kein Spam. Keine Verkaufsanrufe. Nur eine menschliche Antwort.",
-      "successTitle": "Sie sind auf der Liste.",
-      "successBody": "Wir lesen jede Nachricht. Erwarten Sie eine persoenliche Antwort innerhalb von 24 Stunden.",
-      "successBack": "Zurueck zur Seite",
+      "submit": "Der Frühzugangsliste beitreten",
+      "disclaimer": "Kein Spam. Keine Verkaufsgespräche. Nur eine menschliche Antwort.",
+      "successTitle": "Sie stehen auf der Liste.",
+      "successBody": "Wir lesen jede Nachricht. Rechnen Sie innerhalb von 24 Stunden mit einer persönlichen Antwort.",
+      "successBack": "Zurück zur Seite",
       "errorFallback": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
       "networkError": "Netzwerkfehler. Bitte versuchen Sie es erneut."
     },
     "preRegForm": {
-      "emailLabel": "Geschaefts-E-Mail",
+      "emailLabel": "Geschäftliche E-Mail",
       "emailPlaceholder": "sie@unternehmen.de",
-      "submitting": "Anmeldung…",
+      "submitting": "Anmeldung läuft…",
       "submit": "Jetzt vorregistrieren",
-      "privacy": "Kein Spam. Keine Zahlung erforderlich. Nur Fruhzugang-Updates und Launch-Details.",
-      "successTitle": "Sie sind auf der Liste.",
-      "successBody": "Wir melden uns, wenn PicoMUTX-Zugang offnet. Kein Spam, keine Zahlung erforderlich.",
+      "privacy": "Kein Spam. Keine Zahlung erforderlich. Nur Updates zum Frühzugang und Details zum Launch.",
+      "successTitle": "Sie stehen auf der Liste.",
+      "successBody": "Wir melden uns, sobald der Zugang zu PicoMUTX geöffnet wird. Kein Spam, keine Zahlung erforderlich.",
       "errorFallback": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
     },
     "footer": {
@@ -215,7 +215,7 @@
         "contact": "Kontakt",
         "privacy": "Datenschutz"
       },
-      "copyright": "© MUTX 2026. Offene Kontrolle fuer eingesetzte Agenten."
+      "copyright": "© MUTX 2026. Offene Kontrolle für bereitgestellte Agenten."
     }
   }
 }

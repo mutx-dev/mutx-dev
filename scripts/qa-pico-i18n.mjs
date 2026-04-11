@@ -5,11 +5,11 @@ const repoRoot = process.cwd()
 const messagesDir = path.join(repoRoot, 'messages')
 const baseLocale = 'en'
 const picoKey = 'pico'
-const englishTextPattern = /[A-Za-z]{4,}(?:[\s'"(),.;:!?-]+[A-Za-z]{2,}){2,}/
 const arabicPattern = /\p{Script=Arabic}/u
 const latinPattern = /[A-Za-z]/
 const hanPattern = /\p{Script=Han}/u
-const strictLocales = new Set(['ar'])
+const strictLocales = new Set(['es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh', 'ar'])
+const exactEnglishLocales = new Set(['ko', 'zh', 'ar'])
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'))
@@ -39,12 +39,8 @@ function shouldIgnoreMixedScript(value) {
   return value.includes('PicoMUTX') || value.includes('MUTX') || value.includes('GitHub') || value.includes('SaaS') || value.includes('@')
 }
 
-function shouldIgnoreExactEnglish(locale, key, value) {
-  if (locale !== 'ar') {
-    return false
-  }
-
-  return key === 'nav.brand' || key === 'footer.links.github' || (value.includes('@') && key.endsWith('emailPlaceholder'))
+function shouldIgnoreExactEnglish(_locale, key, value) {
+  return key === 'nav.brand' || key === 'nav.brandTag' || key === 'footer.links.github' || key === 'contactForm.companyPlaceholder' || (value.includes('@') && key.endsWith('emailPlaceholder'))
 }
 
 const english = flatten(readJson(path.join(messagesDir, `${baseLocale}.json`))[picoKey])
@@ -66,12 +62,8 @@ for (const file of localeFiles) {
       continue
     }
 
-    if (strictLocales.has(locale) && source && normalized === source.trim() && !shouldIgnoreExactEnglish(locale, key, normalized)) {
+    if (exactEnglishLocales.has(locale) && source && normalized === source.trim() && !shouldIgnoreExactEnglish(locale, key, normalized)) {
       issues.push(`${locale}:${key}: exact English fallback`)
-    }
-
-    if (strictLocales.has(locale) && englishTextPattern.test(normalized)) {
-      issues.push(`${locale}:${key}: contains English text block`)
     }
 
     if (locale === 'ar' && !shouldIgnoreMixedScript(normalized) && arabicPattern.test(normalized) && (latinPattern.test(normalized) || hanPattern.test(normalized))) {

@@ -6,6 +6,10 @@ import { routing } from '@/i18n/routing'
 
 const RTL_LOCALES = new Set(['ar'])
 
+function getDirection(locale: string) {
+  return RTL_LOCALES.has(locale) ? 'rtl' : 'ltr'
+}
+
 export const metadata: Metadata = {
   manifest: '/pico/manifest.webmanifest',
   icons: {
@@ -30,8 +34,8 @@ export default async function PicoLayout({ children }: Props) {
     ? requestedLocale
     : 'en'
 
-  const messages = await getMessages()
-  const direction = RTL_LOCALES.has(locale) ? 'rtl' : 'ltr'
+  const messages = await getMessages({ locale })
+  const direction = getDirection(locale)
 
   return (
     <div lang={locale} dir={direction}>
