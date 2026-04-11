@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.services.approval import (
     ApprovalRequest,
@@ -426,6 +427,52 @@ class TestApprovalRoutes:
         assert data["payload"]["execution"]["template_id"] == "personal_assistant"
         assert data["payload"]["execution"]["deployment_id"]
         assert data["payload"]["execution"]["agent_id"]
+
+    @pytest.mark.asyncio
+    async def test_approve_deployment_restart_request_executes_action(
+        self,
+        client: AsyncClient,
+        approval_service,
+        test_deployment,
+        test_agent,
+        db_session: AsyncSession,
+    ):
+        test_deployment.status = "failed"
+        test_deployment.error_message = "boot failed"
+        test_agent.status = "stopped"
+        await db_session.commit()
+
+        create_resp = await client.post(
+            "/v1/approvals",
+            json={
+                "agent_id": "pico-autopilot",
+                "session_id": "session-restart",
+                "action_type": "deployment_restart",
+                "payload": {
+                    "kind": "deployment_restart",
+                    "deployment_id": str(test_deployment.id),
+                    "summary": f"Restart deployment {test_deployment.id}.",
+                },
+            },
+        )
+        request_id = create_resp.json()["id"]
+
+        response = await client.post(
+            f"/v1/approvals/{request_id}/approve",
+            json={"comment": "restart it"},
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "APPROVED"
+        assert data["payload"]["execution"]["status"] == "completed"
+        assert data["payload"]["execution"]["deployment_id"] == str(test_deployment.id)
+        assert data["payload"]["execution"]["deployment_status"] == "pending"
+
+        await db_session.refresh(test_deployment)
+        await db_session.refresh(test_agent)
+        assert test_deployment.status == "pending"
+        assert test_agent.status == "running"
 
     @pytest.mark.asyncio
     async def test_reject_request(

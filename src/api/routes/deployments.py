@@ -292,13 +292,12 @@ async def create_deployment(
     return _serialize_deployment(deployment)
 
 
-@router.post("/{deployment_id}/restart", response_model=DeploymentResponse)
-async def restart_deployment(
+async def restart_owned_deployment(
+    *,
     deployment_id: uuid.UUID,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: AsyncSession,
+    current_user: User,
 ):
-    """Restart an existing deployment."""
     deployment = await get_owned_deployment(deployment_id, db, current_user)
 
     # Can only restart deployments that are stopped, failed, or killed
@@ -347,6 +346,20 @@ async def restart_deployment(
     )
 
     return _serialize_deployment(deployment)
+
+
+@router.post("/{deployment_id}/restart", response_model=DeploymentResponse)
+async def restart_deployment(
+    deployment_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Restart an existing deployment."""
+    return await restart_owned_deployment(
+        deployment_id=deployment_id,
+        db=db,
+        current_user=current_user,
+    )
 
 
 @router.get("/{deployment_id}/logs", response_model=list[DeploymentLogsResponse])

@@ -31,13 +31,23 @@ type AlertSummary = {
   created_at: string
 }
 
+type DeploymentSummary = {
+  id: string
+  agent_id: string
+  status: string
+  replicas: number
+  version?: string
+}
+
 type ApprovalExecutionSummary = {
+  kind?: string
   status?: string
   detail?: string
   deployment_id?: string
   agent_id?: string
   agent_name?: string
   template_id?: string
+  deployment_status?: string
 }
 
 type StarterDeploymentRequest = {
@@ -53,6 +63,8 @@ type ApprovalPayload = {
   summary?: string
   kind?: string
   template_id?: string
+  deployment_id?: string
+  source_status?: string
   deployment_request?: StarterDeploymentRequest
   execution?: ApprovalExecutionSummary
 }
@@ -74,7 +86,14 @@ type StarterDeploymentResponse = {
   }
   deployment?: {
     id?: string
+    status?: string
   }
+}
+
+type DeploymentActionResponse = {
+  id?: string
+  agent_id?: string
+  status?: string
 }
 
 type ControlledActionReceipt = {
@@ -84,6 +103,7 @@ type ControlledActionReceipt = {
 }
 
 const STARTER_TEMPLATE_ID = 'personal_assistant'
+const RESTARTABLE_DEPLOYMENT_STATUSES = new Set(['stopped', 'failed', 'killed'])
 const STARTER_DEPLOYMENT_REQUEST: StarterDeploymentRequest = {
   name: 'Pico Autopilot Assistant',
   description: 'Starter assistant deployed from Pico autopilot.',
@@ -156,11 +176,21 @@ function buildStarterApprovalPayload(): ApprovalPayload {
   }
 }
 
+function buildDeploymentRestartApprovalPayload(deployment: DeploymentSummary): ApprovalPayload {
+  return {
+    summary: `Restart deployment ${deployment.id}.`,
+    kind: 'deployment_restart',
+    deployment_id: deployment.id,
+    source_status: deployment.status,
+  }
+}
+
 export function PicoAutopilotPageClient() {
   const { progress, actions } = usePicoProgress()
   const [runs, setRuns] = useState<RunSummary[]>([])
   const [budget, setBudget] = useState<BudgetSummary | null>(null)
   const [alerts, setAlerts] = useState<AlertSummary[]>([])
+  const [deployments, setDeployments] = useState<DeploymentSummary[]>([])
   const [approvals, setApprovals] = useState<ApprovalSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [authRequired, setAuthRequired] = useState(false)
@@ -168,6 +198,7 @@ export function PicoAutopilotPageClient() {
   const [receipt, setReceipt] = useState<ControlledActionReceipt | null>(null)
   const [thresholdDraft, setThresholdDraft] = useState(progress.autopilot.costThresholdPercent)
   const [runningStarterAction, setRunningStarterAction] = useState(false)
+  const [runningRestartActionId, setRunningRestartActionId] = useState<string | null>(null)
   const [resolvingApprovalId, setResolvingApprovalId] = useState<string | null>(null)
 
   async function load() {
@@ -175,35 +206,39 @@ export function PicoAutopilotPageClient() {
     setError(null)
 
     try {
-      const [runsResponse, budgetResponse, alertsResponse, approvalsResponse] = await Promise.all([
+      const [runsResponse, budgetResponse, alertsResponse, deploymentsResponse, approvalsResponse] = await Promise.all([
         fetch('/api/dashboard/runs?limit=8', { credentials: 'include', cache: 'no-store' }),
         fetch('/api/dashboard/budgets', { credentials: 'include', cache: 'no-store' }),
         fetch('/api/dashboard/monitoring/alerts?limit=8', { credentials: 'include', cache: 'no-store' }),
+        fetch('/api/dashboard/deployments', { credentials: 'include', cache: 'no-store' }),
         fetch('/api/pico/approvals?status=PENDING', { credentials: 'include', cache: 'no-store' }),
       ])
 
-      if ([runsResponse, budgetResponse, alertsResponse, approvalsResponse].some((response) => response.status === 401)) {
+      if ([runsResponse, budgetResponse, alertsResponse, deploymentsResponse, approvalsResponse].some((response) => response.status === 401)) {
         setAuthRequired(true)
         setRuns([])
         setBudget(null)
         setAlerts([])
+        setDeployments([])
         setApprovals([])
         setLoading(false)
         return
       }
 
-      if ([runsResponse, budgetResponse, alertsResponse, approvalsResponse].some((response) => !response.ok)) {
+      if ([runsResponse, budgetResponse, alertsResponse, deploymentsResponse, approvalsResponse].some((response) => !response.ok)) {
         setError('Some live autopilot signals could not be loaded. Refresh to retry.')
       }
 
       const runsPayload = runsResponse.ok ? await runsResponse.json() : { items: [] }
       const budgetPayload = budgetResponse.ok ? await budgetResponse.json() : null
       const alertsPayload = alertsResponse.ok ? await alertsResponse.json() : { items: [] }
+      const deploymentsPayload = deploymentsResponse.ok ? await deploymentsResponse.json() : []
       const approvalsPayload = approvalsResponse.ok ? await approvalsResponse.json() : []
 
       setRuns(Array.isArray(runsPayload?.items) ? runsPayload.items : Array.isArray(runsPayload) ? runsPayload : [])
       setBudget(budgetPayload)
       setAlerts(Array.isArray(alertsPayload?.items) ? alertsPayload.items : [])
+      setDeployments(Array.isArray(deploymentsPayload) ? deploymentsPayload : [])
       setApprovals(Array.isArray(approvalsPayload) ? approvalsPayload : [])
       setAuthRequired(false)
       if ((Array.isArray(runsPayload?.items) && runsPayload.items.length > 0) || (Array.isArray(alertsPayload?.items) && alertsPayload.items.length > 0)) {
@@ -240,6 +275,11 @@ export function PicoAutopilotPageClient() {
 
     return null
   }, [thresholdDraft])
+
+  const restartableDeployment = useMemo(
+    () => deployments.find((deployment) => RESTARTABLE_DEPLOYMENT_STATUSES.has(deployment.status)),
+    [deployments]
+  )
 
   useEffect(() => {
     if (thresholdBreached && !progress.autopilot.lastThresholdBreachAt) {
@@ -371,6 +411,92 @@ export function PicoAutopilotPageClient() {
     }
   }
 
+  async function queueDeploymentRestartApproval(deployment: DeploymentSummary) {
+    const response = await fetch('/api/pico/approvals', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        agent_id: 'pico-autopilot',
+        session_id: `pico-${Date.now()}`,
+        action_type: 'deployment_restart',
+        payload: buildDeploymentRestartApprovalPayload(deployment),
+      }),
+    })
+
+    const payload = await readJsonSafely(response)
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        setAuthRequired(true)
+      }
+
+      throw new Error(extractErrorMessage(payload, 'Failed to queue deployment restart approval'))
+    }
+
+    const approval = payload as ApprovalSummary | null
+    rememberApprovalRequest(typeof approval?.id === 'string' ? approval.id : undefined)
+    actions.unlockMilestone('first_approval_gate_enabled')
+    setReceipt({
+      tone: 'queued',
+      title: 'Deployment restart queued',
+      description:
+        typeof approval?.id === 'string'
+          ? `Approval ${approval.id} is waiting to restart deployment ${deployment.id}.`
+          : `Deployment ${deployment.id} is waiting for human approval.`,
+    })
+    await load()
+  }
+
+  async function runDeploymentRestartNow(deployment: DeploymentSummary) {
+    const response = await fetch(`/api/dashboard/deployments/${deployment.id}?action=restart`, {
+      method: 'POST',
+      credentials: 'include',
+      cache: 'no-store',
+    })
+
+    const payload = await readJsonSafely(response)
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        setAuthRequired(true)
+      }
+
+      throw new Error(extractErrorMessage(payload, 'Failed to restart deployment'))
+    }
+
+    const restartPayload = payload as DeploymentActionResponse | null
+    setReceipt({
+      tone: 'success',
+      title: 'Deployment restarted',
+      description:
+        restartPayload?.id && restartPayload?.status
+          ? `Deployment ${restartPayload.id} moved to ${restartPayload.status}.`
+          : `Deployment ${deployment.id} was restarted through the real control-plane action.`,
+    })
+    await load()
+  }
+
+  async function handleDeploymentRestart(deployment: DeploymentSummary) {
+    setRunningRestartActionId(deployment.id)
+    setError(null)
+    setReceipt(null)
+
+    try {
+      if (approvalGateEnabled) {
+        await queueDeploymentRestartApproval(deployment)
+      } else {
+        await runDeploymentRestartNow(deployment)
+      }
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Failed to run deployment restart action')
+    } finally {
+      setRunningRestartActionId(null)
+    }
+  }
+
   async function resolveApproval(id: string, action: 'approve' | 'reject') {
     setResolvingApprovalId(id)
     setError(null)
@@ -397,9 +523,10 @@ export function PicoAutopilotPageClient() {
 
       const approval = payload as ApprovalSummary | null
       const execution = approval?.payload?.execution
+      const actionKind = execution?.kind ?? approval?.payload?.kind
 
       if (action === 'approve') {
-        if (execution?.status === 'completed') {
+        if (execution?.status === 'completed' && actionKind === 'starter_template_deploy') {
           actions.unlockMilestone('successful_deployment')
           setReceipt({
             tone: 'success',
@@ -407,7 +534,16 @@ export function PicoAutopilotPageClient() {
             description:
               execution.deployment_id && execution.agent_id
                 ? `Starter deployment ${execution.deployment_id} shipped for agent ${execution.agent_id}.`
-                : 'The approved action was executed.',
+                : 'The approved starter deployment was executed.',
+          })
+        } else if (execution?.status === 'completed' && actionKind === 'deployment_restart') {
+          setReceipt({
+            tone: 'success',
+            title: 'Approved and restarted',
+            description:
+              execution.deployment_id && execution.deployment_status
+                ? `Deployment ${execution.deployment_id} moved to ${execution.deployment_status}.`
+                : 'The approved deployment restart was executed.',
           })
         } else if (execution?.status === 'failed') {
           setReceipt({
@@ -449,7 +585,7 @@ export function PicoAutopilotPageClient() {
     <PicoShell
       eyebrow="Autopilot bridge"
       title="See the runtime, not just the dream"
-      description="Pico reuses real MUTX signals for runs, budget, alerts, and approvals. The only approval-controlled action wired here today is starter deployment. That is enough to make the gate real instead of decorative."
+      description="Pico reuses real MUTX signals for runs, budget, alerts, deployments, and approvals. Two actions are honestly wired today: starter deployment and deployment restart. That is enough to make the gate feel like control instead of wallpaper."
       actions={
         <div className="flex flex-wrap gap-3">
           <button
@@ -481,11 +617,9 @@ export function PicoAutopilotPageClient() {
           <p className="mt-2">Live unresolved alerts plus your Pico threshold check.</p>
         </div>
         <div className="rounded-[24px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-5 text-sm text-slate-300 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Budget</p>
-          <p className="mt-3 text-3xl font-semibold text-white">
-            {budget ? formatPercent(budget.usage_percentage) : '--'}
-          </p>
-          <p className="mt-2">Threshold: {formatPercent(progress.autopilot.costThresholdPercent)}</p>
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Deployments</p>
+          <p className="mt-3 text-3xl font-semibold text-white">{deployments.length}</p>
+          <p className="mt-2">Live deployment inventory for restartable lanes.</p>
         </div>
         <div className="rounded-[24px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-5 text-sm text-slate-300 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
           <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Approvals</p>
@@ -496,7 +630,7 @@ export function PicoAutopilotPageClient() {
 
       {authRequired ? (
         <div className="mt-6 rounded-[28px] border border-amber-400/20 bg-amber-400/10 p-6 text-sm text-amber-50">
-          Live autopilot data needs an authenticated MUTX session. The academy still works offline, but live runs, alerts, budgets, and approvals need the real control plane.
+          Live autopilot data needs an authenticated MUTX session. The academy still works offline, but live runs, alerts, deployments, budgets, and approvals need the real control plane.
         </div>
       ) : null}
 
@@ -517,54 +651,108 @@ export function PicoAutopilotPageClient() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Approval gate</p>
-                <h2 className="mt-2 text-xl font-semibold text-white">Control a real action</h2>
+                <h2 className="mt-2 text-xl font-semibold text-white">Control real actions</h2>
               </div>
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.18em] text-slate-300">
                 {approvalGateEnabled ? 'Gate enabled' : 'Gate disabled'}
               </span>
             </div>
-            <div className="mt-4 rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
-              <p className="font-medium text-white">Starter deployment</p>
-              <p className="mt-2">
-                This button controls the real <span className="font-mono text-xs text-slate-200">/v1/templates/{STARTER_TEMPLATE_ID}/deploy</span> action.
-                With the gate on, Pico writes a pending approval request and waits. With the gate off, the deployment fires immediately.
-              </p>
-              <div className="mt-4 grid gap-3 md:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Deploy payload</p>
-                  <p className="mt-2">Name: {STARTER_DEPLOYMENT_REQUEST.name}</p>
-                  <p className="mt-1">Workspace: {STARTER_DEPLOYMENT_REQUEST.workspace}</p>
-                  <p className="mt-1">Skills: {(STARTER_DEPLOYMENT_REQUEST.skills ?? []).join(', ')}</p>
+            <div className="mt-4 grid gap-4 xl:grid-cols-2">
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
+                <p className="font-medium text-white">Starter deployment</p>
+                <p className="mt-2">
+                  This button controls the real <span className="font-mono text-xs text-slate-200">/v1/templates/{STARTER_TEMPLATE_ID}/deploy</span> action.
+                  With the gate on, Pico writes a pending approval request and waits. With the gate off, deployment fires immediately.
+                </p>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Deploy payload</p>
+                    <p className="mt-2">Name: {STARTER_DEPLOYMENT_REQUEST.name}</p>
+                    <p className="mt-1">Workspace: {STARTER_DEPLOYMENT_REQUEST.workspace}</p>
+                    <p className="mt-1">Skills: {(STARTER_DEPLOYMENT_REQUEST.skills ?? []).join(', ')}</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-slate-500">What the human controls</p>
+                    <p className="mt-2">
+                      Approve = create the starter deployment. Reject = nothing runs. Tracked requests: {trackedApprovalCount}.
+                    </p>
+                  </div>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">What the human controls</p>
-                  <p className="mt-2">
-                    Approve = create the starter deployment. Reject = nothing runs. Tracked requests: {trackedApprovalCount}.
-                  </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => void handleStarterDeployment()}
+                    disabled={runningStarterAction || authRequired}
+                    className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
+                  >
+                    {runningStarterAction
+                      ? approvalGateEnabled
+                        ? 'Queueing request...'
+                        : 'Deploying starter...'
+                      : approvalGateEnabled
+                        ? 'Queue starter deployment'
+                        : 'Deploy starter now'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setApprovalGateEnabled(!approvalGateEnabled)}
+                    className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200"
+                  >
+                    {approvalGateEnabled ? 'Bypass gate for this lane' : 'Require approval for this lane'}
+                  </button>
                 </div>
               </div>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={() => void handleStarterDeployment()}
-                  disabled={runningStarterAction || authRequired}
-                  className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
-                >
-                  {runningStarterAction
-                    ? approvalGateEnabled
-                      ? 'Queueing request...'
-                      : 'Deploying starter...'
-                    : approvalGateEnabled
-                      ? 'Queue starter deployment'
-                      : 'Deploy starter now'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setApprovalGateEnabled(!approvalGateEnabled)}
-                  className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200"
-                >
-                  {approvalGateEnabled ? 'Bypass gate for this lane' : 'Require approval for this lane'}
-                </button>
+
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
+                <p className="font-medium text-white">Deployment restart</p>
+                <p className="mt-2">
+                  This lane controls the real <span className="font-mono text-xs text-slate-200">/v1/deployments/{'{deployment_id}'}/restart</span> action.
+                  Only failed, stopped, or killed deployments qualify. No governance cosplay. If there is nothing restartable, the button stays dead.
+                </p>
+                {restartableDeployment ? (
+                  <>
+                    <div className="mt-4 grid gap-3 md:grid-cols-2">
+                      <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
+                        <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Target deployment</p>
+                        <p className="mt-2 break-all">ID: {restartableDeployment.id}</p>
+                        <p className="mt-1">Status: {restartableDeployment.status}</p>
+                        <p className="mt-1">Replicas: {restartableDeployment.replicas}</p>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
+                        <p className="text-xs uppercase tracking-[0.18em] text-slate-500">What the human controls</p>
+                        <p className="mt-2">
+                          Approve = push that deployment back to pending. Reject = leave it broken or stopped.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={() => void handleDeploymentRestart(restartableDeployment)}
+                        disabled={runningRestartActionId === restartableDeployment.id || authRequired}
+                        className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
+                      >
+                        {runningRestartActionId === restartableDeployment.id
+                          ? approvalGateEnabled
+                            ? 'Queueing restart...'
+                            : 'Restarting deployment...'
+                          : approvalGateEnabled
+                            ? 'Queue deployment restart'
+                            : 'Restart deployment now'}
+                      </button>
+                      <Link
+                        href="/dashboard/deployments"
+                        className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200"
+                      >
+                        Open deployments
+                      </Link>
+                    </div>
+                  </>
+                ) : (
+                  <div className="mt-4 rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-3 text-sm text-slate-300">
+                    No failed, stopped, or killed deployments are available to restart right now.
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -650,18 +838,19 @@ export function PicoAutopilotPageClient() {
               </span>
             </div>
             <p className="mt-4 text-sm text-slate-300">
-              This queue is not theater. Turn the gate on, trigger starter deployment, then approve or reject the real action here.
+              This queue is not theater. Turn the gate on, trigger starter deployment or deployment restart, then approve or reject the real action here.
             </p>
             <div className="mt-4 space-y-3">
               {approvals.length === 0 ? (
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
-                  No pending approvals. Turn the gate on and run starter deployment to queue a real request.
+                  No pending approvals. Turn the gate on and trigger one of the real actions above.
                 </div>
               ) : (
                 approvals.map((approval) => {
                   const starterRequest = approval.payload?.deployment_request
-                  const starterExecution = approval.payload?.execution
+                  const execution = approval.payload?.execution
                   const isStarterDeploy = approval.payload?.kind === 'starter_template_deploy'
+                  const isDeploymentRestart = approval.payload?.kind === 'deployment_restart'
 
                   return (
                     <div key={approval.id} className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
@@ -683,9 +872,15 @@ export function PicoAutopilotPageClient() {
                           <p className="mt-1">Workspace: {starterRequest?.workspace ?? 'n/a'}</p>
                         </div>
                       ) : null}
-                      {starterExecution?.status === 'failed' ? (
+                      {isDeploymentRestart ? (
+                        <div className="mt-3 rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
+                          <p>Approve will call <span className="font-mono text-xs text-slate-200">/v1/deployments/{approval.payload?.deployment_id ?? '{deployment_id}'}/restart</span>.</p>
+                          <p className="mt-1">Current status: {approval.payload?.source_status ?? 'unknown'}</p>
+                        </div>
+                      ) : null}
+                      {execution?.status === 'failed' ? (
                         <div className="mt-3 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-amber-50">
-                          Previous execution failed: {starterExecution.detail ?? 'Unknown error'}
+                          Previous execution failed: {execution.detail ?? 'Unknown error'}
                         </div>
                       ) : null}
                       <div className="mt-4 flex gap-3">
@@ -719,6 +914,16 @@ export function PicoAutopilotPageClient() {
               <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">Loading live MUTX signals...</div>
             ) : (
               <div className="mt-4 space-y-3">
+                {deployments.slice(0, 3).map((deployment) => (
+                  <div key={deployment.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+                    <p className="font-medium text-white">Deployment {deployment.id}</p>
+                    <p className="mt-1">Status: {deployment.status}</p>
+                    <p className="mt-1">Replicas: {deployment.replicas}</p>
+                    <Link href="/dashboard/deployments" className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+                      Open deployments
+                    </Link>
+                  </div>
+                ))}
                 {runs.slice(0, 3).map((run) => (
                   <div key={run.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
                     <p className="font-medium text-white">Run {run.id}</p>

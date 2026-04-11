@@ -3,6 +3,7 @@ Approval workflow REST endpoints.
 """
 
 import logging
+import uuid
 from datetime import datetime, timezone
 from typing import Annotated, Any, Optional
 
@@ -15,6 +16,7 @@ from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models import User
 from src.api.models.schemas import StarterDeploymentCreate
+from src.api.routes.deployments import restart_owned_deployment
 from src.api.routes.templates import create_starter_template_deployment
 from src.api.services.approval import (
     ApprovalRequest,
@@ -64,7 +66,7 @@ async def _execute_approved_action(
 ) -> ApprovalRequest:
     payload = dict(approval.payload or {})
     action_kind = payload.get("kind")
-    if action_kind != "starter_template_deploy":
+    if action_kind not in {"starter_template_deploy", "deployment_restart"}:
         return approval
 
     execution: dict[str, Any] = {
@@ -73,68 +75,93 @@ async def _execute_approved_action(
         "executed_by": approver.email,
     }
 
-    template_id = payload.get("template_id")
-    deployment_request_payload = payload.get("deployment_request")
-
-    if not isinstance(template_id, str) or not template_id.strip():
+    requester_user = await _resolve_requester_user(db, approval)
+    if requester_user is None:
         execution |= {
             "status": "failed",
-            "detail": "Missing template_id for approved action",
-        }
-    elif not isinstance(deployment_request_payload, dict):
-        execution |= {
-            "status": "failed",
-            "detail": "Missing deployment payload for approved action",
+            "detail": f"Requester '{approval.requester}' no longer exists",
         }
     else:
-        requester_user = await _resolve_requester_user(db, approval)
-        if requester_user is None:
+        try:
+            if action_kind == "starter_template_deploy":
+                template_id = payload.get("template_id")
+                deployment_request_payload = payload.get("deployment_request")
+                if not isinstance(template_id, str) or not template_id.strip():
+                    execution |= {
+                        "status": "failed",
+                        "detail": "Missing template_id for approved action",
+                    }
+                elif not isinstance(deployment_request_payload, dict):
+                    execution |= {
+                        "status": "failed",
+                        "detail": "Missing deployment payload for approved action",
+                    }
+                else:
+                    deployment_request = StarterDeploymentCreate.model_validate(
+                        deployment_request_payload
+                    )
+                    result = await create_starter_template_deployment(
+                        template_id=template_id,
+                        request=deployment_request,
+                        db=db,
+                        current_user=requester_user,
+                    )
+                    execution |= {
+                        "status": "completed",
+                        "template_id": template_id,
+                        "agent_id": str(result["agent"]["id"]),
+                        "deployment_id": str(result["deployment"]["id"]),
+                        "agent_name": result["agent"].get("name"),
+                        "deployment_status": result["deployment"].get("status"),
+                    }
+            elif action_kind == "deployment_restart":
+                deployment_id = payload.get("deployment_id")
+                if not isinstance(deployment_id, str) or not deployment_id.strip():
+                    execution |= {
+                        "status": "failed",
+                        "detail": "Missing deployment_id for approved action",
+                    }
+                else:
+                    result = await restart_owned_deployment(
+                        deployment_id=uuid.UUID(deployment_id),
+                        db=db,
+                        current_user=requester_user,
+                    )
+                    execution |= {
+                        "status": "completed",
+                        "deployment_id": str(result["id"]),
+                        "agent_id": str(result["agent_id"]),
+                        "deployment_status": result.get("status"),
+                    }
+        except ValidationError as exc:
             execution |= {
                 "status": "failed",
-                "detail": f"Requester '{approval.requester}' no longer exists",
+                "detail": exc.errors()[0].get("msg", "Invalid starter deployment payload"),
             }
-        else:
-            try:
-                deployment_request = StarterDeploymentCreate.model_validate(
-                    deployment_request_payload
-                )
-                result = await create_starter_template_deployment(
-                    template_id=template_id,
-                    request=deployment_request,
-                    db=db,
-                    current_user=requester_user,
-                )
-                execution |= {
-                    "status": "completed",
-                    "template_id": template_id,
-                    "agent_id": str(result["agent"]["id"]),
-                    "deployment_id": str(result["deployment"]["id"]),
-                    "agent_name": result["agent"].get("name"),
-                }
-            except ValidationError as exc:
-                execution |= {
-                    "status": "failed",
-                    "detail": exc.errors()[0].get("msg", "Invalid starter deployment payload"),
-                }
-            except HTTPException as exc:
-                execution |= {
-                    "status": "failed",
-                    "detail": (
-                        exc.detail
-                        if isinstance(exc.detail, str)
-                        else "Failed to execute approved action"
-                    ),
-                }
-            except Exception:
-                logger.exception(
-                    "Failed to execute approved action %s for request %s",
-                    action_kind,
-                    approval.id,
-                )
-                execution |= {
-                    "status": "failed",
-                    "detail": "Failed to execute approved action",
-                }
+        except ValueError as exc:
+            execution |= {
+                "status": "failed",
+                "detail": str(exc),
+            }
+        except HTTPException as exc:
+            execution |= {
+                "status": "failed",
+                "detail": (
+                    exc.detail
+                    if isinstance(exc.detail, str)
+                    else "Failed to execute approved action"
+                ),
+            }
+        except Exception:
+            logger.exception(
+                "Failed to execute approved action %s for request %s",
+                action_kind,
+                approval.id,
+            )
+            execution |= {
+                "status": "failed",
+                "detail": "Failed to execute approved action",
+            }
 
     payload["execution"] = execution
     return await service.update_payload(str(approval.id), payload)
