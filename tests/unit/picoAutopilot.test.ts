@@ -1,8 +1,13 @@
 import {
+  analyzeAutopilotIntegration,
   buildAutopilotTimeline,
   describeRunDetail,
   explainApprovalImpact,
   formatPercent,
+  getAlertsEmptyState,
+  getApprovalsEmptyState,
+  getRunsEmptyState,
+  getUsageEmptyState,
 } from '../../components/pico/picoAutopilot'
 
 describe('pico autopilot helpers', () => {
@@ -101,5 +106,107 @@ describe('pico autopilot helpers', () => {
 
   it('formats percentages for the budget UI', () => {
     expect(formatPercent(81.2)).toBe('81%')
+  })
+
+  it('treats a no-agent account as not connected to MUTX yet', () => {
+    const status = analyzeAutopilotIntegration({
+      runs: [],
+      alerts: [],
+      approvals: [],
+      budget: null,
+      usage: null,
+      approvalGateConfigured: false,
+    })
+
+    expect(status.hasLiveAgent).toBe(false)
+    expect(getRunsEmptyState(status, { label: 'Deploy next', href: '/pico/academy/deploy-hermes-on-a-vps' }).title).toMatch(/No monitored agent/i)
+  })
+
+  it('distinguishes agent-without-runs from true no-agent state', () => {
+    const status = analyzeAutopilotIntegration({
+      runs: [],
+      alerts: [],
+      approvals: [
+        {
+          id: 'approval-3',
+          agent_id: 'agent-1',
+          action_type: 'outbound_message_send',
+          status: 'PENDING',
+          requester: 'operator@mutx.dev',
+          created_at: '2026-04-11T01:20:00.000Z',
+        },
+      ],
+      budget: null,
+      usage: null,
+      approvalGateConfigured: false,
+    })
+
+    expect(status.hasLiveAgent).toBe(true)
+    expect(status.hasRuns).toBe(false)
+    expect(getRunsEmptyState(status, { label: 'Trigger a run', href: '/pico/academy/create-a-scheduled-workflow' }).title).toMatch(/nothing has run yet/i)
+  })
+
+  it('explains no-alerts state differently once runs exist', () => {
+    const status = analyzeAutopilotIntegration({
+      runs: [{ id: 'run-2', agent_id: 'agent-1', status: 'COMPLETED' }],
+      alerts: [],
+      approvals: [],
+      budget: null,
+      usage: null,
+      approvalGateConfigured: false,
+    })
+
+    expect(getAlertsEmptyState(status, { label: 'Inspect runs', href: '/pico/autopilot' }).title).toMatch(/No live alerts right now/i)
+  })
+
+  it('calls out budget-without-usage as a separate broken state', () => {
+    const status = analyzeAutopilotIntegration({
+      runs: [],
+      alerts: [],
+      approvals: [],
+      budget: {
+        plan: 'starter',
+        credits_total: 1000,
+        credits_used: 0,
+        credits_remaining: 1000,
+        usage_percentage: 0,
+      },
+      usage: {
+        total_credits_used: 0,
+        credits_remaining: 1000,
+        credits_total: 1000,
+        period_start: '2026-04-01T00:00:00.000Z',
+        period_end: '2026-04-30T00:00:00.000Z',
+        usage_by_agent: [],
+        usage_by_type: [],
+      },
+      approvalGateConfigured: false,
+    })
+
+    expect(status.hasBudget).toBe(true)
+    expect(status.hasUsage).toBe(false)
+    expect(getUsageEmptyState(status, { label: 'Trigger usage', href: '/pico/academy/create-a-scheduled-workflow' }).title).toMatch(/Budget exists, but usage is empty/i)
+  })
+
+  it('flags approval history when the local gate is still off', () => {
+    const status = analyzeAutopilotIntegration({
+      runs: [],
+      alerts: [],
+      approvals: [
+        {
+          id: 'approval-4',
+          agent_id: 'agent-1',
+          action_type: 'outbound_message_send',
+          status: 'APPROVED',
+          requester: 'operator@mutx.dev',
+          created_at: '2026-04-11T01:20:00.000Z',
+        },
+      ],
+      budget: null,
+      usage: null,
+      approvalGateConfigured: false,
+    })
+
+    expect(getApprovalsEmptyState(status, { label: 'Configure gate', href: '/pico/academy/add-an-approval-gate' }).title).toMatch(/gate is off/i)
   })
 })

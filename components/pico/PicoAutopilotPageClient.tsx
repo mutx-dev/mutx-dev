@@ -322,7 +322,6 @@ export function PicoAutopilotPageClient() {
 
   const liveValue = (value: string) => (authRequired ? '--' : value)
   const liveHint = (readyHint: string, offlineHint: string) => (authRequired ? offlineHint : readyHint)
-  const loadStateLabel = useMemo(() => loadState.toUpperCase(), [loadState])
   const latestRun = runs[0] ?? null
   const primaryAutopilotHref = authRequired || !latestRun
     ? derived.nextLesson
@@ -366,7 +365,11 @@ export function PicoAutopilotPageClient() {
           label="Runs"
           value={liveValue(String(runs.length))}
           hint={liveHint(
-            runs.length > 0 ? 'Recent executions pulled from MUTX.' : 'No runs have been recorded for this session yet.',
+            !integrationStatus.hasLiveAgent
+              ? 'No agent is connected to MUTX yet.'
+              : runs.length > 0
+                ? 'Recent executions pulled from MUTX.'
+                : 'An agent exists, but no run has landed yet.',
             'Sign in to read live run history.',
           )}
         />
@@ -382,7 +385,11 @@ export function PicoAutopilotPageClient() {
           label="Alerts"
           value={liveValue(String(alerts.filter((alert) => !alert.resolved).length))}
           hint={liveHint(
-            alerts.some((alert) => !alert.resolved) ? 'Unresolved operator pain from the monitoring feed.' : 'No unresolved alerts right now.',
+            alerts.some((alert) => !alert.resolved)
+              ? 'Unresolved operator pain from the monitoring feed.'
+              : integrationStatus.hasRuns
+                ? 'No unresolved alerts right now.'
+                : 'No alerts yet because nothing has executed.',
             'Sign in to read live alerts.',
           )}
         />
@@ -390,7 +397,11 @@ export function PicoAutopilotPageClient() {
           label="Budget"
           value={liveValue(budget ? formatPercent(budget.usage_percentage) : '--')}
           hint={liveHint(
-            budget ? `${formatPercent(progress.autopilot.costThresholdPercent)} threshold against live spend.` : 'No live budget snapshot returned yet.',
+            !integrationStatus.hasBudget
+              ? 'No live budget snapshot returned yet.'
+              : integrationStatus.hasUsage
+                ? `${formatPercent(progress.autopilot.costThresholdPercent)} threshold against live spend.`
+                : 'Budget exists, but usage is empty in the current window.',
             'Sign in to read budget usage.',
           )}
         />
@@ -398,7 +409,11 @@ export function PicoAutopilotPageClient() {
           label="Approvals"
           value={liveValue(String(pendingApprovals.length))}
           hint={liveHint(
-            pendingApprovals.length > 0 ? 'Pending risky actions are waiting for a human call.' : 'No risky actions are blocked right now.',
+            pendingApprovals.length > 0
+              ? 'Pending risky actions are waiting for a human call.'
+              : integrationStatus.hasApprovalRecords && !integrationStatus.approvalGateConfigured
+                ? 'Approval history exists, but Pico gate is still off locally.'
+                : 'No risky actions are blocked right now.',
             'Sign in to see live approvals.',
           )}
         />
@@ -422,9 +437,7 @@ export function PicoAutopilotPageClient() {
                   No timeline without live control-plane access. That is the honest answer.
                 </div>
               ) : timeline.length === 0 ? (
-                <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
-                  No activity is visible yet. Either nothing ran or the control plane has not recorded signals for this account.
-                </div>
+                <EmptyStatePanel state={runEmptyState} />
               ) : (
                 timeline.map((item) => <TimelineItemCard key={item.id} item={item} />)
               )}
@@ -454,9 +467,7 @@ export function PicoAutopilotPageClient() {
                   Sign in, then come back here to inspect the first real run.
                 </div>
               ) : runs.length === 0 ? (
-                <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
-                  No runs returned from MUTX yet. Finish the next lesson, trigger a real run, then use this page to inspect it.
-                </div>
+                <EmptyStatePanel state={runEmptyState} />
               ) : (
                 runs.map((run) => {
                   const severity = getRunSeverity(run.status)
@@ -593,7 +604,7 @@ export function PicoAutopilotPageClient() {
                       </div>
                     ))
                   ) : (
-                    <p>No agent-level usage was returned for the last 30 days.</p>
+                    <EmptyStatePanel state={usageEmptyState} />
                   )}
                 </div>
               </div>
@@ -610,7 +621,7 @@ export function PicoAutopilotPageClient() {
                       </div>
                     ))
                   ) : (
-                    <p>No usage event breakdown was returned for the last 30 days.</p>
+                    <EmptyStatePanel state={usageEmptyState} />
                   )}
                 </div>
               </div>
@@ -633,9 +644,7 @@ export function PicoAutopilotPageClient() {
                   Sign in to load live alerts.
                 </div>
               ) : alerts.length === 0 ? (
-                <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
-                  No alerts returned from MUTX right now.
-                </div>
+                <EmptyStatePanel state={alertsEmptyState} />
               ) : (
                 alerts.map((alert) => (
                   <article key={alert.id} className={`rounded-[24px] border p-5 ${severityClasses(alert.resolved ? 'good' : 'critical')}`}>
@@ -677,11 +686,14 @@ export function PicoAutopilotPageClient() {
                   Sign in to load live approval requests.
                 </div>
               ) : pendingApprovals.length === 0 && resolvedApprovals.length === 0 ? (
-                <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
-                  No approval records are stored for this account yet.
-                </div>
+                <EmptyStatePanel state={approvalsEmptyState} />
               ) : (
                 <>
+                  {integrationStatus.hasApprovalRecords && !integrationStatus.approvalGateConfigured ? (
+                    <div className="rounded-[24px] border border-amber-400/20 bg-amber-400/10 p-5 text-sm leading-6 text-amber-50">
+                      Approval records already exist in MUTX, but Pico still shows the gate as off locally. Turn on the gate here so the product state matches the control-plane reality.
+                    </div>
+                  ) : null}
                   {pendingApprovals.map((approval) => (
                     <article key={approval.id} className={`rounded-[24px] border p-5 ${severityClasses('warn')}`}>
                       <div className="flex flex-wrap items-center justify-between gap-3">
