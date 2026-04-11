@@ -21,7 +21,7 @@ from mutx.agent_runtime import (
 from mutx.agents import Agents
 from mutx.analytics import Analytics
 from mutx.api_keys import APIKeys
-from mutx.approvals import Approvals
+from mutx.approvals import Approvals as Approvals
 from mutx.assistant import Assistant
 from mutx.budgets import Budgets
 from mutx.clawhub import ClawHub
