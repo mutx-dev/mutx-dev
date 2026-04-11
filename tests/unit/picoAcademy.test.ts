@@ -27,11 +27,13 @@ describe('pico academy progress', () => {
   })
 
   it('prefers the selected track when choosing the next lesson', () => {
-    const base = createDefaultPicoProgress()
-    const selected = selectTrack(base, 'controlled-agent')
+    let progress = createDefaultPicoProgress()
+    progress = applyLessonCompleted(progress, 'install-hermes-locally')
+    progress = applyLessonCompleted(progress, 'run-your-first-agent')
+    const selected = selectTrack(progress, 'deployed-agent')
     const derived = derivePicoProgress(selected)
 
-    expect(derived.nextLesson?.slug).toBe('see-your-agent-activity')
+    expect(derived.nextLesson?.slug).toBe('deploy-hermes-on-a-vps')
   })
 
   it('keeps local progress when remote auth state is still empty', () => {

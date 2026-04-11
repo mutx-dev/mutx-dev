@@ -3,6 +3,7 @@
 ## Current product truth
 
 PicoMUTX now has one canonical product system.
+This file is the authoritative reconciliation log for that order.
 
 Canonical product surface:
 - `app/pico/*`
