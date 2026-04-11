@@ -1812,10 +1812,7 @@ export interface paths {
         put?: never;
         /**
          * Similarity Search
-         * @description Simple similarity search endpoint.
-         *
-         *     Note: Full implementation requires pgvector and a document store.
-         *     This is a placeholder that demonstrates the API contract.
+         * @description Run similarity search against the configured default collection.
          */
         post: operations["similarity_search_v1_rag_search_post"];
         delete?: never;
@@ -1855,10 +1852,7 @@ export interface paths {
         put?: never;
         /**
          * Ingest Documents
-         * @description Ingest documents into the vector store for later retrieval via /search.
-         *
-         *     Documents are chunked, embedded, and stored in the configured PostgreSQL
-         *     vector store. Requires OPENAI_API_KEY and DATABASE_URL (PostgreSQL).
+         * @description Ingest documents into the named vector-store collection.
          */
         post: operations["ingest_documents_v1_rag_ingest_post"];
         delete?: never;

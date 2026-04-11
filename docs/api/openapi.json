@@ -7364,7 +7364,7 @@
           "rag"
         ],
         "summary": "Similarity Search",
-        "description": "Simple similarity search endpoint.\n\nNote: Full implementation requires pgvector and a document store.\nThis is a placeholder that demonstrates the API contract.",
+        "description": "Run similarity search against the configured default collection.",
         "operationId": "similarity_search_v1_rag_search_post",
         "parameters": [
           {
@@ -7476,7 +7476,7 @@
           "rag"
         ],
         "summary": "Ingest Documents",
-        "description": "Ingest documents into the vector store for later retrieval via /search.\n\nDocuments are chunked, embedded, and stored in the configured PostgreSQL\nvector store. Requires OPENAI_API_KEY and DATABASE_URL (PostgreSQL).",
+        "description": "Ingest documents into the named vector-store collection.",
         "operationId": "ingest_documents_v1_rag_ingest_post",
         "parameters": [
           {

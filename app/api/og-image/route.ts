@@ -31,6 +31,13 @@ const IMAGE_CACHE_MAX_ENTRIES = 200;
 const imageCache = new Map<string, { png: Uint8Array; expiresAt: number }>();
 const inflightImageRenders = new Map<string, Promise<Uint8Array>>();
 
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  return bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  ) as ArrayBuffer;
+}
+
 async function loadFont(weight: "regular" | "bold" = "regular"): Promise<ArrayBuffer> {
   if (weight === "bold" && geistBold) return geistBold;
   if (weight === "regular" && geistRegular) return geistRegular;
@@ -350,7 +357,7 @@ export async function GET(request: NextRequest) {
 
   const cachedPng = getCachedImage(cacheKey);
   if (cachedPng) {
-    return new NextResponse(cachedPng, {
+    return new NextResponse(toArrayBuffer(cachedPng), {
       status: 200,
       headers: {
         "Content-Type": "image/png",
@@ -423,7 +430,7 @@ export async function GET(request: NextRequest) {
     inflightImageRenders.delete(cacheKey);
 
     // 3. Return PNG with cache headers
-    return new NextResponse(png, {
+    return new NextResponse(toArrayBuffer(png), {
       status: 200,
       headers: {
         "Content-Type": "image/png",
