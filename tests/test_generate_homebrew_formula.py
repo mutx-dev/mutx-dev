@@ -107,7 +107,8 @@ name = "mutx-cli"
 version = "{CURRENT_CLI_VERSION}"
 description = "CLI for mutx.dev"
 license = "BUSL-1.1"
-""".strip() + "\n",
+""".strip()
+        + "\n",
         encoding="utf-8",
     )
 
