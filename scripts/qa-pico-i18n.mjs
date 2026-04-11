@@ -8,7 +8,6 @@ const picoKey = 'pico'
 const arabicPattern = /\p{Script=Arabic}/u
 const latinPattern = /[A-Za-z]/
 const hanPattern = /\p{Script=Han}/u
-const strictLocales = new Set(['es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh', 'ar'])
 const exactEnglishLocales = new Set(['ko', 'zh', 'ar'])
 
 function readJson(filePath) {

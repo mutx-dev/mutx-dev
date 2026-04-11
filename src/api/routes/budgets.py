@@ -55,7 +55,7 @@ class UsageBreakdownResponse(BaseModel):
     usage_by_type: list[UsageByType]
 
 
-def _parse_datetime(dt_str):
+def _parse_datetime(dt_str: Optional[str]) -> Optional[datetime]:
     if not dt_str:
         return None
     try:
@@ -188,7 +188,7 @@ async def get_usage_breakdown(
     for event in events:
         event_type = event.event_type or "unknown"
         if event_type not in type_usage:
-            type_usage[event_type] = {"credits": 0, "count": 0}
+            type_usage[event_type] = {"credits": 0.0, "count": 0}
         type_usage[event_type]["credits"] += event.credits_used or 0
         type_usage[event_type]["count"] += 1
 
@@ -201,9 +201,7 @@ async def get_usage_breakdown(
         for event_type, data in type_usage.items()
     ]
 
-    total_credits = sum(data["credits"] for data in agent_usage.values())
-    if total_credits == 0:
-        total_credits = sum((event.credits_used or 0) for event in events)
+    total_credits = sum((event.credits_used or 0) for event in events)
 
     credits_total = get_plan_credits(current_user.plan)
 
