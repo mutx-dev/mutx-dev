@@ -296,6 +296,36 @@ describe('dashboard route proxies', () => {
     expect(response.status).toBe(204)
   })
 
+  it('forwards starter-template deploy bodies to the backend', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ agent: { id: 'agent_123' }, deployment: { id: 'dep_123' } }), {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    )
+    const { POST } = await import('../../app/api/dashboard/templates/[templateId]/deploy/route')
+
+    const request = {
+      json: async () => ({ name: 'Pico Starter Assistant', workspace: 'pico-starter' }),
+    } as NextRequest
+    const response = await POST(request, {
+      params: Promise.resolve({ templateId: 'personal_assistant' }),
+    })
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/templates/personal_assistant/deploy',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: 'Pico Starter Assistant', workspace: 'pico-starter' }),
+        fallbackMessage: 'Failed to deploy starter template',
+      }
+    )
+    expect(response.status).toBe(201)
+  })
 
   it('preserves upstream unauthorized responses for auth me proxy', async () => {
     hasAuthSession.mockReturnValue(true)
