@@ -16,64 +16,35 @@ const CSRF_FAILURE_DETAIL = 'CSRF validation failed: origin is not allowed'
 const APP_HOST = 'app.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
-const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.localhost'])
+const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.mutxx.dev', 'pico.localhost'])
 const PICO_LOCALES = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh', 'ar'] as const
-const PICO_COUNTRY_TO_LOCALE: Record<string, (typeof PICO_LOCALES)[number]> = {
-  US: 'en',
-  GB: 'en',
-  AU: 'en',
-  NZ: 'en',
-  IE: 'en',
-  CA: 'en',
-  ES: 'es',
-  MX: 'es',
-  AR: 'es',
-  CO: 'es',
-  CL: 'es',
-  PE: 'es',
-  VE: 'es',
-  UY: 'es',
-  PY: 'es',
-  BO: 'es',
-  EC: 'es',
-  CR: 'es',
-  PA: 'es',
-  GT: 'es',
-  HN: 'es',
-  SV: 'es',
-  NI: 'es',
-  DO: 'es',
-  PR: 'es',
-  FR: 'fr',
-  BE: 'fr',
-  LU: 'fr',
-  CH: 'fr',
-  DE: 'de',
-  AT: 'de',
-  IT: 'it',
-  PT: 'pt',
-  BR: 'pt',
+const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, (typeof PICO_LOCALES)[number]>> = {
   JP: 'ja',
   KR: 'ko',
   CN: 'zh',
   HK: 'zh',
   TW: 'zh',
   MO: 'zh',
+  IT: 'it',
+  PT: 'pt',
+  BR: 'pt',
+  ES: 'es',
+  MX: 'es',
+  AR: 'es',
+  CO: 'es',
+  CL: 'es',
+  FR: 'fr',
+  BE: 'fr',
+  LU: 'fr',
+  DE: 'de',
+  AT: 'de',
   SA: 'ar',
   AE: 'ar',
   EG: 'ar',
-  QA: 'ar',
-  KW: 'ar',
-  BH: 'ar',
-  OM: 'ar',
-  JO: 'ar',
-  MA: 'ar',
-  DZ: 'ar',
-  TN: 'ar',
-  IQ: 'ar',
-  LB: 'ar',
-  SY: 'ar',
-  YE: 'ar',
+  US: 'en',
+  GB: 'en',
+  AU: 'en',
+  CA: 'en',
 }
 const UI_CACHE_CONTROL = 'private, no-cache, no-store, max-age=0, must-revalidate'
 const API_CACHE_CONTROL = 'no-store'
@@ -123,7 +94,7 @@ function getLocaleFromRequest(request: NextRequest): string {
   const cfCountry = request.headers.get('CF-IPCountry') ||
                     request.headers.get('X-Vercel-IP-Country')
   if (cfCountry) {
-    const localeFromCountry = PICO_COUNTRY_TO_LOCALE[cfCountry.toUpperCase()]
+    const localeFromCountry = PICO_LOCALE_BY_COUNTRY[cfCountry.toUpperCase()]
     if (localeFromCountry) {
       return localeFromCountry
     }
