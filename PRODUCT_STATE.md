@@ -241,3 +241,21 @@ What failed
 What is next
 - Tighten the run payload itself so successful runs can surface richer output summaries, not just status.
 - Keep translating each new milestone into one sharper capability unlock instead of gamification theater.
+
+### 2026-04-11 03:41:00 CEST — run-detail enrichment
+What changed
+- Pico Autopilot now pulls per-run detail for the most recent runs instead of relying only on the flat list payload.
+- Live run cards now show richer result summaries, the latest trace signal, duration when known, and a trace-backed next improvement move.
+- Failed runs now deep-link into the grounded tutor with the failure context already packed into the question.
+
+What was tested
+- `PATH=/opt/homebrew/bin:$PATH npm run typecheck`
+- `PATH=/opt/homebrew/bin:$PATH npx jest --runInBand tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `PATH=/opt/homebrew/bin:$PATH npm run build`
+
+What failed
+- No Pico-specific blocker failed.
+- Existing Next/Turbopack workspace-root and NFT warnings remain environment noise.
+
+What is next
+- If the backend starts storing stronger run metadata, feed that straight into the same result -> improve loop.

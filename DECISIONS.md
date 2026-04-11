@@ -48,6 +48,11 @@ Why:
 - English-first truth is better than multilingual nonsense.
 
 ## 2026-04-11 03:29:00 CEST
+
+Decision: Pico Autopilot should read run detail for recent executions and turn that result into the next improvement move.
+Why:
+- A status badge is not enough to make the loop habit-forming.
+- Users need the actual result signal and the next concrete move in the same place.
 Decision: Pico milestones must unlock the next capability, and live runs must always point at one concrete improvement move.
 Why:
 - The product loop dies when lessons end in celebration screens instead of action.

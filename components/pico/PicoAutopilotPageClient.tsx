@@ -17,6 +17,19 @@ type RunSummary = {
   agent_id?: string
   error_message?: string | null
   output_text?: string | null
+  metadata?: Record<string, unknown>
+}
+
+type RunTraceSummary = {
+  id: string
+  event_type: string
+  message: string
+  timestamp?: string
+  sequence?: number
+}
+
+type RunDetailSummary = RunSummary & {
+  traces?: RunTraceSummary[]
 }
 
 type BudgetSummary = {
@@ -89,24 +102,67 @@ function humanizeRunStatus(status: string) {
   return status.replace(/[_-]+/g, ' ').toLowerCase().replace(/\w/g, (char) => char.toUpperCase())
 }
 
-function describeRunResult(run: RunSummary) {
-  if (run.error_message?.trim()) return run.error_message
-  if (run.output_text?.trim()) return run.output_text
-  if (['FAILED', 'ERROR', 'CANCELLED'].includes(run.status.toUpperCase())) {
-    return 'This run ended badly. Open the failure path and make one deliberate fix.'
-  }
-  if (['RUNNING', 'QUEUED', 'PENDING'].includes(run.status.toUpperCase())) {
-    return 'The run is still moving. Read the live state before you touch config.'
-  }
-  return 'The run completed. Verify the output was useful, not just technically done.'
+function compactText(value?: string | null, limit = 180) {
+  if (!value) return null
+  const compact = value.replace(/\s+/g, ' ').trim()
+  if (!compact) return null
+  return compact.length <= limit ? compact : `${compact.slice(0, limit - 1)}...`
 }
 
-function getRunImprovement(run: RunSummary, completedLessons: string[]) {
+function getLatestTrace(detail?: RunDetailSummary | null) {
+  const traces = detail?.traces ?? []
+  return [...traces]
+    .filter((trace) => trace.message?.trim())
+    .sort((left, right) => {
+      const leftTime = new Date(left.timestamp ?? 0).getTime()
+      const rightTime = new Date(right.timestamp ?? 0).getTime()
+      if (leftTime !== rightTime) return rightTime - leftTime
+      return (right.sequence ?? 0) - (left.sequence ?? 0)
+    })[0] ?? null
+}
+
+function describeRunResult(run: RunSummary, detail?: RunDetailSummary | null) {
+  const current = detail ?? run
+  const latestTrace = getLatestTrace(detail)
+
+  return (
+    compactText(current.error_message) ??
+    compactText(current.output_text) ??
+    compactText(latestTrace?.message) ??
+    (['FAILED', 'ERROR', 'CANCELLED'].includes(current.status.toUpperCase())
+      ? 'This run ended badly. Open the failure path and make one deliberate fix.'
+      : ['RUNNING', 'QUEUED', 'PENDING'].includes(current.status.toUpperCase())
+        ? 'The run is still moving. Read the live state before you touch config.'
+        : 'The run completed. Verify the output was useful, not just technically done.')
+  )
+}
+
+function formatRunDuration(run: RunSummary, detail?: RunDetailSummary | null) {
+  const current = detail ?? run
+  const startedAt = current.started_at ?? current.created_at
+  const completedAt = current.completed_at
+  if (!startedAt || !completedAt) return null
+  const deltaMs = new Date(completedAt).getTime() - new Date(startedAt).getTime()
+  if (!Number.isFinite(deltaMs) || deltaMs <= 0) return null
+  const seconds = Math.round(deltaMs / 1000)
+  if (seconds < 60) return `${seconds}s`
+  const minutes = Math.floor(seconds / 60)
+  const remainder = seconds % 60
+  return remainder === 0 ? `${minutes}m` : `${minutes}m ${remainder}s`
+}
+
+function describeLatestSignal(detail?: RunDetailSummary | null) {
+  const latestTrace = getLatestTrace(detail)
+  if (!latestTrace) return 'No trace signals returned for this run yet.'
+  return `${latestTrace.event_type}: ${compactText(latestTrace.message, 140) ?? latestTrace.message}`
+}
+
+function getRunImprovement(run: RunSummary, detail: RunDetailSummary | null | undefined, completedLessons: string[]) {
   const status = run.status.toUpperCase()
 
   if (['FAILED', 'ERROR', 'CANCELLED'].includes(status)) {
     const params = new URLSearchParams({
-      q: `Latest run ${run.id} failed. Status: ${run.status}. Result: ${describeRunResult(run)}. What should I do next?`,
+      q: `Latest run ${run.id} failed. Status: ${run.status}. Result: ${describeRunResult(run, detail)}. Latest signal: ${describeLatestSignal(detail)}. What should I do next?`,
     })
     return {
       title: 'Turn the failure into the next fix',
@@ -156,6 +212,7 @@ export function PicoAutopilotPageClient() {
   const { progress, actions } = usePicoProgress()
   const toHref = usePicoHref()
   const [runs, setRuns] = useState<RunSummary[]>([])
+  const [runDetails, setRunDetails] = useState<Record<string, RunDetailSummary>>({})
   const [budget, setBudget] = useState<BudgetSummary | null>(null)
   const [alerts, setAlerts] = useState<AlertSummary[]>([])
   const [approvals, setApprovals] = useState<ApprovalSummary[]>([])
@@ -181,6 +238,7 @@ export function PicoAutopilotPageClient() {
       if ([runsResponse, budgetResponse, alertsResponse, approvalsResponse].some((response) => response.status === 401)) {
         setAuthRequired(true)
         setRuns([])
+        setRunDetails({})
         setBudget(null)
         setAlerts([])
         setApprovals([])
@@ -196,16 +254,35 @@ export function PicoAutopilotPageClient() {
       const budgetPayload = budgetResponse.ok ? await budgetResponse.json() : null
       const alertsPayload = alertsResponse.ok ? await alertsResponse.json() : { items: [] }
       const approvalsPayload = approvalsResponse.ok ? await approvalsResponse.json() : []
+      const nextRuns = Array.isArray(runsPayload?.items) ? runsPayload.items : Array.isArray(runsPayload) ? runsPayload : []
 
-      setRuns(Array.isArray(runsPayload?.items) ? runsPayload.items : Array.isArray(runsPayload) ? runsPayload : [])
+      setRuns(nextRuns)
       setBudget(budgetPayload)
       setAlerts(Array.isArray(alertsPayload?.items) ? alertsPayload.items : [])
       setApprovals(Array.isArray(approvalsPayload) ? approvalsPayload : [])
       setAuthRequired(false)
-      if (Array.isArray(runsPayload?.items) && runsPayload.items.length > 0) {
+
+      const detailEntries = await Promise.all(
+        nextRuns.slice(0, 3).map(async (run: RunSummary) => {
+          try {
+            const response = await fetch(`/api/dashboard/runs/${encodeURIComponent(run.id)}`, {
+              credentials: 'include',
+              cache: 'no-store',
+            })
+            if (!response.ok) return null
+            const payload = (await readJsonSafely(response)) as RunDetailSummary | null
+            if (!payload || typeof payload !== 'object' || !('id' in payload)) return null
+            return [run.id, payload] as const
+          } catch {
+            return null
+          }
+        })
+      )
+      setRunDetails(Object.fromEntries(detailEntries.filter(Boolean) as Array<readonly [string, RunDetailSummary]>))
+      if (nextRuns.length > 0) {
         actions.unlockMilestone('first_agent_run')
       }
-      if ((Array.isArray(runsPayload?.items) && runsPayload.items.length > 0) || (Array.isArray(alertsPayload?.items) && alertsPayload.items.length > 0)) {
+      if (nextRuns.length > 0 || (Array.isArray(alertsPayload?.items) && alertsPayload.items.length > 0)) {
         actions.unlockMilestone('first_monitoring_event_seen')
       }
     } catch (loadError) {
@@ -521,10 +598,12 @@ export function PicoAutopilotPageClient() {
             ) : (
               <div className="mt-4 space-y-3">
                 {runs.slice(0, 3).map((run) => {
-                  const improvement = getRunImprovement(run, progress.completedLessons)
+                  const detail = runDetails[run.id]
+                  const improvement = getRunImprovement(run, detail, progress.completedLessons)
                   const improvementHref = improvement.href.startsWith('/dashboard')
                     ? improvement.href
                     : toHref(improvement.href)
+                  const duration = formatRunDuration(run, detail)
                   return (
                     <div key={run.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
                       <div className="flex items-start justify-between gap-3">
@@ -539,7 +618,9 @@ export function PicoAutopilotPageClient() {
                       <div className="mt-3 grid gap-3 md:grid-cols-2">
                         <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
                           <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Result</p>
-                          <p className="mt-2">{describeRunResult(run)}</p>
+                          <p className="mt-2">{describeRunResult(run, detail)}</p>
+                          <p className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-500">Latest signal</p>
+                          <p className="mt-2">{describeLatestSignal(detail)}</p>
                         </div>
                         <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4 text-emerald-50">
                           <p className="text-xs uppercase tracking-[0.18em] text-emerald-100">Improve next</p>
@@ -549,9 +630,12 @@ export function PicoAutopilotPageClient() {
                           </Link>
                         </div>
                       </div>
-                      <p className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-500">
-                        Started: {run.started_at ?? run.created_at ?? 'n/a'}
-                      </p>
+                      <div className="mt-3 flex flex-wrap gap-4 text-xs uppercase tracking-[0.18em] text-slate-500">
+                        <span>Started: {run.started_at ?? run.created_at ?? 'n/a'}</span>
+                        <span>Agent: {run.agent_id ?? 'unknown'}</span>
+                        <span>Duration: {duration ?? 'n/a'}</span>
+                        <span>Traces: {detail?.traces?.length ?? 0}</span>
+                      </div>
                     </div>
                   )
                 })}
