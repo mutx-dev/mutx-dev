@@ -51,27 +51,33 @@ export function PicoLangSwitcher() {
   }, [])
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', display: 'inline-block' }}>
+    <div ref={containerRef} style={{ position: 'relative', display: 'inline-flex' }}>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
         style={{
-          borderRadius: '8px',
+          minHeight: '2.2rem',
+          padding: '0 0.85rem',
+          borderRadius: '999px',
           background: 'rgba(255,255,255,0.05)',
           border: '1px solid rgba(255,255,255,0.08)',
           cursor: 'pointer',
-          padding: '6px 10px',
-          fontSize: '0.9rem',
-          display: 'flex',
+          fontSize: '0.82rem',
+          fontWeight: 600,
+          lineHeight: 1,
+          display: 'inline-flex',
           alignItems: 'center',
-          gap: '4px',
-          color: 'inherit',
+          justifyContent: 'center',
+          gap: '0.35rem',
+          color: 'rgba(238,240,246,0.92)',
+          boxSizing: 'border-box',
+          transition: 'transform 160ms ease, background 160ms ease, border-color 160ms ease',
         }}
       >
         <span aria-hidden="true">{current.flag}</span>
-        <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>▾</span>
+        <span style={{ fontSize: '0.68rem', opacity: 0.6 }}>▾</span>
       </button>
 
       {open && (

@@ -88,10 +88,12 @@ export function PicoLandingPage() {
               <span className={s.navTag}>{t('nav.brandTag')}</span>
             </span>
           </Link>
-          <PicoLangSwitcher />
-          <button className={s.navCta} onClick={() => openForm()} type="button">
-            {t('nav.cta')}
-          </button>
+          <div className={s.navActions}>
+            <PicoLangSwitcher />
+            <button className={s.navCta} onClick={() => openForm()} type="button">
+              {t('nav.cta')}
+            </button>
+          </div>
         </div>
       </nav>
 
