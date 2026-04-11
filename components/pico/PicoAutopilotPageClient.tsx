@@ -70,6 +70,24 @@ async function readJsonSafely(response: Response) {
   return response.json().catch(() => null)
 }
 
+export function isUnauthorizedPayload(payload: unknown) {
+  if (!payload || typeof payload !== 'object') {
+    return false
+  }
+
+  const candidate = payload as {
+    status?: unknown
+    error?: unknown
+  }
+
+  if (candidate.status !== 'error' || !candidate.error || typeof candidate.error !== 'object') {
+    return false
+  }
+
+  const error = candidate.error as { code?: unknown }
+  return error.code === 'UNAUTHORIZED'
+}
+
 function severityClasses(severity: AutopilotTimelineItem['severity']) {
   switch (severity) {
     case 'critical':

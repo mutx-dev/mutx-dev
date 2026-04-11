@@ -435,5 +435,9 @@ export function buildAutopilotTimeline(input: {
     })
   })
 
-  return timeline.sort((left, right) => new Date(right.occurredAt).getTime() - new Date(left.occurredAt).getTime())
+  return timeline.sort((left, right) => {
+    const rightTime = toDate(right.occurredAt)?.getTime() ?? 0
+    const leftTime = toDate(left.occurredAt)?.getTime() ?? 0
+    return rightTime - leftTime
+  })
 }

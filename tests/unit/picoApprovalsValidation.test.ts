@@ -76,7 +76,7 @@ describe('pico approvals validation', () => {
       expect(result.success).toBe(false)
       if (!result.success) {
         expect(result.response.status).toBe(400)
-        return expect(result.response.json()).resolves.toEqual({
+        void expect(result.response.json()).resolves.toEqual({
           status: 'error',
           error: {
             code: 'BAD_REQUEST',
