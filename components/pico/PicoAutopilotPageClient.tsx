@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
+import { PicoProgressPulse } from '@/components/pico/PicoProgressPulse'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_PLAN_MATRIX } from '@/lib/pico/academy'
@@ -82,7 +83,7 @@ function formatPercent(value: number) {
 }
 
 export function PicoAutopilotPageClient() {
-  const { progress, actions } = usePicoProgress()
+  const { progress, actions, momentum, streak, feedback } = usePicoProgress()
   const [runs, setRuns] = useState<RunSummary[]>([])
   const [budget, setBudget] = useState<BudgetSummary | null>(null)
   const [alerts, setAlerts] = useState<AlertSummary[]>([])
@@ -282,6 +283,8 @@ export function PicoAutopilotPageClient() {
         </div>
       }
     >
+      <PicoProgressPulse momentum={momentum} streak={streak} feedback={feedback} onDismissFeedback={actions.dismissFeedback} />
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-[24px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-5 text-sm text-slate-300 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
           <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Runs</p>

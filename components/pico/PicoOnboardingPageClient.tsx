@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 
+import { PicoProgressPulse } from '@/components/pico/PicoProgressPulse'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_TRACKS } from '@/lib/pico/academy'
@@ -16,7 +17,7 @@ const checklist = [
 ]
 
 export function PicoOnboardingPageClient() {
-  const { progress, derived, actions } = usePicoProgress()
+  const { progress, derived, actions, momentum, streak, feedback } = usePicoProgress()
   const toHref = usePicoHref()
 
   useEffect(() => {
@@ -36,6 +37,8 @@ export function PicoOnboardingPageClient() {
         </Link>
       }
     >
+      <PicoProgressPulse momentum={momentum} streak={streak} feedback={feedback} onDismissFeedback={actions.dismissFeedback} />
+
       <section className="grid gap-6 lg:grid-cols-[0.9fr,1.1fr]">
         <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
           <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Checklist</p>

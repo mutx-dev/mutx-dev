@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
+import { PicoProgressPulse } from '@/components/pico/PicoProgressPulse'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_RELEASE_NOTES, PICO_SHOWCASE_PATTERNS, getLessonBySlug } from '@/lib/pico/academy'
@@ -10,7 +11,7 @@ import { usePicoHref } from '@/lib/pico/navigation'
 import { PicoContactForm } from '@/components/pico/PicoContactForm'
 
 export function PicoSupportPageClient() {
-  const { actions } = usePicoProgress()
+  const { actions, momentum, streak, feedback } = usePicoProgress()
   const toHref = usePicoHref()
   const [formOpen, setFormOpen] = useState(false)
   const [interest, setInterest] = useState<string | undefined>()
@@ -48,6 +49,8 @@ export function PicoSupportPageClient() {
           </div>
         }
       >
+        <PicoProgressPulse momentum={momentum} streak={streak} feedback={feedback} onDismissFeedback={actions.dismissFeedback} />
+
         <section className="grid gap-6 lg:grid-cols-[0.9fr,1.1fr]">
           <div className="space-y-6">
             <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">

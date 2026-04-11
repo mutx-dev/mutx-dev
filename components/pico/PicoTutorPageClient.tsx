@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState } from 'react'
 import Link from 'next/link'
 
+import { PicoProgressPulse } from '@/components/pico/PicoProgressPulse'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_LESSONS } from '@/lib/pico/academy'
@@ -45,7 +46,7 @@ function resolveTutorHref(toHref: ReturnType<typeof usePicoHref>, href: string) 
 }
 
 export function PicoTutorPageClient() {
-  const { progress, actions } = usePicoProgress()
+  const { progress, actions, momentum, streak, feedback } = usePicoProgress()
   const toHref = usePicoHref()
   const [question, setQuestion] = useState('')
   const [lessonSlug, setLessonSlug] = useState(progress.selectedTrack ? PICO_LESSONS.find((lesson) => lesson.track === progress.selectedTrack)?.slug ?? '' : '')
@@ -110,6 +111,8 @@ export function PicoTutorPageClient() {
         </Link>
       }
     >
+      <PicoProgressPulse momentum={momentum} streak={streak} feedback={feedback} onDismissFeedback={actions.dismissFeedback} />
+
       <section className="grid gap-6 lg:grid-cols-[1fr,0.9fr]">
         <form onSubmit={submit} className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
           <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Question</p>

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+import { PicoProgressPulse } from '@/components/pico/PicoProgressPulse'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_LEVELS, PICO_TRACKS, getLessonBySlug } from '@/lib/pico/academy'
@@ -20,7 +21,7 @@ function ProgressCard({ label, value, hint }: { label: string; value: string; hi
 
 export function PicoAcademyDashboard() {
   const router = useRouter()
-  const { progress, derived, syncState, ready, actions } = usePicoProgress()
+  const { progress, derived, syncState, ready, actions, momentum, streak, feedback } = usePicoProgress()
   const toHref = usePicoHref()
   const nextLesson = derived.nextLesson
 
@@ -49,6 +50,8 @@ export function PicoAcademyDashboard() {
         ) : null
       }
     >
+      <PicoProgressPulse momentum={momentum} streak={streak} feedback={feedback} onDismissFeedback={actions.dismissFeedback} />
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <ProgressCard
           label="XP"
