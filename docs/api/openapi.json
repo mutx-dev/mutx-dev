@@ -8502,6 +8502,114 @@
         }
       }
     },
+    "/v1/pico/progress": {
+      "get": {
+        "tags": [
+          "pico"
+        ],
+        "summary": "Pico Progress",
+        "operationId": "pico_progress_v1_pico_progress_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Pico Progress V1 Pico Progress Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "pico"
+        ],
+        "summary": "Pico Progress Update",
+        "operationId": "pico_progress_update_v1_pico_progress_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PicoProgressPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Pico Progress Update V1 Pico Progress Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/runtime/providers/{provider}": {
       "get": {
         "tags": [
@@ -10802,7 +10910,7 @@
           "approvals"
         ],
         "summary": "Create Approval",
-        "description": "Submit a new approval request.\n\nThe requesting user's email is recorded as the ``requester``.",
+        "description": "Submit a new approval request.\n\nStored in the existing user_settings table so approvals survive process restarts.",
         "operationId": "create_approval_v1_approvals_post",
         "parameters": [
           {
@@ -11005,7 +11113,7 @@
           "approvals"
         ],
         "summary": "Approve Request",
-        "description": "Approve a pending request.\n\nRequires DEVELOPER or ADMIN role (enforced when RBAC is active).",
+        "description": "Approve a pending request.\n\nRequires DEVELOPER or ADMIN role unless the requester is approving their own request.",
         "operationId": "approve_request_v1_approvals__request_id__approve_post",
         "parameters": [
           {
@@ -11074,7 +11182,7 @@
           "approvals"
         ],
         "summary": "Reject Request",
-        "description": "Reject a pending request.\n\nRequires DEVELOPER or ADMIN role (enforced when RBAC is active).",
+        "description": "Reject a pending request.\n\nRequires DEVELOPER or ADMIN role unless the requester is rejecting their own request.",
         "operationId": "reject_request_v1_approvals__request_id__reject_post",
         "parameters": [
           {
@@ -17861,6 +17969,11 @@
         "additionalProperties": false,
         "type": "object",
         "title": "OpenClawWakeupConfig"
+      },
+      "PicoProgressPayload": {
+        "properties": {},
+        "type": "object",
+        "title": "PicoProgressPayload"
       },
       "Policy": {
         "properties": {
