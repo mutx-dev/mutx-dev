@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { getLessonBySlug, type PicoLesson } from '@/lib/pico/academy'
+import { usePicoHref } from '@/lib/pico/navigation'
 
 type PicoLessonDetailProps = {
   lesson: PicoLesson
@@ -12,6 +13,7 @@ type PicoLessonDetailProps = {
 
 export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
   const { progress, derived, actions } = usePicoProgress()
+  const toHref = usePicoHref()
   const completed = progress.completedLessons.includes(lesson.slug)
   const unlocked = derived.unlockedLessonSlugs.includes(lesson.slug)
   const nextLesson = lesson.nextLesson ? getLessonBySlug(lesson.nextLesson) : null
@@ -93,7 +95,7 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
                   return prerequisiteLesson ? (
                     <Link
                       key={prerequisite}
-                      href={`/academy/${prerequisiteLesson.slug}`}
+                      href={toHref(`/academy/${prerequisiteLesson.slug}`)}
                       className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200"
                     >
                       <span>{prerequisiteLesson.title}</span>
@@ -125,10 +127,10 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
                 <h2 className="mt-2 text-lg font-semibold text-white">{nextLesson.title}</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-300">{nextLesson.summary}</p>
                 <div className="mt-4 flex gap-3">
-                  <Link href={`/academy/${nextLesson.slug}`} className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
+                  <Link href={toHref(`/academy/${nextLesson.slug}`)} className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
                     Open next lesson
                   </Link>
-                  <Link href="/tutor" className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
+                  <Link href={toHref('/tutor')} className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
                     Ask tutor
                   </Link>
                 </div>
@@ -136,7 +138,7 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
             ) : (
               <>
                 <p className="mt-2 text-sm text-slate-300">You are at the end of this branch. Open Autopilot and inspect what the runtime is doing.</p>
-                <Link href="/autopilot" className="mt-4 inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
+                <Link href={toHref('/autopilot')} className="mt-4 inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
                   Open autopilot
                 </Link>
               </>

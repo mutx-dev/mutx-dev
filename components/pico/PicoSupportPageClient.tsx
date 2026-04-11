@@ -6,10 +6,12 @@ import Link from 'next/link'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_RELEASE_NOTES, PICO_SHOWCASE_PATTERNS, getLessonBySlug } from '@/lib/pico/academy'
+import { usePicoHref } from '@/lib/pico/navigation'
 import { PicoContactForm } from '@/components/site/pico/PicoContactForm'
 
 export function PicoSupportPageClient() {
   const { actions } = usePicoProgress()
+  const toHref = usePicoHref()
   const [formOpen, setFormOpen] = useState(false)
   const [interest, setInterest] = useState<string | undefined>()
 
@@ -28,7 +30,7 @@ export function PicoSupportPageClient() {
         description="Use the tutor first. Escalate when the issue is risky, ambiguous, or still broken after the grounded path."
         actions={
           <div className="flex flex-wrap gap-3">
-            <Link href="/tutor" className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950">
+            <Link href={toHref('/tutor')} className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950">
               Ask tutor
             </Link>
             <button
@@ -97,7 +99,7 @@ export function PicoSupportPageClient() {
                     <h2 className="text-lg font-semibold text-white">{pattern.title}</h2>
                     <p className="mt-2 text-sm leading-6 text-slate-300">{pattern.summary}</p>
                     {lesson ? (
-                      <Link href={`/academy/${lesson.slug}`} className="mt-4 inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
+                      <Link href={toHref(`/academy/${lesson.slug}`)} className="mt-4 inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
                         Open {lesson.title}
                       </Link>
                     ) : null}

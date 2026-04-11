@@ -10,6 +10,7 @@ import s from './PicoLanding.module.css'
 import { SiteReveal } from '../SiteReveal'
 import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
+import { usePicoHref } from '@/lib/pico/navigation'
 
 /* ------------------------------------------------------------------ */
 /*  Icon helper                                                        */
@@ -58,6 +59,7 @@ function HowItWorksIcon({ kind }: { kind: string }) {
 
 export function PicoLandingPage() {
   const t = useTranslations('pico')
+  const toHref = usePicoHref()
   const prefersReducedMotion = useReducedMotion()
   const [formOpen, setFormOpen] = useState(false)
   const [formInterest, setFormInterest] = useState<string | undefined>()
@@ -130,7 +132,7 @@ export function PicoLandingPage() {
                   {t('hero.cta')}
                   <ArrowRight className="h-4 w-4" />
                 </button>
-                <Link href="/onboarding" className={s.btnSecondary}>
+                <Link href={toHref('/onboarding')} className={s.btnSecondary}>
                   Start onboarding
                 </Link>
               </div>

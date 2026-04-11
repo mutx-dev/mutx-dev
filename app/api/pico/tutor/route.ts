@@ -7,22 +7,18 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   return withErrorHandling(async () => {
-    const body = await request.json().catch(() => null)
-    const question = typeof body?.question === 'string' ? body.question.trim() : ''
-    const lessonSlug = typeof body?.lessonSlug === 'string' ? body.lessonSlug : null
+    const body = await request.json().catch(() => ({}))
+    const question = typeof body.question === 'string' ? body.question : ''
 
-    if (!question) {
+    if (!question.trim()) {
       return badRequest('Question is required')
     }
 
-    const answer = answerPicoTutorQuestion(question, {
-      lessonSlug,
-      progress: body?.progress,
-    })
-    const reply = answerTutorQuestion(question, body?.progress)
+    const legacyAnswer = answerPicoTutorQuestion(question)
+    const reply = answerTutorQuestion(question, body.progress)
 
     return NextResponse.json({
-      ...answer,
+      ...legacyAnswer,
       reply,
     })
   })(request)

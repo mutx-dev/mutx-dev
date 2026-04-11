@@ -67,6 +67,7 @@ def test_app_factory_mounts_expected_public_routes():
         "/v1/webhooks",
         "/v1/analytics",
         "/v1/onboarding",
+        "/v1/pico",
         "/v1/approvals",
         "/v1/policies",
         "/v1/audit",
