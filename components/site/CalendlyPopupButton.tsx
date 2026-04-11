@@ -6,7 +6,7 @@ import Turnstile, { type BoundTurnstileObject } from "react-turnstile";
 
 import { cn } from "@/lib/utils";
 
-const CALENDLY_URL = "https://calendly.com/defipath";
+const CALENDLY_URL = "https://calendly.com/mutxdev";
 
 type CalendlyPopupButtonProps = {
   children: ReactNode;
