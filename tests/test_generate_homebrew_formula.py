@@ -13,7 +13,6 @@ from scripts.generate_homebrew_formula import (
     validate_release_tag,
 )
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 with (REPO_ROOT / "pyproject.toml").open("rb") as handle:
     CURRENT_CLI_VERSION = str(tomllib.load(handle)["project"]["version"])
@@ -92,6 +91,7 @@ def test_render_formula_uses_tagged_source_and_non_network_smoke_checks() -> Non
     assert f'version "{CURRENT_CLI_VERSION}"' in formula
     assert 'resource "click" do' in formula
     assert 'assert_match "Usage: mutx onboard [OPTIONS]"' in formula
+    assert 'assert_match "Usage: mutx first-agent [OPTIONS] [TASK]..."' in formula
     assert 'assert_match "--install-openclaw"' in formula
     assert 'assert_match "inspect"' in formula
     assert 'system libexec/"bin/python", "-c", "import click, httpx, textual"' in formula
@@ -107,8 +107,7 @@ name = "mutx-cli"
 version = "{CURRENT_CLI_VERSION}"
 description = "CLI for mutx.dev"
 license = "BUSL-1.1"
-""".strip()
-        + "\n",
+""".strip() + "\n",
         encoding="utf-8",
     )
 
