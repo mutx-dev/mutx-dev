@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { POST as captureLeadPost } from '@/app/api/leads/route'
 import { validateData, schemas } from '@/app/api/_lib/validation'
 import { withErrorHandling, badRequest } from '@/app/api/_lib/errors'
 
@@ -138,7 +139,7 @@ async function notifyDiscord(data: {
 export async function POST(request: Request): Promise<NextResponse> {
   return withErrorHandling(async () => {
     const body = await request.json().catch(() => ({}))
-    const { name, company, message, tier, source, honeypot } = body
+    const { name, company, message, tier, interest, source, honeypot } = body
 
     // Honeypot
     if (honeypot) {
@@ -152,8 +153,38 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     const normalizedEmail = validation.data.email.toLowerCase().trim()
-    const normalizedSource = String(source || 'pico-landing').trim().slice(0, 120)
-    const normalizedTier = tier ? String(tier).trim().slice(0, 50) : undefined
+    const normalizedSource = String(source || 'pico-landing').trim().slice(0, 50)
+    const normalizedInterest = tier || interest ? String(tier || interest).trim().slice(0, 50) : undefined
+    const trimmedName = name?.trim()
+    const trimmedCompany = company?.trim()
+    const trimmedMessage = message?.trim()
+    const leadMessage = normalizedInterest
+      ? [
+          `Interest: ${normalizedInterest}`,
+          trimmedMessage || null,
+        ]
+          .filter(Boolean)
+          .join('\n\n')
+      : trimmedMessage
+
+    const leadCaptureResponse = await captureLeadPost(
+      new Request('http://localhost/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: normalizedEmail,
+          name: trimmedName,
+          company: trimmedCompany,
+          message: leadMessage,
+          source: normalizedSource,
+          honeypot: '',
+        }),
+      }),
+    )
+
+    if (!leadCaptureResponse.ok) {
+      return leadCaptureResponse
+    }
 
     // Send notification to team
     let notified = false
@@ -161,10 +192,10 @@ export async function POST(request: Request): Promise<NextResponse> {
       try {
         await sendNotificationEmail({
           email: normalizedEmail,
-          name: name?.trim(),
-          company: company?.trim(),
-          message: message?.trim(),
-          tier: normalizedTier,
+          name: trimmedName,
+          company: trimmedCompany,
+          message: leadMessage,
+          tier: normalizedInterest,
           source: normalizedSource,
         })
         notified = true
@@ -176,19 +207,19 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     // Send confirmation to user (uses waitlist template) and add to Resend audience
-    await sendConfirmationEmail(normalizedEmail, name?.trim(), company?.trim())
+    await sendConfirmationEmail(normalizedEmail, trimmedName, trimmedCompany)
     await syncResendAudienceContact({
       email: normalizedEmail,
-      name: name?.trim(),
-      company: company?.trim(),
+      name: trimmedName,
+      company: trimmedCompany,
       source: normalizedSource,
     })
     await notifyDiscord({
       email: normalizedEmail,
-      name: name?.trim(),
-      company: company?.trim(),
-      message: message?.trim(),
-      tier: normalizedTier,
+      name: trimmedName,
+      company: trimmedCompany,
+      message: leadMessage,
+      tier: normalizedInterest,
       source: normalizedSource,
     })
 
