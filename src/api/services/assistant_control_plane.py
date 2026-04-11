@@ -543,17 +543,88 @@ def _request_gateway_json(paths: tuple[str, ...]) -> Any | None:
     return None
 
 
+def _load_sessions_from_json_store(
+    state_dir: Path,
+    assistant_id: str | None = None,
+) -> list[dict[str, Any]]:
+    agents_dir = state_dir / "agents"
+    if not agents_dir.exists():
+        return []
+
+    discovered: list[dict[str, Any]] = []
+    for agent_dir in agents_dir.iterdir():
+        sessions_file = agent_dir / "sessions" / "sessions.json"
+        if not sessions_file.is_file():
+            continue
+
+        agent_name = agent_dir.name
+        if assistant_id and agent_name != assistant_id:
+            continue
+
+        try:
+            payload = json.loads(sessions_file.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+
+        if not isinstance(payload, dict):
+            continue
+
+        for key, entry in payload.items():
+            if not isinstance(entry, dict):
+                continue
+
+            updated_at = _normalize_timestamp(
+                entry.get("updatedAt") or entry.get("updated_at") or entry.get("last_activity")
+            )
+            created_at = _normalize_timestamp(
+                entry.get("startedAt")
+                or entry.get("createdAt")
+                or entry.get("created_at")
+                or updated_at
+            )
+            channel = (
+                (entry.get("deliveryContext") or {}).get("channel")
+                or entry.get("lastChannel")
+                or entry.get("channel")
+                or "direct"
+            )
+            total_tokens = entry.get("totalTokens")
+            if total_tokens is None:
+                total_tokens = int(entry.get("inputTokens") or 0) + int(entry.get("outputTokens") or 0)
+
+            raw = {
+                "id": entry.get("sessionId") or f"{agent_name}:{key}",
+                "key": str(key),
+                "assistant_id": agent_name,
+                "agent": agent_name,
+                "kind": entry.get("chatType") or entry.get("kind") or "session",
+                "created_at": created_at,
+                "updated_at": updated_at,
+                "model": entry.get("model"),
+                "channel": channel,
+                "total_tokens": total_tokens,
+                "active": bool(updated_at and (int(time.time()) - updated_at) < (90 * 60)),
+                "source": "openclaw-local",
+            }
+            normalized = _normalize_gateway_session(raw)
+            if normalized is not None:
+                discovered.append(normalized)
+
+    return discovered
+
+
 def _load_sessions_from_state_dir(assistant_id: str | None = None) -> list[dict[str, Any]]:
     state_dir = get_detected_openclaw_state_dir()
     if state_dir is None or not state_dir.exists():
         return []
+
+    discovered: list[dict[str, Any]] = _load_sessions_from_json_store(state_dir, assistant_id)
 
     candidates = [
         state_dir / "sessions",
         state_dir / "gateway" / "sessions",
         state_dir / "state" / "sessions",
     ]
-    discovered: list[dict[str, Any]] = []
     for root in candidates:
         if not root.exists():
             continue
@@ -577,7 +648,17 @@ def _load_sessions_from_state_dir(assistant_id: str | None = None) -> list[dict[
             normalized = _normalize_gateway_session(raw)
             if normalized is not None:
                 discovered.append(normalized)
-    return discovered
+
+    deduped: dict[str, dict[str, Any]] = {}
+    for session in discovered:
+        key = str(session.get("key") or session.get("id") or "")
+        if not key:
+            continue
+        existing = deduped.get(key)
+        if existing is None or session.get("last_activity", 0) >= existing.get("last_activity", 0):
+            deduped[key] = session
+
+    return sorted(deduped.values(), key=lambda item: item.get("last_activity", 0), reverse=True)
 
 
 def list_gateway_sessions(*, assistant_id: str | None = None) -> list[dict[str, Any]]:
