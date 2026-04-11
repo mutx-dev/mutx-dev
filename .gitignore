@@ -75,6 +75,16 @@ infrastructure/terraform/*.backup
 # Generated
 next-env.d.ts
 
+# Internal planning scratchpads
+CONTENT_MAP.md
+DECISIONS.md
+EVENT_MODEL.md
+EXECUTION_PLAN.md
+PRD_PICOMUTX.md
+PRODUCT_STATE.md
+SHIP_CHECKLIST.md
+app/dashboard/SPEC.md
+
 # OS
 .DS_Store
 Thumbs.db
