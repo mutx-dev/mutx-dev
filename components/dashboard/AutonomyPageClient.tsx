@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Bot, Cpu, GitBranch, TerminalSquare } from "lucide-react";
 
+import { FailureProgressCard } from "@/components/dashboard/FailureProgressCard";
 import {
   LiveEmptyState,
   LiveErrorState,
@@ -17,6 +18,7 @@ import {
   formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import { deriveRuntimeFailureGuidance } from "@/lib/dashboardFailureGuidance";
 
 type QueueItem = {
   id?: string;
@@ -116,6 +118,11 @@ export function AutonomyPageClient() {
   if (error || !data) return <LiveErrorState title="Autonomy unavailable" message={error ?? "No autonomy data returned."} />;
 
   const daemonStatus = typeof data.daemon.status === "string" ? data.daemon.status : "unknown";
+  const daemonHeartbeat = typeof data.daemon.heartbeat_at === "string" ? data.daemon.heartbeat_at : null;
+  const runtimeGuidance = deriveRuntimeFailureGuidance({
+    status: daemonStatus,
+    heartbeatAt: daemonHeartbeat,
+  });
   const queueCounts = data.queue.counts ?? {};
   const laneEntries = Object.entries(data.lanes.lanes ?? {});
 
@@ -147,6 +154,13 @@ export function AutonomyPageClient() {
           status={asDashboardStatus(data.generatedTasks.length > 0 ? "queued" : "idle")}
         />
       </LiveKpiGrid>
+
+      {runtimeGuidance ? (
+        <FailureProgressCard
+          guidance={runtimeGuidance}
+          signal={daemonHeartbeat ? `Last heartbeat ${formatDateTime(daemonHeartbeat)}` : 'Heartbeat missing from daemon status'}
+        />
+      ) : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
         <LivePanel title="Daemon / runtime" meta="local-only control plane">

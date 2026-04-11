@@ -20,6 +20,7 @@ import {
 import { ApiRequestError, readJson, writeJson } from "@/components/app/http";
 import { DashboardDialog } from "@/components/dashboard/DashboardDialog";
 import { EmptyState } from "@/components/dashboard/EmptyState";
+import { FailureProgressCard } from "@/components/dashboard/FailureProgressCard";
 import { RouteHeader } from "@/components/dashboard/RouteHeader";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import {
@@ -35,6 +36,7 @@ import {
 } from "@/components/dashboard/livePrimitives";
 import { dashboardTokens } from "@/components/dashboard/tokens";
 import { type components } from "@/app/types/api";
+import { deriveRuntimeFailureGuidance } from "@/lib/dashboardFailureGuidance";
 
 type Agent = components["schemas"]["AgentResponse"];
 type BusyAction = "refresh" | "stop" | "deploy" | "delete" | null;
@@ -179,6 +181,11 @@ export default function AgentDetailPage() {
 
   const canDeploy = agent ? ["stopped", "failed", "error", "deployed"].includes(agent.status) : false;
   const canStop = agent?.status === "running";
+  const runtimeGuidance = agent
+    ? deriveRuntimeFailureGuidance({
+        status: agent.status,
+      })
+    : null;
 
   const routeHeader = (
     <RouteHeader
@@ -249,6 +256,8 @@ export default function AgentDetailPage() {
           {actionError}
         </div>
       ) : null}
+
+      {runtimeGuidance ? <FailureProgressCard guidance={runtimeGuidance} signal={`Agent status ${agent.status}`} /> : null}
 
       <div className="flex flex-wrap items-center gap-2">
         <ActionButton label="Back to Agents" icon={ArrowLeft} onClick={() => router.push("/dashboard/agents")} />

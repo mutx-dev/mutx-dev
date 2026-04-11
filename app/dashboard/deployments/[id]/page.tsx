@@ -19,6 +19,7 @@ import {
 import { ApiRequestError, readJson, writeJson } from "@/components/app/http";
 import { DashboardDialog } from "@/components/dashboard/DashboardDialog";
 import { EmptyState } from "@/components/dashboard/EmptyState";
+import { FailureProgressCard } from "@/components/dashboard/FailureProgressCard";
 import { RouteHeader } from "@/components/dashboard/RouteHeader";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import {
@@ -34,6 +35,7 @@ import {
 } from "@/components/dashboard/livePrimitives";
 import { dashboardTokens } from "@/components/dashboard/tokens";
 import { type components } from "@/app/types/api";
+import { deriveDeploymentFailureGuidance } from "@/lib/dashboardFailureGuidance";
 
 type Deployment = components["schemas"]["DeploymentResponse"];
 type DeploymentEvent = NonNullable<Deployment["events"]>[number];
@@ -181,6 +183,15 @@ export default function DeploymentDetailPage() {
     />
   );
   const recentEvents: DeploymentEvent[] = deployment?.events?.slice(0, 6) ?? [];
+  const failureGuidance = deployment
+    ? deriveDeploymentFailureGuidance({
+        deploymentId: deployment.id,
+        status: deployment.status,
+        errorMessage: deployment.error_message,
+        events: deployment.events ?? [],
+      })
+    : null;
+  const failureSignal = deployment?.error_message ?? recentEvents.find((event) => event.error_message)?.error_message ?? null;
 
   if (loading) {
     return (
@@ -234,6 +245,8 @@ export default function DeploymentDetailPage() {
           {actionError}
         </div>
       ) : null}
+
+      {failureGuidance ? <FailureProgressCard guidance={failureGuidance} signal={failureSignal} /> : null}
 
       <div className="flex flex-wrap items-center gap-2">
         <ActionButton label="Back to Deployments" icon={ArrowLeft} onClick={() => router.push("/dashboard/deployments")} />
