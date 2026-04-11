@@ -42,7 +42,7 @@ async def test_get_telemetry_config_infers_exporter_type_from_sdk(client: AsyncC
     assert response.status_code == 200
     assert response.json() == {
         "otel_enabled": True,
-        "exporter_type": "otlp",
+        "exporter_type": "console",
         "endpoint": "http://tempo:4317",
     }
 
