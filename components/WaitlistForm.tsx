@@ -4,6 +4,7 @@ import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react'
 import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
+import { useLocale } from 'next-intl'
 
 import { cn } from '@/lib/utils'
 import styles from './WaitlistForm.module.css'
@@ -17,6 +18,7 @@ export type WaitlistFormProps = {
 
 export function WaitlistForm({ source = 'homepage', compact = false, className }: WaitlistFormProps) {
   const initialTurnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? ''
+  const locale = useLocale()
   const [email, setEmail] = useState('')
   const [count, setCount] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
@@ -116,7 +118,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
       const response = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source, captchaToken, honeypot }),
+        body: JSON.stringify({ email, source, locale, captchaToken, honeypot }),
       })
 
       const payload = await response.json()

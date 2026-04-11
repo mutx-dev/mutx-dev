@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { NextResponse } from 'next/server'
 
+const localeSchema = z.string().trim().toLowerCase().regex(/^[a-z]{2}(?:-[a-z]{2})?$/, 'Invalid locale format').optional()
+
 function validationErrorResponse(details: Record<string, { message: string }[]>) {
   return NextResponse.json(
     {
@@ -102,6 +104,7 @@ export const schemas = {
     name: z.string().max(100, 'Name too long').optional(),
     company: z.string().max(200, 'Company name too long').optional(),
     message: z.string().max(2000, 'Message too long').optional(),
+    locale: localeSchema,
     source: z.string().max(50, 'Source too long').optional(),
   }),
   
@@ -167,6 +170,7 @@ export const schemas = {
   // Newsletter schema
   newsletter: z.object({
     email: z.string().email('Invalid email format'),
+    locale: localeSchema,
   }),
   
   // Generic ID parameter

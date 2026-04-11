@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useState, useCallback, useEffect, useRef, type FormEvent } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import * as Select from '@radix-ui/react-select'
@@ -18,6 +18,7 @@ type PicoContactFormProps = {
 
 export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico-landing', onSuccess }: PicoContactFormProps) {
   const t = useTranslations('pico.contactForm')
+  const locale = useLocale()
   const prefersReducedMotion = useReducedMotion()
   const [state, setState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -47,6 +48,7 @@ export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico
         company: form.get('company') as string,
         message: form.get('message') as string,
         interest,
+        locale,
         source,
         honeypot: honeypotRef.current?.value || '',
       }
@@ -74,7 +76,7 @@ export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico
         setState('error')
       }
     },
-    [state, interest, onSuccess, source, t],
+    [state, interest, locale, onSuccess, source, t],
   )
 
   const handleClose = useCallback(() => {

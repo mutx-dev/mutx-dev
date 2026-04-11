@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { validateData, schemas } from '@/app/api/_lib/validation'
 import { withErrorHandling, badRequest } from '@/app/api/_lib/errors'
+import { routing, type Locale } from '@/i18n/routing'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,6 +14,31 @@ const notifyEmail =
 const resendAudienceId = process.env.RESEND_AUDIENCE_ID?.trim()
 const discordWebhookUrl = process.env.LEAD_DISCORD_WEBHOOK_URL?.trim() || process.env.DISCORD_LEAD_WEBHOOK_URL?.trim()
 const resend = resendApiKey ? new Resend(resendApiKey) : null
+const contactTemplateIdsByLocale = Object.fromEntries(
+  routing.locales.map((locale) => [
+    locale,
+    process.env[`RESEND_CONTACT_TEMPLATE_ID_${locale.toUpperCase()}`]?.trim(),
+  ]),
+) as Record<Locale, string | undefined>
+const defaultContactTemplateId =
+  process.env.RESEND_CONTACT_TEMPLATE_ID_EN?.trim()
+  || process.env.RESEND_CONTACT_TEMPLATE_ID?.trim()
+  || '76afba66-9948-419d-9df2-ae9414006859'
+
+function normalizeLocale(locale?: string): Locale {
+  const normalizedLocale = locale?.trim().toLowerCase()
+  if (!normalizedLocale) return routing.defaultLocale
+
+  const primaryLocale = normalizedLocale.split('-')[0]
+  return routing.locales.includes(primaryLocale as Locale)
+    ? (primaryLocale as Locale)
+    : routing.defaultLocale
+}
+
+function getContactTemplateId(locale?: string) {
+  const normalizedLocale = normalizeLocale(locale)
+  return contactTemplateIdsByLocale[normalizedLocale] || defaultContactTemplateId
+}
 
 async function sendNotificationEmail(data: {
   email: string
@@ -57,6 +83,7 @@ async function sendNotificationEmail(data: {
 
 async function sendConfirmationEmail(
   to: string,
+  locale?: string,
   _name?: string,
   _company?: string,
 ) {
@@ -66,7 +93,7 @@ async function sendConfirmationEmail(
     await resend.emails.send({
       from: resendFromEmail,
       to: [to],
-      template: { id: '76afba66-9948-419d-9df2-ae9414006859' },
+      template: { id: getContactTemplateId(locale) },
       headers: { 'X-Entity-Ref-ID': `pico-waitlist-${Date.now()}` },
     })
   } catch {
@@ -138,7 +165,7 @@ async function notifyDiscord(data: {
 export async function POST(request: Request): Promise<NextResponse> {
   return withErrorHandling(async () => {
     const body = await request.json().catch(() => ({}))
-    const { name, company, message, tier, source, honeypot } = body
+    const { name, company, message, tier, source, locale, honeypot } = body
 
     // Honeypot
     if (honeypot) {
@@ -176,7 +203,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     // Send confirmation to user (uses waitlist template) and add to Resend audience
-    await sendConfirmationEmail(normalizedEmail, name?.trim(), company?.trim())
+    await sendConfirmationEmail(normalizedEmail, locale, name?.trim(), company?.trim())
     await syncResendAudienceContact({
       email: normalizedEmail,
       name: name?.trim(),

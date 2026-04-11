@@ -3,6 +3,7 @@ import { Resend } from 'resend'
 import sql from '@/lib/db'
 import { validateData, schemas } from '@/app/api/_lib/validation'
 import { withErrorHandling, badRequest } from '@/app/api/_lib/errors'
+import { routing, type Locale } from '@/i18n/routing'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,14 +17,38 @@ type TurnstileVerificationResult = {
 
 const resendApiKey = process.env.RESEND_API_KEY?.trim()
 const resendFromEmail = process.env.RESEND_FROM_EMAIL?.trim() || 'MUTX <waitlist@mutx.dev>'
-const resendWaitlistTemplateId = process.env.RESEND_WAITLIST_TEMPLATE_ID?.trim() || 'waitlist'
 const resend = resendApiKey ? new Resend(resendApiKey) : null
+const waitlistTemplateIdsByLocale = Object.fromEntries(
+  routing.locales.map((locale) => [
+    locale,
+    process.env[`RESEND_WAITLIST_TEMPLATE_ID_${locale.toUpperCase()}`]?.trim(),
+  ]),
+) as Record<Locale, string | undefined>
+const defaultWaitlistTemplateId =
+  process.env.RESEND_WAITLIST_TEMPLATE_ID_EN?.trim()
+  || process.env.RESEND_WAITLIST_TEMPLATE_ID?.trim()
+  || 'waitlist'
 
-function isEmailDeliveryConfigured() {
-  return Boolean(resend && resendFromEmail && resendWaitlistTemplateId)
+function normalizeLocale(locale?: string): Locale {
+  const normalizedLocale = locale?.trim().toLowerCase()
+  if (!normalizedLocale) return routing.defaultLocale
+
+  const primaryLocale = normalizedLocale.split('-')[0]
+  return routing.locales.includes(primaryLocale as Locale)
+    ? (primaryLocale as Locale)
+    : routing.defaultLocale
 }
 
-async function sendWaitlistConfirmationEmail(to: string) {
+function getWaitlistTemplateId(locale?: string) {
+  const normalizedLocale = normalizeLocale(locale)
+  return waitlistTemplateIdsByLocale[normalizedLocale] || defaultWaitlistTemplateId
+}
+
+function isEmailDeliveryConfigured() {
+  return Boolean(resend && resendFromEmail && defaultWaitlistTemplateId)
+}
+
+async function sendWaitlistConfirmationEmail(to: string, locale?: string) {
   if (!resend) {
     throw new Error('RESEND_API_KEY is not configured')
   }
@@ -32,7 +57,7 @@ async function sendWaitlistConfirmationEmail(to: string) {
     from: resendFromEmail,
     to: [to],
     template: {
-      id: resendWaitlistTemplateId,
+      id: getWaitlistTemplateId(locale),
       variables: {},
     },
   })
@@ -125,7 +150,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
     
     const body = await request.json().catch(() => ({}))
-    const { email: _email, source, captchaToken, honeypot } = body
+    const { email: _email, source, locale, captchaToken, honeypot } = body
 
     // 1. Honeypot check
     if (honeypot) {
@@ -169,7 +194,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     if (isEmailDeliveryConfigured()) {
       try {
-        await sendWaitlistConfirmationEmail(normalizedEmail)
+        await sendWaitlistConfirmationEmail(normalizedEmail, locale)
         emailSent = true
         message = "You're on the list. Check your inbox."
       } catch (emailError) {
