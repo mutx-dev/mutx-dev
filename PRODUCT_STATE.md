@@ -92,6 +92,11 @@ What is next
 - Replace manual telemetry with live agent ingestion.
 - Tighten landing copy so the public story matches the shipped beta exactly.
 
+### 2026-04-11 01:55:02 CEST — cycle start
+- Executive order received: do not stop until PicoMUTX is actually finished.
+- Began reconciliation of shadow Pico work left by the other active Hermes sessions.
+- Current coordination target: merge the useful parts, kill duplicates, and end with one Pico truth.
+
 ### 2026-04-11 01:54:00 CEST — cycle end
 What changed
 - Added a new Pico academy shell under `app/pico/academy`, `app/pico/onboarding`, `app/pico/tutor`, `app/pico/autopilot`, and `app/pico/support`.
@@ -116,3 +121,25 @@ What is next
 - Decide whether to absorb or delete the older untracked Pico beta artifacts instead of leaving parallel shadows around.
 - Move the landing CTA and copy fully onto the new shell so the product entrance is obvious.
 - Add an admin/content-ops lane only if editing lessons in source files becomes a bottleneck.
+
+### 2026-04-11 00:02:05 UTC — cycle end
+What changed
+- Added `/pico/app` as a new authenticated workspace and shipped lesson detail pages under `/pico/app/lessons/[slug]`.
+- Added `/api/pico/state` plus backend `/v1/pico/state` on top of `user_settings` so the new workspace has persistent progress, thresholds, and approval-gate config.
+- Kept old `/v1/pico/progress` working by adding compatibility transforms instead of breaking the earlier Pico shell.
+- Rewrote tutor compatibility so both the new workspace and the older Pico tutor surfaces stay functional.
+- Redirected `/pico/workspace` to `/pico/app` so the product has one cleaner entry.
+
+What was tested
+- `./.venv/bin/python -m pytest tests/api/test_pico_route.py tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
+- `npm test -- --runInBand picoTutor picoAcademy`
+- `npm run build`
+
+What failed
+- First pass broke `/v1/pico/progress` compatibility and the legacy tutor exports. Fixed in the same cycle.
+- Remaining warnings are existing repo noise: OpenTelemetry shutdown log spam in pytest and Turbopack NFT warnings in build.
+
+What is next
+- Collapse the duplicate Pico shells into one canonical flow instead of carrying both the old academy/tutor pages and the new `/pico/app` workspace forever.
+- Connect a real approval-request action path so the approval gate protects something concrete, not just a saved setting.
+- Decide which of the shadow/untracked Pico files are worth keeping and delete the rest with intent.

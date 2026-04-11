@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_TRACKS } from '@/lib/pico/academy'
+import { usePicoHref } from '@/lib/pico/navigation'
 
 const checklist = [
   'Pick one track instead of trying to do everything at once.',
@@ -16,6 +17,7 @@ const checklist = [
 
 export function PicoOnboardingPageClient() {
   const { progress, derived, actions } = usePicoProgress()
+  const toHref = usePicoHref()
 
   useEffect(() => {
     if (!progress.milestoneEvents.includes('account_created')) {
@@ -29,7 +31,7 @@ export function PicoOnboardingPageClient() {
       title="Start narrow, not cute"
       description="Pick one lane. Finish one useful agent. Then add control. Everything else is procrastination with better branding."
       actions={
-        <Link href="/academy" className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950">
+        <Link href={toHref('/academy')} className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950">
           Open academy dashboard
         </Link>
       }
@@ -86,10 +88,10 @@ export function PicoOnboardingPageClient() {
                     ))}
                   </div>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <Link href={`/academy/${track.lessons[0]}`} className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
+                    <Link href={toHref(`/academy/${track.lessons[0]}`)} className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
                       Start track
                     </Link>
-                    <Link href="/tutor" className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
+                    <Link href={toHref('/tutor')} className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
                       Ask tutor first
                     </Link>
                   </div>

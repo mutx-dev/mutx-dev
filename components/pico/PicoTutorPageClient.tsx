@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_LESSONS } from '@/lib/pico/academy'
+import { usePicoHref } from '@/lib/pico/navigation'
 import type { PicoTutorAnswer } from '@/lib/pico/tutor'
 
 const examplePrompts = [
@@ -16,9 +17,11 @@ const examplePrompts = [
 
 export function PicoTutorPageClient() {
   const { progress, actions } = usePicoProgress()
+  const toHref = usePicoHref()
   const [question, setQuestion] = useState('')
   const [lessonSlug, setLessonSlug] = useState(progress.selectedTrack ? PICO_LESSONS.find((lesson) => lesson.track === progress.selectedTrack)?.slug ?? '' : '')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [answer, setAnswer] = useState<PicoTutorAnswer | null>(null)
   const availableLessons = useMemo(() => PICO_LESSONS, [])
 
@@ -27,6 +30,7 @@ export function PicoTutorPageClient() {
     if (!question.trim()) return
 
     setLoading(true)
+    setError(null)
     try {
       const response = await fetch('/api/pico/tutor', {
         method: 'POST',
@@ -39,9 +43,18 @@ export function PicoTutorPageClient() {
           progress,
         }),
       })
-      const payload = (await response.json()) as PicoTutorAnswer
-      setAnswer(payload)
+      const payload = (await response.json()) as Partial<PicoTutorAnswer> & { detail?: string }
+      if (!response.ok) {
+        throw new Error(payload.detail || 'Tutor request failed')
+      }
+      if (!payload.answer || !Array.isArray(payload.matches) || !Array.isArray(payload.nextActions)) {
+        throw new Error('Tutor response came back malformed')
+      }
+      setAnswer(payload as PicoTutorAnswer)
       actions.recordTutorQuestion()
+    } catch (submitError) {
+      setAnswer(null)
+      setError(submitError instanceof Error ? submitError.message : 'Tutor request failed')
     } finally {
       setLoading(false)
     }
@@ -53,7 +66,7 @@ export function PicoTutorPageClient() {
       title="Ask for the exact next step"
       description="The tutor only answers from the shipped Pico lesson corpus. If confidence is low or the topic is risky, it tells you to escalate instead of pretending to be clever."
       actions={
-        <Link href="/support" className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10">
+        <Link href={toHref('/support')} className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10">
           Open support lane
         </Link>
       }
@@ -107,6 +120,11 @@ export function PicoTutorPageClient() {
 
         <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
           <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Answer</p>
+          {error ? (
+            <div className="mt-4 rounded-[24px] border border-rose-400/20 bg-rose-400/10 p-5 text-sm leading-6 text-rose-50">
+              {error}
+            </div>
+          ) : null}
           {answer ? (
             <div className="mt-4 space-y-4">
               <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
@@ -115,7 +133,7 @@ export function PicoTutorPageClient() {
 
               {answer.lessonSlug ? (
                 <Link
-                  href={`/academy/${answer.lessonSlug}`}
+                  href={toHref(`/academy/${answer.lessonSlug}`)}
                   className="inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
                 >
                   Open {answer.lessonTitle}

@@ -1,27 +1,4 @@
-import { getLessonBySlug, searchLessonCorpus, type PicoProgressState } from '@/lib/pico/academy'
-
-const RISKY_KEYWORDS = ['delete', 'production', 'billing', 'payment', 'credential', 'token', 'secret', 'gdpr', 'legal', 'contract', 'security']
-
-export type PicoTutorReply = {
-  title: string
-  confidence: 'grounded' | 'escalate'
-  summary: string
-  answer: string
-  nextActions: string[]
-  lessons: Array<{
-    id: string
-    title: string
-    href: string
-  }>
-  docs: Array<{
-    label: string
-    href: string
-    sourcePath: string
-  }>
-  recommendedLessonIds: string[]
-  escalate: boolean
-  escalationReason?: string
-}
+import { picoLessons, picoTracks } from '@/lib/pico/catalog'
 
 export type PicoTutorAnswer = {
   answer: string
@@ -37,103 +14,170 @@ export type PicoTutorAnswer = {
   escalationReason: string | null
 }
 
-export function answerPicoTutorQuestion(
-  question: string,
-  options?: { lessonSlug?: string | null; progress?: Partial<PicoProgressState> | null }
-): PicoTutorAnswer {
-  const normalizedQuestion = question.trim()
-  const lowerQuestion = normalizedQuestion.toLowerCase()
-  const directLesson = options?.lessonSlug ? getLessonBySlug(options.lessonSlug) : null
-  const matches = searchLessonCorpus(`${options?.lessonSlug ?? ''} ${normalizedQuestion}`)
-  const best = directLesson ?? matches[0]?.lesson ?? null
+export type PicoTutorReply = {
+  title: string
+  summary: string
+  answer: string
+  confidence: 'high' | 'medium' | 'low'
+  nextActions: string[]
+  lessons: Array<{ id: string; title: string; href: string }>
+  docs: Array<{ label: string; href: string; sourcePath: string }>
+  recommendedLessonIds: string[]
+  escalate: boolean
+  escalationReason?: string
+}
 
-  const riskyTopic = RISKY_KEYWORDS.find((keyword) => lowerQuestion.includes(keyword))
-  if (!best) {
+const supportEscalation = {
+  label: 'Support',
+  href: '/support',
+  sourcePath: 'support.md',
+}
+
+function tokenize(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+}
+
+function scoreLesson(question: string, lesson: (typeof picoLessons)[number]) {
+  const haystack = tokenize([
+    lesson.title,
+    lesson.summary,
+    lesson.objective,
+    lesson.outcome,
+    ...lesson.prerequisites,
+    ...lesson.validation,
+    ...lesson.troubleshooting,
+    ...lesson.steps.map((step) => `${step.title} ${step.body}`),
+  ].join(' '))
+  const needle = tokenize(question)
+  let score = 0
+  for (const token of needle) {
+    if (haystack.includes(token)) {
+      score += token.length > 5 ? 3 : 1
+    }
+  }
+  return score
+}
+
+export function answerPicoTutorQuestion(question: string): PicoTutorAnswer {
+  const normalized = question.trim()
+  const mentionsBudget = /budget|cost|credit|spend|threshold/i.test(normalized)
+  const mentionsApproval = /approval|approve|deny|gate|review/i.test(normalized)
+  const mentionsDeploy = /deploy|vps|server|persistent|alive|restart/i.test(normalized)
+  const mentionsInstall = /install|setup|path|binary|cli/i.test(normalized)
+  const mentionsSecurity = /security|credential|key|secret|breach|billing|payment|production/i.test(normalized)
+
+  if (!normalized) {
     return {
-      answer:
-        'I cannot ground that in the shipped Pico lesson corpus yet. Use the support lane and include the exact command, error, and what you expected to happen.',
+      answer: 'Name the exact step that is failing and what you expected to happen.',
       lessonSlug: null,
       lessonTitle: null,
       matches: [],
       nextActions: [
-        'Open the support lane and paste the exact command or stack trace.',
-        'State which lesson you were following.',
-        'Include the last step that actually worked.',
+        'Name the lesson or deployment step you are blocked on.',
+        'Paste the exact error or tell me what you expected to happen.',
       ],
-      escalationReason: 'No grounded lesson match found.',
+      escalationReason: null,
     }
   }
 
-  if (riskyTopic) {
+  const scoredLessons = picoLessons
+    .map((lesson) => ({ lesson, score: scoreLesson(normalized, lesson) }))
+    .sort((left, right) => right.score - left.score)
+
+  const topLessons = scoredLessons.filter((item) => item.score > 0).slice(0, 3).map((item) => item.lesson)
+
+  if (topLessons.length === 0) {
     return {
-      answer: `This question touches ${riskyTopic}, which is exactly where the tutor should stop bluffing. Follow the grounded steps below, but escalate before doing anything irreversible.`,
-      lessonSlug: best.slug,
-      lessonTitle: best.title,
-      matches: matches.map((match) => ({
-        slug: match.lesson.slug,
-        title: match.lesson.title,
-        score: match.score,
-        reason: `Matched lesson objective and troubleshooting notes for ${match.lesson.title}.`,
-      })),
+      answer: 'I cannot ground that in the shipped Pico lesson set yet, so I will not fake it.',
+      lessonSlug: null,
+      lessonTitle: null,
+      matches: [],
       nextActions: [
-        best.steps[0]?.body ?? 'Re-read the first step in the matched lesson.',
-        best.validation,
-        'Escalate with the exact command, environment, and intended action before executing the risky part.',
+        'Rephrase the question around install, deploy, runtime visibility, thresholds, or approvals.',
+        'If this is a real content gap, escalate it so Pico can add the missing lesson.',
       ],
-      escalationReason: 'Security or irreversible action detected. Escalate before executing the risky step.',
+      escalationReason: 'No grounded lesson match for the question.',
     }
   }
 
-  const nextActions = best.steps.slice(0, 3).map((step) => `${step.title}: ${step.body}`)
-  const troubleshooting = best.troubleshooting[0]
-  const answer = [
-    `Best match: ${best.title}.`,
-    best.objective,
-    `Do this next: ${nextActions[0] ?? best.validation}`,
-    troubleshooting ? `Watch for this failure mode: ${troubleshooting}` : '',
-    `Validation: ${best.validation}`,
+  const primary = topLessons[0]
+  const nextActions = [
+    ...primary.validation.slice(0, 2),
+    ...primary.troubleshooting.slice(0, 1),
   ]
-    .filter(Boolean)
-    .join(' ')
+
+  if (mentionsInstall) {
+    nextActions.unshift('Use the quickstart and CLI docs as ground truth before changing anything else.')
+  }
+  if (mentionsDeploy) {
+    nextActions.unshift('Treat deployment as incomplete until the process survives disconnects and restarts.')
+  }
+  if (mentionsBudget) {
+    nextActions.unshift('Set a threshold first. A rough honest limit beats waiting for perfect cost math.')
+  }
+  if (mentionsApproval) {
+    nextActions.unshift('Use one explicit risky-action gate first. Do not pretend you need a full governance machine on day one.')
+  }
+
+  const escalationReason = mentionsSecurity
+    ? 'Security or irreversible topic detected. Escalate before taking the risky action.'
+    : scoredLessons[0].score < 4
+      ? 'Low-confidence match. Escalate if the first next action does not fix it.'
+      : null
 
   return {
-    answer,
-    lessonSlug: best.slug,
-    lessonTitle: best.title,
-    matches: matches.map((match) => ({
-      slug: match.lesson.slug,
-      title: match.lesson.title,
-      score: match.score,
-      reason: `Matched lesson body, troubleshooting, and validation steps for ${match.lesson.title}.`,
+    answer: `${primary.summary} Focus track: ${picoTracks.find((track) => track.id === primary.trackId)?.title || 'Pico track'}.`,
+    lessonSlug: primary.slug,
+    lessonTitle: primary.title,
+    matches: topLessons.map((lesson) => ({
+      slug: lesson.slug,
+      title: lesson.title,
+      score: scoreLesson(normalized, lesson),
+      reason: `Matched lesson objective, steps, and troubleshooting notes for ${lesson.title}.`,
     })),
-    nextActions,
-    escalationReason: matches[0]?.score && matches[0].score >= 4 ? null : 'Low-confidence match. Escalate if the first next action does not fix it.',
+    nextActions: Array.from(new Set(nextActions)).slice(0, 4),
+    escalationReason,
   }
 }
 
 export function answerTutorQuestion(
   question: string,
-  _state?: Partial<PicoProgressState> | null | Record<string, unknown>
+  _state?: unknown,
 ): PicoTutorReply {
   const answer = answerPicoTutorQuestion(question)
-  const lessons = answer.matches.map((match) => ({
-    id: match.slug,
-    title: match.title,
-    href: `/academy/${match.slug}`,
+  const matchedLessons = answer.matches
+    .map((match) => picoLessons.find((lesson) => lesson.slug === match.slug))
+    .filter((lesson): lesson is NonNullable<typeof lesson> => Boolean(lesson))
+
+  const docs = Array.from(
+    new Map(
+      [
+        ...matchedLessons.flatMap((lesson) => lesson.docLinks),
+        supportEscalation,
+      ].map((entry) => [entry.href, entry]),
+    ).values(),
+  ).slice(0, 4)
+
+  const lessons = matchedLessons.map((lesson) => ({
+    id: lesson.id,
+    title: lesson.title,
+    href: `/pico/app/lessons/${lesson.slug}`,
   }))
+
+  const highConfidence = answer.matches[0]?.score ? answer.matches[0].score >= 5 : false
 
   return {
     title: answer.lessonTitle ?? 'Pico tutor answer',
-    confidence: answer.escalationReason ? 'escalate' : 'grounded',
     summary: answer.answer,
     answer: answer.answer,
+    confidence: highConfidence ? 'high' : answer.escalationReason ? 'low' : 'medium',
     nextActions: answer.nextActions,
     lessons,
-    docs: lessons.map((lesson) => ({
-      label: lesson.title,
-      href: lesson.href,
-      sourcePath: `academy/${lesson.id}`,
-    })),
+    docs,
     recommendedLessonIds: lessons.map((lesson) => lesson.id),
     escalate: Boolean(answer.escalationReason),
     escalationReason: answer.escalationReason ?? undefined,

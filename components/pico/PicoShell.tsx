@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import { picoHref } from '@/lib/pico/navigation'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -31,7 +32,7 @@ export function PicoShell({ eyebrow, title, description, actions, children }: Pi
         <header className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-5 shadow-[0_24px_80px_rgba(2,8,23,0.35)] backdrop-blur">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-2">
-              <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.24em] text-emerald-300">
+              <Link href={picoHref(pathname, '/')} className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.24em] text-emerald-300">
                 <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-400/15 text-emerald-200">PM</span>
                 PicoMUTX
               </Link>
@@ -49,7 +50,7 @@ export function PicoShell({ eyebrow, title, description, actions, children }: Pi
               return (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={picoHref(pathname, item.href)}
                   className={cn(
                     'rounded-full border px-4 py-2 text-sm transition',
                     active

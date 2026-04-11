@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_LEVELS, PICO_TRACKS, getLessonBySlug } from '@/lib/pico/academy'
+import { usePicoHref } from '@/lib/pico/navigation'
 
 function ProgressCard({ label, value, hint }: { label: string; value: string; hint: string }) {
   return (
@@ -18,6 +19,7 @@ function ProgressCard({ label, value, hint }: { label: string; value: string; hi
 
 export function PicoAcademyDashboard() {
   const { progress, derived, syncState, ready, actions } = usePicoProgress()
+  const toHref = usePicoHref()
   const nextLesson = derived.nextLesson
 
   return (
@@ -29,7 +31,7 @@ export function PicoAcademyDashboard() {
         nextLesson ? (
           <>
             <Link
-              href={`/academy/${nextLesson.slug}`}
+              href={toHref(`/academy/${nextLesson.slug}`)}
               className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
             >
               Continue with {nextLesson.title}
@@ -138,7 +140,7 @@ export function PicoAcademyDashboard() {
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Tracks</p>
             <h2 className="mt-2 text-2xl font-semibold text-white">Project-based learning paths</h2>
           </div>
-          <Link href="/onboarding" className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
+          <Link href={toHref('/onboarding')} className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
             Open onboarding
           </Link>
         </div>
@@ -178,7 +180,7 @@ export function PicoAcademyDashboard() {
                   {trackLessons.map((lesson) => (
                     <Link
                       key={lesson.slug}
-                      href={`/academy/${lesson.slug}`}
+                      href={toHref(`/academy/${lesson.slug}`)}
                       className="flex items-center justify-between rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-3 text-sm text-slate-200 transition hover:border-white/20 hover:bg-white/5"
                     >
                       <span>{lesson.title}</span>
