@@ -47,7 +47,7 @@ require_content "${SITE_URL}" "Releases"
 require_content "${SITE_URL}/download/macos" "Download MUTX for macOS"
 require_content "${APP_URL}/login" "Welcome back"
 require_content "${APP_URL}/register" "Create your account"
-require_content "${DOCS_RELEASE_URL}" "MUTX v1.3"
+require_content "${DOCS_RELEASE_URL}" "v${RELEASE_LINE} Release Notes"
 require_ok "${API_URL}/health"
 require_ok "${API_URL}/ready"
 

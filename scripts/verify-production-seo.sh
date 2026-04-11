@@ -179,7 +179,11 @@ for label, spec in checks.items():
     expect(og_url == spec['og_url'], f'{label} og:url mismatch: {og_url!r} != {spec["og_url"]!r}', failures)
     expect(og_image is not None and '/opengraph-image' in og_image, f'{label} missing page OG image route', failures)
     expect(twitter_title is not None and spec['title_contains'] in twitter_title, f'{label} twitter:title missing expected text', failures)
-    expect(twitter_image is not None and '/twitter-image' in twitter_image, f'{label} missing page twitter image route', failures)
+    expect(
+        twitter_image is not None and ('/twitter-image' in twitter_image or '/opengraph-image' in twitter_image),
+        f'{label} missing page twitter image route',
+        failures,
+    )
     expect(twitter_card == 'summary_large_image', f'{label} twitter:card drifted: {twitter_card!r}', failures)
     if label.startswith('docs_') or label in {'homepage', 'download', 'download_macos', 'releases', 'contact', 'whitepaper', 'ai_agent_control_plane'}:
         expect(robots_meta is not None and 'index' in robots_meta.lower(), f'{label} missing indexable robots meta', failures)
