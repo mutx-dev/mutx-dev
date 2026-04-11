@@ -137,7 +137,8 @@ def test_setup_hosted_deploys_personal_assistant(monkeypatch, tmp_path: Path) ->
     assert "OpenClaw binary: /opt/homebrew/bin/openclaw" in result.output
     assert "Tracking: imported into ~/.mutx/providers/openclaw" in result.output
     assert "Immediate payoff:" in result.output
-    assert 'mutx first-agent "Turn these rough notes into three next steps"' in result.output
+    assert "mutx onboard --help" in result.output
+    assert "run mutx runtime inspect to verify your local runtime" in result.output
     assert launched["value"] is True
 
 
@@ -253,7 +254,8 @@ def test_setup_local_bootstraps_local_operator_without_credentials(
     assert captured["wizard_kwargs"]["assistant_name"] == "Personal Assistant"
     assert "Assistant deployed: agent-pa-01" in result.output
     assert "Immediate payoff:" in result.output
-    assert 'mutx first-agent "Turn these rough notes into three next steps"' in result.output
+    assert "mutx onboard --help" in result.output
+    assert "run mutx runtime inspect to verify your local runtime" in result.output
     assert launched["value"] is True
 
 

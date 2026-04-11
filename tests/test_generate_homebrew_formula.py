@@ -91,7 +91,7 @@ def test_render_formula_uses_tagged_source_and_non_network_smoke_checks() -> Non
     assert f'version "{CURRENT_CLI_VERSION}"' in formula
     assert 'resource "click" do' in formula
     assert 'assert_match "Usage: mutx onboard [OPTIONS]"' in formula
-    assert 'assert_match "Usage: mutx first-agent [OPTIONS] [TASK]..."' in formula
+    assert 'assert_match "Usage: mutx setup [OPTIONS] COMMAND [ARGS]..."' in formula
     assert 'assert_match "--install-openclaw"' in formula
     assert 'assert_match "inspect"' in formula
     assert 'system libexec/"bin/python", "-c", "import click, httpx, textual"' in formula
