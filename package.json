@@ -3,7 +3,7 @@
   "version": "1.4.0",
   "private": true,
   "license": "BUSL-1.1",
-  "packageManager": "npm@10.7.0",
+  "packageManager": "npm@11.12.1",
   "main": "desktop/main.cjs",
   "scripts": {
     "prebuild": "node -e \"require('fs').rmSync('public/_next', { recursive: true, force: true })\"",

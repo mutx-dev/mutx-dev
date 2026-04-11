@@ -1,8 +1,8 @@
 # Multi-stage build for MUTX Next.js application
-FROM node:20-alpine AS base
+FROM node:20-alpine3.22 AS base
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install patched npm + pnpm
+RUN apk upgrade --no-cache && npm install -g npm@11.12.1 && corepack enable && corepack prepare pnpm@latest --activate
 
 # Dependencies stage
 FROM base AS deps
