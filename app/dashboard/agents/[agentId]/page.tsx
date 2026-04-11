@@ -36,7 +36,7 @@ import {
 } from "@/components/dashboard/livePrimitives";
 import { dashboardTokens } from "@/components/dashboard/tokens";
 import { type components } from "@/app/types/api";
-import { deriveRuntimeFailureGuidance } from "@/lib/dashboardFailureGuidance";
+import { deriveFailureGuidanceFromSignal, deriveRuntimeFailureGuidance } from "@/lib/dashboardFailureGuidance";
 
 type Agent = components["schemas"]["AgentResponse"];
 type BusyAction = "refresh" | "stop" | "deploy" | "delete" | null;
@@ -186,6 +186,11 @@ export default function AgentDetailPage() {
         status: agent.status,
       })
     : null;
+  const actionGuidance = actionError
+    ? deriveFailureGuidanceFromSignal({
+        message: actionError,
+      })
+    : null;
 
   const routeHeader = (
     <RouteHeader
@@ -257,6 +262,7 @@ export default function AgentDetailPage() {
         </div>
       ) : null}
 
+      {actionGuidance && !runtimeGuidance ? <FailureProgressCard guidance={actionGuidance} signal={actionError} /> : null}
       {runtimeGuidance ? <FailureProgressCard guidance={runtimeGuidance} signal={`Agent status ${agent.status}`} /> : null}
 
       <div className="flex flex-wrap items-center gap-2">

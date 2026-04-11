@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { ApiRequestError, readJson } from "@/components/app/http";
+import { FailureProgressCard } from "@/components/dashboard/FailureProgressCard";
 import {
   LiveAuthRequired,
   LiveEmptyState,
@@ -16,6 +18,7 @@ import {
   formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import { deriveAlertFailureGuidance } from "@/lib/dashboardFailureGuidance";
 
 import type { components } from "@/app/types/api";
 
@@ -86,7 +89,11 @@ export function MonitoringPageClient() {
     };
   }, []);
 
-  const unresolvedCount = alerts.filter((alert) => !alert.resolved).length;
+  const unresolvedAlerts = alerts.filter((alert) => !alert.resolved);
+  const unresolvedCount = unresolvedAlerts.length;
+  const alertGuidance = unresolvedAlerts
+    .map((alert) => ({ alert, guidance: deriveAlertFailureGuidance({ type: alert.type, message: alert.message }) }))
+    .find((entry) => entry.guidance);
   const healthStatus = typeof health?.status === "string" ? health.status : "unknown";
   const databaseStatus = typeof health?.database === "string" ? health.database : "unknown";
   const timestamp = typeof health?.timestamp === "string" ? health.timestamp : null;
@@ -119,6 +126,13 @@ export function MonitoringPageClient() {
         />
       </LiveKpiGrid>
 
+      {alertGuidance?.guidance ? (
+        <FailureProgressCard
+          guidance={alertGuidance.guidance}
+          signal={alertGuidance.alert.message}
+        />
+      ) : null}
+
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
         <LivePanel title="Alert rail" meta={`${alerts.length} records`}>
           {alerts.length === 0 ? (
@@ -128,25 +142,37 @@ export function MonitoringPageClient() {
             />
           ) : (
             <div className="space-y-3">
-              {alerts.map((alert) => (
-                <div key={alert.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-white">{alert.type.replaceAll("_", " ")}</p>
-                      <p className="mt-1 text-sm text-slate-400">{alert.message}</p>
+              {alerts.map((alert) => {
+                const guidance = deriveAlertFailureGuidance({ type: alert.type, message: alert.message })
+
+                return (
+                  <div key={alert.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-white">{alert.type.replaceAll("_", " ")}</p>
+                        <p className="mt-1 text-sm text-slate-400">{alert.message}</p>
+                      </div>
+                      <StatusBadge
+                        status={alert.resolved ? "success" : "warning"}
+                        label={alert.resolved ? "resolved" : "open"}
+                      />
                     </div>
-                    <StatusBadge
-                      status={alert.resolved ? "success" : "warning"}
-                      label={alert.resolved ? "resolved" : "open"}
-                    />
+                    <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+                      <span>{formatRelativeTime(alert.created_at)}</span>
+                      <span>{formatDateTime(alert.created_at)}</span>
+                      <span>agent {alert.agent_id.slice(0, 8)}</span>
+                    </div>
+                    {guidance ? (
+                      <div className="mt-3 rounded-lg border border-sky-300/15 bg-sky-300/8 px-3 py-2">
+                        <p className="text-xs text-sky-100">{guidance.stageNote}</p>
+                        <Link href={guidance.primaryAction.href} className="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-sky-200 hover:text-sky-100">
+                          {guidance.primaryAction.label}
+                        </Link>
+                      </div>
+                    ) : null}
                   </div>
-                  <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
-                    <span>{formatRelativeTime(alert.created_at)}</span>
-                    <span>{formatDateTime(alert.created_at)}</span>
-                    <span>agent {alert.agent_id.slice(0, 8)}</span>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </LivePanel>

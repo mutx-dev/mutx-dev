@@ -35,7 +35,7 @@ import {
 } from "@/components/dashboard/livePrimitives";
 import { dashboardTokens } from "@/components/dashboard/tokens";
 import { type components } from "@/app/types/api";
-import { deriveDeploymentFailureGuidance } from "@/lib/dashboardFailureGuidance";
+import { deriveDeploymentFailureGuidance, deriveFailureGuidanceFromSignal } from "@/lib/dashboardFailureGuidance";
 
 type Deployment = components["schemas"]["DeploymentResponse"];
 type DeploymentEvent = NonNullable<Deployment["events"]>[number];
@@ -185,13 +185,19 @@ export default function DeploymentDetailPage() {
   const recentEvents: DeploymentEvent[] = deployment?.events?.slice(0, 6) ?? [];
   const failureGuidance = deployment
     ? deriveDeploymentFailureGuidance({
-        deploymentId: deployment.id,
+        deploymentId: deployment?.id,
         status: deployment.status,
         errorMessage: deployment.error_message,
         events: deployment.events ?? [],
       })
     : null;
   const failureSignal = deployment?.error_message ?? recentEvents.find((event) => event.error_message)?.error_message ?? null;
+  const actionGuidance = actionError
+    ? deriveFailureGuidanceFromSignal({
+        message: actionError,
+        deploymentId: deployment?.id,
+      })
+    : null;
 
   if (loading) {
     return (
@@ -246,6 +252,7 @@ export default function DeploymentDetailPage() {
         </div>
       ) : null}
 
+      {actionGuidance && !failureGuidance ? <FailureProgressCard guidance={actionGuidance} signal={actionError} /> : null}
       {failureGuidance ? <FailureProgressCard guidance={failureGuidance} signal={failureSignal} /> : null}
 
       <div className="flex flex-wrap items-center gap-2">

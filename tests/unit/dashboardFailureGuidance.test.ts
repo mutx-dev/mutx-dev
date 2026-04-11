@@ -1,5 +1,7 @@
 import {
+  deriveAlertFailureGuidance,
   deriveDeploymentFailureGuidance,
+  deriveFailureGuidanceFromSignal,
   deriveRuntimeFailureGuidance,
 } from '../../lib/dashboardFailureGuidance'
 
@@ -52,7 +54,29 @@ describe('dashboard failure guidance', () => {
     jest.restoreAllMocks()
   })
 
+
+  it('maps monitoring alerts onto the same recovery lane', () => {
+    const guidance = deriveAlertFailureGuidance({
+      type: 'agent_down',
+      message: 'Agent alpha failed to report heartbeat for 120s',
+    })
+
+    expect(guidance?.kind).toBe('agent_not_responding')
+    expect(guidance?.primaryAction.href).toBe('/pico/academy/keep-your-agent-alive')
+  })
+
+  it('derives generic action failures from deployment-style messages', () => {
+    const guidance = deriveFailureGuidanceFromSignal({
+      message: 'Railway build failed: exited with status 1',
+      deploymentId: 'dep_456',
+    })
+
+    expect(guidance?.kind).toBe('deployment_failed')
+    expect(guidance?.secondaryAction?.href).toBe('/dashboard/logs?deploymentId=dep_456')
+  })
+
   it('stays quiet when no failure signal exists', () => {
+    jest.spyOn(Date, 'now').mockReturnValue(new Date('2026-04-11T03:10:00.000Z').getTime())
     const deploymentGuidance = deriveDeploymentFailureGuidance({
       deploymentId: 'dep_ok',
       status: 'running',
@@ -67,5 +91,7 @@ describe('dashboard failure guidance', () => {
 
     expect(deploymentGuidance).toBeNull()
     expect(runtimeGuidance).toBeNull()
+
+    jest.restoreAllMocks()
   })
 })

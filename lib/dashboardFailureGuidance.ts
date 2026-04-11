@@ -37,6 +37,17 @@ type RuntimeFailureSignal = {
   heartbeatAt?: string | null
 }
 
+type GenericFailureSignal = {
+  message?: string | null
+  status?: string | null
+  deploymentId?: string
+}
+
+type AlertFailureSignal = {
+  type?: string | null
+  message?: string | null
+}
+
 const RUNTIME_HEARTBEAT_STALE_MS = 3 * 60 * 1000
 const HEARTBEAT_KEYWORDS = ['heartbeat', 'not responding', 'unresponsive', 'monitor_failed', 'stale']
 const FAILURE_KEYWORDS = ['failed', 'error', 'crash', 'rollback', 'timeout', 'exited with status']
@@ -106,6 +117,24 @@ function buildDeploymentFailedGuidance(deploymentId: string | undefined, detecte
   }
 }
 
+export function deriveFailureGuidanceFromSignal(signal: GenericFailureSignal): FailureGuidance | null {
+  const flattened = joinSignals([signal.status, signal.message])
+
+  if (!flattened) {
+    return null
+  }
+
+  if (includesAny(flattened, HEARTBEAT_KEYWORDS)) {
+    return buildAgentNotRespondingGuidance(signal.message ?? flattened)
+  }
+
+  if (includesAny(flattened, FAILURE_KEYWORDS)) {
+    return buildDeploymentFailedGuidance(signal.deploymentId, signal.message ?? flattened)
+  }
+
+  return null
+}
+
 export function deriveDeploymentFailureGuidance(signal: DeploymentFailureSignal): FailureGuidance | null {
   const flattened = joinSignals([
     signal.status,
@@ -113,19 +142,16 @@ export function deriveDeploymentFailureGuidance(signal: DeploymentFailureSignal)
     ...(signal.events ?? []).flatMap((event) => [event.event_type, event.status, event.error_message]),
   ])
 
-  if (!flattened) {
-    return null
-  }
+  return deriveFailureGuidanceFromSignal({
+    message: flattened,
+    deploymentId: signal.deploymentId,
+  })
+}
 
-  if (includesAny(flattened, HEARTBEAT_KEYWORDS)) {
-    return buildAgentNotRespondingGuidance(signal.errorMessage ?? flattened)
-  }
-
-  if (includesAny(flattened, FAILURE_KEYWORDS)) {
-    return buildDeploymentFailedGuidance(signal.deploymentId, signal.errorMessage ?? flattened)
-  }
-
-  return null
+export function deriveAlertFailureGuidance(signal: AlertFailureSignal): FailureGuidance | null {
+  return deriveFailureGuidanceFromSignal({
+    message: joinSignals([signal.type, signal.message]),
+  })
 }
 
 export function deriveRuntimeFailureGuidance(signal: RuntimeFailureSignal): FailureGuidance | null {
