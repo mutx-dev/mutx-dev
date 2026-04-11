@@ -216,6 +216,22 @@
         "privacy": "Datenschutz"
       },
       "copyright": "© MUTX 2026. Offene Kontrolle für bereitgestellte Agenten."
+    },
+    "waitlistForm": {
+      "submit": "Zugang anfordern",
+      "submitting": "Wird gesendet...",
+      "success": "Sie stehen auf der Liste.",
+      "successCheckInbox": "Sie stehen auf der Liste. Prüfen Sie Ihren Posteingang.",
+      "alreadyJoined": "Sie stehen bereits auf der Liste!",
+      "successNote": "Wir melden uns bald bei Ihnen.",
+      "joinFailed": "Beitritt zur Warteliste fehlgeschlagen",
+      "verificationLoading": "Verifizierungsprüfung wird geladen...",
+      "verificationLoadingTryAgain": "Die Verifizierung wird noch geladen. Bitte versuchen Sie es gleich noch einmal.",
+      "verificationUnavailable": "Die Wartelisten-Verifizierung ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.",
+      "verificationRequired": "Bitte schließen Sie die Verifizierungsprüfung ab.",
+      "verificationFailedRefresh": "Verifizierung fehlgeschlagen. Bitte laden Sie die Prüfung neu und versuchen Sie es erneut.",
+      "verificationExpired": "Die Verifizierung ist abgelaufen. Bitte schließen Sie die Prüfung erneut ab.",
+      "verificationTimedOut": "Zeitüberschreitung bei der Verifizierung. Bitte schließen Sie die Prüfung erneut ab."
     }
   }
 }

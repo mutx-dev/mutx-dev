@@ -216,6 +216,22 @@
         "privacy": "Privacy"
       },
       "copyright": "© MUTX 2026. Controllo aperto per gli agenti distribuiti."
+    },
+    "waitlistForm": {
+      "submit": "Richiedi accesso",
+      "submitting": "Invio in corso...",
+      "success": "Sei nella lista.",
+      "successCheckInbox": "Sei nella lista. Controlla la tua casella di posta.",
+      "alreadyJoined": "Sei già nella lista!",
+      "successNote": "Ti contatteremo presto.",
+      "joinFailed": "Impossibile iscriversi alla lista d'attesa",
+      "verificationLoading": "Caricamento della verifica...",
+      "verificationLoadingTryAgain": "La verifica è ancora in caricamento. Riprova tra un momento.",
+      "verificationUnavailable": "La verifica della lista d'attesa non è disponibile al momento. Riprova più tardi.",
+      "verificationRequired": "Completa la verifica.",
+      "verificationFailedRefresh": "Verifica non riuscita. Aggiorna la verifica e riprova.",
+      "verificationExpired": "La verifica è scaduta. Completa di nuovo la verifica.",
+      "verificationTimedOut": "Timeout della verifica. Completa di nuovo la verifica."
     }
   }
 }

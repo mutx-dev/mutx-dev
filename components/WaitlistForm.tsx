@@ -4,7 +4,7 @@ import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react'
 import Turnstile, { type BoundTurnstileObject } from 'react-turnstile'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { cn } from '@/lib/utils'
 import styles from './WaitlistForm.module.css'
@@ -19,11 +19,12 @@ export type WaitlistFormProps = {
 export function WaitlistForm({ source = 'homepage', compact = false, className }: WaitlistFormProps) {
   const initialTurnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? ''
   const locale = useLocale()
+  const t = useTranslations('waitlistForm')
   const [email, setEmail] = useState('')
   const [count, setCount] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [successMessage, setSuccessMessage] = useState("You're on the list. Check your inbox.")
+  const [successMessage, setSuccessMessage] = useState(t('successCheckInbox'))
   const [error, setError] = useState('')
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [honeypot, setHoneypot] = useState('')
@@ -100,14 +101,14 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
     if (!turnstileSiteKey) {
       setError(
         loadingTurnstileSiteKey
-          ? 'Verification is still loading. Please try again in a moment.'
-          : 'Waitlist verification is unavailable right now. Please try again later.'
+          ? t('verificationLoadingTryAgain')
+          : t('verificationUnavailable')
       )
       return
     }
 
     if (!captchaToken) {
-      setError('Please complete the verification challenge.')
+      setError(t('verificationRequired'))
       return
     }
 
@@ -124,20 +125,20 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
       const payload = await response.json()
 
       if (!response.ok) {
-        throw new Error(payload.error?.message || payload.error?.code || 'Failed to join waitlist')
+        throw new Error(payload.error?.message || payload.error?.code || t('joinFailed'))
       }
 
-      const alreadyJoined = String(payload.message || '').toLowerCase().includes('already')
+      const alreadyJoined = Boolean(payload.alreadyJoined)
       const emailSent = payload.emailSent !== false
 
       setSuccess(true)
       setSuccessMessage(
-        alreadyJoined
-          ? payload.message || "You're already on the list!"
-          : payload.message
-            || (emailSent
-              ? "You're on the list. Check your inbox."
-              : "You're on the list.")
+        payload.message
+          || (alreadyJoined
+            ? t('alreadyJoined')
+            : emailSent
+              ? t('successCheckInbox')
+              : t('success'))
       )
 
       if (!alreadyJoined) {
@@ -146,7 +147,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
 
       setEmail('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to join waitlist')
+      setError(err instanceof Error ? err.message : t('joinFailed'))
     } finally {
       resetTurnstile()
       setLoading(false)
@@ -179,7 +180,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
             <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-white" />
             <div>
               <p>{successMessage}</p>
-              <p className={styles.successNote}>We&apos;ll be in touch soon.</p>
+              <p className={styles.successNote}>{t('successNote')}</p>
             </div>
           </motion.div>
         ) : (
@@ -213,12 +214,12 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
                 onError={(_, boundTurnstile) => {
                   turnstileRef.current = boundTurnstile ?? null
                   setCaptchaToken(null)
-                  setError('Verification failed. Please refresh the challenge and try again.')
+                  setError(t('verificationFailedRefresh'))
                 }}
                 onExpire={(_, boundTurnstile) => {
                   turnstileRef.current = boundTurnstile
                   setCaptchaToken(null)
-                  setError('Verification expired. Please complete the challenge again.')
+                  setError(t('verificationExpired'))
                 }}
                 onLoad={(_, boundTurnstile) => {
                   turnstileRef.current = boundTurnstile
@@ -226,7 +227,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
                 onTimeout={(boundTurnstile) => {
                   turnstileRef.current = boundTurnstile
                   setCaptchaToken(null)
-                  setError('Verification timed out. Please complete the challenge again.')
+                  setError(t('verificationTimedOut'))
                 }}
                 onVerify={(token, boundTurnstile) => {
                   turnstileRef.current = boundTurnstile
@@ -241,8 +242,8 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
             ) : (
               <div className={styles.turnstileFallback}>
                 {loadingTurnstileSiteKey
-                  ? 'Loading verification challenge...'
-                  : 'Waitlist verification is unavailable right now. Please try again later.'}
+                  ? t('verificationLoading')
+                  : t('verificationUnavailable')}
               </div>
             )}
 
@@ -251,7 +252,7 @@ export function WaitlistForm({ source = 'homepage', compact = false, className }
               disabled={loading || !captchaToken || !turnstileSiteKey}
               className={styles.button}
             >
-              {loading ? 'Submitting...' : 'Request access'}
+              {loading ? t('submitting') : t('submit')}
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>

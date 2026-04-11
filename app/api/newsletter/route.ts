@@ -29,6 +29,107 @@ const defaultWaitlistTemplateId =
   || process.env.RESEND_WAITLIST_TEMPLATE_ID?.trim()
   || 'waitlist'
 
+const waitlistMessages = {
+  en: {
+    invalidInput: 'Invalid input',
+    invalidEmail: 'Invalid email format',
+    verificationRequired: 'Please complete the verification challenge.',
+    verificationFailed: 'Verification failed. Please try again.',
+    alreadyJoined: "You're already on the list!",
+    success: "You're on the list!",
+    successCheckInbox: "You're on the list. Check your inbox.",
+  },
+  ar: {
+    invalidInput: 'إدخال غير صالح',
+    invalidEmail: 'تنسيق البريد الإلكتروني غير صالح',
+    verificationRequired: 'يرجى إكمال تحدي التحقق.',
+    verificationFailed: 'فشل التحقق. يرجى المحاولة مرة أخرى.',
+    alreadyJoined: 'أنت بالفعل على القائمة!',
+    success: 'لقد انضممت إلى القائمة!',
+    successCheckInbox: 'لقد انضممت إلى القائمة. تحقق من بريدك الوارد.',
+  },
+  de: {
+    invalidInput: 'Ungültige Eingabe',
+    invalidEmail: 'Ungültiges E-Mail-Format',
+    verificationRequired: 'Bitte schließen Sie die Verifizierungsprüfung ab.',
+    verificationFailed: 'Verifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+    alreadyJoined: 'Sie stehen bereits auf der Liste!',
+    success: 'Sie stehen auf der Liste!',
+    successCheckInbox: 'Sie stehen auf der Liste. Prüfen Sie Ihren Posteingang.',
+  },
+  es: {
+    invalidInput: 'Entrada no válida',
+    invalidEmail: 'Formato de correo electrónico no válido',
+    verificationRequired: 'Por favor completa el desafío de verificación.',
+    verificationFailed: 'La verificación ha fallado. Inténtalo de nuevo.',
+    alreadyJoined: '¡Ya estás en la lista!',
+    success: '¡Estás en la lista!',
+    successCheckInbox: '¡Estás en la lista! Revisa tu bandeja de entrada.',
+  },
+  fr: {
+    invalidInput: 'Entrée non valide',
+    invalidEmail: 'Format d’adresse e-mail invalide',
+    verificationRequired: 'Veuillez terminer la vérification.',
+    verificationFailed: 'Échec de la vérification. Veuillez réessayer.',
+    alreadyJoined: 'Vous êtes déjà sur la liste !',
+    success: 'Vous êtes sur la liste !',
+    successCheckInbox: 'Vous êtes sur la liste. Vérifiez votre boîte de réception.',
+  },
+  it: {
+    invalidInput: 'Input non valido',
+    invalidEmail: 'Formato email non valido',
+    verificationRequired: 'Completa la verifica.',
+    verificationFailed: 'Verifica non riuscita. Riprova.',
+    alreadyJoined: 'Sei già nella lista!',
+    success: 'Sei nella lista!',
+    successCheckInbox: 'Sei nella lista. Controlla la tua casella di posta.',
+  },
+  ja: {
+    invalidInput: '無効な入力です',
+    invalidEmail: 'メールアドレスの形式が正しくありません',
+    verificationRequired: '認証チャレンジを完了してください。',
+    verificationFailed: '認証に失敗しました。もう一度お試しください。',
+    alreadyJoined: 'すでにリストに登録されています！',
+    success: 'リストに登録されました！',
+    successCheckInbox: 'リストに登録されました。受信トレイをご確認ください。',
+  },
+  ko: {
+    invalidInput: '잘못된 입력입니다',
+    invalidEmail: '유효하지 않은 이메일 형식입니다',
+    verificationRequired: '인증 확인을 완료해 주세요.',
+    verificationFailed: '인증에 실패했습니다. 다시 시도해 주세요.',
+    alreadyJoined: '이미 대기자 명단에 등록되어 있습니다!',
+    success: '대기자 명단에 등록되었습니다!',
+    successCheckInbox: '대기자 명단에 등록되었습니다. 받은편지함을 확인해 주세요.',
+  },
+  pt: {
+    invalidInput: 'Entrada inválida',
+    invalidEmail: 'Formato de e-mail inválido',
+    verificationRequired: 'Conclua o desafio de verificação.',
+    verificationFailed: 'A verificação falhou. Tente novamente.',
+    alreadyJoined: 'Você já está na lista!',
+    success: 'Você está na lista!',
+    successCheckInbox: 'Você está na lista. Verifique sua caixa de entrada.',
+  },
+  zh: {
+    invalidInput: '输入无效',
+    invalidEmail: '电子邮件格式无效',
+    verificationRequired: '请完成验证挑战。',
+    verificationFailed: '验证失败，请重试。',
+    alreadyJoined: '你已经在名单中了！',
+    success: '你已加入名单！',
+    successCheckInbox: '你已加入名单。请检查收件箱。',
+  },
+} as const satisfies Record<Locale, {
+  invalidInput: string
+  invalidEmail: string
+  verificationRequired: string
+  verificationFailed: string
+  alreadyJoined: string
+  success: string
+  successCheckInbox: string
+}>
+
 function normalizeLocale(locale?: string): Locale {
   const normalizedLocale = locale?.trim().toLowerCase()
   if (!normalizedLocale) return routing.defaultLocale
@@ -42,6 +143,10 @@ function normalizeLocale(locale?: string): Locale {
 function getWaitlistTemplateId(locale?: string) {
   const normalizedLocale = normalizeLocale(locale)
   return waitlistTemplateIdsByLocale[normalizedLocale] || defaultWaitlistTemplateId
+}
+
+function getWaitlistMessages(locale?: string) {
+  return waitlistMessages[normalizeLocale(locale)]
 }
 
 function isEmailDeliveryConfigured() {
@@ -151,26 +256,32 @@ export async function POST(request: Request): Promise<NextResponse> {
     
     const body = await request.json().catch(() => ({}))
     const { email: _email, source, locale, captchaToken, honeypot } = body
+    const messages = getWaitlistMessages(locale)
 
     // 1. Honeypot check
     if (honeypot) {
-      return badRequest('Invalid input')
+      return badRequest(messages.invalidInput)
     }
 
     // 2. Validate email with schema
     const validation = await validateData(schemas.newsletter, body)
     if (!validation.success) {
+      const validationBody = await validation.response.json()
+      if (validationBody?.error?.message === 'Invalid email format') {
+        return badRequest(messages.invalidEmail)
+      }
+
       return validation.response
     }
 
     // 3. Validate captcha token
     if (typeof captchaToken !== 'string' || !captchaToken.trim()) {
-      return badRequest('Please complete the verification challenge.')
+      return badRequest(messages.verificationRequired)
     }
 
     const isValidCaptcha = await verifyTurnstileToken(request, captchaToken)
     if (!isValidCaptcha) {
-      return badRequest('Verification failed. Please try again.')
+      return badRequest(messages.verificationFailed)
     }
 
     const normalizedEmail = validation.data.email.toLowerCase().trim()
@@ -186,17 +297,17 @@ export async function POST(request: Request): Promise<NextResponse> {
     `
 
     if (result.length === 0) {
-      return NextResponse.json({ success: true, message: "You're already on the list!", emailSent: false })
+      return NextResponse.json({ success: true, message: messages.alreadyJoined, emailSent: false, alreadyJoined: true })
     }
 
     let emailSent = false
-    let message = "You're on the list!"
+    let message: string = messages.success
 
     if (isEmailDeliveryConfigured()) {
       try {
         await sendWaitlistConfirmationEmail(normalizedEmail, locale)
         emailSent = true
-        message = "You're on the list. Check your inbox."
+        message = messages.successCheckInbox
       } catch (emailError) {
         console.error('Waitlist confirmation email failed:', emailError)
       }
@@ -208,6 +319,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       success: true,
       message,
       emailSent,
+      alreadyJoined: false,
     })
   })(request)
 }

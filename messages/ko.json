@@ -216,6 +216,22 @@
         "privacy": "개인정보 보호"
       },
       "copyright": "© MUTX 2026. 배포된 에이전트를 위한 열린 제어."
+    },
+    "waitlistForm": {
+      "submit": "액세스 요청",
+      "submitting": "제출 중...",
+      "success": "대기자 명단에 등록되었습니다.",
+      "successCheckInbox": "대기자 명단에 등록되었습니다. 받은편지함을 확인해 주세요.",
+      "alreadyJoined": "이미 대기자 명단에 등록되어 있습니다!",
+      "successNote": "곧 연락드리겠습니다.",
+      "joinFailed": "대기자 명단 등록에 실패했습니다",
+      "verificationLoading": "인증 확인을 불러오는 중...",
+      "verificationLoadingTryAgain": "인증이 아직 로드 중입니다. 잠시 후 다시 시도해 주세요.",
+      "verificationUnavailable": "현재 대기자 명단 인증을 사용할 수 없습니다. 나중에 다시 시도해 주세요.",
+      "verificationRequired": "인증 확인을 완료해 주세요.",
+      "verificationFailedRefresh": "인증에 실패했습니다. 확인을 새로고침한 뒤 다시 시도해 주세요.",
+      "verificationExpired": "인증이 만료되었습니다. 다시 완료해 주세요.",
+      "verificationTimedOut": "인증 시간이 초과되었습니다. 다시 완료해 주세요."
     }
   }
 }

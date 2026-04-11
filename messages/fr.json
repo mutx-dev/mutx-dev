@@ -216,6 +216,22 @@
         "privacy": "Confidentialité"
       },
       "copyright": "© MUTX 2026. Contrôle ouvert pour les agents déployés."
+    },
+    "waitlistForm": {
+      "submit": "Demander l'accès",
+      "submitting": "Envoi en cours...",
+      "success": "Vous êtes sur la liste.",
+      "successCheckInbox": "Vous êtes sur la liste. Vérifiez votre boîte de réception.",
+      "alreadyJoined": "Vous êtes déjà sur la liste !",
+      "successNote": "Nous vous contacterons bientôt.",
+      "joinFailed": "Impossible de rejoindre la liste d'attente",
+      "verificationLoading": "Chargement du défi de vérification...",
+      "verificationLoadingTryAgain": "La vérification est toujours en cours de chargement. Veuillez réessayer dans un instant.",
+      "verificationUnavailable": "La vérification de la liste d'attente est indisponible pour le moment. Veuillez réessayer plus tard.",
+      "verificationRequired": "Veuillez terminer la vérification.",
+      "verificationFailedRefresh": "Échec de la vérification. Actualisez le défi et réessayez.",
+      "verificationExpired": "La vérification a expiré. Veuillez terminer le défi à nouveau.",
+      "verificationTimedOut": "Le délai de vérification a expiré. Veuillez terminer le défi à nouveau."
     }
   }
 }

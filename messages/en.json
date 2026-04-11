@@ -205,6 +205,22 @@
       "successBody": "We will be in touch when PicoMUTX access opens. No spam, no payment required.",
       "errorFallback": "Something went wrong. Please try again."
     },
+    "waitlistForm": {
+      "submit": "Request access",
+      "submitting": "Submitting...",
+      "success": "You're on the list.",
+      "successCheckInbox": "You're on the list. Check your inbox.",
+      "alreadyJoined": "You're already on the list!",
+      "successNote": "We'll be in touch soon.",
+      "joinFailed": "Failed to join waitlist",
+      "verificationLoading": "Loading verification challenge...",
+      "verificationLoadingTryAgain": "Verification is still loading. Please try again in a moment.",
+      "verificationUnavailable": "Waitlist verification is unavailable right now. Please try again later.",
+      "verificationRequired": "Please complete the verification challenge.",
+      "verificationFailedRefresh": "Verification failed. Please refresh the challenge and try again.",
+      "verificationExpired": "Verification expired. Please complete the challenge again.",
+      "verificationTimedOut": "Verification timed out. Please complete the challenge again."
+    },
     "footer": {
       "links": {
         "releases": "Releases",

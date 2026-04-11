@@ -217,6 +217,22 @@
         "privacy": "الخصوصية"
       },
       "copyright": "© MUTX 2026. تحكم مفتوح في الوكلاء المنشورين."
+    },
+    "waitlistForm": {
+      "submit": "اطلب الوصول",
+      "submitting": "جارٍ الإرسال...",
+      "success": "لقد انضممت إلى القائمة.",
+      "successCheckInbox": "لقد انضممت إلى القائمة. تحقق من بريدك الوارد.",
+      "alreadyJoined": "أنت بالفعل على القائمة!",
+      "successNote": "سنتواصل معك قريبًا.",
+      "joinFailed": "تعذر الانضمام إلى قائمة الانتظار",
+      "verificationLoading": "جارٍ تحميل تحدي التحقق...",
+      "verificationLoadingTryAgain": "لا يزال التحقق قيد التحميل. يرجى المحاولة مرة أخرى بعد قليل.",
+      "verificationUnavailable": "التحقق لقائمة الانتظار غير متاح الآن. يرجى المحاولة لاحقًا.",
+      "verificationRequired": "يرجى إكمال تحدي التحقق.",
+      "verificationFailedRefresh": "فشل التحقق. يرجى تحديث التحدي والمحاولة مرة أخرى.",
+      "verificationExpired": "انتهت صلاحية التحقق. يرجى إكمال التحدي مرة أخرى.",
+      "verificationTimedOut": "انتهت مهلة التحقق. يرجى إكمال التحدي مرة أخرى."
     }
   }
 }

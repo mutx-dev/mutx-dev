@@ -216,6 +216,22 @@
         "privacy": "Privacidad"
       },
       "copyright": "© MUTX 2026. Control abierto para agentes desplegados."
+    },
+    "waitlistForm": {
+      "submit": "Solicitar acceso",
+      "submitting": "Enviando...",
+      "success": "Estás en la lista.",
+      "successCheckInbox": "Estás en la lista. Revisa tu bandeja de entrada.",
+      "alreadyJoined": "¡Ya estás en la lista!",
+      "successNote": "Nos pondremos en contacto contigo pronto.",
+      "joinFailed": "No se pudo unir a la lista de espera",
+      "verificationLoading": "Cargando desafío de verificación...",
+      "verificationLoadingTryAgain": "La verificación aún se está cargando. Inténtalo de nuevo en un momento.",
+      "verificationUnavailable": "La verificación de la lista de espera no está disponible en este momento. Inténtalo más tarde.",
+      "verificationRequired": "Por favor completa el desafío de verificación.",
+      "verificationFailedRefresh": "La verificación ha fallado. Actualiza el desafío y vuelve a intentarlo.",
+      "verificationExpired": "La verificación ha caducado. Completa el desafío de nuevo.",
+      "verificationTimedOut": "Se agotó el tiempo de verificación. Completa el desafío de nuevo."
     }
   }
 }
