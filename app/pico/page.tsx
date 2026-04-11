@@ -1,34 +1,51 @@
-import type { Metadata } from "next";
-
+import type { Metadata } from 'next'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { PicoLandingSurface } from '@/components/pico/PicoLandingSurface'
 import { DEFAULT_X_HANDLE, getPageOgImageUrl } from '@/lib/seo'
+import { routing } from '@/i18n/routing'
 
-const pageTitle = "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer";
-const pageDescription =
-  "PicoMUTX helps founders, operators, and small teams build, deploy, and run AI agents safely — with step-by-step guidance, built-in safeguards, and real support. Pre-register now for early access.";
-
-export const metadata: Metadata = {
-  title: pageTitle,
-  description: pageDescription,
-  alternates: {
-    canonical: 'https://pico.mutx.dev',
-  },
-  openGraph: {
-    title: pageTitle,
-    description: pageDescription,
-    url: 'https://pico.mutx.dev',
-    images: [getPageOgImageUrl(pageTitle, pageDescription, { path: '/pico' })],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    creator: DEFAULT_X_HANDLE,
-    title: pageTitle,
-    description: pageDescription,
-    images: [getPageOgImageUrl(pageTitle, pageDescription, { path: '/pico' })],
-  },
+function normalizeLocale(locale: string) {
+  return routing.locales.includes(locale as (typeof routing.locales)[number])
+    ? locale
+    : routing.defaultLocale
 }
 
-export default function PicoPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = normalizeLocale(await getLocale())
+  const t = await getTranslations({ locale, namespace: 'pico.meta' })
+  const pageTitle = t('title')
+  const pageDescription = t('description')
+
+  return {
+    title: pageTitle,
+    description: pageDescription,
+    alternates: {
+      canonical: 'https://pico.mutx.dev',
+      languages: Object.fromEntries(routing.locales.map((supportedLocale) => [supportedLocale, 'https://pico.mutx.dev'])),
+    },
+    openGraph: {
+      title: pageTitle,
+      description: pageDescription,
+      url: 'https://pico.mutx.dev',
+      locale,
+      images: [getPageOgImageUrl(pageTitle, pageDescription, { path: '/pico' })],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      creator: DEFAULT_X_HANDLE,
+      title: pageTitle,
+      description: pageDescription,
+      images: [getPageOgImageUrl(pageTitle, pageDescription, { path: '/pico' })],
+    },
+  }
+}
+
+export default async function PicoPage() {
+  const locale = normalizeLocale(await getLocale())
+  const t = await getTranslations({ locale, namespace: 'pico.meta' })
+  const pageTitle = t('title')
+  const pageDescription = t('description')
+
   return (
     <>
       <script
@@ -37,7 +54,8 @@ export default function PicoPage() {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'WebPage',
-            name: 'PicoMUTX',
+            inLanguage: locale,
+            name: pageTitle,
             url: 'https://pico.mutx.dev',
             description: pageDescription,
             isPartOf: {

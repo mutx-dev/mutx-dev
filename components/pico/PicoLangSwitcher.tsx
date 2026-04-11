@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useLocale } from 'next-intl'
 
@@ -17,6 +18,7 @@ const LOCALES = [
 ]
 
 export function PicoLangSwitcher() {
+  const router = useRouter()
   const locale = useLocale()
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -47,8 +49,8 @@ export function PicoLangSwitcher() {
   const handleSelect = useCallback((code: string) => {
     document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
     setOpen(false)
-    window.location.reload()
-  }, [])
+    router.refresh()
+  }, [router])
 
   return (
     <div ref={containerRef} style={{ position: 'relative', display: 'inline-flex' }}>

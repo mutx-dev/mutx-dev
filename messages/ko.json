@@ -1,221 +1,221 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer",
-      "description": "PicoMUTX helps founders, operators, and small teams build, deploy, and run AI agents safely — with step-by-step guidance, built-in safeguards, and real support. Pre-register now for early access."
+      "title": "PicoMUTX — 개발자를 채용하지 않고도 AI 에이전트를 안전하게 구축하고 배포하세요",
+      "description": "PicoMUTX는 창업자, 운영 담당자, 소규모 팀이 AI 에이전트를 안전하게 구축, 배포, 운영할 수 있도록 돕습니다. 단계별 안내, 기본 내장 안전장치, 그리고 실질적인 지원을 제공합니다. 지금 사전 등록하고 얼리 액세스를 받아보세요."
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
-      "cta": "Pre-register"
+      "cta": "사전 등록"
     },
     "hero": {
-      "badge": "Early Access · Limited Spots",
-      "title": "Build and deploy AI agents ",
-      "titleAccent": "without hiring a developer.",
-      "subtitle": "PicoMUTX gives you a safe, guided path to a working AI agent — whether you are starting from scratch, fixing an agent that is not working, or trying to avoid another expensive mistake.",
-      "cta": "Pre-Register for Early Access",
-      "meta": "Free to pre-register · No credit card required · Founding spots limited"
+      "badge": "얼리 액세스 · 한정된 자리",
+      "title": "AI 에이전트를 구축하고 배포하세요 ",
+      "titleAccent": "개발자를 채용하지 않고도.",
+      "subtitle": "PicoMUTX는 실제로 작동하는 AI 에이전트에 도달할 수 있도록 안전하고 안내된 경로를 제공합니다. 처음부터 시작하든, 제대로 작동하지 않는 에이전트를 바로잡든, 또 다른 큰 비용의 실수를 피하려 하든 모두 가능합니다.",
+      "cta": "얼리 액세스 사전 등록",
+      "meta": "사전 등록 무료 · 신용카드 불필요 · 창립 멤버 자리는 한정됨"
     },
     "trustBar": {
       "items": {
-        "0": "For founders, operators, and small teams",
-        "1": "Step-by-step guidance",
-        "2": "Built-in safeguards from day one"
+        "0": "창업자, 운영 담당자, 소규모 팀을 위한 서비스",
+        "1": "단계별 안내",
+        "2": "첫날부터 내장된 안전장치"
       }
     },
     "problem": {
-      "eyebrow": "The Problem",
-      "title": "The problem is not the idea.",
-      "titleLine2": "It is everything that happens after it.",
-      "body": "Most people do not get stuck because they lack ambition. They get stuck because building an AI agent still feels like entering a world designed by engineers, for engineers.",
+      "eyebrow": "문제",
+      "title": "문제는 아이디어가 아닙니다.",
+      "titleLine2": "문제는 그다음에 벌어지는 모든 일입니다.",
+      "body": "대부분의 사람이 막히는 이유는 야심이 부족해서가 아닙니다. AI 에이전트를 만드는 일이 여전히 엔지니어가 엔지니어를 위해 설계한 세계에 들어가는 것처럼 느껴지기 때문입니다.",
       "scenarios": {
         "0": {
-          "label": "\"I want an AI agent, but I don't know where to start.\"",
-          "body": "There are too many tools, too many opinions, and too many people assuming you already know the basics. The gap between \"I have an idea\" and \"I have something working\" feels larger than it should."
+          "label": "\"AI 에이전트를 만들고 싶지만, 어디서 시작해야 할지 모르겠습니다.\"",
+          "body": "도구는 너무 많고, 의견도 너무 많고, 이미 기본을 알고 있다고 가정하는 사람도 너무 많습니다. \"아이디어는 있다\"와 \"실제로 돌아가는 무언가는 있다\" 사이의 간격이 필요 이상으로 크게 느껴집니다."
         },
         "1": {
-          "label": "\"I already tried — and got stuck.\"",
-          "body": "You made progress, hit a wall, and had nobody to ask who could actually help. The idea is sitting in your backlog instead of creating value."
+          "label": "\"이미 시도해 봤지만, 중간에 막혔습니다.\"",
+          "body": "어느 정도 진전은 있었지만 벽에 부딪혔고, 실제로 도움을 줄 수 있는 사람은 없었습니다. 그 아이디어는 가치를 만들지 못한 채 백로그에 남아 있습니다."
         },
         "2": {
-          "label": "\"I spent money, and it still isn't working properly.\"",
-          "body": "Maybe you hired someone. Maybe you paid for tools. Now you are not just uncertain — you are skeptical."
+          "label": "\"돈을 썼는데도 아직 제대로 작동하지 않습니다.\"",
+          "body": "누군가를 고용했을 수도 있습니다. 도구에 비용을 지불했을 수도 있습니다. 이제 당신은 단순히 불확실한 상태를 넘어, 회의적이 되었습니다."
         },
         "3": {
-          "label": "\"I don't want to deploy something I can't trust.\"",
-          "body": "An agent that gives the wrong answer, behaves unpredictably, or creates hidden costs is not an asset. It is a liability."
+          "label": "\"믿을 수 없는 것을 배포하고 싶지 않습니다.\"",
+          "body": "잘못된 답을 내놓거나, 예측 불가능하게 행동하거나, 숨겨진 비용을 만드는 에이전트는 자산이 아닙니다. 그것은 리스크입니다."
         }
       },
-      "close": "That's exactly why PicoMUTX exists."
+      "close": "바로 그래서 PicoMUTX가 존재합니다."
     },
     "platform": {
-      "eyebrow": "What PicoMUTX Is",
-      "title": "Where AI agents go from “interesting idea” to “working system.”",
-      "body": "PicoMUTX is a guided platform for people who want to build and run AI agents safely — without needing to become full-time engineers. It gives you the structure, support, and safeguards that are usually missing when people try to do this alone. Instead of assembling everything from scratch, you move step by step: from idea to implementation, from confusion to clarity, from prototype to something you can actually use.",
+      "eyebrow": "PicoMUTX란",
+      "title": "AI 에이전트를 ‘흥미로운 아이디어’에서 ‘작동하는 시스템’으로 바꾸는 곳.",
+      "body": "PicoMUTX는 AI 에이전트를 안전하게 구축하고 운영하고 싶은 사람들을 위한 가이드형 플랫폼입니다. 풀타임 엔지니어가 될 필요는 없습니다. 혼자 해보려 할 때 흔히 빠져 있는 구조, 지원, 안전장치를 제공하며, 모든 것을 처음부터 짜맞추는 대신 아이디어에서 구현으로, 혼란에서 명확함으로, 프로토타입에서 실제로 쓸 수 있는 무언가로 한 단계씩 나아가게 해줍니다.",
       "howItWorks": {
         "0": {
-          "title": "Step-by-step implementation paths",
-          "body": "Follow structured paths based on what you are trying to build — from customer support agents to internal automations. No generic theory. No endless searching."
+          "title": "단계별 구현 경로",
+          "body": "만들고자 하는 것에 맞는 구조화된 경로를 따라갈 수 있습니다. 고객 지원 에이전트부터 내부 자동화까지 가능합니다. 추상적인 이론만 나열하지 않습니다. 끝없는 검색도 필요 없습니다."
         },
         "1": {
-          "title": "Guided support when you get stuck",
-          "body": "When something breaks or becomes unclear, you do not have to figure it out alone. PicoMUTX keeps momentum alive instead of letting projects die in confusion."
+          "title": "막혔을 때 받는 가이드형 지원",
+          "body": "무언가가 망가지거나 불분명해졌을 때, 혼자 해결하려 애쓸 필요가 없습니다. PicoMUTX는 프로젝트가 혼란 속에서 멈춰 버리지 않도록 흐름을 유지해 줍니다."
         },
         "2": {
-          "title": "Built-in safety from day one",
-          "body": "Cost awareness, visibility, and guardrails matter. You always know what your agent is doing, what it is costing, and when something needs attention."
+          "title": "첫날부터 내장된 안전성",
+          "body": "비용 인식, 가시성, 가드레일은 중요합니다. 에이전트가 무엇을 하고 있는지, 얼마의 비용이 들고 있는지, 언제 주의가 필요한지 항상 파악할 수 있습니다."
         },
         "3": {
-          "title": "Live expert touchpoints",
-          "body": "Some things are too nuanced for static documentation. Real guidance moments designed to help you unblock faster and make better decisions."
+          "title": "전문가와의 실시간 접점",
+          "body": "정적인 문서만으로는 다룰 수 없을 만큼 미묘한 문제들이 있습니다. 더 빨리 막힌 지점을 풀고 더 나은 결정을 내릴 수 있도록 설계된 실제 가이드 순간을 제공합니다."
         }
       }
     },
     "who": {
-      "eyebrow": "Is PicoMUTX for You?",
-      "title": "PicoMUTX is not for everyone.",
-      "forYouTitle": "This is for you if…",
-      "notForYouTitle": "This is not for you if…",
+      "eyebrow": "PicoMUTX가 당신에게 맞을까요?",
+      "title": "PicoMUTX는 모두를 위한 서비스가 아닙니다.",
+      "forYouTitle": "이런 분께 적합합니다…",
+      "notForYouTitle": "이런 분께는 적합하지 않습니다…",
       "forYou": {
-        "0": "You want to build an AI agent but don't want to depend entirely on developers",
-        "1": "You've tried before and got stuck halfway",
-        "2": "You already spent money on tools or implementation and still don't trust the outcome",
-        "3": "You want a practical path, not more theory",
-        "4": "You want support while building, not only after something goes wrong"
+        "0": "AI 에이전트를 만들고 싶지만 개발자에게 전적으로 의존하고 싶지는 않다",
+        "1": "예전에 시도해 봤지만 중간에 막혔다",
+        "2": "이미 도구나 구현에 돈을 썼지만 결과를 아직 신뢰하지 못한다",
+        "3": "이론이 아니라 실질적인 실행 경로가 필요하다",
+        "4": "문제가 생긴 뒤가 아니라 구축하는 동안 지원을 받고 싶다"
       },
       "notForYou": {
-        "0": "You are looking for a shortcut with zero learning",
-        "1": "You already run a mature enterprise agent stack and need complex governance infrastructure",
-        "2": "You want entertainment, trends, or hype more than execution",
-        "3": "You are not ready to change how the business actually operates",
-        "4": "You expect AI to replace judgment, leadership, or accountability"
+        "0": "아무것도 배우지 않고 지름길만 원한다",
+        "1": "이미 성숙한 엔터프라이즈 에이전트 스택을 운영하고 있고 복잡한 거버넌스 인프라가 필요하다",
+        "2": "실행보다 엔터테인먼트, 트렌드, 화제성을 더 원한다",
+        "3": "비즈니스가 실제로 운영되는 방식을 바꿀 준비가 아직 되어 있지 않다",
+        "4": "AI가 판단, 리더십, 책임을 대체하리라 기대한다"
       }
     },
     "beforeAfter": {
-      "eyebrow": "The Shift",
-      "title": "What changes when you stop figuring it out alone",
-      "beforeLabel": "Before",
-      "afterLabel": "After",
+      "eyebrow": "변화",
+      "title": "혼자서 다 해결하려는 일을 멈췄을 때 바뀌는 것",
+      "beforeLabel": "이전",
+      "afterLabel": "이후",
       "items": {
         "0": {
-          "before": "You have an idea, but no clear path",
-          "after": "You have a structured way forward"
+          "before": "아이디어는 있지만 분명한 경로가 없다",
+          "after": "구조화된 다음 단계가 생긴다"
         },
         "1": {
-          "before": "You waste time jumping between tools, docs, and tutorials",
-          "after": "You follow guided implementation paths"
+          "before": "도구, 문서, 튜토리얼 사이를 오가며 시간을 낭비한다",
+          "after": "가이드된 구현 경로를 따라간다"
         },
         "2": {
-          "before": "You get stuck and lose momentum",
-          "after": "You get support before the project dies"
+          "before": "막히고 추진력을 잃는다",
+          "after": "프로젝트가 죽기 전에 지원을 받는다"
         },
         "3": {
-          "before": "Your agent stays in theory",
-          "after": "Your agent gets built and put to work"
+          "before": "에이전트가 아이디어 수준에 머문다",
+          "after": "에이전트가 실제로 구축되어 업무에 투입된다"
         }
       },
-      "close": "The goal is not to “learn AI someday.” The goal is to get your agent live — safely, clearly, and with less friction."
+      "close": "목표는 ‘언젠가 AI를 배우는 것’이 아닙니다. 목표는 당신의 에이전트를 더 안전하고, 더 명확하게, 더 적은 마찰로 실제 운영에 올리는 것입니다."
     },
     "earlyAccess": {
-      "eyebrow": "Early Access",
-      "title": "PicoMUTX is opening in stages. Founding access won't stay open forever.",
-      "body": "Pre-registering now puts you ahead of the public rollout and inside the group that helps shape the platform early. Early users get a closer line to the product, earlier onboarding, and more influence over what gets prioritized.",
+      "eyebrow": "얼리 액세스",
+      "title": "PicoMUTX는 단계적으로 오픈됩니다. 창립 멤버 액세스는 영원히 열려 있지 않습니다.",
+      "body": "지금 사전 등록하면 공개 출시보다 앞서 참여할 수 있고, 초기에 플랫폼을 함께 만들어 가는 그룹에 들어갈 수 있습니다. 초기 사용자는 제품과 더 가까운 연결, 더 빠른 온보딩, 그리고 무엇이 우선순위가 될지에 대한 더 큰 영향력을 갖게 됩니다.",
       "benefits": {
-        "0": "Early access before public release",
-        "1": "Priority consideration for founding member spots",
-        "2": "Early onboarding and launch updates",
-        "3": "The ability to influence early use cases and rollout priorities",
-        "4": "First visibility into pricing and access terms"
+        "0": "정식 공개 전 얼리 액세스",
+        "1": "창립 멤버 자리 우선 검토",
+        "2": "조기 온보딩 및 출시 업데이트",
+        "3": "초기 사용 사례와 롤아웃 우선순위에 영향력을 행사할 수 있는 기회",
+        "4": "가격 및 접근 조건을 가장 먼저 확인할 수 있는 기회"
       }
     },
     "faq": {
-      "eyebrow": "Questions",
-      "title": "Questions people usually have before joining",
+      "eyebrow": "질문",
+      "title": "참여 전에 사람들이 주로 묻는 질문",
       "items": {
         "0": {
-          "q": "Do I need to know how to code?",
-          "a": "No. PicoMUTX is built for people who want to build useful AI agents without needing deep technical expertise."
+          "q": "코딩을 알아야 하나요?",
+          "a": "아니요. PicoMUTX는 깊은 기술 전문성이 없어도 유용한 AI 에이전트를 만들고 싶은 사람들을 위해 만들어졌습니다."
         },
         "1": {
-          "q": "What if I've already tried and failed?",
-          "a": "That is exactly one of the people this is for. PicoMUTX is designed to reduce the confusion and fragmentation that usually cause people to stop halfway."
+          "q": "이미 시도했다가 실패한 경우는요?",
+          "a": "바로 그런 분들을 위한 서비스입니다. PicoMUTX는 사람들이 중간에 멈추게 되는 원인인 혼란과 단절을 줄이도록 설계되었습니다."
         },
         "2": {
-          "q": "What kind of agents can I build?",
-          "a": "Practical ones — the kind that save time, support operations, improve workflows, and help businesses run better. The focus is usefulness, not toy demos."
+          "q": "어떤 종류의 에이전트를 만들 수 있나요?",
+          "a": "실용적인 에이전트입니다. 시간을 절약하고, 운영을 지원하고, 워크플로를 개선하고, 비즈니스가 더 잘 돌아가도록 돕는 종류의 에이전트입니다. 초점은 장난감 같은 데모가 아니라 실용성에 있습니다."
         },
         "3": {
-          "q": "Is pre-registration free?",
-          "a": "Yes. Pre-registration is free and does not require payment. You will be among the first to hear when access opens and when founding spots become available."
+          "q": "사전 등록은 무료인가요?",
+          "a": "네. 사전 등록은 무료이며 결제가 필요하지 않습니다. 액세스가 열릴 때와 창립 멤버 자리가 생길 때 가장 먼저 소식을 듣는 분들 중 하나가 될 수 있습니다."
         },
         "4": {
-          "q": "Is this for enterprises?",
-          "a": "PicoMUTX is better suited to founders, operators, and small teams who want a guided way to build and deploy AI agents. Larger enterprise governance needs belong to the broader MUTX ecosystem."
+          "q": "엔터프라이즈용 서비스인가요?",
+          "a": "PicoMUTX는 AI 에이전트를 가이드와 함께 구축하고 배포하고자 하는 창업자, 운영 담당자, 소규모 팀에 더 적합합니다. 더 큰 규모의 엔터프라이즈 거버넌스 요구사항은 더 넓은 MUTX 생태계의 영역입니다."
         }
       }
     },
     "finalCta": {
-      "eyebrow": "Early Access · Limited Spots",
-      "title": "Your agent does not need to stay an unfinished idea.",
-      "body": "You do not need more tabs open. You do not need another tutorial. You need a clearer path to something that works. PicoMUTX is built for that moment.",
-      "formHeadline": "Pre-register for PicoMUTX",
-      "formSubline": "Join the early access list. Be first when we open.",
-      "ctaButton": "Pre-Register Now",
-      "formCtaMeta": "Free to pre-register · No credit card required · Early users get priority access"
+      "eyebrow": "얼리 액세스 · 한정된 자리",
+      "title": "당신의 에이전트가 미완성 아이디어로 남아 있을 필요는 없습니다.",
+      "body": "더 많은 탭을 열 필요는 없습니다. 또 다른 튜토리얼도 필요 없습니다. 필요한 것은 실제로 작동하는 무언가에 도달할 더 분명한 경로입니다. PicoMUTX는 바로 그 순간을 위해 만들어졌습니다.",
+      "formHeadline": "PicoMUTX 사전 등록",
+      "formSubline": "얼리 액세스 리스트에 참여하세요. 오픈할 때 가장 먼저 안내받으세요.",
+      "ctaButton": "지금 사전 등록하기",
+      "formCtaMeta": "사전 등록 무료 · 신용카드 불필요 · 초기 사용자는 우선 액세스 제공"
     },
     "contactForm": {
-      "dialogLabel": "Contact form",
-      "closeLabel": "Close",
-      "title": "Pre-register for early access",
-      "subtitle": "Tell us where you are. We'll get you in.",
-      "emailLabel": "Work email",
+      "dialogLabel": "문의 양식",
+      "closeLabel": "닫기",
+      "title": "얼리 액세스 사전 등록",
+      "subtitle": "현재 상황을 알려 주세요. 참여할 수 있도록 도와드리겠습니다.",
+      "emailLabel": "업무용 이메일",
       "emailPlaceholder": "you@company.com",
-      "nameLabel": "Name",
-      "namePlaceholder": "Jane Smith",
-      "companyLabel": "Company",
+      "nameLabel": "이름",
+      "namePlaceholder": "김민지",
+      "companyLabel": "회사명",
       "companyPlaceholder": "Acme Inc.",
-      "interestLabel": "What brings you here?",
+      "interestLabel": "어떤 이유로 오셨나요?",
       "interestOptions": {
-        "building-first": "Building my first AI agent",
-        "fixing-existing": "Fixing an agent that isn't working",
-        "evaluating": "Evaluating platforms or tools",
-        "spent-money": "Already spent money — still not working",
-        "other": "Something else"
+        "building-first": "첫 AI 에이전트를 만들고 있습니다",
+        "fixing-existing": "작동하지 않는 에이전트를 고치고 있습니다",
+        "evaluating": "플랫폼이나 도구를 평가하고 있습니다",
+        "spent-money": "이미 돈을 썼지만 아직도 작동하지 않습니다",
+        "other": "기타"
       },
-      "messageLabel": "Anything we should know?",
-      "messageOptional": "(optional)",
-      "messagePlaceholder": "E.g. I run a small SaaS and want to automate customer support...",
-      "submitting": "Sending...",
-      "submit": "Join the early access list",
-      "disclaimer": "No spam. No sales calls. Just a human reply.",
-      "successTitle": "You're on the list.",
-      "successBody": "We read every message. Expect a personal reply within 24 hours.",
-      "successBack": "Back to the page",
-      "errorFallback": "Something went wrong. Please try again.",
-      "networkError": "Network error. Please try again."
+      "messageLabel": "미리 알아두면 좋을 내용이 있나요?",
+      "messageOptional": "(선택)",
+      "messagePlaceholder": "예: 작은 SaaS를 운영 중이며 고객 지원을 자동화하고 싶습니다...",
+      "submitting": "전송 중...",
+      "submit": "얼리 액세스 리스트에 참여하기",
+      "disclaimer": "스팸 없음. 영업 전화 없음. 사람이 직접 답변합니다.",
+      "successTitle": "리스트에 등록되었습니다.",
+      "successBody": "모든 메시지를 직접 읽습니다. 24시간 이내에 개인 답변을 받아보실 수 있습니다.",
+      "successBack": "페이지로 돌아가기",
+      "errorFallback": "문제가 발생했습니다. 다시 시도해 주세요.",
+      "networkError": "네트워크 오류입니다. 다시 시도해 주세요."
     },
     "preRegForm": {
-      "emailLabel": "Work email",
+      "emailLabel": "업무용 이메일",
       "emailPlaceholder": "you@company.com",
-      "submitting": "Joining…",
-      "submit": "Pre-Register Now",
-      "privacy": "No spam. No payment required. Just early access updates and launch details.",
-      "successTitle": "You are on the list.",
-      "successBody": "We will be in touch when PicoMUTX access opens. No spam, no payment required.",
-      "errorFallback": "Something went wrong. Please try again."
+      "submitting": "등록 중…",
+      "submit": "지금 사전 등록하기",
+      "privacy": "스팸 없음. 결제 불필요. 얼리 액세스 업데이트와 출시 정보만 보내드립니다.",
+      "successTitle": "리스트에 등록되었습니다.",
+      "successBody": "PicoMUTX 액세스가 열리면 연락드리겠습니다. 스팸도 없고 결제도 필요 없습니다.",
+      "errorFallback": "문제가 발생했습니다. 다시 시도해 주세요."
     },
     "footer": {
       "links": {
-        "releases": "Releases",
-        "docs": "Docs",
+        "releases": "릴리스",
+        "docs": "문서",
         "github": "GitHub",
-        "download": "Download",
-        "dashboard": "Dashboard",
-        "contact": "Contact",
-        "privacy": "Privacy"
+        "download": "다운로드",
+        "dashboard": "대시보드",
+        "contact": "문의",
+        "privacy": "개인정보 보호"
       },
-      "copyright": "© MUTX 2026. Open control for deployed agents."
+      "copyright": "© MUTX 2026. 배포된 에이전트를 위한 열린 제어."
     }
   }
 }
