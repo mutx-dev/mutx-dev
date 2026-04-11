@@ -88,9 +88,29 @@ What failed
 - Docs nav drift in `SUMMARY.md` remains unresolved outside this cycle.
 
 What is next
-- Add optional auth-backed sync into existing onboarding/observability/usage routes.
-- Replace manual telemetry with live agent ingestion.
-- Tighten landing copy so the public story matches the shipped beta exactly.
+- Tighten landing copy so the public story matches the shipped multipage product exactly.
+- Expand authenticated workspace depth once real user feedback exposes the sharp edges.
+
+### 2026-04-11 00:00:00Z — convergence update
+What changed
+- Collapsed two competing Pico frontends into one direction: the multipage Pico app now owns onboarding, academy, tutor, autopilot, and support.
+- Redirected the legacy `/workspace` lane into onboarding instead of keeping two different truths alive.
+- Removed the redundant local-only workspace components and old progress model files from the active product path.
+- Fixed Pico route links so they work both on `pico.mutx.dev/*` and on direct `/pico/*` local paths.
+- Fixed local POST CSRF validation for loopback development hosts so the tutor works in local testing.
+
+What was tested
+- `npm run typecheck`
+- `npx jest --runInBand tests/unit/picoState.test.ts tests/unit/picoTutor.test.ts`
+- `./.venv/bin/python -m pytest tests/api/test_pico_route.py tests/api/test_app_factory.py -q`
+- `npm run build`
+- Browser smoke on `/pico/onboarding` and `/pico/tutor`
+
+What failed
+- Nothing in the converged Pico lane after the proxy fix and tutor hardening.
+
+What is next
+- Commit the converged product slice.
 
 ### 2026-04-11 01:55:02 CEST — cycle start
 - Executive order received: do not stop until PicoMUTX is actually finished.

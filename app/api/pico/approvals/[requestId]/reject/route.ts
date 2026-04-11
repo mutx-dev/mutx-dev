@@ -3,6 +3,9 @@ import { NextRequest } from 'next/server'
 import { getApiBaseUrl } from '@/app/api/_lib/controlPlane'
 import { withErrorHandling } from '@/app/api/_lib/errors'
 import { proxyJson } from '@/app/api/_lib/proxy'
+import { validateRequest } from '@/app/api/_lib/validation'
+
+import { approvalResolveSchema, validateApprovalRequestId } from '@/app/api/pico/approvals/_validation'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,14 +15,22 @@ export async function POST(
 ) {
   return withErrorHandling(async () => {
     const { requestId } = await context.params
-    const payload = await request.json().catch(() => ({}))
+    const requestIdValidation = validateApprovalRequestId(requestId)
+    if (!requestIdValidation.success) {
+      return requestIdValidation.response
+    }
 
-    return proxyJson(request, `${getApiBaseUrl()}/v1/approvals/${requestId}/reject`, {
+    const payloadValidation = await validateRequest(approvalResolveSchema, request)
+    if (!payloadValidation.success) {
+      return payloadValidation.response
+    }
+
+    return proxyJson(request, `${getApiBaseUrl()}/v1/approvals/${requestIdValidation.requestId}/reject`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(payloadValidation.data),
       fallbackMessage: 'Failed to reject request',
     })
   })(request)

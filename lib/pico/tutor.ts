@@ -1,4 +1,5 @@
 import { picoLessons, picoTracks } from '@/lib/pico/catalog'
+import { PICO_LESSON_MAP } from '@/lib/pico/content'
 
 export type PicoTutorAnswer = {
   answer: string
@@ -31,6 +32,26 @@ const supportEscalation = {
   label: 'Support',
   href: '/support',
   sourcePath: 'support.md',
+}
+
+const legacyLessonIdBySlug: Record<string, string> = {
+  'install-hermes-locally': 'install-hermes-locally',
+  'run-your-first-agent': 'run-first-agent',
+  'deploy-hermes-on-a-vps': 'deploy-hermes-vps',
+  'keep-your-agent-alive': 'keep-agent-alive',
+  'connect-a-messaging-layer': 'connect-interface-layer',
+  'add-your-first-skill-tool': 'add-first-skill-tool',
+  'create-a-scheduled-workflow': 'create-scheduled-workflow',
+  'see-your-agent-activity': 'see-agent-activity',
+  'set-a-cost-threshold': 'set-cost-threshold',
+  'add-an-approval-gate': 'add-approval-gate',
+  'build-a-lead-response-agent': 'build-lead-response-agent',
+  'build-a-document-processing-agent': 'build-document-processing-agent',
+}
+
+function resolveLegacyLessonId(slug: string, fallbackId: string) {
+  const legacyId = legacyLessonIdBySlug[slug] ?? fallbackId
+  return legacyId in PICO_LESSON_MAP ? legacyId : fallbackId
 }
 
 function tokenize(value: string) {
@@ -163,9 +184,9 @@ export function answerTutorQuestion(
   ).slice(0, 4)
 
   const lessons = matchedLessons.map((lesson) => ({
-    id: lesson.id,
+    id: resolveLegacyLessonId(lesson.slug, lesson.id),
     title: lesson.title,
-    href: `/pico/app/lessons/${lesson.slug}`,
+    href: `/academy/${lesson.slug}`,
   }))
 
   const highConfidence = answer.matches[0]?.score ? answer.matches[0].score >= 5 : false

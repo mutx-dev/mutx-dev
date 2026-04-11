@@ -39,6 +39,43 @@ type ApprovalSummary = {
   agent_id: string
 }
 
+function extractErrorMessage(payload: unknown, fallbackMessage: string) {
+  if (!payload || typeof payload !== 'object') {
+    return fallbackMessage
+  }
+
+  const candidate = payload as {
+    detail?: unknown
+    message?: unknown
+    error?: unknown
+  }
+
+  if (typeof candidate.detail === 'string' && candidate.detail.trim()) {
+    return candidate.detail
+  }
+
+  if (typeof candidate.message === 'string' && candidate.message.trim()) {
+    return candidate.message
+  }
+
+  if (typeof candidate.error === 'string' && candidate.error.trim()) {
+    return candidate.error
+  }
+
+  if (candidate.error && typeof candidate.error === 'object') {
+    const nestedError = candidate.error as { message?: unknown }
+    if (typeof nestedError.message === 'string' && nestedError.message.trim()) {
+      return nestedError.message
+    }
+  }
+
+  return fallbackMessage
+}
+
+async function readJsonSafely(response: Response) {
+  return response.json().catch(() => null)
+}
+
 function formatPercent(value: number) {
   return `${Math.round(value)}%`
 }
@@ -53,6 +90,8 @@ export function PicoAutopilotPageClient() {
   const [authRequired, setAuthRequired] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [thresholdDraft, setThresholdDraft] = useState(progress.autopilot.costThresholdPercent)
+  const [creatingApproval, setCreatingApproval] = useState(false)
+  const [resolvingApprovalId, setResolvingApprovalId] = useState<string | null>(null)
 
   async function load() {
     setLoading(true)
@@ -74,6 +113,10 @@ export function PicoAutopilotPageClient() {
         setApprovals([])
         setLoading(false)
         return
+      }
+
+      if ([runsResponse, budgetResponse, alertsResponse, approvalsResponse].some((response) => !response.ok)) {
+        setError('Some live autopilot signals could not be loaded. Refresh to retry.')
       }
 
       const runsPayload = runsResponse.ok ? await runsResponse.json() : { items: [] }
@@ -100,10 +143,26 @@ export function PicoAutopilotPageClient() {
     void load()
   }, [])
 
+  useEffect(() => {
+    setThresholdDraft(progress.autopilot.costThresholdPercent)
+  }, [progress.autopilot.costThresholdPercent])
+
   const thresholdBreached = useMemo(() => {
     if (!budget) return false
     return budget.usage_percentage >= progress.autopilot.costThresholdPercent
   }, [budget, progress.autopilot.costThresholdPercent])
+
+  const thresholdValidationError = useMemo(() => {
+    if (!Number.isFinite(thresholdDraft)) {
+      return 'Enter a threshold between 1 and 100.'
+    }
+
+    if (thresholdDraft < 1 || thresholdDraft > 100) {
+      return 'Enter a threshold between 1 and 100.'
+    }
+
+    return null
+  }, [thresholdDraft])
 
   useEffect(() => {
     if (thresholdBreached && !progress.autopilot.lastThresholdBreachAt) {
@@ -112,46 +171,90 @@ export function PicoAutopilotPageClient() {
   }, [actions, progress.autopilot.lastThresholdBreachAt, thresholdBreached])
 
   async function saveThreshold() {
-    actions.setAutopilot({ costThresholdPercent: thresholdDraft, alertChannel: progress.autopilot.alertChannel })
+    if (thresholdValidationError) {
+      return
+    }
+
+    const nextThreshold = Math.round(thresholdDraft)
+    setError(null)
+    setThresholdDraft(nextThreshold)
+    actions.setAutopilot({ costThresholdPercent: nextThreshold, alertChannel: progress.autopilot.alertChannel })
     actions.unlockMilestone('first_alert_configured')
   }
 
   async function createApprovalRequest() {
-    const response = await fetch('/api/pico/approvals', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        agent_id: 'pico-autopilot',
-        session_id: `pico-${Date.now()}`,
-        action_type: 'outbound_message_send',
-        payload: {
-          summary: 'Send an outbound lead reply to an external contact.',
-          risk: 'medium',
-          source: 'pico-autopilot',
-        },
-      }),
-    })
+    setCreatingApproval(true)
+    setError(null)
 
-    if (response.ok) {
+    try {
+      const response = await fetch('/api/pico/approvals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          agent_id: 'pico-autopilot',
+          session_id: `pico-${Date.now()}`,
+          action_type: 'outbound_message_send',
+          payload: {
+            summary: 'Send an outbound lead reply to an external contact.',
+            risk: 'medium',
+            source: 'pico-autopilot',
+          },
+        }),
+      })
+
+      const payload = await readJsonSafely(response)
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setAuthRequired(true)
+        }
+
+        throw new Error(extractErrorMessage(payload, 'Failed to create approval request'))
+      }
+
       actions.setAutopilot({ approvalGateEnabled: true })
       actions.unlockMilestone('first_approval_gate_enabled')
       await load()
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Failed to create approval request')
+    } finally {
+      setCreatingApproval(false)
     }
   }
 
   async function resolveApproval(id: string, action: 'approve' | 'reject') {
-    await fetch(`/api/pico/approvals/${id}/${action}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ comment: `Resolved from Pico ${action} flow` }),
-    })
-    await load()
+    setResolvingApprovalId(id)
+    setError(null)
+
+    try {
+      const response = await fetch(`/api/pico/approvals/${encodeURIComponent(id)}/${action}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ comment: `Resolved from Pico ${action} flow` }),
+      })
+
+      const payload = await readJsonSafely(response)
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setAuthRequired(true)
+        }
+
+        throw new Error(extractErrorMessage(payload, `Failed to ${action} request`))
+      }
+
+      await load()
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : `Failed to ${action} request`)
+    } finally {
+      setResolvingApprovalId(null)
+    }
   }
 
   return (
@@ -225,7 +328,10 @@ export function PicoAutopilotPageClient() {
                   min={1}
                   max={100}
                   value={thresholdDraft}
-                  onChange={(event) => setThresholdDraft(Number(event.target.value))}
+                  onChange={(event) => {
+                    setError(null)
+                    setThresholdDraft(Number(event.target.value))
+                  }}
                   className="mt-3 w-full rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-3 text-sm text-slate-100 outline-none"
                 />
               </label>
@@ -233,6 +339,7 @@ export function PicoAutopilotPageClient() {
                 <button
                   type="button"
                   onClick={() => void saveThreshold()}
+                  disabled={Boolean(thresholdValidationError)}
                   className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
                 >
                   Save threshold
@@ -247,6 +354,11 @@ export function PicoAutopilotPageClient() {
                   <option value="webhook">Webhook-ready</option>
                 </select>
               </div>
+              {thresholdValidationError ? (
+                <div className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-50">
+                  {thresholdValidationError}
+                </div>
+              ) : null}
               {thresholdBreached ? (
                 <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50">
                   Threshold breached. Live usage is above your configured line in the sand.
@@ -285,9 +397,10 @@ export function PicoAutopilotPageClient() {
               <button
                 type="button"
                 onClick={() => void createApprovalRequest()}
+                disabled={creatingApproval || authRequired}
                 className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
               >
-                Create sample request
+                {creatingApproval ? 'Creating request...' : 'Create sample request'}
               </button>
             </div>
             <div className="mt-4 space-y-3">
@@ -305,16 +418,18 @@ export function PicoAutopilotPageClient() {
                       <button
                         type="button"
                         onClick={() => void resolveApproval(approval.id, 'approve')}
+                        disabled={resolvingApprovalId === approval.id}
                         className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
                       >
-                        Approve
+                        {resolvingApprovalId === approval.id ? 'Working...' : 'Approve'}
                       </button>
                       <button
                         type="button"
                         onClick={() => void resolveApproval(approval.id, 'reject')}
+                        disabled={resolvingApprovalId === approval.id}
                         className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200"
                       >
-                        Reject
+                        {resolvingApprovalId === approval.id ? 'Working...' : 'Reject'}
                       </button>
                     </div>
                   </div>
