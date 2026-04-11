@@ -51,6 +51,8 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
   const missingPrerequisite = lesson.prerequisites.find((prerequisite) => !progress.completedLessons.includes(prerequisite))
   const missingPrerequisiteLesson = missingPrerequisite ? getLessonBySlug(missingPrerequisite) : null
   const activationLesson = lesson.slug === 'install-hermes-locally' || lesson.slug === 'run-your-first-agent'
+  const approvalLesson = lesson.slug === 'add-an-approval-gate'
+  const approvalSetupHref = toHref('/autopilot#approvals-section')
 
   useEffect(() => {
     if (!missingPrerequisiteLesson && !started && !completed) {
@@ -78,6 +80,22 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
           >
             {getCompletedNextLabel(nextLesson)}
           </Link>
+        ) : approvalLesson ? (
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={approvalSetupHref}
+              className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+            >
+              Open live approval setup
+            </Link>
+            <button
+              type="button"
+              onClick={() => actions.completeLesson(lesson.slug)}
+              className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10"
+            >
+              {getCompleteLabel(lesson.slug)}
+            </button>
+          </div>
         ) : (
           <button
             type="button"

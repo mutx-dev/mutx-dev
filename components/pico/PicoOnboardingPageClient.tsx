@@ -85,7 +85,7 @@ export function PicoOnboardingPageClient() {
           </div>
           <div className="mt-6 rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5 text-sm text-slate-300">
             <p className="font-medium text-white">Current state</p>
-            <p className="mt-3">Lane locked: {activeTrack.title}</p>
+            <p className="mt-3">Track locked: {activeTrack.title}</p>
             <p className="mt-2">Completed lessons: {derived.completedLessonCount}</p>
             <p className="mt-2">Next lesson: {derived.nextLesson?.title ?? 'none'}</p>
             <p className="mt-2">Visible success moment: {firstRunDone ? 'done' : installDone ? 'one prompt away' : 'install first'}</p>
@@ -93,7 +93,7 @@ export function PicoOnboardingPageClient() {
         </div>
 
         <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Activation lane</p>
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Activation track</p>
           <article className="mt-5 rounded-[24px] border border-white/10 bg-white/5 p-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div>
@@ -138,7 +138,7 @@ export function PicoOnboardingPageClient() {
                         disabled={!unlocked}
                         className="rounded-full border border-white/10 px-3 py-2 text-xs font-medium text-slate-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        {selected ? 'Active lane' : unlocked ? 'Set as lane' : 'Locked'}
+                        {selected ? 'Active track' : unlocked ? 'Set as track' : 'Locked'}
                       </button>
                     </div>
                   </article>
@@ -147,7 +147,7 @@ export function PicoOnboardingPageClient() {
             </div>
           ) : (
             <div className="mt-6 rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5 text-sm text-slate-300">
-              Ignore the later lanes until the first local run works. More choices this early are just prettier procrastination.
+              Ignore the later tracks until the first local run works. More choices this early are just prettier procrastination.
             </div>
           )}
         </div>
