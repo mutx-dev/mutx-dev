@@ -34,12 +34,12 @@ async def list_templates():
     return assistant_template_catalog()
 
 
-@router.post("/{template_id}/deploy", response_model=StarterDeploymentResponse, status_code=201)
-async def deploy_template(
+async def create_starter_template_deployment(
+    *,
     template_id: str,
     request: StarterDeploymentCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    db: AsyncSession,
+    current_user: User,
 ):
     if template_id != DEFAULT_TEMPLATE_ID:
         raise HTTPException(status_code=404, detail="Starter template not found")
@@ -99,3 +99,18 @@ async def deploy_template(
         "agent": _serialize_agent(agent),
         "deployment": _serialize_deployment(deployment),
     }
+
+
+@router.post("/{template_id}/deploy", response_model=StarterDeploymentResponse, status_code=201)
+async def deploy_template(
+    template_id: str,
+    request: StarterDeploymentCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return await create_starter_template_deployment(
+        template_id=template_id,
+        request=request,
+        db=db,
+        current_user=current_user,
+    )

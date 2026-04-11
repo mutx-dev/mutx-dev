@@ -3,13 +3,19 @@ Approval workflow REST endpoints.
 """
 
 import logging
-from typing import Annotated, Optional
+from datetime import datetime, timezone
+from typing import Annotated, Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models import User
+from src.api.models.schemas import StarterDeploymentCreate
+from src.api.routes.templates import create_starter_template_deployment
 from src.api.services.approval import (
     ApprovalRequest,
     ApprovalService,
@@ -38,6 +44,100 @@ def _ensure_approval_visible(user: User, req: ApprovalRequest) -> None:
         status_code=status.HTTP_403_FORBIDDEN,
         detail="Approval request is not visible to this user",
     )
+
+
+def _utcnow_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+async def _resolve_requester_user(db: AsyncSession, approval: ApprovalRequest) -> User | None:
+    result = await db.execute(select(User).where(User.email == approval.requester))
+    return result.scalar_one_or_none()
+
+
+async def _execute_approved_action(
+    *,
+    approval: ApprovalRequest,
+    service: ApprovalService,
+    db: AsyncSession,
+    approver: User,
+) -> ApprovalRequest:
+    payload = dict(approval.payload or {})
+    action_kind = payload.get("kind")
+    if action_kind != "starter_template_deploy":
+        return approval
+
+    execution: dict[str, Any] = {
+        "kind": action_kind,
+        "executed_at": _utcnow_iso(),
+        "executed_by": approver.email,
+    }
+
+    template_id = payload.get("template_id")
+    deployment_request_payload = payload.get("deployment_request")
+
+    if not isinstance(template_id, str) or not template_id.strip():
+        execution |= {
+            "status": "failed",
+            "detail": "Missing template_id for approved action",
+        }
+    elif not isinstance(deployment_request_payload, dict):
+        execution |= {
+            "status": "failed",
+            "detail": "Missing deployment payload for approved action",
+        }
+    else:
+        requester_user = await _resolve_requester_user(db, approval)
+        if requester_user is None:
+            execution |= {
+                "status": "failed",
+                "detail": f"Requester '{approval.requester}' no longer exists",
+            }
+        else:
+            try:
+                deployment_request = StarterDeploymentCreate.model_validate(
+                    deployment_request_payload
+                )
+                result = await create_starter_template_deployment(
+                    template_id=template_id,
+                    request=deployment_request,
+                    db=db,
+                    current_user=requester_user,
+                )
+                execution |= {
+                    "status": "completed",
+                    "template_id": template_id,
+                    "agent_id": str(result["agent"]["id"]),
+                    "deployment_id": str(result["deployment"]["id"]),
+                    "agent_name": result["agent"].get("name"),
+                }
+            except ValidationError as exc:
+                execution |= {
+                    "status": "failed",
+                    "detail": exc.errors()[0].get("msg", "Invalid starter deployment payload"),
+                }
+            except HTTPException as exc:
+                execution |= {
+                    "status": "failed",
+                    "detail": (
+                        exc.detail
+                        if isinstance(exc.detail, str)
+                        else "Failed to execute approved action"
+                    ),
+                }
+            except Exception:
+                logger.exception(
+                    "Failed to execute approved action %s for request %s",
+                    action_kind,
+                    approval.id,
+                )
+                execution |= {
+                    "status": "failed",
+                    "detail": "Failed to execute approved action",
+                }
+
+    payload["execution"] = execution
+    return await service.update_payload(str(approval.id), payload)
 
 
 # ------------------------------------------------------------------
@@ -144,6 +244,7 @@ async def approve_request(
     body: ApprovalResolve,
     service: Annotated[ApprovalService, Depends(get_approval_service)],
     user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """
     Approve a pending request.
@@ -157,13 +258,20 @@ async def approve_request(
             detail="Only the requester or an approver role can approve this request",
         )
     try:
-        return await service.approve(
+        approved = await service.approve(
             request_id=request_id,
             approver=user.email,
             comment=body.comment,
         )
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+    return await _execute_approved_action(
+        approval=approved,
+        service=service,
+        db=db,
+        approver=user,
+    )
 
 
 @router.post("/{request_id}/reject", response_model=ApprovalRequest)

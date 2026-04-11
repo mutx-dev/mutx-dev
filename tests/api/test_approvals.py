@@ -1,7 +1,7 @@
 """
 Tests for /v1/approvals endpoints and ApprovalService.
 """
-import asyncio
+
 import uuid
 from datetime import datetime, timezone
 
@@ -13,9 +13,7 @@ from src.api.services.approval import (
     ApprovalRequest,
     ApprovalService,
     ApprovalStatus,
-    get_approval_service,
 )
-
 
 # ------------------------------------------------------------------
 # ApprovalService unit tests
@@ -387,6 +385,47 @@ class TestApprovalRoutes:
             assert data["comment"] == "looks good"
         finally:
             test_user.role = original_role
+
+    @pytest.mark.asyncio
+    async def test_approve_starter_template_request_executes_action(
+        self,
+        client: AsyncClient,
+        test_user,
+        approval_service,
+    ):
+        create_resp = await client.post(
+            "/v1/approvals",
+            json={
+                "agent_id": "pico-autopilot",
+                "session_id": "session-starter",
+                "action_type": "starter_template_deploy",
+                "payload": {
+                    "kind": "starter_template_deploy",
+                    "template_id": "personal_assistant",
+                    "deployment_request": {
+                        "name": "Approval Driven Starter",
+                        "description": "Deployed after Pico approval",
+                        "workspace": "pico-autopilot",
+                        "skills": ["hermes-agent"],
+                    },
+                },
+            },
+        )
+        request_id = create_resp.json()["id"]
+
+        response = await client.post(
+            f"/v1/approvals/{request_id}/approve",
+            json={"comment": "ship it"},
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "APPROVED"
+        assert data["comment"] == "ship it"
+        assert data["payload"]["execution"]["status"] == "completed"
+        assert data["payload"]["execution"]["template_id"] == "personal_assistant"
+        assert data["payload"]["execution"]["deployment_id"]
+        assert data["payload"]["execution"]["agent_id"]
 
     @pytest.mark.asyncio
     async def test_reject_request(

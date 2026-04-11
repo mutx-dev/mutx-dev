@@ -279,6 +279,35 @@ describe('dashboard route proxies', () => {
     await expect(response.json()).resolves.toEqual({ id: 'dep_123', status: 'pending' })
   })
 
+  it('forwards starter deployment request bodies', async () => {
+    proxyJson.mockResolvedValue(
+      new Response(JSON.stringify({ deployment: { id: 'dep_123' } }), {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    )
+    const { POST } = await import('../../app/api/dashboard/templates/[templateId]/deploy/route')
+
+    const request = {
+      text: async () => JSON.stringify({ name: 'Approval Driven Starter' }),
+    } as NextRequest
+    const response = await POST(request, {
+      params: Promise.resolve({ templateId: 'personal_assistant' }),
+    })
+
+    expect(proxyJson).toHaveBeenCalledWith(
+      request,
+      'http://localhost:8000/v1/templates/personal_assistant/deploy',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'Approval Driven Starter' }),
+        fallbackMessage: 'Failed to deploy starter template',
+      },
+    )
+    expect(response.status).toBe(201)
+  })
+
   it('proxies deployment delete actions', async () => {
     proxyJson.mockResolvedValue(new Response(null, { status: 204 }))
     const { DELETE } = await import('../../app/api/dashboard/deployments/[id]/route')

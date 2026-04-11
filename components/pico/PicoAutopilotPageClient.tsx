@@ -31,6 +31,32 @@ type AlertSummary = {
   created_at: string
 }
 
+type ApprovalExecutionSummary = {
+  status?: string
+  detail?: string
+  deployment_id?: string
+  agent_id?: string
+  agent_name?: string
+  template_id?: string
+}
+
+type StarterDeploymentRequest = {
+  name: string
+  description?: string
+  replicas?: number
+  workspace?: string
+  skills?: string[]
+  runtime_metadata?: Record<string, unknown>
+}
+
+type ApprovalPayload = {
+  summary?: string
+  kind?: string
+  template_id?: string
+  deployment_request?: StarterDeploymentRequest
+  execution?: ApprovalExecutionSummary
+}
+
 type ApprovalSummary = {
   id: string
   action_type: string
@@ -38,6 +64,35 @@ type ApprovalSummary = {
   requester: string
   created_at: string
   agent_id: string
+  payload?: ApprovalPayload
+}
+
+type StarterDeploymentResponse = {
+  agent?: {
+    id?: string
+    name?: string
+  }
+  deployment?: {
+    id?: string
+  }
+}
+
+type ControlledActionReceipt = {
+  tone: 'success' | 'queued' | 'warning'
+  title: string
+  description: string
+}
+
+const STARTER_TEMPLATE_ID = 'personal_assistant'
+const STARTER_DEPLOYMENT_REQUEST: StarterDeploymentRequest = {
+  name: 'Pico Autopilot Assistant',
+  description: 'Starter assistant deployed from Pico autopilot.',
+  replicas: 1,
+  workspace: 'pico-autopilot',
+  skills: ['hermes-agent'],
+  runtime_metadata: {
+    source: 'pico-autopilot',
+  },
 }
 
 function extractErrorMessage(payload: unknown, fallbackMessage: string) {
@@ -81,6 +136,26 @@ function formatPercent(value: number) {
   return `${Math.round(value)}%`
 }
 
+function formatTimestamp(value?: string) {
+  if (!value) return 'n/a'
+
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    return value
+  }
+
+  return parsed.toLocaleString()
+}
+
+function buildStarterApprovalPayload(): ApprovalPayload {
+  return {
+    summary: 'Deploy the Pico starter assistant.',
+    kind: 'starter_template_deploy',
+    template_id: STARTER_TEMPLATE_ID,
+    deployment_request: STARTER_DEPLOYMENT_REQUEST,
+  }
+}
+
 export function PicoAutopilotPageClient() {
   const { progress, actions } = usePicoProgress()
   const [runs, setRuns] = useState<RunSummary[]>([])
@@ -90,8 +165,9 @@ export function PicoAutopilotPageClient() {
   const [loading, setLoading] = useState(true)
   const [authRequired, setAuthRequired] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [receipt, setReceipt] = useState<ControlledActionReceipt | null>(null)
   const [thresholdDraft, setThresholdDraft] = useState(progress.autopilot.costThresholdPercent)
-  const [creatingApproval, setCreatingApproval] = useState(false)
+  const [runningStarterAction, setRunningStarterAction] = useState(false)
   const [resolvingApprovalId, setResolvingApprovalId] = useState<string | null>(null)
 
   async function load() {
@@ -171,6 +247,27 @@ export function PicoAutopilotPageClient() {
     }
   }, [actions, progress.autopilot.lastThresholdBreachAt, thresholdBreached])
 
+  const approvalGateEnabled = progress.autopilot.approvalGateEnabled
+  const trackedApprovalCount = progress.autopilot.approvalRequestIds.length
+
+  function setApprovalGateEnabled(enabled: boolean) {
+    setError(null)
+    setReceipt(null)
+    actions.setAutopilot({ approvalGateEnabled: enabled })
+    if (enabled) {
+      actions.unlockMilestone('first_approval_gate_enabled')
+    }
+  }
+
+  function rememberApprovalRequest(requestId?: string) {
+    if (!requestId) return
+
+    actions.setAutopilot({
+      approvalGateEnabled: true,
+      approvalRequestIds: Array.from(new Set([...progress.autopilot.approvalRequestIds, requestId])),
+    })
+  }
+
   async function saveThreshold() {
     if (thresholdValidationError) {
       return
@@ -183,46 +280,94 @@ export function PicoAutopilotPageClient() {
     actions.unlockMilestone('first_alert_configured')
   }
 
-  async function createApprovalRequest() {
-    setCreatingApproval(true)
-    setError(null)
+  async function queueStarterDeploymentApproval() {
+    const response = await fetch('/api/pico/approvals', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        agent_id: 'pico-autopilot',
+        session_id: `pico-${Date.now()}`,
+        action_type: 'starter_template_deploy',
+        payload: buildStarterApprovalPayload(),
+      }),
+    })
 
-    try {
-      const response = await fetch('/api/pico/approvals', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          agent_id: 'pico-autopilot',
-          session_id: `pico-${Date.now()}`,
-          action_type: 'outbound_message_send',
-          payload: {
-            summary: 'Send an outbound lead reply to an external contact.',
-            risk: 'medium',
-            source: 'pico-autopilot',
-          },
-        }),
-      })
+    const payload = await readJsonSafely(response)
 
-      const payload = await readJsonSafely(response)
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          setAuthRequired(true)
-        }
-
-        throw new Error(extractErrorMessage(payload, 'Failed to create approval request'))
+    if (!response.ok) {
+      if (response.status === 401) {
+        setAuthRequired(true)
       }
 
-      actions.setAutopilot({ approvalGateEnabled: true })
-      actions.unlockMilestone('first_approval_gate_enabled')
-      await load()
+      throw new Error(extractErrorMessage(payload, 'Failed to queue starter deployment approval'))
+    }
+
+    const approval = payload as ApprovalSummary | null
+    rememberApprovalRequest(typeof approval?.id === 'string' ? approval.id : undefined)
+    actions.unlockMilestone('first_approval_gate_enabled')
+    setReceipt({
+      tone: 'queued',
+      title: 'Starter deployment queued',
+      description:
+        typeof approval?.id === 'string'
+          ? `Approval ${approval.id} is waiting below.`
+          : 'The starter deployment is waiting for human approval.',
+    })
+    await load()
+  }
+
+  async function runStarterDeploymentNow() {
+    const response = await fetch(`/api/dashboard/templates/${STARTER_TEMPLATE_ID}/deploy`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      cache: 'no-store',
+      body: JSON.stringify(STARTER_DEPLOYMENT_REQUEST),
+    })
+
+    const payload = await readJsonSafely(response)
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        setAuthRequired(true)
+      }
+
+      throw new Error(extractErrorMessage(payload, 'Failed to deploy starter assistant'))
+    }
+
+    const deployPayload = payload as StarterDeploymentResponse | null
+    actions.unlockMilestone('successful_deployment')
+    setReceipt({
+      tone: 'success',
+      title: 'Starter assistant deployed',
+      description:
+        deployPayload?.deployment?.id && deployPayload?.agent?.id
+          ? `Deployment ${deployPayload.deployment.id} is live for agent ${deployPayload.agent.id}.`
+          : 'The starter assistant was deployed through the real control-plane action.',
+    })
+    await load()
+  }
+
+  async function handleStarterDeployment() {
+    setRunningStarterAction(true)
+    setError(null)
+    setReceipt(null)
+
+    try {
+      if (approvalGateEnabled) {
+        await queueStarterDeploymentApproval()
+      } else {
+        await runStarterDeploymentNow()
+      }
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Failed to create approval request')
+      setError(requestError instanceof Error ? requestError.message : 'Failed to run starter deployment action')
     } finally {
-      setCreatingApproval(false)
+      setRunningStarterAction(false)
     }
   }
 
@@ -250,6 +395,41 @@ export function PicoAutopilotPageClient() {
         throw new Error(extractErrorMessage(payload, `Failed to ${action} request`))
       }
 
+      const approval = payload as ApprovalSummary | null
+      const execution = approval?.payload?.execution
+
+      if (action === 'approve') {
+        if (execution?.status === 'completed') {
+          actions.unlockMilestone('successful_deployment')
+          setReceipt({
+            tone: 'success',
+            title: 'Approved and executed',
+            description:
+              execution.deployment_id && execution.agent_id
+                ? `Starter deployment ${execution.deployment_id} shipped for agent ${execution.agent_id}.`
+                : 'The approved action was executed.',
+          })
+        } else if (execution?.status === 'failed') {
+          setReceipt({
+            tone: 'warning',
+            title: 'Approved, but follow-through failed',
+            description: execution.detail ?? 'The request was approved but the real action did not complete.',
+          })
+        } else {
+          setReceipt({
+            tone: 'success',
+            title: 'Approval recorded',
+            description: 'The request left the queue.',
+          })
+        }
+      } else {
+        setReceipt({
+          tone: 'warning',
+          title: 'Request rejected',
+          description: 'The queued action will not run.',
+        })
+      }
+
       await load()
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : `Failed to ${action} request`)
@@ -258,11 +438,18 @@ export function PicoAutopilotPageClient() {
     }
   }
 
+  const receiptClassName = useMemo(() => {
+    if (!receipt) return ''
+    if (receipt.tone === 'success') return 'border-emerald-400/20 bg-emerald-400/10 text-emerald-50'
+    if (receipt.tone === 'queued') return 'border-sky-400/20 bg-sky-400/10 text-sky-50'
+    return 'border-amber-400/20 bg-amber-400/10 text-amber-50'
+  }, [receipt])
+
   return (
     <PicoShell
       eyebrow="Autopilot bridge"
       title="See the runtime, not just the dream"
-      description="Pico reuses real MUTX signals for runs, budget, alerts, and approvals. If you are not authenticated yet, the product says so instead of pretending otherwise."
+      description="Pico reuses real MUTX signals for runs, budget, alerts, and approvals. The only approval-controlled action wired here today is starter deployment. That is enough to make the gate real instead of decorative."
       actions={
         <div className="flex flex-wrap gap-3">
           <button
@@ -274,10 +461,10 @@ export function PicoAutopilotPageClient() {
           </button>
           <button
             type="button"
-            onClick={() => actions.setAutopilot({ approvalGateEnabled: true })}
+            onClick={() => setApprovalGateEnabled(!approvalGateEnabled)}
             className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950"
           >
-            Enable gate locally
+            {approvalGateEnabled ? 'Turn gate off' : 'Turn gate on'}
           </button>
         </div>
       }
@@ -317,8 +504,71 @@ export function PicoAutopilotPageClient() {
         <div className="mt-6 rounded-[28px] border border-rose-400/20 bg-rose-400/10 p-6 text-sm text-rose-50">{error}</div>
       ) : null}
 
+      {receipt ? (
+        <div className={`mt-6 rounded-[28px] border p-6 text-sm ${receiptClassName}`}>
+          <p className="font-semibold">{receipt.title}</p>
+          <p className="mt-2">{receipt.description}</p>
+        </div>
+      ) : null}
+
       <section className="mt-6 grid gap-6 lg:grid-cols-[0.9fr,1.1fr]">
         <div className="space-y-6">
+          <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Approval gate</p>
+                <h2 className="mt-2 text-xl font-semibold text-white">Control a real action</h2>
+              </div>
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.18em] text-slate-300">
+                {approvalGateEnabled ? 'Gate enabled' : 'Gate disabled'}
+              </span>
+            </div>
+            <div className="mt-4 rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
+              <p className="font-medium text-white">Starter deployment</p>
+              <p className="mt-2">
+                This button controls the real <span className="font-mono text-xs text-slate-200">/v1/templates/{STARTER_TEMPLATE_ID}/deploy</span> action.
+                With the gate on, Pico writes a pending approval request and waits. With the gate off, the deployment fires immediately.
+              </p>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Deploy payload</p>
+                  <p className="mt-2">Name: {STARTER_DEPLOYMENT_REQUEST.name}</p>
+                  <p className="mt-1">Workspace: {STARTER_DEPLOYMENT_REQUEST.workspace}</p>
+                  <p className="mt-1">Skills: {(STARTER_DEPLOYMENT_REQUEST.skills ?? []).join(', ')}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">What the human controls</p>
+                  <p className="mt-2">
+                    Approve = create the starter deployment. Reject = nothing runs. Tracked requests: {trackedApprovalCount}.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => void handleStarterDeployment()}
+                  disabled={runningStarterAction || authRequired}
+                  className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
+                >
+                  {runningStarterAction
+                    ? approvalGateEnabled
+                      ? 'Queueing request...'
+                      : 'Deploying starter...'
+                    : approvalGateEnabled
+                      ? 'Queue starter deployment'
+                      : 'Deploy starter now'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setApprovalGateEnabled(!approvalGateEnabled)}
+                  className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200"
+                >
+                  {approvalGateEnabled ? 'Bypass gate for this lane' : 'Require approval for this lane'}
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Thresholds</p>
             <div className="mt-4 rounded-[24px] border border-white/10 bg-white/5 p-5">
@@ -390,51 +640,75 @@ export function PicoAutopilotPageClient() {
 
         <div className="space-y-6">
           <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Approval gate</p>
-                <h2 className="mt-2 text-xl font-semibold text-white">Risky action queue</h2>
+                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Pending approvals</p>
+                <h2 className="mt-2 text-xl font-semibold text-white">Human click required</h2>
               </div>
-              <button
-                type="button"
-                onClick={() => void createApprovalRequest()}
-                disabled={creatingApproval || authRequired}
-                className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
-              >
-                {creatingApproval ? 'Creating request...' : 'Create sample request'}
-              </button>
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.18em] text-slate-300">
+                {approvals.length} waiting
+              </span>
             </div>
+            <p className="mt-4 text-sm text-slate-300">
+              This queue is not theater. Turn the gate on, trigger starter deployment, then approve or reject the real action here.
+            </p>
             <div className="mt-4 space-y-3">
               {approvals.length === 0 ? (
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
-                  No pending approvals. Good if that is intentional. Bad if you expected a gate and forgot to create one.
+                  No pending approvals. Turn the gate on and run starter deployment to queue a real request.
                 </div>
               ) : (
-                approvals.map((approval) => (
-                  <div key={approval.id} className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                    <p className="font-medium text-white">{approval.action_type}</p>
-                    <p className="mt-1">Requester: {approval.requester}</p>
-                    <p className="mt-1">Agent: {approval.agent_id}</p>
-                    <div className="mt-4 flex gap-3">
-                      <button
-                        type="button"
-                        onClick={() => void resolveApproval(approval.id, 'approve')}
-                        disabled={resolvingApprovalId === approval.id}
-                        className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
-                      >
-                        {resolvingApprovalId === approval.id ? 'Working...' : 'Approve'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => void resolveApproval(approval.id, 'reject')}
-                        disabled={resolvingApprovalId === approval.id}
-                        className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200"
-                      >
-                        {resolvingApprovalId === approval.id ? 'Working...' : 'Reject'}
-                      </button>
+                approvals.map((approval) => {
+                  const starterRequest = approval.payload?.deployment_request
+                  const starterExecution = approval.payload?.execution
+                  const isStarterDeploy = approval.payload?.kind === 'starter_template_deploy'
+
+                  return (
+                    <div key={approval.id} className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="font-medium text-white">{approval.payload?.summary ?? approval.action_type}</p>
+                          <p className="mt-1 text-slate-400">Queued {formatTimestamp(approval.created_at)}</p>
+                        </div>
+                        <span className="rounded-full border border-white/10 bg-[rgba(3,8,20,0.45)] px-3 py-1 text-xs uppercase tracking-[0.18em] text-slate-300">
+                          {approval.status}
+                        </span>
+                      </div>
+                      <p className="mt-3">Requester: {approval.requester}</p>
+                      <p className="mt-1">Agent lane: {approval.agent_id}</p>
+                      {isStarterDeploy ? (
+                        <div className="mt-3 rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
+                          <p>Approve will call <span className="font-mono text-xs text-slate-200">/v1/templates/{approval.payload?.template_id ?? STARTER_TEMPLATE_ID}/deploy</span>.</p>
+                          <p className="mt-1">Assistant name: {starterRequest?.name ?? 'n/a'}</p>
+                          <p className="mt-1">Workspace: {starterRequest?.workspace ?? 'n/a'}</p>
+                        </div>
+                      ) : null}
+                      {starterExecution?.status === 'failed' ? (
+                        <div className="mt-3 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-amber-50">
+                          Previous execution failed: {starterExecution.detail ?? 'Unknown error'}
+                        </div>
+                      ) : null}
+                      <div className="mt-4 flex gap-3">
+                        <button
+                          type="button"
+                          onClick={() => void resolveApproval(approval.id, 'approve')}
+                          disabled={resolvingApprovalId === approval.id}
+                          className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
+                        >
+                          {resolvingApprovalId === approval.id ? 'Working...' : 'Approve'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void resolveApproval(approval.id, 'reject')}
+                          disabled={resolvingApprovalId === approval.id}
+                          className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200"
+                        >
+                          {resolvingApprovalId === approval.id ? 'Working...' : 'Reject'}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  )
+                })
               )}
             </div>
           </div>

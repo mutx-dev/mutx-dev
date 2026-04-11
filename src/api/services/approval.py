@@ -162,6 +162,19 @@ class ApprovalService:
             ]
             return results
 
+    async def update_payload(self, request_id: str, payload: dict[str, Any]) -> ApprovalRequest:
+        """
+        Replace the payload for an existing request and return the updated record.
+        """
+        async with self._lock:
+            req = self._store.get(request_id)
+            if req is None:
+                raise ValueError(f"Approval request '{request_id}' not found")
+
+            req.payload = payload
+            self._store[request_id] = req
+            return req
+
     # ------------------------------------------------------------------
     # Maintenance
     # ------------------------------------------------------------------
