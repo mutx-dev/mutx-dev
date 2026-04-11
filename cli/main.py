@@ -11,6 +11,7 @@ from cli.commands.config import config_group
 from cli.commands.deployment import deployment_group
 from cli.commands.deploy import deploy_group
 from cli.commands.doctor import doctor_command
+from cli.commands.first_agent import first_agent_command
 from cli.commands.governance import governance_group
 from cli.commands.observability import observability_group
 from cli.commands.runtime import runtime_group
@@ -112,6 +113,7 @@ cli.add_command(clawhub_group)
 cli.add_command(deploy_group)
 cli.add_command(deployment_group)
 cli.add_command(doctor_command)
+cli.add_command(first_agent_command)
 cli.add_command(config_group)
 cli.add_command(governance_group)
 cli.add_command(observability_group)

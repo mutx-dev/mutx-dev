@@ -15,6 +15,14 @@ mutx setup hosted
 
 That handoff now opens the MUTX provider wizard. 🦞 OpenClaw is the first enabled provider, and MUTX can detect an existing local install, track it in `~/.mutx/providers/openclaw`, and keep the upstream home plus local keys in place.
 
+Fastest payoff after Hermes is already on your machine:
+
+```bash
+hermes chat -q "Turn these rough launch notes into three concrete next steps: ship docs landing, add waitlist form, post launch note" -Q
+```
+
+If Hermes is already installed, `mutx first-agent "Turn these launch notes into three next steps"` runs the same real query, cleans up the output, and saves proof under `~/.mutx/first-agent/`.
+
 Manual tap flow:
 
 ```bash

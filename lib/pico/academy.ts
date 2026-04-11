@@ -415,7 +415,7 @@ export const PICO_LESSONS: PicoLesson[] = [
     prerequisites: ['install-hermes-locally'],
     outcome: 'One verified local response.',
     expectedResult: 'Hermes answers a real prompt and you keep the output as proof.',
-    validation: 'Ask Hermes to summarize a short input or generate a tiny action plan and save the response.',
+    validation: 'Run one real Hermes query that turns your own rough notes into a tighter action plan, then save the response as proof.',
     xp: 60,
     milestoneEvents: ['first_tutorial_completed', 'first_agent_run'],
     steps: [
@@ -426,11 +426,12 @@ export const PICO_LESSONS: PicoLesson[] = [
       },
       {
         title: 'Run a bounded prompt',
-        body: 'Use a tiny prompt with a clear answer. Example: summarize a note, rewrite a message, or plan three next steps.',
+        body: 'Use a tiny prompt with a clear answer. Best fast move: feed Hermes rough notes from something you actually need to ship and ask for three next actions.',
+        command: 'hermes chat -q "Turn these rough launch notes into three concrete next steps: ship docs landing, add waitlist form, post launch note" -Q',
       },
       {
         title: 'Keep the proof',
-        body: 'Save a screenshot or paste the output into your notes. It sounds obvious. It also saves you from “did it actually work?” brain fog later.',
+        body: 'Save a screenshot or paste the output into your notes. The visible proof matters because it turns "maybe it works" into "holy shit, it works."',
       },
     ],
     troubleshooting: [

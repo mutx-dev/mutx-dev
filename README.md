@@ -25,6 +25,16 @@ brew tap mutx-dev/homebrew-tap && brew install mutx
 mutx setup hosted
 ```
 
+Fastest payoff after Hermes is already on your machine:
+
+```bash
+hermes chat -q "Turn these rough launch notes into three concrete next steps: ship docs landing, add waitlist form, post launch note" -Q
+```
+
+That command is the payoff moment: a real agent run with visible output, not a fake walkthrough.
+
+If Hermes is already installed, `mutx first-agent "Turn these launch notes into three next steps"` runs the same real query, cleans up the output, and saves proof under `~/.mutx/first-agent/`.
+
 Hosted is the default. For the local Docker stack:
 
 ```bash
