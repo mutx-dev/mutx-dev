@@ -117,8 +117,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       [
         ["agents", `${apiBaseUrl}/v1/agents?limit=20`, "Failed to fetch agents"],
         ["deployments", `${apiBaseUrl}/v1/deployments?limit=20`, "Failed to fetch deployments"],
-        ["runs", `${apiBaseUrl}/v1/runs?limit=24`, "Failed to fetch runs"],
-        ["alerts", `${apiBaseUrl}/v1/monitoring/alerts?limit=12`, "Failed to fetch alerts"],
+        ["runs", `${apiBaseUrl}/v1/runs?limit=100`, "Failed to fetch runs"],
+        ["alerts", `${apiBaseUrl}/v1/monitoring/alerts?limit=50`, "Failed to fetch alerts"],
         ["webhooks", `${apiBaseUrl}/v1/webhooks`, "Failed to fetch webhooks"],
         ["budget", `${apiBaseUrl}/v1/budgets`, "Failed to fetch budget"],
         ["health", `${apiBaseUrl}/health`, "Failed to fetch health"],
@@ -131,6 +131,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           "onboarding",
           `${apiBaseUrl}/v1/onboarding?provider=openclaw`,
           "Failed to fetch OpenClaw onboarding state",
+        ],
+        [
+          "governance",
+          `${apiBaseUrl}/v1/runtime/governance/status`,
+          "Failed to fetch governance status",
         ],
       ].map(async ([key, url, fallbackMessage]) => {
         const resource = await fetchOverviewResource(request, url, fallbackMessage);

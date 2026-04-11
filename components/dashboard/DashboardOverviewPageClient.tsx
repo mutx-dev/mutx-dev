@@ -69,6 +69,21 @@ type OpenClawOnboardingState = {
   last_error?: string | null;
 };
 
+type GovernanceStatus = {
+  daemon_reachable?: boolean;
+  socket_reachable?: boolean;
+  policy_loaded?: boolean;
+  version?: string;
+  policy_name?: string;
+  decisions_total?: number;
+  permits_today?: number;
+  denies_today?: number;
+  defers_today?: number;
+  pending_approvals?: number;
+  status?: string;
+  error?: string;
+};
+
 type OverviewResource<T = unknown> = {
   status: "ok" | "auth_error" | "error";
   statusCode: number;
@@ -93,6 +108,7 @@ type DashboardOverviewPayload = {
     health: OverviewResource<Record<string, unknown>>;
     runtime: OverviewResource<OpenClawRuntimeSnapshot>;
     onboarding: OverviewResource<OpenClawOnboardingState>;
+    governance: OverviewResource<GovernanceStatus>;
   };
 };
 
@@ -137,6 +153,56 @@ function summarizeRunHealth(runs: Run[]) {
   };
 }
 
+function parseTimestamp(value: string | null | undefined): number | null {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+function occurredWithinDays(value: string | null | undefined, days: number, now: number) {
+  const parsed = parseTimestamp(value);
+  if (parsed === null) {
+    return false;
+  }
+
+  return now - parsed <= days * 24 * 60 * 60 * 1000;
+}
+
+function formatCountLabel(count: number, singular: string, plural = `${singular}s`) {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
+function formatThresholdSummary(thresholdAlertHits: number, budgetThresholdHit: boolean) {
+  if (thresholdAlertHits > 0 && budgetThresholdHit) {
+    return `${formatCountLabel(thresholdAlertHits, "monitoring threshold")} plus the budget envelope tripped this week.`;
+  }
+
+  if (thresholdAlertHits > 0) {
+    return `${formatCountLabel(thresholdAlertHits, "monitoring threshold")} tripped this week.`;
+  }
+
+  if (budgetThresholdHit) {
+    return "The budget envelope tripped this week.";
+  }
+
+  return "No spend or runtime thresholds are barking right now.";
+}
+
+function normalizeGovernanceStatus(payload: unknown): GovernanceStatus | null {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  if (typeof payload.error === "string" && payload.error.trim().length > 0) {
+    return null;
+  }
+
+  return payload as GovernanceStatus;
+}
+
 function isAuthError(error: unknown): error is ApiRequestError {
   return error instanceof ApiRequestError && (error.status === 401 || error.status === 403);
 }
@@ -155,6 +221,7 @@ export function DashboardOverviewPageClient() {
   const [health, setHealth] = useState<Record<string, unknown> | null>(null);
   const [openclawRuntime, setOpenclawRuntime] = useState<OpenClawRuntimeSnapshot | null>(null);
   const [openclawOnboarding, setOpenclawOnboarding] = useState<OpenClawOnboardingState | null>(null);
+  const [governance, setGovernance] = useState<GovernanceStatus | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -185,6 +252,7 @@ export function DashboardOverviewPageClient() {
           health: healthResult,
           runtime: runtimeResult,
           onboarding: onboardingResult,
+          governance: governanceResult,
         } = payload.resources;
 
         const coreResults = [
@@ -228,6 +296,9 @@ export function DashboardOverviewPageClient() {
         setOpenclawRuntime(runtimeResult.status === "ok" ? runtimeResult.data : null);
         setOpenclawOnboarding(
           onboardingResult.status === "ok" ? onboardingResult.data : null,
+        );
+        setGovernance(
+          governanceResult.status === "ok" ? normalizeGovernanceStatus(governanceResult.data) : null,
         );
         setLoading(false);
       } catch (loadError) {
@@ -282,6 +353,42 @@ export function DashboardOverviewPageClient() {
       openclawOnboarding?.gateway_url,
   );
   const openclawStatus = openclawRuntime?.status ?? openclawOnboarding?.status ?? "unknown";
+
+  const valueSummary = useMemo(() => {
+    const now = Date.now();
+    const alertsThisWeek = alerts.filter((alert) => {
+      if (occurredWithinDays(alert.created_at, 7, now)) {
+        return true;
+      }
+
+      return alert.resolved ? occurredWithinDays(alert.resolved_at ?? null, 7, now) : false;
+    });
+    const runsThisWeek = runs.filter((run) => occurredWithinDays(run.started_at, 7, now));
+    const issuesCaughtBeforeDamage = alerts.filter(
+      (alert) =>
+        alert.resolved && occurredWithinDays(alert.resolved_at ?? alert.created_at, 7, now),
+    ).length;
+    const approvalsUsed = governance?.defers_today ?? 0;
+    const deniedToday = governance?.denies_today ?? 0;
+    const pendingApprovals = governance?.pending_approvals ?? 0;
+    const thresholdAlertHits = alertsThisWeek.filter((alert) =>
+      ["cpu_high", "memory_high", "quota_exceeded"].includes(alert.type),
+    ).length;
+    const budgetThresholdHit = Boolean(budget && budget.usage_percentage >= 80);
+
+    return {
+      runsThisWeek: runsThisWeek.length,
+      alertsThisWeek: alertsThisWeek.length,
+      issuesCaughtBeforeDamage,
+      approvalsUsed,
+      deniedToday,
+      pendingApprovals,
+      thresholdAlertHits,
+      thresholdsHit: thresholdAlertHits + (budgetThresholdHit ? 1 : 0),
+      actionsPrevented: deniedToday + approvalsUsed,
+      budgetThresholdHit,
+    };
+  }, [alerts, budget, governance, runs]);
 
   const briefingBarEntries = [
     {
@@ -365,6 +472,82 @@ export function DashboardOverviewPageClient() {
       ) : null}
 
       <BriefingBar entries={briefingBarEntries} />
+
+      <LivePanel title="Proof this plan is doing work" meta="last 7 days + live governance">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-5">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-cyan-100/70">Run activity</p>
+              <p className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white">
+                {valueSummary.runsThisWeek > 0
+                  ? `Your agent ran ${valueSummary.runsThisWeek} ${valueSummary.runsThisWeek === 1 ? "time" : "times"} this week`
+                  : "No runs landed in the last 7 days"}
+              </p>
+              <p className="mt-3 text-sm leading-6 text-cyan-50/80">
+                {valueSummary.runsThisWeek > 0
+                  ? `${runHealth.completed} completed and ${runHealth.failed} failed across the current run window.`
+                  : "Once the next job executes, this surface should stop looking sleepy."}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-5">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-100/70">Issues intercepted</p>
+              <p className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white">
+                {valueSummary.issuesCaughtBeforeDamage > 0
+                  ? `${formatCountLabel(valueSummary.issuesCaughtBeforeDamage, "issue")} caught before damage`
+                  : "No caught issues recorded this week"}
+              </p>
+              <p className="mt-3 text-sm leading-6 text-emerald-50/80">
+                {valueSummary.issuesCaughtBeforeDamage > 0
+                  ? `${formatCountLabel(valueSummary.alertsThisWeek, "alert")} surfaced and ${formatCountLabel(valueSummary.actionsPrevented, "action")} got stopped or kicked to approval.`
+                  : unresolvedAlerts.length > 0
+                    ? `${formatCountLabel(unresolvedAlerts.length, "open alert")} still need operator eyes.`
+                    : "Nothing ugly is slipping past the rail right now."}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Alerts surfaced</p>
+              <p className="mt-2 text-2xl font-semibold text-white">{valueSummary.alertsThisWeek}</p>
+              <p className="mt-2 text-sm text-slate-400">
+                {unresolvedAlerts.length > 0
+                  ? `${formatCountLabel(unresolvedAlerts.length, "alert")} still unresolved.`
+                  : "Alert rail is clear right now."}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Actions prevented today</p>
+              <p className="mt-2 text-2xl font-semibold text-white">{valueSummary.actionsPrevented}</p>
+              <p className="mt-2 text-sm text-slate-400">
+                {valueSummary.actionsPrevented > 0
+                  ? `${valueSummary.deniedToday} denied and ${valueSummary.approvalsUsed} deferred for review today.`
+                  : "Guardrails have not needed to block anything today."}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Approvals used today</p>
+              <p className="mt-2 text-2xl font-semibold text-white">{valueSummary.approvalsUsed}</p>
+              <p className="mt-2 text-sm text-slate-400">
+                {valueSummary.pendingApprovals > 0
+                  ? `${formatCountLabel(valueSummary.pendingApprovals, "approval")} still waiting on a human.`
+                  : "No approval backlog right now."}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Thresholds hit</p>
+              <p className="mt-2 text-2xl font-semibold text-white">{valueSummary.thresholdsHit}</p>
+              <p className="mt-2 text-sm text-slate-400">
+                {formatThresholdSummary(valueSummary.thresholdAlertHits, valueSummary.budgetThresholdHit)}
+              </p>
+            </div>
+          </div>
+        </div>
+      </LivePanel>
 
       <LiveKpiGrid>
         <LiveStatCard
