@@ -168,6 +168,29 @@ What is next
 - Commit the coordinated cleanup and ship state.
 - If more Pico-specific product work appears from the other Hermes sessions, merge it into the single Pico truth instead of reopening shadow lanes.
 
+### 2026-04-11 00:32:01 UTC — cycle end
+What changed
+- Coordinated another live merge wave across the active Hermes sessions instead of letting Pico fork into parallel products again.
+- Kept the multipage Pico app as the single real product flow and treated the old workspace/state layer as dead weight.
+- Re-pointed the public entrance toward the real Pico workspace path and updated English landing copy away from stale waitlist language.
+- Preserved tutor/support/autopilot coherence while deleting more duplicate Pico state/catalog baggage.
+- Re-validated the converged route/test/build surface after the merge wave.
+
+What was tested
+- `npm test -- --runInBand picoTutor picoAcademy`
+- `npm run build`
+- `./.venv/bin/python -m pytest tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
+- live browser checks on `/pico`, `/pico/app`, and `/pico/tutor`
+
+What failed
+- Browser automation against the dev server still showed noisy HMR/socket behavior and unreliable button interaction in-browser, but repo-native build and targeted tests stayed green.
+- Standalone local server startup is noisy because another local server was already bound to port 3000.
+
+What is next
+- Commit this convergence wave cleanly.
+- Run one more production-style smoke pass against the freshly committed Pico routes.
+- Then move to real runtime/auth sync instead of more shell churn.
+
 ### 2026-04-11 00:02:05 UTC — cycle end
 What changed
 - Added `/pico/app` as a new authenticated workspace and shipped lesson detail pages under `/pico/app/lessons/[slug]`.

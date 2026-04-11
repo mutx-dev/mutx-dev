@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { PicoShell } from '@/components/pico/PicoShell'
@@ -449,12 +450,18 @@ export function PicoAutopilotPageClient() {
                     <p className="font-medium text-white">Run {run.id}</p>
                     <p className="mt-1">Status: {run.status}</p>
                     <p className="mt-1">Started: {run.started_at ?? 'n/a'}</p>
+                    <Link href="/dashboard/runs" className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+                      Inspect runs in MUTX dashboard
+                    </Link>
                   </div>
                 ))}
                 {alerts.slice(0, 3).map((alert) => (
                   <div key={alert.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
                     <p className="font-medium text-white">{alert.type}</p>
                     <p className="mt-1">{alert.message}</p>
+                    <Link href="/dashboard/monitoring" className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+                      Open monitoring
+                    </Link>
                   </div>
                 ))}
                 {budget ? (
@@ -463,6 +470,9 @@ export function PicoAutopilotPageClient() {
                     <p className="mt-1">Plan: {budget.plan}</p>
                     <p className="mt-1">Used: {budget.credits_used}</p>
                     <p className="mt-1">Remaining: {budget.credits_remaining}</p>
+                    <Link href="/dashboard/budgets" className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+                      Open budgets
+                    </Link>
                   </div>
                 ) : null}
               </div>

@@ -38,8 +38,8 @@ Phase 3 moving into Phase 4/5.
 - Docs drift remains a repo-wide tax and will bite again if left alone too long.
 
 ## Next execution wave
-1. Pass validation.
-2. Commit the current Pico beta workspace slice.
-3. Add auth-aware optional sync to existing dashboard routes.
-4. Add richer tutorial rendering and track-specific progress views.
-5. Replace manual event entry with live connector ingestion.
+1. Commit the converged multipage Pico slice.
+2. Run a fresh production-style smoke pass on the committed Pico routes.
+3. Add auth-aware sync from Pico flows into existing dashboard/onboarding/observability routes.
+4. Replace manual event entry with live connector ingestion.
+5. Cut more stale waitlist/copy residue across non-English locales once the core flow stops moving.

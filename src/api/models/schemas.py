@@ -616,15 +616,6 @@ class RuntimeProviderSnapshotResponse(RuntimeProviderSnapshotUpsert):
     stale_after_seconds: int = 900
 
 
-class PicoStateResponse(BaseModel):
-    state: dict[str, Any] = Field(default_factory=dict)
-
-
-class PicoStateUpdateRequest(BaseModel):
-    patch: dict[str, Any] = Field(default_factory=dict)
-    replace: bool = False
-
-
 # API Key Schemas
 class APIKeyCreate(BaseModel):
     name: str

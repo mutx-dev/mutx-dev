@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 
-import { PicoLandingPage } from "@/components/site/pico/PicoLandingPage";
-import { PicoFooter } from "@/components/site/pico/PicoFooter";
-import { PublicSurface } from "@/components/site/PublicSurface";
+import { PicoLandingSurface } from '@/components/pico/PicoLandingSurface'
 import { DEFAULT_X_HANDLE, getPageOgImageUrl } from '@/lib/seo'
 
-const pageTitle = "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer";
+const pageTitle = "PicoMUTX — From first agent to one you actually trust";
 const pageDescription =
-  "PicoMUTX helps founders, operators, and small teams build, deploy, and run AI agents safely — with step-by-step guidance, built-in safeguards, and real support. Pre-register now for early access.";
+  "PicoMUTX is the guided academy, tutor, and autopilot layer that takes you from first agent to a production workflow you can actually trust.";
 
 export const metadata: Metadata = {
   title: pageTitle,
@@ -32,7 +30,7 @@ export const metadata: Metadata = {
 
 export default function PicoPage() {
   return (
-    <PublicSurface>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -50,8 +48,7 @@ export default function PicoPage() {
           }),
         }}
       />
-      <PicoLandingPage />
-      <PicoFooter />
-    </PublicSurface>
+      <PicoLandingSurface />
+    </>
   );
 }
