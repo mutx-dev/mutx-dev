@@ -88,7 +88,7 @@ export type AutopilotAgentSummary = {
 export type AutopilotTimelineItem = {
   id: string
   kind: 'run' | 'alert' | 'approval' | 'budget'
-  occurredAt: string
+  occurredAt: string | null
   title: string
   detail: string
   impact: string
@@ -124,15 +124,17 @@ function toDate(value?: string | null) {
   return Number.isNaN(date.getTime()) ? null : date
 }
 
-function fallbackTimestamp(...values: Array<string | null | undefined>) {
-  return values.find((value) => typeof value === 'string' && value.trim()) ?? new Date(0).toISOString()
+function fallbackTimestamp(...values: Array<string | null | undefined>): string | null {
+  return values.find((value) => typeof value === 'string' && value.trim()) ?? null
 }
 
 function excerpt(value?: string | null, max = 140) {
   if (!value) return null
   const compact = value.replace(/\s+/g, ' ').trim()
   if (!compact) return null
-  return compact.length <= max ? compact : `${compact.slice(0, max - 1)}...`
+  if (compact.length <= max) return compact
+  if (max <= 3) return '.'.repeat(Math.max(0, max))
+  return `${compact.slice(0, max - 3)}...`
 }
 
 function titleCase(value: string) {
@@ -196,9 +198,12 @@ export function getRunSeverity(status: string): AutopilotTimelineItem['severity'
 
 export function describeRunDetail(run: AutopilotRunSummary, traces: AutopilotRunTrace[] = []) {
   const status = run.status.toUpperCase()
-  const latestTrace = [...traces]
+  const latestTrace = traces
     .filter((trace) => typeof trace.message === 'string' && trace.message.trim())
-    .sort((left, right) => new Date(right.timestamp ?? 0).getTime() - new Date(left.timestamp ?? 0).getTime())[0]
+    .reduce<AutopilotRunTrace | undefined>((latest, trace) => {
+      if (!latest) return trace
+      return new Date(trace.timestamp ?? 0).getTime() > new Date(latest.timestamp ?? 0).getTime() ? trace : latest
+    }, undefined)
 
   if (['FAILED', 'ERROR', 'CANCELLED'].includes(status)) {
     return excerpt(run.error_message) ?? excerpt(latestTrace?.message) ?? 'The run stopped without a stored error message.'
@@ -397,6 +402,19 @@ export function buildAutopilotTimeline(input: {
     })
   })
 
+  const getApprovalSeverity = (status: string): 'warn' | 'good' | 'critical' | 'neutral' => {
+    switch (status) {
+      case 'PENDING':
+        return 'warn'
+      case 'APPROVED':
+        return 'good'
+      case 'REJECTED':
+        return 'critical'
+      default:
+        return 'neutral'
+    }
+  }
+
   input.approvals.forEach((approval) => {
     const normalized = approval.status.toUpperCase()
     const summary =
@@ -411,7 +429,7 @@ export function buildAutopilotTimeline(input: {
       title: `${titleCase(approval.action_type)} ${normalized.toLowerCase()}`,
       detail: excerpt(summary, 180) ?? `Requested by ${approval.requester}.`,
       impact: explainApprovalImpact(approval),
-      severity: normalized === 'PENDING' ? 'warn' : normalized === 'APPROVED' ? 'good' : normalized === 'REJECTED' ? 'critical' : 'neutral',
+      severity: getApprovalSeverity(normalized),
       href: '#approvals-section',
       sourceLabel: 'Approvals',
     })

@@ -70,13 +70,13 @@ describe('pico approvals validation', () => {
       })
     })
 
-    it('returns a bad request response for blank request ids', async () => {
+    it('returns a bad request response for blank request ids', () => {
       const result = validateApprovalRequestId('   ')
 
       expect(result.success).toBe(false)
       if (!result.success) {
         expect(result.response.status).toBe(400)
-        await expect(result.response.json()).resolves.toEqual({
+        return expect(result.response.json()).resolves.toEqual({
           status: 'error',
           error: {
             code: 'BAD_REQUEST',
