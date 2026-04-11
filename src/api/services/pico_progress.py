@@ -1,65 +1,51 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.models import User, UserSetting
+from src.api.models import User
+from src.api.services.operator_state import _get_setting, _upsert_setting
 
 PICO_PROGRESS_KEY = 'pico.progress'
-PICO_PROGRESS_VERSION = 1
+
+DEFAULT_PICO_PROGRESS: dict[str, Any] = {
+    'version': 1,
+    'startedAt': None,
+    'updatedAt': None,
+    'selectedTrack': None,
+    'startedLessons': [],
+    'completedLessons': [],
+    'milestoneEvents': [],
+    'tutorQuestions': 0,
+    'supportRequests': 0,
+    'helpfulResponses': 0,
+    'sharedProjects': [],
+    'autopilot': {
+        'costThresholdPercent': 75,
+        'alertChannel': 'in_app',
+        'approvalGateEnabled': False,
+        'approvalRequestIds': [],
+        'lastThresholdBreachAt': None,
+    },
+}
 
 
-def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+def _utcnow_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
-def _default_progress() -> dict[str, Any]:
-    now = _utcnow().isoformat()
-    return {
-        'version': PICO_PROGRESS_VERSION,
-        'started_at': now,
-        'updated_at': now,
-        'effective_plan': 'starter',
-        'plan_source': 'alpha_override',
-        'focus_track_id': 'track-a-first-agent',
-        'xp': 25,
-        'started_lesson_ids': [],
-        'completed_lesson_ids': [],
-        'earned_badge_ids': ['account-created'],
-        'unlocked_level_ids': [0],
-        'milestone_ids': ['account-created'],
-        'events': [
-            {
-                'id': 'account-created',
-                'type': 'account_created',
-                'summary': 'Account created and Pico workspace unlocked.',
-                'created_at': now,
-                'status': 'completed',
-                'metadata': {},
-            }
-        ],
-        'alert_config': {
-            'enabled': False,
-            'monthly_budget_usd': 25,
-            'notify_email': True,
-            'notify_webhook': False,
-        },
-        'approval_gate': {
-            'enabled': False,
-            'risky_action': 'deployment_change',
-            'pending_requests': [],
-            'last_reviewed_at': None,
-        },
-        'tutor': {
-            'free_questions_remaining': 5,
-            'questions_asked': 0,
-            'escalations': 0,
-            'history': [],
-        },
-    }
+def _dedupe_string_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+
+    deduped: list[str] = []
+    for item in value:
+        if isinstance(item, str) and item.strip() and item not in deduped:
+            deduped.append(item)
+    return deduped
 
 
 def _deep_merge(base: dict[str, Any], patch: dict[str, Any]) -> dict[str, Any]:
@@ -72,100 +58,58 @@ def _deep_merge(base: dict[str, Any], patch: dict[str, Any]) -> dict[str, Any]:
     return merged
 
 
-def _normalize_string_list(value: Any) -> list[str]:
-    if not isinstance(value, list):
-        return []
-
-    deduped: list[str] = []
-    for item in value:
-        if isinstance(item, str) and item.strip() and item not in deduped:
-            deduped.append(item)
-    return deduped
-
-
-def _normalize_int_list(value: Any) -> list[int]:
-    if not isinstance(value, list):
-        return []
-
-    deduped: list[int] = []
-    for item in value:
-        try:
-            normalized = int(item)
-        except (TypeError, ValueError):
-            continue
-        if normalized not in deduped:
-            deduped.append(normalized)
-    return deduped
-
-
 def _normalize_progress(payload: dict[str, Any] | None) -> dict[str, Any]:
-    progress = _default_progress()
+    progress = deepcopy(DEFAULT_PICO_PROGRESS)
     if payload:
         progress = _deep_merge(progress, payload)
 
-    progress['version'] = PICO_PROGRESS_VERSION
-    progress['updated_at'] = _utcnow().isoformat()
-    progress['started_at'] = (
-        progress.get('started_at') if isinstance(progress.get('started_at'), str) else _utcnow().isoformat()
+    now = _utcnow_iso()
+    progress['version'] = 1
+    progress['startedAt'] = (
+        progress.get('startedAt') if isinstance(progress.get('startedAt'), str) else now
     )
-    progress['focus_track_id'] = (
-        progress.get('focus_track_id') if isinstance(progress.get('focus_track_id'), str) else 'track-a-first-agent'
+    progress['updatedAt'] = (
+        progress.get('updatedAt') if isinstance(progress.get('updatedAt'), str) else now
     )
-    progress['xp'] = max(int(progress.get('xp') or 0), 0)
-    progress['started_lesson_ids'] = _normalize_string_list(progress.get('started_lesson_ids'))
-    progress['completed_lesson_ids'] = _normalize_string_list(progress.get('completed_lesson_ids'))
-    progress['earned_badge_ids'] = _normalize_string_list(progress.get('earned_badge_ids'))
-    progress['milestone_ids'] = _normalize_string_list(progress.get('milestone_ids'))
-    progress['unlocked_level_ids'] = _normalize_int_list(progress.get('unlocked_level_ids')) or [0]
-    progress['events'] = [
-        item for item in (progress.get('events') or []) if isinstance(item, dict) and item.get('type')
-    ]
+    progress['selectedTrack'] = (
+        progress.get('selectedTrack') if isinstance(progress.get('selectedTrack'), str) else None
+    )
+    progress['startedLessons'] = _dedupe_string_list(progress.get('startedLessons'))
+    progress['completedLessons'] = _dedupe_string_list(progress.get('completedLessons'))
+    progress['milestoneEvents'] = _dedupe_string_list(progress.get('milestoneEvents'))
+    progress['sharedProjects'] = _dedupe_string_list(progress.get('sharedProjects'))
+    progress['tutorQuestions'] = max(int(progress.get('tutorQuestions') or 0), 0)
+    progress['supportRequests'] = max(int(progress.get('supportRequests') or 0), 0)
+    progress['helpfulResponses'] = max(int(progress.get('helpfulResponses') or 0), 0)
 
-    default_autopilot = _default_progress()['alert_config']
-    progress['alert_config'] = _deep_merge(
-        default_autopilot,
-        progress.get('alert_config') if isinstance(progress.get('alert_config'), dict) else {},
-    )
-    progress['alert_config']['monthly_budget_usd'] = max(
-        int(progress['alert_config'].get('monthly_budget_usd') or 25),
-        1,
+    autopilot = progress.get('autopilot') if isinstance(progress.get('autopilot'), dict) else {}
+    normalized_autopilot = deepcopy(DEFAULT_PICO_PROGRESS['autopilot'])
+    normalized_autopilot.update(autopilot)
+    normalized_autopilot['approvalRequestIds'] = _dedupe_string_list(
+        normalized_autopilot.get('approvalRequestIds')
     )
 
-    default_gate = _default_progress()['approval_gate']
-    progress['approval_gate'] = _deep_merge(
-        default_gate,
-        progress.get('approval_gate') if isinstance(progress.get('approval_gate'), dict) else {},
-    )
-    progress['approval_gate']['enabled'] = bool(progress['approval_gate'].get('enabled'))
-    progress['approval_gate']['pending_requests'] = [
-        item
-        for item in progress['approval_gate'].get('pending_requests', [])
-        if isinstance(item, dict)
-    ]
+    threshold = normalized_autopilot.get('costThresholdPercent')
+    if isinstance(threshold, (int, float)):
+        normalized_autopilot['costThresholdPercent'] = max(1, min(100, round(float(threshold))))
+    else:
+        normalized_autopilot['costThresholdPercent'] = DEFAULT_PICO_PROGRESS['autopilot'][
+            'costThresholdPercent'
+        ]
 
-    default_tutor = _default_progress()['tutor']
-    progress['tutor'] = _deep_merge(
-        default_tutor,
-        progress.get('tutor') if isinstance(progress.get('tutor'), dict) else {},
+    alert_channel = normalized_autopilot.get('alertChannel')
+    normalized_autopilot['alertChannel'] = (
+        alert_channel if alert_channel in {'in_app', 'email', 'webhook'} else 'in_app'
     )
-    progress['tutor']['questions_asked'] = max(int(progress['tutor'].get('questions_asked') or 0), 0)
-    progress['tutor']['free_questions_remaining'] = max(
-        int(progress['tutor'].get('free_questions_remaining') or 0),
-        0,
+    normalized_autopilot['approvalGateEnabled'] = bool(normalized_autopilot.get('approvalGateEnabled'))
+    normalized_autopilot['lastThresholdBreachAt'] = (
+        normalized_autopilot.get('lastThresholdBreachAt')
+        if isinstance(normalized_autopilot.get('lastThresholdBreachAt'), str)
+        else None
     )
-    progress['tutor']['escalations'] = max(int(progress['tutor'].get('escalations') or 0), 0)
-    progress['tutor']['history'] = [
-        item for item in progress['tutor'].get('history', []) if isinstance(item, dict)
-    ]
 
+    progress['autopilot'] = normalized_autopilot
     return progress
-
-
-async def _get_setting(db: AsyncSession, *, user_id, key: str) -> UserSetting | None:
-    result = await db.execute(
-        select(UserSetting).where(UserSetting.user_id == user_id, UserSetting.key == key)
-    )
-    return result.scalar_one_or_none()
 
 
 async def get_pico_progress(db: AsyncSession, *, user: User) -> dict[str, Any]:
@@ -183,13 +127,8 @@ async def upsert_pico_progress(
     existing = await _get_setting(db, user_id=user.id, key=PICO_PROGRESS_KEY)
     current_progress = _normalize_progress(existing.value if existing else None)
     next_progress = _normalize_progress(payload if replace else _deep_merge(current_progress, payload))
+    next_progress['updatedAt'] = _utcnow_iso()
 
-    if existing is None:
-        existing = UserSetting(user_id=user.id, key=PICO_PROGRESS_KEY, value=next_progress)
-        db.add(existing)
-    else:
-        existing.value = next_progress
-
+    await _upsert_setting(db, user=user, key=PICO_PROGRESS_KEY, value=next_progress)
     await db.commit()
-    await db.refresh(existing)
-    return _normalize_progress(existing.value)
+    return _normalize_progress(next_progress)

@@ -923,7 +923,16 @@ export function derivePicoProgress(progressInput: Partial<PicoProgressState> | n
     return levelComplete ? item.id : level
   }, 0)
 
-  const nextLesson = PICO_LESSONS.find((lesson) => !completedLessons.has(lesson.slug) && unlockedLessonSlugs.includes(lesson.slug)) ?? null
+  const selectedTrackLessons = progress.selectedTrack
+    ? getLessonsForTrack(progress.selectedTrack).filter(
+        (lesson) => !completedLessons.has(lesson.slug) && unlockedLessonSlugs.includes(lesson.slug)
+      )
+    : []
+
+  const nextLesson =
+    selectedTrackLessons[0] ??
+    PICO_LESSONS.find((lesson) => !completedLessons.has(lesson.slug) && unlockedLessonSlugs.includes(lesson.slug)) ??
+    null
 
   return {
     xp,

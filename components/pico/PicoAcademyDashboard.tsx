@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
@@ -18,6 +19,7 @@ function ProgressCard({ label, value, hint }: { label: string; value: string; hi
 }
 
 export function PicoAcademyDashboard() {
+  const router = useRouter()
   const { progress, derived, syncState, ready, actions } = usePicoProgress()
   const toHref = usePicoHref()
   const nextLesson = derived.nextLesson
@@ -56,7 +58,7 @@ export function PicoAcademyDashboard() {
         <ProgressCard
           label="Lessons"
           value={`${derived.completedLessonCount}/${derived.totalLessons}`}
-          hint="Every lesson ends with a real artifact or a real operating action."
+          hint="Every lesson defines a real artifact or operating action to finish."
         />
         <ProgressCard
           label="Level"
@@ -87,7 +89,10 @@ export function PicoAcademyDashboard() {
             {nextLesson ? (
               <button
                 type="button"
-                onClick={() => actions.startLesson(nextLesson.slug)}
+                onClick={() => {
+                  actions.startLesson(nextLesson.slug)
+                  router.push(toHref(`/academy/${nextLesson.slug}`))
+                }}
                 className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-100"
               >
                 Start lesson
@@ -140,8 +145,8 @@ export function PicoAcademyDashboard() {
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Tracks</p>
             <h2 className="mt-2 text-2xl font-semibold text-white">Project-based learning paths</h2>
           </div>
-          <Link href={toHref('/app')} className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
-            Open workspace
+          <Link href={toHref('/onboarding')} className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
+            Open onboarding
           </Link>
         </div>
         <div className="mt-5 grid gap-4 xl:grid-cols-2">

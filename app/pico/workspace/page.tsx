@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
 
 export default function PicoWorkspacePage() {
-  redirect('/pico/app')
+  redirect('/pico/onboarding')
 }

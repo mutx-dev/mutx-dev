@@ -23,7 +23,12 @@ export function PicoSupportPageClient() {
 
   return (
     <>
-      <PicoContactForm open={formOpen} onClose={() => setFormOpen(false)} defaultInterest={interest} />
+      <PicoContactForm
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        defaultInterest={interest}
+        source={interest === 'Office hours' ? 'pico-office-hours' : 'pico-support'}
+      />
       <PicoShell
         eyebrow="Support shell"
         title="Support without the fake community fluff"

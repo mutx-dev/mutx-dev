@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useState, useCallback, useRef, type FormEvent } from 'react'
+import { useState, useCallback, useEffect, useRef, type FormEvent } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import * as Select from '@radix-ui/react-select'
 import { X, ArrowRight, Check, ChevronDown } from 'lucide-react'
@@ -12,15 +12,22 @@ type PicoContactFormProps = {
   open: boolean
   onClose: () => void
   defaultInterest?: string
+  source?: string
 }
 
-export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactFormProps) {
+export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico-landing' }: PicoContactFormProps) {
   const t = useTranslations('pico.contactForm')
   const prefersReducedMotion = useReducedMotion()
   const [state, setState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [interest, setInterest] = useState(defaultInterest || 'building-first')
   const honeypotRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (open) {
+      setInterest(defaultInterest || 'building-first')
+    }
+  }, [defaultInterest, open])
 
   const handleSubmit = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
@@ -39,7 +46,7 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
         company: form.get('company') as string,
         message: form.get('message') as string,
         interest,
-        source: 'pico-landing',
+        source,
         honeypot: honeypotRef.current?.value || '',
       }
 
@@ -65,7 +72,7 @@ export function PicoContactForm({ open, onClose, defaultInterest }: PicoContactF
         setState('error')
       }
     },
-    [state, interest, t],
+    [state, interest, source, t],
   )
 
   const handleClose = useCallback(() => {

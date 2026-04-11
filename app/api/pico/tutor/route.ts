@@ -9,12 +9,16 @@ export async function POST(request: NextRequest) {
   return withErrorHandling(async () => {
     const body = await request.json().catch(() => ({}))
     const question = typeof body.question === 'string' ? body.question : ''
+    const lessonSlug = typeof body.lessonSlug === 'string' ? body.lessonSlug : null
 
     if (!question.trim()) {
       return badRequest('Question is required')
     }
 
-    const legacyAnswer = answerPicoTutorQuestion(question)
+    const legacyAnswer = answerPicoTutorQuestion(question, {
+      lessonSlug,
+      progress: body.progress,
+    })
     const reply = answerTutorQuestion(question, body.progress)
 
     return NextResponse.json({
