@@ -46,10 +46,16 @@ export function PicoOnboardingPageClient() {
       actions={
         <div className="flex flex-wrap gap-3">
           <Link
-            href={toHref(`/academy/${activationLessonSlug}`)}
+            href={firstRunDone && !derived.nextLesson ? toHref('/autopilot') : toHref(`/academy/${activationLessonSlug}`)}
             className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950"
           >
-            {installDone ? 'Run your first agent' : 'Install Hermes now'}
+            {!installDone
+              ? 'Install Hermes now'
+              : !firstRunDone
+                ? 'Run your first agent'
+                : derived.nextLesson
+                  ? `Continue with ${derived.nextLesson.title}`
+                  : 'Open Autopilot'}
           </Link>
           {!installDone ? (
             <Link

@@ -1,43 +1,46 @@
 # EXECUTION_PLAN
 
 ## Current phase
-Phase 7 truth hardening through simplification.
+Phase 7 truth hardening.
 
-The product already has the necessary surfaces.
-The job now is to make them feel inevitable instead of sprawling.
+The product already has the needed surfaces.
+The job now is to keep the Pico loop honest, obvious, and tight.
 
-## Priorities
-1. Keep the first-time path obvious.
-2. Delete duplicate concepts before adding anything else.
-3. Keep Pico self-contained and readable.
-4. Keep validation green and docs honest.
+## What just landed
+- Approval gate bootstrap inside Autopilot
+- Direct lesson-to-control linkage for `add-an-approval-gate`
+- Better onboarding and academy CTA coherence
+- Better tutor alternate-match surfacing
+- Support submit counting fixed to real success instead of modal opens
+
+## Current priorities
+1. Browser-smoke the updated Pico loop
+2. Remove duplicate helper drift (`lib/pico/autopilot.ts`) if truly unused
+3. Tighten lesson completion honesty where validation is still too implicit
+4. Keep docs synced with code truth
 
 ## Active tasks
-- [x] Tighten activation around the first working agent
-- [x] Harden trust-critical Autopilot surfaces
-- [x] Simplify vocabulary across the active Pico UI
-- [x] Collapse support overlap into tutor + human help
-- [ ] Browser-smoke simplified tutor and human-help flows
-- [ ] Sweep remaining copy for unnecessary product nouns
+- [x] Create/update mandatory Pico operating docs
+- [x] Wire approval gate bootstrap into Autopilot
+- [x] Tie lesson `add-an-approval-gate` to the live product path
+- [x] Fix support submit counting semantics
+- [x] Fix onboarding/academy/tutor truth gaps touched in this slice
+- [ ] Browser-smoke updated Pico surfaces
+- [ ] Remove or justify duplicate legacy helper `lib/pico/autopilot.ts`
 
-## Current simplification rules
-- Use `track`, never `lane`.
-- Use `Start building` / `Start`, not `workspace`, unless the route name itself requires it.
-- Use `Tutor` for grounded in-product help.
-- Use `Human help` for escalation.
-- If a section duplicates another section's job, merge it or kill it.
+## Acceptance gates for next commit
+- `git diff --check`
+- `npm run typecheck`
+- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts tests/unit/picoAutopilot.test.ts`
+- `npm run build`
+- Manual pass on `/pico/onboarding`, `/pico/academy`, `/pico/tutor`, `/pico/support`, `/pico/autopilot`
 
 ## Risks
-- Broader `/dashboard/*` pages still look like secondary surfaces, not trustworthy Pico drill-downs.
-- Dirty tree changes outside the simplification slice can reintroduce complexity by accident.
-- Copy drift is still the fastest way to make Pico feel bigger and less clear than it is.
+- Green unit/build checks can still miss browser-level copy or navigation regressions.
+- Duplicate helper surfaces are still a drift risk until `lib/pico/autopilot.ts` is settled.
+- Lesson completion remains somewhat trust-based in places outside the approval flow.
 
-## Acceptance gates for the next simplification commit
-- `npm run typecheck`
-- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
-- `npm run build`
-
-## Definition of success
-- A new user can tell where to start in one glance.
-- A blocked user can tell the difference between tutor and human help in one glance.
-- The product sounds like one system, not five overlapping ones.
+## Definition of success for the next cycle
+- Browser-smoke confirms the updated Pico loop is coherent.
+- Duplicate helper drift is reduced.
+- No docs claim anything the product cannot now do.

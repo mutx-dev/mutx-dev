@@ -1,40 +1,56 @@
 # SHIP_CHECKLIST
 
-## Product readiness
-- [x] Pico workspace route exists
-- [x] Academy levels, tracks, and tutorials exist
-- [x] Progress persists locally and syncs when authenticated
-- [x] XP and badge logic exists
-- [x] Tutor surface exists and is grounded in shipped lessons
-- [x] Support escalation path exists
-- [x] Autopilot page exists with live runs, budgets, alerts, and approvals
-- [x] Plan gating exists without faking live billing
-- [ ] Billing exists
+## Product truth blockers
+- [x] Approval gate can be enabled from Pico, not just described
+- [x] A sample approval request can be created from Pico and resolved from Pico
+- [x] Lesson `add-an-approval-gate` maps cleanly to the live product flow
+- [x] Support request counting reflects real submissions, not modal opens
+- [ ] Duplicate `lib/pico/autopilot.ts` drift is removed or explicitly justified
 
-## Quality checks
-- [x] Typecheck passes
-- [x] Targeted unit tests pass
-- [x] Targeted API tests pass
-- [x] Build passes
-- [x] Pico landing points clearly to the canonical workspace entry
-- [x] Public copy matches shipped product truth on the live landing paths
+## Academy readiness
+- [x] Academy dashboard exists
+- [x] 7 levels exist in code
+- [x] 5 tracks exist in code
+- [x] 12 lessons exist in code
+- [x] Progress persists locally
+- [x] Progress sync path exists for authenticated users
+- [ ] Lesson completion feels honest enough for public ship everywhere, not just in the approval flow
+- [x] Onboarding CTA targets stay coherent across clean/install-done/first-run-done states
+- [x] Completed-track copy avoids restart confusion
 
-## Content completeness
-- [x] 12 launch tutorials defined
-- [x] 5 project tracks defined
-- [x] 7 level objectives defined
-- [x] Validation step exists for every lesson
-- [x] Troubleshooting exists for every lesson
-- [x] Lesson pages exist outside the workspace shell
-- [ ] Localization for workspace content exists
+## Tutor readiness
+- [x] Tutor is grounded in lesson corpus
+- [x] Tutor escalates risky topics
+- [x] Tutor UI surfaces alternate grounded lesson matches
 
-## Launch blockers
-- No Pico-specific blocker remains.
-- Remaining work is post-v1 hardening, not ship-readiness.
+## Support shell readiness
+- [x] Human escalation surface exists
+- [x] Office-hours path exists
+- [x] Support counting semantics are based on successful submit
+- [ ] Interest taxonomy could still be tightened later
 
-## Post-v1 hardening
-- Non-English Pico landing copy cleanup
-- Durable approval persistence instead of the current in-memory service
-- Real billing/checkouts instead of plan flags only
-- Deeper runtime ingestion and richer run drill-down
-- Docs nav drift cleanup across the wider repo
+## Autopilot readiness
+- [x] Run visibility exists
+- [x] Budget visibility exists
+- [x] Alert visibility exists
+- [x] Approval queue visibility exists
+- [x] Approve/reject actions exist
+- [x] Approval gate bootstrap exists end-to-end
+- [x] Approval milestone updates are exercised through the live flow
+- [ ] Manual browser pass still needed
+
+## Validation gates
+- [x] `git diff --check` on touched files
+- [x] `npm run typecheck`
+- [x] `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts tests/unit/picoAutopilot.test.ts`
+- [x] `npm run build`
+- [ ] Manual sanity pass on `/pico/onboarding`, `/pico/academy`, `/pico/tutor`, `/pico/support`, `/pico/autopilot`
+
+## Launch copy checks
+- [ ] No placeholder copy on public Pico screens
+- [x] No fake supported features in the touched Pico slice
+- [x] No vague community fluff pretending to be value in the touched Pico slice
+- [x] User now gets clearer next steps across onboarding, tutor, support, and approvals
+
+## Public ship rule
+Do not call PicoMUTX shipped until the academy promise and the control promise meet in one honest loop and survive a browser smoke pass.
