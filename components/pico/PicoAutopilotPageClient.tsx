@@ -161,7 +161,6 @@ export function PicoAutopilotPageClient() {
   const [error, setError] = useState<string | null>(null)
   const [thresholdDraft, setThresholdDraft] = useState(progress.autopilot.costThresholdPercent)
   const [resolvingApprovalId, setResolvingApprovalId] = useState<string | null>(null)
-  const [, setCreatingApprovalRequest] = useState(false)
 
   const pendingApprovals = useMemo(
     () => approvals.filter((approval) => approval.status === 'PENDING'),
