@@ -46,3 +46,15 @@ Decision: Reject parallel locale churn unless it is validated and intentionally 
 Why:
 - Bad translation churn creates a second public truth.
 - English-first truth is better than multilingual nonsense.
+
+## 2026-04-11 03:31:00 CEST
+Decision: Pico support escalation must send the backend contact contract (`tier` + `source`), not a frontend-only `interest` field.
+Why:
+- Human escalation is a trust surface. Dropping the user's intent at submit time is stupid and avoidable.
+- `pico-support` and `pico-office-hours` need to stay distinct so the team can route the ask without guesswork.
+
+Decision: Keep in-memory approval persistence as an explicit beta limitation, not a launch blocker for Pico v1.
+Why:
+- The current approval lane is an honest single-user safety click, not a fake enterprise governance promise.
+- Product docs already state the limitation plainly, and this week's ship should not die on a bigger persistence refactor.
+- Durable approvals stay in post-v1 hardening where they belong.

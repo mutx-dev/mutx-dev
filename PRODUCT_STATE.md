@@ -91,15 +91,40 @@ Deleted because they duplicated the Pico product, state, or tutor model instead 
 ## Validation snapshot
 
 Latest validated commands:
-- `rm -rf .next && npm run typecheck`
-- `npm run build`
+- `npm run lint`
+- `npm run typecheck`
 - `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
-- `./.venv/bin/python -m pytest tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
-- `curl -I http://127.0.0.1:3000/pico/onboarding`
-- `curl -I http://127.0.0.1:3000/pico/app`
-- `curl -I http://127.0.0.1:3000/pico/workspace`
+- `python3 -m pytest tests/api/test_approvals.py tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
+- `npm run build:docs-search`
+- `npm run build`
+- Browser smoke on `/pico`, `/pico/onboarding`, `/pico/academy`, `/pico/tutor`, `/pico/autopilot`, and `/pico/support`
 
 ## Work cycle log
+
+### 2026-04-11 03:31:00 CEST — launch-pressure hardening pass
+What changed
+- Fixed Pico support/contact escalation so the frontend now sends the backend contract it actually expects: `tier` plus truthful `source` values.
+- Normalized support intents so human escalation defaults to `fixing-existing` and office-hours requests default to `other` instead of shoving fake select values into the form.
+- Aligned `CONTENT_MAP.md` lesson ids to the shipped slugs in `lib/pico/academy.ts`, removing canonical docs drift right before ship.
+- Tightened approval-role matching so lowercase `role` values and `roles[]` collections both work for approver visibility and resolution.
+
+What was tested
+- `npm run lint`
+- `npm run typecheck`
+- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `python3 -m pytest tests/api/test_approvals.py tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
+- `npm run build:docs-search`
+- `npm run build`
+- Browser smoke on `/pico`, `/pico/onboarding`, `/pico/academy`, `/pico/tutor`, `/pico/autopilot`, and `/pico/support`
+- Browser verification that support escalation and office-hours flows open the Pico contact form with the correct default intent
+
+What failed
+- No Pico-specific blocker failed validation.
+- Existing repo-wide warning noise remains: Next/Turbopack NFT tracing noise and the OpenTelemetry closed-stream logging noise after pytest shutdown.
+
+What is next
+- Commit the launch-hardening slice and push the branch.
+- Keep durable approvals and real billing in post-v1 hardening, not in the critical path for this week's ship.
 
 ### 2026-04-11 02:41:00 CEST — canonical Pico reconciliation complete
 What changed

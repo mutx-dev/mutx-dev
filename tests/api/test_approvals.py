@@ -422,6 +422,69 @@ class TestApprovalRoutes:
             test_user.role = original_role
 
     @pytest.mark.asyncio
+    async def test_approve_request_accepts_lowercase_admin_role(
+        self,
+        client: AsyncClient,
+        test_user,
+        approval_service,
+    ):
+        create_resp = await client.post(
+            "/v1/approvals",
+            json={
+                "agent_id": "agent-lower-admin",
+                "session_id": "session-lower-admin",
+                "action_type": "deploy",
+                "payload": {},
+            },
+        )
+        request_id = create_resp.json()["id"]
+
+        original_role = getattr(test_user, "role", None)
+        test_user.role = "admin"
+
+        try:
+            response = await client.post(
+                f"/v1/approvals/{request_id}/approve",
+                json={"comment": "lowercase admin works"},
+            )
+            assert response.status_code == 200
+            assert response.json()["status"] == "APPROVED"
+        finally:
+            test_user.role = original_role
+
+    @pytest.mark.asyncio
+    async def test_list_approvals_visible_to_roles_list_approver(
+        self,
+        client: AsyncClient,
+        other_user,
+        other_user_client: AsyncClient,
+        approval_service,
+    ):
+        create_resp = await client.post(
+            "/v1/approvals",
+            json={
+                "agent_id": "agent-role-list",
+                "session_id": "session-role-list",
+                "action_type": "deploy",
+                "payload": {},
+            },
+        )
+        request_id = create_resp.json()["id"]
+
+        original_roles = getattr(other_user, "roles", None)
+        other_user.roles = ["developer"]
+
+        try:
+            response = await other_user_client.get(f"/v1/approvals/{request_id}")
+            assert response.status_code == 200
+            assert response.json()["id"] == request_id
+        finally:
+            if original_roles is None and hasattr(other_user, "roles"):
+                delattr(other_user, "roles")
+            else:
+                other_user.roles = original_roles
+
+    @pytest.mark.asyncio
     async def test_cannot_approve_already_approved(
         self,
         client: AsyncClient,

@@ -26,7 +26,14 @@ APPROVER_ROLES = {"DEVELOPER", "ADMIN"}
 
 def _has_approver_role(user: User) -> bool:
     role: Optional[str] = getattr(user, "role", None)
-    return role in APPROVER_ROLES if role is not None else False
+    if isinstance(role, str) and role.strip().upper() in APPROVER_ROLES:
+        return True
+
+    roles = getattr(user, "roles", None)
+    if isinstance(roles, (list, tuple, set)):
+        return any(isinstance(item, str) and item.strip().upper() in APPROVER_ROLES for item in roles)
+
+    return False
 
 
 def _ensure_approval_visible(user: User, req: ApprovalRequest) -> None:

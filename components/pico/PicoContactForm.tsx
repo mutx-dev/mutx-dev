@@ -15,17 +15,43 @@ type PicoContactFormProps = {
   source?: string
 }
 
+const INTEREST_OPTIONS = [
+  'building-first',
+  'fixing-existing',
+  'evaluating',
+  'spent-money',
+  'other',
+] as const
+
+type InterestOption = (typeof INTEREST_OPTIONS)[number]
+
+function isInterestOption(value: string | undefined): value is InterestOption {
+  return Boolean(value && INTEREST_OPTIONS.includes(value as InterestOption))
+}
+
+function resolveInterestValue(defaultInterest?: string): InterestOption {
+  return isInterestOption(defaultInterest) ? defaultInterest : 'other'
+}
+
 export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico-landing' }: PicoContactFormProps) {
   const t = useTranslations('pico.contactForm')
   const prefersReducedMotion = useReducedMotion()
   const [state, setState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
-  const [interest, setInterest] = useState(defaultInterest || 'building-first')
+  const [interest, setInterest] = useState<InterestOption>(resolveInterestValue(defaultInterest))
   const honeypotRef = useRef<HTMLInputElement>(null)
+
+  const interestLabelByValue: Record<InterestOption, string> = {
+    'building-first': t('interestOptions.building-first'),
+    'fixing-existing': t('interestOptions.fixing-existing'),
+    evaluating: t('interestOptions.evaluating'),
+    'spent-money': t('interestOptions.spent-money'),
+    other: t('interestOptions.other'),
+  }
 
   useEffect(() => {
     if (open) {
-      setInterest(defaultInterest || 'building-first')
+      setInterest(resolveInterestValue(defaultInterest))
     }
   }, [defaultInterest, open])
 
@@ -45,7 +71,7 @@ export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico
         name: form.get('name') as string,
         company: form.get('company') as string,
         message: form.get('message') as string,
-        interest,
+        tier: interestLabelByValue[interest],
         source,
         honeypot: honeypotRef.current?.value || '',
       }
@@ -81,6 +107,12 @@ export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico
     setErrorMsg('')
     onClose()
   }, [state, onClose])
+
+  const handleInterestChange = useCallback((value: string) => {
+    if (isInterestOption(value)) {
+      setInterest(value)
+    }
+  }, [])
 
   return (
     <AnimatePresence>
@@ -186,7 +218,7 @@ export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico
 
                   <div className={s.label}>
                     <span className={s.labelText}>{t('interestLabel')}</span>
-                    <Select.Root value={interest} onValueChange={setInterest}>
+                    <Select.Root value={interest} onValueChange={handleInterestChange}>
                       <Select.Trigger className={s.selectTrigger}>
                         <Select.Value />
                         <Select.Icon className={s.selectIcon}>

@@ -21,17 +21,17 @@
 | ID | Lesson | Level | Track | Status | Artifact |
 |----|--------|-------|-------|--------|----------|
 | install-hermes-locally | Install Hermes locally | 0 | First Agent | shipped | Working local Hermes runtime |
-| run-first-agent | Run your first agent | 0 | First Agent | shipped | Saved first prompt and response |
-| deploy-hermes-vps | Deploy Hermes on a VPS | 1 | Deployed Agent | shipped | Persistent Hermes runtime |
-| keep-agent-alive | Keep your agent alive between sessions | 1 | Deployed Agent | shipped | Service/process-manager definition |
-| connect-interface-layer | Connect a messaging or interface layer | 1 | Deployed Agent | shipped | Working interface route |
-| add-first-skill-tool | Add your first skill or tool | 2 | Useful Workflow | shipped | First documented skill |
-| create-scheduled-workflow | Create a scheduled workflow | 3 | Useful Workflow | shipped | Scheduled workflow |
-| see-agent-activity | See your agent activity | 4 | Controlled Agent | shipped | Readable run timeline |
-| set-cost-threshold | Set a cost threshold | 5 | Controlled Agent | shipped | Budget threshold + warning path |
-| add-approval-gate | Add an approval gate | 5 | Controlled Agent | shipped | Approval gate + decision trail |
-| build-lead-response-agent | Build a lead-response agent | 6 | Production Pattern | shipped | Reusable lead-response pattern |
-| build-document-processing-agent | Build a document-processing agent | 6 | Production Pattern | shipped | Reusable document-processing pattern |
+| run-your-first-agent | Run your first agent | 0 | First Agent | shipped | Saved first prompt and response |
+| deploy-hermes-on-a-vps | Deploy Hermes on a VPS | 1 | Deployed Agent | shipped | Persistent Hermes runtime |
+| keep-your-agent-alive | Keep your agent alive between sessions | 1 | Deployed Agent | shipped | Service/process-manager definition |
+| connect-a-messaging-layer | Connect a messaging or interface layer | 1 | Deployed Agent | shipped | Working interface route |
+| add-your-first-skill | Add your first skill or tool | 2 | Useful Workflow | shipped | First documented skill |
+| create-a-scheduled-workflow | Create a scheduled workflow | 3 | Useful Workflow | shipped | Scheduled workflow |
+| see-your-agent-activity | See your agent activity | 4 | Controlled Agent | shipped | Readable run timeline |
+| set-a-cost-threshold | Set a cost threshold | 5 | Controlled Agent | shipped | Budget threshold + warning path |
+| add-an-approval-gate | Add an approval gate | 5 | Controlled Agent | shipped | Approval gate + decision trail |
+| build-a-lead-response-agent | Build a lead-response agent | 6 | Production Pattern | shipped | Reusable lead-response pattern |
+| build-a-document-processing-agent | Build a document-processing agent | 6 | Production Pattern | shipped | Reusable document-processing pattern |
 
 ## Content schema
 Every lesson includes:
