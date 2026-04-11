@@ -18,11 +18,12 @@ Repo guidance for agentic coding agents working in `/Users/fortune/MUTX`.
 * `app/`: Next.js 16 App Router frontend.
 * `app/api/`: Next.js route handlers that proxy or handle website requests.
 * `components/`: shared React UI components.
-* `lib/`: shared TypeScript utilities; currently `lib/utils.ts` only.
+* `lib/`: shared TypeScript utilities, docs helpers, desktop release helpers, and Pico support modules.
 * `src/api/`: FastAPI backend, models, services, middleware, and integrations.
 * `cli/`: Click-based Python CLI.
 * `sdk/mutx/`: Python SDK package.
 * `tests/api/`: pytest API tests.
+* `tests/unit/`: Jest frontend unit tests.
 * `tests/website.spec.ts`: Playwright smoke tests.
 * `infrastructure/`: Terraform, Ansible, monitoring, and related Make targets.
 * `infrastructure/helm/`: Kubernetes Helm chart for MUTX deployment.
@@ -157,7 +158,7 @@ headers = trace_context()  # Returns {"traceparent": "...", "tracestate": "..."}
 ```
 
 **API Routes**:
-- `GET /telemetry/config` - Returns `{otel_enabled, exporter_type, endpoint}`
+* `GET /v1/telemetry/config` - Returns `{otel_enabled, exporter_type, endpoint}`
 
 **Middleware** (`src/api/middleware/tracing.py`):
 - Extracts `TRACEPARENT` and `TRACESTATE` headers

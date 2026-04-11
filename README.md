@@ -10,7 +10,7 @@ Prototype an agent in an afternoon. Run one in production for a year — that's 
 
 | Component | What it does |
 |-----------|-------------|
-| **Control Plane API** | FastAPI backend — `/v1/*` routes for auth, agents, deployments, sessions, runs, webhooks, budgets, swarms, RAG |
+| **Control Plane API** | FastAPI backend — `/v1/*` routes for auth, agents, deployments, sessions, runs, webhooks, budgets, swarms, RAG, and pico progress |
 | **Operator Dashboard** | Authenticated dashboard at `app.mutx.dev/dashboard` |
 | **Landing Site** | `mutx.dev` — narrative, quickstart, downloads |
 | **macOS App** | Signed & notarized desktop app via `mutx.dev/download/macos` |
@@ -80,7 +80,7 @@ Governance via [Faramesh](https://faramesh.dev) — policy enforcement, session 
 - [API Reference](docs/api/reference.md) — `/v1/*` contract
 - [CLI Guide](docs/cli.md) — terminal workflows
 - [Python SDK](docs/sdk.md) — programmatic access
-- [v1.3 Release Notes](docs/releases/v1.3.md) — latest release
+- [v1.4 Release Notes](docs/releases/v1.4.md) — latest release
 - [Contributing](CONTRIBUTING.md) — repo conventions
 - [Infrastructure](docs/infrastructure.md) — deploy guide
 

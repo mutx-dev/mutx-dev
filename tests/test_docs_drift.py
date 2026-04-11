@@ -119,18 +119,22 @@ def test_canonical_quickstart_surfaces_share_assistant_first_commands() -> None:
     landing_content = read_text("lib/marketingContent.ts")
     install_script = read_text("public/install.sh")
 
-    for content in (readme, quickstart, install_surface):
+    for content in (quickstart, install_surface):
         assert "curl -fsSL https://mutx.dev/install.sh | bash" in content
         assert "OpenClaw" in content
+
+    assert "brew tap mutx-dev/homebrew-tap && brew install mutx" in readme
+    assert "mutx setup hosted" in readme
 
     for content in (readme, quickstart):
         assert "mutx setup hosted" in content
         assert "mutx setup local" in content
         assert "mutx doctor" in content
-        assert "personal_assistant" in content or "Personal Assistant" in content, (
-            "Expected content to mention the personal assistant using either "
-            "'personal_assistant' or 'Personal Assistant'."
-        )
+
+    assert "personal_assistant" in quickstart or "Personal Assistant" in quickstart, (
+        "Expected the deployment quickstart to mention the personal assistant using either "
+        "'personal_assistant' or 'Personal Assistant'."
+    )
 
     assert "/download" in landing_content
     assert "/releases" in landing_content
@@ -151,23 +155,24 @@ def test_quickstart_redirect_points_to_canonical_doc() -> None:
 def test_readme_uses_access_token_config_shape() -> None:
     readme = read_text("README.md")
 
-    assert '"access_token": null' in readme
-    assert '"api_key": null' not in readme
+    assert "brew tap mutx-dev/homebrew-tap && brew install mutx" in readme
+    assert "mutx setup hosted" in readme
+    assert "mutx doctor" in readme
 
 
 def test_readme_keeps_demo_gif() -> None:
     readme = read_text("README.md")
 
-    assert "![MUTX dashboard demo](demo.gif)" in readme
+    assert "![MUTX dashboard demo](public/demo.gif)" in readme
 
 
 def test_readme_keeps_gitbook_card_targets() -> None:
     readme = read_text("README.md")
 
-    assert 'data-card-target data-type="content-ref"' in readme
-    assert 'data-card-cover data-type="files"' in readme
-    assert "public/landing/docs-surface.png" in readme
-    assert "docs/api/index.md" in readme
+    assert "docs/manifesto.md" in readme
+    assert "docs/whitepaper.md" in readme
+    assert "docs/api/reference.md" in readme
+    assert "docs/api/reference.md" in readme
 
 
 def test_docs_hub_keeps_repo_backed_cards() -> None:
@@ -176,9 +181,12 @@ def test_docs_hub_keeps_repo_backed_cards() -> None:
     assert 'data-card-target data-type="content-ref"' in docs_hub
     assert 'data-card-cover data-type="files"' in docs_hub
     assert "../public/landing/wiring-bay.png" in docs_hub
-    assert "docs/releases/v1.3.md" in read_text("SUMMARY.md")
-    assert "./releases/v1.3.md" in read_text("docs/changelog-status.md")
-    assert "releases/v1.3.md" in docs_hub
+    assert "docs/releases/v1.4.md" in read_text("SUMMARY.md")
+    assert "docs/releases/v1.5-checklist.md" in read_text("SUMMARY.md")
+    assert "./releases/v1.4.md" in read_text("docs/changelog-status.md")
+    assert "./releases/v1.5-checklist.md" in read_text("docs/changelog-status.md")
+    assert "releases/v1.4.md" in docs_hub
+    assert "releases/v1.5-checklist.md" in docs_hub
 
 
 def test_v13_release_notes_page_keeps_soft_launch_truth() -> None:

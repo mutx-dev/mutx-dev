@@ -232,7 +232,8 @@ def _register_application_routes(app: FastAPI) -> None:
 | `/runs` | `routes/runs.py` | Agent run tracking |
 | `/sessions` | `routes/sessions.py` | Session management |
 | `/analytics` | `routes/analytics.py` | Analytics events |
-| `/telemetry` | `routes/telemetry.py` | Telemetry ingestion |
+| `/telemetry` | `routes/telemetry.py` | Telemetry config + health |
+| `/pico` | `routes/pico.py` | Progress read/write for Pico |
 | `/rag` | `routes/rag.py` | RAG operations |
 | `/templates` | `routes/templates.py` | Agent templates |
 | `/swarms` | `routes/swarms.py` | Swarm coordination |
@@ -2431,7 +2432,7 @@ Source: `infrastructure/monitoring/prometheus/`
 
 ## 18. What Ships Today
 
-- FastAPI control plane with 32 route modules (136 paths, 170 operations)
+- FastAPI control plane with 32 route modules (141 paths, 181 operations)
 - JWT + API key dual authentication with refresh token rotation
 - Governance engine: ActionMediator, ContextAccumulator, PolicyEngine, ApprovalService, ReceiptGenerator, AARMComplianceChecker
 - Faramesh supervisor with 13 framework auto-patches

@@ -60,7 +60,8 @@ Use this section when you want the code-accurate view of setup, runtime surfaces
 
 - [Overview](https://github.com/mutx-dev/mutx-dev/blob/main/README.md)
 - [Quickstart](./deployment/quickstart.md)
-- [v1.3 Release Notes](./releases/v1.3.md)
+- [v1.4 Release Notes](./releases/v1.4.md)
+- [v1.5 Release Checklist](./releases/v1.5-checklist.md)
 - [Project Status](./project-status.md)
 - [Roadmap](https://github.com/mutx-dev/mutx-dev/blob/main/roadmap.md)
 

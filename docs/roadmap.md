@@ -59,12 +59,13 @@ It is a guide for contributors, not a promise of exact delivery order.
 
 ## Shipped (Last 30 Days)
 
+- `2026-04-11` Pico progress API mounted at `/v1/pico/progress` with GET/POST progress persistence
 - `2026-04-10` Swarms real DB persistence with PATCH/DELETE endpoints
 - `2026-04-10` RAG `/v1/rag/ingest` for document ingestion into vector store
 - `2026-04-10` Sessions local discovery (Claude/Codex/Hermes auto-detection)
 - `2026-04-10` Scheduler upgraded from stub to real asyncio task engine (374 lines)
 - `2026-04-10` RAG upgraded from stub to real embed/search with OpenAI embeddings
-- `2026-04-10` OpenAPI spec: 28 route prefixes, 179 endpoint-method pairs
+- `2026-04-11` OpenAPI spec: 29 route prefixes, 181 endpoint-method pairs
 - `2026-04-09` RBAC enforcement on all routes
 - `2026-04-09` OIDC token validation at `src/api/auth/oidc.py`
 - `2026-04-09` Kubernetes/Helm chart in `infrastructure/helm/`

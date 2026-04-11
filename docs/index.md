@@ -59,7 +59,7 @@ Setup, platform references, and operator docs — code-accurate view of the stac
 | **Setup** | [Quickstart](./deployment/quickstart.md) · [CLI Guide](./cli.md) · [Local Developer Bootstrap](./deployment/local-developer-bootstrap.md) |
 | **API** | [API Reference](./api/reference.md) · [API Overview](./api/index.md) · [Authentication](./api/authentication.md) |
 | **Platform** | [Architecture](./architecture/README.md) · [Autonomy](./autonomy/README.md) · [Infrastructure](https://github.com/mutx-dev/mutx-dev/blob/main/infrastructure.md) · [Python SDK](https://github.com/mutx-dev/mutx-dev/blob/main/sdk.md) |
-| **Releases** | [v1.3 Notes](./releases/v1.3.md) · [v1.4 Notes](./releases/v1.4.md) · [v1.3 Checklist](./releases/v1.3-checklist.md) · [v1.4 Checklist](./releases/v1.4-checklist.md) |
+| **Releases** | [v1.3 Notes](./releases/v1.3.md) · [v1.4 Notes](./releases/v1.4.md) · [v1.3 Checklist](./releases/v1.3-checklist.md) · [v1.4 Checklist](./releases/v1.4-checklist.md) · [v1.5 Checklist](./releases/v1.5-checklist.md) |
 | **Troubleshooting** | [Common Issues](./troubleshooting/common-issues.md) · [Debugging](./troubleshooting/debugging.md) · [FAQ](./troubleshooting/faq.md) |
 | **Context** | [Surface Matrix](./surfaces.md) · [Project Status](./project-status.md) · [App Dashboard](./app-dashboard.md) |
 

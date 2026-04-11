@@ -12,7 +12,7 @@
 
 | Claim | Source | Reality | Status |
 |-------|--------|---------|--------|
-| "FastAPI control plane with public routes mounted under `/v1/*`\" | README.md | TRUE — 28 mounted route prefixes, 179 endpoint-method pairs in OpenAPI | SHIPPED |
+| "FastAPI control plane with public routes mounted under `/v1/*`\" | README.md | TRUE — 29 mounted route prefixes, 181 endpoint-method pairs in OpenAPI | SHIPPED |
 | "route groups for auth, agents, deployments, API keys, webhooks, newsletter, health, and readiness" | README.md | Auth ✓, Agents ✓, Deployments ✓, API Keys ✓, Webhooks ✓. Newsletter is UNMOUNTED (code exists but not served). Health probes at `/`, `/health`, `/ready` | PARTIAL |
 | "route groups for templates, sessions, runs, usage, api-keys, webhooks, monitoring, budgets, rag, clawhub, runtime, analytics, onboarding, swarms, and leads" | README.md | ALL confirmed in OpenAPI as of v1.4+: templates ✓, sessions ✓, runs ✓, usage ✓, api-keys ✓, webhooks ✓, monitoring ✓, budgets ✓, rag ✓, clawhub ✓, runtime ✓, analytics ✓, onboarding ✓, swarms ✓, leads ✓ | SHIPPED |
 | "a Python CLI and first-party Textual TUI" | README.md | `cli/` exists with Click-based commands. `mutx tui` referenced in docs. TUI shell exists. | SHIPPED |
@@ -72,8 +72,8 @@
 ## 2. OpenAPI `/v1/*` Route Inventory
 
 **Audit Date:** 2026-04-11  
-**Total unique route prefixes in OpenAPI:** 28  
-**Total endpoint-method pairs:** 179
+**Total unique route prefixes in OpenAPI:** 29
+**Total endpoint-method pairs:** 181
 
 | Route Prefix | Auth (Depends) | Methods | Notes |
 |---|---|---|---|
@@ -94,6 +94,7 @@
 | `/v1/monitoring` | `get_current_user` | GET, PATCH | alerts, health |
 | `/v1/observability` | `get_current_user` | POST, GET | runs, eval, provenance, status, steps |
 | `/v1/onboarding` | `get_current_user` | GET, POST | state management |
+| `/v1/pico` | `get_current_user` | GET, POST | progress read/write persistence |
 | `/v1/policies` | `get_current_user` | GET, POST, DELETE | CRUD + reload |
 | `/v1/rag` | `get_current_user` | POST, GET | embed, embed/batch, search, health, **ingest** |
 | `/v1/runs` | `get_current_user` | POST, GET | runs, traces |
@@ -113,10 +114,11 @@
 - `/v1/newsletter` — waitlist signup code exists but router is in `UNMOUNTED_ROUTER_NAMES`
 
 **Key Changes Since April 10 Audit:**
+- **NEW:** `/v1/pico/progress` — GET/POST progress persistence for Pico
 - **NEW:** `POST /v1/rag/ingest` — document ingestion into vector store
 - **NEW:** Swarms PATCH/DELETE on `/{swarm_id}` with real DB persistence
 - **NEW:** Sessions local discovery — auto-discovers Claude, Codex, and Hermes sessions from local filesystem
-- Route prefix count: 27 → 28; endpoint-method pairs: 170 → 179
+- Route prefix count: 28 → 29; endpoint-method pairs: 179 → 181
 
 ---
 
@@ -196,12 +198,12 @@ These scripts have hardcoded absolute paths that will break if the repo moves:
 
 | Surface | Previous | Current | Change |
 |---------|----------|---------|--------|
-| FastAPI `/v1/*` control plane | SHIPPED | SHIPPED | 27 route prefixes, 170 endpoint-method pairs |
+| FastAPI `/v1/*` control plane | SHIPPED | SHIPPED | 29 route prefixes, 181 endpoint-method pairs |
 | Agent lifecycle | SHIPPED | SHIPPED | Expanded: commands, heartbeat, status, versions, rollback |
 | Assistant routes | SHIPPED | SHIPPED | Expanded: skill install/delete |
 | Templates | SHIPPED | SHIPPED | — |
 | Webhooks | SHIPPED | SHIPPED | Now includes PATCH |
-| Auth | PARTIAL | SHIPPED | `get_current_user` on 146+ endpoints, RBAC role checks, SSO support |
+| Auth | PARTIAL | SHIPPED | `get_current_user` present in 29/32 route modules, RBAC role checks, SSO support |
 | API Keys | PARTIAL | SHIPPED | Auth enforced |
 | Leads | SHIPPED | SHIPPED | Expanded: PATCH support |
 | Clawhub | SHIPPED | SHIPPED | — |
@@ -217,7 +219,7 @@ These scripts have hardcoded absolute paths that will break if the repo moves:
 | Onboarding | PLACEHOLDER | SHIPPED | State management |
 | Swarms | PLACEHOLDER | SHIPPED | List, create, get, update, delete, scale; **real DB persistence** |
 | Governance metrics | MISLEADING | SHIPPED | `/v1/runtime/governance/metrics` + status + supervised |
-| Governance credentials | PARTIAL | SHIPPED | Full CRUD for backends, health checks, secret retrieval |
+| Governance credentials | PARTIAL | PARTIAL | Route surface is real, but Vault remains a documented stub backend |
 | Security | — | SHIPPED | NEW: actions, approvals, compliance, metrics, receipts, sessions |
 | Observability | — | SHIPPED | NEW: runs, eval, provenance, status, steps |
 | Policies | — | SHIPPED | NEW: CRUD + reload |
@@ -225,6 +227,7 @@ These scripts have hardcoded absolute paths that will break if the repo moves:
 | Audit | — | SHIPPED | NEW: events, traces (private route) |
 | Ingest | — | SHIPPED | NEW: agent-status, deployment, metrics |
 | Telemetry | — | SHIPPED | NEW: config, health |
+| Pico progress | — | SHIPPED | NEW: `/v1/pico/progress` GET/POST with DB-backed progress persistence |
 | Newsletter | MISLEADING | PARTIAL | Code exists but UNMOUNTED — `/v1/leads` is the active replacement |
 | Vault integration | STUB | STUB | No change — still documented as stub |
 
@@ -232,7 +235,7 @@ These scripts have hardcoded absolute paths that will break if the repo moves:
 
 | Classification | Count | Previous |
 |---------------|-------|----------|
-| SHIPPED | 30 | 30 |
+| SHIPPED | 29 | 30 |
 | PARTIAL | 2 | 2 |
 | STUB | 1 | 1 |
 | PLACEHOLDER | 0 | 0 |
@@ -246,7 +249,7 @@ These scripts have hardcoded absolute paths that will break if the repo moves:
 
 2. **Newsletter route unmounted** — `/v1/newsletter` code exists but router is explicitly excluded from serving. Should either be removed or docs updated to not claim it.
 
-3. **Auth header `required: false` in OpenAPI** — Despite `get_current_user` dependencies on 146+ endpoints, the OpenAPI spec still marks authorization header as `required: false` on most routes. This is a spec accuracy issue, not a runtime enforcement gap — the code enforces auth via FastAPI dependencies.
+3. **Auth header `required: false` in OpenAPI** — Despite auth enforcement across 29/32 route modules, the OpenAPI spec still marks authorization header as `required: false` on 157 endpoint-method pairs. This is a spec accuracy issue, not a runtime enforcement gap — the code enforces auth via FastAPI dependencies.
 
 4. **Hardcoded paths block portability** — Every autonomy script hardcodes `/Users/fortune/MUTX` and references non-existent worktree directories.
 
