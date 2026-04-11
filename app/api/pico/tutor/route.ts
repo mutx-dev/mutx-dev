@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       ...legacyAnswer,
+      legacy: legacyAnswer,
       reply,
     })
   })(request)

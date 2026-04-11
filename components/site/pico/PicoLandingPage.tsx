@@ -132,8 +132,8 @@ export function PicoLandingPage() {
                   {t('hero.cta')}
                   <ArrowRight className="h-4 w-4" />
                 </button>
-                <Link href={toHref('/onboarding')} className={s.btnSecondary}>
-                  Start onboarding
+                <Link href={toHref('/app')} className={s.btnSecondary}>
+                  Open workspace
                 </Link>
               </div>
             </SiteReveal>

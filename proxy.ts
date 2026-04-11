@@ -264,14 +264,31 @@ function finalizeResponse(response: NextResponse, host: string, pathname: string
   return response
 }
 
+function isLoopbackHost(hostname: string) {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1'
+}
+
 function isAllowedApiOrigin(request: NextRequest, host: string): boolean {
   const requestOrigin = normalizeOrigin(request.headers.get('origin'))
   if (!requestOrigin) {
     return false
   }
 
-  const expectedOrigin = `${getRequestScheme(request)}://${host}`.toLowerCase()
-  return requestOrigin === expectedOrigin
+  try {
+    const originUrl = new URL(requestOrigin)
+    const requestUrl = request.nextUrl
+    const requestScheme = getRequestScheme(request)
+    const exactMatch = requestOrigin === normalizeOrigin(requestUrl.origin)
+    const sameHost = originUrl.protocol === `${requestScheme}:` && originUrl.hostname === requestUrl.hostname
+    const sameHostHeader = originUrl.protocol === `${requestScheme}:` && originUrl.hostname === host
+    const loopbackMatch =
+      originUrl.protocol === `${requestScheme}:` &&
+      isLoopbackHost(originUrl.hostname) &&
+      (isLoopbackHost(requestUrl.hostname) || isLoopbackHost(host))
+    return exactMatch || sameHost || sameHostHeader || loopbackMatch
+  } catch {
+    return false
+  }
 }
 
 function getPolicy(pathname: string): RateLimitPolicy | null {

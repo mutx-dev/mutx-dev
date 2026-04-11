@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 
-import { PicoAppWorkspace } from '@/components/site/pico/PicoAppWorkspace'
-import { PublicSurface } from '@/components/site/PublicSurface'
+import { PicoOnboardingPageClient } from '@/components/pico/PicoOnboardingPageClient'
 
 export const metadata: Metadata = {
   title: 'PicoMUTX Workspace',
@@ -16,9 +15,5 @@ export const metadata: Metadata = {
 }
 
 export default function PicoAppPage() {
-  return (
-    <PublicSurface>
-      <PicoAppWorkspace />
-    </PublicSurface>
-  )
+  return <PicoOnboardingPageClient />
 }
