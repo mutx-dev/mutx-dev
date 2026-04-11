@@ -81,6 +81,7 @@ Governance via [Faramesh](https://faramesh.dev) — policy enforcement, session 
 - [CLI Guide](docs/cli.md) — terminal workflows
 - [Python SDK](docs/sdk.md) — programmatic access
 - [v1.4 Release Notes](docs/releases/v1.4.md) — latest release
+- [v1.3 Release Notes](docs/releases/v1.3.md) — previous release
 - [Contributing](CONTRIBUTING.md) — repo conventions
 - [Infrastructure](docs/infrastructure.md) — deploy guide
 
