@@ -6,6 +6,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_PLAN_MATRIX } from '@/lib/pico/academy'
+import { getPicoTrackTarget } from '@/lib/pico/journey'
+import { usePicoHref } from '@/lib/pico/navigation'
 
 type RunSummary = {
   id: string
@@ -39,6 +41,20 @@ type ApprovalSummary = {
   created_at: string
   agent_id: string
 }
+
+type AutopilotNextAction =
+  | {
+      type: 'link'
+      href: string
+      label: string
+      description: string
+    }
+  | {
+      type: 'button'
+      action: 'refresh' | 'approval' | 'scroll'
+      label: string
+      description: string
+    }
 
 function extractErrorMessage(payload: unknown, fallbackMessage: string) {
   if (!payload || typeof payload !== 'object') {
@@ -83,6 +99,7 @@ function formatPercent(value: number) {
 
 export function PicoAutopilotPageClient() {
   const { progress, actions } = usePicoProgress()
+  const toHref = usePicoHref()
   const [runs, setRuns] = useState<RunSummary[]>([])
   const [budget, setBudget] = useState<BudgetSummary | null>(null)
   const [alerts, setAlerts] = useState<AlertSummary[]>([])
@@ -93,6 +110,7 @@ export function PicoAutopilotPageClient() {
   const [thresholdDraft, setThresholdDraft] = useState(progress.autopilot.costThresholdPercent)
   const [creatingApproval, setCreatingApproval] = useState(false)
   const [resolvingApprovalId, setResolvingApprovalId] = useState<string | null>(null)
+  const controlTrackTarget = useMemo(() => getPicoTrackTarget(progress, 'controlled-agent'), [progress])
 
   async function load() {
     setLoading(true)
@@ -164,6 +182,69 @@ export function PicoAutopilotPageClient() {
 
     return null
   }, [thresholdDraft])
+
+  const nextAction = useMemo<AutopilotNextAction>(() => {
+    if (authRequired) {
+      return {
+        type: 'link',
+        href: '/login',
+        label: 'Sign in to load live signals',
+        description: 'Autopilot only becomes real after you attach it to an authenticated MUTX session.',
+      }
+    }
+
+    if (!progress.completedLessons.includes('see-your-agent-activity')) {
+      return {
+        type: 'link',
+        href: `/academy/${controlTrackTarget.lesson.slug}`,
+        label: `Finish ${controlTrackTarget.lesson.title}`,
+        description: 'Autopilot sits downstream of the control track. Finish the first visibility lesson before expecting live signal.',
+      }
+    }
+
+    if (!progress.completedLessons.includes('set-a-cost-threshold')) {
+      return {
+        type: 'link',
+        href: '/academy/set-a-cost-threshold',
+        label: 'Finish Set a cost threshold',
+        description: 'Save a line in the sand before you trust the runtime with money.',
+      }
+    }
+
+    if (!progress.completedLessons.includes('add-an-approval-gate')) {
+      return {
+        type: 'link',
+        href: '/academy/add-an-approval-gate',
+        label: 'Finish Add an approval gate',
+        description: 'You need one real human gate before outbound actions become trustworthy.',
+      }
+    }
+
+    if (!progress.autopilot.approvalGateEnabled && approvals.length === 0) {
+      return {
+        type: 'button',
+        action: 'approval',
+        label: 'Create a sample approval request',
+        description: 'Exercise the risky-action queue once so the gate is not just a promise.',
+      }
+    }
+
+    if (approvals.length > 0) {
+      return {
+        type: 'button',
+        action: 'scroll',
+        label: 'Review pending approvals',
+        description: 'There is a risky action waiting for a human click below.',
+      }
+    }
+
+    return {
+      type: 'button',
+      action: 'refresh',
+      label: 'Refresh live data',
+      description: 'Pull the latest runs, budgets, alerts, and approvals from the control plane.',
+    }
+  }, [authRequired, approvals.length, controlTrackTarget.lesson.slug, controlTrackTarget.lesson.title, progress.autopilot.approvalGateEnabled, progress.completedLessons])
 
   useEffect(() => {
     if (thresholdBreached && !progress.autopilot.lastThresholdBreachAt) {
@@ -258,29 +339,69 @@ export function PicoAutopilotPageClient() {
     }
   }
 
+  function resolveHref(href: string) {
+    return href === '/login' ? href : toHref(href)
+  }
+
+  function handleNextAction() {
+    if (nextAction.type !== 'button') {
+      return
+    }
+
+    if (nextAction.action === 'approval') {
+      void createApprovalRequest()
+      return
+    }
+
+    if (nextAction.action === 'scroll') {
+      document.getElementById('approval-gate')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
+    }
+
+    void load()
+  }
+
+  function renderNextActionButton(className: string) {
+    if (nextAction.type === 'link') {
+      return (
+        <Link href={resolveHref(nextAction.href)} className={className}>
+          {nextAction.label}
+        </Link>
+      )
+    }
+
+    const disabled =
+      nextAction.action === 'approval'
+        ? creatingApproval || authRequired
+        : nextAction.action === 'refresh'
+          ? loading
+          : false
+    const label =
+      nextAction.action === 'approval' && creatingApproval ? 'Creating request...' : nextAction.label
+
+    return (
+      <button
+        type="button"
+        onClick={handleNextAction}
+        disabled={disabled}
+        className={className}
+      >
+        {label}
+      </button>
+    )
+  }
+
+  const showApprovalEmptyStateAction =
+    !authRequired && approvals.length === 0 && !(nextAction.type === 'button' && nextAction.action === 'approval')
+
   return (
     <PicoShell
       eyebrow="Autopilot bridge"
       title="See the runtime, not just the dream"
       description="Pico reuses real MUTX signals for runs, budget, alerts, and approvals. If you are not authenticated yet, the product says so instead of pretending otherwise."
-      actions={
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => void load()}
-            className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10"
-          >
-            Refresh live data
-          </button>
-          <button
-            type="button"
-            onClick={() => actions.setAutopilot({ approvalGateEnabled: true })}
-            className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950"
-          >
-            Enable gate locally
-          </button>
-        </div>
-      }
+      actions={renderNextActionButton(
+        'rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60'
+      )}
     >
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-[24px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-5 text-sm text-slate-300 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
@@ -319,6 +440,17 @@ export function PicoAutopilotPageClient() {
 
       <section className="mt-6 grid gap-6 lg:grid-cols-[0.9fr,1.1fr]">
         <div className="space-y-6">
+          <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Next move</p>
+            <h2 className="mt-2 text-2xl font-semibold text-white">{nextAction.label}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-300">{nextAction.description}</p>
+            <div className="mt-4">
+              {renderNextActionButton(
+                'rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60'
+              )}
+            </div>
+          </div>
+
           <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Thresholds</p>
             <div className="mt-4 rounded-[24px] border border-white/10 bg-white/5 p-5">
@@ -389,25 +521,27 @@ export function PicoAutopilotPageClient() {
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
+          <div id="approval-gate" className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Approval gate</p>
                 <h2 className="mt-2 text-xl font-semibold text-white">Risky action queue</h2>
               </div>
-              <button
-                type="button"
-                onClick={() => void createApprovalRequest()}
-                disabled={creatingApproval || authRequired}
-                className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
-              >
-                {creatingApproval ? 'Creating request...' : 'Create sample request'}
-              </button>
             </div>
             <div className="mt-4 space-y-3">
               {approvals.length === 0 ? (
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
-                  No pending approvals. Good if that is intentional. Bad if you expected a gate and forgot to create one.
+                  <p>No pending approvals. Good if that is intentional. Bad if you expected a gate and forgot to create one.</p>
+                  {showApprovalEmptyStateAction ? (
+                    <button
+                      type="button"
+                      onClick={() => void createApprovalRequest()}
+                      disabled={creatingApproval}
+                      className="mt-4 rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {creatingApproval ? 'Creating request...' : 'Create sample request'}
+                    </button>
+                  ) : null}
                 </div>
               ) : (
                 approvals.map((approval) => (

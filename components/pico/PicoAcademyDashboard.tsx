@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_LEVELS, PICO_TRACKS, getLessonBySlug } from '@/lib/pico/academy'
+import { getPicoPrimaryJourney, getPicoTrackTarget } from '@/lib/pico/journey'
 import { usePicoHref } from '@/lib/pico/navigation'
 
 function ProgressCard({ label, value, hint }: { label: string; value: string; hint: string }) {
@@ -23,6 +24,23 @@ export function PicoAcademyDashboard() {
   const { progress, derived, syncState, ready, actions } = usePicoProgress()
   const toHref = usePicoHref()
   const nextLesson = derived.nextLesson
+  const primaryJourney = getPicoPrimaryJourney(progress)
+
+  function openJourney() {
+    if (primaryJourney.lesson) {
+      actions.pickTrack(primaryJourney.track.slug)
+      actions.startLesson(primaryJourney.lesson.slug)
+    }
+
+    router.push(toHref(primaryJourney.href))
+  }
+
+  function focusTrack(trackSlug: string) {
+    const target = getPicoTrackTarget(progress, trackSlug)
+    actions.pickTrack(target.track.slug)
+    actions.startLesson(target.lesson.slug)
+    router.push(toHref(`/academy/${target.lesson.slug}`))
+  }
 
   return (
     <PicoShell
@@ -30,23 +48,13 @@ export function PicoAcademyDashboard() {
       title="Build the first agent you can actually trust"
       description="This is the narrowest honest loop: learn, ship, observe, and control. No toy demos. No dashboard cosplay."
       actions={
-        nextLesson ? (
-          <>
-            <Link
-              href={toHref(`/academy/${nextLesson.slug}`)}
-              className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
-            >
-              Continue with {nextLesson.title}
-            </Link>
-            <button
-              type="button"
-              onClick={() => actions.pickTrack(progress.selectedTrack ?? 'first-agent')}
-              className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10"
-            >
-              Sync state: {syncState}
-            </button>
-          </>
-        ) : null
+        <button
+          type="button"
+          onClick={openJourney}
+          className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+        >
+          {primaryJourney.label}
+        </button>
       }
     >
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -86,18 +94,13 @@ export function PicoAcademyDashboard() {
                   : 'Time to harden the autopilot bridge or add a stronger production pattern.'}
               </p>
             </div>
-            {nextLesson ? (
-              <button
-                type="button"
-                onClick={() => {
-                  actions.startLesson(nextLesson.slug)
-                  router.push(toHref(`/academy/${nextLesson.slug}`))
-                }}
-                className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-100"
-              >
-                Start lesson
-              </button>
-            ) : null}
+            <button
+              type="button"
+              onClick={openJourney}
+              className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-100"
+            >
+              {primaryJourney.label}
+            </button>
           </div>
           <div className="mt-5 rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
             {nextLesson ? (
@@ -145,9 +148,6 @@ export function PicoAcademyDashboard() {
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Tracks</p>
             <h2 className="mt-2 text-2xl font-semibold text-white">Project-based learning paths</h2>
           </div>
-          <Link href={toHref('/onboarding')} className="text-sm font-medium text-emerald-200 hover:text-emerald-100">
-            Open workspace
-          </Link>
         </div>
         <div className="mt-5 grid gap-4 xl:grid-cols-2">
           {PICO_TRACKS.map((track) => {
@@ -156,6 +156,7 @@ export function PicoAcademyDashboard() {
               const lesson = getLessonBySlug(lessonSlug)
               return lesson ? [lesson] : []
             })
+            const target = getPicoTrackTarget(progress, track.slug)
             return (
               <article key={track.slug} className="rounded-[24px] border border-white/10 bg-white/5 p-5">
                 <div className="flex items-start justify-between gap-4">
@@ -163,13 +164,15 @@ export function PicoAcademyDashboard() {
                     <h3 className="text-lg font-semibold text-white">{track.title}</h3>
                     <p className="mt-2 text-sm leading-6 text-slate-300">{track.intro}</p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => actions.pickTrack(track.slug)}
-                    className="rounded-full border border-white/10 px-3 py-2 text-xs font-medium text-slate-200 transition hover:bg-white/10"
-                  >
-                    {progress.selectedTrack === track.slug ? 'Selected' : 'Set active'}
-                  </button>
+                  {target.selected ? (
+                    <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-xs font-medium text-emerald-100">
+                      Focused track
+                    </span>
+                  ) : (
+                    <span className="rounded-full border border-white/10 px-3 py-2 text-xs font-medium text-slate-200">
+                      Next: {target.lesson.title}
+                    </span>
+                  )}
                 </div>
                 <p className="mt-4 text-sm text-emerald-100">Outcome: {track.outcome}</p>
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-900/60">
@@ -195,6 +198,19 @@ export function PicoAcademyDashboard() {
                     </Link>
                   ))}
                 </div>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => focusTrack(track.slug)}
+                    className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
+                  >
+                    {target.completed
+                      ? `Review ${track.title}`
+                      : target.selected
+                        ? `Continue with ${target.lesson.title}`
+                        : `Focus ${track.title}`}
+                  </button>
+                </div>
               </article>
             )
           })}
@@ -205,10 +221,6 @@ export function PicoAcademyDashboard() {
         <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Levels</p>
         <div className="mt-5 grid gap-4 xl:grid-cols-2">
           {PICO_LEVELS.map((level) => {
-            const levelLessons = PICO_LEVELS[level.id] ? PICO_LEVELS[level.id] : level
-            const lessons = PICO_TRACKS.flatMap((track) => track.lessons)
-            void levelLessons
-            void lessons
             const completed = progress.completedLessons.filter((lessonSlug) => {
               const lesson = getLessonBySlug(lessonSlug)
               return lesson?.level === level.id

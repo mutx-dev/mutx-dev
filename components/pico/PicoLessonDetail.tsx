@@ -1,10 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useMemo } from 'react'
 
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { getLessonBySlug, type PicoLesson } from '@/lib/pico/academy'
+import { getPicoLessonFollowUp } from '@/lib/pico/journey'
 import { usePicoHref } from '@/lib/pico/navigation'
 
 type PicoLessonDetailProps = {
@@ -16,7 +18,13 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
   const toHref = usePicoHref()
   const completed = progress.completedLessons.includes(lesson.slug)
   const unlocked = derived.unlockedLessonSlugs.includes(lesson.slug)
-  const nextLesson = lesson.nextLesson ? getLessonBySlug(lesson.nextLesson) : null
+  const followUp = useMemo(() => getPicoLessonFollowUp(progress, lesson.slug), [progress, lesson.slug])
+
+  useEffect(() => {
+    if (!progress.startedLessons.includes(lesson.slug)) {
+      actions.startLesson(lesson.slug)
+    }
+  }, [actions, lesson.slug, progress.startedLessons])
 
   return (
     <PicoShell
@@ -24,23 +32,23 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
       title={lesson.title}
       description={lesson.summary}
       actions={
-        <>
+        followUp?.kind === 'complete' ? (
           <button
             type="button"
-            onClick={() => actions.startLesson(lesson.slug)}
-            className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10"
-          >
-            Mark started
-          </button>
-          <button
-            type="button"
-            disabled={!unlocked}
+            disabled={!unlocked || completed}
             onClick={() => actions.completeLesson(lesson.slug)}
             className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {completed ? 'Completed' : `Complete for +${lesson.xp} XP`}
+            {followUp.label}
           </button>
-        </>
+        ) : followUp?.href ? (
+          <Link
+            href={toHref(followUp.href)}
+            className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+          >
+            {followUp.label}
+          </Link>
+        ) : null
       }
     >
       <div className="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
@@ -92,7 +100,11 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
                 lesson.prerequisites.map((prerequisite) => {
                   const prerequisiteLesson = getLessonBySlug(prerequisite)
                   const prerequisiteDone = progress.completedLessons.includes(prerequisite)
-                  return prerequisiteLesson ? (
+                  if (!prerequisiteLesson) {
+                    return null
+                  }
+
+                  return (
                     <Link
                       key={prerequisite}
                       href={toHref(`/academy/${prerequisiteLesson.slug}`)}
@@ -103,7 +115,7 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
                         {prerequisiteDone ? 'done' : 'required'}
                       </span>
                     </Link>
-                  ) : null
+                  )
                 })
               )}
             </div>
@@ -121,27 +133,35 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
           </section>
 
           <section className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Next</p>
-            {nextLesson ? (
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Next action</p>
+            {followUp ? (
               <>
-                <h2 className="mt-2 text-lg font-semibold text-white">{nextLesson.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-300">{nextLesson.summary}</p>
-                <div className="mt-4 flex gap-3">
-                  <Link href={toHref(`/academy/${nextLesson.slug}`)} className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
-                    Open next lesson
-                  </Link>
-                  <Link href={toHref('/tutor')} className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
-                    Ask tutor
-                  </Link>
+                <h2 className="mt-2 text-lg font-semibold text-white">{followUp.label}</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{followUp.description}</p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {followUp.kind === 'complete' ? (
+                    <button
+                      type="button"
+                      disabled={!unlocked || completed}
+                      onClick={() => actions.completeLesson(lesson.slug)}
+                      className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {followUp.label}
+                    </button>
+                  ) : followUp.href ? (
+                    <Link href={toHref(followUp.href)} className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
+                      {followUp.label}
+                    </Link>
+                  ) : null}
+                  {!completed ? (
+                    <Link href={toHref('/tutor')} className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
+                      Ask tutor if blocked
+                    </Link>
+                  ) : null}
                 </div>
               </>
             ) : (
-              <>
-                <p className="mt-2 text-sm text-slate-300">You are at the end of this branch. Open Autopilot and inspect what the runtime is doing.</p>
-                <Link href={toHref('/autopilot')} className="mt-4 inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950">
-                  Open autopilot
-                </Link>
-              </>
+              <p className="mt-2 text-sm text-slate-300">Ask tutor if you need help finding the next step.</p>
             )}
           </section>
         </aside>
