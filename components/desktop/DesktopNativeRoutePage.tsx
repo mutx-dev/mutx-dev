@@ -2806,8 +2806,8 @@ export function DesktopNativeRoutePage({
                   />
                 ) : (
                   <div className="space-y-3">
-                    {cloudAlerts.map((alert) => {
-                      const id = pickString(alert, ["id"], Math.random().toString());
+                    {cloudAlerts.map((alert, index) => {
+                      const id = pickString(alert, ["id"], `alert-${index}`);
                       const open = !pickBoolean(alert, ["resolved"], false);
                       return (
                         <SelectionCard
@@ -3141,8 +3141,8 @@ export function DesktopNativeRoutePage({
                   />
                 ) : (
                   <div className="space-y-3">
-                    {cloudObservability.map((event) => {
-                      const id = pickString(event, ["id"], `${Math.random()}`);
+                    {cloudObservability.map((event, index) => {
+                      const id = pickString(event, ["id"], `event-${index}`);
                       const statusLabel = pickString(event, ["status", "level"], "unknown");
                       return (
                         <SelectionCard
@@ -3261,8 +3261,8 @@ export function DesktopNativeRoutePage({
                       />
                     ) : (
                       <div className="space-y-2">
-                        {cloudSessions.map((session) => {
-                          const id = pickString(session, ["id", "session_id", "key"], `${Math.random()}`);
+                        {cloudSessions.map((session, index) => {
+                          const id = pickString(session, ["id", "session_id", "key"], `session-${index}`);
                           const active = pickBoolean(session, ["active"], false);
                           return (
                             <SelectionCard
@@ -3577,7 +3577,7 @@ export function DesktopNativeRoutePage({
               emptyMessage="Budget event history will appear here once the API emits usage rows."
               renderRecord={(event) => (
                 <div
-                  key={pickString(event, ["id"], `${Math.random()}`)}
+                  key={pickString(event, ["id"], `usage-event-${pickString(event, ["created_at", "timestamp"], "fallback")}`)}
                   className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
                 >
                   <p className="text-sm font-semibold text-white">
@@ -3697,9 +3697,9 @@ export function DesktopNativeRoutePage({
                 />
               ) : (
                 <div className="space-y-3">
-                  {cloudKeys.slice(0, 6).map((keyRecord) => (
+                  {cloudKeys.slice(0, 6).map((keyRecord, index) => (
                     <div
-                      key={pickString(keyRecord, ["id"], `${Math.random()}`)}
+                      key={pickString(keyRecord, ["id"], `key-record-${index}`)}
                       className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
                     >
                       <p className="text-sm font-semibold text-white">{pickString(keyRecord, ["name"], "API key")}</p>
@@ -3788,7 +3788,7 @@ export function DesktopNativeRoutePage({
             emptyMessage="Grouped agent topology will appear here once the swarm contract has data."
             renderRecord={(swarm) => (
               <div
-                key={pickString(swarm, ["id"], `${Math.random()}`)}
+                key={pickString(swarm, ["id"], `swarm-${pickString(swarm, ["name"], "fallback")}`)}
                 className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
               >
                 <p className="text-sm font-semibold text-white">{pickString(swarm, ["name", "id"], "Swarm")}</p>

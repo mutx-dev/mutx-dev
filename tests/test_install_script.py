@@ -750,7 +750,6 @@ def test_install_script_tty_can_skip_hosted_and_launch_local_setup_after_recover
     assert exit_code == 0
     assert "source fallback" in transcript
     assert "Select a lane [1/2/3]" in transcript
-    assert "http://localhost:8000" in transcript
     assert "Launching MUTX local setup against http://localhost:8000" in transcript
     assert "LOCAL SETUP --install-openclaw --open-tui" in transcript
     assert "MUTX setup wizard\\nInstall the CLI" not in transcript
@@ -777,7 +776,6 @@ def test_install_script_tty_local_lane_does_not_require_ready_localhost(tmp_path
     )
 
     assert exit_code == 0
-    assert "http://localhost:8000" in transcript
     assert "Local dev lane needs a running control plane" not in transcript
     assert "This lane is for contributor checkouts" not in transcript
     assert "Launching MUTX local setup against http://localhost:8000" in transcript
@@ -796,6 +794,5 @@ def test_install_script_tty_hosted_lane_targets_hosted_api(tmp_path: Path) -> No
     )
 
     assert exit_code == 0
-    assert "https://api.mutx.dev" in transcript
     assert "Launching MUTX hosted setup against https://api.mutx.dev" in transcript
     assert "Error: No such option" not in transcript
