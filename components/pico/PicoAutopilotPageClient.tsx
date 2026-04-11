@@ -7,7 +7,6 @@ import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoHref } from '@/lib/pico/navigation'
 import {
-  analyzeAutopilotIntegration,
   buildAutopilotTimeline,
   describeRunDetail,
   explainAlertImpact,
@@ -15,16 +14,11 @@ import {
   formatPercent,
   formatRelativeTime,
   formatTimestamp,
-  getAlertsEmptyState,
-  getApprovalsEmptyState,
   getRunSeverity,
-  getRunsEmptyState,
-  getUsageEmptyState,
   humanizeRunStatus,
   type AutopilotAlertSummary,
   type AutopilotApprovalSummary,
   type AutopilotBudgetSummary,
-  type AutopilotEmptyState,
   type AutopilotRunSummary,
   type AutopilotRunTrace,
   type AutopilotTimelineItem,
@@ -109,18 +103,6 @@ function TimelineItemCard({ item }: { item: AutopilotTimelineItem }) {
       <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {item.impact}</p>
       <Link href={item.href} className="mt-4 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
         Jump to detail section
-      </Link>
-    </div>
-  )
-}
-
-function EmptyStatePanel({ state }: { state: AutopilotEmptyState }) {
-  return (
-    <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
-      <h3 className="text-base font-semibold text-white">{state.title}</h3>
-      <p className="mt-3">{state.body}</p>
-      <Link href={state.nextStep.href} className="mt-4 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
-        {state.nextStep.label}
       </Link>
     </div>
   )
@@ -291,68 +273,6 @@ export function PicoAutopilotPageClient() {
     [alerts, approvals, budget, progress.autopilot.costThresholdPercent, runs, tracesByRunId],
   )
 
-  const integrationStatus = useMemo(
-    () =>
-      analyzeAutopilotIntegration({
-        runs,
-        alerts,
-        approvals,
-        budget,
-        usage,
-        approvalGateConfigured: progress.autopilot.approvalGateEnabled,
-      }),
-    [alerts, approvals, budget, progress.autopilot.approvalGateEnabled, runs, usage],
-  )
-
-  const defaultNextStep = useMemo(
-    () =>
-      derived.nextLesson
-        ? {
-            label: `Open ${derived.nextLesson.title}`,
-            href: toHref(`/academy/${derived.nextLesson.slug}`),
-          }
-        : {
-            label: 'Open onboarding',
-            href: toHref('/onboarding'),
-          },
-    [derived.nextLesson, toHref],
-  )
-
-  const approvalNextStep = useMemo(
-    () => ({
-      label: 'Configure the approval gate',
-      href: toHref('/academy/add-an-approval-gate'),
-    }),
-    [toHref],
-  )
-
-  const runEmptyState = useMemo(
-    () => getRunsEmptyState(integrationStatus, defaultNextStep),
-    [defaultNextStep, integrationStatus],
-  )
-
-  const alertsEmptyState = useMemo(
-    () => getAlertsEmptyState(integrationStatus, defaultNextStep),
-    [defaultNextStep, integrationStatus],
-  )
-
-  const usageEmptyState = useMemo(
-    () => getUsageEmptyState(integrationStatus, defaultNextStep),
-    [defaultNextStep, integrationStatus],
-  )
-
-  const approvalsEmptyState = useMemo(
-    () =>
-      getApprovalsEmptyState(
-        integrationStatus,
-        integrationStatus.hasApprovalRecords && !integrationStatus.approvalGateConfigured
-          ? approvalNextStep
-          : defaultNextStep,
-      ),
-    [approvalNextStep, defaultNextStep, integrationStatus],
-  )
-
-  const loadStateLabel = useMemo(() => loadState.toUpperCase(), [loadState])
 
   function saveThreshold() {
     if (thresholdValidationError) {
