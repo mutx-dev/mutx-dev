@@ -3,13 +3,14 @@
 ## Current phase
 Phase 7 truth hardening.
 - Phases 1-5 are shipped enough for Pico v1: academy, progress, tutor, support, and the live autopilot bridge all exist.
-- Current implementation focus: canonical route truth, public-copy truth, and validation discipline.
+- Current implementation focus: canonical route truth, activation speed, public-copy truth, and validation discipline.
 
 ## Priorities
-1. Keep Pico workspace coherent and truthful.
-2. Keep the canonical onboarding entry and live autopilot bridge obvious.
-3. Keep validation green and docs honest.
-4. Hardening next: localized copy cleanup and durable approvals persistence.
+1. Get users to the first working agent in the shortest honest path.
+2. Keep Pico workspace coherent and truthful.
+3. Keep the canonical onboarding entry and live autopilot bridge obvious.
+4. Keep validation green and docs honest.
+5. Hardening next: localized copy cleanup and durable approvals persistence.
 
 ## Active tasks
 - [x] Inspect repo and current Pico surfaces
@@ -21,6 +22,7 @@ Phase 7 truth hardening.
 - [x] Implement live autopilot bridge for runs, budgets, alerts, and approvals on existing MUTX surfaces
 - [x] Re-audit the Autopilot trust surface against real MUTX signals only
 - [x] Remove demo-smelling Autopilot affordances and make approvals durable without adding a new schema or route family
+- [x] Reorder onboarding and the first two lessons around the fastest path to first agent success
 - [ ] Finish truth-alignment cleanup for public copy and legacy compatibility routes
 - [ ] Re-run validation and commit the current slice
 - [ ] Sweep non-English Pico landing copy so localized surfaces stop lying

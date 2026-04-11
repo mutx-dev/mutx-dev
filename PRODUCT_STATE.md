@@ -98,6 +98,43 @@ Latest validated commands for the current canonical slice:
 
 ## Work cycle log
 
+### 2026-04-11 03:46:00 CEST - activation audit started
+What changed
+- Started a first-10-minutes pass across Pico onboarding, academy start, and the first lesson flow.
+- Treated every extra click before the first working agent as friction to remove.
+
+What was tested
+- Source audit of onboarding, academy, and lesson flow before editing.
+
+What failed
+- Found avoidable activation drag: lane selection before the first win, too much academy noise before the first agent run, and generic lesson buttons that hid the success moment instead of sharpening it.
+
+What is next
+- Lock the first lane automatically.
+- Push the first two lessons to the front.
+- Make the first success moment obvious and fast.
+
+### 2026-04-11 03:56:38 CEST - activation hardening complete
+What changed
+- Reworked onboarding so the first-agent lane is auto-selected and the page points straight at install -> first prompt instead of asking the user to make unnecessary path decisions.
+- Reduced first-session noise by de-emphasizing later tracks until the first local run is finished.
+- Rebuilt the academy hero around the activation path so the first visible success is always the primary action.
+- Reworked the first lesson pages so opening a lesson auto-starts it, the buttons speak in concrete activation language, and the first success moment is explicit instead of buried in generic completion copy.
+- Tightened the first two lesson briefs so they read like a short activation sprint instead of a slow curriculum block.
+
+What was tested
+- `npm run typecheck`
+- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `npm run build`
+
+What failed
+- No activation-specific blocker remains in the canonical Pico surface.
+- Existing repo-wide warning noise remains: Next/Turbopack NFT tracing noise and unrelated Jest console noise from other surfaces.
+
+What is next
+- Do a real browser smoke on `/pico/onboarding` -> `/pico/academy/install-hermes-locally` -> `/pico/academy/run-your-first-agent` with an authenticated or realistic local session.
+- If the first run still feels slower than it should, tighten lesson copy again before adding anything new.
+
 ### 2026-04-11 03:21:00 CEST - trust audit started
 What changed
 - Started a trust-first pass against Pico Autopilot, agent activity, alerts, approvals, and cost tracking.

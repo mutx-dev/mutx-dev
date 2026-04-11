@@ -52,6 +52,16 @@ Why:
 - Showing run UUIDs as if they were agents is garbage accounting.
 - Cost tracking must map to the thing the user thinks they are paying for.
 
+Decision: Pico activation defaults to the `first-agent` lane until the first real run is done.
+Why:
+- Asking users to choose among multiple lanes before the first win is fake optionality.
+- The shortest honest path is install -> first prompt -> visible answer.
+
+Decision: Opening the first two lesson pages should auto-start the lesson and speak in concrete success language.
+Why:
+- A separate `Start lesson` click before reading instructions is useless friction.
+- `Holy shit, it works` is clearer than abstract completion theater when the product is trying to earn trust fast.
+
 ## 2026-04-11 02:51:43 CEST
 Decision: `/pico/onboarding` is the canonical Pico workspace entry.
 Why:
