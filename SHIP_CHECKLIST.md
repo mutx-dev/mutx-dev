@@ -17,7 +17,7 @@
 - [x] Targeted API tests pass
 - [x] Build passes
 - [x] Pico landing points clearly to the canonical workspace entry
-- [ ] Non-English Pico landing locales match shipped product truth
+- [x] Public copy matches shipped product truth on the live landing paths
 
 ## Content completeness
 - [x] 12 launch tutorials defined
