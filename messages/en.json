@@ -13,15 +13,15 @@
       "badge": "Shipped beta · Real product",
       "title": "Build one useful agent, ",
       "titleAccent": "then learn how to trust it.",
-      "subtitle": "PicoMUTX gives you a guided academy, grounded tutor, and autopilot layer so you can get a real agent running without wandering through fifteen tabs of bullshit.",
+      "subtitle": "PicoMUTX helps you get a real agent live without losing control. You get guided steps, grounded help, and a control layer that helps you catch cost leaks, stop bad automation, and understand what happened.",
       "cta": "Talk to the team",
-      "meta": "Open workspace now · Guided lessons · Real operator signals"
+      "meta": "Open workspace now · Know when something breaks · Prevent bad actions"
     },
     "trustBar": {
       "items": {
         "0": "For founders, operators, and small teams",
-        "1": "Step-by-step guidance",
-        "2": "Built-in safeguards from day one"
+        "1": "Control from day one",
+        "2": "Less risk, less guesswork"
       }
     },
     "problem": {
@@ -51,24 +51,24 @@
     },
     "platform": {
       "eyebrow": "What PicoMUTX Is",
-      "title": "Where AI agents go from “interesting idea” to “working system.”",
-      "body": "PicoMUTX is a guided platform for people who want to build and run AI agents safely — without needing to become full-time engineers. It gives you the structure, support, and safeguards that are usually missing when people try to do this alone. Instead of assembling everything from scratch, you move step by step: from idea to implementation, from confusion to clarity, from prototype to something you can actually use.",
+      "title": "Build the agent. Keep control.",
+      "body": "PicoMUTX is for people who want a useful agent without blind execution. You get a clear path, grounded help, and a control layer that helps you catch cost leaks, stop bad automation, and understand bad runs fast.",
       "howItWorks": {
         "0": {
-          "title": "Step-by-step implementation paths",
-          "body": "Follow structured paths based on what you are trying to build — from customer support agents to internal automations. No generic theory. No endless searching."
+          "title": "Build with a clear path",
+          "body": "Follow one path. Ship one useful agent. Skip the wandering."
         },
         "1": {
-          "title": "Guided support when you get stuck",
-          "body": "When something breaks or becomes unclear, you do not have to figure it out alone. PicoMUTX keeps momentum alive instead of letting projects die in confusion."
+          "title": "Know when something breaks",
+          "body": "When a run fails or drifts, you see it fast instead of finding out later."
         },
         "2": {
-          "title": "Built-in safety from day one",
-          "body": "Cost awareness, visibility, and guardrails matter. You always know what your agent is doing, what it is costing, and when something needs attention."
+          "title": "Prevent bad actions",
+          "body": "Put a gate in front of risky sends, spend, and other moves you do not want an agent making alone."
         },
         "3": {
-          "title": "Live expert touchpoints",
-          "body": "Some things are too nuanced for static documentation. Real guidance moments designed to help you unblock faster and make better decisions."
+          "title": "Understand what happened",
+          "body": "Keep the trail you need to explain a bad run, fix it, and move on."
         }
       }
     },
@@ -94,39 +94,39 @@
     },
     "beforeAfter": {
       "eyebrow": "The Shift",
-      "title": "What changes when you stop figuring it out alone",
+      "title": "What you are really buying",
       "beforeLabel": "Before",
       "afterLabel": "After",
       "items": {
         "0": {
-          "before": "You have an idea, but no clear path",
-          "after": "You have a structured way forward"
+          "before": "You hope the agent is fine",
+          "after": "You know when something breaks"
         },
         "1": {
-          "before": "You waste time jumping between tools, docs, and tutorials",
-          "after": "You follow guided implementation paths"
+          "before": "Costs drift in the dark",
+          "after": "You catch cost leaks early"
         },
         "2": {
-          "before": "You get stuck and lose momentum",
-          "after": "You get support before the project dies"
+          "before": "Risky actions run on autopilot",
+          "after": "Bad actions wait for approval"
         },
         "3": {
-          "before": "Your agent stays in theory",
-          "after": "Your agent gets built and put to work"
+          "before": "A bad run turns into guesswork",
+          "after": "You can see what happened"
         }
       },
-      "close": "The goal is not to “learn AI someday.” The goal is to get your agent live — safely, clearly, and with less friction."
+      "close": "That is the point. More control. Less surprise."
     },
     "earlyAccess": {
       "eyebrow": "Beta access",
-      "title": "The product is live. The sharp edges are honest.",
-      "body": "PicoMUTX is now a real guided product, not a waitlist fantasy. Open the workspace, follow the lessons, use the tutor when you get blocked, and escalate when the problem is messy enough to need a human.",
+      "title": "The product is live. So is the control layer.",
+      "body": "Open the workspace, follow the lessons, and use real signals to catch cost leaks, stop risky actions, and understand bad runs before they turn expensive.",
       "benefits": {
         "0": "Open the workspace now",
         "1": "Follow guided onboarding and academy tracks",
-        "2": "Use a grounded tutor instead of guessing",
-        "3": "See real autopilot signals from the control layer",
-        "4": "Talk to the team when the path needs human judgment"
+        "2": "Know when something breaks",
+        "3": "Prevent bad actions before they land",
+        "4": "Get a human when the edge case is ugly"
       }
     },
     "faq": {
@@ -150,19 +150,19 @@
           "a": "Yes. The beta product is live. Use the workspace, follow the lessons, and contact the team if you need a human hand on a messy edge case."
         },
         "4": {
-          "q": "Is this for enterprises?",
-          "a": "PicoMUTX is better suited to founders, operators, and small teams who want a guided way to build and deploy AI agents. Larger enterprise governance needs belong to the broader MUTX ecosystem."
+          "q": "What am I really paying for?",
+          "a": "Control and peace of mind. Knowing when something breaks, stopping risky actions before they land, and having the trail you need to understand what happened."
         }
       }
     },
     "finalCta": {
       "eyebrow": "Workspace live",
-      "title": "Your agent does not need to stay an unfinished idea.",
-      "body": "You do not need more tabs open. You need a clearer path, a grounded tutor, and real operator signals. PicoMUTX is built for that moment.",
+      "title": "What you want is control and peace of mind.",
+      "body": "Fewer surprises. Fewer expensive mistakes. A clear trail when something breaks. That is what PicoMUTX is for.",
       "formHeadline": "Talk to the PicoMUTX team",
-      "formSubline": "Tell us what you are building or where it hurts. We will point you to the right path.",
+      "formSubline": "Tell us what needs control: cost leaks, risky actions, or blind spots. We will point you to the right path.",
       "ctaButton": "Send message",
-      "formCtaMeta": "Open workspace now · Human reply when needed · No fake onboarding theater"
+      "formCtaMeta": "Open workspace now · Real control signals · Human reply when needed"
     },
     "contactForm": {
       "dialogLabel": "Contact form",
