@@ -31,7 +31,7 @@ Phase 7 truth hardening.
 - Billing: internal plan flags only until pricing and payment rails are worth wiring.
 
 ## Risks
-- Non-English Pico landing locales still carry stale prereg/waitlist language.
+- Active non-English Pico landing truth now falls back to English on the key CTA/contact surfaces, but proper localization is still incomplete.
 - Approval persistence is still backed by the shared in-memory approvals service.
 - Existing dashboard/backend surfaces can confuse future implementation if preview/shell routes are treated like shipped product.
 - Docs drift remains a repo-wide tax and will bite again if left alone too long.

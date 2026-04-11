@@ -81,7 +81,7 @@ Deleted because they duplicated the Pico product, state, or tutor model instead 
 ### Honest limitations
 - Billing is still flag-driven, not wired to checkout.
 - Approval persistence is still backed by the shared in-memory approvals service, now tightened for visibility but not yet durable across restarts.
-- Non-English Pico landing locales still carry stale prereg/waitlist copy and need a cleanup sweep.
+- Non-English Pico landing keys now fall back to English on the active truth-critical CTA/contact surfaces. Full localization still needs a proper sweep.
 - Build still emits the existing repo-wide Turbopack NFT warning around `next.config.js`; not a Pico blocker.
 
 ### Not blocked
@@ -136,6 +136,44 @@ What is next
 - Keep shipping inside the canonical Pico files only.
 - If another session produces Pico changes outside that order, absorb the useful parts and delete the shadow immediately.
 
+### 2026-04-11 00:57:03 UTC — canonical order enforcement
+What changed
+- Re-audited the repo against the explicit canonical Pico order.
+- Confirmed the canonical route truth remains:
+  - `/pico/onboarding` = real entry
+  - `/pico/app` = compatibility redirect only
+  - `/pico/workspace` = compatibility redirect only
+- Absorbed the remaining Pico frontend shadow system by moving the last Pico-owned site components under `components/pico/*` and removing `components/site/pico/*` from the product truth.
+- Updated `docs/surfaces.md` so it stops advertising `components/site/pico/` as a Pico source of truth.
+- Rejected the in-flight non-English message churn from parallel sessions because it was not part of the canonical reconciliation and would have reintroduced copy drift.
+
+What was merged
+- `PicoLandingPage`, `PicoFooter`, `PicoContactForm`, `PicoLangSwitcher`, and their CSS now belong to the canonical Pico component system.
+
+What was deleted or deprecated
+- `components/site/pico/*` as an active Pico product surface.
+- Shadow translation churn in `messages/*.json` was discarded instead of merged.
+
+Why
+- The canonical frontend system is `components/pico/*`, not two Pico UI trees.
+- A second Pico component directory is how the product starts lying about where truth lives.
+- Bad translation churn is worse than no translation churn.
+
+What was tested
+- `npm run build`
+- `npm test -- --runInBand picoTutor picoAcademy`
+- `./.venv/bin/python -m pytest tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
+- `./.venv/bin/python -m pytest tests/api/test_approvals.py -q`
+- Production-style smoke against `/pico`, `/pico/app`, `/pico/onboarding`, and `/pico/tutor`
+
+What failed
+- No Pico-specific blocker surfaced.
+- Existing repo-wide noise remains: Next/Turbopack NFT warning and pytest OpenTelemetry shutdown spam.
+
+What is next
+- Keep `/pico/app` and `/pico/workspace` only as compatibility redirects until they can be removed safely.
+- Continue from the canonical files only: `app/pico/*`, `components/pico/*`, `lib/pico/academy.ts`, `lib/pico/tutor.ts`, `src/api/routes/pico.py`, `src/api/services/pico_progress.py`.
+
 ### 2026-04-11 02:58:00 CEST — finish pass
 What changed
 - Added Pico-specific metadata for academy, tutor, autopilot, support, workspace, and lesson pages.
@@ -162,3 +200,24 @@ What failed
 What is next
 - PicoMUTX v1 is finished enough to ship.
 - Future work is post-v1 hardening: durable approvals, real billing, and deeper runtime ingestion.
+
+### 2026-04-11 02:59:52 CEST — truth-alignment validation pass
+What changed
+- Tightened the product docs so Pico's remaining localization reality is described honestly instead of pretending every locale is fully cleaned up.
+- Marked the live landing paths as truthful in `SHIP_CHECKLIST.md` and narrowed the remaining gap to proper full localization.
+- Updated `docs/surfaces.md` so `pico.mutx.dev` is listed as a real MUTX surface and removed the stale `components/site/pico/*` source-of-truth claim.
+
+What was tested
+- `npm run typecheck`
+- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `./.venv/bin/python -m pytest tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
+- `npm run build:docs-search`
+- `npm run build`
+
+What failed
+- No Pico-specific blocker failed validation.
+- Existing repo-wide warnings remain: Next/Turbopack NFT tracing noise and the OpenTelemetry closed-stream logging noise after pytest shutdown.
+
+What is next
+- Commit this truth-alignment slice.
+- If we want multilingual polish instead of English fallbacks on the live CTA/contact paths, do a deliberate locale sweep rather than sneaking in half-translated sludge.

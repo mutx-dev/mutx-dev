@@ -73,7 +73,7 @@ Surfaces marked **Preview** are:
 - A billing-complete product
 - Proof that every deeper control-plane action has durable backend enforcement
 
-**Source of truth:** `app/pico/`, `components/pico/`, `components/site/pico/`, `lib/pico/`
+**Source of truth:** `app/pico/`, `components/pico/`, `lib/pico/`
 
 ---
 
