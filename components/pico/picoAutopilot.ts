@@ -104,6 +104,7 @@ export type AutopilotIntegrationStatus = {
   hasBudget: boolean
   hasUsage: boolean
   hasApprovalRecords: boolean
+  approvalGateConfigured: boolean
 }
 
 export type AutopilotNextStep = {
@@ -249,13 +250,15 @@ export function explainApprovalImpact(approval: AutopilotApprovalSummary) {
 }
 
 export function analyzeAutopilotIntegration(input: {
-  agents: AutopilotAgentSummary[]
+  agents?: AutopilotAgentSummary[]
   runs: AutopilotRunSummary[]
   alerts: AutopilotAlertSummary[]
   approvals: AutopilotApprovalSummary[]
   budget: AutopilotBudgetSummary | null
   usage: AutopilotUsageBreakdown | null
+  approvalGateConfigured?: boolean
 }): AutopilotIntegrationStatus {
+  const agents = input.agents ?? []
   const hasRuns = input.runs.length > 0
   const hasAlerts = input.alerts.length > 0
   const hasApprovalRecords = input.approvals.length > 0
@@ -266,21 +269,29 @@ export function analyzeAutopilotIntegration(input: {
         input.usage.usage_by_agent.length > 0 ||
         input.usage.usage_by_type.length > 0)
   )
+  const hasLiveAgent =
+    agents.length > 0 ||
+    hasRuns ||
+    hasAlerts ||
+    hasApprovalRecords ||
+    hasBudget ||
+    hasUsage
 
   return {
-    hasLiveAgent: input.agents.length > 0,
+    hasLiveAgent,
     hasRuns,
     hasAlerts,
     hasBudget,
     hasUsage,
     hasApprovalRecords,
+    approvalGateConfigured: Boolean(input.approvalGateConfigured),
   }
 }
 
 export function getRunsEmptyState(status: AutopilotIntegrationStatus, nextStep: AutopilotNextStep): AutopilotEmptyState {
   if (!status.hasLiveAgent) {
     return {
-      title: 'No MUTX agents exist yet',
+      title: 'No monitored agent is connected yet',
       body: 'Pico has no real agent to attach to. Create or deploy one actual MUTX agent first, then come back for run history.',
       nextStep,
     }
@@ -330,6 +341,14 @@ export function getApprovalsEmptyState(status: AutopilotIntegrationStatus, nextS
     return {
       title: 'No agent exists to gate yet',
       body: 'Approval queues only matter when a real agent is capable of doing something risky. Create or deploy the agent first.',
+      nextStep,
+    }
+  }
+
+  if (status.hasApprovalRecords && !status.approvalGateConfigured) {
+    return {
+      title: 'Approval history exists, but the gate is off locally',
+      body: 'MUTX already has approval records, but Pico still shows the gate as disabled. Turn the gate on here so the product state matches reality.',
       nextStep,
     }
   }

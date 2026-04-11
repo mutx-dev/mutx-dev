@@ -7,6 +7,7 @@ import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoHref } from '@/lib/pico/navigation'
 import {
+  analyzeAutopilotIntegration,
   buildAutopilotTimeline,
   describeRunDetail,
   explainAlertImpact,
@@ -14,11 +15,16 @@ import {
   formatPercent,
   formatRelativeTime,
   formatTimestamp,
+  getAlertsEmptyState,
+  getApprovalsEmptyState,
   getRunSeverity,
+  getRunsEmptyState,
+  getUsageEmptyState,
   humanizeRunStatus,
   type AutopilotAlertSummary,
   type AutopilotApprovalSummary,
   type AutopilotBudgetSummary,
+  type AutopilotEmptyState,
   type AutopilotRunSummary,
   type AutopilotRunTrace,
   type AutopilotTimelineItem,
@@ -103,6 +109,21 @@ function TimelineItemCard({ item }: { item: AutopilotTimelineItem }) {
       <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {item.impact}</p>
       <Link href={item.href} className="mt-4 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
         Jump to detail section
+      </Link>
+    </div>
+  )
+}
+
+function EmptyStatePanel({ state }: { state: AutopilotEmptyState }) {
+  return (
+    <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+      <p className="font-medium text-white">{state.title}</p>
+      <p className="mt-2">{state.body}</p>
+      <Link
+        href={state.nextStep.href}
+        className="mt-4 inline-flex rounded-full border border-emerald-400/30 px-4 py-2 text-sm font-medium text-emerald-200 transition hover:border-emerald-300/60 hover:text-emerald-100"
+      >
+        {state.nextStep.label}
       </Link>
     </div>
   )
@@ -274,6 +295,62 @@ export function PicoAutopilotPageClient() {
     [alerts, approvals, budget, progress.autopilot.costThresholdPercent, runs, tracesByRunId],
   )
 
+  const nextStep = useMemo(
+    () =>
+      derived.nextLesson
+        ? {
+            label: `Finish ${derived.nextLesson.title}`,
+            href: toHref(`/academy/${derived.nextLesson.slug}`),
+          }
+        : {
+            label: 'Go back to academy',
+            href: toHref('/academy'),
+          },
+    [derived.nextLesson, toHref],
+  )
+
+  const integrationStatus = useMemo(
+    () =>
+      analyzeAutopilotIntegration({
+        runs,
+        alerts,
+        approvals,
+        budget,
+        usage,
+        approvalGateConfigured: progress.autopilot.approvalGateEnabled,
+      }),
+    [alerts, approvals, budget, progress.autopilot.approvalGateEnabled, runs, usage],
+  )
+
+  const runEmptyState = useMemo(
+    () => getRunsEmptyState(integrationStatus, nextStep),
+    [integrationStatus, nextStep],
+  )
+  const alertsEmptyState = useMemo(
+    () => getAlertsEmptyState(integrationStatus, nextStep),
+    [integrationStatus, nextStep],
+  )
+  const usageEmptyState = useMemo(
+    () => getUsageEmptyState(integrationStatus, nextStep),
+    [integrationStatus, nextStep],
+  )
+  const approvalsEmptyState = useMemo(
+    () => getApprovalsEmptyState(integrationStatus, nextStep),
+    [integrationStatus, nextStep],
+  )
+
+  const loadStateLabel = useMemo(() => {
+    switch (loadState) {
+      case 'loading':
+        return 'Loading live data'
+      case 'partial':
+        return 'Partial live data'
+      case 'offline':
+        return 'Auth required'
+      default:
+        return 'Live data ready'
+    }
+  }, [loadState])
 
   function saveThreshold() {
     if (thresholdValidationError) {
