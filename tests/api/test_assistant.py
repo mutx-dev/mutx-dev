@@ -97,3 +97,40 @@ class TestAssistantOverview:
             item["id"] == "browser_control" and not item["installed"]
             for item in uninstall_response.json()
         )
+
+    @pytest.mark.asyncio
+    async def test_assistant_sessions_returns_gateway_data(self, client: AsyncClient, monkeypatch):
+        create_response = await client.post(
+            "/v1/templates/personal_assistant/deploy",
+            json={"name": "Ops Assistant", "assistant_id": "ops-assistant"},
+        )
+        agent_id = create_response.json()["agent"]["id"]
+
+        monkeypatch.setattr(
+            "src.api.services.assistant_control_plane._request_gateway_json",
+            lambda _paths: {
+                "sessions": [
+                    {
+                        "id": "session-123",
+                        "session_key": "session-123",
+                        "assistant_id": "ops-assistant",
+                        "model": "openai/gpt-5",
+                        "channel": "webchat",
+                        "status": "active",
+                        "created_at": 1_700_000_000,
+                        "updated_at": 1_700_000_100,
+                        "input_tokens": 12,
+                        "output_tokens": 8,
+                    }
+                ]
+            },
+        )
+
+        response = await client.get(f"/v1/assistant/{agent_id}/sessions")
+
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload[0]["id"] == "session-123"
+        assert payload[0]["agent"] == "ops-assistant"
+        assert payload[0]["tokens"] == "20"
+        assert payload[0]["active"] is True

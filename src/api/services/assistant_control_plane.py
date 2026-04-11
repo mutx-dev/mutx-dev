@@ -1,15 +1,28 @@
 from __future__ import annotations
 
 import json
+import logging
+import os
 import re
+import time
+import urllib.error
+import urllib.request
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from src.api.models import Agent, AgentType
+from src.api.services.gateway_runtime import (
+    get_detected_gateway_port,
+    get_detected_gateway_token,
+    get_detected_openclaw_config_path,
+    get_detected_openclaw_state_dir,
+)
 
 DEFAULT_TEMPLATE_ID = "personal_assistant"
 DEFAULT_ASSISTANT_MODEL = "openai/gpt-5"
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -242,8 +255,45 @@ def _extract_skill_metadata(skill_file: Path) -> SkillCatalogItem | None:
     )
 
 
+def _candidate_skill_roots() -> list[Path]:
+    state_dir = get_detected_openclaw_state_dir()
+    roots = [
+        Path.home() / ".hermes" / "skills",
+        Path.home() / ".openclaw" / "skills",
+    ]
+    if state_dir is not None:
+        roots.extend(
+            [
+                state_dir / "skills",
+                state_dir / "workspace" / "skills",
+                state_dir / "workspaces",
+            ]
+        )
+
+    env_root = os.environ.get("OPENCLAW_SKILLS_DIR")
+    if env_root:
+        roots.insert(0, Path(env_root).expanduser())
+
+    deduped: list[Path] = []
+    seen: set[str] = set()
+    for root in roots:
+        resolved = str(root.expanduser())
+        if resolved not in seen:
+            deduped.append(root.expanduser())
+            seen.add(resolved)
+    return deduped
+
+
 def discover_workspace_skills() -> list[SkillCatalogItem]:
-    return []
+    discovered: dict[str, SkillCatalogItem] = {}
+    for root in _candidate_skill_roots():
+        if not root.exists():
+            continue
+        for skill_file in root.rglob("SKILL.md"):
+            item = _extract_skill_metadata(skill_file)
+            if item is not None:
+                discovered.setdefault(item.id, item)
+    return sorted(discovered.values(), key=lambda item: item.name.lower())
 
 
 def list_skill_catalog() -> list[SkillCatalogItem]:
@@ -342,27 +392,258 @@ def list_assistant_wakeups(agent: Agent) -> list[dict[str, Any]]:
     return items
 
 
-def list_gateway_sessions(*, assistant_id: str | None = None) -> list[dict[str, Any]]:
-    return []
+def _normalize_timestamp(value: Any) -> int:
+    if value is None:
+        return 0
+    if isinstance(value, (int, float)):
+        return int(value)
+    if isinstance(value, datetime):
+        return int(value.timestamp())
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return 0
+        if stripped.isdigit():
+            return int(stripped)
+        try:
+            return int(datetime.fromisoformat(stripped.replace("Z", "+00:00")).timestamp())
+        except ValueError:
+            return 0
+    return 0
 
 
-def collect_gateway_health() -> dict[str, Any]:
-    status = "client_required"
-    doctor_summary = (
-        "Local OpenClaw runtime state is resolved from the operator host. "
-        "Use the MUTX CLI or TUI on that machine to inspect live health and sessions."
+def _format_age(last_activity: int, start_time: int) -> str:
+    baseline = last_activity or start_time or int(time.time())
+    age_seconds = max(0, int(time.time()) - baseline)
+    if age_seconds < 60:
+        return f"{age_seconds}s"
+    if age_seconds < 3600:
+        return f"{age_seconds // 60}m"
+    if age_seconds < 86400:
+        return f"{age_seconds // 3600}h"
+    return f"{age_seconds // 86400}d"
+
+
+def _session_matches_assistant(raw: dict[str, Any], assistant_id: str | None) -> bool:
+    if not assistant_id:
+        return True
+
+    needle = assistant_id.strip().lower()
+    candidates = [
+        raw.get("assistant_id"),
+        raw.get("assistant"),
+        raw.get("agent"),
+        raw.get("workspace"),
+        raw.get("name"),
+        raw.get("key"),
+        raw.get("session_key"),
+        raw.get("id"),
+    ]
+    return any(needle in str(candidate).lower() for candidate in candidates if candidate)
+
+
+def _normalize_flags(raw: dict[str, Any]) -> list[str]:
+    flags: list[str] = []
+    raw_flags = raw.get("flags")
+    if isinstance(raw_flags, list):
+        flags.extend(str(flag) for flag in raw_flags if flag)
+
+    for key in ("thinking", "verbose", "reasoning", "label"):
+        value = raw.get(key)
+        if value in (None, "", False):
+            continue
+        flags.append(key if value is True else f"{key}:{value}")
+
+    return list(dict.fromkeys(flags))
+
+
+def _normalize_gateway_session(raw: dict[str, Any]) -> dict[str, Any] | None:
+    key = str(
+        raw.get("key") or raw.get("session_key") or raw.get("session") or raw.get("id") or ""
+    ).strip()
+    if not key:
+        return None
+
+    start_time = _normalize_timestamp(
+        raw.get("start_time") or raw.get("created_at") or raw.get("started_at")
+    )
+    last_activity = _normalize_timestamp(
+        raw.get("last_activity") or raw.get("updated_at") or raw.get("timestamp")
+    )
+    total_tokens = raw.get("tokens") or raw.get("total_tokens")
+    if total_tokens is None:
+        input_tokens = int(raw.get("input_tokens") or 0)
+        output_tokens = int(raw.get("output_tokens") or 0)
+        total_tokens = input_tokens + output_tokens if input_tokens or output_tokens else ""
+
+    status = str(raw.get("status") or "").lower()
+    active = bool(raw.get("active", status in {"active", "running", "open", "available"}))
+    agent = str(
+        raw.get("agent")
+        or raw.get("assistant")
+        or raw.get("assistant_id")
+        or raw.get("workspace")
+        or "unknown"
     )
 
     return {
+        "id": str(raw.get("id") or key),
+        "key": key,
+        "agent": agent,
+        "kind": str(raw.get("kind") or raw.get("type") or "session"),
+        "age": _format_age(last_activity, start_time),
+        "model": str(raw.get("model") or raw.get("provider_model") or "unknown"),
+        "tokens": str(total_tokens),
+        "channel": str(raw.get("channel") or raw.get("source") or "direct"),
+        "flags": _normalize_flags(raw),
+        "active": active,
+        "start_time": start_time,
+        "last_activity": last_activity or start_time,
+        "source": str(raw.get("source") or "openclaw"),
+    }
+
+
+def _gateway_base_url() -> tuple[int | None, str | None]:
+    port = get_detected_gateway_port()
+    host = os.environ.get("OPENCLAW_GATEWAY_HOST", "127.0.0.1")
+    if port is None:
+        return None, None
+    return port, f"http://{host}:{port}"
+
+
+def _gateway_headers() -> dict[str, str]:
+    headers = {"Accept": "application/json"}
+    token = get_detected_gateway_token()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+
+
+def _request_gateway_json(paths: tuple[str, ...]) -> Any | None:
+    _port, base_url = _gateway_base_url()
+    if not base_url:
+        return None
+
+    for path in paths:
+        request = urllib.request.Request(f"{base_url}{path}", headers=_gateway_headers())
+        try:
+            with urllib.request.urlopen(request, timeout=3) as response:
+                payload = response.read().decode("utf-8")
+                if not payload:
+                    return None
+                return json.loads(payload)
+        except urllib.error.HTTPError as exc:
+            if exc.code == 404:
+                continue
+            logger.debug("Gateway request failed for %s: %s", path, exc)
+            return None
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+            logger.debug("Gateway request failed for %s: %s", path, exc)
+            return None
+    return None
+
+
+def _load_sessions_from_state_dir(assistant_id: str | None = None) -> list[dict[str, Any]]:
+    state_dir = get_detected_openclaw_state_dir()
+    if state_dir is None or not state_dir.exists():
+        return []
+
+    candidates = [
+        state_dir / "sessions",
+        state_dir / "gateway" / "sessions",
+        state_dir / "state" / "sessions",
+    ]
+    discovered: list[dict[str, Any]] = []
+    for root in candidates:
+        if not root.exists():
+            continue
+        for path in root.rglob("*.json*"):
+            try:
+                stat = path.stat()
+            except OSError:
+                continue
+            raw = {
+                "id": path.stem,
+                "key": path.stem,
+                "assistant_id": assistant_id or root.name,
+                "agent": assistant_id or root.name,
+                "kind": path.suffix.lstrip(".") or "session",
+                "created_at": int(stat.st_ctime),
+                "updated_at": int(stat.st_mtime),
+                "source": "openclaw-state",
+            }
+            if not _session_matches_assistant(raw, assistant_id):
+                continue
+            normalized = _normalize_gateway_session(raw)
+            if normalized is not None:
+                discovered.append(normalized)
+    return discovered
+
+
+def list_gateway_sessions(*, assistant_id: str | None = None) -> list[dict[str, Any]]:
+    payload = _request_gateway_json(("/api/sessions", "/sessions"))
+    raw_sessions: list[dict[str, Any]] = []
+
+    if isinstance(payload, dict):
+        items = payload.get("sessions") or payload.get("items") or payload.get("data") or []
+        if isinstance(items, list):
+            raw_sessions = [item for item in items if isinstance(item, dict)]
+    elif isinstance(payload, list):
+        raw_sessions = [item for item in payload if isinstance(item, dict)]
+
+    sessions = [
+        normalized
+        for normalized in (
+            _normalize_gateway_session(item)
+            for item in raw_sessions
+            if _session_matches_assistant(item, assistant_id)
+        )
+        if normalized is not None
+    ]
+
+    if not sessions:
+        sessions = _load_sessions_from_state_dir(assistant_id)
+
+    sessions.sort(key=lambda item: item.get("last_activity", 0), reverse=True)
+    return sessions
+
+
+def collect_gateway_health() -> dict[str, Any]:
+    config_path = get_detected_openclaw_config_path()
+    detected_state_dir = get_detected_openclaw_state_dir()
+    state_dir = detected_state_dir if detected_state_dir and detected_state_dir.exists() else None
+    port, gateway_url = _gateway_base_url()
+    credential_detected = bool(get_detected_gateway_token())
+    gateway_reachable = _request_gateway_json(("/health", "/api/health")) is not None
+    gateway_configured = any([config_path, state_dir, credential_detected, port is not None])
+    cli_available = config_path is not None or state_dir is not None
+
+    if gateway_reachable:
+        status = "healthy"
+        doctor_summary = "OpenClaw gateway is reachable and returning health data."
+    elif gateway_configured:
+        status = "configured"
+        doctor_summary = (
+            "OpenClaw configuration was detected, but the local gateway is not reachable from this process. "
+            "Start the operator runtime or check gateway auth and port settings."
+        )
+    else:
+        status = "client_required"
+        doctor_summary = (
+            "Local OpenClaw runtime state is resolved from the operator host. "
+            "Use the MUTX CLI or TUI on that machine to inspect live health and sessions."
+        )
+
+    return {
         "status": status,
-        "cli_available": False,
-        "gateway_configured": False,
-        "gateway_reachable": False,
-        "gateway_port": None,
-        "gateway_url": None,
-        "credential_detected": False,
-        "config_path": None,
-        "state_dir": None,
+        "cli_available": cli_available,
+        "gateway_configured": gateway_configured,
+        "gateway_reachable": gateway_reachable,
+        "gateway_port": port,
+        "gateway_url": gateway_url,
+        "credential_detected": credential_detected,
+        "config_path": str(config_path) if config_path else None,
+        "state_dir": str(state_dir) if state_dir else None,
         "doctor_summary": doctor_summary,
     }
 

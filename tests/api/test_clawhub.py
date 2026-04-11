@@ -41,3 +41,21 @@ class TestClawHubSkillManagement:
         )
 
         assert response.status_code == 403
+
+    @pytest.mark.asyncio
+    async def test_list_skills_includes_workspace_skills(
+        self, client: AsyncClient, tmp_path, monkeypatch
+    ):
+        skill_dir = tmp_path / "workspace-skills" / "demo-skill"
+        skill_dir.mkdir(parents=True)
+        (skill_dir / "SKILL.md").write_text(
+            "# Demo Skill\nA workspace-discovered skill.\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setenv("OPENCLAW_SKILLS_DIR", str(tmp_path / "workspace-skills"))
+
+        response = await client.get("/v1/clawhub/skills")
+
+        assert response.status_code == 200
+        payload = response.json()
+        assert any(skill["id"] == "demo-skill" for skill in payload)
