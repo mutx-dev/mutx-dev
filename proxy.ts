@@ -18,6 +18,63 @@ const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
 const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.localhost'])
 const PICO_LOCALES = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh', 'ar'] as const
+const PICO_COUNTRY_TO_LOCALE: Record<string, (typeof PICO_LOCALES)[number]> = {
+  US: 'en',
+  GB: 'en',
+  AU: 'en',
+  NZ: 'en',
+  IE: 'en',
+  CA: 'en',
+  ES: 'es',
+  MX: 'es',
+  AR: 'es',
+  CO: 'es',
+  CL: 'es',
+  PE: 'es',
+  VE: 'es',
+  UY: 'es',
+  PY: 'es',
+  BO: 'es',
+  EC: 'es',
+  CR: 'es',
+  PA: 'es',
+  GT: 'es',
+  HN: 'es',
+  SV: 'es',
+  NI: 'es',
+  DO: 'es',
+  PR: 'es',
+  FR: 'fr',
+  BE: 'fr',
+  LU: 'fr',
+  CH: 'fr',
+  DE: 'de',
+  AT: 'de',
+  IT: 'it',
+  PT: 'pt',
+  BR: 'pt',
+  JP: 'ja',
+  KR: 'ko',
+  CN: 'zh',
+  HK: 'zh',
+  TW: 'zh',
+  MO: 'zh',
+  SA: 'ar',
+  AE: 'ar',
+  EG: 'ar',
+  QA: 'ar',
+  KW: 'ar',
+  BH: 'ar',
+  OM: 'ar',
+  JO: 'ar',
+  MA: 'ar',
+  DZ: 'ar',
+  TN: 'ar',
+  IQ: 'ar',
+  LB: 'ar',
+  SY: 'ar',
+  YE: 'ar',
+}
 const UI_CACHE_CONTROL = 'private, no-cache, no-store, max-age=0, must-revalidate'
 const API_CACHE_CONTROL = 'no-store'
 const APP_PUBLIC_PATHS = new Set([
@@ -66,17 +123,10 @@ function getLocaleFromRequest(request: NextRequest): string {
   const cfCountry = request.headers.get('CF-IPCountry') ||
                     request.headers.get('X-Vercel-IP-Country')
   if (cfCountry) {
-    const lang = cfCountry.toLowerCase()
-    if (lang === 'zh') return 'zh'
-    if (['ja'].includes(lang)) return lang
-    if (['ko'].includes(lang)) return lang
-    if (['ar', 'sa', 'ae', 'eg'].includes(lang)) return 'ar'
-    if (['en', 'gb', 'au', 'ca', 'us'].includes(lang)) return 'en'
-    if (['es', 'mx', 'ar', 'co', 'cl'].includes(lang)) return 'es'
-    if (['fr', 'be', 'ca', 'ch'].includes(lang)) return 'fr'
-    if (['de', 'at', 'ch'].includes(lang)) return 'de'
-    if (['it'].includes(lang)) return 'it'
-    if (['pt', 'br'].includes(lang)) return 'pt'
+    const localeFromCountry = PICO_COUNTRY_TO_LOCALE[cfCountry.toUpperCase()]
+    if (localeFromCountry) {
+      return localeFromCountry
+    }
   }
   // 3. Accept-Language header
   const acceptLang = request.headers.get('accept-language')
