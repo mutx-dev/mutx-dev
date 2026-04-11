@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 
+import { PicoShareProjectCard } from '@/components/pico/PicoShareProjectCard'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
-import { getLessonBySlug, type PicoLesson } from '@/lib/pico/academy'
+import { buildPicoLessonShareMoment, getLessonBySlug, type PicoLesson } from '@/lib/pico/academy'
 import { usePicoHref } from '@/lib/pico/navigation'
 
 type PicoLessonDetailProps = {
@@ -17,6 +18,7 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
   const completed = progress.completedLessons.includes(lesson.slug)
   const unlocked = derived.unlockedLessonSlugs.includes(lesson.slug)
   const nextLesson = lesson.nextLesson ? getLessonBySlug(lesson.nextLesson) : null
+  const shareMoment = buildPicoLessonShareMoment(progress, lesson.slug)
 
   return (
     <PicoShell
@@ -43,6 +45,17 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
         </>
       }
     >
+      {shareMoment ? (
+        <div className="mb-6">
+          <PicoShareProjectCard
+            shareMoment={shareMoment}
+            shareHref={toHref(`/academy/${lesson.slug}`)}
+            shared={progress.sharedProjects.includes(shareMoment.id)}
+            onShared={actions.shareProject}
+          />
+        </div>
+      ) : null}
+
       <div className="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
         <section className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
           <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Lesson brief</p>

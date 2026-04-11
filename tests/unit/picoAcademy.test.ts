@@ -1,8 +1,11 @@
 import {
   applyLessonCompleted,
+  buildPicoLessonShareMoment,
   createDefaultPicoProgress,
   derivePicoProgress,
+  getLatestPicoShareMoment,
   getLessonBySlug,
+  markProjectShared,
   mergePicoProgress,
   selectTrack,
 } from '../../lib/pico/academy'
@@ -43,6 +46,28 @@ describe('pico academy progress', () => {
     const merged = mergePicoProgress(local, createDefaultPicoProgress())
 
     expect(merged.completedLessons).toContain('install-hermes-locally')
+  })
+
+  it('builds a share moment for completed milestone lessons', () => {
+    let progress = createDefaultPicoProgress()
+    progress = applyLessonCompleted(progress, 'run-your-first-agent')
+
+    const shareMoment = buildPicoLessonShareMoment(progress, 'run-your-first-agent')
+
+    expect(shareMoment?.id).toBe('lesson:run-your-first-agent')
+    expect(shareMoment?.milestoneLabel).toBe('First agent run')
+    expect(shareMoment?.agentDoes).toContain('Hermes runs and answers real prompts.')
+    expect(shareMoment?.achieved).toContain('Hermes answers a real prompt')
+  })
+
+  it('surfaces the latest unshared milestone as the share prompt', () => {
+    let progress = createDefaultPicoProgress()
+    progress = applyLessonCompleted(progress, 'run-your-first-agent')
+
+    expect(getLatestPicoShareMoment(progress)?.lessonSlug).toBe('run-your-first-agent')
+
+    progress = markProjectShared(progress, 'lesson:run-your-first-agent')
+    expect(getLatestPicoShareMoment(progress)).toBeNull()
   })
 })
 

@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+import { PicoShareProjectCard } from '@/components/pico/PicoShareProjectCard'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
-import { PICO_LEVELS, PICO_TRACKS, getLessonBySlug } from '@/lib/pico/academy'
+import { PICO_LEVELS, PICO_TRACKS, getLatestPicoShareMoment, getLessonBySlug } from '@/lib/pico/academy'
 import { usePicoHref } from '@/lib/pico/navigation'
 
 function ProgressCard({ label, value, hint }: { label: string; value: string; hint: string }) {
@@ -23,6 +24,7 @@ export function PicoAcademyDashboard() {
   const { progress, derived, syncState, ready, actions } = usePicoProgress()
   const toHref = usePicoHref()
   const nextLesson = derived.nextLesson
+  const shareMoment = getLatestPicoShareMoment(progress)
 
   return (
     <PicoShell
@@ -71,6 +73,17 @@ export function PicoAcademyDashboard() {
           hint={derived.badges[0] ?? 'No badge yet. Finish the first two lessons.'}
         />
       </div>
+
+      {shareMoment ? (
+        <div className="mt-6">
+          <PicoShareProjectCard
+            shareMoment={shareMoment}
+            shareHref={toHref(`/academy/${shareMoment.lessonSlug}`)}
+            shared={progress.sharedProjects.includes(shareMoment.id)}
+            onShared={actions.shareProject}
+          />
+        </div>
+      ) : null}
 
       <section className="mt-6 grid gap-6 lg:grid-cols-[1.4fr,0.8fr]">
         <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">

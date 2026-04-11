@@ -91,6 +91,16 @@ export type PicoDerivedProgress = {
   nextLesson: PicoLesson | null
 }
 
+export type PicoShareMoment = {
+  id: string
+  lessonSlug: string
+  milestoneLabel: string
+  title: string
+  agentDoes: string
+  achieved: string
+  summary: string
+}
+
 export const PICO_MILESTONE_XP: Record<string, number> = {
   account_created: 20,
   first_tutorial_started: 15,
@@ -884,6 +894,89 @@ export function getLessonsForTrack(trackSlug: string) {
 
 export function getLessonsForLevel(levelId: number) {
   return PICO_LESSONS.filter((lesson) => lesson.level === levelId)
+}
+
+const PICO_MILESTONE_LABELS: Record<string, string> = {
+  account_created: 'Account live',
+  first_tutorial_started: 'First lesson started',
+  first_tutorial_completed: 'First lesson finished',
+  first_agent_run: 'First agent run',
+  successful_deployment: 'Deployment shipped',
+  first_skill_added: 'First skill added',
+  first_workflow_built: 'Workflow live',
+  first_monitoring_event_seen: 'Monitoring online',
+  first_alert_configured: 'Alert configured',
+  first_approval_gate_enabled: 'Approval gate enabled',
+  project_shared: 'Project shared',
+  helpful_community_response: 'Helpful community response',
+}
+
+export function getPicoMilestoneLabel(eventId: string) {
+  return PICO_MILESTONE_LABELS[eventId] ?? eventId.replace(/_/g, ' ')
+}
+
+export function buildPicoLessonShareMoment(
+  progressInput: Partial<PicoProgressState> | null | undefined,
+  lessonSlug: string
+): PicoShareMoment | null {
+  const progress = normalizePicoProgress(progressInput)
+  const lesson = getLessonBySlug(lessonSlug)
+  if (!lesson || !progress.completedLessons.includes(lessonSlug)) {
+    return null
+  }
+
+  const milestoneCandidates = lesson.milestoneEvents ?? []
+  let milestoneEvent: string | null = null
+  for (let index = milestoneCandidates.length - 1; index >= 0; index -= 1) {
+    const eventId = milestoneCandidates[index]
+    if (progress.milestoneEvents.includes(eventId)) {
+      milestoneEvent = eventId
+      break
+    }
+  }
+  if (!milestoneEvent) {
+    return null
+  }
+
+  const track = getTrackBySlug(lesson.track)
+  const level = PICO_LEVELS.find((item) => item.id === lesson.level)
+  const milestoneLabel = getPicoMilestoneLabel(milestoneEvent)
+  const agentDoes = track?.outcome ?? lesson.outcome
+  const achieved = lesson.expectedResult
+  const title = `${milestoneLabel} unlocked`
+  const summary = [
+    `Built with Pico.`,
+    `Agent does: ${agentDoes}`,
+    `Achieved: ${achieved}`,
+    `Milestone: ${milestoneLabel}.`,
+    `Shipped in ${lesson.title}${level ? ` at level ${level.id} ${level.title}` : ''}.`,
+  ].join(' ')
+
+  return {
+    id: `lesson:${lesson.slug}`,
+    lessonSlug: lesson.slug,
+    milestoneLabel,
+    title,
+    agentDoes,
+    achieved,
+    summary,
+  }
+}
+
+export function getLatestPicoShareMoment(
+  progressInput: Partial<PicoProgressState> | null | undefined
+): PicoShareMoment | null {
+  const progress = normalizePicoProgress(progressInput)
+
+  for (let index = progress.completedLessons.length - 1; index >= 0; index -= 1) {
+    const lessonSlug = progress.completedLessons[index]
+    const shareMoment = buildPicoLessonShareMoment(progress, lessonSlug)
+    if (shareMoment && !progress.sharedProjects.includes(shareMoment.id)) {
+      return shareMoment
+    }
+  }
+
+  return null
 }
 
 export function derivePicoProgress(progressInput: Partial<PicoProgressState> | null | undefined): PicoDerivedProgress {
