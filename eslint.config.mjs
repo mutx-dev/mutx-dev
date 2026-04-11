@@ -28,6 +28,7 @@ export default tseslint.config(
       ".venv*/**",
       ".worktrees/**",
       "ios/**/*.build/**",
+      "coverage/**",
     ],
   },
   {
