@@ -1,5 +1,5 @@
+import json
 import logging
-
 import uuid
 from datetime import datetime, timezone, timedelta
 from typing import Optional
@@ -19,6 +19,7 @@ from src.api.models.schemas import (
     CostSummaryResponse,
     BudgetResponse,
 )
+from src.api.services.billing import get_current_billing_period, get_plan_credits, get_usage_credits
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 logger = logging.getLogger(__name__)
@@ -33,13 +34,12 @@ def _parse_datetime(dt_str):
         return None
 
 
-@router.get("/summary", response_model=AnalyticsSummaryResponse)
-async def get_analytics_summary(
-    period_start: Optional[str] = Query(None),
-    period_end: Optional[str] = Query(None),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
+def _resolve_period(
+    period_start: Optional[str],
+    period_end: Optional[str],
+    *,
+    default_days: int = 30,
+) -> tuple[datetime, datetime]:
     now = datetime.now(timezone.utc)
     if period_start == "24h":
         period_start_dt = now - timedelta(hours=24)
@@ -48,8 +48,45 @@ async def get_analytics_summary(
     elif period_start == "30d":
         period_start_dt = now - timedelta(days=30)
     else:
-        period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=30))
+        period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=default_days))
+
     period_end_dt = _parse_datetime(period_end) or now
+    return period_start_dt, period_end_dt
+
+
+def _decode_event_metadata(raw: Optional[str]) -> dict[str, str]:
+    if not raw:
+        return {}
+    try:
+        parsed = json.loads(raw)
+    except (TypeError, json.JSONDecodeError):
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def _resolve_usage_agent_key(event: UsageEvent, owned_agent_ids: set[str]) -> str | None:
+    metadata = _decode_event_metadata(event.event_metadata)
+    metadata_agent_id = metadata.get("agent_id")
+    if isinstance(metadata_agent_id, str) and metadata_agent_id:
+        return metadata_agent_id
+
+    if event.resource_type == "agent" and event.resource_id:
+        return event.resource_id
+
+    if event.event_type.startswith("agent_") and event.resource_id in owned_agent_ids:
+        return event.resource_id
+
+    return None
+
+
+@router.get("/summary", response_model=AnalyticsSummaryResponse)
+async def get_analytics_summary(
+    period_start: Optional[str] = Query(None),
+    period_end: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    period_start_dt, period_end_dt = _resolve_period(period_start, period_end)
 
     agent_query = select(Agent).where(Agent.user_id == current_user.id)
     agent_result = await db.execute(agent_query)
@@ -71,7 +108,13 @@ async def get_analytics_summary(
         total_deployments = active_deployments = 0
 
     if agent_ids:
-        runs_query = select(AgentRun).where(AgentRun.agent_id.in_(agent_ids))
+        runs_query = select(AgentRun).where(
+            and_(
+                AgentRun.agent_id.in_(agent_ids),
+                AgentRun.started_at >= period_start_dt,
+                AgentRun.started_at <= period_end_dt,
+            )
+        )
         runs_result = await db.execute(runs_query)
         runs = runs_result.scalars().all()
         total_runs = len(runs)
@@ -312,16 +355,7 @@ async def get_cost_summary(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    now = datetime.now(timezone.utc)
-    if period_start == "24h":
-        period_start_dt = now - timedelta(hours=24)
-    elif period_start == "7d":
-        period_start_dt = now - timedelta(days=7)
-    elif period_start == "30d":
-        period_start_dt = now - timedelta(days=30)
-    else:
-        period_start_dt = _parse_datetime(period_start) or (now - timedelta(days=30))
-    period_end_dt = _parse_datetime(period_end) or now
+    period_start_dt, period_end_dt = _resolve_period(period_start, period_end)
 
     result = await db.execute(
         select(UsageEvent).where(
@@ -333,29 +367,33 @@ async def get_cost_summary(
         )
     )
     events = result.scalars().all()
-    usage_by_event_type, usage_by_agent = {}, {}
+
+    agent_result = await db.execute(select(Agent.id).where(Agent.user_id == current_user.id))
+    owned_agent_ids = {str(agent_id) for agent_id in agent_result.scalars().all()}
+
+    usage_by_event_type: dict[str, float] = {}
+    usage_by_agent: dict[str, float] = {}
+    total_credits = 0.0
+
     for event in events:
-        usage_by_event_type[event.event_type] = usage_by_event_type.get(event.event_type, 0) + 1
-        if event.resource_id:
-            usage_by_agent[event.resource_id] = usage_by_agent.get(event.resource_id, 0) + 1
+        event_credits = float(event.credits_used or 0.0)
+        total_credits += event_credits
 
-    from src.api.models.plan_tiers import PlanTier
+        event_type = event.event_type or "unknown"
+        usage_by_event_type[event_type] = usage_by_event_type.get(event_type, 0.0) + event_credits
 
-    plan_credits = {
-        PlanTier.FREE: 100,
-        PlanTier.STARTER: 1000,
-        PlanTier.PRO: 10000,
-        PlanTier.ENTERPRISE: 100000,
-    }
-    credits_total = plan_credits.get(current_user.plan, 100)
-    total_credits = sum(usage_by_event_type.values())
+        agent_key = _resolve_usage_agent_key(event, owned_agent_ids)
+        if agent_key:
+            usage_by_agent[agent_key] = usage_by_agent.get(agent_key, 0.0) + event_credits
+
+    credits_total = get_plan_credits(current_user.plan)
 
     return CostSummaryResponse(
-        total_credits_used=total_credits,
-        credits_remaining=max(0, credits_total - total_credits),
+        total_credits_used=round(total_credits, 2),
+        credits_remaining=round(max(0.0, credits_total - total_credits), 2),
         credits_total=credits_total,
-        usage_by_event_type=usage_by_event_type,
-        usage_by_agent=usage_by_agent,
+        usage_by_event_type={key: round(value, 2) for key, value in usage_by_event_type.items()},
+        usage_by_agent={key: round(value, 2) for key, value in usage_by_agent.items()},
         period_start=period_start_dt,
         period_end=period_end_dt,
     )
@@ -365,33 +403,22 @@ async def get_cost_summary(
 async def get_budget(
     db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
-    from src.api.models.plan_tiers import PlanTier
+    billing_period_start, reset_date = get_current_billing_period()
+    credits_used = await get_usage_credits(
+        db,
+        current_user.id,
+        period_start=billing_period_start,
+        period_end=reset_date,
+    )
+    credits_total = get_plan_credits(current_user.plan)
+    credits_remaining = max(0.0, credits_total - credits_used)
 
-    result = await db.execute(
-        select(func.sum(UsageEvent.credits_used)).where(UsageEvent.user_id == current_user.id)
-    )
-    credits_used = result.scalar_one() or 0.0
-    plan_credits = {
-        PlanTier.FREE: 100,
-        PlanTier.STARTER: 1000,
-        PlanTier.PRO: 10000,
-        PlanTier.ENTERPRISE: 100000,
-    }
-    credits_total = plan_credits.get(current_user.plan, 100)
-    credits_remaining = max(0, credits_total - credits_used)
-    now = datetime.now(timezone.utc)
-    reset_date = datetime(
-        now.year + 1 if now.month == 12 else now.year,
-        1 if now.month == 12 else now.month + 1,
-        1,
-        tzinfo=timezone.utc,
-    )
     return BudgetResponse(
         user_id=current_user.id,
         plan=current_user.plan,
         credits_total=credits_total,
-        credits_used=credits_used,
-        credits_remaining=credits_remaining,
+        credits_used=round(credits_used, 2),
+        credits_remaining=round(credits_remaining, 2),
         reset_date=reset_date,
-        usage_percentage=round(credits_used / credits_total * 100, 2) if credits_total > 0 else 0,
+        usage_percentage=round((credits_used / credits_total) * 100, 2) if credits_total > 0 else 0,
     )
