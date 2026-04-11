@@ -260,3 +260,29 @@ What is next
 - Tighten the lower live-data cards so Assistant, Budget, and Approvals scan faster under pressure.
 - Sweep any remaining copy that still sounds like framework plumbing instead of operator product language.
 
+### 2026-04-11 03:38:02 CEST — Control card scanability pass START
+- Orchestrator assigned a builder/reviewer loop for the lower Pico Control cards.
+- Scope: assistant overview, budget, approvals, and any nearby scan-killing clutter.
+- Goal: faster under-pressure scanning without changing the underlying data contract.
+
+### 2026-04-11 03:55:38 CEST — Control card scanability pass END
+What changed
+- Ran a builder/reviewer loop on the lower Pico Control cards instead of doing an unreviewed direct tweak.
+- Refactored Assistant overview, Budget, Runtime, Approvals, and Health into faster-scanning summary blocks plus key/value details.
+- Added real operator receipts for deploy, threshold, and approval actions, then hardened the lower cards so those receipts connect to clearer live-state panels.
+- Fixed review findings: health now prefers truthful fields, healthy database state recognizes `ready`, and compact list items no longer clip important identifiers.
+
+What was tested
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
+- Reviewer pass on `components/pico/PicoControlPage.tsx` after patching
+
+What failed
+- No blocking Pico failures remain in this slice.
+- Existing repo-level Next/Turbopack warnings remain non-blocking.
+
+What is next
+- Sweep remaining control copy so every label sounds like operator product language instead of backend plumbing.
+- Keep tightening any dense panels that still force the user to read too much before spotting the state that matters.
+

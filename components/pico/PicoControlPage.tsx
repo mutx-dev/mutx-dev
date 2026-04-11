@@ -133,6 +133,150 @@ function SectionCard({
   );
 }
 
+type SummaryItem = {
+  label: string;
+  value: string;
+  tone?: "default" | "good" | "warn";
+};
+
+type KeyValueItem = {
+  label: string;
+  value: string;
+  mono?: boolean;
+};
+
+function formatControlValue(value: unknown, fallback = "—") {
+  if (value === null || value === undefined || value === "") {
+    return fallback;
+  }
+
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) {
+      return fallback;
+    }
+
+    return new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: Number.isInteger(value) ? 0 : 2,
+    }).format(value);
+  }
+
+  if (typeof value === "boolean") {
+    return value ? "Yes" : "No";
+  }
+
+  return String(value);
+}
+
+function formatControlTimestamp(value: unknown, fallback = "No timestamp returned") {
+  if (typeof value !== "string" || value.length === 0) {
+    return fallback;
+  }
+
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? value : new Date(parsed).toLocaleString();
+}
+
+function formatControlDuration(value: unknown, fallback = "—") {
+  const totalSeconds =
+    typeof value === "number" ? value : typeof value === "string" && value.trim().length > 0 ? Number(value) : Number.NaN;
+
+  if (!Number.isFinite(totalSeconds) || totalSeconds < 0) {
+    return fallback;
+  }
+
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+  if (days > 0) {
+    return `${days}d ${hours}h`;
+  }
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+
+  if (minutes > 0) {
+    return `${minutes}m`;
+  }
+
+  return `${Math.floor(totalSeconds)}s`;
+}
+
+function summaryToneClass(tone: SummaryItem["tone"]) {
+  if (tone === "good") {
+    return "text-emerald-200";
+  }
+
+  if (tone === "warn") {
+    return "text-amber-200";
+  }
+
+  return "text-white";
+}
+
+function SummaryGrid({ items }: { items: SummaryItem[] }) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-3">
+      {items.map((item) => (
+        <div key={item.label} className={`${picoSurfaceInsetClass} p-3`}>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/45">{item.label}</p>
+          <p className={`mt-2 text-lg font-semibold ${summaryToneClass(item.tone)}`}>{item.value}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function KeyValueList({ items }: { items: KeyValueItem[] }) {
+  return (
+    <dl className="mt-4 space-y-3">
+      {items.map((item) => (
+        <div
+          key={item.label}
+          className="flex items-start justify-between gap-4 border-t border-white/8 pt-3 first:border-t-0 first:pt-0"
+        >
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/45">{item.label}</dt>
+          <dd className={`max-w-[70%] text-right text-sm font-medium text-white ${item.mono ? "break-all font-mono text-xs sm:text-sm" : ""}`}>
+            {item.value}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function CompactList({
+  title,
+  items,
+  emptyLabel,
+}: {
+  title: string;
+  items: Array<{ id: string; primary: string; secondary?: string; meta?: string }>;
+  emptyLabel: string;
+}) {
+  return (
+    <div className="mt-4">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/45">{title}</p>
+      {items.length > 0 ? (
+        <div className="mt-3 space-y-2">
+          {items.map((item) => (
+            <div key={item.id} className={`${picoSurfaceInsetClass} flex items-start justify-between gap-3 p-3`}>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold leading-6 text-white break-words">{item.primary}</p>
+                {item.secondary ? <p className="mt-1 text-xs text-white/55">{item.secondary}</p> : null}
+              </div>
+              {item.meta ? <p className="shrink-0 text-xs font-medium text-cyan-100/90">{item.meta}</p> : null}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-3 text-sm text-white/55">{emptyLabel}</p>
+      )}
+    </div>
+  );
+}
+
 export function PicoControlPage() {
   const basePath = usePicoBasePath();
   const academyHref = buildPicoPath(basePath, "/academy");
@@ -218,6 +362,13 @@ export function PicoControlPage() {
   const usage = isRecord(sections.usage?.payload) ? sections.usage.payload : null;
   const runtime = isRecord(sections.runtime?.payload) ? sections.runtime.payload : null;
   const health = isRecord(sections.health?.payload) ? sections.health.payload : null;
+  const healthDetail =
+    typeof health?.error === "string" && health.error.length > 0
+      ? health.error
+      : typeof health?.detail === "string" && health.detail.length > 0
+        ? health.detail
+        : null;
+  const healthComponents = isRecord(health?.components) ? Object.keys(health.components) : [];
   const planLabel = picoState.plan ?? (typeof budget?.plan === "string" ? budget.plan : "FREE");
   const planNote =
     planLabel === "FREE"
@@ -542,22 +693,82 @@ export function PicoControlPage() {
 
       <div className="grid gap-5 xl:grid-cols-2">
         <div id="assistant-overview">
-        <SectionCard title="Assistant overview" section={sections.assistant}>
-          {assistantRuntime ? (
-            <div className="space-y-2">
-              <p>Name: {String(assistantRuntime.name ?? "Unnamed assistant")}</p>
-              <p>Status: {String(assistantRuntime.status ?? "unknown")}</p>
-              <p>Sessions: {String(assistantRuntime.session_count ?? 0)}</p>
-              <p>
-                Gateway: {isRecord(assistantRuntime.gateway) ? String(assistantRuntime.gateway.status ?? "unknown") : "unknown"}
-              </p>
-              <p>Skills: {Array.isArray(assistantRuntime.installed_skills) ? assistantRuntime.installed_skills.length : 0}</p>
-              <p>Channels: {Array.isArray(assistantRuntime.channels) ? assistantRuntime.channels.length : 0}</p>
-            </div>
-          ) : (
-            <p>No assistant runtime is currently available for this operator session.</p>
-          )}
-        </SectionCard>
+          <SectionCard title="Assistant overview" section={sections.assistant}>
+            {assistantRuntime ? (
+              <>
+                <SummaryGrid
+                  items={[
+                    {
+                      label: "Status",
+                      value: formatControlValue(assistantRuntime.status, "unknown"),
+                      tone:
+                        String(assistantRuntime.status ?? "").toLowerCase().includes("run") ||
+                        String(assistantRuntime.status ?? "").toLowerCase().includes("health") ||
+                        String(assistantRuntime.status ?? "").toLowerCase().includes("ok") ||
+                        String(assistantRuntime.status ?? "").toLowerCase().includes("active")
+                          ? "good"
+                          : "default",
+                    },
+                    {
+                      label: "Sessions",
+                      value: formatControlValue(assistantRuntime.session_count, "0"),
+                    },
+                    {
+                      label: "Gateway",
+                      value: formatControlValue(
+                        isRecord(assistantRuntime.gateway) ? assistantRuntime.gateway.status : null,
+                        "unknown",
+                      ),
+                      tone:
+                        String(isRecord(assistantRuntime.gateway) ? assistantRuntime.gateway.status ?? "" : "")
+                          .toLowerCase()
+                          .includes("health") ||
+                        String(isRecord(assistantRuntime.gateway) ? assistantRuntime.gateway.status ?? "" : "")
+                          .toLowerCase()
+                          .includes("ok")
+                          ? "good"
+                          : "default",
+                    },
+                  ]}
+                />
+                <KeyValueList
+                  items={[
+                    {
+                      label: "Name",
+                      value: formatControlValue(assistantRuntime.name, "Unnamed assistant"),
+                    },
+                    {
+                      label: "Assistant ID",
+                      value: formatControlValue(assistantRuntime.assistant_id, "Not returned"),
+                      mono: true,
+                    },
+                    {
+                      label: "Workspace",
+                      value: formatControlValue(assistantRuntime.workspace, "Not returned"),
+                      mono: true,
+                    },
+                    {
+                      label: "Skills",
+                      value: formatControlValue(
+                        Array.isArray(assistantRuntime.installed_skills) ? assistantRuntime.installed_skills.length : 0,
+                        "0",
+                      ),
+                    },
+                    {
+                      label: "Channels",
+                      value: formatControlValue(Array.isArray(assistantRuntime.channels) ? assistantRuntime.channels.length : 0, "0"),
+                    },
+                    {
+                      label: "Last activity",
+                      value: formatControlTimestamp(assistantRuntime.last_activity, "No activity timestamp"),
+                    },
+                  ]}
+                />
+              </>
+            ) : (
+              <p>No assistant runtime is currently available for this operator session.</p>
+            )}
+          </SectionCard>
         </div>
 
         <SectionCard title="Recent runs" section={sections.runs}>
@@ -593,58 +804,220 @@ export function PicoControlPage() {
         </SectionCard>
 
         <div id="budget-card">
-        <SectionCard title="Budget" section={sections.budget}>
-          <p>Plan: {String(budget?.plan ?? planLabel)}</p>
-          <p>
-            Credits remaining: {String(budget?.credits_remaining ?? "0")} / {String(budget?.credits_total ?? "0")}
-          </p>
-          <p>Usage: {String(budget?.usage_percentage ?? "0")}%</p>
-          <p className="mt-3 text-white/55">Top usage drivers:</p>
-          <ul className="mt-2 space-y-2 text-white/60">
-            {Array.isArray(usage?.usage_by_agent) ? (
-              usage.usage_by_agent.slice(0, 3).map((item, index) => {
-                const agent = isRecord(item) ? item : {};
-                return (
-                  <li key={String(agent.agent_id ?? index)}>
-                    {String(agent.agent_name ?? "Unknown agent")} · {String(agent.credits_used ?? 0)} credits
-                  </li>
-                );
-              })
-            ) : (
-              <li>No usage breakdown returned.</li>
-            )}
-          </ul>
-        </SectionCard>
+          <SectionCard title="Budget" section={sections.budget}>
+            <SummaryGrid
+              items={[
+                {
+                  label: "Plan",
+                  value: formatControlValue(budget?.plan ?? planLabel, planLabel),
+                },
+                {
+                  label: "Credits left",
+                  value: formatControlValue(budget?.credits_remaining, "0"),
+                },
+                {
+                  label: "Usage",
+                  value: `${formatControlValue(budget?.usage_percentage, "0")}%`,
+                  tone: Number(budget?.usage_percentage ?? 0) >= 80 ? "warn" : "default",
+                },
+              ]}
+            />
+            <KeyValueList
+              items={[
+                {
+                  label: "Credits total",
+                  value: formatControlValue(budget?.credits_total, "0"),
+                },
+                {
+                  label: "Credits used",
+                  value: formatControlValue(budget?.credits_used ?? usage?.total_credits_used, "0"),
+                },
+                {
+                  label: "Reset date",
+                  value: formatControlTimestamp(budget?.reset_date, "Not returned"),
+                },
+                {
+                  label: "Usage window",
+                  value:
+                    typeof usage?.period_start === "string" && typeof usage?.period_end === "string"
+                      ? `${formatControlTimestamp(usage.period_start)} → ${formatControlTimestamp(usage.period_end)}`
+                      : "Last 30d request",
+                },
+              ]}
+            />
+            <CompactList
+              title="Top usage drivers"
+              emptyLabel="No usage breakdown returned."
+              items={
+                Array.isArray(usage?.usage_by_agent)
+                  ? usage.usage_by_agent.slice(0, 3).map((item, index) => {
+                      const agent = isRecord(item) ? item : {};
+                      return {
+                        id: String(agent.agent_id ?? index),
+                        primary: formatControlValue(agent.agent_name, "Unknown agent"),
+                        secondary:
+                          agent.event_count !== undefined ? `${formatControlValue(agent.event_count, "0")} events in window` : undefined,
+                        meta: `${formatControlValue(agent.credits_used, "0")} cr`,
+                      };
+                    })
+                  : []
+              }
+            />
+          </SectionCard>
         </div>
 
         <SectionCard title="Runtime" section={sections.runtime}>
-          <p>Provider: {String(runtime?.label ?? runtime?.provider ?? "openclaw")}</p>
-          <p>Status: {String(runtime?.status ?? "unknown")}</p>
-          <p>Version: {String(runtime?.version ?? "unknown")}</p>
-          <p>Binding count: {String(runtime?.binding_count ?? 0)}</p>
-          <p>Gateway URL: {String(runtime?.gateway_url ?? "not set")}</p>
+          <SummaryGrid
+            items={[
+              {
+                label: "Provider",
+                value: formatControlValue(runtime?.label ?? runtime?.provider, "openclaw"),
+              },
+              {
+                label: "Status",
+                value: formatControlValue(runtime?.status, "unknown"),
+                tone:
+                  String(runtime?.status ?? "").toLowerCase().includes("health") ||
+                  String(runtime?.status ?? "").toLowerCase().includes("ok")
+                    ? "good"
+                    : String(runtime?.status ?? "").toLowerCase().includes("degrad") ||
+                        String(runtime?.status ?? "").toLowerCase().includes("stale")
+                      ? "warn"
+                      : "default",
+              },
+              {
+                label: "Bindings",
+                value: formatControlValue(runtime?.binding_count, "0"),
+              },
+            ]}
+          />
+          <KeyValueList
+            items={[
+              {
+                label: "Version",
+                value: formatControlValue(runtime?.version, "unknown"),
+                mono: true,
+              },
+              {
+                label: "Gateway URL",
+                value: formatControlValue(runtime?.gateway_url, "not set"),
+                mono: true,
+              },
+              {
+                label: "Tracking mode",
+                value: formatControlValue(runtime?.tracking_mode ?? runtime?.install_method, "Not returned"),
+              },
+              {
+                label: "Last seen",
+                value: formatControlTimestamp(runtime?.last_seen_at, "No timestamp returned"),
+              },
+            ]}
+          />
         </SectionCard>
 
         <div id="approvals-card">
-        <SectionCard title="Approvals" section={sections.approvals}>
-          <p>Pending approvals returned: {approvals.length}</p>
-          <ul className="mt-3 space-y-2 text-white/60">
-            {approvals.slice(0, 4).map((approval, index) => {
-              const item = isRecord(approval) ? approval : {};
-              return (
-                <li key={String(item.id ?? index)}>
-                  {String(item.action_type ?? "unknown action")} · {String(item.requester ?? "unknown requester")} · {String(item.status ?? "PENDING")}
-                </li>
-              );
-            })}
-          </ul>
-        </SectionCard>
+          <SectionCard title="Approvals" section={sections.approvals}>
+            <SummaryGrid
+              items={[
+                {
+                  label: "Gate",
+                  value: approvalGateEnabled ? "Enabled" : "Not enabled",
+                  tone: approvalGateEnabled ? "good" : "warn",
+                },
+                {
+                  label: "Pending",
+                  value: formatControlValue(approvals.length, "0"),
+                  tone: approvals.length > 0 ? "warn" : "default",
+                },
+                {
+                  label: "Queue",
+                  value: approvals.length > 0 ? "Needs review" : "Clear",
+                  tone: approvals.length > 0 ? "warn" : "good",
+                },
+              ]}
+            />
+            <KeyValueList
+              items={[
+                {
+                  label: "Control message",
+                  value: approvalGateEnabled ? "New risky outbound actions can be held for review." : "Enable the gate above to create a real review stop.",
+                },
+                {
+                  label: "Latest status",
+                  value: approvals.length > 0 && isRecord(approvals[0]) ? formatControlValue(approvals[0].status, "PENDING") : "No pending approvals returned",
+                },
+              ]}
+            />
+            <CompactList
+              title="Pending queue"
+              emptyLabel="No pending approvals returned."
+              items={approvals.slice(0, 4).map((approval, index) => {
+                const item = isRecord(approval) ? approval : {};
+                return {
+                  id: String(item.id ?? index),
+                  primary: formatControlValue(item.action_type, "unknown action"),
+                  secondary: formatControlValue(item.requester, "unknown requester"),
+                  meta: formatControlValue(item.status, "PENDING"),
+                };
+              })}
+            />
+          </SectionCard>
         </div>
 
         <SectionCard title="Health" section={sections.health}>
-          <p>Status: {String(health?.status ?? "unknown")}</p>
-          <p>Database: {String(health?.database ?? "unknown")}</p>
-          <p>Uptime seconds: {String(health?.uptime_seconds ?? 0)}</p>
+          <SummaryGrid
+            items={[
+              {
+                label: "Status",
+                value: formatControlValue(health?.status, "unknown"),
+                tone:
+                  String(health?.status ?? "").toLowerCase().includes("ok") ||
+                  String(health?.status ?? "").toLowerCase().includes("health")
+                    ? "good"
+                    : String(health?.status ?? "").toLowerCase().includes("degrad")
+                      ? "warn"
+                      : "default",
+              },
+              {
+                label: "Database",
+                value: formatControlValue(health?.database, "unknown"),
+                tone:
+                  String(health?.database ?? "").toLowerCase().includes("ok") ||
+                  String(health?.database ?? "").toLowerCase().includes("healthy") ||
+                  String(health?.database ?? "").toLowerCase().includes("ready")
+                    ? "good"
+                    : String(health?.database ?? "").toLowerCase().includes("degrad") ||
+                        String(health?.database ?? "").toLowerCase().includes("down")
+                      ? "warn"
+                      : "default",
+              },
+              {
+                label: "Uptime",
+                value: formatControlDuration(health?.uptime_seconds ?? health?.uptime, "0s"),
+              },
+            ]}
+          />
+          <KeyValueList
+            items={[
+              {
+                label: "Checked at",
+                value: formatControlTimestamp(health?.timestamp, "Not returned"),
+              },
+              {
+                label: "Version",
+                value: formatControlValue(health?.version, "Not returned"),
+                mono: true,
+              },
+              {
+                label: "Components",
+                value: healthComponents.length > 0 ? healthComponents.join(", ") : "Not returned",
+              },
+              {
+                label: "Detail",
+                value: formatControlValue(healthDetail, "No extra detail returned"),
+              },
+            ]}
+          />
         </SectionCard>
       </div>
     </PicoProductShell>
