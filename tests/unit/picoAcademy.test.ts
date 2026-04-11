@@ -5,6 +5,7 @@ import {
   derivePicoProgress,
   getLatestPicoShareMoment,
   getLessonBySlug,
+  getPicoShareSnapshotUrl,
   markProjectShared,
   mergePicoProgress,
   selectTrack,
@@ -68,6 +69,19 @@ describe('pico academy progress', () => {
 
     progress = markProjectShared(progress, 'lesson:run-your-first-agent')
     expect(getLatestPicoShareMoment(progress)).toBeNull()
+  })
+
+  it('builds a snapshot url for the share card', () => {
+    let progress = createDefaultPicoProgress()
+    progress = applyLessonCompleted(progress, 'run-your-first-agent')
+    const shareMoment = buildPicoLessonShareMoment(progress, 'run-your-first-agent')
+
+    expect(shareMoment).not.toBeNull()
+    const snapshotUrl = getPicoShareSnapshotUrl(shareMoment!, '/academy/run-your-first-agent')
+
+    expect(snapshotUrl).toContain('/api/og-image?')
+    expect(snapshotUrl).toContain('title=First+agent+run+unlocked')
+    expect(snapshotUrl).toContain('badge=First+agent+run')
   })
 })
 

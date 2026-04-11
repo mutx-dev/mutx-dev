@@ -1,9 +1,10 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
-import { type PicoShareMoment } from '@/lib/pico/academy'
+import { getPicoShareSnapshotUrl, type PicoShareMoment } from '@/lib/pico/academy'
 
 type PicoShareProjectCardProps = {
   shareMoment: PicoShareMoment
@@ -12,7 +13,7 @@ type PicoShareProjectCardProps = {
   onShared: (shareId: string) => void
 }
 
-type ShareStatus = 'idle' | 'shared' | 'copied' | 'linked' | 'error'
+type ShareStatus = 'idle' | 'shared' | 'copied' | 'linked' | 'snapshot' | 'error'
 
 export function PicoShareProjectCard({
   shareMoment,
@@ -28,18 +29,19 @@ export function PicoShareProjectCard({
 
     return new URL(shareHref, window.location.origin).toString()
   }, [shareHref])
+  const snapshotUrl = useMemo(() => getPicoShareSnapshotUrl(shareMoment, shareHref), [shareHref, shareMoment])
 
   async function handleShare() {
     try {
       if (navigator.share) {
         await navigator.share({
           title: shareMoment.title,
-          text: shareMoment.summary,
+          text: `${shareMoment.summary} Snapshot: ${snapshotUrl}`,
           url: shareUrl,
         })
         setStatus('shared')
       } else {
-        await navigator.clipboard.writeText(`${shareMoment.summary} ${shareUrl}`)
+        await navigator.clipboard.writeText(`${shareMoment.summary} ${shareUrl} Snapshot: ${snapshotUrl}`)
         setStatus('copied')
       }
       onShared(shareMoment.id)
@@ -53,8 +55,18 @@ export function PicoShareProjectCard({
 
   async function handleCopySummary() {
     try {
-      await navigator.clipboard.writeText(`${shareMoment.summary} ${shareUrl}`)
+      await navigator.clipboard.writeText(`${shareMoment.summary} ${shareUrl} Snapshot: ${snapshotUrl}`)
       setStatus('copied')
+      onShared(shareMoment.id)
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  async function handleCopySnapshot() {
+    try {
+      await navigator.clipboard.writeText(snapshotUrl)
+      setStatus('snapshot')
       onShared(shareMoment.id)
     } catch {
       setStatus('error')
@@ -79,9 +91,11 @@ export function PicoShareProjectCard({
         ? 'Share summary copied.'
         : status === 'linked'
           ? 'Project link copied.'
-          : status === 'error'
-            ? 'Share failed. Clipboard probably got weird.'
-            : 'Make it stupidly easy to show the win while it still feels fresh.'
+          : status === 'snapshot'
+            ? 'Snapshot link copied.'
+            : status === 'error'
+              ? 'Share failed. Clipboard probably got weird.'
+              : 'Make it stupidly easy to show the win while it still feels fresh.'
 
   return (
     <section className="rounded-[28px] border border-emerald-400/20 bg-[linear-gradient(135deg,rgba(16,185,129,0.16),rgba(8,15,28,0.96))] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.28)]">
@@ -113,6 +127,23 @@ export function PicoShareProjectCard({
         </div>
       </div>
 
+      <div className="mt-5 overflow-hidden rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.42)]">
+        <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
+          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Snapshot</p>
+          <a href={snapshotUrl} target="_blank" rel="noreferrer" className="text-sm font-medium text-emerald-100 hover:text-emerald-50">
+            Open snapshot
+          </a>
+        </div>
+        <Image
+          src={snapshotUrl}
+          alt={`${shareMoment.title} snapshot`}
+          width={1200}
+          height={630}
+          unoptimized
+          className="h-auto w-full"
+        />
+      </div>
+
       <div className="mt-5 rounded-[24px] border border-white/10 bg-slate-950/70 p-4 text-sm leading-6 text-slate-200">
         {shareMoment.summary} {shareUrl}
       </div>
@@ -132,6 +163,13 @@ export function PicoShareProjectCard({
           className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-100 transition hover:bg-white/10"
         >
           Copy summary
+        </button>
+        <button
+          type="button"
+          onClick={() => void handleCopySnapshot()}
+          className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-100 transition hover:bg-white/10"
+        >
+          Copy snapshot
         </button>
         <button
           type="button"

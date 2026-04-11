@@ -1,3 +1,5 @@
+import { getPageOgImageUrl } from '../seo'
+
 export type PicoPlan = 'free' | 'starter' | 'pro'
 export type PicoLessonDifficulty = 'setup' | 'operator' | 'builder'
 
@@ -977,6 +979,13 @@ export function getLatestPicoShareMoment(
   }
 
   return null
+}
+
+export function getPicoShareSnapshotUrl(shareMoment: PicoShareMoment, shareHref: string) {
+  return getPageOgImageUrl(shareMoment.title, `${shareMoment.agentDoes} ${shareMoment.achieved}`, {
+    path: shareHref,
+    badge: shareMoment.milestoneLabel,
+  })
 }
 
 export function derivePicoProgress(progressInput: Partial<PicoProgressState> | null | undefined): PicoDerivedProgress {
