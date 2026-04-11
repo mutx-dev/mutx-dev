@@ -1,3 +1,5 @@
+import shutil
+
 import click
 
 from cli.commands.tui import launch_tui
@@ -75,6 +77,20 @@ def _choose_openclaw_action(
         4: "cancel",
     }
     return mapping[selection]
+
+
+def _echo_first_agent_hint() -> None:
+    click.echo("")
+    click.echo("Immediate payoff:")
+    click.echo('  mutx first-agent "Turn these rough notes into three next steps"')
+    if shutil.which("hermes"):
+        click.echo(
+            "Runs Hermes for a real result, cleans up the output, and saves proof under ~/.mutx/first-agent/."
+        )
+    else:
+        click.echo(
+            "This uses Hermes. Install Hermes first, then rerun the command for one real useful output plus proof under ~/.mutx/first-agent/."
+        )
 
 
 def _finish_setup(
@@ -157,6 +173,7 @@ def _finish_setup(
         f"Privacy: {result.runtime_snapshot.get('privacy_summary') or 'Local-only runtime tracking.'}"
     )
 
+    _echo_first_agent_hint()
     _install_faramesh_governance()
 
     if open_tui:
@@ -193,7 +210,9 @@ def _install_faramesh_governance() -> None:
         shutil.copy(bundled_policy, policy_path)
         click.echo(f"  ✓ Bundled policy installed to {policy_path}")
 
-    proc = start_faramesh_daemon(policy_path=policy_path, socket_path=FAREMESH_SOCKET_PATH)  # noqa: F821
+    proc = start_faramesh_daemon(
+        policy_path=policy_path, socket_path=FAREMESH_SOCKET_PATH
+    )  # noqa: F821
     if proc is None:
         click.echo("  ⚠ Faramesh daemon could not be started automatically")
         click.echo("    Run manually: faramesh serve --policy <policy.yaml>")
