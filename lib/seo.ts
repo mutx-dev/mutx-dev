@@ -95,25 +95,27 @@ function getImageRouteBase(path = '/') {
 export function getPageOgImageUrl(
   title: string,
   description?: string,
-  options?: { path?: string; badge?: string },
+  options?: { path?: string; badge?: string; host?: string },
 ): string {
   const params = new URLSearchParams({ title })
   if (description) params.set('description', description)
   if (options?.path) params.set('path', options.path)
   if (options?.badge) params.set('badge', options.badge)
-  return `${toAbsoluteSiteUrl(getImageRouteBase(options?.path))}/opengraph-image?${params.toString()}`
+  const baseUrl = normalizeUrl(options?.host, toAbsoluteSiteUrl(getImageRouteBase(options?.path)))
+  return `${baseUrl}/opengraph-image?${params.toString()}`
 }
 
 export function getPageTwitterImageUrl(
   title: string,
   description?: string,
-  options?: { path?: string; badge?: string },
+  options?: { path?: string; badge?: string; host?: string },
 ): string {
   const params = new URLSearchParams({ title })
   if (description) params.set('description', description)
   if (options?.path) params.set('path', options.path)
   if (options?.badge) params.set('badge', options.badge)
-  return `${toAbsoluteSiteUrl(getImageRouteBase(options?.path))}/twitter-image?${params.toString()}`
+  const baseUrl = normalizeUrl(options?.host, toAbsoluteSiteUrl(getImageRouteBase(options?.path)))
+  return `${baseUrl}/twitter-image?${params.toString()}`
 }
 
 /**

@@ -155,14 +155,14 @@ export async function generateMetadata({
       title: `${title} — MUTX Docs`,
       description,
       url: getCanonicalUrl(normalizedPath),
-      images: [getPageOgImageUrl(`${title} — MUTX Docs`, description)],
+      images: [getPageOgImageUrl(`${title} — MUTX Docs`, description, { path: normalizedPath })],
     },
     twitter: {
       card: "summary_large_image",
       creator: DEFAULT_X_HANDLE,
       title: `${title} — MUTX Docs`,
       description,
-      images: [getPageOgImageUrl(`${title} — MUTX Docs`, description)],
+      images: [getPageOgImageUrl(`${title} — MUTX Docs`, description, { path: normalizedPath })],
     },
   };
 }

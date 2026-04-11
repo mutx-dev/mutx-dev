@@ -34,11 +34,13 @@ export const metadata: Metadata = {
     title: "Dashboard - MUTX",
     description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
     url: "https://app.mutx.dev",
+    images: ["https://app.mutx.dev/opengraph-image?title=Dashboard%20-%20MUTX&description=Operator%20dashboard%20for%20agents%2C%20deployments%2C%20runs%2C%20budgets%2C%20webhooks%2C%20and%20governance."],
   },
   twitter: {
+    card: "summary_large_image",
     title: "Dashboard - MUTX",
     description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",
-    images: ["https://mutx.dev/landing/victory-core.png"],
+    images: ["https://app.mutx.dev/twitter-image?title=Dashboard%20-%20MUTX&description=Operator%20dashboard%20for%20agents%2C%20deployments%2C%20runs%2C%20budgets%2C%20webhooks%2C%20and%20governance."],
   },
 };
 

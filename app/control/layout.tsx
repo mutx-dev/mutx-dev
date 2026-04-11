@@ -47,11 +47,13 @@ export const metadata: Metadata = {
     title: "MUTX Control Plane",
     description: "Operator-grade control plane for deploying, observing, and governing agent infrastructure.",
     url: "https://app.mutx.dev/control",
+    images: ["https://app.mutx.dev/opengraph-image?title=MUTX%20Control%20Plane&description=Operator-grade%20control%20plane%20for%20deploying%2C%20observing%2C%20and%20governing%20agent%20infrastructure."],
   },
   twitter: {
+    card: "summary_large_image",
     title: "MUTX Control Plane",
     description: "Operator-grade control plane for deploying, observing, and governing agent infrastructure.",
-    images: ["https://mutx.dev/landing/victory-core.png"],
+    images: ["https://app.mutx.dev/twitter-image?title=MUTX%20Control%20Plane&description=Operator-grade%20control%20plane%20for%20deploying%2C%20observing%2C%20and%20governing%20agent%20infrastructure."],
   },
 };
 

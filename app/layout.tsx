@@ -15,10 +15,10 @@ const ogImageUrl = getOgImageUrl();
 const twitterImageUrl = getTwitterImageUrl();
 
 export const viewport = {
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#060810",
+  themeColor: '#060810',
 } as const
 
 export const metadata: Metadata = {
@@ -66,8 +66,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: ogImageUrl,
-        width: 1536,
-        height: 1024,
+        width: 1200,
+        height: 630,
         alt: DEFAULT_OG_IMAGE_ALT,
       },
     ],

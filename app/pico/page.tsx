@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { getLocale, getTranslations } from 'next-intl/server'
+
 import { PicoLandingSurface } from '@/components/pico/PicoLandingSurface'
-import { DEFAULT_X_HANDLE, getPageOgImageUrl, getPageTwitterImageUrl } from '@/lib/seo'
 import { routing } from '@/i18n/routing'
+import { DEFAULT_X_HANDLE, getPageOgImageUrl, getPageTwitterImageUrl } from '@/lib/seo'
 
 function normalizeLocale(locale: string) {
   return routing.locales.includes(locale as (typeof routing.locales)[number])
@@ -28,14 +29,14 @@ export async function generateMetadata(): Promise<Metadata> {
       description: pageDescription,
       url: 'https://pico.mutx.dev',
       locale,
-      images: [getPageOgImageUrl(pageTitle, pageDescription, { path: '/pico' })],
+      images: [getPageOgImageUrl(pageTitle, pageDescription, { path: '/pico', host: 'https://pico.mutx.dev' })],
     },
     twitter: {
       card: 'summary_large_image',
       creator: DEFAULT_X_HANDLE,
       title: pageTitle,
       description: pageDescription,
-      images: [getPageTwitterImageUrl(pageTitle, pageDescription, { path: '/pico' })],
+      images: [getPageTwitterImageUrl(pageTitle, pageDescription, { path: '/pico', host: 'https://pico.mutx.dev' })],
     },
   }
 }

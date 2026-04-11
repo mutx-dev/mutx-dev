@@ -30,26 +30,47 @@ checks = {
     'download': {
         'url': f'{site_url}/download',
         'canonical': f'{site_url}/download',
-        'title_contains': 'Download for macOS | MUTX',
+        'title_contains': 'Download MUTX | MUTX',
         'og_url': f'{site_url}/download',
+    },
+    'download_macos': {
+        'url': f'{site_url}/download/macos',
+        'canonical': f'{site_url}/download/macos',
+        'title_contains': 'Download for macOS | MUTX',
+        'og_url': f'{site_url}/download/macos',
     },
     'releases': {
         'url': f'{site_url}/releases',
         'canonical': f'{site_url}/releases',
         'title_contains': 'Releases | MUTX',
         'og_url': f'{site_url}/releases',
+        'require_jsonld': True,
     },
     'contact': {
         'url': f'{site_url}/contact',
         'canonical': f'{site_url}/contact',
         'title_contains': 'Contact | MUTX',
         'og_url': f'{site_url}/contact',
+        'require_jsonld': True,
+    },
+    'whitepaper': {
+        'url': f'{site_url}/whitepaper',
+        'canonical': f'{site_url}/whitepaper',
+        'title_contains': 'Whitepaper',
+        'og_url': f'{site_url}/whitepaper',
     },
     'docs_reference': {
-        'url': f'{site_url}/docs/api/reference',
-        'canonical': f'{site_url}/docs/api/reference',
+        'url': f'{site_url}/docs/reference',
+        'canonical': f'{site_url}/docs/reference',
         'title_contains': 'MUTX Docs',
-        'og_url': f'{site_url}/docs/api/reference',
+        'og_url': f'{site_url}/docs/reference',
+    },
+    'ai_agent_control_plane': {
+        'url': f'{site_url}/ai-agent-control-plane',
+        'canonical': f'{site_url}/ai-agent-control-plane',
+        'title_contains': 'AI Agent Control Plane',
+        'og_url': f'{site_url}/ai-agent-control-plane',
+        'require_jsonld': True,
     },
 }
 
@@ -67,10 +88,13 @@ required_robots_tokens = [
 
 required_sitemap_routes = [
     f'{site_url}/download',
+    f'{site_url}/download/macos',
     f'{site_url}/releases',
     f'{site_url}/contact',
+    f'{site_url}/whitepaper',
+    f'{site_url}/ai-agent-control-plane',
     f'{site_url}/docs',
-    f'{site_url}/docs/api/reference',
+    f'{site_url}/docs/reference',
     f'{site_url}/docs/architecture',
     f'{site_url}/docs/deployment/quickstart',
 ]
@@ -143,18 +167,31 @@ for label, spec in checks.items():
     canonical = extract(r'<link rel="canonical" href="(.*?)"', body)
     title = extract(r'<title>(.*?)</title>', body)
     og_url = extract(r'<meta property="og:url" content="(.*?)"', body)
+    og_image = extract(r'<meta property="og:image" content="(.*?)"', body)
     twitter_title = extract(r'<meta name="twitter:title" content="(.*?)"', body)
+    twitter_image = extract(r'<meta name="twitter:image" content="(.*?)"', body)
+    twitter_card = extract(r'<meta name="twitter:card" content="(.*?)"', body)
     robots_meta = extract(r'<meta name="robots" content="(.*?)"', body)
     jsonld_blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>', body, re.I | re.S)
 
     expect(canonical == spec['canonical'], f'{label} canonical mismatch: {canonical!r} != {spec["canonical"]!r}', failures)
     expect(title is not None and spec['title_contains'] in title, f'{label} title missing expected text', failures)
     expect(og_url == spec['og_url'], f'{label} og:url mismatch: {og_url!r} != {spec["og_url"]!r}', failures)
+    expect(og_image is not None and '/opengraph-image' in og_image, f'{label} missing page OG image route', failures)
     expect(twitter_title is not None and spec['title_contains'] in twitter_title, f'{label} twitter:title missing expected text', failures)
-    if label.startswith('docs_') or label in {'homepage', 'download', 'releases', 'contact'}:
+    expect(twitter_image is not None and '/twitter-image' in twitter_image, f'{label} missing page twitter image route', failures)
+    expect(twitter_card == 'summary_large_image', f'{label} twitter:card drifted: {twitter_card!r}', failures)
+    if label.startswith('docs_') or label in {'homepage', 'download', 'download_macos', 'releases', 'contact', 'whitepaper', 'ai_agent_control_plane'}:
         expect(robots_meta is not None and 'index' in robots_meta.lower(), f'{label} missing indexable robots meta', failures)
     if spec.get('require_jsonld'):
         expect(len(jsonld_blocks) > 0, f'{label} missing JSON-LD', failures)
+        for block in jsonld_blocks:
+            try:
+                parsed = json.loads(block)
+            except Exception as error:
+                failures.append(f'{label} JSON-LD parse failed: {error}')
+                continue
+            expect('@context' in parsed or '@graph' in parsed, f'{label} JSON-LD missing schema context', failures)
 
 if failures:
     print('MUTX production SEO verification failed:', file=sys.stderr)

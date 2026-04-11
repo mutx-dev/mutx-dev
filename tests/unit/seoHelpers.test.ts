@@ -260,12 +260,23 @@ describe('getOgImageUrl', () => {
     )
   })
 
-  it('builds pico image routes on the pico host path', () => {
+  it('supports host-aware image routes for pico', () => {
     delete process.env.NEXT_PUBLIC_SITE_URL
     expect(
-      getPageOgImageUrl('Pico | MUTX', 'Pre-register.', { path: '/pico' }),
+      getPageOgImageUrl('Pico | MUTX', 'Pre-register.', {
+        path: '/pico',
+        host: 'https://pico.mutx.dev',
+      }),
     ).toBe(
-      'https://mutx.dev/pico/opengraph-image?title=Pico+%7C+MUTX&description=Pre-register.&path=%2Fpico',
+      'https://pico.mutx.dev/opengraph-image?title=Pico+%7C+MUTX&description=Pre-register.&path=%2Fpico',
+    )
+    expect(
+      getPageTwitterImageUrl('Pico | MUTX', 'Pre-register.', {
+        path: '/pico',
+        host: 'https://pico.mutx.dev',
+      }),
+    ).toBe(
+      'https://pico.mutx.dev/twitter-image?title=Pico+%7C+MUTX&description=Pre-register.&path=%2Fpico',
     )
   })
 
