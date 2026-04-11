@@ -142,6 +142,32 @@ What is next
 - Move the landing CTA and copy fully onto the new shell so the product entrance is obvious.
 - Add an admin/content-ops lane only if editing lessons in source files becomes a bottleneck.
 
+### 2026-04-11 02:14:00 CEST — cycle end
+What changed
+- Coordinated the shadow Pico work from the other active Hermes sessions by inspecting their route, data-model, and backend/test artifacts.
+- Kept the useful parts: route-prefix navigation, approval request validation, stronger tutor payload handling, and the `/api/pico/state` / `/v1/pico/state` compatibility lane.
+- Re-centered the public shell on onboarding instead of the abandoned shadow workspace path.
+- Tightened tutor outputs so links and escalation land on real Pico routes.
+- Killed more dead Pico UI branches and planning clutter that were only creating a second fake product.
+- Fixed the host-aware proxy origin check so forwarded HTTPS writes pass the middleware tests again.
+
+What was tested
+- `npm run typecheck`
+- `npm run build`
+- `npm test -- tests/unit/picoTutor.test.ts`
+- `npm test -- tests/unit/middlewareRouting.test.ts`
+- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts tests/unit/picoState.test.ts`
+- `./.venv/bin/python -m pytest tests/api/test_pico_route.py tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
+- `curl http://127.0.0.1:3000/pico/onboarding` and compatibility-path checks for `/pico/workspace`, `/pico/app`, and `/pico/app/lessons/*`
+
+What failed
+- No Pico-specific blockers remain in the validated surface.
+- Build still emits the existing Next NFT warning around `next.config.js` and docs tracing; that is repo-wide noise, not a Pico ship blocker.
+
+What is next
+- Commit the coordinated cleanup and ship state.
+- If more Pico-specific product work appears from the other Hermes sessions, merge it into the single Pico truth instead of reopening shadow lanes.
+
 ### 2026-04-11 00:02:05 UTC — cycle end
 What changed
 - Added `/pico/app` as a new authenticated workspace and shipped lesson detail pages under `/pico/app/lessons/[slug]`.
