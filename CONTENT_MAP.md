@@ -57,3 +57,9 @@ Every lesson in the canonical corpus includes:
 - Visual assets and diagrams for harder deployment lessons are still thin.
 - The document-processing lesson still needs richer sample files.
 - Video walkthroughs do not exist and are not required for v1 ship.
+
+## Content audit decisions
+- Kept all 12 lessons, but rewrote the weak ones instead of letting them ship as filler.
+- Removed screenshot theater and vague browse-the-UI steps where they did not create a real artifact.
+- Tightened deployment lessons so they now require a real service definition or ingress path, not setup vibes.
+- Kept lead-response and document-processing as the only production-pattern lessons so the track map matches the actual lesson intent.
