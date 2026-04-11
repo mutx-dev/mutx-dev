@@ -12,9 +12,12 @@ export async function POST(
 ) {
   return withErrorHandling(async () => {
     const { templateId } = await params
+    const payload = await request.json()
+
     return proxyJson(request, `${getApiBaseUrl()}/v1/templates/${templateId}/deploy`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
       fallbackMessage: 'Failed to deploy starter template',
     })
   })(request)
