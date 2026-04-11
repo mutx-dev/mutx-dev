@@ -3,41 +3,44 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
+import { PicoDisclosure, PicoNowNext } from '@/components/pico/PicoSimpleFlow'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
-import { PICO_PLAN_MATRIX } from '@/lib/pico/academy'
+import {
+  buildAutopilotTimeline,
+  describeRunDetail,
+  explainAlertImpact,
+  explainApprovalImpact,
+  formatPercent,
+  formatRelativeTime,
+  formatTimestamp,
+  getRunSeverity,
+  humanizeRunStatus,
+  type AutopilotAlertSummary,
+  type AutopilotApprovalSummary,
+  type AutopilotBudgetSummary,
+  type AutopilotRunSummary,
+  type AutopilotRunTrace,
+  type AutopilotTimelineItem,
+  type AutopilotUsageBreakdown,
+} from '@/components/pico/picoAutopilot'
 
-type RunSummary = {
-  id: string
-  status: string
-  started_at?: string
-  completed_at?: string
-  agent_id?: string
-}
+type LoadState = 'loading' | 'ready' | 'partial' | 'offline'
 
-type BudgetSummary = {
-  plan: string
-  credits_total: number
-  credits_used: number
-  credits_remaining: number
-  usage_percentage: number
-}
+type FocusAction =
+  | 'runs'
+  | 'monitoring'
+  | 'approvals'
+  | 'threshold'
+  | 'refresh'
+  | 'dashboard'
+  | 'enable-gate'
+  | 'none'
 
-type AlertSummary = {
-  id: string
-  message: string
-  resolved: boolean
-  type: string
-  created_at: string
-}
-
-type ApprovalSummary = {
-  id: string
-  action_type: string
-  status: string
-  requester: string
-  created_at: string
-  agent_id: string
+type FocusState = {
+  title: string
+  body: string
+  action: FocusAction
 }
 
 function extractErrorMessage(payload: unknown, fallbackMessage: string) {
@@ -77,66 +80,195 @@ async function readJsonSafely(response: Response) {
   return response.json().catch(() => null)
 }
 
-function formatPercent(value: number) {
-  return `${Math.round(value)}%`
+function severityClasses(severity: AutopilotTimelineItem['severity']) {
+  switch (severity) {
+    case 'critical':
+      return 'border-rose-400/20 bg-rose-400/10 text-rose-50'
+    case 'warn':
+      return 'border-amber-400/20 bg-amber-400/10 text-amber-50'
+    case 'good':
+      return 'border-emerald-400/20 bg-emerald-400/10 text-emerald-50'
+    default:
+      return 'border-white/10 bg-white/5 text-slate-200'
+  }
+}
+
+function sectionClasses() {
+  return 'rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]'
+}
+
+function StatCard({ label, value, hint }: { label: string; value: string; hint: string }) {
+  return (
+    <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
+      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">{label}</p>
+      <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
+      <p className="mt-2">{hint}</p>
+    </div>
+  )
+}
+
+function TimelineItemCard({ item }: { item: AutopilotTimelineItem }) {
+  return (
+    <div className={`rounded-[24px] border p-5 ${severityClasses(item.severity)}`}>
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-[0.18em]">
+        <span>{item.sourceLabel}</span>
+        <span>
+          {formatTimestamp(item.occurredAt)} • {formatRelativeTime(item.occurredAt)}
+        </span>
+      </div>
+      <h3 className="mt-3 text-base font-semibold text-white">{item.title}</h3>
+      <p className="mt-2 text-sm leading-6">{item.detail}</p>
+      <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {item.impact}</p>
+      <Link href={item.href} className="mt-4 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+        Open source view
+      </Link>
+    </div>
+  )
+}
+
+function approvalSummary(approval: AutopilotApprovalSummary) {
+  return typeof approval.payload?.summary === 'string'
+    ? approval.payload.summary
+    : `${approval.requester} requested this action for agent ${approval.agent_id}.`
 }
 
 export function PicoAutopilotPageClient() {
-  const { progress, actions } = usePicoProgress()
-  const [runs, setRuns] = useState<RunSummary[]>([])
-  const [budget, setBudget] = useState<BudgetSummary | null>(null)
-  const [alerts, setAlerts] = useState<AlertSummary[]>([])
-  const [approvals, setApprovals] = useState<ApprovalSummary[]>([])
-  const [loading, setLoading] = useState(true)
+  const { progress, actions, syncState } = usePicoProgress()
+  const [runs, setRuns] = useState<AutopilotRunSummary[]>([])
+  const [tracesByRunId, setTracesByRunId] = useState<Record<string, AutopilotRunTrace[]>>({})
+  const [budget, setBudget] = useState<AutopilotBudgetSummary | null>(null)
+  const [usage, setUsage] = useState<AutopilotUsageBreakdown | null>(null)
+  const [alerts, setAlerts] = useState<AutopilotAlertSummary[]>([])
+  const [approvals, setApprovals] = useState<AutopilotApprovalSummary[]>([])
+  const [loadState, setLoadState] = useState<LoadState>('loading')
   const [authRequired, setAuthRequired] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [thresholdDraft, setThresholdDraft] = useState(progress.autopilot.costThresholdPercent)
-  const [creatingApproval, setCreatingApproval] = useState(false)
   const [resolvingApprovalId, setResolvingApprovalId] = useState<string | null>(null)
 
+  const pendingApprovals = useMemo(
+    () => approvals.filter((approval) => approval.status === 'PENDING'),
+    [approvals],
+  )
+
+  const resolvedApprovals = useMemo(
+    () => approvals.filter((approval) => approval.status !== 'PENDING').slice(0, 4),
+    [approvals],
+  )
+
   async function load() {
-    setLoading(true)
+    setLoadState('loading')
     setError(null)
 
     try {
-      const [runsResponse, budgetResponse, alertsResponse, approvalsResponse] = await Promise.all([
-        fetch('/api/dashboard/runs?limit=8', { credentials: 'include', cache: 'no-store' }),
+      const [
+        runsResponse,
+        budgetResponse,
+        usageResponse,
+        alertsResponse,
+        pendingResponse,
+        approvedResponse,
+        rejectedResponse,
+      ] = await Promise.all([
+        fetch('/api/dashboard/runs?limit=6', { credentials: 'include', cache: 'no-store' }),
         fetch('/api/dashboard/budgets', { credentials: 'include', cache: 'no-store' }),
+        fetch('/api/dashboard/budgets/usage?period_start=30d', { credentials: 'include', cache: 'no-store' }),
         fetch('/api/dashboard/monitoring/alerts?limit=8', { credentials: 'include', cache: 'no-store' }),
         fetch('/api/pico/approvals?status=PENDING', { credentials: 'include', cache: 'no-store' }),
+        fetch('/api/pico/approvals?status=APPROVED', { credentials: 'include', cache: 'no-store' }),
+        fetch('/api/pico/approvals?status=REJECTED', { credentials: 'include', cache: 'no-store' }),
       ])
 
-      if ([runsResponse, budgetResponse, alertsResponse, approvalsResponse].some((response) => response.status === 401)) {
+      const responses = [
+        runsResponse,
+        budgetResponse,
+        usageResponse,
+        alertsResponse,
+        pendingResponse,
+        approvedResponse,
+        rejectedResponse,
+      ]
+      if (responses.some((response) => response.status === 401)) {
         setAuthRequired(true)
         setRuns([])
+        setTracesByRunId({})
         setBudget(null)
+        setUsage(null)
         setAlerts([])
         setApprovals([])
-        setLoading(false)
+        setLoadState('offline')
         return
       }
 
-      if ([runsResponse, budgetResponse, alertsResponse, approvalsResponse].some((response) => !response.ok)) {
-        setError('Some live autopilot signals could not be loaded. Refresh to retry.')
-      }
+      const [
+        runsPayload,
+        budgetPayload,
+        usagePayload,
+        alertsPayload,
+        pendingPayload,
+        approvedPayload,
+        rejectedPayload,
+      ] = await Promise.all(responses.map((response) => (response.ok ? readJsonSafely(response) : Promise.resolve(null))))
 
-      const runsPayload = runsResponse.ok ? await runsResponse.json() : { items: [] }
-      const budgetPayload = budgetResponse.ok ? await budgetResponse.json() : null
-      const alertsPayload = alertsResponse.ok ? await alertsResponse.json() : { items: [] }
-      const approvalsPayload = approvalsResponse.ok ? await approvalsResponse.json() : []
+      const partialFailure = responses.some((response) => !response.ok)
+      const nextRuns = Array.isArray((runsPayload as { items?: unknown[] } | null)?.items)
+        ? ((runsPayload as { items: AutopilotRunSummary[] }).items ?? [])
+        : Array.isArray(runsPayload)
+          ? (runsPayload as AutopilotRunSummary[])
+          : []
+      const nextAlerts = Array.isArray((alertsPayload as { items?: unknown[] } | null)?.items)
+        ? ((alertsPayload as { items: AutopilotAlertSummary[] }).items ?? [])
+        : []
+      const nextApprovals = [
+        ...(Array.isArray(pendingPayload) ? (pendingPayload as AutopilotApprovalSummary[]) : []),
+        ...(Array.isArray(approvedPayload) ? (approvedPayload as AutopilotApprovalSummary[]) : []),
+        ...(Array.isArray(rejectedPayload) ? (rejectedPayload as AutopilotApprovalSummary[]) : []),
+      ].sort((left, right) => {
+        const leftTime = new Date(left.resolved_at ?? left.created_at).getTime()
+        const rightTime = new Date(right.resolved_at ?? right.created_at).getTime()
+        return rightTime - leftTime
+      })
 
-      setRuns(Array.isArray(runsPayload?.items) ? runsPayload.items : Array.isArray(runsPayload) ? runsPayload : [])
-      setBudget(budgetPayload)
-      setAlerts(Array.isArray(alertsPayload?.items) ? alertsPayload.items : [])
-      setApprovals(Array.isArray(approvalsPayload) ? approvalsPayload : [])
+      setRuns(nextRuns)
+      setBudget((budgetPayload as AutopilotBudgetSummary | null) ?? null)
+      setUsage((usagePayload as AutopilotUsageBreakdown | null) ?? null)
+      setAlerts(nextAlerts)
+      setApprovals(nextApprovals)
       setAuthRequired(false)
-      if ((Array.isArray(runsPayload?.items) && runsPayload.items.length > 0) || (Array.isArray(alertsPayload?.items) && alertsPayload.items.length > 0)) {
+      setLoadState(partialFailure ? 'partial' : 'ready')
+
+      if (nextRuns.length > 0 || nextAlerts.length > 0) {
         actions.unlockMilestone('first_monitoring_event_seen')
       }
+
+      const tracePairs = await Promise.all(
+        nextRuns.slice(0, 4).map(async (run) => {
+          try {
+            const response = await fetch(`/api/dashboard/runs/${encodeURIComponent(run.id)}/traces?limit=6`, {
+              credentials: 'include',
+              cache: 'no-store',
+            })
+
+            if (!response.ok) {
+              return [run.id, []] as const
+            }
+
+            const payload = (await readJsonSafely(response)) as { items?: AutopilotRunTrace[] } | null
+            return [run.id, Array.isArray(payload?.items) ? payload.items : []] as const
+          } catch {
+            return [run.id, []] as const
+          }
+        }),
+      )
+
+      setTracesByRunId(Object.fromEntries(tracePairs))
+
+      if (partialFailure) {
+        setError('Some live MUTX signals failed to load. What is shown is partial, not fabricated.')
+      }
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : 'Failed to load autopilot data')
-    } finally {
-      setLoading(false)
+      setLoadState('partial')
+      setError(loadError instanceof Error ? loadError.message : 'Failed to load live autopilot data')
     }
   }
 
@@ -171,59 +303,48 @@ export function PicoAutopilotPageClient() {
     }
   }, [actions, progress.autopilot.lastThresholdBreachAt, thresholdBreached])
 
-  async function saveThreshold() {
+  const failedRuns = useMemo(
+    () => runs.filter((run) => ['FAILED', 'ERROR', 'CANCELLED'].includes(run.status.toUpperCase())),
+    [runs],
+  )
+
+  const timeline = useMemo(
+    () =>
+      buildAutopilotTimeline({
+        runs,
+        alerts,
+        approvals: approvals.slice(0, 8),
+        budget,
+        thresholdPercent: progress.autopilot.costThresholdPercent,
+        tracesByRunId,
+      }).slice(0, 10),
+    [alerts, approvals, budget, progress.autopilot.costThresholdPercent, runs, tracesByRunId],
+  )
+
+  const unresolvedAlerts = useMemo(() => alerts.filter((alert) => !alert.resolved), [alerts])
+  const leadApproval = pendingApprovals[0] ?? null
+  const leadAlert = unresolvedAlerts[0] ?? null
+  const leadFailure = failedRuns[0] ?? null
+  const latestRun = runs[0] ?? null
+  const hasLiveSignals = Boolean(runs.length || alerts.length || approvals.length || budget || usage)
+
+  function saveThreshold() {
     if (thresholdValidationError) {
       return
     }
 
     const nextThreshold = Math.round(thresholdDraft)
-    setError(null)
     setThresholdDraft(nextThreshold)
-    actions.setAutopilot({ costThresholdPercent: nextThreshold, alertChannel: progress.autopilot.alertChannel })
+    actions.setAutopilot({
+      costThresholdPercent: nextThreshold,
+      alertChannel: progress.autopilot.alertChannel,
+    })
     actions.unlockMilestone('first_alert_configured')
   }
 
-  async function createApprovalRequest() {
-    setCreatingApproval(true)
-    setError(null)
-
-    try {
-      const response = await fetch('/api/pico/approvals', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          agent_id: 'pico-autopilot',
-          session_id: `pico-${Date.now()}`,
-          action_type: 'outbound_message_send',
-          payload: {
-            summary: 'Send an outbound lead reply to an external contact.',
-            risk: 'medium',
-            source: 'pico-autopilot',
-          },
-        }),
-      })
-
-      const payload = await readJsonSafely(response)
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          setAuthRequired(true)
-        }
-
-        throw new Error(extractErrorMessage(payload, 'Failed to create approval request'))
-      }
-
-      actions.setAutopilot({ approvalGateEnabled: true })
-      actions.unlockMilestone('first_approval_gate_enabled')
-      await load()
-    } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Failed to create approval request')
-    } finally {
-      setCreatingApproval(false)
-    }
+  function enableApprovalGate() {
+    actions.setAutopilot({ approvalGateEnabled: true })
+    actions.unlockMilestone('first_approval_gate_enabled')
   }
 
   async function resolveApproval(id: string, action: 'approve' | 'reject') {
@@ -241,10 +362,10 @@ export function PicoAutopilotPageClient() {
       })
 
       const payload = await readJsonSafely(response)
-
       if (!response.ok) {
         if (response.status === 401) {
           setAuthRequired(true)
+          setLoadState('offline')
         }
 
         throw new Error(extractErrorMessage(payload, `Failed to ${action} request`))
@@ -258,228 +379,629 @@ export function PicoAutopilotPageClient() {
     }
   }
 
-  return (
-    <PicoShell
-      eyebrow="Autopilot bridge"
-      title="See the runtime, not just the dream"
-      description="Pico reuses real MUTX signals for runs, budget, alerts, and approvals. If you are not authenticated yet, the product says so instead of pretending otherwise."
-      actions={
-        <div className="flex flex-wrap gap-3">
+  const liveValue = (value: string) => (authRequired ? '--' : value)
+  const liveHint = (readyHint: string, offlineHint: string) => (authRequired ? offlineHint : readyHint)
+
+  const currentFocus = useMemo<FocusState>(() => {
+    if (authRequired) {
+      return {
+        title: 'Sign in to unlock live runtime truth',
+        body: 'No honest run, alert, budget, or approval feed exists until your MUTX session is authenticated.',
+        action: 'dashboard',
+      }
+    }
+
+    if (thresholdBreached && budget) {
+      return {
+        title: 'Budget line crossed',
+        body: `Live usage is ${formatPercent(budget.usage_percentage)} against your ${formatPercent(progress.autopilot.costThresholdPercent)} threshold. Fix the line in the sand before spend surprises you again.`,
+        action: 'threshold',
+      }
+    }
+
+    if (leadApproval) {
+      return {
+        title: `${leadApproval.action_type} is waiting on a human call`,
+        body: approvalSummary(leadApproval),
+        action: 'approvals',
+      }
+    }
+
+    if (leadAlert) {
+      return {
+        title: 'A live alert needs attention',
+        body: `${leadAlert.message} ${explainAlertImpact(leadAlert)}`,
+        action: 'monitoring',
+      }
+    }
+
+    if (leadFailure) {
+      return {
+        title: `Recent run ${leadFailure.id.slice(0, 8)} failed`,
+        body: describeRunDetail(leadFailure, tracesByRunId[leadFailure.id] ?? []),
+        action: 'runs',
+      }
+    }
+
+    if (latestRun) {
+      return {
+        title: `Runtime visible: ${humanizeRunStatus(latestRun.status)}`,
+        body: describeRunDetail(latestRun, tracesByRunId[latestRun.id] ?? []),
+        action: 'runs',
+      }
+    }
+
+    return {
+      title: 'No live signals yet',
+      body: hasLiveSignals
+        ? 'Some control-plane data exists, but nothing urgent is leading the feed.'
+        : 'Either nothing ran yet or the control plane has no signals for this account.',
+      action: 'refresh',
+    }
+  }, [
+    authRequired,
+    budget,
+    hasLiveSignals,
+    latestRun,
+    leadAlert,
+    leadApproval,
+    leadFailure,
+    progress.autopilot.costThresholdPercent,
+    thresholdBreached,
+    tracesByRunId,
+  ])
+
+  const nextFocus = useMemo<FocusState>(() => {
+    if (authRequired) {
+      return {
+        title: 'Next: get into the control plane',
+        body: 'Once signed in, Pico can show real runs, live alerts, spend, and approval decisions instead of a blank shell.',
+        action: 'dashboard',
+      }
+    }
+
+    if (!progress.autopilot.approvalGateEnabled) {
+      return {
+        title: 'Next: turn on the approval gate',
+        body: 'Keep risky outbound actions waiting for a human instead of trusting vibes.',
+        action: 'enable-gate',
+      }
+    }
+
+    if (pendingApprovals.length > 0) {
+      return {
+        title: 'Next: clear the risky-action queue',
+        body: `${pendingApprovals.length} pending approval${pendingApprovals.length === 1 ? '' : 's'} should not sit around unowned.`,
+        action: 'approvals',
+      }
+    }
+
+    return {
+      title: 'Next: keep controls honest',
+      body: `Threshold is ${formatPercent(progress.autopilot.costThresholdPercent)} and alerts route to ${progress.autopilot.alertChannel.replace('_', ' ')}. Tune that before the next surprise bill or bad send.`,
+      action: 'threshold',
+    }
+  }, [authRequired, pendingApprovals.length, progress.autopilot.alertChannel, progress.autopilot.approvalGateEnabled, progress.autopilot.costThresholdPercent])
+
+  function renderFocusAction(action: FocusAction) {
+    switch (action) {
+      case 'runs':
+        return (
+          <Link href="/dashboard/runs" className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
+            Open run history
+          </Link>
+        )
+      case 'monitoring':
+        return (
+          <Link href="/dashboard/monitoring" className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
+            Open monitoring
+          </Link>
+        )
+      case 'dashboard':
+        return (
+          <Link href="/dashboard" className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
+            Open MUTX dashboard
+          </Link>
+        )
+      case 'threshold':
+        return (
+          <a href="#pico-autopilot-controls" className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
+            Tune controls
+          </a>
+        )
+      case 'refresh':
+        return (
           <button
             type="button"
             onClick={() => void load()}
-            className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10"
+            className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200"
           >
             Refresh live data
           </button>
+        )
+      case 'enable-gate':
+        return (
           <button
             type="button"
-            onClick={() => actions.setAutopilot({ approvalGateEnabled: true })}
-            className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950"
+            onClick={enableApprovalGate}
+            className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200"
           >
-            Enable gate locally
+            Enable approval gate
           </button>
-        </div>
+        )
+      case 'approvals':
+        if (!leadApproval) {
+          return (
+            <Link href="/dashboard/approvals" className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
+              Open approvals
+            </Link>
+          )
+        }
+
+        return (
+          <>
+            <button
+              type="button"
+              onClick={() => void resolveApproval(leadApproval.id, 'approve')}
+              disabled={resolvingApprovalId === leadApproval.id}
+              className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {resolvingApprovalId === leadApproval.id ? 'Working...' : 'Approve'}
+            </button>
+            <button
+              type="button"
+              onClick={() => void resolveApproval(leadApproval.id, 'reject')}
+              disabled={resolvingApprovalId === leadApproval.id}
+              className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {resolvingApprovalId === leadApproval.id ? 'Working...' : 'Reject'}
+            </button>
+          </>
+        )
+      default:
+        return null
+    }
+  }
+
+  return (
+    <PicoShell
+      eyebrow="Autopilot bridge"
+      title="Keep the control loop obvious"
+      description="Autopilot should surface the one thing that matters now, the one thing to do next, and hide the noisy feeds until you ask for them."
+      actions={
+        <button
+          type="button"
+          onClick={() => void load()}
+          className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10"
+        >
+          Refresh live data
+        </button>
       }
     >
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-[24px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-5 text-sm text-slate-300 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Runs</p>
-          <p className="mt-3 text-3xl font-semibold text-white">{runs.length}</p>
-          <p className="mt-2">Recent run visibility from the live MUTX run surface.</p>
-        </div>
-        <div className="rounded-[24px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-5 text-sm text-slate-300 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Alerts</p>
-          <p className="mt-3 text-3xl font-semibold text-white">{alerts.filter((alert) => !alert.resolved).length}</p>
-          <p className="mt-2">Live unresolved alerts plus your Pico threshold check.</p>
-        </div>
-        <div className="rounded-[24px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-5 text-sm text-slate-300 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Budget</p>
-          <p className="mt-3 text-3xl font-semibold text-white">
-            {budget ? formatPercent(budget.usage_percentage) : '--'}
-          </p>
-          <p className="mt-2">Threshold: {formatPercent(progress.autopilot.costThresholdPercent)}</p>
-        </div>
-        <div className="rounded-[24px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-5 text-sm text-slate-300 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Approvals</p>
-          <p className="mt-3 text-3xl font-semibold text-white">{approvals.length}</p>
-          <p className="mt-2">Pending risky actions waiting for a human click.</p>
-        </div>
-      </div>
-
       {authRequired ? (
-        <div className="mt-6 rounded-[28px] border border-amber-400/20 bg-amber-400/10 p-6 text-sm text-amber-50">
-          Live autopilot data needs an authenticated MUTX session. The academy still works offline, but live runs, alerts, budgets, and approvals need the real control plane.
+        <div className="mb-6 rounded-[28px] border border-amber-400/20 bg-amber-400/10 p-6 text-sm leading-6 text-amber-50">
+          Live Autopilot needs an authenticated MUTX session. Until then, there is no honest run, alert, budget, or approval feed to show you.
         </div>
       ) : null}
 
       {error ? (
-        <div className="mt-6 rounded-[28px] border border-rose-400/20 bg-rose-400/10 p-6 text-sm text-rose-50">{error}</div>
+        <div className="mb-6 rounded-[28px] border border-rose-400/20 bg-rose-400/10 p-6 text-sm leading-6 text-rose-50">
+          {error}
+        </div>
       ) : null}
 
-      <section className="mt-6 grid gap-6 lg:grid-cols-[0.9fr,1.1fr]">
-        <div className="space-y-6">
-          <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Thresholds</p>
-            <div className="mt-4 rounded-[24px] border border-white/10 bg-white/5 p-5">
-              <label className="block text-sm text-slate-300">
-                <span className="block text-xs uppercase tracking-[0.24em] text-slate-500">Cost threshold percent</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={100}
-                  value={thresholdDraft}
-                  onChange={(event) => {
-                    setError(null)
-                    setThresholdDraft(Number(event.target.value))
-                  }}
-                  className="mt-3 w-full rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-3 text-sm text-slate-100 outline-none"
-                />
-              </label>
-              <div className="mt-4 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => void saveThreshold()}
-                  disabled={Boolean(thresholdValidationError)}
-                  className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
-                >
-                  Save threshold
-                </button>
-                <select
-                  value={progress.autopilot.alertChannel}
-                  onChange={(event) => actions.setAutopilot({ alertChannel: event.target.value as 'in_app' | 'email' | 'webhook' })}
-                  className="rounded-full border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-2 text-sm text-slate-100 outline-none"
-                >
-                  <option value="in_app">In-app</option>
-                  <option value="email">Email-ready</option>
-                  <option value="webhook">Webhook-ready</option>
-                </select>
-              </div>
-              {thresholdValidationError ? (
-                <div className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-50">
-                  {thresholdValidationError}
-                </div>
-              ) : null}
-              {thresholdBreached ? (
-                <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50">
-                  Threshold breached. Live usage is above your configured line in the sand.
-                </div>
-              ) : null}
+      <PicoNowNext
+        current={{
+          label: 'Current step',
+          title: currentFocus.title,
+          body: currentFocus.body,
+          actions: renderFocusAction(currentFocus.action),
+        }}
+        next={{
+          label: 'Next step',
+          title: nextFocus.title,
+          body: nextFocus.body,
+          actions: renderFocusAction(nextFocus.action),
+        }}
+      />
+
+      <section id="pico-autopilot-controls" className="mt-6 grid gap-4 xl:grid-cols-2">
+        <div className={sectionClasses()}>
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Control 01</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">Cost threshold</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Keep the threshold visible and editable. The detailed spend breakdown can stay folded away.
+          </p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Live usage</p>
+              <p className="mt-3 text-3xl font-semibold text-white">
+                {authRequired ? '--' : budget ? formatPercent(budget.usage_percentage) : '--'}
+              </p>
+              <p className="mt-2">
+                {authRequired
+                  ? 'Live budget requires authentication.'
+                  : budget
+                    ? `${budget.credits_used} used of ${budget.credits_total}.`
+                    : 'No live budget snapshot returned.'}
+              </p>
+            </div>
+            <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Stored limit</p>
+              <p className="mt-3 text-3xl font-semibold text-white">
+                {formatPercent(progress.autopilot.costThresholdPercent)}
+              </p>
+              <p className="mt-2">Progress sync: {syncState}</p>
             </div>
           </div>
-
-          <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Plan matrix</p>
-            <div className="mt-4 grid gap-4 md:grid-cols-3">
-              {Object.entries(PICO_PLAN_MATRIX).map(([plan, features]) => (
-                <div key={plan} className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                  <p className="text-lg font-semibold text-white capitalize">{plan}</p>
-                  <div className="mt-3 space-y-2">
-                    {Object.entries(features).map(([feature, value]) => (
-                      <div key={feature}>
-                        <p className="text-xs uppercase tracking-[0.18em] text-slate-500">{feature.replaceAll('_', ' ')}</p>
-                        <p className="mt-1">{value}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+          <div className="mt-5 rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5">
+            <label className="block text-sm text-slate-300">
+              <span className="block text-xs uppercase tracking-[0.24em] text-slate-500">Cost threshold percent</span>
+              <input
+                type="number"
+                min={1}
+                max={100}
+                value={thresholdDraft}
+                onChange={(event) => {
+                  setError(null)
+                  setThresholdDraft(Number(event.target.value))
+                }}
+                className="mt-3 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-100 outline-none"
+              />
+            </label>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={saveThreshold}
+                disabled={Boolean(thresholdValidationError)}
+                className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Save threshold
+              </button>
+              <select
+                value={progress.autopilot.alertChannel}
+                onChange={(event) =>
+                  actions.setAutopilot({
+                    alertChannel: event.target.value as 'in_app' | 'email' | 'webhook',
+                  })
+                }
+                className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-100 outline-none"
+              >
+                <option value="in_app">In-app</option>
+                <option value="email">Email-ready</option>
+                <option value="webhook">Webhook-ready</option>
+              </select>
             </div>
+            {thresholdValidationError ? (
+              <div className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-50">
+                {thresholdValidationError}
+              </div>
+            ) : null}
+            {thresholdBreached ? (
+              <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50">
+                Threshold breached. Live usage is above the limit you configured.
+              </div>
+            ) : null}
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Approval gate</p>
-                <h2 className="mt-2 text-xl font-semibold text-white">Risky action queue</h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => void createApprovalRequest()}
-                disabled={creatingApproval || authRequired}
-                className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
-              >
-                {creatingApproval ? 'Creating request...' : 'Create sample request'}
-              </button>
-            </div>
-            <div className="mt-4 space-y-3">
-              {approvals.length === 0 ? (
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
-                  No pending approvals. Good if that is intentional. Bad if you expected a gate and forgot to create one.
-                </div>
+        <div className={sectionClasses()}>
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Control 02</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">Approval gate</h2>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Keep risky actions behind a human decision. Show the queue. Hide the historical sludge unless someone asks.
+          </p>
+          <div className="mt-5 rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
+            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Status</p>
+            <p className="mt-3 text-3xl font-semibold text-white">
+              {progress.autopilot.approvalGateEnabled ? 'Enabled' : 'Off'}
+            </p>
+            <p className="mt-2">
+              {progress.autopilot.approvalGateEnabled
+                ? 'Risky actions can pause for a human decision.'
+                : 'Turn this on before you trust outbound sends.'}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {progress.autopilot.approvalGateEnabled ? (
+                <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs uppercase tracking-[0.18em] text-emerald-100">
+                  Gate ready
+                </span>
               ) : (
-                approvals.map((approval) => (
-                  <div key={approval.id} className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                    <p className="font-medium text-white">{approval.action_type}</p>
-                    <p className="mt-1">Requester: {approval.requester}</p>
-                    <p className="mt-1">Agent: {approval.agent_id}</p>
-                    <div className="mt-4 flex gap-3">
-                      <button
-                        type="button"
-                        onClick={() => void resolveApproval(approval.id, 'approve')}
-                        disabled={resolvingApprovalId === approval.id}
-                        className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
-                      >
-                        {resolvingApprovalId === approval.id ? 'Working...' : 'Approve'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => void resolveApproval(approval.id, 'reject')}
-                        disabled={resolvingApprovalId === approval.id}
-                        className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200"
-                      >
-                        {resolvingApprovalId === approval.id ? 'Working...' : 'Reject'}
-                      </button>
-                    </div>
-                  </div>
-                ))
+                <button
+                  type="button"
+                  onClick={enableApprovalGate}
+                  className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
+                >
+                  Enable approval gate
+                </button>
               )}
+              <Link href="/dashboard/approvals" className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200">
+                Open approvals
+              </Link>
             </div>
           </div>
 
-          <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Live signals</p>
-            {loading ? (
-              <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">Loading live MUTX signals...</div>
-            ) : (
-              <div className="mt-4 space-y-3">
-                {runs.slice(0, 3).map((run) => (
-                  <div key={run.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                    <p className="font-medium text-white">Run {run.id}</p>
-                    <p className="mt-1">Status: {run.status}</p>
-                    <p className="mt-1">Started: {run.started_at ?? 'n/a'}</p>
-                    <Link href="/dashboard/runs" className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
-                      Inspect runs in MUTX dashboard
-                    </Link>
-                  </div>
-                ))}
-                {alerts.slice(0, 3).map((alert) => (
-                  <div key={alert.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                    <p className="font-medium text-white">{alert.type}</p>
-                    <p className="mt-1">{alert.message}</p>
-                    <Link href="/dashboard/monitoring" className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
-                      Open monitoring
-                    </Link>
-                  </div>
-                ))}
-                {budget ? (
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                    <p className="font-medium text-white">Budget snapshot</p>
-                    <p className="mt-1">Plan: {budget.plan}</p>
-                    <p className="mt-1">Used: {budget.credits_used}</p>
-                    <p className="mt-1">Remaining: {budget.credits_remaining}</p>
-                    <Link href="/dashboard/budgets" className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
-                      Open budgets
-                    </Link>
-                  </div>
-                ) : null}
+          <div className="mt-5 rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5 text-sm text-slate-300">
+            <p className="font-medium text-white">Pending queue</p>
+            {leadApproval ? (
+              <div className="mt-3 space-y-3">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">{leadApproval.action_type}</p>
+                  <p className="mt-2">{approvalSummary(leadApproval)}</p>
+                  <p className="mt-3 text-slate-400">Why it matters: {explainApprovalImpact(leadApproval)}</p>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => void resolveApproval(leadApproval.id, 'approve')}
+                    disabled={resolvingApprovalId === leadApproval.id}
+                    className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {resolvingApprovalId === leadApproval.id ? 'Working...' : 'Approve'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void resolveApproval(leadApproval.id, 'reject')}
+                    disabled={resolvingApprovalId === leadApproval.id}
+                    className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {resolvingApprovalId === leadApproval.id ? 'Working...' : 'Reject'}
+                  </button>
+                </div>
               </div>
+            ) : (
+              <p className="mt-3">No pending approvals are waiting right now.</p>
             )}
           </div>
         </div>
       </section>
+
+      <div className="mt-6 grid gap-4 xl:grid-cols-2">
+        <PicoDisclosure title="Show live summary" hint="Quick counts if you want them, folded away when you do not.">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <StatCard
+              label="Runs"
+              value={liveValue(String(runs.length))}
+              hint={liveHint(
+                runs.length > 0 ? 'Recent executions pulled from MUTX.' : 'No runs recorded yet.',
+                'Sign in to read live run history.',
+              )}
+            />
+            <StatCard
+              label="Failures"
+              value={liveValue(String(failedRuns.length))}
+              hint={liveHint(
+                failedRuns.length > 0 ? 'Failures are visible. Good. Hidden failures are worse.' : 'No failed runs in the current window.',
+                'Sign in to see failed run count.',
+              )}
+            />
+            <StatCard
+              label="Alerts"
+              value={liveValue(String(unresolvedAlerts.length))}
+              hint={liveHint(
+                unresolvedAlerts.length > 0 ? 'Unresolved operator pain from the monitoring feed.' : 'No unresolved alerts right now.',
+                'Sign in to read live alerts.',
+              )}
+            />
+            <StatCard
+              label="Budget"
+              value={liveValue(budget ? formatPercent(budget.usage_percentage) : '--')}
+              hint={liveHint(
+                budget ? `${formatPercent(progress.autopilot.costThresholdPercent)} threshold against live spend.` : 'No live budget snapshot returned yet.',
+                'Sign in to read budget usage.',
+              )}
+            />
+            <StatCard
+              label="Approvals"
+              value={liveValue(String(pendingApprovals.length))}
+              hint={liveHint(
+                pendingApprovals.length > 0 ? 'Pending risky actions are waiting for a human call.' : 'No risky actions are blocked right now.',
+                'Sign in to see live approvals.',
+              )}
+            />
+            <StatCard
+              label="Load"
+              value={loadState}
+              hint={authRequired ? 'Autopilot is offline until you sign in.' : 'Live fetch status for this surface.'}
+            />
+          </div>
+        </PicoDisclosure>
+
+        <PicoDisclosure title="Show activity timeline" hint="Timeline, logs, and extra context live here when you actually need them.">
+          <div className="space-y-4">
+            {authRequired ? (
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+                No timeline without live control-plane access. That is the honest answer.
+              </div>
+            ) : timeline.length === 0 ? (
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+                No activity is visible yet. Either nothing ran or the control plane has not recorded signals for this account.
+              </div>
+            ) : (
+              timeline.map((item) => <TimelineItemCard key={item.id} item={item} />)
+            )}
+          </div>
+        </PicoDisclosure>
+
+        <PicoDisclosure title="Show recent runs" hint="Execution history and traces are useful, but they should not bury the next action.">
+          <div className="space-y-4">
+            {authRequired ? (
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+                Sign in to load recent runs and traces.
+              </div>
+            ) : runs.length === 0 ? (
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+                No runs returned from MUTX yet.
+              </div>
+            ) : (
+              runs.map((run) => {
+                const severity = getRunSeverity(run.status)
+                const traces = tracesByRunId[run.id] ?? []
+                return (
+                  <article key={run.id} className={`rounded-[24px] border p-5 ${severityClasses(severity)}`}>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.18em]">{humanizeRunStatus(run.status)}</p>
+                        <h3 className="mt-2 text-lg font-semibold text-white">Run {run.id.slice(0, 8)}</h3>
+                      </div>
+                      <div className="text-right text-xs uppercase tracking-[0.18em] text-slate-300">
+                        <p>{formatTimestamp(run.completed_at ?? run.started_at ?? run.created_at)}</p>
+                        <p className="mt-1">{formatRelativeTime(run.completed_at ?? run.started_at ?? run.created_at)}</p>
+                      </div>
+                    </div>
+                    <p className="mt-4 text-sm leading-6">{describeRunDetail(run, traces)}</p>
+                    <div className="mt-4 grid gap-3 text-sm text-slate-300 md:grid-cols-2">
+                      <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
+                        <p className="font-medium text-white">Why it matters</p>
+                        <p className="mt-2">
+                          {['FAILED', 'ERROR', 'CANCELLED'].includes(run.status.toUpperCase())
+                            ? 'This job failed. If the agent is still trusted, it should be because you understand this failure.'
+                            : ['RUNNING', 'QUEUED', 'PENDING'].includes(run.status.toUpperCase())
+                              ? 'This work is still active. Long silence usually means you should check the runtime.'
+                              : 'The job finished. Now verify the output is useful, not just technically complete.'}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4">
+                        <p className="font-medium text-white">Trace signals</p>
+                        {traces.length === 0 ? (
+                          <p className="mt-2">No run traces were returned for this run.</p>
+                        ) : (
+                          <div className="mt-2 space-y-2">
+                            {[...traces].slice(-3).reverse().map((trace) => (
+                              <div key={`${trace.run_id}-${trace.sequence ?? trace.timestamp ?? trace.event_type}`} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
+                                <p className="text-xs uppercase tracking-[0.16em] text-slate-400">{trace.event_type}</p>
+                                <p className="mt-1">{trace.message}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                )
+              })
+            )}
+          </div>
+        </PicoDisclosure>
+
+        <PicoDisclosure title="Show budget breakdown" hint="Spend detail stays here until someone needs the breakdown.">
+          <div className="space-y-4 text-sm text-slate-300">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5">
+                <p className="font-medium text-white">Usage snapshot</p>
+                <p className="mt-3 text-3xl font-semibold text-white">
+                  {authRequired ? '--' : budget ? formatPercent(budget.usage_percentage) : '--'}
+                </p>
+                <p className="mt-2">
+                  {authRequired
+                    ? 'Live budget requires authentication.'
+                    : budget
+                      ? `${budget.credits_used} used of ${budget.credits_total}. Reset ${budget.reset_date ? formatTimestamp(budget.reset_date) : 'unknown'}.`
+                      : 'No live budget snapshot returned.'}
+                </p>
+              </div>
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5">
+                <p className="font-medium text-white">Top spenders</p>
+                <div className="mt-3 space-y-2">
+                  {authRequired ? (
+                    <p>Sign in to read the usage breakdown.</p>
+                  ) : usage?.usage_by_agent.length ? (
+                    usage.usage_by_agent.slice(0, 3).map((item) => (
+                      <div key={`${item.agent_id}-${item.agent_name}`} className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-3">
+                        <p className="font-medium text-white">{item.agent_name}</p>
+                        <p className="mt-1">{item.credits_used} credits across {item.event_count} events</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No agent-level usage returned for the last 30 days.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="rounded-[24px] border border-white/10 bg-white/5 p-5">
+              <p className="font-medium text-white">Usage drivers</p>
+              <div className="mt-3 space-y-2">
+                {authRequired ? (
+                  <p>Sign in to read the usage breakdown.</p>
+                ) : usage?.usage_by_type.length ? (
+                  usage.usage_by_type.slice(0, 3).map((item) => (
+                    <div key={item.event_type} className="rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-3">
+                      <p className="font-medium text-white">{item.event_type}</p>
+                      <p className="mt-1">{item.credits_used} credits across {item.event_count} events</p>
+                    </div>
+                  ))
+                ) : (
+                  <p>No usage event breakdown returned for the last 30 days.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </PicoDisclosure>
+
+        <PicoDisclosure title="Show alerts" hint="Live monitoring events, folded until you need the list.">
+          <div className="space-y-4">
+            {authRequired ? (
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+                Sign in to load live alerts.
+              </div>
+            ) : alerts.length === 0 ? (
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+                No alerts returned from MUTX right now.
+              </div>
+            ) : (
+              alerts.map((alert) => (
+                <article key={alert.id} className={`rounded-[24px] border p-5 ${severityClasses(alert.resolved ? 'good' : 'critical')}`}>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em]">{alert.type}</p>
+                      <h3 className="mt-2 text-lg font-semibold text-white">{alert.resolved ? 'Resolved alert' : 'Active alert'}</h3>
+                    </div>
+                    <div className="text-right text-xs uppercase tracking-[0.18em] text-slate-300">
+                      <p>{formatTimestamp(alert.resolved_at ?? alert.created_at)}</p>
+                      <p className="mt-1">{formatRelativeTime(alert.resolved_at ?? alert.created_at)}</p>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm leading-6">{alert.message}</p>
+                  <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {explainAlertImpact(alert)}</p>
+                </article>
+              ))
+            )}
+          </div>
+        </PicoDisclosure>
+
+        <PicoDisclosure title="Show approval history" hint="Pending work stays on the main surface. History lives here.">
+          <div className="space-y-4">
+            {authRequired ? (
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+                Sign in to load live approval requests.
+              </div>
+            ) : pendingApprovals.length === 0 && resolvedApprovals.length === 0 ? (
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+                No approval events were returned from MUTX.
+              </div>
+            ) : (
+              <>
+                {resolvedApprovals.map((approval) => (
+                  <article key={approval.id} className={`rounded-[24px] border p-5 ${severityClasses(approval.status === 'APPROVED' ? 'good' : 'critical')}`}>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.18em]">{approval.status}</p>
+                        <h3 className="mt-2 text-lg font-semibold text-white">{approval.action_type}</h3>
+                      </div>
+                      <div className="text-right text-xs uppercase tracking-[0.18em] text-slate-300">
+                        <p>{formatTimestamp(approval.resolved_at ?? approval.created_at)}</p>
+                        <p className="mt-1">{formatRelativeTime(approval.resolved_at ?? approval.created_at)}</p>
+                      </div>
+                    </div>
+                    <p className="mt-4 text-sm leading-6">{approvalSummary(approval)}</p>
+                    <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {explainApprovalImpact(approval)}</p>
+                  </article>
+                ))}
+              </>
+            )}
+          </div>
+        </PicoDisclosure>
+      </div>
     </PicoShell>
   )
 }
