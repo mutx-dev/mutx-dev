@@ -35,3 +35,14 @@ Decision: `/pico/onboarding` is the canonical Pico workspace entry. `/pico/app` 
 Why:
 - The product promise starts with onboarding, not a vague app shell.
 - One visible entry route beats split-route confusion.
+
+## 2026-04-11 01:01:56 UTC
+Decision: `components/pico/*` is the only Pico frontend system. `components/site/pico/*` is absorbed and dead.
+Why:
+- A second Pico component tree is how the product starts lying about where truth lives.
+- Public landing, contact, footer, and locale switching are still Pico product concerns, so they belong under the canonical Pico component system.
+
+Decision: Reject parallel locale churn unless it is validated and intentionally merged.
+Why:
+- Bad translation churn creates a second public truth.
+- English-first truth is better than multilingual nonsense.
