@@ -6,7 +6,7 @@ import asyncio
 import croniter
 import logging
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -82,18 +82,30 @@ class TriggerTaskResponse(BaseModel):
 
 
 def _parse_schedule_next(task: dict[str, Any]) -> datetime | None:
-    """Calculate next run time from cron expression or interval."""
-    if task.get("interval_seconds"):
-        last = task.get("last_run")
+    """Calculate the next scheduled run from cron expression or interval."""
+    interval_seconds = task.get("interval_seconds")
+    if interval_seconds:
+        base_timestamp = task.get("last_run") or task.get("created_at")
         base = (
-            datetime.fromtimestamp(last, tz=timezone.utc) if last else datetime.now(tz=timezone.utc)
+            datetime.fromtimestamp(base_timestamp, tz=timezone.utc)
+            if base_timestamp
+            else datetime.now(tz=timezone.utc)
         )
-        return base.replace(microsecond=0)
+        return (base + timedelta(seconds=int(interval_seconds))).replace(microsecond=0)
+
     schedule = task.get("schedule")
     if not schedule:
         return None
+
+    base_timestamp = task.get("last_run") or task.get("created_at")
+    base = (
+        datetime.fromtimestamp(base_timestamp, tz=timezone.utc)
+        if base_timestamp
+        else datetime.now(tz=timezone.utc)
+    )
+
     try:
-        cron = croniter.croniter(schedule, datetime.now(tz=timezone.utc))
+        cron = croniter.croniter(schedule, base)
         return cron.get_next(datetime)
     except (croniter.CroniterBadCronError, ValueError):
         return None
@@ -174,14 +186,11 @@ async def _scheduler_loop() -> None:
                         continue
                     next_run_ts = int(next_run.timestamp())
 
-                    # Determine if task is due
-                    last_run = task.get("last_run")
-                    is_due = (last_run is None) or (now_ts >= next_run_ts)
-
-                    if is_due:
+                    if now_ts >= next_run_ts:
                         task["last_run"] = now_ts
                         task["run_count"] = task.get("run_count", 0) + 1
-                        task["next_run"] = next_run_ts
+                        upcoming_run = _parse_schedule_next(task)
+                        task["next_run"] = int(upcoming_run.timestamp()) if upcoming_run else None
                         # Fire in background
                         asyncio.create_task(_execute_task(task))
 
@@ -279,6 +288,8 @@ async def create_scheduled_task(
         "created_at": now_ts,
         "updated_at": now_ts,
     }
+    next_run = _parse_schedule_next(task)
+    task["next_run"] = int(next_run.timestamp()) if next_run else None
 
     async with _scheduler_lock:
         _task_store[task_id] = task
@@ -337,6 +348,8 @@ async def update_scheduled_task(
         for key, value in update_data.items():
             task[key] = value
         task["updated_at"] = int(datetime.now(tz=timezone.utc).timestamp())
+        next_run = _parse_schedule_next(task) if task.get("enabled", True) else None
+        task["next_run"] = int(next_run.timestamp()) if next_run else None
 
     logger.info(f"[scheduler] Updated task {task_id}")
     return _serialize_task(task)
@@ -370,12 +383,16 @@ async def trigger_scheduled_task(
 
     async with _scheduler_lock:
         task = _task_store.get(task_id)
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
 
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-
-    execution_id = str(uuid.uuid4())
-    triggered_at = int(datetime.now(tz=timezone.utc).timestamp())
+        execution_id = str(uuid.uuid4())
+        triggered_at = int(datetime.now(tz=timezone.utc).timestamp())
+        task["last_run"] = triggered_at
+        task["run_count"] = task.get("run_count", 0) + 1
+        task["updated_at"] = triggered_at
+        next_run = _parse_schedule_next(task) if task.get("enabled", True) else None
+        task["next_run"] = int(next_run.timestamp()) if next_run else None
 
     # Fire in background without blocking
     asyncio.create_task(_execute_task(task))
