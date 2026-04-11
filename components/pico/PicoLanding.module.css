@@ -158,6 +158,13 @@
   color: var(--pico-text);
 }
 
+.navActions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
 .navCta {
   display: inline-flex;
   align-items: center;
