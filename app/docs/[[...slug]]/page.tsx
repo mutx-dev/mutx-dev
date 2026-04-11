@@ -8,7 +8,7 @@ import { DocsRenderer, extractHeadings } from "@/components/site/docs/DocsRender
 import { TableOfContents } from "@/components/site/docs/TableOfContents";
 import { SectionLanding } from "@/components/site/docs/SectionLanding";
 import { PrevNextNav } from "@/components/site/docs/PrevNextNav";
-import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl } from "@/lib/seo";
+import { DEFAULT_X_HANDLE, getCanonicalUrl, getPageOgImageUrl, getPageTwitterImageUrl } from "@/lib/seo";
 import { parseSummary } from "@/lib/docs";
 
 export const dynamicParams = true;
@@ -162,7 +162,7 @@ export async function generateMetadata({
       creator: DEFAULT_X_HANDLE,
       title: `${title} — MUTX Docs`,
       description,
-      images: [getPageOgImageUrl(`${title} — MUTX Docs`, description, { path: normalizedPath })],
+      images: [getPageTwitterImageUrl(`${title} — MUTX Docs`, description, { path: normalizedPath })],
     },
   };
 }
@@ -184,8 +184,8 @@ const FEATURED = [
     desc: "Understand the shape behind app, backend, CLI, SDK, and infra.",
   },
   {
-    title: "v1.3 Release Notes",
-    href: "/docs/releases/v1.3",
+    title: "v1.4 Release Notes",
+    href: "/docs/v1.4",
     desc: "Current public release posture, supported surfaces, and download path.",
   },
   {

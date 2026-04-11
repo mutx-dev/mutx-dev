@@ -254,6 +254,11 @@ describe('getOgImageUrl', () => {
       'https://mutx.dev/opengraph-image?title=Docs+%7C+MUTX&description=Code-accurate+docs.&path=%2Fdocs%2Freference',
     )
     expect(
+      getPageTwitterImageUrl('Docs | MUTX', 'Code-accurate docs.', { path: '/docs/reference' }),
+    ).toBe(
+      'https://mutx.dev/twitter-image?title=Docs+%7C+MUTX&description=Code-accurate+docs.&path=%2Fdocs%2Freference',
+    )
+    expect(
       getPageTwitterImageUrl('Download | MUTX', 'Signed builds.', { path: '/download' }),
     ).toBe(
       'https://mutx.dev/twitter-image?title=Download+%7C+MUTX&description=Signed+builds.&path=%2Fdownload',
