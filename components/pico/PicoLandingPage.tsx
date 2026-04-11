@@ -11,7 +11,6 @@ import s from './PicoLanding.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
 import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
-import { usePicoHref } from '@/lib/pico/navigation'
 
 /* ------------------------------------------------------------------ */
 /*  Icon helper                                                        */
@@ -60,7 +59,6 @@ function HowItWorksIcon({ kind }: { kind: string }) {
 
 export function PicoLandingPage() {
   const t = useTranslations('pico')
-  const toHref = usePicoHref()
   const prefersReducedMotion = useReducedMotion()
   const [formOpen, setFormOpen] = useState(false)
   const [formInterest, setFormInterest] = useState<string | undefined>()
@@ -120,10 +118,7 @@ export function PicoLandingPage() {
 
             <SiteReveal delay={0.22}>
               <div className={s.heroActions}>
-                <Link href={toHref('/onboarding')} className={s.btnPrimary}>
-                  Start building
-                </Link>
-                <button onClick={() => openForm()} className={s.btnSecondary} type="button">
+                <button onClick={() => openForm()} className={s.btnPrimary} type="button">
                   {t('hero.cta')}
                   <ArrowRight className="h-4 w-4" />
                 </button>
@@ -273,7 +268,7 @@ export function PicoLandingPage() {
           </div>
         </section>
 
-        {/* ---- Live beta truth (Sections 8+9 merged) ---- */}
+        {/* ---- Why Pre-Register + Founding (Sections 8+9 merged) ---- */}
         <section className={`${s.section} ${s.sectionDark}`}>
           <div className={s.shell}>
             <div className={s.sectionHeader}>
@@ -311,7 +306,7 @@ export function PicoLandingPage() {
         </section>
 
         {/* ---- Final CTA (Section 11) ---- */}
-        <section id="contact" className={`${s.section} ${s.sectionCta}`}>
+        <section id="pre-register" className={`${s.section} ${s.sectionCta}`}>
           <div className={s.shell}>
             <div className={s.ctaPanel}>
               <div className={s.ctaPanelGlow} aria-hidden="true" />
