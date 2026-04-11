@@ -7,6 +7,7 @@ import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { usePicoHref } from '@/lib/pico/navigation'
 import {
+  analyzeAutopilotIntegration,
   buildAutopilotTimeline,
   describeRunDetail,
   explainAlertImpact,
@@ -14,11 +15,16 @@ import {
   formatPercent,
   formatRelativeTime,
   formatTimestamp,
+  getAlertsEmptyState,
+  getApprovalsEmptyState,
+  getRunsEmptyState,
   getRunSeverity,
+  getUsageEmptyState,
   humanizeRunStatus,
   type AutopilotAlertSummary,
   type AutopilotApprovalSummary,
   type AutopilotBudgetSummary,
+  type AutopilotEmptyState,
   type AutopilotRunSummary,
   type AutopilotRunTrace,
   type AutopilotTimelineItem,
@@ -103,6 +109,18 @@ function TimelineItemCard({ item }: { item: AutopilotTimelineItem }) {
       <p className="mt-3 text-sm leading-6 text-slate-300">Why it matters: {item.impact}</p>
       <Link href={item.href} className="mt-4 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
         Jump to detail section
+      </Link>
+    </div>
+  )
+}
+
+function EmptyStatePanel({ state }: { state: AutopilotEmptyState }) {
+  return (
+    <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+      <p className="font-medium text-white">{state.title}</p>
+      <p className="mt-2">{state.body}</p>
+      <Link href={state.nextStep.href} className="mt-4 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+        {state.nextStep.label}
       </Link>
     </div>
   )
@@ -274,6 +292,74 @@ export function PicoAutopilotPageClient() {
     [alerts, approvals, budget, progress.autopilot.costThresholdPercent, runs, tracesByRunId],
   )
 
+  const integrationStatus = useMemo(
+    () =>
+      analyzeAutopilotIntegration({
+        runs,
+        alerts,
+        approvals,
+        budget,
+        usage,
+        approvalGateConfigured: progress.autopilot.approvalGateEnabled,
+      }),
+    [alerts, approvals, budget, progress.autopilot.approvalGateEnabled, runs, usage],
+  )
+
+  const loadStateLabel = authRequired
+    ? 'sign in required'
+    : loadState === 'loading'
+      ? 'loading live data'
+      : loadState === 'partial'
+        ? 'partial signal'
+        : loadState === 'offline'
+          ? 'offline'
+          : 'live'
+
+  const runEmptyState = useMemo(
+    () =>
+      getRunsEmptyState(integrationStatus, {
+        label: derived.nextLesson ? `Open ${derived.nextLesson.title}` : 'Open academy',
+        href: derived.nextLesson ? toHref(`/academy/${derived.nextLesson.slug}`) : toHref('/academy'),
+      }),
+    [derived.nextLesson, integrationStatus, toHref],
+  )
+
+  const alertsEmptyState = useMemo(
+    () =>
+      getAlertsEmptyState(integrationStatus, {
+        label: integrationStatus.hasRuns ? 'Inspect recent runs' : 'Get the first run live',
+        href: integrationStatus.hasRuns
+          ? '#recent-runs'
+          : derived.nextLesson
+            ? toHref(`/academy/${derived.nextLesson.slug}`)
+            : toHref('/academy'),
+      }),
+    [derived.nextLesson, integrationStatus, toHref],
+  )
+
+  const usageEmptyState = useMemo(
+    () =>
+      getUsageEmptyState(integrationStatus, {
+        label: integrationStatus.hasBudget ? 'Trigger real usage' : 'Set up budget visibility',
+        href: integrationStatus.hasBudget
+          ? '#recent-runs'
+          : derived.nextLesson
+            ? toHref(`/academy/${derived.nextLesson.slug}`)
+            : toHref('/academy'),
+      }),
+    [derived.nextLesson, integrationStatus, toHref],
+  )
+
+  const approvalsEmptyState = useMemo(
+    () =>
+      getApprovalsEmptyState(integrationStatus, {
+        label: integrationStatus.approvalGateConfigured ? 'Run a gated action' : 'Configure approval gate',
+        href: integrationStatus.approvalGateConfigured
+          ? '#recent-runs'
+          : toHref('/academy/add-an-approval-gate'),
+      }),
+    [integrationStatus, toHref],
+  )
 
   function saveThreshold() {
     if (thresholdValidationError) {

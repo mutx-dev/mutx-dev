@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import { useCallback, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Check } from 'lucide-react'
 import { motion, useReducedMotion } from 'framer-motion'
@@ -82,16 +83,7 @@ export function PicoLandingPage() {
         <div className={s.navInner}>
           <Link href="https://pico.mutx.dev" className={s.navBrand}>
             <span className={s.navLogo}>
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <rect width="20" height="20" rx="5" fill="url(#grad)" />
-                <path d="M6 10l3 3 5-5" stroke="#052e16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <defs>
-                  <linearGradient id="grad" x1="0" y1="0" x2="20" y2="20">
-                    <stop offset="0%" stopColor="#4ade80" />
-                    <stop offset="100%" stopColor="#22c55e" />
-                  </linearGradient>
-                </defs>
-              </svg>
+              <Image src="/pico/logo.png" alt="PicoMUTX logo" width={20} height={20} priority />
             </span>
             <span className={s.navName}>
               {t('nav.brand')}

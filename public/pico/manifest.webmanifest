@@ -1,0 +1,27 @@
+{
+  "name": "PicoMUTX",
+  "short_name": "PicoMUTX",
+  "description": "PicoMUTX helps founders, operators, and small teams build and ship AI agents with guided lessons, grounded support, and real control.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "icons": [
+    {
+      "src": "/pico/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/pico/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/pico/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
