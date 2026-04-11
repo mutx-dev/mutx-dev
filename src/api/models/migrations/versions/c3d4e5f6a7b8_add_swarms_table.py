@@ -22,9 +22,7 @@ def upgrade() -> None:
     is_postgresql = bind.dialect.name == "postgresql"
 
     # Keep SQLite-compatible text storage, but use native ARRAY on PostgreSQL
-    agent_ids_type = (
-        sa.dialects.postgresql.ARRAY(sa.String()) if is_postgresql else sa.Text()
-    )
+    agent_ids_type = sa.dialects.postgresql.ARRAY(sa.String()) if is_postgresql else sa.Text()
 
     op.create_table(
         "swarms",
