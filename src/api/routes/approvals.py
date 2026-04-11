@@ -59,7 +59,9 @@ async def _load_approval_setting(
     db: AsyncSession,
     request_id: str,
 ) -> tuple[UserSetting, ApprovalRequest]:
-    result = await db.execute(select(UserSetting).where(UserSetting.key == _approval_key(request_id)))
+    result = await db.execute(
+        select(UserSetting).where(UserSetting.key == _approval_key(request_id))
+    )
     setting = result.scalar_one_or_none()
     if setting is None:
         raise HTTPException(

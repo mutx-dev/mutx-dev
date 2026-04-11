@@ -615,7 +615,7 @@ def collect_gateway_health() -> dict[str, Any]:
     port, gateway_url = _gateway_base_url()
     credential_detected = bool(get_detected_gateway_token())
     gateway_reachable = _request_gateway_json(("/health", "/api/health")) is not None
-    gateway_configured = any([config_path, state_dir, credential_detected, port is not None])
+    gateway_configured = any([config_path, credential_detected, port is not None])
     cli_available = config_path is not None or state_dir is not None
 
     if gateway_reachable:
