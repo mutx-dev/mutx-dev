@@ -104,6 +104,7 @@ export type AutopilotIntegrationStatus = {
   hasBudget: boolean
   hasUsage: boolean
   hasApprovalRecords: boolean
+  approvalGateConfigured: boolean
 }
 
 export type AutopilotNextStep = {
@@ -249,12 +250,12 @@ export function explainApprovalImpact(approval: AutopilotApprovalSummary) {
 }
 
 export function analyzeAutopilotIntegration(input: {
-  agents: AutopilotAgentSummary[]
   runs: AutopilotRunSummary[]
   alerts: AutopilotAlertSummary[]
   approvals: AutopilotApprovalSummary[]
   budget: AutopilotBudgetSummary | null
   usage: AutopilotUsageBreakdown | null
+  approvalGateConfigured: boolean
 }): AutopilotIntegrationStatus {
   const hasRuns = input.runs.length > 0
   const hasAlerts = input.alerts.length > 0
@@ -266,29 +267,36 @@ export function analyzeAutopilotIntegration(input: {
         input.usage.usage_by_agent.length > 0 ||
         input.usage.usage_by_type.length > 0)
   )
+  const hasLiveAgent = Boolean(
+    input.runs.some((run) => typeof run.agent_id === 'string' && run.agent_id.trim()) ||
+      input.alerts.some((alert) => typeof alert.agent_id === 'string' && alert.agent_id.trim()) ||
+      input.approvals.some((approval) => typeof approval.agent_id === 'string' && approval.agent_id.trim()) ||
+      (input.usage?.usage_by_agent.length ?? 0) > 0
+  )
 
   return {
-    hasLiveAgent: input.agents.length > 0,
+    hasLiveAgent,
     hasRuns,
     hasAlerts,
     hasBudget,
     hasUsage,
     hasApprovalRecords,
+    approvalGateConfigured: input.approvalGateConfigured,
   }
 }
 
 export function getRunsEmptyState(status: AutopilotIntegrationStatus, nextStep: AutopilotNextStep): AutopilotEmptyState {
   if (!status.hasLiveAgent) {
     return {
-      title: 'No MUTX agents exist yet',
-      body: 'Pico has no real agent to attach to. Create or deploy one actual MUTX agent first, then come back for run history.',
+      title: 'No monitored agent is connected yet',
+      body: 'MUTX has no live agent reference from runs, alerts, approvals, or usage. Deploy the agent, connect one ingress, then trigger one real task before expecting Autopilot to say anything useful.',
       nextStep,
     }
   }
 
   return {
     title: 'An agent exists, but nothing has run yet',
-    body: 'MUTX knows about at least one agent, but there is no run history yet. Trigger one real task or wait for the first schedule tick, then come back here.',
+    body: 'The control plane can see an agent reference, but there is no run history yet. Trigger one real task or wait for the first schedule tick, then come back here.',
     nextStep,
   }
 }
@@ -297,14 +305,14 @@ export function getAlertsEmptyState(status: AutopilotIntegrationStatus, nextStep
   if (!status.hasRuns) {
     return {
       title: 'No alerts because nothing is running yet',
-      body: 'An empty alert feed means nothing until the agent has executed real work. Get one run into MUTX first.',
+      body: 'An empty alert feed is meaningless until the runtime actually executes work. First get a run into MUTX, then judge whether monitoring is quiet or missing.',
       nextStep,
     }
   }
 
   return {
     title: 'No live alerts right now',
-    body: 'Good. The monitoring feed is quiet right now. Keep watching the next real run and failure path.',
+    body: 'Good. That means nothing has fired yet. It does not automatically mean your monitoring setup is complete, so keep one eye on the next real run and failure path.',
     nextStep,
   }
 }
@@ -313,30 +321,38 @@ export function getUsageEmptyState(status: AutopilotIntegrationStatus, nextStep:
   if (!status.hasBudget) {
     return {
       title: 'No live budget snapshot yet',
-      body: 'There is no MUTX budget snapshot to compare against yet. Until that exists, cost awareness is incomplete.',
+      body: 'Pico can store a threshold locally, but there is no MUTX budget snapshot to compare against. Until that exists, cost awareness is only half wired.',
       nextStep,
     }
   }
 
   return {
     title: 'Budget exists, but usage is empty',
-    body: 'The budget surface is live, but no usage events landed in the current window. Either the agent has not spent anything yet or usage emission is missing.',
+    body: 'The account has a budget surface, but no usage events landed in the current window. Either the agent has not spent anything yet or usage emission is not wired cleanly.',
     nextStep,
   }
 }
 
 export function getApprovalsEmptyState(status: AutopilotIntegrationStatus, nextStep: AutopilotNextStep): AutopilotEmptyState {
-  if (!status.hasLiveAgent) {
+  if (status.hasApprovalRecords && !status.approvalGateConfigured) {
     return {
-      title: 'No agent exists to gate yet',
-      body: 'Approval queues only matter when a real agent is capable of doing something risky. Create or deploy the agent first.',
+      title: 'Approval records exist, but Pico says the gate is off',
+      body: 'The control plane has approval history, but the local Pico toggle is still off. Turn the gate on here so the UI matches reality instead of lying about enforcement.',
+      nextStep,
+    }
+  }
+
+  if (!status.hasApprovalRecords && status.approvalGateConfigured) {
+    return {
+      title: 'The gate is configured, but nothing has hit it yet',
+      body: 'Good start. Now send one risky action into the queue on purpose so you can verify approve and reject paths before trusting the workflow.',
       nextStep,
     }
   }
 
   return {
     title: 'No approval records yet',
-    body: 'Nothing risky has been routed through the real approval queue yet. Exercise one real gated action before you call this governed.',
+    body: 'Nothing is gated yet. Before you let an agent send, publish, or mutate anything risky, create one real approval checkpoint and exercise it once.',
     nextStep,
   }
 }

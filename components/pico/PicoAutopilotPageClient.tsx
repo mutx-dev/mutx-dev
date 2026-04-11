@@ -122,7 +122,6 @@ export function PicoAutopilotPageClient() {
   const [error, setError] = useState<string | null>(null)
   const [thresholdDraft, setThresholdDraft] = useState(progress.autopilot.costThresholdPercent)
   const [resolvingApprovalId, setResolvingApprovalId] = useState<string | null>(null)
-  const [creatingApprovalRequest, setCreatingApprovalRequest] = useState(false)
 
   const pendingApprovals = useMemo(
     () => approvals.filter((approval) => approval.status === 'PENDING'),
@@ -274,6 +273,54 @@ export function PicoAutopilotPageClient() {
     [alerts, approvals, budget, progress.autopilot.costThresholdPercent, runs, tracesByRunId],
   )
 
+  const integrationStatus = useMemo(
+    () =>
+      analyzeAutopilotIntegration({
+        runs,
+        alerts,
+        approvals,
+        budget,
+        usage,
+        approvalGateConfigured: progress.autopilot.approvalGateEnabled,
+      }),
+    [alerts, approvals, budget, progress.autopilot.approvalGateEnabled, runs, usage],
+  )
+
+  const defaultNextStep = useMemo(
+    () =>
+      derived.nextLesson
+        ? {
+            label: `Open ${derived.nextLesson.title}`,
+            href: toHref(`/academy/${derived.nextLesson.slug}`),
+          }
+        : {
+            label: 'Open onboarding',
+            href: toHref('/onboarding'),
+          },
+    [derived.nextLesson, toHref],
+  )
+
+  const runEmptyState = useMemo(
+    () => getRunsEmptyState(integrationStatus, defaultNextStep),
+    [defaultNextStep, integrationStatus],
+  )
+
+  const alertsEmptyState = useMemo(
+    () => getAlertsEmptyState(integrationStatus, defaultNextStep),
+    [defaultNextStep, integrationStatus],
+  )
+
+  const usageEmptyState = useMemo(
+    () => getUsageEmptyState(integrationStatus, defaultNextStep),
+    [defaultNextStep, integrationStatus],
+  )
+
+  const approvalsEmptyState = useMemo(
+    () => getApprovalsEmptyState(integrationStatus, defaultNextStep),
+    [defaultNextStep, integrationStatus],
+  )
+
+  const loadStateLabel = useMemo(() => loadState.toUpperCase(), [loadState])
 
   function saveThreshold() {
     if (thresholdValidationError) {
@@ -412,9 +459,7 @@ export function PicoAutopilotPageClient() {
           hint={liveHint(
             pendingApprovals.length > 0
               ? 'Pending risky actions are waiting for a human call.'
-              : integrationStatus.hasApprovalRecords && !integrationStatus.approvalGateConfigured
-                ? 'Approval history exists, but Pico gate is still off locally.'
-                : 'No risky actions are blocked right now.',
+              : 'No risky actions are blocked right now.',
             'Sign in to see live approvals.',
           )}
         />
