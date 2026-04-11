@@ -1,221 +1,221 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX — Build and Deploy AI Agents Safely Without Hiring a Developer",
-      "description": "PicoMUTX helps founders, operators, and small teams build, deploy, and run AI agents safely — with step-by-step guidance, built-in safeguards, and real support. Pre-register now for early access."
+      "title": "PicoMUTX - 无需雇佣开发者，也能安全构建和部署 AI 智能体",
+      "description": "PicoMUTX 帮助创始人、运营者和小团队安全地构建、部署并运行 AI 智能体，提供分步指导、内置护栏和真实支持。现在预注册，抢先获得早期访问资格。"
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
-      "cta": "Pre-register"
+      "cta": "预注册"
     },
     "hero": {
-      "badge": "Early Access · Limited Spots",
-      "title": "Build and deploy AI agents ",
-      "titleAccent": "without hiring a developer.",
-      "subtitle": "PicoMUTX gives you a safe, guided path to a working AI agent — whether you are starting from scratch, fixing an agent that is not working, or trying to avoid another expensive mistake.",
-      "cta": "Pre-Register for Early Access",
-      "meta": "Free to pre-register · No credit card required · Founding spots limited"
+      "badge": "早期访问 · 名额有限",
+      "title": "安全构建和部署 AI 智能体，",
+      "titleAccent": "无需雇佣开发者。",
+      "subtitle": "无论你是从零开始、正在修复一个跑不通的智能体，还是想避免再犯一次昂贵错误，PicoMUTX 都能为你提供一条安全、清晰、有人引导的落地路径。",
+      "cta": "立即预注册，获取早期访问",
+      "meta": "免费预注册 · 无需信用卡 · 创始席位有限"
     },
     "trustBar": {
       "items": {
-        "0": "For founders, operators, and small teams",
-        "1": "Step-by-step guidance",
-        "2": "Built-in safeguards from day one"
+        "0": "面向创始人、运营者和小团队",
+        "1": "分步指导",
+        "2": "从第一天起就有内置护栏"
       }
     },
     "problem": {
-      "eyebrow": "The Problem",
-      "title": "The problem is not the idea.",
-      "titleLine2": "It is everything that happens after it.",
-      "body": "Most people do not get stuck because they lack ambition. They get stuck because building an AI agent still feels like entering a world designed by engineers, for engineers.",
+      "eyebrow": "问题所在",
+      "title": "问题不在想法本身。",
+      "titleLine2": "而在于之后发生的一切。",
+      "body": "大多数人卡住，并不是因为没有野心，而是因为构建 AI 智能体这件事，依然像在进入一个由工程师为工程师设计的世界。",
       "scenarios": {
         "0": {
-          "label": "\"I want an AI agent, but I don't know where to start.\"",
-          "body": "There are too many tools, too many opinions, and too many people assuming you already know the basics. The gap between \"I have an idea\" and \"I have something working\" feels larger than it should."
+          "label": "\"我想做一个 AI 智能体，但不知道该从哪里开始。\"",
+          "body": "工具太多，观点太多，太多人默认你已经懂基础。从\"我有个想法\"到\"我有个能跑的东西\"之间的落差，本不该这么大。"
         },
         "1": {
-          "label": "\"I already tried — and got stuck.\"",
-          "body": "You made progress, hit a wall, and had nobody to ask who could actually help. The idea is sitting in your backlog instead of creating value."
+          "label": "\"我已经试过了，但卡住了。\"",
+          "body": "你确实推进过，也确实撞过墙，但身边没有一个真正能帮你解决问题的人。结果，这个想法躺进了待办列表，没有产生任何价值。"
         },
         "2": {
-          "label": "\"I spent money, and it still isn't working properly.\"",
-          "body": "Maybe you hired someone. Maybe you paid for tools. Now you are not just uncertain — you are skeptical."
+          "label": "\"我已经花过钱了，可它还是跑不好。\"",
+          "body": "也许你雇过人，也许你买过工具。现在你不只是拿不准，而是已经开始怀疑这一切。"
         },
         "3": {
-          "label": "\"I don't want to deploy something I can't trust.\"",
-          "body": "An agent that gives the wrong answer, behaves unpredictably, or creates hidden costs is not an asset. It is a liability."
+          "label": "\"我不想部署一个自己都不信任的东西。\"",
+          "body": "会给错答案、行为不可预测、还带来隐性成本的智能体，不是资产，而是负债。"
         }
       },
-      "close": "That's exactly why PicoMUTX exists."
+      "close": "这正是 PicoMUTX 存在的原因。"
     },
     "platform": {
-      "eyebrow": "What PicoMUTX Is",
-      "title": "Where AI agents go from “interesting idea” to “working system.”",
-      "body": "PicoMUTX is a guided platform for people who want to build and run AI agents safely — without needing to become full-time engineers. It gives you the structure, support, and safeguards that are usually missing when people try to do this alone. Instead of assembling everything from scratch, you move step by step: from idea to implementation, from confusion to clarity, from prototype to something you can actually use.",
+      "eyebrow": "PicoMUTX 是什么",
+      "title": "让 AI 智能体从“有趣的想法”变成“真正能运行的系统”。",
+      "body": "PicoMUTX 是一个面向非全职工程师的引导式平台，帮助你安全地构建和运行 AI 智能体。它补上了大多数人独自推进时最缺的东西：结构、支持和护栏。你不需要从零拼装一切，而是可以一步一步前进：从想法到实现，从混乱到清晰，从原型到真正能投入使用的系统。",
       "howItWorks": {
         "0": {
-          "title": "Step-by-step implementation paths",
-          "body": "Follow structured paths based on what you are trying to build — from customer support agents to internal automations. No generic theory. No endless searching."
+          "title": "分步实施路径",
+          "body": "根据你想构建的东西，沿着结构化路径推进：从客服智能体到内部自动化。没有空泛理论，没有无休止搜索。"
         },
         "1": {
-          "title": "Guided support when you get stuck",
-          "body": "When something breaks or becomes unclear, you do not have to figure it out alone. PicoMUTX keeps momentum alive instead of letting projects die in confusion."
+          "title": "卡住时有引导支持",
+          "body": "当某个环节坏掉了，或者事情开始变得不清楚时，你不用一个人硬扛。PicoMUTX 的目标，是让项目继续向前，而不是死在混乱里。"
         },
         "2": {
-          "title": "Built-in safety from day one",
-          "body": "Cost awareness, visibility, and guardrails matter. You always know what your agent is doing, what it is costing, and when something needs attention."
+          "title": "从第一天起就具备安全性",
+          "body": "成本感知、可见性和护栏都很重要。你始终知道智能体在做什么、花了多少钱，以及什么时候需要你介入。"
         },
         "3": {
-          "title": "Live expert touchpoints",
-          "body": "Some things are too nuanced for static documentation. Real guidance moments designed to help you unblock faster and make better decisions."
+          "title": "真人专家触点",
+          "body": "有些问题不是靠静态文档就能解决的。这里设计了真实的引导触点，帮助你更快解除阻塞，做出更好的决策。"
         }
       }
     },
     "who": {
-      "eyebrow": "Is PicoMUTX for You?",
-      "title": "PicoMUTX is not for everyone.",
-      "forYouTitle": "This is for you if…",
-      "notForYouTitle": "This is not for you if…",
+      "eyebrow": "PicoMUTX 适合你吗？",
+      "title": "PicoMUTX 不是给所有人的。",
+      "forYouTitle": "如果你符合这些情况，它适合你……",
+      "notForYouTitle": "如果你符合这些情况，它不适合你……",
       "forYou": {
-        "0": "You want to build an AI agent but don't want to depend entirely on developers",
-        "1": "You've tried before and got stuck halfway",
-        "2": "You already spent money on tools or implementation and still don't trust the outcome",
-        "3": "You want a practical path, not more theory",
-        "4": "You want support while building, not only after something goes wrong"
+        "0": "你想构建 AI 智能体，但不想完全依赖开发者",
+        "1": "你之前尝试过，但中途卡住了",
+        "2": "你已经在工具或实现上花过钱，但依然不信任结果",
+        "3": "你想要的是实用路径，而不是更多理论",
+        "4": "你希望在构建过程中得到支持，而不是等出问题后再补救"
       },
       "notForYou": {
-        "0": "You are looking for a shortcut with zero learning",
-        "1": "You already run a mature enterprise agent stack and need complex governance infrastructure",
-        "2": "You want entertainment, trends, or hype more than execution",
-        "3": "You are not ready to change how the business actually operates",
-        "4": "You expect AI to replace judgment, leadership, or accountability"
+        "0": "你只想找一个零学习成本的捷径",
+        "1": "你已经在运行成熟的企业级智能体体系，只差复杂治理基础设施",
+        "2": "你追求的是热点、趋势和噱头，而不是落地执行",
+        "3": "你还没准备好真正改变业务的运作方式",
+        "4": "你希望 AI 取代判断力、领导力或责任"
       }
     },
     "beforeAfter": {
-      "eyebrow": "The Shift",
-      "title": "What changes when you stop figuring it out alone",
-      "beforeLabel": "Before",
-      "afterLabel": "After",
+      "eyebrow": "转变",
+      "title": "当你不再独自摸索，会发生什么变化",
+      "beforeLabel": "之前",
+      "afterLabel": "之后",
       "items": {
         "0": {
-          "before": "You have an idea, but no clear path",
-          "after": "You have a structured way forward"
+          "before": "你有一个想法，但没有清晰路径",
+          "after": "你拥有一条结构化的前进路线"
         },
         "1": {
-          "before": "You waste time jumping between tools, docs, and tutorials",
-          "after": "You follow guided implementation paths"
+          "before": "你在工具、文档和教程之间来回跳，浪费大量时间",
+          "after": "你沿着引导式实施路径推进"
         },
         "2": {
-          "before": "You get stuck and lose momentum",
-          "after": "You get support before the project dies"
+          "before": "你一旦卡住，就会失去 momentum",
+          "after": "你会在项目夭折前得到支持"
         },
         "3": {
-          "before": "Your agent stays in theory",
-          "after": "Your agent gets built and put to work"
+          "before": "你的智能体一直停留在理论阶段",
+          "after": "你的智能体会被真正构建出来并投入使用"
         }
       },
-      "close": "The goal is not to “learn AI someday.” The goal is to get your agent live — safely, clearly, and with less friction."
+      "close": "目标不是“以后某天再学 AI”。目标是把你的智能体真正上线 - 更安全、更清晰、阻力更小。"
     },
     "earlyAccess": {
-      "eyebrow": "Early Access",
-      "title": "PicoMUTX is opening in stages. Founding access won't stay open forever.",
-      "body": "Pre-registering now puts you ahead of the public rollout and inside the group that helps shape the platform early. Early users get a closer line to the product, earlier onboarding, and more influence over what gets prioritized.",
+      "eyebrow": "早期访问",
+      "title": "PicoMUTX 将分阶段开放。创始访问资格不会一直敞开。",
+      "body": "现在预注册，你就能比公开发布更早进入，并加入帮助塑造平台早期方向的那批人。早期用户会更靠近产品，更早开始上手，也对优先级拥有更大影响力。",
       "benefits": {
-        "0": "Early access before public release",
-        "1": "Priority consideration for founding member spots",
-        "2": "Early onboarding and launch updates",
-        "3": "The ability to influence early use cases and rollout priorities",
-        "4": "First visibility into pricing and access terms"
+        "0": "公开发布前优先获得访问资格",
+        "1": "优先考虑创始成员席位",
+        "2": "更早获取上手引导和上线更新",
+        "3": "有机会影响早期使用场景和发布优先级",
+        "4": "第一时间了解价格和访问条款"
       }
     },
     "faq": {
-      "eyebrow": "Questions",
-      "title": "Questions people usually have before joining",
+      "eyebrow": "常见问题",
+      "title": "加入前大家通常会问的问题",
       "items": {
         "0": {
-          "q": "Do I need to know how to code?",
-          "a": "No. PicoMUTX is built for people who want to build useful AI agents without needing deep technical expertise."
+          "q": "我需要会写代码吗？",
+          "a": "不需要。PicoMUTX 就是为那些想构建有用 AI 智能体、但不具备深度技术背景的人设计的。"
         },
         "1": {
-          "q": "What if I've already tried and failed?",
-          "a": "That is exactly one of the people this is for. PicoMUTX is designed to reduce the confusion and fragmentation that usually cause people to stop halfway."
+          "q": "如果我之前试过并且失败了怎么办？",
+          "a": "那正是我们重点服务的人群之一。PicoMUTX 的设计目标，就是减少通常会让人半路放弃的混乱和碎片化。"
         },
         "2": {
-          "q": "What kind of agents can I build?",
-          "a": "Practical ones — the kind that save time, support operations, improve workflows, and help businesses run better. The focus is usefulness, not toy demos."
+          "q": "我能构建什么类型的智能体？",
+          "a": "能真正带来价值的那种：节省时间、支持运营、改善工作流程、让业务运行得更顺的智能体。重点是实用，不是玩具演示。"
         },
         "3": {
-          "q": "Is pre-registration free?",
-          "a": "Yes. Pre-registration is free and does not require payment. You will be among the first to hear when access opens and when founding spots become available."
+          "q": "预注册是免费的吗？",
+          "a": "是的。预注册完全免费，不需要付款。访问开放或创始席位出现时，你会是第一批知道的人。"
         },
         "4": {
-          "q": "Is this for enterprises?",
-          "a": "PicoMUTX is better suited to founders, operators, and small teams who want a guided way to build and deploy AI agents. Larger enterprise governance needs belong to the broader MUTX ecosystem."
+          "q": "这是给企业用的吗？",
+          "a": "PicoMUTX 更适合想通过引导式方式构建和部署 AI 智能体的创始人、运营者和小团队。更复杂的企业级治理需求属于更广泛的 MUTX 体系。"
         }
       }
     },
     "finalCta": {
-      "eyebrow": "Early Access · Limited Spots",
-      "title": "Your agent does not need to stay an unfinished idea.",
-      "body": "You do not need more tabs open. You do not need another tutorial. You need a clearer path to something that works. PicoMUTX is built for that moment.",
-      "formHeadline": "Pre-register for PicoMUTX",
-      "formSubline": "Join the early access list. Be first when we open.",
-      "ctaButton": "Pre-Register Now",
-      "formCtaMeta": "Free to pre-register · No credit card required · Early users get priority access"
+      "eyebrow": "早期访问 · 名额有限",
+      "title": "你的智能体没必要永远停留在未完成的想法阶段。",
+      "body": "你不需要再开更多标签页，也不需要再看另一篇教程。你真正需要的，是一条更清晰、能把东西做出来的路径。PicoMUTX 就是为这个时刻打造的。",
+      "formHeadline": "预注册 PicoMUTX",
+      "formSubline": "加入早期访问名单。开放时第一时间知道。",
+      "ctaButton": "立即预注册",
+      "formCtaMeta": "免费预注册 · 无需信用卡 · 早期用户优先访问"
     },
     "contactForm": {
-      "dialogLabel": "Contact form",
-      "closeLabel": "Close",
-      "title": "Pre-register for early access",
-      "subtitle": "Tell us where you are. We'll get you in.",
-      "emailLabel": "Work email",
+      "dialogLabel": "联系表单",
+      "closeLabel": "关闭",
+      "title": "预注册，获取早期访问",
+      "subtitle": "告诉我们你的情况。我们会把你拉进来。",
+      "emailLabel": "工作邮箱",
       "emailPlaceholder": "you@company.com",
-      "nameLabel": "Name",
-      "namePlaceholder": "Jane Smith",
-      "companyLabel": "Company",
+      "nameLabel": "姓名",
+      "namePlaceholder": "张三",
+      "companyLabel": "公司",
       "companyPlaceholder": "Acme Inc.",
-      "interestLabel": "What brings you here?",
+      "interestLabel": "你为什么来到这里？",
       "interestOptions": {
-        "building-first": "Building my first AI agent",
-        "fixing-existing": "Fixing an agent that isn't working",
-        "evaluating": "Evaluating platforms or tools",
-        "spent-money": "Already spent money — still not working",
-        "other": "Something else"
+        "building-first": "正在构建我的第一个 AI 智能体",
+        "fixing-existing": "正在修复一个跑不通的智能体",
+        "evaluating": "正在评估平台或工具",
+        "spent-money": "已经花过钱了 - 还是没跑起来",
+        "other": "其他"
       },
-      "messageLabel": "Anything we should know?",
-      "messageOptional": "(optional)",
-      "messagePlaceholder": "E.g. I run a small SaaS and want to automate customer support...",
-      "submitting": "Sending...",
-      "submit": "Join the early access list",
-      "disclaimer": "No spam. No sales calls. Just a human reply.",
-      "successTitle": "You're on the list.",
-      "successBody": "We read every message. Expect a personal reply within 24 hours.",
-      "successBack": "Back to the page",
-      "errorFallback": "Something went wrong. Please try again.",
-      "networkError": "Network error. Please try again."
+      "messageLabel": "还有什么我们需要知道的吗？",
+      "messageOptional": "（可选）",
+      "messagePlaceholder": "例如：我在运营一个小型 SaaS，想把客服自动化……",
+      "submitting": "发送中...",
+      "submit": "加入早期访问名单",
+      "disclaimer": "不发垃圾邮件。不打销售电话。只会有人类亲自回复。",
+      "successTitle": "你已加入名单。",
+      "successBody": "我们会认真阅读每一条消息。预计 24 小时内收到人工回复。",
+      "successBack": "返回页面",
+      "errorFallback": "出了点问题。请重试。",
+      "networkError": "网络错误。请重试。"
     },
     "preRegForm": {
-      "emailLabel": "Work email",
+      "emailLabel": "工作邮箱",
       "emailPlaceholder": "you@company.com",
-      "submitting": "Joining…",
-      "submit": "Pre-Register Now",
-      "privacy": "No spam. No payment required. Just early access updates and launch details.",
-      "successTitle": "You are on the list.",
-      "successBody": "We will be in touch when PicoMUTX access opens. No spam, no payment required.",
-      "errorFallback": "Something went wrong. Please try again."
+      "submitting": "加入中…",
+      "submit": "立即预注册",
+      "privacy": "不发垃圾邮件。无需付款。只发送早期访问更新和上线消息。",
+      "successTitle": "你已加入名单。",
+      "successBody": "PicoMUTX 开放访问时，我们会联系你。不发垃圾邮件，不要求付款。",
+      "errorFallback": "出了点问题。请重试。"
     },
     "footer": {
       "links": {
-        "releases": "Releases",
-        "docs": "Docs",
+        "releases": "版本发布",
+        "docs": "文档",
         "github": "GitHub",
-        "download": "Download",
-        "dashboard": "Dashboard",
-        "contact": "Contact",
-        "privacy": "Privacy"
+        "download": "下载",
+        "dashboard": "控制台",
+        "contact": "联系",
+        "privacy": "隐私"
       },
-      "copyright": "© MUTX 2026. Open control for deployed agents."
+      "copyright": "© MUTX 2026. 已部署智能体的开放控制。"
     }
   }
 }

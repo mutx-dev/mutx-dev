@@ -16,8 +16,36 @@ const CSRF_FAILURE_DETAIL = 'CSRF validation failed: origin is not allowed'
 const APP_HOST = 'app.mutx.dev'
 const APP_HOSTS = new Set([APP_HOST, 'app.localhost'])
 const MARKETING_HOSTS = new Set(['mutx.dev', 'www.mutx.dev'])
-const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.localhost'])
+const PICO_HOSTS = new Set(['pico.mutx.dev', 'pico.mutxx.dev', 'pico.localhost'])
 const PICO_LOCALES = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh', 'ar'] as const
+const PICO_LOCALE_BY_COUNTRY: Partial<Record<string, (typeof PICO_LOCALES)[number]>> = {
+  JP: 'ja',
+  KR: 'ko',
+  CN: 'zh',
+  HK: 'zh',
+  TW: 'zh',
+  MO: 'zh',
+  IT: 'it',
+  PT: 'pt',
+  BR: 'pt',
+  ES: 'es',
+  MX: 'es',
+  AR: 'es',
+  CO: 'es',
+  CL: 'es',
+  FR: 'fr',
+  BE: 'fr',
+  LU: 'fr',
+  DE: 'de',
+  AT: 'de',
+  SA: 'ar',
+  AE: 'ar',
+  EG: 'ar',
+  US: 'en',
+  GB: 'en',
+  AU: 'en',
+  CA: 'en',
+}
 const UI_CACHE_CONTROL = 'private, no-cache, no-store, max-age=0, must-revalidate'
 const API_CACHE_CONTROL = 'no-store'
 const APP_PUBLIC_PATHS = new Set([
@@ -66,17 +94,10 @@ function getLocaleFromRequest(request: NextRequest): string {
   const cfCountry = request.headers.get('CF-IPCountry') ||
                     request.headers.get('X-Vercel-IP-Country')
   if (cfCountry) {
-    const lang = cfCountry.toLowerCase()
-    if (lang === 'zh') return 'zh'
-    if (['ja'].includes(lang)) return lang
-    if (['ko'].includes(lang)) return lang
-    if (['ar', 'sa', 'ae', 'eg'].includes(lang)) return 'ar'
-    if (['en', 'gb', 'au', 'ca', 'us'].includes(lang)) return 'en'
-    if (['es', 'mx', 'ar', 'co', 'cl'].includes(lang)) return 'es'
-    if (['fr', 'be', 'ca', 'ch'].includes(lang)) return 'fr'
-    if (['de', 'at', 'ch'].includes(lang)) return 'de'
-    if (['it'].includes(lang)) return 'it'
-    if (['pt', 'br'].includes(lang)) return 'pt'
+    const localeFromCountry = PICO_LOCALE_BY_COUNTRY[cfCountry.toUpperCase()]
+    if (localeFromCountry) {
+      return localeFromCountry
+    }
   }
   // 3. Accept-Language header
   const acceptLang = request.headers.get('accept-language')

@@ -6,6 +6,7 @@ function mockRequest(
   url: string,
   headers: Record<string, string> = {},
   method = 'GET',
+  cookies: Record<string, string> = {},
 ) {
   const normalizedHeaders = Object.fromEntries(
     Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]),
@@ -18,6 +19,12 @@ function mockRequest(
     headers: {
       get(name: string) {
         return normalizedHeaders[name.toLowerCase()] ?? null
+      },
+    },
+    cookies: {
+      get(name: string) {
+        const value = cookies[name]
+        return value ? { value } : undefined
       },
     },
   } as unknown as NextRequest
@@ -141,6 +148,48 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('cache-control')).toBe(
       'private, no-cache, no-store, max-age=0, must-revalidate',
     )
+  })
+
+  it('maps pico geolocation headers to supported locales on first visit', () => {
+    const jpResponse = proxy(
+      mockRequest('https://pico.mutx.dev/', { host: 'pico.mutx.dev', 'CF-IPCountry': 'JP' }),
+    )
+    const krResponse = proxy(
+      mockRequest('https://pico.mutxx.dev/', { host: 'pico.mutxx.dev', 'CF-IPCountry': 'KR' }),
+    )
+    const cnResponse = proxy(
+      mockRequest('https://pico.mutx.dev/', { host: 'pico.mutx.dev', 'CF-IPCountry': 'CN' }),
+    )
+
+    expect(jpResponse.headers.get('set-cookie')).toContain('NEXT_LOCALE=ja')
+    expect(jpResponse.headers.get('x-middleware-rewrite')).toBe('https://pico.mutx.dev/pico')
+    expect(krResponse.headers.get('set-cookie')).toContain('NEXT_LOCALE=ko')
+    expect(krResponse.headers.get('x-middleware-rewrite')).toBe('https://pico.mutxx.dev/pico')
+    expect(cnResponse.headers.get('set-cookie')).toContain('NEXT_LOCALE=zh')
+  })
+
+  it('keeps cookie precedence over pico geolocation', () => {
+    const response = proxy(
+      mockRequest(
+        'https://pico.mutxx.dev/',
+        { host: 'pico.mutxx.dev', 'CF-IPCountry': 'JP' },
+        'GET',
+        { NEXT_LOCALE: 'es' },
+      ),
+    )
+
+    expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=es')
+  })
+
+  it('falls back to accept-language for pico when geo headers are missing', () => {
+    const response = proxy(
+      mockRequest(
+        'https://pico.mutxx.dev/',
+        { host: 'pico.mutxx.dev', 'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8' },
+      ),
+    )
+
+    expect(response.headers.get('set-cookie')).toContain('NEXT_LOCALE=es')
   })
 
   it('still applies rate-limit headers on protected auth endpoints', () => {
