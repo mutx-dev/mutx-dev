@@ -26,11 +26,11 @@ export function PicoAcademyDashboard() {
   const installDone = progress.completedLessons.includes('install-hermes-locally')
   const firstRunDone = progress.completedLessons.includes('run-your-first-agent')
   const activationLessonSlug = firstRunDone
-    ? (nextLesson?.slug ?? 'deploy-hermes-on-a-vps')
+    ? (nextLesson?.slug ?? null)
     : installDone
       ? 'run-your-first-agent'
       : 'install-hermes-locally'
-  const activationLesson = getLessonBySlug(activationLessonSlug)
+  const activationLesson = activationLessonSlug ? getLessonBySlug(activationLessonSlug) : null
   const activationTrack = PICO_TRACKS[0]
 
   return (
@@ -40,10 +40,16 @@ export function PicoAcademyDashboard() {
       description="The fastest path is boring on purpose: install Hermes, run one prompt, keep the proof, then move on."
       actions={
         <Link
-          href={toHref(`/academy/${activationLessonSlug}`)}
+          href={firstRunDone && !activationLessonSlug ? toHref('/autopilot') : toHref(`/academy/${activationLessonSlug}`)}
           className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
         >
-          {installDone ? (firstRunDone ? `Continue with ${nextLesson?.title ?? 'the next lesson'}` : 'Run your first agent') : 'Install Hermes now'}
+          {!installDone
+            ? 'Install Hermes now'
+            : !firstRunDone
+              ? 'Run your first agent'
+              : activationLessonSlug && nextLesson
+                ? `Continue with ${nextLesson.title}`
+                : 'Open Autopilot'}
         </Link>
       }
     >
@@ -80,7 +86,9 @@ export function PicoAcademyDashboard() {
                 ? 'Install Hermes from the first lesson. Do not browse the rest of the academy yet.'
                 : !firstRunDone
                   ? 'Good. The runtime is installed. Now run one tiny prompt and get one visible answer back.'
-                  : `You cleared the first win. Continue with ${nextLesson?.title ?? 'the next lesson'} while the momentum is still hot.`}
+                  : nextLesson
+                    ? `You cleared the first win. Continue with ${nextLesson.title} while the momentum is still hot.`
+                    : 'You finished the current lesson path. Open Autopilot and inspect the control surface.'}
             </p>
           </div>
           <div className="mt-5 grid gap-4 md:grid-cols-3">
@@ -123,12 +131,17 @@ export function PicoAcademyDashboard() {
           <button
             type="button"
             onClick={() => {
-              actions.startLesson(activationLessonSlug)
-              router.push(toHref(`/academy/${activationLessonSlug}`))
+              if (activationLessonSlug) {
+                actions.startLesson(activationLessonSlug)
+                router.push(toHref(`/academy/${activationLessonSlug}`))
+                return
+              }
+
+              router.push(toHref('/autopilot'))
             }}
             className="mt-5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-100"
           >
-            Open the fastest next step
+            {activationLessonSlug ? 'Open the fastest next step' : 'Open Autopilot'}
           </button>
         </div>
       </section>
@@ -188,9 +201,11 @@ export function PicoAcademyDashboard() {
                     <div className="mt-4 rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] p-4 text-sm text-slate-300">
                       {nextTrackLesson
                         ? `Next lesson in this track: ${nextTrackLesson.title}`
-                        : unlocked && firstTrackLesson
-                          ? `Start with ${firstTrackLesson.title}.`
-                          : 'Finish the previous track before you open this one.'}
+                        : completedCount === track.lessons.length
+                          ? 'This track is complete. Do not restart it just to feel busy.'
+                          : unlocked && firstTrackLesson
+                            ? `Start with ${firstTrackLesson.title}.`
+                            : 'Finish the previous track before you open this one.'}
                     </div>
                   </article>
                 )

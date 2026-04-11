@@ -13,9 +13,10 @@ type PicoContactFormProps = {
   onClose: () => void
   defaultInterest?: string
   source?: string
+  onSuccess?: () => void
 }
 
-export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico-landing' }: PicoContactFormProps) {
+export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico-landing', onSuccess }: PicoContactFormProps) {
   const t = useTranslations('pico.contactForm')
   const prefersReducedMotion = useReducedMotion()
   const [state, setState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
@@ -67,12 +68,13 @@ export function PicoContactForm({ open, onClose, defaultInterest, source = 'pico
         }
 
         setState('success')
+        onSuccess?.()
       } catch {
         setErrorMsg(t('networkError'))
         setState('error')
       }
     },
-    [state, interest, source, t],
+    [state, interest, onSuccess, source, t],
   )
 
   const handleClose = useCallback(() => {

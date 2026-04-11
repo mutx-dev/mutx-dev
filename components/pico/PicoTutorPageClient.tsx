@@ -180,14 +180,29 @@ export function PicoTutorPageClient() {
                 {reply.summary}
               </div>
 
-              {reply.lessons[0] ? (
-                <div className="flex flex-wrap gap-3">
-                  <Link
-                    href={resolveTutorHref(toHref, reply.lessons[0].href)}
-                    className="inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
-                  >
-                    Open {reply.lessons[0].title}
-                  </Link>
+              {reply.lessons.length ? (
+                <div className="space-y-3">
+                  <div className="flex flex-wrap gap-3">
+                    <Link
+                      href={resolveTutorHref(toHref, reply.lessons[0].href)}
+                      className="inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
+                    >
+                      Open {reply.lessons[0].title}
+                    </Link>
+                  </div>
+                  {reply.lessons.length > 1 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {reply.lessons.slice(1).map((lesson) => (
+                        <Link
+                          key={lesson.id}
+                          href={resolveTutorHref(toHref, lesson.href)}
+                          className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-slate-300 transition hover:bg-white/10"
+                        >
+                          Or open {lesson.title}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
 
