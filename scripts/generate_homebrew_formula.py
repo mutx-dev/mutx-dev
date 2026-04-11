@@ -17,7 +17,6 @@ import tomllib
 from typing import Any
 from urllib.request import urlopen
 
-
 DEFAULT_HOMEPAGE = "https://mutx.dev"
 DEFAULT_REPOSITORY = "mutx-dev/mutx-dev"
 DEFAULT_PYTHON_FORMULA = "python@3.12"
@@ -77,7 +76,9 @@ def source_archive_url(repository: str, tag: str) -> str:
 
 def sha256_for_url(url: str) -> str:
     digest = hashlib.sha256()
-    with urlopen(url) as response:  # noqa: S310 - release automation downloads a trusted artifact URL
+    with urlopen(
+        url
+    ) as response:  # noqa: S310 - release automation downloads a trusted artifact URL
         while True:
             chunk = response.read(1024 * 1024)
             if not chunk:
@@ -175,16 +176,11 @@ def render_formula(
     python_formula: str,
     resources: list[HomebrewResource],
 ) -> str:
-    resource_blocks = "\n\n".join(
-        textwrap.dedent(
-            f"""\
+    resource_blocks = "\n\n".join(textwrap.dedent(f"""\
               resource "{_escape_ruby(resource.name)}" do
                 url "{_escape_ruby(resource.url)}"
                 sha256 "{resource.sha256}"
-              end"""
-        )
-        for resource in resources
-    )
+              end""") for resource in resources)
     if resource_blocks:
         resource_section = "\n".join(
             f"  {line}" if line else "" for line in resource_blocks.splitlines()
@@ -213,11 +209,12 @@ class {FORMULA_CLASS_NAME} < Formula
 
   test do
     assert_match "Usage: mutx onboard [OPTIONS]", shell_output("#{{bin}}/mutx onboard --help")
+    assert_match "Usage: mutx first-agent [OPTIONS] [TASK]...", shell_output("#{{bin}}/mutx first-agent --help")
     assert_match "--install-openclaw", shell_output("#{{bin}}/mutx setup hosted --help")
     assert_match "inspect", shell_output("#{{bin}}/mutx runtime --help")
     system libexec/"bin/python", "-c", "import {imports}"
   end
-end
+
 """
     return body
 

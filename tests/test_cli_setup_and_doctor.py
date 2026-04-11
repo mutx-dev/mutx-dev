@@ -29,12 +29,14 @@ def wizard_result_payload(*, reused_existing_assistant: bool = False) -> SimpleN
             workspace="/tmp/openclaw/workspace-personal-assistant",
         ),
         health=SimpleNamespace(status="healthy", gateway_url="http://127.0.0.1:18789"),
-        deployment=None
-        if reused_existing_assistant
-        else {
-            "agent": {"id": "agent-pa-01"},
-            "deployment": {"id": "dep-pa-01"},
-        },
+        deployment=(
+            None
+            if reused_existing_assistant
+            else {
+                "agent": {"id": "agent-pa-01"},
+                "deployment": {"id": "dep-pa-01"},
+            }
+        ),
         assistant_id="agent-pa-01",
         reused_existing_assistant=reused_existing_assistant,
         action_type="import",
@@ -79,6 +81,7 @@ def test_setup_hosted_deploys_personal_assistant(monkeypatch, tmp_path: Path) ->
 
     monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
     monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: None)
+    monkeypatch.setattr("cli.commands.setup.shutil.which", lambda _name: "/usr/local/bin/hermes")
     monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
     monkeypatch.setattr(
         "cli.commands.setup.mark_auth_completed",
@@ -133,6 +136,8 @@ def test_setup_hosted_deploys_personal_assistant(monkeypatch, tmp_path: Path) ->
     assert "OpenClaw assistant_id: personal-assistant" in result.output
     assert "OpenClaw binary: /opt/homebrew/bin/openclaw" in result.output
     assert "Tracking: imported into ~/.mutx/providers/openclaw" in result.output
+    assert "Immediate payoff:" in result.output
+    assert 'mutx first-agent "Turn these rough notes into three next steps"' in result.output
     assert launched["value"] is True
 
 
@@ -150,6 +155,7 @@ def test_setup_hosted_defaults_to_hosted_api(monkeypatch, tmp_path: Path) -> Non
 
     monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
     monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: None)
+    monkeypatch.setattr("cli.commands.setup.shutil.which", lambda _name: "/usr/local/bin/hermes")
     monkeypatch.setattr("cli.commands.setup._auth_service", lambda: DummyAuth())
     monkeypatch.setattr(
         "cli.commands.setup.mark_auth_completed",
@@ -199,6 +205,7 @@ def test_setup_local_bootstraps_local_operator_without_credentials(
 
     monkeypatch.setattr("cli.main.CLIConfig", lambda: config)
     monkeypatch.setattr("cli.commands.setup.find_openclaw_bin", lambda: None)
+    monkeypatch.setattr("cli.commands.setup.shutil.which", lambda _name: "/usr/local/bin/hermes")
     monkeypatch.setattr(
         "cli.commands.setup.ensure_local_control_plane",
         lambda **kwargs: SimpleNamespace(
@@ -245,6 +252,8 @@ def test_setup_local_bootstraps_local_operator_without_credentials(
     assert captured["wizard_kwargs"]["mode"] == "local"
     assert captured["wizard_kwargs"]["assistant_name"] == "Personal Assistant"
     assert "Assistant deployed: agent-pa-01" in result.output
+    assert "Immediate payoff:" in result.output
+    assert 'mutx first-agent "Turn these rough notes into three next steps"' in result.output
     assert launched["value"] is True
 
 
