@@ -340,7 +340,10 @@ def _extract_archive(archive_path: Path, destination: Path) -> None:
                 )
 
             extraction_target = (destination_root / member.name).resolve()
-            if extraction_target != destination_root and destination_root not in extraction_target.parents:
+            if (
+                extraction_target != destination_root
+                and destination_root not in extraction_target.parents
+            ):
                 raise LocalControlPlaneError(
                     "MUTX could not provision the local control plane source. "
                     "Archive contains unsafe paths."
