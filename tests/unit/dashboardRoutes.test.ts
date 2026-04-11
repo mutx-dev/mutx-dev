@@ -306,7 +306,7 @@ describe('dashboard route proxies', () => {
     const { POST } = await import('../../app/api/dashboard/templates/[templateId]/deploy/route')
 
     const request = {
-      text: async () => JSON.stringify({ name: 'Pico Starter Assistant', workspace: 'pico-starter' }),
+      json: async () => ({ name: 'Pico Starter Assistant', workspace: 'pico-starter' }),
     } as NextRequest
     const response = await POST(request, {
       params: Promise.resolve({ templateId: 'personal_assistant' }),

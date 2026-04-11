@@ -122,8 +122,27 @@ What failed
 - Nothing in the validated Pico slice. Existing OpenTelemetry shutdown noise still shows up after pytest and remains non-blocking.
 
 What is next
-- Exercise the authenticated deploy path against a real MUTX session so the starter agent receipt and control actions get one live end-to-end pass.
 - Once the runtime emits richer live state, deepen the in-Pico run view instead of sending anyone back to dashboard chrome.
+- Replace deployment-only visibility with true run visibility when the underlying run producer is ready.
+
+### 2026-04-11 10:09:28 CEST — authenticated Pico smoke passed
+What changed
+- Fixed the last deploy-proxy bug by switching the starter-template route to `request.json()` plus `JSON.stringify(payload)` forwarding.
+- Booted a local backend on `127.0.0.1:8000` with a temporary smoke database so the real auth and deploy flow could be exercised end to end.
+- Verified authenticated Pico deploy, stop/start control, and approval create/approve flow from the Pico UI.
+
+What was tested
+- `npm run typecheck`
+- `npm test -- tests/unit/dashboardRoutes.test.ts`
+- `npm run build`
+- browser-auth smoke on `http://127.0.0.1:3013/pico/academy` and `http://127.0.0.1:3013/pico/autopilot`
+
+What failed
+- Nothing in the Pico slice after the proxy fix.
+
+What is next
+- Commit and ship the proxy correction alongside the authenticated smoke proof.
+- If we want "see it run" to mean actual run history instead of deploy state, wire a real run producer next instead of faking one.
 
 ### 2026-04-11 02:41:00 CEST — canonical Pico reconciliation complete
 What changed

@@ -20,7 +20,7 @@ Phase 8 loop closure.
 - [x] Implement grounded tutor with escalation guardrails
 - [x] Implement live autopilot bridge for runs, budgets, alerts, and approvals on existing MUTX surfaces
 - [x] Close the in-Pico starter deploy and control loop on top of existing MUTX routes
-- [ ] Exercise the authenticated deploy path against a real MUTX session
+- [x] Exercise the authenticated deploy path against a real MUTX session
 - [ ] Sweep non-English Pico landing copy so localized surfaces stop lying
 
 ## Architecture direction
