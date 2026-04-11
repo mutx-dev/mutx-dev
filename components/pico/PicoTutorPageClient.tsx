@@ -16,11 +16,16 @@ const examplePrompts = [
   'I want approval before any outbound send. Which lesson do I follow?',
 ]
 
-type TutorApiResponse = PicoTutorReply & {
+type TutorApiResponse = Partial<PicoTutorReply> & {
   detail?: string
+  reply?: PicoTutorReply
 }
 
-function isTutorReply(value: TutorApiResponse): value is PicoTutorReply {
+function isTutorReply(value: Partial<PicoTutorReply> | null | undefined): value is PicoTutorReply {
+  if (!value) {
+    return false
+  }
+
   return Boolean(
     typeof value.answer === 'string' &&
       typeof value.summary === 'string' &&
@@ -28,6 +33,19 @@ function isTutorReply(value: TutorApiResponse): value is PicoTutorReply {
       Array.isArray(value.lessons) &&
       Array.isArray(value.docs),
   )
+}
+
+
+function normalizeTutorReply(payload: TutorApiResponse) {
+  if (isTutorReply(payload)) {
+    return payload
+  }
+
+  if (isTutorReply(payload.reply)) {
+    return payload.reply
+  }
+
+  return null
 }
 
 function resolveTutorHref(toHref: ReturnType<typeof usePicoHref>, href: string) {
@@ -80,11 +98,12 @@ export function PicoTutorPageClient() {
         throw new Error(payload.detail || 'Tutor request failed')
       }
 
-      if (!isTutorReply(payload)) {
+      const normalizedReply = normalizeTutorReply(payload)
+      if (!normalizedReply) {
         throw new Error('Tutor response came back malformed')
       }
 
-      setReply(payload)
+      setReply(normalizedReply)
       actions.recordTutorQuestion()
     } catch (submitError) {
       setReply(null)
