@@ -35,7 +35,8 @@ PicoMUTX is the narrow honest loop:
 - persistent progress with XP, badges, unlocks, and local-plus-auth sync
 - grounded tutor using the shipped lesson corpus
 - support shell with real human escalation
-- autopilot page using real MUTX runs, alerts, budgets, and approvals
+- starter-template deploy and lifecycle control directly inside Pico
+- autopilot page using real MUTX runs, alerts, budgets, approvals, and in-Pico control links
 - simple plan gating without pretending billing is finished
 
 It is not a fake community clone, not a no-code builder, and not a dashboard full of pretend telemetry.
@@ -81,6 +82,7 @@ Deleted because they duplicated the Pico product, state, or tutor model instead 
 ### Honest limitations
 - Billing is still flag-driven, not wired to checkout.
 - Approval persistence is still backed by the shared in-memory approvals service, now tightened for visibility but not yet durable across restarts.
+- Deploying and live control still require a real MUTX login; anonymous Pico users get the honest auth-required state instead of a fake demo deploy.
 - Non-English Pico landing keys now fall back to English on the active truth-critical CTA/contact surfaces. Full localization still needs a proper sweep.
 - Build still emits the existing repo-wide Turbopack NFT warning around `next.config.js`; not a Pico blocker.
 
@@ -91,15 +93,37 @@ Deleted because they duplicated the Pico product, state, or tutor model instead 
 ## Validation snapshot
 
 Latest validated commands:
-- `rm -rf .next && npm run typecheck`
+- `npm run typecheck`
 - `npm run build`
-- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
-- `./.venv/bin/python -m pytest tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
-- `curl -I http://127.0.0.1:3000/pico/onboarding`
-- `curl -I http://127.0.0.1:3000/pico/app`
-- `curl -I http://127.0.0.1:3000/pico/workspace`
+- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts tests/unit/dashboardRoutes.test.ts`
+- `/Users/fortune/MUTX/.venv/bin/python -m pytest tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
+- `curl -I http://127.0.0.1:3012/pico/academy`
+- `curl -I http://127.0.0.1:3012/pico/autopilot`
+- browser smoke on `http://127.0.0.1:3012/pico/academy`, `http://127.0.0.1:3012/pico/academy/deploy-hermes-on-a-vps`, and `http://127.0.0.1:3012/pico/autopilot`
 
 ## Work cycle log
+
+### 2026-04-11 03:30:22 CEST — in-Pico deploy and control loop closed
+What changed
+- Added a real Pico agent loop card that sits inside academy, deploy/control lessons, and Autopilot.
+- Wired Pico to the existing starter-template deploy flow instead of leaving deployment as a dead-end lesson.
+- Added in-Pico lifecycle visibility and control actions for the deployed starter agent.
+- Removed the last obvious dashboard escape hatches from Pico Autopilot by pointing the live-signal guidance back into Pico.
+- Fixed the dashboard starter-template proxy so deploy request bodies actually reach the backend.
+
+What was tested
+- `npm run typecheck`
+- `npm run build`
+- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts tests/unit/dashboardRoutes.test.ts`
+- `/Users/fortune/MUTX/.venv/bin/python -m pytest tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
+- browser smoke on academy, deploy lesson, and Autopilot at `http://127.0.0.1:3012`
+
+What failed
+- Nothing in the validated Pico slice. Existing OpenTelemetry shutdown noise still shows up after pytest and remains non-blocking.
+
+What is next
+- Exercise the authenticated deploy path against a real MUTX session so the starter agent receipt and control actions get one live end-to-end pass.
+- Once the runtime emits richer live state, deepen the in-Pico run view instead of sending anyone back to dashboard chrome.
 
 ### 2026-04-11 02:41:00 CEST — canonical Pico reconciliation complete
 What changed

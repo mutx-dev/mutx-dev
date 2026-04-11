@@ -3,9 +3,11 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
+import { PicoAgentLoopCard } from '@/components/pico/PicoAgentLoopCard'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_PLAN_MATRIX } from '@/lib/pico/academy'
+import { usePicoHref } from '@/lib/pico/navigation'
 
 type RunSummary = {
   id: string
@@ -83,6 +85,7 @@ function formatPercent(value: number) {
 
 export function PicoAutopilotPageClient() {
   const { progress, actions } = usePicoProgress()
+  const toHref = usePicoHref()
   const [runs, setRuns] = useState<RunSummary[]>([])
   const [budget, setBudget] = useState<BudgetSummary | null>(null)
   const [alerts, setAlerts] = useState<AlertSummary[]>([])
@@ -317,6 +320,10 @@ export function PicoAutopilotPageClient() {
         <div className="mt-6 rounded-[28px] border border-rose-400/20 bg-rose-400/10 p-6 text-sm text-rose-50">{error}</div>
       ) : null}
 
+      <section className="mt-6">
+        <PicoAgentLoopCard context="autopilot" />
+      </section>
+
       <section className="mt-6 grid gap-6 lg:grid-cols-[0.9fr,1.1fr]">
         <div className="space-y-6">
           <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
@@ -450,8 +457,8 @@ export function PicoAutopilotPageClient() {
                     <p className="font-medium text-white">Run {run.id}</p>
                     <p className="mt-1">Status: {run.status}</p>
                     <p className="mt-1">Started: {run.started_at ?? 'n/a'}</p>
-                    <Link href="/dashboard/runs" className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
-                      Inspect runs in MUTX dashboard
+                    <Link href={toHref('/academy/see-your-agent-activity')} className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+                      Review the monitoring lesson in Pico
                     </Link>
                   </div>
                 ))}
@@ -459,8 +466,8 @@ export function PicoAutopilotPageClient() {
                   <div key={alert.id} className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
                     <p className="font-medium text-white">{alert.type}</p>
                     <p className="mt-1">{alert.message}</p>
-                    <Link href="/dashboard/monitoring" className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
-                      Open monitoring
+                    <Link href={toHref('/academy/set-a-cost-threshold')} className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+                      Tune the alert lesson in Pico
                     </Link>
                   </div>
                 ))}
@@ -470,8 +477,8 @@ export function PicoAutopilotPageClient() {
                     <p className="mt-1">Plan: {budget.plan}</p>
                     <p className="mt-1">Used: {budget.credits_used}</p>
                     <p className="mt-1">Remaining: {budget.credits_remaining}</p>
-                    <Link href="/dashboard/budgets" className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
-                      Open budgets
+                    <Link href={toHref('/academy/set-a-cost-threshold')} className="mt-3 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+                      Adjust your threshold from the Pico lesson
                     </Link>
                   </div>
                 ) : null}

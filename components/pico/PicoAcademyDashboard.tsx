@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+import { PicoAgentLoopCard } from '@/components/pico/PicoAgentLoopCard'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_LEVELS, PICO_TRACKS, getLessonBySlug } from '@/lib/pico/academy'
@@ -137,6 +138,10 @@ export function PicoAcademyDashboard() {
             </div>
           ) : null}
         </div>
+      </section>
+
+      <section className="mt-6">
+        <PicoAgentLoopCard context="academy" />
       </section>
 
       <section className="mt-6 rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">

@@ -1,9 +1,9 @@
 # EXECUTION_PLAN
 
 ## Current phase
-Phase 7 truth hardening.
+Phase 8 loop closure.
 - Phases 1-5 are shipped enough for Pico v1: academy, progress, tutor, support, and the live autopilot bridge all exist.
-- Current implementation focus: canonical route truth, public-copy truth, and validation discipline.
+- Phase 8 closes the product loop inside Pico itself: start lesson, deploy starter agent, inspect live state, and control it without bouncing out to dashboard chrome.
 
 ## Priorities
 1. Keep Pico workspace coherent and truthful.
@@ -19,8 +19,8 @@ Phase 7 truth hardening.
 - [x] Implement XP, badges, milestones, and unlock logic
 - [x] Implement grounded tutor with escalation guardrails
 - [x] Implement live autopilot bridge for runs, budgets, alerts, and approvals on existing MUTX surfaces
-- [ ] Finish truth-alignment cleanup for public copy and legacy compatibility routes
-- [ ] Re-run validation and commit the current slice
+- [x] Close the in-Pico starter deploy and control loop on top of existing MUTX routes
+- [ ] Exercise the authenticated deploy path against a real MUTX session
 - [ ] Sweep non-English Pico landing copy so localized surfaces stop lying
 
 ## Architecture direction

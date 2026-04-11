@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 
+import { PicoAgentLoopCard } from '@/components/pico/PicoAgentLoopCard'
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { getLessonBySlug, type PicoLesson } from '@/lib/pico/academy'
@@ -17,6 +18,12 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
   const completed = progress.completedLessons.includes(lesson.slug)
   const unlocked = derived.unlockedLessonSlugs.includes(lesson.slug)
   const nextLesson = lesson.nextLesson ? getLessonBySlug(lesson.nextLesson) : null
+  const showLiveLoopCard = [
+    'deploy-hermes-on-a-vps',
+    'see-your-agent-activity',
+    'set-a-cost-threshold',
+    'add-an-approval-gate',
+  ].includes(lesson.slug)
 
   return (
     <PicoShell
@@ -119,6 +126,8 @@ export function PicoLessonDetail({ lesson }: PicoLessonDetailProps) {
               ))}
             </div>
           </section>
+
+          {showLiveLoopCard ? <PicoAgentLoopCard context="academy" /> : null}
 
           <section className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
             <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Next</p>
