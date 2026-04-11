@@ -32,7 +32,13 @@ function isReplyEnvelope(value: TutorApiResponse): value is TutorApiResponse & {
 }
 
 function resolveTutorHref(toHref: ReturnType<typeof usePicoHref>, href: string) {
-  if (href.startsWith('/docs') || href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:')) {
+  if (
+    href.startsWith('/pico') ||
+    href.startsWith('/docs') ||
+    href.startsWith('http://') ||
+    href.startsWith('https://') ||
+    href.startsWith('mailto:')
+  ) {
     return href
   }
   return toHref(href)
