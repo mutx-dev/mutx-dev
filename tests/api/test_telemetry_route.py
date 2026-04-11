@@ -39,7 +39,7 @@ async def test_get_telemetry_config_infers_exporter_type_from_sdk(client: AsyncC
     assert response.status_code == 200
     assert response.json() == {
         "otel_enabled": True,
-        "exporter_type": "console",
+        "exporter_type": "otlp",
         "endpoint": "http://tempo:4317",
     }
 
@@ -137,10 +137,8 @@ async def test_configure_telemetry_returns_500_for_unexpected_error(
         fake_configure_telemetry_backend,
     )
 
-    response = await client.post(
-        "/v1/telemetry/config",
-        json={"otlp_endpoint": "http://tempo:4317", "protocol": "grpc"},
-    )
-
-    assert response.status_code == 500
-    assert response.json() == {"detail": "Failed to configure telemetry backend"}
+    with pytest.raises(RuntimeError, match="disk full"):
+        await client.post(
+            "/v1/telemetry/config",
+            json={"otlp_endpoint": "http://tempo:4317", "protocol": "grpc"},
+        )

@@ -80,12 +80,12 @@ export function isUnauthorizedPayload(payload: unknown) {
     error?: unknown
   }
 
-  if (candidate.status !== 'error' || !candidate.error || typeof candidate.error !== 'object') {
-    return false
+  if (candidate.status === 'error' && candidate.error && typeof candidate.error === 'object') {
+    const error = candidate.error as { code?: unknown }
+    return error.code === 'UNAUTHORIZED'
   }
 
-  const error = candidate.error as { code?: unknown }
-  return error.code === 'UNAUTHORIZED'
+  return false
 }
 
 function severityClasses(severity: AutopilotTimelineItem['severity']) {
@@ -150,6 +150,7 @@ function EmptyStatePanel({ state }: { state: AutopilotEmptyState }) {
 export function PicoAutopilotPageClient() {
   const { progress, derived, actions, syncState } = usePicoProgress()
   const toHref = usePicoHref()
+  const approvalLessonHref = toHref('/academy/add-an-approval-gate')
   const [runs, setRuns] = useState<AutopilotRunSummary[]>([])
   const [tracesByRunId, setTracesByRunId] = useState<Record<string, AutopilotRunTrace[]>>({})
   const [budget, setBudget] = useState<AutopilotBudgetSummary | null>(null)
