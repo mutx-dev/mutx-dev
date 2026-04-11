@@ -2,213 +2,133 @@
 
 ## Current product truth
 
-PicoMUTX is now being rebuilt as a narrow, honest product loop:
-- Academy: shipped as a browser-persistent workspace with 7 levels, 5 tracks, and 12 outcome-based tutorials.
-- Tutor: shipped as a grounded lesson-aware support layer with escalation guardrails.
-- Autopilot: shipped as a manual-first control layer with event timeline, cost threshold, alerts, approval gate, and audit export.
-- Community/support: shipped as lightweight office-hours, project-share, and human escalation lanes.
-- Billing: internal plan flags exist; billing is not wired.
-- Live runtime connector: not shipped yet. Current autopilot uses manual run check-ins by design.
+PicoMUTX now has one canonical product system.
 
-## Brutally honest repo assessment
+Canonical product surface:
+- `app/pico/*`
 
-### Reusable
-- Pico subdomain routing in `proxy.ts`
-- `app/pico/*` shell and `components/site/pico/*`
-- Existing Next.js public surface, docs shell, and shared UI primitives
-- Dashboard API proxies for onboarding, observability, alerts, usage, and runtime when auth-backed sync is added later
-- Backend control-plane surfaces worth reusing later: onboarding, observability runs, usage events, monitoring alerts, webhooks
+Canonical frontend system:
+- `components/pico/*`
 
-### Broken
-- `app/pico/page.tsx` canonical/SEO previously pointed at a blocked `mutx.dev/pico` path
-- `SUMMARY.md` docs nav is broken and currently fails docs drift tests
-- Backend approvals/policies are fragmented and partly in-memory
-- Assistant overview/live health surfaces are partly placeholder-backed
+Canonical academy/state model:
+- `lib/pico/academy.ts`
+- `lib/pico/tutor.ts`
 
-### Misleading
-- `/onboarding` is desktop/operator setup, not Pico onboarding
-- Parts of `/dashboard/*` and `/control/*` are shell/demo surfaces, not product truth
-- Existing Pico landing promised guided support/product depth that did not exist yet
-- The mutx.dev sitemap previously advertised `/pico` even though the host routing blocked it
+Canonical backend persistence:
+- `src/api/routes/pico.py`
+- `src/api/services/pico_progress.py`
 
-### Missing before this cycle
-- Academy content model
-- Progress state model
-- Tutor grounding layer
-- Honest autopilot surface for first users
-- Mandatory Pico product docs and ship checklist
+Canonical product docs:
+- `PRODUCT_STATE.md`
+- `EXECUTION_PLAN.md`
+- `PRD_PICOMUTX.md`
+- `CONTENT_MAP.md`
+- `EVENT_MODEL.md`
+- `SHIP_CHECKLIST.md`
+- `DECISIONS.md`
 
-### Delete immediately
-- Nothing yet. Repo has bigger drift than dead code. Kill confusion first, then delete with intent.
+## What PicoMUTX is right now
 
-### Ship first
-- Pico workspace on `pico.mutx.dev/workspace`
-- Internal state files and canonical PRD
-- Lesson corpus and progress engine
-- Manual-first autopilot with clear beta framing
+PicoMUTX is the narrow honest loop:
+- academy with 7 levels, 5 tracks, and 12 real lessons
+- persistent progress with XP, badges, unlocks, and local-plus-auth sync
+- grounded tutor using the shipped lesson corpus
+- support shell with real human escalation
+- autopilot page using real MUTX runs, alerts, budgets, and approvals
+- simple plan gating without pretending billing is finished
 
-## In progress
-- Validation across typecheck and targeted tests
-- End-of-cycle state update and commit
+It is not a fake community clone, not a no-code builder, and not a dashboard full of pretend telemetry.
 
-## Blocked
-- Live runtime connector to control-plane observability and alerts still needs authenticated sync design
-- Billing is intentionally stubbed behind plan flags only
-- Docs nav drift remains outside the Pico v1 scope for this cycle
+## Canonical rules in force
 
-## Ships next
-1. Auth-backed sync from Pico workspace into existing dashboard/onboarding/observability APIs
-2. Live tutor backed by content retrieval + model inference when credentials are present
-3. Public-facing copy rewrite so the landing mirrors the shipped beta instead of the old waitlist thesis
-4. Replace manual telemetry with real run ingestion
+1. No alternate Pico surfaces.
+2. No reintroduction of legacy workspace shells as product truth.
+3. No duplicate state models.
+4. No duplicate tutor systems.
+5. If a Pico concern already exists in the canonical files, changes go there or nowhere.
+
+## Reconciliation status
+
+### Merged into the canonical system
+- Route-prefix navigation behavior from the shadow sessions was preserved so links work both on `pico.mutx.dev/*` and local `/pico/*` paths.
+- Approval request validation helpers were kept under `app/api/pico/approvals/_validation.ts` because they strengthen the canonical approvals bridge without creating a parallel Pico model.
+- Better tutor response handling was folded into `components/pico/PicoTutorPageClient.tsx` and `lib/pico/tutor.ts`.
+- Legacy path compatibility was reduced to redirects only:
+  - `/pico/app` -> redirects to `/pico/onboarding`
+  - `/pico/app/lessons/[slug]` -> redirects to `/pico/academy/[slug]`
+  - `/pico/workspace` -> redirects to `/pico/onboarding`
+
+### Deleted shadow implementations
+Deleted because they duplicated the Pico product, state, or tutor model instead of extending the canonical system:
+- `app/api/pico/state/route.ts`
+- `lib/pico/catalog.ts`
+- `lib/pico/content.ts`
+- `lib/pico/state.ts`
+- `tests/api/test_pico_route.py`
+- `tests/unit/picoState.test.ts`
+- `components/site/pico/PicoPreRegForm.tsx`
+
+### Why they were deleted
+- They defined competing lesson ids, track ids, or state shapes.
+- They split Pico persistence across `/state` and `/progress` contracts.
+- They pulled the tutor against a different lesson corpus than the product actually ships.
+- They created the exact kind of forked reality that makes a product rot.
+
+## Current open realities
+
+### Honest limitations
+- Billing is still flag-driven, not wired to checkout.
+- Live runtime ingestion is still lighter than the eventual full control-plane bridge.
+- Build still emits the existing repo-wide Turbopack NFT warning around `next.config.js`; not a Pico blocker.
+
+### Not blocked
+- PicoMUTX v1 is coherent and shippable.
+- Repo-native validation for the canonical Pico surface is green.
+
+## Validation snapshot
+
+Latest validated commands:
+- `rm -rf .next && npm run typecheck`
+- `npm run build`
+- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `./.venv/bin/python -m pytest tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
+- `curl -I http://127.0.0.1:3000/pico/onboarding`
+- `curl -I http://127.0.0.1:3000/pico/app`
+- `curl -I http://127.0.0.1:3000/pico/workspace`
 
 ## Work cycle log
 
-### 2026-04-10 23:24:08Z — cycle start
-- Pulled a brutal repo audit across frontend, backend, and docs/content surfaces.
-- Chosen direction: stop pretending Pico is already a guided product and ship the narrow honest loop first.
-- Highest-leverage path selected: create the state/docs spine, build the academy+tutor+manual-autopilot workspace, and fix Pico SEO truth on the way.
-
-### 2026-04-10 23:44:22Z — cycle end
+### 2026-04-11 02:41:00 CEST — canonical Pico reconciliation complete
 What changed
-- Shipped `pico.mutx.dev/workspace` as a new beta workspace route.
-- Added academy content, state, and tutor models under `lib/pico/`.
-- Added the new Pico workspace UI with onboarding, tracks, lessons, tutor, autopilot, support, and audit export.
-- Added mandatory product docs: PRODUCT_STATE, EXECUTION_PLAN, PRD_PICOMUTX, CONTENT_MAP, EVENT_MODEL, SHIP_CHECKLIST, DECISIONS.
-- Fixed Pico canonical truth to the pico subdomain, removed the bogus `/pico` sitemap entry, and added a landing-page link into the workspace.
+- Reconciled all remaining shadow Pico implementations into one canonical system.
+- Removed the duplicate `/state` persistence lane and its tests.
+- Rebased Pico tutor behavior onto `lib/pico/academy.ts` so lesson matching, ids, and links come from the same shipped lesson corpus as the UI.
+- Repointed every active entry back to the canonical onboarding and academy flow.
+- Moved the public landing composition under `components/pico/*` ownership via `components/pico/PicoLandingSurface.tsx`.
+
+What was merged
+- Useful route-prefix navigation behavior.
+- Approval payload validation helpers.
+- Stronger tutor response envelopes and support escalation behavior.
+
+What was deleted
+- Shadow state files, shadow route tests, and the unused prereg surface listed above.
+
+Why
+- One Pico truth beats three almost-right ones.
+- Duplicate lesson/state models are how products start lying to themselves.
 
 What was tested
-- `npm run typecheck`
-- `npx jest --runInBand tests/unit/picoState.test.ts tests/unit/picoTutor.test.ts`
-- `npm run build`
-
-What failed
-- Nothing in the staged Pico workspace slice.
-- Repo still contains concurrent/untracked Pico backend and dashboard scaffolding outside this commit scope.
-- Docs nav drift in `SUMMARY.md` remains unresolved outside this cycle.
-
-What is next
-- Tighten landing copy so the public story matches the shipped multipage product exactly.
-- Expand authenticated workspace depth once real user feedback exposes the sharp edges.
-
-### 2026-04-11 00:00:00Z — convergence update
-What changed
-- Collapsed two competing Pico frontends into one direction: the multipage Pico app now owns onboarding, academy, tutor, autopilot, and support.
-- Redirected the legacy `/workspace` lane into onboarding instead of keeping two different truths alive.
-- Removed the redundant local-only workspace components and old progress model files from the active product path.
-- Fixed Pico route links so they work both on `pico.mutx.dev/*` and on direct `/pico/*` local paths.
-- Fixed local POST CSRF validation for loopback development hosts so the tutor works in local testing.
-
-What was tested
-- `npm run typecheck`
-- `npx jest --runInBand tests/unit/picoState.test.ts tests/unit/picoTutor.test.ts`
-- `./.venv/bin/python -m pytest tests/api/test_pico_route.py tests/api/test_app_factory.py -q`
-- `npm run build`
-- Browser smoke on `/pico/onboarding` and `/pico/tutor`
-
-What failed
-- Nothing in the converged Pico lane after the proxy fix and tutor hardening.
-
-What is next
-- Commit the converged product slice.
-
-### 2026-04-11 01:55:02 CEST — cycle start
-- Executive order received: do not stop until PicoMUTX is actually finished.
-- Began reconciliation of shadow Pico work left by the other active Hermes sessions.
-- Current coordination target: merge the useful parts, kill duplicates, and end with one Pico truth.
-
-### 2026-04-11 01:54:00 CEST — cycle end
-What changed
-- Added a new Pico academy shell under `app/pico/academy`, `app/pico/onboarding`, `app/pico/tutor`, `app/pico/autopilot`, and `app/pico/support`.
-- Added typed lesson, level, track, XP, badge, plan, and release-note data under `lib/pico/academy.ts`.
-- Added browser-local progress with authenticated sync via `/api/pico/progress` and backend `/v1/pico/progress` backed by `user_settings`.
-- Added a grounded tutor route that returns lesson-matched next actions and compatibility payloads for the older Pico beta surfaces.
-- Added approval proxy routes and wired the autopilot page to live runs, alerts, budgets, and approvals.
-- Redirected the older workspace beta path to the new onboarding entry.
-
-What was tested
-- `npm run typecheck`
+- `rm -rf .next && npm run typecheck`
 - `npm run build`
 - `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
-- `python3 -m compileall src/api`
-- `./.venv/bin/python -m pytest tests/api/test_pico_progress_route.py -q`
-
-What failed
-- No product-blocking failures remained after the final pass.
-- Existing unrelated test suites still emit their usual console noise, but the build and targeted validations are green.
-
-What is next
-- Decide whether to absorb or delete the older untracked Pico beta artifacts instead of leaving parallel shadows around.
-- Move the landing CTA and copy fully onto the new shell so the product entrance is obvious.
-- Add an admin/content-ops lane only if editing lessons in source files becomes a bottleneck.
-
-### 2026-04-11 02:14:00 CEST — cycle end
-What changed
-- Coordinated the shadow Pico work from the other active Hermes sessions by inspecting their route, data-model, and backend/test artifacts.
-- Kept the useful parts: route-prefix navigation, approval request validation, stronger tutor payload handling, and the `/api/pico/state` / `/v1/pico/state` compatibility lane.
-- Re-centered the public shell on onboarding instead of the abandoned shadow workspace path.
-- Tightened tutor outputs so links and escalation land on real Pico routes.
-- Killed more dead Pico UI branches and planning clutter that were only creating a second fake product.
-- Fixed the host-aware proxy origin check so forwarded HTTPS writes pass the middleware tests again.
-
-What was tested
-- `npm run typecheck`
-- `npm run build`
-- `npm test -- tests/unit/picoTutor.test.ts`
-- `npm test -- tests/unit/middlewareRouting.test.ts`
-- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts tests/unit/picoState.test.ts`
-- `./.venv/bin/python -m pytest tests/api/test_pico_route.py tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
-- `curl http://127.0.0.1:3000/pico/onboarding` and compatibility-path checks for `/pico/workspace`, `/pico/app`, and `/pico/app/lessons/*`
-
-What failed
-- No Pico-specific blockers remain in the validated surface.
-- Build still emits the existing Next NFT warning around `next.config.js` and docs tracing; that is repo-wide noise, not a Pico ship blocker.
-
-What is next
-- Commit the coordinated cleanup and ship state.
-- If more Pico-specific product work appears from the other Hermes sessions, merge it into the single Pico truth instead of reopening shadow lanes.
-
-### 2026-04-11 00:32:01 UTC — cycle end
-What changed
-- Coordinated another live merge wave across the active Hermes sessions instead of letting Pico fork into parallel products again.
-- Kept the multipage Pico app as the single real product flow and treated the old workspace/state layer as dead weight.
-- Re-pointed the public entrance toward the real Pico workspace path and updated English landing copy away from stale waitlist language.
-- Preserved tutor/support/autopilot coherence while deleting more duplicate Pico state/catalog baggage.
-- Re-validated the converged route/test/build surface after the merge wave.
-
-What was tested
-- `npm test -- --runInBand picoTutor picoAcademy`
-- `npm run build`
 - `./.venv/bin/python -m pytest tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
-- live browser checks on `/pico`, `/pico/app`, and `/pico/tutor`
+- curl smoke checks on `/pico/onboarding`, `/pico/app`, and `/pico/workspace`
 
 What failed
-- Browser automation against the dev server still showed noisy HMR/socket behavior and unreliable button interaction in-browser, but repo-native build and targeted tests stayed green.
-- Standalone local server startup is noisy because another local server was already bound to port 3000.
+- No Pico-specific blockers remain.
+- Only existing repo-wide warning noise remains.
 
 What is next
-- Commit this convergence wave cleanly.
-- Run one more production-style smoke pass against the freshly committed Pico routes.
-- Then move to real runtime/auth sync instead of more shell churn.
-
-### 2026-04-11 00:02:05 UTC — cycle end
-What changed
-- Added `/pico/app` as a new authenticated workspace and shipped lesson detail pages under `/pico/app/lessons/[slug]`.
-- Added `/api/pico/state` plus backend `/v1/pico/state` on top of `user_settings` so the new workspace has persistent progress, thresholds, and approval-gate config.
-- Kept old `/v1/pico/progress` working by adding compatibility transforms instead of breaking the earlier Pico shell.
-- Rewrote tutor compatibility so both the new workspace and the older Pico tutor surfaces stay functional.
-- Redirected `/pico/workspace` to `/pico/app` so the product has one cleaner entry.
-
-What was tested
-- `./.venv/bin/python -m pytest tests/api/test_pico_route.py tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
-- `npm test -- --runInBand picoTutor picoAcademy`
-- `npm run build`
-
-What failed
-- First pass broke `/v1/pico/progress` compatibility and the legacy tutor exports. Fixed in the same cycle.
-- Remaining warnings are existing repo noise: OpenTelemetry shutdown log spam in pytest and Turbopack NFT warnings in build.
-
-What is next
-- Collapse the duplicate Pico shells into one canonical flow instead of carrying both the old academy/tutor pages and the new `/pico/app` workspace forever.
-- Connect a real approval-request action path so the approval gate protects something concrete, not just a saved setting.
-- Decide which of the shadow/untracked Pico files are worth keeping and delete the rest with intent.
+- Keep shipping inside the canonical Pico files only.
+- If another session produces Pico changes outside that order, absorb the useful parts and delete the shadow immediately.

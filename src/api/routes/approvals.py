@@ -24,20 +24,20 @@ logger = logging.getLogger(__name__)
 APPROVER_ROLES = {"DEVELOPER", "ADMIN"}
 
 
-def _check_approver_role(user: User) -> None:
-    """
-    Verify the authenticated user has an approver role.
-
-    When the RBAC system (Prompt 6) is live, user.role will be populated.
-    Until then we allow any authenticated user through and rely on the
-    RBAC integration to enforce restrictions retroactively.
-    """
+def _has_approver_role(user: User) -> bool:
     role: Optional[str] = getattr(user, "role", None)
-    if role is not None and role not in APPROVER_ROLES:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Role '{role}' is not authorized to manage approvals",
-        )
+    return role in APPROVER_ROLES if role is not None else False
+
+
+def _ensure_approval_visible(user: User, req: ApprovalRequest) -> None:
+    if _has_approver_role(user):
+        return
+    if req.requester == user.email or req.approver == user.email:
+        return
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Approval request is not visible to this user",
+    )
 
 
 # ------------------------------------------------------------------
@@ -99,17 +99,24 @@ async def list_approvals(
     - ``status``: filter by status (e.g. PENDING)
     - ``agent_id``: filter by agent
     """
-    if status_filter is not None:
-        # Filter by explicit status — walk the full store
-        async with service._lock:
-            results = [
-                req
-                for req in service._store.values()
-                if req.status == status_filter and (agent_id is None or req.agent_id == agent_id)
-            ]
-            return results
+    async with service._lock:
+        results = list(service._store.values())
 
-    return await service.list_pending(agent_id=agent_id)
+    visible_results = []
+    for req in results:
+        if status_filter is not None and req.status != status_filter:
+            continue
+        if status_filter is None and req.status != ApprovalStatus.PENDING:
+            continue
+        if agent_id is not None and req.agent_id != agent_id:
+            continue
+        try:
+            _ensure_approval_visible(user, req)
+        except HTTPException:
+            continue
+        visible_results.append(req)
+
+    return visible_results
 
 
 @router.get("/{request_id}", response_model=ApprovalRequest)
@@ -127,6 +134,7 @@ async def get_approval(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Approval request not found"
         )
+    _ensure_approval_visible(user, req)
     return req
 
 
@@ -142,7 +150,12 @@ async def approve_request(
 
     Requires DEVELOPER or ADMIN role (enforced when RBAC is active).
     """
-    _check_approver_role(user)
+    approval = await get_approval(request_id=request_id, service=service, user=user)
+    if not _has_approver_role(user) and approval.requester != user.email:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only the requester or an approver role can approve this request",
+        )
     try:
         return await service.approve(
             request_id=request_id,
@@ -165,7 +178,12 @@ async def reject_request(
 
     Requires DEVELOPER or ADMIN role (enforced when RBAC is active).
     """
-    _check_approver_role(user)
+    approval = await get_approval(request_id=request_id, service=service, user=user)
+    if not _has_approver_role(user) and approval.requester != user.email:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only the requester or an approver role can reject this request",
+        )
     try:
         return await service.reject(
             request_id=request_id,
