@@ -9,6 +9,8 @@ Updated: 2026-04-11T00:55:00Z
 - [x] At least one real deployment path exists in Pico.
 - [x] Control page shows real operational data.
 - [x] Support page returns grounded next steps.
+- [x] A soft threshold can be set in-product.
+- [x] A real approval request can be created in-product.
 - [x] Free vs paid plan flags behave honestly.
 
 ## Quality checks

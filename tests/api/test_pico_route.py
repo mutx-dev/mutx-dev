@@ -12,6 +12,8 @@ async def test_get_pico_state_default(client: AsyncClient):
     assert data["plan"] == "FREE"
     assert data["xp_total"] == 0
     assert data["current_level"] == 1
+    assert data["cost_threshold_usd"] is None
+    assert data["approval_gate_enabled"] is False
     assert data["completed_lessons"] == []
     assert data["completed_tracks"] == []
     assert data["badges"] == []
@@ -95,3 +97,21 @@ async def test_post_pico_events_roundtrip_state(client: AsyncClient):
         "milestone_reached",
         "tutor_session_used",
     ]
+
+
+@pytest.mark.asyncio
+async def test_post_pico_threshold_and_gate_flags(client: AsyncClient):
+    threshold_response = await client.post(
+        "/v1/pico/events",
+        json={"event": "cost_threshold_set", "metadata": {"threshold_usd": 42}},
+    )
+    assert threshold_response.status_code == 200
+    approval_response = await client.post(
+        "/v1/pico/events",
+        json={"event": "approval_gate_enabled"},
+    )
+    assert approval_response.status_code == 200
+
+    data = approval_response.json()
+    assert data["cost_threshold_usd"] == 42
+    assert data["approval_gate_enabled"] is True

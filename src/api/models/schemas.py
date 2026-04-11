@@ -591,6 +591,8 @@ class PicoStateResponse(BaseModel):
     plan: str
     xp_total: int = Field(default=0, ge=0)
     current_level: int = Field(default=1, ge=1)
+    cost_threshold_usd: float | None = Field(default=None, ge=0)
+    approval_gate_enabled: bool = False
     completed_lessons: list[str] = Field(default_factory=list)
     completed_tracks: list[str] = Field(default_factory=list)
     badges: list[str] = Field(default_factory=list)

@@ -74,6 +74,16 @@ export function PicoAcademyPage() {
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-200">Signed in</p>
               <p className="mt-2 text-lg font-semibold text-white">Your completion will sync across the academy.</p>
               <p className="mt-2 text-sm leading-7 text-white/65">Open the next incomplete lesson, run the validation checklist, and use the completion button when the workflow is truly ready.</p>
+              <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-2xl border border-white/10 bg-[#0a101b] px-4 py-3">
+                  <p className="text-white/45">Level</p>
+                  <p className="mt-1 text-xl font-semibold text-white">{typeof (state.raw as { current_level?: unknown } | null)?.current_level === 'number' ? (state.raw as { current_level: number }).current_level : 1}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-[#0a101b] px-4 py-3">
+                  <p className="text-white/45">XP</p>
+                  <p className="mt-1 text-xl font-semibold text-white">{typeof (state.raw as { xp_total?: unknown } | null)?.xp_total === 'number' ? (state.raw as { xp_total: number }).xp_total : 0}</p>
+                </div>
+              </div>
             </>
           ) : (
             <>

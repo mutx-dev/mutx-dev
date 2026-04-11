@@ -73,6 +73,7 @@ What changed
 - Added a 12-tutorial lesson corpus aligned to Levels 0-6 and Tracks A-E.
 - Added same-origin Pico API proxies plus an approvals proxy for the control page.
 - Added an in-product starter deploy card in Pico control that uses the real personal_assistant template deploy route.
+- Added cost-threshold and approval-gate actions inside Pico control, backed by Pico state plus the real approvals API.
 - Added soft plan-flag messaging in Pico control so free vs paid scope is visible without faking billing.
 - Updated the Pico landing CTA so it opens the product instead of dumping users into waitlist-only behavior.
 

@@ -100,6 +100,9 @@ export function PicoControlPage() {
   const [deploying, setDeploying] = useState(false);
   const [deployError, setDeployError] = useState<string | null>(null);
   const [deployReceipt, setDeployReceipt] = useState<Record<string, unknown> | null>(null);
+  const [thresholdInput, setThresholdInput] = useState("50");
+  const [thresholdMessage, setThresholdMessage] = useState<string | null>(null);
+  const [approvalMessage, setApprovalMessage] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -158,6 +161,9 @@ export function PicoControlPage() {
         : planLabel === "PRO"
           ? "Pro assumes multiple monitored agents plus stronger control habits."
           : "Team stays soft-gated until multi-user behavior is actually implemented.";
+  const picoRaw = isRecord(picoState.raw) ? picoState.raw : null;
+  const currentThreshold = typeof picoRaw?.cost_threshold_usd === "number" ? picoRaw.cost_threshold_usd : null;
+  const approvalGateEnabled = picoRaw?.approval_gate_enabled === true;
 
   async function handleDeployStarter() {
     setDeploying(true);
@@ -210,6 +216,59 @@ export function PicoControlPage() {
     } finally {
       setDeploying(false);
     }
+  }
+
+  async function handleSetThreshold() {
+    setThresholdMessage(null);
+    const threshold = Number(thresholdInput);
+    if (!Number.isFinite(threshold) || threshold < 0) {
+      setThresholdMessage("Enter a non-negative threshold.");
+      return;
+    }
+
+    await fetch("/api/pico/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event: "cost_threshold_set",
+        metadata: { threshold_usd: threshold },
+      }),
+    });
+    setThresholdMessage(`Soft threshold saved at ${threshold}. This is a Pico operator guardrail, not hard budget enforcement.`);
+  }
+
+  async function handleEnableApprovalGate() {
+    setApprovalMessage(null);
+    const agentId = isRecord(assistantRuntime) ? assistantRuntime.agent_id : null;
+    if (typeof agentId !== "string") {
+      setApprovalMessage("Deploy a starter assistant first so there is a real runtime to gate.");
+      return;
+    }
+
+    const response = await fetch("/api/dashboard/approvals", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        agent_id: agentId,
+        session_id: `pico-control-${Date.now()}`,
+        action_type: "external_send",
+        payload: { source: "pico-control", guardrail: "manual approval before risky outbound action" },
+      }),
+    });
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      setApprovalMessage(extractError(payload, "Failed to create approval gate request."));
+      return;
+    }
+
+    await fetch("/api/pico/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event: "approval_gate_enabled", metadata: { action_type: "external_send" } }),
+    }).catch(() => null);
+    setApprovalMessage("Approval gate request created. Review the pending approvals panel below.");
+    await refresh();
   }
 
   return (
@@ -311,6 +370,51 @@ export function PicoControlPage() {
               Starter assistant deployed. Refresh the control cards if the new runtime summary does not appear immediately.
             </p>
           ) : null}
+        </section>
+      ) : null}
+
+      {!authRequired ? (
+        <section className="grid gap-5 xl:grid-cols-2">
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-6">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100/90">Cost threshold</p>
+            <h2 className="mt-2 text-xl font-semibold text-white">Set one visible spending line.</h2>
+            <p className="mt-3 text-sm leading-7 text-white/68">
+              This saves a Pico operator threshold in learner state. It is honest soft control, not hidden fake enforcement.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <input
+                value={thresholdInput}
+                onChange={(event) => setThresholdInput(event.target.value)}
+                className="w-40 rounded-2xl border border-white/10 bg-[#0a101b] px-4 py-3 text-white outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => void handleSetThreshold()}
+                className="rounded-full bg-cyan-300 px-4 py-3 text-sm font-semibold text-slate-950"
+              >
+                Save threshold
+              </button>
+            </div>
+            <p className="mt-4 text-sm text-white/55">Current saved threshold: {currentThreshold ?? "not set"}</p>
+            {thresholdMessage ? <p className="mt-3 text-sm text-emerald-200">{thresholdMessage}</p> : null}
+          </div>
+
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-6">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cyan-100/90">Approval gate</p>
+            <h2 className="mt-2 text-xl font-semibold text-white">Create one real pending approval.</h2>
+            <p className="mt-3 text-sm leading-7 text-white/68">
+              This creates a real approval request for a risky outbound action when an assistant exists. It proves the gate path without pretending governance is magic.
+            </p>
+            <button
+              type="button"
+              onClick={() => void handleEnableApprovalGate()}
+              className="mt-4 rounded-full bg-cyan-300 px-4 py-3 text-sm font-semibold text-slate-950"
+            >
+              {approvalGateEnabled ? "Create another pending approval" : "Enable approval gate"}
+            </button>
+            <p className="mt-4 text-sm text-white/55">Gate status: {approvalGateEnabled ? "enabled" : "not yet enabled"}</p>
+            {approvalMessage ? <p className="mt-3 text-sm text-emerald-200">{approvalMessage}</p> : null}
+          </div>
         </section>
       ) : null}
 

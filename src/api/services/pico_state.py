@@ -108,6 +108,8 @@ def _default_pico_state(plan: str) -> dict[str, Any]:
         "plan": plan,
         "xp_total": 0,
         "current_level": 1,
+        "cost_threshold_usd": None,
+        "approval_gate_enabled": False,
         "completed_lessons": [],
         "completed_tracks": [],
         "badges": [],
@@ -156,6 +158,12 @@ def _normalize_state(payload: dict[str, Any] | None, *, plan: str) -> dict[str, 
     state["plan"] = plan
     state["xp_total"] = xp_total
     state["current_level"] = _level_from_xp(xp_total)
+    state["cost_threshold_usd"] = (
+        float(state["cost_threshold_usd"])
+        if state.get("cost_threshold_usd") not in {None, ""}
+        else None
+    )
+    state["approval_gate_enabled"] = bool(state.get("approval_gate_enabled", False))
     state["completed_lessons"] = _dedupe_strings(state.get("completed_lessons"))
     state["completed_tracks"] = _dedupe_strings(state.get("completed_tracks"))
     state["badges"] = _dedupe_strings(state.get("badges"))
@@ -266,6 +274,12 @@ async def record_pico_event(
         state["tutor_sessions_used"] += sessions_used
         if xp is None:
             xp_awarded = EVENT_XP_MAP[canonical_event] * sessions_used
+    elif canonical_event == "cost_threshold_set":
+        threshold = metadata.get("threshold_usd") if isinstance(metadata, dict) else None
+        if threshold is not None:
+            state["cost_threshold_usd"] = float(threshold)
+    elif canonical_event == "approval_gate_enabled":
+        state["approval_gate_enabled"] = True
 
     if lesson_id and canonical_event != "lesson_completed" and lesson_id not in completed_lessons:
         completed_lessons.append(lesson_id)

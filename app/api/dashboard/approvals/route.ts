@@ -19,3 +19,15 @@ export async function GET(request: NextRequest) {
     });
   })(request);
 }
+
+export async function POST(request: NextRequest) {
+  return withErrorHandling(async () => {
+    const body = await request.text();
+    return proxyJson(request, `${getApiBaseUrl()}/v1/approvals`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+      fallbackMessage: "Failed to create approval request",
+    });
+  })(request);
+}

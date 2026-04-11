@@ -27,7 +27,7 @@ Ship the narrowest honest PicoMUTX product loop that gets a user from signup to 
 
 ## Active tasks
 - [in_progress] Commit and handoff this foundation slice.
-- [pending] Turn soft plan messaging into simple enforceable limits.
+- [pending] Turn soft plan messaging into stronger enforceable limits where the underlying behavior already exists.
 - [pending] Add admin/content-ops capture for tutor content gaps.
 - [pending] Expand the control page from summary to richer run drill-down where the data is already real.
 
