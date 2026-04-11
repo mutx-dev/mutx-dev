@@ -114,13 +114,12 @@ Minimum viable support infrastructure:
 - release-note view for what the beta really ships
 
 ## Autopilot beta
-v1 autopilot is manual-first by design.
+v1 autopilot is an auth-aware live bridge onto existing MUTX signals.
 That means:
-- users log real runs manually while live connectors are not wired yet
-- cost usage is tracked from those run entries
-- alerts trigger when thresholds are crossed
-- approval queue is real and exportable
-- audit trail is append-only within the workspace state
+- progress stays local-first and syncs through the existing Pico progress route when a MUTX session exists
+- runs, budget, alerts, and approvals load from existing MUTX surfaces when authenticated
+- the academy still works without auth, but the product says when live control-plane data is unavailable
+- threshold settings, approval flow, and audit export stay real inside the shipped surfaces
 
 Shipped surfaces:
 - recent activity timeline
@@ -132,7 +131,7 @@ Shipped surfaces:
 
 Not yet shipped:
 - automatic runtime ingestion
-- cross-device sync
+- multilingual copy cleanup across every Pico locale
 - external alert delivery execution
 - live agent pause/deny enforcement outside the workspace
 
@@ -159,8 +158,8 @@ Pro:
 ## Technical strategy
 - Keep Pico isolated under `app/pico/*`
 - Reuse existing MUTX stack only where it is real, not where it is theater
-- Use browser persistence first to avoid auth friction blocking v1
-- Use existing dashboard/backend routes later for sync once the Pico surface is stable
+- Use local-first progress so onboarding works fast, then sync through existing Pico routes when auth is present
+- Reuse existing dashboard/backend routes for live autopilot signals instead of inventing a Pico-only telemetry stack
 - Treat current backend approvals/policies as untrusted until rebuilt or unified
 
 ## Definition of done for this beta slice
@@ -170,7 +169,7 @@ A user can:
 3. Start and complete lessons with persistent progress
 4. Earn XP and badges
 5. Ask the tutor for grounded help
-6. Log real runs manually
+6. Sync progress when authenticated and stay local-first when not
 7. See activity, usage, alerts, and approvals
 8. Export the audit trail
 9. Escalate to a human when the issue is risky

@@ -55,8 +55,8 @@ It is not a fake community clone, not a no-code builder, and not a dashboard ful
 - Approval request validation helpers were kept under `app/api/pico/approvals/_validation.ts` because they strengthen the canonical approvals bridge without creating a parallel Pico model.
 - Better tutor response handling was folded into `components/pico/PicoTutorPageClient.tsx` and `lib/pico/tutor.ts`.
 - Legacy path compatibility was reduced to one canonical workspace entry plus redirects:
-  - `/pico/app` -> canonical workspace entry, rendering the onboarding-first workspace shell
-  - `/pico/onboarding` -> redirects to `/pico/app`
+  - `/pico/onboarding` -> canonical workspace entry, rendering the onboarding-first workspace shell
+  - `/pico/app` -> redirects to `/pico/onboarding`
   - `/pico/app/lessons/[slug]` -> redirects to `/pico/academy/[slug]`
   - `/pico/workspace` -> redirects to `/pico/onboarding`
 
@@ -81,6 +81,7 @@ Deleted because they duplicated the Pico product, state, or tutor model instead 
 ### Honest limitations
 - Billing is still flag-driven, not wired to checkout.
 - Approval persistence is still backed by the shared in-memory approvals service, now tightened for visibility but not yet durable across restarts.
+- Non-English Pico landing locales still carry stale prereg/waitlist copy and need a cleanup sweep.
 - Build still emits the existing repo-wide Turbopack NFT warning around `next.config.js`; not a Pico blocker.
 
 ### Not blocked

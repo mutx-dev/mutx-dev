@@ -17,7 +17,7 @@
 - [x] Targeted API tests pass
 - [x] Build passes
 - [x] Pico landing points clearly to the canonical workspace entry
-- [x] Public copy matches shipped product truth
+- [ ] Non-English Pico landing locales match shipped product truth
 
 ## Content completeness
 - [x] 12 launch tutorials defined
@@ -33,6 +33,7 @@
 - Remaining work is post-v1 hardening, not ship-readiness.
 
 ## Post-v1 hardening
+- Non-English Pico landing copy cleanup
 - Durable approval persistence instead of the current in-memory service
 - Real billing/checkouts instead of plan flags only
 - Deeper runtime ingestion and richer run drill-down

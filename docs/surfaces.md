@@ -11,7 +11,8 @@ This document maps MUTX's public surfaces and their maturity level so users can 
 
 | Surface | URL | Role | Status |
 | ------- | --- | ---- | ------ |
-| Marketing | [mutx.dev](https://mutx.dev) | Public product narrative, waitlist capture, and entry point | **Supported** |
+| Marketing | [mutx.dev](https://mutx.dev) | Public product narrative, release summary, docs, and desktop/download entry point | **Supported** |
+| PicoMUTX beta | [pico.mutx.dev](https://pico.mutx.dev) | Guided academy, tutor, support, and autopilot beta for first-agent operators | **Preview** |
 | Release summary | [mutx.dev/releases](https://mutx.dev/releases) | Current release summary, asset map, and release-note handoff | **Supported** |
 | Desktop download lane | [mutx.dev/download/macos](https://mutx.dev/download/macos) | First-party signed and notarized macOS release handoff | **Supported** |
 | Documentation | [docs.mutx.dev](https://docs.mutx.dev) | Canonical docs, API reference, and operator guides | **Supported** |
@@ -57,6 +58,22 @@ Surfaces marked **Preview** are:
 - The source of truth for route behavior
 
 **Source of truth:** `app/page.tsx`
+
+---
+
+### pico.mutx.dev (Preview)
+
+**What it does today:**
+- Provides the PicoMUTX landing page and onboarding-first workspace
+- Ships the academy, lesson pages, grounded tutor, support lane, and autopilot bridge
+- Reuses existing MUTX dashboard signals for runs, budget, alerts, and approvals when authenticated
+
+**What it is not yet:**
+- A fully localized launch surface across every supported locale
+- A billing-complete product
+- Proof that every deeper control-plane action has durable backend enforcement
+
+**Source of truth:** `app/pico/`, `components/pico/`, `components/site/pico/`, `lib/pico/`
 
 ---
 

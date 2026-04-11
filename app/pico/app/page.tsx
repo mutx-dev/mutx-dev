@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
-
-import { PicoOnboardingPageClient } from '@/components/pico/PicoOnboardingPageClient'
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: 'PicoMUTX Workspace',
-  description: 'Start the PicoMUTX workspace and choose the first agent path you will actually ship.',
+  description: 'Legacy PicoMUTX workspace route kept only as a compatibility redirect.',
   alternates: {
-    canonical: 'https://pico.mutx.dev/app',
+    canonical: 'https://pico.mutx.dev/onboarding',
   },
   robots: {
     index: false,
@@ -15,5 +14,5 @@ export const metadata: Metadata = {
 }
 
 export default function PicoAppPage() {
-  return <PicoOnboardingPageClient />
+  redirect('/pico/onboarding')
 }

@@ -1,45 +1,44 @@
 # EXECUTION_PLAN
 
 ## Current phase
-Phase 3 moving into Phase 4/5.
-- Phase 1 complete enough for action: repo inspected, reuse/dead/drift mapped.
-- Phase 2 complete enough for v1: academy, progress, event, and plan-gating models defined.
-- Current implementation focus: academy shell, tutor grounding, and autopilot beta.
+Phase 7 truth hardening.
+- Phases 1-5 are shipped enough for Pico v1: academy, progress, tutor, support, and the live autopilot bridge all exist.
+- Current implementation focus: canonical route truth, public-copy truth, and validation discipline.
 
 ## Priorities
 1. Keep Pico workspace coherent and truthful.
-2. Validate the new academy/progress/tutor/autopilot surfaces.
-3. Commit the current product slice.
-4. Wire live sync into existing MUTX APIs next.
+2. Keep the canonical onboarding entry and live autopilot bridge obvious.
+3. Keep validation green and docs honest.
+4. Hardening next: localized copy cleanup and durable approvals persistence.
 
 ## Active tasks
 - [x] Inspect repo and current Pico surfaces
 - [x] Create mandatory PicoMUTX docs
 - [x] Define academy levels, tracks, and lessons
-- [x] Implement persistent browser workspace state
+- [x] Implement local-first progress with auth-backed sync on the existing Pico progress route
 - [x] Implement XP, badges, milestones, and unlock logic
 - [x] Implement grounded tutor with escalation guardrails
-- [x] Implement manual-first autopilot timeline, alerts, approvals, and export
-- [ ] Validate with typecheck and targeted unit tests
-- [ ] Commit current slice
-- [ ] Start auth-backed sync design
+- [x] Implement live autopilot bridge for runs, budgets, alerts, and approvals on existing MUTX surfaces
+- [ ] Finish truth-alignment cleanup for public copy and legacy compatibility routes
+- [ ] Re-run validation and commit the current slice
+- [ ] Sweep non-English Pico landing copy so localized surfaces stop lying
 
 ## Architecture direction
 - Frontend: keep Pico isolated under `app/pico/*` and do not route through desktop/operator onboarding.
-- State: local browser persistence first, because authless onboarding ships sooner than a half-wired account system.
+- State: local-first browser persistence plus auth-backed sync through the existing `/api/pico/progress` -> `/v1/pico/progress` lane.
 - Tutor: deterministic lesson-grounded answers first; model-backed tutor later.
-- Autopilot: manual telemetry first; live control-plane sync later.
+- Autopilot: reuse live MUTX runs, budgets, alerts, and approvals when authenticated; say "offline" when that data is unavailable.
 - Billing: internal plan flags only until pricing and payment rails are worth wiring.
 
 ## Risks
-- Browser-local persistence is single-device only. Honest for beta, not enough for GA.
-- Manual telemetry is real but not automatic. Must stay clearly labeled until live ingestion lands.
+- Non-English Pico landing locales still carry stale prereg/waitlist language.
+- Approval persistence is still backed by the shared in-memory approvals service.
 - Existing dashboard/backend surfaces can confuse future implementation if preview/shell routes are treated like shipped product.
 - Docs drift remains a repo-wide tax and will bite again if left alone too long.
 
 ## Next execution wave
-1. Commit the converged multipage Pico slice.
-2. Run a fresh production-style smoke pass on the committed Pico routes.
-3. Add auth-aware sync from Pico flows into existing dashboard/onboarding/observability routes.
-4. Replace manual event entry with live connector ingestion.
-5. Cut more stale waitlist/copy residue across non-English locales once the core flow stops moving.
+1. Commit the route-truth and public-copy cleanup.
+2. Sweep non-English Pico landing copy so every live locale matches the shipped product.
+3. Replace the shared in-memory approvals backing with durable persistence.
+4. Deepen runtime drill-down and richer control-plane ingestion without adding parallel Pico routes.
+5. Wire real billing only after the control loop is durable enough to charge for.
