@@ -6,6 +6,19 @@ import types
 def _load_langchain_agent_module():
     sys.modules.pop("src.api.integrations.langchain_agent", None)
 
+    stubbed_modules = [
+        "langchain_openai",
+        "langchain_anthropic",
+        "langchain_community.chat_models",
+        "langchain_core.messages",
+        "langchain_core.tools",
+        "langchain.agents",
+        "langchain.memory",
+        "langchain_core.prompts",
+        "src.api.integrations.vector_store",
+    ]
+    original_modules = {name: sys.modules.get(name) for name in stubbed_modules}
+
     langchain_openai = types.ModuleType("langchain_openai")
     langchain_openai.ChatOpenAI = type("ChatOpenAI", (), {})
     sys.modules["langchain_openai"] = langchain_openai
@@ -59,7 +72,14 @@ def _load_langchain_agent_module():
     )
     sys.modules["src.api.integrations.vector_store"] = vector_store
 
-    return importlib.import_module("src.api.integrations.langchain_agent")
+    try:
+        return importlib.import_module("src.api.integrations.langchain_agent")
+    finally:
+        for name, original_module in original_modules.items():
+            if original_module is None:
+                sys.modules.pop(name, None)
+            else:
+                sys.modules[name] = original_module
 
 
 def test_calculate_supports_basic_arithmetic() -> None:
