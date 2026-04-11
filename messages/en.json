@@ -51,7 +51,7 @@
     },
     "platform": {
       "eyebrow": "What PicoMUTX Is",
-      "title": "Where AI agents go from \u201Cinteresting idea\u201D to \u201Cworking system.\u201D",
+      "title": "Where AI agents go from “interesting idea” to “working system.”",
       "body": "PicoMUTX is a guided platform for people who want to build and run AI agents safely — without needing to become full-time engineers. It gives you the structure, support, and safeguards that are usually missing when people try to do this alone. Instead of assembling everything from scratch, you move step by step: from idea to implementation, from confusion to clarity, from prototype to something you can actually use.",
       "howItWorks": {
         "0": {
@@ -75,8 +75,8 @@
     "who": {
       "eyebrow": "Is PicoMUTX for You?",
       "title": "PicoMUTX is not for everyone.",
-      "forYouTitle": "This is for you if\u2026",
-      "notForYouTitle": "This is not for you if\u2026",
+      "forYouTitle": "This is for you if…",
+      "notForYouTitle": "This is not for you if…",
       "forYou": {
         "0": "You want to build an AI agent but don't want to depend entirely on developers",
         "1": "You've tried before and got stuck halfway",
@@ -98,12 +98,24 @@
       "beforeLabel": "Before",
       "afterLabel": "After",
       "items": {
-        "0": { "before": "You have an idea, but no clear path", "after": "You have a structured way forward" },
-        "1": { "before": "You waste time jumping between tools, docs, and tutorials", "after": "You follow guided implementation paths" },
-        "2": { "before": "You get stuck and lose momentum", "after": "You get support before the project dies" },
-        "3": { "before": "Your agent stays in theory", "after": "Your agent gets built and put to work" }
+        "0": {
+          "before": "You have an idea, but no clear path",
+          "after": "You have a structured way forward"
+        },
+        "1": {
+          "before": "You waste time jumping between tools, docs, and tutorials",
+          "after": "You follow guided implementation paths"
+        },
+        "2": {
+          "before": "You get stuck and lose momentum",
+          "after": "You get support before the project dies"
+        },
+        "3": {
+          "before": "Your agent stays in theory",
+          "after": "Your agent gets built and put to work"
+        }
       },
-      "close": "The goal is not to \u201Clearn AI someday.\u201D The goal is to get your agent live — safely, clearly, and with less friction."
+      "close": "The goal is not to “learn AI someday.” The goal is to get your agent live — safely, clearly, and with less friction."
     },
     "earlyAccess": {
       "eyebrow": "Beta access",
@@ -121,11 +133,26 @@
       "eyebrow": "Questions",
       "title": "Questions people usually have before joining",
       "items": {
-        "0": { "q": "Do I need to know how to code?", "a": "No. PicoMUTX is built for people who want to build useful AI agents without needing deep technical expertise." },
-        "1": { "q": "What if I've already tried and failed?", "a": "That is exactly one of the people this is for. PicoMUTX is designed to reduce the confusion and fragmentation that usually cause people to stop halfway." },
-        "2": { "q": "What kind of agents can I build?", "a": "Practical ones — the kind that save time, support operations, improve workflows, and help businesses run better. The focus is usefulness, not toy demos." },
-        "3": { "q": "Can I use the workspace now?", "a": "Yes. The beta product is live. Use the workspace, follow the lessons, and contact the team if you need a human hand on a messy edge case." },
-        "4": { "q": "Is this for enterprises?", "a": "PicoMUTX is better suited to founders, operators, and small teams who want a guided way to build and deploy AI agents. Larger enterprise governance needs belong to the broader MUTX ecosystem." }
+        "0": {
+          "q": "Do I need to know how to code?",
+          "a": "No. PicoMUTX is built for people who want to build useful AI agents without needing deep technical expertise."
+        },
+        "1": {
+          "q": "What if I've already tried and failed?",
+          "a": "That is exactly one of the people this is for. PicoMUTX is designed to reduce the confusion and fragmentation that usually cause people to stop halfway."
+        },
+        "2": {
+          "q": "What kind of agents can I build?",
+          "a": "Practical ones — the kind that save time, support operations, improve workflows, and help businesses run better. The focus is usefulness, not toy demos."
+        },
+        "3": {
+          "q": "Can I use the workspace now?",
+          "a": "Yes. The beta product is live. Use the workspace, follow the lessons, and contact the team if you need a human hand on a messy edge case."
+        },
+        "4": {
+          "q": "Is this for enterprises?",
+          "a": "PicoMUTX is better suited to founders, operators, and small teams who want a guided way to build and deploy AI agents. Larger enterprise governance needs belong to the broader MUTX ecosystem."
+        }
       }
     },
     "finalCta": {
@@ -171,11 +198,11 @@
     "preRegForm": {
       "emailLabel": "Work email",
       "emailPlaceholder": "you@company.com",
-      "submitting": "Joining\u2026",
-      "submit": "Pre-Register Now",
-      "privacy": "No spam. No payment required. Just early access updates and launch details.",
-      "successTitle": "You are on the list.",
-      "successBody": "We will be in touch when PicoMUTX access opens. No spam, no payment required.",
+      "submitting": "Sending...",
+      "submit": "Send message",
+      "privacy": "No spam. No sales calls. Just a human reply.",
+      "successTitle": "Message sent.",
+      "successBody": "We read every message. Expect a personal reply within 24 hours.",
       "errorFallback": "Something went wrong. Please try again."
     },
     "footer": {
@@ -188,7 +215,7 @@
         "contact": "Contact",
         "privacy": "Privacy"
       },
-      "copyright": "\u00a9 MUTX 2026. Open control for deployed agents."
+      "copyright": "© MUTX 2026. Open control for deployed agents."
     }
   }
 }

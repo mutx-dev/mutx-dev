@@ -1,21 +1,21 @@
 {
   "pico": {
     "meta": {
-      "title": "PicoMUTX — 不需要雇用开发者，安全构建和部署AI代理",
-      "description": "PicoMUTX 帮助创始人、运营者和小型团队安全地构建、部署和运行AI代理——提供逐步指导、内置安全防护和真实支持。立即预注册以获取早期访问权限。"
+      "title": "PicoMUTX - 从第一个智能体到一个你真的敢信任的智能体",
+      "description": "PicoMUTX 是一层带引导的 academy、tutor 和 autopilot，帮助你从第一个智能体走到一个你真的可以信任的生产工作流。"
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " by MUTX",
-      "cta": "预注册"
+      "cta": "和我们聊聊"
     },
     "hero": {
-      "badge": "早期访问 · 名额有限",
-      "title": "构建和部署AI代理 ",
-      "titleAccent": "无需雇用开发者。",
-      "subtitle": "PicoMUTX为你提供一条安全、引导式的路径，通向可工作的AI代理——无论你是从零开始、修复一个不工作的代理，还是试图避免另一次昂贵的错误。",
-      "cta": "预注册获取早期访问",
-      "meta": "预注册免费 · 无需信用卡 · 创始人名额有限"
+      "badge": "Beta 已上线 - 真实产品",
+      "title": "先做出一个有用的智能体，",
+      "titleAccent": "再学会如何真正信任它。",
+      "subtitle": "PicoMUTX 提供带引导的 academy、 grounded tutor 和 autopilot 层，让你不用在十五个标签页的噪音里打转，也能把一个真实智能体跑起来。",
+      "cta": "和团队聊聊",
+      "meta": "现在打开 workspace - 引导式课程 - 真实运营信号"
     },
     "trustBar": {
       "items": {
@@ -28,27 +28,26 @@
       "eyebrow": "问题",
       "title": "问题不在于创意。",
       "titleLine2": "而在于创意之后发生的一切。",
-      "body": "大多数人不是因为缺乏雄心而停滞。停滞是因为构建AI代理仍然感觉像是进入了一个由工程师为工程师设计的世界。"
-    },
-    "scenarios": {
-      "0": {
-        "label": "「我想要一个AI代理，但不知道从哪里开始。」",
-        "body": "工具太多、意见太多、假设你已经懂基础知识的人太多。从「我有了一个创意」到「我有了一个可工作的东西」之间的差距看起来比应有的更大。"
+      "body": "大多数人不是因为缺乏雄心而停滞。停滞是因为构建AI代理仍然感觉像是进入了一个由工程师为工程师设计的世界。",
+      "scenarios": {
+        "0": {
+          "label": "「我想要一个AI代理，但不知道从哪里开始。」",
+          "body": "工具太多、意见太多、假设你已经懂基础知识的人太多。从「我有了一个创意」到「我有了一个可工作的东西」之间的差距看起来比应有的更大。"
+        },
+        "1": {
+          "label": "「我已经尝试过了——然后卡住了。」",
+          "body": "你取得了进展，撞了墙，没有人可以真正帮助你的。你有创意，但创意在 backlog 里而不是在创造价值。"
+        },
+        "2": {
+          "label": "「我花了钱，但它仍然不能正常工作。」",
+          "body": "也许你雇了人。也许你为工具付了费。现在你不只是不确定——你是持怀疑态度的。"
+        },
+        "3": {
+          "label": "「我不想部署一个我无法信任的东西。」",
+          "body": "给出错误答案、行为不可预测或产生隐藏成本的代理不是资产。是负债。"
+        }
       },
-      "1": {
-        "label": "「我已经尝试过了——然后卡住了。」",
-        "body": "你取得了进展，撞了墙，没有人可以真正帮助你的。你有创意，但创意在 backlog 里而不是在创造价值。"
-      },
-      "2": {
-        "label": "「我花了钱，但它仍然不能正常工作。」",
-        "body": "也许你雇了人。也许你为工具付了费。现在你不只是不确定——你是持怀疑态度的。"
-      },
-      "3": {
-        "label": "「我不想部署一个我无法信任的东西。」",
-        "body": "给出错误答案、行为不可预测或产生隐藏成本的代理不是资产。是负债。"
-      }
-    },
-    "close": "这正是 PicoMUTX 存在的原因。"
+      "close": "这正是 PicoMUTX 存在的原因。"
     },
     "platform": {
       "eyebrow": "PicoMUTX 是什么",
@@ -99,85 +98,94 @@
       "beforeLabel": "之前",
       "afterLabel": "之后",
       "items": {
-        "0": { "before": "你有一个创意，但没有明确的路径", "after": "你有一条结构化的前进之路" },
-        "1": { "before": "你在工具、文档和教程之间跳跃，浪费时间", "after": "你遵循引导式实施路径" },
-        "2": { "before": "你卡住了，失去势头", "after": "你在项目死亡之前获得支持" },
-        "3": { "before": "你的代理停留在理论中", "after": "你的代理被构建并投入使用" }
+        "0": {
+          "before": "你有一个创意，但没有明确的路径",
+          "after": "你有一条结构化的前进之路"
+        },
+        "1": {
+          "before": "你在工具、文档和教程之间跳跃，浪费时间",
+          "after": "你遵循引导式实施路径"
+        },
+        "2": {
+          "before": "你卡住了，失去势头",
+          "after": "你在项目死亡之前获得支持"
+        },
+        "3": {
+          "before": "你的代理停留在理论中",
+          "after": "你的代理被构建并投入使用"
+        }
       },
       "close": "目标不是「某天学习AI」。目标是将你的代理上线——安全、清晰、更少摩擦。"
     },
     "earlyAccess": {
-      "eyebrow": "早期访问",
-      "title": "PicoMUTX 正在分阶段开放。创始人访问不会永远开放。",
-      "body": "现在预注册让你走在公开推出之前，并在帮助塑造平台的群体中。早期用户可以更直接地接触产品、更早的入门、以及对优先事项更大的影响力。",
+      "eyebrow": "Beta 访问",
+      "title": "产品已经上线，锋利的边角也很诚实。",
+      "body": "PicoMUTX 现在是真正可用的引导式产品，不是等待名单幻想。打开 workspace，跟着课程走，卡住时用 tutor，问题太复杂时就升级给真人。",
       "benefits": {
-        "0": "在公开发布前获得早期访问",
-        "1": "创始人成员名额的优先考虑",
-        "2": "早期入门和发布更新",
-        "3": "影响早期用例和推出优先事项的能力",
-        "4": "首先看到定价和访问条款"
+        "0": "现在打开 workspace",
+        "1": "跟随引导式 onboarding 和 academy tracks",
+        "2": "使用 grounded tutor，而不是靠猜",
+        "3": "从控制层看到真实 autopilot 信号",
+        "4": "需要人工判断时和团队聊聊"
       }
     },
     "faq": {
-      "eyebrow": "问题",
-      "title": "人们在加入前通常会有的问题",
       "items": {
-        "0": { "q": "我需要知道如何编程吗？", "a": "不需要。PicoMUTX 是为想要构建有用的AI代理而不需要深厚技术专业知识的人设计的。" },
-        "1": { "q": "如果我已经尝试过并失败了怎么办？", "a": "这正是这类人之一。PicoMUTX 旨在减少通常导致人们在中途停止的困惑和碎片化。" },
-        "2": { "q": "我可以构建什么样的代理？", "a": "实用的代理——那种节省时间、支持运营、改善工作流程并帮助企业更好地运行的东西。重点是有用性，而不是玩具演示。" },
-        "3": { "q": "预注册免费吗？", "a": "是的。预注册是免费的，不需要付款。当访问开放时以及创始人名额可用时，你将是第一个知道的人。" },
-        "4": { "q": "这是给企业的吗？", "a": "PicoMUTX 更适合想要引导式方式来构建和部署AI代理的创始人、运营者和小型团队。更大的企业治理需求属于更广泛的 MUTX 生态系统。" }
+        "3": {
+          "q": "我现在可以使用 workspace 吗？",
+          "a": "可以。Beta 产品已经上线。你可以直接进入 workspace，跟着课程走；如果碰到棘手边界情况，就联系团队。"
+        }
       }
     },
     "finalCta": {
-      "eyebrow": "早期访问 · 名额有限",
-      "title": "你的代理不需要保持为一个未完成的创意。",
-      "body": "你不需要打开更多的标签页。你不需要另一个教程。你需要一条更清晰的路，走向有效的东西。PicoMUTX 就是为那一刻而构建的。",
-      "formHeadline": "预注册 PicoMUTX",
-      "formSubline": "加入早期访问列表。当我们开放时成为第一个。",
-      "ctaButton": "立即预注册",
-      "formCtaMeta": "预注册免费 · 无需信用卡 · 早期用户获得优先访问权"
+      "eyebrow": "workspace 已上线",
+      "title": "你的智能体没必要一直停留在半成品想法阶段。",
+      "body": "你不需要更多标签页。你需要更清晰的路径、 grounded tutor，以及真实的运营信号。PicoMUTX 就是为这个时刻做的。",
+      "formHeadline": "和 PicoMUTX 团队聊聊",
+      "formSubline": "告诉我们你在做什么，或者卡在哪里。我们会把你指向正确路径。",
+      "ctaButton": "发送消息",
+      "formCtaMeta": "现在打开 workspace - 需要时真人回复 - 没有假装的 onboarding 戏码"
     },
     "contactForm": {
       "dialogLabel": "联系表单",
       "closeLabel": "关闭",
-      "title": "预注册早期访问",
-      "subtitle": "告诉我们你目前的情况。我们会帮你进入。",
+      "title": "和 PicoMUTX 团队聊聊",
+      "subtitle": "告诉我们你在做什么，或者卡在哪里。我们会尽快把你导向正确路径。",
       "emailLabel": "工作邮箱",
       "emailPlaceholder": "you@company.com",
       "nameLabel": "姓名",
-      "namePlaceholder": "张三",
+      "namePlaceholder": "张晨",
       "companyLabel": "公司",
-      "companyPlaceholder": "示例公司",
-      "interestLabel": "是什么让你来到这里？",
+      "companyPlaceholder": "Acme",
+      "interestLabel": "你为什么来到这里？",
       "interestOptions": {
-        "building-first": "构建我的第一个AI代理",
-        "fixing-existing": "修复一个不工作的代理",
-        "evaluating": "评估平台或工具",
-        "spent-money": "已经花了钱——仍然不工作",
+        "building-first": "我正在构建第一个 AI 智能体",
+        "fixing-existing": "我在修一个跑不起来的智能体",
+        "evaluating": "我在评估平台或工具",
+        "spent-money": "我已经花了钱，但还是跑不通",
         "other": "其他"
       },
       "messageLabel": "有什么我们应该知道的吗？",
-      "messageOptional": "（可选）",
-      "messagePlaceholder": "例如：我经营一家小型SaaS，想自动化客户支持...",
+      "messageOptional": "(可选)",
+      "messagePlaceholder": "例如：我在做一个小型 SaaS，想自动化客服支持……",
       "submitting": "发送中...",
-      "submit": "加入早期访问列表",
-      "disclaimer": "无垃圾邮件。无销售电话。只有人类回复。",
-      "successTitle": "你在列表上了。",
-      "successBody": "我们阅读每条消息。预计在24小时内获得个人回复。",
+      "submit": "发送消息",
+      "disclaimer": "没有垃圾信息。没有销售电话。只有真人回复。",
+      "successTitle": "消息已发送。",
+      "successBody": "我们会阅读每一条消息。预计 24 小时内收到人工回复。",
       "successBack": "返回页面",
-      "errorFallback": "出了点问题。请重试。",
-      "networkError": "网络错误。请重试。"
+      "errorFallback": "出了点问题。请再试一次。",
+      "networkError": "网络错误。请再试一次。"
     },
     "preRegForm": {
       "emailLabel": "工作邮箱",
       "emailPlaceholder": "you@company.com",
-      "submitting": "加入中…",
-      "submit": "立即预注册",
-      "privacy": "无垃圾邮件。无需付款。只有早期访问更新和发布详情。",
-      "successTitle": "你在列表上了。",
-      "successBody": "当 PicoMUTX 访问开放时我们会联系你。无垃圾邮件，无需付款。",
-      "errorFallback": "出了点问题。请重试。"
+      "submitting": "发送中...",
+      "submit": "发送消息",
+      "privacy": "没有垃圾信息。没有销售电话。只有真人回复。",
+      "successTitle": "消息已发送。",
+      "successBody": "我们会阅读每一条消息。预计 24 小时内收到人工回复。",
+      "errorFallback": "出了点问题。请再试一次。"
     },
     "footer": {
       "links": {
