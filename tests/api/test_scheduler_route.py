@@ -53,10 +53,9 @@ async def test_interval_task_next_run_is_created_at_plus_interval(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_create_scheduled_task_sets_future_interval_next_run(monkeypatch):
+async def test_create_scheduled_task_sets_future_interval_next_run():
     """Creating an interval task should return the actual future next_run timestamp."""
     admin_user = SimpleNamespace(role="admin")
-    monkeypatch.setattr(scheduler_route, "_ensure_scheduler_running", lambda: None)
 
     response = await scheduler_route.create_scheduled_task(
         scheduler_route.SchedulerTaskCreate(name="heartbeat", interval_seconds=90),
