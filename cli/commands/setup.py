@@ -210,9 +210,7 @@ def _install_faramesh_governance() -> None:
         shutil.copy(bundled_policy, policy_path)
         click.echo(f"  ✓ Bundled policy installed to {policy_path}")
 
-    proc = start_faramesh_daemon(
-        policy_path=policy_path, socket_path=FAREMESH_SOCKET_PATH
-    )  # noqa: F821
+    proc = start_faramesh_daemon(policy_path=policy_path, socket_path=FAREMESH_SOCKET_PATH)  # noqa: F821
     if proc is None:
         click.echo("  ⚠ Faramesh daemon could not be started automatically")
         click.echo("    Run manually: faramesh serve --policy <policy.yaml>")
