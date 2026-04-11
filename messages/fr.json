@@ -2,20 +2,20 @@
   "pico": {
     "meta": {
       "title": "PicoMUTX — Construisez et deployez des agents IA en toute securite sans recruter un developpeur",
-      "description": "PicoMUTX aide les fondateurs, operateurs et petites equipes a construire, deployer et executer des agents IA en toute securite — avec un accompagnement etape par etape, des garde-fous integres et un vrai soutien. Pre-inscrivez-vous maintenant."
+      "description": "PicoMUTX aide les fondateurs, operateurs et petites equipes a construire, deployer et executer des agents IA en toute securite — avec un corpus de lecons deja livre, un parcours de deploiement initial et un support fonde."
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " par MUTX",
-      "cta": "Pre-inscription"
+      "cta": "Ouvrir Pico"
     },
     "hero": {
-      "badge": "Acces anticipe · Places limitees",
+      "badge": "Ouvert maintenant · Configuration guidee",
       "title": "Construisez et deployez des agents IA ",
       "titleAccent": "sans recruter un developpeur.",
       "subtitle": "PicoMUTX vous offre un parcours sur et guide vers un agent IA fonctionnel — que vous partiez de zero, repariez un agent qui ne fonctionne pas ou cherchiez a eviter une autre erreur couteuse.",
-      "cta": "Pre-inscription pour l'acces anticipe",
-      "meta": "Pre-inscription gratuite · Sans carte bancaire · Places fondatrices limitees"
+      "cta": "Ouvrir Pico",
+      "meta": "Academy livree · Parcours de deploiement initial · Support fonde"
     },
     "trustBar": {
       "items": {
@@ -118,15 +118,15 @@
       "close": "L'objectif n'est pas d'“apprendre l'IA un jour.” L'objectif est de mettre votre agent en production — en toute securite, clairement et avec moins de friction."
     },
     "earlyAccess": {
-      "eyebrow": "Acces anticipe",
-      "title": "PicoMUTX s'ouvre par etapes. L'acces fondateur ne restera pas ouvert indéfiniment.",
-      "body": "Vous pre-inscrire maintenant vous met en avance sur le lancement public et dans le groupe qui aide a faconner la plateforme tot. Les utilisateurs anticipes obtiennent un acces plus direct au produit, un onboarding plus precoce et plus d'influence sur les priorites.",
+      "eyebrow": "Ouvert maintenant",
+      "title": "PicoMUTX est ouvert avec une academy livree, un parcours de deploiement initial et un support fonde.",
+      "body": "Commencez par l academy, suivez la checklist initiale et utilisez la voie de support quand vous avez besoin d aide pour la prochaine etape concrete.",
       "benefits": {
-        "0": "Acces anticipe avant le lancement public",
-        "1": "Consideration prioritaire pour les places de membre fondateur",
-        "2": "Onboarding anticipe et mises a jour de lancement",
-        "3": "La possibilite d'influencer les premiers cas d'usage et les priorites de deploiement",
-        "4": "Premiere visibilite sur les tarifs et conditions d'acces"
+        "0": "Parcourez des maintenant l academy Pico livree",
+        "1": "Utilisez la checklist de deploiement initial pour la premiere configuration",
+        "2": "Connectez-vous pour acceder au controle Pico et aux fonctions liees au plan",
+        "3": "Obtenez un support fonde sur le corpus de lecons livre",
+        "4": "Escaladez vers un humain quand le corpus ne suffit pas"
       }
     },
     "faq": {
@@ -146,8 +146,8 @@
           "a": "Des agents pratiques — ceux qui font gagner du temps, soutiennent les operations, ameliorent les flux de travail et aident les entreprises a mieux fonctionner. L'accent est mis sur l'utilite, pas les demos."
         },
         "3": {
-          "q": "La pre-inscription est-elle gratuite ?",
-          "a": "Oui. La pre-inscription est gratuite et ne necessite aucun paiement. Vous serez parmi les premiers a savoir quand l'acces s'ouvre et quand les places fondatrices seront disponibles."
+          "q": "Puis-je utiliser PicoMUTX maintenant ?",
+          "a": "Oui. Pico est maintenant ouvert. Vous pouvez commencer aujourd hui avec l academy et le parcours initial, puis vous connecter quand vous voulez les fonctions liees au plan et l historique du support."
         },
         "4": {
           "q": "Est-ce pour les entreprises ?",
@@ -156,19 +156,19 @@
       }
     },
     "finalCta": {
-      "eyebrow": "Acces anticipe · Places limitees",
+      "eyebrow": "Ouvert maintenant",
       "title": "Votre agent n'a pas besoin de rester une idee inachevee.",
-      "body": "Vous n'avez pas besoin de plus d'onglets ouverts. Vous n'avez pas besoin d'un autre tutoriel. Vous avez besoin d'un chemin plus clair vers quelque chose qui fonctionne. PicoMUTX est construit pour ce moment.",
-      "formHeadline": "Pre-inscrivez-vous a PicoMUTX",
-      "formSubline": "Rejoignez la liste d'acces anticipe. Soyez le premier quand nous ouvrons.",
-      "ctaButton": "Pre-inscription",
-      "formCtaMeta": "Pre-inscription gratuite · Sans carte bancaire · Les utilisateurs anticipes obtiennent un acces prioritaire"
+      "body": "Vous n avez pas besoin de plus d onglets ouverts. Vous n avez pas besoin d un autre tutoriel. Vous avez besoin d un chemin plus clair vers quelque chose qui fonctionne. Pico est maintenant ouvert avec une academy livree, un parcours initial et un support fonde.",
+      "formHeadline": "Ouvrir PicoMUTX",
+      "formSubline": "Commencez par la checklist, parcourez l academy ou ecrivez-nous quand vous avez besoin d aide.",
+      "ctaButton": "Ouvrir Pico",
+      "formCtaMeta": "Academy livree · Parcours de deploiement initial · Aide humaine si necessaire"
     },
     "contactForm": {
       "dialogLabel": "Formulaire de contact",
       "closeLabel": "Fermer",
-      "title": "Pre-inscription pour l'acces anticipe",
-      "subtitle": "Dites-nous ou vous en etes. On vous integrera.",
+      "title": "Dites-nous ce dont vous avez besoin",
+      "subtitle": "Expliquez ou vous etes bloque ou ce que vous voulez construire. Nous vous repondrons.",
       "emailLabel": "Email professionnel",
       "emailPlaceholder": "vous@entreprise.com",
       "nameLabel": "Nom",
@@ -187,9 +187,9 @@
       "messageOptional": "(facultatif)",
       "messagePlaceholder": "Ex. J'ai un SaaS et je veux automatiser le support client...",
       "submitting": "Envoi en cours...",
-      "submit": "Rejoindre la liste d'acces anticipe",
+      "submit": "Contacter l equipe Pico",
       "disclaimer": "Pas de spam. Pas d'appels commerciaux. Juste une reponse humaine.",
-      "successTitle": "Vous etes dans la liste.",
+      "successTitle": "Message recu.",
       "successBody": "Nous lisons chaque message. Attendez une reponse personnelle sous 24 heures.",
       "successBack": "Retour a la page",
       "errorFallback": "Quelque chose s'est mal passe. Veuillez reessayer.",
@@ -198,11 +198,11 @@
     "preRegForm": {
       "emailLabel": "Email professionnel",
       "emailPlaceholder": "vous@entreprise.com",
-      "submitting": "Inscription…",
-      "submit": "Pre-inscription",
-      "privacy": "Pas de spam. Aucun paiement requis. Juste les mises a jour d'acces anticipe et les details de lancement.",
-      "successTitle": "Vous etes dans la liste.",
-      "successBody": "Nous vous contacterons quand l'acces PicoMUTX s'ouvrira. Pas de spam, aucun paiement requis.",
+      "submitting": "Envoi…",
+      "submit": "Recevoir les mises a jour Pico",
+      "privacy": "Pas de spam. Seulement des mises a jour Pico occasionnelles quand elles comptent.",
+      "successTitle": "Merci — vous etes inscrit.",
+      "successBody": "Nous enverrons ici des mises a jour Pico occasionnelles.",
       "errorFallback": "Quelque chose s'est mal passe. Veuillez reessayer."
     },
     "footer": {

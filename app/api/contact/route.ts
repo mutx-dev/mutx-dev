@@ -10,7 +10,6 @@ const resendFromEmail =
   process.env.RESEND_FROM_EMAIL?.trim() || 'MUTX <hello@mutx.dev>'
 const notifyEmail =
   process.env.CONTACT_NOTIFY_EMAIL?.trim() || 'hello@mutx.dev'
-const resendAudienceId = process.env.RESEND_AUDIENCE_ID?.trim()
 const discordWebhookUrl = process.env.LEAD_DISCORD_WEBHOOK_URL?.trim() || process.env.DISCORD_LEAD_WEBHOOK_URL?.trim()
 const resend = resendApiKey ? new Resend(resendApiKey) : null
 
@@ -55,47 +54,6 @@ async function sendNotificationEmail(data: {
   return result
 }
 
-async function sendConfirmationEmail(
-  to: string,
-  _name?: string,
-  _company?: string,
-) {
-  if (!resend) return
-
-  try {
-    await resend.emails.send({
-      from: resendFromEmail,
-      to: [to],
-      template: { id: '76afba66-9948-419d-9df2-ae9414006859' },
-      headers: { 'X-Entity-Ref-ID': `pico-waitlist-${Date.now()}` },
-    })
-  } catch {
-    // non-fatal — notification already sent
-    console.error('Contact confirmation email failed')
-  }
-}
-
-async function syncResendAudienceContact(data: {
-  email: string
-  name?: string
-  company?: string
-  source: string
-}) {
-  if (!resend || !resendAudienceId) return
-
-  try {
-    await resend.contacts.create({
-      audienceId: resendAudienceId,
-      email: data.email,
-      firstName: data.name || undefined,
-      lastName: data.company || undefined,
-    })
-  } catch (err) {
-    // Non-fatal — contact may already exist (409) or audience not configured
-    console.error('Resend audience sync failed:', err)
-  }
-}
-
 async function notifyDiscord(data: {
   email: string
   name?: string
@@ -122,7 +80,7 @@ async function notifyDiscord(data: {
         avatar_url: 'https://mutx.dev/logo.png',
         embeds: [{
           title: 'New PicoMUTX Lead',
-          description: `**${data.email}** just signed up.`,
+          description: `**${data.email}** sent a Pico contact request.`,
           color: 0x06b6d4,
           fields,
           footer: { text: 'MUTX Lead Pipeline' },
@@ -175,14 +133,6 @@ export async function POST(request: Request): Promise<NextResponse> {
       console.warn('Contact form: Resend not configured, skipping email')
     }
 
-    // Send confirmation to user (uses waitlist template) and add to Resend audience
-    await sendConfirmationEmail(normalizedEmail, name?.trim(), company?.trim())
-    await syncResendAudienceContact({
-      email: normalizedEmail,
-      name: name?.trim(),
-      company: company?.trim(),
-      source: normalizedSource,
-    })
     await notifyDiscord({
       email: normalizedEmail,
       name: name?.trim(),

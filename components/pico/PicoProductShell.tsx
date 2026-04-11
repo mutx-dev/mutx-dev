@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { ArrowRight, BookOpen, ListChecks, LifeBuoy, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, LifeBuoy, ListChecks, Loader2, ShieldCheck, Sparkles } from "lucide-react";
 
 import { usePicoPath } from "@/components/pico/PicoPathProvider";
 import { picoPrimaryButtonClass, picoSecondaryButtonClass, picoSurfaceClass } from "@/components/pico/picoUi";
+import { usePicoState } from "@/components/pico/usePicoState";
 
 type PicoProductShellProps = {
   title: string;
@@ -25,8 +26,20 @@ function pathIsActive(pathname: string, href: string) {
   return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 }
 
+function formatPlanLabel(plan: string | null) {
+  if (!plan) {
+    return null;
+  }
+
+  return plan
+    .replace(/[_-]+/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
 export function PicoProductShell({ title, description, actions, children }: PicoProductShellProps) {
   const pathname = usePathname();
+  const { state, loading } = usePicoState();
   const homeHref = usePicoPath("/");
   const startHref = usePicoPath("/start");
   const academyHref = usePicoPath("/academy");
@@ -34,6 +47,7 @@ export function PicoProductShell({ title, description, actions, children }: Pico
   const supportHref = usePicoPath("/support");
   const loginHref = usePicoPath("/login");
   const registerHref = usePicoPath("/register");
+  const planLabel = formatPlanLabel(state.plan);
 
   return (
     <div className="site-page min-h-screen text-white">
@@ -75,18 +89,45 @@ export function PicoProductShell({ title, description, actions, children }: Pico
           </nav>
 
           <div className="flex flex-wrap items-center gap-3">
-            <Link
-              href={loginHref}
-              className={picoSecondaryButtonClass}
-            >
-              Sign in
-            </Link>
-            <Link
-              href={registerHref}
-              className={picoPrimaryButtonClass}
-            >
-              Create account
-            </Link>
+            {loading ? (
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/70">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Checking session
+              </div>
+            ) : state.authenticated ? (
+              <>
+                <div className="inline-flex items-center rounded-full border border-emerald-300/20 bg-emerald-300/10 px-4 py-2 text-sm font-semibold text-emerald-100">
+                  Signed in{planLabel ? ` · ${planLabel}` : ""}
+                </div>
+                <Link
+                  href={startHref}
+                  className={picoSecondaryButtonClass}
+                >
+                  Continue setup
+                </Link>
+                <Link
+                  href={controlHref}
+                  className={picoPrimaryButtonClass}
+                >
+                  Open control
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href={loginHref}
+                  className={picoSecondaryButtonClass}
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href={registerHref}
+                  className={picoPrimaryButtonClass}
+                >
+                  Create account
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>

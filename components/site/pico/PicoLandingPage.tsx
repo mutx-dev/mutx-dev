@@ -59,7 +59,6 @@ export function PicoLandingPage() {
   const t = useTranslations('pico')
   const prefersReducedMotion = useReducedMotion()
   const homeHref = usePicoPath('/')
-  const academyHref = usePicoPath('/academy')
   const startHref = usePicoPath('/start')
 
   return (
@@ -87,7 +86,7 @@ export function PicoLandingPage() {
             </span>
           </Link>
           <PicoLangSwitcher />
-          <Link className={s.navCta} href={startHref}>Open start</Link>
+          <Link className={s.navCta} href={startHref}>{t('nav.cta')}</Link>
         </div>
       </nav>
 
@@ -115,11 +114,8 @@ export function PicoLandingPage() {
             <SiteReveal delay={0.22}>
               <div className={s.heroActions}>
                 <Link href={startHref} className={s.btnPrimary}>
-                  Start Pico
+                  {t('hero.cta')}
                   <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link href={academyHref} className={s.btnSecondary}>
-                  Browse academy
                 </Link>
               </div>
             </SiteReveal>
@@ -305,7 +301,7 @@ export function PicoLandingPage() {
         </section>
 
         {/* ---- Final CTA (Section 11) ---- */}
-        <section id="pre-register" className={`${s.section} ${s.sectionCta}`}>
+        <section id="get-started" className={`${s.section} ${s.sectionCta}`}>
           <div className={s.shell}>
             <div className={s.ctaPanel}>
               <div className={s.ctaPanelGlow} aria-hidden="true" />
@@ -327,7 +323,7 @@ export function PicoLandingPage() {
                     <p className={s.formHeadline}>{t('finalCta.formHeadline')}</p>
                     <p className={s.formSubline}>{t('finalCta.formSubline')}</p>
                     <Link href={startHref} className={s.btnPrimary}>
-                      Open start checklist
+                      {t('finalCta.ctaButton')}
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                     <p className={s.formCtaMeta}>{t('finalCta.formCtaMeta')}</p>

@@ -2,20 +2,20 @@
   "pico": {
     "meta": {
       "title": "PicoMUTX — KI-Agenten sicher erstellen und bereitstellen ohne Entwickler einzustellen",
-      "description": "PicoMUTX hilft Grundern, Operatoren und kleinen Teams, KI-Agenten sicher zu erstellen, bereitzustellen und zu betreiben — mit Schritt-fur-Schritt-Anleitung, eingebauten Schutzmechanismen und echtem Support. Jetzt vorregistrieren."
+      "description": "PicoMUTX hilft Gruendern, Operatoren und kleinen Teams, KI-Agenten sicher zu bauen, auszurollen und zu betreiben — mit einem ausgelieferten Lektionen-Korpus, einem Starter-Deploy-Pfad und fundiertem Support."
     },
     "nav": {
       "brand": "PicoMUTX",
       "brandTag": " von MUTX",
-      "cta": "Vorregistrieren"
+      "cta": "Pico oeffnen"
     },
     "hero": {
-      "badge": "Fruhzugang · Begrenzte Platze",
+      "badge": "Jetzt offen · Gefuehrte Einrichtung",
       "title": "KI-Agenten erstellen und bereitstellen ",
       "titleAccent": "ohne einen Entwickler einzustellen.",
       "subtitle": "PicoMUTX bietet Ihnen einen sicheren, gefuhrten Weg zu einem funktionierenden KI-Agenten — egal ob Sie bei null anfangen, einen Agenten reparieren der nicht funktioniert oder einen weiteren teuren Fehler vermeiden wollen.",
-      "cta": "Fruhzugang vorregistrieren",
-      "meta": "Kostenlose Vorregistrierung · Keine Kreditkarte erforderlich · Grunderplatze begrenzt"
+      "cta": "Pico oeffnen",
+      "meta": "Ausgelieferte Academy · Starter-Deploy-Pfad · Fundierter Support"
     },
     "trustBar": {
       "items": {
@@ -118,15 +118,15 @@
       "close": "Das Ziel ist nicht “KI irgendwann zu lernen.” Das Ziel ist, Ihren Agenten live zu bringen — sicher, klar und mit weniger Reibung."
     },
     "earlyAccess": {
-      "eyebrow": "Fruhzugang",
-      "title": "PicoMUTX offnet sich in Phasen. Grunderzugang bleibt nicht fur immer offen.",
-      "body": "Sich jetzt vorzuregistrieren bringt Sie vor dem offentlichen Rollout und in die Gruppe, die die Plattform frueh mitgestaltet. Fruhe Nutzer bekommen direkteren Zugang zum Produkt, fruheres Onboarding und mehr Einfluss auf Prioritaeten.",
+      "eyebrow": "Jetzt offen",
+      "title": "PicoMUTX ist offen: mit ausgelieferter Academy, Starter-Deploy-Pfad und fundiertem Support.",
+      "body": "Starte mit der Academy, gehe die Starter-Checkliste durch und nutze die Support-Spur, wenn du Hilfe beim naechsten konkreten Schritt brauchst.",
       "benefits": {
-        "0": "Fruhzugang vor dem offentlichen Release",
-        "1": "Prioritaetsberuecksichtigung fuer Grundermitgliedsplaetze",
-        "2": "Fruehes Onboarding und Launch-Updates",
-        "3": "Die Moeglichkeit, fruehe Use Cases und Rollout-Prioritaeten zu beeinflussen",
-        "4": "Erste Einsicht in Preise und Zugangsbedingungen"
+        "0": "Durchsuche jetzt die ausgelieferte Pico Academy",
+        "1": "Nutze die Starter-Deploy-Checkliste fuer das erste Setup",
+        "2": "Melde dich an, um Pico Control und planbezogene Funktionen zu nutzen",
+        "3": "Erhalte fundierten Support, gebunden an den ausgelieferten Lektionen-Korpus",
+        "4": "Eskaliere an einen Menschen, wenn der Korpus nicht ausreicht"
       }
     },
     "faq": {
@@ -146,8 +146,8 @@
           "a": "Praktische — solche, die Zeit sparen, Ablaeufe unterstuetzen, Workflows verbessern und Unternehmen helfen, besser zu funktionieren. Im Fokus steht Nuetzlichkeit, nicht Spielzeug-Demos."
         },
         "3": {
-          "q": "Ist die Vorregistrierung kostenlos?",
-          "a": "Ja. Die Vorregistrierung ist kostenlos und erfordert keine Zahlung. Sie werden zu den Ersten gehoeren, die erfahren, wenn der Zugang offnet und Grunderplaetze verfuegbar werden."
+          "q": "Kann ich PicoMUTX jetzt nutzen?",
+          "a": "Ja. Pico ist jetzt offen. Du kannst heute mit der Academy und dem Starter-Pfad beginnen und dich anmelden, wenn du planbezogene Funktionen und Support-Verlauf nutzen willst."
         },
         "4": {
           "q": "Ist das fuer Unternehmen?",
@@ -156,19 +156,19 @@
       }
     },
     "finalCta": {
-      "eyebrow": "Fruhzugang · Begrenzte Platze",
+      "eyebrow": "Jetzt offen",
       "title": "Ihr Agent muss keine unvollendete Idee bleiben.",
-      "body": "Sie brauchen keine weiteren offenen Tabs. Sie brauchen kein weiteres Tutorial. Sie brauchen einen klareren Weg zu etwas, das funktioniert. PicoMUTX ist fuer diesen Moment gebaut.",
-      "formHeadline": "Fur PicoMUTX vorregistrieren",
-      "formSubline": "Treten Sie der Fruhzugangsliste bei. Seien Sie der Erste, wenn wir eroeffnen.",
-      "ctaButton": "Jetzt vorregistrieren",
-      "formCtaMeta": "Kostenlose Vorregistrierung · Keine Kreditkarte · Fruhe Nutzer bekommen Prioritaetszugang"
+      "body": "Du brauchst nicht mehr offene Tabs. Du brauchst kein weiteres Tutorial. Du brauchst einen klareren Weg zu etwas, das funktioniert. Pico ist jetzt offen mit ausgelieferter Academy, Starter-Pfad und fundiertem Support.",
+      "formHeadline": "PicoMUTX oeffnen",
+      "formSubline": "Starte mit der Checkliste, durchsuche die Academy oder melde dich, wenn du Hilfe brauchst.",
+      "ctaButton": "Pico oeffnen",
+      "formCtaMeta": "Ausgelieferte Academy · Starter-Deploy-Pfad · Menschliche Hilfe bei Bedarf"
     },
     "contactForm": {
       "dialogLabel": "Kontaktformular",
       "closeLabel": "Schliessen",
-      "title": "Fruhzugang vorregistrieren",
-      "subtitle": "Erzahlen Sie uns, wo Sie stehen. Wir bringen Sie rein.",
+      "title": "Sag uns, was du brauchst",
+      "subtitle": "Beschreibe, wo du feststeckst oder was du bauen willst. Wir antworten.",
       "emailLabel": "Geschaefts-E-Mail",
       "emailPlaceholder": "sie@unternehmen.de",
       "nameLabel": "Name",
@@ -187,9 +187,9 @@
       "messageOptional": "(optional)",
       "messagePlaceholder": "Z.B. Ich betreibe ein kleines SaaS und moechte den Kundensupport automatisieren...",
       "submitting": "Wird gesendet...",
-      "submit": "Fruhzugangsliste beitreten",
+      "submit": "Pico-Team kontaktieren",
       "disclaimer": "Kein Spam. Keine Verkaufsanrufe. Nur eine menschliche Antwort.",
-      "successTitle": "Sie sind auf der Liste.",
+      "successTitle": "Nachricht erhalten.",
       "successBody": "Wir lesen jede Nachricht. Erwarten Sie eine persoenliche Antwort innerhalb von 24 Stunden.",
       "successBack": "Zurueck zur Seite",
       "errorFallback": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
@@ -198,11 +198,11 @@
     "preRegForm": {
       "emailLabel": "Geschaefts-E-Mail",
       "emailPlaceholder": "sie@unternehmen.de",
-      "submitting": "Anmeldung…",
-      "submit": "Jetzt vorregistrieren",
-      "privacy": "Kein Spam. Keine Zahlung erforderlich. Nur Fruhzugang-Updates und Launch-Details.",
-      "successTitle": "Sie sind auf der Liste.",
-      "successBody": "Wir melden uns, wenn PicoMUTX-Zugang offnet. Kein Spam, keine Zahlung erforderlich.",
+      "submitting": "Wird gesendet…",
+      "submit": "Pico-Updates erhalten",
+      "privacy": "Kein Spam. Nur gelegentliche Pico-Updates, wenn sie wichtig sind.",
+      "successTitle": "Danke — du bist eingetragen.",
+      "successBody": "Wir senden gelegentliche Pico-Updates an diese Adresse.",
       "errorFallback": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
     },
     "footer": {

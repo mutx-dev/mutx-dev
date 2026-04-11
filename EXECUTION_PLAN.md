@@ -28,6 +28,7 @@ Ship the narrowest honest PicoMUTX product loop that gets a user from signup to 
 - Pico-specific unit test coverage for academy, support, control helpers, and state normalization.
 
 ## Active tasks
+- [completed] Remove remaining shipped Pico waitlist/early-access trust leaks and make the shared shell auth-aware.
 - [completed] Unify the shared Pico UI primitives used by the active product shell.
 - [completed] Reduce early churn on Start, Lesson, Support, and Control surfaces.
 - [completed] Tighten Academy hierarchy so the next lesson dominates the page.

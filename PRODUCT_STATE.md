@@ -313,3 +313,33 @@ What is next
 - Sweep the remaining Pico waitlist/early-access language leaking from landing/contact surfaces.
 - Make the shared Pico shell session-aware so the header stops looking logged out after auth.
 
+### 2026-04-11 04:12:31 CEST — Final trust-leak cleanup START
+- Orchestrator opened parallel builder lanes for the last obvious Pico trust leaks.
+- Lane A: remove remaining waitlist / early-access language from shipped Pico landing and contact flows.
+- Lane B: make the shared Pico shell session-aware so auth state is visible in the product chrome.
+- Next: merge, validate, review, and ship the approved cleanup slice.
+
+### 2026-04-11 04:49:19 CEST — Final trust-leak cleanup END
+What changed
+- Merged the multi-agent cleanup for the last obvious Pico trust leaks.
+- Shared Pico shell now reflects session state instead of always looking logged out, with focused test coverage for guest/loading/authenticated chrome.
+- Shipped Pico landing and contact surfaces no longer frame themselves as preregistration or early access in the touched locale bundles.
+- Contact submissions no longer silently behave like audience-list signups; the route now behaves like a real contact/help lane.
+- Cleaned the touched locale bundle issues enough to ship: Japanese broken strings were corrected, and Korean/Chinese now fall back to clean English rather than broken or stale prereg copy.
+
+What was tested
+- `npm run test:app -- --runTestsByPath tests/unit/PicoProductShell.test.tsx`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
+- JSON parse check over `messages/*.json`
+- Reviewer approval on the merged shell + landing/contact + locale slice
+
+What failed
+- No blocking Pico failures remain in this slice.
+- Existing repo-level Next/Turbopack warnings remain non-blocking.
+
+What is next
+- If we keep going, the next honest cleanup is a real localization pass for the remaining Pico locales instead of fallback English.
+- After that: dedupe repeated Pico state fetches between the shell and page bodies if the extra request becomes worth caring about.
+
