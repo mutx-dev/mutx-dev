@@ -30,6 +30,12 @@ Decision: Remove `/pico` from the mutx.dev sitemap and fix Pico canonical truth 
 Why:
 - The old sitemap and canonical pointed to a marketing-host path that the router actively blocked. That was sloppy and wrong.
 
+## 2026-04-11 03:17:32 CEST
+Decision: Pico Autopilot stays brutally literal: only live MUTX runs, traces, alerts, budgets, usage, approvals, and timeline events belong on the trust surface.
+Why:
+- A control layer stops being useful the second it starts decorating the truth with fake counters or sandbox theater.
+- If a signal is missing, the surface should say it is missing instead of manufacturing comfort.
+
 ## 2026-04-11 02:51:43 CEST
 Decision: `/pico/onboarding` is the canonical Pico workspace entry.
 Why:

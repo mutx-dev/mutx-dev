@@ -98,6 +98,43 @@ Latest validated commands for the current canonical slice:
 
 ## Work cycle log
 
+### 2026-04-11 03:06:00 CEST - Autopilot truth audit started
+What changed
+- Re-audited the Pico Autopilot surface strictly against live MUTX signals: runs, run traces, alerts, budgets, usage breakdown, approvals, and the combined activity timeline.
+- Confirmed the current Autopilot implementation is built around real proxy-backed MUTX data instead of fake dashboard filler.
+
+What was tested
+- Source audit only at cycle start.
+
+What failed
+- Nothing yet. This was the discovery pass.
+
+What is next
+- Re-run frontend validation on the Autopilot slice.
+- Smoke the live route locally.
+- Record any truth gaps instead of hand-waving them away.
+
+### 2026-04-11 03:17:32 CEST - Autopilot truth audit complete
+What changed
+- Revalidated the Autopilot surface around the live MUTX control-plane feeds it already uses: `/api/dashboard/runs`, `/api/dashboard/runs/[runId]/traces`, `/api/dashboard/monitoring/alerts`, `/api/dashboard/budgets`, `/api/dashboard/budgets/usage`, and `/api/pico/approvals`.
+- Confirmed the shipped surface is focused on real runs, readable failures, meaningful alerts, budget pressure, approvals, and a cross-signal activity timeline.
+- Confirmed the surface avoids fake charts, synthetic counters, and `coming soon` sludge on the trust-critical Autopilot path.
+
+What was tested
+- `npm run typecheck`
+- `npm test -- tests/unit/picoAutopilot.test.ts tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `npm run build`
+- `curl -I http://127.0.0.1:3000/pico/autopilot`
+- Browser load on `http://127.0.0.1:3000/pico/autopilot`
+
+What failed
+- Browser automation on the unauthenticated local route returned an empty accessibility tree even though the route served `200 OK`; this needs a deeper authenticated browser smoke if we want stronger UI proof than build-plus-curl.
+- Existing Next/Turbopack warning noise remains unrelated to the Pico Autopilot slice.
+
+What is next
+- Do an authenticated browser pass so the live control-plane cards can be inspected end to end instead of only via build, tests, and route smoke.
+- Replace the shared in-memory approvals backing when we want durable governance instead of honest MVP gating.
+
 ### 2026-04-11 03:05:40 CEST - canonical Pico cleanup started
 What changed
 - Started a strict cleanup pass to remove the last shadow Pico routes and stale Pico truth from docs.
