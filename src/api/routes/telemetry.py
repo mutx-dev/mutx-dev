@@ -51,6 +51,9 @@ async def get_telemetry_config(request: Request):
             exporter_type = "jaeger"
 
     config = get_current_config()
+    if config.get("endpoint") and exporter_type == "console":
+        exporter_type = "otlp"
+
     return {
         "otel_enabled": True,
         "exporter_type": config.get("exporter_type", exporter_type),
