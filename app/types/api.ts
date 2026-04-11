@@ -2383,7 +2383,7 @@ export interface paths {
         };
         /**
          * Get Budget
-         * @description Get current user's budget and credits.
+         * @description Get the current user's monthly budget and credits.
          */
         get: operations["get_budget_v1_budgets_get"];
         put?: never;
