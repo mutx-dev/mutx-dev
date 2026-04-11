@@ -258,6 +258,7 @@ export function analyzeAutopilotIntegration(input: {
   usage: AutopilotUsageBreakdown | null
   approvalGateConfigured: boolean
 }): AutopilotIntegrationStatus {
+  const agents = input.agents ?? []
   const hasRuns = input.runs.length > 0
   const hasAlerts = input.alerts.length > 0
   const hasApprovalRecords = input.approvals.length > 0
@@ -268,15 +269,16 @@ export function analyzeAutopilotIntegration(input: {
         input.usage.usage_by_agent.length > 0 ||
         input.usage.usage_by_type.length > 0)
   )
+  const hasLiveAgent =
+    agents.length > 0 ||
+    hasRuns ||
+    hasAlerts ||
+    hasApprovalRecords ||
+    hasBudget ||
+    hasUsage
 
   return {
-    hasLiveAgent:
-      (input.agents?.length ?? 0) > 0 ||
-      hasRuns ||
-      hasAlerts ||
-      hasApprovalRecords ||
-      hasBudget ||
-      hasUsage,
+    hasLiveAgent,
     hasRuns,
     hasAlerts,
     hasBudget,

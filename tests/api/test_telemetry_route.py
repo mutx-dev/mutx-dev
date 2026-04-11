@@ -10,7 +10,9 @@ class FakeOTLPExporter:
 
 
 @pytest.mark.asyncio
-async def test_get_telemetry_config_is_public(client_no_auth: AsyncClient, monkeypatch):
+async def test_get_telemetry_config_requires_authentication(
+    client_no_auth: AsyncClient, monkeypatch
+):
     monkeypatch.setattr(telemetry_sdk, "get_exporter_from_env", lambda: FakeOTLPExporter())
     monkeypatch.setattr(
         telemetry_route,
@@ -20,12 +22,7 @@ async def test_get_telemetry_config_is_public(client_no_auth: AsyncClient, monke
 
     response = await client_no_auth.get("/v1/telemetry/config")
 
-    assert response.status_code == 200
-    assert response.json() == {
-        "otel_enabled": True,
-        "exporter_type": "otlp",
-        "endpoint": "http://tempo:4317",
-    }
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio
@@ -45,6 +42,16 @@ async def test_get_telemetry_config_infers_exporter_type_from_sdk(client: AsyncC
         "exporter_type": "otlp",
         "endpoint": "http://tempo:4317",
     }
+
+
+@pytest.mark.asyncio
+async def test_configure_telemetry_requires_authentication(client_no_auth: AsyncClient):
+    response = await client_no_auth.post(
+        "/v1/telemetry/config",
+        json={"otlp_endpoint": "http://tempo:4317", "protocol": "http"},
+    )
+
+    assert response.status_code == 401
 
 
 @pytest.mark.asyncio

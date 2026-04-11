@@ -12,7 +12,7 @@ from typing import Any, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from src.api.middleware.auth import get_current_user
+from src.api.middleware.auth import get_current_internal_user
 from src.api.models import User
 
 router = APIRouter(prefix="/scheduler", tags=["scheduler"])
@@ -235,12 +235,9 @@ def _serialize_task(task: dict[str, Any]) -> SchedulerTaskResponse:
 
 @router.get("", response_model=dict)
 async def get_scheduler(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ) -> dict:
     """List all scheduled tasks for the admin user."""
-    if getattr(current_user, "role", None) != "admin":
-        raise HTTPException(status_code=403, detail="Admin role required")
-
     _ensure_scheduler_running()
 
     async with _scheduler_lock:
@@ -252,12 +249,9 @@ async def get_scheduler(
 @router.post("", response_model=SchedulerTaskResponse, status_code=201)
 async def create_scheduled_task(
     task_data: SchedulerTaskCreate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ) -> SchedulerTaskResponse:
     """Create a new scheduled task."""
-    if getattr(current_user, "role", None) != "admin":
-        raise HTTPException(status_code=403, detail="Admin role required")
-
     if task_data.schedule:
         try:
             croniter.croniter(task_data.schedule, datetime.now(tz=timezone.utc))
@@ -303,12 +297,9 @@ async def create_scheduled_task(
 @router.get("/{task_id}", response_model=SchedulerTaskResponse)
 async def get_task(
     task_id: str,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ) -> SchedulerTaskResponse:
     """Get a specific scheduled task."""
-    if getattr(current_user, "role", None) != "admin":
-        raise HTTPException(status_code=403, detail="Admin role required")
-
     async with _scheduler_lock:
         task = _task_store.get(task_id)
 
@@ -322,12 +313,9 @@ async def get_task(
 async def update_scheduled_task(
     task_id: str,
     update: SchedulerTaskUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ) -> SchedulerTaskResponse:
     """Update an existing scheduled task."""
-    if getattr(current_user, "role", None) != "admin":
-        raise HTTPException(status_code=403, detail="Admin role required")
-
     async with _scheduler_lock:
         task = _task_store.get(task_id)
         if not task:
@@ -358,12 +346,9 @@ async def update_scheduled_task(
 @router.delete("/{task_id}", status_code=204)
 async def delete_scheduled_task(
     task_id: str,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ) -> None:
     """Delete a scheduled task."""
-    if getattr(current_user, "role", None) != "admin":
-        raise HTTPException(status_code=403, detail="Admin role required")
-
     async with _scheduler_lock:
         if task_id not in _task_store:
             raise HTTPException(status_code=404, detail="Task not found")
@@ -375,12 +360,9 @@ async def delete_scheduled_task(
 @router.post("/{task_id}/trigger", response_model=TriggerTaskResponse)
 async def trigger_scheduled_task(
     task_id: str,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_internal_user),
 ) -> TriggerTaskResponse:
     """Manually trigger a scheduled task immediately (fire-and-forget)."""
-    if getattr(current_user, "role", None) != "admin":
-        raise HTTPException(status_code=403, detail="Admin role required")
-
     async with _scheduler_lock:
         task = _task_store.get(task_id)
         if not task:

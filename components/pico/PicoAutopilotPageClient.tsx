@@ -119,7 +119,10 @@ function EmptyStatePanel({ state }: { state: AutopilotEmptyState }) {
     <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
       <p className="font-medium text-white">{state.title}</p>
       <p className="mt-2">{state.body}</p>
-      <Link href={state.nextStep.href} className="mt-4 inline-flex text-sm font-medium text-emerald-200 hover:text-emerald-100">
+      <Link
+        href={state.nextStep.href}
+        className="mt-4 inline-flex rounded-full border border-emerald-400/30 px-4 py-2 text-sm font-medium text-emerald-200 transition hover:border-emerald-300/60 hover:text-emerald-100"
+      >
         {state.nextStep.label}
       </Link>
     </div>
@@ -305,16 +308,6 @@ export function PicoAutopilotPageClient() {
     [alerts, approvals, budget, progress.autopilot.approvalGateEnabled, runs, usage],
   )
 
-  const loadStateLabel = authRequired
-    ? 'sign in required'
-    : loadState === 'loading'
-      ? 'loading live data'
-      : loadState === 'partial'
-        ? 'partial signal'
-        : loadState === 'offline'
-          ? 'offline'
-          : 'live'
-
   const runEmptyState = useMemo(
     () =>
       getRunsEmptyState(integrationStatus, {
@@ -361,6 +354,22 @@ export function PicoAutopilotPageClient() {
     [integrationStatus, toHref],
   )
 
+  const loadStateLabel = useMemo(() => {
+    if (authRequired) {
+      return 'Auth required'
+    }
+
+    switch (loadState) {
+      case 'loading':
+        return 'Loading live data'
+      case 'partial':
+        return 'Partial live data'
+      case 'offline':
+        return 'Offline'
+      default:
+        return 'Live data ready'
+    }
+  }, [authRequired, loadState])
   function saveThreshold() {
     if (thresholdValidationError) {
       return
