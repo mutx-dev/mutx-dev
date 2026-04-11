@@ -16,18 +16,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.database import get_db
 from src.api.middleware.auth import get_current_user
 from src.api.models import UsageEvent, Agent, User
-from src.api.models.plan_tiers import PlanTier
+from src.api.services.billing import get_current_billing_period, get_plan_credits, get_usage_credits
 
 router = APIRouter(prefix="/budgets", tags=["budgets"])
 logger = logging.getLogger(__name__)
-
-
-PLAN_CREDITS = {
-    PlanTier.FREE: 100,
-    PlanTier.STARTER: 1000,
-    PlanTier.PRO: 10000,
-    PlanTier.ENTERPRISE: 100000,
-}
 
 
 class BudgetResponse(BaseModel):
@@ -96,29 +88,26 @@ async def get_budget(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Get current user's budget and credits."""
-    result = await db.execute(
-        select(func.sum(UsageEvent.credits_used)).where(UsageEvent.user_id == current_user.id)
+    """Get the current user's monthly budget and credits."""
+    billing_period_start, reset_date = get_current_billing_period()
+    credits_used = await get_usage_credits(
+        db,
+        current_user.id,
+        period_start=billing_period_start,
+        period_end=reset_date,
     )
-    credits_used = result.scalar_one() or 0.0
 
-    credits_total = PLAN_CREDITS.get(current_user.plan, 100)
-    credits_remaining = max(0, credits_total - credits_used)
-
-    now = datetime.now(timezone.utc)
-    if now.month == 12:
-        reset_date = datetime(now.year + 1, 1, 1, tzinfo=timezone.utc)
-    else:
-        reset_date = datetime(now.year, now.month + 1, 1, tzinfo=timezone.utc)
+    credits_total = get_plan_credits(current_user.plan)
+    credits_remaining = max(0.0, credits_total - credits_used)
 
     return BudgetResponse(
         user_id=current_user.id,
         plan=current_user.plan,
         credits_total=credits_total,
-        credits_used=credits_used,
-        credits_remaining=credits_remaining,
+        credits_used=round(credits_used, 2),
+        credits_remaining=round(credits_remaining, 2),
         reset_date=reset_date,
-        usage_percentage=round(credits_used / credits_total * 100, 2) if credits_total > 0 else 0,
+        usage_percentage=round((credits_used / credits_total) * 100, 2) if credits_total > 0 else 0,
     )
 
 
@@ -216,7 +205,7 @@ async def get_usage_breakdown(
     if total_credits == 0:
         total_credits = sum((event.credits_used or 0) for event in events)
 
-    credits_total = PLAN_CREDITS.get(current_user.plan, 100)
+    credits_total = get_plan_credits(current_user.plan)
 
     return UsageBreakdownResponse(
         total_credits_used=round(total_credits, 2),

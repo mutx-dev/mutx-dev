@@ -3,6 +3,7 @@ Tests for /budgets endpoints.
 """
 
 import json
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from httpx import AsyncClient
@@ -24,6 +25,46 @@ class TestGetBudget:
         assert "credits_remaining" in data
         assert "reset_date" in data
         assert "usage_percentage" in data
+
+    @pytest.mark.asyncio
+    async def test_get_budget_uses_current_billing_cycle_only(
+        self,
+        client: AsyncClient,
+        db_session,
+        test_user,
+    ):
+        """Historical usage outside the current month should not burn current credits."""
+        from src.api.models.models import UsageEvent
+
+        now = datetime.now(timezone.utc)
+        current_month_start = datetime(now.year, now.month, 1, tzinfo=timezone.utc)
+        previous_month_event_time = current_month_start - timedelta(days=1)
+        current_month_event_time = current_month_start + timedelta(days=1)
+
+        db_session.add_all(
+            [
+                UsageEvent(
+                    user_id=test_user.id,
+                    event_type="api_call",
+                    credits_used=80.0,
+                    created_at=previous_month_event_time,
+                ),
+                UsageEvent(
+                    user_id=test_user.id,
+                    event_type="api_call",
+                    credits_used=20.0,
+                    created_at=current_month_event_time,
+                ),
+            ]
+        )
+        await db_session.commit()
+
+        response = await client.get("/v1/budgets")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["credits_used"] == 20.0
+        assert data["credits_remaining"] == 80.0
+        assert data["usage_percentage"] == 20.0
 
 
 class TestGetUsageBreakdown:
