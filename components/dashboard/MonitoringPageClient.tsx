@@ -16,6 +16,8 @@ import {
   formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import { UpgradePromptCard } from "@/components/dashboard/UpgradePromptCard";
+import { getMonitoringUpgradePrompt } from "@/components/dashboard/upgradeMoments";
 
 import type { components } from "@/app/types/api";
 
@@ -90,6 +92,11 @@ export function MonitoringPageClient() {
   const healthStatus = typeof health?.status === "string" ? health.status : "unknown";
   const databaseStatus = typeof health?.database === "string" ? health.database : "unknown";
   const timestamp = typeof health?.timestamp === "string" ? health.timestamp : null;
+  const upgradePrompt = getMonitoringUpgradePrompt({
+    unresolvedAlerts: unresolvedCount,
+    totalAlerts: alerts.length,
+    healthStatus,
+  });
 
   if (loading) return <LiveLoading title="Monitoring" />;
   if (authRequired) {
@@ -118,6 +125,8 @@ export function MonitoringPageClient() {
           status={asDashboardStatus(unresolvedCount > 0 ? "warning" : "healthy")}
         />
       </LiveKpiGrid>
+
+      {upgradePrompt ? <UpgradePromptCard prompt={upgradePrompt} /> : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
         <LivePanel title="Alert rail" meta={`${alerts.length} records`}>

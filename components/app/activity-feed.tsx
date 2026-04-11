@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { EmptyState } from '@/components/dashboard'
+import { UpgradePromptCard } from '@/components/dashboard/UpgradePromptCard'
+import { getActivityUpgradePrompt } from '@/components/dashboard/upgradeMoments'
 import { cn } from '@/lib/utils'
 
 interface ActivityEvent {
@@ -260,6 +262,7 @@ export function ActivityFeed({
 
   const activityTypes = Array.from(new Set(events.map(e => e.type))).sort()
   const groupedByDay = groupByDay(filteredEvents)
+  const upgradePrompt = getActivityUpgradePrompt({ eventCount: filteredEvents.length })
 
   return (
     <div className={cn('flex flex-col', className)}>
@@ -311,6 +314,12 @@ export function ActivityFeed({
               ))}
             </select>
           </div>
+        </div>
+      )}
+
+      {upgradePrompt && (
+        <div className="px-4 pt-4">
+          <UpgradePromptCard prompt={upgradePrompt} />
         </div>
       )}
 

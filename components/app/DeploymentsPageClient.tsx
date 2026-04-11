@@ -34,6 +34,8 @@ import {
   asDashboardStatus,
   formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
+import { UpgradePromptCard } from "@/components/dashboard/UpgradePromptCard";
+import { getDeploymentUpgradePrompt } from "@/components/dashboard/upgradeMoments";
 import { DeploymentHistory } from "./DeploymentHistory";
 import { type components } from "@/app/types/api";
 
@@ -325,6 +327,10 @@ export function DeploymentsPageClient() {
       return a.agent_id.localeCompare(b.agent_id);
     });
 
+  const upgradePrompt = getDeploymentUpgradePrompt({
+    runningDeployments,
+  });
+
   async function loadDeployments() {
     try {
       const data = await readJson<unknown>("/api/dashboard/deployments");
@@ -598,6 +604,8 @@ export function DeploymentsPageClient() {
           status={asDashboardStatus(searchQuery ? "active" : "idle")}
         />
       </LiveKpiGrid>
+
+      {upgradePrompt ? <UpgradePromptCard prompt={upgradePrompt} /> : null}
 
       <FilterBar
         searchValue={searchQuery}

@@ -16,6 +16,8 @@ import {
   formatRelativeTime,
 } from "@/components/dashboard/livePrimitives";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
+import { UpgradePromptCard } from "@/components/dashboard/UpgradePromptCard";
+import { getRunsUpgradePrompt } from "@/components/dashboard/upgradeMoments";
 
 import type { components } from "@/app/types/api";
 
@@ -72,6 +74,16 @@ export function RunsPageClient() {
     return { completed, failed, pending, running, live };
   }, [runs]);
 
+  const upgradePrompt = useMemo(
+    () =>
+      getRunsUpgradePrompt({
+        completedRuns: totals.completed,
+        failedRuns: totals.failed,
+        totalRuns: runs.length,
+      }),
+    [runs.length, totals.completed, totals.failed],
+  );
+
   if (loading) return <LiveLoading title="Runs" />;
   if (authRequired) {
     return (
@@ -112,6 +124,8 @@ export function RunsPageClient() {
           status={asDashboardStatus(totals.failed > 0 ? "failed" : "healthy")}
         />
       </LiveKpiGrid>
+
+      {upgradePrompt ? <UpgradePromptCard prompt={upgradePrompt} /> : null}
 
       <LivePanel title="Execution timeline" meta={`${runs.length} records`}>
         {runs.length === 0 ? (
