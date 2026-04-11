@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
-import { PICO_PLAN_MATRIX } from '@/lib/pico/academy'
+import { PICO_PLAN_DEFINITIONS, PICO_PLAN_ORDER } from '@/lib/pico/academy'
 
 type RunSummary = {
   id: string
@@ -369,21 +369,23 @@ export function PicoAutopilotPageClient() {
           </div>
 
           <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Plan matrix</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Plans</p>
             <div className="mt-4 grid gap-4 md:grid-cols-3">
-              {Object.entries(PICO_PLAN_MATRIX).map(([plan, features]) => (
-                <div key={plan} className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                  <p className="text-lg font-semibold text-white capitalize">{plan}</p>
-                  <div className="mt-3 space-y-2">
-                    {Object.entries(features).map(([feature, value]) => (
-                      <div key={feature}>
-                        <p className="text-xs uppercase tracking-[0.18em] text-slate-500">{feature.replaceAll('_', ' ')}</p>
-                        <p className="mt-1">{value}</p>
-                      </div>
-                    ))}
+              {PICO_PLAN_ORDER.map((plan) => {
+                const definition = PICO_PLAN_DEFINITIONS[plan]
+                return (
+                  <div key={plan} className="rounded-[24px] border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+                    <p className="text-lg font-semibold text-white">{definition.label}</p>
+                    <div className="mt-3 space-y-2">
+                      {definition.items.map((item) => (
+                        <p key={item} className="rounded-2xl bg-[rgba(3,8,20,0.45)] px-3 py-2">
+                          {item}
+                        </p>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>

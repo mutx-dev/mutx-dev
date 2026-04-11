@@ -4,6 +4,8 @@ import {
   derivePicoProgress,
   getLessonBySlug,
   mergePicoProgress,
+  PICO_PLAN_DEFINITIONS,
+  PICO_PLAN_ORDER,
   selectTrack,
 } from '../../lib/pico/academy'
 import { answerPicoTutorQuestion } from '../../lib/pico/tutor'
@@ -43,6 +45,23 @@ describe('pico academy progress', () => {
     const merged = mergePicoProgress(local, createDefaultPicoProgress())
 
     expect(merged.completedLessons).toContain('install-hermes-locally')
+  })
+
+  it('keeps the public plans blunt and narrow', () => {
+    expect(PICO_PLAN_ORDER.map((plan) => PICO_PLAN_DEFINITIONS[plan])).toEqual([
+      {
+        label: 'FREE',
+        items: ['academy', '1 agent (limited visibility)', 'no alerts', 'no approvals'],
+      },
+      {
+        label: 'STARTER',
+        items: ['1 agent monitored', 'alerts', 'basic history'],
+      },
+      {
+        label: 'PRO',
+        items: ['multiple agents', 'approvals', 'deeper control', 'longer retention'],
+      },
+    ])
   })
 })
 

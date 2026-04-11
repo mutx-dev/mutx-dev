@@ -66,7 +66,7 @@ Lesson XP is added on top of milestone XP.
 - Lessons unlock linearly in the shipped beta sequence.
 - Levels advance when the previous level's lessons are completed.
 - Tracks show progress based on completed lesson count.
-- Plan features gate tutor usage, webhook alerts, retention, and approval capacity.
+- Plan copy lives in `PICO_PLAN_DEFINITIONS` and keeps the tiers narrow: visibility, alerts, approvals, and retention.
 
 ## Alert model
 Open alerts today:

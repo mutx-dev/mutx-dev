@@ -49,14 +49,13 @@ export type PicoTrack = {
   nextTrack?: string
 }
 
-export type PicoPlanFeature =
-  | 'academy'
-  | 'tutor'
-  | 'project_limit'
-  | 'monitored_agents'
-  | 'alerts'
-  | 'approvals'
-  | 'retention'
+export type PicoPlanDefinition = {
+  label: string
+  items: string[]
+}
+
+export const PICO_PLAN_ORDER: PicoPlan[] = ['free', 'starter', 'pro']
+
 
 export type PicoProgressState = {
   version: number
@@ -106,33 +105,18 @@ export const PICO_MILESTONE_XP: Record<string, number> = {
   helpful_community_response: 35,
 }
 
-export const PICO_PLAN_MATRIX: Record<PicoPlan, Record<PicoPlanFeature, string>> = {
+export const PICO_PLAN_DEFINITIONS: Record<PicoPlan, PicoPlanDefinition> = {
   free: {
-    academy: 'Full academy access',
-    tutor: 'Grounded tutor with light daily usage',
-    project_limit: '1 active project lane',
-    monitored_agents: 'Preview only',
-    alerts: 'In-app threshold alerts',
-    approvals: 'Preview the approval workflow',
-    retention: '7-day product memory',
+    label: 'FREE',
+    items: ['academy', '1 agent (limited visibility)', 'no alerts', 'no approvals'],
   },
   starter: {
-    academy: 'Full academy access',
-    tutor: 'Priority tutor routing',
-    project_limit: '3 active project lanes',
-    monitored_agents: '1 monitored agent',
-    alerts: 'In-app plus email-ready config',
-    approvals: 'One approval gate',
-    retention: '30-day run and alert history',
+    label: 'STARTER',
+    items: ['1 agent monitored', 'alerts', 'basic history'],
   },
   pro: {
-    academy: 'Full academy access',
-    tutor: 'Priority tutor routing',
-    project_limit: 'Unlimited project lanes',
-    monitored_agents: 'Multiple monitored agents',
-    alerts: 'Stronger alert routing',
-    approvals: 'Multiple approval gates',
-    retention: '90-day run and alert history',
+    label: 'PRO',
+    items: ['multiple agents', 'approvals', 'deeper control', 'longer retention'],
   },
 }
 

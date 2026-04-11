@@ -1426,6 +1426,25 @@
   color: var(--pico-text-secondary);
 }
 
+/* --- Plans ------------------------------------------------------- */
+.planGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 959px) {
+  .planGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .planGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* --- FAQ --------------------------------------------------------- */
 .faqGrid {
   display: grid;

@@ -138,22 +138,22 @@ Not yet shipped:
 ## Plan model
 Billing is not wired yet. Internal flags are.
 
-Free:
-- academy access
-- limited tutor usage
-- read-only autopilot exposure
+FREE:
+- academy
+- 1 agent (limited visibility)
+- no alerts
+- no approvals
 
-Starter:
-- 1 monitored agent
-- email alerts
-- 7-day retention
-- 1 approval gate
+STARTER:
+- 1 agent monitored
+- alerts
+- basic history
 
-Pro:
-- 5 monitored agents
-- email + webhook alerts
-- 30-day retention
-- 5 approval gates
+PRO:
+- multiple agents
+- approvals
+- deeper control
+- longer retention
 
 ## Technical strategy
 - Keep Pico isolated under `app/pico/*`

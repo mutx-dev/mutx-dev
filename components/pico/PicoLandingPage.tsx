@@ -10,6 +10,7 @@ import s from './PicoLanding.module.css'
 import { SiteReveal } from '@/components/site/SiteReveal'
 import { PicoContactForm } from './PicoContactForm'
 import { PicoLangSwitcher } from './PicoLangSwitcher'
+import { PICO_PLAN_DEFINITIONS, PICO_PLAN_ORDER } from '@/lib/pico/academy'
 import { usePicoHref } from '@/lib/pico/navigation'
 
 /* ------------------------------------------------------------------ */
@@ -17,6 +18,13 @@ import { usePicoHref } from '@/lib/pico/navigation'
 /* ------------------------------------------------------------------ */
 
 const HOW_ICONS = ['path', 'support', 'shield', 'expert'] as const
+
+const SIMPLE_PLAN_COPY = {
+  eyebrow: 'Plans',
+  title: 'Three plans. No confusion.',
+  body: 'The tiers stay narrow on purpose. Free gets you started. Starter adds monitoring. Pro adds deeper control.',
+  close: 'No enterprise theater. Pick the smallest plan that matches the amount of control you actually need.',
+}
 
 function HowItWorksIcon({ kind }: { kind: string }) {
   const sz = 20
@@ -297,6 +305,36 @@ export function PicoLandingPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ---- Plans ---- */}
+        <section className={`${s.section} ${s.sectionDark}`}>
+          <div className={s.shell}>
+            <div className={s.sectionHeader}>
+              <span className={s.eyebrow}>{SIMPLE_PLAN_COPY.eyebrow}</span>
+              <h2 className={s.sectionTitle}>{SIMPLE_PLAN_COPY.title}</h2>
+              <p className={s.sectionBody}>{SIMPLE_PLAN_COPY.body}</p>
+            </div>
+            <div className={s.planGrid}>
+              {PICO_PLAN_ORDER.map((plan) => {
+                const definition = PICO_PLAN_DEFINITIONS[plan]
+                return (
+                  <div key={plan} className={s.howCard}>
+                    <p className={s.whoColTitle}>{definition.label}</p>
+                    <ul className={s.whoList}>
+                      {definition.items.map((item) => (
+                        <li key={item} className={s.whoItem}>
+                          <Check className={s.whoCheck} />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )
+              })}
+            </div>
+            <p className={s.baClose}>{SIMPLE_PLAN_COPY.close}</p>
           </div>
         </section>
 
