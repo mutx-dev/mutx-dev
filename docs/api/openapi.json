@@ -8502,6 +8502,114 @@
         }
       }
     },
+    "/v1/pico/progress": {
+      "get": {
+        "tags": [
+          "pico"
+        ],
+        "summary": "Pico Progress",
+        "operationId": "pico_progress_v1_pico_progress_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Pico Progress V1 Pico Progress Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "pico"
+        ],
+        "summary": "Pico Progress Update",
+        "operationId": "pico_progress_update_v1_pico_progress_post",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PicoProgressPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Pico Progress Update V1 Pico Progress Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/runtime/providers/{provider}": {
       "get": {
         "tags": [
@@ -17861,6 +17969,11 @@
         "additionalProperties": false,
         "type": "object",
         "title": "OpenClawWakeupConfig"
+      },
+      "PicoProgressPayload": {
+        "properties": {},
+        "type": "object",
+        "title": "PicoProgressPayload"
       },
       "Policy": {
         "properties": {

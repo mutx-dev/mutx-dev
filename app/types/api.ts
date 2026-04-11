@@ -2074,6 +2074,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/pico/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pico Progress */
+        get: operations["pico_progress_v1_pico_progress_get"];
+        put?: never;
+        /** Pico Progress Update */
+        post: operations["pico_progress_update_v1_pico_progress_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/runtime/providers/{provider}": {
         parameters: {
             query?: never;
@@ -5554,6 +5572,8 @@ export interface components {
             /** Label */
             label?: string | null;
         };
+        /** PicoProgressPayload */
+        PicoProgressPayload: Record<string, never>;
         /**
          * Policy
          * @description A named collection of rules with versioning and enablement.
@@ -11040,6 +11060,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OnboardingStateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pico_progress_v1_pico_progress_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pico_progress_update_v1_pico_progress_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PicoProgressPayload"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
             /** @description Validation Error */
