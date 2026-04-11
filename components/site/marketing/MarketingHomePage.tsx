@@ -176,23 +176,23 @@ export function MarketingHomePage() {
         <section className={home.socialProofStrip} data-testid="homepage-social-proof">
           <div className={core.shell}>
             <div className={home.socialProofInner}>
-              <p className={home.socialProofTagline}>Trusted by teams running AI agents in production</p>
+              <p className={home.socialProofTagline}>Built around the surfaces that are actually live today</p>
               <div className={home.socialProofMetrics}>
                 <div className={home.socialProofMetric}>
-                  <p className={home.socialProofValue}>100%</p>
-                  <p className={home.socialProofLabel}>Audit Coverage</p>
+                  <p className={home.socialProofValue}>v1.4</p>
+                  <p className={home.socialProofLabel}>Current release</p>
                 </div>
                 <div className={home.socialProofMetric}>
-                  <p className={home.socialProofValue}>&lt;2 min</p>
-                  <p className={home.socialProofLabel}>Time to First Run</p>
+                  <p className={home.socialProofValue}>RBAC</p>
+                  <p className={home.socialProofLabel}>Protected API surface</p>
                 </div>
                 <div className={home.socialProofMetric}>
-                  <p className={home.socialProofValue}>0</p>
-                  <p className={home.socialProofLabel}>Config Required</p>
+                  <p className={home.socialProofValue}>Preview</p>
+                  <p className={home.socialProofLabel}>Pico clearly marked beta</p>
                 </div>
                 <div className={home.socialProofMetric}>
                   <p className={home.socialProofValue}>macOS</p>
-                  <p className={home.socialProofLabel}>Native Desktop</p>
+                  <p className={home.socialProofLabel}>Native desktop handoff</p>
                 </div>
               </div>
             </div>
