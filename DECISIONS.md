@@ -31,10 +31,22 @@ Why:
 - The old sitemap and canonical pointed to a marketing-host path that the router actively blocked. That was sloppy and wrong.
 
 ## 2026-04-11 02:51:43 CEST
-Decision: `/pico/onboarding` is the canonical Pico workspace entry. `/pico/app` and `/pico/workspace` are compatibility redirects only.
+Decision: `/pico/onboarding` is the canonical Pico workspace entry.
 Why:
 - The product promise starts with onboarding, not a vague app shell.
 - One visible entry route beats split-route confusion.
+
+## 2026-04-11 03:05:40 CEST
+Decision: delete the last legacy Pico route aliases instead of carrying redirect theater.
+Why:
+- `/pico/app`, `/pico/workspace`, and `/pico/app/lessons/[slug]` kept a second route family alive for no current user value.
+- The canonical Pico truth is simpler when the repo only ships one workspace entry and one lesson family.
+- No active Pico UI paths depend on those aliases anymore.
+
+Decision: collapse the Pico tutor API to one reply envelope.
+Why:
+- Returning both legacy and reply shapes kept a duplicate tutor contract alive.
+- The tutor should speak one product language from `lib/pico/tutor.ts` through the UI.
 
 ## 2026-04-11 01:01:56 UTC
 Decision: `components/pico/*` is the only Pico frontend system. `components/site/pico/*` is absorbed and dead.

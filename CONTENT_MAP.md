@@ -1,54 +1,59 @@
 # CONTENT_MAP
 
+Canonical source: `lib/pico/academy.ts`
+
 ## Level inventory
-- Level 0 Setup — status: shipped in workspace beta
-- Level 1 Deployment — status: shipped in workspace beta
-- Level 2 Capability — status: shipped in workspace beta
-- Level 3 Automation — status: shipped in workspace beta
-- Level 4 Production — status: shipped in workspace beta
-- Level 5 Control — status: shipped in workspace beta
-- Level 6 Systems — status: shipped in workspace beta
+- Level 0 - Setup - status: shipped
+- Level 1 - Deployment - status: shipped
+- Level 2 - Capability - status: shipped
+- Level 3 - Automation - status: shipped
+- Level 4 - Production - status: shipped
+- Level 5 - Control - status: shipped
+- Level 6 - Systems - status: shipped
 
 ## Track inventory
-- Track A First Agent — status: shipped
-- Track B Deployed Agent — status: shipped
-- Track C Useful Workflow — status: shipped
-- Track D Controlled Agent — status: shipped
-- Track E Production Pattern — status: shipped
+- Track A - First Agent (`first-agent`) - status: shipped
+- Track B - Deployed Agent (`deployed-agent`) - status: shipped
+- Track C - Useful Workflow (`useful-workflow`) - status: shipped
+- Track D - Controlled Agent (`controlled-agent`) - status: shipped
+- Track E - Production Pattern (`production-pattern`) - status: shipped
 
 ## Lesson inventory
 
-| ID | Lesson | Level | Track | Status | Artifact |
-|----|--------|-------|-------|--------|----------|
-| install-hermes-locally | Install Hermes locally | 0 | First Agent | shipped | Working local Hermes runtime |
-| run-first-agent | Run your first agent | 0 | First Agent | shipped | Saved first prompt and response |
-| deploy-hermes-vps | Deploy Hermes on a VPS | 1 | Deployed Agent | shipped | Persistent Hermes runtime |
-| keep-agent-alive | Keep your agent alive between sessions | 1 | Deployed Agent | shipped | Service/process-manager definition |
-| connect-interface-layer | Connect a messaging or interface layer | 1 | Deployed Agent | shipped | Working interface route |
-| add-first-skill-tool | Add your first skill or tool | 2 | Useful Workflow | shipped | First documented skill |
-| create-scheduled-workflow | Create a scheduled workflow | 3 | Useful Workflow | shipped | Scheduled workflow |
-| see-agent-activity | See your agent activity | 4 | Controlled Agent | shipped | Readable run timeline |
-| set-cost-threshold | Set a cost threshold | 5 | Controlled Agent | shipped | Budget threshold + warning path |
-| add-approval-gate | Add an approval gate | 5 | Controlled Agent | shipped | Approval gate + decision trail |
-| build-lead-response-agent | Build a lead-response agent | 6 | Production Pattern | shipped | Reusable lead-response pattern |
-| build-document-processing-agent | Build a document-processing agent | 6 | Production Pattern | shipped | Reusable document-processing pattern |
+| Slug | Lesson | Level | Track | Status | Artifact |
+|------|--------|-------|-------|--------|----------|
+| install-hermes-locally | Install Hermes locally | 0 | first-agent | shipped | Working local Hermes runtime |
+| run-your-first-agent | Run your first agent | 0 | first-agent | shipped | Saved first prompt and response |
+| deploy-hermes-on-a-vps | Deploy Hermes on a VPS | 1 | deployed-agent | shipped | Persistent Hermes runtime |
+| keep-your-agent-alive | Keep your agent alive between sessions | 1 | deployed-agent | shipped | Service or process-manager definition |
+| connect-a-messaging-layer | Connect a messaging layer | 1 | deployed-agent | shipped | Working message ingress |
+| add-your-first-skill | Add your first skill/tool | 2 | useful-workflow | shipped | First documented skill or tool capability |
+| create-a-scheduled-workflow | Create a scheduled workflow | 3 | useful-workflow | shipped | Scheduled workflow |
+| see-your-agent-activity | See your agent activity | 4 | controlled-agent | shipped | Readable run timeline |
+| set-a-cost-threshold | Set a cost threshold | 5 | controlled-agent | shipped | Budget threshold plus warning path |
+| add-an-approval-gate | Add an approval gate | 5 | controlled-agent | shipped | Approval gate plus decision trail |
+| build-a-lead-response-agent | Build a lead-response agent | 6 | production-pattern | shipped | Reusable lead-response pattern |
+| build-a-document-processing-agent | Build a document-processing agent | 6 | production-pattern | shipped | Reusable document-processing pattern |
 
 ## Content schema
-Every lesson includes:
+Every lesson in the canonical corpus includes:
+- slug
 - title
+- summary
 - objective
 - prerequisites
+- outcome
 - expected result
-- validation step
+- validation
 - troubleshooting
-- steps
-- artifact
+- ordered steps
 - duration
 - XP reward
+- next lesson hint
+- milestone event bindings when applicable
 
-## Content gaps still open
-- Rich markdown lesson pages separate from the workspace cards
-- Visual assets or diagrams for the harder deployment lessons
-- Real-world sample files for the document-processing lesson
-- Video walkthroughs
-- Localized workspace lesson copy
+## Current content gaps
+- Localized Pico lesson copy outside English still needs a cleanup sweep.
+- Visual assets and diagrams for harder deployment lessons are still thin.
+- The document-processing lesson still needs richer sample files.
+- Video walkthroughs do not exist and are not required for v1 ship.

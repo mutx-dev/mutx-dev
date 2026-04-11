@@ -124,9 +124,12 @@ export function answerPicoTutorQuestion(
 
 export function answerTutorQuestion(
   question: string,
-  _state?: Partial<PicoProgressState> | null | Record<string, unknown>,
+  options?: { lessonSlug?: string | null; progress?: Partial<PicoProgressState> | null | Record<string, unknown> },
 ): PicoTutorReply {
-  const answer = answerPicoTutorQuestion(question)
+  const answer = answerPicoTutorQuestion(question, {
+    lessonSlug: options?.lessonSlug ?? null,
+    progress: options?.progress as Partial<PicoProgressState> | null | undefined,
+  })
   const lessons = answer.matches.map((match) => ({
     id: match.slug,
     title: match.title,
