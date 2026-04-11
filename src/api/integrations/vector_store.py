@@ -1,22 +1,54 @@
-import os
+import hashlib
 import logging
-from typing import Optional, List, Dict, Any
+import math
+import os
+import re
 from dataclasses import dataclass
 from enum import Enum
-
-from sqlalchemy import Column, String, Text, create_engine
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import declarative_base, sessionmaker
+from typing import Any, Dict, List, Optional
 
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from sqlalchemy import JSON, Column, String, Text, create_engine
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 from src.api.database import build_sync_database_url
 
 logger = logging.getLogger(__name__)
 
 Base = declarative_base()
+JSON_TYPE = JSON().with_variant(JSONB, "postgresql")
+
+
+class LocalHashEmbeddings:
+    """Deterministic local embeddings for environments without OpenAI credentials."""
+
+    def __init__(self, *, dimensions: int = 1536):
+        self.dimensions = max(8, int(dimensions))
+
+    def _embed(self, text: str) -> list[float]:
+        tokens = re.findall(r"[\w-]+", text.lower()) or [text.lower().strip() or "empty"]
+        vector = [0.0] * self.dimensions
+
+        for token in tokens:
+            digest = hashlib.blake2b(token.encode("utf-8"), digest_size=16).digest()
+            index = int.from_bytes(digest[:8], "big") % self.dimensions
+            sign = 1.0 if digest[8] % 2 == 0 else -1.0
+            weight = 1.0 + (digest[9] / 255.0)
+            vector[index] += sign * weight
+
+        norm = math.sqrt(sum(value * value for value in vector))
+        if norm:
+            vector = [round(value / norm, 8) for value in vector]
+        return vector
+
+    def embed_documents(self, texts: List[str]) -> List[list[float]]:
+        return [self._embed(text) for text in texts]
+
+    def embed_query(self, text: str) -> list[float]:
+        return self._embed(text)
 
 
 class DocumentModel(Base):
@@ -25,8 +57,8 @@ class DocumentModel(Base):
     id = Column(String, primary_key=True)
     collection_name = Column(String, nullable=False, index=True)
     content = Column(Text, nullable=False)
-    extra_data = Column("metadata", JSONB, default=dict)
-    embedding = Column(JSONB, nullable=True)
+    extra_data = Column("metadata", JSON_TYPE, default=dict)
+    embedding = Column(JSON_TYPE, nullable=True)
 
 
 class EmbeddingProvider(str, Enum):
@@ -57,9 +89,16 @@ class VectorStoreManager:
         )
         self._sync_engine = None
         self._sync_session_maker = None
+        self._memory_documents: list[dict[str, Any]] = []
 
     def _initialize_embeddings(self):
         if self.config.embedding_provider == EmbeddingProvider.OPENAI:
+            if not os.getenv("OPENAI_API_KEY"):
+                logger.info(
+                    "OPENAI_API_KEY not set; using deterministic local embeddings for collection %s",
+                    self.config.collection_name,
+                )
+                return LocalHashEmbeddings(dimensions=self.config.embedding_dimensions)
             return OpenAIEmbeddings(
                 model=self.config.embedding_model,
                 dimensions=self.config.embedding_dimensions,
@@ -78,10 +117,17 @@ class VectorStoreManager:
         else:
             raise ValueError(f"Unknown embedding provider: {self.config.embedding_provider}")
 
+    def _uses_memory_store(self) -> bool:
+        database_url = self.config.database_url.lower()
+        return database_url.startswith(("sqlite:///:memory:", "sqlite+aiosqlite:///:memory:"))
+
     def _get_sync_engine(self):
         if self._sync_engine is None:
+            database_url = build_sync_database_url(self.config.database_url)
+            if database_url.startswith("sqlite+aiosqlite://"):
+                database_url = database_url.replace("sqlite+aiosqlite://", "sqlite://", 1)
             self._sync_engine = create_engine(
-                build_sync_database_url(self.config.database_url),
+                database_url,
                 pool_pre_ping=True,
             )
         return self._sync_engine
@@ -92,8 +138,43 @@ class VectorStoreManager:
         return self._sync_session_maker
 
     def init_database(self):
+        if self._uses_memory_store():
+            logger.info(
+                "Vector store '%s' using in-memory persistence",
+                self.config.collection_name,
+            )
+            return
         Base.metadata.create_all(self._get_sync_engine())
         logger.info("Vector store database initialized")
+
+    @staticmethod
+    def _cosine_similarity(a: List[float], b: List[float]) -> float:
+        numerator = sum(x * y for x, y in zip(a, b))
+        left_norm = math.sqrt(sum(x * x for x in a))
+        right_norm = math.sqrt(sum(y * y for y in b))
+        if not left_norm or not right_norm:
+            return 0.0
+        return float(numerator / (left_norm * right_norm))
+
+    def _rank_documents(
+        self,
+        query_embedding: List[float],
+        documents: List[dict[str, Any]],
+    ) -> List[tuple[Document, float]]:
+        ranked: list[tuple[Document, float]] = []
+        for entry in documents:
+            score = self._cosine_similarity(query_embedding, entry.get("embedding") or [])
+            ranked.append(
+                (
+                    Document(
+                        page_content=entry["content"],
+                        metadata=entry.get("metadata") or {},
+                    ),
+                    score,
+                )
+            )
+        ranked.sort(key=lambda item: item[1], reverse=True)
+        return ranked
 
     def add_documents(
         self,
@@ -106,23 +187,49 @@ class VectorStoreManager:
             for text, metadata in zip(texts, metadatas or [{}] * len(texts))
         ]
         splits = self._text_splitter.split_documents(documents)
+        generated_ids = [
+            ids[i] if ids and i < len(ids) else f"doc_{i}_{os.urandom(8).hex()}"
+            for i in range(len(splits))
+        ]
+        embeddings = self._embeddings.embed_documents([split.page_content for split in splits])
+
+        if self._uses_memory_store():
+            for i, split in enumerate(splits):
+                self._memory_documents.append(
+                    {
+                        "id": generated_ids[i],
+                        "collection_name": self.config.collection_name,
+                        "content": split.page_content,
+                        "metadata": split.metadata,
+                        "embedding": embeddings[i],
+                    }
+                )
+
+            logger.info(
+                "Added %s document chunks to in-memory collection %s",
+                len(splits),
+                self.config.collection_name,
+            )
+            return generated_ids
 
         with self._get_sync_session_maker() as session:
             for i, split in enumerate(splits):
-                doc_id = ids[i] if ids and i < len(ids) else f"doc_{i}_{os.urandom(8).hex()}"
                 doc = DocumentModel(
-                    id=doc_id,
+                    id=generated_ids[i],
                     collection_name=self.config.collection_name,
                     content=split.page_content,
                     extra_data=split.metadata,
+                    embedding=embeddings[i],
                 )
                 session.add(doc)
             session.commit()
 
         logger.info(
-            f"Added {len(splits)} document chunks to collection {self.config.collection_name}"
+            "Added %s document chunks to collection %s",
+            len(splits),
+            self.config.collection_name,
         )
-        return [f"doc_{i}" for i in range(len(splits))]
+        return generated_ids
 
     def similarity_search(
         self,
@@ -130,42 +237,55 @@ class VectorStoreManager:
         k: int = 4,
         filter_metadata: Optional[Dict[str, Any]] = None,
     ) -> List[Document]:
-        with self._get_sync_session_maker() as session:
-            query_embedding = self._embeddings.embed_query(query)
+        query_embedding = self._embeddings.embed_query(query)
 
-            stmt = session.query(DocumentModel).filter(
-                DocumentModel.collection_name == self.config.collection_name
-            )
-
-            if filter_metadata:
-                for key, value in filter_metadata.items():
-                    stmt = stmt.filter(DocumentModel.extra_data[key].astext == str(value))
-
-            results = stmt.all()
-
-            def cosine_similarity(a: List[float], b: List[float]) -> float:
-                import numpy as np
-
-                a = np.array(a)
-                b = np.array(b)
-                return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
-
-            scored_results = []
-            for doc in results:
-                if doc.embedding:
-                    score = cosine_similarity(query_embedding, doc.embedding)
-                else:
-                    score = 0.0
-                scored_results.append((score, doc))
-
-            scored_results.sort(key=lambda x: x[0], reverse=True)
-            top_k = scored_results[:k]
-
+        if self._uses_memory_store():
             documents = [
-                Document(page_content=doc.content, metadata=doc.extra_data) for score, doc in top_k
+                doc
+                for doc, _score in self._rank_documents(
+                    query_embedding,
+                    [
+                        entry
+                        for entry in self._memory_documents
+                        if entry["collection_name"] == self.config.collection_name
+                        and (
+                            not filter_metadata
+                            or all(
+                                str((entry.get("metadata") or {}).get(key)) == str(value)
+                                for key, value in filter_metadata.items()
+                            )
+                        )
+                    ],
+                )[:k]
+            ]
+            logger.info("Similarity search returned %s documents", len(documents))
+            return documents
+
+        with self._get_sync_session_maker() as session:
+            results = (
+                session.query(DocumentModel)
+                .filter(DocumentModel.collection_name == self.config.collection_name)
+                .all()
+            )
+            candidate_docs = [
+                {
+                    "content": doc.content,
+                    "metadata": doc.extra_data,
+                    "embedding": doc.embedding,
+                }
+                for doc in results
+                if not filter_metadata
+                or all(
+                    str((doc.extra_data or {}).get(key)) == str(value)
+                    for key, value in filter_metadata.items()
+                )
             ]
 
-        logger.info(f"Similarity search returned {len(documents)} documents")
+            documents = [
+                doc for doc, _score in self._rank_documents(query_embedding, candidate_docs)[:k]
+            ]
+
+        logger.info("Similarity search returned %s documents", len(documents))
         return documents
 
     def similarity_search_with_score(
@@ -173,48 +293,69 @@ class VectorStoreManager:
         query: str,
         k: int = 4,
     ) -> List[tuple[Document, float]]:
-        docs = self.similarity_search(query, k)
-        with self._get_sync_session_maker() as session:
-            query_embedding = self._embeddings.embed_query(query)
-            results = []
-            for doc in docs:
-                doc_model = (
-                    session.query(DocumentModel)
-                    .filter(
-                        DocumentModel.collection_name == self.config.collection_name,
-                        DocumentModel.content == doc.page_content,
-                    )
-                    .first()
-                )
-                if doc_model and doc_model.embedding:
-                    import numpy as np
+        query_embedding = self._embeddings.embed_query(query)
 
-                    score = float(
-                        np.dot(
-                            np.array(query_embedding),
-                            np.array(doc_model.embedding),
-                        )
-                        / (
-                            np.linalg.norm(np.array(query_embedding))
-                            * np.linalg.norm(np.array(doc_model.embedding))
-                        )
-                    )
-                else:
-                    score = 0.0
-                results.append((doc, score))
-        return results
+        if self._uses_memory_store():
+            return self._rank_documents(
+                query_embedding,
+                [
+                    entry
+                    for entry in self._memory_documents
+                    if entry["collection_name"] == self.config.collection_name
+                ],
+            )[:k]
+
+        with self._get_sync_session_maker() as session:
+            results = (
+                session.query(DocumentModel)
+                .filter(DocumentModel.collection_name == self.config.collection_name)
+                .all()
+            )
+            return self._rank_documents(
+                query_embedding,
+                [
+                    {
+                        "content": doc.content,
+                        "metadata": doc.extra_data,
+                        "embedding": doc.embedding,
+                    }
+                    for doc in results
+                ],
+            )[:k]
 
     def delete_collection(self, collection_name: Optional[str] = None) -> bool:
         target_collection = collection_name or self.config.collection_name
+        if self._uses_memory_store():
+            self._memory_documents = [
+                entry
+                for entry in self._memory_documents
+                if entry["collection_name"] != target_collection
+            ]
+            logger.info("Deleted in-memory collection %s", target_collection)
+            return True
+
         with self._get_sync_session_maker() as session:
             session.query(DocumentModel).filter(
                 DocumentModel.collection_name == target_collection
             ).delete()
             session.commit()
-        logger.info(f"Deleted collection {target_collection}")
+        logger.info("Deleted collection %s", target_collection)
         return True
 
     def get_collection_stats(self) -> Dict[str, Any]:
+        if self._uses_memory_store():
+            count = sum(
+                1
+                for entry in self._memory_documents
+                if entry["collection_name"] == self.config.collection_name
+            )
+            return {
+                "collection_name": self.config.collection_name,
+                "document_count": count,
+                "embedding_provider": self.config.embedding_provider,
+                "embedding_model": self.config.embedding_model,
+            }
+
         with self._get_sync_session_maker() as session:
             count = (
                 session.query(DocumentModel)
@@ -237,7 +378,7 @@ class VectorStoreRegistry:
         store = VectorStoreManager(config)
         store.init_database()
         cls._stores[name] = store
-        logger.info(f"Created vector store: {name}")
+        logger.info("Created vector store: %s", name)
         return store
 
     @classmethod

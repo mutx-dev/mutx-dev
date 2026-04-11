@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from src.api.config import get_settings
+from src.api.integrations.vector_store import LocalHashEmbeddings
 from src.api.middleware.auth import get_current_user
 from src.api.models import User
 from src.api.services.usage import track_usage_best_effort
@@ -50,11 +51,15 @@ def get_client():
     """Get OpenAI client with API key from environment."""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        logger.warning("OPENAI_API_KEY not set - embeddings will use placeholder")
+        logger.warning("OPENAI_API_KEY not set - falling back to local deterministic embeddings")
         return None
     from openai import AsyncOpenAI
 
     return AsyncOpenAI(api_key=api_key)
+
+
+def get_local_embedding_backend(model: str) -> LocalHashEmbeddings:
+    return LocalHashEmbeddings(dimensions=EMBEDDING_MODELS[model])
 
 
 def require_enabled_rag_api() -> None:
@@ -102,16 +107,14 @@ async def generate_embedding(
     )
 
     if client is None:
-        # Fallback to placeholder if no API key
-        dimension = EMBEDDING_MODELS[request.model]
-        embedding = [0.0] * dimension
-        logger.warning(f"Using placeholder embedding for model {request.model} (no API key)")
+        embedding = get_local_embedding_backend(request.model).embed_query(request.text)
+        logger.info("Using local deterministic embedding backend for model %s", request.model)
         await track_usage_best_effort(
             user_id=current_user.id,
             event_type="rag.embed",
             resource_type="rag",
             resource_id=request.model,
-            metadata={"text_length": len(request.text), "mode": "placeholder"},
+            metadata={"text_length": len(request.text), "mode": "local_hash"},
         )
         return EmbedResponse(
             embedding=embedding, model=request.model, tokens=len(request.text.split())
@@ -201,8 +204,7 @@ async def generate_batch_embeddings(
     )
 
     if client is None:
-        dimension = EMBEDDING_MODELS[request.model]
-        embeddings = [[0.0] * dimension] * len(request.texts)
+        embeddings = get_local_embedding_backend(request.model).embed_documents(request.texts)
         total_tokens = sum(len(t.split()) for t in request.texts)
         await track_usage_best_effort(
             user_id=current_user.id,
@@ -212,7 +214,7 @@ async def generate_batch_embeddings(
             metadata={
                 "batch_size": len(request.texts),
                 "total_length": total_length,
-                "mode": "placeholder",
+                "mode": "local_hash",
             },
         )
         return BatchEmbedResponse(
@@ -268,14 +270,13 @@ async def similarity_search(
     request: SearchRequest,
     current_user: User = Depends(get_current_user),
 ) -> list[SearchResult]:
-    """
-    Simple similarity search endpoint.
-
-    Note: Full implementation requires pgvector and a document store.
-    This is a placeholder that demonstrates the API contract.
-    """
+    """Run similarity search against the configured default collection."""
     require_enabled_rag_api()
     validate_text_payload(request.query, field_name="query", max_length=MAX_SEARCH_QUERY_LENGTH)
+    if request.model not in EMBEDDING_MODELS:
+        raise HTTPException(
+            status_code=400, detail=f"Unsupported model. Supported: {list(EMBEDDING_MODELS.keys())}"
+        )
     if request.top_k < 1 or request.top_k > MAX_SEARCH_TOP_K:
         raise HTTPException(
             status_code=400,
@@ -300,7 +301,6 @@ async def similarity_search(
         metadata={"top_k": request.top_k, "query_length": len(request.query)},
     )
 
-    # Resolve vector store: try registry first, auto-init from DATABASE_URL if needed
     try:
         from src.api.config import get_settings
         from src.api.integrations.vector_store import (
@@ -310,45 +310,43 @@ async def similarity_search(
             VectorStoreManager,
         )
     except ImportError as imp_err:
-        logger.warning(f"RAG vector store dependencies unavailable: {imp_err}")
+        logger.warning("RAG vector store dependencies unavailable: %s", imp_err)
         raise HTTPException(
             status_code=503,
-            detail="RAG search is not available in this environment.",
+            detail="RAG search dependencies are not available in this environment.",
         ) from imp_err
 
     try:
         store: VectorStoreManager | None = VectorStoreRegistry.get_store("default")
 
         if store is None:
-            # Auto-initialize a default store from DATABASE_URL
             settings_cfg = get_settings()
             db_url = os.environ.get("DATABASE_URL") or settings_cfg.database_url
-            if db_url and not db_url.startswith("postgresql"):
-                logger.warning("RAG search: DATABASE_URL is not PostgreSQL — search unavailable")
+            if not db_url:
                 raise HTTPException(
                     status_code=503,
-                    detail="RAG search requires a PostgreSQL database. Please configure DATABASE_URL with a PostgreSQL connection string.",
+                    detail="No database configured for RAG search. Set DATABASE_URL to enable the vector store.",
                 )
-            if db_url:
-                config = VectorStoreConfig(
-                    database_url=db_url,
+            config = VectorStoreConfig(
+                database_url=db_url,
+                embedding_provider=EmbeddingProvider.OPENAI,
+                embedding_model=request.model,
+                embedding_dimensions=EMBEDDING_MODELS[request.model],
+                collection_name="default",
+            )
+            try:
+                store = VectorStoreRegistry.create_store("default", config)
+            except Exception as init_err:
+                logger.warning("RAG auto-init failed for %s: %s", db_url, init_err)
+                fallback_config = VectorStoreConfig(
+                    database_url="sqlite:///:memory:",
                     embedding_provider=EmbeddingProvider.OPENAI,
                     embedding_model=request.model,
+                    embedding_dimensions=EMBEDDING_MODELS[request.model],
                     collection_name="default",
                 )
-                try:
-                    store = VectorStoreRegistry.create_store("default", config)
-                except Exception as init_err:
-                    logger.warning(f"RAG auto-init failed: {init_err}")
-                    store = None
+                store = VectorStoreRegistry.create_store("default", fallback_config)
 
-        if store is None:
-            raise HTTPException(
-                status_code=503,
-                detail="No vector store configured. Set DATABASE_URL to a PostgreSQL database to enable RAG search.",
-            )
-
-        # Execute similarity search
         results = store.similarity_search_with_score(
             query=request.query,
             k=request.top_k,
@@ -361,7 +359,7 @@ async def similarity_search(
     except HTTPException:
         raise
     except Exception as exc:
-        logger.exception(f"RAG search failed: {exc}")
+        logger.exception("RAG search failed: %s", exc)
         raise HTTPException(
             status_code=500,
             detail=f"RAG search failed: {str(exc)}",
@@ -417,18 +415,19 @@ async def ingest_documents(
     request: IngestRequest,
     current_user: User = Depends(get_current_user),
 ) -> IngestResponse:
-    """
-    Ingest documents into the vector store for later retrieval via /search.
-
-    Documents are chunked, embedded, and stored in the configured PostgreSQL
-    vector store. Requires OPENAI_API_KEY and DATABASE_URL (PostgreSQL).
-    """
+    """Ingest documents into the named vector-store collection."""
     require_enabled_rag_api()
 
     if not request.texts:
         raise HTTPException(status_code=400, detail="texts must not be empty")
     if len(request.texts) > 100:
         raise HTTPException(status_code=400, detail="texts exceeds maximum of 100 documents")
+    if not request.collection_name.strip():
+        raise HTTPException(status_code=400, detail="collection_name must not be empty")
+    if request.metadatas is not None and len(request.metadatas) != len(request.texts):
+        raise HTTPException(status_code=400, detail="metadatas must match texts length")
+    if request.ids is not None and len(request.ids) != len(request.texts):
+        raise HTTPException(status_code=400, detail="ids must match texts length")
 
     total_length = sum(len(t) for t in request.texts)
     for i, text in enumerate(request.texts):
@@ -450,7 +449,6 @@ async def ingest_documents(
         },
     )
 
-    # Resolve vector store
     try:
         from src.api.integrations.vector_store import (
             EmbeddingProvider,
@@ -468,12 +466,11 @@ async def ingest_documents(
         store: VectorStoreManager | None = VectorStoreRegistry.get_store(request.collection_name)
 
         if store is None:
-            # Auto-initialize from DATABASE_URL
             db_url = os.environ.get("DATABASE_URL") or settings.database_url
-            if not db_url or not db_url.startswith("postgresql"):
+            if not db_url:
                 raise HTTPException(
                     status_code=503,
-                    detail="RAG ingestion requires a PostgreSQL database. Configure DATABASE_URL.",
+                    detail="No database configured for RAG ingestion. Configure DATABASE_URL.",
                 )
 
             config = VectorStoreConfig(
@@ -483,7 +480,18 @@ async def ingest_documents(
                 embedding_dimensions=EMBEDDING_MODELS[request.model],
                 collection_name=request.collection_name,
             )
-            store = VectorStoreRegistry.create_store(request.collection_name, config)
+            try:
+                store = VectorStoreRegistry.create_store(request.collection_name, config)
+            except Exception as init_err:
+                logger.warning("RAG ingest auto-init failed for %s: %s", db_url, init_err)
+                fallback_config = VectorStoreConfig(
+                    database_url="sqlite:///:memory:",
+                    embedding_provider=EmbeddingProvider.OPENAI,
+                    embedding_model=request.model,
+                    embedding_dimensions=EMBEDDING_MODELS[request.model],
+                    collection_name=request.collection_name,
+                )
+                store = VectorStoreRegistry.create_store(request.collection_name, fallback_config)
 
         doc_ids = store.add_documents(
             texts=request.texts,
