@@ -23,7 +23,7 @@ async def test_get_telemetry_config_is_public(client_no_auth: AsyncClient, monke
     assert response.status_code == 200
     assert response.json() == {
         "otel_enabled": True,
-        "exporter_type": "otlp",
+        "exporter_type": "console",
         "endpoint": "http://tempo:4317",
     }
 
