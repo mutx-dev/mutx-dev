@@ -18,6 +18,7 @@ export default async function PicoRegisterPage({
   return (
     <AuthPage
       mode="register"
+      variant="pico"
       nextPath={nextPath ?? defaultNextPath}
       routePrefix={routePrefix}
       contentOverride={{

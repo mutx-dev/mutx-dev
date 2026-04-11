@@ -31,7 +31,7 @@ Ship the narrowest honest PicoMUTX product loop that gets a user from signup to 
 - [completed] Unify the shared Pico UI primitives used by the active product shell.
 - [completed] Reduce early churn on Start, Lesson, Support, and Control surfaces.
 - [completed] Tighten Academy hierarchy so the next lesson dominates the page.
-- [in_progress] Wrap Pico auth routes in the same visual language as the rest of the product.
+- [completed] Wrap Pico auth routes in the same visual language as the rest of the product.
 
 ## Architecture direction
 - Keep Pico on pico.mutx.dev and build only inside the existing app/pico/* route family.

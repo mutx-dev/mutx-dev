@@ -219,3 +219,23 @@ What is next
 - Wrap Pico login/register in the same shell so the auth boundary stops feeling like a different product.
 - Keep tightening Control and Academy receipts where real progress happens.
 
+### 2026-04-11 03:31:00 CEST — Pico auth shell unified
+What changed
+- Wrapped Pico login and register in the same Pico product shell instead of dropping users into the generic marketing auth surface.
+- Kept the existing hosted auth logic and redirects, but made the auth boundary feel like the same product the user was already in.
+- Reused the shared Pico UI primitives for fields, buttons, and support cards so auth no longer looks outsourced.
+- Added clearer Pico-specific next-step context inside auth so users know they are returning to Start, Academy, and Support rather than a random dashboard.
+
+What was tested
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
+
+What failed
+- No blocking Pico failures remain in this slice.
+- Existing repo-level Next/Turbopack warnings remain non-blocking.
+
+What is next
+- Tighten Pico control receipts further so starter deploy, threshold save, and approval creation all feel equally explicit.
+- Sweep any remaining copy drift between Pico route copy and the underlying authenticated destinations.
+
