@@ -3,6 +3,8 @@ import {
   createDefaultPicoProgress,
   derivePicoProgress,
   getLessonBySlug,
+  mergePicoProgress,
+  selectTrack,
 } from '../../lib/pico/academy'
 import { answerPicoTutorQuestion } from '../../lib/pico/tutor'
 
@@ -22,6 +24,23 @@ describe('pico academy progress', () => {
 
   it('returns a lesson by slug', () => {
     expect(getLessonBySlug('set-a-cost-threshold')?.title).toBe('Set a cost threshold')
+  })
+
+  it('prefers the selected track when choosing the next lesson', () => {
+    const base = createDefaultPicoProgress()
+    const selected = selectTrack(base, 'controlled-agent')
+    const derived = derivePicoProgress(selected)
+
+    expect(derived.nextLesson?.slug).toBe('see-your-agent-activity')
+  })
+
+  it('keeps local progress when remote auth state is still empty', () => {
+    let local = createDefaultPicoProgress()
+    local = applyLessonCompleted(local, 'install-hermes-locally')
+
+    const merged = mergePicoProgress(local, createDefaultPicoProgress())
+
+    expect(merged.completedLessons).toContain('install-hermes-locally')
   })
 })
 

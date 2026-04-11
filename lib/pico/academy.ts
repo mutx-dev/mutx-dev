@@ -950,7 +950,44 @@ export function derivePicoProgress(progressInput: Partial<PicoProgressState> | n
 export function mergePicoProgress(localValue: Partial<PicoProgressState> | null | undefined, remoteValue: Partial<PicoProgressState> | null | undefined) {
   const local = normalizePicoProgress(localValue)
   const remote = normalizePicoProgress(remoteValue)
-  return new Date(remote.updatedAt).getTime() > new Date(local.updatedAt).getTime() ? remote : local
+
+  const remoteLooksEmpty =
+    !remote.selectedTrack &&
+    remote.startedLessons.length === 0 &&
+    remote.completedLessons.length === 0 &&
+    remote.milestoneEvents.length === 0 &&
+    remote.sharedProjects.length === 0 &&
+    remote.tutorQuestions === 0 &&
+    remote.supportRequests === 0
+
+  if (remoteLooksEmpty) {
+    return local
+  }
+
+  return normalizePicoProgress({
+    ...remote,
+    selectedTrack: local.selectedTrack || remote.selectedTrack,
+    startedLessons: Array.from(new Set([...remote.startedLessons, ...local.startedLessons])),
+    completedLessons: Array.from(new Set([...remote.completedLessons, ...local.completedLessons])),
+    milestoneEvents: Array.from(new Set([...remote.milestoneEvents, ...local.milestoneEvents])),
+    sharedProjects: Array.from(new Set([...remote.sharedProjects, ...local.sharedProjects])),
+    tutorQuestions: Math.max(remote.tutorQuestions, local.tutorQuestions),
+    supportRequests: Math.max(remote.supportRequests, local.supportRequests),
+    helpfulResponses: Math.max(remote.helpfulResponses, local.helpfulResponses),
+    autopilot: {
+      ...remote.autopilot,
+      ...local.autopilot,
+      approvalRequestIds: Array.from(
+        new Set([...remote.autopilot.approvalRequestIds, ...local.autopilot.approvalRequestIds])
+      ),
+      lastThresholdBreachAt:
+        remote.autopilot.lastThresholdBreachAt || local.autopilot.lastThresholdBreachAt || null,
+    },
+    updatedAt:
+      new Date(remote.updatedAt).getTime() > new Date(local.updatedAt).getTime()
+        ? remote.updatedAt
+        : local.updatedAt,
+  })
 }
 
 export function applyLessonStarted(progressInput: Partial<PicoProgressState>, lessonSlug: string): PicoProgressState {
