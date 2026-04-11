@@ -7,7 +7,7 @@ import { PicoShell } from '@/components/pico/PicoShell'
 import { usePicoProgress } from '@/components/pico/usePicoProgress'
 import { PICO_LESSONS } from '@/lib/pico/academy'
 import { usePicoHref } from '@/lib/pico/navigation'
-import type { PicoTutorAnswer, PicoTutorReply } from '@/lib/pico/tutor'
+import type { PicoTutorReply } from '@/lib/pico/tutor'
 
 const examplePrompts = [
   'Hermes launches locally but dies on the VPS. What should I check first?',
@@ -15,19 +15,17 @@ const examplePrompts = [
   'I want approval before any outbound send. Which lesson do I follow?',
 ]
 
-type TutorApiResponse = Partial<PicoTutorAnswer> & {
+type TutorApiResponse = Partial<PicoTutorReply> & {
   detail?: string
-  legacy?: PicoTutorAnswer
-  reply?: PicoTutorReply
 }
 
-function isReplyEnvelope(value: TutorApiResponse): value is TutorApiResponse & { reply: PicoTutorReply } {
+function isTutorReply(value: TutorApiResponse): value is PicoTutorReply {
   return Boolean(
-    value.reply &&
-      typeof value.reply.answer === 'string' &&
-      Array.isArray(value.reply.nextActions) &&
-      Array.isArray(value.reply.lessons) &&
-      Array.isArray(value.reply.docs),
+    typeof value.answer === 'string' &&
+      Array.isArray(value.nextActions) &&
+      Array.isArray(value.lessons) &&
+      Array.isArray(value.docs) &&
+      Array.isArray(value.matches),
   )
 }
 
@@ -48,10 +46,13 @@ export function PicoTutorPageClient() {
   const { progress, actions } = usePicoProgress()
   const toHref = usePicoHref()
   const [question, setQuestion] = useState('')
-  const [lessonSlug, setLessonSlug] = useState(progress.selectedTrack ? PICO_LESSONS.find((lesson) => lesson.track === progress.selectedTrack)?.slug ?? '' : '')
+  const [lessonSlug, setLessonSlug] = useState(
+    progress.selectedTrack
+      ? PICO_LESSONS.find((lesson) => lesson.track === progress.selectedTrack)?.slug ?? ''
+      : '',
+  )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [answer, setAnswer] = useState<PicoTutorAnswer | null>(null)
   const [reply, setReply] = useState<PicoTutorReply | null>(null)
   const availableLessons = useMemo(() => PICO_LESSONS, [])
 
@@ -77,21 +78,13 @@ export function PicoTutorPageClient() {
       if (!response.ok) {
         throw new Error(payload.detail || 'Tutor request failed')
       }
-
-      const legacyAnswer = payload.legacy ?? payload
-      const hasLegacyShape = Boolean(
-        legacyAnswer.answer && Array.isArray(legacyAnswer.matches) && Array.isArray(legacyAnswer.nextActions),
-      )
-
-      if (!isReplyEnvelope(payload) && !hasLegacyShape) {
+      if (!isTutorReply(payload)) {
         throw new Error('Tutor response came back malformed')
       }
 
-      setReply(isReplyEnvelope(payload) ? payload.reply : null)
-      setAnswer(hasLegacyShape ? (legacyAnswer as PicoTutorAnswer) : null)
+      setReply(payload)
       actions.recordTutorQuestion()
     } catch (submitError) {
-      setAnswer(null)
       setReply(null)
       setError(submitError instanceof Error ? submitError.message : 'Tutor request failed')
     } finally {
@@ -101,33 +94,33 @@ export function PicoTutorPageClient() {
 
   return (
     <PicoShell
-      eyebrow="Grounded tutor"
-      title="Ask for the exact next step"
-      description="The tutor only answers from the shipped Pico lesson corpus. If confidence is low or the topic is risky, it tells you to escalate instead of pretending to be clever."
+      eyebrow='Grounded tutor'
+      title='Ask for the exact next step'
+      description='The tutor only answers from the shipped Pico lesson corpus. If confidence is low or the topic is risky, it tells you to escalate instead of pretending to be clever.'
       actions={
-        <Link href={toHref('/support')} className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10">
+        <Link href={toHref('/support')} className='rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10'>
           Open support lane
         </Link>
       }
     >
-      <section className="grid gap-6 lg:grid-cols-[1fr,0.9fr]">
-        <form onSubmit={submit} className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Question</p>
+      <section className='grid gap-6 lg:grid-cols-[1fr,0.9fr]'>
+        <form onSubmit={submit} className='rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]'>
+          <p className='text-xs uppercase tracking-[0.24em] text-slate-500'>Question</p>
           <textarea
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
-            placeholder="Describe the block, the exact step, and what you expected to happen."
-            className="mt-4 min-h-[180px] w-full rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-4 text-sm text-slate-100 outline-none placeholder:text-slate-500"
+            placeholder='Describe the block, the exact step, and what you expected to happen.'
+            className='mt-4 min-h-[180px] w-full rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-4 text-sm text-slate-100 outline-none placeholder:text-slate-500'
           />
-          <div className="mt-4 grid gap-4 md:grid-cols-[1fr,auto] md:items-end">
-            <label className="block text-sm text-slate-300">
-              <span className="mb-2 block text-xs uppercase tracking-[0.24em] text-slate-500">Current lesson</span>
+          <div className='mt-4 grid gap-4 md:grid-cols-[1fr,auto] md:items-end'>
+            <label className='block text-sm text-slate-300'>
+              <span className='mb-2 block text-xs uppercase tracking-[0.24em] text-slate-500'>Current lesson</span>
               <select
                 value={lessonSlug}
                 onChange={(event) => setLessonSlug(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-3 text-sm text-slate-100 outline-none"
+                className='w-full rounded-2xl border border-white/10 bg-[rgba(3,8,20,0.45)] px-4 py-3 text-sm text-slate-100 outline-none'
               >
-                <option value="">No lesson selected</option>
+                <option value=''>No lesson selected</option>
                 {availableLessons.map((lesson) => (
                   <option key={lesson.slug} value={lesson.slug}>
                     {lesson.title}
@@ -136,20 +129,20 @@ export function PicoTutorPageClient() {
               </select>
             </label>
             <button
-              type="submit"
+              type='submit'
               disabled={loading}
-              className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+              className='rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60'
             >
               {loading ? 'Thinking from the corpus...' : 'Ask tutor'}
             </button>
           </div>
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className='mt-5 flex flex-wrap gap-2'>
             {examplePrompts.map((prompt) => (
               <button
                 key={prompt}
-                type="button"
+                type='button'
                 onClick={() => setQuestion(prompt)}
-                className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-slate-300 transition hover:bg-white/10"
+                className='rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-slate-300 transition hover:bg-white/10'
               >
                 {prompt}
               </button>
@@ -157,67 +150,58 @@ export function PicoTutorPageClient() {
           </div>
         </form>
 
-        <div className="rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Answer</p>
+        <div className='rounded-[28px] border border-white/10 bg-[rgba(8,15,28,0.82)] p-6 shadow-[0_24px_80px_rgba(2,8,23,0.25)]'>
+          <p className='text-xs uppercase tracking-[0.24em] text-slate-500'>Answer</p>
           {error ? (
-            <div className="mt-4 rounded-[24px] border border-rose-400/20 bg-rose-400/10 p-5 text-sm leading-6 text-rose-50">
+            <div className='mt-4 rounded-[24px] border border-rose-400/20 bg-rose-400/10 p-5 text-sm leading-6 text-rose-50'>
               {error}
             </div>
           ) : null}
-          {reply || answer ? (
-            <div className="mt-4 space-y-4">
-              {reply ? (
-                <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
-                  <span>{reply.title}</span>
-                  <span className="rounded-full border border-white/10 px-3 py-1 text-[11px] text-slate-300">{reply.confidence} confidence</span>
-                </div>
-              ) : null}
-
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
-                {reply?.summary ?? answer?.answer}
+          {reply ? (
+            <div className='mt-4 space-y-4'>
+              <div className='flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-500'>
+                <span>{reply.title}</span>
+                <span className='rounded-full border border-white/10 px-3 py-1 text-[11px] text-slate-300'>{reply.confidence} confidence</span>
               </div>
 
-              {reply?.lessons.length ? (
-                <div className="flex flex-wrap gap-3">
+              <div className='rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300'>
+                {reply.answer}
+              </div>
+
+              {reply.lessons.length ? (
+                <div className='flex flex-wrap gap-3'>
                   {reply.lessons.map((lesson) => (
                     <Link
                       key={`${lesson.id}-${lesson.href}`}
                       href={resolveTutorHref(toHref, lesson.href)}
-                      className="inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
+                      className='inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950'
                     >
                       Open {lesson.title}
                     </Link>
                   ))}
                 </div>
-              ) : answer?.lessonSlug ? (
-                <Link
-                  href={toHref(`/academy/${answer.lessonSlug}`)}
-                  className="inline-flex rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950"
-                >
-                  Open {answer.lessonTitle}
-                </Link>
               ) : null}
 
-              <div className="rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5">
-                <p className="text-sm font-medium text-white">Next actions</p>
-                <div className="mt-3 space-y-2">
-                  {(reply?.nextActions ?? answer?.nextActions ?? []).map((item) => (
-                    <div key={item} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
+              <div className='rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5'>
+                <p className='text-sm font-medium text-white'>Next actions</p>
+                <div className='mt-3 space-y-2'>
+                  {reply.nextActions.map((item) => (
+                    <div key={item} className='rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300'>
                       {item}
                     </div>
                   ))}
                 </div>
               </div>
 
-              {reply?.docs.length ? (
-                <div className="rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5">
-                  <p className="text-sm font-medium text-white">Docs and help</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
+              {reply.docs.length ? (
+                <div className='rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5'>
+                  <p className='text-sm font-medium text-white'>Docs and help</p>
+                  <div className='mt-3 flex flex-wrap gap-2'>
                     {reply.docs.map((doc) => (
                       <Link
                         key={`${doc.href}-${doc.sourcePath}`}
                         href={resolveTutorHref(toHref, doc.href)}
-                        className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-slate-300 transition hover:bg-white/10"
+                        className='rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-slate-300 transition hover:bg-white/10'
                       >
                         {doc.label}
                       </Link>
@@ -226,27 +210,27 @@ export function PicoTutorPageClient() {
                 </div>
               ) : null}
 
-              {answer?.matches.length ? (
-                <div className="rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5">
-                  <p className="text-sm font-medium text-white">Matches</p>
-                  <div className="mt-3 space-y-2">
-                    {answer.matches.map((match) => (
-                      <div key={match.slug} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
-                        <p className="font-medium text-white">{match.title}</p>
-                        <p className="mt-1">{match.reason}</p>
+              {reply.matches.length ? (
+                <div className='rounded-[24px] border border-white/10 bg-[rgba(3,8,20,0.45)] p-5'>
+                  <p className='text-sm font-medium text-white'>Matches</p>
+                  <div className='mt-3 space-y-2'>
+                    {reply.matches.map((match) => (
+                      <div key={match.slug} className='rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300'>
+                        <p className='font-medium text-white'>{match.title}</p>
+                        <p className='mt-1'>{match.reason}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : null}
 
-              {(reply?.escalationReason ?? answer?.escalationReason) ? (
-                <div className="rounded-[24px] border border-amber-400/20 bg-amber-400/10 p-5 text-sm text-amber-50">
-                  Escalation note: {reply?.escalationReason ?? answer?.escalationReason}
-                  <div className="mt-4">
+              {reply.escalationReason ? (
+                <div className='rounded-[24px] border border-amber-400/20 bg-amber-400/10 p-5 text-sm text-amber-50'>
+                  Escalation note: {reply.escalationReason}
+                  <div className='mt-4'>
                     <Link
                       href={toHref('/support')}
-                      className="inline-flex rounded-full bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-950"
+                      className='inline-flex rounded-full bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-950'
                     >
                       Open support lane
                     </Link>
@@ -255,7 +239,7 @@ export function PicoTutorPageClient() {
               ) : null}
             </div>
           ) : (
-            <div className="mt-4 rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300">
+            <div className='mt-4 rounded-[24px] border border-white/10 bg-white/5 p-5 text-sm leading-6 text-slate-300'>
               Ask a concrete question and the tutor will route you to the exact lesson, troubleshooting note, and validation step.
             </div>
           )}

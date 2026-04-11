@@ -54,11 +54,8 @@ It is not a fake community clone, not a no-code builder, and not a dashboard ful
 - Route-prefix navigation behavior from the shadow sessions was preserved so links work both on `pico.mutx.dev/*` and local `/pico/*` paths.
 - Approval request validation helpers were kept under `app/api/pico/approvals/_validation.ts` because they strengthen the canonical approvals bridge without creating a parallel Pico model.
 - Better tutor response handling was folded into `components/pico/PicoTutorPageClient.tsx` and `lib/pico/tutor.ts`.
-- Legacy path compatibility was reduced to one canonical workspace entry plus redirects:
-  - `/pico/onboarding` -> canonical workspace entry, rendering the onboarding-first workspace shell
-  - `/pico/app` -> redirects to `/pico/onboarding`
-  - `/pico/app/lessons/[slug]` -> redirects to `/pico/academy/[slug]`
-  - `/pico/workspace` -> redirects to `/pico/onboarding`
+- Pico now has one product entry route: `/pico/onboarding`. Alternate `/pico/app`, `/pico/app/lessons/[slug]`, and `/pico/workspace` routes were removed instead of preserved as aliases.
+- Tutor responses now flow through one canonical reply shape from `lib/pico/tutor.ts` to `/api/pico/tutor` and the Pico tutor UI.
 
 ### Deleted shadow implementations
 Deleted because they duplicated the Pico product, state, or tutor model instead of extending the canonical system:
@@ -69,12 +66,18 @@ Deleted because they duplicated the Pico product, state, or tutor model instead 
 - `tests/api/test_pico_route.py`
 - `tests/unit/picoState.test.ts`
 - `components/site/pico/PicoPreRegForm.tsx`
+- `app/pico/app/page.tsx`
+- `app/pico/app/lessons/[slug]/page.tsx`
+- `app/pico/workspace/page.tsx`
+- the legacy dual-shape tutor path (`answerPicoTutorQuestion` export plus `legacy` API envelope)
 
 ### Why they were deleted
 - They defined competing lesson ids, track ids, or state shapes.
 - They split Pico persistence across `/state` and `/progress` contracts.
 - They pulled the tutor against a different lesson corpus than the product actually ships.
 - They created the exact kind of forked reality that makes a product rot.
+- Route aliases kept teaching the repo that Pico had more than one product entry.
+- The tutor had one logic core but two public response contracts, which is how UI drift sneaks back in.
 
 ## Current open realities
 
@@ -91,13 +94,10 @@ Deleted because they duplicated the Pico product, state, or tutor model instead 
 ## Validation snapshot
 
 Latest validated commands:
-- `rm -rf .next && npm run typecheck`
-- `npm run build`
-- `npm test -- tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `npm run typecheck`
+- `npx jest --runInBand tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
 - `./.venv/bin/python -m pytest tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
-- `curl -I http://127.0.0.1:3000/pico/onboarding`
-- `curl -I http://127.0.0.1:3000/pico/app`
-- `curl -I http://127.0.0.1:3000/pico/workspace`
+- `npm run build`
 
 ## Work cycle log
 
@@ -140,9 +140,8 @@ What is next
 What changed
 - Re-audited the repo against the explicit canonical Pico order.
 - Confirmed the canonical route truth remains:
-  - `/pico/onboarding` = real entry
-  - `/pico/app` = compatibility redirect only
-  - `/pico/workspace` = compatibility redirect only
+  - `/pico/onboarding` = the only product entry
+  - `/pico/app`, `/pico/app/lessons/[slug]`, and `/pico/workspace` = deleted
 - Absorbed the remaining Pico frontend shadow system by moving the last Pico-owned site components under `components/pico/*` and removing `components/site/pico/*` from the product truth.
 - Updated `docs/surfaces.md` so it stops advertising `components/site/pico/` as a Pico source of truth.
 - Rejected the in-flight non-English message churn from parallel sessions because it was not part of the canonical reconciliation and would have reintroduced copy drift.
@@ -171,7 +170,7 @@ What failed
 - Existing repo-wide noise remains: Next/Turbopack NFT warning and pytest OpenTelemetry shutdown spam.
 
 What is next
-- Keep `/pico/app` and `/pico/workspace` only as compatibility redirects until they can be removed safely.
+- `/pico/app`, `/pico/app/lessons/[slug]`, and `/pico/workspace` are removed. Do not bring them back.
 - Continue from the canonical files only: `app/pico/*`, `components/pico/*`, `lib/pico/academy.ts`, `lib/pico/tutor.ts`, `src/api/routes/pico.py`, `src/api/services/pico_progress.py`.
 
 ### 2026-04-11 02:58:00 CEST — finish pass
@@ -221,3 +220,35 @@ What failed
 What is next
 - Commit this truth-alignment slice.
 - If we want multilingual polish instead of English fallbacks on the live CTA/contact paths, do a deliberate locale sweep rather than sneaking in half-translated sludge.
+
+
+### 2026-04-11 03:14:45 CEST — Pico canon enforcement pass
+What changed
+- Deleted the alternate Pico product routes at `/pico/app`, `/pico/app/lessons/[slug]`, and `/pico/workspace`.
+- Collapsed the tutor back to one public contract: `lib/pico/tutor.ts` now exports one canonical reply shape, `/api/pico/tutor` returns that shape directly, and `components/pico/PicoTutorPageClient.tsx` consumes only that shape.
+- Updated `DECISIONS.md` and this file so the repo now states the same truth the code enforces.
+
+What was removed
+- `app/pico/app/page.tsx`
+- `app/pico/app/lessons/[slug]/page.tsx`
+- `app/pico/workspace/page.tsx`
+- the legacy tutor response lane (`answerPicoTutorQuestion` + `legacy` envelope in `/api/pico/tutor`)
+
+Why
+- Redirect shims were still alternate product routes. They kept teaching the repo that Pico had multiple valid entries.
+- The tutor had one corpus but two public response contracts. That is architectural drift in a nicer shirt.
+- Canonical Pico now means one entry route, one academy/state model, one tutor contract, and one backend progress lane.
+
+What was tested
+- `npm run typecheck`
+- `npx jest --runInBand tests/unit/picoAcademy.test.ts tests/unit/picoTutor.test.ts`
+- `./.venv/bin/python -m pytest tests/api/test_pico_progress_route.py tests/api/test_app_factory.py -q`
+- `npm run build`
+
+What failed
+- No Pico-specific blocker failed validation.
+- Existing repo-wide warning noise remains during build and pytest shutdown.
+
+What is next
+- Keep extending Pico only inside `app/pico/*`, `components/pico/*`, `lib/pico/academy.ts`, `lib/pico/tutor.ts`, `src/api/routes/pico.py`, and `src/api/services/pico_progress.py`.
+- If another alias, shadow state file, or second tutor contract shows up, delete it instead of negotiating with it.

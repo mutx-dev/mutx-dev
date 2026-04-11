@@ -6,7 +6,7 @@ import {
   mergePicoProgress,
   selectTrack,
 } from '../../lib/pico/academy'
-import { answerPicoTutorQuestion } from '../../lib/pico/tutor'
+import { answerTutorQuestion } from '../../lib/pico/tutor'
 
 describe('pico academy progress', () => {
   it('unlocks XP and badges after the first two lessons', () => {
@@ -48,13 +48,13 @@ describe('pico academy progress', () => {
 
 describe('pico tutor', () => {
   it('routes scheduling questions to the workflow lesson', () => {
-    const answer = answerPicoTutorQuestion('How do I schedule the workflow to run every day?')
-    expect(answer.lessonSlug).toBe('create-a-scheduled-workflow')
+    const answer = answerTutorQuestion('How do I schedule the workflow to run every day?')
+    expect(answer.recommendedLessonIds).toContain('create-a-scheduled-workflow')
     expect(answer.nextActions.length).toBeGreaterThan(0)
   })
 
   it('escalates risky topics instead of bluffing', () => {
-    const answer = answerPicoTutorQuestion('Can I delete production credentials after changing billing?')
-    expect(answer.escalationReason).not.toBeNull()
+    const answer = answerTutorQuestion('Can I delete production credentials after changing billing?')
+    expect(answer.escalate).toBe(true)
   })
 })

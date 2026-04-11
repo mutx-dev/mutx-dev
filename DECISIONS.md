@@ -30,8 +30,14 @@ Decision: Remove `/pico` from the mutx.dev sitemap and fix Pico canonical truth 
 Why:
 - The old sitemap and canonical pointed to a marketing-host path that the router actively blocked. That was sloppy and wrong.
 
+## 2026-04-11 03:14:45 CEST
+Decision: `/pico/onboarding` is the only Pico product entry. `/pico/app`, `/pico/app/lessons/[slug]`, and `/pico/workspace` were deleted.
+Why:
+- Redirect shims still train the codebase and the docs to depend on the wrong surface.
+- One visible entry route beats route aliases that eventually mutate back into product forks.
+
 ## 2026-04-11 02:51:43 CEST
-Decision: `/pico/onboarding` is the canonical Pico workspace entry. `/pico/app` and `/pico/workspace` are compatibility redirects only.
+Decision: `/pico/onboarding` is the canonical Pico workspace entry.
 Why:
 - The product promise starts with onboarding, not a vague app shell.
 - One visible entry route beats split-route confusion.

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { badRequest, withErrorHandling } from '@/app/api/_lib/errors'
-import { answerPicoTutorQuestion, answerTutorQuestion } from '@/lib/pico/tutor'
+import { answerTutorQuestion } from '@/lib/pico/tutor'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,16 +15,11 @@ export async function POST(request: NextRequest) {
       return badRequest('Question is required')
     }
 
-    const legacyAnswer = answerPicoTutorQuestion(question, {
+    const reply = answerTutorQuestion(question, {
       lessonSlug,
       progress: body.progress,
     })
-    const reply = answerTutorQuestion(question, body.progress)
 
-    return NextResponse.json({
-      ...legacyAnswer,
-      legacy: legacyAnswer,
-      reply,
-    })
+    return NextResponse.json(reply)
   })(request)
 }
