@@ -10,6 +10,15 @@ function mockRequest(
   const normalizedHeaders = Object.fromEntries(
     Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]),
   )
+  const cookieEntries = (normalizedHeaders.cookie ?? '')
+    .split(';')
+    .map((chunk) => chunk.trim())
+    .filter(Boolean)
+    .map((chunk) => {
+      const [name, ...rest] = chunk.split('=')
+      return [name, rest.join('=')] as const
+    })
+  const cookieMap = new Map(cookieEntries)
 
   return {
     url,
@@ -18,6 +27,12 @@ function mockRequest(
     headers: {
       get(name: string) {
         return normalizedHeaders[name.toLowerCase()] ?? null
+      },
+    },
+    cookies: {
+      get(name: string) {
+        const value = cookieMap.get(name)
+        return value ? { name, value } : undefined
       },
     },
   } as unknown as NextRequest
@@ -128,6 +143,48 @@ describe('host-aware UI routing proxy', () => {
     expect(response.headers.get('cache-control')).toBe(
       'private, no-cache, no-store, max-age=0, must-revalidate',
     )
+  })
+
+
+  it('maps pico geo country codes onto the expected locale cookie', () => {
+    const japanResponse = proxy(
+      mockRequest('https://pico.mutx.dev/', { host: 'pico.mutx.dev', 'cf-ipcountry': 'JP' }),
+    )
+    expect(japanResponse.headers.get('x-middleware-rewrite')).toBe('https://pico.mutx.dev/pico')
+    expect(japanResponse.cookies.get('NEXT_LOCALE')?.value).toBe('ja')
+
+    const koreaResponse = proxy(
+      mockRequest('https://pico.mutx.dev/', { host: 'pico.mutx.dev', 'cf-ipcountry': 'KR' }),
+    )
+    expect(koreaResponse.cookies.get('NEXT_LOCALE')?.value).toBe('ko')
+
+    const chinaResponse = proxy(
+      mockRequest('https://pico.mutx.dev/', { host: 'pico.mutx.dev', 'cf-ipcountry': 'CN' }),
+    )
+    expect(chinaResponse.cookies.get('NEXT_LOCALE')?.value).toBe('zh')
+  })
+
+  it('prefers an explicit NEXT_LOCALE cookie over geo detection on pico hosts', () => {
+    const response = proxy(
+      mockRequest('https://pico.mutx.dev/', {
+        host: 'pico.mutx.dev',
+        cookie: 'NEXT_LOCALE=fr',
+        'cf-ipcountry': 'IT',
+      }),
+    )
+
+    expect(response.cookies.get('NEXT_LOCALE')?.value).toBe('fr')
+  })
+
+  it('falls back to Accept-Language when pico geo headers are missing', () => {
+    const response = proxy(
+      mockRequest('https://pico.mutx.dev/', {
+        host: 'pico.mutx.dev',
+        'accept-language': 'es-ES,es;q=0.9,en;q=0.8',
+      }),
+    )
+
+    expect(response.cookies.get('NEXT_LOCALE')?.value).toBe('es')
   })
 
   it('passes through unrelated marketing routes without injecting auth-form rate-limit headers', () => {
