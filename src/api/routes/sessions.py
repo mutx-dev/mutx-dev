@@ -284,25 +284,22 @@ async def list_sessions(
     current_user: User = Depends(get_current_user),
 ) -> SessionListResponse:
     """List assistant sessions discovered from OpenClaw state plus local sources."""
-    try:
-        assistant_id = None
-        if agent_id is not None:
-            agent = await get_owned_agent(agent_id, db, current_user)
-            await db.refresh(agent, attribute_names=["deployments"])
-            overview = collect_assistant_overview(agent, list(agent.deployments))
-            assistant_id = overview["assistant_id"]
+    assistant_id = None
+    if agent_id is not None:
+        agent = await get_owned_agent(agent_id, db, current_user)
+        await db.refresh(agent, attribute_names=["deployments"])
+        overview = collect_assistant_overview(agent, list(agent.deployments))
+        assistant_id = overview["assistant_id"]
+        return SessionListResponse(sessions=list_gateway_sessions(assistant_id=assistant_id))
 
-        gateway_sessions = list_gateway_sessions(assistant_id=assistant_id)
-        merged = merge_and_dedupe_sessions(
-            gateway_sessions,
-            get_local_claude_sessions(),
-            get_local_codex_sessions(),
-            get_local_hermes_sessions(),
-        )
-        return SessionListResponse(sessions=merged)
-    except Exception as exc:
-        logger.exception("Sessions API error: %s", exc)
-        return SessionListResponse(sessions=[])
+    gateway_sessions = list_gateway_sessions(assistant_id=assistant_id)
+    merged = merge_and_dedupe_sessions(
+        gateway_sessions,
+        get_local_claude_sessions(),
+        get_local_codex_sessions(),
+        get_local_hermes_sessions(),
+    )
+    return SessionListResponse(sessions=merged)
 
 
 @router.post("", response_model=SessionActionResponse)
@@ -358,27 +355,13 @@ async def session_action(
     else:
         body["level"] = request.level
 
-    try:
-        result = await _call_gateway("PATCH", gateway_path_map[action], json=body)
-        return SessionActionResponse(
-            session_key=request.session_key,
-            action=action,
-            applied=True,
-            detail=result.get("message") or result.get("detail"),
-        )
-    except HTTPException:
-        # If gateway isn't running, return structured 501-style response
-        # describing the action that *would* be applied
-        logger.warning(
-            f"Gateway unreachable — session action '{action}' recorded for "
-            f"session {request.session_key} but not applied"
-        )
-        return SessionActionResponse(
-            session_key=request.session_key,
-            action=action,
-            applied=False,
-            detail="Gateway unreachable — action recorded but not applied",
-        )
+    result = await _call_gateway("PATCH", gateway_path_map[action], json=body)
+    return SessionActionResponse(
+        session_key=request.session_key,
+        action=action,
+        applied=True,
+        detail=result.get("message") or result.get("detail"),
+    )
 
 
 @router.delete("", response_model=SessionActionResponse)
@@ -393,23 +376,12 @@ async def delete_session(
     if not request.session_key:
         raise HTTPException(status_code=400, detail="session_key is required")
 
-    try:
-        await _call_gateway(
-            "DELETE",
-            f"/api/sessions/{request.session_key}",
-        )
-        return SessionActionResponse(
-            session_key=request.session_key,
-            action="delete",
-            applied=True,
-        )
-    except HTTPException as exc:
-        if exc.status_code == 404:
-            raise HTTPException(status_code=404, detail="Session not found on gateway")
-        # Gateway unreachable — surface the error but include detail
-        return SessionActionResponse(
-            session_key=request.session_key,
-            action="delete",
-            applied=False,
-            detail=f"Gateway error: {exc.detail}",
-        )
+    await _call_gateway(
+        "DELETE",
+        f"/api/sessions/{request.session_key}",
+    )
+    return SessionActionResponse(
+        session_key=request.session_key,
+        action="delete",
+        applied=True,
+    )
