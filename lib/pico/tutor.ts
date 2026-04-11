@@ -127,17 +127,27 @@ export function answerTutorQuestion(
   _state?: Partial<PicoProgressState> | null | Record<string, unknown>,
 ): PicoTutorReply {
   const answer = answerPicoTutorQuestion(question)
-  const lessons = answer.matches.map((match) => ({
-    id: match.slug,
-    title: match.title,
-    href: `/pico/academy/${match.slug}`,
-  }))
+  const primaryLesson = answer.lessonSlug
+    ? {
+        id: answer.lessonSlug,
+        title: answer.lessonTitle ?? 'Open lesson',
+        href: `/pico/academy/${answer.lessonSlug}`,
+      }
+    : null
+  const lessons = primaryLesson ? [primaryLesson] : []
 
-  const docs = [SUPPORT_DOC, ...lessons.map((lesson) => ({
-    label: lesson.title,
-    href: lesson.href,
-    sourcePath: `pico/academy/${lesson.id}`,
-  }))].slice(0, 4)
+  const docs = [
+    ...(primaryLesson
+      ? [
+          {
+            label: primaryLesson.title,
+            href: primaryLesson.href,
+            sourcePath: `pico/academy/${primaryLesson.id}`,
+          },
+        ]
+      : []),
+    SUPPORT_DOC,
+  ].slice(0, 2)
 
   const topScore = answer.matches[0]?.score ?? 0
 

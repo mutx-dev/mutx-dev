@@ -26,6 +26,7 @@ describe('Pico tutor', () => {
     const answer = answerTutorQuestion('How do I keep the agent alive after I close SSH?')
 
     expect(answer.recommendedLessonIds).toContain('keep-your-agent-alive')
+    expect(answer.lessons).toHaveLength(1)
     expect(answer.docs.some((doc) => doc.href === '/pico/support')).toBe(true)
   })
 })

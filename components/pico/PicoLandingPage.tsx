@@ -129,7 +129,7 @@ export function PicoLandingPage() {
             <SiteReveal delay={0.22}>
               <div className={s.heroActions}>
                 <Link href={toHref('/onboarding')} className={s.btnPrimary}>
-                  Open workspace
+                  Start onboarding
                 </Link>
                 <button onClick={() => openForm()} className={s.btnSecondary} type="button">
                   {t('hero.cta')}
