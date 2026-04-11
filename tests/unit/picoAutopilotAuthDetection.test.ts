@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import type { ReactNode } from 'react'
 
 const actualReact = jest.requireActual('react') as typeof import('react')
 
@@ -6,7 +7,7 @@ const mockUsePicoProgress = jest.fn()
 const mockUsePicoHref = jest.fn()
 
 jest.mock('../../components/pico/PicoShell', () => ({
-  PicoShell: ({ children }: { children: actualReact.ReactNode }) => actualReact.createElement('div', null, children),
+  PicoShell: ({ children }: { children: ReactNode }) => actualReact.createElement('div', null, children),
 }))
 
 jest.mock('../../components/pico/usePicoProgress', () => ({
