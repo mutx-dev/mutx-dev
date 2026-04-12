@@ -7,6 +7,7 @@ import * as Select from '@radix-ui/react-select'
 import { X, ArrowRight, Check, ChevronDown } from 'lucide-react'
 
 import s from './PicoContactForm.module.css'
+import { buildPicoContactPayload } from './picoContactPayload'
 
 type PicoContactFormProps = {
   open: boolean
@@ -50,7 +51,7 @@ export function PicoContactForm({
       setErrorMsg('')
 
       const form = new FormData(e.currentTarget)
-      const payload = {
+      const payload = buildPicoContactPayload({
         email: form.get('email') as string,
         name: form.get('name') as string,
         company: form.get('company') as string,
@@ -59,7 +60,7 @@ export function PicoContactForm({
         locale,
         source,
         honeypot: honeypotRef.current?.value || '',
-      }
+      })
 
       try {
         const res = await fetch('/api/contact', {
