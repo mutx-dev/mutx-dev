@@ -42,6 +42,25 @@ type TutorApiResponse = Partial<PicoTutorReply> & {
   reply?: PicoTutorReply
 }
 
+type TutorOpenAIConnection = {
+  provider: string
+  status: 'connected' | 'platform' | 'disconnected' | 'error'
+  source: 'user' | 'platform' | 'none'
+  connected: boolean
+  model: string
+  maskedKey?: string | null
+  connectedAt?: string | null
+  validatedAt?: string | null
+  message: string
+}
+
+type TutorOpenAIConnectionApiResponse = Partial<TutorOpenAIConnection> & {
+  detail?: string
+  error?: {
+    message?: string
+  }
+}
+
 function resolveTutorHref(toHref: ReturnType<typeof usePicoHref>, href: string) {
   if (
     href.startsWith('/pico') ||
@@ -88,6 +107,28 @@ function writeRecentQuestions(nextQuestions: string[]) {
   )
 }
 
+function readApiErrorMessage(payload: TutorApiResponse | TutorOpenAIConnectionApiResponse | null | undefined) {
+  if (typeof payload?.detail === 'string' && payload.detail) {
+    return payload.detail
+  }
+
+  const errorValue = (payload as { error?: string | { message?: string } | null } | null | undefined)?.error
+  if (typeof errorValue === 'string' && errorValue) {
+    return errorValue
+  }
+
+  if (
+    errorValue &&
+    typeof errorValue === 'object' &&
+    typeof errorValue.message === 'string' &&
+    errorValue.message
+  ) {
+    return errorValue.message
+  }
+
+  return null
+}
+
 export function PicoTutorPageClient() {
   const pathname = usePathname()
   const session = usePicoSession()
@@ -109,6 +150,11 @@ export function PicoTutorPageClient() {
   const [error, setError] = useState<string | null>(null)
   const [reply, setReply] = useState<PicoTutorReply | null>(null)
   const [recentQuestions, setRecentQuestions] = useState<string[]>([])
+  const [openAIConnection, setOpenAIConnection] = useState<TutorOpenAIConnection | null>(null)
+  const [openAIConnectionLoading, setOpenAIConnectionLoading] = useState(false)
+  const [openAIConnectionSaving, setOpenAIConnectionSaving] = useState(false)
+  const [openAIConnectionError, setOpenAIConnectionError] = useState<string | null>(null)
+  const [openAIApiKey, setOpenAIApiKey] = useState('')
   const availableLessons = useMemo(() => PICO_LESSONS, [])
   const selectedLesson = useMemo(
     () => availableLessons.find((lesson) => lesson.slug === lessonSlug) ?? null,
@@ -151,6 +197,56 @@ export function PicoTutorPageClient() {
       actions.setPlatform({ activeSurface: 'tutor' })
     }
   }, [actions, progress.platform.activeSurface])
+
+  useEffect(() => {
+    if (session.status !== 'authenticated') {
+      setOpenAIConnection(null)
+      setOpenAIConnectionLoading(false)
+      setOpenAIConnectionError(null)
+      return
+    }
+
+    let cancelled = false
+    setOpenAIConnectionLoading(true)
+    setOpenAIConnectionError(null)
+
+    async function loadConnection() {
+      try {
+        const response = await fetch('/api/pico/tutor/openai', {
+          credentials: 'include',
+          cache: 'no-store',
+        })
+        const payload = (await response.json().catch(() => null)) as TutorOpenAIConnectionApiResponse | null
+
+        if (cancelled) {
+          return
+        }
+
+        if (!response.ok) {
+          throw new Error(readApiErrorMessage(payload) || 'Failed to load OpenAI connection')
+        }
+
+        setOpenAIConnection(payload as TutorOpenAIConnection)
+      } catch (loadError) {
+        if (!cancelled) {
+          setOpenAIConnection(null)
+          setOpenAIConnectionError(
+            loadError instanceof Error ? loadError.message : 'Failed to load OpenAI connection',
+          )
+        }
+      } finally {
+        if (!cancelled) {
+          setOpenAIConnectionLoading(false)
+        }
+      }
+    }
+
+    void loadConnection()
+
+    return () => {
+      cancelled = true
+    }
+  }, [session.status])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -196,7 +292,7 @@ export function PicoTutorPageClient() {
       })
       const payload = (await response.json()) as TutorApiResponse
       if (!response.ok) {
-        throw new Error(payload.detail || 'Tutor request failed')
+        throw new Error(readApiErrorMessage(payload) || 'Tutor request failed')
       }
 
       const normalizedReply = normalizeTutorReplyPayload(payload)
@@ -219,6 +315,66 @@ export function PicoTutorPageClient() {
       setError(submitError instanceof Error ? submitError.message : 'Tutor request failed')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function connectOpenAI() {
+    if (!openAIApiKey.trim()) {
+      setOpenAIConnectionError('Paste an OpenAI API key first')
+      return
+    }
+
+    setOpenAIConnectionSaving(true)
+    setOpenAIConnectionError(null)
+    try {
+      const response = await fetch('/api/pico/tutor/openai', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ apiKey: openAIApiKey.trim() }),
+      })
+      const payload = (await response.json().catch(() => null)) as TutorOpenAIConnectionApiResponse | null
+
+      if (!response.ok) {
+        throw new Error(readApiErrorMessage(payload) || 'Failed to connect the OpenAI key')
+      }
+
+      setOpenAIConnection(payload as TutorOpenAIConnection)
+      setOpenAIApiKey('')
+    } catch (connectError) {
+      setOpenAIConnectionError(
+        connectError instanceof Error ? connectError.message : 'Failed to connect the OpenAI key',
+      )
+    } finally {
+      setOpenAIConnectionSaving(false)
+    }
+  }
+
+  async function disconnectOpenAI() {
+    setOpenAIConnectionSaving(true)
+    setOpenAIConnectionError(null)
+    try {
+      const response = await fetch('/api/pico/tutor/openai', {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      const payload = (await response.json().catch(() => null)) as TutorOpenAIConnectionApiResponse | null
+
+      if (!response.ok) {
+        throw new Error(readApiErrorMessage(payload) || 'Failed to disconnect the OpenAI key')
+      }
+
+      setOpenAIConnection(payload as TutorOpenAIConnection)
+    } catch (disconnectError) {
+      setOpenAIConnectionError(
+        disconnectError instanceof Error
+          ? disconnectError.message
+          : 'Failed to disconnect the OpenAI key',
+      )
+    } finally {
+      setOpenAIConnectionSaving(false)
     }
   }
 
@@ -459,6 +615,80 @@ export function PicoTutorPageClient() {
                   </div>
                 </div>
               ) : null}
+
+              <div className={picoInset('mt-4 p-4')}>
+                <div data-testid="pico-openai-connect-panel">
+                  <p className={picoClasses.label}>OpenAI connection</p>
+                  <div className="mt-3 rounded-[18px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] p-4">
+                    <p
+                      className="text-sm leading-6 text-[#d5c0a8]"
+                      data-testid="pico-openai-connect-status"
+                    >
+                      {session.status !== 'authenticated'
+                        ? 'Sign in to attach your own OpenAI key. Tutor still works in read-only mode without a personal connection.'
+                        : openAIConnectionLoading
+                          ? 'Checking whether your OpenAI key is already connected.'
+                          : openAIConnection?.message ??
+                            'Connect an OpenAI key if you want your own live Tutor quota and model access.'}
+                    </p>
+                    {session.status === 'authenticated' ? (
+                      <div className="mt-4 grid gap-3">
+                        {openAIConnection?.status === 'connected' ? (
+                          <div className={picoSoft('p-4')}>
+                            <p className="font-medium text-[#fff4e6]">
+                              Connected {openAIConnection.maskedKey ? `as ${openAIConnection.maskedKey}` : 'key'}
+                            </p>
+                            <p className="mt-2 text-sm leading-6 text-[#d5c0a8]">
+                              Live Tutor answers now prefer your own OpenAI access before any platform fallback.
+                            </p>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              <span className={picoClasses.chip}>{openAIConnection.model}</span>
+                              <span className={picoClasses.chip}>source: {openAIConnection.source}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => void disconnectOpenAI()}
+                              disabled={openAIConnectionSaving}
+                              className={cn(picoClasses.secondaryButton, 'mt-4')}
+                            >
+                              {openAIConnectionSaving ? 'Disconnecting...' : 'Disconnect OpenAI'}
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <label className="block text-sm text-[#d5c0a8]">
+                              <span className={picoClasses.label}>Bring your own OpenAI key</span>
+                              <input
+                                type="password"
+                                value={openAIApiKey}
+                                onChange={(event) => setOpenAIApiKey(event.target.value)}
+                                placeholder="sk-proj-..."
+                                className="mt-3 w-full rounded-[18px] border border-[#4a3423] bg-[rgba(255,247,235,0.03)] px-4 py-3 text-sm text-[#f6e7d4] outline-none placeholder:text-[#8f7157]"
+                              />
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => void connectOpenAI()}
+                              disabled={openAIConnectionSaving}
+                              className={picoClasses.secondaryButton}
+                            >
+                              {openAIConnectionSaving ? 'Connecting OpenAI...' : 'Connect OpenAI'}
+                            </button>
+                          </>
+                        )}
+                        {openAIConnection?.status === 'platform' ? (
+                          <p className="text-xs leading-6 text-[#a8896e]">
+                            Platform access is already available. Connecting your own key simply overrides the Tutor model budget and ownership path for this account.
+                          </p>
+                        ) : null}
+                      </div>
+                    ) : null}
+                    {openAIConnectionError ? (
+                      <p className="mt-3 text-sm leading-6 text-rose-200">{openAIConnectionError}</p>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
 
               <div className={picoInset('mt-4 p-4')}>
                 <p className={picoClasses.label}>Escalation rule</p>
