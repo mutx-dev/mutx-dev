@@ -105,7 +105,7 @@ export type MarketingHomepage = {
 
 const homepageActions: MarketingActionLink[] = [
   {
-    label: 'Go to PicoMUTX',
+    label: 'Pre-register for PicoMUTX',
     href: 'https://pico.mutx.dev',
     external: true,
     tone: 'primary',
@@ -280,12 +280,12 @@ export const marketingHomepage: MarketingHomepage = {
     eyebrow: 'Choose your first page',
     title: 'Enter through the lane that matches your attention span.',
     body:
-      'Some people want the guided product path. Some want the release lane. Some want the repo. The point is to let the work start where curiosity is already real.',
+      'Some people want the guided early-access lane. Some want the release lane. Some want the repo. The point is to let the work start where curiosity is already real.',
     items: [
       {
-        label: 'Guided path',
-        title: 'Open PicoMUTX',
-        body: 'Walk the lesson path, ask the tutor, and move through a live product surface instead of a marketing dead end.',
+        label: 'Early access',
+        title: 'Pre-register for PicoMUTX',
+        body: 'Join the guided early-access lane, claim founding access, and get into PicoMUTX as the staged rollout opens.',
         href: 'https://pico.mutx.dev',
         external: true,
       },
@@ -306,9 +306,9 @@ export const marketingHomepage: MarketingHomepage = {
   },
   cta: {
     eyebrow: 'Final page',
-    title: 'If the story works, the next step should be product, not persuasion.',
+    title: 'If the story works, the next step should be a truthful lane, not persuasion.',
     body:
-      'Download the Mac app, open PicoMUTX, or read the repo. The point of this front door is to get you to a truthful surface fast.',
+      'Download the Mac app, pre-register for PicoMUTX, or read the repo. The point of this front door is to get you to a truthful lane fast.',
     quote: 'A control plane should read like a calm book in the middle of a messy week.',
     mediaSrc: '/landing/webp/reading-bench.webp',
     mediaAlt: 'A quiet reading scene that closes the public narrative with a calmer note.',
@@ -319,7 +319,7 @@ export const marketingHomepage: MarketingHomepage = {
         tone: 'primary',
       },
       {
-        label: 'Go to PicoMUTX',
+        label: 'Pre-register for PicoMUTX',
         href: 'https://pico.mutx.dev',
         external: true,
         tone: 'secondary',

@@ -77,7 +77,7 @@ class SwarmListResponse(BaseModel):
 
 @router.get("/blueprints", response_model=list[SwarmBlueprintResponse])
 async def list_swarm_blueprint_catalog(
-    current_user: User = Depends(get_current_user),
+    _current_user: User = Depends(get_current_user),
 ):
     """List curated multi-agent orchestration blueprints sourced from Orchestra Research."""
     return list_swarm_blueprints()

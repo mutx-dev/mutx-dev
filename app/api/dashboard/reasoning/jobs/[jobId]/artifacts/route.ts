@@ -30,7 +30,7 @@ export async function POST(
       },
     )
 
-    const payload = await response.json().catch(() => ({ detail: 'Failed to upload document artifact' }))
+    const payload = await response.json().catch(() => ({ detail: 'Failed to upload reasoning artifact' }))
     const nextResponse = NextResponse.json(payload, { status: response.status })
     if (tokenRefreshed && refreshedTokens) {
       applyAuthCookies(nextResponse, request, refreshedTokens)

@@ -14,9 +14,9 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL("https://app.mutx.dev"),
   robots: {
-    index: true,
-    follow: true,
-    nocache: false,
+    index: false,
+    follow: false,
+    nocache: true,
   },
   title: "Dashboard - MUTX",
   description: "Operator dashboard for agents, deployments, runs, budgets, webhooks, and governance.",

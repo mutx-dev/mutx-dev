@@ -1,3 +1,4 @@
+import { metadata as dashboardMetadata } from "../../app/dashboard/layout";
 import { metadata as forgotPasswordMetadata } from "../../app/forgot-password/layout";
 import { metadata as loginMetadata } from "../../app/login/layout";
 import { metadata as registerMetadata } from "../../app/register/layout";
@@ -5,6 +6,7 @@ import { metadata as resetPasswordMetadata } from "../../app/reset-password/layo
 import { metadata as verifyEmailMetadata } from "../../app/verify-email/layout";
 
 const noindexLayouts = [
+  ["dashboard", dashboardMetadata],
   ["forgot-password", forgotPasswordMetadata],
   ["login", loginMetadata],
   ["register", registerMetadata],

@@ -517,7 +517,7 @@ test.describe('mutx.dev QA', () => {
     await expect(
       page.getByText(/they look like a helpful run/i)
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: /go to picomutx/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /pre-register for picomutx/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^releases$/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /^docs$/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /view github/i }).first()).toBeVisible();
@@ -557,7 +557,7 @@ test.describe('mutx.dev QA', () => {
         });
       })
       .toBeGreaterThan(0.95);
-    expect(heroActions).toEqual(['Go to PicoMUTX', 'View GitHub', 'Releases']);
+    expect(heroActions).toEqual(['Pre-register for PicoMUTX', 'View GitHub', 'Releases']);
     expect(strayLargeLogos).toBe(0);
     await expect(page.getByTestId('marketing-loader-stage')).toHaveCount(0);
 
