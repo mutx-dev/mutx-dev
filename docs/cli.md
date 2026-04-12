@@ -162,6 +162,9 @@ Both lanes now:
 | `mutx assistant skills list --agent-id <id>` | List available and installed skills |
 | `mutx assistant skills install --agent-id <id> --skill-id <skill>` | Install a skill |
 | `mutx assistant skills remove --agent-id <id> --skill-id <skill>` | Remove a skill |
+| `mutx clawhub list` | Browse the full MUTX + Orchestra skill catalog |
+| `mutx clawhub bundles` | List curated Orchestra Research skill bundles |
+| `mutx clawhub install-bundle --agent-id <id> --bundle-id <bundle>` | Install a curated bundle |
 
 ### Agents + deployments
 

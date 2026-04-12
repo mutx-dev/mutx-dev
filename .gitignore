@@ -114,7 +114,7 @@ ui-worker-state.json
 mutx-engineering-agents/dispatch/
 
 # Skill registry cache
-skills/
+/skills/
 
 # Stale lock files (project uses npm, see packageManager in package.json)
 pnpm-lock.yaml

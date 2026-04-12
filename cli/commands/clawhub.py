@@ -69,10 +69,10 @@ def list_bundles():
     click.echo(f"{'ID':<32} | {'NAME':<28} | {'SKILLS':<13} | {'TEMPLATE':<28}")
     click.echo("-" * 113)
     for bundle in bundles:
+        skill_ratio = f"{bundle.get('available_skill_count', 0)}/{bundle.get('skill_count', 0)}"
         click.echo(
             f"{bundle['id']:<32} | {bundle['name'][:28]:<28} | "
-            f"{f\"{bundle.get('available_skill_count', 0)}/{bundle.get('skill_count', 0)}\":<13} | "
-            f"{str(bundle.get('recommended_template_id') or '')[:28]:<28}"
+            f"{skill_ratio:<13} | {str(bundle.get('recommended_template_id') or '')[:28]:<28}"
         )
 
 

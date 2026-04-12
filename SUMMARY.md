@@ -14,6 +14,7 @@
     * [Leads API](docs/api/leads.md)
     * [Webhooks and Ingestion API](docs/api/webhooks.md)
   * [CLI Guide](docs/cli.md)
+  * [Orchestra Research Skillpack](docs/orchestra-research.md)
   * [v1.3 Release Notes](docs/releases/v1.3.md)
   * [v1.4 Release Notes](docs/releases/v1.4.md)
   * [v1.4 Release Checklist](docs/releases/v1.4-checklist.md)

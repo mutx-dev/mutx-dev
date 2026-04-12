@@ -14,6 +14,7 @@ class Skill:
         self.author = data["author"]
         self.stars = data.get("stars", 0)
         self.category = data["category"]
+        self.source = data.get("source", "catalog")
         self.is_official = data.get("is_official", False)
         self.tags = list(data.get("tags") or [])
         self.path = data.get("path")

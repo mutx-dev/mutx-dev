@@ -465,7 +465,7 @@ export function DashboardOverviewPageClient() {
                       <div className="min-w-0">
                         <p className="truncate font-mono text-sm text-white">{run.id}</p>
                         <p className="mt-1 text-sm text-slate-400">
-                          Agent {run.agent_id.slice(0, 8)} · {run.trace_count} traces · {formatRelativeTime(run.started_at)}
+                          Agent {typeof run.agent_id === 'string' ? run.agent_id.slice(0, 8) : 'unknown'} · {run.trace_count} traces · {formatRelativeTime(run.started_at)}
                         </p>
                       </div>
                       <div className="flex items-start justify-between gap-3 md:flex-col md:items-end">
