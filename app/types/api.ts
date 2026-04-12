@@ -863,9 +863,29 @@ export interface paths {
         };
         /**
          * List Available Skills
-         * @description Returns the current MUTX/OpenClaw skill catalog.
+         * @description Returns the current MUTX skill catalog, including bundled Orchestra Research imports.
          */
         get: operations["list_available_skills_v1_clawhub_skills_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/clawhub/bundles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Available Skill Bundles
+         * @description Returns curated skill bundles for shipping common Orchestra Research stacks.
+         */
+        get: operations["list_available_skill_bundles_v1_clawhub_bundles_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -888,6 +908,26 @@ export interface paths {
          * @description Installs a skill to an agent's configuration.
          */
         post: operations["install_skill_v1_clawhub_install_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/clawhub/install-bundle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Install Bundle
+         * @description Installs all currently available skills from a curated bundle.
+         */
+        post: operations["install_bundle_v1_clawhub_install_bundle_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1387,6 +1427,280 @@ export interface paths {
          *     Traces are used to track the step-by-step execution of an agent.
          */
         post: operations["add_run_traces_v1_runs__run_id__traces_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Document Templates */
+        get: operations["get_document_templates_v1_documents_templates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Document Jobs Endpoint */
+        get: operations["list_document_jobs_endpoint_v1_documents_jobs_get"];
+        put?: never;
+        /** Create Document Job Endpoint */
+        post: operations["create_document_job_endpoint_v1_documents_jobs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Document Job Endpoint */
+        get: operations["get_document_job_endpoint_v1_documents_jobs__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/jobs/{job_id}/artifacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register Document Artifact Endpoint */
+        post: operations["register_document_artifact_endpoint_v1_documents_jobs__job_id__artifacts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/jobs/{job_id}/dispatch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dispatch Document Job Endpoint */
+        post: operations["dispatch_document_job_endpoint_v1_documents_jobs__job_id__dispatch_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/jobs/{job_id}/launch-local": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Launch Document Job Local Endpoint */
+        post: operations["launch_document_job_local_endpoint_v1_documents_jobs__job_id__launch_local_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/jobs/{job_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Append Document Job Event Endpoint */
+        post: operations["append_document_job_event_endpoint_v1_documents_jobs__job_id__events_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/documents/jobs/{job_id}/artifacts/{artifact_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download Document Artifact Endpoint */
+        get: operations["download_document_artifact_endpoint_v1_documents_jobs__job_id__artifacts__artifact_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reasoning/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Reasoning Templates */
+        get: operations["get_reasoning_templates_v1_reasoning_templates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reasoning/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Reasoning Jobs Endpoint */
+        get: operations["list_reasoning_jobs_endpoint_v1_reasoning_jobs_get"];
+        put?: never;
+        /** Create Reasoning Job Endpoint */
+        post: operations["create_reasoning_job_endpoint_v1_reasoning_jobs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reasoning/jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Reasoning Job Endpoint */
+        get: operations["get_reasoning_job_endpoint_v1_reasoning_jobs__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reasoning/jobs/{job_id}/artifacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register Reasoning Artifact Endpoint */
+        post: operations["register_reasoning_artifact_endpoint_v1_reasoning_jobs__job_id__artifacts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reasoning/jobs/{job_id}/dispatch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dispatch Reasoning Job Endpoint */
+        post: operations["dispatch_reasoning_job_endpoint_v1_reasoning_jobs__job_id__dispatch_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reasoning/jobs/{job_id}/launch-local": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Launch Reasoning Job Local Endpoint */
+        post: operations["launch_reasoning_job_local_endpoint_v1_reasoning_jobs__job_id__launch_local_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reasoning/jobs/{job_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Append Reasoning Job Event Endpoint */
+        post: operations["append_reasoning_job_event_endpoint_v1_reasoning_jobs__job_id__events_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/reasoning/jobs/{job_id}/artifacts/{artifact_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download Reasoning Artifact Endpoint */
+        get: operations["download_reasoning_artifact_endpoint_v1_reasoning_jobs__job_id__artifacts__artifact_id__get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2120,6 +2434,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/pico/tutor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pico Tutor */
+        post: operations["pico_tutor_v1_pico_tutor_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/runtime/providers/{provider}": {
         parameters: {
             query?: never;
@@ -2271,6 +2602,26 @@ export interface paths {
          *     Requires session_key to identify the session to delete.
          */
         delete: operations["delete_session_v1_sessions_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/swarms/blueprints": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Swarm Blueprint Catalog
+         * @description List curated multi-agent orchestration blueprints sourced from Orchestra Research.
+         */
+        get: operations["list_swarm_blueprint_catalog_v1_swarms_blueprints_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3913,6 +4264,21 @@ export interface components {
             tags?: string[];
             /** Path */
             path?: string | null;
+            /** Canonical Name */
+            canonical_name?: string | null;
+            /** Upstream Path */
+            upstream_path?: string | null;
+            /** Upstream Repo */
+            upstream_repo?: string | null;
+            /** Upstream Commit */
+            upstream_commit?: string | null;
+            /** License */
+            license?: string | null;
+            /**
+             * Available
+             * @default true
+             */
+            available: boolean;
         };
         /** AssistantTemplateResponse */
         AssistantTemplateResponse: {
@@ -3929,6 +4295,25 @@ export interface components {
             starter_prompt: string;
             /** Default Config */
             default_config: components["schemas"]["OpenClawAgentConfig"] | Record<string, never>;
+            /** Category */
+            category?: string | null;
+            /** Tags */
+            tags?: string[];
+            /**
+             * Is Official
+             * @default false
+             */
+            is_official: boolean;
+            /** Source Path */
+            source_path?: string | null;
+            /** Version */
+            version?: string | null;
+            /** Validation Status */
+            validation_status?: string | null;
+            /** Validation Message */
+            validation_message?: string | null;
+            /** Bundle Ids */
+            bundle_ids?: string[];
         };
         /** AssistantWakeupResponse */
         AssistantWakeupResponse: {
@@ -4044,6 +4429,42 @@ export interface components {
             reset_date: string;
             /** Usage Percentage */
             usage_percentage: number;
+        };
+        /** ClawHubSkillBundleResponse */
+        ClawHubSkillBundleResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Summary */
+            summary: string;
+            /** Description */
+            description: string;
+            /** Skill Ids */
+            skill_ids?: string[];
+            /**
+             * Skill Count
+             * @default 0
+             */
+            skill_count: number;
+            /**
+             * Available Skill Count
+             * @default 0
+             */
+            available_skill_count: number;
+            /** Unavailable Skill Ids */
+            unavailable_skill_ids?: string[];
+            /** Recommended Template Id */
+            recommended_template_id?: string | null;
+            /** Recommended Swarm Blueprint Id */
+            recommended_swarm_blueprint_id?: string | null;
+            /** Tags */
+            tags?: string[];
+            /**
+             * Source
+             * @default orchestra-research
+             */
+            source: string;
         };
         /** CommandAcknowledgeRequest */
         CommandAcknowledgeRequest: {
@@ -4403,6 +4824,229 @@ export interface components {
             /** Rolled Back At */
             rolled_back_at?: string | null;
         };
+        /** DocumentArtifactResponse */
+        DocumentArtifactResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Job Id
+             * Format: uuid
+             */
+            job_id: string;
+            /** Role */
+            role: string;
+            /** Kind */
+            kind: string;
+            /** Storage Backend */
+            storage_backend: string;
+            /** Storage Uri */
+            storage_uri?: string | null;
+            /** Local Path */
+            local_path?: string | null;
+            /** Filename */
+            filename: string;
+            /** Content Type */
+            content_type?: string | null;
+            /** Size Bytes */
+            size_bytes?: number | null;
+            /** Sha256 */
+            sha256?: string | null;
+            /** Metadata */
+            metadata?: Record<string, never>;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** DocumentJobCreate */
+        DocumentJobCreate: {
+            /** Template Id */
+            template_id: string;
+            /**
+             * Execution Mode
+             * @default managed
+             */
+            execution_mode: string;
+            /** Parameters */
+            parameters?: Record<string, never>;
+        };
+        /** DocumentJobDispatchRequest */
+        DocumentJobDispatchRequest: {
+            /**
+             * Mode
+             * @default managed
+             */
+            mode: string;
+        };
+        /** DocumentJobEventCreate */
+        DocumentJobEventCreate: {
+            /** Event Type */
+            event_type: string;
+            /** Message */
+            message?: string | null;
+            /** Payload */
+            payload?: Record<string, never>;
+            /** Status */
+            status?: string | null;
+            /** Output Text */
+            output_text?: string | null;
+            /** Error Message */
+            error_message?: string | null;
+            /** Result Summary */
+            result_summary?: Record<string, never> | null;
+            /** Timestamp */
+            timestamp?: string | null;
+        };
+        /** DocumentJobHistoryResponse */
+        DocumentJobHistoryResponse: {
+            /** Items */
+            items?: components["schemas"]["DocumentJobResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Status */
+            status?: string | null;
+            /** Template Id */
+            template_id?: string | null;
+        };
+        /** DocumentJobLocalLaunchRequest */
+        DocumentJobLocalLaunchRequest: {
+            /** Output Dir */
+            output_dir?: string | null;
+        };
+        /** DocumentJobLocalLaunchResponse */
+        DocumentJobLocalLaunchResponse: {
+            /**
+             * Job Id
+             * Format: uuid
+             */
+            job_id: string;
+            /** Template Id */
+            template_id: string;
+            /** Execution Mode */
+            execution_mode: string;
+            /** Manifest */
+            manifest?: Record<string, never>;
+            /** Artifacts */
+            artifacts?: components["schemas"]["DocumentArtifactResponse"][];
+        };
+        /** DocumentJobResponse */
+        DocumentJobResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /** Template Id */
+            template_id: string;
+            /** Execution Mode */
+            execution_mode: string;
+            /** Status */
+            status: string;
+            /** Parameters */
+            parameters?: Record<string, never>;
+            /** Result Summary */
+            result_summary?: Record<string, never>;
+            /** Error Message */
+            error_message?: string | null;
+            /** Claimed By */
+            claimed_by?: string | null;
+            /** Claimed At */
+            claimed_at?: string | null;
+            /** Last Heartbeat At */
+            last_heartbeat_at?: string | null;
+            /**
+             * Attempts
+             * @default 0
+             */
+            attempts: number;
+            /** Dispatched At */
+            dispatched_at?: string | null;
+            /** Completed At */
+            completed_at?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Artifacts */
+            artifacts?: components["schemas"]["DocumentArtifactResponse"][];
+        };
+        /** DocumentTemplateFieldResponse */
+        DocumentTemplateFieldResponse: {
+            /** Name */
+            name: string;
+            /** Type */
+            type: string;
+            /**
+             * Required
+             * @default true
+             */
+            required: boolean;
+            /**
+             * Accepts Multiple
+             * @default false
+             */
+            accepts_multiple: boolean;
+            /** Description */
+            description: string;
+        };
+        /** DocumentTemplateOutputResponse */
+        DocumentTemplateOutputResponse: {
+            /** Role */
+            role: string;
+            /** Kind */
+            kind: string;
+            /** Description */
+            description: string;
+        };
+        /** DocumentTemplateResponse */
+        DocumentTemplateResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Summary */
+            summary: string;
+            /** Description */
+            description: string;
+            /**
+             * Supports Managed
+             * @default true
+             */
+            supports_managed: boolean;
+            /**
+             * Supports Local
+             * @default true
+             */
+            supports_local: boolean;
+            /** Inputs */
+            inputs?: components["schemas"]["DocumentTemplateFieldResponse"][];
+            /** Outputs */
+            outputs?: components["schemas"]["DocumentTemplateOutputResponse"][];
+        };
         /**
          * EmbedRequest
          * @description Request model for embedding generation.
@@ -4537,6 +5181,16 @@ export interface components {
             collection_name: string;
             /** Document Count */
             document_count: number;
+        };
+        /** InstallSkillBundleRequest */
+        InstallSkillBundleRequest: {
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /** Bundle Id */
+            bundle_id: string;
         };
         /** InstallSkillRequest */
         InstallSkillRequest: {
@@ -5621,6 +6275,139 @@ export interface components {
         };
         /** PicoProgressPayload */
         PicoProgressPayload: Record<string, never>;
+        /** PicoTutorCommand */
+        PicoTutorCommand: {
+            /** Label */
+            label: string;
+            /** Code */
+            code: string;
+            /**
+             * Language
+             * @default bash
+             */
+            language: string;
+            /** Note */
+            note?: string | null;
+        };
+        /** PicoTutorDocLink */
+        PicoTutorDocLink: {
+            /** Label */
+            label: string;
+            /** Href */
+            href: string;
+            /** Sourcepath */
+            sourcePath: string;
+        };
+        /** PicoTutorLessonLink */
+        PicoTutorLessonLink: {
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /** Href */
+            href: string;
+        };
+        /** PicoTutorRequest */
+        PicoTutorRequest: {
+            /** Question */
+            question: string;
+            /** Lessonslug */
+            lessonSlug?: string | null;
+            /** Progress */
+            progress?: Record<string, never> | null;
+            setupContext?: components["schemas"]["PicoTutorSetupContext"] | null;
+        };
+        /** PicoTutorResponse */
+        PicoTutorResponse: {
+            /** Title */
+            title: string;
+            /** Summary */
+            summary: string;
+            /** Answer */
+            answer: string;
+            /**
+             * Confidence
+             * @enum {string}
+             */
+            confidence: "high" | "medium" | "low";
+            /** Nextactions */
+            nextActions?: string[];
+            /** Lessons */
+            lessons?: components["schemas"]["PicoTutorLessonLink"][];
+            /** Docs */
+            docs?: components["schemas"]["PicoTutorDocLink"][];
+            /** Recommendedlessonids */
+            recommendedLessonIds?: string[];
+            /**
+             * Escalate
+             * @default false
+             */
+            escalate: boolean;
+            /** Escalationreason */
+            escalationReason?: string | null;
+            structured: components["schemas"]["PicoTutorStructuredReply"];
+            /**
+             * Intent
+             * @enum {string}
+             */
+            intent: "choose" | "install" | "repair" | "migrate" | "compare" | "tailscale" | "optimize" | "integrate";
+            /**
+             * Skilllevel
+             * @enum {string}
+             */
+            skillLevel: "beginner" | "intermediate" | "advanced";
+            /**
+             * Usedofficialfallback
+             * @default false
+             */
+            usedOfficialFallback: boolean;
+        };
+        /** PicoTutorSetupContext */
+        PicoTutorSetupContext: {
+            /** Onboarding */
+            onboarding?: Record<string, never> | null;
+            /** Runtime */
+            runtime?: Record<string, never> | null;
+            /** Currentsurface */
+            currentSurface?: string | null;
+        };
+        /** PicoTutorSource */
+        PicoTutorSource: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "lesson" | "knowledge_pack" | "official";
+            /** Title */
+            title: string;
+            /** Sourcepath */
+            sourcePath: string;
+            /** Href */
+            href?: string | null;
+            /** Excerpt */
+            excerpt?: string | null;
+        };
+        /** PicoTutorStructuredReply */
+        PicoTutorStructuredReply: {
+            /** Situation */
+            situation: string;
+            /** Diagnosis */
+            diagnosis: string;
+            /** Steps */
+            steps?: string[];
+            /** Commands */
+            commands?: components["schemas"]["PicoTutorCommand"][];
+            /** Verify */
+            verify?: string[];
+            /** Ifthisfails */
+            ifThisFails?: string[];
+            /** Officiallinks */
+            officialLinks?: components["schemas"]["PicoTutorDocLink"][];
+            /** Sources */
+            sources?: components["schemas"]["PicoTutorSource"][];
+            /** Nextquestion */
+            nextQuestion?: string | null;
+        };
         /**
          * Policy
          * @description A named collection of rules with versioning and enablement.
@@ -5656,6 +6443,229 @@ export interface components {
             enabled: boolean;
             /** Cue */
             cue?: string | null;
+        };
+        /** ReasoningArtifactResponse */
+        ReasoningArtifactResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Job Id
+             * Format: uuid
+             */
+            job_id: string;
+            /** Role */
+            role: string;
+            /** Kind */
+            kind: string;
+            /** Storage Backend */
+            storage_backend: string;
+            /** Storage Uri */
+            storage_uri?: string | null;
+            /** Local Path */
+            local_path?: string | null;
+            /** Filename */
+            filename: string;
+            /** Content Type */
+            content_type?: string | null;
+            /** Size Bytes */
+            size_bytes?: number | null;
+            /** Sha256 */
+            sha256?: string | null;
+            /** Metadata */
+            metadata?: Record<string, never>;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ReasoningJobCreate */
+        ReasoningJobCreate: {
+            /** Template Id */
+            template_id: string;
+            /**
+             * Execution Mode
+             * @default managed
+             */
+            execution_mode: string;
+            /** Parameters */
+            parameters?: Record<string, never>;
+        };
+        /** ReasoningJobDispatchRequest */
+        ReasoningJobDispatchRequest: {
+            /**
+             * Mode
+             * @default managed
+             */
+            mode: string;
+        };
+        /** ReasoningJobEventCreate */
+        ReasoningJobEventCreate: {
+            /** Event Type */
+            event_type: string;
+            /** Message */
+            message?: string | null;
+            /** Payload */
+            payload?: Record<string, never>;
+            /** Status */
+            status?: string | null;
+            /** Output Text */
+            output_text?: string | null;
+            /** Error Message */
+            error_message?: string | null;
+            /** Result Summary */
+            result_summary?: Record<string, never> | null;
+            /** Timestamp */
+            timestamp?: string | null;
+        };
+        /** ReasoningJobHistoryResponse */
+        ReasoningJobHistoryResponse: {
+            /** Items */
+            items?: components["schemas"]["ReasoningJobResponse"][];
+            /** Total */
+            total: number;
+            /** Skip */
+            skip: number;
+            /** Limit */
+            limit: number;
+            /** Status */
+            status?: string | null;
+            /** Template Id */
+            template_id?: string | null;
+        };
+        /** ReasoningJobLocalLaunchRequest */
+        ReasoningJobLocalLaunchRequest: {
+            /** Output Dir */
+            output_dir?: string | null;
+        };
+        /** ReasoningJobLocalLaunchResponse */
+        ReasoningJobLocalLaunchResponse: {
+            /**
+             * Job Id
+             * Format: uuid
+             */
+            job_id: string;
+            /** Template Id */
+            template_id: string;
+            /** Execution Mode */
+            execution_mode: string;
+            /** Manifest */
+            manifest?: Record<string, never>;
+            /** Artifacts */
+            artifacts?: components["schemas"]["ReasoningArtifactResponse"][];
+        };
+        /** ReasoningJobResponse */
+        ReasoningJobResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Run Id
+             * Format: uuid
+             */
+            run_id: string;
+            /** Template Id */
+            template_id: string;
+            /** Execution Mode */
+            execution_mode: string;
+            /** Status */
+            status: string;
+            /** Parameters */
+            parameters?: Record<string, never>;
+            /** Result Summary */
+            result_summary?: Record<string, never>;
+            /** Error Message */
+            error_message?: string | null;
+            /** Claimed By */
+            claimed_by?: string | null;
+            /** Claimed At */
+            claimed_at?: string | null;
+            /** Last Heartbeat At */
+            last_heartbeat_at?: string | null;
+            /**
+             * Attempts
+             * @default 0
+             */
+            attempts: number;
+            /** Dispatched At */
+            dispatched_at?: string | null;
+            /** Completed At */
+            completed_at?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Artifacts */
+            artifacts?: components["schemas"]["ReasoningArtifactResponse"][];
+        };
+        /** ReasoningTemplateFieldResponse */
+        ReasoningTemplateFieldResponse: {
+            /** Name */
+            name: string;
+            /** Type */
+            type: string;
+            /**
+             * Required
+             * @default true
+             */
+            required: boolean;
+            /**
+             * Accepts Multiple
+             * @default false
+             */
+            accepts_multiple: boolean;
+            /** Description */
+            description: string;
+        };
+        /** ReasoningTemplateOutputResponse */
+        ReasoningTemplateOutputResponse: {
+            /** Role */
+            role: string;
+            /** Kind */
+            kind: string;
+            /** Description */
+            description: string;
+        };
+        /** ReasoningTemplateResponse */
+        ReasoningTemplateResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Summary */
+            summary: string;
+            /** Description */
+            description: string;
+            /**
+             * Supports Managed
+             * @default true
+             */
+            supports_managed: boolean;
+            /**
+             * Supports Local
+             * @default true
+             */
+            supports_local: boolean;
+            /** Inputs */
+            inputs?: components["schemas"]["ReasoningTemplateFieldResponse"][];
+            /** Outputs */
+            outputs?: components["schemas"]["ReasoningTemplateOutputResponse"][];
         };
         /** RefreshRequest */
         RefreshRequest: {
@@ -5771,11 +6781,8 @@ export interface components {
              * Format: uuid
              */
             id: string;
-            /**
-             * Agent Id
-             * Format: uuid
-             */
-            agent_id: string;
+            /** Agent Id */
+            agent_id?: string | null;
             /** Status */
             status: string;
             /** Input Text */
@@ -5803,6 +6810,16 @@ export interface components {
              * @default 0
              */
             trace_count: number;
+            /** Subject Type */
+            subject_type?: string | null;
+            /** Subject Id */
+            subject_id?: string | null;
+            /** Subject Label */
+            subject_label?: string | null;
+            /** Template Id */
+            template_id?: string | null;
+            /** Execution Mode */
+            execution_mode?: string | null;
             /** Traces */
             traces?: components["schemas"]["RunTraceResponse"][];
         };
@@ -5828,11 +6845,8 @@ export interface components {
              * Format: uuid
              */
             id: string;
-            /**
-             * Agent Id
-             * Format: uuid
-             */
-            agent_id: string;
+            /** Agent Id */
+            agent_id?: string | null;
             /** Status */
             status: string;
             /** Input Text */
@@ -5860,6 +6874,16 @@ export interface components {
              * @default 0
              */
             trace_count: number;
+            /** Subject Type */
+            subject_type?: string | null;
+            /** Subject Id */
+            subject_id?: string | null;
+            /** Subject Label */
+            subject_label?: string | null;
+            /** Template Id */
+            template_id?: string | null;
+            /** Execution Mode */
+            execution_mode?: string | null;
         };
         /** RunTraceCreate */
         RunTraceCreate: {
@@ -6271,26 +7295,6 @@ export interface components {
             /** Sessions */
             sessions: Record<string, never>[];
         };
-        /** Skill */
-        Skill: {
-            /** Id */
-            id: string;
-            /** Name */
-            name: string;
-            /** Description */
-            description: string;
-            /** Author */
-            author: string;
-            /** Stars */
-            stars: number;
-            /** Category */
-            category: string;
-            /**
-             * Is Official
-             * @default false
-             */
-            is_official: boolean;
-        };
         /** StarterDeploymentCreate */
         StarterDeploymentCreate: {
             /**
@@ -6374,6 +7378,44 @@ export interface components {
             status: string;
             /** Replicas */
             replicas: number;
+        };
+        /** SwarmBlueprintResponse */
+        SwarmBlueprintResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Summary */
+            summary: string;
+            /** Description */
+            description: string;
+            /** Roles */
+            roles?: components["schemas"]["SwarmBlueprintRoleResponse"][];
+            /**
+             * Recommended Min Agents
+             * @default 1
+             */
+            recommended_min_agents: number;
+            /**
+             * Recommended Max Agents
+             * @default 1
+             */
+            recommended_max_agents: number;
+            /** Coordination Notes */
+            coordination_notes: string;
+            /** Tags */
+            tags?: string[];
+        };
+        /** SwarmBlueprintRoleResponse */
+        SwarmBlueprintRoleResponse: {
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /** Bundle Id */
+            bundle_id: string;
+            /** Goal */
+            goal: string;
         };
         /** SwarmCreate */
         SwarmCreate: {
@@ -8660,7 +9702,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Skill"][];
+                    "application/json": components["schemas"]["AssistantSkillResponse"][];
+                };
+            };
+        };
+    };
+    list_available_skill_bundles_v1_clawhub_bundles_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClawHubSkillBundleResponse"][];
                 };
             };
         };
@@ -8677,6 +9739,41 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["InstallSkillRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    install_bundle_v1_clawhub_install_bundle_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InstallSkillBundleRequest"];
             };
         };
         responses: {
@@ -9831,6 +10928,610 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RunTraceHistoryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_document_templates_v1_documents_templates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentTemplateResponse"][];
+                };
+            };
+        };
+    };
+    list_document_jobs_endpoint_v1_documents_jobs_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                status?: string | null;
+                template_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentJobHistoryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_document_job_endpoint_v1_documents_jobs_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentJobCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_document_job_endpoint_v1_documents_jobs__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    register_document_artifact_endpoint_v1_documents_jobs__job_id__artifacts_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentArtifactResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dispatch_document_job_endpoint_v1_documents_jobs__job_id__dispatch_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentJobDispatchRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    launch_document_job_local_endpoint_v1_documents_jobs__job_id__launch_local_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentJobLocalLaunchRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentJobLocalLaunchResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    append_document_job_event_endpoint_v1_documents_jobs__job_id__events_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentJobEventCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_document_artifact_endpoint_v1_documents_jobs__job_id__artifacts__artifact_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                job_id: string;
+                artifact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_reasoning_templates_v1_reasoning_templates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReasoningTemplateResponse"][];
+                };
+            };
+        };
+    };
+    list_reasoning_jobs_endpoint_v1_reasoning_jobs_get: {
+        parameters: {
+            query?: {
+                skip?: number;
+                limit?: number;
+                status?: string | null;
+                template_id?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReasoningJobHistoryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_reasoning_job_endpoint_v1_reasoning_jobs_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReasoningJobCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReasoningJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_reasoning_job_endpoint_v1_reasoning_jobs__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReasoningJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    register_reasoning_artifact_endpoint_v1_reasoning_jobs__job_id__artifacts_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReasoningArtifactResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dispatch_reasoning_job_endpoint_v1_reasoning_jobs__job_id__dispatch_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReasoningJobDispatchRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReasoningJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    launch_reasoning_job_local_endpoint_v1_reasoning_jobs__job_id__launch_local_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReasoningJobLocalLaunchRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReasoningJobLocalLaunchResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    append_reasoning_job_event_endpoint_v1_reasoning_jobs__job_id__events_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReasoningJobEventCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReasoningJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_reasoning_artifact_endpoint_v1_reasoning_jobs__job_id__artifacts__artifact_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                job_id: string;
+                artifact_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
@@ -11283,6 +12984,41 @@ export interface operations {
             };
         };
     };
+    pico_tutor_v1_pico_tutor_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PicoTutorRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PicoTutorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     runtime_provider_state_v1_runtime_providers__provider__get: {
         parameters: {
             query?: never;
@@ -11707,6 +13443,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SessionActionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_swarm_blueprint_catalog_v1_swarms_blueprints_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SwarmBlueprintResponse"][];
                 };
             };
             /** @description Validation Error */

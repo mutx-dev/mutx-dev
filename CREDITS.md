@@ -194,6 +194,18 @@ SOFTWARE.
 
 ---
 
+### Orchestra Research AI-Research-SKILLs
+
+**Repository:** https://github.com/Orchestra-Research/AI-Research-SKILLs
+
+**License:** MIT
+
+**Contribution:** MUTX now ships a pinned integration against Orchestra Research's AI research skill library. The repo imports catalog metadata from upstream commit `05f1958727bfc2bc22240f41d060504473c4f236`, curates install bundles and swarm blueprints, and exposes a runtime sync path via `scripts/sync_orchestra_research_skills.py`.
+
+This is an integration and attribution layer, not a claim of authorship over the upstream skill content. The skill content remains credited to Orchestra Research and the upstream project authors they documented.
+
+---
+
 ## Full License Texts
 
 The incorporated projects listed above currently use the MIT License. See their repositories for full license texts:

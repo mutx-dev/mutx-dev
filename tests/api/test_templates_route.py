@@ -3,7 +3,6 @@
 import pytest
 from httpx import AsyncClient
 
-
 # ---------------------------------------------------------------------------
 # GET /v1/templates  — list templates
 # ---------------------------------------------------------------------------
@@ -33,6 +32,15 @@ async def test_list_templates_has_required_fields(client: AsyncClient):
         assert "agent_type" in template
 
 
+@pytest.mark.asyncio
+async def test_list_templates_includes_orchestra_research_presets(client: AsyncClient):
+    response = await client.get("/v1/templates")
+    assert response.status_code == 200
+    template_ids = {item["id"] for item in response.json()}
+    assert "orchestra_research_foundation" in template_ids
+    assert "orchestra_rag_lab" in template_ids
+
+
 # ---------------------------------------------------------------------------
 # POST /v1/templates/{template_id}/deploy  — deploy template
 # ---------------------------------------------------------------------------
@@ -52,7 +60,6 @@ async def test_deploy_template_not_found(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_deploy_template_default_success(client: AsyncClient):
     """Deploying the default starter template creates agent + deployment."""
-    # First, find the default template ID from the catalog
     list_resp = await client.get("/v1/templates")
     templates = list_resp.json()
     if not templates:

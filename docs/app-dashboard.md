@@ -65,13 +65,13 @@ Stable pages:
 - runs and traces
 - sessions and swarms
 - budgets and monitoring
+- skills and bundles
 - API keys
 - webhooks
 
 Preview/demo or redirect-backed pages:
 
 - channels
-- skills
 - orchestration
 - memory
 - spawn

@@ -11,7 +11,6 @@ import pytest
 
 from mutx.swarms import Swarm, SwarmAgent, Swarms
 
-
 # ---------------------------------------------------------------------------
 # Payload helpers
 # ---------------------------------------------------------------------------
@@ -78,6 +77,46 @@ def test_swarms_list_hits_contract_route_and_maps_payload() -> None:
     assert len(swarms[0].agents) == 2
     assert swarms[0].agents[0].agent_name == "agent-1"
     assert swarms[0].agents[0].replicas == 2
+
+
+def test_swarms_list_blueprints_hits_contract_route() -> None:
+    captured: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["path"] = request.url.path
+        return httpx.Response(
+            200,
+            json=[
+                {
+                    "id": "research-triad",
+                    "name": "Research Triad",
+                    "summary": "One orchestrator, one scout, one executor",
+                    "description": "Curated multi-agent preset",
+                    "recommended_min_agents": 3,
+                    "recommended_max_agents": 5,
+                    "coordination_notes": "Review every loop.",
+                    "tags": ["research"],
+                    "roles": [
+                        {
+                            "id": "orchestrator",
+                            "title": "Research Orchestrator",
+                            "bundle_id": "orchestra-research-foundation",
+                            "goal": "Own findings and routing",
+                        }
+                    ],
+                }
+            ],
+        )
+
+    with httpx.Client(
+        base_url="https://api.test", transport=httpx.MockTransport(handler)
+    ) as client:
+        blueprints = Swarms(client).list_blueprints()
+
+    assert captured["path"] == "/swarms/blueprints"
+    assert len(blueprints) == 1
+    assert blueprints[0].id == "research-triad"
+    assert blueprints[0].roles[0].bundle_id == "orchestra-research-foundation"
 
 
 def test_swarms_get_hits_contract_route_and_maps_payload() -> None:
@@ -309,9 +348,7 @@ def test_swarm_parser_accepts_optional_description() -> None:
 def test_swarm_parser_nested_agents() -> None:
     agent_id = str(uuid.uuid4())
     payload = _swarm_payload(
-        agents=[
-            {"agent_id": agent_id, "agent_name": "alpha", "status": "running", "replicas": 4}
-        ]
+        agents=[{"agent_id": agent_id, "agent_name": "alpha", "status": "running", "replicas": 4}]
     )
 
     swarm = Swarm(payload)
@@ -330,9 +367,7 @@ def test_swarm_repr() -> None:
 
 
 def test_swarm_agent_repr() -> None:
-    agent = SwarmAgent(
-        {"agent_id": "a1", "agent_name": "beta", "status": "idle", "replicas": 1}
-    )
+    agent = SwarmAgent({"agent_id": "a1", "agent_name": "beta", "status": "idle", "replicas": 1})
     # SwarmAgent has the expected attributes but no custom __repr__
     assert agent.agent_id == "a1"
     assert agent.agent_name == "beta"
